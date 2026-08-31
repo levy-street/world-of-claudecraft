@@ -155,6 +155,51 @@ export const RELIQUARY_SLAIN_GLYPH_URL = `data:image/svg+xml,${encodeURIComponen
   SLAIN_GLYPH_SVG,
 )}`;
 
+/** The farm-bed field note (masterwrought Phase 18). */
+const GOLDEN_HARVEST_MARK_ID = 'gather_event:golden_harvest';
+
+/** Marker id carried by the golden-harvest glyph. */
+export const RELIQUARY_GOLDEN_HARVEST_GLYPH_ID = 'woc-golden-harvest-glyph';
+
+// The golden harvest: a bound wheat sheaf in the same DESIGN.md section 6
+// direction the two glyphs above take (rich color, heavy dark outline, light
+// from the top left, double-quoted attributes only so the window's esc()
+// leaves the encoding alone). It is AUTHORED rather than borrowed because
+// farming is the one FIELD_NOTE_PROFESSIONS member with no committed
+// gather_* sheet art, and the specimen note set the precedent for a field
+// note owning its own image when no profession art can be borrowed.
+const SHEAF_BAND_PATH = 'M23 36h18l-2 9H25z';
+const GOLDEN_HARVEST_GLYPH_SVG =
+  `<svg id="${RELIQUARY_GOLDEN_HARVEST_GLYPH_ID}" xmlns="http://www.w3.org/2000/svg" ` +
+  'viewBox="0 0 64 64" width="64" height="64">' +
+  '<defs>' +
+  '<linearGradient id="w" x1="18%" y1="4%" x2="84%" y2="94%">' +
+  '<stop offset="0" stop-color="#fff3b8"/><stop offset="46%" stop-color="#e0a92c"/>' +
+  '<stop offset="1" stop-color="#7a4d10"/></linearGradient>' +
+  '<linearGradient id="t" x1="10%" y1="0%" x2="90%" y2="100%">' +
+  '<stop offset="0" stop-color="#8a6a2c"/><stop offset="1" stop-color="#3a2408"/></linearGradient>' +
+  '</defs>' +
+  '<path d="M32 6c5 5 7 11 6 18-5-1-8-5-9-10z" fill="url(#w)" stroke="#0a0603" ' +
+  'stroke-width="3.5" stroke-linejoin="round"/>' +
+  '<path d="M17 13c6 3 9 9 9 16-5-1-9-5-11-10z" fill="url(#w)" stroke="#0a0603" ' +
+  'stroke-width="3.5" stroke-linejoin="round"/>' +
+  '<path d="M47 13c-6 3-9 9-9 16 5-1 9-5 11-10z" fill="url(#w)" stroke="#0a0603" ' +
+  'stroke-width="3.5" stroke-linejoin="round"/>' +
+  '<path d="M26 27h12l4 31H22z" fill="url(#w)" stroke="#0a0603" stroke-width="3.5" ' +
+  'stroke-linejoin="round"/>' +
+  `<path d="${SHEAF_BAND_PATH}" fill="url(#t)" stroke="#0a0603" stroke-width="3.5" ` +
+  'stroke-linejoin="round"/>' +
+  '<path d="M30 11c1 3 2 6 2 9" fill="none" stroke="#fffbe2" stroke-width="2.4" ' +
+  'stroke-linecap="round" opacity="0.85"/>' +
+  '<path d="M28 31v22M36 31v22" fill="none" stroke="#8a6a2c" stroke-width="2" ' +
+  'stroke-linecap="round" opacity="0.55"/>' +
+  '</svg>';
+
+/** The golden-harvest field note as an `<img>`-ready percent-encoded src. */
+export const RELIQUARY_GOLDEN_HARVEST_IMAGE_URL = `data:image/svg+xml,${encodeURIComponent(
+  GOLDEN_HARVEST_GLYPH_SVG,
+)}`;
+
 /**
  * Art for one relic slot, or null when this bundle cannot place it (an id from
  * a newer server, a content id that moved, a kind with no art seam). Null is a
@@ -251,6 +296,13 @@ function markArt(markId: string): ReliquaryCellArt | null {
       url: RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
       fallbackUrl: RELIQUARY_SPECIMEN_GLYPH_URL,
     };
+  }
+  if (markId === GOLDEN_HARVEST_MARK_ID) {
+    // Named before the FIELD_NOTE_PROFESSIONS lookup below because farming is
+    // the one member with no committed gather_* sheet art: the lookup would
+    // answer a URL that does not ship. Its own glyph instead, the specimen
+    // note's answer to the same problem.
+    return { kind: 'url', url: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL };
   }
   if (markId.startsWith(MASTERWORK_PREFIX)) {
     const craft = markId.slice(MASTERWORK_PREFIX.length);

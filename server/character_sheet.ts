@@ -218,6 +218,10 @@ export const RELIQUARY_MARK_ENGLISH: ReadonlyMap<string, string> = new Map([
   ['gather_event:pristine_vein', 'Pristine Vein'],
   ['gather_event:ancient_heartwood', 'Ancient Heartwood'],
   ['gather_event:moonlit_bloom', 'Moonlit Bloom'],
+  // masterwrought Phase 18: the farm-bed field note's cell landed, so its row
+  // is owed here in the same change (sheetRelicRecentText answers null for an
+  // unknown id, and the /c/ SSR page silently drops the entry).
+  ['gather_event:golden_harvest', 'Golden Harvest'],
   ['gather_event:perfect_specimen', 'Perfect Specimen'],
   // Rares of the Realm kill proofs (Phase 21): 'Slain: <mob display name>',
   // names verbatim from MOBS (tests/character_sheet.test.ts derives the pin).

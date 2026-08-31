@@ -1496,6 +1496,16 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // promoter; soulbound would dead-end the design. Price basis: input 553 on
   // the sibling recipes' buyValue basis (buyValue where one exists, else
   // sellValue) vs output 50 (the recipe row spells the arithmetic).
+  // noDiscard (Phase 18, reopening the phase 13 "matches its named arm"
+  // judgment): the chase-material rule at items.ts, a chase material is never
+  // lost to a stray discard, applies here on the deed's own footing, and the
+  // deed DIVERGES from wyrmfall_core deliberately. A core is a repeatable
+  // faucet drop (1 to 3 per endgame final boss per day, plus the rift grants
+  // and the Marks backstop); a deed is a single-use capstone whose only
+  // replacement is a skill-125 inscription craft on a 553-basis bill, so a
+  // mis-click on the destroy prompt costs the whole promotion. Nothing wedges:
+  // the deed is tradable, mailable, listable, and vendorable at 50, so the
+  // flag closes the accident channel without closing the exit.
   deed_of_making: {
     id: 'deed_of_making',
     name: 'Deed of Making',
@@ -1503,6 +1513,7 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stackSize: 20,
     sellValue: 50,
+    noDiscard: true,
   },
 
   // --- Masterwrought apex armor (Phase 08, R13/R14) --------------------------

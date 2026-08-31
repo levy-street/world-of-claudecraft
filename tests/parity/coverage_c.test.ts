@@ -18,6 +18,7 @@ import {
 import { HEROIC_BOSS_LOOT } from '../../src/sim/content/heroic_loot';
 import { heroicVariantId } from '../../src/sim/content/heroic_variants';
 import { ITEMS, MOBS } from '../../src/sim/data';
+import { countRawInSlots, countUnlockedInSlots } from '../../src/sim/item_lock';
 import { RIFT_IMPAIRED_FUSE_CAP } from '../../src/sim/mob/rift_escape_window';
 import {
   FARM_GOLDEN_BONUS_PATTERN_IDS,
@@ -43,6 +44,8 @@ import {
   FARM_GOLDEN_PADDING_CYCLES,
   FARM_GOLDEN_WIN_YIELD_SEED,
   FARM_TONIC_WINNER_YIELD_SEED,
+  HEROIC_FIVE_MAN_BOSS_ID,
+  HEROIC_FIVE_MAN_DUNGEON_ID,
   PERFECTING_WALK_ATTEMPT_CAP,
   SCENARIOS,
 } from './scenarios';
@@ -1009,7 +1012,9 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       itemId: 'vale_wheat',
     });
     expect(meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(true);
-    expect(meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
+    // The Reliquary field note pages too since masterwrought Phase 18 (the
+    // ledgered cell deferral retired), so this arm flipped with the content.
+    expect(meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(true);
     // THE PAYING BAND: seedBackCount PRESENT at exactly one (the one-seed
     // band, 0.08 <= 0.155753 < 0.4), the upgrade from the zero-band beat
     // above whose grant proof degraded to 0 === 0.
@@ -1529,16 +1534,23 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
       .map((e) => e.text as string);
     const logs = ev.filter((e) => e.type === 'log' && e.pid === pid).map((e) => e.text as string);
 
-    // The three deny arms the drive stages, each answered by its DEDICATED
-    // line and nothing else on the error channel (no noItem, no busy). The
+    // The SIX deny arms the drive stages, each answered by its DEDICATED
+    // line and nothing else on the error channel, in drive order. The
     // post-stamp denial changed lines at phase 13: a nameless perfect_item on
     // a Perfected copy now routes to the promotion ladder, whose first
     // answer here is the missing-name refusal (the perfectAlready line is
-    // retired from the sim).
+    // retired from the sim). The last three joined at masterwrought Phase 18,
+    // which moved the ladder's remaining arms onto this scenario; the
+    // lock-only line is the one that matters most here, because a regression
+    // that dropped its split would answer the GENUINE shortfall line instead
+    // and this equality is what says which one landed.
     expect(errors).toEqual([
       'Perfecting that requires 125 skill in the craft that made it.',
       'That work needs a name to become a legend.',
       'You lack the materials to perfect that item.',
+      "You don't have that item.",
+      'Only Masterwrought items can be perfected.',
+      'A material needed for perfecting is locked.',
     ]);
 
     // One bind per piece (the R2 stamp fires on the FIRST resolved attempt
@@ -1600,6 +1612,13 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(drawsAt('perfect-worn-attempted')).toBe(baggedAttempts + WORN_ATTEMPTS);
     expect(drawsAt('perfect-embers-stripped')).toBe(baggedAttempts + WORN_ATTEMPTS);
     expect(drawsAt('perfect-denied-materials')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    // The three Phase 18 arms draw nothing either, so the ledger is flat from
+    // the materials denial to the end of the drive.
+    expect(drawsAt('perfect-staged-noitem')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-noitem')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-notapex')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-materials-locked')).toBe(baggedAttempts + WORN_ATTEMPTS);
+    expect(drawsAt('perfect-denied-locked')).toBe(baggedAttempts + WORN_ATTEMPTS);
     expect(trace.draws).toBe(baggedAttempts + WORN_ATTEMPTS);
     // ...and every draw is accounted for by exactly one notice: an advance or
     // a fail, never both, never neither.
@@ -1615,6 +1634,27 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(stateAt('perfect-denied-skill')).toBe(stateAt('perfect-staged'));
     expect(stateAt('perfect-denied-perfected')).toBe(stateAt('perfect-bagged-walked'));
     expect(stateAt('perfect-denied-materials')).toBe(stateAt('perfect-embers-stripped'));
+    // The Phase 18 arms take the same bracket. The not-apex arm is bracketed
+    // by the noItem denial's own frame rather than a staged one, which is
+    // sound precisely because that denial is itself proven a no-op on the
+    // line above: two consecutive no-ops leave one unmoved digest across all
+    // three frames, so a not-apex arm that consumed a material still reds.
+    expect(stateAt('perfect-denied-noitem')).toBe(stateAt('perfect-staged-noitem'));
+    expect(stateAt('perfect-denied-notapex')).toBe(stateAt('perfect-denied-noitem'));
+    expect(stateAt('perfect-denied-locked')).toBe(stateAt('perfect-materials-locked'));
+    // The lock-only arm's PREMISE, so it cannot go vacuous by decaying into
+    // the genuine shortfall it is supposed to be distinguished from: the
+    // locking really happened (cells were locked), and the raw counts still
+    // meet the whole bill at the moment of the denial.
+    expect(rec.notes.lockedCells as number).toBeGreaterThanOrEqual(PERFECTING_ATTEMPT_COST.length);
+    for (const c of PERFECTING_ATTEMPT_COST) {
+      expect(countRawInSlots(meta.inventory, c.itemId), `raw ${c.itemId}`).toBeGreaterThanOrEqual(
+        c.count,
+      );
+      expect(countUnlockedInSlots(meta.inventory, c.itemId), `unlocked ${c.itemId}`).toBeLessThan(
+        c.count,
+      );
+    }
 
     // The bagged copy at rest: bound to the perfecter, the track field gone,
     // the stamp on, the R5 delta merged (an int 8 / sta 6 neck with a +1
@@ -1699,5 +1739,122 @@ describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () 
     expect(notes.visitorCooldownRetained).toBe(true);
     expect(notes.raiderCooldownReset).toBe(true);
     expect(notes.encounterReset).toBe(true);
+  });
+
+  it('heroic_five_man_clear: one shared heroic claim, the variant swap and appended draws, marks and the lockout to every participant', () => {
+    const rec = run('heroic_five_man_clear');
+    const sim = rec.sim as any;
+    const partyPids = rec.notes.partyPids as number[];
+    const boss = sim.entities.get(rec.notes.bossId as number);
+
+    // ONE claim, shared: all five walked the door and joined the same
+    // instance, which is the premise the marks arm below is measured against
+    // (a party left outside would record a one-player payout).
+    expect(partyPids).toHaveLength(5);
+    expect(rec.notes.instanceMembers).toEqual([...partyPids].sort((a, b) => a - b));
+    const heroicClaims = sim.instances.filter(
+      (i: any) => i.dungeonId === HEROIC_FIVE_MAN_DUNGEON_ID && i.difficulty === 'heroic',
+    );
+    expect(heroicClaims).toHaveLength(1);
+
+    // The kill really resolved and really rolled loot.
+    expect(boss.dead).toBe(true);
+    const droppedIds = ((boss.loot?.items ?? []) as any[]).map((s) => s.itemId);
+    expect(droppedIds.length).toBeGreaterThan(0);
+
+    // ARM 1, the heroicItem swap: at least one drop came back as its heroic_
+    // copy of a BASE-table id, which is the arm the raid claim cannot reach
+    // (its variants read the raid tier instead). The base id is asserted too,
+    // so the swap is proven against the table rather than against a prefix.
+    const baseTableIds = new Set(
+      ((MOBS[HEROIC_FIVE_MAN_BOSS_ID].loot ?? []) as any[])
+        .map((e) => e.itemId)
+        .filter((id): id is string => typeof id === 'string'),
+    );
+    const swapped = droppedIds.filter(
+      (id) => id.startsWith('heroic_') && baseTableIds.has(id.slice('heroic_'.length)),
+    );
+    expect(swapped.length, `no variant swap in ${droppedIds.join(',')}`).toBeGreaterThan(0);
+    for (const id of swapped) {
+      expect(ITEMS[id]?.heroicOf, id).toBe(id.slice('heroic_'.length));
+    }
+
+    // ARM 2, the APPENDED heroic-only table: at least one drop came from
+    // HEROIC_BOSS_LOOT rather than the base walk, which is the stream position
+    // a base-table tail append shifts.
+    const heroicOnlyIds = new Set(
+      (HEROIC_BOSS_LOOT[HEROIC_FIVE_MAN_BOSS_ID] ?? []).map((e) => e.itemId),
+    );
+    expect(
+      droppedIds.filter((id) => heroicOnlyIds.has(id)).length,
+      `no appended heroic drop in ${droppedIds.join(',')}`,
+    ).toBeGreaterThan(0);
+
+    // ARM 3, awardHeroicMarks on a FIVE-MAN: the tuning's marksPerParticipant
+    // to EVERY participant (the raid pays 3, so the number itself says which
+    // table answered), plus the per-difficulty daily lockout and NOT the plain
+    // normal key.
+    const tuning = HEROIC_DUNGEON_TUNING[HEROIC_FIVE_MAN_DUNGEON_ID];
+    expect(tuning.marksPerParticipant).toBe(1);
+    for (const pid of partyPids) {
+      expect(sim.countItem(HEROIC_MARK_ITEM_ID, pid), `marks pid ${pid}`).toBe(
+        tuning.marksPerParticipant,
+      );
+      const lockouts = sim.players.get(pid).raidLockouts;
+      expect(lockouts.has(`${HEROIC_FIVE_MAN_DUNGEON_ID}:heroic`), `lock pid ${pid}`).toBe(true);
+      expect(lockouts.has(HEROIC_FIVE_MAN_DUNGEON_ID), `plain key pid ${pid}`).toBe(false);
+    }
+    // Marks are paid into the bags, never onto the corpse.
+    expect(droppedIds).not.toContain(HEROIC_MARK_ITEM_ID);
+  });
+
+  it('flask_consumables: one flask ever rides, upward replaces, downward refuses, and the whole path draws nothing', () => {
+    const { trace, rec } = record(SCENARIOS.find((s) => s.name === 'flask_consumables')!);
+    const sim = rec.sim as any;
+    const pid = rec.notes.pid as number;
+    const p = sim.entities.get(pid);
+    const ev = rec.allEvents as Ev[];
+
+    // The whole use path is draw-free, which is worth a golden on its own: a
+    // consumable that STARTS drawing shifts every later draw in its host.
+    expect(trace.draws).toBe(0);
+
+    const frameAt = (label: string) => {
+      const frame = trace.frames.find((f) => f.label === label);
+      if (!frame) throw new Error(`missing the ${label} checkpoint frame`);
+      return frame;
+    };
+    const stateAt = (label: string): string => frameAt(label).state;
+
+    // BEAT 3, the downward refusal, is the one that can regress silently, so
+    // it is pinned as a state NO-OP between its bracketing frames (bags and
+    // auras alike unmoved) and by its own refusal line.
+    expect(stateAt('flask-downgrade-refused')).toBe(stateAt('flask-upgraded'));
+    const errors = ev.filter((e) => e.type === 'error' && e.pid === pid).map((e) => e.text);
+    expect(errors).toEqual(['A more powerful effect is already active.']);
+    // The refused unit was NOT consumed. Two went in and beat 1 spent one, so
+    // one remains: a refusal that quietly drank would leave zero. (The digest
+    // equality above is the decisive half, since the bags are sampled; this
+    // spells the arithmetic so the count is readable on its own.)
+    expect(sim.countItem('elixir_of_the_serpent', pid)).toBe(1);
+
+    // BEATS 1, 2 and 4 really moved the aura set, so the no-op above is a
+    // refusal rather than a path that does nothing at all. Each of the three
+    // quaffs that landed spent exactly one unit.
+    expect(stateAt('flask-elixir-up')).not.toBe(stateAt('flasks-staged'));
+    expect(stateAt('flask-upgraded')).not.toBe(stateAt('flask-elixir-up'));
+    expect(stateAt('flask-family-swapped')).not.toBe(stateAt('flask-downgrade-refused'));
+    expect(sim.countItem('ironhusk_flask', pid)).toBe(1);
+    expect(sim.countItem('warboar_flask', pid)).toBe(1);
+
+    // THE ONE-FLASK RULE at rest: exactly one flask-MARKED aura rides, and it
+    // is the last family quaffed. Keyed on the marker, never the aura id or
+    // the item kind, which is what the sim keys on.
+    const flaskAuras = (p.auras as any[]).filter((a) => a.flask === true);
+    expect(flaskAuras).toHaveLength(1);
+    expect(flaskAuras[0].kind).toBe('buff_ap');
+    // ...and the stamina family it replaced is gone entirely, so the strip
+    // shed the aura rather than leaving a stale second one behind.
+    expect((p.auras as any[]).filter((a) => a.kind === 'buff_sta')).toEqual([]);
   });
 });

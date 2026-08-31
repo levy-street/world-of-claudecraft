@@ -58,6 +58,37 @@ describe('canonical', () => {
   it('serializes Infinity as a sentinel, never null', () => {
     expect(canonical({ t: Infinity })).toEqual({ t: 'Infinity' });
   });
+
+  it('keeps a ZERO inside a per-copy payload, and only there (the zero-key blindness)', () => {
+    // The defect this closes (masterwrought Phase 12, reopened and fixed at
+    // Phase 18): the Perfecting stamp merges its R5 bonus into rolled.stats
+    // and skips a share that rounds to zero, so "no share written" and "a
+    // share written as 0" canonicalized identically and the golden could not
+    // tell them apart. Inside a payload a zero now survives...
+    expect(canonical({ itemId: 'x', instance: { rolled: { stats: { int: 1, sta: 0 } } } })).toEqual(
+      { itemId: 'x', instance: { rolled: { stats: { int: 1, sta: 0 } } } },
+    );
+    // ...and it is DISTINGUISHABLE from the absent case, which is the whole
+    // point: these two must not canonicalize to the same value.
+    expect(canonical({ instance: { rolled: { stats: { sta: 0 } } } })).not.toEqual(
+      canonical({ instance: { rolled: { stats: {} } } }),
+    );
+    // The worn twin reaches its payloads through equipmentInstance, so the
+    // rule has to follow that key too (one slot deep, then the payload).
+    expect(canonical({ equipmentInstance: { ring1: { rolled: { stats: { agi: 0 } } } } })).toEqual({
+      equipmentInstance: { ring1: { rolled: { stats: { agi: 0 } } } },
+    });
+    // SCOPED, not global: a resting zero anywhere else is still inert, which
+    // is what keeps every other golden from growing a key per zero field.
+    expect(canonical({ hp: 0, mana: 5 })).toEqual({ mana: 5 });
+    expect(canonical({ itemId: 'x', count: 0 })).toEqual({ itemId: 'x' });
+    // And inside a payload it is ONLY the zero that is information: null,
+    // false, '' and [] stay inert there, so the region does not turn into a
+    // second, wordier sampler.
+    expect(canonical({ instance: { a: 0, b: false, c: '', d: null, e: [] } })).toEqual({
+      instance: { a: 0 },
+    });
+  });
 });
 
 describe('samplePlayerMeta', () => {

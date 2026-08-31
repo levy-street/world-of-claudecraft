@@ -297,6 +297,41 @@ function sourceIndexOf(): Map<string, ItemSource> {
   return sourceIndex;
 }
 
+// itemId -> "this drops from the HEROIC Nythraxis raid", the question the raid
+// flag above cannot answer. The heroic raid's loot registers raid: false on
+// purpose: its source level IS the raid tier (27), so OR-ing the raid bonus in
+// would price it a second time. Two arms, the two ways a heroic raid pays:
+// the heroic-ONLY extras on the boss's own heroic table (the three bespoke
+// weapons), and the heroic variants of the boss's normal drops, which the
+// claim swaps in. Built once, lazily, from the same static tables, and reset
+// with the source index.
+let heroicRaidIndex: Set<string> | null = null;
+
+function buildHeroicRaidIndex(): Set<string> {
+  const idx = new Set<string>();
+  for (const entry of HEROIC_BOSS_LOOT[NYTHRAXIS_RAID_BOSS_ID] ?? []) {
+    if (entry.itemId) idx.add(entry.itemId);
+  }
+  const raidBases = new Set(
+    (MOBS[NYTHRAXIS_RAID_BOSS_ID]?.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
+  );
+  for (const item of Object.values(ITEMS)) {
+    if (item.heroicOf && raidBases.has(item.heroicOf)) idx.add(item.id);
+  }
+  return idx;
+}
+
+// Whether the HEROIC Nythraxis raid is a source for this item. Separate from
+// itemFromRaid because the two answer different questions: that one drives the
+// item-level raid bonus (which the heroic tier already prices into its source
+// level), this one says the piece was won in a raid encounter. Sundering is
+// the consumer: the Phase 05 QA ruling admits heroic-raid epics, and reading
+// the source here keeps that eligibility flip out of the item-level math.
+export function itemFromHeroicRaid(itemId: string): boolean {
+  if (!heroicRaidIndex) heroicRaidIndex = buildHeroicRaidIndex();
+  return heroicRaidIndex.has(itemId);
+}
+
 // The level of the content an item drops from, or undefined for items with no
 // drop/quest source (vendor stock, starter gear, junk, conjured/quest items).
 export function itemSourceLevel(itemId: string): number | undefined {
@@ -368,4 +403,5 @@ export function itemScore(item: ItemDef): number {
 export function resetItemLevelCache(): void {
   sourceIndex = null;
   encounterIndex = null;
+  heroicRaidIndex = null;
 }

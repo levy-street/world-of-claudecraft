@@ -7945,6 +7945,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.pieceMark': '大师锻造',
   'hudChrome.masterwrought.tooltipWorn': '占用一个大师锻造栏位（已用{used}/{cap}）。',
   'hudChrome.masterwrought.tooltipAtCap': '你的全部{cap}个大师锻造栏位均已占用。',
+  'hudChrome.masterwrought.tooltipLegendaryLimit': '最多只能穿戴{cap}件传说品质的大师锻造物品。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中时几率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': '造成伤害的法术几率（{chance}%）：{effect}',
@@ -11293,6 +11294,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '完美矿脉',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古木心材',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '月华花蕾',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': '金色丰收',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '完美标本',
   'hudChrome.reliquary.markFind.slain_old_greyjaw': '斩杀：老灰颚',
   'hudChrome.reliquary.markFind.slain_mogger': '斩杀：莫格',
@@ -12144,6 +12146,20 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '农用品。种植时消耗，有机会获得略多的收成。若作物枯萎，滋补剂也会随之失去。',
   'hudChrome.materialHint.wyrmfallCore':
     '大师锻造制作催化剂。团队副本最终首领每个难度每日一次，为每位玩家掉落1到3个。英雄地下城最终首领各自每日一次，为每位玩家掉落1到3个。每日首次在A级或S级裂隙竞速中获胜时，A级可获得1个，S级可获得2个。英雄军需官以英雄徽记出售。',
+  'hudChrome.materialHint.mudfinScale':
+    '制作材料。泥鳍潜伏者约有一半几率掉落，沼泽深处的鱼类稍低一些，而水中的精英首领则必定携带。',
+  'hudChrome.materialHint.crackedWyrmScale':
+    '制作材料。圣所鳞卫约有一半几率掉落，世上再无他处可得。',
+  'hudChrome.materialHint.crackedOgreTusk':
+    '制作材料。碎颅者布鲁托克每次倒下都会留下一枚，也只有他会掉落。',
+  'hudChrome.materialHint.tallowCandle':
+    '制作材料。深岩挖掘者掉落的几率过半，唤墓者教徒偶尔掉落，而两者中的精英首领必定携带。',
+  'hudChrome.materialHint.banditBandana':
+    '制作材料。强盗约有一半几率掉落，而他们的精英首领必定携带。',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    '制作材料。老裂颚每次倒下都会留下一张，别的野兽都不会掉落。',
+  'hudChrome.materialHint.emberwingCinderscale':
+    '制作材料。炽翼沃斯卡每次倒下都会留下一片，别的野兽都不会掉落。',
   'hudChrome.enchanting.tier.base': '基础附魔',
   'hudChrome.enchanting.tier.runed': '符文附魔',
   'hudChrome.enchanting.tier.greater': '强效附魔',

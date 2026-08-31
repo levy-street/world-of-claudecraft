@@ -429,8 +429,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // derivation-equality pins' own demand: 348 on the merged tree
     // (346 + 2; the release's own chain read 342 = 340 + 2). The four
     // Crucible raid pages (the 2026-08-30 sync merge) add the release's 43
-    // distinct new item ids (its own chain read 385 = 342 + 43): 391.
-    expect(full).toEqual({ owned: 391, total: 391 });
+    // distinct new item ids (its own chain read 385 = 342 + 43): 391. The
+    // masterwrought Phase 18 golden-harvest field note is the 392nd, retiring
+    // the farming phase's ledgered cell deferral.
+    expect(full).toEqual({ owned: 392, total: 392 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -444,8 +446,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins). The phase 11i apex rod is an ITEM, so it moves this pair
     // by the same one as the overview: 319 on the merged tree before the raid
-    // pages (317 + 2), 362 with them.
-    expect(character).toEqual({ owned: 362, total: 362 });
+    // pages (317 + 2), 362 with them, and 363 with the Phase 18
+    // golden-harvest MARK, which is character-scoped like every other mark.
+    expect(character).toEqual({ owned: 363, total: 363 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -477,14 +480,17 @@ describe('Reliquary Conqueror catalog structure', () => {
     // add 41 slots (17 + 3 + 16 + 5) on top of the 375 measured before them,
     // and the raid's flawless title joins the titles page, plus the two
     // Varkhul legendaries at the launch wiring: 419; then 418 when the
-    // maintainer pulled Forgebreaker to route it through crafting.
+    // maintainer pulled Forgebreaker to route it through crafting. The
+    // masterwrought Phase 18 golden-harvest field note is the one slot after
+    // that: 427.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(426);
+    ).toBe(427);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
-    // proofs of conquerors_rares_of_the_realm, and the two craft masterwork
-    // marks (masterwork:jewelcrafting, masterwork:inscription).
+    // proofs of conquerors_rares_of_the_realm, the two craft masterwork
+    // marks (masterwork:jewelcrafting, masterwork:inscription), and the
+    // masterwrought Phase 18 gather_event:golden_harvest field note.
     expect(
       RELIQUARY_MARK_IDS.size,
       `mark total moved; by namespace: ${[
@@ -497,7 +503,7 @@ describe('Reliquary Conqueror catalog structure', () => {
       ]
         .map(([ns, n]) => `${ns}=${n}`)
         .join(', ')}`,
-    ).toBe(31);
+    ).toBe(32);
   });
 
   it('keeps every page single-kind (the emit path depends on it)', () => {
@@ -2131,6 +2137,10 @@ describe('Reliquary Professions shelf (Phase 7)', () => {
       'gather_event:pristine_vein',
       'gather_event:ancient_heartwood',
       'gather_event:moonlit_bloom',
+      // masterwrought Phase 18 retired the farming phase's deliberate absence:
+      // the farm-bed flavor now has its cell beside the three node siblings,
+      // so the allowlist no longer documents a missing row here.
+      'gather_event:golden_harvest',
       'gather_event:perfect_specimen',
     ]);
     expect([...RELIQUARY_PROFESSION_MARKS.fieldNotes]).toEqual(markRelicIds(page));
@@ -2907,7 +2917,10 @@ const EXPECTED_DISTINCT_SOURCES: Record<string, number> = {
   // it; the count read 7 while its mark rode SOURCE_PENDING_RULING
   // un-hinted).
   professions_masterwork: 8,
-  professions_field_notes: 4,
+  // 5 = corpse_harvest (perfect_specimen) + the three node-working gathering
+  // professions + farming, whose golden-harvest cell landed at masterwrought
+  // Phase 18.
+  professions_field_notes: 5,
   // 7 = corpse_harvest + the four gathering professions with a jackpot slot
   // (mining, logging, herbalism, fishing) + the rods' engineering craft and
   // their Litany board keeper (Phase 21).
@@ -3258,6 +3271,24 @@ describe('Reliquary source hints resolve against live content', () => {
         }
       }
     }
+    // The farming arm (masterwrought Phase 18): farm beds are deliberately
+    // never gather nodes, so the 'crop' rare-event source has NO
+    // NODE_HARVEST_TABLE row and the node loop above structurally cannot
+    // reach the golden harvest. Derive it from what is live anyway:
+    // gatherRareEventFlavor maps 'crop' to the flavor, and farming is the one
+    // gathering profession that works no node type and is not the fishing arm
+    // above, so it is the only honest answer for a source with no node. A
+    // SWAP still fails, which is the whole point of this test: crediting the
+    // golden harvest to mining reds because mining's own flavor derives from
+    // its node row.
+    const nodeProfessions = new Set<string>(
+      nodeTypes.map((t) => NODE_HARVEST_TABLE[t].professionId),
+    );
+    const nodelessProfessions = Object.keys(GATHERING_PROFESSIONS).filter(
+      (id) => !nodeProfessions.has(id) && id !== 'fishing',
+    );
+    expect(nodelessProfessions).toEqual(['farming']);
+    remember(`gather_event:${gatherRareEventFlavor('crop')}`, nodelessProfessions[0]);
     // A slot deriving two professions would make the comparison below
     // meaningless, so it fails here rather than silently picking the last one.
     expect(conflicts).toEqual([]);
@@ -3265,6 +3296,7 @@ describe('Reliquary source hints resolve against live content', () => {
     // every node type, so a table that stopped contributing cannot leave this
     // test quietly comparing nothing.
     expect(nodeTypes.length).toBe(3);
+    expect(expectedBySlotId.get('gather_event:golden_harvest')).toBe('farming');
     expect(expectedBySlotId.get('gather_event:pristine_vein')).toBeDefined();
     expect(expectedBySlotId.get('fine_thorium_ore')).toBeDefined();
     expect(expectedBySlotId.get('glimmerfin_koi')).toBe('fishing');
@@ -3307,10 +3339,11 @@ describe('Reliquary source hints resolve against live content', () => {
       }
     }
     expect(offenders).toEqual([]);
-    // Vacuity floor: three field-note marks, three fine-material jackpots, the
-    // two crafted Sanctum combo pieces, the fishing koi, and the two
-    // engineering-crafted rods (Phase 21).
-    expect(checked).toBeGreaterThanOrEqual(11);
+    // Vacuity floor: four field-note marks (the golden harvest joined at
+    // masterwrought Phase 18), three fine-material jackpots, the two crafted
+    // Sanctum combo pieces, the fishing koi, and the two engineering-crafted
+    // rods (Phase 21).
+    expect(checked).toBeGreaterThanOrEqual(12);
   });
 
   it('every catalogued relic with a live recipe names that craft as a door (the reverse pass)', () => {

@@ -6974,6 +6974,9 @@ function perfectingWalk(seed = 1): Scenario {
       'post-stamp denial: a NAMELESS perfect_item on the Perfected copy routes to the phase 13 promotion ladder and refuses with the missing-name line, ZERO draws, nothing consumed',
       'worn attempts (warhewn_signet equipped through equipItem, via { slot }): two resolved attempts mutate the equipmentInstance copy in place, the bind notice, exactly two draws',
       'materials denial (the ember stack removed): the missing-materials line, ZERO draws',
+      'noItem denial (a bag ref past the end of the bags): the unresolvable-ref line, ZERO draws',
+      'not-apex denial (a held prismglass_setting): the not-masterwrought line above the material gate, ZERO draws',
+      'lock-only shortfall (every material cell locked, raw counts intact): the DEDICATED locked line, not the missing-materials one, ZERO draws',
     ],
     build: () => new Sim({ seed, playerClass: 'warrior', autoEquip: false }),
     drive(rec: Recorder) {
@@ -7049,9 +7052,255 @@ function perfectingWalk(seed = 1): Scenario {
       rec.snapshot('perfect-embers-stripped');
       sim.perfectItemAs(pid, { slot: 'ring1' });
       rec.snapshot('perfect-denied-materials');
+
+      // Steps 6 to 8 (masterwrought Phase 18): the three deny arms the walk
+      // used to leave to tests/perfecting.test.ts, staged the same bracketed
+      // way as the three above so the gate pins each as draw-free AND
+      // state-identical rather than merely draw-free. They are APPENDED, so
+      // every frame recorded before this point is untouched by the addition.
+      //
+      // Step 6: the noItem denial. Presence-only ownership makes an
+      // UNRESOLVABLE ref the only noItem arm, so the ref names a bag cell
+      // past the end of the bags: baggedSlotAt answers nothing, the line
+      // emits, and the ladder never reaches a draw.
+      rec.snapshot('perfect-staged-noitem');
+      sim.perfectItemAs(pid, {
+        bag: meta.inventory.length + 5,
+        itemId: PERFECTING_BAGGED_APEX,
+      });
+      rec.snapshot('perfect-denied-noitem');
+
+      // Step 7: the NOT-APEX denial, one rung below noItem. The ref resolves
+      // to a real held item that is simply not masterwrought (a Prismglass
+      // Setting, still in the bags from the walk's own bill), so the arm
+      // proves the def gate rather than the ref gate: same zero draws, and
+      // the material stacks are untouched because this rung answers well
+      // above the material gate.
+      const settingCell = meta.inventory.findIndex((s) => s.itemId === 'prismglass_setting');
+      if (settingCell < 0) throw new Error('the walk left no prismglass setting to deny on');
+      rec.notes.notApexCell = settingCell;
+      sim.perfectItemAs(pid, { bag: settingCell, itemId: 'prismglass_setting' });
+      rec.snapshot('perfect-denied-notapex');
+
+      // Step 8: the LOCK-ONLY shortfall, which has its own line precisely
+      // because it is NOT a genuine shortfall. Put one ember back so the RAW
+      // counts meet the whole bill again (a draw-free hub line), then lock
+      // EVERY cell holding a material id through the real command entry: raw
+      // counts pass, unlocked counts do not, so the ladder takes the
+      // dedicated locked line instead of the missing-materials one it took
+      // at step 5. Locking is staged BEFORE the bracket so the denial itself
+      // is the only thing between the two frames.
+      sim.addItem('makers_ember', 1, pid);
+      const materialIds = new Set(PERFECTING_ATTEMPT_COST.map((c) => c.itemId));
+      let lockedCells = 0;
+      for (let i = 0; i < meta.inventory.length; i++) {
+        const slot = meta.inventory[i];
+        if (!slot.itemId || !materialIds.has(slot.itemId)) continue;
+        sim.setItemLocked(slot.itemId, true, pid, i);
+        lockedCells++;
+      }
+      rec.notes.lockedCells = lockedCells;
+      rec.snapshot('perfect-materials-locked');
+      sim.perfectItemAs(pid, { slot: 'ring1' });
+      rec.snapshot('perfect-denied-locked');
     },
   };
 }
+// gravewyrm_sanctum is the five-man that reaches EVERY heroic arm at once, and
+// it was picked by measuring the live tables rather than by name:
+// HEROIC_DUNGEON_TUNING names korzul_the_gravewyrm its finalBossId at
+// marksPerParticipant 1, HEROIC_BOSS_LOOT carries a korzul table (the two
+// heroic-only gear groups plus the farm patterns), and korzul's BASE table is
+// the only five-man one with heroic variants to swap (16 of them; hollow_crypt,
+// the obvious first pick, has ZERO, so a scenario there would have claimed the
+// heroicItem arm while never reaching it). Named here rather than inline so a
+// re-pick is one edit.
+export const HEROIC_FIVE_MAN_DUNGEON_ID = 'gravewyrm_sanctum';
+export const HEROIC_FIVE_MAN_BOSS_ID = 'korzul_the_gravewyrm';
+// A HEROIC FIVE-MAN clear, closing a coverage boundary the phase 09 ledger
+// recorded honestly and never filled: the gate pins a heroic RAID claim
+// (nythraxis_heroic_claim above) and a heroic DELVE (drowned_litany), but
+// nothing walked a heroic five-man, whose reward arms are a different set. Two
+// things are only true here: HEROIC_DUNGEON_TUNING pays marksPerParticipant to
+// EVERY participant of a five-man final boss (the raid pays on its own table),
+// and the heroic loot swap on a five-man reads HEROIC_VARIANT_SOURCE_LEVEL,
+// where the raid's reads the raid tier. hollow_crypt is the model five-man:
+// the tuning names morthen its final boss, and HEROIC_BOSS_LOOT carries a
+// morthen table, so one kill drives all three heroic arms at once (the
+// appended heroic loot draws, the heroicItem variant swap, and
+// awardHeroicMarks with its per-difficulty daily lockout).
+//
+// DELIBERATELY LEAN, the nythraxis_heroic_claim discipline: the trash pull is
+// not the residual and the boss dies to one lethal hit, which is what the
+// heroic arms of tests/dungeons.test.ts do. Every member walks the door
+// (enterDungeon per member, the shared instanceKeyFor join) because the marks
+// arm pays the PARTICIPATION snapshot: a party left at the door would record a
+// one-player payout and stop being a representative clear.
+//
+// SEED 4520 WAS MEASURED, NOT PICKED, against both heroic loot arms at once,
+// and it is the first seed from 4520 satisfying both (the hunt drove this very
+// scenario body and swapped only the Sim seed):
+//   1. THE VARIANT SWAP FIRING. A base drop must actually come back as its
+//      heroic_ copy, or the coverage line would claim an arm the recording
+//      never reached (the professions_craft "proc missed for the pinned seed"
+//      doctrine). This seed swaps heroic_wildgrowth_leggings.
+//   2. AN APPENDED HEROIC-TABLE DROP. At least one item from
+//      HEROIC_BOSS_LOOT[korzul] must land, which is what pins the stream
+//      position a base-table tail append would shift. This seed sheds
+//      sanctum_prowlers_grips and gravewyrm_claws.
+// Measured over seeds 4520 to 4559: 32 of 40 swap a variant, 40 of 40 shed an
+// appended drop (the korzul_heroic group's chances sum to 1.0, so it always
+// pays), and 32 clear both.
+function heroicFiveManClear(): Scenario {
+  return {
+    name: 'heroic_five_man_clear',
+    coverage: [
+      'a heroic FIVE-MAN claim: setDungeonDifficulty heroic + enterDungeon per member sharing one instance (instanceKeyFor), the five-man counterpart of the raid claim above',
+      'rollLoot HEROIC arm on a five-man final boss: the base-table walk, then the appended HEROIC_BOSS_LOOT draws in the SAME call',
+      'heroicItem(): base drops swapped IN PLACE for their heroic variants at the FIVE-MAN tier (HEROIC_VARIANT_SOURCE_LEVEL), the arm the raid claim cannot reach',
+      'awardHeroicMarks on a five-man heroic kill: marksPerParticipant to every participant, plus the hollow_crypt:heroic daily lockout',
+      'class:warrior',
+    ],
+    sampleEvery: 10,
+    build: () => new Sim({ seed: 4520, playerClass: 'warrior', noPlayer: true }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const tankPid = sim.addPlayer('warrior', 'HeroicFiveTank') as number;
+      sim.setPlayerLevel(MAX_LEVEL, tankPid);
+      sim.setSpec('prot', tankPid);
+      const partyPids: number[] = [tankPid];
+      for (let i = 0; i < 4; i++) {
+        const pid = sim.addPlayer('mage', `HeroicFiveDps${i}`) as number;
+        sim.setPlayerLevel(MAX_LEVEL, pid);
+        sim.partyInvite(pid, tankPid);
+        sim.partyAccept(pid);
+        partyPids.push(pid);
+      }
+      // The one line that makes this a heroic run. Set on the LEADER, whose
+      // selection the claim reads; every member then walks the same door and
+      // joins the one claim rather than each minting their own.
+      sim.setDungeonDifficulty('heroic', tankPid);
+      for (const pid of partyPids) sim.enterDungeon(HEROIC_FIVE_MAN_DUNGEON_ID, pid);
+      const inst = requireValue(
+        sim.instances.find(
+          (i) => i.dungeonId === HEROIC_FIVE_MAN_DUNGEON_ID && i.difficulty === 'heroic',
+        ),
+        'parity scenario heroic five-man instance',
+      );
+      rec.notes.instanceMembers = [...inst.enteredBy].sort((a, b) => a - b);
+      const boss = requireValue(
+        [...sim.entities.values()].find(
+          (e: AnyEntity) => e.kind === 'mob' && e.templateId === HEROIC_FIVE_MAN_BOSS_ID && !e.dead,
+        ),
+        'parity scenario heroic five-man boss',
+      ) as AnyEntity;
+      rec.track(boss.id);
+      rec.notes.bossId = boss.id;
+      rec.notes.tankPid = tankPid;
+      rec.notes.partyPids = partyPids;
+
+      // Stage the whole party inside PARTY_XP_RANGE of the boss, the raid
+      // claim's reasoning exactly: handleDeath builds its participation
+      // snapshot from the party members within that range, and the marks arm
+      // pays that snapshot. Y is pinned to the boss's own floor because the
+      // shared teleport helper snaps to OVERWORLD terrain, which drops an
+      // instanced player into lethal falling damage.
+      const stage = (e: AnyEntity, x: number, z: number) => {
+        e.pos.x = x;
+        e.pos.z = z;
+        e.pos.y = boss.pos.y;
+        e.prevPos = { ...e.pos };
+        e.fallStartY = boss.pos.y;
+        e.vy = 0;
+        e.onGround = true;
+        sim.rebucket(e);
+      };
+      const tank = sim.entities.get(tankPid) as AnyEntity;
+      stage(tank, boss.pos.x, boss.pos.z - 6);
+      const dps = partyPids
+        .filter((pid) => pid !== tankPid)
+        .map((pid) => sim.entities.get(pid) as AnyEntity);
+      for (let i = 0; i < dps.length; i++) {
+        stage(dps[i], boss.pos.x - 3 + i * 2, boss.pos.z - 12);
+      }
+      rec.snapshot('claimed');
+
+      sim.dealDamage(tank, boss, boss.hp + 1000, false, 'physical', null, 'hit', true);
+      rec.tick(1); // updateMob dead-branch -> handleDeath -> rollLoot + the marks award
+      rec.snapshot('death');
+    },
+  };
+}
+
+// The FLASK aura path, golden-covered across hosts. Phase 04 considered a flask
+// parity golden and DECLINED it on the maintenance cost every future release
+// sync pays for a moved golden; Phase 18 reopened that, because the ordering
+// rules the flask family carries are exactly what a golden is for. Each of the
+// three keys on the Aura.flask MARKER rather than the item kind or the aura id
+// (src/sim/items.ts), so an extraction can reorder the strip loop, the
+// same-family replace and the downward refusal against each other while every
+// scalar in tests/flask_consumables.test.ts still matches.
+//
+// The four beats drive the real useItem entry point and take NO ticks (the
+// perfecting_walk idiom): a flask applies on the spot, so every frame here is
+// a quaff's own result and the trace reads straight off the labelled frames.
+// The scenario draws no rng at all, which is itself the point of recording it:
+// a use path that STARTS drawing shows up in the draw digest immediately.
+const FLASK_SAME_FAMILY_WEAKER_ID = 'elixir_of_the_serpent'; // buff_sta 12/900
+const FLASK_ID = 'ironhusk_flask'; // buff_sta 13/1200, the same family, stronger
+const FLASK_OTHER_FAMILY_ID = 'warboar_flask'; // buff_ap, a different family
+const FLASK_SCENARIO_IDS = [FLASK_SAME_FAMILY_WEAKER_ID, FLASK_ID, FLASK_OTHER_FAMILY_ID] as const;
+function flaskConsumables(): Scenario {
+  return {
+    name: 'flask_consumables',
+    coverage: [
+      'useItem on the elixir rung: the same-family aura applies (the quaff beat, and the thing the flask then replaces)',
+      'UPWARD replace: the flask replaces the weaker same-family source in place, never stacking a second aura',
+      'DOWNWARD refusal: the weaker source is refused while the flask is up, consuming nothing (a state no-op between bracketing frames)',
+      'the ONE-FLASK strip: a flask of a DIFFERENT family sheds the standing flask, so exactly one flask-marked aura ever rides',
+      'class:warrior',
+    ],
+    build: () => new Sim({ seed: 4522, playerClass: 'warrior', autoEquip: false }),
+    drive(rec: Recorder) {
+      const sim = rec.sim;
+      const pid = sim.playerId as number;
+      rec.notes.pid = pid;
+      // Max level so nothing is refused for level, and the grants are ordinary
+      // draw-free hub lines. TWO of each so the refusal beat is provable: a
+      // refused quaff leaves its stack at two, where a silent consume would
+      // leave one.
+      sim.setPlayerLevel(MAX_LEVEL, pid);
+      for (const itemId of FLASK_SCENARIO_IDS) sim.addItem(itemId, 2, pid);
+      rec.notes.flaskIds = [...FLASK_SCENARIO_IDS];
+      rec.snapshot('flasks-staged');
+
+      // Beat 1: the QUAFF. The weaker same-family source goes up first, so the
+      // replace beat below has something to replace.
+      sim.useItem(FLASK_SAME_FAMILY_WEAKER_ID, pid);
+      rec.snapshot('flask-elixir-up');
+
+      // Beat 2: the UPWARD replace, in place: one aura of the family before,
+      // one after, and it is the flask.
+      sim.useItem(FLASK_ID, pid);
+      rec.snapshot('flask-upgraded');
+
+      // Beat 3: the DOWNWARD refusal. The weaker source is quaffed while the
+      // flask is up: neither the aura nor the stack may move, which the
+      // bracketing frames pin as a state no-op the way the perfecting walk
+      // pins its denials.
+      sim.useItem(FLASK_SAME_FAMILY_WEAKER_ID, pid);
+      rec.snapshot('flask-downgrade-refused');
+
+      // Beat 4: the ONE-FLASK strip. A flask of a DIFFERENT family sheds the
+      // standing one outright, so the flask-marked count stays at one
+      // whichever family is up: the rule that is NOT ordinary elixir
+      // behavior, and the one a reordered strip loop would break.
+      sim.useItem(FLASK_OTHER_FAMILY_ID, pid);
+      rec.snapshot('flask-family-swapped');
+    },
+  };
+}
+
 function ignivarRaidTuning(): Scenario {
   return {
     name: 'ignivar_raid_tuning',
@@ -7363,4 +7612,10 @@ export const SCENARIOS: Scenario[] = [
   perfectingWalk(),
   ignivarRaidTuning(),
   varkhulRaidTuning(),
+  // masterwrought Phase 18, both appended for the same tiling rule the
+  // comments above state: SHARD_BOUNDS ends at SCENARIOS.length, so an
+  // addition at the END lands in the final shard and moves no other scenario
+  // between shards.
+  heroicFiveManClear(),
+  flaskConsumables(),
 ];

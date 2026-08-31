@@ -8451,6 +8451,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.pieceMark': 'Ковка мастера',
   'hudChrome.masterwrought.tooltipWorn': 'Занимает ячейку Ковки мастера (занято {used} из {cap}).',
   'hudChrome.masterwrought.tooltipAtCap': 'Все ваши {cap} ячейки Ковки мастера заняты.',
+  'hudChrome.masterwrought.tooltipLegendaryLimit':
+    'Можно носить не более {cap} легендарного предмета Ковки мастера.',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': 'Шанс при попадании ({chance}%): {effect}',
   'hudChrome.itemProc.onSpellDamage': 'Шанс от уронных заклинаний ({chance}%): {effect}',
@@ -12050,6 +12052,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': 'Нетронутая жила',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': 'Древняя сердцевина',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': 'Лунный цвет',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': 'Золотой урожай',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': 'Идеальный образец',
   'hudChrome.reliquary.markFind.slain_old_greyjaw': 'Старый Серочелюст повержен',
   'hudChrome.reliquary.markFind.slain_mogger': 'Моггер повержен',
@@ -12939,6 +12942,20 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Принадлежность для фермерства. Расходуется при посадке и даёт шанс собрать чуть больший урожай. Если растение засохнет, тоник пропадает вместе с ним.',
   'hudChrome.materialHint.wyrmfallCore':
     'Катализатор Ковки мастера. Финальный босс рейда раз в день на каждой сложности приносит каждому игроку от 1 до 3. Финальный босс каждого героического подземелья раз в день приносит каждому игроку от 1 до 3. Первая за день победа в гонке разлома ранга A или S даёт 1 за ранг A или 2 за ранг S. Героический интендант продаёт его за Героические знаки.',
+  'hudChrome.materialHint.mudfinScale':
+    'Реагент для ремесла. Илогривые скрытни роняют её примерно в половине случаев, рыбы глубоких топей чуть реже, а именные ужасы этих вод всегда.',
+  'hudChrome.materialHint.crackedWyrmScale':
+    'Реагент для ремесла. Чешуйчатые стражи святилища роняют её примерно в половине случаев, и больше нигде в мире её не найти.',
+  'hudChrome.materialHint.crackedOgreTusk':
+    'Реагент для ремесла. Бруток Сокрушитель черепов оставляет один каждый раз, когда падает, и он единственный источник.',
+  'hudChrome.materialHint.tallowCandle':
+    'Реагент для ремесла. Глубокоскальные копатели роняют её чаще, чем нет, культисты Могильного Зова изредка, а именные вожаки и тех и других всегда.',
+  'hudChrome.materialHint.banditBandana':
+    'Реагент для ремесла. Разбойники роняют её примерно в половине случаев, а их именные главари всегда.',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    'Реагент для ремесла. Старый Крэгмо оставляет одну каждый раз, когда падает, и больше её не роняет ни один зверь.',
+  'hudChrome.materialHint.emberwingCinderscale':
+    'Реагент для ремесла. Воскар Жарокрыл оставляет одну каждый раз, когда падает, и больше её не роняет ни один зверь.',
   'hudChrome.enchanting.tier.base': 'Базовые чары',
   'hudChrome.enchanting.tier.runed': 'Рунные чары',
   'hudChrome.enchanting.tier.greater': 'Высшие чары',

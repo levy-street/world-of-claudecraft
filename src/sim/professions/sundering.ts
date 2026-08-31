@@ -25,7 +25,7 @@
 import { bagPools, bagsFullError, fitsAll } from '../bags';
 import { ITEMS } from '../data';
 import { consumeSelectedInventorySlot, itemCopyPin } from '../item_copy_ref';
-import { itemFromRaid } from '../item_level';
+import { itemFromHeroicRaid, itemFromRaid } from '../item_level';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { type Entity, type InvSlot, type ItemDef, isConsuming, SUNDER_CAST_ID } from '../types';
@@ -40,9 +40,17 @@ import { SUNDERED_ESSENCE_ITEM_ID } from './masterwrought_materials';
 // RS3 trimmed-masterwork model this stage follows is a 1:1 sink).
 export const SUNDERED_ESSENCE_YIELD = 1;
 
-/** The one eligibility rule: a GEAR epic whose source index says a raid
- *  encounter drops it. Rift legendaries and heroic five-man epics are excluded
- *  by the index itself (itemFromRaid), vendor and crafted epics never enter it.
+/** The one eligibility rule: a GEAR epic a raid encounter drops, normal OR
+ *  heroic. Rift legendaries and heroic five-man epics are excluded by the
+ *  source index itself, vendor and crafted epics never enter it.
+ *  The heroic-raid arm implements the Phase 05 QA ruling (2026-08-10): heroic
+ *  Nythraxis epics ARE sunderable, aligning with the settled
+ *  any-raid-epic-of-the-tier model, the normal-only boundary having been an
+ *  accident of the item_level.ts raid: false registration rather than a
+ *  decision. It reads itemFromHeroicRaid rather than flipping that
+ *  registration deliberately: the flag drives the +3 raid item-level bonus,
+ *  and the heroic tier already prices itself through its own source level, so
+ *  flipping it would move shipped item levels to buy an eligibility change.
  *  Pattern items were excluded by a recipe-kind denylist at phase 11 (the raid
  *  pattern drops are epic and raid-sourced, so without a kind guard a player
  *  could grind a chase pattern into one essence, a pure foot-gun); AMENDED at
@@ -62,7 +70,10 @@ const SUNDERABLE_GEAR_KINDS: ReadonlySet<ItemDef['kind']> = new Set([
 ]);
 export function isSunderable(def: ItemDef | undefined): boolean {
   return (
-    !!def && def.quality === 'epic' && SUNDERABLE_GEAR_KINDS.has(def.kind) && itemFromRaid(def.id)
+    !!def &&
+    def.quality === 'epic' &&
+    SUNDERABLE_GEAR_KINDS.has(def.kind) &&
+    (itemFromRaid(def.id) || itemFromHeroicRaid(def.id))
   );
 }
 

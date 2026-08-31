@@ -6,7 +6,7 @@
 // description style the tooltip's other def-driven use lines share.
 import { describe, expect, it } from 'vitest';
 import { ENCHANTS } from '../src/sim/content/enchants';
-import { ITEMS } from '../src/sim/data';
+import { ITEMS, MOBS } from '../src/sim/data';
 import {
   ARMOR_SECONDARY_BY_TYPE,
   TIMBER_WEAPON_TYPES,
@@ -27,6 +27,7 @@ import {
   materialHintKey,
   materialHintLine,
 } from '../src/ui/hud/professions/material_hint_view';
+import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 const ENCHANTING_IDS = [
   'arcane_dust',
@@ -69,6 +70,11 @@ const PROMOTION_WRIT_HINT_IDS = ['deed_of_making'];
 // point is WHERE it comes from, so its line names the faucets
 // (masterwrought_materials.ts) and is pinned to that module's constants below.
 const APEX_CATALYST_HINT_IDS = ['wyrmfall_core'];
+// The adopted trophies (Masterwrought phase 11l, leads authored at Phase 18).
+// DERIVED from the live TROPHY_RECIPES the same way the fine grades derive
+// from MATERIAL_GRADES, never restated: a de-adopted trophy leaves this set
+// and the coverage arms below then demand its lead be removed with it.
+const TROPHY_HINT_IDS = adoptedTrophyIds(ITEMS);
 const EXPECTED_IDS = [
   ...ENCHANTING_IDS,
   ...FINE_IDS,
@@ -76,6 +82,7 @@ const EXPECTED_IDS = [
   ...FARM_SUPPLY_HINT_IDS,
   ...PROMOTION_WRIT_HINT_IDS,
   ...APEX_CATALYST_HINT_IDS,
+  ...TROPHY_HINT_IDS,
 ].sort();
 
 describe('material_hint_view', () => {
@@ -205,6 +212,95 @@ describe('material_hint_view', () => {
     // Craft-free lead scoping (the intermediates rule): the lead must not
     // claim a single craft, because the Used-by line names the consumers.
     expect(line).not.toContain('Enchanting reagent.');
+  });
+
+  it('every trophy lead names a faucet the live mob tables really pay, at the rate it claims', () => {
+    // The seven adopted trophies each carry their OWN lead (masterwrought
+    // Phase 18 reopened the phase 11l refusal), so each has to be true of
+    // its own item. Written from the live MOBS loot tables the way the
+    // wyrmfall core line is written from its income module: the rate WORDS
+    // are the pin, so a retuned drop chance reds here.
+    //
+    // The vocabulary, held to the live chances:
+    //   "always" / "every time he falls"  -> a chance of exactly 1
+    //   "about half the time"             -> the 0.5 band
+    //   "more often than not"             -> above 0.5, below 1
+    // and an "only source" claim means exactly one mob drops the id.
+    const dropsOf = (itemId: string): { name: string; chance: number }[] => {
+      const rows: { name: string; chance: number }[] = [];
+      for (const mob of Object.values(MOBS)) {
+        for (const entry of mob.loot ?? []) {
+          if (entry.itemId === itemId) rows.push({ name: mob.name, chance: entry.chance });
+        }
+      }
+      return rows;
+    };
+    // Anti-vacuity: the derived trophy set is the live seven, and each really
+    // has a mob faucet, so the per-id arms below cannot pass over an empty
+    // list.
+    expect(TROPHY_HINT_IDS).toHaveLength(7);
+    for (const id of TROPHY_HINT_IDS) {
+      const line = materialHintLine(id);
+      expect(line, id).toContain('class="tt-desc"');
+      expect(line, id).toContain('Crafting reagent.');
+      // Craft-free, so the Used-by line still names the consuming craft.
+      expect(line, id).not.toContain('Enchanting reagent.');
+      expect(dropsOf(id).length, `${id} has a live faucet`).toBeGreaterThan(0);
+    }
+    // The two SOLE-SOURCE claims: one mob, chance 1.
+    for (const [id, mobName] of [
+      ['old_cragmaws_pelt', 'Old Cragmaw'],
+      ['emberwing_cinderscale', 'Voskar the Emberwing'],
+      ['cracked_ogre_tusk', 'Brutok Skullsmasher'],
+    ] as const) {
+      const rows = dropsOf(id);
+      expect(
+        rows.map((r) => r.name),
+        `${id} sole source`,
+      ).toEqual([mobName]);
+      expect(rows[0].chance, `${id} always drops`).toBe(1);
+      expect(materialHintLine(id), id).toContain(mobName);
+      expect(materialHintLine(id), `${id} claims certainty`).toContain('every time he falls');
+    }
+    // The "nothing else in the world carries one" claim on the wyrm scale:
+    // one mob at the 0.5 band.
+    const wyrm = dropsOf('cracked_wyrm_scale');
+    expect(wyrm.map((r) => r.name)).toEqual(['Sanctum Scaleguard']);
+    expect(wyrm[0].chance).toBe(0.5);
+    expect(materialHintLine('cracked_wyrm_scale')).toContain(
+      'Sanctum Scaleguards drop it about half the time',
+    );
+    // The MULTI-SOURCE claims: a common drop at the 0.5 band plus named
+    // sources that always carry one. The bandana line says both halves and
+    // names no mob, so only the rates are pinned.
+    const bandana = dropsOf('bandit_bandana');
+    expect(bandana.filter((r) => r.chance === 0.5).length).toBeGreaterThanOrEqual(3);
+    expect(bandana.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('bandit_bandana')).toContain('about half the time');
+    expect(materialHintLine('bandit_bandana')).toContain('named leaders always carry one');
+    const mudfin = dropsOf('mudfin_scale');
+    expect(mudfin.find((r) => r.name === 'Mudfin Skulker')?.chance).toBe(0.5);
+    // "a little less often" for the deeper marsh fish: strictly under the
+    // Skulker's rate, and above nothing.
+    for (const row of mudfin.filter((r) => r.chance !== 1 && r.name !== 'Mudfin Skulker')) {
+      expect(row.chance, `${row.name} is a softer rate`).toBeLessThan(0.5);
+      expect(row.chance, `${row.name} still drops`).toBeGreaterThan(0);
+    }
+    expect(mudfin.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('mudfin_scale')).toContain(
+      'Mudfin Skulkers drop it about half the time',
+    );
+    // "more often than not" for the Deeprock digger: strictly above the half
+    // band and strictly below certainty, so neither neighbouring word fits.
+    const candle = dropsOf('tallow_candle');
+    const digger = candle.find((r) => r.name === 'Deeprock Digger');
+    expect(digger?.chance, 'Deeprock Digger rate').toBeGreaterThan(0.5);
+    expect(digger?.chance).toBeLessThan(1);
+    expect(candle.some((r) => r.name.startsWith('Gravecaller') && r.chance < 0.5)).toBe(true);
+    expect(candle.some((r) => r.chance === 1)).toBe(true);
+    expect(materialHintLine('tallow_candle')).toContain(
+      'Deeprock diggers drop it more often than not',
+    );
   });
 
   it('every enchanting-hinted material is really consumed by at least one enchant', () => {

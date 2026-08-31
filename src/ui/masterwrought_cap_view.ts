@@ -10,11 +10,11 @@
 // `masterwrought` flag; duplicates legal, a two-hander counts once), pinned
 // equivalent in tests/masterwrought_cap_view.test.ts so the readout can never
 // say "1 of 2" while the equip rule refuses.
-import { MASTERWROUGHT_EQUIP_CAP } from '../sim/equipment_rules';
+import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../sim/equipment_rules';
 import { ALL_EQUIP_SLOTS, type EquipSlot, type ItemDef } from '../sim/types';
 import { itemNumber } from './item_instance_tooltip';
 
-export { MASTERWROUGHT_EQUIP_CAP };
+export { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP };
 
 /** The worn equipment slots holding a Masterwrought (apex) piece, in
  *  ALL_EQUIP_SLOTS order: the same flag filter the equip cap's conflict walk
@@ -53,19 +53,43 @@ export function masterwroughtCapReadout(
 /** The item tooltip's Masterwrought lines, as key + pre-formatted values rows
  *  the hud resolves through t() one wrapper at a time: the counted-family line
  *  always (the tag names the budget the whole family shares, never this one
- *  copy), and the at-cap line when the viewer's worn set has consumed the
+ *  copy), the LEGENDARY SUB-CAP line when the hovered copy is legendary-
+ *  effective, and the at-cap line when the viewer's worn set has consumed the
  *  whole budget, so a bag copy being weighed against the cap says so at hover
- *  time. */
+ *  time.
+ *
+ *  `hoveredQuality` is the EFFECTIVE quality of the exact copy under the
+ *  cursor (src/ui/item_instance_tooltip.ts tooltipEffectiveQuality), the same
+ *  reading masterwroughtConflictSlot's `incomingQuality` takes, so the line
+ *  appears on exactly the copies the sub-cap can refuse. The sub-cap is a
+ *  LIMIT (docs/design/tooltip-writing.md: state important limits), and until
+ *  the orange promotion shipped there was no legendary Masterwrought copy to
+ *  put it on; there is now, so the tooltip says it instead of leaving the
+ *  refusal line to be the first the player hears of it. Omitting the argument
+ *  keeps the pre-sub-cap behavior, for a caller with no copy in hand. */
 export function masterwroughtTooltipLines(
   equipment: Partial<Record<EquipSlot, string>>,
   items: Record<string, ItemDef>,
+  hoveredQuality?: string,
 ): {
-  key: 'hudChrome.itemMasterwrought' | 'hudChrome.masterwrought.tooltipAtCap';
+  key:
+    | 'hudChrome.itemMasterwrought'
+    | 'hudChrome.masterwrought.tooltipLegendaryLimit'
+    | 'hudChrome.masterwrought.tooltipAtCap';
   values: Record<string, string>;
 }[] {
   const lines: ReturnType<typeof masterwroughtTooltipLines> = [
     { key: 'hudChrome.itemMasterwrought', values: { count: itemNumber(MASTERWROUGHT_EQUIP_CAP) } },
   ];
+  // Strict equality, the equip rule's own comparison: an unrecognized quality
+  // string off a hostile or future-tier wire reads non-legendary here exactly
+  // as it does there, so the tooltip and the refusal can never disagree.
+  if (hoveredQuality === 'legendary') {
+    lines.push({
+      key: 'hudChrome.masterwrought.tooltipLegendaryLimit',
+      values: { cap: itemNumber(MASTERWROUGHT_LEGENDARY_CAP) },
+    });
+  }
   const readout = masterwroughtCapReadout(equipment, items);
   if (readout?.atCap) {
     lines.push({

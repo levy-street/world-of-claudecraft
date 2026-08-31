@@ -145,6 +145,17 @@ describe('the content the promotion consumes', () => {
     // shape): an inscriptionist scribes it FOR the promoter.
     expect(def.soulbound).toBeUndefined();
     expect(def.quality).toBe('rare');
+    // Phase 18 reopened the "matches its named arm" judgment: the deed is
+    // protected from a stray destroy, and it is the one place the tradable
+    // arm diverges from wyrmfall_core (a single-use capstone against a
+    // repeatable faucet drop), so BOTH sides are pinned here rather than the
+    // divergence living only in a comment.
+    expect(def.noDiscard).toBe(true);
+    expect(ITEMS.wyrmfall_core.noDiscard).toBeUndefined();
+    // Nothing wedges a bag: every exit but the destroy prompt stays open.
+    expect(def.noVendorSell).toBeUndefined();
+    expect(def.noMarketList).toBeUndefined();
+    expect(def.sellValue).toBe(50);
   });
 
   it('pins the D13-7 deed row BY NAME (renown 50, the legendariesForged count-1 trigger)', () => {

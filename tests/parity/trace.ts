@@ -54,6 +54,34 @@ function isInert(v: unknown): boolean {
   return false;
 }
 
+/**
+ * Object keys whose VALUE opens a zero-bearing region: inside one, a numeric
+ * 0 is INFORMATION and stays in the sample instead of being dropped as inert.
+ * The flag is inherited by everything below the key, so naming a container
+ * covers its whole subtree.
+ *
+ * Why (masterwrought Phase 12, closed at Phase 18): the Perfecting stamp
+ * merges its per-slot R5 bonus into `rolled.stats` and SKIPS a share that
+ * rounds to zero. Dropping inert keys made those two outcomes identical in
+ * the sample: "no share written" and "a share written as 0" both canonicalize
+ * to an absent key, so a change that started writing zero shares (or stopped
+ * skipping them) moved no golden at all. That is the harness being blind to a
+ * real behavior change, not a size optimization, and the fix is to stop
+ * dropping the zero exactly where a per-copy payload lives.
+ *
+ * SCOPED, not global: `0` stays inert everywhere else on purpose. Entity and
+ * PlayerMeta carry dozens of resting-zero fields per sample, and keeping all
+ * of them would balloon every golden for no gameplay reason (the same
+ * argument the inert rule was written on). A per-copy payload is small and
+ * sparse, so keeping its zeros costs almost nothing. Add a key here when a new
+ * sparse per-copy record grows a field whose zero is a real state.
+ */
+const ZERO_BEARING_CONTAINERS: ReadonlySet<string> = new Set([
+  'instance', // InvSlot.instance: the per-copy ItemInstancePayload in any container
+  'equipmentInstance', // PlayerMeta.equipmentInstance: the worn payloads, by slot
+  'rolled', // the payload's own roll record, where the Perfecting shares land
+]);
+
 // Compare two canonical keys for a stable, deterministic Map/Set ordering:
 // numbers numerically, everything else by JSON string.
 function compareKeys(a: unknown, b: unknown): number {
@@ -66,6 +94,10 @@ function compareKeys(a: unknown, b: unknown): number {
 export interface CanonicalOpts {
   // Drop inert object keys (default true). Digests pass false to stay faithful.
   omitDefaults?: boolean;
+  // Set by the walk itself once it is INSIDE a ZERO_BEARING_CONTAINERS key, so
+  // a numeric 0 there survives the inert filter. Not a caller knob: callers
+  // pass omitDefaults and let the container list decide the rest.
+  keepZeros?: boolean;
 }
 
 // Recursively convert any sim value into a stable, JSON-safe shape:
@@ -95,9 +127,15 @@ export function canonical(value: unknown, opts: CanonicalOpts = {}): unknown {
   }
   if (t === 'object') {
     const out: Record<string, unknown> = {};
+    const insideZeroBearing = opts.keepZeros === true;
     for (const k of Object.keys(value as object).sort()) {
-      const cv = canonical((value as Record<string, unknown>)[k], opts);
-      if (omit && isInert(cv)) continue;
+      // The key's own value opens a zero-bearing region for everything BELOW
+      // it; whether THIS key may be dropped is decided by the region this
+      // object already sits in, which is why the two flags are read apart.
+      const childOpts =
+        insideZeroBearing || ZERO_BEARING_CONTAINERS.has(k) ? { ...opts, keepZeros: true } : opts;
+      const cv = canonical((value as Record<string, unknown>)[k], childOpts);
+      if (omit && isInert(cv) && !(insideZeroBearing && cv === 0)) continue;
       out[k] = cv;
     }
     return out;

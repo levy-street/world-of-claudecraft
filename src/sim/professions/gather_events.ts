@@ -109,9 +109,9 @@ export function announceGatherRareEvent(
   // (col_pristine_vein / col_ancient_heartwood / col_moonlit_bloom, and the
   // farming phase's golden-harvest deed on gather_event:golden_harvest).
   // Reliquary field-note trophies reuse the same stable gather_event:* ids
-  // (catalog allowlist only; noteReliquaryMark no-ops unknown ids, which is
-  // deliberately where golden_harvest sits today: its field-note cell is a
-  // ledgered deferral, not an oversight).
+  // (catalog allowlist only; noteReliquaryMark no-ops an id the catalog does
+  // not carry). All four flavors have a cell since masterwrought Phase 18,
+  // which retired the farming phase's ledgered golden_harvest deferral.
   const visitMark = `gather_event:${flavor}`;
   ctx.markVisited(finder, visitMark);
   noteReliquaryMark(ctx, finder, visitMark);

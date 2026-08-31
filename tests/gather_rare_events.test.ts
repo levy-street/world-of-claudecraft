@@ -295,14 +295,15 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     }
   });
 
-  it('a crop source announces golden_harvest with the structural payload and the mark, NO reliquary cell', () => {
+  it('a crop source announces golden_harvest with the structural payload, the mark, and its reliquary cell', () => {
     // The farming harvest caller (professions/farming.ts harvestCrop) passes
     // a STRUCTURAL source ({ zoneId, type: 'crop' }): farm beds never become
     // gather nodes, and the fanout, event shape, and visit mark are the
-    // shared ones. The reliquary is the deliberate difference: golden_harvest
-    // has NO field-note cell (a ledgered deferral), so noteReliquaryMark
-    // no-ops and no reliquaryUnlock fires, asserted as the negative here so
-    // the deferral retires consciously rather than by accident.
+    // shared ones. The reliquary used to be the deliberate difference here
+    // (golden_harvest had no field-note cell, a ledgered deferral, so
+    // noteReliquaryMark no-opped and this arm asserted the negative). The
+    // cell landed at masterwrought Phase 18, so the arm flipped WITH it: the
+    // crop flavor now pages exactly like its three node siblings above.
     const { ctx, emitted, marks, addPlayer } = fakeCtx();
     const finder = addPlayer(1, 'Alba', 0);
     addPlayer(2, 'Bystander', 0); // eastbrook_vale, receives the fanout
@@ -331,9 +332,13 @@ describe('announceGatherRareEvent: soft zone fanout + dormant deed mark', () => 
     }
     // The visit mark writes through the shared path...
     expect(marks).toEqual(['gather_event:golden_harvest']);
-    // ...and the reliquary deliberately does not.
-    expect(finder.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
-    expect(emitted.some((e) => e.type === 'reliquaryUnlock')).toBe(false);
+    // ...and so does the Reliquary field note, first find included.
+    expect(finder.reliquary.marks.has('gather_event:golden_harvest')).toBe(true);
+    expect(
+      emitted.some(
+        (e) => e.type === 'reliquaryUnlock' && e.markId === 'gather_event:golden_harvest',
+      ),
+    ).toBe(true);
   });
 });
 

@@ -89,6 +89,26 @@ export const MATERIAL_HINT_KEYS: Readonly<Record<string, TranslationKey>> = {
   // WYRMFALL_RIFT_COUNT first-clear grants, the Heroic Quartermaster row in
   // content/heroic_vendor.ts); the Used-by line names its consuming crafts.
   wyrmfall_core: 'hudChrome.materialHint.wyrmfallCore',
+  // The adopted trophies (masterwrought Phase 11l): mob drops promoted to
+  // common reagents by the TROPHY_RECIPES rows that consume them. Phase 11l
+  // deliberately shipped them with no lead, on the reading that one would
+  // duplicate the Used-by line; Phase 18 reopened that and authored these,
+  // because the two lines answer different questions. The Used-by line says
+  // which craft SPENDS a trophy, which the recipe tables already imply once
+  // the player knows the trophy is a reagent at all; nothing in the client
+  // said where MORE of one comes from, and a trophy's faucet is a named foe
+  // rather than a node a gathering skill can be pointed at. Every lead here
+  // is craft-free for that reason, so both lines render together.
+  // The set is exactly the derived adopted list (tests/helpers/
+  // adopted_trophy_ids.ts holds it in both directions), so a de-adopted
+  // trophy cannot keep a lead that calls it a crafting reagent.
+  mudfin_scale: 'hudChrome.materialHint.mudfinScale',
+  cracked_wyrm_scale: 'hudChrome.materialHint.crackedWyrmScale',
+  cracked_ogre_tusk: 'hudChrome.materialHint.crackedOgreTusk',
+  tallow_candle: 'hudChrome.materialHint.tallowCandle',
+  bandit_bandana: 'hudChrome.materialHint.banditBandana',
+  old_cragmaws_pelt: 'hudChrome.materialHint.oldCragmawsPelt',
+  emberwing_cinderscale: 'hudChrome.materialHint.emberwingCinderscale',
 };
 
 /** The hint key for one item id, or undefined for every other item. */

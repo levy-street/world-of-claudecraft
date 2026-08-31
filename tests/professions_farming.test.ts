@@ -2976,11 +2976,12 @@ describe('the golden_harvest roll: the shared rare event at the farm bed', () =>
     const harvested = eventsOf(h.sim, from, 'farmHarvested')[0];
     expect(harvested.count).toBe(expected.count * GATHER_RARE_EVENT_YIELD_MULT);
     expect(harvested.fineCount).toBe(expected.fine * GATHER_RARE_EVENT_YIELD_MULT);
-    // The visit mark lands; the Reliquary deliberately has NO golden cell
-    // (noteReliquaryMark no-ops unknown ids: the ledgered field-note
-    // deferral, asserted as the negative so it retires consciously).
+    // The visit mark lands, and so does the Reliquary field note: the
+    // ledgered cell deferral this arm used to assert as a negative retired
+    // at masterwrought Phase 18, so the golden harvest now pages beside its
+    // three node siblings and the assertion flipped with the content.
     expect(h.meta.deedStats.visited.has('gather_event:golden_harvest')).toBe(true);
-    expect(h.meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(false);
+    expect(h.meta.reliquary.marks.has('gather_event:golden_harvest')).toBe(true);
     // Every hub grant kept both #2430 flags (the signed grant sites too).
     const loots = eventsOf(h.sim, from, 'loot');
     expect(loots.length).toBeGreaterThan(0);

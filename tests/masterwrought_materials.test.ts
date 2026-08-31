@@ -9,7 +9,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { BUILTIN_WORLD, ITEMS, MOBS } from '../src/sim/data';
 import { enterDungeon } from '../src/sim/instances/dungeons';
-import { itemFromRaid } from '../src/sim/item_level';
+import { itemFromHeroicRaid, itemFromRaid, itemLevel } from '../src/sim/item_level';
 import { isItemLocked } from '../src/sim/item_lock';
 import {
   awardRiftFirstClearMaterials,
@@ -881,10 +881,10 @@ describe('sundered essence: the extraction', () => {
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
   });
 
-  it('the eligibility boundary: raid legendaries, heroic-raid epics, rift gear all refuse', () => {
+  it('the eligibility boundary: raid legendaries and rift gear refuse, heroic-raid epics pass', () => {
     // Deleting the quality === 'epic' clause makes the two RAID LEGENDARIES
     // sunderable (they are the only raid-sourced non-epics); deleting the
-    // itemFromRaid clause admits five-man and rift gear. One negative per
+    // source clause admits five-man and rift gear. One negative per
     // clause so each is load-bearing on its own.
     const sim = makeSunderSim();
     const { pid } = playerOf(sim);
@@ -895,11 +895,34 @@ describe('sundered essence: the extraction', () => {
     expect(errors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
     expect(sim.countItem('deathless_heartwood', pid)).toBe(1);
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
-    // The scope AS SHIPPED (open item: pending a ruling before phase 12):
-    // the source index registers heroic-raid variants raid: false, so a
-    // heroic Nythraxis epic is NOT sunderable; neither is rift gear.
+    // The boundary MOVED at Phase 18, implementing the ratified Phase 05 QA
+    // ruling (2026-08-10, state.md): heroic-raid epics ARE sunderable, the
+    // normal-only line having been an accident of the raid: false
+    // registration. The registration still reads false (it prices the item
+    // level), so the predicate asks itemFromHeroicRaid instead: the premise
+    // is pinned per id so this arm cannot go vacuous, and the item level is
+    // pinned unmoved because the ruling names moving it as the thing to
+    // avoid.
     expect(ITEMS.deathless_greatblade.quality).toBe('epic');
-    expect(isSunderable(ITEMS.deathless_greatblade)).toBe(false);
+    expect(itemFromRaid('deathless_greatblade'), 'premise: still registered non-raid').toBe(false);
+    expect(itemFromHeroicRaid('deathless_greatblade')).toBe(true);
+    expect(isSunderable(ITEMS.deathless_greatblade)).toBe(true);
+    expect(itemLevel(ITEMS.deathless_greatblade), 'the ilvl the ruling forbids moving').toBe(33);
+    // The other two heroic-ONLY raid weapons and a heroic VARIANT of a raid
+    // drop take the same arm: both ways a heroic raid pays are admitted.
+    expect(isSunderable(ITEMS.scepter_of_the_deathless_court)).toBe(true);
+    expect(isSunderable(ITEMS.stormcallers_focus)).toBe(true);
+    expect(ITEMS.heroic_soulflame_cowl.heroicOf).toBe('soulflame_cowl');
+    expect(itemFromRaid('heroic_soulflame_cowl')).toBe(false);
+    expect(isSunderable(ITEMS.heroic_soulflame_cowl)).toBe(true);
+    // The heroic FIVE-MAN tier stays out: a heroic variant whose base is NOT
+    // a raid drop is not a heroic-raid piece, so the widening is scoped to
+    // the raid exactly as ruled.
+    expect(itemFromHeroicRaid(FIVEMAN_EPIC)).toBe(false);
+    expect(isSunderable(ITEMS[FIVEMAN_EPIC])).toBe(false);
+    // Quality still refuses the heroic-raid LEGENDARY, and rift gear is
+    // untouched by the widening.
+    expect(isSunderable(ITEMS.heroic_deathless_heartwood)).toBe(false);
     expect(isSunderable(ITEMS.heart_of_the_rift)).toBe(false);
     expect(isSunderable(ITEMS.deathless_heartwood)).toBe(false);
     // Phase 11: the raid pattern drops are epic AND raid-sourced, the first
@@ -923,6 +946,19 @@ describe('sundered essence: the extraction', () => {
     expect(patternErrors.map((e) => e.text)).toEqual(['Only raid-won epics can be sundered.']);
     expect(sim.countItem('pattern_duskforged_warblade', pid)).toBe(1);
     expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(0);
+  });
+
+  it('drives the REAL cast path on a heroic-raid epic: consumed, one essence minted', () => {
+    // The predicate arm above says the boundary moved; this says the cast
+    // agrees. Own sim so no earlier arm's essence can stand in for the grant.
+    const sim = makeSunderSim();
+    const { pid } = playerOf(sim);
+    sim.addItem('deathless_greatblade', 1, pid);
+    sim.drainEvents();
+    runSunder(sim, 'deathless_greatblade');
+    expect((sim.drainEvents() as any[]).filter((e) => e.type === 'error')).toEqual([]);
+    expect(sim.countItem('deathless_greatblade', pid)).toBe(0);
+    expect(sim.countItem(SUNDERED_ESSENCE_ITEM_ID, pid)).toBe(SUNDERED_ESSENCE_YIELD);
   });
 
   it('the eighth-sync gear allowlist: raid-sourced epic non-gear never sunders', () => {

@@ -8261,6 +8261,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.masterwrought.pieceMark': '名匠鍛造',
   'hudChrome.masterwrought.tooltipWorn': '名匠鍛造スロットを1つ使用（{used}/{cap}使用中）。',
   'hudChrome.masterwrought.tooltipAtCap': 'あなたの名匠鍛造スロット{cap}枠はすべて使用中です。',
+  'hudChrome.masterwrought.tooltipLegendaryLimit':
+    '伝説の名匠鍛造の品は{cap}つまでしか装備できません。',
   'hudChrome.itemSet.header': '{name} ({have}/{total})',
   'hudChrome.itemProc.onMeleeHit': '命中時に確率（{chance}%）：{effect}',
   'hudChrome.itemProc.onSpellDamage': 'ダメージ呪文で確率（{chance}%）：{effect}',
@@ -11837,6 +11839,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.markFind.gather_event_pristine_vein': '無垢の鉱脈',
   'hudChrome.reliquary.markFind.gather_event_ancient_heartwood': '古代の心材',
   'hudChrome.reliquary.markFind.gather_event_moonlit_bloom': '月明かりの花',
+  'hudChrome.reliquary.markFind.gather_event_golden_harvest': '黄金の実り',
   'hudChrome.reliquary.markFind.gather_event_perfect_specimen': '完璧な標本',
   'hudChrome.reliquary.markFind.slain_old_greyjaw': '討伐: 老グレイジョー',
   'hudChrome.reliquary.markFind.slain_mogger': '討伐: モガー',
@@ -12711,6 +12714,20 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '農業用品。作付け時に消費され、収穫がやや増えることがある。作物が枯れるとトニックも失われる。',
   'hudChrome.materialHint.wyrmfallCore':
     '名匠鍛造の製作触媒。レイドの最終ボスは難易度ごとに1日1回、各プレイヤーに1から3個をドロップする。ヒロイックダンジョンの最終ボスはそれぞれ1日1回、各プレイヤーに1から3個をドロップする。その日最初のAまたはSランクのリフトレース勝利で、Aランクなら1個、Sランクなら2個を獲得できる。英雄補給係が英雄の証と引き換えに販売している。',
+  'hudChrome.materialHint.mudfinScale':
+    '生産の材料。泥ひれの潜伏者は約半数の確率で落とし、沼の深みの魚はやや低く、その水域の名を持つ強敵は必ず持っている。',
+  'hudChrome.materialHint.crackedWyrmScale':
+    '生産の材料。サンクタム・スケイルガードが約半数の確率で落とし、ほかのどこからも手に入らない。',
+  'hudChrome.materialHint.crackedOgreTusk':
+    '生産の材料。頭蓋砕きブルトークが倒れるたびに必ず一つ残し、入手先は彼だけ。',
+  'hudChrome.materialHint.tallowCandle':
+    '生産の材料。ディープロックの掘削者は半数を超える確率で落とし、グレイブコーラーの信徒はときおり落とす。どちらも名を持つ長は必ず持っている。',
+  'hudChrome.materialHint.banditBandana':
+    '生産の材料。山賊が約半数の確率で落とし、名を持つ頭目は必ず持っている。',
+  'hudChrome.materialHint.oldCragmawsPelt':
+    '生産の材料。老いたるクラッグモウが倒れるたびに必ず一枚残し、ほかの獣は落とさない。',
+  'hudChrome.materialHint.emberwingCinderscale':
+    '生産の材料。燃え翼のヴォスカルが倒れるたびに必ず一枚残し、ほかの獣は落とさない。',
   'hudChrome.enchanting.tier.base': '基本エンチャント',
   'hudChrome.enchanting.tier.runed': 'ルーンエンチャント',
   'hudChrome.enchanting.tier.greater': '上級エンチャント',

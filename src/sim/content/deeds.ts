@@ -3067,8 +3067,8 @@ export const DEEDS: Record<string, DeedDef> = {
   // delights, not public zone-wide celebrations). Keys on the finder-only
   // gather_event mark its announce site writes; golden_harvest joins the
   // family from the farming rare-event seam (professions/gather_events.ts),
-  // where noteReliquaryMark no-ops for it by design (no reliquary cell, a
-  // ledgered deferral).
+  // and since masterwrought Phase 18 it also pages a Reliquary field note
+  // beside its three node siblings.
   col_golden_harvest: {
     id: 'col_golden_harvest',
     name: 'Golden Harvest',

@@ -492,11 +492,23 @@ export const RELIQUARY_PROFESSION_MARKS = {
     'masterwork:inscription',
     'masterwork:engineering',
   ],
-  /** Rare gather / corpse specimen visit marks already written by professions. */
+  /** Rare gather / corpse specimen visit marks already written by professions.
+   *  golden_harvest joined at masterwrought Phase 18, retiring the farming
+   *  phase's ledgered deferral ((bv), farming/state.md): the farm bed's rare
+   *  event is the fourth flavor the shared gather_event announce writes, and
+   *  it sat outside this allowlist (so noteReliquaryMark no-opped for it)
+   *  while its three node siblings each had a cell. Inserted BEFORE
+   *  perfect_specimen so the three-plus-one shape holds: the gathering
+   *  flavors first, then the corpse-harvest one that belongs to no gathering
+   *  profession. Safe on a shipped page for the same reason the inscription
+   *  masterwork row was: marks are id-keyed in the sparse blob, so no
+   *  persisted state is index-dependent, and the order pin in
+   *  tests/reliquary_content.test.ts moves with this row. */
   fieldNotes: [
     'gather_event:pristine_vein',
     'gather_event:ancient_heartwood',
     'gather_event:moonlit_bloom',
+    'gather_event:golden_harvest',
     'gather_event:perfect_specimen',
   ],
 } as const;
@@ -522,19 +534,26 @@ export const RELIQUARY_PROFESSION_SPECIMEN_ITEMS = [
   'glimmerfin_koi',
 ] as const;
 
-/** Field-note flavor to the gathering profession that works its node type
+/** Field-note flavor to the gathering profession that works its source
  *  (gatherRareEventFlavor plus NODE_HARVEST_TABLE, src/sim/professions/).
+ *  The first three are node types (ore to mining, wood to logging, herb to
+ *  herbalism); golden_harvest has no node at all, since a farm bed is worked
+ *  rather than found, so it names farming as the profession whose harvest
+ *  rolls it (professions/farming.ts harvestCrop).
  *  gather_event:perfect_specimen is absent on purpose: it fires on corpse
  *  harvest, which belongs to no gathering profession and takes the
  *  corpse_harvest ACTIVITY hint instead.
  *
  *  Exported because the client's cell-art resolver paints each field note
  *  with its gathering profession's art and must read that pairing from here
- *  rather than re-listing it. */
+ *  rather than re-listing it. Farming is the one member with no committed
+ *  gather_* sheet art, so the resolver gives its note an authored glyph and
+ *  reads this map for the SOURCE HINT only. */
 export const FIELD_NOTE_PROFESSIONS: Readonly<Record<string, string>> = Object.freeze({
   'gather_event:pristine_vein': 'mining',
   'gather_event:ancient_heartwood': 'logging',
   'gather_event:moonlit_bloom': 'herbalism',
+  'gather_event:golden_harvest': 'farming',
 });
 
 /** Specimen jackpot to its gathering profession. The five corpse-harvest
@@ -1304,12 +1323,14 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     id: 'professions_field_notes',
     shelf: 'professions',
     name: 'Rare Field Notes',
-    desc: 'Signature rare finds from the wild: veins, heartwood, moonlit blooms, and perfect specimens.',
+    desc: 'Signature rare finds from the wild: veins, heartwood, moonlit blooms, golden harvests, and perfect specimens.',
     clearSource: { kind: 'none' },
     // gatherRareEventFlavor (src/sim/professions/gather_events.ts) maps the
     // node type to the flavor, and NODE_HARVEST_TABLE maps that node type to
     // the profession that works it: ore to mining, wood to logging, herb to
-    // herbalism. perfect_specimen is the corpse-harvest flavor instead, and
+    // herbalism. golden_harvest comes off the same announce with a STRUCTURAL
+    // source instead of a node (a farm bed is never a gather node), so it
+    // names farming. perfect_specimen is the corpse-harvest flavor, and
     // corpse harvest belongs to no gathering profession, so it names the
     // corpse_harvest activity (the src/sim/interaction.ts write site) rather
     // than a profession it does not have.
