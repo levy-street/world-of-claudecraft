@@ -16,6 +16,7 @@ import {
   runClearItemName,
   stripLegendaryNames,
 } from '../../server/clear_item_name';
+import { BACKPACK_SLOTS, BAG_SOCKETS, bagSlotsOf } from '../../src/sim/bags';
 import { ITEMS } from '../../src/sim/data';
 import type { CharacterState } from '../../src/sim/sim';
 import type { ItemInstancePayload } from '../../src/sim/types';
@@ -95,13 +96,13 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
       'a bag target needs both the cell index and its item id',
     );
     expect(clearItemNameBodyError({ bag: 1.5, itemId: 'x' })).toBe(
-      'bag must be a non-negative whole number',
+      'bag must be a whole number from 0 to 1023',
     );
     expect(clearItemNameBodyError({ bag: -1, itemId: 'x' })).toBe(
-      'bag must be a non-negative whole number',
+      'bag must be a whole number from 0 to 1023',
     );
     expect(clearItemNameBodyError({ bag: '0', itemId: 'x' })).toBe(
-      'bag must be a non-negative whole number',
+      'bag must be a whole number from 0 to 1023',
     );
     expect(clearItemNameBodyError({ bag: 0, itemId: '' })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 7 })).toBe('unknown item id');
@@ -116,6 +117,41 @@ describe('clearItemNameBodyError / clearItemNameTarget', () => {
     expect(clearItemNameBodyError({ bag: 0, itemId: 'slur\nline' })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 'wyrmfall pendant' })).toBe('unknown item id');
     expect(clearItemNameBodyError({ bag: 0, itemId: 'pendant/../etc' })).toBe('unknown item id');
+  });
+
+  it('bounds the bag index ABOVE as well as below, both edges', () => {
+    // The Phase 18 security review's A3: Number.isInteger answers TRUE for
+    // 1e21, so the lower-bound-only check let a request reach the audit row
+    // and render its folded detail as `bag 1e+21`, and any absurd index
+    // bought a pointless load-strip-and-refuse round trip. Both edges are
+    // pinned by LITERAL here, never rebuilt from the module's own constant,
+    // so a moved bound reds rather than following itself.
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'wyrmfall_pendant' })).toBeNull();
+    expect(clearItemNameBodyError({ bag: 1023, itemId: 'wyrmfall_pendant' })).toBeNull();
+    expect(clearItemNameBodyError({ bag: 1024, itemId: 'wyrmfall_pendant' })).toBe(
+      'bag must be a whole number from 0 to 1023',
+    );
+    // The offending shapes the old check admitted, and the ones it already
+    // refused, under the one message.
+    for (const bag of [1e21, 1e300, Number.MAX_SAFE_INTEGER, Number.MAX_VALUE]) {
+      expect(clearItemNameBodyError({ bag, itemId: 'wyrmfall_pendant' }), String(bag)).toBe(
+        'bag must be a whole number from 0 to 1023',
+      );
+    }
+    for (const bag of [Number.POSITIVE_INFINITY, Number.NaN, -0.5, -1e21]) {
+      expect(clearItemNameBodyError({ bag, itemId: 'wyrmfall_pendant' }), String(bag)).toBe(
+        'bag must be a whole number from 0 to 1023',
+      );
+    }
+    // Non-vacuity: the bound must sit ABOVE every carried inventory the game
+    // can actually build, or it would refuse a real target. The largest
+    // possible carried array is the backpack plus one copy of the roomiest
+    // bag in every socket, computed here from the live catalog rather than
+    // asserted as a number that could quietly grow past the bound.
+    const roomiestBag = Math.max(...Object.keys(ITEMS).map((id) => bagSlotsOf(ITEMS[id])));
+    const maxCarried = BACKPACK_SLOTS + BAG_SOCKETS * roomiestBag;
+    expect(roomiestBag).toBeGreaterThan(0);
+    expect(maxCarried).toBeLessThan(1024);
   });
 
   it('a bagged copy of a RETIRED id is targetable per-cell (the shape bound, not an allowlist)', () => {

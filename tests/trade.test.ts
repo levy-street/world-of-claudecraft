@@ -997,6 +997,96 @@ describe('trade module (direct, no Sim)', () => {
     ]);
   });
 
+  it('refuses the swap and resets both accepts when a staged copy is mutated between accept and confirm', () => {
+    // The mid-trade payload-mutator substitution class (Phase 18,
+    // trade-substitution-class). Ayla stages her plain-rolled signed copy; the
+    // counterparty accepts what the window showed; between the accepts and the
+    // final confirm the copy's payload changes under it (a Perfecting stamp
+    // here; a rename or an enchant would do the same). The pinned match then
+    // finds no payload-equal copy, and BEFORE this close the marker-blind
+    // fallback shipped SOME eligible copy: the mutated one or its sibling,
+    // either a copy Borin never agreed to. Now every staged instanced copy is
+    // re-pinned at confirm by the removal's own walk over scratch bags, and a
+    // miss refuses the swap, resets both accept flags, and leaves the window
+    // open on the existing unavailable line, so the trade can only proceed
+    // once the offer is re-staged with what the bags really hold.
+    const staged = { signer: 'Ayla', rolled: { quality: 'epic' } };
+    const sibling = { signer: 'Ayla', rolled: { quality: 'epic' }, name: 'Sibling' };
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [
+        { itemId: 'wolf_fang', count: 1, instance: sibling },
+        { itemId: 'wolf_fang', count: 1, instance: staged },
+      ],
+      [],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    const session = tradeMod.tradeFor(ctx, 1);
+    expect((session!.a === 1 ? session!.offerA : session!.offerB).items).toEqual([
+      { itemId: 'wolf_fang', count: 1, instance: staged },
+    ]);
+    // Borin confirms what he saw; Ayla's copy is then Perfected under the
+    // open window (the live payload object is what a sim-side stamp mutates).
+    tradeMod.tradeConfirm(ctx, 2);
+    const live = players.get(1).inventory.find((s: any) => s.instance?.name === undefined);
+    live.instance.rolled = { quality: 'legendary', stats: { str: 4 } };
+    live.instance.perfected = true;
+    tradeMod.tradeConfirm(ctx, 1);
+
+    const errors = events.filter((e: any) => e.type === 'error');
+    expect(errors.map((e: any) => e.pid).sort()).toEqual([1, 2]);
+    for (const e of errors) {
+      expect(e.text).toBe('Trade failed: items or money no longer available.');
+    }
+    expect(events.some((e: any) => e.type === 'tradeDone')).toBe(false);
+    // Nothing moved: Borin's bags are still empty and Ayla keeps both copies,
+    // the mutated one included.
+    expect(players.get(2).inventory).toEqual([]);
+    expect(players.get(1).inventory).toHaveLength(2);
+    // The window stays open with BOTH accepts cleared: a fresh double-confirm
+    // over the stale offer would refuse again, so the mutator has to re-stage.
+    const after = tradeMod.tradeFor(ctx, 1);
+    expect(after, 'the session survives the refusal').toBeTruthy();
+    expect(after!.acceptedA).toBe(false);
+    expect(after!.acceptedB).toBe(false);
+  });
+
+  it('a re-staged offer after the mutation trades the copy as it now is (the benign path)', () => {
+    // The close refuses only the SUBSTITUTION; unchanged copies and a
+    // re-staged mutated copy both trade. After the refusal Ayla re-sets her
+    // offer, the preview pins the copy as it now is, and the swap ships
+    // exactly that payload.
+    const staged = { signer: 'Ayla', rolled: { quality: 'epic' } };
+    const { ctx, players, events } = makeInstancedTradeCtx(
+      [{ itemId: 'wolf_fang', count: 1, instance: staged }],
+      [],
+    );
+    tradeMod.tradeRequest(ctx, 2, 1);
+    tradeMod.tradeAccept(ctx, 2);
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    players.get(1).inventory[0].instance.perfected = true;
+    tradeMod.tradeConfirm(ctx, 1);
+    expect(events.filter((e: any) => e.type === 'error')).toHaveLength(2);
+    expect(players.get(2).inventory).toEqual([]);
+
+    tradeMod.tradeSetOffer(ctx, [{ itemId: 'wolf_fang', count: 1 }], 0, 1);
+    tradeMod.tradeConfirm(ctx, 1);
+    tradeMod.tradeConfirm(ctx, 2);
+    expect(events.filter((e: any) => e.type === 'error')).toHaveLength(2);
+    expect(events.some((e: any) => e.type === 'tradeDone')).toBe(true);
+    expect(players.get(2).inventory).toEqual([
+      {
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: 'Ayla', rolled: { quality: 'epic' }, perfected: true },
+      },
+    ]);
+    expect(players.get(1).inventory).toEqual([]);
+    expect(tradeMod.tradeFor(ctx, 1)).toBe(null);
+  });
+
   it('refuses the swap when the PINNED instanced copy cannot fit, whatever the plain stock says', () => {
     // The capacity model must budget the copies the removal will actually
     // ship. The preview pinned the SIGNED copy (the only one held at staging);

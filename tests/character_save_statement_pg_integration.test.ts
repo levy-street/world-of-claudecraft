@@ -21,10 +21,32 @@
 import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
+  OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
+} from '../server/offline_character_save_db';
 import type { CharacterState } from '../src/sim/sim';
 
+/** How early the lock bound may fire and still count as "waited on the lock".
+ *  PostgreSQL checks lock_timeout on its own clock and the measurement here
+ *  includes the round trips, so a small slack keeps the floor from flaking
+ *  without letting an instant failure (a bound that never engaged) pass. */
+const LOCK_WAIT_SLACK_MS = 250;
+
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
-const VERIFY_DB = 'wocc_character_save_verify';
+// PER-RUN NAME, a deliberate divergence from the guild_bank_pg_integration
+// recipe this suite otherwise copies verbatim (the Phase 18 database review's
+// B4). That recipe uses a FIXED database name and, in beforeAll,
+// pg_terminate_backend's every connection to it before the DROP. With a fixed
+// name that is a cross-run kill switch: two runs against the same server (a
+// second worktree, a second vitest worker, a local run beside a watch) tear
+// down each other's database mid-suite, and the loser fails with confusing
+// connection errors that look like a real fence bug. The suffix makes the
+// database this run's own, so the terminate can only ever reach connections
+// this run opened, and afterAll drops it rather than leaving one named
+// database per run behind. VITEST_WORKER_ID is stable per worker within a run;
+// the pid covers a direct (non-vitest) invocation.
+const VERIFY_DB = `wocc_character_save_verify_${process.env.VITEST_WORKER_ID ?? process.pid}`;
 
 function verifyUrl(admin: string): string {
   const u = new URL(admin);
@@ -33,8 +55,11 @@ function verifyUrl(admin: string): string {
 }
 
 // server/db.ts reads DATABASE_URL at module load; nothing above statically
-// imports a server module, so this assignment points the module under test at
-// the disposable database (the guild bank suite's ordering trick).
+// imports a server module that BUILDS A POOL, so this assignment still points
+// the module under test at the disposable database (the guild bank suite's
+// ordering trick). The one static server import above is
+// offline_character_save_db, which holds no pool of its own (db.ts injects the
+// transaction runner), so hoisting it ahead of this line changes nothing.
 if (ADMIN_URL) process.env.DATABASE_URL = verifyUrl(ADMIN_URL);
 
 const describeDb = ADMIN_URL ? describe : describe.skip;
@@ -114,6 +139,11 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
   afterAll(async () => {
     await pool?.end().catch(() => {});
     await db?.pool?.end().catch(() => {});
+    // Drop the per-run database, or the server accumulates one per run
+    // (the fixed-name recipe reuses its single database instead). Best
+    // effort: a failure here must never fail an otherwise green suite, and
+    // the next run's beforeAll DROPs IF EXISTS anyway.
+    await admin?.query(`DROP DATABASE IF EXISTS ${VERIFY_DB}`).catch(() => {});
     await admin?.end().catch(() => {});
   }, 30_000);
 
@@ -157,6 +187,54 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
     it('answers false, never a throw, for a character row that does not exist', async () => {
       expect(await db.saveOfflineCharacterState(999_999, 7, STATE('ghost'))).toBe(false);
     });
+
+    it('fails FAST on a contended row: the lock bound fires, never the statement bound', async () => {
+      // The Phase 18 database review's B1, proved against a real lock rather
+      // than a SET LOCAL text pin. Before this the offline writer ran under
+      // statement_timeout alone (at the 60s heavy tier), so a fence UPDATE
+      // contending with a live session's save waited the FULL statement
+      // allowance with a pooled client pinned for all of it. Now the
+      // transaction carries lock_timeout 2s, so the wait ends there and the
+      // caller learns it was contention (55P03), not a fence refusal or a
+      // hang.
+      const id = await makeCharacter();
+      const holder = await pool.connect();
+      try {
+        await holder.query('BEGIN');
+        // A real conflicting row lock, taken exactly the way a live save's
+        // UPDATE takes it, and held open for the whole attempt.
+        await holder.query('SELECT 1 FROM characters WHERE id = $1 FOR UPDATE', [id]);
+
+        const startedAt = Date.now();
+        let code: string | undefined;
+        await expect(
+          db.saveOfflineCharacterState(id, 7, STATE('contended')).catch((err: unknown) => {
+            code = (err as { code?: string }).code;
+            throw err;
+          }),
+        ).rejects.toThrow();
+        const waited = Date.now() - startedAt;
+
+        // lock_not_available, the lock_timeout's own SQLSTATE: not 57014
+        // (statement timeout) and not a silent 0-row answer.
+        expect(code).toBe('55P03');
+        // It gave up at the LOCK bound, comfortably inside the statement
+        // bound that used to be the only one. The floor keeps this honest:
+        // an instant failure would mean it never waited on the lock at all.
+        expect(waited).toBeGreaterThanOrEqual(
+          OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS - LOCK_WAIT_SLACK_MS,
+        );
+        expect(waited).toBeLessThan(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+      // The contended attempt wrote nothing, and the row is writable again
+      // the moment the holder lets go.
+      expect(await markerOf(id)).toBeUndefined();
+      expect(await db.saveOfflineCharacterState(id, 7, STATE('after-release'))).toBe(true);
+      expect(await markerOf(id)).toBe('after-release');
+    }, 30_000);
 
     it('REFUSES a cross-realm character id, touching nothing (the realm qualifier)', async () => {
       // The Phase 17 security review's defense-in-depth arm: the offline

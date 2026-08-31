@@ -91,6 +91,7 @@ import {
 import { requireOwned } from './http/middleware/require_owned';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
+import { countOfflineFenceRefusal } from './offline_fence_refusals';
 import { REALM } from './realm';
 
 // ---------------------------------------------------------------------------
@@ -475,8 +476,13 @@ export async function rekeyReclaimedCharacterWorldState(
         reclaimed.state,
       );
       if (!landed) {
+        // The 0-row answer has two causes, and the line names both: a live
+        // lease, or a row that vanished between the reclaim and this write.
+        // Naming only the lease sends an operator hunting a session that is
+        // not there (the Phase 18 database review).
+        countOfflineFenceRefusal('reclaim_sweep');
         console.error(
-          'reclaimed holder signer sweep refused by the load lease fence (a live lease stands); the orphan keeps its old signers:',
+          'reclaimed holder signer sweep refused by the load lease fence (a live lease stands, or the row is gone); the orphan keeps its old signers:',
           reclaimed.id,
         );
       }
@@ -518,12 +524,26 @@ export async function rekeyRenamedCharacterOwnSigner(
   newName: string,
 ): Promise<void> {
   if (state && rekeyInstanceSigner(state, oldName, newName)) {
-    const landed = await charactersDb.saveOfflineCharacterState(characterId, level, state);
-    if (!landed) {
-      console.error(
-        'renamed character signer sweep refused by the load lease fence (a live lease stands); the blob keeps its old signers:',
-        characterId,
-      );
+    // Swallow-and-log exactly like the reclaim sweep above, for the same
+    // reason: both callers await this AFTER the rename committed and after
+    // the market and mail rekeys landed, with no guard of their own, so a
+    // thrown save used to surface as a 500 on a rename that had in fact
+    // happened, and the client's retry then 403s on the cleared force_rename
+    // flag. The cost of swallowing is the same bounded one the reclaim sweep
+    // records: the blob keeps its old signers with nothing to re-trigger the
+    // sweep.
+    try {
+      const landed = await charactersDb.saveOfflineCharacterState(characterId, level, state);
+      if (!landed) {
+        // Both causes of the 0-row answer, named (see the reclaim sweep).
+        countOfflineFenceRefusal('rename_sweep');
+        console.error(
+          'renamed character signer sweep refused by the load lease fence (a live lease stands, or the row is gone); the blob keeps its old signers:',
+          characterId,
+        );
+      }
+    } catch (err) {
+      console.error('failed to save the renamed character signer sweep:', err);
     }
   }
 }

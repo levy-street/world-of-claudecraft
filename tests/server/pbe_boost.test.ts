@@ -33,6 +33,7 @@ import {
   enforceMasterwroughtCap,
   type HandLegalityReads,
   NYTHRAXIS_ATTUNEMENT_QUESTS,
+  outscores,
   pbeBoostEnabled,
   randomBoostName,
   roleItemScore,
@@ -47,8 +48,10 @@ import { bestKitBag } from '../../src/sim/dev_kit';
 import {
   canEquipItem,
   canEquipItemInSlot,
+  displacedSlotForEquip,
   isShieldItem,
   MASTERWROUGHT_EQUIP_CAP,
+  occupiesHand,
 } from '../../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../../src/sim/item_level_req';
 import { materialItemIds } from '../../src/sim/material_ids';
@@ -245,13 +248,26 @@ describe('bisKit (true best-in-slot over the whole PvE ladder)', () => {
     }
   });
 
-  it('fills the offhand legally: never beside a two-hander, always slot-equippable', () => {
+  it('fills the offhand legally: sim displacement law beside a two-hander, always slot-equippable', () => {
+    // The two-hand rule is the SIM's (src/sim/equipment_rules.ts
+    // displacedSlotForEquip): a two-hander benches only an offhand that
+    // OCCUPIES a hand, so a worn offhand (occupiesHand false, the quiver
+    // class) may ride beside it and anything held may not. Pinned against
+    // that law rather than a flat "never beside a two-hander", so the kit can
+    // never carry a pair the equip path would displace (the Phase 18
+    // fillhands-prequiver re-cut).
     for (const cls of BOOST_CLASSES) {
       const kit = bisKit(cls);
       if (!kit.offhand) continue;
       const main = ITEMS[kit.mainhand as string];
-      expect(main.kind === 'weapon' && main.hand === 'twohand', `${cls} 2H+offhand`).toBe(false);
       const off = ITEMS[kit.offhand];
+      if (main.kind === 'weapon' && main.hand === 'twohand') {
+        expect(occupiesHand(off), `${cls} 2H beside a held offhand ${off.id}`).toBe(false);
+      }
+      expect(
+        displacedSlotForEquip(off, 'offhand', { mainhand: kit.mainhand }, (id) => ITEMS[id], cls),
+        `${cls} offhand ${off.id} would displace the mainhand`,
+      ).toBeNull();
       expect(canEquipItemInSlot(cls, off, 'offhand', null), `${cls} offhand ${off.id}`).toBe(true);
       expect(kit.offhand).not.toBe(kit.mainhand);
     }
@@ -841,6 +857,51 @@ describe('boostAccountCharacters', () => {
     const count = await boostAccountCharacters(42, deps);
     expect(count).toBe(0);
   });
+
+  it('skips the second write entirely when the create already carried the level', async () => {
+    // The Phase 18 database review's B3. The create INSERTs the whole ~38 KB
+    // blob and RETURNS it; the roster save then rewrote that entire blob a
+    // second time only to move the level column, once per class, so a boosted
+    // registration paid nine redundant full-blob writes. A create that
+    // reports the level landed leaves the save nothing to do. The roster is
+    // otherwise identical: the same characters, the same count.
+    const { created, saved, deps } = fakes();
+    const inner = deps.createCharacter;
+    deps.createCharacter = async (accountId, name, cls, state) => {
+      const result = await inner(accountId, name, cls, state);
+      return typeof result === 'object' && result !== null
+        ? { ...result, levelStored: true }
+        : result;
+    };
+
+    const count = await boostAccountCharacters(42, deps);
+
+    expect(count).toBe(BOOST_CLASSES.length);
+    expect(created).toHaveLength(BOOST_CLASSES.length);
+    for (const c of created) expect(c.state.level).toBe(BOOST_LEVEL);
+    expect(saved).toEqual([]);
+  });
+
+  it('still writes when the create reports the level did NOT land', async () => {
+    // The other arm, and the reason `levelStored` is read off the RETURNING
+    // row rather than assumed: a binding that cannot carry the level (or a
+    // row that came back at some other level) must still get its save, or
+    // charselect would list a level-1 character.
+    const { created, saved, deps } = fakes();
+    const inner = deps.createCharacter;
+    deps.createCharacter = async (accountId, name, cls, state) => {
+      const result = await inner(accountId, name, cls, state);
+      return typeof result === 'object' && result !== null
+        ? { ...result, levelStored: false }
+        : result;
+    };
+
+    const count = await boostAccountCharacters(42, deps);
+
+    expect(count).toBe(BOOST_CLASSES.length);
+    expect(saved).toHaveLength(created.length);
+    for (const s of saved) expect(s.level).toBe(BOOST_LEVEL);
+  });
 });
 
 describe('Masterwrought equip-cap awareness (phase 08)', () => {
@@ -1011,6 +1072,237 @@ describe('Masterwrought equip-cap awareness (phase 08)', () => {
   });
 });
 
+describe('tank kit identity: the caster-belt tripwire (Phase 18, re-derived on the merged catalog)', () => {
+  // RE-DERIVATION RECORD (2026-08-31, the merged post-eighth/ninth-sync
+  // catalog). The Phase 15 audit read that spiritweld_girdle (int 9, spi 6,
+  // armor 224, a rating pair) won the tank waist for warrior/prot and
+  // paladin/protection because a tank role counts ANY armour toward
+  // identity and the rating term then out-scored the role stats; the
+  // proposed tripwire was CUT because it would have shipped red. On the
+  // merged catalog the offender does NOT reproduce: the Crucible plate belt
+  // forgewall_girdle (armor 270, str 8, sta 9) wins both tank waists at
+  // 43.80 (prot) and 43.00 (protection), spiritweld_girdle scores 30.67 and
+  // 32.47 (fifth and fourth of the eligible waists), and every armour piece
+  // both tank kits wear carries at least one role-weighted stat. The scorer
+  // itself is unchanged (it did not need the fix on this catalog); these
+  // arms are the tripwire that would have caught the recorded shape and will
+  // catch its return: a catalog or scorer change that hands a tank a belt
+  // with none of its role stats reds HERE with the ids.
+  const TANK_ROLES: [PlayerClass, string][] = [
+    ['warrior', 'prot'],
+    ['paladin', 'protection'],
+  ];
+  // A PRIMARY role stat: one the role weights at half or more (sta and str
+  // for both tank roles). paladin/protection also lists int at 0.2, which
+  // is exactly the weight that let the recorded offender's 9 int read as
+  // identity; the tripwire asks about the stats the kit exists for.
+  const PRIMARY_WEIGHT = 0.5;
+  const carriesRoleStat = (role: BoostRole, def: ItemDef): boolean =>
+    (Object.entries(role.weights) as [keyof NonNullable<ItemDef['stats']>, number][]).some(
+      ([stat, weight]) => weight >= PRIMARY_WEIGHT && (def.stats?.[stat] ?? 0) > 0,
+    );
+
+  it.each(TANK_ROLES)(
+    '%s/%s wears a waist carrying its role stats, above spiritweld_girdle',
+    (cls, roleId) => {
+      const role = roleOf(cls, roleId);
+      const kit = bisKitForRole(cls, role);
+      const waist = ITEMS[kit.waist as string];
+      expect(waist, `${cls}/${roleId} waist filled`).toBeTruthy();
+      expect(
+        carriesRoleStat(role, waist),
+        `${waist.id} carries none of ${cls}/${roleId}'s stats`,
+      ).toBe(true);
+      // Premise, not assumption: the recorded offender is still an eligible
+      // waist for this class, so the ordering below is a live comparison and
+      // not a vacuous one over a retired id.
+      const offender = ITEMS.spiritweld_girdle;
+      expect(offender?.slot).toBe('waist');
+      expect(canEquipItem(cls, offender)).toBe(true);
+      expect(meetsLevelRequirement(BOOST_LEVEL, offender)).toBe(true);
+      expect(carriesRoleStat(role, offender), 'the offender still carries no tank stat').toBe(
+        false,
+      );
+      expect(
+        roleItemScore(role, waist),
+        `${cls}/${roleId}: spiritweld_girdle out-scores the worn waist ${waist.id} again`,
+      ).toBeGreaterThan(roleItemScore(role, offender));
+    },
+  );
+
+  it.each(TANK_ROLES)(
+    '%s/%s wears no armour piece carrying none of its role stats',
+    (cls, roleId) => {
+      const role = roleOf(cls, roleId);
+      const kit = bisKitForRole(cls, role);
+      let armourPieces = 0;
+      for (const [slot, id] of Object.entries(kit)) {
+        const def = ITEMS[id as string];
+        if (def.kind !== 'armor') continue;
+        armourPieces += 1;
+        expect(
+          carriesRoleStat(role, def),
+          `${cls}/${roleId} ${slot}=${id} is a dead-stat pick`,
+        ).toBe(true);
+      }
+      // Vacuity floor: the eight armour slots plus the shield and both rings.
+      expect(armourPieces).toBeGreaterThanOrEqual(10);
+    },
+  );
+
+  it('a tank role scores the role-stat belt above a dead-stat belt at equal armour and ratings', () => {
+    // The synthetic shape of the recorded pick, with the armour and rating
+    // terms held equal so only the identity stats decide: the role's own
+    // stats must be worth more than nothing to a tank.
+    const role = roleOf('warrior', 'prot');
+    const belt = (id: string, stats: NonNullable<ItemDef['stats']>): ItemDef =>
+      ({
+        id,
+        name: id,
+        kind: 'armor',
+        slot: 'waist',
+        quality: 'epic',
+        stats,
+        critRating: 20,
+        hasteRating: 20,
+      }) as ItemDef;
+    const roleBelt = belt('synthetic_role_belt', { armor: 224, str: 9, sta: 6 });
+    const deadBelt = belt('synthetic_dead_belt', { armor: 224, int: 9, spi: 6 });
+    expect(roleItemScore(role, roleBelt)).toBeGreaterThan(roleItemScore(role, deadBelt));
+    // And the dead belt's armour is still worth SOMETHING to a tank (armour
+    // is the tank identity stat): the discount factor never zeroes it.
+    expect(roleItemScore(role, deadBelt)).toBeGreaterThan(0);
+  });
+});
+
+describe('bestBySlot tie policy: first encountered wins (Phase 18 pin)', () => {
+  // The per-slot argmax keeps the INCUMBENT on an equal score (strict
+  // greater-than), so among equal-scored candidates the first one the ITEMS
+  // walk reaches wins; the ring, weapon, and shield lists share the policy
+  // through a stable sort. dev_kit's twin (src/sim/dev/bis_gear.ts,
+  // bestKitBag) breaks ties by ascending id instead. JUDGED at this pin
+  // (2026-08-31, the merged catalog): unifying is NOT behavior-neutral. The
+  // live catalog holds 37 real equal-score ties across the 16 role kits and
+  // 35 of them diverge between the two policies, every one a WORN tier-set
+  // piece (warrior arms/fury slagbreaker vs emberfury, hunter packlord vs
+  // coldsight, rogue cinderfang vs ashveil, priest holy emberscreed vs
+  // benison_dawnweave, mage pyroclast vs frostquench, warlock hexthread vs
+  // gravebrand), so an id sort would swap SEVEN role kits onto a different
+  // set with different set bonuses the scorer never prices. First-wins is
+  // therefore pinned as the contract; a deliberate unification re-derives
+  // those kits and this pin together.
+  it('outscores replaces the incumbent only on a strictly higher score', () => {
+    const incumbent = { id: 'first_seen', score: 10 };
+    expect(outscores({ id: 'later_equal', score: 10 }, incumbent)).toBe(false);
+    expect(outscores({ id: 'later_lower', score: 9.999 }, incumbent)).toBe(false);
+    expect(outscores({ id: 'later_higher', score: 10.001 }, incumbent)).toBe(true);
+    // An empty slot takes any candidate, whatever its score.
+    expect(outscores({ id: 'first', score: 0 }, undefined)).toBe(true);
+    expect(outscores({ id: 'first', score: -1 }, undefined)).toBe(true);
+  });
+
+  it('a live tie is real and resolves to the first id the catalog walk reaches', () => {
+    // The warrior arms chest: two tier-set chests score identically under the
+    // arms weights. Premise checks (the tie exists, both are eligible) keep
+    // this from going vacuous when the catalog moves; the winner is the one
+    // ITEMS enumerates first, never the id sort's.
+    const role = roleOf('warrior', 'arms');
+    const [first, second] = ['slagbreaker_chest', 'emberfury_chest'];
+    expect(roleItemScore(role, ITEMS[first])).toBeCloseTo(roleItemScore(role, ITEMS[second]), 9);
+    const order = Object.keys(ITEMS);
+    expect(order.indexOf(first)).toBeGreaterThanOrEqual(0);
+    expect(order.indexOf(first)).toBeLessThan(order.indexOf(second));
+    // The id sort would pick the other one: the divergence this pin records.
+    expect([first, second].sort()[0]).toBe(second);
+    expect(bisKitForRole('warrior', role).chest).toBe(first);
+  });
+});
+
+describe('fillHands: a worn offhand rides beside a two-hander (Phase 18, sim displacement law)', () => {
+  // src/sim/equipment_rules.ts displacedSlotForEquip lets an offhand with
+  // occupiesHand false (the quiver class) coexist with a two-hand mainhand in
+  // either equip order; before this arm fillHands hard-coded the pre-quiver
+  // rule and left the offhand empty beside every two-hander. No live kit
+  // reaches the pair today (the hunter's best weapon is a one-hander and no
+  // other class has a worn offhand), so the arm is synthetic through the
+  // HandLegalityReads seam, the phase 09 idiom below.
+  const isFlagged = (id: string) => id.startsWith('mw_');
+  const scoreOf = (scores: Record<string, number>) => (id: string) => scores[id] ?? 0;
+  const ROLE: BoostRole = { id: 'test', weights: {}, melee: true };
+  const wornQuiver: HandLegalityReads = {
+    canEquipInSlot: () => true,
+    canDualWieldSpecless: () => false,
+    occupiesHand: (id) => id !== 'plain_quiver',
+  };
+
+  it('a demoted flagged two-hander refills as a two-hander AND keeps the worn quiver', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_greatbow',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_quiver', score: 20 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_greatbow: 50 }),
+      isFlagged,
+      {
+        cls: 'hunter',
+        role: ROLE,
+        weapons: [
+          { id: 'mw_greatbow', score: 50, twoHand: true },
+          { id: 'plain_longbow', score: 40, twoHand: true },
+          { id: 'plain_kris', score: 30, twoHand: false },
+        ],
+        shields: [],
+        held: { id: 'plain_quiver', score: 20 },
+        reads: wornQuiver,
+      },
+    );
+    // The pre-quiver rule emptied the offhand here; sim law says the quiver
+    // hangs on the back and displaces nothing.
+    expect(kit.mainhand).toBe('plain_longbow');
+    expect(kit.offhand).toBe('plain_quiver');
+  });
+
+  it('a HELD offhand still never rides beside a two-hander (the rule that stays)', () => {
+    const kit: Partial<Record<EquipSlot, string>> = {
+      chest: 'mw_chest',
+      waist: 'mw_waist',
+      mainhand: 'mw_greatbow',
+    };
+    enforceMasterwroughtCap(
+      kit,
+      new Map([['offhand', { id: 'plain_orb', score: 20 }]]),
+      [],
+      scoreOf({ mw_chest: 100, mw_waist: 90, mw_greatbow: 50 }),
+      isFlagged,
+      {
+        cls: 'hunter',
+        role: ROLE,
+        weapons: [
+          { id: 'mw_greatbow', score: 50, twoHand: true },
+          { id: 'plain_longbow', score: 40, twoHand: true },
+        ],
+        shields: [],
+        held: { id: 'plain_orb', score: 20 },
+        reads: wornQuiver,
+      },
+    );
+    expect(kit.mainhand).toBe('plain_longbow');
+    expect(kit.offhand).toBeUndefined();
+  });
+
+  it('the real reads answer the sim rule: a quiver is worn, an orb and a shield are held', () => {
+    // The seam's production binding is equipment_rules occupiesHand over ITEMS;
+    // pin the two answers the arm above depends on against real defs.
+    expect(occupiesHand(ITEMS.heroic_direfang_quiver)).toBe(false);
+    expect(occupiesHand(ITEMS.heroic_wraithfire_orb)).toBe(true);
+    expect(occupiesHand(ITEMS.varkhul_emberward)).toBe(true);
+  });
+});
+
 describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)', () => {
   // Phase 09 ships flagged hands (Ridgebreaker, Duskforged Warblade and
   // Bulwark, the two held offhands), but none is an argmax pick for any role
@@ -1022,13 +1314,18 @@ describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)',
   // comment names the wrong pick a regression would produce.
   const isFlagged = (id: string) => id.startsWith('mw_');
   const scoreOf = (scores: Record<string, number>) => (id: string) => scores[id] ?? 0;
+  // Every synthetic held offhand below is an orb: it OCCUPIES a hand, so the
+  // two-hand exclusion binds it exactly as before the worn-offhand read landed
+  // (the quiver arm further down is the one that answers false).
   const anyLegal: HandLegalityReads = {
     canEquipInSlot: () => true,
     canDualWieldSpecless: () => true,
+    occupiesHand: () => true,
   };
   const noDualWield: HandLegalityReads = {
     canEquipInSlot: () => true,
     canDualWieldSpecless: () => false,
+    occupiesHand: () => true,
   };
   const ROLE: BoostRole = { id: 'test', weights: {}, melee: true };
 
@@ -1127,6 +1424,7 @@ describe('Masterwrought cap: hand demotion routes through fillHands (phase 09)',
         reads: {
           canEquipInSlot: (_cls, id, slot) => !(slot === 'offhand' && id === 'plain_polearm'),
           canDualWieldSpecless: () => true,
+          occupiesHand: () => true,
         },
       },
     );

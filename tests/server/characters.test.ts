@@ -46,6 +46,10 @@ import {
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Ctx, Method, Middleware } from '../../server/http/types';
 import {
+  offlineFenceRefusals,
+  resetOfflineFenceRefusalsForTests,
+} from '../../server/offline_fence_refusals';
+import {
   CHARACTER_MUTATION_MAX_PER_MINUTE,
   resetCharacterMutationRateLimits,
   resetRateLimitClock,
@@ -232,6 +236,9 @@ async function runRoute(
 
 beforeEach(() => {
   installRuntime();
+  // The offline-writer fence counters are process-global and monotonic, so a
+  // count left by an earlier case would read as this one's.
+  resetOfflineFenceRefusalsForTests();
 });
 
 afterEach(() => {
@@ -836,6 +843,64 @@ describe('create handler', () => {
     expect(saveOfflineCharacterState).toHaveBeenCalledWith(903, 3, orphanState);
     expect(error).toHaveBeenCalledTimes(1);
     expect(String(error.mock.calls[0][0])).toContain('lease');
+    // The 0-row answer has TWO causes and the line must name both: a live
+    // lease, or a row that vanished between the reclaim and the write (the
+    // database review's B2). Reading it as "a live lease" alone sends an
+    // operator hunting a session that does not exist.
+    expect(String(error.mock.calls[0][0])).toContain('a live lease stands, or the row is gone');
+    // And the refusal is COUNTED on its own family, so a rate of silently
+    // unlanded sweeps is watchable rather than log-only (the security
+    // review's A1); no sibling family moves.
+    expect(offlineFenceRefusals()).toEqual({
+      rename_sweep: 0,
+      reclaim_sweep: 1,
+      pbe_roster: 0,
+    });
+  });
+
+  it('a reclaim sweep whose save THROWS still counts nothing and completes the create', async () => {
+    // The counter is the FENCE's refusal, never a thrown write: a dead pool
+    // and a live lease need different operator responses, so the series must
+    // not fold them together. The throw still rides the sweep's existing
+    // swallow-and-log arm.
+    const createCharacterCapped = vi
+      .fn()
+      .mockRejectedValueOnce({ code: '23505' })
+      .mockResolvedValueOnce(charRow({ id: 14, name: 'Valid', class: 'warrior', level: 1 }));
+    const orphanState = st({
+      inventory: [{ itemId: 'iron_ore', count: 2, instance: { signer: 'Valid' } }],
+    });
+    setCharactersDbForTests({
+      createCharacterCapped,
+      reclaimDeactivatedName: async () => ({
+        id: 904,
+        archivedName: 'Valida',
+        freedName: 'Valid',
+        level: 3,
+        state: orphanState,
+      }),
+      saveOfflineCharacterState: async () => {
+        throw new Error('pool is gone');
+      },
+    });
+    installRuntime({
+      rekeyMarketSeller: vi.fn(() => false),
+      rekeyMailOwner: vi.fn(() => false),
+    });
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const res = await callHandler('POST', '/api/characters', {
+      account: { accountId: 7, scope: 'full' },
+      body: { name: 'Valid', class: 'warrior' },
+    });
+    expect(res.status).toBe(200);
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain('failed to save');
+    expect(offlineFenceRefusals()).toEqual({
+      rename_sweep: 0,
+      reclaim_sweep: 0,
+      pbe_roster: 0,
+    });
   });
 
   it('409s when the reclaimed name collides AGAIN on the retry (second 23505)', async () => {
@@ -1443,6 +1508,53 @@ describe('rename handler', () => {
     expect(saveOfflineCharacterState).toHaveBeenCalledWith(5, 8, blob);
     expect(error).toHaveBeenCalledTimes(1);
     expect(String(error.mock.calls[0][0])).toContain('lease');
+    // Both causes of the 0-row answer, named (the database review's B2).
+    expect(String(error.mock.calls[0][0])).toContain('a live lease stands, or the row is gone');
+    // Counted on the rename family only (the security review's A1).
+    expect(offlineFenceRefusals()).toEqual({
+      rename_sweep: 1,
+      reclaim_sweep: 0,
+      pbe_roster: 0,
+    });
+  });
+
+  it('a rename sweep whose save THROWS is swallowed: the committed rename still 200s', async () => {
+    // B5, the out-of-remit note the database review flagged: the handler
+    // awaits the sweep with no guard of its own, so before this the sweep's
+    // throw escaped past the market and mail rekeys (which already
+    // committed) and past the committed rename itself, and the route's outer
+    // catch rethrew it as a 500. The client then sees a failed rename that
+    // in fact landed, and retrying it 403s on the cleared force_rename flag.
+    // The reclaim sweep already swallowed; the rename sweep now matches it.
+    const blob = st({
+      inventory: [{ itemId: 'bone_fragments', count: 1, instance: { signer: 'Oldname' } }],
+    });
+    const renamed = charRow({ id: 5, name: 'Newname', level: 8, force_rename: false, state: blob });
+    setCharactersDbForTests({
+      renameCharacter: async () => renamed,
+      saveOfflineCharacterState: async () => {
+        throw new Error('statement timeout');
+      },
+    });
+    installRuntime({ isCharacterOnline: () => false });
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const character = charRow({ id: 5, name: 'Oldname', level: 8, force_rename: true });
+    const res = await callHandler('POST', '/api/characters/:id/rename', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(character),
+      body: { name: 'Newname' },
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({ id: 5, name: 'Newname' });
+    expect(error).toHaveBeenCalledTimes(1);
+    expect(String(error.mock.calls[0][0])).toContain('failed to save');
+    // A throw is not a fence refusal: nothing is counted.
+    expect(offlineFenceRefusals()).toEqual({
+      rename_sweep: 0,
+      reclaim_sweep: 0,
+      pbe_roster: 0,
+    });
   });
 
   it('skips the state save when no held instance carried the old name', async () => {

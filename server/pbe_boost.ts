@@ -42,6 +42,7 @@ import {
   canEquipItemInSlot,
   isShieldItem,
   MASTERWROUGHT_EQUIP_CAP,
+  occupiesHand,
   weaponHand,
 } from '../src/sim/equipment_rules';
 import { meetsLevelRequirement } from '../src/sim/item_level_req';
@@ -51,6 +52,7 @@ import { normalizeCharName, offensiveName } from './auth';
 import { createCharacterCapped, saveOfflineCharacterState } from './db';
 import { logger } from './http/logger';
 import { isUniqueViolation } from './http_util';
+import { countOfflineFenceRefusal } from './offline_fence_refusals';
 
 export const BOOST_LEVEL = 20;
 // Mirrors the per-realm character cap in server/characters.ts (10) and its
@@ -393,13 +395,10 @@ export function bisKitForRole(
     if (isShieldItem(item)) shields.push({ id: item.id, score });
     // Shields and held offhands declare slot 'offhand' and land in that bucket.
     const slot = item.slot as string;
-    const best = bestBySlot.get(slot);
-    if (!best || score > best.score) bestBySlot.set(slot, { id: item.id, score });
-    if (!item.masterwrought) {
-      const bestPlain = bestUnflaggedBySlot.get(slot);
-      if (!bestPlain || score > bestPlain.score) {
-        bestUnflaggedBySlot.set(slot, { id: item.id, score });
-      }
+    const candidate = { id: item.id, score };
+    if (outscores(candidate, bestBySlot.get(slot))) bestBySlot.set(slot, candidate);
+    if (!item.masterwrought && outscores(candidate, bestUnflaggedBySlot.get(slot))) {
+      bestUnflaggedBySlot.set(slot, candidate);
     }
   }
   rings.sort((a, b) => b.score - a.score);
@@ -511,6 +510,19 @@ export function enforceMasterwroughtCap(
 export type ScoredItem = { id: string; score: number };
 export type ScoredWeapon = ScoredItem & { twoHand: boolean };
 
+/** The per-slot argmax's replacement rule: a candidate takes the slot only on
+ *  a STRICTLY higher score, so among equal-scored candidates the first one the
+ *  ITEMS walk reaches wins (the ring, weapon, and shield lists share the policy
+ *  through a stable sort). This is deliberately NOT dev_kit's ascending-id
+ *  tie-break (src/sim/dev/bis_gear.ts, bestKitBag): on the merged catalog the
+ *  two policies diverge on 35 of 37 real equal-score ties, every one a worn
+ *  tier-set piece whose set bonus the scorer never prices, so unifying them
+ *  would re-gear seven role kits. Pinned as the contract in
+ *  tests/server/pbe_boost.test.ts (the Phase 18 tie-policy pin). */
+export function outscores(candidate: ScoredItem, best: ScoredItem | undefined): boolean {
+  return best === undefined || candidate.score > best.score;
+}
+
 /** The per-item legality reads fillHands makes, injectable so the cap
  *  enforcer's hand-refill arm is drivable with synthetic defs that never
  *  touch ITEMS (the same seam pattern as isFlagged above). */
@@ -522,11 +534,16 @@ export interface HandLegalityReads {
     spec: string | null,
   ) => boolean;
   canDualWieldSpecless: (cls: PlayerClass) => boolean;
+  /** Does this offhand-slot item take up a HAND (equipment_rules occupiesHand)?
+   *  False for the worn class (a quiver hangs on the back), which is what lets
+   *  it ride beside a two-hand mainhand under the sim's displacement rule. */
+  occupiesHand: (id: string) => boolean;
 }
 
 const ITEM_HAND_READS: HandLegalityReads = {
   canEquipInSlot: (cls, id, slot, spec) => canEquipItemInSlot(cls, ITEMS[id], slot, spec),
   canDualWieldSpecless: (cls) => canDualWield(cls, null),
+  occupiesHand: (id) => occupiesHand(ITEMS[id]),
 };
 
 /** The candidate pools fillHands drew from, handed to enforceMasterwroughtCap
@@ -582,25 +599,34 @@ function fillHands(
     }
   }
   const mainhand = weapons[0];
-  if (mainhand) kit.mainhand = mainhand.id;
-  // A two-handed mainhand occupies both hands (equipping any offhand would
-  // displace it, src/sim/items.ts equipItem); otherwise the offhand takes the
-  // best of a shield / held offhand, or, for a dual-wielder (rogue at spawn:
-  // no spec is chosen yet), the second-best one-hand weapon.
-  if (mainhand && !mainhand.twoHand) {
-    // The second weapon must be offhand-legal (canEquipItemInSlot excludes
-    // two-handers and mainhand-only weapons for a spec-less dual-wielder);
-    // anything else would displace the mainhand pick on equip.
-    const second = reads.canDualWieldSpecless(cls)
-      ? weapons.find(
-          (w) => w.id !== mainhand.id && reads.canEquipInSlot(cls, w.id, 'offhand', null),
-        )
-      : undefined;
-    const off = [held, second]
-      .filter((c): c is ScoredItem => c !== undefined)
-      .sort((a, b) => b.score - a.score)[0];
-    if (off) kit.offhand = off.id;
+  if (!mainhand) return;
+  kit.mainhand = mainhand.id;
+  if (mainhand.twoHand) {
+    // A two-handed mainhand occupies both hands, so the sim's displacement
+    // rule (src/sim/equipment_rules.ts displacedSlotForEquip) benches any
+    // offhand that itself OCCUPIES a hand: a shield, a second weapon, a held
+    // orb or tome. A WORN offhand (occupiesHand false, the quiver class) is
+    // outside that rule and coexists with the two-hander in either equip
+    // order, so the best offhand-slot pick rides along exactly when it is
+    // worn. Before the Phase 18 fillhands-prequiver re-cut this arm
+    // hard-coded the pre-quiver rule and left the offhand empty beside every
+    // two-hander.
+    if (held && !reads.occupiesHand(held.id)) kit.offhand = held.id;
+    return;
   }
+  // Otherwise the offhand takes the best of a shield / held offhand, or, for a
+  // dual-wielder (rogue at spawn: no spec is chosen yet), the second-best
+  // one-hand weapon. The second weapon must be offhand-legal
+  // (canEquipItemInSlot excludes two-handers and mainhand-only weapons for a
+  // spec-less dual-wielder); anything else would displace the mainhand pick
+  // on equip.
+  const second = reads.canDualWieldSpecless(cls)
+    ? weapons.find((w) => w.id !== mainhand.id && reads.canEquipInSlot(cls, w.id, 'offhand', null))
+    : undefined;
+  const off = [held, second]
+    .filter((c): c is ScoredItem => c !== undefined)
+    .sort((a, b) => b.score - a.score)[0];
+  if (off) kit.offhand = off.id;
 }
 
 /** The class's PRIMARY (spawn-equipped) role kit. */
@@ -827,7 +853,14 @@ export function buildBoostedCharacterState(
 // keep the db seam testable; the defaults hit the real characters table
 // through the lease-fenced offline writer (server/db.ts saveOfflineCharacterState).
 
-export type BoostCreateResult = { id: number } | 'name_taken' | null;
+/** A created row's id, plus whether the create's OWN insert already carried
+ *  BOOST_LEVEL into the level column. True means the roster save below has
+ *  nothing left to move and is skipped; the flag is read off the create's
+ *  RETURNING row, never assumed from what was asked for, so a binding that
+ *  cannot carry the level still gets its save (the Phase 18 database review:
+ *  the second write rewrote the whole ~38 KB blob for one integer column,
+ *  once per class). */
+export type BoostCreateResult = { id: number; levelStored?: boolean } | 'name_taken' | null;
 
 export interface BoostDeps {
   /** Insert the character row (null = account at the slot cap: stop). */
@@ -838,6 +871,7 @@ export interface BoostDeps {
     state: CharacterState,
   ): Promise<BoostCreateResult>;
   /** Persist the level column + state blob (charselect reads the column).
+   *  Called only when the create did NOT already store the level.
    *  An OFFLINE writer by contract: the real binding is the lease-fenced
    *  saveOfflineCharacterState, and a fence refusal logs and resolves (the
    *  roster loop's swallow-and-log posture), never throws. */
@@ -850,8 +884,20 @@ export interface BoostDeps {
 export const defaultBoostDeps: BoostDeps = {
   createCharacter: async (accountId, name, cls, state) => {
     try {
-      const row = await createCharacterCapped(accountId, name, cls, CHARACTER_LIMIT, state);
-      return row ? { id: row.id } : null;
+      // The level rides the SAME insert as the blob (the Phase 18 database
+      // review's B3), so the roster save below is skipped whenever the
+      // RETURNING row confirms it landed. No appearance: a boosted character
+      // is created on the legacy rig.
+      const row = await createCharacterCapped(
+        accountId,
+        name,
+        cls,
+        CHARACTER_LIMIT,
+        state,
+        null,
+        BOOST_LEVEL,
+      );
+      return row ? { id: row.id, levelStored: row.level === BOOST_LEVEL } : null;
     } catch (err) {
       if (isUniqueViolation(err)) return 'name_taken';
       throw err;
@@ -866,9 +912,14 @@ export const defaultBoostDeps: BoostDeps = {
     // world join tops the character up).
     const landed = await saveOfflineCharacterState(characterId, level, state);
     if (!landed) {
+      // The 0-row answer has two causes and the line names both (the Phase 18
+      // database review): a live lease, or the row gone between the create
+      // and this write. On a freshly created row the second is the likelier,
+      // which is exactly why the old lease-only wording misled.
+      countOfflineFenceRefusal('pbe_roster');
       logger.error(
         { characterId, level },
-        'pbe boost roster save refused by the load lease fence (a live lease stands)',
+        'pbe boost roster save refused by the load lease fence (a live lease stands, or the row is gone)',
       );
     }
   },
@@ -899,7 +950,10 @@ export async function boostAccountCharacters(
         const result = await deps.createCharacter(accountId, name, cls, state);
         if (result === 'name_taken') continue;
         if (result === null) return created;
-        await deps.saveState(result.id, BOOST_LEVEL, state);
+        // Only when the create did not already carry the level: the blob it
+        // inserted is this same object, so re-writing it would move nothing
+        // else (the Phase 18 database review's B3).
+        if (!result.levelStored) await deps.saveState(result.id, BOOST_LEVEL, state);
         created++;
         break;
       }

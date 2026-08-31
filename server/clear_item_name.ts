@@ -79,6 +79,20 @@ import { CHARACTER_SAVE_LEASED_LINE } from './character_save_statement';
  *  length is the sim's persisted-id bound. */
 const BAG_ITEM_ID_SHAPE = /^[A-Za-z0-9_.:-]{1,64}$/;
 
+/** The bag target's INDEX bound, both ends. Number.isInteger answers true for
+ *  1e21 and for MAX_SAFE_INTEGER, so a lower-bound-only check let an absurd
+ *  index through: it bought a pointless load-strip-and-refuse round trip and,
+ *  worse, wrote its folded detail into the audit row as `bag 1e+21`, which
+ *  reads as corruption to whoever audits it later (the Phase 18 security
+ *  review). The ceiling is deliberately far above any inventory the game can
+ *  build (the backpack's 16 slots plus the roomiest bag in each of the 4
+ *  sockets, src/sim/bags.ts; the suite computes that maximum from the live
+ *  catalog and pins it under this bound), so it can never refuse a real
+ *  target: it exists to keep nonsense out of the audit trail, not to model
+ *  capacity, which is why it is a flat number here rather than a per-character
+ *  computation the validator has no blob to make. */
+const MAX_BAG_INDEX = 1023;
+
 /** What the operator asked to strip: one worn slot, one bag cell (the
  *  index-plus-id pin, so a shifted stack is never stripped by accident), or
  *  every named copy on the character. The bag target is the persisted
@@ -129,8 +143,16 @@ export function clearItemNameBodyError(body: {
   if (body.bag === undefined || body.itemId === undefined) {
     return 'a bag target needs both the cell index and its item id';
   }
-  if (typeof body.bag !== 'number' || !Number.isInteger(body.bag) || body.bag < 0) {
-    return 'bag must be a non-negative whole number';
+  if (
+    typeof body.bag !== 'number' ||
+    !Number.isInteger(body.bag) ||
+    body.bag < 0 ||
+    body.bag > MAX_BAG_INDEX
+  ) {
+    // One message for every malformed shape (a float, a string, a negative,
+    // an absurd index): the operator's fix is the same in all four cases, and
+    // the ceiling is named so an honest large index is answered honestly.
+    return `bag must be a whole number from 0 to ${MAX_BAG_INDEX}`;
   }
   if (typeof body.itemId !== 'string' || !BAG_ITEM_ID_SHAPE.test(body.itemId)) {
     // Shape, not catalog membership: a bagged copy of an id RETIRED from the

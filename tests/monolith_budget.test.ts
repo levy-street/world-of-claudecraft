@@ -1448,7 +1448,19 @@ const MONOLITHS: MonolithRow[] = [
     // bodies), so the merged file measures 4999 (wc -l < server/db.ts).
     // INHERITED growth on the release arm. Exact merged count, zero slack:
     // the fix stays a domain module, never a raise.
-    ceiling: 4999,
+    // LOWERED 4999 -> 4937 at the Phase 18 database review (2026-08-31). Two
+    // extractions paid for that review's own growth and then some: the
+    // lease-fenced OFFLINE write moved whole to
+    // server/offline_character_save_db.ts (where its three transaction
+    // bounds and their rationale now live; db.ts keeps only the binding of
+    // the real transaction runner, the way the save family keeps its
+    // beginSaveTx binding), and the capped character CREATE moved whole to
+    // server/character_create_db.ts, the sibling of the already-extracted
+    // server/character_delete_db.ts, re-exported so no caller re-points.
+    // The growth they paid for is createCharacterCapped's optional level
+    // parameter, which removes the boost roster's nine redundant full-blob
+    // rewrites per registration. Exact count, zero slack.
+    ceiling: 4937,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

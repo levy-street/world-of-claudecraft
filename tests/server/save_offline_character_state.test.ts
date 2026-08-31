@@ -20,6 +20,11 @@ vi.mock('pg', () => ({
 }));
 
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveOfflineCharacterState } from '../../server/db';
+import {
+  OFFLINE_CHARACTER_SAVE_IDLE_TX_TIMEOUT_MS,
+  OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
+  OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
+} from '../../server/offline_character_save_db';
 import { type CharacterState, Sim } from '../../src/sim/sim';
 
 function realCharacterState(): CharacterState {
@@ -72,11 +77,46 @@ describe('saveOfflineCharacterState: fenced on the absence of a live lease', () 
     expect(values[1]).toBe(12);
     // The persisted blob is the sanitized state, whole (the shared save chokepoint).
     expect((JSON.parse(values[2] as string) as CharacterState).level).toBe(state.level);
-    // The heavy allowance the live save family runs on.
-    const setLocal = client.query.mock.calls.find(
-      (c) => typeof c[0] === 'string' && c[0].startsWith('SET LOCAL statement_timeout'),
+  });
+
+  it('bounds the lock wait and the idle hold, not just the statement (the B1 arm)', async () => {
+    // The Phase 18 database review's BLOCK finding. This write replaced one
+    // that ran through beginCharacterSaveTx, which sets statement_timeout AND
+    // lock_timeout 2s AND idle_in_transaction_session_timeout 10s; the
+    // replacement kept only the statement bound, so a CONTENDED fence UPDATE
+    // (a live save holding the row) waited the whole statement allowance
+    // instead of failing fast at two seconds, with a pooled client pinned for
+    // the duration and an operator watching a spinner. All three bounds are
+    // pinned here by their exact SET LOCAL text, and by literal below, so
+    // dropping one reds. The real-Postgres proof that the lock bound actually
+    // FIRES at ~2s rides
+    // tests/character_save_statement_pg_integration.test.ts.
+    const client = transactionClient(1);
+    dbMock.connect.mockResolvedValue(client as never);
+
+    await saveOfflineCharacterState(41, 12, realCharacterState());
+
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    expect(statements[0]).toBe('BEGIN');
+    // A single-row UPDATE's own allowance, NOT the 60s heavy-read tier the
+    // aggregates and the multi-statement live saves need.
+    expect(statements[1]).toBe('SET LOCAL statement_timeout = 5000');
+    expect(statements[2]).toBe('SET LOCAL lock_timeout = 2000');
+    expect(statements[3]).toBe('SET LOCAL idle_in_transaction_session_timeout = 10000');
+    // Every bound is set BEFORE the write it bounds.
+    const update = statements.findIndex((text) => text.includes('UPDATE characters'));
+    expect(update).toBe(4);
+    expect(statements).toContain('COMMIT');
+    // The constants, and their relations: the statement bound must exceed the
+    // lock bound (or a contended wait could never report itself as a lock
+    // timeout), and must sit well under the heavy tier it no longer uses.
+    expect(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBe(5_000);
+    expect(OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS).toBe(2_000);
+    expect(OFFLINE_CHARACTER_SAVE_IDLE_TX_TIMEOUT_MS).toBe(10_000);
+    expect(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBeGreaterThan(
+      OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
     );
-    expect(setLocal?.[0]).toContain(String(DB_HEAVY_STATEMENT_TIMEOUT_MS));
+    expect(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
   });
 
   it('touches nothing and reports false while a live lease exists (rowCount 0)', async () => {

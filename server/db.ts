@@ -90,6 +90,7 @@ import {
   runMarketBackfill,
 } from './market_backfill';
 import { OAUTH_SCHEMA } from './oauth_db';
+import { runOfflineCharacterSave } from './offline_character_save_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
 import {
   closeOrphanPlayerSessions,
@@ -3241,61 +3242,10 @@ export async function guildNameForCharacter(characterId: number): Promise<string
   return res.rows[0]?.name ?? null;
 }
 
-export async function createCharacterCapped(
-  accountId: number,
-  name: string,
-  cls: PlayerClass,
-  limit = 10,
-  state: CharacterState | null = null,
-  // The authored modular look, already normalized by the route handler.
-  // Null = created without the creator (legacy rig).
-  appearance: Record<string, unknown> | null = null,
-): Promise<CharacterRow | null> {
-  const client = await pool.connect();
-  try {
-    await client.query('BEGIN');
-    const account = await client.query('SELECT id FROM accounts WHERE id = $1 FOR UPDATE', [
-      accountId,
-    ]);
-    if ((account.rowCount ?? 0) === 0) {
-      await client.query('ROLLBACK');
-      return null;
-    }
-    const count = await client.query(
-      'SELECT count(*)::int AS n FROM characters WHERE account_id = $1 AND realm = $2',
-      [accountId, REALM],
-    );
-    if (Number(count.rows[0]?.n ?? 0) >= limit) {
-      await client.query('ROLLBACK');
-      return null;
-    }
-    const res = await client.query(
-      'INSERT INTO characters (account_id, name, class, realm, state, appearance) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, account_id, name, class, level, state, is_gm, force_rename, appearance',
-      [
-        accountId,
-        name,
-        cls,
-        REALM,
-        state ? JSON.stringify(state) : null,
-        appearance ? JSON.stringify(appearance) : null,
-      ],
-    );
-    await recordCharacterCreation(client, accountId, REALM);
-    await client.query('COMMIT');
-    // A created character can become the account's top one, and its class is fixed
-    // here forever (no statement ever updates characters.class). Enqueued inside the
-    // db function rather than at the route so the RouteDef arm, its retained legacy
-    // twin in main.ts, and the PBE boost roster are all covered by one site. After
-    // COMMIT: a rolled-back create must never have enqueued.
-    enqueueLinkChange({ accountId, kinds: ['flex'] }, Date.now());
-    return res.rows[0];
-  } catch (err) {
-    await client.query('ROLLBACK').catch(() => {});
-    throw err;
-  } finally {
-    client.release();
-  }
-}
+// The capped character CREATE moved whole to server/character_create_db.ts
+// at the Phase 18 database review (the character_delete_db.ts sibling's
+// shape); re-exported here so no caller re-points.
+export { createCharacterCapped } from './character_create_db';
 
 // Reclaim a character name abandoned by a deactivated ("invalid") account.
 // Character names are unique per (realm, lower(name)), and deactivation is a
@@ -3527,29 +3477,17 @@ export async function saveCharacterState(
   }
 }
 
-// Persist a character row from an OFFLINE writer (the admin clear-item-name
-// strip, server/clear_item_name.ts): fenced in the SAME statement on the
-// ABSENCE of a live load lease, so a login that has already claimed the lease
-// (the handshake acquires it before it re-reads the blob, server/ws_auth.ts)
-// makes this write touch nothing and return false, which the caller surfaces
-// as a refusal instead of landing a write the session's next autosave would
-// clobber. The caller's pre-checks answer the common case; the fence answers
-// the reconnect window a per-process session map cannot see (a peer process
-// too), and pins the row's realm. Same chokepoints as the live save.
-export async function saveOfflineCharacterState(
+// The lease-fenced OFFLINE write (the two signer sweeps, the PBE roster save,
+// the admin clear-item-name strip). The statement, its three bounds, and the
+// rationale for each live in server/offline_character_save_db.ts; db.ts keeps
+// only the binding of the real transaction runner, the way the save family
+// keeps only its beginSaveTx binding.
+export function saveOfflineCharacterState(
   characterId: number,
   level: number,
   state: CharacterState,
 ): Promise<boolean> {
-  const cleanState = sanitizeRemovedZone1Content(state).state;
-  const stmt = characterUpdateStatement(characterId, level, JSON.stringify(cleanState), {
-    kind: 'unleased',
-    realm: REALM,
-  });
-  const res = await runWithStatementTimeout(DB_HEAVY_STATEMENT_TIMEOUT_MS, (query) =>
-    query(stmt.text, stmt.values),
-  );
-  return (res.rowCount ?? 0) > 0;
+  return runOfflineCharacterSave(runWithStatementTimeout, characterId, level, state);
 }
 
 // Persist character plus this realm's market/mail escrow blobs atomically.
