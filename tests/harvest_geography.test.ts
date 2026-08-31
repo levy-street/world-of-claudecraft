@@ -32,7 +32,8 @@
 //   a template is REACHABLE when it has at least one CAMPS row (src/sim/data.ts
 //   CAMPS, the overworld spawn table the Sim camp loop scatters at world
 //   build) whose center is an OVERWORLD position: not on the far-east instance
-//   plane, and resolving by zoneAt to an authored ZONES entry.
+//   plane, and strictly contained by an authored ZONES rect (zoneContaining,
+//   the honest resolver; zoneAt clamps, see isOverworldCamp).
 // EVERY ZONES ENTRY IS OPEN WORLD, the Proving Shore included. The tutorial
 // island is an ordinary revisitable zone: src/sim/interactions/ferry_bell.ts
 // tryRingFerryBell routes EITHER bell to the other shore with no graduation
@@ -182,14 +183,21 @@ export function isInstancePlanePosition(x: number): boolean {
   return x > DUNGEON_X_THRESHOLD || dungeonAt(x) !== null || isDelvePos(x) || isRiftPos(x);
 }
 
-/** An overworld camp: its center is off the instance plane and zoneAt
- *  resolves it to an authored zone of the world. Every authored zone is open
- *  world (the Proving Shore included, see the header). */
+/** An overworld camp: its center is off the instance plane and STRICTLY
+ *  contained by an authored zone rect (zoneContaining). Every authored zone is
+ *  open world (the Proving Shore included, see the header). The old zone half,
+ *  `world.zones.includes(world.zoneOf(x, z))`, was vacuous by construction:
+ *  zoneOf is zoneAt, which CLAMPS every overworld query to some authored zone,
+ *  so that membership held for any position at all (Phase 11m QA, recorded;
+ *  reopened qr-18). Strict containment is the honest half: a camp off every
+ *  authored rect (a far-west stray, a beyond-the-north-end row) is refused
+ *  instead of clamped in, and the far-west proof arm below is what shows this
+ *  half bites where the plane arm cannot. */
 // biome-ignore lint/suspicious/noExportsInTest: the admission half of the predicate, exported with the other half
 export function isOverworldCamp(camp: CampDef, world: HarvestWorld): boolean {
   const { x, z } = camp.center;
   if (isInstancePlanePosition(x)) return false;
-  return world.zones.includes(world.zoneOf(x, z));
+  return zoneContaining(x, z) !== null;
 }
 
 /** The template's overworld camps. */
@@ -480,9 +488,9 @@ describe('the reachability predicate', () => {
       expect(isOverworldCamp(camp, LIVE_WORLD), camp.mobId).toBe(false);
     }
     // The shipped table has no such camp: every center is off the plane and
-    // strictly inside an authored zone rect (zoneContaining agrees with
-    // zoneAt), so on the live tree the predicate's zone reads are literal,
-    // never clamped.
+    // strictly inside an authored zone rect, where zoneContaining (the
+    // predicate's own resolver) and zoneAt agree, so the zones census over
+    // zoneOf counts the same zones the containment half admitted.
     const unplaced = CAMPS.filter(
       (camp) =>
         isInstancePlanePosition(camp.center.x) ||
@@ -491,6 +499,26 @@ describe('the reachability predicate', () => {
     ).map((camp) => `${camp.mobId} at (${camp.center.x}, ${camp.center.z})`);
     expect(unplaced).toEqual([]);
     expect(CAMPS.length).toBeGreaterThan(0);
+  });
+
+  it('refuses a camp outside every authored zone rect, where only containment can bite', () => {
+    // The proof arm the strict half earns its keep on: a far-WEST stray is off
+    // the instance plane (the plane is far-east), so the plane arm admits it,
+    // and the retired membership half admitted it too (zoneAt clamps every
+    // overworld query into some authored zone). Only strict containment
+    // refuses it. Reverting isOverworldCamp to the clamped membership form
+    // reds exactly here.
+    const strayX = -1_000_000;
+    expect(isInstancePlanePosition(strayX), 'the stray is off the instance plane').toBe(false);
+    expect(zoneContaining(strayX, 0), 'no authored rect contains the stray').toBeNull();
+    expect(ZONES.includes(zoneAt(strayX, 0)), 'zoneAt clamps the stray into ZONES').toBe(true);
+    const stray: CampDef = {
+      mobId: 'synthetic_stray',
+      center: { x: strayX, z: 0 },
+      radius: 4,
+      count: 1,
+    };
+    expect(isOverworldCamp(stray, LIVE_WORLD)).toBe(false);
   });
 });
 

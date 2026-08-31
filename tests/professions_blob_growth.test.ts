@@ -339,6 +339,16 @@ const PERFECTED_CAP_SLOTS: readonly (readonly [EquipSlot, string])[] = [
 const PROMOTED_CAP_SLOT: EquipSlot = PERFECTED_CAP_SLOTS[0][0];
 const PROMOTED_CAP_NAME = 'A'.repeat(MAX_LEGENDARY_NAME_LENGTH);
 
+// The R2 bind stamp at PRODUCTION width (Phase 12 QA's boundTo digit-width
+// note, reopened qr-18). A live wearer's entity id is the character's
+// database id, a Postgres 32-bit serial that reaches ten digits, while this
+// offline fixture's own entity id is two: stamping meta.entityId understated
+// the term by 8 bytes per cap slot. The load path carries boundTo verbatim
+// (item_instance_load.ts names no arm for it and nothing re-binds on load,
+// which is also what lets the settle stay a fixed point across sims whose
+// own ids differ), so the ceiling stamps the widest legal wearer id.
+const PRODUCTION_WIDTH_BOUND_TO = 2_147_483_647;
+
 function ceilingSim(nowMs?: number): Sim {
   const sim = makeSim(31, nowMs);
   const meta = sim.players.get(sim.playerId) as PlayerMeta;
@@ -451,7 +461,7 @@ function ceilingSim(nowMs?: number): Sim {
       rolled: slot === PROMOTED_CAP_SLOT ? { stats, quality: 'legendary' } : { stats },
       signer: longName,
       perfected: true,
-      boundTo: meta.entityId,
+      boundTo: PRODUCTION_WIDTH_BOUND_TO,
       ...(slot === PROMOTED_CAP_SLOT ? { name: PROMOTED_CAP_NAME } : {}),
     };
   }
@@ -515,10 +525,15 @@ function ceilingSim(nowMs?: number): Sim {
       cropId: widestCropId,
       plantedAtMs: plantAnchorMs,
       readyAtMs: plantAnchorMs + FARM_MAX_GROW_MS,
-      // The widest LEGAL JSON form of a roll is exponential (up to 23
-      // characters, reachable only by hand-edited rows; the real mint divides
-      // a uint32 by 2^32); deliberately unmeasured (11d DB review, F4).
-      survivalRoll: 0.12345678901234566,
+      // The widest LEGAL JSON form of a roll is exponential: 17 significant
+      // digits plus a three-digit negative exponent, 23 characters, reachable
+      // only by hand-edited rows (the real mint divides a uint32 by 2^32).
+      // MEASURED since Phase 18 (F4's deliberately-unmeasured note retired,
+      // reopened qr-18): the value below is a shortest-roundtrip double
+      // inside [0, 1), so clampSurvivalRoll passes it through verbatim and
+      // the settle stays a fixed point at the full 23-character width, +4
+      // bytes per bed over the old 19-character decimal form.
+      survivalRoll: 1.2345678901234565e-108,
       yieldSeed: 4_294_967_295,
       compost: true,
       watch: true,
@@ -913,9 +928,22 @@ describe('the professions blob growth bound (phase 16)', () => {
     // "recipe_resonant_weave_bag", (28), and
     // "recipe_loombound_reagent_satchel", (35). The edge stays measurement
     // plus one and the floor measurement minus 380 (the 11m rule).
+    //
+    // AND AGAIN AT Phase 18 (the fixture honesty pass, no content moved):
+    // 17,573 bytes, upper edge 17,466 to 17,574, floor 17,085 to 17,193. The
+    // delta is +108, predicted from the two fixture-width terms BEFORE the
+    // run and measured EXACTLY (drift zero): the R2 bind at production width,
+    // `,"boundTo":2147483647` for `,"boundTo":43` (+8 per Perfected cap slot,
+    // two slots, +16; PRODUCTION_WIDTH_BOUND_TO above records why), and the
+    // survivalRoll ceiling at its widest legal exponential JSON form,
+    // 1.2345678901234565e-108 (23 characters) for 0.12345678901234566 (19),
+    // +4 across all 23 beds, +92 (retiring F4's deliberately-unmeasured
+    // note). The edge stays measurement plus one and the floor measurement
+    // minus 380 (the 11m rule); the 18 KiB structural ceiling holds with 859
+    // bytes of headroom.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(17085);
-    expect(bytes).toBeLessThan(17466);
+    expect(bytes).toBeGreaterThan(17193);
+    expect(bytes).toBeLessThan(17574);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

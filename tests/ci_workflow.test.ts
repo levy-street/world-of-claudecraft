@@ -267,10 +267,20 @@ function screenshotSparseBlocks(source: string): string[] {
     if (!SPARSE_HEADER_RE.test(lines[i].trim())) continue;
     const headerIndent = indentOf(lines[i]);
     let end = i;
-    while (end + 1 < lines.length) {
-      const next = lines[end + 1];
-      if (next.trim() === '' || indentOf(next) <= headerIndent) break;
-      end++;
+    for (let j = i + 1; j < lines.length; j++) {
+      const line = lines[j];
+      // THE TERMINATOR: the body ends at the next NON-BLANK line at or above
+      // the header's own indent (the next `with:` key, the cone-mode closer,
+      // or the next job). A blank line is legal INSIDE a YAML block scalar
+      // and must not end the walk: the pre-fix loop broke at the first blank,
+      // so a block split by an internal blank line was truncated above its
+      // exclusion line and left discovery entirely, which is the one
+      // direction this extractor must never fail in (fewer blocks found).
+      // Trailing blanks stay excluded because `end` only advances on a
+      // non-blank body line.
+      if (line.trim() === '') continue;
+      if (indentOf(line) <= headerIndent) break;
+      end = j;
     }
     let block = lines.slice(i, end + 1).join('\n');
     const closer = lines[end + 1];
@@ -403,6 +413,25 @@ describe('CI workflow parity', () => {
       const styled = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${restyled}\n`;
       expect(screenshotSparseBlocks(styled), `a ${style} block must be found`).toHaveLength(6);
     }
+
+    // ...and the same sixth block split by an INTERNAL BLANK LINE above its
+    // exclusion line is still discovered whole. Blank lines are legal inside
+    // a YAML block scalar, and the pre-fix extractor broke its body walk at
+    // the first one: this block's truncated fragment lacked the exclusion, so
+    // the divergent sixth cone left discovery entirely and the five-block
+    // count above stayed green over it. The control reds on that extractor
+    // (five blocks found) and holds the fixed walk to the honest direction:
+    // a formatting trick may only ever surface as MORE blocks discovered
+    // (then unequal to the one cone), never fewer.
+    const splitLines = divergentCone.split('\n');
+    const exclusionAt = splitLines.findIndex((line) => SCREENSHOT_EXCLUSION_RE.test(line));
+    expect(exclusionAt, 'the divergent cone still carries the exclusion line').toBeGreaterThan(0);
+    splitLines.splice(exclusionAt, 0, '');
+    const blankSplitCone = splitLines.join('\n');
+    const withBlankSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankSplitCone}\n`;
+    const blankBlocks = screenshotSparseBlocks(withBlankSixth);
+    expect(blankBlocks, 'a blank-line-split sixth block must be DISCOVERED whole').toHaveLength(6);
+    expect(blankBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
     const coneDirs = new Set<string>(
       [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
     );

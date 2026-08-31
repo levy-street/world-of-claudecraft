@@ -254,8 +254,9 @@ describe('the crafted rod ladder', () => {
     // Non-vacuity: the filter really did walk a populated catalog. (The
     // comparison's true arm lost its shipped exemplar when masterwrought
     // Phase 11o re-tiered the three land tools to the cap; the synthetic
-    // proof that teachTierMet really can refuse lives in the tier boundary
-    // suites, and the arithmetic arm above keeps the 150-above-cap fact.)
+    // proof that teachTierMet really can refuse is the in-file control
+    // directly below, and the arithmetic arm above keeps the 150-above-cap
+    // fact.)
     expect(ALL_RECIPES.filter((r) => (r.acquisition ?? []).length > 0).length).toBeGreaterThan(20);
     // Since the 11o re-tier NOTHING sits above its cap, exempt or not: the
     // whole catalog is inside the reachable band, which is the lesson's end
@@ -266,6 +267,19 @@ describe('the crafted rod ladder', () => {
         .sort(),
       'no row anywhere sits above its craft cap since the masterwrought Phase 11o re-tier',
     ).toEqual([]);
+  });
+
+  it('teachTierMet really can refuse, the in-file control for the empty above-cap sweep', () => {
+    // The sweep above pins TWO sets EMPTY, which is exactly the shape that
+    // passes vacuously if teachTierMet ever degrades to always-true. This
+    // synthetic (moved here from tests/professions_engineering_onramp.test.ts
+    // so the control sits beside the sweep it controls) keeps the sweep's
+    // predicate provably able to answer false without depending on a sibling
+    // suite: a real recipe pushed to the retired 150 requirement against a
+    // capped 125 skill must be refused.
+    const chassis = ALL_RECIPES.find((r) => r.id === 'recipe_precision_chassis');
+    expect(chassis).toBeDefined();
+    expect(teachTierMet({ ...chassis!, skillReq: 150 }, { engineering: 125 })).toBe(false);
   });
 
   it('rides ALL_RECIPES, and stays out of TOOL_RECIPES', () => {

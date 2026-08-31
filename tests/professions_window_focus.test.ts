@@ -16,22 +16,16 @@ import {
 
 // jsdom ships no 2D canvas, so the procedural icon compositor cannot run here;
 // the painter only ever uses the returned string as an <img src>.
-vi.mock('../src/ui/icons', () => ({
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  // Additive, never bare (the reliquary_window_behavior lesson): the real
+  // module passes through, QUALITY_COLOR included (the hand-mirrored copy the
+  // bare form needed is retired: a real record cannot drift), and only the
+  // two resolvers below stay stubbed.
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: () => 'data:,',
   // Echo the requested id into the URL so painter tests catch a wrong or
   // hardcoded profession/gathering resolver argument.
   professionIconUrl: (id: string) => `/test-professions/${id}.webp`,
-  // The tool-effect hover card (tool_effect_tooltip.ts) colors its title by
-  // item quality; mirror the full record so wiring the card does not crash
-  // here and a partial-mock miss cannot bite a later quality.
-  QUALITY_COLOR: {
-    poor: '#9d9d9d',
-    common: '#ffffff',
-    uncommon: '#1eff00',
-    rare: '#0070dd',
-    epic: '#a335ee',
-    legendary: '#ff8000',
-  },
 }));
 
 interface WorldState {

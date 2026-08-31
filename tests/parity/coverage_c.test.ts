@@ -47,7 +47,13 @@ import {
   SCENARIOS,
 } from './scenarios';
 
-describe('coverage: each scenario fires its subsystem', () => {
+// Explicit suite timeout, the run_scenarios.ts gate precedent: every case here
+// re-records its scenario (nythraxis_full_pull alone records a full raid
+// pull), and the heavy recordings brush the global 20s budget under
+// parallel-worker contention while green standalone (the same pathology the
+// gate's 90s per-test timeouts were minted for). Assertions are unchanged; a
+// genuine hang still fails, with room to finish under suite load.
+describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () => {
   it('mob_lifecycle: frenzy + death-throes arm/detonate + wild respawn (despawn adds) + dungeon stays dead', () => {
     const rec = run('mob_lifecycle');
     const n = rec.notes as Record<string, any>;

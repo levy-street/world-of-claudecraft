@@ -16,7 +16,11 @@ vi.mock('../src/render/characters/portrait', () => ({
   portraitsReady: vi.fn(() => false),
   visualPortraitDataUrl: vi.fn(),
 }));
-vi.mock('../src/ui/icons', () => ({
+// Additive, never bare (the reliquary_window_behavior lesson): the canvas
+// resolvers stay stubbed; every export the factory does not name passes
+// through, so hud.ts gaining a new icons import cannot red this suite.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => `mock:${kind}:${id}`,
   QUALITY_COLOR: {},
   raidMarkerDataUrl: vi.fn(() => ''),

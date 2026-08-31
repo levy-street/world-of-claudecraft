@@ -19,6 +19,7 @@ import { ru_RU } from '../src/ui/i18n.locales/ru_RU';
 import { zh_CN } from '../src/ui/i18n.locales/zh_CN';
 import { zh_TW } from '../src/ui/i18n.locales/zh_TW';
 import { DICT } from '../src/ui/sim_i18n';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The five non-Latin overlays, keyed for the guide cap-copy sweep below.
 const GUIDE_FILL_BY_LOCALE: Record<string, Partial<Record<string, string>>> = {
@@ -170,8 +171,11 @@ afterAll(() => {
   }
 });
 
+// EMPTY_TEST_WORLD (the gate-perf trim): every case here is addItem/equip
+// driven against synthetic ids, so no arm reads a camp, npc, or ground
+// object; zones/terrain/playerStart stay identical to the built-in world.
 function makeWarrior(seed: number): Sim {
-  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true });
+  const sim = new Sim({ seed, playerClass: 'warrior', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -180,7 +184,7 @@ function makeWarrior(seed: number): Sim {
 // shaman sits in the HEAVY melee group (ridgebreaker) and the caster
 // proficiency group (the held offhands).
 function makeShaman(seed: number): Sim {
-  const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: true });
+  const sim = new Sim({ seed, playerClass: 'shaman', autoEquip: true, world: EMPTY_TEST_WORLD });
   sim.setPlayerLevel(60);
   return sim;
 }
@@ -961,7 +965,12 @@ describe('masterwrought legacy save tolerance', () => {
     state.equipment.ring2 = RING_ID;
     state.equipment.neck = AMULET_ID;
 
-    const sim = new Sim({ seed: 7107, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 7107,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Restored', { state });
     const meta = sim.meta(pid)!;
 
@@ -994,7 +1003,12 @@ describe('masterwrought legacy save tolerance', () => {
     state.equipment.ring2 = ASH_ID;
     state.equipment.neck = AMULET_ID;
 
-    const sim = new Sim({ seed: 7115, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 7115,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Overcap', { state });
     const meta = sim.meta(pid)!;
     expect(meta.equipment.ring1).toBe(EMBER_ID);

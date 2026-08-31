@@ -16,7 +16,12 @@ import { record } from './record';
 import { type Ev, entities, run } from './run_scenarios';
 import { SCENARIOS } from './scenarios';
 
-describe('coverage: each scenario fires its subsystem', () => {
+// Explicit suite timeout, the run_scenarios.ts gate precedent: every case here
+// re-records its scenario, and the heavy recordings brush the global 20s
+// budget under parallel-worker contention while green standalone (the same
+// pathology the gate's 90s per-test timeouts were minted for). Assertions are
+// unchanged; a genuine hang still fails, with room to finish under suite load.
+describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () => {
   it('duel_to_winner: a duel goes active then ends with a winner, clearing duels', () => {
     const rec = run('duel_to_winner');
     const ev = rec.allEvents as Ev[];

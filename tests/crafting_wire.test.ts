@@ -65,7 +65,7 @@ describe('decodeCraftingIdentity', () => {
     expect(decoded.craftSkills).toEqual({ alchemy: 3, weaponcrafting: 7 });
   });
 
-  it('defaults every ?? arm cleanly against an older server payload', () => {
+  it('defaults every nullish-coalescing arm cleanly against an older server payload', () => {
     // An older server's cprof carries none of the later fields at all; the
     // ?? []/?? 0/?? null arms must load it as the zero-value identity.
     const decoded = decodeCraftingIdentity({} as CraftingIdentityView);

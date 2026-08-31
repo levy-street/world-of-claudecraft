@@ -5,7 +5,10 @@
 // through) is icons.ts behavior, not this module's.
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('../src/ui/icons', () => ({
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  // Additive, never bare (the reliquary_window_behavior lesson): the real
+  // module passes through and only iconDataUrl stays stubbed.
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
   iconDataUrl: (kind: string, id: string) => {
     if (id === 'canvasless_id') throw new Error('2D canvas context is unavailable');
     if (id === 'hostile_url_id') return 'x" onerror="alert(1)';

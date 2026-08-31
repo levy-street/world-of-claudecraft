@@ -149,14 +149,19 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
 /** Sender bodies from ClientWorld, keyed by the wire token they send. */
 function senderBodyFor(cmd: string): string {
   // Every sender routes through the private cmd() helper, so the token literal
-  // appears inside the method that owns it. Take a window around each occurrence
-  // rather than parsing: the assertion only needs to see whether the selection
-  // field rides alongside the token.
+  // appears inside the method that owns it. The window ENDS at the owning
+  // method's closing brace (the next `\n  }` at class-body indent), the client
+  // half of the server arm's next-case bound below: a fixed-length slice bled
+  // into the NEIGHBOURING method, and since most senders do pass a selection,
+  // the field assertion stayed green with the sender under test's field
+  // deleted (verified by re-running the old window over a useItem with its
+  // slot field removed: discardItem's `slot` landed inside the 220 chars).
   const needle = `cmd: '${cmd}'`;
   let out = '';
   let at = ONLINE.indexOf(needle);
   while (at !== -1) {
-    out += ONLINE.slice(at, at + 220);
+    const end = ONLINE.indexOf('\n  }', at);
+    out += end === -1 ? ONLINE.slice(at) : ONLINE.slice(at, end);
     at = ONLINE.indexOf(needle, at + 1);
   }
   return out;

@@ -23,6 +23,7 @@ import {
   recipePatternTooltipModel,
 } from '../src/ui/hud/professions/recipe_pattern_tooltip_view';
 import { bareClient } from './helpers/bare_client';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // An alchemy recipe with a real skill gate and a resolvable result item.
 const GATED_RECIPE = 'recipe_tooltip_pattern_gated';
@@ -215,7 +216,15 @@ describe('recipePatternTooltipModel', () => {
     // band-free compare in the view) and a cell reds. Recipes cover on-step
     // (50), off-step (60), sub-tier (10), and free (0) gates; skills straddle
     // every band edge those gates can meet.
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    // EMPTY_TEST_WORLD (the gate-perf trim): both Sim builds here only read
+    // craft skills and known recipes off a fresh player, never a camp, npc,
+    // or ground object.
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Matrix');
     const meta = sim.meta(pid);
     if (!meta) throw new Error('missing meta');
@@ -363,7 +372,12 @@ describe('same input, same output across both IWorld shapes', () => {
   // either shape. A core reaching for Set.has or a prototype method would pass
   // one arm and fail the other.
   function offlineViewer(skill: number, known: readonly string[]): RecipePatternViewerInput {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    });
     const pid = sim.addPlayer('warrior', 'Patternist');
     const meta = sim.meta(pid);
     if (!meta) throw new Error('missing meta');

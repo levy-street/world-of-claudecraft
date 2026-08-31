@@ -143,15 +143,6 @@ describe('engineering on-ramp: the attuned climb needs no grandfathered tool cra
     expect(hoe).toBeDefined();
     expect(trainingFeeFor(hoe!)).toBe(0);
   });
-
-  it('teachTierMet really can refuse (in-file control for the empty above-cap sweep)', () => {
-    // tests/professions_rod_recipes.test.ts pins the above-cap set EMPTY
-    // since the 11o re-tier; this synthetic keeps that sweep's predicate
-    // provably able to answer true without depending on a sibling suite.
-    const chassis = recipeById('recipe_precision_chassis');
-    expect(chassis).toBeDefined();
-    expect(teachTierMet({ ...chassis!, skillReq: 150 }, { engineering: 125 })).toBe(false);
-  });
 });
 
 describe('engineering on-ramp: the part feeds the chassis (masterwrought R18)', () => {

@@ -295,7 +295,13 @@ describe('playerDummyShedHp', () => {
   const rest = playerDummyRestHp(maxHp);
 
   it('rests at the resting fraction of the pool', () => {
-    expect(rest).toBe(Math.round(maxHp * PLAYER_DUMMY_REST_HP_FRACTION));
+    // Literal pins, not rest === round(maxHp * FRACTION): that form re-derives
+    // the expectation from the same constant the function reads, so no edit to
+    // the fraction could ever red it (the constant-self-comparison trap). The
+    // 0.35 is the shipped design value (practice_dummies.ts documents why);
+    // moving it is a deliberate retune that updates both literals here.
+    expect(PLAYER_DUMMY_REST_HP_FRACTION).toBe(0.35);
+    expect(rest).toBe(1400);
     expect(rest).toBeLessThan(maxHp);
   });
 

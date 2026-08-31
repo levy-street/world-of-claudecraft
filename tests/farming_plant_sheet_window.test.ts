@@ -640,8 +640,13 @@ describe('plant sheet window (source contract)', () => {
     // for both selectors (the #tf-name.hostile idiom). Extract the block by
     // BALANCED BRACES, not by slicing to the next media query, so a rule
     // parked after the block's closing brace cannot satisfy the pin
-    // (tests/quest_marker_styles.test.ts is the precedent).
-    const baseCss = readFileSync(join(repoRoot, 'src/styles/base.css'), 'utf8');
+    // (tests/quest_marker_styles.test.ts is the precedent), and walk the
+    // COMMENT-STRIPPED sheet (the shared strip idiom, same as sheetSrc
+    // above): a CSS comment carrying a brace inside the forced-colors block
+    // would desync the raw depth count and truncate or overrun the extracted
+    // block (the F6 brace-walk remark, Phase 11 QA; quest_marker_styles
+    // already strips, this walk was the remaining raw reader).
+    const baseCss = stripComments(readFileSync(join(repoRoot, 'src/styles/base.css'), 'utf8'));
     const marker = '@media (forced-colors: active)';
     const start = baseCss.indexOf(marker);
     expect(start).toBeGreaterThan(-1);

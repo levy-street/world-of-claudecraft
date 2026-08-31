@@ -12,7 +12,12 @@
 import { describe, expect, it } from 'vitest';
 import { type Ev, entities, run } from './run_scenarios';
 
-describe('coverage: each scenario fires its subsystem', () => {
+// Explicit suite timeout, the run_scenarios.ts gate precedent: every case here
+// re-records its scenario, and the heavy recordings brush the global 20s
+// budget under parallel-worker contention while green standalone (the same
+// pathology the gate's 90s per-test timeouts were minted for). Assertions are
+// unchanged; a genuine hang still fails, with room to finish under suite load.
+describe('coverage: each scenario fires its subsystem', { timeout: 90_000 }, () => {
   it('solo_warrior: auto-attack + mobSwing both ways, mob death -> rollLoot produced loot', () => {
     const rec = run('solo_warrior');
     const pid = rec.sim.playerId;

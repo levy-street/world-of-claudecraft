@@ -10,12 +10,20 @@ vi.mock('../src/guide/viewer', () => ({
 }));
 // The page renders through icons/class crests (canvas) and t(); none of that is under
 // test here, so stub the lot and assert on behavior, not labels.
-vi.mock('../src/ui/icons', () => ({ iconDataUrl: () => '' }));
+// Additive, never bare (the reliquary_window_behavior lesson): only the
+// canvas-touching iconDataUrl stays stubbed.
+vi.mock('../src/ui/icons', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/icons')>()),
+  iconDataUrl: () => '',
+}));
 vi.mock('../src/guide/class_view', () => ({
   classCrest: () => '',
   className: (id: string) => id,
 }));
-vi.mock('../src/ui/i18n', () => ({ t: (k: string) => k }));
+vi.mock('../src/ui/i18n', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../src/ui/i18n')>()),
+  t: (k: string) => k,
+}));
 
 import { models } from '../src/guide/pages/models';
 

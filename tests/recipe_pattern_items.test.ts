@@ -32,13 +32,19 @@ import { groundHeight } from '../src/sim/world';
 import { supportedLanguages } from '../src/ui/i18n';
 import { DICT } from '../src/ui/sim_i18n';
 
-// Mock the db layer so the online arm below needs no Postgres (shape from
-// tests/prof_intro_hint_online.test.ts). Hoisted above the server/game import.
+// Mock the db layer so the online arm below needs no Postgres. Hoisted above
+// the server/game import. The key set mirrors the canonical sibling shape in
+// tests/snapshots.test.ts (plus loadGuildBankRow, which this suite's join path
+// reaches): a thinner hand-list fails only on the merged tree the day game.ts
+// grows a './db' import, which is green-by-avoidance under targeted runs.
 vi.mock('../server/db', () => ({
   pool: { query: vi.fn(async () => ({ rows: [] })) },
   saveCharacterState: vi.fn(async () => {}),
+  saveCharacterAndGuildBankState: vi.fn(async () => true),
   loadGuildBankRow: vi.fn(async () => null),
   saveCharacterAndMarketState: vi.fn(async () => {}),
+  saveMarketState: vi.fn(async () => {}),
+  saveMailState: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -57,6 +63,7 @@ vi.mock('../server/db', () => ({
 
 import { GameServer } from '../server/game';
 import { bareClient, broadcast, fakeWs, joinServer } from './helpers/bare_client';
+import { EMPTY_TEST_WORLD, VENDOR_TEST_WORLD } from './sim_shared';
 
 // The three refusal literals, spelled out once. These ARE the registered
 // English matcher rows (pinned against DICT.en at the bottom of this file), and
@@ -125,6 +132,13 @@ const MISSING_PATTERN_ID = 'test_pattern_missing_recipe';
 const TRAINER_PATTERN_ID = 'test_pattern_trainer_only';
 const GRANDFATHERED_PATTERN_ID = 'test_pattern_grandfathered';
 const MISSING_RECIPE_ID = 'recipe_test_pattern_no_such_recipe';
+// The table-key-vs-def-id mismatch fixture (runtime-injected, never a shipped
+// row: shipped content keeps key === def.id): the ITEMS key the dispatch and
+// the bags speak, and the def.id the record itself claims, deliberately
+// different so the consume-by-caller-id contract has a pin (see the
+// dispatch-id test below).
+const DISPATCH_KEY_PATTERN_ID = 'test_pattern_dispatch_key';
+const DEF_IDENTITY_PATTERN_ID = 'test_pattern_def_identity';
 
 // No cast: the annotation makes tsc the guard for the very shape the kind
 // exists to force (teachesRecipeId required, no use payload, no stackSize).
@@ -150,6 +164,14 @@ beforeAll(() => {
     'Pattern: Test Grandfathered',
     GRANDFATHERED_RECIPE.id,
   );
+  // Registered under DISPATCH_KEY_PATTERN_ID while the def names
+  // DEF_IDENTITY_PATTERN_ID: the mismatch no shipped row may carry, injected
+  // so the dispatch-id contract test can tell the two ids apart.
+  ITEMS[DISPATCH_KEY_PATTERN_ID] = patternDef(
+    DEF_IDENTITY_PATTERN_ID,
+    'Pattern: Test Dispatch Key Mismatch',
+    PATTERN_RECIPE.id,
+  );
 });
 
 afterAll(() => {
@@ -157,13 +179,28 @@ afterAll(() => {
     const at = ALL_RECIPES.indexOf(recipe);
     if (at >= 0) ALL_RECIPES.splice(at, 1);
   }
-  for (const id of [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID, GRANDFATHERED_PATTERN_ID]) {
+  for (const id of [
+    PATTERN_ID,
+    MISSING_PATTERN_ID,
+    TRAINER_PATTERN_ID,
+    GRANDFATHERED_PATTERN_ID,
+    DISPATCH_KEY_PATTERN_ID,
+  ]) {
     delete ITEMS[id];
   }
 });
 
+// EMPTY_TEST_WORLD (the gate-perf trim): the learn/refusal arms drive
+// synthetic patterns through useItem and never read a camp, npc, or ground
+// object. The two market-listing arms are the exception: they stand the
+// seller at the Merchant, so they build on VENDOR_TEST_WORLD (npcs kept,
+// camps and ground objects still trimmed) via makeVendorWorld below.
 function makeWorld(): Sim {
-  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: EMPTY_TEST_WORLD });
+}
+
+function makeVendorWorld(): Sim {
+  return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true, world: VENDOR_TEST_WORLD });
 }
 
 /** A player with `skill` in the pattern's craft, holding `count` copies. */
@@ -304,6 +341,35 @@ describe('using a recipe pattern (offline host, the real useItem path)', () => {
     expect(useAndCollectErrors(sim, PATTERN_ID, pid)).toEqual([]);
 
     expect(sim.countItem(PATTERN_ID, pid)).toBe(1);
+  });
+
+  it('consumes by the DISPATCH item id, never def.id (the table-key mismatch pin)', () => {
+    // The contract written at the consume site (pattern_items.ts): spend the
+    // id the caller was asked to use, because useItem's ownership gate
+    // counted THAT id, and def.id is the record's own claim, not the bag key.
+    // Judged unpinnable in Phase 02 without an unshippable mismatch fixture;
+    // the packet's own runtime-injection precedent makes one without shipping
+    // it: the def registered under DISPATCH_KEY_PATTERN_ID names
+    // DEF_IDENTITY_PATTERN_ID as its id, the player holds one copy under the
+    // dispatch key plus a decoy bag row under the def-id string, and the
+    // learn must eat the dispatch-key copy alone. A consume switched to
+    // ctx.removeItem(def.id, ...) leaves the dispatch copy standing and (were
+    // a def-id row present, as here) eats the row the ownership gate never
+    // counted: both count pins red on it.
+    const sim = makeWorld();
+    const { pid, meta } = patternHolder(sim, 100, 1, DISPATCH_KEY_PATTERN_ID);
+    // The decoy rides the def-id STRING as a bare bag row (no ITEMS entry
+    // exists under that key, exactly like a retired id in a legacy save).
+    meta.inventory.push({ itemId: DEF_IDENTITY_PATTERN_ID, count: 1 });
+    expect(sim.countItem(DISPATCH_KEY_PATTERN_ID, pid)).toBe(1);
+    expect(sim.countItem(DEF_IDENTITY_PATTERN_ID, pid)).toBe(1);
+
+    const events = useAndCollect(sim, DISPATCH_KEY_PATTERN_ID, pid);
+    expect(errorTexts(events)).toEqual([]);
+    expect(trainResults(events)).toHaveLength(1);
+    expect(meta.knownRecipes.has(PATTERN_RECIPE.id)).toBe(true);
+    expect(sim.countItem(DISPATCH_KEY_PATTERN_ID, pid), 'the dispatch copy is spent').toBe(0);
+    expect(sim.countItem(DEF_IDENTITY_PATTERN_ID, pid), 'the def-id decoy survives').toBe(1);
   });
 
   it('spends the exact clicked copy when the use names a slot, sparing a locked sibling', () => {
@@ -589,7 +655,7 @@ describe('patterns on the World Market', () => {
   });
 
   it('lists a pattern for sale: tradable drops, bound only by being consumed', () => {
-    const sim = makeWorld();
+    const sim = makeVendorWorld();
     const { pid } = patternHolder(sim, 0);
     standAtMerchant(sim, pid);
     sim.drainEvents();
@@ -704,13 +770,20 @@ describe('shipped pattern content shape', () => {
   // has, and content review is the only place to catch it.
   it('skips exactly this suite own synthetic ids, and they are really present', () => {
     // The skip below is only safe while it covers this file's fixtures and
-    // nothing else. Three of the four are deliberately malformed; if a shipped
-    // id ever took this prefix, the sweep would silently stop checking it.
+    // nothing else. Four of the five are deliberately malformed (the
+    // dispatch-key mismatch fixture included); if a shipped id ever took this
+    // prefix, the sweep would silently stop checking it.
     const synthetic = Object.keys(ITEMS)
       .filter((id) => id.startsWith(SYNTHETIC_ID_PREFIX))
       .sort();
     expect(synthetic).toEqual(
-      [PATTERN_ID, MISSING_PATTERN_ID, TRAINER_PATTERN_ID, GRANDFATHERED_PATTERN_ID].sort(),
+      [
+        PATTERN_ID,
+        MISSING_PATTERN_ID,
+        TRAINER_PATTERN_ID,
+        GRANDFATHERED_PATTERN_ID,
+        DISPATCH_KEY_PATTERN_ID,
+      ].sort(),
     );
   });
 
@@ -854,7 +927,7 @@ describe('the FARMING patterns ride the shipped machinery unchanged', () => {
     }
     // And one real listing through the live path, so the browse claim above is
     // not the only thing standing between a farm pattern and the market.
-    const sim = makeWorld();
+    const sim = makeVendorWorld();
     const pattern = patternAtRung(75);
     const { pid } = cook(sim, 0, pattern.id);
     standAtMerchant(sim, pid);
