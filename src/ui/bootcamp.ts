@@ -35,6 +35,10 @@ import {
 import type { GamepadKind } from '../game/gamepad_map';
 import { currentInputHintMode } from '../game/input_hint_mode';
 import type { Keybinds } from '../game/keybinds';
+import {
+  type TutorialBagControllerStep,
+  tutorialBagControllerStep,
+} from '../game/tutorial_bag_controller_step';
 import { voice } from '../game/voice';
 import { coachTrailPlan, distanceToTrail } from '../render/coach_trail_core';
 import type { Renderer } from '../render/renderer';
@@ -671,22 +675,45 @@ export class BootcampOverlay {
     keybinds: Keybinds,
     mode: ReturnType<typeof currentInputHintMode>,
     gamepadBindings: CoachGamepadBindings | null,
-  ): { caps: readonly string[]; verbKey: TranslationKey } | null {
+  ): { caps: readonly string[]; verb: string } | null {
     const key = (id: string): string[] =>
       mode === 'keyboard' ? [keybinds.primaryLabel(id) || ''].filter(Boolean) : [];
     const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
     const control = (id: string): readonly string[] =>
       padSource ? gamepadControlHint(padSource, { type: 'action', action: id }) : key(id);
-    const bagItem = (): readonly string[] =>
-      padSource ? gamepadControlHint(padSource, { type: 'bagItem' }) : key('bags');
+    const targetBagItem =
+      this.ringPhase === 'equip'
+        ? RING_LESSON_ITEM_ID
+        : coachGlowBagItemId(this.lastFocus, world.bags);
+    const bagItem = (finalVerbKey: TranslationKey): { caps: readonly string[]; verb: string } => {
+      if (!padSource) {
+        return { caps: key('bags'), verb: t('hudChrome.bootcamp.promptOpenBags') };
+      }
+      const guidance = liveTutorialBagControllerGuidance(targetBagItem);
+      return {
+        caps: gamepadControlHint(padSource, {
+          type: 'bagItem',
+          step: guidance.step,
+        }),
+        verb: tutorialBagControllerVerb(
+          guidance.step,
+          targetBagItem,
+          finalVerbKey,
+          guidance.blockingWindowCloseLabel,
+        ),
+      };
+    };
     if (this.ringPhase === 'equip') {
-      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.itemMenu.equip');
     }
     if (this.ringPhase === 'admire') {
-      return { caps: control('char'), verbKey: 'hudChrome.bootcamp.promptCharacterSheet' };
+      return {
+        caps: control('char'),
+        verb: t('hudChrome.bootcamp.promptCharacterSheet'),
+      };
     }
     if (pouchLessonActive(this.lastFocus, world.bags)) {
-      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.itemMenu.equip');
     }
     // The death lesson's first beat: the stone is in the bags.
     if (
@@ -694,12 +721,12 @@ export class BootcampOverlay {
       this.lastFocus?.questId === DEATH_LESSON_QUEST_ID &&
       this.lastFocus.state === 'active'
     ) {
-      return { caps: bagItem(), verbKey: 'hudChrome.bootcamp.promptOpenBags' };
+      return bagItem('hudChrome.bootcamp.promptKneel');
     }
     // The Gauntlet's closing camera lesson teaches the VIEW itself, so it
     // has never had a world anchor and had only the card to carry it.
     if (this.step === 'camera') {
-      return { caps: [], verbKey: 'hudChrome.bootcamp.promptLookAround' };
+      return { caps: [], verb: t('hudChrome.bootcamp.promptLookAround') };
     }
     return null;
   }
@@ -752,11 +779,11 @@ export class BootcampOverlay {
       : this.centeredAsk(world, keybinds, mode, gamepadBindings);
     if (centered) {
       this.promptButtonGlow = null;
-      const contentKey = `centered:${centered.verbKey}:${centered.caps.join(',')}`;
+      const contentKey = `centered:${centered.verb}:${centered.caps.join(',')}`;
       if (this.promptContentKey !== contentKey) {
         this.promptContentKey = contentKey;
         this.paintPromptChips(centered.caps.map((cap) => ({ cap })));
-        this.promptVerbEl.textContent = t(centered.verbKey);
+        this.promptVerbEl.textContent = centered.verb;
       }
       this.prompt.classList.add('tut-prompt-center');
       if (!this.promptPainted.visible) {
@@ -842,10 +869,31 @@ export class BootcampOverlay {
     // plan says which press it wants; the chip follows it.
     const abilityAsk = plan.verbKey === 'hudChrome.bootcamp.promptUseAbility';
     const padSource = mode === 'pad' ? gamepadHintSource(gamepadBindings) : null;
+    const targetBagItem = coachGlowBagItemId(this.lastFocus, world.bags);
+    const bagGuidance =
+      plan.kind === 'use'
+        ? liveTutorialBagControllerGuidance(targetBagItem)
+        : { step: 'enterHud' as const, blockingWindowCloseLabel: null };
+    const bagStep = bagGuidance.step;
+    const promptVerb =
+      padSource && plan.kind === 'use'
+        ? tutorialBagControllerVerb(
+            bagStep,
+            targetBagItem,
+            plan.verbKey,
+            bagGuidance.blockingWindowCloseLabel,
+          )
+        : t(plan.verbKey);
     const padControlCaps = padSource
       ? gamepadControlHint(
           padSource,
-          coachGamepadIntent(plan.kind, abilityAsk, this.casterClass, this.taughtAbilityId),
+          coachGamepadIntent(
+            plan.kind,
+            abilityAsk,
+            this.casterClass,
+            this.taughtAbilityId,
+            bagStep,
+          ),
         )
       : [];
     const chips = coachPromptChips(plan.kind, mode, {
@@ -864,11 +912,11 @@ export class BootcampOverlay {
       abilityAsk,
       caster: this.casterClass,
     });
-    const contentKey = `${plan.verbKey}:${chips.map(chipKey).join(',')}:${mode}`;
+    const contentKey = `${promptVerb}:${chips.map(chipKey).join(',')}:${mode}`;
     if (this.promptContentKey !== contentKey) {
       this.promptContentKey = contentKey;
       this.paintPromptChips(chips);
-      this.promptVerbEl.textContent = t(plan.verbKey);
+      this.promptVerbEl.textContent = promptVerb;
     }
 
     const groundKey = `${plan.x},${plan.z}`;
@@ -1007,10 +1055,11 @@ function coachGamepadIntent(
   abilityAsk: boolean,
   caster: boolean,
   taughtAbilityId: string | null,
+  bagStep: TutorialBagControllerStep,
 ): GamepadControlHintIntent {
   if (kind === 'select') return { type: 'target' };
   if (kind === 'jump') return { type: 'action', action: 'jump' };
-  if (kind === 'use') return { type: 'bagItem' };
+  if (kind === 'use') return { type: 'bagItem', step: bagStep };
   if (kind !== 'kill') return { type: 'interact' };
   const usesAbility = abilityAsk || caster;
   return {
@@ -1018,6 +1067,55 @@ function coachGamepadIntent(
     action: { type: 'ability', id: usesAbility && taughtAbilityId ? taughtAbilityId : 'attack' },
     fallback: usesAbility ? 'slot1' : 'slot0',
   };
+}
+
+function liveTutorialBagControllerGuidance(targetItemId: string | null): {
+  step: TutorialBagControllerStep;
+  blockingWindowCloseLabel: string | null;
+} {
+  const active = document.activeElement as HTMLElement | null;
+  const bagsEl = document.getElementById('bags');
+  const bagsOpen = bagsEl !== null && bagsWindowShown(bagsEl.style.display);
+  const activeWindow = active?.closest<HTMLElement>('[role="dialog"], .window.panel') ?? null;
+  const blockingWindow = activeWindow !== bagsEl ? activeWindow : null;
+  const closeButton = blockingWindow?.querySelector<HTMLElement>('[data-close]') ?? null;
+  return {
+    step: tutorialBagControllerStep({
+      bagsOpen,
+      blockingWindowOpen: blockingWindow !== null,
+      blockingWindowCloseFocused: active === closeButton,
+      padFocusActive: active?.classList.contains('pad-focus') ?? false,
+      bagsButtonFocused: active?.id === 'mm-bag',
+      itemFocused: bagsOpen && targetItemId !== null && active?.dataset.coachItem === targetItemId,
+    }),
+    blockingWindowCloseLabel: closeButton?.getAttribute('aria-label') ?? null,
+  };
+}
+
+function tutorialBagControllerVerb(
+  step: TutorialBagControllerStep,
+  targetItemId: string | null,
+  finalVerbKey: TranslationKey,
+  blockingWindowCloseLabel: string | null,
+): string {
+  if (step === 'enterHud') return t('hudChrome.bootcamp.promptAccessInterface');
+  if (step === 'navigateToBlockingWindowClose' || step === 'closeBlockingWindow') {
+    const closeWindow = blockingWindowCloseLabel ?? t('itemUi.vendor.close');
+    return step === 'navigateToBlockingWindowClose'
+      ? t('hudChrome.bootcamp.promptMoveToTarget', { target: closeWindow })
+      : closeWindow;
+  }
+  if (step === 'navigateToBags') {
+    return t('hudChrome.bootcamp.promptMoveToTarget', { target: t('itemUi.bags.title') });
+  }
+  if (step === 'openBags') return t('hudChrome.bootcamp.promptOpenBags');
+  if (step === 'navigateToItem') {
+    if (!targetItemId) return t('hudChrome.bootcamp.promptSelect');
+    return t('hudChrome.bootcamp.promptSelectItem', {
+      item: tEntity({ kind: 'item', id: targetItemId, field: 'name' }),
+    });
+  }
+  return t(finalVerbKey);
 }
 
 /** One rail quest's coach state, or null when it is not moving (locked

@@ -48,14 +48,25 @@ describe('gamepadControlHint', () => {
       crossHotbarSet: 0,
     };
 
-    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([
-      'R3',
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'enterHud' })).toEqual(['R3']);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'navigateToBags' })).toEqual([
       'D-pad',
-      'A',
-      'D-pad',
+    ]);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'openBags' })).toEqual(['A']);
+    expect(
+      gamepadControlHint(source, {
+        type: 'bagItem',
+        step: 'navigateToBlockingWindowClose',
+      }),
+    ).toEqual(['D-pad']);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'closeBlockingWindow' })).toEqual([
       'A',
     ]);
-    expect(gamepadControlHint(source, { type: 'bagItem' })).not.toContain('View');
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'navigateToItem' })).toEqual([
+      'D-pad',
+    ]);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'useItem' })).toEqual(['A']);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'enterHud' })).not.toContain('View');
     expect(
       gamepadControlHint(
         {
@@ -67,9 +78,19 @@ describe('gamepadControlHint', () => {
             { button: GP.X, action: GAMEPAD_CONFIRM },
           ],
         },
-        { type: 'bagItem' },
+        { type: 'bagItem', step: 'enterHud' },
       ),
-    ).toEqual(['L3', 'D-pad', 'Square', 'D-pad', 'Square']);
+    ).toEqual(['L3']);
+    expect(
+      gamepadControlHint(
+        {
+          ...source,
+          kind: 'playstation',
+          entries: [{ button: GP.X, action: GAMEPAD_CONFIRM }],
+        },
+        { type: 'bagItem', step: 'useItem' },
+      ),
+    ).toEqual(['Square']);
   });
 
   it('ignores a duplicate system-button HUD binding in favor of a usable stick binding', () => {
@@ -85,13 +106,7 @@ describe('gamepadControlHint', () => {
       crossHotbarSet: 0,
     };
 
-    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([
-      'R3',
-      'D-pad',
-      'A',
-      'D-pad',
-      'A',
-    ]);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'enterHud' })).toEqual(['R3']);
   });
 
   it('stays silent when the bag route requires a system button or lacks a required action', () => {
@@ -106,13 +121,19 @@ describe('gamepadControlHint', () => {
       crossHotbarSet: 0,
     };
 
-    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([]);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'enterHud' })).toEqual([]);
     expect(
       gamepadControlHint(
         { ...source, entries: [{ button: GP.R3, action: GAMEPAD_CYCLE_HUD }] },
-        { type: 'bagItem' },
+        { type: 'bagItem', step: 'enterHud' },
       ),
     ).toEqual([]);
+    expect(
+      gamepadControlHint(
+        { ...source, entries: [{ button: GP.A, action: GAMEPAD_CONFIRM }] },
+        { type: 'bagItem', step: 'useItem' },
+      ),
+    ).toEqual(['A']);
     expect(
       gamepadControlHint(
         {
@@ -122,7 +143,7 @@ describe('gamepadControlHint', () => {
             { button: GP.BACK, action: GAMEPAD_CONFIRM },
           ],
         },
-        { type: 'bagItem' },
+        { type: 'bagItem', step: 'useItem' },
       ),
     ).toEqual([]);
   });
@@ -140,7 +161,7 @@ describe('gamepadControlHint', () => {
       crossHotbarSet: 0,
     };
 
-    expect(gamepadControlHint(source, { type: 'bagItem' })).toEqual([]);
+    expect(gamepadControlHint(source, { type: 'bagItem', step: 'navigateToBags' })).toEqual([]);
     expect(
       gamepadControlHint(
         {
@@ -150,9 +171,9 @@ describe('gamepadControlHint', () => {
             entry.button === GP.DPAD_DOWN ? { ...entry, action: 'slot3' } : entry,
           ),
         },
-        { type: 'bagItem' },
+        { type: 'bagItem', step: 'navigateToItem' },
       ),
-    ).toEqual(['R3', 'D-pad', 'A', 'D-pad', 'A']);
+    ).toEqual(['D-pad']);
   });
 
   it('names the exact primary cross-hotbar chord for Attack', () => {

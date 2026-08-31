@@ -1182,6 +1182,9 @@ export const hudChromeStrings = {
     // Screen-anchored asks: the lessons whose answer is a press on the
     // interface rather than a place in the world. With the coach card gone
     // these ARE the instruction, so each names its own press.
+    promptAccessInterface: 'Access interface',
+    promptMoveToTarget: 'Move to {target}',
+    promptSelectItem: 'Select {item}',
     promptOpenBags: 'Open your bags',
     promptCharacterSheet: 'Open your character sheet',
     promptLookAround: 'Hold right-click and drag to look around',

@@ -13756,6 +13756,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '點擊一個草人把它設為目標，然後點擊動作列上的{ability}。那是你自己的本事，不是隨手一揮。命中三次。',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '把一個草人設為目標，然後按放著{ability}的動作按鈕。那是你自己的本事，不是隨手一揮。命中三次。',
+  'hudChrome.bootcamp.promptAccessInterface': '開啟介面',
+  'hudChrome.bootcamp.promptMoveToTarget': '移動到{target}',
+  'hudChrome.bootcamp.promptSelectItem': '選擇{item}',
   'hudChrome.bootcamp.promptOpenBags': '打開背包',
   'hudChrome.bootcamp.promptCharacterSheet': '打開角色面板',
   'hudChrome.bootcamp.promptLookAround': '按住右鍵拖曳來環視四周',

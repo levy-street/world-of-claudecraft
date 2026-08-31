@@ -24,6 +24,7 @@ import {
   GP,
   gamepadButtonLabel,
 } from './gamepad_map';
+import type { TutorialBagControllerStep } from './tutorial_bag_controller_step';
 
 export interface GamepadControlHintSource {
   entries: readonly GamepadBindingEntry[];
@@ -36,7 +37,7 @@ export interface GamepadControlHintSource {
 export type GamepadControlHintIntent =
   | { readonly type: 'interact' }
   | { readonly type: 'target' }
-  | { readonly type: 'bagItem' }
+  | { readonly type: 'bagItem'; readonly step: TutorialBagControllerStep }
   | { readonly type: 'action'; readonly action: GamepadActionId }
   | {
       readonly type: 'crossHotbar';
@@ -63,9 +64,19 @@ export function gamepadControlHint(
   if (intent.type === 'bagItem') {
     const enterHud = safeTutorialActionLabel(source, GAMEPAD_CYCLE_HUD);
     const confirm = safeTutorialActionLabel(source, GAMEPAD_CONFIRM);
-    return enterHud && confirm && dpadNavigatesHud(source)
-      ? [enterHud, 'D-pad', confirm, 'D-pad', confirm]
-      : [];
+    const dpadAvailable = dpadNavigatesHud(source);
+    if (!tutorialBagRouteAvailable(intent.step, enterHud, confirm, dpadAvailable)) return [];
+    if (intent.step === 'enterHud') {
+      return enterHud ? [enterHud] : [];
+    }
+    if (
+      intent.step === 'navigateToBlockingWindowClose' ||
+      intent.step === 'navigateToBags' ||
+      intent.step === 'navigateToItem'
+    ) {
+      return ['D-pad'];
+    }
+    return confirm ? [confirm] : [];
   }
   if (intent.type === 'action') {
     const label = labelForGamepadAction(source.entries, intent.action, source.kind);
@@ -94,6 +105,18 @@ export function gamepadControlHint(
     return cycle ? [cycle, chord] : [];
   }
   return [];
+}
+
+function tutorialBagRouteAvailable(
+  step: TutorialBagControllerStep,
+  enterHud: string | null,
+  confirm: string | null,
+  dpadAvailable: boolean,
+): boolean {
+  if (!confirm) return false;
+  if (step === 'useItem') return true;
+  if (!dpadAvailable) return false;
+  return step !== 'enterHud' || enterHud !== null;
 }
 
 function safeTutorialActionLabel(
