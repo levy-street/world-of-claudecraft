@@ -705,6 +705,12 @@ export const en = {
   'alert.customExpiryRequired': 'Choose a custom suspension expiry.',
   'alert.actionFailed': 'moderation action failed',
   'auth.loginFailed': 'login failed, is the server up?',
+  // The one permission-denied treatment every data surface shares
+  // (components/PermissionDenied.svelte). Its sibling is each surface's own
+  // generic `<domain>.loadFailed` line, which stays per-surface.
+  'loadFailure.forbiddenTitle': 'Permission denied',
+  'loadFailure.forbiddenDetail':
+    'Your staff roles do not carry the permission this view reads. Ask a superadmin to grant it, then reload.',
   'common.unknown': 'unknown',
   'common.emptyValue': '-',
   'detail.since': 'since {value}',
@@ -798,6 +804,14 @@ export const en = {
   'marketMetrics.bucketSummary':
     '{listings} listings, {quantity} units, {listed} of {tracked} items listed',
   'marketMetrics.bucketEmpty': 'no live listings',
+  // Sold volume: what actually changed hands, from the server's accumulating
+  // store. Distinct from every listing figure above, which describe supply on
+  // offer right now.
+  'marketMetrics.bucketSold':
+    'Sold in the last {days} days: {sales} sales, {quantity} items, {copper}',
+  'marketMetrics.soldNone': 'Sold in the last {days} days: nothing',
+  'marketMetrics.soldUnavailable':
+    'Sold volume is unavailable right now, so only live listings are shown below.',
   'marketMetrics.essenceNote':
     'These materials are soulbound and can never be listed. Any row here means the market escrow invariant broke and needs engineering attention.',
   'marketMetrics.colItem': 'Item',

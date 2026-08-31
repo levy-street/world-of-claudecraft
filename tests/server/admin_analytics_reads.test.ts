@@ -417,7 +417,12 @@ describe('one memo per route, and both readable from the ops readout', () => {
   });
 
   it('the activity route moves only the activity memo; the metrics route only its own', async () => {
-    configureAdminMarketMetrics(() => ({ realm: 'memo-realm', buckets: [] }));
+    configureAdminMarketMetrics(() => ({
+      realm: 'memo-realm',
+      buckets: [],
+      soldWindowDays: 7,
+      soldAvailable: false,
+    }));
     const before = adminAnalyticsMemoStats();
     await runRoute('/admin/api/activity');
     await runRoute('/admin/api/activity');

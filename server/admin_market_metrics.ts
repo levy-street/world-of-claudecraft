@@ -15,6 +15,7 @@ import {
   WYRMFALL_CORE_ITEM_ID,
 } from '../src/sim/professions/masterwrought_materials';
 import { type CachedRead, createCachedRead, deepFreezeSnapshot } from './cached_read';
+import { MARKET_SOLD_VOLUME_WINDOW_DAYS, type MarketSoldVolumeRow } from './market_sold_volume_db';
 
 // Fixed bucket order: the response always carries all six in this order so the
 // dashboard renders a stable layout with zeros.
@@ -79,6 +80,23 @@ export interface AdminMarketMetricsItemRow {
   medianPerUnit: number;
 }
 
+/**
+ * What actually changed hands in a bucket over the readout window. Distinct
+ * from every other figure here: the rest of this module folds the LIVE BOOK
+ * (supply on offer right now), while these come from the accumulating store
+ * (server/market_sold_volume_db.ts), because the sim's own sale ledger is a
+ * pending list cleared the moment a seller collects and cannot be folded.
+ */
+export interface AdminMarketSoldVolume {
+  saleCount: number;
+  /** Units sold. */
+  quantity: number;
+  /** Gross buyout copper, before the Merchant's cut. */
+  copper: number;
+}
+
+const NO_SOLD_VOLUME: AdminMarketSoldVolume = { saleCount: 0, quantity: 0, copper: 0 };
+
 export interface AdminMarketMetricsBucket {
   bucket: MarketMetricsBucketId;
   listingCount: number;
@@ -86,11 +104,22 @@ export interface AdminMarketMetricsBucket {
   trackedItemCount: number;
   listedItemCount: number;
   items: AdminMarketMetricsItemRow[];
+  /** Zeroed by the pure builder; filled by `withMarketSoldVolume`. */
+  sold: AdminMarketSoldVolume;
 }
 
 export interface AdminMarketMetrics {
   realm: string;
   buckets: AdminMarketMetricsBucket[];
+  /** The trailing UTC-day window the `sold` figures cover. */
+  soldWindowDays: number;
+  /**
+   * False when the sold-volume store could not be read (unwired process, a
+   * database blip). The listing half is still valid and still rendered; the
+   * dashboard says the volume half is unavailable rather than showing a zero
+   * that reads like "nothing sold".
+   */
+  soldAvailable: boolean;
 }
 
 // Whole-copper median over the per-listing per-unit prices, rounding up on an
@@ -160,9 +189,62 @@ export function buildAdminMarketMetrics(
       trackedItemCount: MARKET_METRICS_BUCKET_SETS[bucket].size,
       listedItemCount: items.length,
       items,
+      // Zeroed here and filled by withMarketSoldVolume: this builder folds the
+      // in-process listing book and must stay synchronous and database-free.
+      sold: { ...NO_SOLD_VOLUME },
     };
   });
-  return { realm, buckets };
+  return {
+    realm,
+    buckets,
+    soldWindowDays: MARKET_SOLD_VOLUME_WINDOW_DAYS,
+    soldAvailable: false,
+  };
+}
+
+/**
+ * Fold per-item store rows into per-bucket totals, using the SAME
+ * classification the listing half uses, so a bucket's supply and its volume
+ * can never disagree about which items belong to it. Unclassified ids are
+ * ignored (the writer refuses them, so this is a belt-and-braces arm for rows
+ * left behind by a content change that retired an id).
+ */
+export function foldMarketSoldVolume(
+  rows: readonly MarketSoldVolumeRow[],
+): Record<MarketMetricsBucketId, AdminMarketSoldVolume> {
+  const totals = {} as Record<MarketMetricsBucketId, AdminMarketSoldVolume>;
+  for (const bucket of MARKET_METRICS_BUCKETS) totals[bucket] = { ...NO_SOLD_VOLUME };
+  for (const row of rows) {
+    const bucket = classifyMarketMetricsItem(row.itemId);
+    if (bucket === null) continue;
+    const acc = totals[bucket];
+    acc.saleCount += row.saleCount;
+    acc.quantity += row.quantity;
+    acc.copper += row.copper;
+  }
+  return totals;
+}
+
+/**
+ * A COPY of `metrics` carrying the folded sold volume. Pure, and copying
+ * rather than mutating on purpose: the readout it is handed comes straight
+ * from the pure builder, and the result is what gets deep-frozen and shared by
+ * reference with every reader in a TTL window.
+ */
+export function withMarketSoldVolume(
+  metrics: AdminMarketMetrics,
+  rows: readonly MarketSoldVolumeRow[],
+  available: boolean,
+): AdminMarketMetrics {
+  const totals = foldMarketSoldVolume(rows);
+  return {
+    ...metrics,
+    buckets: metrics.buckets.map((bucket) => ({
+      ...bucket,
+      sold: available ? totals[bucket.bucket] : { ...NO_SOLD_VOLUME },
+    })),
+    soldAvailable: available,
+  };
 }
 
 // The economy-oversight sibling's TTL (TOP_WEALTH_HOLDERS_TTL_MS): this read
@@ -177,6 +259,7 @@ export const ADMIN_MARKET_METRICS_TTL_MS = 15_000;
 // ---------------------------------------------------------------------------
 
 let metricsSource: (() => AdminMarketMetrics) | null = null;
+let soldVolumeSource: (() => Promise<MarketSoldVolumeRow[]>) | null = null;
 let metricsCache: CachedRead<AdminMarketMetrics> | null = null;
 
 /** Inject the live-book metrics build (boot wiring, or a test fake). */
@@ -185,9 +268,20 @@ export function configureAdminMarketMetrics(source: () => AdminMarketMetrics): v
   metricsCache = null;
 }
 
-/** Clear the injected source and cache (test-only). */
+/**
+ * Inject the sold-volume read (boot wiring, or a test fake). Optional by
+ * design: an unwired process still serves the listing half, with
+ * `soldAvailable: false`.
+ */
+export function configureAdminMarketSoldVolume(source: () => Promise<MarketSoldVolumeRow[]>): void {
+  soldVolumeSource = source;
+  metricsCache = null;
+}
+
+/** Clear the injected sources and cache (test-only). */
 export function resetAdminMarketMetricsForTests(): void {
   metricsSource = null;
+  soldVolumeSource = null;
   metricsCache = null;
 }
 
@@ -204,8 +298,24 @@ export function readAdminMarketMetrics(): Promise<AdminMarketMetrics> {
   // route, server/ok_response_memo.ts); freeze it WHOLE, buckets and rows
   // included, so no consumer can poison the shared readout or desync the
   // memoized bytes from the object (a shallow freeze left the rows open).
-  metricsCache ??= createCachedRead(async () => deepFreezeSnapshot(source()), {
-    ttlMs: ADMIN_MARKET_METRICS_TTL_MS,
-  });
+  //
+  // The sold-volume read is a database round trip, so it rides INSIDE this
+  // cached read: at most one query per TTL window, single-flighted with every
+  // other reader, never once per request. Its failure degrades the volume half
+  // only; the listing half is in-process and always answerable.
+  metricsCache ??= createCachedRead(
+    async () => {
+      const base = source();
+      const sold = soldVolumeSource;
+      if (sold === null) return deepFreezeSnapshot(base);
+      try {
+        return deepFreezeSnapshot(withMarketSoldVolume(base, await sold(), true));
+      } catch (err) {
+        console.error('admin market sold-volume read failed:', err);
+        return deepFreezeSnapshot(base);
+      }
+    },
+    { ttlMs: ADMIN_MARKET_METRICS_TTL_MS },
+  );
   return metricsCache.read();
 }

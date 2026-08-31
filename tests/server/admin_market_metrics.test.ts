@@ -15,14 +15,18 @@ import {
   buildAdminMarketMetrics,
   classifyMarketMetricsItem,
   configureAdminMarketMetrics,
+  configureAdminMarketSoldVolume,
+  foldMarketSoldVolume,
   MARKET_METRICS_BUCKET_SETS,
   MARKET_METRICS_BUCKETS,
   readAdminMarketMetrics,
   resetAdminMarketMetricsForTests,
+  withMarketSoldVolume,
 } from '../../server/admin_market_metrics';
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
+import { MARKET_SOLD_VOLUME_WINDOW_DAYS } from '../../server/market_sold_volume_db';
 import { resetAdminAnalyticsRateLimits } from '../../server/ratelimit';
 import {
   FARM_CROPS,
@@ -438,5 +442,142 @@ describe('GET /admin/api/market/metrics', () => {
     }).toThrow();
     // Same installed object inside the TTL: the identity the memo keys on.
     expect(second).toBe(first);
+  });
+});
+
+describe('sold volume (the accumulating store, folded into the readout)', () => {
+  afterEach(() => {
+    resetAdminMarketMetricsForTests();
+  });
+
+  it('zeroes sold volume in the pure builder and states the window', () => {
+    // The builder folds the in-process listing book and must stay synchronous
+    // and database-free; the volume half arrives separately.
+    const out = buildAdminMarketMetrics(FIXTURE, 'eastbrook');
+    expect(out.soldWindowDays).toBe(MARKET_SOLD_VOLUME_WINDOW_DAYS);
+    expect(out.soldAvailable).toBe(false);
+    for (const bucket of out.buckets) {
+      expect(bucket.sold, bucket.bucket).toEqual({ saleCount: 0, quantity: 0, copper: 0 });
+    }
+  });
+
+  it('folds store rows into buckets through the SAME classification as supply', () => {
+    const totals = foldMarketSoldVolume([
+      { itemId: WYRMFALL_CORE_ITEM_ID, saleCount: 2, quantity: 5, copper: 1500 },
+      { itemId: SEED_ID, saleCount: 1, quantity: 3, copper: 90 },
+      { itemId: PRODUCE_ID, saleCount: 4, quantity: 40, copper: 200 },
+      // An id no bucket owns: the writer refuses these, and a row left behind
+      // by a retired content id must not land in some other bucket.
+      { itemId: 'roasted_boar', saleCount: 9, quantity: 9, copper: 9 },
+    ]);
+    expect(totals.cores).toEqual({ saleCount: 2, quantity: 5, copper: 1500 });
+    expect(totals.seeds).toEqual({ saleCount: 1, quantity: 3, copper: 90 });
+    expect(totals.produce).toEqual({ saleCount: 4, quantity: 40, copper: 200 });
+    expect(totals.essence).toEqual({ saleCount: 0, quantity: 0, copper: 0 });
+    expect(totals.patterns).toEqual({ saleCount: 0, quantity: 0, copper: 0 });
+    expect(totals.compost).toEqual({ saleCount: 0, quantity: 0, copper: 0 });
+    // Every bucket present, so a page rendering the record never reads undefined.
+    expect(Object.keys(totals).sort()).toEqual([...MARKET_METRICS_BUCKETS].sort());
+  });
+
+  it('sums several items landing in one bucket', () => {
+    // Two crops both fold into produce; a fold that overwrote instead of
+    // adding would silently report only the last row.
+    const crops = Object.values(FARM_CROPS);
+    const totals = foldMarketSoldVolume([
+      { itemId: crops[0].produceItemId, saleCount: 1, quantity: 2, copper: 30 },
+      { itemId: crops[1].produceItemId, saleCount: 3, quantity: 4, copper: 70 },
+    ]);
+    expect(totals.produce).toEqual({ saleCount: 4, quantity: 6, copper: 100 });
+  });
+
+  it('copies rather than mutating the readout it is given', () => {
+    const base = buildAdminMarketMetrics(FIXTURE, 'eastbrook');
+    const filled = withMarketSoldVolume(
+      base,
+      [{ itemId: WYRMFALL_CORE_ITEM_ID, saleCount: 2, quantity: 5, copper: 1500 }],
+      true,
+    );
+    expect(filled).not.toBe(base);
+    expect(filled.buckets.find((b) => b.bucket === 'cores')?.sold).toEqual({
+      saleCount: 2,
+      quantity: 5,
+      copper: 1500,
+    });
+    // The input is untouched, which is what lets the cached read hand the
+    // builder's output straight in without a defensive clone of its own.
+    expect(base.buckets.find((b) => b.bucket === 'cores')?.sold).toEqual({
+      saleCount: 0,
+      quantity: 0,
+      copper: 0,
+    });
+    expect(base.soldAvailable).toBe(false);
+    expect(filled.soldAvailable).toBe(true);
+    // The listing half is carried through verbatim.
+    expect(filled.buckets.map((b) => b.listingCount)).toEqual(
+      base.buckets.map((b) => b.listingCount),
+    );
+  });
+
+  it('reports unavailable, never a misleading zero, when told the read failed', () => {
+    const filled = withMarketSoldVolume(
+      buildAdminMarketMetrics(FIXTURE, 'eastbrook'),
+      [{ itemId: WYRMFALL_CORE_ITEM_ID, saleCount: 2, quantity: 5, copper: 1500 }],
+      false,
+    );
+    expect(filled.soldAvailable).toBe(false);
+    for (const bucket of filled.buckets) {
+      expect(bucket.sold, bucket.bucket).toEqual({ saleCount: 0, quantity: 0, copper: 0 });
+    }
+  });
+
+  it('serves the store read through the cached read: one query per TTL window', async () => {
+    configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
+    const read = vi.fn(async () => [
+      { itemId: WYRMFALL_CORE_ITEM_ID, saleCount: 2, quantity: 5, copper: 1500 },
+    ]);
+    configureAdminMarketSoldVolume(read);
+    const first = await readAdminMarketMetrics();
+    const second = await readAdminMarketMetrics();
+    // The whole point of riding the existing cache: a poll storm cannot turn
+    // into a query storm.
+    expect(read).toHaveBeenCalledTimes(1);
+    expect(second).toBe(first);
+    expect(first.soldAvailable).toBe(true);
+    expect(first.buckets.find((b) => b.bucket === 'cores')?.sold.copper).toBe(1500);
+  });
+
+  it('deep-freezes the sold figures with the rest of the snapshot', async () => {
+    configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
+    configureAdminMarketSoldVolume(async () => [
+      { itemId: WYRMFALL_CORE_ITEM_ID, saleCount: 2, quantity: 5, copper: 1500 },
+    ]);
+    const out = await readAdminMarketMetrics();
+    for (const bucket of out.buckets) expect(Object.isFrozen(bucket.sold)).toBe(true);
+    expect(() => {
+      (out.buckets[0].sold as { copper: number }).copper = 1;
+    }).toThrow();
+  });
+
+  it('still serves the listing half when the store read rejects', async () => {
+    // A database blip must not blank the dashboard: the listing half is
+    // in-process and always answerable.
+    const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+    configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
+    configureAdminMarketSoldVolume(async () => {
+      throw new Error('db down');
+    });
+    const out = await readAdminMarketMetrics();
+    expect(out.soldAvailable).toBe(false);
+    expect(out.buckets.find((b) => b.bucket === 'cores')?.listingCount).toBeGreaterThan(0);
+    expect(errors).toHaveBeenCalledTimes(1);
+    errors.mockRestore();
+  });
+
+  it('still serves the listing half when no store is wired at all', async () => {
+    configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
+    const out = await readAdminMarketMetrics();
+    expect(out.soldAvailable).toBe(false);
+    expect(out.buckets).toHaveLength(MARKET_METRICS_BUCKETS.length);
   });
 });

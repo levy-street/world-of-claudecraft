@@ -1,18 +1,15 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
-  import {
-    readAutoRefreshPreference,
-    writeAutoRefreshPreference,
-  } from '../auto_refresh_preference';
   import AccountLink from '../components/AccountLink.svelte';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import Badge from '../components/Badge.svelte';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { fmtCopper, fmtNumber, fmtRelative } from '../format';
   import { t } from '../i18n';
   import { accountStatusFor } from '../account_status';
-  import { auth } from '../state/auth.svelte';
+  import { createAutoRefresh } from '../state/auto_refresh.svelte';
   import type { TopWealthHolderRow } from '../types';
 
   // The rich list: top accounts by materialised total gold (purse plus mail and
@@ -22,57 +19,28 @@
   const AUTO_REFRESH_STORAGE_KEY = 'claudecraft_admin_top_holders_auto_refresh';
   const AUTO_REFRESH_MS = 30_000;
 
-  let rows = $state<TopWealthHolderRow[] | null>(null);
-  let failed = $state(false);
-  let autoRefresh = $state(true);
-  let mounted = $state(false);
-  let requestId = 0;
-
-  async function refresh(): Promise<void> {
-    const currentRequest = ++requestId;
-    try {
-      const result = await apiGet<{ rows: TopWealthHolderRow[] }>('/admin/api/wealth/top');
-      if (currentRequest !== requestId) return;
-      rows = result.rows;
-      failed = false;
-    } catch (err) {
-      if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
-    }
-  }
-
-  function changeAutoRefresh(enabled: boolean): void {
-    autoRefresh = enabled;
-    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
-    if (enabled) void refresh();
-  }
-
-  $effect(() => {
-    if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), AUTO_REFRESH_MS);
-    return () => clearInterval(id);
+  const surface = createAutoRefresh<{ rows: TopWealthHolderRow[] }>({
+    storageKey: AUTO_REFRESH_STORAGE_KEY,
+    intervalMs: AUTO_REFRESH_MS,
+    load: () => apiGet<{ rows: TopWealthHolderRow[] }>('/admin/api/wealth/top'),
   });
+  let rows = $derived(surface.data?.rows ?? null);
 
-  onMount(() => {
-    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
-    mounted = true;
-    void refresh();
-    return () => {
-      requestId += 1;
-    };
-  });
+  onMount(() => surface.start());
 </script>
 
 <Panel>
   <div class="page-controls">
     <p class="hint">{t('topHolders.hint')}</p>
     <AutoRefreshToggle
-      checked={autoRefresh}
+      checked={surface.enabled}
       label={t('topHolders.autoRefresh', { seconds: AUTO_REFRESH_MS / 1000 })}
-      onChange={changeAutoRefresh}
+      onChange={(enabled) => surface.setEnabled(enabled)}
     />
   </div>
-  {#if failed}
+  {#if surface.failure === 'forbidden'}
+    <PermissionDenied />
+  {:else if surface.failure === 'error'}
     <div class="empty">{t('topHolders.loadFailed')}</div>
   {:else if rows === null}
     <div class="empty">{t('topHolders.loading')}</div>
@@ -102,7 +70,7 @@
                 <AccountLink
                   accountId={row.accountId}
                   label={row.username}
-                  onChanged={() => void refresh()}
+                  onChanged={() => surface.refresh()}
                 />
                 {#if status === 'banned'}
                   <Badge variant="bad">{t('accounts.badgeBanned')}</Badge>

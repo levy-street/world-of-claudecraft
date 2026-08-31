@@ -4,6 +4,8 @@ import { render, screen, waitFor } from '@testing-library/svelte';
 import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import type { AdminMarketMetrics, AdminMarketMetricsBucket } from '../../src/admin/types';
 
+const NO_SOLD = { saleCount: 0, quantity: 0, copper: 0 };
+
 function emptyBucket(bucket: AdminMarketMetricsBucket['bucket'], tracked: number) {
   return {
     bucket,
@@ -12,11 +14,14 @@ function emptyBucket(bucket: AdminMarketMetricsBucket['bucket'], tracked: number
     trackedItemCount: tracked,
     listedItemCount: 0,
     items: [],
+    sold: { ...NO_SOLD },
   };
 }
 
 const METRICS: AdminMarketMetrics = {
   realm: 'eastbrook',
+  soldWindowDays: 7,
+  soldAvailable: true,
   buckets: [
     {
       bucket: 'cores',
@@ -34,6 +39,7 @@ const METRICS: AdminMarketMetrics = {
           medianPerUnit: 4,
         },
       ],
+      sold: { saleCount: 6, quantity: 11, copper: 4200 },
     },
     emptyBucket('essence', 2),
     {
@@ -54,6 +60,7 @@ const METRICS: AdminMarketMetrics = {
           medianPerUnit: 15,
         },
       ],
+      sold: { saleCount: 1, quantity: 1, copper: 900 },
     },
     emptyBucket('produce', 24),
     emptyBucket('seeds', 12),
@@ -63,6 +70,8 @@ const METRICS: AdminMarketMetrics = {
 
 const EMPTY_METRICS: AdminMarketMetrics = {
   realm: 'eastbrook',
+  soldWindowDays: 7,
+  soldAvailable: true,
   buckets: [
     emptyBucket('cores', 1),
     emptyBucket('essence', 2),
@@ -203,6 +212,68 @@ describe('Market Metrics page', () => {
     }
     // one heading per table: duplicated ids would all resolve to the first
     expect(new Set(seenIds).size).toBe(seenIds.length);
+  });
+
+  it('renders each bucket its own sold-volume line over the stated window', async () => {
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(7),
+          sales: fmtNumber(6),
+          quantity: fmtNumber(11),
+          copper: fmtCopper(4200),
+        }),
+      ),
+    ).toBeInTheDocument();
+    // A second bucket with its OWN figures: a line rendered from the wrong
+    // bucket's row would still satisfy a single-bucket assertion.
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(7),
+          sales: fmtNumber(1),
+          quantity: fmtNumber(1),
+          copper: fmtCopper(900),
+        }),
+      ),
+    ).toBeInTheDocument();
+    // The four buckets with nothing sold say so rather than showing zeros.
+    expect(screen.getAllByText(t('marketMetrics.soldNone', { days: fmtNumber(7) }))).toHaveLength(
+      4,
+    );
+    expect(screen.queryByText(t('marketMetrics.soldUnavailable'))).not.toBeInTheDocument();
+  });
+
+  it('says sold volume is unavailable rather than showing a misleading zero', async () => {
+    // soldAvailable false means the server could not read the store. Rendering
+    // "nothing sold" there would be a lie an operator could act on.
+    apiGetMock.mockResolvedValue({ ...METRICS, soldAvailable: false });
+    render(MarketMetrics);
+    expect(await screen.findByText(t('marketMetrics.soldUnavailable'))).toBeInTheDocument();
+    expect(
+      screen.queryByText(t('marketMetrics.soldNone', { days: fmtNumber(7) })),
+    ).not.toBeInTheDocument();
+    // ...and the listing half still renders in full.
+    expect(screen.getByText('Wyrmfall Core')).toBeInTheDocument();
+    expect(screen.getByText(fmtCopper(3))).toBeInTheDocument();
+  });
+
+  it('honours the window the server states rather than a hard-coded one', async () => {
+    apiGetMock.mockResolvedValue({ ...METRICS, soldWindowDays: 30 });
+    render(MarketMetrics);
+    await screen.findByText('Wyrmfall Core');
+    expect(
+      screen.getByText(
+        t('marketMetrics.bucketSold', {
+          days: fmtNumber(30),
+          sales: fmtNumber(6),
+          quantity: fmtNumber(11),
+          copper: fmtCopper(4200),
+        }),
+      ),
+    ).toBeInTheDocument();
   });
 
   it('auto-refresh refetches on the 30 s interval and the toggle-off cancels it', async () => {

@@ -1,15 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { apiGet } from '../api';
-  import {
-    readAutoRefreshPreference,
-    writeAutoRefreshPreference,
-  } from '../auto_refresh_preference';
   import AutoRefreshToggle from '../components/AutoRefreshToggle.svelte';
   import Panel from '../components/Panel.svelte';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { fmtCopper, fmtNumber } from '../format';
   import { t } from '../i18n';
-  import { auth } from '../state/auth.svelte';
+  import { createAutoRefresh } from '../state/auto_refresh.svelte';
   import type { AdminMarketMetrics, MarketMetricsBucketId } from '../types';
 
   // Live World Market listing metrics over the tracked supply buckets: what is
@@ -30,62 +27,36 @@
     compost: 'marketMetrics.bucketCompost',
   };
 
-  let metrics = $state<AdminMarketMetrics | null>(null);
-  let failed = $state(false);
-  let autoRefresh = $state(true);
-  let mounted = $state(false);
-  let requestId = 0;
-
-  async function refresh(): Promise<void> {
-    const currentRequest = ++requestId;
-    try {
-      const result = await apiGet<AdminMarketMetrics>('/admin/api/market/metrics');
-      if (currentRequest !== requestId) return;
-      metrics = result;
-      failed = false;
-    } catch (err) {
-      if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
-    }
-  }
-
-  function changeAutoRefresh(enabled: boolean): void {
-    autoRefresh = enabled;
-    writeAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY, enabled);
-    if (enabled) void refresh();
-  }
-
-  $effect(() => {
-    if (!mounted || !autoRefresh) return;
-    const id = setInterval(() => void refresh(), AUTO_REFRESH_MS);
-    return () => clearInterval(id);
+  const surface = createAutoRefresh<AdminMarketMetrics>({
+    storageKey: AUTO_REFRESH_STORAGE_KEY,
+    intervalMs: AUTO_REFRESH_MS,
+    load: () => apiGet<AdminMarketMetrics>('/admin/api/market/metrics'),
   });
+  let metrics = $derived(surface.data);
 
-  onMount(() => {
-    autoRefresh = readAutoRefreshPreference(AUTO_REFRESH_STORAGE_KEY);
-    mounted = true;
-    void refresh();
-    return () => {
-      requestId += 1;
-    };
-  });
+  onMount(() => surface.start());
 </script>
 
 <Panel>
   <div class="page-controls">
     <p class="hint">{t('marketMetrics.hint')}</p>
     <AutoRefreshToggle
-      checked={autoRefresh}
+      checked={surface.enabled}
       label={t('marketMetrics.autoRefresh', { seconds: AUTO_REFRESH_MS / 1000 })}
-      onChange={changeAutoRefresh}
+      onChange={(enabled) => surface.setEnabled(enabled)}
     />
   </div>
-  {#if failed}
+  {#if surface.failure === 'forbidden'}
+    <PermissionDenied />
+  {:else if surface.failure === 'error'}
     <div class="empty">{t('marketMetrics.loadFailed')}</div>
   {:else if metrics === null}
     <div class="empty">{t('marketMetrics.loading')}</div>
   {:else}
     <p class="realm">{t('marketMetrics.realm', { realm: metrics.realm })}</p>
+    {#if !metrics.soldAvailable}
+      <p class="sold-unavailable">{t('marketMetrics.soldUnavailable')}</p>
+    {/if}
     {#if metrics.buckets.every((bucket) => bucket.listingCount === 0)}
       <div class="empty">{t('marketMetrics.empty')}</div>
     {/if}
@@ -100,6 +71,18 @@
             tracked: fmtNumber(bucket.trackedItemCount),
           })}
         </p>
+        {#if metrics.soldAvailable}
+          <p class="bucket-sold">
+            {bucket.sold.saleCount === 0
+              ? t('marketMetrics.soldNone', { days: fmtNumber(metrics.soldWindowDays) })
+              : t('marketMetrics.bucketSold', {
+                  days: fmtNumber(metrics.soldWindowDays),
+                  sales: fmtNumber(bucket.sold.saleCount),
+                  quantity: fmtNumber(bucket.sold.quantity),
+                  copper: fmtCopper(bucket.sold.copper),
+                })}
+          </p>
+        {/if}
         {#if bucket.bucket === 'essence'}
           <p class="essence-note">{t('marketMetrics.essenceNote')}</p>
         {/if}
@@ -163,8 +146,18 @@
     color: var(--text-soft);
   }
 
+  .bucket-sold {
+    margin: 0 0 8px;
+    color: var(--text-soft);
+  }
+
   .essence-note {
     margin: 0 0 8px;
+    color: var(--badge-warn-text);
+  }
+
+  .sold-unavailable {
+    margin: 0 0 12px;
     color: var(--badge-warn-text);
   }
 

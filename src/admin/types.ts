@@ -262,6 +262,16 @@ export interface AdminMarketMetricsItemRow {
   medianPerUnit: number;
 }
 
+// What changed hands in a bucket over the readout window. Every other figure
+// here describes the LIVE BOOK (what is on offer now); these come from the
+// server's accumulating sold-volume store.
+export interface AdminMarketSoldVolume {
+  saleCount: number;
+  quantity: number;
+  /** Gross buyout copper, before the Merchant's cut. */
+  copper: number;
+}
+
 export interface AdminMarketMetricsBucket {
   bucket: MarketMetricsBucketId;
   listingCount: number;
@@ -269,11 +279,16 @@ export interface AdminMarketMetricsBucket {
   trackedItemCount: number;
   listedItemCount: number;
   items: AdminMarketMetricsItemRow[];
+  sold: AdminMarketSoldVolume;
 }
 
 export interface AdminMarketMetrics {
   realm: string;
   buckets: AdminMarketMetricsBucket[];
+  /** The trailing UTC-day window the `sold` figures cover. */
+  soldWindowDays: number;
+  /** False when the server could not read the store; the sold figures are then meaningless. */
+  soldAvailable: boolean;
 }
 
 export interface AccountWealthCharacterRow {

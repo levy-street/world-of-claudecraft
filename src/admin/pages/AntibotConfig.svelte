@@ -17,6 +17,8 @@
   import PageHeader from '../components/PageHeader.svelte';
   import { fmtDate } from '../format';
   import { localizeAdminError, t } from '../i18n';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import type {
     AntibotConfigCatalog,
@@ -31,7 +33,7 @@
   // Saving validates and applies LIVE server-side and persists per realm for
   // the next boot; a field left at its default carries no override.
   let data = $state<AntibotConfigCatalog | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let values = $state<Record<string, AntibotFormValue>>({});
   let invalid = $state<string[]>([]);
   let saving = $state(false);
@@ -39,7 +41,7 @@
   let expandedGroups = $state<Record<string, boolean>>({});
   let changeNote = $state('');
   let historyEntries = $state<AntibotConfigHistoryEntry[]>([]);
-  let historyFailed = $state(false);
+  let historyFailed = $state<AdminLoadFailure>('none');
   let restoredSkippedCount = $state<number | null>(null);
   let actionsElement = $state<HTMLDivElement | null>(null);
   let restoreNoticeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -65,9 +67,9 @@
   async function refresh(): Promise<void> {
     try {
       adopt(await apiGet<AntibotConfigCatalog>('/admin/api/antibot-config'));
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -77,9 +79,9 @@
         '/admin/api/antibot-config/history',
       );
       historyEntries = history.entries;
-      historyFailed = false;
+      historyFailed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) historyFailed = true;
+      if (!auth.handleAuthFailure(err)) historyFailed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -218,7 +220,9 @@
     <p class="ac-error">{t('antibot.invalidFields')}</p>
   {/if}
 
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <p class="ac-error">{t('antibot.loadFailed')}</p>
   {:else if data === null}
     <p class="ac-note">{t('antibot.loading')}</p>

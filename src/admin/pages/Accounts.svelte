@@ -4,6 +4,8 @@
   import { apiGet } from '../api';
   import { getAccountModalController } from '../account_modal';
   import { accountStatusFor } from '../account_status';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { SEARCH_DEBOUNCE_MS } from '../state/poll';
   import { t } from '../i18n';
@@ -25,7 +27,7 @@
 
   const accountModal = getAccountModalController();
   let accounts = $state<Paginated<AccountRow> | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let search = $state('');
   let page = $state(1);
   let sort = $state<AccountSort>('id');
@@ -41,10 +43,10 @@
       const next = await apiGet<Paginated<AccountRow>>(`/admin/api/accounts?${params}`);
       if (disposed || epoch !== requestEpoch) return;
       accounts = next;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (disposed || epoch !== requestEpoch || auth.handleAuthFailure(err)) return;
-      failed = true;
+      failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -110,7 +112,9 @@
       </div>
     {/if}
   </div>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('accounts.loadFailed')}</div>
   {:else if accounts && accounts.rows.length === 0}
     <div class="empty">{t('accounts.empty')}</div>

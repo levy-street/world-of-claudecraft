@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { StaffData, StaffHistoryData, StaffRow } from '../types';
   import { apiGet, apiPost } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { localizeAdminError, t } from '../i18n';
   import { fmtDate } from '../format';
@@ -13,7 +15,7 @@
   // operator's own row render read-only; the server refuses both anyway.
   let data = $state<StaffData | null>(null);
   let history = $state<StaffHistoryData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let edits = $state<Record<number, string[]>>({});
   let addUsername = $state('');
   let addRoles = $state<string[]>([]);
@@ -83,9 +85,9 @@
       } else {
         edits = {};
       }
-      failed = false;
+      failed = 'none';
     } catch (err) {
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -158,7 +160,9 @@
 </Panel>
 
 <Panel title={t('staff.listTitle')}>
-  {#if failed}
+  {#if failed === 'forbidden'}
+    <PermissionDenied />
+  {:else if failed === 'error'}
     <div class="empty">{t('staff.loadFailed')}</div>
   {:else if data && data.rows.length === 0}
     <div class="empty">{t('staff.empty')}</div>

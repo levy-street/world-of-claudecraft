@@ -2,25 +2,29 @@
   import { antibotConfigHistoryRows } from '../antibot_config_history';
   import { fmtDate } from '../format';
   import { t } from '../i18n';
+  import type { AdminLoadFailure } from '../load_failure';
   import type { AntibotConfigField, AntibotConfigHistoryEntry } from '../types';
   import Panel from './Panel.svelte';
+  import PermissionDenied from './PermissionDenied.svelte';
 
   let {
     entries,
     fields,
-    failed = false,
+    failed = 'none',
     onloadversion,
   }: {
     entries: AntibotConfigHistoryEntry[];
     fields: AntibotConfigField[];
-    failed?: boolean;
+    failed?: AdminLoadFailure;
     onloadversion?: (entry: AntibotConfigHistoryEntry) => void;
   } = $props();
 </script>
 
 <div class="history-panel">
   <Panel title={t('antibot.historyTitle')} hint={t('antibot.historyHint')}>
-    {#if failed}
+    {#if failed === 'forbidden'}
+      <PermissionDenied />
+    {:else if failed === 'error'}
       <div class="history-empty history-error">{t('antibot.historyLoadFailed')}</div>
     {:else if entries.length === 0}
       <div class="history-empty">{t('antibot.historyEmpty')}</div>

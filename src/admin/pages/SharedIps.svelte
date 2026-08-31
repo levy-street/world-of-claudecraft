@@ -2,6 +2,8 @@
   import { onMount } from 'svelte';
   import type { SharedIpsData } from '../types';
   import { apiGet } from '../api';
+  import { type AdminLoadFailure, classifyAdminLoadFailure } from '../load_failure';
+  import PermissionDenied from '../components/PermissionDenied.svelte';
   import { auth } from '../state/auth.svelte';
   import { fmtDate, fmtNumber } from '../format';
   import { t } from '../i18n';
@@ -14,7 +16,7 @@
 
   const navigation = getAdminNavigation();
   let data = $state<SharedIpsData | null>(null);
-  let failed = $state(false);
+  let failed = $state<AdminLoadFailure>('none');
   let page = $state(1);
   let onlineOnly = $state(false);
   let sort = $state<SharedIpSort>('accounts');
@@ -29,10 +31,10 @@
       const result = await apiGet<SharedIpsData>(`/admin/api/shared-ips?${params}`);
       if (currentRequest !== requestId) return;
       data = result;
-      failed = false;
+      failed = 'none';
     } catch (err) {
       if (currentRequest !== requestId) return;
-      if (!auth.handleAuthFailure(err)) failed = true;
+      if (!auth.handleAuthFailure(err)) failed = classifyAdminLoadFailure(err);
     }
   }
 
@@ -45,7 +47,7 @@
     onlineOnly = (event.currentTarget as HTMLInputElement).checked;
     page = 1;
     data = null;
-    failed = false;
+    failed = 'none';
     void refresh();
   }
 
@@ -88,7 +90,9 @@
     </div>
     <div class="investigation-note" role="note">{t('sharedIps.warning')}</div>
 
-    {#if failed}
+    {#if failed === 'forbidden'}
+      <PermissionDenied />
+    {:else if failed === 'error'}
       <div class="empty">{t('sharedIps.loadFailed')}</div>
     {:else if data === null}
       <div class="empty">{t('sharedIps.loading')}</div>
