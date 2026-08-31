@@ -8,11 +8,12 @@
 // response) carries the same set. It must never run on the WS upgrade handshake,
 // which bypasses routeHttpRequest by construction (server.on('upgrade')).
 //
-// Deliberately NOT set here: any Content-Security-Policy header (deferred to a
-// separate report-only effort) and Cross-Origin-Embedder-Policy (it would break
+// Content-Security-Policy is set only for the isolated /exchange document.
+// Cross-Origin-Embedder-Policy is not set because it would break
 // the cross-origin GLB / HDRI asset loads the renderer depends on).
 
 import type * as http from 'node:http';
+import { EXCHANGE_CSP, isExchangeDocumentPath } from '../exchange_csp';
 
 const HEADER_CONTENT_TYPE_OPTIONS = 'X-Content-Type-Options';
 const HEADER_REFERRER_POLICY = 'Referrer-Policy';
@@ -22,6 +23,7 @@ const HEADER_CROSS_ORIGIN_RESOURCE_POLICY = 'Cross-Origin-Resource-Policy';
 const HEADER_STRICT_TRANSPORT_SECURITY = 'Strict-Transport-Security';
 const HEADER_FRAME_OPTIONS = 'X-Frame-Options';
 const HEADER_CACHE_CONTROL = 'Cache-Control';
+const HEADER_CONTENT_SECURITY_POLICY = 'Content-Security-Policy';
 
 // Headers node's http never sets; removing them pins the contract so a future
 // proxy or middleware that starts leaking a Server / X-Powered-By banner is
@@ -112,6 +114,10 @@ export function withSecurityHeaders(
   if (path.startsWith(OAUTH_PATH_PREFIX)) {
     res.setHeader(HEADER_FRAME_OPTIONS, FRAME_OPTIONS_DENY_VALUE);
     res.setHeader(HEADER_CACHE_CONTROL, CACHE_CONTROL_NO_STORE_VALUE);
+  }
+
+  if (isExchangeDocumentPath(path)) {
+    res.setHeader(HEADER_CONTENT_SECURITY_POLICY, EXCHANGE_CSP);
   }
 
   res.removeHeader(HEADER_SERVER);

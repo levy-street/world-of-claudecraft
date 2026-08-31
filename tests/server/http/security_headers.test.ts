@@ -32,6 +32,8 @@ const EXPECT = {
   strictTransportSecurity: 'max-age=31536000; includeSubDomains',
   frameOptions: 'DENY',
   cacheControl: 'no-store',
+  exchangeCsp:
+    "default-src 'none'; script-src 'self' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://secure.walletconnect.com https://api.web3modal.org; font-src 'self' https://fonts.reown.com; connect-src 'self' https://*.walletconnect.com https://*.walletconnect.org wss://*.walletconnect.com wss://*.walletconnect.org https://api.web3modal.org https://pulse.walletconnect.org; frame-src https://challenges.cloudflare.com https://secure.walletconnect.com https://verify.walletconnect.com; base-uri 'none'; object-src 'none'; frame-ancestors 'none'; form-action 'self'",
 } as const;
 
 /** Drive withSecurityHeaders over a fresh req/res and return the FakeRes. */
@@ -79,10 +81,15 @@ describe('withSecurityHeaders (unit)', () => {
     expect(res.getHeader('Cache-Control')).toBe(EXPECT.cacheControl);
   });
 
-  it('never sets a Content-Security-Policy or a Cross-Origin-Embedder-Policy header', () => {
+  it('sets CSP only on the Exchange document and never sets Cross-Origin-Embedder-Policy', () => {
     for (const url of ['/api/status', '/oauth/authorize']) {
       const res = run(url);
       expect(res.getHeader('Content-Security-Policy')).toBeUndefined();
+      expect(res.getHeader('Cross-Origin-Embedder-Policy')).toBeUndefined();
+    }
+    for (const url of ['/exchange', '/exchange/', '/exchange.html?from=test']) {
+      const res = run(url);
+      expect(res.getHeader('Content-Security-Policy')).toBe(EXPECT.exchangeCsp);
       expect(res.getHeader('Cross-Origin-Embedder-Policy')).toBeUndefined();
     }
   });

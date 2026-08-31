@@ -518,6 +518,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/exchange', '/exchange.html'],
+  ['/exchange/', '/exchange.html'],
   ['/wallet-handoff', '/wallet-handoff.html'],
   ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],

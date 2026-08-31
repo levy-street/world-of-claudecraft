@@ -16,6 +16,7 @@ import {
   diagnosticsReadAllowed,
 } from './scripts/lib/diagnostics_capture_guard.mjs';
 import { shouldDisableVitestFsModuleCache } from './scripts/lib/vitest_fs_module_cache.mjs';
+import { EXCHANGE_CSP, isExchangeDocumentPath } from './server/http/exchange_csp';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
 const disableVitestFsModuleCache = shouldDisableVitestFsModuleCache(root);
@@ -93,6 +94,8 @@ const STATIC_PAGE_ALIASES = new Map([
   ['/social-media-links/', '/links.html'],
   ['/play', '/play.html'],
   ['/play/', '/play.html'],
+  ['/exchange', '/exchange.html'],
+  ['/exchange/', '/exchange.html'],
   ['/wallet-handoff', '/wallet-handoff.html'],
   ['/wallet-handoff/', '/wallet-handoff.html'],
   ['/privacy', '/privacy.html'],
@@ -122,20 +125,30 @@ function isGuideSpaPath(pathOnly: string): boolean {
   return !last.includes('.');
 }
 function staticPageAliasPlugin() {
-  const rewrite = (req: { url?: string }) => {
+  const rewrite = (
+    req: { url?: string },
+    res?: { setHeader(name: string, value: string): void },
+  ) => {
     const url = req.url ?? '';
     const pathOnly = url.split('?')[0];
+    if (isExchangeDocumentPath(pathOnly)) res?.setHeader('Content-Security-Policy', EXCHANGE_CSP);
     const target =
       STATIC_PAGE_ALIASES.get(pathOnly) ?? (isGuideSpaPath(pathOnly) ? '/guide.html' : undefined);
     if (target) req.url = target + url.slice(pathOnly.length);
   };
   const attach = (server: {
     middlewares: {
-      use: (fn: (req: { url?: string }, res: unknown, next: () => void) => void) => void;
+      use: (
+        fn: (
+          req: { url?: string },
+          res: { setHeader(name: string, value: string): void },
+          next: () => void,
+        ) => void,
+      ) => void;
     };
   }) => {
     server.middlewares.use((req, _res, next) => {
-      rewrite(req);
+      rewrite(req, _res);
       next();
     });
   };
@@ -480,6 +493,7 @@ export default defineConfig({
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
         play: fileURLToPath(new URL('play.html', import.meta.url)),
+        exchange: fileURLToPath(new URL('exchange.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
         walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
