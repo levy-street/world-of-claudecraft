@@ -11,7 +11,7 @@
 // The S3 guard in tests/localization_fixes.test.ts parses src/sim/sim.ts, enumerates
 // every player-facing emit site, and fails if any is no longer recognized by a client
 // matcher — so a new unhandled sim string cannot ship silently.
-import { ABILITIES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
+import { ABILITIES, CLASSES, DELVES, ITEMS, MOBS, ZONES } from '../sim/data';
 import { DELVE_MODULE_NAMES } from '../sim/sim';
 import type { EntityKind, PlayerClass } from '../sim/types';
 import { tEntity } from './entity_i18n';
@@ -9600,19 +9600,96 @@ export function tSim(
 }
 
 // Reverse maps: the sim splices English item/mob names into its text; localize them.
-const itemNameToId = new Map<string, string>();
-for (const [id, it] of Object.entries(ITEMS)) itemNameToId.set(it.name, it.heroicOf ?? id);
-const mobNameToId = new Map<string, string>();
-for (const [id, m] of Object.entries(MOBS)) mobNameToId.set(m.name, id);
-const abilityNameToId = new Map<string, string>();
-for (const [id, a] of Object.entries(ABILITIES)) abilityNameToId.set(a.name, id);
+//
+// An English display name is NOT a key. Two content records can carry the same
+// one, and the bare `map.set(name, id)` loop these maps used to be handed such a
+// name to whichever record the merged catalog happened to spread LAST, silently
+// and with nothing red. Three ability lines shipped mistranslated that way, each
+// losing to a record no player can reach: 'Aether Surge' resolved to the retired
+// arcane_power instead of the mage kit's arcane_surge, 'Patch Up' to the unkitted
+// mend_pet instead of the hunter kit's revive_pet, and 'Sacred Goad' to the hidden
+// holy_taunt instead of sacred_challenge. A German player learning Aether Surge
+// read "Arkane Macht".
+//
+// buildNameReverseMap resolves a collision on purpose instead: a `prefer`
+// predicate picks the reachable record, any remaining tie breaks on the sorted id
+// so the winner never depends on catalog spread order, and every colliding name is
+// RECORDED in NAME_COLLISIONS. tests/sim_i18n_name_collisions.test.ts holds that
+// record against the real per-locale renderings, so a name whose records translate
+// differently cannot quietly join the list.
+type NameCollisionKind = 'item' | 'mob' | 'ability' | 'zone' | 'delve' | 'delveModule';
+
+export type NameCollision = {
+  kind: NameCollisionKind;
+  name: string;
+  /** Every distinct id carrying this English name, sorted. */
+  ids: readonly string[];
+  /** The id the map resolves the name to. */
+  resolved: string;
+};
+
+const nameCollisions: NameCollision[] = [];
+
+function buildNameReverseMap(
+  kind: NameCollisionKind,
+  entries: readonly (readonly [id: string, name: string])[],
+  prefer?: (id: string) => boolean,
+): Map<string, string> {
+  const byName = new Map<string, string[]>();
+  for (const [id, name] of entries) {
+    const bucket = byName.get(name);
+    if (bucket) bucket.push(id);
+    else byName.set(name, [id]);
+  }
+  const out = new Map<string, string>();
+  for (const [name, ids] of byName) {
+    const unique = [...new Set(ids)].sort();
+    // Two records already pointing at ONE id is not a collision: it is the base
+    // and Heroic copies of an item collapsing through heroicOf, which is what
+    // that field is for.
+    if (unique.length === 1) {
+      out.set(name, unique[0]);
+      continue;
+    }
+    const preferred = prefer ? unique.filter(prefer) : [];
+    out.set(name, preferred.length === 1 ? preferred[0] : unique[0]);
+    nameCollisions.push({ kind, name, ids: unique, resolved: out.get(name) as string });
+  }
+  return out;
+}
+
+// Reachable = a player can have it: in some class kit, and not force-hidden the
+// way the retired paladin ids are. This is the only signal that separates the
+// three colliding ability pairs, and in all three the reachable id is the loser
+// under spread order.
+const KIT_ABILITY_IDS = new Set(Object.values(CLASSES).flatMap((c) => c.abilities));
+const isReachableAbility = (id: string): boolean =>
+  KIT_ABILITY_IDS.has(id) && !ABILITIES[id]?.hiddenFromPlayer;
+
+const itemNameToId = buildNameReverseMap(
+  'item',
+  Object.entries(ITEMS).map(([id, it]) => [it.heroicOf ?? id, it.name] as const),
+);
+const mobNameToId = buildNameReverseMap(
+  'mob',
+  Object.entries(MOBS).map(([id, m]) => [id, m.name] as const),
+);
+const abilityNameToId = buildNameReverseMap(
+  'ability',
+  Object.entries(ABILITIES).map(([id, a]) => [id, a.name] as const),
+  isReachableAbility,
+);
 abilityNameToId.set('Veil Mark', 'veilbound_mark');
-const delveNameToId = new Map<string, string>();
-for (const [id, d] of Object.entries(DELVES)) delveNameToId.set(d.name, id);
+const delveNameToId = buildNameReverseMap(
+  'delve',
+  Object.entries(DELVES).map(([id, d]) => [id, d.name] as const),
+);
 // Module display names are also the delveUi.moduleName.* source values; reverse
 // them so the sim's English module-name splices localize like the run tracker.
-const delveModuleNameToId = new Map<string, string>();
-for (const [id, name] of Object.entries(DELVE_MODULE_NAMES)) delveModuleNameToId.set(name, id);
+const delveModuleNameToId = buildNameReverseMap(
+  'delveModule',
+  Object.entries(DELVE_MODULE_NAMES).map(([id, name]) => [id, name] as const),
+);
 
 function locItem(name: string): string {
   const id = itemNameToId.get(name);
@@ -9626,8 +9703,15 @@ function locAbility(name: string): string {
   const id = abilityNameToId.get(name);
   return id ? tEntity({ kind: 'ability', id, field: 'name' }) : name;
 }
-const zoneNameToId = new Map<string, string>();
-for (const z of ZONES) zoneNameToId.set(z.name, z.id);
+const zoneNameToId = buildNameReverseMap(
+  'zone',
+  ZONES.map((z) => [z.id, z.name] as const),
+);
+
+// Every English display name two or more content records share, with the id each
+// one resolves to. Exported for the guard, never for rendering.
+export const NAME_COLLISIONS: readonly NameCollision[] = nameCollisions;
+
 function locZone(name: string): string {
   const id = zoneNameToId.get(name);
   return id ? tEntity({ kind: 'zone', id, field: 'name' }) : name;
@@ -9748,9 +9832,6 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   // buff_sta aura display name each crafted elixir pushes on use.
   'Might of the Boar': 'aura.elixirBoar',
   'Vipersear Vigor': 'aura.elixirVenomfire',
-  // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
-  // still emits the pre-rename aura string. Drop after v0.29.0 ships.
-  'Venomfire Vigor': 'aura.elixirVenomfire',
   'Might of the Serpent': 'aura.elixirSerpent',
   // Masterwrought phase 10: the three apex flask auras and the Well Fed a
   // finished buff meal leaves, farm dish or role plate since 11c
@@ -9830,7 +9911,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Wintergnaw: 'aura.frostbite',
   // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
   // still emits the pre-rename aura string. The rename ships with the
-  // masterwrought branch; drop after its release (v0.40.0 or later) deploys.
+  // masterwrought branch, which integrates onto release/v0.41.0; drop once that
+  // release is fully deployed. Named as a version, not as "a future release",
+  // because the Venomfire alias this pattern came from said "drop after v0.29.0"
+  // and outlived its window by eleven releases before Phase 18 removed it.
   Winterbite: 'aura.frostbite',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
@@ -12958,18 +13042,6 @@ const RULES: Rule[] = [
     re: /^Crushing Depth crushes!$/,
     build: () => t('sim.rift.detonateCrushingDepth'),
   },
-  {
-    re: /^Pact Seal detonates!$/,
-    build: () => t('sim.rift.detonatePactSeal'),
-  },
-  {
-    re: /^Blood Rite falls!$/,
-    build: () => t('sim.rift.detonateBloodRite'),
-  },
-  {
-    re: /^Pit Sentence detonates!$/,
-    build: () => t('sim.rift.detonatePitSentence'),
-  },
   { re: /^You cannot enter a delve right now\.$/, build: () => t('sim.delve.cannotEnterNow') },
   { re: /^Leave the dungeon first\.$/, build: () => t('sim.delve.leaveDungeonFirst') },
   { re: /^Leave the arena first\.$/, build: () => t('sim.delve.leaveArenaFirst') },
@@ -12993,7 +13065,8 @@ const RULES: Rule[] = [
   {
     // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
     // still emits the pre-rename line. The rename ships with the masterwrought
-    // branch; drop after its release (v0.40.0 or later) deploys.
+    // branch, which integrates onto release/v0.41.0; drop once that release is
+    // fully deployed (same horizon as the Winterbite aura alias).
     re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },
@@ -13424,6 +13497,9 @@ export function localizeAuthoredYellSpeakerName(
   if (templateId && (speakerKind === 'mob' || speakerKind === 'npc')) {
     return tEntity({ kind: speakerKind, id: templateId, field: 'name' });
   }
-  const mob = Object.values(MOBS).find((entry) => entry.name === name);
-  return mob ? tEntity({ kind: 'mob', id: mob.id, field: 'name' }) : name;
+  // Through the shared reverse map, not a fresh `find`: a bare find is FIRST-write
+  // wins where the map is last-write wins, so on a colliding mob name the yell
+  // speaker and the combat log used to disagree with each other.
+  const id = mobNameToId.get(name);
+  return id ? tEntity({ kind: 'mob', id, field: 'name' }) : name;
 }

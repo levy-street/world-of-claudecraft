@@ -549,7 +549,6 @@ export const nl_NL: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Drogmars Oorlogskamp',
   'poi.thornpeak_heights.5': 'Stormrots',
   'poi.thornpeak_heights.6': 'Het Glinstermeer',
-  'poi.thornpeak_heights.7': 'Wurmcultus-Tenten',
   'poi.thornpeak_heights.8': 'Weergangersvelden',
   'poi.thornpeak_heights.9': 'Grafwurm-Heiligdom',
   'location.kind.overworld': 'Bovenwereld',

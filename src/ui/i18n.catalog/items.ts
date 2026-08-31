@@ -2,7 +2,7 @@
 // Part of src/ui/i18n.catalog/; assembled into `en` by ./index.ts.
 // Translations live in src/ui/i18n.locales/<lang>.ts, never here.
 
-import { classAbilityNames, classAbilityNamesEn } from './abilities';
+import { classAbilityNamesEn } from './abilities';
 
 const itemStringsEn = {
   itemUi: {
@@ -4022,7 +4022,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.es.entities,
       items: itemTranslations([
         'Espada corta desgastada',
         'Bastón nudoso',
@@ -4447,7 +4446,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.fr_FR.entities,
       items: itemTranslations([
         'Épée courte usée',
         'Bâton noueux',
@@ -4873,7 +4871,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.it_IT.entities,
       items: itemTranslations([
         'Spada corta logora',
         'Bastone nodoso',
@@ -5297,7 +5294,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.de_DE.entities,
       items: itemTranslations([
         'Abgenutztes Kurzschwert',
         'Knorriger Stab',
@@ -5721,7 +5717,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.zh_CN.entities,
       items: itemTranslations([
         '破旧短剑',
         '多节法杖',
@@ -6145,7 +6140,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.zh_TW.entities,
       items: itemTranslations([
         '破舊短劍',
         '多節法杖',
@@ -6569,7 +6563,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ko_KR.entities,
       items: itemTranslations([
         '낡은 쇼트소드',
         '옹이진 지팡이',
@@ -6993,7 +6986,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ja_JP.entities,
       items: itemTranslations([
         '擦り切れたショートソード',
         '節くれだった杖',
@@ -7417,7 +7409,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.pt_BR.entities,
       items: itemTranslations([
         'Espada curta gasta',
         'Cajado nodoso',
@@ -7841,7 +7832,6 @@ export const itemNames = {
       },
     },
     entities: {
-      ...classAbilityNames.ru_RU.entities,
       items: itemTranslations([
         'Изношенный короткий меч',
         'Сучковатый посох',

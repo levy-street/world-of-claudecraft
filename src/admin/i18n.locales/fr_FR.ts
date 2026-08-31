@@ -595,7 +595,6 @@ export const fr_FR: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Camp de guerre de Drogmar',
   'poi.thornpeak_heights.5': 'Roc des Tempêtes',
   'poi.thornpeak_heights.6': "L'Étang scintillant",
-  'poi.thornpeak_heights.7': 'Tentes du Culte du Wyrm',
   'poi.thornpeak_heights.8': 'Champs des Revenants',
   'poi.thornpeak_heights.9': 'Sanctuaire du Gravewyrm',
   'location.kind.overworld': 'Extérieur',

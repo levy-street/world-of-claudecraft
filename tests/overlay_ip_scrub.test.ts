@@ -14,6 +14,7 @@
 // (Han is shared and no rule can demand kana), so the ja half of a swap is
 // caught only when the zh half trips.
 import { describe, expect, it } from 'vitest';
+import { SUPPORTED_LANGUAGES as ADMIN_SUPPORTED_LANGUAGES } from '../src/admin/i18n.resolved.generated/loaders';
 import { DEED_LOCALE_LOADERS, type DeedLocaleTable } from '../src/ui/deed_i18n';
 import { SUPPORTED_LANGUAGES } from '../src/ui/i18n.resolved.generated/loaders';
 import {
@@ -32,6 +33,11 @@ import {
 const ENGLISH = new Set(['en', 'en_CA', 'en_XA']);
 const OVERLAY_LOCALES = SUPPORTED_LANGUAGES.filter((l) => !ENGLISH.has(l));
 const DEED_LOCALES = Object.keys(DEED_LOCALE_LOADERS).filter((l) => !ENGLISH.has(l));
+// The ADMIN overlays are a fourth non-English corpus, and until Phase 18 the only
+// one this guard never looked at. Operators are users (root CLAUDE.md), so an
+// admin overlay is player-facing surface in the sense that matters here: the
+// Wyrmcult derivative leak reached six of these files and nothing saw it.
+const ADMIN_LOCALES = ADMIN_SUPPORTED_LANGUAGES.filter((l) => !ENGLISH.has(l));
 
 // Derivation canaries: every assertion below ends in toEqual([]), which passes
 // on zero comparisons, so a registry change that empties a derived list would
@@ -40,6 +46,7 @@ const DEED_LOCALES = Object.keys(DEED_LOCALE_LOADERS).filter((l) => !ENGLISH.has
 it('the derived locale sets cover the shipped registries', () => {
   expect(OVERLAY_LOCALES.length).toBeGreaterThan(15);
   expect(DEED_LOCALES.length).toBeGreaterThan(15);
+  expect(ADMIN_LOCALES.length).toBeGreaterThan(15);
 });
 
 // The scrubbed coins a translated value must never carry verbatim (substring,
@@ -96,7 +103,46 @@ const OLD_COINS = [
   'ガロウミア',
   '갈로미어',
   'Гэллоумир',
+  // The zh half of that same arm, which the v0.36.0 fix left unarmed. zh has
+  // three ways to render a proper noun and only one is uncovered: a raw Latin
+  // name is caught by the arms above (the zh overlays keep plenty of them, e.g.
+  // Eastbrook), and a DESCRIPTIVE rendering cannot be armed at all because it is
+  // ambiguous with the replacement name (zh spells both Gallowmere and its
+  // successor Gibbetmere as 绞湖镇, which is why the v0.36.0 fix correctly left
+  // both zh rows alone). That leaves the PHONETIC rendering, the exact shape the
+  // ja/ko/ru fills minted, and these are its standard simplified and traditional
+  // forms. Prospective by nature: no zh row carries one today, and the point is
+  // that a future fill cannot introduce one unseen.
+  '加洛米尔',
+  '盖洛米尔',
+  '加洛米爾',
+  '蓋洛米爾',
 ] as const;
+
+// Localized DERIVATIVES: a value that translates a scrubbed coin while keeping
+// the coin's own morphemes. The literal denylist above cannot see one, and
+// neither can ip_scrub's English-surface scan or the originality_renames literal
+// pins, so this class survived every shipped guard on BOTH merge parents: five
+// Latin game overlays translated 'Wyrmcult Zealot' as Wyrmkult-Eiferer / Zelote
+// du Culte du Wyrm / Culto del Wyrm and six admin overlays did the same to the
+// Thornpeak tents POI. All 21 rows were deleted rather than re-translated (the
+// English they translated is long gone: the labels now read "Orders from Below",
+// "Ritual Phylactery" and "Broodsworn Tents"), so the fill re-makes them against
+// live English.
+//
+// Scoped to Latin script and to morpheme-keeping renderings on purpose. A locale
+// that translates the IDEA into its own vocabulary (da_DK "Ormekult", sv_SE
+// "Lindormskult", pl_PL "Kult Zmija", zh "龙教") is not carrying the coin, and a
+// pattern loose enough to catch those would fire on any legitimate dragon-cult
+// phrasing the replacement name earns.
+const DERIVATIVES: readonly { coin: string; re: RegExp; note: string }[] = [
+  {
+    coin: 'Wyrmcult',
+    // wyrm/wurm beside a cult stem, either order, across the Romance articles.
+    re: /(w[yu]rm[a-zà-ÿ]{0,3}[ -]?(?:k|c)ult|(?:k|c)ult[a-zà-ÿ]{0,3}\s+(?:de[lu]s?\s+|du\s+|do\s+|des\s+)?w[yu]rm)/i,
+    note: 'Wyrmkult-Eiferer, Zelote du Culte du Wyrm, Wurmcultus-Tenten',
+  },
+];
 
 // Values a coin legitimately appears in: native vocabulary that only spells
 // like a coin. Each entry names the locale, a key substring, and the token it
@@ -181,6 +227,91 @@ describe('non-English surfaces carry no scrubbed coin', () => {
     }
     expect(scanned).toBeGreaterThan(5_000);
     expect(hits, JSON.stringify(hits.slice(0, 10), null, 2)).toEqual([]);
+  });
+
+  it('admin i18n.locales overlay values', async () => {
+    const hits: Hit[] = [];
+    let scanned = 0;
+    for (const locale of ADMIN_LOCALES) {
+      const mod = await import(`../src/admin/i18n.locales/${locale}.ts`);
+      const table = mod[locale] as Record<string, string>;
+      expect(table, `${locale} admin overlay export`).toBeTruthy();
+      scanned += scanValues(`admin.${locale}`, Object.entries(table), hits);
+    }
+    expect(scanned).toBeGreaterThan(3_000);
+    expect(hits, JSON.stringify(hits.slice(0, 10), null, 2)).toEqual([]);
+  });
+});
+
+// The derivative pass. Same corpora, but asking whether a value TRANSLATED a coin
+// rather than kept it: the class that survived every shipped guard because none of
+// them reads a non-English value for anything but a literal English token.
+describe('non-English surfaces carry no localized coin derivative', () => {
+  async function overlayEntries(): Promise<[string, [string, unknown][]][]> {
+    const out: [string, [string, unknown][]][] = [];
+    for (const locale of OVERLAY_LOCALES) {
+      const mod = await import(`../src/ui/i18n.locales/${locale}.ts`);
+      out.push([locale, Object.entries(mod[locale] as Record<string, string>)]);
+    }
+    for (const locale of ADMIN_LOCALES) {
+      const mod = await import(`../src/admin/i18n.locales/${locale}.ts`);
+      out.push([`admin.${locale}`, Object.entries(mod[locale] as Record<string, string>)]);
+    }
+    for (const locale of DEED_LOCALES) {
+      const mod = await import(`../src/ui/deed_i18n.locales/${locale}.ts`);
+      out.push([`deed.${locale}`, deedEntries(mod.table as DeedLocaleTable)]);
+    }
+    return out;
+  }
+
+  it('arms a derivative pattern per coin it covers', () => {
+    // Non-vacuity for the pattern list itself, and a self-check that each pattern
+    // really bites: an inert regex would make the whole pass a silent no-op.
+    expect(DERIVATIVES.length).toBeGreaterThan(0);
+    for (const d of DERIVATIVES) {
+      expect(d.note.length, `${d.coin} needs example derivatives`).toBeGreaterThan(10);
+      const examples = d.note.split(', ');
+      expect(examples.length, `${d.coin} needs more than one example`).toBeGreaterThan(1);
+      for (const ex of examples)
+        expect(d.re.test(ex), `${d.coin} pattern must match ${ex}`).toBe(true);
+    }
+  });
+
+  it('no overlay, admin overlay or deed chunk value translates a scrubbed coin', async () => {
+    const hits: Hit[] = [];
+    let scanned = 0;
+    for (const [locale, entries] of await overlayEntries()) {
+      for (const [key, raw] of entries) {
+        if (typeof raw !== 'string') continue;
+        scanned++;
+        for (const d of DERIVATIVES) {
+          const m = d.re.exec(raw);
+          if (m) hits.push({ locale, key, token: `${d.coin} -> ${m[0]}`, value: raw });
+        }
+      }
+    }
+    // Floor near the real corpus (game + admin + deeds), so an import that
+    // silently returns nothing cannot pass this on zero comparisons.
+    expect(scanned).toBeGreaterThan(20_000);
+    expect(hits, JSON.stringify(hits.slice(0, 10), null, 2)).toEqual([]);
+  });
+
+  it('the pattern does not fire on a locale that translated the IDEA', () => {
+    // The scoping decision, pinned: these are real shipped renderings of the same
+    // concept in the locale's own vocabulary, and they are NOT the leak. A future
+    // pattern loosened until one of these trips has stopped being a coin guard.
+    for (const ok of [
+      'Ormekult-Zelot draebt', // da_DK
+      'Lindormskultsivrare draept', // sv_SE
+      'Zabity zelota Kultu Zmija', // pl_PL
+      'Ejdertarikati Bagnazi olduruldu', // tr_TR
+      'Fanatik kultu draka zabit', // cs_CZ
+      'Da ha Cuong Tin Long Giao', // vi_VN
+    ]) {
+      for (const d of DERIVATIVES) {
+        expect(d.re.test(ok), `${d.coin} pattern must not fire on ${ok}`).toBe(false);
+      }
+    }
   });
 });
 

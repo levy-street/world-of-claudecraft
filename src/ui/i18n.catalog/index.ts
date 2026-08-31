@@ -934,9 +934,6 @@ export const en = {
       detonateStormcallersWrath: "Stormcaller's Wrath erupts!",
       detonateAbyssalMaw: 'Abyssal Maw closes!',
       detonateCrushingDepth: 'Crushing Depth crushes!',
-      detonatePactSeal: 'Pact Seal detonates!',
-      detonateBloodRite: 'Blood Rite falls!',
-      detonatePitSentence: 'Pit Sentence detonates!',
     },
     delve: {
       cannotEnterNow: 'You cannot enter a delve right now.',

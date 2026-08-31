@@ -741,14 +741,12 @@ export const mergeStrings = {
   en: mergeStringsEn,
   es: {
     abilityUi: {
-      ...abilityStrings.es.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Sanación demoníaca',
         thunzharrStormcall: 'Llamada de la tormenta',
       },
       actionBar: {
-        ...abilityStrings.es.abilityUi.actionBar,
         clearHint: 'Mayús-clic derecho o Mayús-Supr para vaciar',
         itemInBags: 'En bolsas: {count}',
         itemNoneInBags: 'Ninguno en las bolsas',
@@ -914,14 +912,12 @@ export const mergeStrings = {
   es_ES: {} as typeof mergeStringsEn,
   fr_FR: {
     abilityUi: {
-      ...abilityStrings.fr_FR.abilityUi,
       cast: {
         fishing: 'Pêche',
         demonHeal: 'Soin démoniaque',
         thunzharrStormcall: 'Appel de la tempête',
       },
       actionBar: {
-        ...abilityStrings.fr_FR.abilityUi.actionBar,
         clearHint: 'Maj-clic droit ou Maj-Suppr pour vider',
         itemInBags: 'Dans les sacs : {count}',
         itemNoneInBags: 'Aucun dans les sacs',
@@ -1088,14 +1084,12 @@ export const mergeStrings = {
   en_CA: mergeStringsEn,
   it_IT: {
     abilityUi: {
-      ...abilityStrings.it_IT.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Cura demoniaca',
         thunzharrStormcall: 'Richiamo della tempesta',
       },
       actionBar: {
-        ...abilityStrings.it_IT.abilityUi.actionBar,
         clearHint: 'Maiusc-clic destro o Maiusc-Canc per svuotare',
         itemInBags: 'Nelle borse: {count}',
         itemNoneInBags: 'Nessuno nelle borse',
@@ -1255,14 +1249,12 @@ export const mergeStrings = {
   },
   de_DE: {
     abilityUi: {
-      ...abilityStrings.de_DE.abilityUi,
       cast: {
         fishing: 'Angeln',
         demonHeal: 'Dämonenheilung',
         thunzharrStormcall: 'Sturmruf',
       },
       actionBar: {
-        ...abilityStrings.de_DE.abilityUi.actionBar,
         clearHint: 'Umschalt-Rechtsklick oder Umschalt-Entf zum Leeren',
         itemInBags: 'In Taschen: {count}',
         itemNoneInBags: 'Keine in den Taschen',
@@ -1426,7 +1418,6 @@ export const mergeStrings = {
   },
   zh_CN: {
     abilityUi: {
-      ...abilityStrings.zh_CN.abilityUi,
       cast: {
         fishing: '钓鱼',
         demonHeal: '恶魔治疗',
@@ -1449,7 +1440,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.zh_CN.abilityUi.actionBar,
         clearHint: 'Shift-右键或 Shift-Delete 清除',
         itemInBags: '背包中：{count}',
         itemNoneInBags: '背包中没有',
@@ -1606,7 +1596,6 @@ export const mergeStrings = {
   },
   zh_TW: {
     abilityUi: {
-      ...abilityStrings.zh_TW.abilityUi,
       cast: {
         fishing: '釣魚',
         demonHeal: '惡魔治療',
@@ -1629,7 +1618,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.zh_TW.abilityUi.actionBar,
         clearHint: 'Shift-右鍵或 Shift-Delete 清除',
         itemInBags: '背包中：{count}',
         itemNoneInBags: '背包中沒有',
@@ -1786,7 +1774,6 @@ export const mergeStrings = {
   },
   ko_KR: {
     abilityUi: {
-      ...abilityStrings.ko_KR.abilityUi,
       cast: {
         fishing: '낚시',
         demonHeal: '악마 치유',
@@ -1809,7 +1796,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ko_KR.abilityUi.actionBar,
         clearHint: 'Shift-우클릭 또는 Shift-Delete로 비우기',
         itemInBags: '가방 보유: {count}',
         itemNoneInBags: '가방에 없음',
@@ -1969,7 +1955,6 @@ export const mergeStrings = {
   },
   ja_JP: {
     abilityUi: {
-      ...abilityStrings.ja_JP.abilityUi,
       cast: {
         fishing: '釣り',
         demonHeal: '悪魔の治癒',
@@ -1992,7 +1977,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ja_JP.abilityUi.actionBar,
         clearHint: 'Shift-右クリックまたはShift-Deleteで消去',
         itemInBags: 'バッグ内: {count}',
         itemNoneInBags: 'バッグ内になし',
@@ -2155,14 +2139,12 @@ export const mergeStrings = {
   },
   pt_BR: {
     abilityUi: {
-      ...abilityStrings.pt_BR.abilityUi,
       cast: {
         fishing: 'Pesca',
         demonHeal: 'Cura demoníaca',
         thunzharrStormcall: 'Chamado da Tempestade',
       },
       actionBar: {
-        ...abilityStrings.pt_BR.abilityUi.actionBar,
         clearHint: 'Shift-clique direito ou Shift-Delete para limpar',
         itemInBags: 'Nas bolsas: {count}',
         itemNoneInBags: 'Nenhum nas bolsas',
@@ -2327,7 +2309,6 @@ export const mergeStrings = {
   },
   ru_RU: {
     abilityUi: {
-      ...abilityStrings.ru_RU.abilityUi,
       cast: {
         fishing: 'Рыбная ловля',
         demonHeal: 'Исцеление демона',
@@ -2350,7 +2331,6 @@ export const mergeStrings = {
         rift_tide_strike: 'Crushing Depth',
       },
       actionBar: {
-        ...abilityStrings.ru_RU.abilityUi.actionBar,
         clearHint: 'Shift-правый щелчок или Shift-Delete, чтобы очистить',
         itemInBags: 'В сумках: {count}',
         itemNoneInBags: 'В сумках нет',

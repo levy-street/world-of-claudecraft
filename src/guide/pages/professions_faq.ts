@@ -23,9 +23,26 @@ export const PROF_FAQ_COUNT = 11;
  * retired. Naming the keys costs one line each and makes every row of this page
  * fixable the same way the fishing prose was.
  *
- * The question keys stay indexed: none of them states a mechanic, so none can
- * go stale the way an answer can.
+ * The QUESTION keys are named too (Phase 18): a question cannot go stale the
+ * way an answer can, but an index-built `faq.qN` key still re-points every
+ * following question when a row is inserted mid-list, silently pairing each
+ * question with the wrong answer. Two named rosters walk in lockstep instead
+ * (pinned by tests/guide_prof_faq_keys.test.ts).
  */
+export const FAQ_QUESTION_KEYS: readonly TranslationKey[] = [
+  'guide.profPages.faq.q1',
+  'guide.profPages.faq.q2',
+  'guide.profPages.faq.q3',
+  'guide.profPages.faq.q4',
+  'guide.profPages.faq.q5',
+  'guide.profPages.faq.q6',
+  'guide.profPages.faq.q7',
+  'guide.profPages.faq.q8',
+  'guide.profPages.faq.q9',
+  'guide.profPages.faq.q10',
+  'guide.profPages.faq.q11',
+];
+
 export const FAQ_ANSWER_KEYS: readonly TranslationKey[] = [
   'guide.profPages.faq.a1',
   'guide.profPages.faq.a2',
@@ -43,7 +60,7 @@ export const FAQ_ANSWER_KEYS: readonly TranslationKey[] = [
 export function faqDetailHtml(): string {
   const items: string[] = [];
   for (let n = 1; n <= PROF_FAQ_COUNT; n += 1) {
-    const q = t(`guide.profPages.faq.q${n}` as TranslationKey);
+    const q = t(FAQ_QUESTION_KEYS[n - 1]);
     const a = paras(FAQ_ANSWER_KEYS[n - 1]);
     items.push(`<details class="guide-faq-item"><summary>${esc(q)}</summary>${a}</details>`);
   }

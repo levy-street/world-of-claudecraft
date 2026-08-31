@@ -973,6 +973,13 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   // Quotes stay admitted on purpose: the live guild-create condition is
   // `result.error === 'name_taken'` (server/social.ts).
   const cond = '[^?,{}\\n;)]*?';
+  // The same condition, newline-tolerant, for the WRAPPED emit shapes. Biome puts
+  // a long `text:` value on its own line, which parked the condition of a ternary
+  // emit one line below the `text:` and made the whole emit invisible to `cond`
+  // (nine live sites, dungeons.ts's difficulty-mismatch pair among them). `;` and
+  // `)` still terminate it, so it cannot cross a statement or call boundary; only
+  // the newline rule is relaxed.
+  const condm = '[^?,{};)]*?';
   const unq = (s: string) => s.slice(1, -1);
   // --- src/sim/sim.ts (+ extracted sim modules, which emit via ctx.*) emits ---
   const e1 = new RegExp(`emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${lit}`, 'gs');
@@ -981,7 +988,7 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of simSrc.matchAll(e2)) cands.push({ type: m[2] as Cand['type'], tmpl: unq(m[1]) });
   // Ternary `text:` emits (both branches) — previously a blind spot.
   const e3 = new RegExp(
-    `emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${cond}\\?\\s*${lit}\\s*:\\s*${lit}`,
+    `emit\\(\\{[^}]*?type:\\s*'(log|loot)'[^}]*?text:\\s*${condm}\\?\\s*${lit}\\s*:\\s*${lit}`,
     'gs',
   );
   for (const m of simSrc.matchAll(e3)) {
@@ -1000,9 +1007,13 @@ function scanEmitCandidates(simSrc: string, serverSrc: string): Cand[] {
   for (const m of simSrc.matchAll(er)) cands.push({ type: 'error', tmpl: unq(m[1]) });
   // Variable-routed sim emits: this/ctx.notice(pid, '<lit>') (emits 'log') and
   // this/ctx.stopFollow(p, '<lit>') (arg2 routes through error) — blind spots.
-  // The first-arg class excludes ),(,newline so a single-arg call (e.g.
-  // `this.stopFollow(p);`) cannot span into the NEXT call's literal.
-  const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()\\n]+,\\s*${lit}`, 'g');
+  // The first-arg class excludes parens so a single-arg call (e.g.
+  // `this.stopFollow(p);`) cannot span into the NEXT call's literal. It spans
+  // NEWLINES, matching its `er`/`ert`/`s4`/`s5` siblings: biome wraps a call whose
+  // literal is long, putting the pid on its own line, and the old newline
+  // exclusion made every such notice invisible (ready_check.ts's readout and
+  // dungeon_finder.ts's assembled line both sat outside the guard that way).
+  const nr = new RegExp(`(?:this|ctx)\\.(?:notice|stopFollow)\\([^,()]+,\\s*${lit}`, 'g');
   for (const m of simSrc.matchAll(nr)) cands.push({ type: 'log', tmpl: unq(m[1]) });
   // Ternary args to error/notice/stopFollow (both branches). The first-arg
   // class spans newlines (a biome-wrapped call puts each arg on its own line)
@@ -1510,7 +1521,11 @@ describe('S3: every sim.ts emit is recognized (drift guard)', () => {
     // one of them (the numeric class below would otherwise read `rank` as 5).
     if (/RANK_LABEL/.test(expr)) return 'Officer';
     if (
-      /rank|level|count|players|roll|prestige|amount|seconds|minutes|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD/i.test(
+      // The three ready-check tallies are counts whose names say so in words
+      // rather than in any of the stems below, so they read as a NAME and the
+      // readout's `(\d+)` rule rejected the probe form. Word-anchored, so
+      // `alreadyQueued` and friends are untouched.
+      /rank|level|count|players|roll|prestige|amount|seconds|minutes|percent|\bN\b|MAX_|FIRST_|threshold|number|\.length|Math|round|parseInt|\*\s*100|suggested|FEE_GOLD|\bready\b|\bnotReady\b|\bnoResponse\b/i.test(
         expr,
       )
     )
@@ -1759,9 +1774,21 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     // terminator must not choke on nullish coalescing).
     "ctx.error(\n  p.id,\n  (p.mana ?? 0) === 0\n    ? 'SYNTH_WRAPPED_NULLISH_A'\n    : 'SYNTH_WRAPPED_NULLISH_B',\n);",
     "return 'Synth returns a sentence here.';", // rr
+    // nr, biome-WRAPPED: a notice whose literal is long puts the pid on its own
+    // line, which the old newline-excluding first-arg class could not cross, so
+    // the whole call was invisible (ready_check.ts's readout, dungeon_finder.ts's
+    // assembled line).
+    'ctx.notice(\n  mPid,\n  `SYNTH_WRAPPED_NOTICE ${ready} ready.`,\n);',
+    // e3, biome-WRAPPED: a long ternary `text:` value moves the CONDITION to the
+    // line below `text:`, which the old newline-excluding cond could not cross,
+    // so both branches were invisible (dungeons.ts's difficulty-mismatch pair).
+    "ctx.emit({\n  type: 'log',\n  text:\n    diff === 'heroic'\n      ? 'SYNTH_WRAPPED_EMIT_TERN_A'\n      : 'SYNTH_WRAPPED_EMIT_TERN_B',\n  pid: r.meta.entityId,\n});",
     // nr anti-bleed: a single-arg stopFollow() must stop its first-arg scan at ')'
-    // (the [^,()\\n]+ class) and NOT span into a following call's literal.
+    // (the [^,()]+ class) and NOT span into a following call's literal.
     "this.stopFollow(p); track(metric, 'BLEED_SENTINEL_should_not_capture');",
+    // e3 anti-bleed: the newline-tolerant condm must still stop at ';' and ')', so
+    // an emit followed by an unrelated wrapped ternary cannot harvest its branches.
+    "ctx.emit({ type: 'log', text: 'SYNTH_EMIT_STOP' });\ny =\n  b\n    ? 'EMIT_TERN_BLEED_A'\n    : 'EMIT_TERN_BLEED_B';",
   ].join('\n');
   const synthServer = [
     "this.send({ type: 'error', text: 'SYNTH_SERVER_INLINE' });", // s1
@@ -1807,6 +1834,14 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     ['sim wrapped nullish-condition ternary, branch A (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_A'],
     ['sim wrapped nullish-condition ternary, branch B (ert)', 'error', 'SYNTH_WRAPPED_NULLISH_B'],
     ['sim return-sentence (rr)', 'error', 'Synth returns a sentence here.'],
+    ['sim ctx.notice biome-wrapped (nr)', 'log', 'SYNTH_WRAPPED_NOTICE ${ready} ready.'],
+    ['sim wrapped emit ternary, branch A (e3)', 'log', 'SYNTH_WRAPPED_EMIT_TERN_A'],
+    ['sim wrapped emit ternary, branch B (e3)', 'log', 'SYNTH_WRAPPED_EMIT_TERN_B'],
+    [
+      'sim emit beside an unrelated wrapped ternary (the e3 anti-bleed host)',
+      'log',
+      'SYNTH_EMIT_STOP',
+    ],
     ['server inline text (s1)', 'error', 'SYNTH_SERVER_INLINE'],
     ['server ternary text, branch A (s1t)', 'log', 'SYNTH_SRV_TERN_A'],
     ['server ternary text, branch B (s1t)', 'log', 'SYNTH_SRV_TERN_B'],
@@ -1848,6 +1883,16 @@ describe('S3 scanner enumerates each hardened emit form (regression)', () => {
     expect(
       ternBled,
       "cond class must stop at ';' and ')' (no cross-statement ternary harvest)",
+    ).toEqual([]);
+    // Negative for the newline-tolerant condm: relaxing the newline rule must not
+    // also relax the statement boundary, or an emit would harvest whatever ternary
+    // happens to sit below it.
+    const emitTernBled = cands.filter(
+      (c) => c.tmpl === 'EMIT_TERN_BLEED_A' || c.tmpl === 'EMIT_TERN_BLEED_B',
+    );
+    expect(
+      emitTernBled,
+      "condm must stop at ';' and ')' across newlines (no cross-statement emit-ternary harvest)",
     ).toEqual([]);
   });
 });
@@ -1960,16 +2005,22 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     }
   });
 
-  it('the pre-rename aura string keeps a legacy alias for the deploy window', () => {
+  it('the retired Venomfire Vigor deploy-window alias stays deleted', () => {
+    // The alias row ("drop after v0.29.0 ships") outlived its deploy window by
+    // eleven releases; Phase 18 removed it. An unmapped legacy aura name now
+    // resolves to null (callers fall back to the raw name), and this pin keeps
+    // the dead alias from quietly returning with a future merge.
     setLanguage('en');
-    expect(localizeSimAuraName('Venomfire Vigor')).toBe('Vipersear Vigor');
+    expect(localizeSimAuraName('Venomfire Vigor')).toBeNull();
   });
 
   it('the phase 03 wire-carried renames keep legacy aliases for the deploy window', () => {
-    // Same precedent as Venomfire Vigor above: a not-yet-restarted server
-    // still emits the pre-rename strings, so the new client must localize
-    // them until the release carrying the rename fully ships. Drop with the
-    // alias rows after v0.36.0 ships.
+    // The Venomfire Vigor precedent (its alias is dropped above, its window
+    // long shipped): a not-yet-restarted server still emits the pre-rename
+    // strings, so the new client must localize them until the release
+    // carrying the rename fully ships. These two ride the masterwrought
+    // branch, which integrates onto release/v0.41.0; drop them once that
+    // release is fully deployed.
     setLanguage('en');
     expect(localizeSimAuraName('Winterbite')).toBe(localizeSimAuraName('Wintergnaw'));
     const legacyLine = "The dead answer Deacon Varric's call!";

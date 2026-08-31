@@ -7128,13 +7128,11 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Gli zeloti si muovono come soldati prima di un assedio. Chi si organizza prende ordini, {playerName}. Uccidine altri 8 e portami 4 ordini scritti.',
   'entities.quests.q_cult_orders.completion':
     'Questa scrittura viene dal grimorio di Morthen. La stessa mano ha guidato ogni tomba, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
   'entities.quests.q_necromancers.title': 'Anello di filatteri',
   'entities.quests.q_necromancers.text':
     "Gli ordini parlano di un anello di filatteri, vasi d'anima attorno al Santuario, {playerName}. Uccidi 8 negromanti e portane 3 intatti.",
   'entities.quests.q_necromancers.completion':
     'Che la Luce ci perdoni. Contengono i morti della Valle e della palude; non stavano costruendo un esercito, {playerName}, raccoglievano una decima.',
-  'entities.quests.q_necromancers.objectives.0.label': 'Negromante del Culto del Wyrm ucciso',
   'entities.quests.q_revenants.title': 'Campi dei revenant',
   'entities.quests.q_revenants.text':
     'A est della strada giace un vecchio campo di battaglia. Il culto ne ha rialzato le ossa in piastre arrugginite. Rimettine 12 a terra, {playerName}.',
@@ -7164,7 +7162,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
     'Ieri tutto il campo si è inginocchiato verso il Santuario, {playerName}. Uccidi 10 zeloti e 6 negromanti prima che quella voce abbia abbastanza mani.',
   'entities.quests.q_voice_below.completion':
     "L'inginocchiarsi è finito. Non abbiamo zittito la voce, {playerName}; solo ridotto il suo coro.",
-  'entities.quests.q_voice_below.objectives.0.label': 'Zelota del Culto del Wyrm ucciso',
   'entities.quests.q_sanctum_gate.title': 'La porta del Santuario',
   'entities.quests.q_sanctum_gate.text':
     "Questa è l'ultima soglia, {playerName}. La chiave del Santuario fu spezzata sotto gli occhi dei morti corazzati d'ossa. Portami 3 frammenti e aprirò la via in silenzio.",
@@ -9324,7 +9321,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zero Assoluto erompe!',
   'sim.rift.detonateAbyssalMaw': 'Fauci Abissali si chiudono!',
   'sim.rift.detonateArcaneAnnihilation': 'Annientamento Arcano erompe!',
-  'sim.rift.detonateBloodRite': 'Rito di Sangue cala!',
   'sim.rift.detonateBroodmothersMark': 'La Marca della Madre della Covata detona!',
   'sim.rift.detonateCoreMeltdown': 'Fusione del Nucleo detona!',
   'sim.rift.detonateCrushingDepth': 'Profondità Schiacciante schiaccia!',
@@ -9334,8 +9330,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateGlacialGrave': 'Tomba Glaciale detona!',
   'sim.rift.detonateLightningRod': 'Il Parafulmine colpisce!',
   'sim.rift.detonateMagmaWell': 'Il Pozzo di Magma erompe!',
-  'sim.rift.detonatePactSeal': 'Il Sigillo del Patto detona!',
-  'sim.rift.detonatePitSentence': 'La Sentenza della Fossa detona!',
   'sim.rift.detonateSoulGrave': "La Tomba dell'Anima detona!",
   'sim.rift.detonateStormcallersWrath': "L'Ira del Richiamatempeste erompe!",
   'sim.rift.detonateVenomPool': 'La Pozza di Veleno erompe!',

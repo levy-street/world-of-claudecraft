@@ -7587,13 +7587,11 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Les zélotes bougent comme des soldats avant un siège, {playerName}. Tuez-en 8 autres et rapportez 4 jeux d'ordres.",
   'entities.quests.q_cult_orders.completion':
     'Cette écriture vient du grimoire de Morthen. La même main a guidé chaque tombe, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Zélote du Culte du Wyrm tué',
   'entities.quests.q_necromancers.title': "L'anneau des phylactères",
   'entities.quests.q_necromancers.text':
     "Les ordres parlent d'un anneau de phylactères, {playerName}, vases d'âme autour du Sanctuaire. Tuez 8 nécromanciens et rapportez-en 3 intacts.",
   'entities.quests.q_necromancers.completion':
     "Que la Lumière nous pardonne. Ils contiennent les morts du Val et du marais; ce n'était pas une armée qu'ils bâtissaient, {playerName}, c'était une dîme.",
-  'entities.quests.q_necromancers.objectives.0.label': 'Nécromancien du Culte du Wyrm tué',
   'entities.quests.q_revenants.title': 'Les champs des revenants',
   'entities.quests.q_revenants.text':
     "À l'est de la route dort un vieux champ de bataille. Le culte a relevé ses os en armures rouillées. Remettez-en 12 en terre, {playerName}.",
@@ -7623,7 +7621,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
     "Hier, tout le camp s'est agenouillé face au Sanctuaire, {playerName}. Tuez 10 zélotes et 6 nécromanciens avant que cette voix ait assez de mains.",
   'entities.quests.q_voice_below.completion':
     "L'agenouillement a cessé. Nous n'avons pas réduit la voix au silence, {playerName}; seulement son chœur.",
-  'entities.quests.q_voice_below.objectives.0.label': 'Zélote du Culte du Wyrm tué',
   'entities.quests.q_sanctum_gate.title': 'La porte du Sanctuaire',
   'entities.quests.q_sanctum_gate.text':
     "C'est le dernier seuil, {playerName}. La clef du Sanctuaire fut brisée sous les yeux des morts cuirassés. Rapportez 3 éclats et j'ouvrirai la voie en silence.",
@@ -9801,7 +9798,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zéro absolu se déchaîne !',
   'sim.rift.detonateAbyssalMaw': 'La Gueule abyssale se referme !',
   'sim.rift.detonateArcaneAnnihilation': "L'Anéantissement arcanique se déchaîne !",
-  'sim.rift.detonateBloodRite': "Le Rite du sang s'abat !",
   'sim.rift.detonateBroodmothersMark': 'La Marque de la Mère des couvées explose !',
   'sim.rift.detonateCoreMeltdown': 'La Fusion du noyau explose !',
   'sim.rift.detonateCrushingDepth': 'La Profondeur écrasante écrase !',
@@ -9811,8 +9807,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateGlacialGrave': 'La Tombe glaciale explose !',
   'sim.rift.detonateLightningRod': 'Paratonnerre frappe !',
   'sim.rift.detonateMagmaWell': 'Le Puits de magma jaillit !',
-  'sim.rift.detonatePactSeal': 'Le Sceau du pacte explose !',
-  'sim.rift.detonatePitSentence': 'La Sentence de la fosse explose !',
   'sim.rift.detonateSoulGrave': 'La Tombe des âmes explose !',
   'sim.rift.detonateStormcallersWrath': "La Colère de l'Invocateur des tempêtes se déchaîne !",
   'sim.rift.detonateVenomPool': 'La Mare de venin jaillit !',

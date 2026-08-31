@@ -7136,13 +7136,11 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Die Eiferer bewegen sich wie Soldaten vor einer Belagerung. Eiferer, die sich organisieren, nehmen Befehle entgegen, {playerName}. Töte 8 weitere und bring 4 Befehlssätze.',
   'entities.quests.q_cult_orders.completion':
     'Diese Schrift kenne ich aus Morthens Grimoire. Dieselbe Hand führte jedes Grab, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Wyrmkult-Eiferer getötet',
   'entities.quests.q_necromancers.title': 'Der Ring der Phylakterien',
   'entities.quests.q_necromancers.text':
     'Die Befehle nennen einen Ring von Phylakterien, {playerName}, Seelengefäße um das Heiligtum. Töte 8 Nekromanten und bring 3 unversehrt.',
   'entities.quests.q_necromancers.completion':
     'Licht, vergib uns. Darin sind die Toten aus Tal und Moor; sie bauten nie ein Heer, {playerName}. Sie sammelten einen Zehnt.',
-  'entities.quests.q_necromancers.objectives.0.label': 'Wyrmkult-Nekromant getötet',
   'entities.quests.q_revenants.title': 'Die Wiedergängerfelder',
   'entities.quests.q_revenants.text':
     'Östlich der Straße liegt ein altes Schlachtfeld. Der Kult hob die Knochen in rostiger Rüstung. Leg 12 zurück in die Erde, {playerName}.',
@@ -7173,7 +7171,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Gestern kniete das ganze Lager zum Heiligtum, {playerName}. Töte 10 Eiferer und 6 Nekromanten, bevor diese Stimme genug Hände hat.',
   'entities.quests.q_voice_below.completion':
     'Das Knien hat aufgehört. Wir haben die Stimme nicht zum Schweigen gebracht, {playerName}; nur ihren Chor ausgedünnt.',
-  'entities.quests.q_voice_below.objectives.0.label': 'Wyrmkult-Eiferer getötet',
   'entities.quests.q_sanctum_gate.title': 'Das Tor des Heiligtums',
   'entities.quests.q_sanctum_gate.text':
     'Dies ist die letzte Schwelle, {playerName}. Der Schlüssel des Heiligtums wurde unter den Augen knochengepanzerter Toter zerbrochen. Bring 3 Splitter, und ich öffne leise den Weg.',
@@ -12977,7 +12974,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Absoluter Nullpunkt bricht aus!',
   'sim.rift.detonateAbyssalMaw': 'Abgrundrachen schließt sich!',
   'sim.rift.detonateArcaneAnnihilation': 'Arkane Auslöschung bricht aus!',
-  'sim.rift.detonateBloodRite': 'Blutritus fällt!',
   'sim.rift.detonateBroodmothersMark': 'Mal der Brutmutter detoniert!',
   'sim.rift.detonateCoreMeltdown': 'Kernschmelze detoniert!',
   'sim.rift.detonateCrushingDepth': 'Erdrückende Tiefe zermalmt!',
@@ -12987,8 +12983,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateGlacialGrave': 'Gletschergrab detoniert!',
   'sim.rift.detonateLightningRod': 'Blitzableiter schlägt ein!',
   'sim.rift.detonateMagmaWell': 'Magmaquelle bricht aus!',
-  'sim.rift.detonatePactSeal': 'Paktsiegel detoniert!',
-  'sim.rift.detonatePitSentence': 'Grubenurteil detoniert!',
   'sim.rift.detonateSoulGrave': 'Seelengrab detoniert!',
   'sim.rift.detonateStormcallersWrath': 'Zorn des Sturmrufers bricht aus!',
   'sim.rift.detonateVenomPool': 'Gifttümpel bricht aus!',

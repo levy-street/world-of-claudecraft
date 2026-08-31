@@ -7081,13 +7081,11 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Os zelotes se movem como soldados antes de um cerco. Cultistas que se organizam são cultistas recebendo ordens, {playerName}. Mate mais 8 e traga 4 conjuntos de ordens.',
   'entities.quests.q_cult_orders.completion':
     'Esta letra veio do grimório de Morthen. A mesma mão guiou cada túmulo, {playerName}.',
-  'entities.quests.q_cult_orders.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
   'entities.quests.q_necromancers.title': 'O anel de filactérios',
   'entities.quests.q_necromancers.text':
     'As ordens falam de um anel de filactérios, vasos de alma, {playerName}, ao redor do Santuário. Mate 8 necromantes e traga 3 intactos.',
   'entities.quests.q_necromancers.completion':
     'Que a Luz nos perdoe. Eles guardam os mortos do Vale e do pântano; nunca estavam erguendo um exército, {playerName}. Eram um dízimo.',
-  'entities.quests.q_necromancers.objectives.0.label': 'Necromante do Culto do Wyrm abatido',
   'entities.quests.q_revenants.title': 'Campos de revenantes',
   'entities.quests.q_revenants.text':
     'A leste da estrada há um velho campo de batalha. O culto ergueu seus ossos em placas enferrujadas. Ponha 12 de volta no chão, {playerName}.',
@@ -7118,7 +7116,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Ontem o campo inteiro se ajoelhou para o Santuário, {playerName}. Mate 10 zelotes e 6 necromantes antes que essa voz tenha mãos suficientes.',
   'entities.quests.q_voice_below.completion':
     'Os joelhos se ergueram. Não silenciamos a voz, {playerName}; só afinamos seu coro.',
-  'entities.quests.q_voice_below.objectives.0.label': 'Zelote do Culto do Wyrm abatido',
   'entities.quests.q_sanctum_gate.title': 'O portão do Santuário',
   'entities.quests.q_sanctum_gate.text':
     'Este é o último limiar, {playerName}. A chave do Santuário foi quebrada sob os olhos dos mortos encouraçados de ossos. Traga 3 fragmentos e abrirei a passagem em silêncio.',
@@ -9248,7 +9245,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateAbsoluteZero': 'Zero Absoluto explode!',
   'sim.rift.detonateAbyssalMaw': 'Fauces Abissais se fecham!',
   'sim.rift.detonateArcaneAnnihilation': 'Aniquilação Arcana explode!',
-  'sim.rift.detonateBloodRite': 'Rito de Sangue cai!',
   'sim.rift.detonateBroodmothersMark': 'A Marca da Mãe da Ninhada detona!',
   'sim.rift.detonateCoreMeltdown': 'Fusão do Núcleo detona!',
   'sim.rift.detonateCrushingDepth': 'Profundeza Esmagadora esmaga!',
@@ -9258,8 +9254,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'sim.rift.detonateGlacialGrave': 'Sepultura Glacial detona!',
   'sim.rift.detonateLightningRod': 'O Para-raios atinge!',
   'sim.rift.detonateMagmaWell': 'O Poço de Magma explode!',
-  'sim.rift.detonatePactSeal': 'O Selo do Pacto detona!',
-  'sim.rift.detonatePitSentence': 'A Sentença do Fosso detona!',
   'sim.rift.detonateSoulGrave': 'A Sepultura da Alma detona!',
   'sim.rift.detonateStormcallersWrath': 'A Fúria do Invocador de Tempestades explode!',
   'sim.rift.detonateVenomPool': 'A Poça de Veneno explode!',

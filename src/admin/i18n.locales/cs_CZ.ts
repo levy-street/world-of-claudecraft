@@ -647,7 +647,6 @@ export const cs_CZ: Record<string, string> = {
   'poi.thornpeak_heights.4': 'Drogmarův válečný tábor',
   'poi.thornpeak_heights.5': 'Stormcrag',
   'poi.thornpeak_heights.6': 'Glimmermere',
-  'poi.thornpeak_heights.7': 'Stany wyrmkultu',
   'poi.thornpeak_heights.8': 'Pole revenantů',
   'poi.thornpeak_heights.9': 'Svatyně hrobového wyrma',
   'reason.cheating': 'Podvádění / exploit',
