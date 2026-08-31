@@ -19,7 +19,12 @@ src/ui/i18n.catalog/translation_keys.generated.ts linguist-generated
 # hashed the smudged bytes, and the gate's manifest freshness step failed on
 # src/render/assets/manifest.generated.ts. Pin every extension in the manifest
 # script's MEDIA_EXTENSIONS set, not just the ones the heuristic misses today
-# (welded by tests/media_gitattributes.test.ts).
+# (welded by tests/media_gitattributes.test.ts). These rules only apply at
+# checkout: a Windows clone made before they landed still has the smudged
+# bytes on disk (git status stays clean, nothing re-smudges them). Heal it by
+# deleting the affected files and re-checking them out:
+#   rm public/env/evergarden_day_1k.hdr public/env/evergarden_day_2k.hdr
+#   git checkout -- public/env
 *.glb binary
 *.fbx binary
 *.hdr binary
