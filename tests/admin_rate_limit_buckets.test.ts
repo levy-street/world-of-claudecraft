@@ -10,10 +10,16 @@
 // the economy-oversight budget (whose exhaustion would 429 the moderation
 // Flagged workflow), and an oversight burst can never blank the dashboards.
 import { EventEmitter } from 'node:events';
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET,
+  ADMIN_ANALYTICS_IP_TAB_BUDGET,
+  ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE,
   ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+  ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE,
   ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
   ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
   AUTH_MAX_PER_MINUTE,
@@ -27,6 +33,7 @@ import {
   resetRateLimits,
   setRateLimitClock,
 } from '../server/ratelimit';
+import { ACTIVITY_REFRESH_MS, LIVE_REFRESH_MS } from '../src/admin/state/poll';
 
 const FIXED_NOW_MS = 1_700_000_000_000;
 const OPERATOR = 7;
@@ -155,9 +162,55 @@ describe('admin oversight rate-limit buckets', () => {
 });
 
 describe('admin analytics read bucket', () => {
-  it('pins the budget with the same polling headroom as the oversight reads', () => {
-    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(120);
-    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE);
+  it('derives both arms from tab-equivalents of the real dashboard poll cadence', () => {
+    // One open tab: overview at LIVE_REFRESH_MS, activity at ACTIVITY_REFRESH_MS
+    // (src/admin/state/poll.ts), market metrics at the page's own AUTO_REFRESH_MS
+    // (MarketMetrics.svelte, read from source since a .svelte module has no
+    // node import). 12 + 1 + 2 = 15 requests per tab per minute.
+    const svelte = readFileSync(
+      resolve(process.cwd(), 'src/admin/pages/MarketMetrics.svelte'),
+      'utf8',
+    );
+    const metricsMs = Number(
+      /const AUTO_REFRESH_MS = ([\d_]+);/.exec(svelte)?.[1]?.replace(/_/g, ''),
+    );
+    expect(metricsMs).toBe(30_000);
+    const perTab = 60_000 / LIVE_REFRESH_MS + 60_000 / ACTIVITY_REFRESH_MS + 60_000 / metricsMs;
+    expect(perTab).toBe(15);
+    expect(ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE).toBe(perTab);
+    // The account arm is one operator's own tabs; the IP arm a whole NAT.
+    expect(ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET).toBe(8);
+    expect(ADMIN_ANALYTICS_IP_TAB_BUDGET).toBe(40);
+    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(8 * 15);
+    expect(ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE).toBe(40 * 15);
+    expect(ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE).toBeGreaterThan(
+      ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+    );
+  });
+
+  it('three operators with three tabs each behind one NAT all stay under the IP arm', () => {
+    // The hot-path review's failing scenario for the first cut (an IP arm equal
+    // to the account arm): 9 tabs x 15/min = 135/min from one address, which
+    // 429'd the Overview live cards. Now every one of those requests passes.
+    const ip = '203.0.113.30';
+    for (let minuteRequest = 0; minuteRequest < 3 * 3 * 15; minuteRequest++) {
+      const operator = OPERATOR + (minuteRequest % 3);
+      expect(adminAnalyticsReadRateLimited(reqFrom(ip), operator).allowed).toBe(true);
+    }
+  });
+
+  it('the IP arm still closes at its own budget when many operators share one address', () => {
+    // Rotating accounts so the account arm never trips: only the IP arm can
+    // deny, and it must, at exactly the derived budget.
+    const ip = '203.0.113.31';
+    let n = 0;
+    exhaust(
+      () => adminAnalyticsReadRateLimited(reqFrom(ip), 10_000 + n++),
+      ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE,
+      'shared-ip analytics read',
+    );
+    // A different address is unaffected.
+    expect(adminAnalyticsReadRateLimited(reqFrom('203.0.113.32'), 10_000 + n).allowed).toBe(true);
   });
 
   it('an analytics burst never consumes the oversight, flag-write, or login buckets', () => {

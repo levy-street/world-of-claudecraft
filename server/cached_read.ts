@@ -31,6 +31,21 @@ export interface CachedReadOptions {
   now?: () => number;
 }
 
+/**
+ * Freeze a cache snapshot WHOLE (every nested object and array) and return
+ * it. Object.freeze alone is shallow, so a tenant that froze only its top
+ * level left the rows the serialize-once memo (server/ok_response_memo.ts)
+ * depends on mutable; a consumer poisoning a shared row would then desync the
+ * memoized bytes from the object. Plain data only (no cycles, no exotic
+ * objects): the shapes cached_read tenants install.
+ */
+export function deepFreezeSnapshot<T>(value: T): T {
+  if (typeof value !== 'object' || value === null || Object.isFrozen(value)) return value;
+  Object.freeze(value);
+  for (const child of Object.values(value as Record<string, unknown>)) deepFreezeSnapshot(child);
+  return value;
+}
+
 export interface CachedRead<T> {
   /** Serve fresh-within-TTL from cache; otherwise refresh (single-flight). */
   read(): Promise<T>;

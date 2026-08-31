@@ -127,4 +127,28 @@ describe('serialize-once keying', () => {
     memo.send(res(), a);
     expect(memo.stats()).toEqual({ serves: 3, stringifies: 2 });
   });
+
+  it('refuses an EMPTY parts array (it would key on the fresh wrapper and never hit)', () => {
+    const memo = createOkResponseMemo();
+    const r = res();
+    expect(() => memo.send(r, { n: 1 }, [])).toThrow('empty parts array');
+    // Nothing was served or stringified, and nothing was written.
+    expect(memo.stats()).toEqual({ serves: 0, stringifies: 0 });
+    expect(captured(r).body).toBe('');
+  });
+
+  it('a hit writes the byte length memoized with the body (never recomputed from the string)', () => {
+    // Observable contract: the Content-Length on a hit equals the miss's, and
+    // equals the UTF-8 byte length of the served body (not its code-unit
+    // length), so the memoized pair stays consistent for a non-ASCII payload.
+    const memo = createOkResponseMemo();
+    const data = Object.freeze({ name: 'Grimmschädel (café)' });
+    const miss = res();
+    memo.send(miss, data);
+    const hit = res();
+    memo.send(hit, data);
+    expect(captured(hit).headers['content-length']).toBe(captured(miss).headers['content-length']);
+    expect(captured(hit).headers['content-length']).toBe(Buffer.byteLength(captured(hit).body));
+    expect(memo.stats()).toEqual({ serves: 2, stringifies: 1 });
+  });
 });

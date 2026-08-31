@@ -29,7 +29,11 @@
 // Pure apart from the size signal: no pool, no clock of its own, the holder
 // injected, so the statement text is unit-testable
 // (tests/server/character_save_statement.test.ts).
-import { recordCharacterBlobBytes, reportCharacterBlobSize } from './character_blob_size';
+import {
+  queueCharacterBlobWarning,
+  recordCharacterBlobBytes,
+  reportCharacterBlobSize,
+} from './character_blob_size';
 
 export type CharacterSaveFence =
   | { kind: 'none' }
@@ -89,21 +93,11 @@ export function characterUpdateStatement(
   // (the two beginSaveTx escrow flushes plus saveCharacterStateOnClient after
   // lockSaveEffectAccounts), and console.warn is a SYNCHRONOUS write when
   // stdout is a blocking sink (a file, a full pipe), which would lengthen the
-  // lock hold at exactly the moment the signal fires. setImmediate keeps the
-  // line, off the critical section.
-  // The callback swallows its own throw (EPIPE on a stdout closed at
-  // shutdown): an unhandled async rejection from a dev-channel line would be
-  // worse than a lost line, and a shutdown-path save losing its queued warn
-  // is an accepted cost of keeping the write off the lock hold.
-  if (sizeWarning !== null) {
-    setImmediate(() => {
-      try {
-        console.warn(sizeWarning);
-      } catch {
-        /* a lost dev-channel line, never a crash */
-      }
-    });
-  }
+  // lock hold at exactly the moment the signal fires. The queue writes the
+  // line on the next immediate, off the critical section, and the shutdown
+  // train drains it synchronously before process.exit (the lost-line window
+  // the bare setImmediate left open; see character_blob_size.ts).
+  if (sizeWarning !== null) queueCharacterBlobWarning(sizeWarning);
   switch (fence.kind) {
     case 'none':
       return {

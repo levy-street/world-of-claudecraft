@@ -10,8 +10,18 @@ import type { Sim } from '../src/sim/sim';
 
 /** Routes one farming command frame. `msg` is the already-parsed client
  *  frame (game.ts's ClientMessage, structurally a string-keyed record); every
- *  field is re-guarded here exactly as dispatchMessage guards its own cases. */
-export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, pid: number): void {
+ *  field is re-guarded here exactly as dispatchMessage guards its own cases.
+ *  Returns whether the frame REACHED the sim (its guards passed and a sim
+ *  method was invoked): the dispatch's heavy-self mark for the arm-marked
+ *  farming members rides this answer (server/heavy_self.ts
+ *  HEAVY_SELF_ARM_MARKED_CMDS), so a frame refused HERE never buys a heavy
+ *  self re-serialize. The sim's own verdict is not visible here and is not
+ *  claimed: true means invoked, never accepted. */
+export function dispatchFarmingCommand(
+  sim: Sim,
+  msg: Record<string, unknown>,
+  pid: number,
+): boolean {
   switch (msg.cmd) {
     case 'plant_crop':
       // Farming's growth phase. TYPE boundary only: the sim is the single
@@ -59,16 +69,18 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
           },
           pid,
         );
+        return true;
       }
-      break;
+      return false;
     case 'harvest_crop':
       // The other half of the same pair. The yield comes entirely from the
       // hidden slots pre-rolled at plant time, so this frame cannot
       // influence what it pays out: it names a bed and nothing else.
       if (typeof msg.bed === 'string') {
         sim.harvestCrop(msg.bed, pid);
+        return true;
       }
-      break;
+      return false;
     case 'convert_husks':
       // Farming's knobs phase: trade withered husks for compost. NO payload
       // to guard: the ratio, the batch count and both item ids resolve
@@ -76,7 +88,7 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
       // husks, or no farmer NPC in reach: the go-live's range gate lives in
       // the sim body) answer with the pid-scoped text-free farmDenied event.
       sim.convertHusks(pid);
-      break;
+      return true;
     case 'place_feast':
       // The shared feast's place verb. NO payload to guard: the one feast
       // item id, its charge count, its expiry, and the one-active-feast-per
@@ -85,7 +97,7 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
       // nothing on this frame to forge. Every refusal answers with the
       // pid-scoped text-free farmDenied event.
       sim.placeFeast(pid);
-      break;
+      return true;
     case 'consume_feast':
       // The shared feast's eat verb: the feast ENTITY id and nothing else.
       // TYPE boundary only (an integer; the sim validates liveness,
@@ -95,8 +107,11 @@ export function dispatchFarmingCommand(sim: Sim, msg: Record<string, unknown>, p
       // switch's own stated laundering reason.
       if (typeof msg.id === 'number' && Number.isInteger(msg.id)) {
         sim.consumeFeast(msg.id, pid);
+        return true;
       }
-      break;
+      return false;
+    default:
+      return false;
   }
 }
 

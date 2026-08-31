@@ -14,7 +14,7 @@ import {
   SUNDERED_ESSENCE_ITEM_ID,
   WYRMFALL_CORE_ITEM_ID,
 } from '../src/sim/professions/masterwrought_materials';
-import { type CachedRead, createCachedRead } from './cached_read';
+import { type CachedRead, createCachedRead, deepFreezeSnapshot } from './cached_read';
 
 // Fixed bucket order: the response always carries all six in this order so the
 // dashboard renders a stable layout with zeros.
@@ -201,9 +201,10 @@ export function readAdminMarketMetrics(): Promise<AdminMarketMetrics> {
   const source = metricsSource;
   // One snapshot object is served by reference to every reader in a TTL
   // window (and its serialized envelope is memoized on that identity by the
-  // route, server/ok_response_memo.ts); freeze it so no consumer can poison
-  // the shared readout or desync the memoized bytes.
-  metricsCache ??= createCachedRead(async () => Object.freeze(source()), {
+  // route, server/ok_response_memo.ts); freeze it WHOLE, buckets and rows
+  // included, so no consumer can poison the shared readout or desync the
+  // memoized bytes from the object (a shallow freeze left the rows open).
+  metricsCache ??= createCachedRead(async () => deepFreezeSnapshot(source()), {
     ttlMs: ADMIN_MARKET_METRICS_TTL_MS,
   });
   return metricsCache.read();

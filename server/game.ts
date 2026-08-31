@@ -16,7 +16,7 @@ import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
-import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
+import { MECH_CHROMAS } from '../src/sim/content/skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
 import { isWeaponSkinType, WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
@@ -29,7 +29,6 @@ import {
   isBgPos,
   isDelvePos,
   MOBS,
-  ZONES,
   zoneAt,
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
@@ -49,6 +48,7 @@ import {
 import type { PickAction } from '../src/sim/lockpick';
 import { lootHasGoneFfa } from '../src/sim/loot/loot_ffa';
 import { type MarketQuery, sanitizeMarketQuery } from '../src/sim/market_query';
+import { unequipWornMechChroma } from '../src/sim/mech_chroma_ownership';
 import { parseMoveInputFrame } from '../src/sim/move_input';
 import {
   partyFrameAbsorb,
@@ -155,6 +155,7 @@ import {
   buildDetectionCalibrationSnapshot,
   type DetectionCalibrationSnapshot,
 } from './calibration_snapshot';
+import { characterBlobBytesP99 } from './character_blob_size';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
 import { applyCharacterSaveFixups } from './character_save_fixups';
 import { ChatFilter } from './chat_filter';
@@ -276,7 +277,7 @@ import {
   loadGuildBanksIntoSim,
 } from './guild_bank_state';
 import { createPaidGuildWithLeaderAtomic } from './guild_create_db';
-import { HEAVY_SELF_CMDS, HEAVY_SELF_EVENTS } from './heavy_self';
+import { HEAVY_SELF_EVENTS, heavySelfMarkOnAccept, heavySelfMarkOnReceipt } from './heavy_self';
 import { gameMetricsCounters, type WsDropCause } from './http/game_signals';
 import { buildSharedInterestCandidates } from './interest_candidates';
 import {
@@ -379,6 +380,15 @@ import type { StorageAppliedEffect } from './storage_purchase_db';
 import { storageAppliedEffectsCommitted, storageRecovery } from './storage_purchases';
 import { StorageRecoverySessionSweep as RecoverySweep } from './storage_recovery_session_sweep';
 import { attachDetectorFlagHost } from './suspicion_flags';
+import {
+  formatMobZoneLine,
+  formatSimPhaseLine,
+  formatTickPerfLine,
+  MOB_ZONE_PHASE_BY_ID,
+  MOB_ZONE_PHASE_INSTANCE,
+  MOB_ZONE_PHASE_OTHER,
+  SIM_MOB_ZONE_PHASES,
+} from './tick_perf_log';
 import { TickProfiler } from './tick_profiler';
 import { hrtimeToMs, TickRateMeter } from './tick_rate_meter';
 import { maybeTrackDay7Retained, trackLevelMilestoneCapi } from './ua_capi';
@@ -535,25 +545,10 @@ export const SIM_LAP_PHASES = [
   ...MOB_UPDATE_BUCKETS.map((b) => `mob.update|${b}`),
 ].map((n) => `sim.${n}`);
 
-// Per-zone attribution buckets for the mob.update phase. The mob loop
-// tags each mob.update lap with its entity; the host splits that slice of the phase
-// time by the mob's zone/group so a stall localizes to "which zone froze" instead of
-// only the phase total. These are HOST-DERIVED (the sim never emits them), so they are
-// registered in the profiler but deliberately kept OUT of SIM_LAP_PHASES (which pins
-// the sim's own emissions). Overworld mobs bucket by zone id; instance/delve mobs
-// (x beyond DUNGEON_X_THRESHOLD) share one 'instance' bucket; 'other' is a safety net.
-const MOB_ZONE_PHASE_PREFIX = 'sim.mob.z:';
-const MOB_ZONE_PHASE_INSTANCE = `${MOB_ZONE_PHASE_PREFIX}instance`;
-const MOB_ZONE_PHASE_OTHER = `${MOB_ZONE_PHASE_PREFIX}other`;
-// Pre-interned zone-id -> phase-name map so the per-mob probe allocates no strings.
-const MOB_ZONE_PHASE_BY_ID = new Map<string, string>(
-  ZONES.map((z) => [z.id, `${MOB_ZONE_PHASE_PREFIX}${z.id}`]),
-);
-export const SIM_MOB_ZONE_PHASES = [
-  ...ZONES.map((z) => `${MOB_ZONE_PHASE_PREFIX}${z.id}`),
-  MOB_ZONE_PHASE_INSTANCE,
-  MOB_ZONE_PHASE_OTHER,
-];
+// The per-zone mob.update attribution buckets live beside the line that prints
+// them (server/tick_perf_log.ts); re-exported so the capture suite's pin keeps
+// its import.
+export { SIM_MOB_ZONE_PHASES };
 
 // Per-key-group attribution buckets for the bcastSelf phase (selfWireJson).
 // HOST-DERIVED like the mob zone buckets and populated only while a detailed
@@ -3390,22 +3385,6 @@ export class GameServer {
       .catch((err) => console.error('failed to grant account weapon skins:', err));
   }
 
-  /** Take a mech chroma off the acting character's own current appearance. The
-   *  account-wide unlock (accountCosmetics.mechChromaIds) is permanent, exactly
-   *  like an owned Season 1 Armory weapon skin: this never revokes it, so any
-   *  character on the account (online or not, now or later) can still take the
-   *  look off, and can freely put it back on via change_skin with no item
-   *  involved. Only the acting character's OWN display changes; every other
-   *  character's independently chosen look is left alone. */
-  private unequipAccountMechChroma(session: ClientSession, chromaId: string): void {
-    const skin = mechChromaSkinIndex(chromaId);
-    if (skin < 0) return;
-    const e = this.sim.entities.get(session.pid);
-    if (e?.skinCatalog === 'mech' && e.skin === skin) {
-      this.sim.setPlayerSkin(session.pid, 0, 'class');
-    }
-  }
-
   /** Apply (skinId set) or detach (skinId null + wtype) a Season 1 Armory weapon
    *  skin. Server-authoritative: the account must own the skin, and the Sim
    *  re-validates that a weapon of the skin's type is equipped right now. The
@@ -5598,33 +5577,31 @@ export class GameServer {
     const heartbeat = tick - this.lastPerfLogTick >= 100;
     if (!overBudget && !heartbeat) return;
     this.lastPerfLogTick = tick;
-    const p = this.tickProfiler.profile().phases;
-    const fmt = (n: string) => `${n}=${p[n].p95}/${p[n].max}`;
+    // The three line formatters live in server/tick_perf_log.ts (pure, pinned).
+    const phases = this.tickProfiler.profile().phases;
     console.log(
-      `[perf] online=${this.clients.size} ents=${this.sim.entities.size} tickHz=${this.tickHz == null ? 'n/a' : round2(this.tickHz)} tickMs=${round2(tickMs)}${overBudget ? ' OVER' : ''}` +
-        ` | p95/max ${['total', 'tick', 'broadcast', 'bcastSelf', 'bcastGrid', 'events', 'social'].map(fmt).join(' ')}` +
-        ` | visits=${this.bcVisits} serializes=${this.bcSerializes} baseSerializes=${this.bcBaseSerializes} serializeMs=${round2(Number(this.bcSerializeNs) / 1e6)} timerVariants=${this.bcLegacySerializes}/${this.bcStableSerializes} aggroVisits=${this.mobScanTickStats.lastAggroScanVisits} threatVisits=${this.mobScanTickStats.lastThreatEntryVisits}`,
+      formatTickPerfLine({
+        online: this.clients.size,
+        ents: this.sim.entities.size,
+        tickHz: this.tickHz,
+        tickMs,
+        overBudget,
+        phases,
+        visits: this.bcVisits,
+        serializes: this.bcSerializes,
+        baseSerializes: this.bcBaseSerializes,
+        serializeNs: this.bcSerializeNs,
+        legacySerializes: this.bcLegacySerializes,
+        stableSerializes: this.bcStableSerializes,
+        aggroVisits: this.mobScanTickStats.lastAggroScanVisits,
+        threatVisits: this.mobScanTickStats.lastThreatEntryVisits,
+        blobP99Bytes: characterBlobBytesP99(),
+      }),
     );
-    // The sim.tick() internal breakdown, mean-sorted so the phase that actually eats
-    // the average (not just a spike) leads. Populated only while detailed timing is on.
-    const simPhases = SIM_LAP_PHASES.filter((n) => p[n] && p[n].mean > 0).sort(
-      (a, b) => p[b].mean - p[a].mean,
-    );
-    if (simPhases.length > 0) {
-      const fmtMean = (n: string) => `${n.slice(4)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
-      console.log(`[perf.sim] mean/p95/max ${simPhases.slice(0, 14).map(fmtMean).join(' ')}`);
-    }
-    // Per-zone split of mob.update, mean-sorted so the zone eating the
-    // phase leads. Only prints when the mob.update cost is actually attributed to a
-    // zone, so a normal tick stays quiet.
-    const zonePhases = SIM_MOB_ZONE_PHASES.filter((n) => p[n] && p[n].mean > 0).sort(
-      (a, b) => p[b].mean - p[a].mean,
-    );
-    if (zonePhases.length > 0) {
-      const fmtZone = (n: string) =>
-        `${n.slice(MOB_ZONE_PHASE_PREFIX.length)}=${p[n].mean}/${p[n].p95}/${p[n].max}`;
-      console.log(`[perf.sim.mob] zone mean/p95/max ${zonePhases.map(fmtZone).join(' ')}`);
-    }
+    const simLine = formatSimPhaseLine(phases, SIM_LAP_PHASES);
+    if (simLine !== null) console.log(simLine);
+    const zoneLine = formatMobZoneLine(phases);
+    if (zoneLine !== null) console.log(zoneLine);
   }
 
   suspiciousPlayers(): SuspiciousPlayer[] {
@@ -6473,8 +6450,11 @@ export class GameServer {
     }
     // A command that can change a heavy self field forces the next snapshot to
     // re-diff those fields (combat-only commands like cast/target/attack do not,
-    // which is what keeps the gating a win during a fight).
-    if (typeof msg.cmd === 'string' && HEAVY_SELF_CMDS.has(msg.cmd)) session.selfHeavyDirty = true;
+    // which is what keeps the gating a win during a fight). The arm-marked
+    // members (heavy_self.ts) mark inside their own case instead, once the
+    // frame has passed the arm's guards: a dispatch-refused frame marks nothing.
+    if (typeof msg.cmd === 'string' && heavySelfMarkOnReceipt(msg.cmd))
+      session.selfHeavyDirty = true;
     // The viewer's own market commands re-arm the market wire gate so their
     // search/list/buy/cancel/collect feedback lands on the next snapshot
     // instead of waiting out the MARKET_WIRE_HZ cadence.
@@ -6860,7 +6840,12 @@ export class GameServer {
         if (ref) {
           const named = resolvePerfectItemName(msg, offensiveName);
           if (named.refused) this.sendChatNotice(session, 'That name is not allowed.');
-          else sim.perfectItemAs(pid, ref, named.name);
+          else {
+            // Arm-marked: the heavy-self mark rides the frame that reaches the sim,
+            // never the malformed-ref or screened-name refusals above.
+            if (heavySelfMarkOnAccept(command)) session.selfHeavyDirty = true;
+            sim.perfectItemAs(pid, ref, named.name);
+          }
         }
         break;
       }
@@ -6968,7 +6953,10 @@ export class GameServer {
         // Farming's command bodies live whole in server/farming_commands.ts
         // (the v0.38.0 sync monolith heal). The labels stay HERE: the
         // command-schema suite scans this switch for the dispatch universe.
-        dispatchFarmingCommand(sim, msg, pid);
+        // Arm-marked heavy-self members mark only when the frame reached the sim.
+        if (dispatchFarmingCommand(sim, msg, pid) && heavySelfMarkOnAccept(command)) {
+          session.selfHeavyDirty = true;
+        }
         break;
       case 'sell_all_junk':
         sim.sellAllJunk(pid);
@@ -7002,9 +6990,17 @@ export class GameServer {
           }
         }
         break;
-      case 'unequip_mech_chroma':
-        if (typeof msg.chroma === 'string') this.unequipAccountMechChroma(session, msg.chroma);
+      case 'unequip_mech_chroma': {
+        // The rule (take the chroma off THIS character's current look only; the
+        // account-wide unlock is permanent) is the sim's, read off the live
+        // entity: src/sim/mech_chroma_ownership.ts, no second copy here.
+        const e = typeof msg.chroma === 'string' ? sim.entities.get(pid) : undefined;
+        if (e) {
+          const worn = { entityId: pid, skinCatalog: e.skinCatalog, skin: e.skin };
+          unequipWornMechChroma(sim, worn, msg.chroma as string);
+        }
         break;
+      }
       // Rideable mounts: the Sim re-validates everything (catalog key, level
       // gate, combat gate); the entity mirror + self `mnt` field carry the result.
       case 'mount_toggle':

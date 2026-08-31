@@ -10,12 +10,15 @@
 //    tests/admin_rate_limit_buckets.test.ts.
 // 2. Serialize-once on activity: both arms compose the response from the four
 //    cache-stable arrays (server/admin_activity_cache.ts) and serve memoized
-//    envelope bytes through ONE shared memo (server/ok_response_memo.ts), so
-//    a TTL window costs one stringify across BOTH arms, and the bytes are
+//    envelope bytes through the route's ONE memo (server/ok_response_memo.ts;
+//    one instance per route, shared by that route's two dispatch arms), so a
+//    TTL window costs one stringify across BOTH arms, and the bytes are
 //    exactly what ok() would have produced. Overview is pinned EXEMPT from
 //    byte memoization: its response embeds the per-request live adminStats()
 //    merge, so two requests inside one cache window must still serve
-//    different bytes when the live stats moved.
+//    different bytes when the live stats moved. The memo's key contract (every
+//    non-part field a module constant) and the per-route instance split are
+//    pinned at the end of this file.
 //
 // Harness: the admin_overview_cache_arms.test.ts shape. Auth rides partial
 // mocks over db/staff_db so BOTH the legacy arm's direct imports and the lazy
@@ -25,7 +28,9 @@
 process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_analytics_reads';
 
 import { EventEmitter } from 'node:events';
+import { readFileSync } from 'node:fs';
 import type * as http from 'node:http';
+import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../server/db', async (importOriginal) => {
@@ -42,6 +47,7 @@ vi.mock('../../server/staff_db', async (importOriginal) => {
 
 import {
   type AdminRuntime,
+  adminAnalyticsMemoStats,
   configureAdminRuntime,
   handleAdminApi,
   resetAdminDbForTests,
@@ -50,12 +56,17 @@ import {
   setAdminDbForTests,
 } from '../../server/admin';
 import {
+  ACTIVITY_WINDOW_DAYS,
   ADMIN_ACTIVITY_TTL_MS,
   type AdminActivityBundle,
   resetAdminActivityCacheForTests,
   setAdminActivityCacheForTests,
 } from '../../server/admin_activity_cache';
 import type { OverviewCounts } from '../../server/admin_db';
+import {
+  configureAdminMarketMetrics,
+  resetAdminMarketMetricsForTests,
+} from '../../server/admin_market_metrics';
 import {
   resetOverviewCacheForTests,
   setOverviewCacheForTests,
@@ -371,5 +382,65 @@ describe('uniform metering on the analytics read bucket', () => {
     expect(r.status).toBe(429);
     expect(JSON.parse(r.rawBody)).toEqual({ success: false, data: null, error: TOO_MANY });
     expect(overviewCalls).toBe(0);
+  });
+});
+
+describe('the memo key contract at the activity route', () => {
+  it('every non-part field of the composed activity data is a module constant (exactly days)', () => {
+    // The memo keys on the four cache-stable arrays; any OTHER field of the
+    // composed data must be a module constant, or two requests could share
+    // memoized bytes while differing in that field. Today the only such field
+    // is `days`, pinned to ACTIVITY_WINDOW_DAYS (the value assertWindow refuses
+    // to serve any other). A new request-derived scalar reds here until it
+    // either joins the parts or the route leaves the memo.
+    const stringify = vi.spyOn(JSON, 'stringify');
+    return runRoute('/admin/api/activity').then((r) => {
+      const envelope = stringify.mock.calls
+        .map(([value]) => value as { success?: boolean; data?: Record<string, unknown> } | null)
+        .find((value) => value?.success === true && value?.data?.days !== undefined);
+      stringify.mockRestore();
+      expect(r.status).toBe(200);
+      expect(envelope).toBeDefined();
+      const data = (envelope as { data: Record<string, unknown> }).data;
+      const partKeys = ['registrations', 'sessions', 'classes', 'levels'];
+      const nonPartKeys = Object.keys(data).filter((key) => !partKeys.includes(key));
+      expect(nonPartKeys).toEqual(['days']);
+      expect(data.days).toBe(ACTIVITY_WINDOW_DAYS);
+      for (const key of partKeys) expect(Array.isArray(data[key]), key).toBe(true);
+    });
+  });
+});
+
+describe('one memo per route, and both readable from the ops readout', () => {
+  afterEach(() => {
+    resetAdminMarketMetricsForTests();
+  });
+
+  it('the activity route moves only the activity memo; the metrics route only its own', async () => {
+    configureAdminMarketMetrics(() => ({ realm: 'memo-realm', buckets: [] }));
+    const before = adminAnalyticsMemoStats();
+    await runRoute('/admin/api/activity');
+    await runRoute('/admin/api/activity');
+    const afterActivity = adminAnalyticsMemoStats();
+    expect(afterActivity.activity.serves - before.activity.serves).toBe(2);
+    expect(afterActivity.activity.stringifies - before.activity.stringifies).toBe(1);
+    expect(afterActivity.marketMetrics).toEqual(before.marketMetrics);
+
+    await runRoute('/admin/api/market/metrics');
+    await runRoute('/admin/api/market/metrics');
+    const afterMetrics = adminAnalyticsMemoStats();
+    expect(afterMetrics.marketMetrics.serves - afterActivity.marketMetrics.serves).toBe(2);
+    expect(afterMetrics.marketMetrics.stringifies - afterActivity.marketMetrics.stringifies).toBe(
+      1,
+    );
+    expect(afterMetrics.activity).toEqual(afterActivity.activity);
+  });
+
+  it('server/main.ts publishes both memos on the internal stuck readout', () => {
+    // The same source-pin shape tests/server/woc_market_hot_reads.test.ts uses
+    // for the read-cache counters on this readout: the line is the production
+    // reader of stats(), so a hit-rate regression is scrape-visible.
+    const main = readFileSync(resolve(process.cwd(), 'server/main.ts'), 'utf8');
+    expect(main).toContain('adminAnalyticsMemo: adminAnalyticsMemoStats(),');
   });
 });

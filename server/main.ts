@@ -61,6 +61,7 @@ import {
   withAccountWealthSweepLock,
 } from './account_wealth_db';
 import {
+  adminAnalyticsMemoStats,
   configureAdminGuildBoardCacheBust,
   configureAdminPlayersCap,
   configureAdminRuntime,
@@ -112,7 +113,11 @@ import {
   pruneBugReportsBatch,
 } from './bug_report_db';
 import { createCachedRead } from './cached_read';
-import { characterBlobBytesHighWater } from './character_blob_size';
+import {
+  characterBlobBytesHighWater,
+  characterBlobBytesP99,
+  flushQueuedCharacterBlobWarnings,
+} from './character_blob_size';
 import {
   characterDeleteGateStats,
   configureCharacterDeleteBackgroundGate,
@@ -3095,6 +3100,11 @@ configureInternalWocMarketStuckRead(async () => ({
   // surface): eviction thrash or a bust storm is a DB-load incident in the
   // making, and this readout is where an operator already looks.
   readCaches: wocMarketReadCache.stats(),
+  // The admin analytics serialize-once memos (activity, market metrics): the
+  // serve/stringify pair per route. Stringifies tracking serves means the memo
+  // stopped hitting (a cache turning over per request, or an unstable key),
+  // the regression nothing else in the process would surface.
+  adminAnalyticsMemo: adminAnalyticsMemoStats(),
   // The auth-guard cache readout: both arms (token rows, moderation rows)
   // plus the soft-bounded internals (account index, recent-bust ledger) and
   // the join-veto refetch counter; a bust storm or eviction thrash here is
@@ -3757,6 +3767,7 @@ export async function startServer(): Promise<http.Server> {
   const gameStateSource: GameStateSource = {
     usernameBanlistLoaded: usernameBanlistFileLoaded,
     characterBlobBytesHighWater,
+    characterBlobBytesP99,
     playersOnline: () => game.clients.size,
     accountsOnline: () => game.liveAccountIds().size,
     wsConnections: () => wss.clients.size,
@@ -4202,6 +4213,12 @@ export async function startServer(): Promise<http.Server> {
     await closeGeneralChatQuotaPool();
     await closeBackendCancelPool();
     await pool.end();
+    // The last drain, and a synchronous one: a save-size warn line queued by
+    // any shutdown-path save above (saveAll, the leave flushes) waits on a
+    // setImmediate that process.exit would discard. No deadline needed, it is
+    // a console write; the deferral exists only to keep the line off a lock
+    // hold, which no longer matters here.
+    flushQueuedCharacterBlobWarnings();
     process.exit(0);
   };
   process.on('SIGINT', shutdown);

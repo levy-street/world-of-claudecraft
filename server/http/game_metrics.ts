@@ -93,6 +93,9 @@ import {
 export const WOC_PLAYERS_ONLINE = 'woc_players_online';
 export const WOC_USERNAME_BANLIST_FILE_LOADED = 'woc_username_banlist_file_loaded';
 export const WOC_CHARACTER_STATE_BYTES_MAX = 'woc_character_state_bytes_max';
+/** The p99 serialized character blob over the most recent saves: the fleet-creep
+ *  read the monotonic max cannot give (server/character_blob_size.ts). */
+export const WOC_CHARACTER_STATE_BYTES_P99 = 'woc_character_state_bytes_p99';
 
 /** Distinct accounts online (a single account may hold several sessions). */
 export const WOC_ACCOUNTS_ONLINE = 'woc_accounts_online';
@@ -357,6 +360,14 @@ export interface GameStateSource {
    * bound shows as a climbing max long before the log says anything.
    */
   characterBlobBytesHighWater(): number;
+  /**
+   * The p99 serialized character blob (bytes) over the most recent saves at the
+   * same chokepoint (server/character_blob_size.ts, a count-windowed ring). The
+   * max above flags one outlier; this moves only when the bulk of the realm's
+   * blobs move, which is the shape a per-player field growing without a bound
+   * takes across a fleet. 0 before the first save.
+   */
+  characterBlobBytesP99(): number;
   /** Live characters online. */
   playersOnline(): number;
   /** Distinct accounts online. */
@@ -498,6 +509,26 @@ export function registerGameStateMetrics(
       this.set(source.characterBlobBytesHighWater());
     },
   });
+
+  new Gauge({
+    name: WOC_CHARACTER_STATE_BYTES_P99,
+    help: 'p99 serialized character blob in bytes over the most recent saves at the save chokepoint (a count-windowed ring, 0 before the first save). The max flags one outlier; this climbs only when the bulk of the realm blobs grow, the fleet-wide creep shape.',
+    registers: [registry],
+    collect() {
+      this.set(source.characterBlobBytesP99());
+    },
+  });
+
+  // TODO(team-lead, Phase 18 U-SRV-HOT hand-off): expose the offline-writer
+  // fence refusals here once server/offline_fence_refusals.ts lands (it was not
+  // in the tree when this unit closed). Intended shape, mirroring the
+  // scrape-time-synced counters below: `woc_offline_fence_refusals_total`, a
+  // Counter with a fixed `writer` label over the module's family vocabulary
+  // (rename_sweep, reclaim_sweep, pbe_roster), zero-backfilled per family at
+  // registration, and replayed at collect() via reset() + inc() from the
+  // module's read function (the truth stays in that module, like the
+  // backend-cancel counts). Add the name constant beside
+  // WOC_CHARACTER_STATE_BYTES_P99 and its census row in the same change.
 
   new Gauge({
     name: WOC_ACCOUNTS_ONLINE,

@@ -94,10 +94,19 @@ describe('lane constants hold the R5 budget literals', () => {
   });
 });
 
-describe('the name-screen lane takes exactly the two matcher-running commands', () => {
-  it('pet_rename always, perfect_item only when a name field rides', () => {
+describe('the name-screen lane takes exactly the three matcher-running commands', () => {
+  it('pet_rename and guild_create always, perfect_item only when a name field rides', () => {
     expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename', name: 'Rex' })).toBe('name_screen');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'pet_rename' })).toBe('name_screen');
+    // The guild-name screen (Phase 18): paidGuildCreation screens the name
+    // through isNameOffensive before any row (server/social.ts), the same
+    // pre-sim matcher cost as pet_rename, so it rides this lane with or
+    // without a well-formed name field (the handler's own guard drops the
+    // malformed frame after the lane, exactly like perfect_item below).
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'guild_create', name: 'Ironvale' })).toBe(
+      'name_screen',
+    );
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'guild_create' })).toBe('name_screen');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', slot: 'neck', name: 'Oath' })).toBe(
       'name_screen',
     );
@@ -110,8 +119,11 @@ describe('the name-screen lane takes exactly the two matcher-running commands', 
   });
 
   it('an UNNAMED perfect_item attempt stays on the command lane, as does everything else', () => {
-    // pet_rename is the one command name that classifies here on its own (it
-    // always screens); the every-other-command sweep below excludes it by name.
+    // pet_rename and guild_create are the two command names that classify
+    // here on their own (each always screens); the every-other-command sweep
+    // below excludes them by name. The other guild verbs run no screen.
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'guild_invite', name: 'Rowan' })).toBe('command');
+    expect(classifyMsgLane({ t: 'cmd', cmd: 'guild_accept' })).toBe('command');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', slot: 'neck' })).toBe('command');
     expect(classifyMsgLane({ t: 'cmd', cmd: 'perfect_item', bag: 0, item: 'x' })).toBe('command');
     // A name field on a command that runs no screen changes nothing.
@@ -148,10 +160,10 @@ describe('classifyMsgLane mirrors the dispatch switch', () => {
   it('classifies every other dispatched command into the command lane', () => {
     for (const name of COMMAND_NAMES) {
       if (name === 'chat' || name === 'telemetry' || name === 'challengeResponse') continue;
-      // pet_rename always screens player text, so it owns the name-screen lane
-      // (pinned by name above); every other command, perfect_item included
-      // when it carries no name, is the command lane.
-      if (name === 'pet_rename') continue;
+      // pet_rename and guild_create always screen player text, so they own the
+      // name-screen lane (pinned by name above); every other command,
+      // perfect_item included when it carries no name, is the command lane.
+      if (name === 'pet_rename' || name === 'guild_create') continue;
       expect(classifyMsgLane({ t: 'cmd', cmd: name })).toBe('command');
     }
   });

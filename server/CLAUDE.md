@@ -121,8 +121,11 @@ logic module pairs with a `<domain>_db.ts` that owns its SQL).
   (`commitGrant` through custody's bounded `persistGrantSerialized`: in-slot serialize, a
   wait deadline that parks instead of blocking the sweep), and every write's blob carries
   the session save fixups (`character_save_fixups.ts`: jail/spectate position, stowed pet,
-  the jail flag). Recorded exception: the offline
-  admin/boost writers, which never race a live session. Cross-queue order is the character
+  the jail flag). The offline admin/boost writers (the rename and reclaim signer
+  sweeps, the PBE roster save, the clear-item-name strip) ride the lease-fenced
+  `saveOfflineCharacterState` since masterwrought Phase 18, so no character-blob
+  writer is unfenced: a live lease makes the write touch nothing, logged and
+  counted rather than raced. Cross-queue order is the character
   FIFO first, THEN the market serial writer; never enqueue from inside a market thunk, an
   open transaction, or another job for the same character.
 - Save cadence: autosave every **30 s** (`AUTOSAVE_SECONDS`), on `leave`, and on

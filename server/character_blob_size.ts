@@ -149,7 +149,121 @@ export const reportCharacterBlobSize = createCharacterBlobSizeReporter();
 let blobBytesHighWater = 0;
 export function recordCharacterBlobBytes(bytes: number): void {
   if (bytes > blobBytesHighWater) blobBytesHighWater = bytes;
+  blobBytesWindow.record(bytes);
 }
 export function characterBlobBytesHighWater(): number {
   return blobBytesHighWater;
+}
+
+// ---------------------------------------------------------------------------
+// The p99 gauge beside the high-water mark (the farming handoff's P3 row): a
+// monotonic max answers "did anything bigger than modelled ever save here",
+// but it cannot tell one outlier from a fleet-wide creep, which is the shape
+// a per-player field growing without a bound actually takes. The p99 over the
+// most recent saves answers that: it moves only when the bulk of the realm's
+// blobs move. Windowed by COUNT, not time, so it is clock-free and its memory
+// is a fixed ring; nearest-rank on a sorted copy at read time, because reads
+// (a scrape every 15 to 60 s, the 5 s heartbeat) are orders of magnitude rarer
+// than records (one per save, ~33/s at 1,000 online on the 30 s autosave).
+// ---------------------------------------------------------------------------
+
+export interface WindowedPercentile {
+  /** Add one sample; the oldest sample leaves once the window is full. */
+  record(value: number): void;
+  /** Nearest-rank percentile (0 < p <= 100) over the retained samples; 0 while empty. */
+  percentile(p: number): number;
+  /** Retained sample count (at most the capacity). */
+  count(): number;
+}
+
+/**
+ * A fixed-capacity ring of the most recent samples with nearest-rank
+ * percentile reads. Pure and instance-scoped (a test owns its own window; the
+ * module instance below is the save path's).
+ */
+export function createWindowedPercentile(capacity: number): WindowedPercentile {
+  if (!Number.isInteger(capacity) || capacity <= 0) {
+    throw new Error(
+      `createWindowedPercentile capacity must be a positive integer, got ${capacity}`,
+    );
+  }
+  const ring = new Array<number>(capacity);
+  let next = 0;
+  let filled = 0;
+  return {
+    record(value: number): void {
+      ring[next] = value;
+      next = (next + 1) % capacity;
+      if (filled < capacity) filled++;
+    },
+    percentile(p: number): number {
+      if (filled === 0) return 0;
+      const sorted = ring.slice(0, filled).sort((a, b) => a - b);
+      // Nearest rank: the smallest sample at or above the p-th share of the
+      // window; p = 100 is the max, p -> 0 is the min.
+      const rank = Math.min(filled, Math.max(1, Math.ceil((p / 100) * filled)));
+      return sorted[rank - 1];
+    },
+    count(): number {
+      return filled;
+    },
+  };
+}
+
+// 1,024 saves: about 30 s of the autosave wave at 1,000 online, or the whole
+// recent history of a quiet realm, either way enough that one pathological
+// character is under 0.1% of the window and cannot move its p99 alone.
+export const CHARACTER_BLOB_P99_WINDOW = 1024;
+
+const blobBytesWindow = createWindowedPercentile(CHARACTER_BLOB_P99_WINDOW);
+
+/** The p99 serialized blob size over the most recent CHARACTER_BLOB_P99_WINDOW saves
+ *  (0 before the first save), scraped as woc_character_state_bytes_p99 and printed
+ *  on the PERF_TICK_LOG heartbeat as blobP99=. */
+export function characterBlobBytesP99(): number {
+  return blobBytesWindow.percentile(99);
+}
+
+// ---------------------------------------------------------------------------
+// The deferred warn-line queue (the setImmediate shutdown trade, closed). The
+// statement builder (server/character_save_statement.ts) runs inside open
+// transactions holding row locks, and console.warn is a SYNCHRONOUS write when
+// stdout is a blocking sink, so the line is queued and written off the lock
+// hold on the next immediate. That deferral used to lose the line when a
+// shutdown-path save queued it after the drain train's last yield: process.exit
+// discards pending immediates. flushQueuedCharacterBlobWarnings is the
+// shutdown train's synchronous drain (server/main.ts, right before exit), and
+// the immediate finds an empty queue when the drain got there first, so a line
+// is written exactly once either way.
+// ---------------------------------------------------------------------------
+
+const queuedWarnLines: string[] = [];
+let warnFlushScheduled = false;
+
+function writeWarnLine(line: string): void {
+  try {
+    console.warn(line);
+  } catch {
+    /* a lost dev-channel line (EPIPE on a closed stdout), never a crash */
+  }
+}
+
+/** Queue one dev-channel warn line for emission off the current call stack. */
+export function queueCharacterBlobWarning(line: string): void {
+  queuedWarnLines.push(line);
+  if (warnFlushScheduled) return;
+  warnFlushScheduled = true;
+  setImmediate(flushQueuedCharacterBlobWarnings);
+}
+
+/** Write every queued warn line NOW (synchronous): the shutdown drain, and the
+ *  deferred immediate's body. Idempotent; an empty queue costs nothing. */
+export function flushQueuedCharacterBlobWarnings(): void {
+  warnFlushScheduled = false;
+  while (queuedWarnLines.length > 0) writeWarnLine(queuedWarnLines.shift() as string);
+}
+
+/** Queued lines not yet written (the drain tests' probe). */
+export function queuedCharacterBlobWarningCount(): number {
+  return queuedWarnLines.length;
 }

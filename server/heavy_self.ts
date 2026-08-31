@@ -38,10 +38,12 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // of resting on the incidental fact that both commands happen to touch bags:
   // a future arm that mutates a plot without an inventory change (the knob
   // commands sketched for the next phase) would otherwise go stale for up to
-  // one backstop interval with nothing in this file hinting why. The cost is
+  // one backstop interval with nothing in this file hinting why. The cost was
   // one spurious heavy re-serialize per REFUSED plant or harvest, the same
   // trade every member here makes ('use', 'equip' and friends all mark on
-  // receipt regardless of outcome).
+  // receipt regardless of outcome); since Phase 18 both are ARM-MARKED (see
+  // HEAVY_SELF_ARM_MARKED_CMDS below), so a frame the dispatch's own type
+  // guards refuse never marks, and only a frame that reaches the sim does.
   'plant_crop',
   'harvest_crop',
   // The knobs phase's husk conversion, the same belt-and-braces trade as the
@@ -50,15 +52,16 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // wireRev already guarantees freshness on the path that changes anything,
   // and the loot event the compost grant rides is a HEAVY_SELF_EVENTS member
   // on top. The entry keeps the guarantee LOCAL to the command per the
-  // ledgered comment above; the cost is one spurious heavy re-serialize per
-  // refused conversion, the same trade every member here makes. NOTE: the
+  // ledgered comment above; arm-marked since Phase 18 like the pair above
+  // (a frame that reaches sim.convertHusks marks, nothing else does). NOTE: the
   // PLANT-TIME KNOBS need no entry of their own because they are not
   // commands: they ride plant_crop's payload, whose membership already marks
   // on receipt, and a paid knob spends items (wireRev again).
   'convert_husks',
   // The shared feast's place verb spends one bag item on success (wireRev
   // covers that path); membership keeps the guarantee local to the command,
-  // the same belt-and-braces trade as its farming siblings above.
+  // the same belt-and-braces trade as its farming siblings above, and it is
+  // arm-marked with them (HEAVY_SELF_ARM_MARKED_CMDS below).
   // consume_feast deliberately has NO entry: a bite touches no bag state
   // (charges and the ledger are feast state, and the buff rides the aura
   // wire), so there is nothing heavy to refresh.
@@ -71,8 +74,10 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   // membership here is what re-diffs both mirrors on the next snapshot; the
   // sim's wireRev bump on the material spend covers the same path, and the
   // entry keeps the guarantee LOCAL to the command per the farming ledger
-  // above. Cost: one spurious heavy re-serialize per REFUSED attempt, the
-  // family's standing trade.
+  // above. ARM-MARKED since Phase 18 (HEAVY_SELF_ARM_MARKED_CMDS below): a
+  // malformed ref or a screened name is refused by the dispatch itself and
+  // marks nothing; a frame that reaches sim.perfectItemAs marks, whatever
+  // the sim's own deny ladder then decides.
   'perfect_item',
   'loot',
   'harvestCorpse',
@@ -137,6 +142,42 @@ export const HEAVY_SELF_CMDS = new Set<string>([
   'dev_give',
   'dev_level',
 ]);
+
+// The ARM-MARKED subset of HEAVY_SELF_CMDS (Phase 18, the perfect-item and
+// farming refusal reads): members whose mark moves off the unconditional
+// receipt line in dispatchMessage and INTO their dispatch arm, set only once
+// the frame has passed the arm's own guards and the sim is actually invoked.
+// The rift-forge refusal-above-flag idiom generalized: a frame the dispatch
+// itself refuses (a malformed perfect_item ref, a screened legendary name, a
+// farming frame whose bed/crop/knob fields fail their type guards) never
+// buys a heavy self re-serialize. The trade every entry above still makes
+// ("marks on receipt regardless of outcome") narrows for these five to
+// "marks when the sim is called": a SIM-side refusal (the deny ladder, a
+// farmDenied) still marks, because the dispatch cannot see the sim's verdict
+// without a return channel the sim does not have, and the success paths keep
+// their own belt-and-braces freshness (wireRev on every spend, the loot and
+// farmPlanted events) exactly as the entries' own comments record.
+export const HEAVY_SELF_ARM_MARKED_CMDS = new Set<string>([
+  'perfect_item',
+  'plant_crop',
+  'harvest_crop',
+  'convert_husks',
+  'place_feast',
+]);
+
+/** Whether `cmd` marks the heavy self dirty at RECEIPT (the pre-switch line):
+ *  every HEAVY_SELF_CMDS member except the arm-marked subset. */
+export function heavySelfMarkOnReceipt(cmd: string): boolean {
+  return HEAVY_SELF_CMDS.has(cmd) && !HEAVY_SELF_ARM_MARKED_CMDS.has(cmd);
+}
+
+/** Whether `cmd` marks the heavy self dirty in its ARM, once the frame is
+ *  accepted (the sim is invoked): the arm-marked subset, and only members.
+ *  Dropping a name from HEAVY_SELF_CMDS retires its mark on both paths. */
+export function heavySelfMarkOnAccept(cmd: string): boolean {
+  return HEAVY_SELF_CMDS.has(cmd) && HEAVY_SELF_ARM_MARKED_CMDS.has(cmd);
+}
+
 export const HEAVY_SELF_EVENTS = new Set<string>([
   'loot',
   // 'vcupBetSettled' (a copper credit) sat here until the Vale Cup retired with

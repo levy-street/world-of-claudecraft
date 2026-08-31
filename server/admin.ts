@@ -163,7 +163,7 @@ import {
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
-import { createOkResponseMemo } from './ok_response_memo';
+import { createOkResponseMemo, type OkResponseMemoStats } from './ok_response_memo';
 import { providerUsageSnapshot } from './provider_usage';
 import {
   adminAnalyticsReadRateLimited,
@@ -632,14 +632,30 @@ function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
 }
 
-// Serialize-once envelope memo for the analytics dashboard reads whose
-// response is a pure function of a TTL-cached snapshot (market metrics, and
-// the activity bundle via sendActivityOk below). ONE instance shared by both
-// dispatch arms, so a cache window costs one stringify however the request
-// arrives. The overview read stays on plain ok(): its response embeds the
-// per-request live adminStats() merge, so memoized bytes could never match
-// what ok() would produce (see overviewHandler).
-const analyticsOkMemo = createOkResponseMemo();
+// Serialize-once envelope memos for the analytics dashboard reads whose
+// response is a pure function of a TTL-cached snapshot: ONE INSTANCE PER
+// ROUTE (the memo's key space has no notion of response shape, so the metrics
+// identity key and the activity four-part key never share an instance), and
+// each route's instance is shared by BOTH of its dispatch arms, so a cache
+// window costs one stringify however the request arrives. The overview read
+// stays on plain ok(): its response embeds the per-request live adminStats()
+// merge, so memoized bytes could never match what ok() would produce (see
+// overviewHandler).
+const activityOkMemo = createOkResponseMemo();
+const marketMetricsOkMemo = createOkResponseMemo();
+
+export interface AdminAnalyticsMemoStats {
+  activity: OkResponseMemoStats;
+  marketMetrics: OkResponseMemoStats;
+}
+
+/** The two memos' serve/stringify counters for the internal ops readout
+ *  (server/main.ts): stringifies climbing toward serves is a hit-rate
+ *  regression (a cache turning over per request, or a key that stopped being
+ *  stable) that nothing else would make visible. */
+export function adminAnalyticsMemoStats(): AdminAnalyticsMemoStats {
+  return { activity: activityOkMemo.stats(), marketMetrics: marketMetricsOkMemo.stats() };
+}
 
 /**
  * Serve the activity response (both dispatch arms call this with the four
@@ -647,6 +663,11 @@ const analyticsOkMemo = createOkResponseMemo();
  * composed wrapper object is fresh per request, so the memo keys on the parts
  * tuple: stable identities inside a TTL window hit the memoized bytes, and a
  * torn read across a turnover re-stringifies rather than serving stale bytes.
+ * `days` is deliberately NOT a part: it is the module constant
+ * ACTIVITY_WINDOW_DAYS (every caller passes it and admin_activity_cache's
+ * assertWindow refuses any other value), so it cannot vary across requests.
+ * The memo's key contract (ok_response_memo.ts header) says exactly this; the
+ * non-part field set is pinned in tests/server/admin_analytics_reads.test.ts.
  */
 function sendActivityOk(
   res: http.ServerResponse,
@@ -655,7 +676,7 @@ function sendActivityOk(
   classes: BucketCount[],
   levels: BucketCount[],
 ): void {
-  analyticsOkMemo.send(
+  activityOkMemo.send(
     res,
     { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels },
     [registrations, sessions, classes, levels],
@@ -2329,7 +2350,8 @@ async function loginHandler(ctx: Ctx): Promise<void> {
 
 /** GET /admin/api/overview: headline counts merged with live server stats.
  *  Metered on the analytics read bucket like its activity/metrics siblings,
- *  but EXEMPT from the family's serialize-once memo (analyticsOkMemo): the
+ *  but EXEMPT from the family's serialize-once memos (activityOkMemo and
+ *  marketMetricsOkMemo): the
  *  response embeds the per-request live adminStats() merge (online, uptime,
  *  memory), so memoized bytes could never stay byte-identical with what ok()
  *  produces. Only the DB counts are cached (admin_overview_cache.ts). */
@@ -2358,12 +2380,13 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
  *  DB cost, but metering is uniform across the admin read families so no
  *  route is the unthrottled odd one out (the oversight bucket stays scoped to
  *  the DB-cost economy-oversight reads). The response IS the cached snapshot,
- *  so the envelope bytes are memoized per cache turnover (analyticsOkMemo). */
+ *  so the envelope bytes are memoized per cache turnover on the route's own
+ *  memo (marketMetricsOkMemo, identity-keyed on the snapshot). */
 async function marketMetricsHandler(ctx: Ctx): Promise<void> {
   if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
     return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
   }
-  analyticsOkMemo.send(ctx.res, await readAdminMarketMetrics());
+  marketMetricsOkMemo.send(ctx.res, await readAdminMarketMetrics());
 }
 
 /** GET /admin/api/me: the caller's own staff identity (any staff role). */

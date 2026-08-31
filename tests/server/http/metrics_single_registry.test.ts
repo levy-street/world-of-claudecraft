@@ -25,6 +25,7 @@ function stubSource(): GameStateSource {
   return {
     usernameBanlistLoaded: () => true,
     characterBlobBytesHighWater: () => 0,
+    characterBlobBytesP99: () => 0,
     playersOnline: () => 0,
     accountsOnline: () => 0,
     wsConnections: () => 0,

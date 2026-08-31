@@ -30,7 +30,7 @@ import {
   sessionsByDay as dbSessionsByDay,
   type SessionDayPoint,
 } from './admin_db';
-import { type CachedRead, createCachedRead } from './cached_read';
+import { type CachedRead, createCachedRead, deepFreezeSnapshot } from './cached_read';
 
 /** The fixed lookback window every activity chart covers. */
 export const ACTIVITY_WINDOW_DAYS = 30;
@@ -65,8 +65,10 @@ let cache: CachedRead<AdminActivityBundle> | null = null;
 /** The cached activity bundle: at most one four-query refresh per TTL window. */
 function readAdminActivity(): Promise<AdminActivityBundle> {
   // One bundle object is served by reference to every reader in a TTL window;
-  // freeze it so no consumer can poison the shared arrays.
-  cache ??= createCachedRead(async () => Object.freeze(await queryFn()), {
+  // freeze it WHOLE (the four arrays and their rows, not just the wrapper) so
+  // no consumer can poison the shared arrays or desync the serialize-once
+  // envelope memo keyed on them (server/ok_response_memo.ts).
+  cache ??= createCachedRead(async () => deepFreezeSnapshot(await queryFn()), {
     ttlMs: ADMIN_ACTIVITY_TTL_MS,
     now: nowFn,
   });

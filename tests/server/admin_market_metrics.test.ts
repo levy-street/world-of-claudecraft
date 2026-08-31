@@ -416,11 +416,26 @@ describe('GET /admin/api/market/metrics', () => {
     expect(second.rawBody).toBe(first.rawBody);
   });
 
-  it('installs a frozen snapshot so the memoized bytes cannot be poisoned', async () => {
+  it('installs a DEEP-frozen snapshot so the memoized bytes cannot be poisoned', async () => {
     configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
     const first = await readAdminMarketMetrics();
     const second = await readAdminMarketMetrics();
     expect(Object.isFrozen(first)).toBe(true);
+    // Whole, not shallow (the hot-path review's nit): the buckets array, every
+    // bucket, its items array, and every item row are frozen, so a consumer
+    // cannot mutate the rows the route's memoized envelope was built from.
+    expect(Object.isFrozen(first.buckets)).toBe(true);
+    expect(first.buckets.length).toBeGreaterThan(0);
+    for (const bucket of first.buckets) {
+      expect(Object.isFrozen(bucket)).toBe(true);
+      expect(Object.isFrozen(bucket.items)).toBe(true);
+      for (const row of bucket.items) expect(Object.isFrozen(row)).toBe(true);
+    }
+    const cores = first.buckets.find((b) => b.bucket === 'cores');
+    expect(cores?.items.length).toBeGreaterThan(0);
+    expect(() => {
+      (cores as { items: unknown[] }).items.push({});
+    }).toThrow();
     // Same installed object inside the TTL: the identity the memo keys on.
     expect(second).toBe(first);
   });

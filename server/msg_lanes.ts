@@ -25,9 +25,10 @@
 //   cmd 'telemetry', and cmd 'challengeResponse'. Defense-in-depth token
 //   accounting: beats and challenge replies never compete for command-lane
 //   tokens, and never spend or refill lane state at all.
-// - name_screen: cmd 'pet_rename', and cmd 'perfect_item' carrying a `name`
-//   field: the two handlers that run the obscenity matcher on player text
-//   before any sim gate (see the lane's constants below).
+// - name_screen: cmd 'pet_rename', cmd 'guild_create', and cmd 'perfect_item'
+//   carrying a `name` field: the three handlers that run the obscenity
+//   matcher on player text before any sim gate (see the lane's constants
+//   below).
 // - command: every OTHER parsed shape. All remaining commands, plus the
 //   garbage shapes (non-object JSON, unknown t, unknown cmd), so sub-ceiling
 //   garbage is bounded to the lane rate and anything above it becomes
@@ -55,22 +56,25 @@ export const MSG_LANE_COMMAND_BURST = 60;
 export const MSG_LANE_CHAT_REFILL_PER_SECOND = 4;
 export const MSG_LANE_CHAT_BURST = 8;
 
-// Name-screen lane (the Masterwrought phase 13 QA hot-path review): the two
+// Name-screen lane (the Masterwrought phase 13 QA hot-path review): the
 // commands that run the obscenity matcher on player text BEFORE any sim gate
-// (pet_rename, and perfect_item when it carries a legendary name) cost about
-// 25 microseconds each on the event loop, and an ALLOWED under-ceiling frame
+// (pet_rename, perfect_item when it carries a legendary name, and since Phase
+// 18 guild_create, whose paid creation screens the guild name through
+// isNameOffensive before any row, server/social.ts) cost about 25
+// microseconds each on the event loop, and an ALLOWED under-ceiling frame
 // books no drop, so on the 30/s command lane a hostile client could spend
-// 0.8 ms/s per session on screens for frames naming an empty slot. Both are
+// 0.8 ms/s per session on screens for frames naming an empty slot. All are
 // dialog actions at single digits per minute for a real player, so the lane
 // is sized far above human rate (the chat lane's human-dialog sizing: a
 // retype after a refusal is a second of human time, and five rapid submits
 // fit the burst) and far below the command lane; refusals drop and tally
 // like every other lane drop, and a dropped frame sends NOTHING back, so the
 // phase 14 window disables its submit for a beat after each submit rather
-// than letting a mash read as a dead button. Both tenants are shape-first:
-// the matcher prices the sim's normalized value (32 or 16 characters), never
-// the raw token. An UNNAMED perfect_item frame stays on the command lane: it
-// runs no screen.
+// than letting a mash read as a dead button. The two named tenants are
+// shape-first: the matcher prices the sim's normalized value (32 or 16
+// characters), never the raw token; the guild name is string-bounded and
+// fee-gated at its handler. An UNNAMED perfect_item frame stays on the
+// command lane: it runs no screen.
 export const MSG_LANE_NAME_SCREEN_REFILL_PER_SECOND = 2;
 export const MSG_LANE_NAME_SCREEN_BURST = 5;
 
@@ -98,11 +102,12 @@ export function createMsgLanes(nowSec: number): MsgLaneState {
   };
 }
 
-/** The two commands whose handler screens player text through the obscenity
- *  matcher ahead of every sim gate; perfect_item only when a name field rides
- *  (the promotion), never for a plain attempt. */
+/** The three commands whose handler screens player text through the obscenity
+ *  matcher ahead of every sim gate: pet_rename and guild_create always (each
+ *  frame names something), perfect_item only when a name field rides (the
+ *  promotion), never for a plain attempt. */
 function isNameScreenCommand(record: Record<string, unknown>): boolean {
-  if (record.cmd === 'pet_rename') return true;
+  if (record.cmd === 'pet_rename' || record.cmd === 'guild_create') return true;
   return record.cmd === 'perfect_item' && record.name !== undefined;
 }
 

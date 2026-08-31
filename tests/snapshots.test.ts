@@ -5902,6 +5902,31 @@ describe('delta-key contract pins (anti-drift)', () => {
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
+  it('the parked-mana field sm is an omit-when-default BASE self field, never a delta key', () => {
+    // The release's druid parked-mana wire field (Phase 18 release-hygiene pin):
+    // it is written straight onto the always-sent self object in selfWireJson
+    // (`self.sm = wireParkedMana(...)`, omitted at rest), and the client's
+    // absent-means-zero decode (src/net/online.ts) is correct ONLY while it
+    // stays off the maybe() delta gate: a delta-gated key is omitted when
+    // UNCHANGED, which the decoder would read as "parked mana returned to
+    // zero" every tick the value held. Pinned three ways: not in the registry,
+    // written before the base stringify in the emitter, and never emitted
+    // through any of the three delta writers anywhere under server/.
+    expect(ALL_DELTA_KEYS as readonly string[]).not.toContain('sm');
+    const gameSource = readFileSync(resolve(process.cwd(), 'server/game.ts'), 'utf8');
+    const assignAt = gameSource.indexOf('self.sm = wireParkedMana(');
+    const baseStringifyAt = gameSource.indexOf('const json = JSON.stringify(self);');
+    expect(assignAt).toBeGreaterThan(-1);
+    expect(baseStringifyAt).toBeGreaterThan(assignAt);
+    const serverSources = tsFilesUnder(resolve(process.cwd(), 'server'));
+    for (const { full } of serverSources) {
+      const raw = readFileSync(full, 'utf8');
+      expect(raw, `${full} delta-gates sm`).not.toMatch(
+        /\b(?:maybe|maybeSerialized|maybeRaw)\(\s*'sm'/,
+      );
+    }
+  });
+
   it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from every server emitter (multi-line lockouts incl.)', () => {
     // Scan the whole recursive server tree: game.ts is the original emitter,
     // while Bank Storage moved the bank family into bank_wire.ts and the

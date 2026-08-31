@@ -82,6 +82,22 @@ describe('characterUpdateStatement: the three fence shapes', () => {
     }
   });
 
+  it('an oversized blob queues its warn line off the builder call, never writes it inline', async () => {
+    // The statement is built inside open transactions holding row locks, so
+    // the line must not hit stdout synchronously; it rides the queue whose
+    // shutdown drain is flushQueuedCharacterBlobWarnings (server/main.ts).
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const queue = vi.spyOn(blobSize, 'queueCharacterBlobWarning');
+    const oversized = `{"pad":"${'x'.repeat(blobSize.CHARACTER_BLOB_WARN_BYTES + 1)}"}`;
+    characterUpdateStatement(11, 1, oversized, { kind: 'none' });
+    expect(queue).toHaveBeenCalledTimes(1);
+    expect(String(queue.mock.calls[0][0])).toContain('character 11');
+    expect(warn).not.toHaveBeenCalled();
+    await new Promise<void>((resolve) => setImmediate(resolve));
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+
   it('pins the offline refusal line the endpoint surfaces', () => {
     expect(CHARACTER_SAVE_LEASED_LINE).toBe(
       'character holds a live session lease; kick them (or wait out the lease) and retry',

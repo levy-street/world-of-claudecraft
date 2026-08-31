@@ -952,11 +952,34 @@ export function resetAdminOversightRateLimits(): void {
 // bucket pair, NOT the oversight maps above: the Overview landing page polls
 // at the dashboard's 5 s tick for every operator by default, and that routine
 // traffic must never burn the economy-oversight budget (whose exhaustion
-// would 429 the moderation Flagged workflow), nor vice versa. Same headroom
-// as the oversight reads: several admins behind one NAT, each with a few
-// polled dashboard tabs open.
+// would 429 the moderation Flagged workflow), nor vice versa.
+//
+// SIZED IN TAB-EQUIVALENTS, because the fused shape has two arms with very
+// different fan-in (the hot-path review of the first cut: an IP arm equal to
+// the account arm 429'd three operators with three tabs each behind one NAT,
+// and a 429 collapses the Overview live cards to "load failed"). One open
+// dashboard tab polls at most:
+//   overview        every LIVE_REFRESH_MS = 5 s      -> 12 / min
+//   activity        every ACTIVITY_REFRESH_MS = 60 s ->  1 / min
+//   market metrics  every AUTO_REFRESH_MS = 30 s     ->  2 / min
+//   (src/admin/state/poll.ts, src/admin/pages/MarketMetrics.svelte)
+// so ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE is 15. The ACCOUNT arm meters one
+// operator's own tabs: 8 tabs of headroom (nobody runs eight dashboards, and a
+// looping tab still trips it) = 120 / min. The IP arm meters a whole office
+// behind one NAT: 40 tab-equivalents (say, a dozen operators with three tabs
+// each, plus reloads) = 600 / min. Both derived, never re-typed as literals;
+// the relation is pinned in tests/admin_rate_limit_buckets.test.ts against
+// the SPA's own poll constants.
 // ---------------------------------------------------------------------------
-export const ADMIN_ANALYTICS_READ_MAX_PER_MINUTE = 120;
+export const ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE = 12 + 1 + 2;
+export const ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET = 8;
+export const ADMIN_ANALYTICS_IP_TAB_BUDGET = 40;
+/** The per-OPERATOR (account arm) budget: one operator's own open tabs. */
+export const ADMIN_ANALYTICS_READ_MAX_PER_MINUTE =
+  ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET * ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE;
+/** The per-IP arm: every operator behind one NAT, in tab-equivalents. */
+export const ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE =
+  ADMIN_ANALYTICS_IP_TAB_BUDGET * ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE;
 
 const adminAnalyticsReadIpAttempts = new Map<string, number[]>();
 const adminAnalyticsReadAccountAttempts = new Map<number, number[]>();
@@ -968,7 +991,7 @@ export function adminAnalyticsReadRateLimited(
   const ip = recordSlidingWindowAttempt(
     adminAnalyticsReadIpAttempts,
     requestIp(req),
-    ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+    ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE,
   );
   const account = recordSlidingWindowAttempt(
     adminAnalyticsReadAccountAttempts,

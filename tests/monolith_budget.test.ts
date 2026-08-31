@@ -1225,7 +1225,15 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 10329, the release 10612. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 10298,
+    // LOWERED 10298 -> 10294 at Phase 18 (U-SRV-HOT, 2026-08-31): the PERF_TICK_LOG
+    // heartbeat's three line formatters and the mob-zone phase-name cluster moved
+    // whole to server/tick_perf_log.ts, and the unequipAccountMechChroma hand-roll
+    // was deleted for the sim's own unequipWornMechChroma at its one call site;
+    // together those paid for the arm-marked heavy-self lines in the perfect_item
+    // and farming cases and the blobP99 heartbeat input. Extraction first, then
+    // the phase's lines, netting 4 under (wc -l < server/game.ts after biome);
+    // the ceiling follows the file down. Exact count, zero slack.
+    ceiling: 10294,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

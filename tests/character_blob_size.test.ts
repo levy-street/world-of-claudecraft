@@ -36,11 +36,17 @@ vi.mock('pg', () => ({
 }));
 
 import {
+  CHARACTER_BLOB_P99_WINDOW,
   CHARACTER_BLOB_WARN_BYTES,
   CHARACTER_BLOB_WARN_WINDOW_MS,
   characterBlobBytesHighWater,
+  characterBlobBytesP99,
   characterBlobSizeWarning,
   createCharacterBlobSizeReporter,
+  createWindowedPercentile,
+  flushQueuedCharacterBlobWarnings,
+  queueCharacterBlobWarning,
+  queuedCharacterBlobWarningCount,
   recordCharacterBlobBytes,
 } from '../server/character_blob_size';
 import {
@@ -386,5 +392,122 @@ describe('createCharacterBlobSizeReporter: one line per window, nothing lost sil
     // A larger one raises it.
     recordCharacterBlobBytes(before + 250);
     expect(characterBlobBytesHighWater()).toBe(before + 250);
+  });
+});
+
+describe('createWindowedPercentile: the p99 gauge core', () => {
+  it('reads 0 while empty and the lone sample at any percentile with one', () => {
+    const w = createWindowedPercentile(8);
+    expect(w.count()).toBe(0);
+    expect(w.percentile(99)).toBe(0);
+    w.record(1_900);
+    expect(w.count()).toBe(1);
+    expect(w.percentile(1)).toBe(1_900);
+    expect(w.percentile(99)).toBe(1_900);
+  });
+
+  it('is nearest-rank over the retained samples (p100 the max, p50 the upper median)', () => {
+    const w = createWindowedPercentile(16);
+    for (const v of [50, 10, 40, 20, 30]) w.record(v);
+    expect(w.percentile(100)).toBe(50);
+    expect(w.percentile(50)).toBe(30); // ceil(0.5 * 5) = rank 3 of [10,20,30,40,50]
+    expect(w.percentile(20)).toBe(10); // rank 1
+    expect(w.percentile(21)).toBe(20); // rank 2
+    expect(w.percentile(99)).toBe(50); // ceil(4.95) = rank 5
+  });
+
+  it('p99 over a full window is the second-largest sample once 1% of it is more than one', () => {
+    // 200 samples: rank ceil(0.99 * 200) = 198 of 200, so the two largest sit
+    // above the p99. One outlier alone cannot move it; that is the whole point
+    // of the gauge beside the monotonic max.
+    const w = createWindowedPercentile(200);
+    for (let i = 1; i <= 199; i++) w.record(20_000);
+    w.record(9_000_000);
+    expect(w.percentile(99)).toBe(20_000);
+    expect(w.percentile(100)).toBe(9_000_000);
+  });
+
+  it('evicts the oldest sample once full (a fixed ring, never a growing array)', () => {
+    const w = createWindowedPercentile(3);
+    w.record(1);
+    w.record(2);
+    w.record(3);
+    expect(w.count()).toBe(3);
+    w.record(100);
+    // The window is now [2, 3, 100]: the 1 aged out.
+    expect(w.count()).toBe(3);
+    expect(w.percentile(1)).toBe(2);
+    expect(w.percentile(100)).toBe(100);
+  });
+
+  it('refuses a non-positive or fractional capacity at wiring time', () => {
+    expect(() => createWindowedPercentile(0)).toThrow('positive integer');
+    expect(() => createWindowedPercentile(2.5)).toThrow('positive integer');
+    expect(() => createWindowedPercentile(-1)).toThrow('positive integer');
+  });
+
+  it('the save path records into the module window: p99 climbs only when the bulk climbs', () => {
+    expect(CHARACTER_BLOB_P99_WINDOW).toBe(1024);
+    // Fill the shared window whole with a modest size so earlier suite
+    // samples age out, then add ONE giant: the max moves, the p99 does not.
+    for (let i = 0; i < CHARACTER_BLOB_P99_WINDOW; i++) recordCharacterBlobBytes(18_000);
+    expect(characterBlobBytesP99()).toBe(18_000);
+    recordCharacterBlobBytes(5_000_000);
+    expect(characterBlobBytesP99()).toBe(18_000);
+    expect(characterBlobBytesHighWater()).toBeGreaterThanOrEqual(5_000_000);
+    // The bulk moving IS the signal: refill at a bigger size and the p99 follows.
+    for (let i = 0; i < CHARACTER_BLOB_P99_WINDOW; i++) recordCharacterBlobBytes(26_000);
+    expect(characterBlobBytesP99()).toBe(26_000);
+  });
+});
+
+describe('the deferred warn-line queue (the setImmediate shutdown trade, closed)', () => {
+  it('queues off the call stack and writes on the next immediate', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      queueCharacterBlobWarning('line A');
+      queueCharacterBlobWarning('line B');
+      // Nothing written synchronously: the whole point is keeping the write
+      // off a row-lock hold.
+      expect(warn).not.toHaveBeenCalled();
+      expect(queuedCharacterBlobWarningCount()).toBe(2);
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      expect(warn.mock.calls.map((c) => c[0])).toEqual(['line A', 'line B']);
+      expect(queuedCharacterBlobWarningCount()).toBe(0);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('a synchronous flush (the shutdown drain) writes queued lines now, and the immediate finds nothing', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      queueCharacterBlobWarning('shutdown-path line');
+      expect(warn).not.toHaveBeenCalled();
+      flushQueuedCharacterBlobWarnings();
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(warn).toHaveBeenCalledWith('shutdown-path line');
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      // Exactly once: the deferred immediate must not print a second copy.
+      expect(warn).toHaveBeenCalledTimes(1);
+      expect(queuedCharacterBlobWarningCount()).toBe(0);
+    } finally {
+      warn.mockRestore();
+    }
+  });
+
+  it('an empty flush is a no-op and a throwing sink (EPIPE at shutdown) is swallowed', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {
+      throw new Error('EPIPE');
+    });
+    try {
+      expect(() => flushQueuedCharacterBlobWarnings()).not.toThrow();
+      queueCharacterBlobWarning('doomed line');
+      expect(() => flushQueuedCharacterBlobWarnings()).not.toThrow();
+      expect(queuedCharacterBlobWarningCount()).toBe(0);
+      await new Promise<void>((resolve) => setImmediate(resolve));
+    } finally {
+      warn.mockRestore();
+    }
   });
 });
