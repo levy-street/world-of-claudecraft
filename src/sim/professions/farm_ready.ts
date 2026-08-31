@@ -47,8 +47,13 @@
 // (proficiency never decrements), with one out-of-play exception: the
 // one-time mastery_reset zeroes skills at load, so a plot corrected in the
 // prior session can read withered again and re-seed the memory, and a later
-// skill rise would then correct it a second time, worst case one duplicate
-// farmReady frame for a character that lived through the reset.
+// skill rise would then correct it a second time: worst case one duplicate
+// correction PER BED for a character that lived through the reset, NOT one
+// duplicate frame for the character. Each bed clears its own survival
+// threshold (its crop tier, its stored roll, its compost and watch), so beds
+// re-withered by the reset can correct on DIFFERENT skill rises and land in
+// as many separate sweeps; only the corrections that fall in the SAME sweep
+// fold into one farmReady frame.
 
 import { farmCropTier } from '../content/farm_crops';
 import type { PlayerMeta } from '../sim';

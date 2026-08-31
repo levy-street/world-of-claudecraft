@@ -1615,9 +1615,7 @@ export function handleDeath(
           : null;
     const meta = creditId !== null ? ctx.players.get(creditId) : null;
     const creditEntity = creditId !== null ? ctx.entities.get(creditId) : null;
-    const rewardInstance = ctx.instances.find(
-      (inst) => inst.partyKey !== null && inst.mobIds.includes(e.id),
-    );
+    const rewardInstance = claimedInstanceForMob(ctx, e.id);
     let heroicRewardRecipients: PlayerMeta[] = [];
     if (meta && creditEntity && !meta.leaving) {
       const tmpl = MOBS[e.templateId];

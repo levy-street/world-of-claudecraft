@@ -57,11 +57,11 @@
 // here): since the existence-oracle guard in consumeFeastAction folded the
 // out-of-range refusal into the not-found frame ('feast_expired'), NOTHING
 // EMITS farmDenied 'feast_range' today. The reason stays in the wire union and
-// its hudChrome.farming.denied.feast_range key stays in the catalog and every
-// overlay as a RESERVED, currently-unemitted reason: retiring it would delete
-// the maintainer's roughly twenty filled overlay rows, which is the release
-// fill lane's call, not this unit's. The QA twin re-judges it at the release
-// fill.
+// its hudChrome.farming.denied.feast_range key stays in the catalog and the
+// overlays as a RESERVED, currently-unemitted reason: the key's footprint is
+// six translated rows plus fifteen pending ones (only five overlay files
+// carry it), and retiring it is the release fill lane's call, not this
+// unit's. The QA twin re-judges it at the release fill.
 
 import { buildConsuming } from '../consuming';
 import { CRAFT_RING } from '../content/professions';

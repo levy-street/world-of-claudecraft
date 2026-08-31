@@ -59,9 +59,11 @@ describe('nearestInteractableFeast', () => {
   });
 
   it('is INCLUSIVE at the exact interact range and excludes just beyond it', () => {
-    // The sim refuses strictly beyond INTERACT_RANGE (feast_range), so the
-    // client boundary must be <=: a press at exactly the range is one the sim
-    // accepts, and the client never pre-refuses it.
+    // The sim refuses strictly beyond INTERACT_RANGE with the merged
+    // not-found frame (farmDenied 'feast_expired', the Phase 18
+    // existence-oracle guard; 'feast_range' is reserved and unemitted), so
+    // the client boundary must be <=: a press at exactly the range is one the
+    // sim accepts, and the client never pre-refuses it.
     const atBoundary = entity({ id: 1, kind: 'object', pos: { x: INTERACT_RANGE, y: 0, z: 0 } });
     expect(nearestInteractableFeast(mapOf(atBoundary), ORIGIN)).toBe(1);
     const beyond = entity({

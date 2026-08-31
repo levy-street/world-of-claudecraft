@@ -139,7 +139,7 @@ function clearResetLocksForClaim(ctx: SimContext, claimId: number): void {
 }
 
 export function lockNormalDungeonResetOnBossKill(ctx: SimContext, mob: Entity): void {
-  const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mob.id));
+  const inst = claimedInstanceForMob(ctx, mob.id);
   if (inst?.difficulty !== 'normal' || RAID_ALLOWED_DUNGEON_IDS.has(inst.dungeonId)) return;
   const finalBossId = HEROIC_DUNGEON_TUNING[inst.dungeonId]?.finalBossId;
   if (mob.templateId !== finalBossId || inst.exitId === null) return;
@@ -1240,15 +1240,29 @@ function heroicRewardWindowToken(lockedUntil: number): string {
   return `reset:${Math.floor(lockedUntil / HEROIC_REWARD_WINDOW_MS)}`;
 }
 
-/** The ONE claimed-instance-for-a-mob predicate (masterwrought Phase 18): the
+/** The claimed-instance-for-a-mob predicate (masterwrought Phase 18): the
  *  slot whose claim holds this mob, or null. The death hub resolves it once
  *  per death and hands the result to awardHeroicMarks AND awardWyrmfallCores
  *  through their optional claimed parameter, so a final-boss kill no longer
  *  pays the mobIds scan twice; both callees fall back to this same predicate
- *  when a foreign caller omits the argument, and the two other death-time
- *  readers (spawnBossExitPortal above, the Nythraxis lockout sweep in
- *  encounters/nythraxis.ts) resolve through it too, so no inline copy of the
- *  predicate survives anywhere. */
+ *  when a foreign caller omits the argument. These death-window readers
+ *  resolve through it too: spawnBossExitPortal and
+ *  lockNormalDungeonResetOnBossKill here, the death hub's rewardInstance
+ *  resolution (combat/damage.ts), and the Nythraxis lockout sweep
+ *  (encounters/nythraxis.ts).
+ *
+ *  ELEVEN verbatim inline copies of the predicate still survive, and this
+ *  header does NOT claim they are all elsewhere in the tick: deeds.ts
+ *  (instanceForMob, reached from onMobKillCreditForDeeds), sim.ts
+ *  (preparePlayerLeave), six in encounters/nythraxis.ts, ignivar_raid_lore.ts,
+ *  mob/ignivar_trash_automata.ts, and mob/dungeon_miniboss_stomp.ts. At least
+ *  three of them run inside the death window as well: deeds.ts's kill-credit
+ *  read, ignivar_raid_lore.ts's narrative arm (handleDeath calls it directly),
+ *  and nythraxis.ts's nythraxisRoomMetas under grantNythraxisLockout. They
+ *  were left alone because routing each one needs its own behavior-identity
+ *  read (the undefined-to-null return change is only free where the caller
+ *  cannot tell the two apart), which is a later chore, deliberately out of
+ *  the Phase 18 fix round's scope. */
 export function claimedInstanceForMob(ctx: SimContext, mobId: number): InstanceSlot | null {
   return ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(mobId)) ?? null;
 }

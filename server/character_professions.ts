@@ -143,7 +143,7 @@ export function characterProfessionsSheet(
   // must not render as a live slot a GM then declines to restore), durability
   // clamps, and the legacy confirmMode coercion (absent reads 'always').
   const slots: ProfessionsSlotRow[] = Object.entries(
-    normalizeToolEffectSlots(state.toolEffectSlots) ?? {},
+    normalizeToolEffectSlots(state.toolEffectSlots, input.name) ?? {},
   ).flatMap(([professionId, slot]) =>
     slot
       ? [
