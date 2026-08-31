@@ -91,7 +91,7 @@ const VENDOR_BUYBACK_LIMIT = 12;
  *  Reliquary obtain tally, and a first find it happens to produce lands with
  *  no clear-count provenance. Shared frozen object so the vendor path does not
  *  allocate per buyback, mirroring MOVEMENT_GRANT on the inventory hub. */
-const BUYBACK_MOVEMENT = { movement: true } as const;
+const BUYBACK_MOVEMENT = { movement: true, buyback: true } as const;
 
 // The one shared shape (types.ts InventoryUnit): both provenance channels of a
 // single unit lifted out of a slot. Kept as a local alias rather than a second

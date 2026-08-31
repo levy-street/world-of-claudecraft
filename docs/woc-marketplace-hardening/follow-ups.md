@@ -87,12 +87,11 @@ enable-vs-rolling-restart exclusion, and the R9 counsel-text verification of
 both consent surfaces. All documented as procedure in
 docs/woc-market-runbook.md section 3. PLUS, surfaced by the rider's runbook
 verification: the OPERATOR ARM for resolving a parked review settlement
-does not exist (transitionSettlement has no route, admin command, or tool
-for review resolution; hand SQL is forbidden by the CAS design; the stuck
-route's own comment records the gap). A review row currently has no
-legitimate manual exit, so the sanctioned surface is a PRE-ENABLE
-requirement, not a nice-to-have. Owner: pre-enable (the 09/19-named
-release-tooling arm).
+did not exist at packet close. CLOSED post-packet: the sanctioned surface
+is POST /internal/woc-market/settlements/:id/resolve
+(server/woc_market_review_resolution.ts through the transitionSettlement
+CAS, dashboard-secret gated beside the stuck readout; runbook sections 3
+and 10 record the procedure). Hand SQL remains forbidden.
 
 ## 5. Game repo: engineering follow-ups with owners
 

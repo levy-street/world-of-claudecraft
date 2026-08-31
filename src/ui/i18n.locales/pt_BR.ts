@@ -2611,6 +2611,16 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Aparar',
   'apiError.wallet.handoff_invalid':
     'Essa autorização de carteira expirou ou não pôde ser verificada. Tente novamente.',
+  'apiError.wallet.reauth_required':
+    'Confirme esta alteração de carteira com a senha da sua conta.',
+  'apiError.wallet.reauth_two_factor':
+    'Sua conta tem a autenticação em duas etapas ativada. Digite seu código para confirmar.',
+  'apiError.wallet.reauth_no_password':
+    'Primeiro defina uma senha nas configurações da conta e tente novamente.',
+  'apiError.wallet.reauth_bad_signature':
+    'Não foi possível verificar a assinatura da carteira. Tente novamente.',
+  'apiError.wallet.reauth_bad_password': 'Sua senha está incorreta.',
+  'apiError.wallet.reauth_bad_two_factor': 'Esse código não é válido, tente novamente.',
   'cardDuel.close': 'Fechar',
   'cardDuel.counts': 'Baralho: {deck} · Descarte: {discard}',
   'cardDuel.forfeit': 'Desistir',
@@ -4842,6 +4852,15 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Desvincular',
   'wallet.unlinkTitle': 'Remover a verificação da carteira desta conta',
   'wallet.unlinkAria': 'Remover a verificação da carteira desta conta',
+  'wallet.reauthTitle': 'Confirmar alteração de carteira',
+  'wallet.reauthUnlinkTitle': 'Confirmar remoção de carteira',
+  'wallet.reauthHelp':
+    'Para sua segurança, digite a senha da sua conta para autorizar esta alteração.',
+  'wallet.reauthNoPassword':
+    'Esta conta entra sem senha. Primeiro defina uma senha nas configurações da conta e tente novamente.',
+  'wallet.reauthConfirm': 'Confirmar',
+  'wallet.reauthCancel': 'Cancelar',
+  'wallet.reauthClose': 'Fechar',
   'wallet.signOut': 'Desconectar',
   'wallet.signOutTitle': 'Desconectar o app da carteira neste navegador',
   'wallet.signOutAria': 'Desconectar o app da carteira neste navegador',

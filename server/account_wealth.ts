@@ -1,9 +1,16 @@
 // The account-wealth sweep: the logic half over account_wealth_db.ts (which
-// owns the SQL). Parses the per-realm mail and market blobs into per-character
-// escrow totals (pure, unit-tested directly), orchestrates one refresh pass,
-// runs the self-clocked sweep loop, and owns the TTL cache the top-holders
-// endpoint reads through. See account_wealth_db.ts's header for why the totals
-// are materialised at all.
+// owns the SQL). Orchestrates one refresh pass (purse totals, then the
+// SQL-aggregated escrow totals), runs the self-clocked sweep loop, and owns
+// the TTL cache the top-holders endpoint reads through. See
+// account_wealth_db.ts's header for why the totals are materialised at all.
+//
+// The escrow aggregation runs INSIDE Postgres (aggregateEscrowTotals): the
+// per-realm mail and market blobs never travel to Node, so a pass costs the
+// main thread nothing proportional to the size of the books. The pure Node
+// fold below (escrowTotalsFromStateRows) is retained ONLY as the parity
+// oracle for that SQL: it defines the semantics, its unit tests keep the
+// spec executable in CI, and tests/account_wealth_pg_integration.test.ts
+// pins the SQL against it on a shared fixture. It is not on the sweep path.
 
 import type {
   AccountPurseRefreshCounts,
@@ -57,6 +64,18 @@ export function parseEscrowStateKey(
 }
 
 /**
+ * THE PARITY ORACLE, not the sweep path: the sweep aggregates in SQL
+ * (account_wealth_db.ts aggregateEscrowTotals), and this fold is the
+ * executable definition that SQL is pinned against
+ * (tests/account_wealth_pg_integration.test.ts). Keep the two in lockstep:
+ * any semantic change lands in BOTH, same change. Two deliberate SQL-side
+ * divergences, both outside any real blob: a copper value at or past
+ * Number.MAX_SAFE_INTEGER + 1 is SKIPPED by the SQL (this fold would
+ * mis-sum it in doubles and applyEscrowTotals would then abort on the
+ * bigint cast, so skipping is the arm that keeps the sweep alive), and a
+ * key padded with exotic Unicode whitespace stays name-keyed in SQL where
+ * String.trim would strip it (the SQL trims the ASCII whitespace set).
+ *
  * Fold the mail and market blobs into per-character escrow totals. Keys follow
  * the market sellerKey convention: a stable character id string, with legacy
  * pre-rekey saves possibly still keyed by character NAME (resolved against the
@@ -117,7 +136,9 @@ export function escrowTotalsFromStateRows(rows: EscrowStateRow[]): EscrowCharact
 /** The db functions one refresh pass needs, injectable for pool-less tests. */
 export interface AccountWealthSweepDeps {
   refreshAccountPurseTotals(): Promise<AccountPurseRefreshCounts>;
-  listEscrowStateRows(): Promise<EscrowStateRow[]>;
+  /** The SQL-side escrow aggregation (account_wealth_db.ts): per-character
+   *  totals computed inside Postgres, never the blobs themselves. */
+  aggregateEscrowTotals(): Promise<EscrowCharacterTotal[]>;
   /** Resolves to the number of stale escrow rows zeroed. */
   applyEscrowTotals(totals: EscrowCharacterTotal[]): Promise<number>;
   // The cross-process guard (account_wealth_db.ts withAccountWealthSweepLock):
@@ -134,18 +155,17 @@ export interface AccountWealthRefreshSummary {
   staleEscrowZeroed: number;
 }
 
-/** One full refresh: purse totals in SQL, then the Node-parsed escrow pass.
- *  Callers other than tests reach it through the sweep loop, which wraps every
- *  pass in the cross-process lock. */
+/** One full refresh: purse totals in SQL, then the SQL-aggregated escrow
+ *  pass. Callers other than tests reach it through the sweep loop, which
+ *  wraps every pass in the cross-process lock. */
 export async function refreshAccountWealth(
   deps: Pick<
     AccountWealthSweepDeps,
-    'refreshAccountPurseTotals' | 'listEscrowStateRows' | 'applyEscrowTotals'
+    'refreshAccountPurseTotals' | 'aggregateEscrowTotals' | 'applyEscrowTotals'
   >,
 ): Promise<AccountWealthRefreshSummary> {
   const purse = await deps.refreshAccountPurseTotals();
-  const rows = await deps.listEscrowStateRows();
-  const totals = escrowTotalsFromStateRows(rows);
+  const totals = await deps.aggregateEscrowTotals();
   const staleEscrowZeroed = await deps.applyEscrowTotals(totals);
   return {
     purseRowsChanged: purse.rowsChanged,

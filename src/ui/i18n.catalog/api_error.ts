@@ -203,6 +203,17 @@ export const apiErrorStrings = {
   },
   wallet: {
     handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
+    // The R11 relink gate (server/wallet_reauth.ts): changing or removing a
+    // linked wallet needs the account password (or the current wallet's
+    // signature); reauth_required is the marker the wallet prompt keys on.
+    reauth_required: 'Confirm this wallet change with your account password.',
+    reauth_two_factor: 'Your account has two-factor enabled. Enter your code to confirm.',
+    reauth_no_password: 'Set a password in account settings first, then try again.',
+    reauth_bad_signature: 'That wallet signature could not be verified. Try again.',
+    // reuses apiError.auth.password_incorrect
+    reauth_bad_password: 'Your password is incorrect.',
+    // reuses apiError.two_factor.code_invalid
+    reauth_bad_two_factor: 'That code is not valid, try again.',
   },
   ota_updates: {
     invalid_input: 'Invalid input.',

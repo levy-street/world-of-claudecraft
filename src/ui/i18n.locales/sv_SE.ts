@@ -2580,6 +2580,14 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parering',
   'apiError.wallet.handoff_invalid':
     'Den plånboksbehörigheten har gått ut eller kunde inte verifieras. Försök igen.',
+  'apiError.wallet.reauth_required': 'Bekräfta den här plånboksändringen med ditt kontolösenord.',
+  'apiError.wallet.reauth_two_factor':
+    'Ditt konto har tvåfaktorsautentisering aktiverad. Ange din kod för att bekräfta.',
+  'apiError.wallet.reauth_no_password':
+    'Ange först ett lösenord i kontoinställningarna och försök igen.',
+  'apiError.wallet.reauth_bad_signature': 'Plånbokens signatur kunde inte verifieras. Försök igen.',
+  'apiError.wallet.reauth_bad_password': 'Ditt lösenord är felaktigt.',
+  'apiError.wallet.reauth_bad_two_factor': 'Den koden är inte giltig, försök igen.',
   'cardDuel.close': 'Stäng',
   'cardDuel.counts': 'Kortlek: {deck} · Kasserad: {discard}',
   'cardDuel.forfeit': 'Ge upp',
@@ -9271,6 +9279,15 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verifiera en annan plånbok',
   'wallet.unlink': 'Avlänka',
   'wallet.unlinkAria': 'Ta bort plånboksverifieringen från det här kontot',
+  'wallet.reauthTitle': 'Bekräfta plånboksändring',
+  'wallet.reauthUnlinkTitle': 'Bekräfta borttagning av plånbok',
+  'wallet.reauthHelp':
+    'För din säkerhet, ange ditt kontolösenord för att godkänna den här ändringen.',
+  'wallet.reauthNoPassword':
+    'Det här kontot loggar in utan lösenord. Ange först ett lösenord i kontoinställningarna och försök igen.',
+  'wallet.reauthConfirm': 'Bekräfta',
+  'wallet.reauthCancel': 'Avbryt',
+  'wallet.reauthClose': 'Stäng',
   'wallet.unlinkFailed': 'Det gick inte att avlänka plånboken.',
   'wallet.unlinkTitle': 'Ta bort plånboksverifieringen från det här kontot',
   'wallet.verify': 'Verifiera plånbok',

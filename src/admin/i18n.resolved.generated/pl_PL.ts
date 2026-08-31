@@ -196,6 +196,8 @@ export const pl_PL: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "Ograniczone żądania wyzwania portfela",
   "usage.metric.walletLinkRequest": "Żądania połączenia portfela",
   "usage.metric.walletLinkFailure": "Niepowodzenia połączenia portfela",
+  "usage.metric.walletUnlinkFailure": "Odmowy odłączenia portfela",
+  "usage.metric.walletUnlinkSuccess": "Ukończone odłączenia portfela",
   "usage.metric.walletLinkRateLimited": "Ograniczone żądania połączenia portfela",
   "usage.metric.cardPublishRequest": "Żądania publikacji karty gracza",
   "usage.metric.cardPublishRejected": "Odrzucone publikacje karty gracza",

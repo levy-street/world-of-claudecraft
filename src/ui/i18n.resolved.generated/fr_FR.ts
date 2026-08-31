@@ -4360,7 +4360,13 @@ export const fr_FR: EnTranslations = {
       "upstream": "Epic n’a pas répondu. Réessayez dans un instant."
     },
     "wallet": {
-      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez."
+      "handoff_invalid": "Cette autorisation de portefeuille a expiré ou n'a pas pu être vérifiée. Réessayez.",
+      "reauth_required": "Confirmez ce changement de portefeuille avec le mot de passe de votre compte.",
+      "reauth_two_factor": "L'authentification à deux facteurs est activée sur votre compte. Saisissez votre code pour confirmer.",
+      "reauth_no_password": "Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+      "reauth_bad_signature": "La signature du portefeuille n'a pas pu être vérifiée. Réessayez.",
+      "reauth_bad_password": "Votre mot de passe est incorrect.",
+      "reauth_bad_two_factor": "Ce code n'est pas valide, réessayez."
     },
     "ota_updates": {
       "invalid_input": "Saisie invalide."
@@ -7285,6 +7291,13 @@ export const fr_FR: EnTranslations = {
     "unlink": "Dissocier",
     "unlinkTitle": "Retirer la vérification du portefeuille de ce compte",
     "unlinkAria": "Retirer la vérification du portefeuille de ce compte",
+    "reauthTitle": "Confirmer le changement de portefeuille",
+    "reauthUnlinkTitle": "Confirmer le retrait du portefeuille",
+    "reauthHelp": "Pour votre sécurité, saisissez le mot de passe de votre compte pour autoriser ce changement.",
+    "reauthNoPassword": "Ce compte se connecte sans mot de passe. Définissez d'abord un mot de passe dans les paramètres du compte, puis réessayez.",
+    "reauthConfirm": "Confirmer",
+    "reauthCancel": "Annuler",
+    "reauthClose": "Fermer",
     "signOut": "Déconnecter",
     "signOutTitle": "Déconnecter l'appli de portefeuille sur ce navigateur",
     "signOutAria": "Déconnecter l'appli de portefeuille sur ce navigateur",

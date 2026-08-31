@@ -2050,14 +2050,16 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     requiredClass: ROG,
   },
   // --- vendor food & drink (Provisioner Hale) ---
+  // Classic-era economy: food/drink is cheaper than combat potions (out-of-combat
+  // sustain vs in-combat emergency), so a meal is affordable between fights.
   fenbridge_rye: {
     id: 'fenbridge_rye',
     name: 'Fenbridge Rye Loaf',
     kind: 'food',
     quality: 'common',
     foodHp: 243,
-    sellValue: 25,
-    buyValue: 400,
+    sellValue: 10,
+    buyValue: 50,
   },
   marsh_mint_tea: {
     id: 'marsh_mint_tea',
@@ -2065,8 +2067,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'drink',
     quality: 'common',
     drinkMana: 288,
-    sellValue: 25,
-    buyValue: 400,
+    sellValue: 10,
+    buyValue: 50,
   },
   smoked_eel: {
     id: 'smoked_eel',
@@ -2074,8 +2076,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'food',
     quality: 'common',
     foodHp: 432,
-    sellValue: 60,
-    buyValue: 1000,
+    sellValue: 20,
+    buyValue: 90,
   },
   silvermist_cordial: {
     id: 'silvermist_cordial',
@@ -2083,8 +2085,8 @@ export const ZONE2_ITEMS: Record<string, ItemDef> = {
     kind: 'drink',
     quality: 'common',
     drinkMana: 436,
-    sellValue: 60,
-    buyValue: 1000,
+    sellValue: 20,
+    buyValue: 90,
   },
   // --- vendor white gear (Provisioner Hale) ---
   bogiron_mace: {

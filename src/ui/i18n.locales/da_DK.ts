@@ -2577,6 +2577,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'itemUi.stats.parry': 'Parering',
   'apiError.wallet.handoff_invalid':
     'Den pung-godkendelse udløb eller kunne ikke bekræftes. Prøv igen.',
+  'apiError.wallet.reauth_required':
+    'Bekræft denne ændring af pungen med din adgangskode til kontoen.',
+  'apiError.wallet.reauth_two_factor':
+    'Din konto har to-faktor-godkendelse slået til. Indtast din kode for at bekræfte.',
+  'apiError.wallet.reauth_no_password':
+    'Opret først en adgangskode i kontoindstillingerne, og prøv igen.',
+  'apiError.wallet.reauth_bad_signature': 'Pungens signatur kunne ikke verificeres. Prøv igen.',
+  'apiError.wallet.reauth_bad_password': 'Din adgangskode er forkert.',
+  'apiError.wallet.reauth_bad_two_factor': 'Den kode er ikke gyldig, prøv igen.',
   'cardDuel.close': 'Luk',
   'cardDuel.counts': 'Bunke: {deck} - Kasserede: {discard}',
   'cardDuel.forfeit': 'Giv op',
@@ -9264,6 +9273,15 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'wallet.switchTitle': 'Verificer en anden pung',
   'wallet.unlink': 'Frakobl',
   'wallet.unlinkAria': 'Fjern pung-verificeringen fra denne konto',
+  'wallet.reauthTitle': 'Bekræft ændring af pung',
+  'wallet.reauthUnlinkTitle': 'Bekræft fjernelse af pung',
+  'wallet.reauthHelp':
+    'Af sikkerhedshensyn skal du indtaste din adgangskode til kontoen for at godkende denne ændring.',
+  'wallet.reauthNoPassword':
+    'Denne konto logger ind uden adgangskode. Opret først en adgangskode i kontoindstillingerne, og prøv igen.',
+  'wallet.reauthConfirm': 'Bekræft',
+  'wallet.reauthCancel': 'Annuller',
+  'wallet.reauthClose': 'Luk',
   'wallet.unlinkFailed': 'Kunne ikke frakoble pungen.',
   'wallet.unlinkTitle': 'Fjern pung-verificeringen fra denne konto',
   'wallet.verify': 'Verificer pung',

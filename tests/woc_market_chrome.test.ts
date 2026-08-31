@@ -9,11 +9,13 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { formatDateTime, setLanguage, t } from '../src/ui/i18n';
+import { buildWalletConnectionView } from '../src/ui/wallet_connection_view';
 import {
   wocBrowseStripHtml,
   wocEndsAtText,
   wocErrorStatusHtml,
   wocLoadingStatusHtml,
+  wocMarketBannersHtml,
   wocSalesHistoryHtml,
   wocSellEmptyHtml,
   wocSpinnerHtml,
@@ -189,5 +191,61 @@ describe('woc_market_chrome: the resolved sell caption', () => {
       '',
     );
     expect(future).toContain('mythic');
+  });
+});
+
+describe('woc_market_chrome: the standing banners', () => {
+  const view = (linked: string | null, connected: string | null) =>
+    buildWalletConnectionView({
+      enabled: true,
+      linkedAddress: linked,
+      connectedAddress: connected,
+      linkedBalance: null,
+      connectedBalance: null,
+    });
+
+  it('renders nothing at all when there is no banner to stand', () => {
+    expect(wocMarketBannersHtml({ paused: false, wallet: null })).toBe('');
+    const off = buildWalletConnectionView({
+      enabled: false,
+      linkedAddress: null,
+      connectedAddress: null,
+      linkedBalance: null,
+      connectedBalance: null,
+    });
+    expect(wocMarketBannersHtml({ paused: false, wallet: off })).toBe('');
+  });
+
+  it('the wallet card is the Claudium card: title, state sentence, one action button', () => {
+    const html = wocMarketBannersHtml({ paused: false, wallet: view(null, null) });
+    expect(html).toContain('<div class="wm-strip">');
+    expect(html).toContain('class="wm-banner wm-banner-wallet" data-wallet-kind="unlinked"');
+    expect(html).toContain(`<strong>${t('hudChrome.wocStore.wallet.title')}</strong>`);
+    expect(html).toContain(`<p>${t('hudChrome.wocStore.wallet.unlinked')}</p>`);
+    // The button keeps the window's connect-wallet click action and its focus
+    // key, so the existing handler arm and the focus-restore ladder both reach it.
+    expect(html).toContain(
+      `<button type="button" data-action="connect-wallet" data-focus-key="wm-connect-wallet">${t(
+        'hudChrome.wocStore.wallet.connect',
+      )}</button>`,
+    );
+  });
+
+  it('spells the linked states as Reconnect wallet and Manage wallet, never hiding the card', () => {
+    const disconnected = wocMarketBannersHtml({ paused: false, wallet: view('L', null) });
+    expect(disconnected).toContain('data-wallet-kind="linked_disconnected"');
+    expect(disconnected).toContain(`>${t('hudChrome.wocStore.wallet.reconnect')}</button>`);
+    const connected = wocMarketBannersHtml({ paused: false, wallet: view('L', 'L') });
+    expect(connected).toContain('data-wallet-kind="linked_connected"');
+    expect(connected).toContain(`>${t('hudChrome.wocStore.wallet.manage')}</button>`);
+    const mismatched = wocMarketBannersHtml({ paused: false, wallet: view('L', 'M') });
+    expect(mismatched).toContain(`>${t('hudChrome.wocStore.wallet.verify')}</button>`);
+  });
+
+  it('the paused banner leads the strip, the wallet card follows it', () => {
+    const html = wocMarketBannersHtml({ paused: true, wallet: view(null, null) });
+    expect(html.indexOf('wm-banner-paused')).toBeGreaterThan(-1);
+    expect(html.indexOf('wm-banner-paused')).toBeLessThan(html.indexOf('wm-banner-wallet'));
+    expect(html).toContain(t('hudChrome.wocMarket.pausedBanner'));
   });
 });

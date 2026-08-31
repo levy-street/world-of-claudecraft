@@ -311,6 +311,8 @@ export const nl_NL: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Beperkte verzoeken portemonnee-uitdaging',
   'usage.metric.walletLinkRequest': 'Verzoeken portemonnee-koppeling',
   'usage.metric.walletLinkFailure': 'Mislukte portemonnee-koppelingen',
+  'usage.metric.walletUnlinkFailure': 'Geweigerde portemonnee-ontkoppelingen',
+  'usage.metric.walletUnlinkSuccess': 'Voltooide portemonnee-ontkoppelingen',
   'usage.metric.walletLinkRateLimited': 'Beperkte verzoeken portemonnee-koppeling',
   'usage.metric.cardPublishRequest': 'Publicatieverzoeken spelerskaart',
   'usage.metric.cardPublishRejected': 'Geweigerde publicaties spelerskaart',
