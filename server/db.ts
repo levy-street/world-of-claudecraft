@@ -57,6 +57,7 @@ import {
 } from './character_save_transaction';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { CLIENT_PERF_SCHEMA } from './client_perf_schema';
 import {
   buildCommunityTestCharacters,
   communityTestAccountsEnabled,
@@ -881,66 +882,6 @@ CREATE TABLE IF NOT EXISTS chat_violations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS chat_violations_account ON chat_violations(account_id, created_at DESC);
-CREATE TABLE IF NOT EXISTS client_perf_reports (
-  id BIGSERIAL PRIMARY KEY,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  schema_version INT NOT NULL DEFAULT 1,
-  release_version TEXT NOT NULL DEFAULT '',
-  build_id TEXT NOT NULL DEFAULT '',
-  session_id TEXT NOT NULL DEFAULT '',
-  account_id INT REFERENCES accounts(id) ON DELETE SET NULL,
-  character_id INT REFERENCES characters(id) ON DELETE SET NULL,
-  realm TEXT NOT NULL DEFAULT '${REALM_SQL_DEFAULT}',
-  graphics_preset TEXT NOT NULL DEFAULT '',
-  gfx_tier TEXT NOT NULL DEFAULT '',
-  auto_governor BOOLEAN NOT NULL DEFAULT FALSE,
-  target_fps INT NOT NULL DEFAULT 0,
-  render_scale REAL NOT NULL DEFAULT 1,
-  effective_render_scale REAL NOT NULL DEFAULT 1,
-  fps_avg REAL NOT NULL DEFAULT 0,
-  frame_p95_ms REAL NOT NULL DEFAULT 0,
-  frame_p99_ms REAL NOT NULL DEFAULT 0,
-  long_frame_count INT NOT NULL DEFAULT 0,
-  renderer_calls INT NOT NULL DEFAULT 0,
-  renderer_triangles INT NOT NULL DEFAULT 0,
-  renderer_textures INT NOT NULL DEFAULT 0,
-  renderer_programs INT NOT NULL DEFAULT 0,
-  context_lost_count INT NOT NULL DEFAULT 0,
-  long_task_count INT NOT NULL DEFAULT 0,
-  long_task_p95_ms REAL NOT NULL DEFAULT 0,
-  memory_used_mb REAL,
-  memory_limit_mb REAL,
-  dpr REAL NOT NULL DEFAULT 1,
-  viewport_bucket TEXT NOT NULL DEFAULT '',
-  device_memory REAL,
-  hardware_concurrency INT NOT NULL DEFAULT 0,
-  mobile_touch BOOLEAN NOT NULL DEFAULT FALSE,
-  browser_family TEXT NOT NULL DEFAULT '',
-  os_family TEXT NOT NULL DEFAULT '',
-  gl_vendor TEXT NOT NULL DEFAULT '',
-  gl_renderer_bucket TEXT NOT NULL DEFAULT '',
-  zone_or_scenario TEXT NOT NULL DEFAULT '',
-  source TEXT NOT NULL DEFAULT 'gameplay',
-  raw_summary JSONB NOT NULL DEFAULT '{}'::jsonb
-);
-CREATE INDEX IF NOT EXISTS client_perf_reports_created ON client_perf_reports(created_at DESC);
-CREATE INDEX IF NOT EXISTS client_perf_reports_release_created ON client_perf_reports(release_version, created_at DESC);
-CREATE INDEX IF NOT EXISTS client_perf_reports_gpu_created ON client_perf_reports(gl_renderer_bucket, created_at DESC);
-CREATE INDEX IF NOT EXISTS client_perf_reports_session_created ON client_perf_reports(session_id, created_at DESC);
--- Packet 0 report dimensions (rulings R3-R7). crowd_bucket keeps the summary
--- statement's GROUPING-bits contract (every grouped column TEXT NOT NULL
--- DEFAULT ''; pre-column rows fold to 'unknown' in the read-time mapper). The
--- worst-10s ranking index builds via CONCURRENT_INDEX_MIGRATIONS
--- (server/client_perf_indexes.ts), never here.
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS crowd_bucket TEXT NOT NULL DEFAULT '';
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS sim_entities INT NOT NULL DEFAULT 0;
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS active_views INT NOT NULL DEFAULT 0;
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS visible_views INT NOT NULL DEFAULT 0;
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS worst_10s_frame_p95_ms REAL NOT NULL DEFAULT 0;
--- Phase 05 (ruling R14): client-computed perf-doctor suggestion ids, validated
--- against the server allowlist in perf_report.ts before storage (filter,
--- dedupe, cap 3). Pre-column and healthy rows both read as the empty array.
-ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}';
 -- Non-custodial Solana wallet links (PRD: docs/prd/woc/wallet-link.md). One
 -- wallet per account (account_id is the PK) and one account per wallet (pubkey
 -- is UNIQUE). The server never holds keys; ownership is proven by a signed
@@ -1331,6 +1272,9 @@ export async function ensureSchema(): Promise<void> {
     // totals + the account-to-IP association ledger). FK-references
     // accounts(id), so it runs after SCHEMA.
     await client.query(PLAY_SESSION_RETENTION_SCHEMA);
+    // Client perf report storage. FK-references accounts(id) and
+    // characters(id), so it runs after SCHEMA.
+    await client.query(CLIENT_PERF_SCHEMA);
     // The daily-reward exclusion view joins account_ip_associations in its
     // association arm, so it is created after the retention schema above; on a
     // fresh database SCHEMA alone could not create it.
@@ -4379,6 +4323,7 @@ export interface ClientPerfReportInsert {
   osFamily: string;
   glVendor: string;
   glRendererBucket: string;
+  glBackend: string;
   zoneOrScenario: string;
   source: string;
   crowdBucket: string;
@@ -4399,7 +4344,7 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_backend, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
        suggestion_ids, raw_summary
      ) VALUES (
@@ -4409,9 +4354,9 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
        $18, $19, $20, $21, $22,
        $23, $24, $25, $26,
        $27, $28, $29, $30, $31,
-       $32, $33, $34, $35, $36, $37,
-       $38, $39, $40, $41, $42,
-       $43, $44
+       $32, $33, $34, $35, $36, $37, $38,
+       $39, $40, $41, $42, $43,
+       $44, $45
      )`,
     [
       row.schemaVersion,
@@ -4449,6 +4394,7 @@ export async function insertClientPerfReport(row: ClientPerfReportInsert): Promi
       row.osFamily,
       row.glVendor,
       row.glRendererBucket,
+      row.glBackend,
       row.zoneOrScenario,
       row.source,
       row.crowdBucket,

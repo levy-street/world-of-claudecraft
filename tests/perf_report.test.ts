@@ -437,6 +437,56 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('stores the graphics backend derived from the adapter name, beside the coarse bucket', async () => {
+    // The two fields answer different questions off the SAME string: the bucket
+    // says whose hardware, gl_backend says which API. This is the pin that the
+    // backend is read from body.glRenderer and NOT from the bucket, which has
+    // already discarded the API token for every recognised vendor.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'backend-d3d11',
+          glRenderer:
+            'ANGLE (NVIDIA, NVIDIA GeForce RTX 3090 (0x00002204) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.90' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glRendererBucket: 'nvidia', glBackend: 'd3d11' }),
+    );
+
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'backend-gles',
+          glRenderer: 'ANGLE (Qualcomm, Adreno (TM) 730, OpenGL ES 3.2)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.91' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glBackend: 'opengl-es' }),
+    );
+
+    // A report with no adapter name stores 'unknown', never an empty string, so
+    // the grouped column never carries two spellings of the same absence.
+    vi.mocked(insertClientPerfReport).mockClear();
+    await handlePerfReport(
+      fakeReq({ sessionId: 'backend-absent', rawSummary: {} }, { remoteAddress: '203.0.113.92' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glBackend: 'unknown' }),
+    );
+  });
+
   it('keeps GPU bucketing coarse', () => {
     expect(perfReportInternalsForTest.bucketGpu('Google SwiftShader')).toBe('software');
     expect(

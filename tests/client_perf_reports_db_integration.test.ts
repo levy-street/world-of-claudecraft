@@ -1,5 +1,5 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
+// dimension columns plus the phase 05 suggestion_ids array. The insert's 45
 // positional parameters are the one place a renumbering slip lands values in
 // the wrong columns while every mocked-pool suite stays green, so this
 // roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
@@ -91,6 +91,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       osFamily: 'macos',
       glVendor: 'RoundtripVendor',
       glRendererBucket: 'apple-m3-pro',
+      glBackend: 'd3d11',
       zoneOrScenario: 'dungeon:hollow_crypt',
       source: 'gameplay',
       crowdBucket: '25-49',
@@ -141,6 +142,7 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.os_family).toBe('macos');
     expect(r.gl_vendor).toBe('RoundtripVendor');
     expect(r.gl_renderer_bucket).toBe('apple-m3-pro');
+    expect(r.gl_backend).toBe('d3d11');
     expect(r.zone_or_scenario).toBe('dungeon:hollow_crypt');
     expect(r.source).toBe('gameplay');
     expect(r.crowd_bucket).toBe('25-49');

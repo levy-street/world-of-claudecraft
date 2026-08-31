@@ -25,6 +25,7 @@ export interface ClientPerfSummaryBuckets {
   byPreset: PerfBucket[];
   byGfxTier: PerfBucket[];
   byGpu: PerfBucket[];
+  byBackend: PerfBucket[];
   byBrowser: PerfBucket[];
   byOs: PerfBucket[];
   byScenario: PerfBucket[];
@@ -54,6 +55,9 @@ export const PERF_SUMMARY_LIMITS = Object.freeze({
   // dimension like gpu or scenario.
   byGfxTier: 20,
   byGpu: 50,
+  // Seven closed-vocabulary labels (server/gl_backend.ts GL_BACKEND_LABELS)
+  // plus the legacy pre-column '' row and headroom.
+  byBackend: 10,
   byBrowser: 20,
   byOs: 20,
   byScenario: 30,
@@ -74,13 +78,14 @@ export function cleanHours(hours: number): number {
 // One flat row of the GROUPING SETS result, as the reading contract the mapper
 // relies on. The g_* fields are GROUPING() bits: 1 means the column is rolled up
 // in this row's grouping set, 0 means the row is grouped by that column. Exactly
-// one bit is 0 on a bucket row; all seven are 1 on the totals row. The shape and
+// one bit is 0 on a bucket row; every bit is 1 on the totals row. The shape and
 // SQL suites type their fixture rows with this contract, so it stays
 // compile-checked against what the tests feed the mapper.
 export type ClientPerfSummaryRow = {
   graphics_preset: string | null;
   gfx_tier: string | null;
   gl_renderer_bucket: string | null;
+  gl_backend: string | null;
   browser_family: string | null;
   os_family: string | null;
   zone_or_scenario: string | null;
@@ -88,6 +93,7 @@ export type ClientPerfSummaryRow = {
   g_preset: number;
   g_gfxtier: number;
   g_gpu: number;
+  g_backend: number;
   g_browser: number;
   g_os: number;
   g_scenario: number;
@@ -144,6 +150,7 @@ const BUCKET_SETS = [
   { bit: 'g_preset', column: 'graphics_preset', list: 'byPreset' },
   { bit: 'g_gfxtier', column: 'gfx_tier', list: 'byGfxTier' },
   { bit: 'g_gpu', column: 'gl_renderer_bucket', list: 'byGpu' },
+  { bit: 'g_backend', column: 'gl_backend', list: 'byBackend' },
   { bit: 'g_browser', column: 'browser_family', list: 'byBrowser' },
   { bit: 'g_os', column: 'os_family', list: 'byOs' },
   { bit: 'g_scenario', column: 'zone_or_scenario', list: 'byScenario' },
@@ -174,6 +181,7 @@ export function mapClientPerfSummaryRows(
     byPreset: [],
     byGfxTier: [],
     byGpu: [],
+    byBackend: [],
     byBrowser: [],
     byOs: [],
     byScenario: [],
@@ -182,17 +190,19 @@ export function mapClientPerfSummaryRows(
   for (const r of rows) {
     const set = BUCKET_SETS.find((s) => Number(r[s.bit]) === 0);
     if (!set) {
-      // All seven bits rolled up: the () grouping set, i.e. the totals row.
+      // Every bit rolled up: the () grouping set, i.e. the totals row.
       totals = perfAggregateFromRow(r);
       continue;
     }
     // Defensive fold: a data row never carries a NULL key (NOT NULL DEFAULT ''),
     // but the mapping mirrors the String(value ?? '') contract regardless. The
-    // crowd list additionally folds the legacy pre-column '' rows to 'unknown'
-    // at read time (ruling R3); the '' and 'unknown' groups stay separate
-    // aggregates because percentiles do not compose.
+    // crowd and backend lists additionally fold their legacy pre-column ''
+    // rows to 'unknown' at read time (ruling R3, and the same contract for
+    // gl_backend); the '' and 'unknown' groups stay separate aggregates because
+    // percentiles do not compose.
     const rawKey = String(r[set.column] ?? '');
-    const key = set.list === 'byCrowd' && rawKey === '' ? 'unknown' : rawKey;
+    const foldsEmptyKey = set.list === 'byCrowd' || set.list === 'byBackend';
+    const key = foldsEmptyKey && rawKey === '' ? 'unknown' : rawKey;
     ranked[set.list].push({
       volRank: Number(r.vol_rank),
       worstRank: Number(r.worst_rank),
@@ -218,6 +228,7 @@ export function mapClientPerfSummaryRows(
     byPreset: byRank(ranked.byPreset, 'volRank', PERF_SUMMARY_LIMITS.byPreset),
     byGfxTier: byRank(ranked.byGfxTier, 'volRank', PERF_SUMMARY_LIMITS.byGfxTier),
     byGpu: byRank(ranked.byGpu, 'volRank', PERF_SUMMARY_LIMITS.byGpu),
+    byBackend: byRank(ranked.byBackend, 'volRank', PERF_SUMMARY_LIMITS.byBackend),
     byBrowser: byRank(ranked.byBrowser, 'volRank', PERF_SUMMARY_LIMITS.byBrowser),
     byOs: byRank(ranked.byOs, 'volRank', PERF_SUMMARY_LIMITS.byOs),
     byScenario: byRank(ranked.byScenario, 'volRank', PERF_SUMMARY_LIMITS.byScenario),

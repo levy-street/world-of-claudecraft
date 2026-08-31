@@ -5,6 +5,7 @@ import {
   getCharacter,
   insertClientPerfReport,
 } from './db';
+import { glBackendFromRenderer } from './gl_backend';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
@@ -852,6 +853,9 @@ export async function handlePerfReport(
     ),
     glVendor: textIn(body.glVendor, 80),
     glRendererBucket: bucketGpu(glRenderer || textIn(body.glRendererBucket, 80)),
+    // Derived from the SAME adapter name, never from the bucket: bucketGpu has
+    // already thrown the API token away by then for every recognised vendor.
+    glBackend: glBackendFromRenderer(glRenderer),
     zoneOrScenario: textIn(
       body.zoneOrScenario,
       80,

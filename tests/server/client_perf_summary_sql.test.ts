@@ -78,13 +78,13 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // The one statement computes the totals row and every bucket grouping.
     expect(sql).toContain('GROUP BY GROUPING SETS');
     expect(sql).toContain(
-      '((), (graphics_preset), (gfx_tier), (gl_renderer_bucket), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))',
+      '((), (graphics_preset), (gfx_tier), (gl_renderer_bucket), (gl_backend), (browser_family), (os_family), (zone_or_scenario), (crowd_bucket))',
     );
     expect(sql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
     // Both orderings live in Postgres as window ranks (collation-proof: the
     // key ASC tie-break must never move into a JS string sort).
     expect(sql).toContain(
-      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gfx_tier, gl_renderer_bucket, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC',
+      'ORDER BY sample_count DESC, COALESCE(graphics_preset, gfx_tier, gl_renderer_bucket, gl_backend, browser_family, os_family, zone_or_scenario, crowd_bucket) ASC',
     );
     expect(sql).toContain('ORDER BY p95_frame_ms DESC, sample_count DESC');
     // The deliberate quirk: p99_frame_ms is percentile 0.99 over frame_p95_ms.
@@ -96,13 +96,14 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // any bucket arm would empty that admin list, with only the env-gated
     // differential (skipped in normal CI) left to notice.
     expect(sql).toContain(
-      '(g_preset + g_gfxtier + g_gpu + g_browser + g_os + g_scenario + g_crowd = 7)',
+      '(g_preset + g_gfxtier + g_gpu + g_backend + g_browser + g_os + g_scenario + g_crowd = 8)',
     );
     // The per-set caps bound what crosses to Node; the gpu set keeps candidates
     // for BOTH orderings so a low-volume worst-p95 bucket still surfaces.
     expect(sql).toContain('(g_preset = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_gfxtier = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_gpu = 0 AND (vol_rank <= 50 OR worst_rank <= 20))');
+    expect(sql).toContain('(g_backend = 0 AND vol_rank <= 10)');
     expect(sql).toContain('(g_browser = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_os = 0 AND vol_rank <= 20)');
     expect(sql).toContain('(g_scenario = 0 AND vol_rank <= 30)');
@@ -145,6 +146,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       graphics_preset: null,
       gfx_tier: null,
       gl_renderer_bucket: null,
+      gl_backend: null,
       browser_family: null,
       os_family: null,
       zone_or_scenario: null,
@@ -152,6 +154,7 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       g_preset: 1,
       g_gfxtier: 1,
       g_gpu: 1,
+      g_backend: 1,
       g_browser: 1,
       g_os: 1,
       g_scenario: 1,

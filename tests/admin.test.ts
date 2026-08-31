@@ -1026,6 +1026,7 @@ describe('admin api auth', () => {
       byPreset: [],
       byGfxTier: [],
       byGpu: [],
+      byBackend: [],
       byBrowser: [],
       byOs: [],
       byScenario: [],

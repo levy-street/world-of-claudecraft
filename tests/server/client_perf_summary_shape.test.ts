@@ -61,6 +61,7 @@ const KEY_COLUMNS = {
   preset: 'graphics_preset',
   gfxtier: 'gfx_tier',
   gpu: 'gl_renderer_bucket',
+  backend: 'gl_backend',
   browser: 'browser_family',
   os: 'os_family',
   scenario: 'zone_or_scenario',
@@ -73,6 +74,7 @@ function totalsRow(seed: number): Row {
     graphics_preset: null,
     gfx_tier: null,
     gl_renderer_bucket: null,
+    gl_backend: null,
     browser_family: null,
     os_family: null,
     zone_or_scenario: null,
@@ -80,6 +82,7 @@ function totalsRow(seed: number): Row {
     g_preset: 1,
     g_gfxtier: 1,
     g_gpu: 1,
+    g_backend: 1,
     g_browser: 1,
     g_os: 1,
     g_scenario: 1,
@@ -114,6 +117,7 @@ describe('mapClientPerfSummaryRows classification', () => {
       bucketRow('preset', '', 1, 1, 3),
       totalsRow(9),
       bucketRow('gpu', 'adreno', 1, 1, 4),
+      bucketRow('backend', 'opengl-es', 1, 1, 11),
       bucketRow('browser', 'Chrome', 1, 1, 5),
       bucketRow('os', 'Windows', 1, 1, 6),
       bucketRow('scenario', 'elwynn', 1, 1, 7),
@@ -123,6 +127,7 @@ describe('mapClientPerfSummaryRows classification', () => {
     expect(out.totals).toEqual(expectedAgg(9));
     expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(3) }]);
     expect(out.byGpu).toEqual([{ key: 'adreno', ...expectedAgg(4) }]);
+    expect(out.byBackend).toEqual([{ key: 'opengl-es', ...expectedAgg(11) }]);
     expect(out.byBrowser).toEqual([{ key: 'Chrome', ...expectedAgg(5) }]);
     expect(out.byOs).toEqual([{ key: 'Windows', ...expectedAgg(6) }]);
     expect(out.byScenario).toEqual([{ key: 'elwynn', ...expectedAgg(7) }]);
@@ -131,8 +136,9 @@ describe('mapClientPerfSummaryRows classification', () => {
     expect(out.byGfxTier).toEqual([{ key: 'ultra', ...expectedAgg(10) }]);
   });
 
-  it('folds the legacy empty-string crowd key to unknown at read time, and ONLY there', () => {
-    // Pre-column rows aggregate under crowd_bucket '' (ruling R3); the mapper
+  it('folds the legacy empty-string key to unknown for crowd AND backend, and ONLY there', () => {
+    // Pre-column rows aggregate under crowd_bucket '' (ruling R3) and, since
+    // the column was added later, gl_backend '' the same way; the mapper
     // relabels them 'unknown' without merging them into the real unknown
     // bucket (percentiles do not compose), while every other list keeps ''
     // as-is (the preset '' key is legitimate data).
@@ -140,12 +146,21 @@ describe('mapClientPerfSummaryRows classification', () => {
       bucketRow('crowd', '', 1, 1, 3),
       bucketRow('crowd', 'unknown', 2, 2, 4),
       bucketRow('preset', '', 1, 1, 5),
+      bucketRow('backend', '', 1, 1, 6),
+      bucketRow('backend', 'unknown', 2, 2, 7),
+      bucketRow('gpu', '', 1, 1, 8),
     ]);
     expect(out.byCrowd).toEqual([
       { key: 'unknown', ...expectedAgg(3) },
       { key: 'unknown', ...expectedAgg(4) },
     ]);
+    expect(out.byBackend).toEqual([
+      { key: 'unknown', ...expectedAgg(6) },
+      { key: 'unknown', ...expectedAgg(7) },
+    ]);
     expect(out.byPreset).toEqual([{ key: '', ...expectedAgg(5) }]);
+    // The negative arm: the gpu list is NOT one of the folding lists.
+    expect(out.byGpu).toEqual([{ key: '', ...expectedAgg(8) }]);
   });
 
   it('returns the totals row as-is, never rebuilt from the bucket rows', () => {
@@ -262,6 +277,7 @@ describe('mapClientPerfSummaryRows caps', () => {
       byPreset: 20,
       byGfxTier: 20,
       byGpu: 50,
+      byBackend: 10,
       byBrowser: 20,
       byOs: 20,
       byScenario: 30,

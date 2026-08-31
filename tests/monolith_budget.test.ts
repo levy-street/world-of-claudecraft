@@ -689,8 +689,12 @@ const MONOLITHS: MonolithRow[] = [
     // post-unlock restructure in place. Exact count, zero slack.
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
-    // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5145,
+    // the composite is the honest size. Lowered -54 from that base when the
+    // client_perf_reports DDL moved verbatim out of SCHEMA into
+    // client_perf_schema.ts (ensureSchema applies it after the core tables it
+    // FK-references); the insert and prune primitives stay here, so only the
+    // table definition left. Exact count, zero slack.
+    ceiling: 5091,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
