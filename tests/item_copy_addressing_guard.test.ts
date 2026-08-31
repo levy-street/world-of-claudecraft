@@ -146,32 +146,41 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
   },
 ];
 
-/** Sender bodies from ClientWorld, keyed by the wire token they send. */
-function senderBodyFor(cmd: string): string {
-  // Every sender routes through the private cmd() helper, so the token literal
-  // appears inside the method that owns it. The window ENDS at the owning
-  // method's closing brace (the next `\n  }` at class-body indent), the client
-  // half of the server arm's next-case bound below: a fixed-length slice bled
-  // into the NEIGHBOURING method, and since most senders do pass a selection,
-  // the field assertion stayed green with the sender under test's field
-  // deleted (verified by re-running the old window over a useItem with its
-  // slot field removed: discardItem's `slot` landed inside the 220 chars).
+/** Sender windows from ClientWorld, one per token occurrence, keyed by the
+ *  wire token they send. Every sender routes through the private cmd()
+ *  helper, so the token literal appears inside the method that owns it. Each
+ *  window ENDS at the owning method's closing brace (the next `\n  }` at
+ *  class-body indent), the client half of the server arm's next-case bound
+ *  below: a fixed-length slice bled into the NEIGHBOURING method, and since
+ *  most senders do pass a selection, the field assertion stayed green with
+ *  the sender under test's field deleted (verified by re-running the old
+ *  window over a useItem with its slot field removed: discardItem's `slot`
+ *  landed inside the 220 chars). Returned as SEPARATE windows rather than one
+ *  concatenation: a token sent from TWO methods (equip: equipItem and
+ *  equipItemToSlot) is otherwise only pinned in aggregate, and deleting the
+ *  field from one method stays green on the other's window. */
+function senderWindowsFor(cmd: string): string[] {
   const needle = `cmd: '${cmd}'`;
-  let out = '';
+  const windows: string[] = [];
   let at = ONLINE.indexOf(needle);
   while (at !== -1) {
     const end = ONLINE.indexOf('\n  }', at);
-    out += end === -1 ? ONLINE.slice(at) : ONLINE.slice(at, end);
+    windows.push(end === -1 ? ONLINE.slice(at) : ONLINE.slice(at, end));
     at = ONLINE.indexOf(needle, at + 1);
   }
-  return out;
+  return windows;
 }
 
 describe('every item command can name the copy it acts on', () => {
   it.each(ADDRESSED_COMMANDS)('$cmd carries a $field selection on the wire', ({ cmd, field }) => {
-    const body = senderBodyFor(cmd);
-    expect(body, `no ClientWorld sender found for ${cmd}`).not.toBe('');
-    expect(body, `${cmd} must be able to send a ${field}`).toContain(field);
+    const windows = senderWindowsFor(cmd);
+    expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
+    // PER OCCURRENCE, never the concatenation: each window is bounded by its
+    // owning method, so every METHOD that sends this token must carry the
+    // field, and deleting it from one of two sender methods reds here.
+    for (const [i, body] of windows.entries()) {
+      expect(body, `${cmd} occurrence ${i + 1} must be able to send a ${field}`).toContain(field);
+    }
   });
 
   it.each(ADDRESSED_COMMANDS)(
@@ -239,7 +248,13 @@ describe('every item command can name the copy it acts on', () => {
   it.each(PARSE_CORE_COMMANDS)(
     '$cmd names its copy through the $parser parse core, with teeth',
     ({ cmd, parser, module, cellField, senderFields }) => {
-      const body = senderBodyFor(cmd);
+      // AGGREGATE over the windows here, deliberately unlike the addressed
+      // test above: perfect_item's two arms send COMPLEMENTARY shapes by
+      // contract (slot on the worn arm, bag plus item on the bagged arm),
+      // so demanding every field per occurrence would fail the correct
+      // sender. Both arms live in one method, so the aggregate is still
+      // method-bounded.
+      const body = senderWindowsFor(cmd).join('');
       expect(body, `no ClientWorld sender found for ${cmd}`).not.toBe('');
       for (const f of senderFields) {
         expect(body, `${cmd} must be able to send ${f}`).toContain(f);

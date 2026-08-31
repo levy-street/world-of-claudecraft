@@ -91,6 +91,8 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   const applied: { itemId: string; enchantId: string; slot?: string; confirmReplace?: boolean }[] =
     [];
   const disenchanted: { itemId: string; target?: { slotIndex: number } }[] = [];
+  const sundered: { itemId: string; target?: { slotIndex: number } }[] = [];
+  const salvaged: { itemId: string; target?: { slotIndex: number } }[] = [];
   const confirms: {
     title: string;
     body: string;
@@ -124,6 +126,15 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     // entity mirror would throw here rather than quietly read an empty body.
     disenchantItem: (itemId: string, target?: { slotIndex: number }) => {
       disenchanted.push({ itemId, target });
+    },
+    // The other two confirmDestroy verbs, so their OK arms are UI-pinnable
+    // too: before these existed a sunder or salvage OK threw on the stub and
+    // only the disenchant arm of the shared dispatch was covered.
+    extractEssence: (itemId: string, target?: { slotIndex: number }) => {
+      sundered.push({ itemId, target });
+    },
+    salvageItem: (itemId: string, target?: { slotIndex: number }) => {
+      salvaged.push({ itemId, target });
     },
     applyEnchant: (itemId: string, enchantId: string, slot?: string, confirmReplace?: boolean) => {
       applied.push({ itemId, enchantId, slot, confirmReplace });
@@ -193,6 +204,8 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     placed,
     applied,
     disenchanted,
+    sundered,
+    salvaged,
     confirms,
     afterActions: () => afterActions,
     openFor,
@@ -356,6 +369,56 @@ describe('BagItemActionMenu disenchant dispatch', () => {
     expect(h.confirms).toHaveLength(1);
     h.confirms[0].onOk();
     expect(h.disenchanted).toEqual([{ itemId, target: { slotIndex: 1 } }]);
+  });
+
+  // The other two verbs of the shared confirmDestroy dispatch, mirroring the
+  // disenchant pair above: before the harness world grew extractEssence and
+  // salvageItem their OK arms simply threw here, so the target forwarding and
+  // the -1 vanished-copy token were UI-unpinned for two of the three verbs.
+  it('the sunder OK names the clicked copy by target, and a vanished copy sends -1', () => {
+    // isSunderable admits only a raid-won GEAR epic; the dreadhelm is the
+    // sunder suite's own fixture (tests/masterwrought_materials.test.ts).
+    const itemId = 'crownforged_dreadhelm';
+    const h = harness(768, [
+      { itemId: DUST, count: 1 },
+      { itemId, count: 1, instance: { signer: 'PlainCopy' } },
+    ]);
+    h.openFor(itemId, 1);
+    h.click('sunder');
+    expect(h.confirms).toHaveLength(1);
+    h.confirms[0].onOk();
+    expect(h.sundered).toEqual([{ itemId, target: { slotIndex: 1 } }]);
+
+    // The vanished-copy token: the mirror emptied between open and OK, so
+    // the OK refuses with the length-independent -1, never the stale index.
+    const inv: InvSlot[] = [{ itemId, count: 1 }];
+    const gone = harness(768, inv);
+    gone.openFor(itemId, 0);
+    gone.click('sunder');
+    inv.length = 0;
+    gone.confirms[0].onOk();
+    expect(gone.sundered).toEqual([{ itemId, target: { slotIndex: -1 } }]);
+  });
+
+  it('the salvage OK names the clicked copy by target, and a vanished copy sends -1', () => {
+    const itemId = defFor('uncommon').id;
+    const h = harness(768, [
+      { itemId: DUST, count: 1 },
+      { itemId, count: 1, instance: { signer: 'PlainCopy' } },
+    ]);
+    h.openFor(itemId, 1);
+    h.click('salvage');
+    expect(h.confirms).toHaveLength(1);
+    h.confirms[0].onOk();
+    expect(h.salvaged).toEqual([{ itemId, target: { slotIndex: 1 } }]);
+
+    const inv: InvSlot[] = [{ itemId, count: 1 }];
+    const gone = harness(768, inv);
+    gone.openFor(itemId, 0);
+    gone.click('salvage');
+    inv.length = 0;
+    gone.confirms[0].onOk();
+    expect(gone.salvaged).toEqual([{ itemId, target: { slotIndex: -1 } }]);
   });
 });
 

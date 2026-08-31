@@ -525,15 +525,21 @@ function ceilingSim(nowMs?: number): Sim {
       cropId: widestCropId,
       plantedAtMs: plantAnchorMs,
       readyAtMs: plantAnchorMs + FARM_MAX_GROW_MS,
-      // The widest LEGAL JSON form of a roll is exponential: 17 significant
-      // digits plus a three-digit negative exponent, 23 characters, reachable
-      // only by hand-edited rows (the real mint divides a uint32 by 2^32).
-      // MEASURED since Phase 18 (F4's deliberately-unmeasured note retired,
-      // reopened qr-18): the value below is a shortest-roundtrip double
-      // inside [0, 1), so clampSurvivalRoll passes it through verbatim and
-      // the settle stays a fixed point at the full 23-character width, +4
-      // bytes per bed over the old 19-character decimal form.
-      survivalRoll: 1.2345678901234565e-108,
+      // The widest LEGAL JSON form of a roll is 24 characters, in DECIMAL
+      // notation: JSON.stringify switches to exponential only below 1e-6, so
+      // a value in [1e-6, 1e-5) prints "0.00000" plus up to 17 significant
+      // digits, one character wider than the widest exponential form (23).
+      // And it is MINT-REACHABLE, not hand-edit-only: the production
+      // replacement mint fnv1a(`${bedId}:${plantedAtMs}:survival`) / 2^32
+      // (farm_persist.ts deriveHiddenSlots) lands in that band about one key
+      // in a hundred thousand (verified against the module's own fnv1a:
+      // 'eastbrook_bed_1:13625:survival' yields 0.0000013611279428005219, 24
+      // characters). MEASURED since Phase 18 (F4's deliberately-unmeasured
+      // note retired, reopened qr-18): the value below is a shortest-roundtrip
+      // double inside [0, 1), so clampSurvivalRoll passes it through verbatim
+      // and the settle stays a fixed point at the full 24-character width, +5
+      // bytes per bed over the old 19-character form.
+      survivalRoll: 0.0000012345678901234567,
       yieldSeed: 4_294_967_295,
       compost: true,
       watch: true,
@@ -930,20 +936,25 @@ describe('the professions blob growth bound (phase 16)', () => {
     // plus one and the floor measurement minus 380 (the 11m rule).
     //
     // AND AGAIN AT Phase 18 (the fixture honesty pass, no content moved):
-    // 17,573 bytes, upper edge 17,466 to 17,574, floor 17,085 to 17,193. The
-    // delta is +108, predicted from the two fixture-width terms BEFORE the
+    // 17,596 bytes, upper edge 17,466 to 17,597, floor 17,085 to 17,216. The
+    // delta is +131, predicted from the two fixture-width terms BEFORE the
     // run and measured EXACTLY (drift zero): the R2 bind at production width,
-    // `,"boundTo":2147483647` for `,"boundTo":43` (+8 per Perfected cap slot,
-    // two slots, +16; PRODUCTION_WIDTH_BOUND_TO above records why), and the
-    // survivalRoll ceiling at its widest legal exponential JSON form,
-    // 1.2345678901234565e-108 (23 characters) for 0.12345678901234566 (19),
-    // +4 across all 23 beds, +92 (retiring F4's deliberately-unmeasured
-    // note). The edge stays measurement plus one and the floor measurement
-    // minus 380 (the 11m rule); the 18 KiB structural ceiling holds with 859
-    // bytes of headroom.
+    // `,"boundTo":2147483647` for `,"boundTo":45` (this fixture player's own
+    // two-digit entity id; +8 per Perfected cap slot, two slots, +16;
+    // PRODUCTION_WIDTH_BOUND_TO above records why), and the survivalRoll
+    // ceiling at its widest legal JSON form, the 24-character DECIMAL
+    // 0.0000012345678901234567 for the 19-character 0.12345678901234566
+    // (+5 across all 23 beds, +115; retiring F4's deliberately-unmeasured
+    // note; the fixture comment records why decimal beats exponential and
+    // that the production mint reaches the width). The audit round corrected
+    // the first cut of this paragraph, which had used the 23-character
+    // exponential form (measured 17,573) and quoted the Phase 12 fixture's
+    // boundTo digits for this fixture's. The edge stays measurement plus one
+    // and the floor measurement minus 380 (the 11m rule); the 18 KiB
+    // structural ceiling holds with 836 bytes of headroom.
     const bytes = professionsBytes(s2);
-    expect(bytes).toBeGreaterThan(17193);
-    expect(bytes).toBeLessThan(17574);
+    expect(bytes).toBeGreaterThan(17216);
+    expect(bytes).toBeLessThan(17597);
     // Strictly dominated by the band's upper edge while the band holds:
     // kept as documentation that the structural ceiling also bounds this
     // state, never the live guard.

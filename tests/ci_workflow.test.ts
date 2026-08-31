@@ -283,7 +283,14 @@ function screenshotSparseBlocks(source: string): string[] {
       end = j;
     }
     let block = lines.slice(i, end + 1).join('\n');
-    const closer = lines[end + 1];
+    // The closer lookup is blank-immune like the body walk above: a blank
+    // line parked between the body and sparse-checkout-cone-mode: must not
+    // drop the closer from the extracted block (which would read as a
+    // divergent copy missing its cone-mode line, or, worse, hide the
+    // cone-mode value from the equality pin entirely).
+    let closerAt = end + 1;
+    while (closerAt < lines.length && lines[closerAt].trim() === '') closerAt++;
+    const closer = lines[closerAt];
     if (closer !== undefined && closer.trim().startsWith('sparse-checkout-cone-mode:')) {
       block += `\n${closer}`;
     }
