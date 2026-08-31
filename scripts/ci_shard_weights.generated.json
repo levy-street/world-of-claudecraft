@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3351,
+    "files": 3575,
     "harvestedFiles": 2939,
     "carried": {
       "tests/ability_drill.test.ts": {
@@ -25,13 +25,79 @@
         "ms": 8,
         "method": "prose-backfill"
       },
+      "tests/action_bar_toggle.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
       "tests/admin/account_wealth_panel.test.ts": {
         "ms": 17,
         "method": "prose-backfill"
       },
+      "tests/admin/auto_refresh_cadence.test.ts": {
+        "ms": 57,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          57,
+          57,
+          59
+        ]
+      },
+      "tests/admin/auto_refresh_surface.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          9,
+          9,
+          9
+        ]
+      },
       "tests/admin/flags_page.test.ts": {
         "ms": 57,
         "method": "prose-backfill"
+      },
+      "tests/admin/load_failure.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/admin/market_metrics_page.test.ts": {
+        "ms": 112,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          112,
+          109,
+          118
+        ]
+      },
+      "tests/admin/permission_denied.test.ts": {
+        "ms": 39,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          39,
+          38,
+          43
+        ]
       },
       "tests/admin/top_holders_page.test.ts": {
         "ms": 42,
@@ -57,6 +123,17 @@
         "ms": 103,
         "method": "prose-backfill"
       },
+      "tests/apex_recipe_view.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          22,
+          21,
+          22
+        ]
+      },
       "tests/armory_card_view.test.ts": {
         "ms": 16,
         "method": "prose-backfill"
@@ -69,9 +146,53 @@
         "ms": 1215,
         "method": "prose-backfill"
       },
+      "tests/aura_preview_direction_css.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          2,
+          2
+        ]
+      },
+      "tests/aura_wire_decode.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/auto_equip_gate.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/bag_pools.test.ts": {
         "ms": 12,
         "method": "prose-backfill"
+      },
+      "tests/bags_stale_click_refusal.test.ts": {
+        "ms": 20,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          20,
+          20,
+          20
+        ]
       },
       "tests/bags_vendor_sell_confirm.test.ts": {
         "ms": 67,
@@ -88,6 +209,17 @@
       "tests/bank_chrome_layout.test.ts": {
         "ms": 57,
         "method": "prose-backfill"
+      },
+      "tests/bank_item_name_core.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
       },
       "tests/bank_ledger_admission.test.ts": {
         "ms": 9,
@@ -141,6 +273,17 @@
         "ms": 147,
         "method": "prose-backfill"
       },
+      "tests/battleground_compile_gate.test.ts": {
+        "ms": 469,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          471,
+          469,
+          467
+        ]
+      },
       "tests/bootcamp_disengage.test.ts": {
         "ms": 1415,
         "method": "prose-backfill"
@@ -152,6 +295,39 @@
       "tests/bootcamp_view.test.ts": {
         "ms": 12,
         "method": "prose-backfill"
+      },
+      "tests/bop_party_trade.test.ts": {
+        "ms": 915,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          908,
+          915,
+          927
+        ]
+      },
+      "tests/bop_party_trade_load.test.ts": {
+        "ms": 607,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          603,
+          613,
+          607
+        ]
+      },
+      "tests/bop_trade_window.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
       },
       "tests/broker_custody.test.ts": {
         "ms": 1082,
@@ -165,9 +341,53 @@
         "ms": 1244,
         "method": "prose-backfill"
       },
+      "tests/character_cast_playout.test.ts": {
+        "ms": 421,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          421,
+          438,
+          396
+        ]
+      },
+      "tests/character_death_grounding.test.ts": {
+        "ms": 343,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          339,
+          350,
+          343
+        ]
+      },
+      "tests/character_death_grounding_core.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2,
+          3,
+          2
+        ]
+      },
       "tests/character_save_fixups.test.ts": {
         "ms": 5,
         "method": "prose-backfill"
+      },
+      "tests/character_save_statement_pg_integration.test.ts": {
+        "ms": 100,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          100,
+          100,
+          100
+        ]
       },
       "tests/character_shadow_policy.test.ts": {
         "ms": 4,
@@ -188,6 +408,28 @@
       "tests/charter_store_view.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
+      },
+      "tests/chat_channel_hint.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          3,
+          3
+        ]
+      },
+      "tests/chat_flair_stamp.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          3,
+          3
+        ]
       },
       "tests/chat_mod_live.test.ts": {
         "ms": 6,
@@ -235,6 +477,17 @@
         "ms": 4,
         "method": "prose-backfill"
       },
+      "tests/clock_seconds_core.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          12,
+          12,
+          14
+        ]
+      },
       "tests/coach_prompt_view.test.ts": {
         "ms": 17,
         "method": "prose-backfill"
@@ -242,6 +495,28 @@
       "tests/coach_trail_core.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
+      },
+      "tests/coach_trail_materials.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          10,
+          10,
+          10
+        ]
+      },
+      "tests/combined_group_detach_css.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          2,
+          2
+        ]
       },
       "tests/consumable_seat_controller.test.ts": {
         "ms": 43,
@@ -275,6 +550,17 @@
         "ms": 1218,
         "method": "prose-backfill"
       },
+      "tests/craft_celebration_text_view.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          13,
+          13,
+          13
+        ]
+      },
       "tests/craft_denial_line_view.test.ts": {
         "ms": 3,
         "method": "prose-backfill"
@@ -283,6 +569,17 @@
         "ms": 3109,
         "method": "prose-backfill"
       },
+      "tests/crafted_wearability.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          7,
+          7
+        ]
+      },
       "tests/crafting_deny_core.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
@@ -290,6 +587,50 @@
       "tests/crafting_window_craft_fee.test.ts": {
         "ms": 22,
         "method": "prose-backfill"
+      },
+      "tests/crafting_wire.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/crucible_vendor.test.ts": {
+        "ms": 883,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          885,
+          883,
+          881
+        ]
+      },
+      "tests/crucible_vendor_online.test.ts": {
+        "ms": 802,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          814,
+          802,
+          795
+        ]
+      },
+      "tests/crucible_vendor_window.test.ts": {
+        "ms": 19,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          19,
+          20,
+          19
+        ]
       },
       "tests/css_token_resolution.test.ts": {
         "ms": 12,
@@ -327,6 +668,17 @@
         "ms": 275,
         "method": "prose-backfill"
       },
+      "tests/denial_line_core.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          11,
+          11,
+          12
+        ]
+      },
       "tests/derelict_bomber.test.ts": {
         "ms": 1467,
         "method": "prose-backfill"
@@ -335,17 +687,160 @@
         "ms": 6,
         "method": "prose-backfill"
       },
+      "tests/dev_kit_tie_chain_census.test.ts": {
+        "ms": 45,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          46,
+          45,
+          45
+        ]
+      },
       "tests/dev_noaggro.test.ts": {
         "ms": 294,
         "method": "prose-backfill"
+      },
+      "tests/dungeon_banner_core.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          7,
+          6
+        ]
       },
       "tests/dungeon_door_online.test.ts": {
         "ms": 2155,
         "method": "prose-backfill"
       },
+      "tests/dungeon_entry_facing.test.ts": {
+        "ms": 15,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          16,
+          14,
+          15
+        ]
+      },
+      "tests/dungeon_map_painter.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/dungeon_map_view.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          4,
+          4
+        ]
+      },
+      "tests/dungeon_miniboss_stomp.test.ts": {
+        "ms": 802,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          810,
+          794,
+          802
+        ]
+      },
+      "tests/dungeon_pack_aggro.test.ts": {
+        "ms": 680,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          686,
+          672,
+          680
+        ]
+      },
+      "tests/dungeon_spawn_miniboss.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/dungeon_tile_kind_core.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          7,
+          7
+        ]
+      },
+      "tests/dungeon_torch_rig.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/dungeon_wall_occlusion.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          18,
+          16,
+          15
+        ]
+      },
       "tests/duration_text.test.ts": {
         "ms": 19,
         "method": "prose-backfill"
+      },
+      "tests/empower_hold_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/encounter_wipe.test.ts": {
+        "ms": 4380,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4348,
+          4415,
+          4380
+        ]
       },
       "tests/entity_display_core.test.ts": {
         "ms": 8,
@@ -375,6 +870,17 @@
         "ms": 18,
         "method": "prose-backfill"
       },
+      "tests/event_pid_index.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
       "tests/exchange_eligibility.test.ts": {
         "ms": 948,
         "method": "prose-backfill"
@@ -382,6 +888,28 @@
       "tests/farm_bed_interact.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
+      },
+      "tests/farm_crop_mark_zone_guard.test.ts": {
+        "ms": 682,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          704,
+          682,
+          672
+        ]
+      },
+      "tests/farm_deny_bed_correlation.test.ts": {
+        "ms": 1029,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1024,
+          1029,
+          1071
+        ]
       },
       "tests/farm_event_feedback.test.ts": {
         "ms": 17,
@@ -399,6 +927,17 @@
         "ms": 1302,
         "method": "prose-backfill"
       },
+      "tests/farm_load_report.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          4
+        ]
+      },
       "tests/farm_patch_placement.test.ts": {
         "ms": 227,
         "method": "prose-backfill"
@@ -414,6 +953,28 @@
       "tests/farm_pattern_items.test.ts": {
         "ms": 1510,
         "method": "prose-backfill"
+      },
+      "tests/farm_press_affordance_controller.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          5,
+          5
+        ]
+      },
+      "tests/farm_press_target_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
       },
       "tests/farm_props_asset.test.ts": {
         "ms": 59,
@@ -503,6 +1064,17 @@
         "ms": 13,
         "method": "prose-backfill"
       },
+      "tests/ferry_bell.test.ts": {
+        "ms": 712,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          721,
+          712,
+          696
+        ]
+      },
       "tests/ferry_prewarm.test.ts": {
         "ms": 3,
         "method": "prose-backfill"
@@ -522,6 +1094,39 @@
       "tests/foliage_shore_gate_core.test.ts": {
         "ms": 88,
         "method": "prose-backfill"
+      },
+      "tests/forgefather_fortress.test.ts": {
+        "ms": 31,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          31,
+          32,
+          31
+        ]
+      },
+      "tests/forgefather_fortress_route.test.ts": {
+        "ms": 10201,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          9870,
+          10409,
+          10201
+        ]
+      },
+      "tests/forgefather_fortress_walkability.test.ts": {
+        "ms": 382,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          382,
+          388,
+          382
+        ]
       },
       "tests/gamepad_bindings.test.ts": {
         "ms": 5,
@@ -555,9 +1160,64 @@
         "ms": 5,
         "method": "prose-backfill"
       },
+      "tests/ground_aim_hud.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          13,
+          12,
+          12
+        ]
+      },
+      "tests/ground_aim_lifecycle_wiring.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          8,
+          8
+        ]
+      },
       "tests/ground_telegraph_wire.test.ts": {
         "ms": 12,
         "method": "prose-backfill"
+      },
+      "tests/guide_harvest_families_prose.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/guide_prof_faq_keys.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          5,
+          4
+        ]
+      },
+      "tests/guide_viewer_model_prewarm.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
       },
       "tests/guild_board_window.test.ts": {
         "ms": 756,
@@ -567,6 +1227,17 @@
         "ms": 3,
         "method": "prose-backfill"
       },
+      "tests/harvest_geography.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          9
+        ]
+      },
       "tests/harvest_journal_view.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
@@ -575,9 +1246,75 @@
         "ms": 56,
         "method": "prose-backfill"
       },
+      "tests/heal_power.test.ts": {
+        "ms": 1497,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1541,
+          1497,
+          1491
+        ]
+      },
+      "tests/healing_power_readers.test.ts": {
+        "ms": 4372,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4372,
+          4373,
+          4341
+        ]
+      },
+      "tests/heavy_self_arm_marks.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          5
+        ]
+      },
+      "tests/heavy_self_arm_marks_online.test.ts": {
+        "ms": 978,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          969,
+          988,
+          978
+        ]
+      },
+      "tests/held_prop_idle.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          7
+        ]
+      },
       "tests/helpers/adopted_trophy_ids.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
+      },
+      "tests/heroic_leap_preview.test.ts": {
+        "ms": 780,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          778,
+          780,
+          785
+        ]
       },
       "tests/hollow_gates.test.ts": {
         "ms": 4,
@@ -587,9 +1324,31 @@
         "ms": 7,
         "method": "prose-backfill"
       },
+      "tests/hud_tones.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
       "tests/idle_stationary.test.ts": {
         "ms": 1468,
         "method": "prose-backfill"
+      },
+      "tests/ignivar_affix_lane.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          5,
+          4
+        ]
       },
       "tests/ignivar_arena.test.ts": {
         "ms": 1856,
@@ -598,6 +1357,17 @@
       "tests/ignivar_arena_atmosphere.test.ts": {
         "ms": 84,
         "method": "prose-backfill"
+      },
+      "tests/ignivar_asset_hygiene.test.ts": {
+        "ms": 40,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          51,
+          40,
+          40
+        ]
       },
       "tests/ignivar_boss_model.test.ts": {
         "ms": 1686,
@@ -611,13 +1381,68 @@
         "ms": 44,
         "method": "prose-backfill"
       },
+      "tests/ignivar_death_dialogue_i18n.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          2
+        ]
+      },
       "tests/ignivar_dev_raid.test.ts": {
         "ms": 3013,
         "method": "prose-backfill"
       },
+      "tests/ignivar_dialogue.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/ignivar_dressing_plan_core.test.ts": {
+        "ms": 58,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          59,
+          58,
+          57
+        ]
+      },
+      "tests/ignivar_eastbrook_entrance.test.ts": {
+        "ms": 828,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          830,
+          828,
+          813
+        ]
+      },
       "tests/ignivar_encounter.test.ts": {
         "ms": 100720,
         "method": "prose-backfill"
+      },
+      "tests/ignivar_encounter_disposal.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          5,
+          5
+        ]
       },
       "tests/ignivar_encounter_render.test.ts": {
         "ms": 257,
@@ -639,6 +1464,17 @@
         "ms": 55046,
         "method": "prose-backfill"
       },
+      "tests/ignivar_forge_lift.test.ts": {
+        "ms": 1428,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1422,
+          1428,
+          1454
+        ]
+      },
       "tests/ignivar_forge_wave.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
@@ -651,13 +1487,90 @@
         "ms": 161,
         "method": "prose-backfill"
       },
+      "tests/ignivar_lava_moat.test.ts": {
+        "ms": 1081,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1075,
+          1081,
+          1109
+        ]
+      },
+      "tests/ignivar_lava_moat_render.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          9,
+          8
+        ]
+      },
+      "tests/ignivar_lift_room.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/ignivar_loot.test.ts": {
+        "ms": 27,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          27,
+          27,
+          26
+        ]
+      },
       "tests/ignivar_meteors.test.ts": {
         "ms": 296,
         "method": "prose-backfill"
       },
+      "tests/ignivar_mist_gate.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          5,
+          4
+        ]
+      },
+      "tests/ignivar_prop_colliders.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          11,
+          11,
+          11
+        ]
+      },
       "tests/ignivar_raid_dressing.test.ts": {
         "ms": 11,
         "method": "prose-backfill"
+      },
+      "tests/ignivar_raid_entry.test.ts": {
+        "ms": 1120,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1120,
+          1124,
+          1114
+        ]
       },
       "tests/ignivar_raid_environment.test.ts": {
         "ms": 15,
@@ -683,6 +1596,149 @@
         "ms": 9854,
         "method": "prose-backfill"
       },
+      "tests/ignivar_raid_trash_restoration.test.ts": {
+        "ms": 732,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          727,
+          734,
+          732
+        ]
+      },
+      "tests/ignivar_raid_trash_tuning.test.ts": {
+        "ms": 767,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          770,
+          765,
+          767
+        ]
+      },
+      "tests/ignivar_revolving_inferno_vfx.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/ignivar_robotic_voice_processing.test.ts": {
+        "ms": 33,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          86,
+          33,
+          33
+        ]
+      },
+      "tests/ignivar_set_bonus_druid.test.ts": {
+        "ms": 10012,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          10012,
+          10002,
+          10117
+        ]
+      },
+      "tests/ignivar_set_bonus_hunter.test.ts": {
+        "ms": 6037,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6085,
+          5986,
+          6037
+        ]
+      },
+      "tests/ignivar_set_bonus_mage.test.ts": {
+        "ms": 7058,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7058,
+          7104,
+          7008
+        ]
+      },
+      "tests/ignivar_set_bonus_paladin.test.ts": {
+        "ms": 2662,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2645,
+          2684,
+          2662
+        ]
+      },
+      "tests/ignivar_set_bonus_priest.test.ts": {
+        "ms": 3676,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3718,
+          3676,
+          3523
+        ]
+      },
+      "tests/ignivar_set_bonus_rogue.test.ts": {
+        "ms": 5012,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5001,
+          5012,
+          5137
+        ]
+      },
+      "tests/ignivar_set_bonus_shaman.test.ts": {
+        "ms": 7028,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7042,
+          7028,
+          6834
+        ]
+      },
+      "tests/ignivar_set_bonus_warlock.test.ts": {
+        "ms": 8618,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8698,
+          8618,
+          8612
+        ]
+      },
+      "tests/ignivar_set_bonus_warrior.test.ts": {
+        "ms": 1066,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1064,
+          1078,
+          1066
+        ]
+      },
       "tests/ignivar_soak_telegraph.test.ts": {
         "ms": 24,
         "method": "prose-backfill"
@@ -690,6 +1746,83 @@
       "tests/ignivar_tile_kit.test.ts": {
         "ms": 105,
         "method": "prose-backfill"
+      },
+      "tests/ignivar_trash_automata.test.ts": {
+        "ms": 965,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          965,
+          944,
+          973
+        ]
+      },
+      "tests/ignivar_varkhul_health.test.ts": {
+        "ms": 1753,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1738,
+          1753,
+          1755
+        ]
+      },
+      "tests/ignivar_voice_extension.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/ignivar_voice_pack.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/ignivar_weekly_lockout.test.ts": {
+        "ms": 1264,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1251,
+          1264,
+          1395
+        ]
+      },
+      "tests/input_controller.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          18,
+          18,
+          18
+        ]
+      },
+      "tests/input_hint_mode.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          2,
+          3
+        ]
       },
       "tests/inscription_catalog.test.ts": {
         "ms": 25,
@@ -711,6 +1844,61 @@
         "ms": 3,
         "method": "prose-backfill"
       },
+      "tests/interface_reset.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          4,
+          4
+        ]
+      },
+      "tests/interface_unlock.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/interface_unlock_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/interface_unlock_menu_core.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          13,
+          13,
+          13
+        ]
+      },
+      "tests/interior_map_controller.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
       "tests/inventory_extract.test.ts": {
         "ms": 5,
         "method": "prose-backfill"
@@ -718,6 +1906,72 @@
       "tests/island_isolation_core.test.ts": {
         "ms": 1547,
         "method": "prose-backfill"
+      },
+      "tests/item_affix_tooltip.test.ts": {
+        "ms": 67,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          67,
+          66,
+          117
+        ]
+      },
+      "tests/item_catalog_positional.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/item_compare_view.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          7,
+          8
+        ]
+      },
+      "tests/item_copy_anchor.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/item_copy_anchor_online.test.ts": {
+        "ms": 816,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          818,
+          813,
+          816
+        ]
+      },
+      "tests/item_copy_confirm_window.test.ts": {
+        "ms": 775,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          771,
+          775,
+          785
+        ]
       },
       "tests/items_sell_units.test.ts": {
         "ms": 5,
@@ -731,6 +1985,17 @@
         "ms": 930,
         "method": "prose-backfill"
       },
+      "tests/jewelcrafting_rung50_reachability.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          7
+        ]
+      },
       "tests/kit_uv_surface_core.test.ts": {
         "ms": 15,
         "method": "prose-backfill"
@@ -739,9 +2004,42 @@
         "ms": 15,
         "method": "prose-backfill"
       },
+      "tests/legendary_chat_plaintext.test.ts": {
+        "ms": 17,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          17,
+          17,
+          17
+        ]
+      },
+      "tests/legendary_regalia.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          30,
+          38,
+          30
+        ]
+      },
       "tests/line_of_sight_elevation.test.ts": {
         "ms": 2769,
         "method": "prose-backfill"
+      },
+      "tests/longest_reagent_bill_render.test.ts": {
+        "ms": 21,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          21,
+          20,
+          22
+        ]
       },
       "tests/lucent_infusion_guard.test.ts": {
         "ms": 799,
@@ -751,6 +2049,28 @@
         "ms": 1300,
         "method": "prose-backfill"
       },
+      "tests/market_search_localized_core.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/market_sold_volume_pg_integration.test.ts": {
+        "ms": 100,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          100,
+          100,
+          100
+        ]
+      },
       "tests/masterwrought_budget.test.ts": {
         "ms": 15,
         "method": "prose-backfill"
@@ -758,6 +2078,17 @@
       "tests/masterwrought_cap.test.ts": {
         "ms": 9061,
         "method": "prose-backfill"
+      },
+      "tests/masterwrought_cap_view.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
       },
       "tests/masterwrought_materials.test.ts": {
         "ms": 2020,
@@ -791,6 +2122,17 @@
         "ms": 4,
         "method": "prose-backfill"
       },
+      "tests/mediawiki_seed_freshness.test.ts": {
+        "ms": 142,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          137,
+          142,
+          147
+        ]
+      },
       "tests/menu_control_controller.test.ts": {
         "ms": 25,
         "method": "prose-backfill"
@@ -823,6 +2165,28 @@
         "ms": 1141,
         "method": "prose-backfill"
       },
+      "tests/mob_portrait_render_env.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
+      },
+      "tests/mobile_action_ring_controller.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          12,
+          12,
+          12
+        ]
+      },
       "tests/mobile_station_party.test.ts": {
         "ms": 1002,
         "method": "prose-backfill"
@@ -831,9 +2195,53 @@
         "ms": 9,
         "method": "prose-backfill"
       },
+      "tests/mobile_station_walk.test.ts": {
+        "ms": 291,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          297,
+          291,
+          291
+        ]
+      },
+      "tests/mount_race_wire.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/nameplate_heraldry_core.test.ts": {
         "ms": 21,
         "method": "prose-backfill"
+      },
+      "tests/nameplate_pick_core.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/nameplate_pick_integration.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          14,
+          15,
+          13
+        ]
       },
       "tests/nameplate_pledge.test.ts": {
         "ms": 4564,
@@ -851,17 +2259,237 @@
         "ms": 4,
         "method": "prose-backfill"
       },
+      "tests/occluder_fade_gate.test.ts": {
+        "ms": 36,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          38,
+          36,
+          36
+        ]
+      },
       "tests/opened_object_view.test.ts": {
         "ms": 1279,
         "method": "prose-backfill"
+      },
+      "tests/options_back_wiring.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/orange_promotion.test.ts": {
+        "ms": 2539,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2494,
+          2539,
+          2547
+        ]
       },
       "tests/overlay_ip_scrub.test.ts": {
         "ms": 759,
         "method": "prose-backfill"
       },
+      "tests/pad_cast_routing.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          4
+        ]
+      },
+      "tests/pad_cast_wiring.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/pad_ground_aim.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          4,
+          3
+        ]
+      },
+      "tests/painter_single_slot_collision_guard.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          6
+        ]
+      },
+      "tests/painter_slot_collision.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/parse_bis_loadouts.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          7,
+          7
+        ]
+      },
+      "tests/party_preview_rows_css.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2,
+          3,
+          3
+        ]
+      },
+      "tests/perf_entry_reveal_core.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/perfect_item_ref.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          6
+        ]
+      },
+      "tests/perfecting.test.ts": {
+        "ms": 6964,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6812,
+          6964,
+          7057
+        ]
+      },
+      "tests/perfecting_view.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/perfecting_window.test.ts": {
+        "ms": 87,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          84,
+          87,
+          88
+        ]
+      },
+      "tests/perfecting_wire.test.ts": {
+        "ms": 993,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          993,
+          984,
+          994
+        ]
+      },
+      "tests/pet_bg_wave_corpse_hold.test.ts": {
+        "ms": 699,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          699,
+          705,
+          698
+        ]
+      },
+      "tests/player_frame_bar_lock.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          4,
+          3
+        ]
+      },
+      "tests/player_frame_box_scale.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          5,
+          3
+        ]
+      },
       "tests/pool_wiring_pins.test.ts": {
         "ms": 27,
         "method": "prose-backfill"
+      },
+      "tests/position_min_range.test.ts": {
+        "ms": 621,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          621,
+          626,
+          614
+        ]
       },
       "tests/pr_shot_entry_opts.test.ts": {
         "ms": 2,
@@ -870,6 +2498,50 @@
       "tests/preview_prewarm_wiring.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
+      },
+      "tests/profession_log_tones.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/professions_barrel.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          4
+        ]
+      },
+      "tests/professions_crafting_daily_corner.test.ts": {
+        "ms": 361,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          357,
+          363,
+          361
+        ]
+      },
+      "tests/professions_engineering_onramp.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
       },
       "tests/professions_farming.test.ts": {
         "ms": 17981,
@@ -886,6 +2558,17 @@
       "tests/professions_hoe_recipes.test.ts": {
         "ms": 11,
         "method": "prose-backfill"
+      },
+      "tests/professions_rail_tiles.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          11,
+          11,
+          10
+        ]
       },
       "tests/proving_shore_content.test.ts": {
         "ms": 57,
@@ -919,6 +2602,17 @@
         "ms": 2709,
         "method": "prose-backfill"
       },
+      "tests/r5_envelope_probe.test.ts": {
+        "ms": 1523,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1554,
+          1518,
+          1523
+        ]
+      },
       "tests/radial_action_core.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
@@ -930,6 +2624,138 @@
       "tests/radial_gesture_core.test.ts": {
         "ms": 5,
         "method": "prose-backfill"
+      },
+      "tests/raid_avoidable_damage_tuning.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2,
+          2,
+          3
+        ]
+      },
+      "tests/raid_boss_guide_model_controller.test.ts": {
+        "ms": 889,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          891,
+          853,
+          889
+        ]
+      },
+      "tests/raid_boss_guide_scroll.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          6,
+          7
+        ]
+      },
+      "tests/raid_boss_guide_styles.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          4
+        ]
+      },
+      "tests/raid_boss_guide_view.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/raid_boss_guide_window.test.ts": {
+        "ms": 105,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          101,
+          110,
+          105
+        ]
+      },
+      "tests/raid_boss_melee_reach.test.ts": {
+        "ms": 824,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          820,
+          826,
+          824
+        ]
+      },
+      "tests/raid_boss_room_welcome.test.ts": {
+        "ms": 1749,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1780,
+          1732,
+          1749
+        ]
+      },
+      "tests/raid_boss_room_welcome_voice_pack.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/raid_boss_voice_assets.test.ts": {
+        "ms": 625,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1522,
+          606,
+          625
+        ]
+      },
+      "tests/raid_boss_voice_audition.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/raid_boss_voice_processing.test.ts": {
+        "ms": 41,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          42,
+          41,
+          41
+        ]
       },
       "tests/raid_music_themes.test.ts": {
         "ms": 7,
@@ -951,9 +2777,42 @@
         "ms": 21,
         "method": "prose-backfill"
       },
+      "tests/remint_registry_completeness.test.ts": {
+        "ms": 11,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          10,
+          11,
+          11
+        ]
+      },
+      "tests/renderer_farm_event_route.test.ts": {
+        "ms": 72,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          70,
+          72,
+          72
+        ]
+      },
       "tests/report_window.test.ts": {
         "ms": 17,
         "method": "prose-backfill"
+      },
+      "tests/reset_day_guard.test.ts": {
+        "ms": 719,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          719,
+          732,
+          713
+        ]
       },
       "tests/reward_counters.test.ts": {
         "ms": 765,
@@ -975,9 +2834,64 @@
         "ms": 3949,
         "method": "prose-backfill"
       },
+      "tests/roof_darkness_core.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/scripted_walk.test.ts": {
+        "ms": 1217,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          1245,
+          1210,
+          1217
+        ]
+      },
+      "tests/self_social_wire.test.ts": {
+        "ms": 143,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          147,
+          142,
+          143
+        ]
+      },
+      "tests/server/admin_analytics_reads.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          13,
+          12,
+          12
+        ]
+      },
       "tests/server/admin_flag_transition_legacy.test.ts": {
         "ms": 9,
         "method": "prose-backfill"
+      },
+      "tests/server/admin_market_metrics.test.ts": {
+        "ms": 16,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          15,
+          16,
+          16
+        ]
       },
       "tests/server/admin_oversight.test.ts": {
         "ms": 15,
@@ -1047,6 +2961,28 @@
         "ms": 5,
         "method": "prose-backfill"
       },
+      "tests/server/character_delete_verify.pg.test.ts": {
+        "ms": 100,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          100,
+          100,
+          100
+        ]
+      },
+      "tests/server/character_save_statement.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
       "tests/server/character_save_transaction.test.ts": {
         "ms": 7,
         "method": "prose-backfill"
@@ -1055,9 +2991,75 @@
         "ms": 15,
         "method": "prose-backfill"
       },
+      "tests/server/clear_item_name.test.ts": {
+        "ms": 13,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          12,
+          13,
+          13
+        ]
+      },
+      "tests/server/clear_item_name_db.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/server/craft_activity.test.ts": {
+        "ms": 22,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          22,
+          22,
+          21
+        ]
+      },
+      "tests/server/db_backend_cancel.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          5,
+          5
+        ]
+      },
+      "tests/server/db_connection_budget.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/server/db_transaction_deadline.test.ts": {
         "ms": 14,
         "method": "prose-backfill"
+      },
+      "tests/server/dungeon_entry_facing.test.ts": {
+        "ms": 874,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          867,
+          874,
+          883
+        ]
       },
       "tests/server/fake_woc_market_db.test.ts": {
         "ms": 7,
@@ -1103,17 +3105,94 @@
         "ms": 4,
         "method": "prose-backfill"
       },
+      "tests/server/market_sold_volume.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
       "tests/server/newborn_island_spawn.test.ts": {
         "ms": 955,
         "method": "prose-backfill"
+      },
+      "tests/server/offline_fence_refusals.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/server/ok_response_memo.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
       },
       "tests/server/paid_guild_creation_bounds.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
       },
+      "tests/server/pbe_boost_save_fence.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          4,
+          4
+        ]
+      },
       "tests/server/pg_rollback_proof.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
+      },
+      "tests/server/save_offline_character_state.test.ts": {
+        "ms": 753,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          749,
+          764,
+          753
+        ]
+      },
+      "tests/server/schema_notices.pg.test.ts": {
+        "ms": 100,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          100,
+          100,
+          100
+        ]
+      },
+      "tests/server/schema_notices.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
       },
       "tests/server/serial_writer.test.ts": {
         "ms": 21,
@@ -1171,6 +3250,17 @@
         "ms": 57,
         "method": "prose-backfill"
       },
+      "tests/server/tick_perf_log.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          6,
+          4
+        ]
+      },
       "tests/server/varkhul_wire.test.ts": {
         "ms": 36,
         "method": "prose-backfill"
@@ -1194,6 +3284,17 @@
       "tests/server/woc_market_delivery.test.ts": {
         "ms": 8,
         "method": "prose-backfill"
+      },
+      "tests/server/woc_market_desktop_handoff.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
       },
       "tests/server/woc_market_directed_sql.test.ts": {
         "ms": 21,
@@ -1267,9 +3368,119 @@
         "ms": 27,
         "method": "prose-backfill"
       },
+      "tests/set_bonus_mods.test.ts": {
+        "ms": 737,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          734,
+          737,
+          743
+        ]
+      },
+      "tests/set_proc_fx.test.ts": {
+        "ms": 2,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          2,
+          3,
+          2
+        ]
+      },
+      "tests/settings_transfer_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          3
+        ]
+      },
+      "tests/shadow_depth_compile.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          6
+        ]
+      },
+      "tests/sheathe_toggle.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/signpost_read.test.ts": {
         "ms": 1187,
         "method": "prose-backfill"
+      },
+      "tests/sim_calendar_feed.test.ts": {
+        "ms": 14,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          18,
+          14,
+          13
+        ]
+      },
+      "tests/sim_i18n_base_new_passthrough.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
+      },
+      "tests/sim_i18n_name_collisions.test.ts": {
+        "ms": 7,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          7,
+          8,
+          7
+        ]
+      },
+      "tests/social_guild_create_lock.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          30,
+          30,
+          29
+        ]
+      },
+      "tests/spawn_intro_seen.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
       },
       "tests/stance_control_controller.test.ts": {
         "ms": 24,
@@ -1286,6 +3497,17 @@
       "tests/stealth_pet_vanish.test.ts": {
         "ms": 2570,
         "method": "prose-backfill"
+      },
+      "tests/steam_wishlist.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          10,
+          11,
+          9
+        ]
       },
       "tests/storage_charters.test.ts": {
         "ms": 1942,
@@ -1347,6 +3569,17 @@
         "ms": 5,
         "method": "prose-backfill"
       },
+      "tests/target_flair_line_view.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
       "tests/teleport_camera.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
@@ -1354,6 +3587,50 @@
       "tests/terms_link.test.ts": {
         "ms": 3,
         "method": "prose-backfill"
+      },
+      "tests/terrain_calm_anchor_doors.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/tool_effect_result_view.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          5,
+          5,
+          5
+        ]
+      },
+      "tests/tooltip_clamp_core.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          5
+        ]
+      },
+      "tests/tooltip_line_core.test.ts": {
+        "ms": 255,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          255,
+          255,
+          264
+        ]
       },
       "tests/trade_woc_arm_painter.test.ts": {
         "ms": 108,
@@ -1366,6 +3643,17 @@
       "tests/transfer_lock.test.ts": {
         "ms": 6,
         "method": "prose-backfill"
+      },
+      "tests/trophy_domination_claims.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          6,
+          6
+        ]
       },
       "tests/tutorial_graduation_deed.test.ts": {
         "ms": 1276,
@@ -1382,6 +3670,28 @@
       "tests/tutorial_start_dispatch.test.ts": {
         "ms": 913,
         "method": "prose-backfill"
+      },
+      "tests/ui_scale_cache.test.ts": {
+        "ms": 9,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          10,
+          9,
+          9
+        ]
+      },
+      "tests/unbind_window_cells.test.ts": {
+        "ms": 12,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          12,
+          12,
+          12
+        ]
       },
       "tests/usd_text.test.ts": {
         "ms": 303,
@@ -1447,6 +3757,17 @@
         "ms": 2351,
         "method": "prose-backfill"
       },
+      "tests/varkhul_dialogue.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/varkhul_encounter.test.ts": {
         "ms": 41551,
         "method": "prose-backfill"
@@ -1503,9 +3824,64 @@
         "ms": 20,
         "method": "prose-backfill"
       },
+      "tests/varkhul_portal_replay.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
+      "tests/varkhul_shared_pyre.test.ts": {
+        "ms": 3,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          3,
+          3
+        ]
+      },
       "tests/varkhul_visual_manifest.test.ts": {
         "ms": 12,
         "method": "prose-backfill"
+      },
+      "tests/varkhul_voice_finalists.test.ts": {
+        "ms": 30,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          31,
+          29,
+          30
+        ]
+      },
+      "tests/varkhul_voice_pack.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/varkhul_voice_processing.test.ts": {
+        "ms": 18,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          30,
+          18,
+          18
+        ]
       },
       "tests/varkhul_worldfire.test.ts": {
         "ms": 14,
@@ -1514,6 +3890,17 @@
       "tests/varkhul_worldfire_render.test.ts": {
         "ms": 101,
         "method": "prose-backfill"
+      },
+      "tests/vault_admission_determinism.test.ts": {
+        "ms": 669,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          669,
+          666,
+          677
+        ]
       },
       "tests/vault_consumption_admission.test.ts": {
         "ms": 155,
@@ -1539,9 +3926,42 @@
         "ms": 2187,
         "method": "prose-backfill"
       },
+      "tests/vendor_floor.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          9,
+          8
+        ]
+      },
       "tests/vendor_stock_gate_core.test.ts": {
         "ms": 5,
         "method": "prose-backfill"
+      },
+      "tests/voice_clip_extraction.test.ts": {
+        "ms": 5,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          5,
+          5
+        ]
+      },
+      "tests/wall_backface_cull_core.test.ts": {
+        "ms": 10,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          9,
+          20,
+          10
+        ]
       },
       "tests/wallet_bridge_reason_text.test.ts": {
         "ms": 8,
@@ -1655,6 +4075,17 @@
         "ms": 5,
         "method": "prose-backfill"
       },
+      "tests/woc_market_wiring_desktop_default.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          3,
+          4,
+          4
+        ]
+      },
       "tests/woc_tokens_text.test.ts": {
         "ms": 14,
         "method": "prose-backfill"
@@ -1666,6 +4097,39 @@
       "tests/woc_trade_offer_view.test.ts": {
         "ms": 4,
         "method": "prose-backfill"
+      },
+      "tests/worn_item_cell_view.test.ts": {
+        "ms": 4,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          4,
+          4,
+          4
+        ]
+      },
+      "tests/zone_celebration_fanout_shape.test.ts": {
+        "ms": 6,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          6,
+          5,
+          6
+        ]
+      },
+      "tests/zone_prewarm_groups.test.ts": {
+        "ms": 8,
+        "method": "local-median",
+        "measured": "2026-08-31",
+        "reason": "phase 18 local carry pending the post-push harvest",
+        "runs": [
+          8,
+          8,
+          8
+        ]
       }
     },
     "backfill": {
@@ -1720,6 +4184,7 @@
   "tests/action_bar_layout_sync.test.ts": 15,
   "tests/action_bar_lock.test.ts": 5,
   "tests/action_bar_painter.test.ts": 11,
+  "tests/action_bar_toggle.test.ts": 4,
   "tests/action_bar_view.test.ts": 39,
   "tests/action_bar_visibility_core.test.ts": 5,
   "tests/action_replacement.test.ts": 13,
@@ -1741,7 +4206,9 @@
   "tests/admin/antibot_config_page.test.ts": 182,
   "tests/admin/app_shell.test.ts": 33,
   "tests/admin/auth_flow.test.ts": 266,
+  "tests/admin/auto_refresh_cadence.test.ts": 57,
   "tests/admin/auto_refresh_preference.test.ts": 7,
+  "tests/admin/auto_refresh_surface.test.ts": 9,
   "tests/admin/bar_chart.test.ts": 28,
   "tests/admin/blocked_ips.test.ts": 223,
   "tests/admin/bug_reports.test.ts": 83,
@@ -1766,7 +4233,9 @@
   "tests/admin/histogram_stats.test.ts": 8,
   "tests/admin/ip_associations.test.ts": 314,
   "tests/admin/ip_block.test.ts": 9,
+  "tests/admin/load_failure.test.ts": 3,
   "tests/admin/location_cell.test.ts": 61,
+  "tests/admin/market_metrics_page.test.ts": 112,
   "tests/admin/moderation.test.ts": 97,
   "tests/admin/moderation_action_labels.test.ts": 8,
   "tests/admin/moderation_actions.test.ts": 25,
@@ -1779,6 +4248,7 @@
   "tests/admin/online_table.test.ts": 63,
   "tests/admin/overview.test.ts": 141,
   "tests/admin/pager.test.ts": 45,
+  "tests/admin/permission_denied.test.ts": 39,
   "tests/admin/player_pages.test.ts": 286,
   "tests/admin/professions_restore.test.ts": 31,
   "tests/admin/provider_usage.test.ts": 45,
@@ -1855,6 +4325,7 @@
   "tests/apex_feast_craft.test.ts": 1351,
   "tests/apex_pattern_channels.test.ts": 8,
   "tests/apex_pattern_items.test.ts": 103,
+  "tests/apex_recipe_view.test.ts": 22,
   "tests/api_error_code_parity.test.ts": 26,
   "tests/app_version.test.ts": 7,
   "tests/app_viewport.test.ts": 12,
@@ -1923,12 +4394,15 @@
   "tests/aura_overlay_settings.test.ts": 142,
   "tests/aura_overlay_styles.test.ts": 20,
   "tests/aura_overlay_view.test.ts": 17,
+  "tests/aura_preview_direction_css.test.ts": 2,
   "tests/aura_tooltip.test.ts": 4,
+  "tests/aura_wire_decode.test.ts": 4,
   "tests/auras_painter.test.ts": 31,
   "tests/auras_view.test.ts": 26,
   "tests/auth_token_scope_constraint_integration.test.ts": 100,
   "tests/auth_utils.test.ts": 13,
   "tests/auto_acquire_target.test.ts": 7,
+  "tests/auto_equip_gate.test.ts": 3,
   "tests/auto_target.test.ts": 7,
   "tests/autoloot.test.ts": 8,
   "tests/avatar.test.ts": 28,
@@ -1953,6 +4427,7 @@
   "tests/bags_guild_deposit_routing.test.ts": 185,
   "tests/bags_money_refresh.test.ts": 2382,
   "tests/bags_money_row_paint.test.ts": 140,
+  "tests/bags_stale_click_refusal.test.ts": 20,
   "tests/bags_vendor_sell_confirm.test.ts": 67,
   "tests/bags_view.test.ts": 31,
   "tests/bags_window.test.ts": 24,
@@ -1970,6 +4445,7 @@
   "tests/bank_chrome_layout.test.ts": 57,
   "tests/bank_entitlements.test.ts": 10,
   "tests/bank_filter.test.ts": 18,
+  "tests/bank_item_name_core.test.ts": 3,
   "tests/bank_ledger.test.ts": 2503,
   "tests/bank_ledger_admission.test.ts": 9,
   "tests/bank_ledger_db.test.ts": 10,
@@ -2002,6 +4478,7 @@
   "tests/battleground_atlas_view.test.ts": 89,
   "tests/battleground_backfill.test.ts": 8,
   "tests/battleground_band.test.ts": 2377,
+  "tests/battleground_compile_gate.test.ts": 469,
   "tests/battleground_fx.test.ts": 10,
   "tests/battleground_fx_consumer.test.ts": 38,
   "tests/battleground_hud.test.ts": 82,
@@ -2033,6 +4510,9 @@
   "tests/bootcamp_disengage.test.ts": 1415,
   "tests/bootcamp_glow.test.ts": 3,
   "tests/bootcamp_view.test.ts": 12,
+  "tests/bop_party_trade.test.ts": 915,
+  "tests/bop_party_trade_load.test.ts": 607,
+  "tests/bop_trade_window.test.ts": 5,
   "tests/border_edges.test.ts": 7,
   "tests/border_ridge_skirt.test.ts": 787,
   "tests/border_waters.test.ts": 4759,
@@ -2103,8 +4583,11 @@
   "tests/character_appearance.test.ts": 10,
   "tests/character_asset_ready.test.ts": 346,
   "tests/character_blob_size.test.ts": 1244,
+  "tests/character_cast_playout.test.ts": 421,
   "tests/character_clipmaps.test.ts": 338,
   "tests/character_db.test.ts": 2304,
+  "tests/character_death_grounding.test.ts": 343,
+  "tests/character_death_grounding_core.test.ts": 2,
   "tests/character_effect_compile_gate.test.ts": 1267,
   "tests/character_effect_prewarm.test.ts": 20,
   "tests/character_effects.test.ts": 16,
@@ -2122,6 +4605,7 @@
   "tests/character_profile.test.ts": 9,
   "tests/character_rename.test.ts": 7,
   "tests/character_save_fixups.test.ts": 5,
+  "tests/character_save_statement_pg_integration.test.ts": 100,
   "tests/character_shadow_policy.test.ts": 4,
   "tests/character_shadow_proxy.test.ts": 6823,
   "tests/character_sheet.test.ts": 30,
@@ -2150,6 +4634,7 @@
   "tests/chat_announcer.test.ts": 8,
   "tests/chat_bubble_lifecycle.test.ts": 6,
   "tests/chat_bubble_style.test.ts": 2438,
+  "tests/chat_channel_hint.test.ts": 3,
   "tests/chat_channels.test.ts": 17,
   "tests/chat_command_hint.test.ts": 6,
   "tests/chat_context_menu.test.ts": 16,
@@ -2157,6 +4642,7 @@
   "tests/chat_filter_commands.test.ts": 11,
   "tests/chat_filter_db.test.ts": 6,
   "tests/chat_flair.test.ts": 3282,
+  "tests/chat_flair_stamp.test.ts": 3,
   "tests/chat_geometry_controller.test.ts": 11,
   "tests/chat_hud_client_seam.test.ts": 47,
   "tests/chat_ignore_core.test.ts": 8,
@@ -2230,8 +4716,10 @@
   "tests/climb.test.ts": 3106,
   "tests/climb_slope.test.ts": 2419,
   "tests/clock_format.test.ts": 20,
+  "tests/clock_seconds_core.test.ts": 12,
   "tests/coach_prompt_view.test.ts": 17,
   "tests/coach_trail_core.test.ts": 7,
+  "tests/coach_trail_materials.test.ts": 10,
   "tests/codex_setup.test.ts": 149,
   "tests/collective_reversal.test.ts": 4108,
   "tests/collective_reversal_online.test.ts": 2857,
@@ -2248,6 +4736,7 @@
   "tests/combat_log_event_route_online.test.ts": 2956,
   "tests/combat_rating.test.ts": 1989,
   "tests/combat_sfx.test.ts": 25,
+  "tests/combined_group_detach_css.test.ts": 2,
   "tests/combo_command.test.ts": 2401,
   "tests/combo_eligibility.test.ts": 9,
   "tests/combo_points.test.ts": 2890,
@@ -2299,11 +4788,13 @@
   "tests/count_format.test.ts": 10,
   "tests/crab_summon.test.ts": 1218,
   "tests/craft_cast_view.test.ts": 12,
+  "tests/craft_celebration_text_view.test.ts": 13,
   "tests/craft_celebration_view.test.ts": 25,
   "tests/craft_denial_line_view.test.ts": 3,
   "tests/craft_from_vault.test.ts": 3109,
   "tests/craft_name_view.test.ts": 8,
   "tests/crafted_item_tooltip_coverage.test.ts": 20,
+  "tests/crafted_wearability.test.ts": 7,
   "tests/crafting_deny_core.test.ts": 4,
   "tests/crafting_launcher.test.ts": 23,
   "tests/crafting_materials_quality.test.ts": 8,
@@ -2315,6 +4806,7 @@
   "tests/crafting_window_craft_fee.test.ts": 22,
   "tests/crafting_window_focus.test.ts": 178,
   "tests/crafting_window_tabs.test.ts": 79,
+  "tests/crafting_wire.test.ts": 3,
   "tests/cragmaw_rare_elite.test.ts": 11,
   "tests/creature_glb_skin_skeleton.test.ts": 11,
   "tests/crest_icon_art.test.ts": 10236,
@@ -2328,6 +4820,9 @@
   "tests/cross_hotbar_wiring.test.ts": 19,
   "tests/crowd_bucket.test.ts": 6,
   "tests/crowd_lod.test.ts": 65,
+  "tests/crucible_vendor.test.ts": 883,
+  "tests/crucible_vendor_online.test.ts": 802,
+  "tests/crucible_vendor_window.test.ts": 19,
   "tests/css_corpus.test.ts": 53,
   "tests/css_token_resolution.test.ts": 12,
   "tests/css_value_validity.test.ts": 16,
@@ -2419,6 +4914,7 @@
   "tests/delves.test.ts": 10655,
   "tests/delves_runs.test.ts": 12,
   "tests/demoralizing_shout.test.ts": 2002,
+  "tests/denial_line_core.test.ts": 11,
   "tests/dependency_audit_gate.test.ts": 8,
   "tests/dependency_sync_gate_preflight.test.ts": 1199,
   "tests/deploy_admission_cap.test.ts": 5,
@@ -2468,6 +4964,7 @@
   "tests/dev_god.test.ts": 3338,
   "tests/dev_item_picker_view.test.ts": 23,
   "tests/dev_kit.test.ts": 2782,
+  "tests/dev_kit_tie_chain_census.test.ts": 45,
   "tests/dev_leaderboard_view.test.ts": 7,
   "tests/dev_noaggro.test.ts": 294,
   "tests/dev_quest_commands.test.ts": 2781,
@@ -2543,16 +5040,26 @@
   "tests/duel.test.ts": 2001,
   "tests/duel_aftermath.test.ts": 2656,
   "tests/duel_module.test.ts": 2725,
+  "tests/dungeon_banner_core.test.ts": 6,
   "tests/dungeon_difficulty.test.ts": 10,
   "tests/dungeon_door_online.test.ts": 2155,
   "tests/dungeon_door_softlock_1894.test.ts": 1838,
   "tests/dungeon_entry_clearance.test.ts": 8945,
+  "tests/dungeon_entry_facing.test.ts": 15,
   "tests/dungeon_finder.test.ts": 7170,
   "tests/dungeon_finder_proposal_popup.test.ts": 33,
   "tests/dungeon_finder_view.test.ts": 28,
   "tests/dungeon_finder_window.test.ts": 16,
   "tests/dungeon_instance_disconnect_reset.test.ts": 2393,
+  "tests/dungeon_map_painter.test.ts": 4,
+  "tests/dungeon_map_view.test.ts": 4,
+  "tests/dungeon_miniboss_stomp.test.ts": 802,
+  "tests/dungeon_pack_aggro.test.ts": 680,
   "tests/dungeon_parkour.test.ts": 2315,
+  "tests/dungeon_spawn_miniboss.test.ts": 3,
+  "tests/dungeon_tile_kind_core.test.ts": 7,
+  "tests/dungeon_torch_rig.test.ts": 5,
+  "tests/dungeon_wall_occlusion.test.ts": 16,
   "tests/dungeons.test.ts": 6634,
   "tests/dungeons_command.test.ts": 2183,
   "tests/duplicate_test_blocks.test.ts": 16,
@@ -2645,9 +5152,11 @@
   "tests/email_templates.test.ts": 11,
   "tests/email_tokens.test.ts": 15,
   "tests/emerald_deck_escape.test.ts": 28471,
+  "tests/empower_hold_core.test.ts": 4,
   "tests/enchant_apply_view.test.ts": 614,
   "tests/enchanting_view.test.ts": 7,
   "tests/enchants_magnitude_invariants.test.ts": 2445,
+  "tests/encounter_wipe.test.ts": 4380,
   "tests/entity_display_core.test.ts": 8,
   "tests/entity_display_name.test.ts": 4,
   "tests/entity_gate_stand_in.test.ts": 27,
@@ -2687,6 +5196,7 @@
   "tests/evade_immunity.test.ts": 5050,
   "tests/event_delivery.test.ts": 5,
   "tests/event_frame_serialize.test.ts": 3776,
+  "tests/event_pid_index.test.ts": 5,
   "tests/evergarden.test.ts": 3493,
   "tests/evil_eye_markers.test.ts": 22,
   "tests/exact_index_geometry.test.ts": 15,
@@ -2702,14 +5212,19 @@
   "tests/far_terrain_night.test.ts": 7,
   "tests/far_terrain_view.test.ts": 4740,
   "tests/farm_bed_interact.test.ts": 4,
+  "tests/farm_crop_mark_zone_guard.test.ts": 682,
+  "tests/farm_deny_bed_correlation.test.ts": 1029,
   "tests/farm_event_feedback.test.ts": 17,
   "tests/farm_golden_bonus.test.ts": 667,
   "tests/farm_intro_quest_content.test.ts": 1178,
   "tests/farm_intro_quest_journey.test.ts": 1302,
+  "tests/farm_load_report.test.ts": 3,
   "tests/farm_patch_placement.test.ts": 227,
   "tests/farm_patches_adapter.test.ts": 177,
   "tests/farm_patches_core.test.ts": 10,
   "tests/farm_pattern_items.test.ts": 1510,
+  "tests/farm_press_affordance_controller.test.ts": 5,
+  "tests/farm_press_target_core.test.ts": 4,
   "tests/farm_props_asset.test.ts": 59,
   "tests/farm_quest_objective.test.ts": 1511,
   "tests/farm_ready.test.ts": 5828,
@@ -2746,6 +5261,7 @@
   "tests/fenbridge_town_capture.test.ts": 209,
   "tests/fenbridge_town_preload.test.ts": 899,
   "tests/fenbridge_town_renderer.test.ts": 1234,
+  "tests/ferry_bell.test.ts": 712,
   "tests/ferry_prewarm.test.ts": 3,
   "tests/fiesta.test.ts": 7200,
   "tests/fiesta_art.test.ts": 40,
@@ -2791,6 +5307,9 @@
   "tests/foliage_shore_gate_core.test.ts": 88,
   "tests/foliage_vertex_pipeline.test.ts": 817,
   "tests/follow.test.ts": 2262,
+  "tests/forgefather_fortress.test.ts": 31,
+  "tests/forgefather_fortress_route.test.ts": 10201,
+  "tests/forgefather_fortress_walkability.test.ts": 382,
   "tests/form_auto_unshift_core.test.ts": 10,
   "tests/form_command.test.ts": 2509,
   "tests/form_cross_shift_billing.test.ts": 2818,
@@ -2909,6 +5428,8 @@
   "tests/graveyard_command.test.ts": 2110,
   "tests/grix_tunnelking_presence.test.ts": 5,
   "tests/ground_aim.test.ts": 8,
+  "tests/ground_aim_hud.test.ts": 12,
+  "tests/ground_aim_lifecycle_wiring.test.ts": 8,
   "tests/ground_aim_reticle_core.test.ts": 5,
   "tests/ground_aim_reticle_visual.test.ts": 22,
   "tests/ground_decor_prewarm.test.ts": 228,
@@ -2923,16 +5444,19 @@
   "tests/guarded_iter.test.ts": 8,
   "tests/guide.test.ts": 1666,
   "tests/guide_class_view.test.ts": 10,
+  "tests/guide_harvest_families_prose.test.ts": 4,
   "tests/guide_hash_nav.test.ts": 440,
   "tests/guide_key_coverage.test.ts": 3423,
   "tests/guide_level_cap_drift.test.ts": 11,
   "tests/guide_models_fallback.test.ts": 8,
+  "tests/guide_prof_faq_keys.test.ts": 4,
   "tests/guide_route_render.test.ts": 156,
   "tests/guide_search.test.ts": 42,
   "tests/guide_still_key.test.ts": 6,
   "tests/guide_talent_venue_drift.test.ts": 416,
   "tests/guide_viewer_embed.test.ts": 9,
   "tests/guide_viewer_framing.test.ts": 23,
+  "tests/guide_viewer_model_prewarm.test.ts": 4,
   "tests/guide_viewer_mount.test.ts": 219,
   "tests/guide_viewer_skin_bounds.test.ts": 9,
   "tests/guild_bank.test.ts": 5012,
@@ -2957,6 +5481,7 @@
   "tests/guild_stamp_fence.test.ts": 1873,
   "tests/hallowed_wall_bounce.test.ts": 2113,
   "tests/harvest_component_materials.test.ts": 6230,
+  "tests/harvest_geography.test.ts": 8,
   "tests/harvest_journal_view.test.ts": 7,
   "tests/harvest_journal_window.test.ts": 56,
   "tests/harvest_yields.test.ts": 8,
@@ -2965,10 +5490,15 @@
   "tests/heal.test.ts": 4478,
   "tests/heal_glow_map_eviction.test.ts": 10,
   "tests/heal_landing_feedback_core.test.ts": 9,
+  "tests/heal_power.test.ts": 1497,
   "tests/heal_rank_caps.test.ts": 12,
   "tests/heal_spellpower.test.ts": 2756,
+  "tests/healing_power_readers.test.ts": 4372,
   "tests/heap_sample.test.ts": 6,
   "tests/heap_sawtooth.test.ts": 9,
+  "tests/heavy_self_arm_marks.test.ts": 4,
+  "tests/heavy_self_arm_marks_online.test.ts": 978,
+  "tests/held_prop_idle.test.ts": 8,
   "tests/held_weapon_models.test.ts": 42,
   "tests/helm_visibility.test.ts": 4006,
   "tests/helpers/adopted_trophy_ids.test.ts": 7,
@@ -2984,6 +5514,7 @@
   "tests/heroic_difficulty_floors.test.ts": 16,
   "tests/heroic_finale_gold.test.ts": 17970,
   "tests/heroic_leap.test.ts": 6992,
+  "tests/heroic_leap_preview.test.ts": 780,
   "tests/heroic_loot_flair.test.ts": 2384,
   "tests/heroic_soulbound.test.ts": 2355,
   "tests/heroic_vendor.test.ts": 8894,
@@ -3009,6 +5540,7 @@
   "tests/hud_perf_budget.test.ts": 384,
   "tests/hud_profession_events.test.ts": 14,
   "tests/hud_resurrection_prompt.test.ts": 25,
+  "tests/hud_tones.test.ts": 8,
   "tests/hud_update_drive.test.ts": 141,
   "tests/hud_wire_enum_fallbacks.test.ts": 9,
   "tests/hunter_class_spec_kits.test.ts": 2037,
@@ -3048,31 +5580,64 @@
   "tests/idle_mob_tick_radius.test.ts": 4361,
   "tests/idle_queue.test.ts": 14,
   "tests/idle_stationary.test.ts": 1468,
+  "tests/ignivar_affix_lane.test.ts": 4,
   "tests/ignivar_arena.test.ts": 1856,
   "tests/ignivar_arena_atmosphere.test.ts": 84,
+  "tests/ignivar_asset_hygiene.test.ts": 40,
   "tests/ignivar_boss_model.test.ts": 1686,
   "tests/ignivar_brand_telegraph.test.ts": 19,
   "tests/ignivar_conduit.test.ts": 44,
+  "tests/ignivar_death_dialogue_i18n.test.ts": 3,
   "tests/ignivar_dev_raid.test.ts": 3013,
+  "tests/ignivar_dialogue.test.ts": 4,
+  "tests/ignivar_dressing_plan_core.test.ts": 58,
+  "tests/ignivar_eastbrook_entrance.test.ts": 828,
   "tests/ignivar_encounter.test.ts": 100720,
+  "tests/ignivar_encounter_disposal.test.ts": 5,
   "tests/ignivar_encounter_render.test.ts": 257,
   "tests/ignivar_fire_beams.test.ts": 21,
   "tests/ignivar_forge_chains.test.ts": 18,
   "tests/ignivar_forge_chains_render.test.ts": 20,
   "tests/ignivar_forge_judgment.test.ts": 55046,
+  "tests/ignivar_forge_lift.test.ts": 1428,
   "tests/ignivar_forge_wave.test.ts": 4,
   "tests/ignivar_frontal_telegraph.test.ts": 20,
   "tests/ignivar_judgment_fire_core.test.ts": 161,
+  "tests/ignivar_lava_moat.test.ts": 1081,
+  "tests/ignivar_lava_moat_render.test.ts": 8,
+  "tests/ignivar_lift_room.test.ts": 4,
+  "tests/ignivar_loot.test.ts": 27,
   "tests/ignivar_meteors.test.ts": 296,
+  "tests/ignivar_mist_gate.test.ts": 4,
+  "tests/ignivar_prop_colliders.test.ts": 11,
   "tests/ignivar_raid_dressing.test.ts": 11,
+  "tests/ignivar_raid_entry.test.ts": 1120,
   "tests/ignivar_raid_environment.test.ts": 15,
   "tests/ignivar_raid_expansion_asset_inputs.test.ts": 1379,
   "tests/ignivar_raid_flow.test.ts": 2066,
   "tests/ignivar_raid_gate.test.ts": 23,
   "tests/ignivar_raid_lore.test.ts": 10822,
   "tests/ignivar_raid_progression.test.ts": 9854,
+  "tests/ignivar_raid_trash_restoration.test.ts": 732,
+  "tests/ignivar_raid_trash_tuning.test.ts": 767,
+  "tests/ignivar_revolving_inferno_vfx.test.ts": 6,
+  "tests/ignivar_robotic_voice_processing.test.ts": 33,
+  "tests/ignivar_set_bonus_druid.test.ts": 10012,
+  "tests/ignivar_set_bonus_hunter.test.ts": 6037,
+  "tests/ignivar_set_bonus_mage.test.ts": 7058,
+  "tests/ignivar_set_bonus_paladin.test.ts": 2662,
+  "tests/ignivar_set_bonus_priest.test.ts": 3676,
+  "tests/ignivar_set_bonus_rogue.test.ts": 5012,
+  "tests/ignivar_set_bonus_shaman.test.ts": 7028,
+  "tests/ignivar_set_bonus_warlock.test.ts": 8618,
+  "tests/ignivar_set_bonus_warrior.test.ts": 1066,
   "tests/ignivar_soak_telegraph.test.ts": 24,
   "tests/ignivar_tile_kit.test.ts": 105,
+  "tests/ignivar_trash_automata.test.ts": 965,
+  "tests/ignivar_varkhul_health.test.ts": 1753,
+  "tests/ignivar_voice_extension.test.ts": 4,
+  "tests/ignivar_voice_pack.test.ts": 4,
+  "tests/ignivar_weekly_lockout.test.ts": 1264,
   "tests/ignore_chat.test.ts": 4066,
   "tests/imbue_exclusive.test.ts": 2873,
   "tests/impact_site.test.ts": 112,
@@ -3083,6 +5648,8 @@
   "tests/input.test.ts": 135,
   "tests/input_activity.test.ts": 7,
   "tests/input_cadence_model.test.ts": 439,
+  "tests/input_controller.test.ts": 18,
+  "tests/input_hint_mode.test.ts": 3,
   "tests/inscription_catalog.test.ts": 25,
   "tests/inscription_flow.test.ts": 1040,
   "tests/inscription_scroll_exclusivity.test.ts": 1927,
@@ -3104,9 +5671,14 @@
   "tests/interest_candidates.test.ts": 2044,
   "tests/interest_policy.test.ts": 3,
   "tests/interface_mode_viewport_wiring.test.ts": 4,
+  "tests/interface_reset.test.ts": 4,
+  "tests/interface_unlock.test.ts": 6,
+  "tests/interface_unlock_core.test.ts": 4,
+  "tests/interface_unlock_menu_core.test.ts": 13,
   "tests/interior_encounter_prewarm.test.ts": 38,
   "tests/interior_encounter_prewarm_pass.test.ts": 6216,
   "tests/interior_light_rig.test.ts": 5,
+  "tests/interior_map_controller.test.ts": 4,
   "tests/interior_resource_lifecycle.test.ts": 39,
   "tests/internal_api.test.ts": 7,
   "tests/inventory_extract.test.ts": 5,
@@ -3119,13 +5691,19 @@
   "tests/ip_block_kick.test.ts": 2601,
   "tests/ip_scrub.test.ts": 3223,
   "tests/island_isolation_core.test.ts": 1547,
+  "tests/item_affix_tooltip.test.ts": 67,
   "tests/item_armor_type.test.ts": 5,
   "tests/item_art_audit_builder.test.ts": 12851,
   "tests/item_art_consistency.test.ts": 4900,
   "tests/item_art_screenshot_evidence.test.ts": 32,
+  "tests/item_catalog_positional.test.ts": 8,
   "tests/item_class_restriction.test.ts": 8,
   "tests/item_compare.test.ts": 9,
+  "tests/item_compare_view.test.ts": 7,
   "tests/item_copy_addressing_guard.test.ts": 12,
+  "tests/item_copy_anchor.test.ts": 4,
+  "tests/item_copy_anchor_online.test.ts": 816,
+  "tests/item_copy_confirm_window.test.ts": 775,
   "tests/item_copy_ref.test.ts": 19,
   "tests/item_copy_refusal.test.ts": 2103,
   "tests/item_icon_converter.test.ts": 4549,
@@ -3148,6 +5726,7 @@
   "tests/items_sell_units.test.ts": 5,
   "tests/jewelcrafting_catalog.test.ts": 27,
   "tests/jewelcrafting_flow.test.ts": 930,
+  "tests/jewelcrafting_rung50_reachability.test.ts": 8,
   "tests/keepalive_stall_sweep.test.ts": 2403,
   "tests/keybinds.test.ts": 41,
   "tests/keybinds_repair.test.ts": 7,
@@ -3176,6 +5755,8 @@
   "tests/leaderboard_view.test.ts": 9,
   "tests/leaderboard_window.test.ts": 20,
   "tests/leaderboard_window_stale.test.ts": 53,
+  "tests/legendary_chat_plaintext.test.ts": 17,
+  "tests/legendary_regalia.test.ts": 30,
   "tests/lich_audio_state.test.ts": 6,
   "tests/lifesap_adversarial.test.ts": 13425,
   "tests/lightning_bolt_fx.test.ts": 3166,
@@ -3225,6 +5806,7 @@
   "tests/log_event_route.test.ts": 4,
   "tests/login_parity.test.ts": 13,
   "tests/logo_fade.test.ts": 12,
+  "tests/longest_reagent_bill_render.test.ts": 21,
   "tests/look_pieces.test.ts": 3146,
   "tests/loopback_guard.test.ts": 81,
   "tests/loot_drops.test.ts": 5365,
@@ -3318,7 +5900,9 @@
   "tests/market_query_diff.test.ts": 9,
   "tests/market_query_game.test.ts": 2455,
   "tests/market_sale_log.test.ts": 12,
+  "tests/market_search_localized_core.test.ts": 5,
   "tests/market_sell_price_ref.test.ts": 80,
+  "tests/market_sold_volume_pg_integration.test.ts": 100,
   "tests/market_view.test.ts": 18,
   "tests/market_window.test.ts": 54,
   "tests/market_wire_cadence.test.ts": 2688,
@@ -3329,6 +5913,7 @@
   "tests/masterwork_zone_broadcast.test.ts": 2724,
   "tests/masterwrought_budget.test.ts": 15,
   "tests/masterwrought_cap.test.ts": 9061,
+  "tests/masterwrought_cap_view.test.ts": 7,
   "tests/masterwrought_materials.test.ts": 2020,
   "tests/masterwrought_tooltip.test.ts": 7,
   "tests/mastery_mechanism.test.ts": 6652,
@@ -3353,6 +5938,7 @@
   "tests/meadow_paint_ring.test.ts": 10,
   "tests/mech_chroma_ownership.test.ts": 4,
   "tests/media_duplicate_prune.test.ts": 17,
+  "tests/mediawiki_seed_freshness.test.ts": 142,
   "tests/mediawiki_seed_visibility.test.ts": 333,
   "tests/melee_haste_additive.test.ts": 2517,
   "tests/menu_control_controller.test.ts": 25,
@@ -3432,6 +6018,7 @@
   "tests/mob_nearby_allies.test.ts": 10,
   "tests/mob_pack_frenzy.test.ts": 2073,
   "tests/mob_plague.test.ts": 1860,
+  "tests/mob_portrait_render_env.test.ts": 6,
   "tests/mob_portrait_source_manifest.test.ts": 8637,
   "tests/mob_purge.test.ts": 2296,
   "tests/mob_pursuit_all.test.ts": 3114,
@@ -3467,6 +6054,7 @@
   "tests/mob_warstomp.test.ts": 2102,
   "tests/mob_wither.test.ts": 2347,
   "tests/mobile_action_page_view.test.ts": 14,
+  "tests/mobile_action_ring_controller.test.ts": 12,
   "tests/mobile_action_ring_painter.test.ts": 31,
   "tests/mobile_chat_centered.test.ts": 13,
   "tests/mobile_chrome_fade.test.ts": 10,
@@ -3478,6 +6066,7 @@
   "tests/mobile_more_dialog.test.ts": 10,
   "tests/mobile_station_party.test.ts": 1002,
   "tests/mobile_station_tooltip.test.ts": 9,
+  "tests/mobile_station_walk.test.ts": 291,
   "tests/mobile_swing_cast_anchor.test.ts": 11,
   "tests/mobile_wallet_deeplink.test.ts": 56,
   "tests/mobile_wallet_launcher.test.ts": 133,
@@ -3499,6 +6088,7 @@
   "tests/mount_race.test.ts": 7155,
   "tests/mount_race_ui.test.ts": 11,
   "tests/mount_race_view.test.ts": 5,
+  "tests/mount_race_wire.test.ts": 3,
   "tests/mount_transition.test.ts": 3727,
   "tests/mount_visuals.test.ts": 24,
   "tests/mounts.test.ts": 3842,
@@ -3521,6 +6111,8 @@
   "tests/nameplate_heraldry_core.test.ts": 21,
   "tests/nameplate_i18n_transition.test.ts": 1295,
   "tests/nameplate_loot_icon.test.ts": 10,
+  "tests/nameplate_pick_core.test.ts": 3,
+  "tests/nameplate_pick_integration.test.ts": 14,
   "tests/nameplate_pledge.test.ts": 4564,
   "tests/nameplate_projection.test.ts": 7,
   "tests/nameplate_quest_marker.test.ts": 32,
@@ -3588,6 +6180,7 @@
   "tests/obs_interaction.test.ts": 3156,
   "tests/occluder_fade.test.ts": 6,
   "tests/occluder_fade_core.test.ts": 12,
+  "tests/occluder_fade_gate.test.ts": 36,
   "tests/occluder_ghost_prewarm.test.ts": 33,
   "tests/off_stream_rng.test.ts": 3340,
   "tests/offhand_dual_wield.test.ts": 2448,
@@ -3598,11 +6191,13 @@
   "tests/opaque_draw_order_core.test.ts": 15,
   "tests/open_sea_swim.test.ts": 2501,
   "tests/opened_object_view.test.ts": 1279,
+  "tests/options_back_wiring.test.ts": 3,
   "tests/options_view.test.ts": 43,
   "tests/options_window.test.ts": 27,
   "tests/options_window_auras.test.ts": 12,
   "tests/options_window_unstuck.test.ts": 6,
   "tests/options_window_wiki.test.ts": 7,
+  "tests/orange_promotion.test.ts": 2539,
   "tests/originality_renames.test.ts": 7,
   "tests/ota_publish.test.ts": 14,
   "tests/ota_server_layout.test.ts": 8,
@@ -3624,12 +6219,17 @@
   "tests/owned_class_raid_armor_avoidance.test.ts": 112347,
   "tests/owned_class_raid_sustain_bands.test.ts": 133660,
   "tests/owned_class_tooltip_clarity.test.ts": 18,
+  "tests/pad_cast_routing.test.ts": 3,
+  "tests/pad_cast_wiring.test.ts": 3,
   "tests/pad_focus_action.test.ts": 13,
+  "tests/pad_ground_aim.test.ts": 3,
   "tests/pad_mouse_cursor.test.ts": 11,
   "tests/pad_reel.test.ts": 12,
   "tests/pad_subcommands.test.ts": 11,
   "tests/pad_target_pick.test.ts": 10,
   "tests/painter_host.test.ts": 22,
+  "tests/painter_single_slot_collision_guard.test.ts": 5,
+  "tests/painter_slot_collision.test.ts": 3,
   "tests/paladin_aegis.test.ts": 4171,
   "tests/paladin_aegis_visual.test.ts": 7,
   "tests/paladin_ascension_core.test.ts": 8,
@@ -3684,6 +6284,7 @@
   "tests/parity/rename_state_proof.test.ts": 100,
   "tests/parkour.test.ts": 4290,
   "tests/parry.test.ts": 2576,
+  "tests/parse_bis_loadouts.test.ts": 7,
   "tests/parse_census.test.ts": 13,
   "tests/parse_content_pack.test.ts": 698,
   "tests/parse_flags.test.ts": 15,
@@ -3703,6 +6304,7 @@
   "tests/party_frames.test.ts": 17,
   "tests/party_frames_painter.test.ts": 54,
   "tests/party_machine.test.ts": 23,
+  "tests/party_preview_rows_css.test.ts": 3,
   "tests/password_reset_client.test.ts": 10,
   "tests/password_reset_server.test.ts": 260,
   "tests/pathfind.test.ts": 2808,
@@ -3718,6 +6320,7 @@
   "tests/perf_diagnosis_titles.test.ts": 5,
   "tests/perf_diagnostics_panel.test.ts": 467,
   "tests/perf_doctor.test.ts": 9,
+  "tests/perf_entry_reveal_core.test.ts": 3,
   "tests/perf_graph_painter.test.ts": 9,
   "tests/perf_metrics_sampler.test.ts": 14,
   "tests/perf_monitor.test.ts": 29,
@@ -3739,7 +6342,12 @@
   "tests/perf_reporter.test.ts": 39,
   "tests/perf_suggestion_id_parity.test.ts": 497,
   "tests/perf_tour_entry.test.ts": 25,
+  "tests/perfect_item_ref.test.ts": 5,
   "tests/perfect_moment.test.ts": 5466,
+  "tests/perfecting.test.ts": 6964,
+  "tests/perfecting_view.test.ts": 8,
+  "tests/perfecting_window.test.ts": 87,
+  "tests/perfecting_wire.test.ts": 993,
   "tests/persisted_position_escape.test.ts": 4830,
   "tests/persistence_round_trip.test.ts": 3703,
   "tests/persistent_aura.test.ts": 5,
@@ -3749,6 +6357,7 @@
   "tests/pet_ai.test.ts": 1756,
   "tests/pet_bar_core.test.ts": 5,
   "tests/pet_bar_keybinds.test.ts": 6,
+  "tests/pet_bg_wave_corpse_hold.test.ts": 699,
   "tests/pet_combat_regen.test.ts": 5365,
   "tests/pet_command.test.ts": 3220,
   "tests/pet_commands_module.test.ts": 5068,
@@ -3785,6 +6394,8 @@
   "tests/player_card_share.test.ts": 5,
   "tests/player_card_title.test.ts": 8,
   "tests/player_death_audio.test.ts": 7,
+  "tests/player_frame_bar_lock.test.ts": 3,
+  "tests/player_frame_box_scale.test.ts": 3,
   "tests/player_frame_css.test.ts": 4,
   "tests/player_look_core.test.ts": 14,
   "tests/player_metrics_db.test.ts": 94,
@@ -3816,6 +6427,7 @@
   "tests/portrait_readback_core.test.ts": 16,
   "tests/portrait_snapshot.test.ts": 102,
   "tests/pose_blend.test.ts": 18,
+  "tests/position_min_range.test.ts": 621,
   "tests/post_bloom_shader_core.test.ts": 21,
   "tests/post_composer.test.ts": 13,
   "tests/post_entry_warmups.test.ts": 9,
@@ -3874,6 +6486,7 @@
   "tests/profession_icons.test.ts": 29,
   "tests/profession_identity_card.test.ts": 202,
   "tests/profession_identity_view.test.ts": 14,
+  "tests/profession_log_tones.test.ts": 8,
   "tests/profession_quest_objectives.test.ts": 2351,
   "tests/profession_surface_refresh.test.ts": 12,
   "tests/profession_tutorial_view.test.ts": 5,
@@ -3889,6 +6502,7 @@
   "tests/professions_attunement_events.test.ts": 2641,
   "tests/professions_attunement_online.test.ts": 4294,
   "tests/professions_audio_wiring.test.ts": 14,
+  "tests/professions_barrel.test.ts": 3,
   "tests/professions_battlefield_xp.test.ts": 1859,
   "tests/professions_bind_on_trade_online.test.ts": 5511,
   "tests/professions_bind_on_trade_surfaces.test.ts": 2957,
@@ -3903,6 +6517,7 @@
   "tests/professions_craft_cast_online.test.ts": 2950,
   "tests/professions_craft_xp.test.ts": 7636,
   "tests/professions_crafting.test.ts": 8738,
+  "tests/professions_crafting_daily_corner.test.ts": 361,
   "tests/professions_crafting_hub.test.ts": 4255,
   "tests/professions_crafts_to_mastery.test.ts": 94,
   "tests/professions_deeds_playthrough.test.ts": 2191,
@@ -3914,6 +6529,7 @@
   "tests/professions_enchanting.test.ts": 2086,
   "tests/professions_enchanting_commands.test.ts": 7355,
   "tests/professions_enchanting_reachable.test.ts": 8,
+  "tests/professions_engineering_onramp.test.ts": 6,
   "tests/professions_farming.test.ts": 17981,
   "tests/professions_farming_state.test.ts": 2210,
   "tests/professions_feast.test.ts": 39356,
@@ -3934,6 +6550,7 @@
   "tests/professions_nudges.test.ts": 4976,
   "tests/professions_perks.test.ts": 2228,
   "tests/professions_quest_cadence.test.ts": 5787,
+  "tests/professions_rail_tiles.test.ts": 11,
   "tests/professions_rarity_roll.test.ts": 1743,
   "tests/professions_result_mirrors_online.test.ts": 2100,
   "tests/professions_rod_recipes.test.ts": 26,
@@ -4034,10 +6651,23 @@
   "tests/questlog_window.test.ts": 6,
   "tests/queued_command.test.ts": 2277,
   "tests/quickening_catalyst_gate.test.ts": 2709,
+  "tests/r5_envelope_probe.test.ts": 1523,
   "tests/race_line_core.test.ts": 12,
   "tests/radial_action_core.test.ts": 7,
   "tests/radial_gesture_controller.test.ts": 32,
   "tests/radial_gesture_core.test.ts": 5,
+  "tests/raid_avoidable_damage_tuning.test.ts": 2,
+  "tests/raid_boss_guide_model_controller.test.ts": 889,
+  "tests/raid_boss_guide_scroll.test.ts": 7,
+  "tests/raid_boss_guide_styles.test.ts": 5,
+  "tests/raid_boss_guide_view.test.ts": 4,
+  "tests/raid_boss_guide_window.test.ts": 105,
+  "tests/raid_boss_melee_reach.test.ts": 824,
+  "tests/raid_boss_room_welcome.test.ts": 1749,
+  "tests/raid_boss_room_welcome_voice_pack.test.ts": 3,
+  "tests/raid_boss_voice_assets.test.ts": 625,
+  "tests/raid_boss_voice_audition.test.ts": 4,
+  "tests/raid_boss_voice_processing.test.ts": 41,
   "tests/raid_buffs.test.ts": 2676,
   "tests/raid_lockout.test.ts": 9,
   "tests/raid_lockout_view.test.ts": 6,
@@ -4089,6 +6719,7 @@
   "tests/reliquary_window_behavior.test.ts": 2183,
   "tests/reliquary_window_jump.test.ts": 611,
   "tests/reliquary_wire.test.ts": 2714,
+  "tests/remint_registry_completeness.test.ts": 11,
   "tests/render_asset_fallback.test.ts": 1314,
   "tests/render_asset_load_retry.test.ts": 8783,
   "tests/render_asset_preload.test.ts": 22,
@@ -4103,6 +6734,7 @@
   "tests/renderer_build_ledger_wiring.test.ts": 11,
   "tests/renderer_compile_gate.test.ts": 35,
   "tests/renderer_cpu_hot_path.test.ts": 9,
+  "tests/renderer_farm_event_route.test.ts": 72,
   "tests/renderer_frame_stats_snapshot.test.ts": 11,
   "tests/renderer_lifecycle.test.ts": 16,
   "tests/renderer_look_pieces_hold.test.ts": 777,
@@ -4111,6 +6743,7 @@
   "tests/renderer_spellfx_dispatch_order.test.ts": 8,
   "tests/report_target.test.ts": 8,
   "tests/report_window.test.ts": 17,
+  "tests/reset_day_guard.test.ts": 719,
   "tests/resident_scenery_core.test.ts": 5,
   "tests/respawn_policy.test.ts": 15338,
   "tests/rest_indicator.test.ts": 5,
@@ -4178,6 +6811,7 @@
   "tests/rogue_talents_v029.test.ts": 4872,
   "tests/rogue_utility_poisons.test.ts": 3949,
   "tests/rogue_wicked_slash_normalization.test.ts": 2872,
+  "tests/roof_darkness_core.test.ts": 3,
   "tests/roving_index.test.ts": 10,
   "tests/row_grants_cast.test.ts": 6022,
   "tests/row_unlock_toast.test.ts": 5,
@@ -4196,6 +6830,7 @@
   "tests/scenery_flame.test.ts": 10,
   "tests/schema_wiring.test.ts": 46,
   "tests/scree.test.ts": 7003,
+  "tests/scripted_walk.test.ts": 1217,
   "tests/scripts_import_meta_tripwire.test.ts": 6,
   "tests/scripts_windows_paths.test.ts": 150,
   "tests/sea_mist_core.test.ts": 168,
@@ -4211,6 +6846,7 @@
   "tests/self_alpha_lead.test.ts": 8,
   "tests/self_motion.test.ts": 2790,
   "tests/self_motion_frame_buffer.test.ts": 5,
+  "tests/self_social_wire.test.ts": 143,
   "tests/self_spirit_prewarm.test.ts": 28,
   "tests/self_wire_phase_breakdown.test.ts": 2412,
   "tests/send_backpressure.test.ts": 6,
@@ -4222,9 +6858,11 @@
   "tests/server/ad_spend.test.ts": 18,
   "tests/server/admin.test.ts": 700,
   "tests/server/admin_activity_cache.test.ts": 8,
+  "tests/server/admin_analytics_reads.test.ts": 12,
   "tests/server/admin_flag_transition_legacy.test.ts": 9,
   "tests/server/admin_general_chat_rate_limit.test.ts": 39,
   "tests/server/admin_guild_bank_view.test.ts": 2250,
+  "tests/server/admin_market_metrics.test.ts": 16,
   "tests/server/admin_oversight.test.ts": 15,
   "tests/server/admin_oversight_legacy.test.ts": 33,
   "tests/server/admin_oversight_redaction.test.ts": 10,
@@ -4254,7 +6892,9 @@
   "tests/server/cached_read.test.ts": 34,
   "tests/server/card_route.test.ts": 20,
   "tests/server/character_delete_http.test.ts": 5,
+  "tests/server/character_delete_verify.pg.test.ts": 100,
   "tests/server/character_rank_cache.test.ts": 11,
+  "tests/server/character_save_statement.test.ts": 4,
   "tests/server/character_save_transaction.test.ts": 7,
   "tests/server/characters.test.ts": 133,
   "tests/server/cheater_mark_admin.test.ts": 25,
@@ -4262,12 +6902,17 @@
   "tests/server/cheater_mark_runtime.test.ts": 14,
   "tests/server/claudium.test.ts": 92,
   "tests/server/claudium_spend_reachability.test.ts": 15,
+  "tests/server/clear_item_name.test.ts": 13,
+  "tests/server/clear_item_name_db.test.ts": 4,
   "tests/server/client_perf_summary_shape.test.ts": 12,
   "tests/server/client_perf_summary_sql.test.ts": 9,
   "tests/server/community_rifts.test.ts": 4813,
+  "tests/server/craft_activity.test.ts": 22,
   "tests/server/daily_reward_schedule.test.ts": 9,
   "tests/server/daily_rewards_board_cache.test.ts": 13,
   "tests/server/daily_rewards_routes.test.ts": 87,
+  "tests/server/db_backend_cancel.test.ts": 5,
+  "tests/server/db_connection_budget.test.ts": 3,
   "tests/server/db_pool_timeout.test.ts": 5781,
   "tests/server/db_transaction_deadline.test.ts": 14,
   "tests/server/deeds.test.ts": 27,
@@ -4284,6 +6929,7 @@
   "tests/server/discord_outbox.test.ts": 52,
   "tests/server/discord_relay_queue.test.ts": 9,
   "tests/server/discord_status_cache.test.ts": 23,
+  "tests/server/dungeon_entry_facing.test.ts": 874,
   "tests/server/earned_deeds_single_flight.test.ts": 12,
   "tests/server/env_bootstrap.test.ts": 8,
   "tests/server/epic_db.test.ts": 13,
@@ -4372,15 +7018,19 @@
   "tests/server/maps_routes.test.ts": 31,
   "tests/server/market_backfill.test.ts": 26,
   "tests/server/market_realm_isolation.test.ts": 962,
+  "tests/server/market_sold_volume.test.ts": 8,
   "tests/server/mob_scan_tick_stats.test.ts": 9,
   "tests/server/moderation_error_body.test.ts": 9,
   "tests/server/moderation_queue_cache.test.ts": 9,
   "tests/server/new_endpoint.test.ts": 8283,
   "tests/server/newborn_island_spawn.test.ts": 955,
   "tests/server/oauth.test.ts": 35,
+  "tests/server/offline_fence_refusals.test.ts": 3,
+  "tests/server/ok_response_memo.test.ts": 4,
   "tests/server/ota_updates.test.ts": 40,
   "tests/server/paid_guild_creation_bounds.test.ts": 4,
   "tests/server/pbe_boost.test.ts": 14961,
+  "tests/server/pbe_boost_save_fence.test.ts": 4,
   "tests/server/perf_gate.test.ts": 70,
   "tests/server/pg_rollback_proof.test.ts": 4,
   "tests/server/progress_events.test.ts": 15,
@@ -4396,6 +7046,9 @@
   "tests/server/rift_assets.test.ts": 1899,
   "tests/server/rift_upgrader.test.ts": 2209,
   "tests/server/route_dispatch.test.ts": 2923,
+  "tests/server/save_offline_character_state.test.ts": 753,
+  "tests/server/schema_notices.pg.test.ts": 100,
+  "tests/server/schema_notices.test.ts": 4,
   "tests/server/seeker_entitlement.test.ts": 234,
   "tests/server/seeker_entitlement_import_isolation.test.ts": 44,
   "tests/server/serial_writer.test.ts": 21,
@@ -4420,6 +7073,7 @@
   "tests/server/storage_recovery_session_sweep.test.ts": 2,
   "tests/server/storage_wire_ledger.test.ts": 57,
   "tests/server/tick_perf_capture.test.ts": 5771,
+  "tests/server/tick_perf_log.test.ts": 5,
   "tests/server/title_reads.test.ts": 11,
   "tests/server/tunables.test.ts": 774,
   "tests/server/ua_capi.test.ts": 24,
@@ -4431,6 +7085,7 @@
   "tests/server/woc_market_backfill.test.ts": 3,
   "tests/server/woc_market_custody.test.ts": 1111,
   "tests/server/woc_market_delivery.test.ts": 8,
+  "tests/server/woc_market_desktop_handoff.test.ts": 4,
   "tests/server/woc_market_directed_sql.test.ts": 21,
   "tests/server/woc_market_env_docs.test.ts": 192,
   "tests/server/woc_market_escrow_gate.test.ts": 8,
@@ -4455,8 +7110,11 @@
   "tests/server_unavailable.test.ts": 6,
   "tests/session_command.test.ts": 2679,
   "tests/set_4pc_bonuses.test.ts": 2953,
+  "tests/set_bonus_mods.test.ts": 737,
   "tests/set_proc_clearcasting.test.ts": 4060,
+  "tests/set_proc_fx.test.ts": 2,
   "tests/settings.test.ts": 30,
+  "tests/settings_transfer_core.test.ts": 4,
   "tests/sfx.test.ts": 79,
   "tests/sfx_conform.test.ts": 1204,
   "tests/sfx_export_core.test.ts": 22611,
@@ -4474,6 +7132,7 @@
   "tests/shader_debug_flag.test.ts": 7,
   "tests/shader_pow_domain.test.ts": 10,
   "tests/shadow_cadence_core.test.ts": 88,
+  "tests/shadow_depth_compile.test.ts": 5,
   "tests/shadow_only_material.test.ts": 7,
   "tests/shadow_pass_gate_core.test.ts": 5,
   "tests/shadow_pass_gate_three.test.ts": 12,
@@ -4494,6 +7153,7 @@
   "tests/shaman_warspirit_engine.test.ts": 2746,
   "tests/shapeshift_form_compile_gate.test.ts": 23,
   "tests/shapeshift_resource_persist.test.ts": 2646,
+  "tests/sheathe_toggle.test.ts": 3,
   "tests/shield_block.test.ts": 2286,
   "tests/shipped_item_ids.test.ts": 5,
   "tests/shore_water_gate_core.test.ts": 203,
@@ -4502,7 +7162,10 @@
   "tests/signature_reworks.test.ts": 3262,
   "tests/signpost_read.test.ts": 1187,
   "tests/sim.test.ts": 5190,
+  "tests/sim_calendar_feed.test.ts": 14,
   "tests/sim_context.test.ts": 4498,
+  "tests/sim_i18n_base_new_passthrough.test.ts": 8,
+  "tests/sim_i18n_name_collisions.test.ts": 7,
   "tests/sim_item_i18n.test.ts": 25,
   "tests/sim_quests_economy.test.ts": 7860,
   "tests/simple_context_menu.test.ts": 27,
@@ -4532,6 +7195,7 @@
   "tests/social_classes.test.ts": 11378,
   "tests/social_db_guild_names.test.ts": 9,
   "tests/social_frames.test.ts": 2736,
+  "tests/social_guild_create_lock.test.ts": 30,
   "tests/social_status_dots.test.ts": 8,
   "tests/social_system.test.ts": 123,
   "tests/social_view.test.ts": 18,
@@ -4544,6 +7208,7 @@
   "tests/soulwell_visual.test.ts": 30,
   "tests/spatial.test.ts": 3668,
   "tests/spawn_cinematic.test.ts": 37,
+  "tests/spawn_intro_seen.test.ts": 3,
   "tests/spec_baselines.test.ts": 2787,
   "tests/spec_icons.test.ts": 4303,
   "tests/spec_masteries.test.ts": 9528,
@@ -4586,6 +7251,7 @@
   "tests/steam_achievement_map.test.ts": 13,
   "tests/steam_link.test.ts": 592,
   "tests/steam_link_markup.test.ts": 5,
+  "tests/steam_wishlist.test.ts": 10,
   "tests/steep_ground_freeze.test.ts": 51795,
   "tests/step_smooth_core.test.ts": 13,
   "tests/storage_charters.test.ts": 1942,
@@ -4677,6 +7343,7 @@
   "tests/target_command.test.ts": 2511,
   "tests/target_cone_debug.test.ts": 9,
   "tests/target_echo_client.test.ts": 51,
+  "tests/target_flair_line_view.test.ts": 4,
   "tests/target_frame.test.ts": 8,
   "tests/target_frame_pos.test.ts": 15,
   "tests/target_portrait_view.test.ts": 742,
@@ -4693,6 +7360,7 @@
   "tests/temporal_hourglass_online.test.ts": 2053,
   "tests/temporal_hourglass_visual.test.ts": 20,
   "tests/terms_link.test.ts": 3,
+  "tests/terrain_calm_anchor_doors.test.ts": 3,
   "tests/terrain_chunk_geometry.test.ts": 1087,
   "tests/terrain_chunk_worker.test.ts": 431,
   "tests/terrain_edit_index.test.ts": 729,
@@ -4734,7 +7402,10 @@
   "tests/token_scope_db.test.ts": 8,
   "tests/tolling_bells.test.ts": 6176,
   "tests/tool_effect_result_lines.test.ts": 24,
+  "tests/tool_effect_result_view.test.ts": 5,
   "tests/tool_effect_tooltip.test.ts": 22,
+  "tests/tooltip_clamp_core.test.ts": 4,
+  "tests/tooltip_line_core.test.ts": 255,
   "tests/tooltip_owner.test.ts": 6,
   "tests/totarget_frame_css.test.ts": 10,
   "tests/totp.test.ts": 18,
@@ -4762,6 +7433,7 @@
   "tests/transfer_lock.test.ts": 6,
   "tests/travel_speed_fx.test.ts": 11,
   "tests/trivial_mob_passive.test.ts": 2339,
+  "tests/trophy_domination_claims.test.ts": 6,
   "tests/turnstile.test.ts": 16,
   "tests/tutorial.test.ts": 10,
   "tests/tutorial_copy.test.ts": 21,
@@ -4775,10 +7447,12 @@
   "tests/ui_effects_profile.test.ts": 11,
   "tests/ui_effects_wiring.test.ts": 15,
   "tests/ui_scale.test.ts": 8,
+  "tests/ui_scale_cache.test.ts": 9,
   "tests/ui_scale_geometry.test.ts": 13,
   "tests/ui_tier_knobs.test.ts": 16,
   "tests/umbral_anchor_marker.test.ts": 8214,
   "tests/umbral_anchor_vfx_core.test.ts": 8,
+  "tests/unbind_window_cells.test.ts": 12,
   "tests/unbind_window_hud.test.ts": 17,
   "tests/unequip_item.test.ts": 1824,
   "tests/unique_equipped.test.ts": 15479,
@@ -4812,6 +7486,7 @@
   "tests/varkhul_cinder_orbs.test.ts": 16,
   "tests/varkhul_damage_attack_animation.test.ts": 17,
   "tests/varkhul_dev_raid.test.ts": 2351,
+  "tests/varkhul_dialogue.test.ts": 3,
   "tests/varkhul_encounter.test.ts": 41551,
   "tests/varkhul_encounter_render.test.ts": 30,
   "tests/varkhul_engage.test.ts": 2155,
@@ -4826,9 +7501,15 @@
   "tests/varkhul_intercept_beam.test.ts": 9,
   "tests/varkhul_intercept_beam_encounter.test.ts": 2494,
   "tests/varkhul_intercept_beam_render.test.ts": 20,
+  "tests/varkhul_portal_replay.test.ts": 3,
+  "tests/varkhul_shared_pyre.test.ts": 3,
   "tests/varkhul_visual_manifest.test.ts": 12,
+  "tests/varkhul_voice_finalists.test.ts": 30,
+  "tests/varkhul_voice_pack.test.ts": 4,
+  "tests/varkhul_voice_processing.test.ts": 18,
   "tests/varkhul_worldfire.test.ts": 14,
   "tests/varkhul_worldfire_render.test.ts": 101,
+  "tests/vault_admission_determinism.test.ts": 669,
   "tests/vault_consumption_admission.test.ts": 155,
   "tests/vault_craft_gate.test.ts": 642,
   "tests/vault_snapshot_wire.test.ts": 4,
@@ -4841,6 +7522,7 @@
   "tests/vendor_buy_count.test.ts": 10,
   "tests/vendor_buy_stack.test.ts": 12,
   "tests/vendor_buyback_instance.test.ts": 2240,
+  "tests/vendor_floor.test.ts": 8,
   "tests/vendor_sell_quantity.test.ts": 9,
   "tests/vendor_stack.test.ts": 6,
   "tests/vendor_stock_gate_core.test.ts": 5,
@@ -4860,12 +7542,14 @@
   "tests/vite_dev_watch.test.ts": 22,
   "tests/vitest_fs_module_cache.test.ts": 6,
   "tests/voice.test.ts": 8,
+  "tests/voice_clip_extraction.test.ts": 5,
   "tests/voice_events.test.ts": 5,
   "tests/voice_manifest.test.ts": 149,
   "tests/voidfeast_gate.test.ts": 3204,
   "tests/voss_controllability.test.ts": 1670,
   "tests/voxel.test.ts": 70,
   "tests/voxel_mesh.test.ts": 321,
+  "tests/wall_backface_cull_core.test.ts": 10,
   "tests/wallet.test.ts": 46,
   "tests/wallet_balance.test.ts": 10,
   "tests/wallet_bridge_reason_text.test.ts": 8,
@@ -4986,6 +7670,7 @@
   "tests/woc_market_window.test.ts": 21,
   "tests/woc_market_window_rig.test.ts": 605,
   "tests/woc_market_wiring.test.ts": 5,
+  "tests/woc_market_wiring_desktop_default.test.ts": 4,
   "tests/woc_store_window_contract.test.ts": 23,
   "tests/woc_tokens_text.test.ts": 14,
   "tests/woc_trade_controller.test.ts": 61,
@@ -5001,6 +7686,7 @@
   "tests/world_grid.test.ts": 241,
   "tests/world_population_invariant.test.ts": 37318,
   "tests/world_telemetry.test.ts": 5,
+  "tests/worn_item_cell_view.test.ts": 4,
   "tests/worn_stone_shader.test.ts": 424,
   "tests/worst_window.test.ts": 8,
   "tests/write_module_dir.test.ts": 9,
@@ -5016,10 +7702,12 @@
   "tests/zone1_quest_directions.test.ts": 9,
   "tests/zone1_removed_content.test.ts": 50,
   "tests/zone3_sanctum_quests.test.ts": 6,
+  "tests/zone_celebration_fanout_shape.test.ts": 6,
   "tests/zone_eviction_core.test.ts": 11,
   "tests/zone_eviction_renderer_seam.test.ts": 6,
   "tests/zone_feature_visibility.test.ts": 9,
   "tests/zone_prepare_stats.test.ts": 5,
+  "tests/zone_prewarm_groups.test.ts": 8,
   "tests/zone_prewarm_templates_core.test.ts": 15,
   "tests/zone_streaming.test.ts": 15,
   "tests/zone_transition.test.ts": 5,
