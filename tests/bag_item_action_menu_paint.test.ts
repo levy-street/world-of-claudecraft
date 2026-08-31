@@ -596,18 +596,17 @@ describe('BagItemActionMenu target step: worn rows', () => {
     expect(h.applied[1]).toEqual({ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: undefined });
   });
 
-  it('a named worn copy titles its row by its chosen name; the bagged twin keeps the def name', () => {
-    // The cell authority in the target picker (the phase 13 QA round 3): the
-    // worn row names the exact worn COPY (Lucent Infusion targets promoted
-    // copies by design, and the chosen name is the discriminator between
-    // byte-identical rows), while bagged rows are grouped by item id and
-    // keep the def name (recorded: the group has no per-copy identity).
+  it('a named copy titles its row by its chosen name in BOTH families (the Phase 18 identity)', () => {
+    // The cell authority in the target picker: the worn row names its slot's
+    // exact COPY, and since the Phase 18 per-copy identity the bagged row
+    // names the VICTIM cell the core resolved (row.copy), so a bagged
+    // promoted legend leads with its chosen name too (Lucent Infusion
+    // targets promoted copies by design, and the chosen name is the
+    // discriminator between byte-identical rows). This closed the recorded
+    // def-name-only limit the pre-18 negative here pinned.
     const h = harness(768, {
       inventory: [
         { itemId: DUST, count: 99 },
-        // The bagged twin CARRIES a chosen name of its own, so the negative
-        // below is honest: the bagged arm groups by item id and must never
-        // read per-copy identity (the round-4 audit's positive control).
         {
           itemId: SWORD,
           count: 1,
@@ -622,8 +621,93 @@ describe('BagItemActionMenu target step: worn rows', () => {
     h.openTargets(WEAPON_ENCHANT);
     expect(h.rows()[0].text).toContain('Dawn Oath');
     expect(h.rows()[0].text).toContain('Worn (Main Hand)');
+    expect(h.rows()[1].text).toContain('Bag Oath');
     expect(h.rows()[1].text).not.toContain('Dawn Oath');
-    expect(h.rows()[1].text).not.toContain('Bag Oath');
+    // The chosen name REPLACES the def name (wornItemCellParts), on both rows.
+    expect(h.rows()[0].text).not.toContain(itemDisplayName(ITEMS[SWORD]));
+    expect(h.rows()[1].text).not.toContain(itemDisplayName(ITEMS[SWORD]));
+  });
+
+  it('the bagged row names the VICTIM copy the sim would spend, never a sibling', () => {
+    // Two instanced unenchanted copies: the plain apply's victim is the
+    // HIGHEST-index one (the remover's walk, mirrored by row.copy), so the
+    // row carries the later copy's chosen name; with the named copy sitting
+    // BELOW an unnamed victim, the row keeps the def name (naming the
+    // sibling would promise a copy the apply does not spend).
+    const named = { rolled: { quality: 'legendary' as const }, name: 'Late Oath' };
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1, instance: { signer: 'Crafter' } },
+        { itemId: SWORD, count: 1, instance: named },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    expect(h.rows()[0].text).toContain('Late Oath');
+
+    const flipped = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        { itemId: SWORD, count: 1, instance: named },
+        { itemId: SWORD, count: 1, instance: { signer: 'Crafter' } },
+      ],
+    });
+    flipped.openTargets(WEAPON_ENCHANT);
+    expect(flipped.rows()[0].text).toContain(itemDisplayName(ITEMS[SWORD]));
+    expect(flipped.rows()[0].text).not.toContain('Late Oath');
+  });
+
+  it('the BAGGED replace confirm names the victim copy by its chosen name (the worn parity)', () => {
+    const h = harness(768, {
+      inventory: [
+        { itemId: DUST, count: 99 },
+        {
+          itemId: SWORD,
+          count: 1,
+          instance: {
+            enchant: 'enchant_weapon_intellect',
+            rolled: { quality: 'legendary' },
+            name: 'Bag Oath',
+          },
+        },
+      ],
+    });
+    h.openTargets(WEAPON_ENCHANT);
+    h.click(`replace:${SWORD}`);
+    expect(h.applied).toEqual([]);
+    expect(h.confirms).toHaveLength(1);
+    expect(`${h.confirms[0].title} ${h.confirms[0].body}`).toContain('Bag Oath');
+  });
+
+  it('a bag shift between paint and click leaves the confirm naming the copy the ROW painted', () => {
+    // row.copy.slotIndex is a LIVE bag cell, so the menu captures the victim
+    // payload as it paints and the confirm speaks for that copy. Here the dust
+    // stack below the victim is spliced away between the paint and the click:
+    // a re-read of the same cell index would land on the sibling that slid down
+    // and name "Sibling Oath", a copy this row never described.
+    const inventory: InvSlot[] = [
+      { itemId: DUST, count: 99 },
+      {
+        itemId: SWORD,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_intellect', name: 'Sibling Oath' },
+      },
+      {
+        itemId: SWORD,
+        count: 1,
+        instance: { enchant: 'enchant_weapon_intellect', name: 'Painted Oath' },
+      },
+    ];
+    const h = harness(768, { inventory });
+    h.openTargets(WEAPON_ENCHANT);
+    // The pinned victim is the highest-index enchanted copy (replaceVictimIndex).
+    expect(h.rows()[0].text).toContain('Painted Oath');
+    inventory.splice(0, 1);
+    h.click(`replace:${SWORD}`);
+    expect(h.confirms).toHaveLength(1);
+    const said = `${h.confirms[0].title} ${h.confirms[0].body}`;
+    expect(said).toContain('Painted Oath');
+    expect(said).not.toContain('Sibling Oath');
   });
 
   it('the replace confirm names the worn victim by its chosen name', () => {

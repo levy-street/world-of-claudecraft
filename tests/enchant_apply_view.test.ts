@@ -49,11 +49,11 @@ function itemForSlot(slot: ItemSlot, skip = new Set<string>()): string {
   return id;
 }
 
-/** The bagged rows minus their per-copy identity (`copy`), for the pins whose
- *  subject is the row FAMILY (grouping, the replace facts, the #2421 / #2466
- *  flags), not WHICH copy the sim would consume: those stay exact over the
- *  family shape, and the identity has its own describe below (the Phase 18
- *  per-copy anchor), so neither pin dilutes the other. */
+/** The bagged rows minus their victim cell (`copy`), for the pins whose subject
+ *  is the row FAMILY (grouping, the replace facts, the #2421 / #2466 flags),
+ *  not WHICH copy the sim would consume: those stay exact over the family
+ *  shape, and the victim cell has its own describe below, so neither pin
+ *  dilutes the other. */
 function familyRows(rows: EnchantTargetRow[]): Array<Omit<EnchantTargetRow, 'copy'>> {
   return rows.map(({ copy: _copy, ...family }) => family);
 }
@@ -465,13 +465,13 @@ describe('enchant_apply_view: enchantTargets', () => {
   });
 });
 
-describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18 anchor)', () => {
-  // Every bagged row names WHICH copy its activation lands on, resolved
-  // through the sim's own walks, and anchors it the Phase 14 Perfecting way
-  // (ordinal among the family's same-id cells plus that count) so a consumer
-  // can follow the copy across the bag shifts the bags pins cover: a splice
-  // below it, the adjacent sibling sliding onto its old cell, and a same-id
-  // departure or arrival (where the anchor stands down on purpose).
+describe('enchant_apply_view: which bagged copy each row lands on (the Phase 18 victim cell)', () => {
+  // Every bagged row names WHICH copy its activation lands on, as that copy's
+  // bag CELL, resolved through the sim's own walks (baggedEnchantVictim for a
+  // plain row, replaceVictimIndex for a replace row) rather than a private
+  // guess. The cell is live for one frame and carries no re-targeting anchor,
+  // so what these arms pin is the RESOLUTION: which copy the walk lands on,
+  // and that a later call re-resolves it rather than reusing a stale cell.
   const chestId = itemForSlot('chest');
   const helmetId = itemForSlot('helmet'); // never a chest row: the filler stack
   const CHEST_ENCHANT = 'enchant_chest_stamina';
@@ -490,18 +490,33 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
     ];
     const rows = enchantTargets(inventory, CHEST_ENCHANT);
     expect(rows).toHaveLength(1);
-    // Units in `count`, CELLS in the anchor: three chest cells, four copies.
+    // `count` is UNITS (four copies over three chest cells); the copy is ONE
+    // cell, so neither number can stand in for the other.
     expect(rows[0].count).toBe(4);
-    expect(rows[0].copy).toEqual({
-      slotIndex: 2,
-      ordinal: 1,
-      count: 3,
-      identity: `plain:${chestId}:1/3`,
-    });
+    expect(rows[0].copy).toEqual({ slotIndex: 2 });
     // The sim's peek agrees: a plain fungible victim reads undefined there and
     // the named cell holds no payload.
     expect(baggedEnchantVictim(inventory, chestId, false)).toBeUndefined();
     expect(inventory[2].instance).toBeUndefined();
+  });
+
+  it('between two PLAIN cells of one id the victim is the highest-index one (the remover walks from the end)', () => {
+    // The one dimension the peek cannot answer for us: a plain fungible victim
+    // reads as undefined through baggedEnchantVictim (there is no payload to
+    // return), so plainVictimIndex spells that pass itself and has to spell it
+    // in the sim's direction. consumeOneScratch's first pass (src/sim/bags.ts,
+    // removeFungibleItem's walk) runs `for (let i = scratch.length - 1; i >= 0;
+    // i--)`, so the apply spends the LAST plain cell; a forward walk here would
+    // name the first, a copy the apply leaves alone. Two plain cells is the
+    // only fixture where the direction decides anything, which is why the arms
+    // above (one plain cell each, or none) all pass either way.
+    const inventory: InvSlot[] = [
+      { itemId: chestId, count: 1 },
+      { itemId: helmetId, count: 1 },
+      { itemId: chestId, count: 1 },
+    ];
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
+    expect(baggedEnchantVictim(inventory, chestId, false)).toBeUndefined();
   });
 
   it('with no plain cell the victim is the newest unenchanted INSTANCED copy, the very object the sim peeks', () => {
@@ -511,7 +526,7 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
       { itemId: chestId, count: 1, instance: { rolled: { masterwork: true } } },
     ];
     const copy = plainCopy(inventory);
-    expect(copy).toEqual({ slotIndex: 2, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
+    expect(copy).toEqual({ slotIndex: 2 });
     // One selection by construction: the cell the row names holds the payload
     // baggedEnchantVictim returns by reference.
     expect(inventory[copy?.slotIndex ?? -1].instance).toBe(
@@ -519,7 +534,7 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
     );
   });
 
-  it('a replace row names the pinned victim (replaceVictimIndex) among the ENCHANTED cells alone', () => {
+  it('a replace row names the pinned victim (replaceVictimIndex), its plain twin its own', () => {
     const inventory: InvSlot[] = [
       { itemId: chestId, count: 1, instance: { enchant: OTHER } },
       { itemId: helmetId, count: 1 },
@@ -528,21 +543,20 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
     ];
     expect(replaceCopy(inventory)).toEqual({
       slotIndex: replaceVictimIndex(inventory, chestId),
-      ordinal: 1,
-      count: 2,
-      identity: `replace:${chestId}:1/2`,
     });
     expect(replaceVictimIndex(inventory, chestId)).toBe(3);
-    // The two families of ONE item id anchor apart, each over its own cells.
-    expect(plainCopy(inventory)).toEqual({
-      slotIndex: 2,
-      ordinal: 0,
-      count: 1,
-      identity: `plain:${chestId}:0/1`,
-    });
+    // The two families of ONE item id resolve apart, each through its own
+    // walk: the replace row's victim is never the plain row's.
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
   });
 
-  it('a splice below the victim shifts its cell but not its identity (the Phase 14 splice arm)', () => {
+  it('re-resolves after a splice: the cell follows the victim rather than naming its sibling', () => {
+    // The cell is live for one frame, so the row is re-derived per call. Here a
+    // stack BELOW the victim is spliced away: a row that cached its old cell
+    // would name A, the adjacent sibling that slid onto it, while the walk
+    // still lands on B. This is why the picker's consumer captures the victim
+    // payload as it PAINTS instead of re-reading the cell when a row is
+    // clicked (tests/bag_item_action_menu_paint.test.ts pins that arm).
     const A: ItemInstancePayload = { signer: 'A' };
     const B: ItemInstancePayload = { signer: 'B' };
     const inventory: InvSlot[] = [
@@ -550,65 +564,14 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
       { itemId: chestId, count: 1, instance: A },
       { itemId: chestId, count: 1, instance: B },
     ];
-    const before = plainCopy(inventory);
-    expect(before).toEqual({
-      slotIndex: 2,
-      ordinal: 1,
-      count: 2,
-      identity: `plain:${chestId}:1/2`,
-    });
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 2 });
     expect(inventory[1].instance).toBe(A);
     inventory.splice(0, 1);
-    const after = plainCopy(inventory);
-    // The cell moved 2 -> 1 and the adjacent sibling's OLD cell (1) now holds
-    // the victim: a cell-keyed row would have named A before and B after,
-    // while the anchor names B both times.
-    expect(after?.slotIndex).toBe(1);
+    expect(plainCopy(inventory)).toEqual({ slotIndex: 1 });
     expect(inventory[1].instance).toBe(B);
-    expect(after?.identity).toBe(before?.identity);
-    expect(after).toEqual({ slotIndex: 1, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
   });
 
-  it('a same-id DEPARTURE moves the count, so the identity moves on purpose (the anchor stands down)', () => {
-    const inventory: InvSlot[] = [
-      { itemId: chestId, count: 1, instance: { signer: 'A' } },
-      { itemId: chestId, count: 1, instance: { signer: 'B' } },
-    ];
-    const before = plainCopy(inventory);
-    expect(before?.identity).toBe(`plain:${chestId}:1/2`);
-    inventory.splice(0, 1); // A sold: B slides onto cell 0
-    const after = plainCopy(inventory);
-    expect(after).toEqual({ slotIndex: 0, ordinal: 0, count: 1, identity: `plain:${chestId}:0/1` });
-    expect(after?.identity).not.toBe(before?.identity);
-  });
-
-  it('a same-id ARRIVAL moves the count too, and the newest copy becomes the victim', () => {
-    const inventory: InvSlot[] = [{ itemId: chestId, count: 1, instance: { signer: 'A' } }];
-    const before = plainCopy(inventory);
-    expect(before).toEqual({
-      slotIndex: 0,
-      ordinal: 0,
-      count: 1,
-      identity: `plain:${chestId}:0/1`,
-    });
-    inventory.push({ itemId: chestId, count: 1, instance: { signer: 'C' } });
-    const after = plainCopy(inventory);
-    expect(after).toEqual({ slotIndex: 1, ordinal: 1, count: 2, identity: `plain:${chestId}:1/2` });
-    expect(after?.identity).not.toBe(before?.identity);
-  });
-
-  it('a fungible stack is ONE cell: the anchor counts cells while the row counts units', () => {
-    const rows = enchantTargets([{ itemId: chestId, count: 3 }], CHEST_ENCHANT);
-    expect(rows[0].count).toBe(3);
-    expect(rows[0].copy).toEqual({
-      slotIndex: 0,
-      ordinal: 0,
-      count: 1,
-      identity: `plain:${chestId}:0/1`,
-    });
-  });
-
-  it('the ordinal counts the GATED family: a Perfected-only enchant anchors the victim among Perfected cells', () => {
+  it('a Perfected-only enchant lands on the Perfected copy, never the gated-out sibling', () => {
     const infusion = Object.values(ENCHANTS).find(
       (enchant) => enchant.requiresPerfected === true && enchant.itemSlot === 'chest',
     );
@@ -621,14 +584,9 @@ describe('enchant_apply_view: per-copy identity on the bagged rows (the Phase 18
     ];
     const rows = enchantTargets(inventory, enchantId, [], viewer);
     expect(rows).toHaveLength(1);
-    // The victim (the newest unenchanted instanced copy) IS the Perfected
-    // cell, and it is the family's only member: ordinal 0 of 1, not 1 of 2.
-    expect(rows[0].copy).toEqual({
-      slotIndex: 1,
-      ordinal: 0,
-      count: 1,
-      identity: `plain:${chestId}:0/1`,
-    });
+    // The row lands on the Perfected cell, not on the signed copy the per-copy
+    // gate refused: the walk sees the GATED family alone.
+    expect(rows[0].copy).toEqual({ slotIndex: 1 });
   });
 });
 

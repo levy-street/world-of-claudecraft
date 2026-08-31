@@ -606,36 +606,25 @@ function replaceInfoFor(
 /** The bagged COPY a target row's activation lands on, named the way the
  *  item_copy_ref selection contract (src/sim/item_copy_ref.ts) names a copy:
  *  its bag cell (`slotIndex`, the index-plus-id pin selectedInventorySlot
- *  takes) plus, for FOLLOWING it across a bag shift, the Phase 14 Perfecting
- *  anchor (perfecting_view.ts PerfectingSelectionAnchor): its ordinal among
- *  the same-id cells of its FAMILY (plain cells for a plain row, enchanted
- *  cells for a replace row), bag order, and that family's cell count. Every
- *  array mutation the sim performs on the bag is a splice or a push at the end
- *  (a drag rewrites cell HINTS, never the array, inventory_order.ts), so a
- *  splice of some other stack shifts every later cell but never reorders
- *  same-id siblings: the pair identifies the copy where its cell cannot (the
- *  adjacent sibling slides onto the old cell), and a same-id departure or
- *  arrival moves `count`, the signal to stop guessing.
+ *  takes). Resolved through the SAME walks the sim consumes through
+ *  (baggedEnchantVictim for the plain apply's victim, replaceVictimIndex for
+ *  the confirmed replace's pinned victim), so the row names the copy the
+ *  id-only command WILL consume, never a guess of its own.
  *
- *  Resolved through the SAME walks the sim consumes through (baggedEnchantVictim
- *  for the plain apply's victim, replaceVictimIndex for the confirmed
- *  replace's pinned victim), so the row names the copy the id-only command
- *  WILL consume, never a guess of its own. A thin consumer keys focus and
- *  selection by `identity` and can tell a shift between paint and click by
- *  re-resolving the row; once the apply facet takes a bag selection, the row
- *  already carries the `slotIndex` that contract consumes. */
+ *  The cell alone, deliberately: the Phase 14 Perfecting anchor
+ *  (perfecting_view.ts PerfectingSelectionAnchor, an ordinal-and-count pair
+ *  that re-targets a copy after a bag shift moves its cell) is NOT carried
+ *  here, because nothing in this picker could re-target with it. The target
+ *  step paints ONCE, its consumer captures the victim payload as it paints,
+ *  and the sim re-resolves the victim itself at accept, so a cross-shift
+ *  re-target has no caller: a copy arriving between dialog and accept moves
+ *  the SIM's own pin, the accepted #2415 window this whole picker already
+ *  carries. The anchor is what a latched SELECTION surviving repeated
+ *  repaints needs (perfecting_view.ts is one); this is not one, and carrying
+ *  it here would have been a shape with no reader. */
 export interface EnchantTargetCopy {
   /** The bag cell of the copy (a live index: valid for exactly one frame). */
   slotIndex: number;
-  /** Position among the family's same-id cells, bag order. */
-  ordinal: number;
-  /** The family's same-id cell count (cells, not units: a fungible stack of
-   *  three is ONE cell here and three in the row's `count`). */
-  count: number;
-  /** `<family>:<itemId>:<ordinal>/<count>`, the per-copy row key (the
-   *  perfecting_view identity shape): stable across a splice, moved on
-   *  purpose by a same-id departure or arrival. */
-  identity: string;
 }
 
 export interface EnchantTargetRow {
@@ -644,8 +633,9 @@ export interface EnchantTargetRow {
    *  already-enchanted copies for a replace row. */
   count: number;
   /** WHICH copy the row's activation lands on (the Phase 18 per-copy
-   *  identity): the sim's own victim for this row's arm, anchored so it can be
-   *  followed across a bag shift. See EnchantTargetCopy. */
+   *  identity): the bag cell of the sim's own victim for this row's arm, so
+   *  the thin consumer names the exact copy rather than the item def. See
+   *  EnchantTargetCopy. */
   copy: EnchantTargetCopy;
   /** Set iff the item is a HEROIC upgraded variant (#2466). ABSENT, never false,
    *  on an ordinary item. The thin consumer paints the heroic mark from this,
@@ -727,13 +717,7 @@ export function enchantTargets(
   if (!skillMeetsEnchant(enchant, viewer)) return [];
   const byItem = new Map<string, number>();
   const enchantedByItem = new Map<string, number>();
-  // The same-id CELLS of each family in bag order (the anchor's siblings):
-  // gated exactly like the counts above them, so the victim the sim walks to
-  // is always one of them (the arm gate passes only on a copy the per-copy
-  // gate accepts).
-  const plainCells = new Map<string, number[]>();
-  const enchantedCells = new Map<string, number[]>();
-  inventory.forEach((slot, cell) => {
+  inventory.forEach((slot) => {
     const def = ITEMS[slot.itemId];
     if (!def || def.slot !== enchant.itemSlot) return;
     if (!copyMeetsPerfectedGate(enchant, slot.instance)) return;
@@ -745,16 +729,14 @@ export function enchantTargets(
     if (!baggedArmMeetsPerfectedGate(enchant, inventory, slot.itemId, enchanted)) return;
     if (enchanted) {
       enchantedByItem.set(slot.itemId, (enchantedByItem.get(slot.itemId) ?? 0) + slot.count);
-      enchantedCells.set(slot.itemId, [...(enchantedCells.get(slot.itemId) ?? []), cell]);
       return;
     }
     byItem.set(slot.itemId, (byItem.get(slot.itemId) ?? 0) + slot.count);
-    plainCells.set(slot.itemId, [...(plainCells.get(slot.itemId) ?? []), cell]);
   });
   const rows: EnchantTargetRow[] = [...byItem].map(([itemId, count]) => ({
     itemId,
     count,
-    copy: anchoredCopy('plain', itemId, plainVictimIndex(inventory, itemId), plainCells),
+    copy: { slotIndex: plainVictimIndex(inventory, itemId) },
   }));
   for (const [itemId, count] of enchantedByItem) {
     const victimIdx = replaceVictimIndex(inventory, itemId);
@@ -765,12 +747,7 @@ export function enchantTargets(
     // confirm can honestly speak for the bind state here.
     const replace = replaceInfoFor(victim, enchantId, false);
     if (!replace) continue;
-    rows.push({
-      itemId,
-      count,
-      copy: anchoredCopy('replace', itemId, victimIdx, enchantedCells),
-      replace,
-    });
+    rows.push({ itemId, count, copy: { slotIndex: victimIdx }, replace });
   }
   // Mark the mixed holdings (#2421) once every family is in, so the flag
   // reflects the rows actually EMITTED: an enchanted copy the picker dropped
@@ -808,20 +785,6 @@ function plainVictimIndex(inventory: readonly InvSlot[], itemId: string): number
     if (slot.itemId === itemId && !slot.instance) return i;
   }
   return -1;
-}
-
-/** The anchor of the victim at `slotIndex` among its family's same-id cells
- *  (the perfecting_view identity vocabulary: `<family>:<id>:<ordinal>/<count>`). */
-function anchoredCopy(
-  family: 'plain' | 'replace',
-  itemId: string,
-  slotIndex: number,
-  cellsByItem: ReadonlyMap<string, readonly number[]>,
-): EnchantTargetCopy {
-  const cells = cellsByItem.get(itemId) ?? [];
-  const ordinal = cells.indexOf(slotIndex);
-  const count = cells.length;
-  return { slotIndex, ordinal, count, identity: `${family}:${itemId}:${ordinal}/${count}` };
 }
 
 export interface WornEnchantTargetRow {

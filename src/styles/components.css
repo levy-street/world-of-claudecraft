@@ -6243,16 +6243,11 @@
     display: block;
     margin-top: 2px;
   }
-  /* A reagent entry never breaks between its name and its have/required
-     count (the .guide-prof-mat wiki twin's rule): a wrapped count reads as a
-     stray number on the next line. */
-  .crafting-reagent {
-    white-space: nowrap;
-  }
   /* One reagent entry never breaks between its name and its have/required
-     count: an inline-block with nowrap wraps the reagent LIST between entries
-     instead (the wiki twin, .guide-prof-mat in src/guide/styles.css, which
-     this mirrors so the two surfaces read a bill the same way). */
+     count (a wrapped count reads as a stray number on the next line): an
+     inline-block with nowrap wraps the reagent LIST between entries instead,
+     mirroring the wiki twin .guide-prof-mat (src/guide/styles.css) so the
+     two surfaces read a bill the same way. */
   .crafting-reagent {
     display: inline-block;
     white-space: nowrap;

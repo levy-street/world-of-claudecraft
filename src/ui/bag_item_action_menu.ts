@@ -47,6 +47,7 @@ import { craftNameKey } from './hud/professions/craft_name_view';
 import { disenchantYieldLines } from './hud/professions/disenchant_yield_view';
 import {
   type EnchantReplaceTargetInfo,
+  type EnchantTargetRow,
   type EnchantViewerInput,
   enchantNameKey,
   enchantSectionsForReagent,
@@ -445,13 +446,15 @@ export class BagItemActionMenu {
     enchantId: string,
     replace: EnchantReplaceTargetInfo,
     slot?: EquipSlot,
+    baggedVictim?: ItemInstancePayload,
   ): void {
     const world = this.deps.world();
     const def = ITEMS[itemId];
-    // The worn victim's chosen name when it has one; a bagged victim is
-    // named by its def (the target rows group bagged copies by item id).
+    // The victim COPY's chosen name when it has one, on both families: the
+    // worn arm reads its slot's payload, the bagged arm the victim payload
+    // the row resolved (row.copy, the Phase 18 per-copy identity).
     const name = def
-      ? wornItemCellParts(def, slot ? world.equipmentInstances?.[slot] : undefined).name
+      ? wornItemCellParts(def, slot ? world.equipmentInstances?.[slot] : baggedVictim).name
       : itemId;
     const oldText = this.replacedEnchantText(replace);
     const newText = t(enchantNameKey(enchantId));
@@ -540,10 +543,13 @@ export class BagItemActionMenu {
       );
       return;
     }
-    // A worn row names the worn COPY (its chosen legendary name when it has
-    // one: Lucent Infusion targets promoted copies by design, and the chosen
-    // name is the discriminator that tells two byte-identical rows apart);
-    // bagged rows are grouped by item id and keep the def name.
+    // EVERY row names the exact COPY its activation lands on (its chosen
+    // legendary name when it has one: Lucent Infusion targets promoted copies
+    // by design, and the chosen name is the discriminator that tells two
+    // byte-identical rows apart). The worn family reads its slot's payload;
+    // the bagged family, still grouped by item id on the wire, reads the
+    // VICTIM cell the core resolved (row.copy, the Phase 18 per-copy
+    // identity), which closed the recorded def-name-only limit.
     const nameOf = (itemId: string, instance?: ItemInstancePayload): string => {
       const def = ITEMS[itemId];
       return esc(def ? wornItemCellParts(def, instance).name : itemId);
@@ -600,6 +606,12 @@ export class BagItemActionMenu {
       target: { itemId: string; heroic?: true },
       instance?: ItemInstancePayload,
     ): string => `${nameOf(target.itemId, instance)}${target.heroic ? heroicMeta() : ''}`;
+    // What each bagged row PAINTED its name from, keyed by the row itself so a
+    // mixed holding's two rows cannot borrow each other's copy. Captured here
+    // rather than re-read when the row is clicked: `copy.slotIndex` is a live
+    // bag cell, so a splice between paint and click would let the confirm name
+    // whatever slid onto that cell instead of the copy the player read.
+    const paintedVictims = new Map<EnchantTargetRow, ItemInstancePayload | undefined>();
     const rows = [
       ...worn.map((target) => {
         const html = `${identityOf(target, world.equipmentInstances?.[target.slot])}${wornMeta(target)}${
@@ -610,11 +622,15 @@ export class BagItemActionMenu {
           : { act: `worn:${target.slot}`, html };
       }),
       ...targets.map((target) => {
+        // The victim cell's payload (row.copy.slotIndex, the sim's own choice
+        // for this row's arm), through the same resolver the worn rows use.
+        const victim = world.inventory[target.copy.slotIndex]?.instance;
+        paintedVictims.set(target, victim);
         if (!target.replace) {
-          const html = `${identityOf(target)}${target.mixedHolding ? plainMeta() : ''}`;
+          const html = `${identityOf(target, victim)}${target.mixedHolding ? plainMeta() : ''}`;
           return { act: `target:${target.itemId}`, html };
         }
-        const html = `${identityOf(target)}${replaceMeta(target.replace)}`;
+        const html = `${identityOf(target, victim)}${replaceMeta(target.replace)}`;
         return target.replace.sameEnchant
           ? { html, disabled: true }
           : { act: `replace:${target.itemId}`, html };
@@ -640,7 +656,17 @@ export class BagItemActionMenu {
           const itemId = act.slice('replace:'.length);
           const target = targets.find((row) => row.itemId === itemId && row.replace);
           if (target?.replace) {
-            this.confirmReplace(itemId, enchantId, target.replace);
+            // The confirm names the copy the ROW described (the victim it
+            // painted from), never a fresh read of a cell that may have moved
+            // since; the sim's own pin re-resolves at accept, the #2415 window
+            // this whole picker already carries.
+            this.confirmReplace(
+              itemId,
+              enchantId,
+              target.replace,
+              undefined,
+              paintedVictims.get(target),
+            );
             return;
           }
         } else {

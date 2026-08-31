@@ -81,9 +81,16 @@ Kept at `src/ui/` root on purpose; do not pull them in without a reason:
   aria-hidden decoration beside accessible text).
 
 ## Named siblings and recorded decisions
-- The commission board opens from the crafting window's title-bar button
-  (`.crafting-orders-btn`), not a rail tile; a sibling professions window
-  reuses that precedent.
+- Openers (revised at the Phase 18 sweep): a professions window that is a
+  standalone player destination takes a col-a side-rail tile plus a keybind
+  (the Perfecting tile under Crafting on Shift+T is the seven-piece exemplar;
+  the Harvest Journal tile rides its pre-existing Shift+K; every seam is
+  pinned in `tests/professions_rail_tiles.test.ts`, because the recorded bug
+  class is a keybind wired at one of the two main.ts dispatch sites and dead
+  at the other). The commission board deliberately keeps the older shape, the
+  crafting window's title-bar button (`.crafting-orders-btn`): it is
+  crafting's own sub-surface (posting an order needs the recipe context), not
+  a standalone destination, so it earns no tile and no keybind.
 - `professions_view.ts`'s simplified-mode body is governed by an OPEN
   maintainer ruling ((be), `docs/prd/masterwrought/farming/state.md`): do
   not restructure the simplified-mode gathering rows without that ruling.

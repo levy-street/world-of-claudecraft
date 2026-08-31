@@ -563,6 +563,12 @@ describe('crafting reagent entries never break mid-entry (the wiki twin rule, Ph
     expect(css).toMatch(
       /\.crafting-reagent \{[^}]*display: inline-block;[^}]*white-space: nowrap;[^}]*\}/s,
     );
+    // ONE block, not two: the two frontend units that landed this rule each
+    // wrote their own, and the earlier white-space-only block was entirely
+    // subsumed by this one while carrying a second, competing rationale. A
+    // regex that only proves the surviving block exists stays green with the
+    // dead twin back above it.
+    expect(css.match(/^\s*\.crafting-reagent \{/gm) ?? []).toHaveLength(1);
     const guide = readFileSync(path.resolve(process.cwd(), 'src/guide/styles.css'), 'utf8');
     expect(guide).toMatch(
       /\.guide-prof-mat \{[^}]*display: inline-block;[^}]*white-space: nowrap;/s,
