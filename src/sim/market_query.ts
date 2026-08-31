@@ -96,6 +96,86 @@ export const MARKET_SORT_OPTIONS = ['name', 'price'] as const;
 // Listings per browse page (the count of OTHER sellers' listings shown at a time;
 // the player's own visible listings are wired on top for quick reclaim).
 export const MARKET_PAGE_SIZE = 50;
+export const MARKET_SEARCH_MAX_LENGTH = 40;
+
+// Localized search stays client-owned, but the server must decide which catalog ids a
+// client matched. The wire carries one bit per item against this stable code-unit-sorted
+// catalog. Its signature rejects masks minted for an older or different item catalog.
+// During a mixed-build deploy that rejection temporarily removes localized-only matches;
+// canonical English-name and item-id matching continue through the ordinary search path.
+export const MARKET_LOCALIZED_ITEM_CATALOG_IDS: readonly string[] = Object.freeze(
+  Object.keys(ITEMS).sort(),
+);
+
+function catalogSignature(ids: readonly string[]): string {
+  // FNV-1a over the deterministic JSON representation. Math.imul makes the 32-bit
+  // overflow identical in every JavaScript host used by the sim.
+  let hash = 0x811c9dc5;
+  const serialized = JSON.stringify(ids);
+  for (let i = 0; i < serialized.length; i++) {
+    hash ^= serialized.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return `m1-${(hash >>> 0).toString(16).padStart(8, '0')}`;
+}
+
+export const MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE = catalogSignature(
+  MARKET_LOCALIZED_ITEM_CATALOG_IDS,
+);
+export const MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH = Math.ceil(
+  MARKET_LOCALIZED_ITEM_CATALOG_IDS.length / 4,
+);
+const MARKET_LOCALIZED_ITEM_INDEX = new Map(
+  MARKET_LOCALIZED_ITEM_CATALOG_IDS.map((itemId, index) => [itemId, index] as const),
+);
+
+function sanitizeLocalizedItemMask(raw: unknown): string {
+  if (typeof raw !== 'string') return '';
+  const prefix = `${MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE}:`;
+  if (raw.length !== prefix.length + MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH) return '';
+  if (!raw.startsWith(prefix)) return '';
+  const payload = raw.slice(prefix.length).toLowerCase();
+  if (!/^[0-9a-f]+$/.test(payload)) return '';
+
+  // The last nibble may contain unused high bits. Refuse those bits so every set of
+  // catalog ids has exactly one canonical encoding.
+  const usedBits = MARKET_LOCALIZED_ITEM_CATALOG_IDS.length % 4;
+  if (usedBits !== 0) {
+    const lastNibble = Number.parseInt(payload[payload.length - 1], 16);
+    if (lastNibble >= 1 << usedBits) return '';
+  }
+  return `${prefix}${payload}`;
+}
+
+export function encodeMarketLocalizedItemMask(itemIds: readonly string[]): string {
+  const nibbles = new Uint8Array(MARKET_LOCALIZED_ITEM_MASK_HEX_LENGTH);
+  for (const itemId of itemIds) {
+    const index = MARKET_LOCALIZED_ITEM_INDEX.get(itemId);
+    if (index !== undefined) nibbles[index >>> 2] |= 1 << (index & 3);
+  }
+  let payload = '';
+  for (const nibble of nibbles) payload += nibble.toString(16);
+  return `${MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE}:${payload}`;
+}
+
+function canonicalMarketLocalizedItemMaskHas(itemId: string, mask: string): boolean {
+  const index = MARKET_LOCALIZED_ITEM_INDEX.get(itemId);
+  if (index === undefined || !mask) return false;
+  const payloadOffset = MARKET_LOCALIZED_ITEM_CATALOG_SIGNATURE.length + 1;
+  const encodedNibble = mask[payloadOffset + (index >>> 2)];
+  if (encodedNibble === undefined) return false;
+  const nibble = Number.parseInt(encodedNibble, 16);
+  return (nibble & (1 << (index & 3))) !== 0;
+}
+
+export function marketLocalizedItemMaskHas(itemId: string, mask: string): boolean {
+  const canonical = sanitizeLocalizedItemMask(mask);
+  return canonicalMarketLocalizedItemMaskHas(itemId, canonical);
+}
+
+export function normalizeMarketSearch(search: string): string {
+  return search.slice(0, MARKET_SEARCH_MAX_LENGTH).trim().toLowerCase();
+}
 
 export type MarketItemTypeFilter = (typeof MARKET_ITEM_TYPE_FILTERS)[number];
 export type MarketArmorTypeFilter = (typeof MARKET_ARMOR_TYPE_FILTERS)[number];
@@ -112,6 +192,8 @@ export type MarketSort = (typeof MARKET_SORT_OPTIONS)[number];
 /** The full browse state: search text, filters, sort, and the page index. */
 export interface MarketQuery {
   search: string;
+  /** Catalog-signed membership for names localized by the UI. Session-only and untrusted. */
+  localizedItemMask: string;
   itemType: MarketItemTypeFilter;
   subtype: MarketSubtypeFilter;
   armorClass: MarketArmorClassFilter;
@@ -128,6 +210,7 @@ export interface MarketQuery {
 export function defaultMarketQuery(): MarketQuery {
   return {
     search: '',
+    localizedItemMask: '',
     itemType: 'all',
     subtype: 'all',
     armorClass: 'all',
@@ -140,11 +223,13 @@ export function defaultMarketQuery(): MarketQuery {
 }
 
 // Coerce an untrusted (wire) query into a valid MarketQuery: unknown enum values
-// fall back to 'all', the search is trimmed to 40 chars, the page floored at 0.
+// fall back to 'all', search is capped at 40 chars, localized membership must match
+// this catalog exactly, and page is floored at 0.
 export function sanitizeMarketQuery(
   raw:
     | {
         search?: unknown;
+        localizedItemMask?: unknown;
         itemType?: unknown;
         subtype?: unknown;
         armorClass?: unknown;
@@ -163,8 +248,13 @@ export function sanitizeMarketQuery(
     typeof raw?.page === 'number' && Number.isFinite(raw.page)
       ? Math.max(0, Math.floor(raw.page))
       : 0;
+  const search =
+    typeof raw?.search === 'string' ? raw.search.slice(0, MARKET_SEARCH_MAX_LENGTH) : '';
   return {
-    search: typeof raw?.search === 'string' ? raw.search.slice(0, 40) : '',
+    search,
+    localizedItemMask: normalizeMarketSearch(search)
+      ? sanitizeLocalizedItemMask(raw?.localizedItemMask)
+      : '',
     itemType: oneOf(MARKET_ITEM_TYPE_FILTERS, raw?.itemType, 'all'),
     subtype: oneOf(
       [
@@ -274,10 +364,15 @@ function itemMatchesPrimaryStat(item: ItemDef, query: MarketQuery): boolean {
 export function marketItemMatches(itemId: string, query: MarketQuery): boolean {
   const item = ITEMS[itemId];
   if (!item) return false;
-  const search = query.search.trim().toLowerCase();
+  const search = normalizeMarketSearch(query.search);
   if (search) {
     const name = (item.name ?? itemId).toLowerCase();
-    if (!name.includes(search) && !itemId.toLowerCase().includes(search)) return false;
+    if (
+      !name.includes(search) &&
+      !itemId.toLowerCase().includes(search) &&
+      !canonicalMarketLocalizedItemMaskHas(itemId, query.localizedItemMask)
+    )
+      return false;
   }
   return (
     itemMatchesType(item, query.itemType) &&

@@ -3,7 +3,7 @@ import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/item
 import { ITEMS } from '../src/sim/data';
 import type { MarketCollection } from '../src/sim/market';
 import { MARKET_PLAYER_LISTING_ID_BASE } from '../src/sim/market_listing_ids';
-import type { MarketQuery } from '../src/sim/market_query';
+import { encodeMarketLocalizedItemMask, type MarketQuery } from '../src/sim/market_query';
 import { emptySaleLog, type MarketSaleLog } from '../src/sim/market_sale_log';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
@@ -20,6 +20,7 @@ function makeWorld() {
 function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
   return {
     search,
+    localizedItemMask: '',
     itemType: 'all',
     subtype: 'all',
     armorClass: 'all',
@@ -140,6 +141,54 @@ describe('the World Market: the Merchant', () => {
     // Clearing the filter restores the full, unfiltered view.
     sim.marketSearch(q(''), seller);
     expect(sim.marketInfoFor(seller)?.totalCount).toBe(all.totalCount);
+  });
+
+  it('filters the full book by localized membership before paginating', () => {
+    const sim = makeWorld();
+    const viewer = sim.addPlayer('warrior', 'Viewer');
+    standAtMerchant(sim, viewer);
+    const book = sim.market.marketListings;
+    book.length = 0;
+
+    // Ashwood Log sorts before Bone Fragments. If pagination happened first, page 0
+    // would contain only distractors and local filtering would incorrectly return none.
+    for (let i = 0; i < 60; i++) {
+      book.push({
+        id: 100 + i,
+        sellerKey: 'distractor',
+        sellerName: 'Distractor',
+        itemId: 'ashwood_log',
+        count: 1,
+        price: 100 + i,
+        expiresAt: Number.POSITIVE_INFINITY,
+        house: false,
+      });
+      book.push({
+        id: 1000 + i,
+        sellerKey: 'match',
+        sellerName: 'Match',
+        itemId: 'bone_fragments',
+        count: 1,
+        price: 100 + i,
+        expiresAt: Number.POSITIVE_INFINITY,
+        house: false,
+      });
+    }
+
+    const localizedItemMask = encodeMarketLocalizedItemMask(['bone_fragments']);
+    sim.marketSearch(q('fragmentos', { localizedItemMask }), viewer);
+    const page0 = marketInfo(sim, viewer);
+    expect(page0.totalCount).toBe(60);
+    expect(page0.pageCount).toBe(2);
+    expect(page0.listings).toHaveLength(50);
+    expect(page0.listings.every((listing) => listing.itemId === 'bone_fragments')).toBe(true);
+
+    sim.marketSearch(q('fragmentos', { localizedItemMask, page: 1 }), viewer);
+    const page1 = marketInfo(sim, viewer);
+    expect(page1.totalCount).toBe(60);
+    expect(page1.pageCount).toBe(2);
+    expect(page1.listings).toHaveLength(10);
+    expect(page1.listings.every((listing) => listing.itemId === 'bone_fragments')).toBe(true);
   });
 
   // Issue #2416: the browse query echo. Before this fix, MarketInfo only echoed the

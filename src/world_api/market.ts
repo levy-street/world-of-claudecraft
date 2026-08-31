@@ -42,9 +42,9 @@ export interface MarketInfo {
   // applied, echoed back alongside `filter` above. A fresh join (post-linkdead-grace
   // reconnect) resets the session-only server query to default while the window's
   // own filter controls survive the socket drop untouched; echoing every filter
-  // axis, not just the search text, is what lets the client detect that drift
-  // (queryDiffersFromEcho below) instead of silently showing filter buttons that no
-  // longer describe what the listings were actually matched against (issue #2416).
+  // axis, not just the search text, is what lets the client avoid silently showing
+  // filter buttons that no longer describe what the listings were actually matched
+  // against (issue #2416).
   itemType: MarketItemTypeFilter;
   subtype: MarketSubtypeFilter;
   armorClass: MarketArmorClassFilter;
@@ -98,41 +98,4 @@ export interface IWorldMarket {
   marketBuy(listingId: number): void;
   marketCancel(listingId: number): void;
   marketCollect(): void;
-}
-
-// True when the caller's intended browse query no longer matches what the server
-// actually applied, per the filter axes MarketInfo echoes back (issue #2416). Page
-// and the raw search text are deliberately left out: the server clamps `page`
-// against the live match count (a normal narrowing, not drift), and `filter` is
-// not sanitized the same way `search` is on the way in (length/trim), so comparing
-// it here would false-positive on a search box the player is mid-typing in. The
-// seven compared axes (five filters plus sort, issue 3102, plus collapseLowest,
-// issue 3103) are exactly the ones that silently reset to default on a fresh join
-// (post-linkdead-grace reconnect) while a window's own filter controls survive the
-// socket drop untouched.
-export function queryDiffersFromEcho(query: MarketQuery, info: MarketInfo): boolean {
-  return (
-    query.itemType !== info.itemType ||
-    query.subtype !== info.subtype ||
-    query.armorClass !== info.armorClass ||
-    query.primaryStat !== info.primaryStat ||
-    query.rarity !== info.rarity ||
-    query.sort !== info.sort ||
-    query.collapseLowest !== info.collapseLowest
-  );
-}
-
-// True when a settled search box no longer matches what the server actually
-// applied. Deliberately NOT folded into queryDiffersFromEcho above: that
-// check runs on every filter-button click (including mid-typed-in searches),
-// where `filter` is not a safe comparison because it is not sanitized the
-// same way `search` is on the client side as the player types. This one is
-// reconnect-only (MarketWindow.onReconnected, once the socket is settled and
-// no keystroke is in flight), where the stored server-side query is exactly
-// `search.slice(0, MARKET_SEARCH_MAX_LEN)` (sanitizeMarketQuery in
-// src/sim/market_query.ts) and so is directly comparable to the echo.
-export const MARKET_SEARCH_MAX_LEN = 40;
-
-export function searchDiffersFromEcho(query: MarketQuery, info: MarketInfo): boolean {
-  return info.filter !== query.search.slice(0, MARKET_SEARCH_MAX_LEN);
 }

@@ -4245,6 +4245,7 @@ function marketRoundTrip(): Scenario {
       sim.marketSearch(
         {
           search: 'wolf',
+          localizedItemMask: '',
           itemType: 'all',
           subtype: 'all',
           armorClass: 'all',
@@ -4260,6 +4261,7 @@ function marketRoundTrip(): Scenario {
       sim.marketSearch(
         {
           search: '',
+          localizedItemMask: '',
           itemType: 'all',
           subtype: 'all',
           armorClass: 'all',

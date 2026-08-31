@@ -25,6 +25,7 @@ function makeWorld() {
 function q(search = '', extra: Partial<MarketQuery> = {}): MarketQuery {
   return {
     search,
+    localizedItemMask: '',
     itemType: 'all',
     subtype: 'all',
     armorClass: 'all',

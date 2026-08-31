@@ -9,6 +9,7 @@ vi.mock('../server/db', () => ({
   saveMailState: vi.fn(async () => {}),
   loadMarketState: vi.fn(async () => null),
   loadMailState: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -27,8 +28,56 @@ vi.mock('../server/db', () => ({
 }));
 
 import { GameServer } from '../server/game';
+import { encodeMarketLocalizedItemMask } from '../src/sim/market_query';
 
 describe('GameServer market query wire', () => {
+  it('decodes and stores a valid localized-name membership mask', () => {
+    const server = new GameServer();
+    const ws = { readyState: 1, send: () => undefined } as unknown as WebSocket;
+    const joined = server.join(ws, 1, 1, 'Buyer', 'warrior', null);
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    const localizedItemMask = encodeMarketLocalizedItemMask(['wolf_fang']);
+
+    server.handleMessage(
+      joined,
+      JSON.stringify({
+        t: 'cmd',
+        cmd: 'market_search',
+        q: 'colmillo',
+        localizedItemMask,
+        page: 0,
+      }),
+    );
+
+    expect(server.sim.players.get(joined.pid)?.marketQuery.localizedItemMask).toBe(
+      localizedItemMask,
+    );
+  });
+
+  it('drops omitted, malformed, and stale localized membership masks', () => {
+    const server = new GameServer();
+    const ws = { readyState: 1, send: () => undefined } as unknown as WebSocket;
+    const joined = server.join(ws, 1, 1, 'Buyer', 'warrior', null);
+    if ('error' in joined) throw new Error(joined.error);
+    joined.blockListLoaded = true;
+    const valid = encodeMarketLocalizedItemMask(['wolf_fang']);
+
+    for (const localizedItemMask of [undefined, `${valid}0`, valid.replace(/^m1-/, 'm0-'), 7]) {
+      server.handleMessage(
+        joined,
+        JSON.stringify({
+          t: 'cmd',
+          cmd: 'market_search',
+          q: 'colmillo',
+          localizedItemMask,
+          page: 0,
+        }),
+      );
+      expect(server.sim.players.get(joined.pid)?.marketQuery.localizedItemMask).toBe('');
+    }
+  });
+
   it('decodes armor class and primary stat before storing the session query', () => {
     const server = new GameServer();
     const ws = {
@@ -57,6 +106,7 @@ describe('GameServer market query wire', () => {
 
     expect(server.sim.players.get(joined.pid)?.marketQuery).toEqual({
       search: 'robe',
+      localizedItemMask: '',
       itemType: 'armor',
       subtype: 'chest',
       armorClass: 'cloth',
@@ -91,6 +141,7 @@ describe('GameServer market query wire', () => {
 
     expect(server.sim.players.get(joined.pid)?.marketQuery).toEqual({
       search: '',
+      localizedItemMask: '',
       itemType: 'all',
       subtype: 'all',
       armorClass: 'all',
