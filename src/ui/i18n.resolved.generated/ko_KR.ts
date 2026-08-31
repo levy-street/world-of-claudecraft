@@ -10391,11 +10391,11 @@ export const ko_KR: EnTranslations = {
       },
       "melting_acid": {
         "name": "용해 산",
-        "description": "대상에게 부식성 독을 끼얹어 {damage}의 자연 피해를 주고 12초 동안 방어도를 5% 감소시킵니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 부식성 산을 끼얹어 12초 동안 방어도를 5% 감소시킵니다."
       },
       "nightshade_coating": {
         "name": "가지독 코팅",
-        "description": "대상을 가지독으로 뒤덮어 {damage}의 자연 피해를 주고 12초 동안 받는 치유 효과를 25% 감소시킵니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상을 가지독으로 뒤덮어 12초 동안 받는 치유 효과를 25% 감소시킵니다."
       },
       "expose_armor": {
         "name": "방어구 돌파",
@@ -10411,11 +10411,11 @@ export const ko_KR: EnTranslations = {
       },
       "instant_poison": {
         "name": "독사의 이빨",
-        "description": "30분 동안 무기에 독을 발라 근접 공격마다 8의 추가 자연 피해를 입힙니다."
+        "description": "30분 동안 무기에 독을 발라 근접 공격마다 {damage}의 추가 자연 피해를 입힙니다."
       },
       "deadly_poison": {
         "name": "곪는 독",
-        "description": "30분 동안 무기에 독을 발라 근접 공격마다 14의 추가 자연 피해를 입힙니다."
+        "description": "30분 동안 무기에 독을 바릅니다. 근접 공격마다 대상에게 독 중첩을 1 추가하고(최대 5) 지속시간 12초를 갱신합니다. 중첩 1당 2초마다 {damage}의 자연 피해를 입힙니다."
       },
       "blind": {
         "name": "흙 뿌리기",

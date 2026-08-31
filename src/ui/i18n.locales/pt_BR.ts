@@ -6182,10 +6182,10 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
     'Some de vista, entrando em Duskveil mesmo em combate. Você se move 50% mais devagar enquanto escondido. Dura até 10 s.',
   'entities.abilities.instant_poison.name': 'Mordida da Víbora',
   'entities.abilities.instant_poison.description':
-    'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar 8 de dano adicional da Natureza.',
+    'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar {damage} de dano adicional da Natureza.',
   'entities.abilities.deadly_poison.name': 'Veneno Purulento',
   'entities.abilities.deadly_poison.description':
-    'Reveste sua arma por 30 min, fazendo cada um de seus golpes corpo a corpo causar 14 de dano adicional da Natureza.',
+    'Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo adiciona um acúmulo de veneno ao alvo, até 5, e renova a duração de 12 s. Cada acúmulo causa {damage} de dano de Natureza a cada 2 s.',
   'entities.abilities.blind.name': 'Punhado de Terra',
   'entities.abilities.blind.description':
     'Cega o alvo, fazendo-o vagar desorientado por 8 s. Qualquer dano quebra o efeito.',
@@ -13875,9 +13875,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "Rastreador HUD",
   "hudChrome.reliquary.trackerToggleShowHint": "Mostre o rastreador do Relicário na sua tela",
   "apiError.account.password_already_set": "Esta conta já possui uma senha. Use Alterar senha.",
-  "entities.abilities.melting_acid.description": "Salpica o alvo com um veneno cáustico, causando {damage} dano de Natureza e reduzindo sua armadura em 5% por 12 s.",
+  "entities.abilities.melting_acid.description": "Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo salpica o alvo com ácido cáustico e reduz sua armadura em 5% por 12 s.",
   "entities.abilities.melting_acid.name": "Ácido Derretido",
-  "entities.abilities.nightshade_coating.description": "Cobre o alvo com beladona, causando {damage} de dano de Natureza e reduzindo em 25% a cura que ele recebe por 12 s.",
+  "entities.abilities.nightshade_coating.description": "Reveste sua arma por 30 min. Cada um de seus golpes corpo a corpo cobre o alvo com beladona e reduz em 25% a cura que ele recebe por 12 s.",
   "entities.abilities.nightshade_coating.name": "Revestimento de erva-moura",
   "guide.settingsPage.ifShowReliquaryTracker": "Se o rastreador do Relicário (suas páginas fixadas e seu progresso) está no seu HUD. A janela do Relicário tem um botão de olho correspondente e fixar uma página ativa o rastreador novamente.",
   // v0.41 release i18n fill.

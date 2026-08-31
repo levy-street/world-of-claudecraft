@@ -3156,10 +3156,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '从视野中消失，即使在战斗中也能进入暮帷状态。隐身时你的移动速度降低 50%。持续最多 10 秒。',
   'entities.abilities.instant_poison.name': '蝰蛇之咬',
   'entities.abilities.instant_poison.description':
-    '为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 8 点自然伤害。',
+    '为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 {damage} 点自然伤害。',
   'entities.abilities.deadly_poison.name': '溃烂毒液',
   'entities.abilities.deadly_poison.description':
-    '为你的武器淬毒，持续 30 分钟，使你的每次近战攻击额外造成 14 点自然伤害。',
+    '为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会为目标叠加 1 层毒素，最多 5 层，并刷新 12 秒的持续时间。每层每 2 秒造成 {damage} 点自然伤害。',
   'entities.abilities.blind.name': '扬尘',
   'entities.abilities.blind.description':
     '使目标失明，导致其神志不清地四处游荡，持续 8 秒。任何伤害都会打破效果。',
@@ -14102,10 +14102,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.anyTarget': '敌方或友方目标',
   'entities.abilities.melting_acid.name': '溶解酸',
   'entities.abilities.melting_acid.description':
-    '向目标泼洒腐蚀性毒液，造成 {damage} 点自然伤害，并使其护甲降低 5%，持续 12 秒。',
+    '为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会向目标泼洒腐蚀性强酸，使其护甲降低 5%，持续 12 秒。',
   'entities.abilities.nightshade_coating.name': '夜影涂层',
   'entities.abilities.nightshade_coating.description':
-    '用夜影覆盖目标，造成 {damage} 点自然伤害，并使其受到的治疗降低 25%，持续 12 秒。',
+    '为你的武器淬毒，持续 30 分钟。你的每次近战攻击都会用夜影覆盖目标，使其受到的治疗降低 25%，持续 12 秒。',
   // v0.41 release i18n fill.
   'hudChrome.itemMenu.sell': '出售',
   'hudChrome.itemMenu.sellAll': '全部出售（{count}）',

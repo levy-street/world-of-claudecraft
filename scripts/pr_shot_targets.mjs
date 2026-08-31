@@ -7359,17 +7359,34 @@ export const TARGETS = [
       'ui/hud/action_bar/ability_requirement_keys',
       'sim/incapacitate_dr',
       'sim/combat/stealth_focus',
+      // Weapon coats decide the whole rogue-poison tooltip family: what the
+      // coat does per swing, and whether the row asks for a target at all.
+      'sim/combat/poison_coating',
     ],
     variants: [
       // Every variant enters as the class that OWNS the ability: the standalone
       // page enters with variant.charClass, and the default (warrior) knows none
       // of these, which reads as "not known at level 20".
-      // The two utility poisons: new rows, so their BEFORE is "not in the book".
+      // The four rogue poisons. All are weapon coats now (issue #3774 turned the
+      // two utility ones back from 40-energy targeted nukes into coatings), so
+      // the row copy is the only place a player reads what each one does.
       {
         key: 'melting-acid',
         charClass: 'rogue',
         charName: 'Nightsliver',
         abilityId: 'melting_acid',
+      },
+      {
+        key: 'instant-poison',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'instant_poison',
+      },
+      {
+        key: 'deadly-poison',
+        charClass: 'rogue',
+        charName: 'Nightsliver',
+        abilityId: 'deadly_poison',
       },
       {
         key: 'nightshade-coating',

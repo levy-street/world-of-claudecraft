@@ -7445,7 +7445,13 @@ function renderClassDetails(
           } else if (secondaryEffect.type === 'absorb') {
             dmgText = formatClassDetailNumber(secondaryEffect.amount);
           } else if (secondaryEffect.type === 'imbue') {
-            dmgText = formatClassDetailNumber(secondaryEffect.bonus);
+            // Same rule as ability_description's $d: a coat with a damage
+            // rider reads the rider, not its zero flat swing bonus.
+            dmgText = formatClassDetailNumber(
+              secondaryEffect.coat?.rider === 'stackDot'
+                ? Math.max(1, Math.round(secondaryEffect.coat.perTick))
+                : secondaryEffect.bonus,
+            );
           }
         }
       }

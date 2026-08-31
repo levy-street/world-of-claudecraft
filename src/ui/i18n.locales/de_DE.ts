@@ -6258,10 +6258,10 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
     'Verschwindet aus dem Blickfeld und tretet selbst im Kampf in Duskveil. Ihr bewegt euch 50% langsamer, solange ihr verborgen seid. Hält bis zu 10 Sek. an.',
   'entities.abilities.instant_poison.name': 'Natternbiss',
   'entities.abilities.instant_poison.description':
-    'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 8 zusätzlichen Naturschaden verursacht.',
+    'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge {damage} zusätzlichen Naturschaden verursacht.',
   'entities.abilities.deadly_poison.name': 'Eiterndes Gift',
   'entities.abilities.deadly_poison.description':
-    'Überzieht eure Waffe 30 Min. lang, sodass jeder eurer Nahkampfschwünge 14 zusätzlichen Naturschaden verursacht.',
+    'Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge fügt dem Ziel eine Giftstufe hinzu, bis zu 5, und erneuert die Dauer von 12 Sek. Jede Stufe verursacht alle 2 Sek. {damage} Naturschaden.',
   'entities.abilities.blind.name': 'Dreckwurf',
   'entities.abilities.blind.description':
     'Blendet das Ziel, sodass es 8 Sek. lang desorientiert umherirrt. Jeder Schaden bricht den Effekt.',
@@ -14063,9 +14063,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD-Tracker",
   "hudChrome.reliquary.trackerToggleShowHint": "Zeigen Sie den Reliquiar-Tracker auf Ihrem Bildschirm an",
   "apiError.account.password_already_set": "Dieses Konto hat bereits ein Passwort. Verwenden Sie stattdessen „Passwort ändern“.",
-  "entities.abilities.melting_acid.description": "Bespritzt das Ziel mit einem ätzenden Gift, das {damage} Naturschaden verursacht und seine Rüstung 12 Sek. lang um 5 % verringert.",
+  "entities.abilities.melting_acid.description": "Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge bespritzt das Ziel mit ätzender Säure und verringert seine Rüstung 12 Sek. lang um 5 %.",
   "entities.abilities.melting_acid.name": "Schmelzende Säure",
-  "entities.abilities.nightshade_coating.description": "Hüllt das Ziel in Nachtschatten, verursacht {damage} Naturschaden und verringert die erhaltene Heilung 12 Sek. lang um 25 %.",
+  "entities.abilities.nightshade_coating.description": "Überzieht eure Waffe 30 Min. lang. Jeder eurer Nahkampfschwünge hüllt das Ziel in Nachtschatten und verringert die erhaltene Heilung 12 Sek. lang um 25 %.",
   "entities.abilities.nightshade_coating.name": "Nachtschattenbeschichtung",
   "guide.settingsPage.ifShowReliquaryTracker": "Ob sich der Reliquiar-Tracker (Ihre angehefteten Seiten und deren Fortschritt) auf Ihrem HUD befindet. Das Reliquiar-Fenster verfügt über eine entsprechende Augenschaltfläche und durch das Anheften einer Seite wird der Tracker wieder aktiviert.",
   // v0.41 release i18n fill.

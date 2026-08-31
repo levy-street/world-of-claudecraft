@@ -10391,11 +10391,11 @@ export const it_IT: EnTranslations = {
       },
       "melting_acid": {
         "name": "Acido Fondere",
-        "description": "Spruzza il bersaglio con un veleno caustico, infliggendo {damage} danni da natura e riducendone l'armatura del 5% per 12 sec."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia spruzza il bersaglio con acido caustico e ne riduce l'armatura del 5% per 12 sec."
       },
       "nightshade_coating": {
         "name": "Rivestimento Nightshade",
-        "description": "Ricopre il bersaglio di ombra notturna, infliggendo {damage} danni da natura e riducendo le cure ricevute del 25% per 12 sec."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia ricopre il bersaglio di ombra notturna e riduce le cure ricevute del 25% per 12 sec."
       },
       "expose_armor": {
         "name": "Breccia nell'Armatura",
@@ -10411,11 +10411,11 @@ export const it_IT: EnTranslations = {
       },
       "instant_poison": {
         "name": "Morso della Vipera",
-        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 8 danni della Natura aggiuntivi."
+        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga {damage} danni della Natura aggiuntivi."
       },
       "deadly_poison": {
         "name": "Veleno Putrescente",
-        "description": "Ricopre la tua arma per 30 min, facendo sì che ognuno dei tuoi attacchi in mischia infligga 14 danni della Natura aggiuntivi."
+        "description": "Ricopre la tua arma per 30 min. Ognuno dei tuoi attacchi in mischia aggiunge una carica di veleno al bersaglio, fino a 5, e rinnova la durata di 12 sec. Ogni carica infligge {damage} danni da natura ogni 2 sec."
       },
       "blind": {
         "name": "Lancio di Terra",

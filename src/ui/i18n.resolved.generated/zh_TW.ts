@@ -10391,11 +10391,11 @@ export const zh_TW: EnTranslations = {
       },
       "melting_acid": {
         "name": "溶解酸",
-        "description": "向目標潑灑腐蝕性毒液，造成 {damage} 點自然傷害，並使其護甲降低 5%，持續 12 秒。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會向目標潑灑腐蝕性強酸，使其護甲降低 5%，持續 12 秒。"
       },
       "nightshade_coating": {
         "name": "夜影塗層",
-        "description": "用夜影覆蓋目標，造成 {damage} 點自然傷害，並使其受到的治療降低 25%，持續 12 秒。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會用夜影覆蓋目標，使其受到的治療降低 25%，持續 12 秒。"
       },
       "expose_armor": {
         "name": "裂甲",
@@ -10411,11 +10411,11 @@ export const zh_TW: EnTranslations = {
       },
       "instant_poison": {
         "name": "蝰蛇之咬",
-        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 8 點自然傷害。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 {damage} 點自然傷害。"
       },
       "deadly_poison": {
         "name": "潰爛之毒",
-        "description": "在你的武器上塗抹毒藥，持續 30 分鐘，使你的每次近戰揮擊額外造成 14 點自然傷害。"
+        "description": "在你的武器上塗抹毒藥，持續 30 分鐘。你的每次近戰揮擊都會為目標疊加 1 層毒素，最多 5 層，並刷新 12 秒的持續時間。每層每 2 秒造成 {damage} 點自然傷害。"
       },
       "blind": {
         "name": "揚塵",

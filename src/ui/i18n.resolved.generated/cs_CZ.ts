@@ -10391,11 +10391,11 @@ export const cs_CZ: EnTranslations = {
       },
       "melting_acid": {
         "name": "Tavící kyselina",
-        "description": "Postříká cíl žíravým jedem, způsobí poškození přírody {damage} a sníží jeho brnění o 5 % na 12 sekund."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko postříká cíl žíravou kyselinou a sníží jeho brnění o 5 % na 12 sekund."
       },
       "nightshade_coating": {
         "name": "Nátěr Nightshade",
-        "description": "Pokryje cíl v nočním stínu, způsobí {damage} poškození přírody a sníží léčení, které obdrží, o 25 % po dobu 12 sekund."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko pokryje cíl nočním stínem a sníží léčení, které obdrží, o 25 % po dobu 12 sekund."
       },
       "expose_armor": {
         "name": "Průraz zbroje",
@@ -10411,11 +10411,11 @@ export const cs_CZ: EnTranslations = {
       },
       "instant_poison": {
         "name": "Zmijí kousnutí",
-        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 8 dodatečného přírodního poškození."
+        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí {damage} dodatečného přírodního poškození."
       },
       "deadly_poison": {
         "name": "Hnisavý jed",
-        "description": "Potře zbraň na 30 min, takže každý tvůj úder na blízko způsobí 14 dodatečného přírodního poškození."
+        "description": "Potře zbraň na 30 min. Každý tvůj úder na blízko přidá cíli vrstvu jedu, až do 5, a obnoví trvání 12 sekund. Každá vrstva způsobí {damage} poškození přírody každé 2 sekundy."
       },
       "blind": {
         "name": "Hození hlíny",

@@ -10391,11 +10391,11 @@ export const sv_SE: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smältande syra",
-        "description": "Stänker målet med ett frätande gift, gör {damage} naturskada och minskar dess rustning med 5 % i 12 sekunder."
+        "description": "Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg stänker frätande syra på målet och minskar dess rustning med 5 % i 12 sekunder."
       },
       "nightshade_coating": {
         "name": "Nightshade beläggning",
-        "description": "Belägger målet i nattskugga, gör {damage} naturskada och minskar läkningen den får med 25 % under 12 sek."
+        "description": "Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg belägger målet i nattskugga och minskar läkningen det får med 25 % i 12 sekunder."
       },
       "expose_armor": {
         "name": "Rustningsbräsch",
@@ -10411,11 +10411,11 @@ export const sv_SE: EnTranslations = {
       },
       "instant_poison": {
         "name": "Huggormens bett",
-        "description": "Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 8 extra naturskada."
+        "description": "Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar {damage} extra naturskada."
       },
       "deadly_poison": {
         "name": "Varande gift",
-        "description": "Bestryker ditt vapen i 30 min så att vart och ett av dina närstridshugg vållar 14 extra naturskada."
+        "description": "Bestryker ditt vapen i 30 min. Vart och ett av dina närstridshugg lägger till en giftstapling på målet, upp till 5, och förnyar varaktigheten på 12 sekunder. Varje stapling vållar {damage} naturskada varannan sekund."
       },
       "blind": {
         "name": "Gruskast",

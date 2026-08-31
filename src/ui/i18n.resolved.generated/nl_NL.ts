@@ -10391,11 +10391,11 @@ export const nl_NL: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smeltend zuur",
-        "description": "Bespat het doelwit met een bijtend gif, richt {damage} schade aan de natuur aan en vermindert het pantser met 5% gedurende 12 seconden."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bespat het doelwit met bijtend zuur en vermindert zijn pantser met 5% gedurende 12 seconden."
       },
       "nightshade_coating": {
         "name": "Nachtschade-coating",
-        "description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bestrijkt het doelwit met nachtschade en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden."
       },
       "expose_armor": {
         "name": "Pantserbres",
@@ -10411,11 +10411,11 @@ export const nl_NL: EnTranslations = {
       },
       "instant_poison": {
         "name": "Adderbeet",
-        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 8 extra Natuurschade toebrengt."
+        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen {damage} extra Natuurschade toebrengt."
       },
       "deadly_poison": {
         "name": "Etterend Gif",
-        "description": "Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 14 extra Natuurschade toebrengt."
+        "description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen voegt een gifstapeling toe aan het doelwit, tot 5, en vernieuwt de duur van 12 seconden. Elke stapeling richt elke 2 seconden {damage} natuurschade aan."
       },
       "blind": {
         "name": "Zandworp",

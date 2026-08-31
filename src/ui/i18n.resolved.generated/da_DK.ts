@@ -10391,11 +10391,11 @@ export const da_DK: EnTranslations = {
       },
       "melting_acid": {
         "name": "Smeltende syre",
-        "description": "Sprøjter målet med en ætsende gift, giver {damage} naturskade og reducerer dets rustning med 5 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek."
       },
       "nightshade_coating": {
         "name": "Natskygge belægning",
-        "description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug overtrækker målet i natskygge og reducerer den heling, det modtager, med 25 % i 12 sek."
       },
       "expose_armor": {
         "name": "Rustningsbrud",
@@ -10411,11 +10411,11 @@ export const da_DK: EnTranslations = {
       },
       "instant_poison": {
         "name": "Hugormbid",
-        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder 8 ekstra naturskade."
+        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder {damage} ekstra naturskade."
       },
       "deadly_poison": {
         "name": "Betændt Gift",
-        "description": "Smører dit våben i 30 min, så hvert af dine nærkampshug volder 14 ekstra naturskade."
+        "description": "Smører dit våben i 30 min. Hvert af dine nærkampshug lægger et lag gift på målet, op til 5, og fornyer varigheden på 12 sek. Hvert lag volder {damage} naturskade hvert 2. sek."
       },
       "blind": {
         "name": "Jordkast",

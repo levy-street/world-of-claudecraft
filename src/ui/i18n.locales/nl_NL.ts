@@ -4910,7 +4910,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'Spurt vooruit en verhoogt de bewegingssnelheid met 50% gedurende 15 sec. Alleen in Wolfsgedaante.',
   'entities.abilities.dash.name': 'Spurt',
   'entities.abilities.deadly_poison.description':
-    'Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 14 extra Natuurschade toebrengt.',
+    'Bestrijkt je wapen gedurende 30 min. Elke slag van wapen voegt een gifstapeling toe aan het doelwit, tot 5, en vernieuwt de duur van 12 seconden. Elke stapeling richt elke 2 seconden {damage} natuurschade aan.',
   'entities.abilities.deadly_poison.name': 'Etterend Gif',
   'entities.abilities.defensive_stance.description':
     'Een verdedigende gevechtshouding: je genereert 30% meer dreiging, maar brengt 10% minder schade toe en incasseert 10% minder. Activeer opnieuw om de houding te verlaten.',
@@ -5036,7 +5036,7 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
     'De vijand wordt belaagd door insecten en lijdt {damage} Natuurschade gedurende 12 sec.',
   'entities.abilities.insect_swarm.name': 'Stekende Zwerm',
   'entities.abilities.instant_poison.description':
-    'Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen 8 extra Natuurschade toebrengt.',
+    'Bestrijkt je wapen gedurende 30 min, waardoor elke slag van wapen {damage} extra Natuurschade toebrengt.',
   'entities.abilities.instant_poison.name': 'Adderbeet',
   'entities.abilities.judgement.description':
     'Ontketent je actieve Zegel op de vijand en verbruikt het om de opgeslagen Heilige schade toe te brengen.',
@@ -13871,9 +13871,9 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD-tracker",
   "hudChrome.reliquary.trackerToggleShowHint": "Toon de Reliquary-tracker op uw scherm",
   "apiError.account.password_already_set": "Dit account heeft al een wachtwoord. Gebruik in plaats daarvan Wachtwoord wijzigen.",
-  "entities.abilities.melting_acid.description": "Bespat het doelwit met een bijtend gif, richt {damage} schade aan de natuur aan en vermindert het pantser met 5% gedurende 12 seconden.",
+  "entities.abilities.melting_acid.description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bespat het doelwit met bijtend zuur en vermindert zijn pantser met 5% gedurende 12 seconden.",
   "entities.abilities.melting_acid.name": "Smeltend zuur",
-  "entities.abilities.nightshade_coating.description": "Bestrijkt het doelwit met nachtschade, richt {damage} natuurschade aan en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden.",
+  "entities.abilities.nightshade_coating.description": "Bestrijkt je wapen gedurende 30 min. Elke slag van wapen bestrijkt het doelwit met nachtschade en vermindert de genezing die het ontvangt met 25% gedurende 12 seconden.",
   "entities.abilities.nightshade_coating.name": "Nachtschade-coating",
   "guide.settingsPage.ifShowReliquaryTracker": "Of de Reliquary-tracker (uw vastgezette pagina's en hun voortgang) op uw HUD staat. Het Reliquary-venster heeft een bijpassende oogknop, en als u een pagina vastzet, wordt de tracker weer ingeschakeld.",
   // v0.41 release i18n fill.

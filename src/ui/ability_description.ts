@@ -124,7 +124,14 @@ export function abilityEffectText(res: ResolvedAbility, scaling?: AbilityScaling
         ? formatAbilityNumber(secondary.amount) + suffix(secondary)
         : formatAbilityNumber(secondary.casterMaxHpPct * 100);
     case 'imbue':
-      return formatAbilityNumber(secondary.bonus);
+      // A coat whose payload IS its rider (Festering Venom deals no flat swing
+      // damage) reads the rider's per-stack tick instead of the zero bonus, so
+      // $d follows the talent-resolved value the same way every other $d does.
+      return formatAbilityNumber(
+        secondary.coat?.rider === 'stackDot'
+          ? Math.max(1, Math.round(secondary.coat.perTick))
+          : secondary.bonus,
+      );
     default:
       return '';
   }

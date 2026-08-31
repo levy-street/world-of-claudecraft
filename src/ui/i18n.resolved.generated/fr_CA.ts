@@ -10391,11 +10391,11 @@ export const fr_CA: EnTranslations = {
       },
       "melting_acid": {
         "name": "Acide fondant",
-        "description": "Projette la cible d'un poison caustique, infligeant {damage} dégâts de Nature et réduisant son armure de 5% pendant 12 s."
+        "description": "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée projette de l'acide caustique sur la cible et réduit son armure de 5% pendant 12 s."
       },
       "nightshade_coating": {
         "name": "Revêtement Morelle",
-        "description": "Enduit la cible de morelle, infligeant {damage} dégâts de Nature et réduisant les soins qu'elle reçoit de 25% pendant 12 s."
+        "description": "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée enduit la cible de morelle et réduit les soins qu'elle reçoit de 25% pendant 12 s."
       },
       "expose_armor": {
         "name": "Brèche d'armure",
@@ -10411,11 +10411,11 @@ export const fr_CA: EnTranslations = {
       },
       "instant_poison": {
         "name": "Morsure de vipère",
-        "description": "Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant 8 dégâts de Nature supplémentaires."
+        "description": "Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant {damage} dégâts de Nature supplémentaires."
       },
       "deadly_poison": {
         "name": "Venin purulent",
-        "description": "Enduit votre arme pendant 30 min, chacune de vos attaques en mêlée infligeant 14 dégâts de Nature supplémentaires."
+        "description": "Enduit votre arme pendant 30 min. Chacune de vos attaques en mêlée ajoute un cumul de venin sur la cible, jusqu'à 5, et rafraîchit la durée de 12 s. Chaque cumul inflige {damage} dégâts de Nature toutes les 2 s."
       },
       "blind": {
         "name": "Jet de terre",

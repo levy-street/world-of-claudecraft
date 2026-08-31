@@ -4785,7 +4785,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'İleri atılarak hareket hızını 15 saniye boyunca %50 artırır. Yalnızca Kurt Formu.',
   'entities.abilities.dash.name': 'Atılma',
   'entities.abilities.deadly_poison.description':
-    'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 14 ek Doğa hasarı verir.',
+    'Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefe bir zehir katı ekler, en fazla 5, ve 12 saniyelik süreyi yeniler. Her kat 2 saniyede bir {damage} Doğa hasarı verir.',
   'entities.abilities.deadly_poison.name': 'İrinli Zehir',
   'entities.abilities.defensive_stance.description':
     'Savunma amaçlı bir dövüş duruşu: %30 daha fazla tehdit üretirsin ama %10 daha az hasar verir ve alırsın. Duruştan çıkmak için tekrar kullan.',
@@ -4907,7 +4907,7 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
     'Düşman böceklerce sarılır ve 12 saniye boyunca {damage} Doğa hasarı alır.',
   'entities.abilities.insect_swarm.name': 'Sokan Sürü',
   'entities.abilities.instant_poison.description':
-    'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 8 ek Doğa hasarı verir.',
+    'Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun {damage} ek Doğa hasarı verir.',
   'entities.abilities.instant_poison.name': 'Engerek Isırığı',
   'entities.abilities.judgement.description':
     'Aktif Mührünü düşmanın üzerine salar ve onu tüketerek depoladığı Kutsal hasarı verir.',
@@ -13630,9 +13630,9 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD izleyici",
   "hudChrome.reliquary.trackerToggleShowHint": "Reliquary izleyiciyi ekranınızda gösterin",
   "apiError.account.password_already_set": "Bu hesabın zaten bir şifresi var. Bunun yerine Şifreyi Değiştir'i kullanın.",
-  "entities.abilities.melting_acid.description": "Hedefe yakıcı bir zehir sıçratarak {damage} Nature hasarı verir ve 12 saniye boyunca zırhını %5 azaltır.",
+  "entities.abilities.melting_acid.description": "Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefe yakıcı asit sıçratır ve 12 saniye boyunca zırhını %5 azaltır.",
   "entities.abilities.melting_acid.name": "Eriyen Asit",
-  "entities.abilities.nightshade_coating.description": "Hedefi itüzümüyle kaplayarak {damage} Nature hasarı verir ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır.",
+  "entities.abilities.nightshade_coating.description": "Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefi itüzümüyle kaplar ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır.",
   "entities.abilities.nightshade_coating.name": "Gece Gölgesi Kaplama",
   "guide.settingsPage.ifShowReliquaryTracker": "Reliquary izleyicinin (sabitlenmiş sayfalarınız ve ilerlemeleri) HUD'nizde bulunup bulunmadığı. Reliquary penceresinde eşleşen bir göz düğmesi bulunur ve bir sayfayı sabitlemek izleyiciyi tekrar açar.",
   // v0.41 release i18n fill.

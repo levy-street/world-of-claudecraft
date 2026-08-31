@@ -10391,11 +10391,11 @@ export const tr_TR: EnTranslations = {
       },
       "melting_acid": {
         "name": "Eriyen Asit",
-        "description": "Hedefe yakıcı bir zehir sıçratarak {damage} Nature hasarı verir ve 12 saniye boyunca zırhını %5 azaltır."
+        "description": "Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefe yakıcı asit sıçratır ve 12 saniye boyunca zırhını %5 azaltır."
       },
       "nightshade_coating": {
         "name": "Gece Gölgesi Kaplama",
-        "description": "Hedefi itüzümüyle kaplayarak {damage} Nature hasarı verir ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır."
+        "description": "Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefi itüzümüyle kaplar ve aldığı iyileştirmeyi 12 saniye boyunca %25 azaltır."
       },
       "expose_armor": {
         "name": "Zırh Gediği",
@@ -10411,11 +10411,11 @@ export const tr_TR: EnTranslations = {
       },
       "instant_poison": {
         "name": "Engerek Isırığı",
-        "description": "Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 8 ek Doğa hasarı verir."
+        "description": "Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun {damage} ek Doğa hasarı verir."
       },
       "deadly_poison": {
         "name": "İrinli Zehir",
-        "description": "Silahını 30 dakika boyunca kaplar; her yakın dövüş vuruşun 14 ek Doğa hasarı verir."
+        "description": "Silahını 30 dakika boyunca kaplar. Her yakın dövüş vuruşun hedefe bir zehir katı ekler, en fazla 5, ve 12 saniyelik süreyi yeniler. Her kat 2 saniyede bir {damage} Doğa hasarı verir."
       },
       "blind": {
         "name": "Toprak Fırlatma",

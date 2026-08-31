@@ -4831,7 +4831,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Rusza naprzód susem, zwiększając prędkość ruchu o 50% na 15 sek. Tylko w postaci wilka.',
   'entities.abilities.dash.name': 'Sus',
   'entities.abilities.deadly_poison.description':
-    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 14 dodatkowych obrażeń od natury.',
+    'Pokrywa twój oręż na 30 min. Każde uderzenie wręcz dodaje celowi warstwę trucizny, do 5, i odnawia czas trwania 12 sek. Każda warstwa zadaje {damage} obrażeń natury co 2 sek.',
   'entities.abilities.deadly_poison.name': 'Jątrzący jad',
   'entities.abilities.defensive_stance.description':
     'Defensywna postawa bojowa: generujesz o 30% więcej zagrożenia, lecz zadajesz i otrzymujesz o 10% mniej obrażeń. Rzuć ponownie, aby opuścić postawę.',
@@ -4954,7 +4954,7 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Wroga oblepia rój owadów, zadając {damage} obrażeń od natury w ciągu 12 sek.',
   'entities.abilities.insect_swarm.name': 'Żądlący rój',
   'entities.abilities.instant_poison.description':
-    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje 8 dodatkowych obrażeń od natury.',
+    'Pokrywa twój oręż na 30 min, sprawiając, że każde uderzenie wręcz zadaje {damage} dodatkowych obrażeń od natury.',
   'entities.abilities.instant_poison.name': 'Ukąszenie żmii',
   'entities.abilities.judgement.description':
     'Uwalnia twoją aktywną pieczęć na wrogu, zużywając ją, by zadać zmagazynowane obrażenia od Świętości.',
@@ -13808,9 +13808,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "Śledzenie HUD-u",
   "hudChrome.reliquary.trackerToggleShowHint": "Pokaż moduł śledzenia relikwiarzy na swoim ekranie",
   "apiError.account.password_already_set": "To konto ma już hasło. Zamiast tego użyj opcji Zmień hasło.",
-  "entities.abilities.melting_acid.description": "Opryskuje cel żrącą trucizną, zadając {damage} obrażeń natury i zmniejszając jego pancerz o 5% na 12 sek.",
+  "entities.abilities.melting_acid.description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz opryskuje cel żrącym kwasem i zmniejsza jego pancerz o 5% na 12 sek.",
   "entities.abilities.melting_acid.name": "Topniejący kwas",
-  "entities.abilities.nightshade_coating.description": "Pokrywa cel psianką, zadając {damage} obrażeń natury i redukując otrzymywane leczenie o 25% na 12 sek.",
+  "entities.abilities.nightshade_coating.description": "Pokrywa twój oręż na 30 min. Każde uderzenie wręcz pokrywa cel psianką i redukuje otrzymywane przez niego leczenie o 25% na 12 sek.",
   "entities.abilities.nightshade_coating.name": "Powłoka Nocnego Cienia",
   "guide.settingsPage.ifShowReliquaryTracker": "Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.",
   // v0.41 release i18n fill.

@@ -3285,10 +3285,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '視界から消え、戦闘中でもダスクヴェール状態に入ります。隠れている間は移動速度が50%低下します。最大10秒間持続します。',
   'entities.abilities.instant_poison.name': '毒蛇の噛みつき',
   'entities.abilities.instant_poison.description':
-    '武器に30分間毒を塗り、近接攻撃ごとに8の追加自然ダメージを与えます。',
+    '武器に30分間毒を塗り、近接攻撃ごとに{damage}の追加自然ダメージを与えます。',
   'entities.abilities.deadly_poison.name': '腐敗の毒',
   'entities.abilities.deadly_poison.description':
-    '武器に30分間毒を塗り、近接攻撃ごとに14の追加自然ダメージを与えます。',
+    '武器に30分間毒を塗ります。近接攻撃ごとに対象へ毒のスタックを1つ追加し（最大5）、持続時間12秒を更新します。1スタックにつき2秒ごとに{damage}の自然ダメージを与えます。',
   'entities.abilities.blind.name': '砂かけ',
   'entities.abilities.blind.description':
     '対象を盲目にし、8秒間混乱してさまよわせます。ダメージを受けると効果が切れます。',
@@ -14411,10 +14411,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'abilityUi.tooltip.anyTarget': '敵または味方の対象',
   'entities.abilities.melting_acid.name': '溶解酸',
   'entities.abilities.melting_acid.description':
-    '対象に腐食性の毒を浴びせ、{damage}の自然ダメージを与え、12秒間その防御力を5%低下させます。',
+    '武器に30分間毒を塗り、近接攻撃ごとに対象に腐食性の酸を浴びせ、12秒間その防御力を5%低下させます。',
   'entities.abilities.nightshade_coating.name': 'ナス科毒の塗布',
   'entities.abilities.nightshade_coating.description':
-    '対象をナス科毒で覆い、{damage}の自然ダメージを与え、12秒間受ける回復量を25%低下させます。',
+    '武器に30分間毒を塗り、近接攻撃ごとに対象をナス科毒で覆い、12秒間受ける回復量を25%低下させます。',
   // v0.41 release i18n fill.
   'hudChrome.itemMenu.sell': '売却',
   'hudChrome.itemMenu.sellAll': 'すべて売却（{count}）',

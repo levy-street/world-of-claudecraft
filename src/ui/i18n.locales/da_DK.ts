@@ -4665,7 +4665,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Spurt fremad og øg bevægelseshastigheden med 50% i 15 sek. Kun i Ulveform.',
   'entities.abilities.dash.name': 'Ræs',
   'entities.abilities.deadly_poison.description':
-    'Smører dit våben i 30 min, så hvert af dine nærkampshug volder 14 ekstra naturskade.',
+    'Smører dit våben i 30 min. Hvert af dine nærkampshug lægger et lag gift på målet, op til 5, og fornyer varigheden på 12 sek. Hvert lag volder {damage} naturskade hvert 2. sek.',
   'entities.abilities.deadly_poison.name': 'Betændt Gift',
   'entities.abilities.defensive_stance.description':
     'En defensiv kampstilling: du skaber 30% mere trussel, men volder og modtager 10% mindre skade. Aktivér igen for at forlade stillingen.',
@@ -4787,7 +4787,7 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
     'Fjenden sværmes af insekter og tager {damage} naturskade over 12 sek.',
   'entities.abilities.insect_swarm.name': 'Stikkende Sværm',
   'entities.abilities.instant_poison.description':
-    'Smører dit våben i 30 min, så hvert af dine nærkampshug volder 8 ekstra naturskade.',
+    'Smører dit våben i 30 min, så hvert af dine nærkampshug volder {damage} ekstra naturskade.',
   'entities.abilities.instant_poison.name': 'Hugormbid',
   'entities.abilities.judgement.description':
     'Udløser dit aktive Segl mod fjenden og forbruger det for at volde dets oplagrede Hellig skade.',
@@ -13724,9 +13724,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   "hudChrome.reliquary.trackerToggleLabel": "HUD tracker",
   "hudChrome.reliquary.trackerToggleShowHint": "Vis Reliquary-trackeren på din skærm",
   "apiError.account.password_already_set": "Denne konto har allerede en adgangskode. Brug Skift adgangskode i stedet.",
-  "entities.abilities.melting_acid.description": "Sprøjter målet med en ætsende gift, giver {damage} naturskade og reducerer dets rustning med 5 % i 12 sek.",
+  "entities.abilities.melting_acid.description": "Smører dit våben i 30 min. Hvert af dine nærkampshug sprøjter målet med ætsende syre og reducerer dets rustning med 5 % i 12 sek.",
   "entities.abilities.melting_acid.name": "Smeltende syre",
-  "entities.abilities.nightshade_coating.description": "Overtrækker målet i natskygge, giver {damage} naturskade og reducerer helingen, den modtager med 25 % i 12 sek.",
+  "entities.abilities.nightshade_coating.description": "Smører dit våben i 30 min. Hvert af dine nærkampshug overtrækker målet i natskygge og reducerer den heling, det modtager, med 25 % i 12 sek.",
   "entities.abilities.nightshade_coating.name": "Natskygge belægning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-trackeren (dine fastgjorte sider og deres fremskridt) sidder på din HUD. Reliquary-vinduet har en matchende øjenknap, og fastgørelse af en side tænder trackeren igen.",
   // v0.41 release i18n fill.

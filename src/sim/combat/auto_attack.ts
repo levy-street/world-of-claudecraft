@@ -72,6 +72,7 @@ import { tryGrantSolarReprisal } from './paladin_solar_reprisal';
 import { applyRequitalAutoAttack } from './paladin_talents';
 import { isValkyrsCallingAirborne } from './paladin_valkyrs_calling_state';
 import { effectivePlayerAttackRange } from './player_attack_reach';
+import { applyPoisonCoats } from './poison_coating';
 import { rangedShotProfile } from './ranged_shot';
 import { wearsSetBonus } from './set_bonus_wearer';
 import { triggerWardCycle } from './shaman_talents';
@@ -676,6 +677,10 @@ export function meleeSwing(
       triggerWardCycle(ctx, attacker);
     }
     onMeleeSwing(ctx, attacker);
+    // Weapon coats (the rogue poisons) land their rider on the struck target
+    // here, on the LANDED arm only: a miss, dodge or parry returned above, so
+    // a whiffed swing carries no poison. Draws no rng.
+    applyPoisonCoats(ctx, attacker, target);
   }
   // thorns / lightning shield: melee attackers take damage back. Charge-limited
   // thorns (Lightning Shield) consume a charge and gate on an internal cooldown.
