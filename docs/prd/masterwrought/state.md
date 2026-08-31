@@ -23394,6 +23394,26 @@ record; the QA twin re-sweeps and diffs.
   cost is one missing "N beds ready" line in a narrow one-time case, accepted
   over a new persisted field.
 
+### THE RE-DERIVATIONS THE AMENDMENT DEMANDED, AND WHAT THEY OVERTURNED
+
+The eighth sync's amendment made two seed anchors re-derive-first. Both were
+re-run on the merged catalog before any fix:
+- pbe-boost-caster-belt-tank: REFUTED. forgewall_girdle (armor 270, str 8,
+  sta 9) now wins both tank waists at 43.80 (warrior prot) and 43.00 (paladin
+  protection); spiritweld_girdle scores 30.67 and ranks fifth of 38 eligible.
+  The recorded defect does not reproduce, so the unit shipped the PIN that
+  catches its return instead of a fix to a scorer that no longer misbehaves.
+  A third recorded figure fell with it: the divergence re-gears SEVEN role
+  kits, not eight (corrected at its two homes).
+- druid-balance-harness-drift: CONFIRMED EXACTLY. Every recorded probe figure
+  reproduces (moongrove 3429/214/3430/5, wildfang 4911/205/5755.24/12, bruin
+  2589/148/8461.88/4; bruin tank at seed 42920 reads wolf 229, bear 147,
+  mitigation 35.81 percent), so the vacuous greater-than-zero arms were
+  replaced by measured bands conditioned on a pinned loadout rather than by
+  guessed ones.
+This is the amendment paying for itself: one anchor was stale and one was
+sound, and only measurement could tell them apart.
+
 ### THE PHASE-CLOSE CHECKLIST (obligations this phase deliberately defers to its own close, each with the reason it cannot be paid earlier)
 
 1. Regenerate the derived artifacts ONCE, after the last content unit lands:
