@@ -43,7 +43,9 @@
 //                               proc draw decides it; this module only names
 //                               the rank it stamps)
 //   info reads / save+load .... 0
-import { ALL_RECIPES, ITEMS } from '../data';
+import { recipeForResultItem } from '../content/recipes';
+import { ITEMS } from '../data';
+import { refusedWhileDead } from '../dead_gate';
 import { markItemDiscovered } from '../deeds';
 import { recalcPlayerStats } from '../entity';
 import { masterwroughtConflictSlot, uniqueEquipConflictSlot } from '../equipment_rules';
@@ -162,10 +164,13 @@ export interface PerfectingInfoView {
 }
 
 /** The recipe in the merged tables whose result is this APEX item, or null
- *  for a non-apex id (content-derived, never instance-derived). */
+ *  for a non-apex id (content-derived, never instance-derived). Resolved
+ *  through the shared resultItemId index (content/recipes.ts
+ *  recipeForResultItem: O(1), first-match, rebuilt when a test fixture grows
+ *  the table), never a second linear scan beside it. */
 function apexRecipeFor(itemId: string): ProfessionRecipeRecord | null {
   if (ITEMS[itemId]?.masterwrought !== true) return null;
-  return ALL_RECIPES.find((r) => r.resultItemId === itemId) ?? null;
+  return recipeForResultItem(itemId) ?? null;
 }
 
 /** The professionId whose skill gates Perfecting this apex item
@@ -354,10 +359,11 @@ interface PerfectingTarget {
 /**
  * The ONE resolution head both command entries run (the attempt and the
  * phase 13 promotion), so their shared deny arms and literals exist exactly
- * once: resolve the player, resolve the ref (resolvePerfectTarget above),
- * then the noItem / not-masterwrought / skill ladder in that order, each
- * deny emitting its own line and drawing ZERO rng. A null answer means a
- * deny already emitted (or an unresolvable pid, which emits nothing); a
+ * once: refuse a dead caller (dead_gate.ts, real code on every entry since
+ * phase 18), resolve the player, resolve the ref (resolvePerfectTarget
+ * above), then the noItem / not-masterwrought / skill ladder in that order,
+ * each deny emitting its own line and drawing ZERO rng. A null answer means
+ * a deny already emitted (or an unresolvable pid, which emits nothing); a
  * non-null answer passed every shared gate.
  * OWNERSHIP IS BY POSSESSION, presence-only (the shipped Maker's Bond
  * doctrine: trade.ts isTradeLocked and commission.ts unbind check that
@@ -371,6 +377,12 @@ function resolvePerfectingHead(
   pid: number | undefined,
   ref: PerfectItemRef,
 ): PerfectingTarget | null {
+  // The while-dead refusal as real code (it was a comment riding the two Sim
+  // wrappers alone, which a direct headless caller bypassed): the wrappers
+  // still gate first and skip the module entirely for a dead player, so no
+  // path double-prints, and a living player's pass through here emits
+  // nothing and draws nothing.
+  if (refusedWhileDead(ctx, pid)) return null;
   const r = ctx.resolve(pid);
   if (!r) return null;
   const meta: PlayerMeta = r.meta;
@@ -401,19 +413,22 @@ function resolvePerfectingHead(
 
 /**
  * Resolve one Perfecting attempt, or route an already-Perfected copy to the
- * phase 13 promotion (resolveLegendaryPromotion below). The dead gate rides
- * the Sim wrapper (dead_gate.ts, like every profession-action wrapper);
- * everything below is this module's own ladder. DENY LADDER, in order, first
+ * phase 13 promotion (resolveLegendaryPromotion below). The Sim wrappers
+ * still run the dead gate first (dead_gate.ts, like every profession-action
+ * wrapper); since phase 18 the shared head repeats it as real code, so a
+ * direct caller of this export is refused too. DENY LADDER, in order, first
  * match wins, every denial draws ZERO rng and consumes nothing:
+ *   1. dead player (the shared head; the matcher-covered shared line)
  *   2. invalid ref / no item at ref (the shared head)
  *   3. not apex (def.masterwrought !== true) (the shared head)
  *   4. skill under PERFECTING_SKILL_REQ in the craft that made it (the
  *      shared head: one gate guards BOTH acts)
  *   5. already Perfected: route to the promotion through the EXPORTED
- *      resolveLegendaryPromotion, so the export IS the production path (its
- *      own head re-runs the three shared gates, every one already passed
- *      here: zero draws, no emit, nothing consumed; its ladder arms are
- *      documented on promotePerfectedCopy)
+ *      resolveLegendaryPromotion, so the export IS the production path,
+ *      handing it the already-resolved target so the shared head runs
+ *      EXACTLY ONCE per command (phase 18; the export left standalone
+ *      resolves its own): zero draws, no emit, nothing consumed; its
+ *      ladder arms are documented on promotePerfectedCopy
  *   6. lock-only material shortfall (raw counts meet the need, unlocked do
  *      not): the DEDICATED locked line, never the missing-materials one
  *   7. genuine material shortfall
@@ -440,7 +455,7 @@ export function resolvePerfectingAttempt(
   const { meta, e, itemId, def, wornSlot, bagged } = head;
   let { payload } = head;
   if (payload?.perfected === true) {
-    resolveLegendaryPromotion(ctx, pid, ref, name);
+    resolveLegendaryPromotion(ctx, pid, ref, name, head);
     return;
   }
   // Sufficiency counted lock-aware (issue 3042 doctrine, the crafting.ts
@@ -537,27 +552,33 @@ export function resolvePerfectingAttempt(
  * here, so a test or the deeds suite driving this export directly exercises
  * the same chain the live command takes (resolvePerfectingAttempt ->
  * resolveLegendaryPromotion -> promotePerfectedCopy). Runs the shared head
- * (resolvePerfectingHead: the same noItem / not-masterwrought / skill arms
- * with the same lines), then the promotion ladder (promotePerfectedCopy
- * below). PRECONDITION arm rather than a fifth deny line: a copy that is
+ * (resolvePerfectingHead: the same while-dead / noItem / not-masterwrought /
+ * skill arms with the same lines) UNLESS the attempt route hands its
+ * already-resolved target in (`head`, phase 18): every one of those gates
+ * passed an instant ago on the same tick, so re-running them was a pure
+ * double execution of the deny head, and threading the target keeps it to
+ * exactly one run per command while a direct caller (a test, the deeds
+ * suite, a future server path) omits the argument and stays standalone-safe.
+ * PRECONDITION arm rather than a fifth deny line: a copy that is
  * NOT Perfected is unreachable here through the real command
  * (resolvePerfectingAttempt owns that routing and sends an unperfected copy
  * down the attempt ladder instead), so a direct call on one is a caller bug
  * and no-ops: nothing consumed, nothing drawn, no invented player line.
- * CALLERS SIT BEHIND THE DEAD GATE: this export runs no refusedWhileDead of
- * its own; the two Sim wrappers (perfectItem / perfectItemAs) own it, and a
- * new server or headless caller reaching this export directly must gate
- * first, or a dead player's copy promotes (the phase 13 QA note).
+ * THE DEAD GATE IS INSIDE THE SHARED HEAD (phase 18): a direct server or
+ * headless caller of this export is refused while dead with the shared
+ * matcher-covered line; the two Sim wrappers (perfectItem / perfectItemAs)
+ * still gate first and skip the module entirely for a dead player.
  */
 export function resolveLegendaryPromotion(
   ctx: SimContext,
   pid: number | undefined,
   ref: PerfectItemRef,
   name: string | undefined,
+  head: PerfectingTarget | null = null,
 ): void {
-  const head = resolvePerfectingHead(ctx, pid, ref);
-  if (!head) return;
-  const { meta, e, itemId, def, payload, wornSlot } = head;
+  const target = head ?? resolvePerfectingHead(ctx, pid, ref);
+  if (!target) return;
+  const { meta, e, itemId, def, payload, wornSlot } = target;
   if (payload?.perfected !== true) return;
   promotePerfectedCopy(ctx, meta, e, itemId, def, payload, wornSlot, name);
 }

@@ -9,7 +9,7 @@
 import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { STATIONS } from '../src/sim/content/professions';
-import { recipeById } from '../src/sim/content/recipes';
+import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
 import { ITEMS, QUESTS } from '../src/sim/data';
 import {
   PRIMARY_STATS,
@@ -19,7 +19,10 @@ import {
   TWOHAND_STAT_MULT,
 } from '../src/sim/item_budget';
 import { sanitizeItemInstancePayloadOnLoad } from '../src/sim/item_instance_load';
+import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import { expectedStatBudget } from '../src/sim/item_level';
+import { archetypeCeilingFor, JACK_CEILING_TIER } from '../src/sim/professions/archetype';
+import { MASTERWORK_CHANCE_CAP, masterworkBumpedQuality } from '../src/sim/professions/masterwork';
 import {
   craftForApexItem,
   PERFECTED_SOURCE_LEVEL,
@@ -30,8 +33,10 @@ import {
   PERFECTING_SUCCESS_CHANCE,
   perfectedBonusStats,
   perfectingInfoFrom,
+  resolvePerfectingAttempt,
 } from '../src/sim/professions/perfecting';
 import { type StationType, stationsOfType } from '../src/sim/professions/stations';
+import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { CoreStats, Entity, ItemDef, SimEvent } from '../src/sim/types';
 import { runCraft } from './helpers/enchant_family_cast';
@@ -124,6 +129,11 @@ describe('the attempt cost table and rank constants (locked tuning)', () => {
     expect(PERFECTING_HEADSTART_RANK).toBe(1);
     expect(PERFECTING_SKILL_REQ).toBe(125);
     expect(PERFECTED_SOURCE_LEVEL).toBe(28);
+    // The relation the rank walk and the head-start mint both lean on: a
+    // head start lands MID-track (a stamp at or past PERFECTING_RANKS would
+    // mint Perfected at craft time). Pinned beside the literals so a retune
+    // of either constant re-answers it consciously.
+    expect(PERFECTING_HEADSTART_RANK).toBeLessThan(PERFECTING_RANKS);
     expect(PERFECTING_ATTEMPT_COST).toEqual([
       { itemId: 'makers_ember', count: 1 },
       { itemId: 'sundered_essence', count: 1 },
@@ -178,6 +188,24 @@ describe('the deny ladder: order, zero draws, zero consumption', () => {
     expect(draws).toBe(0);
     expect(materialCounts(sim, pid)).toEqual(before);
     expect(meta.inventory.find((s) => s.itemId === APEX_NECK)?.instance).toBeUndefined();
+  });
+
+  it('a DIRECT headless call of resolvePerfectingAttempt hits the same dead gate (phase 18)', () => {
+    // The dead gate used to be a comment plus the two Sim wrappers; a caller
+    // reaching the export directly (a headless harness, a future server
+    // path) bypassed it entirely. The shared head now runs
+    // refusedWhileDead itself, so the refusal is real code on EVERY entry.
+    const { sim, pid, meta, e } = perfecter(11);
+    sim.addItem(APEX_NECK, 1, pid);
+    e.dead = true;
+    const ref = bagRefOf(meta, APEX_NECK);
+    const before = materialCounts(sim, pid);
+    sim.drainEvents();
+    const draws = drawsDuring(sim, () => resolvePerfectingAttempt(sim.ctx, pid, ref));
+    expect(errorsOf(sim)).toEqual(["You can't do that while dead."]);
+    expect(draws).toBe(0);
+    expect(materialCounts(sim, pid)).toEqual(before);
+    expect(meta.inventory[ref.bag].instance, 'no bind, no track').toBeUndefined();
   });
 
   it('an invalid ref denies with the noItem line, on every malformed shape', () => {
@@ -907,8 +935,11 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
 
   it('a forced MISS mints the plain signed copy: no rank, no masterwork flag, still one draw', () => {
     const { sim, pid, meta, recipe } = apexCrafter(8, 'jewelcrafting');
-    // 0.999 sits above MASTERWORK_CHANCE_CAP (0.15), so no composition of the
-    // chance terms can turn it into a hit.
+    // 0.999 sits above MASTERWORK_CHANCE_CAP, so no composition of the
+    // chance terms can turn it into a hit; the premise is checked, not
+    // trusted to a comment (a cap retune past it would silently flip this
+    // case into a forced hit).
+    expect(MASTERWORK_CHANCE_CAP).toBeLessThan(0.999);
     const draws = forceRoll(sim, 0.999);
     runCraft(sim, recipe.id, false, pid);
     const result = meta.lastCraftResult;
@@ -973,6 +1004,10 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     runCraft(sim, recipe.id, false, pid);
     expect(meta.lastCraftResult?.ok).toBe(true);
     expect(draws(), 'exactly two draws for a Jack, in order').toBe(2);
+    // The staging premise, checked: 0.5 really mapped to the 'normal' arm
+    // (a variance-threshold retune that re-bins it would make this case
+    // silently test a different arm).
+    expect(meta.lastCraftResult?.variance).toBe('normal');
     expect(meta.lastCraftResult?.masterwork).toBeUndefined();
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.perfecting).toBeUndefined();
@@ -985,10 +1020,59 @@ describe('the crafting.ts head start (R1) over a real Sim', () => {
     runCraft(sim, recipe.id, false, pid);
     expect(meta.lastCraftResult?.ok).toBe(true);
     expect(draws()).toBe(2);
+    // The staging premise, checked (the twin of the 'normal' case above):
+    // 0 really mapped to 'worse'. With the head-start gate's dead Jack term
+    // removed (phase 18), this case and the one above landing IDENTICALLY
+    // is the behavioral half of the deadness proof: the ceiling term alone
+    // already refused both.
+    expect(meta.lastCraftResult?.variance).toBe('worse');
     const slot = meta.inventory.find((s) => s.itemId === APEX_NECK);
     expect(slot?.instance?.signer).toBeTruthy();
     expect(slot?.instance?.perfecting).toBeUndefined();
     expect(slot?.instance?.rolled).toBeUndefined();
+  });
+
+  it('the dominance sweep: every apex def is epic and bumps past every non-major ceiling (phase 18)', () => {
+    // The content half of two phase 18 judgments on the head-start gate.
+    // (a) The `jackVariance !== 'worse'` term was REMOVED as provably dead:
+    // a Jack's activeArchetype is null on every reachable path (the live
+    // verbs refuse cross-attunement and normalizeArchetypeState enforces
+    // the exclusivity on load), so a Jack's ceiling is the null-archetype
+    // rare tier, and every apex def's bumped tier sits above it: the
+    // ceiling term refuses every craft the Jack term could have. (b) The
+    // `bumped !== null` term is defense-in-depth on live content (an epic
+    // def always has a bump target); it survives as the quality-ladder
+    // bound and the strict-null guard for the .tier read. A non-epic apex
+    // def landing here fails loudly and re-opens both judgments.
+    const apex = Object.values(ITEMS).filter((d) => d.masterwrought === true);
+    expect(apex.length, 'the roster is non-empty').toBeGreaterThan(0);
+    expect(
+      JACK_CEILING_TIER,
+      'the Jack ceiling really is the null-archetype ceiling the gate reads',
+    ).toBe(archetypeCeilingFor(null, null, 'jewelcrafting'));
+    for (const def of apex) {
+      expect(def.quality, `${def.id} is epic`).toBe('epic');
+      const bumped = masterworkBumpedQuality(def.quality);
+      expect(bumped?.quality, `${def.id} always has a bump target`).toBe('legendary');
+      expect(bumped?.tier, `${def.id} bumps past the Jack ceiling`).toBeGreaterThan(
+        JACK_CEILING_TIER,
+      );
+    }
+  });
+
+  it('no apex recipe is reachable meta-less: every one is acquisition-gated with a real bill', () => {
+    // The gate's other defense-in-depth term, `!!meta`, positively pinned:
+    // the admission cannot pass for a pid with no meta on any apex recipe,
+    // because isRecipeKnown answers false for an acquisition-gated recipe
+    // with no meta (and the reagent plan would refuse the empty inventory
+    // besides), so the term never decides and survives as the honest guard
+    // for the mint arm's narrowing.
+    const apexRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.masterwrought === true);
+    expect(apexRecipes.length, 'the roster is non-empty').toBeGreaterThan(0);
+    for (const r of apexRecipes) {
+      expect(r.acquisition?.length ?? 0, `${r.id} is acquisition-gated`).toBeGreaterThan(0);
+      expect(r.reagents.length, `${r.id} carries a real bill`).toBeGreaterThan(0);
+    }
   });
 });
 
@@ -1093,5 +1177,97 @@ describe('perfectedBonusStats null arms and the mixed shortfall', () => {
     // satisfy the bill; with the essence genuinely gone it would mislead.
     expect(errorsOf(sim)).toEqual(['You lack the materials to perfect that item.']);
     expect(materialCounts(sim, pid)).toEqual(before);
+  });
+});
+
+describe('the rolled-spread distinguisher (phase 18, the test-lane no-change list re-closed)', () => {
+  it('no shipped content can produce two same-def Perfected copies with differing spreads', () => {
+    // The R5 spread is a function of the item id alone: the rank-4 stamp
+    // bakes perfectedBonusStats(def, apexRecipeFor(itemId)), both arguments
+    // determined by the id, so two independently walked copies of one def
+    // always carry byte-identical rolled.stats. Proven over two REAL walks
+    // rather than asserted of the pure function.
+    const { sim, pid, meta } = perfecter(41, 16);
+    sim.addItem(APEX_NECK, 1, pid);
+    const refA = bagRefOf(meta, APEX_NECK);
+    forceRoll(sim, 0);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, refA);
+    const spreadA = meta.inventory[refA.bag].instance?.rolled?.stats;
+    sim.addItem(APEX_NECK, 1, pid);
+    const refB = bagRefOf(meta, APEX_NECK);
+    for (let i = 0; i < PERFECTING_RANKS; i++) sim.perfectItemAs(pid, refB);
+    const spreadB = meta.inventory[refB.bag].instance?.rolled?.stats;
+    expect(spreadA, 'the walk really baked a spread').toBeTruthy();
+    expect(spreadB).toEqual(spreadA);
+    // ...and the deterministic bake holds across the whole shipped roster:
+    // every apex recipe's def answers the same record on every call.
+    const apexRecipes = ALL_RECIPES.filter((r) => ITEMS[r.resultItemId]?.masterwrought === true);
+    expect(apexRecipes.length).toBeGreaterThan(0);
+    for (const r of apexRecipes) {
+      const def = ITEMS[r.resultItemId];
+      expect(perfectedBonusStats(def, r), r.id).toEqual(perfectedBonusStats(def, r));
+    }
+  });
+
+  it('synthetically produced differing spreads DO distinguish (the arm is real, not vacuous)', () => {
+    // The merge predicate's spread arm, driven by the payloads shipped
+    // content cannot mint: same stat total, different distribution refuses
+    // to read as equal, while a byte-equal spread does. This is the
+    // "produce it synthetically" half of the re-closed entry.
+    const spread = { rolled: { stats: { str: 3, sta: 1 } } };
+    const reshuffled = { rolled: { stats: { str: 1, sta: 3 } } };
+    const twin = { rolled: { stats: { str: 3, sta: 1 } } };
+    expect(itemInstancePayloadsEqual(spread, reshuffled)).toBe(false);
+    expect(itemInstancePayloadsEqual(spread, twin)).toBe(true);
+  });
+});
+
+describe('apexRecipeFor rides the shared resultItemId index (phase 18)', () => {
+  it('answers exactly like the retired linear scan, for every ALL_RECIPES row and a non-apex id', () => {
+    // craftForApexItem is the exported face of apexRecipeFor; the oracle is
+    // the scan the index replaced, run fresh per row.
+    for (const r of ALL_RECIPES) {
+      const scan =
+        ITEMS[r.resultItemId]?.masterwrought === true
+          ? (ALL_RECIPES.find((x) => x.resultItemId === r.resultItemId) ?? null)
+          : null;
+      expect(craftForApexItem(r.resultItemId), r.id).toBe(scan?.professionId ?? null);
+    }
+    expect(craftForApexItem('__no_such_item')).toBeNull();
+  });
+
+  it('a fixture-pushed synthetic apex recipe is seen (the index rebuild contract)', () => {
+    // content/recipes.ts rebuilds its indexes when the table's LENGTH moves
+    // (the recipe_pattern_items.test.ts fixture contract); the apex lookup
+    // must ride that rebuild rather than a stale private memo.
+    const itemId = '__phase18_apex_probe';
+    const recipe: ProfessionRecipeRecord = {
+      id: 'recipe___phase18_apex_probe',
+      professionId: 'jewelcrafting',
+      resultItemId: itemId,
+      resultCount: 1,
+      reagents: [{ itemId: 'makers_ember', count: 1 }],
+      skillReq: 100,
+      itemLevelBudget: 31,
+      level: 25,
+      acquisition: ['drop'],
+    };
+    ITEMS[itemId] = {
+      id: itemId,
+      name: 'Probe Band',
+      kind: 'armor',
+      slot: 'ring',
+      quality: 'epic',
+      masterwrought: true,
+      stats: { str: 1 },
+    } as unknown as ItemDef;
+    ALL_RECIPES.push(recipe);
+    try {
+      expect(craftForApexItem(itemId)).toBe('jewelcrafting');
+    } finally {
+      ALL_RECIPES.splice(ALL_RECIPES.indexOf(recipe), 1);
+      delete ITEMS[itemId];
+    }
+    expect(craftForApexItem(itemId), 'the spliced row is forgotten again').toBeNull();
   });
 });

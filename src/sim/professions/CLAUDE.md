@@ -253,11 +253,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `activeMobileStationCraftsForViewer` is the per-viewer resolver behind the
   `mst` snapshot delta: the deduped, sorted set of every craft a station
   serves the viewer, so the crafting-window rows mirror the craft gate rather
-  than shadowing a shared craft behind the viewer's own. Both ride the ONE
-  private party walk (`eachPartyStationInRange`), so the gate's deny and the
-  row set cannot drift; the station-TYPE filter deliberately stays out of the
-  walk (the gate layers it per craft, the resolver leaves it to
-  `inRangeStationTypes` on the consumer side). Its one
+  than shadowing a shared craft behind the viewer's own. Both consumers run
+  their own plain loops over the ONE private per-member predicate
+  (`partySharedStationFor`), so the gate's deny and the row set cannot drift
+  and a partied viewer's 20 Hz call allocates nothing on an empty answer; the
+  station-TYPE filter deliberately stays out of the predicate (the gate
+  layers it per craft, the resolver leaves it to `inRangeStationTypes` on the
+  consumer side). Its one
   player-visible emit is the placement log line (matched by `log.placeStation`
   in `src/ui/sim_i18n.ts`); draws NO rng.
 - `fishing_bands.ts`: fishing's OWN catch-band ladder, a pure leaf

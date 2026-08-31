@@ -697,18 +697,21 @@ export function evaluateCraftAdmission(
   commission = false,
 ): CraftResult | null {
   const meta = ctx.players.get(pid);
-  // Masterwrought phase 07 daily gate, FIRST on purpose: once today's stamp
-  // is set, no other gate's remedy changes the outcome (a stamped recipe
-  // stays refused however far the player walks or re-attunes), so telling
-  // them anything else sends them on an errand that ends in this same
-  // refusal at the station. The one corner this trades away is a stamp for
-  // a recipe the character does not KNOW reading daily_limit before
-  // recipe_not_learned; the load clamp filters stamps to live oncePerDay
-  // ids, so reaching it takes a tampered row, an accepted corner. Because
-  // this admission is shared by cast start, the complete-side resolve, and
-  // the batch auto-continue, a batch stops itself here the moment the first
-  // craft lands the stamp. Read-only, no rng, no side effect on denial.
-  if (craftDailyLimitReached(ctx, meta, recipe)) {
+  // Masterwrought phase 07 daily gate, FIRST on purpose for a KNOWN recipe:
+  // once today's stamp is set, no other gate's remedy changes the outcome (a
+  // stamped recipe stays refused however far the player walks or
+  // re-attunes), so telling them anything else sends them on an errand that
+  // ends in this same refusal at the station. A stamp for a recipe the
+  // character does not KNOW falls through the ladder instead (phase 18): the
+  // stamp is only minted on a successful resolve, which proved knownness
+  // through this same admission, and the load clamp filters stamps to live
+  // oncePerDay ids, so such a stamp is a DB-tampered row and the character
+  // must answer exactly as they would without it (recipe_not_learned for a
+  // station-free recipe). Because this admission is shared by cast start,
+  // the complete-side resolve, and the batch auto-continue, a batch stops
+  // itself here the moment the first craft lands the stamp. Read-only, no
+  // rng, no side effect on denial.
+  if (craftDailyLimitReached(ctx, meta, recipe) && isRecipeKnown(meta, recipe)) {
     // The refusal tells the player when to come back (phase 14): the host-fed
     // countdown to the reset that reopens this window, attached at refusal
     // time only (the standing-state ruling). Both calendar halves must be
@@ -1115,14 +1118,22 @@ export function resolveCraftForRecipe(
   // above never moves and nothing here rolls again. The bumped and
   // ceilingTier terms survive from the quality-bump gate DELIBERATELY, each
   // for its own reason: `bumped !== null` is the quality-ladder bound (a
-  // poor or legendary def has no bump target, archetype-independent), and
+  // poor or legendary def has no bump target, archetype-independent; every
+  // shipped apex def is epic, so on live content it never decides, pinned by
+  // the apex-roster sweep in tests/perfecting.test.ts), and
   // `bumped.tier <= ceilingTier` is the archetype empowerment gate (a
   // dormant, hobby, unattuned, or Jack craft earns no head start, exactly
   // as it earned no bump), even though this arm grants a rank rather than
-  // the quality those names describe.
+  // the quality those names describe. The masterwork gate's
+  // `jackVariance !== 'worse'` term is deliberately ABSENT here (phase 18
+  // removed it as provably dead): a Jack's ceiling is the rare tier
+  // (activeArchetype null on every reachable path, normalizeArchetypeState
+  // enforces the exclusivity on load) while every apex def's bumped tier is
+  // legendary, so the ceiling term already refuses every craft the Jack
+  // term could have refused; both facts are pinned beside the Jack cases in
+  // tests/perfecting.test.ts.
   const perfectingHeadStart =
     !!meta &&
-    jackVariance !== 'worse' &&
     procRoll < procChance &&
     !!def?.masterwrought &&
     bumped !== null &&

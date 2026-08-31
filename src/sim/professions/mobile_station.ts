@@ -177,49 +177,45 @@ export function nameCarriesOwnArticle(name: string): boolean {
 }
 
 /**
- * THE party-station walk, shared by the craft gate's party arm and the
- * per-viewer set resolver so the two can never drift apart (the exact
- * mismatch the set-valued readout was built to kill): visits every OTHER
- * member's ACTIVE partyShared station within STATION_RADIUS of `pos`
- * (squared-distance, the stations.ts isAtStation idiom). The self slot is
- * skipped on purpose: an own station already satisfies the gate at ANY
- * distance (the training precedent, crafting.ts), and an owner-only station
- * must never leak through the party walk. The station-TYPE filter stays OUT
- * of the walk deliberately: the gate layers it per craft below, while the
- * resolver ships every qualifying craft and lets inRangeStationTypes apply
- * the type dimension on the consumer side (pinned in
- * tests/mobile_station_party.test.ts). Returns true as soon as `visit`
- * does; `metas` is any pid-keyed lookup (the live ctx.players view in
- * production).
+ * THE per-member qualification behind the party arm, shared by the craft
+ * gate and the per-viewer set resolver so the two can never drift apart
+ * (the exact mismatch the set-valued readout was built to kill): answers
+ * ONE member's ACTIVE partyShared station within STATION_RADIUS of `pos`
+ * (squared-distance, the stations.ts isAtStation idiom), or null. The self
+ * slot answers null on purpose: an own station already satisfies the gate
+ * at ANY distance (the training precedent, crafting.ts), and an owner-only
+ * station must never leak through the party arm. The station-TYPE filter
+ * stays OUT of the qualification deliberately: the gate layers it per
+ * craft below, while the resolver ships every qualifying craft and lets
+ * inRangeStationTypes apply the type dimension on the consumer side
+ * (pinned in tests/mobile_station_party.test.ts). Shaped as a per-member
+ * predicate rather than a visitor-taking walk (phase 18): each consumer
+ * runs its own plain loop over `party.members`, so the 20 Hz snapshot path
+ * allocates no per-call closure. `metas` is any pid-keyed lookup (the live
+ * ctx.players view in production).
  */
-function eachPartyStationInRange(
-  party: { members: readonly number[] } | null,
+function partySharedStationFor(
+  memberPid: number,
   selfPid: number,
   metas: { get(pid: number): { mobileStation: MobileCraftingStation | null } | undefined },
   pos: { x: number; z: number },
   nowTick: number,
-  visit: (station: MobileCraftingStation) => boolean,
-): boolean {
-  if (!party) return false;
-  const radiusSq = STATION_RADIUS * STATION_RADIUS;
-  for (const memberPid of party.members) {
-    if (memberPid === selfPid) continue;
-    const station = metas.get(memberPid)?.mobileStation;
-    if (!station || !station.partyShared || !isStationActive(station, nowTick)) continue;
-    const dx = pos.x - station.pos.x;
-    const dz = pos.z - station.pos.z;
-    if (dx * dx + dz * dz > radiusSq) continue;
-    if (visit(station)) return true;
-  }
-  return false;
+): MobileCraftingStation | null {
+  if (memberPid === selfPid) return null;
+  const station = metas.get(memberPid)?.mobileStation;
+  if (!station || !station.partyShared || !isStationActive(station, nowTick)) return null;
+  const dx = pos.x - station.pos.x;
+  const dz = pos.z - station.pos.z;
+  if (dx * dx + dz * dz > STATION_RADIUS * STATION_RADIUS) return null;
+  return station;
 }
 
 /**
  * The party arm of the crafting station gate (Masterwrought phase 09): true
  * while any OTHER member of `party` holds an ACTIVE partyShared mobile
  * station whose craft serves `type`, within STATION_RADIUS of `crafterPos`.
- * A thin type-filtering consumer of the one shared walk above; run per
- * craft command, never per tick.
+ * A thin type-filtering loop over the one shared qualification above; run
+ * per craft command, never per tick.
  */
 export function partySharedStationSatisfies(
   party: { members: readonly number[] } | null,
@@ -229,20 +225,20 @@ export function partySharedStationSatisfies(
   type: StationType,
   nowTick: number,
 ): boolean {
-  return eachPartyStationInRange(
-    party,
-    crafterPid,
-    metas,
-    crafterPos,
-    nowTick,
-    (station) => stationTypeForCraft(station.craftId) === type,
-  );
+  if (!party) return false;
+  for (const memberPid of party.members) {
+    const station = partySharedStationFor(memberPid, crafterPid, metas, crafterPos, nowTick);
+    if (station && stationTypeForCraft(station.craftId) === type) return true;
+  }
+  return false;
 }
 
 // Returned whenever no station serves the viewer: the common case on the
-// per-viewer snapshot path. The party-null path allocates nothing at all;
-// a partied viewer pays one bounded closure for the shared walk even when
-// the result is empty.
+// per-viewer snapshot path. An empty answer allocates NOTHING, partied or
+// not (phase 18: the old visitor-closure trade is gone; the party loop
+// below runs over the shared per-member qualification with no per-call
+// closure, so only a viewer a station actually serves pays an allocation,
+// for the result array itself).
 const EMPTY_CRAFTS: readonly string[] = Object.freeze([]);
 
 /**
@@ -272,16 +268,15 @@ export function activeMobileStationCraftsForViewer(
   let crafts: string[] | null = null;
   const own = ctx.players.get(pid)?.mobileStation;
   if (own && isStationActive(own, ctx.tickCount)) crafts = [own.craftId];
-  {
-    const party = ctx.partyOf(pid);
-    if (party) {
-      eachPartyStationInRange(party, pid, ctx.players, viewer.pos, ctx.tickCount, (station) => {
-        // Dedupe on insert: the own craft and a shared craft can be equal,
-        // and two members can carry stations of one craft.
-        if (!crafts) crafts = [station.craftId];
-        else if (!crafts.includes(station.craftId)) crafts.push(station.craftId);
-        return false;
-      });
+  const party = ctx.partyOf(pid);
+  if (party) {
+    for (const memberPid of party.members) {
+      const station = partySharedStationFor(memberPid, pid, ctx.players, viewer.pos, ctx.tickCount);
+      if (!station) continue;
+      // Dedupe on insert: the own craft and a shared craft can be equal,
+      // and two members can carry stations of one craft.
+      if (!crafts) crafts = [station.craftId];
+      else if (!crafts.includes(station.craftId)) crafts.push(station.craftId);
     }
   }
   if (!crafts) return EMPTY_CRAFTS;

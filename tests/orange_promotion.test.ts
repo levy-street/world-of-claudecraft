@@ -21,6 +21,8 @@ import {
   PERFECTING_ATTEMPT_COST,
   PERFECTING_RANKS,
   PERFECTING_SKILL_REQ,
+  resolveLegendaryPromotion,
+  resolvePerfectingAttempt,
 } from '../src/sim/professions/perfecting';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, ItemDef, SimEvent } from '../src/sim/types';
@@ -698,5 +700,71 @@ describe('the equip interplay: a promoted copy counts on BOTH rules', () => {
     sim.equipItem(APEX_RING, pid);
     expect(errorsOf(sim)).toEqual(['You can only equip one legendary Masterwrought item.']);
     expect(meta.equipment.ring1).toBeUndefined();
+  });
+});
+
+describe('the shared deny head runs once per routed promotion, and gates the direct entries (phase 18)', () => {
+  /** Wrap ctx.resolve with a counter: the seam probe for how many times the
+   *  shared head actually ran (the head resolves the player once for its
+   *  dead gate and once for its own ladder; nothing else on these paths
+   *  touches ctx.resolve). Installed AFTER any fixture walk, so only the
+   *  action under test is counted. */
+  function countResolves(sim: Sim): () => number {
+    let calls = 0;
+    const ctx = sim.ctx as unknown as {
+      resolve: (pid?: number) => ReturnType<Sim['resolve']>;
+    };
+    const real = ctx.resolve;
+    ctx.resolve = (pid?: number) => {
+      calls += 1;
+      return real(pid);
+    };
+    return () => calls;
+  }
+
+  it('routing an already-Perfected copy through the attempt entry re-runs NO shared gate', () => {
+    // The routed path (resolvePerfectingAttempt -> resolveLegendaryPromotion)
+    // threads the already-resolved target, so it must cost exactly the same
+    // player resolutions as the standalone promotion entry: two (the head's
+    // dead gate, then its own ladder). Before phase 18 the promotion's head
+    // re-ran whole, doubling the count.
+    const routed = promoter(96);
+    routed.sim.addItem(APEX_NECK, 1, routed.pid);
+    const routedRef = bagRefOf(routed.meta, APEX_NECK);
+    walkToPerfected(routed, routedRef);
+    const routedCalls = countResolves(routed.sim);
+    resolvePerfectingAttempt(routed.sim.ctx, routed.pid, routedRef, NAME);
+    expect(routed.meta.inventory[routedRef.bag].instance?.rolled?.quality).toBe('legendary');
+
+    const standalone = promoter(96);
+    standalone.sim.addItem(APEX_NECK, 1, standalone.pid);
+    const aloneRef = bagRefOf(standalone.meta, APEX_NECK);
+    walkToPerfected(standalone, aloneRef);
+    const aloneCalls = countResolves(standalone.sim);
+    resolveLegendaryPromotion(standalone.sim.ctx, standalone.pid, aloneRef, NAME);
+    expect(standalone.meta.inventory[aloneRef.bag].instance?.rolled?.quality).toBe('legendary');
+
+    expect(aloneCalls(), 'the standalone entry: dead gate + ladder').toBe(2);
+    expect(routedCalls(), 'the routed entry costs not one resolution more').toBe(aloneCalls());
+  });
+
+  it('a DIRECT headless call of resolveLegendaryPromotion hits the real dead gate', () => {
+    // The gate used to be a comment ("a new server or headless caller ...
+    // must gate first, or a dead player's copy promotes"); it is real code in
+    // the shared head now, so the bypass path is refused identically.
+    const w = promoter(97);
+    const { sim, pid, meta, e } = w;
+    sim.addItem(APEX_NECK, 1, pid);
+    const ref = bagRefOf(meta, APEX_NECK);
+    const draws = walkToPerfected(w, ref);
+    e.dead = true;
+    sim.drainEvents();
+    resolveLegendaryPromotion(sim.ctx, pid, ref, NAME);
+    expect(errorsOf(sim)).toEqual(["You can't do that while dead."]);
+    expect(draws(), 'the refusal draws nothing').toBe(PERFECTING_RANKS);
+    expect(sim.countItem(DEED, pid), 'the deed is intact').toBe(2);
+    const copy = meta.inventory[ref.bag].instance;
+    expect(copy?.rolled?.quality, 'no promotion stamped').toBeUndefined();
+    expect(copy?.name).toBeUndefined();
   });
 });
