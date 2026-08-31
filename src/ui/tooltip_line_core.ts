@@ -14,6 +14,14 @@
 // the four line roles in one place (tt-sub a secondary line, tt-desc a body
 // line, tt-green a benefit, tt-red an unmet gate or a refusal). A builder that
 // needs a fifth role adds it here, never a fifth private copy.
+//
+// THIS MODULE OWNS TooltipLineClass FOR THE WHOLE FAMILY, both mechanisms.
+// The sibling DOM path (tooltip_line.ts createTooltipLine, createElement plus
+// textContent) NARROWS this union with Extract rather than declaring its own,
+// because for one commit the two modules exported the same name with DIFFERENT
+// members and an author got whichever the autoimport picked. Widening here
+// widens what that path may narrow FROM; it never silently widens the path
+// itself, which names its own subset.
 
 import { esc } from './esc';
 

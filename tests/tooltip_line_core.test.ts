@@ -21,7 +21,11 @@ import {
   recipePatternTooltipLines,
 } from '../src/ui/hud/professions/recipe_pattern_tooltip_view';
 import { toolEffectStandaloneTooltip, toolEffectTooltipLines } from '../src/ui/tool_effect_tooltip';
-import { tooltipLine } from '../src/ui/tooltip_line_core';
+// Type-only, so this suite needs no DOM: tooltip_line.ts reaches document.
+import type { TooltipLineElementClass } from '../src/ui/tooltip_line';
+import { type TooltipLineClass, tooltipLine } from '../src/ui/tooltip_line_core';
+import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 /** Comment-stripped source (the mobile_station_tooltip.test.ts helper shape):
  *  a pin must not be satisfiable by a comment mentioning the token. */
@@ -222,6 +226,73 @@ describe('the four consumers import the shared builder and keep no private copy'
     expect(source).not.toMatch(/function\s+(?:tooltip)?[Ll]ine\s*\(/);
     expect(source).not.toMatch(/const\s+(?:tooltip)?[Ll]ine\s*=/);
     expect(source).not.toMatch(/<div class="\$\{cls\}">/);
+  });
+});
+
+describe('one module owns TooltipLineClass for the whole family', () => {
+  // The census caught this after the collapse shipped: src/ui/tooltip_line.ts
+  // (the createElement path) ALSO exported a type named TooltipLineClass, with
+  // DIFFERENT members ('tt-desc' | 'tt-sub' against the core's four). Two
+  // same-named exported unions in one directory is a worse trap than the four
+  // private line() copies the collapse removed, because those at least had
+  // distinct names: an author importing TooltipLineClass got whichever module
+  // the autoimport picked. The fix is single ownership plus derivation, not a
+  // rename, which would leave two unions to keep in sync by hand.
+
+  it('the core is the only module in src/ that declares the type', () => {
+    const offenders = tsFilesUnder(path.join(__dirname, '..', 'src'))
+      .filter(({ full }) =>
+        /export\s+type\s+TooltipLineClass\b/.test(codeOnly(readFileSync(full, 'utf8'))),
+      )
+      .map(({ file }) => `src/${file}`);
+    expect(offenders).toEqual(['src/ui/tooltip_line_core.ts']);
+  });
+
+  it('the DOM sibling DERIVES its subset rather than declaring one', () => {
+    // Extract off the owner's union is what makes drift impossible: drop a role
+    // from the core and this narrows, rather than two lists disagreeing.
+    const source = sourceOf('src/ui/tooltip_line.ts');
+    expect(source).toMatch(
+      /import type \{[^}]*TooltipLineClass[^}]*\} from '\.\/tooltip_line_core'/,
+    );
+    expect(source).toMatch(/Extract<\s*TooltipLineClass\s*,/);
+  });
+
+  it('the scan reaches a real corpus and walks it through the shared walker', () => {
+    const files = tsFilesUnder(path.join(__dirname, '..', 'src'));
+    expect(files.length).toBeGreaterThan(500);
+    expect(files.map(({ file }) => file)).toContain('ui/tooltip_line.ts');
+    expectScansOnlyThroughSharedWalkers(import.meta.url, ['ts_files_under']);
+  });
+
+  it('the derived subset accepts the two DOM roles and refuses the other two', () => {
+    // Compile-time, and tsc covers tests/: if tooltip_line.ts ever re-widens to
+    // the full union these directives go unused and red.
+    const desc: TooltipLineElementClass = 'tt-desc';
+    const sub: TooltipLineElementClass = 'tt-sub';
+    expect([desc, sub]).toEqual(['tt-desc', 'tt-sub']);
+    // @ts-expect-error tt-green is an HTML-string-builder role, not a DOM one.
+    const green: TooltipLineElementClass = 'tt-green';
+    // @ts-expect-error tt-red likewise.
+    const red: TooltipLineElementClass = 'tt-red';
+    expect([green, red]).toEqual(['tt-green', 'tt-red']);
+    // THE SHIPPED MEMBERS ARE UNCHANGED, and this is the pin that says so
+    // rather than the four assertions above, which only bound the set from
+    // each side one member at a time. tooltip_line.ts predates the core, so
+    // deriving must reproduce its published union EXACTLY: mutual
+    // assignability, so widening it (a third member sneaking in through the
+    // owner) reds here just as loudly as narrowing it.
+    type ExactlyShipped = [TooltipLineElementClass] extends ['tt-desc' | 'tt-sub']
+      ? ['tt-desc' | 'tt-sub'] extends [TooltipLineElementClass]
+        ? true
+        : false
+      : false;
+    const shippedMembersUnchanged: ExactlyShipped = true;
+    expect(shippedMembersUnchanged).toBe(true);
+    // And the owner's union really is the wider one, so the Extract above is a
+    // narrowing rather than an identity.
+    const wide: TooltipLineClass = 'tt-green';
+    expect(wide).toBe('tt-green');
   });
 });
 
