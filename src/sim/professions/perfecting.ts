@@ -163,11 +163,15 @@ export interface PerfectingInfoView {
   materials: PerfectingMaterialView[];
 }
 
-/** The recipe in the merged tables whose result is this APEX item, or null
- *  for a non-apex id (content-derived, never instance-derived). Resolved
- *  through the shared resultItemId index (content/recipes.ts
- *  recipeForResultItem: O(1), first-match, rebuilt when a test fixture grows
- *  the table), never a second linear scan beside it. */
+/** The recipe whose result is this APEX item, or null for a non-apex id
+ *  (content-derived, never instance-derived). Resolved through the shared
+ *  resultItemId index (content/recipes.ts recipeForResultItem: O(1),
+ *  first-match, rebuilt when a test fixture grows the table), never a second
+ *  linear scan beside it. Phase 18 moved the read from data.ts's
+ *  ALL_RECIPES snapshot COPY to the live content array behind that index:
+ *  element-identical in production (nothing in src/ mutates either after
+ *  module eval), and the more correct table under test fixtures, which grow
+ *  the content array the snapshot never sees. */
 function apexRecipeFor(itemId: string): ProfessionRecipeRecord | null {
   if (ITEMS[itemId]?.masterwrought !== true) return null;
   return recipeForResultItem(itemId) ?? null;
@@ -455,7 +459,7 @@ export function resolvePerfectingAttempt(
   const { meta, e, itemId, def, wornSlot, bagged } = head;
   let { payload } = head;
   if (payload?.perfected === true) {
-    resolveLegendaryPromotion(ctx, pid, ref, name, head);
+    promoteResolvedTarget(ctx, head, name);
     return;
   }
   // Sufficiency counted lock-aware (issue 3042 doctrine, the crafting.ts
@@ -553,12 +557,11 @@ export function resolvePerfectingAttempt(
  * the same chain the live command takes (resolvePerfectingAttempt ->
  * resolveLegendaryPromotion -> promotePerfectedCopy). Runs the shared head
  * (resolvePerfectingHead: the same while-dead / noItem / not-masterwrought /
- * skill arms with the same lines) UNLESS the attempt route hands its
- * already-resolved target in (`head`, phase 18): every one of those gates
- * passed an instant ago on the same tick, so re-running them was a pure
- * double execution of the deny head, and threading the target keeps it to
- * exactly one run per command while a direct caller (a test, the deeds
- * suite, a future server path) omits the argument and stays standalone-safe.
+ * skill arms with the same lines); the attempt route instead calls the
+ * module-private promoteResolvedTarget below with its already-resolved
+ * target (phase 18), so the deny head runs exactly once per command while
+ * this export's signature stays head-free: an outside caller cannot hand in
+ * a synthesized target and skip the gates.
  * PRECONDITION arm rather than a fifth deny line: a copy that is
  * NOT Perfected is unreachable here through the real command
  * (resolvePerfectingAttempt owns that routing and sends an unperfected copy
@@ -574,9 +577,22 @@ export function resolveLegendaryPromotion(
   pid: number | undefined,
   ref: PerfectItemRef,
   name: string | undefined,
-  head: PerfectingTarget | null = null,
 ): void {
-  const target = head ?? resolvePerfectingHead(ctx, pid, ref);
+  const target = resolvePerfectingHead(ctx, pid, ref);
+  promoteResolvedTarget(ctx, target, name);
+}
+
+/** The threaded promotion arm both routes share: the attempt route hands its
+ *  already-resolved target (every shared gate passed an instant ago on the
+ *  same tick), the export above resolves its own. Module-private on purpose
+ *  (the phase 18 review): PerfectingTarget is structural, so exporting a
+ *  target-taking form would let an outside caller synthesize one and skip
+ *  the deny head, dead gate included. */
+function promoteResolvedTarget(
+  ctx: SimContext,
+  target: PerfectingTarget | null,
+  name: string | undefined,
+): void {
   if (!target) return;
   const { meta, e, itemId, def, payload, wornSlot } = target;
   if (payload?.perfected !== true) return;

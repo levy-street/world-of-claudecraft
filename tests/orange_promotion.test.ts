@@ -744,7 +744,11 @@ describe('the shared deny head runs once per routed promotion, and gates the dir
     resolveLegendaryPromotion(standalone.sim.ctx, standalone.pid, aloneRef, NAME);
     expect(standalone.meta.inventory[aloneRef.bag].instance?.rolled?.quality).toBe('legendary');
 
-    expect(aloneCalls(), 'the standalone entry: dead gate + ladder').toBe(2);
+    // The load-bearing pin is the RELATIVE one below; the absolute count is
+    // the head's current cost (dead gate + ladder), not a contract, so a
+    // future cleanup that threads the resolved player into the gate may
+    // lower it without failing here (the phase 18 review's reading).
+    expect(aloneCalls(), 'the standalone entry: at most dead gate + ladder').toBeLessThanOrEqual(2);
     expect(routedCalls(), 'the routed entry costs not one resolution more').toBe(aloneCalls());
   });
 

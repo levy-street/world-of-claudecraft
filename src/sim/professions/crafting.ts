@@ -1379,10 +1379,11 @@ export function maxCraftCountForRecipe(
   const craftSkills = meta ? meta.craftSkills : {};
   // Masterwrought phase 07: never promise a batch the resolve refuses. A
   // oncePerDay recipe previews at most ONE craft, zero once today's stamp is
-  // set (the same read-only check the admission gate denies on), so the
-  // Create All affordance and the qty clamp can never overpromise.
+  // set (the same stamp-and-knownness read the admission gate denies on,
+  // kept term-for-term in step with the gate at evaluateCraftAdmission), so
+  // the Create All affordance and the qty clamp can never overpromise.
   const dailyCap = recipe.oncePerDay
-    ? craftDailyLimitReached(ctx, meta, recipe)
+    ? craftDailyLimitReached(ctx, meta, recipe) && isRecipeKnown(meta, recipe)
       ? 0
       : 1
     : CRAFT_BATCH_MAX;

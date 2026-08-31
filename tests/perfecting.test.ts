@@ -10,7 +10,7 @@ import { describe, expect, it } from 'vitest';
 import { stackSizeOf } from '../src/sim/bags';
 import { STATIONS } from '../src/sim/content/professions';
 import { ALL_RECIPES, recipeById } from '../src/sim/content/recipes';
-import { ITEMS, QUESTS } from '../src/sim/data';
+import { ALL_RECIPES as ALL_RECIPES_SNAPSHOT, ITEMS, QUESTS } from '../src/sim/data';
 import {
   PRIMARY_STATS,
   primaryStatBudget,
@@ -1225,7 +1225,16 @@ describe('the rolled-spread distinguisher (phase 18, the test-lane no-change lis
 describe('apexRecipeFor rides the shared resultItemId index (phase 18)', () => {
   it('answers exactly like the retired linear scan, for every ALL_RECIPES row and a non-apex id', () => {
     // craftForApexItem is the exported face of apexRecipeFor; the oracle is
-    // the scan the index replaced, run fresh per row.
+    // the scan the index replaced, run fresh per row. The retired scan read
+    // data.ts's ALL_RECIPES snapshot COPY while the index reads the content
+    // array; the two are element-identical by construction (the snapshot is
+    // a spread taken at module eval and nothing in src/ mutates either
+    // after), asserted here so the oracle really stands in for the retired
+    // read (the phase 18 review's table note).
+    expect(ALL_RECIPES_SNAPSHOT.length).toBe(ALL_RECIPES.length);
+    for (let i = 0; i < ALL_RECIPES.length; i++) {
+      expect(ALL_RECIPES_SNAPSHOT[i]).toBe(ALL_RECIPES[i]);
+    }
     for (const r of ALL_RECIPES) {
       const scan =
         ITEMS[r.resultItemId]?.masterwrought === true
@@ -1264,10 +1273,16 @@ describe('apexRecipeFor rides the shared resultItemId index (phase 18)', () => {
     ALL_RECIPES.push(recipe);
     try {
       expect(craftForApexItem(itemId)).toBe('jewelcrafting');
-    } finally {
       ALL_RECIPES.splice(ALL_RECIPES.indexOf(recipe), 1);
+      // The ITEMS row is deliberately still present here, so the null can
+      // only come from the rebuilt index forgetting the spliced row, never
+      // from the masterwrought guard short-circuiting first (the phase 18
+      // review caught the delete-first ordering as a vacuous arm).
+      expect(craftForApexItem(itemId), 'the spliced row is forgotten again').toBeNull();
+    } finally {
+      const leftover = ALL_RECIPES.indexOf(recipe);
+      if (leftover >= 0) ALL_RECIPES.splice(leftover, 1);
       delete ITEMS[itemId];
     }
-    expect(craftForApexItem(itemId), 'the spliced row is forgotten again').toBeNull();
   });
 });
