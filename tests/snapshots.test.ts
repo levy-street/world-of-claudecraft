@@ -5927,6 +5927,44 @@ describe('delta-key contract pins (anti-drift)', () => {
     }
   });
 
+  it('sm is OMITTED at rest and present only while mana is parked (the behavior, not the placement)', () => {
+    // The pin above reads source text: it proves sm is written onto the base
+    // self object rather than through a delta writer, but a regression that
+    // emitted sm unconditionally (0 at rest) would pass it while spending a key
+    // on every self snapshot for every player of every class. This arm drives
+    // the real emitter instead.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Barkskin', 'druid');
+    const player = (server as any).sim.entities.get(session.pid);
+
+    // At rest: a caster on mana with nothing parked. Both halves of the guard
+    // are unmet, so the key must not be on the wire at all.
+    player.resourceType = 'mana';
+    player.savedMana = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self).not.toHaveProperty('sm');
+
+    // Shifted (the live bar runs on rage) but nothing parked yet: still absent,
+    // so the second half of the guard is load-bearing on its own.
+    player.resourceType = 'rage';
+    player.savedMana = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self).not.toHaveProperty('sm');
+
+    // Shifted with a real parked pool: present, floored by wireParkedMana.
+    player.savedMana = 240.7;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self.sm).toBe(240);
+
+    // Back on mana with the pool restored to the live bar: absent again, so a
+    // session that once carried sm does not keep a stale copy of it.
+    player.resourceType = 'mana';
+    player.savedMana = 0;
+    broadcast(server);
+    expect(lastSnap(fc.sent).self).not.toHaveProperty('sm');
+  });
+
   it('ALL_DELTA_KEYS equals the maybe(...) keys scraped from every server emitter (multi-line lockouts incl.)', () => {
     // Scan the whole recursive server tree: game.ts is the original emitter,
     // while Bank Storage moved the bank family into bank_wire.ts and the
@@ -6345,13 +6383,13 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     expect(isAuraDebuff(mirror)).toBe(false);
   });
 
-  it('never wires the Aura.flask marker: it stays server-and-offline state', () => {
-    // Masterwrought phase 10 stamps Aura.flask on the worn flask buff, and it
-    // crosses NO wire: wireAura has no flask arm, so an online client cannot
-    // tell a flask buff from the same-family elixir buff and paints no flask
-    // glyph. That is the recorded phase 14 answer, not an oversight, so it gets
-    // a pin: widening the aura wire to carry it becomes a deliberate edit here
-    // rather than a field that quietly appears in every snapshot.
+  it('WIRES the Aura.flask marker, sparsely, so the online glyph matches offline', () => {
+    // REVERSED at Phase 18 (item flask-buff-glyph-wire-marker). The phase 14
+    // answer was that this marker stays off the wire, which meant an online
+    // client could not tell a flask buff from the same-family elixir buff (they
+    // share an aura ID by design) and painted the same glyph for both. It now
+    // rides as the presence-only `fl`, the `und` shape exactly: sparse, so an
+    // ordinary aura is byte-unchanged, and read only to choose art.
     const flaskBuff: Aura = {
       id: 'elixir_buff_sta',
       name: 'Ironhusk Fortitude',
@@ -6365,13 +6403,32 @@ describe('aura magnitude over the wire (buff/debuff tooltip parity)', () => {
     };
     const { wire, mirror } = roundTrip(flaskBuff);
     const wired = wireAura(wire, 'elixir_buff_sta');
-    expect('flask' in wired, 'the marker stays off the wire').toBe(false);
-    // The rest of the aura still rides, so the absence above is a trimmed field
-    // and not an aura that failed to serialize at all.
+    expect(wired.fl, 'the marker rides as presence-only 1').toBe(1);
+    // The rest of the aura still rides, so the marker is an addition rather
+    // than a re-shaping of the record.
     expect(wired.value).toBe(15);
     expect(wired.school).toBe('nature');
     expect(mirror.value).toBe(15);
-    expect((mirror as { flask?: boolean }).flask, 'and never reaches the mirror').toBeUndefined();
+    expect((mirror as { flask?: boolean }).flask, 'and reaches the mirror').toBe(true);
+  });
+
+  it('leaves an ORDINARY aura byte-unchanged: no fl key at all', () => {
+    // The sparse half of the contract above. A marker sent falsy on every aura
+    // in the game would be a real per-snapshot cost for a rare buff.
+    const plainBuff: Aura = {
+      id: 'elixir_buff_sta',
+      name: 'Ironhusk Fortitude',
+      kind: 'buff_sta',
+      remaining: 1200,
+      duration: 1200,
+      value: 15,
+      sourceId: 0,
+      school: 'nature',
+    };
+    const { wire, mirror } = roundTrip(plainBuff);
+    const wired = wireAura(wire, 'elixir_buff_sta');
+    expect('fl' in wired, 'no marker for a non-flask aura').toBe(false);
+    expect((mirror as { flask?: boolean }).flask).toBeUndefined();
   });
 
   it('sends a POSITIVE absorb value so the shield overlay and tooltip work online too', () => {

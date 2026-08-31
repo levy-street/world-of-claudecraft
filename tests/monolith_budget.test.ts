@@ -942,7 +942,14 @@ const MONOLITHS: MonolithRow[] = [
     // transient farmWitheredAnnounced field, the onCropFarmedForQuests seam
     // binding, and the claimed-instance pass-through on the two award
     // delegates). Exact count, zero slack.
-    ceiling: 12038,
+    // LOWERED 12038 -> 12028 at Phase 18 (U-NET-WIRE, 2026-08-31): the
+    // auto-equip worn-family gate moved to src/sim/auto_equip_gate.ts (two
+    // conflict rules and the reason auto-equip declines rather than displacing,
+    // now a pure predicate a Vitest drives), which paid for the phase's own
+    // lines here (the placeFeast copy fold and the copy-anchor parameter on the
+    // three discard-class delegates) and left 10 over. Measured with
+    // wc -l < src/sim/sim.ts after biome. Exact count.
+    ceiling: 12028,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -1426,7 +1433,17 @@ const MONOLITHS: MonolithRow[] = [
     // BOTH parent pins for the record: ours 5922, the release 5856. Measured on
     // the merged tree, never reconciled by arithmetic. Exact merged count,
     // zero slack: any further growth reds again.
-    ceiling: 5890,
+    // LOWERED 5890 -> 5823 at Phase 18 (U-NET-WIRE, 2026-08-31): the whole aura
+    // half of applySnapshot moved to src/net/aura_wire_decode.ts, the
+    // directory's own "a new decode block is a new sibling" shape (the deadline
+    // clock, the in-place fast path that keeps a steady aura set
+    // allocation-free at 20 Hz, and every presence-only marker's decode, which
+    // had been written out twice inside one method). That paid for the phase's
+    // own additions here (the flask marker's mirror, the feast crafter mark,
+    // the place_feast slot, the discard-class anchor fields and their sender
+    // helper) with 67 lines to spare, so the row follows the file down.
+    // Measured with wc -l < src/net/online.ts after biome. Exact count.
+    ceiling: 5823,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

@@ -18,10 +18,30 @@
 // The win is negligible at every plausible rate, and the splice would buy a
 // cross-module key-order invariant (pid must stay the second key in three sim
 // literals) plus a second serialization path beside serializeEventFragments.
-// REFUSED on the numbers; these pins hold the premises the refusal rests on:
-// the payload stays small and flat, and every copy differs from its siblings
-// by the pid alone (so the day a tenant grows a large per-recipient payload or
-// a second varying field, the measurement re-opens here first).
+// REFUSED on the numbers.
+//
+// AMENDED 2026-08-31 (the Phase 18 hot-path review): the SERIALIZATION figures
+// above are right, but they priced the wrong term. The dominant cost of a
+// celebration was never stringifying it, it was ROUTING it: routeEvents gave
+// every session a full walk of the whole batch with no per-pid index, so one
+// celebration cost recipients x sessions selection iterations (200 in-zone at
+// 1,000 sessions = 200,000 in one tick; the recorded 5,000 x 5,000 ceiling =
+// 25 million), three to four orders of magnitude above the 24 us / 594 us
+// stringify term it was being weighed against. That term is now gone rather
+// than re-measured: server/event_pid_index.ts buckets the batch by pid ONCE and
+// each session pays O(its own pid-scoped events + the broadcast set), pinned by
+// the counting arms in tests/event_pid_index.test.ts. The splice refusal above
+// stands on its own numbers, which is why the record is amended in place and
+// not withdrawn.
+//
+// These pins hold the premises both records rest on: the payload stays small
+// and flat, every copy differs from its siblings by the pid alone (so the day a
+// tenant grows a large per-recipient payload or a second varying field, the
+// serialization measurement re-opens here first), and the fan-out width itself
+// is what the routing measurement was taken against (so a tenant that grows the
+// recipient set past the measured shape re-opens THAT one here too).
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
@@ -150,5 +170,56 @@ describe('zone celebration fan-out: one small pid-only-varying copy per in-zone 
       recipeId: 'recipe_eastbrook_ritual_vestments',
     } as Parameters<typeof announceMasterworkZone>[3]);
     expect(world.events).toHaveLength(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The ROUTING measurement's own premises (the 2026-08-31 amendment). Both
+// records above are products of two numbers: how many events one celebration
+// puts in the batch, and how many sessions the batch is routed to. These pin
+// both multiplicands, so a tenant that changes either re-opens the measurement
+// here first rather than silently invalidating a recorded figure.
+// ---------------------------------------------------------------------------
+
+/** The sample the routing term was measured at: 200 in-zone, 1,000 sessions. */
+const MEASURED_RECIPIENTS = 200;
+const MEASURED_SESSIONS = 1_000;
+/** The recorded absolute ceiling: a full realm, all of it in one zone. */
+const CEILING_RECIPIENTS = 5_000;
+const CEILING_SESSIONS = 5_000;
+
+describe('the fan-out measurement premises (batch size x session count)', () => {
+  it('one celebration puts exactly ONE event per recipient in the batch, at every width', () => {
+    // The first multiplicand. It is 1:1 and LINEAR, which is what makes
+    // "recipients x sessions" the right arithmetic: a tenant that started
+    // minting two events per recipient, or one shared event plus a per-recipient
+    // rider, would double or bend the term and fails here.
+    for (const recipients of [1, 12, 64]) {
+      const world = fakeWorld(recipients);
+      announceMasterworkZone(world.ctx, world.inZone[0], 'Grimmschaedel', {
+        itemId: 'eastbrook_ritual_vestments',
+        recipeId: 'recipe_eastbrook_ritual_vestments',
+      } as Parameters<typeof announceMasterworkZone>[3]);
+      expect(world.events).toHaveLength(recipients);
+      expect(world.events.filter((ev) => ev.type === 'masterworkZone')).toHaveLength(recipients);
+    }
+  });
+
+  it('the recorded ceiling is the realm admission cap on BOTH multiplicands', () => {
+    // The second multiplicand, and the bound on the first: the recipient set is
+    // "every player in the zone", so both ceilings are the realm admission cap.
+    // Read as SOURCE TEXT rather than imported for the same reason
+    // server/bank_vault_ledger_guard.ts mirrors it: server/http/config.ts fails
+    // fast without DATABASE_URL and cannot be imported into a DB-less unit run.
+    const config = readFileSync(resolve(process.cwd(), 'server/http/config.ts'), 'utf8');
+    const match = config.match(/const DEFAULT_MAX_PLAYERS_PER_REALM = (\d+);/);
+    expect(match, 'the realm admission cap default moved or was renamed').not.toBeNull();
+    const realmCap = Number((match as RegExpMatchArray)[1]);
+    expect(realmCap).toBe(CEILING_RECIPIENTS);
+    expect(realmCap).toBe(CEILING_SESSIONS);
+    // The measured sample sits inside that ceiling on both axes, so the two
+    // recorded figures bracket the same space rather than describing two.
+    expect(MEASURED_RECIPIENTS).toBeLessThan(CEILING_RECIPIENTS);
+    expect(MEASURED_SESSIONS).toBeLessThan(CEILING_SESSIONS);
   });
 });

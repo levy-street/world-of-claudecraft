@@ -107,7 +107,16 @@ export interface IWorldFarming {
   // the normal interest-scoped entity snapshot: no new wire mechanism, and
   // clients learn despawn by snapshot absence. Every refusal is a text-free
   // id-carrying farmDenied SimEvent; placement draws zero rng.
-  placeFeast(): void;
+  // `target` NAMES the bag copy to spend (the item_copy_ref index-plus-id
+  // selection every other item verb carries). OPTIONAL, and the omission is
+  // load-bearing: a bare place_feast keeps its exact pre-existing meaning,
+  // spending a harvest_feast through the id-only lock-aware walk, which is what
+  // the Phase 11k pin holds. With it, the clicked copy is the one spent, so a
+  // player holding a signed feast beside a plain one no longer watches the
+  // wrong one leave the bags. Server-revalidated like every selection: the sim
+  // re-resolves the index against its OWN inventory and refuses a mismatch
+  // (farmDenied 'no_feast'), so the client names a copy, it never picks one.
+  placeFeast(target?: { slotIndex: number }): void;
   // Eat once from the placed feast entity `feastId` (the id a client reads
   // off the entity snapshot; the interact funnel's feast arm supplies it).
   // Server-authoritative: the sim re-checks liveness, expiry, charges,

@@ -502,9 +502,11 @@ export const IWORLD_MEMBERS = [
   // The render phase's clock read: each world returns its OWN lockoutNowMs
   // base, so a growth-stage fraction never mixes clock bases.
   { name: 'farmNowMs', kind: 'method' },
-  // The shared-feast phase's pair: payload-free placement and the
-  // entity-id-keyed bite (both methods; the feast entity itself rides the
-  // normal entity snapshot, so no data member exists for it).
+  // The shared-feast phase's pair: placement (whose ONE optional argument is
+  // the item_copy_ref selection naming which bag copy to spend; the bare call
+  // keeps its harvest_feast default) and the entity-id-keyed bite. Both
+  // methods; the feast entity itself rides the normal entity snapshot, so no
+  // data member exists for it.
   { name: 'placeFeast', kind: 'method' },
   { name: 'consumeFeast', kind: 'method' },
 ] as const satisfies readonly IWorldMember[];
