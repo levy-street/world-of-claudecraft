@@ -147,3 +147,4 @@ public/models/sfx-studio-security-*.glb
 
 # Build artifacts (review 3050: class-directions PDFs land here)
 output/
+docs/screenshots/goblin-rocket-sled/
