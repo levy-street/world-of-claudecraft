@@ -298,9 +298,12 @@ describe('isHarvestableCorpse', () => {
     // the beast family: the same template the `included` count above picked
     // up. Minus vale_cup_ball once it retired with the Vale Cup. Plus the
     // Proving Shore tutorial island's training_effigy, a straw target that
-    // yields nothing either.)
+    // yields nothing either. Plus the seven Ignivar raid templates (the
+    // derelict mech, Varkhul, the three crucible automatons, the herald and
+    // the Heart of the End): all elemental-family forge constructs, and a
+    // construct corpse carries no skinnable or butcherable components.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(187);
+    expect(untagged).toHaveLength(194);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

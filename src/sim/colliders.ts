@@ -31,7 +31,6 @@ import {
   BUILTIN_WORLD,
   battlegroundOrigin,
   DUNGEON_FLOOR_Y,
-  DUNGEON_LIST,
   DUNGEON_X_THRESHOLD,
   DUNGEONS,
   defaultDelveModules,
@@ -60,6 +59,7 @@ import {
 export { MAX_BODY_RADIUS } from './collider_cells';
 
 import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
+import { buildDecorPropColliders } from './decor_prop_colliders';
 import {
   decorationHasCollider,
   ROCK_RADIUS_PER_SCALE,
@@ -68,6 +68,7 @@ import {
 } from './decoration_dims';
 import { type DelveModuleId, delveModuleColliders } from './delve_layout';
 import { isLitanyModuleId, litanyModuleLosColliders } from './delve_litany_layout';
+import { dungeonDoorJambColliders } from './dungeon_door_jambs';
 import { dungeonInstanceAt, INTERIOR_LAYOUTS } from './dungeon_floor';
 import {
   ARENA_LAYOUT,
@@ -80,6 +81,8 @@ import {
 import { emberLilySpots } from './ember_lilies';
 import { fenWillowSpots, hollowWillowSpots } from './fen_willows';
 import { FENBRIDGE_LAYOUT } from './fenbridge_layout';
+import { forgefatherFortressColliders, forgefatherStreetlampSites } from './forgefather_fortress';
+import { derivedInteriorColliders } from './interior_collider_sets';
 import {
   benchDrawnHeight,
   CHAPEL_HALL,
@@ -92,10 +95,6 @@ import {
   DELVE_ARCH_HW,
   DOCK_BOAT,
   DOCK_DRESSING,
-  DOOR_ARCH_HEIGHT,
-  DOOR_ARCH_JAMB_HD,
-  DOOR_ARCH_JAMB_HW,
-  DOOR_ARCH_JAMB_X,
   delveArchZ,
   GATHER_NODE_BODIES,
   GRAVE_COUNT,
@@ -766,35 +765,10 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // Hand-placed GLB decor. r 0/absent entries are walk-through dressing and add
-  // no collider. An entry carrying hw AND hd collides as the model's real BOX,
-  // oriented by its own rot; everything else keeps the circle it always had.
-  // The box exists because these models are rectangles: a circle drawn round one
-  // stands off its flat walls (that is the invisible wall players walk into) and
-  // a circle drawn inside one cuts its corners off instead.
-  for (const d of PROPS.decorProps ?? []) {
-    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
-    if (d.hw !== undefined && d.hd !== undefined) {
-      out.push({
-        type: 'obb',
-        x: d.x,
-        z: d.z,
-        hw: d.hw,
-        hd: d.hd,
-        rot: d.rot ?? 0,
-        cameraTopY,
-      });
-      continue;
-    }
-    if (!d.r) continue;
-    out.push({
-      type: 'circle',
-      x: d.x,
-      z: d.z,
-      r: d.r,
-      cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
-    });
-  }
+  // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box
+  // per PROPS.decorProps entry, walk-through when r/hw+hd are absent, standable
+  // on top when standableTop is set (see that module's header).
+  out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the
@@ -874,30 +848,11 @@ function staticWorldColliders(seed: number): Collider[] {
     });
   }
 
-  // Overworld dungeon door arches: only the two stone JAMBS collide, because
-  // walking into the mouth IS the enter trigger. The Abandoned Crypt's door
-  // draws no arch (an invisible click box at the mine), and two dungeons can
-  // share one doorway, so dedupe by position.
-  const doorSpots = new Set<string>();
-  for (const dungeon of DUNGEON_LIST) {
-    if (dungeon.overworldDoor === false) continue;
-    if (dungeon.id === 'nythraxis_crypt') continue;
-    const key = `${dungeon.doorPos.x},${dungeon.doorPos.z}`;
-    if (doorSpots.has(key)) continue;
-    doorSpots.add(key);
-    for (const sx of [-DOOR_ARCH_JAMB_X, DOOR_ARCH_JAMB_X]) {
-      const x = dungeon.doorPos.x + sx;
-      out.push({
-        type: 'obb',
-        x,
-        z: dungeon.doorPos.z,
-        hw: DOOR_ARCH_JAMB_HW,
-        hd: DOOR_ARCH_JAMB_HD,
-        rot: 0,
-        cameraTopY: topY(seed, x, dungeon.doorPos.z, DOOR_ARCH_HEIGHT),
-      });
-    }
-  }
+  // Dungeon door arch jambs (dungeon_door_jambs.ts owns the rule).
+  out.push(...dungeonDoorJambColliders(seed, topY));
+  // The Forgefather's Isle fortress: the owner's baked exterior pass
+  // (forgefather_fortress.ts owns the ground-standing derivation).
+  out.push(...forgefatherFortressColliders(seed));
 
   // Delve entrance portals: the whole slab is a solid one-way threshold
   // (players enter by talking to the warden; leaveDelve drops them mouth-side
@@ -1436,23 +1391,10 @@ const STATIC_INTERIOR_COLLIDERS: Record<string, Collider[]> = {
   dawnhold: DAWNHOLD_COLLIDERS,
 };
 
-// Per-DUNGEON interior sets: dungeons sharing a room plan (Hollow Crypt and
-// the Sunken Bastion are both 'crypt') dress their wall-side slots with
-// different furniture, so the standable tops differ per dungeon even where
-// the walls do not. Built lazily, cached by dungeon id.
-const interiorSetByDungeon = new Map<string, Collider[]>();
+// Per-dungeon interior sets: assembly extracted to interior_collider_sets.ts
+// (which also appends the Ignivar authored dressing-prop colliders).
 function interiorCollidersFor(dungeonId: string | null, interior: string): Collider[] {
-  const staticSet = STATIC_INTERIOR_COLLIDERS[interior];
-  if (staticSet) return staticSet;
-  const key = dungeonId ?? `interior:${interior}`;
-  let set = interiorSetByDungeon.get(key);
-  if (!set) {
-    const layout = INTERIOR_LAYOUTS[interior] ?? CRYPT_LAYOUT;
-    const dressing = dungeonId ? DUNGEONS[dungeonId]?.tombDressing : undefined;
-    set = layoutColliders(layout, dressing, DUNGEON_FLOOR_Y);
-    interiorSetByDungeon.set(key, set);
-  }
-  return set;
+  return derivedInteriorColliders(dungeonId, interior, STATIC_INTERIOR_COLLIDERS);
 }
 
 // ---------------------------------------------------------------------------
@@ -1666,7 +1608,7 @@ function buildStreetlampPlacements(seed: number): PlacedStreetlamp[] {
  * never walls off someone you have to walk up to and talk to.
  */
 function addStreetlampColliders(grid: ColliderGrid, seed: number): void {
-  const placements = buildStreetlampPlacements(seed);
+  const placements = [...buildStreetlampPlacements(seed), ...forgefatherStreetlampSites()];
   streetlampsByGrid.set(grid, placements);
   if (placements.length === 0) return;
   const npcSpots = townNpcPositions();

@@ -256,6 +256,8 @@
         <div class="bar" id="tf-resource"><div class="bar-fill" id="tf-res"></div><div class="bar-text" id="tf-res-text"></div></div>
         <div class="uf-discord" id="tf-discord"></div>
         <div id="tf-castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.targetAria" aria-label="Unit Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
+        <div id="swingbar-target" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+        <div id="swingbar-tot" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
       </div>
       <div class="uf-buffs" id="tf-debuffs"></div>
       <!-- Target of Target (showTargetOfTarget option): the classic mini-frame showing
@@ -288,6 +290,7 @@
 
     <div id="castbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" data-i18n-aria="hudChrome.castBar.playerAria" aria-label="Your Cast Bar"><div class="fill"></div><div class="label"></div><div class="timer"></div></div>
     <div id="swingbar" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
+    <div id="swingbar-offhand" aria-hidden="true"><div class="fill"></div><div class="label"></div></div>
 
     <div id="minimap-wrap">
       <div id="zone-label" data-i18n="entities.zones.eastbrook_vale.name">Eastbrook Vale</div>
@@ -354,7 +357,7 @@
         <div class="paladin-devotion-fill" id="paladin-devotion-fill"></div>
         <div class="paladin-devotion-label" id="paladin-devotion-label"></div>
         <div class="paladin-ascension-charges" aria-hidden="true">
-          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
         </div>
       </div>
       <span class="visually-hidden" id="paladin-ascension-status" role="status" aria-live="polite"></span>
@@ -536,6 +539,7 @@
     </div>
     <div id="arena-window" class="window panel"></div>
     <div id="dungeon-finder-window" class="window panel"></div>
+    <div id="raid-boss-guide-window" class="window panel"></div>
     <div id="dfinder-proposal-popup" class="panel"></div>
     <div id="bg-proposal-popup" class="panel"></div>
     <div id="leaderboard-window" class="window panel"></div>
@@ -1362,19 +1366,19 @@
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="mac"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-mac-universal.dmg"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-mac-universal.dmg"
               data-i18n="download.macCta"
             >Download for macOS</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="win"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-win-x64.exe"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-win-x64.exe"
               data-i18n="download.windowsCta"
             >Download for Windows</a>
             <a
               class="btn btn-primary desktop-download-link"
               data-platform="linux"
-              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.40.0-linux-x86_64.AppImage"
+              href="https://updates.worldofclaudecraft.com/desktop/world-of-claudecraft-0.41.0-linux-x86_64.AppImage"
               data-i18n="download.linuxCta"
             >Download for Linux</a>
           </div>
@@ -1603,7 +1607,7 @@
           <span data-i18n="nav.donate">Donate</span>
         </a>
       </div>
-      <div id="game-version">v0.40.0</div>
+      <div id="game-version">v0.41.0</div>
       </div>
       <div class="footer-legal-row">
         <a href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper">Whitepaper</a>

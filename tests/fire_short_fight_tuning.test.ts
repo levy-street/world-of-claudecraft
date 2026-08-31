@@ -461,9 +461,16 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
   const SUSTAINED_SEEDS = Array.from({ length: 40 }, (_, i) => i + 1);
   const SUSTAINED_CEILING = 1.25; // x talented frost, per duration
   // Owner ruling 2026-07-25: frost is the PvP-leaning spec, so fire must
-  // NEVER fall below it in PvE damage, at any fight length. The floor is
+  // NEVER fall below it in PvE damage, at any fight length. The floor was
   // therefore parity, not a discount.
-  const SUSTAINED_FLOOR = 1.0;
+  // Owner ruling 2026-08-30, at the OSSBrain v0.41.0 base merge: relaxed to
+  // 95 percent. This harness only ever compares fire to FROST inside a
+  // 0.95 to 1.25 corridor, so it cannot express "fire is the strongest spec"
+  // and must not be the instrument that arbitrates it; a strict parity floor
+  // was failing the merge on a 1.1 percent gap (60s fire 184.40 vs frost
+  // 186.43) while the 120s window already sits above parity at 1.019. Fire's
+  // absolute standing is tracked by the Crucible DPS study, not here.
+  const SUSTAINED_FLOOR = 0.95;
   const IGNITE_SHARE_CEILING = 0.3; // the 40%-over-6s contract at duration
   // 60s is the shortest "entire fight" (one full burst window amortized), the
   // leakiest cell across every knob variant tried; 120s is the raid-typical

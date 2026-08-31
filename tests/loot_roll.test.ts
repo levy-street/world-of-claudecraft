@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
+import { BOP_PARTY_TRADE_MS } from '../src/sim/loot/bop_trade_window';
 import {
   activeLootRolls,
   awardSharedLootItem,
@@ -99,6 +100,32 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
     const rate = dropRate(1234, 'bastion_revenant', 'mistveil_cord', 8000);
     expect(rate).toBeGreaterThan(0.04);
     expect(rate).toBeLessThan(0.08);
+  });
+
+  it('awards Emberward only when Varkhul belongs to a heroic instance', () => {
+    const rollVarkhul = (heroic: boolean): string[] => {
+      const sim = makeSim(123);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS.varkhul_forgefather_of_the_last_flame;
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      if (heroic) {
+        sim.ctx.instances.push({
+          id: -1,
+          dungeonId: 'ignivar_inner_crucible',
+          difficulty: 'heroic',
+          partyKey: 'test-party',
+          mobIds: [mob.id],
+        } as unknown as (typeof sim.ctx.instances)[number]);
+      }
+      const nextSpy = vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.99);
+      rollLoot(sim.ctx, mob, meta);
+      nextSpy.mockRestore();
+      return (mob.loot?.items ?? []).map((slot) => slot.itemId);
+    };
+
+    expect(rollVarkhul(false)).not.toContain('varkhul_emberward');
+    expect(rollVarkhul(true)).toContain('varkhul_emberward');
   });
 
   // Reproduces the raid-loot duplicate bug: Nythraxis has 4 independent rollGroups
@@ -764,5 +791,89 @@ describe('loot_roll: heroic-append cross-group dedup arm', () => {
     } finally {
       HEROIC_BOSS_LOOT.morthen = original;
     }
+  });
+});
+
+describe('loot_roll: bind-on-pickup party trade window on soulbound awards', () => {
+  it('stamps the drop-moment candidate snapshot onto a need/greed win of a soulbound item', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
+    const rollId = lootRollEvent(sim).rollId;
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
+    // Winner included: the whole kill-time candidate set may receive the copy.
+    expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
+    expect(slot.instance?.partyTrade?.untilMs).toBe(
+      Math.floor(sim.time * 1000) + BOP_PARTY_TRADE_MS,
+    );
+  });
+
+  it('leaves a non-soulbound award plain (no instance payload)', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'greyjaw_hide_boots', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'greyjaw_hide_boots', mob, playerMeta(sim, a));
+    const rollId = lootRollEvent(sim).rollId;
+    submitLootRoll(sim.ctx, rollId, 'need', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'greyjaw_hide_boots'),
+    );
+    expect(slot.instance).toBeUndefined();
+  });
+
+  it('an everyone-passed return picked up from the corpse still carries the window', () => {
+    const { sim, a, b, c } = partyOfThree();
+    const mob = deadCorpse(sim, a, [a, b, c], {
+      copper: 0,
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+    });
+    awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
+    mob.loot = { copper: 0, items: [] };
+    const rollId = lootRollEvent(sim).rollId;
+    submitLootRoll(sim.ctx, rollId, 'pass', a);
+    submitLootRoll(sim.ctx, rollId, 'pass', b);
+    submitLootRoll(sim.ctx, rollId, 'pass', c);
+    expect(mob.loot?.items.find((s) => s.itemId === 'slagbreaker_helmet')?.openToAll).toBe(true);
+
+    // The pickup from the returned openToAll slot is the interaction path,
+    // which must route through the same windowed grant as a roll win: the
+    // everyone-passed outcome ("sort it out later") is the most common raid
+    // case the window exists for.
+    const looter = expectDefined(sim.entities.get(b));
+    looter.pos = { ...mob.pos };
+    looter.prevPos = { ...mob.pos };
+    sim.rebucket(looter);
+    expect(sim.lootCorpse(mob.id, b)).toBe(true);
+    const slot = expectDefined(
+      playerMeta(sim, b).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
+    expect(slot.instance?.partyTrade?.eligible).toEqual(['Aaa', 'Bbb', 'Ccc']);
+  });
+
+  it('grants a solo soulbound pickup plain: nobody shared the drop, so no window exists', () => {
+    const sim = makeSim();
+    const a = sim.addPlayer('warrior', 'Solo');
+    const mob = deadCorpse(sim, a, [a], {
+      copper: 0,
+      items: [{ itemId: 'slagbreaker_helmet', count: 1 }],
+    });
+    const taken = awardSharedLootItem(sim.ctx, 'slagbreaker_helmet', mob, playerMeta(sim, a));
+    expect(taken).toBe(true);
+    const slot = expectDefined(
+      playerMeta(sim, a).inventory.find((s) => s.itemId === 'slagbreaker_helmet'),
+    );
+    expect(slot.instance).toBeUndefined();
   });
 });

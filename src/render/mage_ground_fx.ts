@@ -19,6 +19,8 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import type { SimEvent } from '../sim/types';
+import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -43,8 +45,11 @@ export function capRingLightness(color: THREE.Color): THREE.Color {
 const METEOR_DROP_HEIGHT = 45; // yards above the impact point it appears
 const METEOR_RADIUS = 1.12;
 const METEOR_TELEGRAPH_SEGMENTS = 72;
+const METEOR_FOOTPRINT_RADIAL_SEGMENTS = 5;
+const METEOR_BEACON_EMBER_COUNT = 14;
 const METEOR_FLAME_COUNT = 18;
 const METEOR_EMBER_COUNT = 28;
+export const METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS = 1 / 20;
 const METEOR_SCORCH_LINGER = 2.2; // central fire left behind after impact
 const RUNE_FADE = 0.8; // seconds of fade at the rune's end of life
 const RUNE_SPIN = 0.5; // rad/s, lazy mote rotation
@@ -60,6 +65,16 @@ export interface MeteorFallSpawn {
    *  retain their legacy fire burst. */
   sourceId?: number;
   ability?: string;
+  showTelegraph?: boolean;
+  warningLead?: number; // seconds where only the ground warning is visible
+  persistentId?: string;
+  initialElapsed?: number;
+}
+
+export interface MeteorWarningState extends MeteorFallSpawn {
+  id: string;
+  remaining: number;
+  warningLead: number;
 }
 
 export interface RuneCircleSpawn {
@@ -86,6 +101,8 @@ const SNOW_TOP = 9; // yards above ground the flakes spawn
 const SNOW_FALL = 3.2; // yards per second
 
 interface MeteorFx {
+  persistentId?: string;
+  snapshotManaged: boolean;
   root: THREE.Group;
   body: THREE.Group;
   trail: THREE.Group;
@@ -95,21 +112,40 @@ interface MeteorFx {
   trailOuterMat: THREE.MeshBasicMaterial;
   trailInnerMat: THREE.MeshBasicMaterial;
   emberMat: THREE.PointsMaterial;
+  footprintMat: THREE.MeshBasicMaterial;
   boundaryMat: THREE.LineBasicMaterial;
-  innerRingMat: THREE.LineBasicMaterial;
+  countdownMat: THREE.MeshBasicMaterial;
   veinMat: THREE.LineBasicMaterial;
   flameMat: THREE.MeshBasicMaterial;
+  beaconEmberMat: THREE.PointsMaterial;
+  beaconEmbers: THREE.Points;
+  countdownRing: THREE.Mesh;
+  countdownPositions: Float32Array;
+  countdownGeometryUpdateElapsed: number;
   flames: THREE.InstancedMesh;
   flameBases: ReadonlyArray<{ x: number; y: number; z: number; phase: number }>;
   flameDummy: THREE.Object3D;
   ownedGeometries: THREE.BufferGeometry[];
   x: number;
   z: number;
+  radius: number;
   groundY: number;
   duration: number;
+  warningLead: number;
   elapsed: number;
   landed: boolean;
   spawn: MeteorFallSpawn;
+  contributorOwnsGroundDetail: boolean;
+  ignivarFireAoe: GroundFireAoeHandle | null;
+}
+
+function advanceGroundFireAoe(aoe: GroundFireAoeHandle, seconds: number): void {
+  let remaining = Math.max(0, seconds);
+  while (remaining > 0) {
+    const step = Math.min(remaining, 0.05);
+    aoe.update(step);
+    remaining -= step;
+  }
 }
 
 interface RuneFx {
@@ -142,8 +178,9 @@ interface SnowFx {
 export class MageGroundFx {
   private readonly scene: THREE.Scene;
   private readonly groundY: (x: number, z: number) => number;
-  private readonly onMeteorLand: (x: number, z: number, spawn: MeteorFallSpawn) => void;
+  private readonly onMeteorLand: (x: number, z: number, spawn?: MeteorFallSpawn) => void;
   private readonly meteors: MeteorFx[] = [];
+  private readonly resolvedPersistentMeteorIds = new Set<string>();
   private readonly runes: RuneFx[] = [];
   private readonly snows: SnowFx[] = [];
   private meteorGeo: THREE.IcosahedronGeometry | null = null;
@@ -164,7 +201,7 @@ export class MageGroundFx {
   constructor(
     scene: THREE.Scene,
     groundY: (x: number, z: number) => number,
-    onMeteorLand: (x: number, z: number, spawn: MeteorFallSpawn) => void,
+    onMeteorLand: (x: number, z: number, spawn?: MeteorFallSpawn) => void,
   ) {
     this.scene = scene;
     this.groundY = groundY;
@@ -203,14 +240,25 @@ export class MageGroundFx {
 
   spawnMeteor(opts: MeteorFallSpawn): void {
     if (this.disposed) return;
+    if (
+      opts.persistentId !== undefined &&
+      this.meteors.some((meteor) => meteor.persistentId === opts.persistentId)
+    ) {
+      return;
+    }
     const geometry = this.ensureMeteorGeometry();
     const fire = new THREE.Color(SCHOOL_COLORS.fire);
     const magma = new THREE.Color(0xff5a0a);
     const root = new THREE.Group();
     root.name = 'mage-meteor-fx';
+    root.userData.persistentMeteorId = opts.persistentId;
 
     const body = new THREE.Group();
     body.name = 'mage-meteor-body';
+    const duration = Math.max(0.3, opts.duration);
+    const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
+    const initialElapsed = Math.min(duration, Math.max(0, opts.initialElapsed ?? 0));
+    body.visible = warningLead === 0;
     const rockMat = this.acquireMaterial(
       'meteor-rock',
       1,
@@ -270,6 +318,7 @@ export class MageGroundFx {
 
     const trail = new THREE.Group();
     trail.name = 'mage-meteor-trail';
+    trail.visible = warningLead === 0;
     const trailOuterMat = this.acquireMaterial(
       'meteor-trail-outer',
       0.48,
@@ -343,10 +392,34 @@ export class MageGroundFx {
     body.position.set(opts.x, startY, opts.z);
     trail.position.copy(body.position);
 
-    const warning = this.buildMeteorTelegraph(opts, geometry.flame);
+    const warning = this.buildMeteorTelegraph(opts, geometry.flame, initialElapsed / duration);
+    warning.group.visible = opts.showTelegraph !== false;
+    const contributorOwnsGroundDetail = opts.persistentId !== undefined;
+    if (contributorOwnsGroundDetail) {
+      warning.group.getObjectByName('mage-meteor-telegraph-footprint')!.visible = false;
+      warning.group.getObjectByName('mage-meteor-telegraph-veins')!.visible = false;
+      warning.group.getObjectByName('mage-meteor-telegraph-flames')!.visible = false;
+      warning.beaconEmbers.visible = false;
+    }
     root.add(warning.group);
+    const ignivarFireAoe = opts.persistentId
+      ? createGroundFireAoe({
+          radius: opts.radius,
+          count: 36,
+          flameTexUrl: '/textures/vfx/ignivar_flame_6x6.webp',
+        })
+      : null;
+    if (ignivarFireAoe) {
+      ignivarFireAoe.group.position.set(opts.x, gy, opts.z);
+      ignivarFireAoe.group.visible = opts.showTelegraph !== false;
+      ignivarFireAoe.heatup();
+      advanceGroundFireAoe(ignivarFireAoe, initialElapsed);
+      this.scene.add(ignivarFireAoe.group);
+    }
     this.scene.add(root);
     this.meteors.push({
+      persistentId: opts.persistentId,
+      snapshotManaged: false,
       root,
       body,
       trail,
@@ -356,22 +429,141 @@ export class MageGroundFx {
       trailOuterMat,
       trailInnerMat,
       emberMat,
+      footprintMat: warning.footprintMat,
       boundaryMat: warning.boundaryMat,
-      innerRingMat: warning.innerRingMat,
+      countdownMat: warning.countdownMat,
       veinMat: warning.veinMat,
       flameMat: warning.flameMat,
+      beaconEmberMat: warning.beaconEmberMat,
+      beaconEmbers: warning.beaconEmbers,
+      countdownRing: warning.countdownRing,
+      countdownPositions: warning.countdownPositions,
+      countdownGeometryUpdateElapsed: 0,
       flames: warning.flames,
       flameBases: warning.flameBases,
       flameDummy: new THREE.Object3D(),
       ownedGeometries: [emberGeo, ...warning.ownedGeometries],
       x: opts.x,
       z: opts.z,
+      radius: opts.radius,
       groundY: gy,
-      duration: Math.max(0.3, opts.duration),
-      elapsed: 0,
+      duration,
+      warningLead,
+      elapsed: initialElapsed,
       landed: false,
       spawn: { ...opts },
+      contributorOwnsGroundDetail,
+      ignivarFireAoe,
     });
+  }
+
+  /** Reconciles warnings from authoritative snapshots with their live event visual. */
+  syncWorldMeteorWarnings(world: {
+    activeIgnivarMeteors: readonly MeteorWarningState[];
+    activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
+    activeVarkhulForgestormWarnings: readonly MeteorWarningState[];
+  }): void {
+    this.syncMeteorWarnings(
+      world.activeIgnivarMeteors,
+      world.activeVarkhulAnvilMeteors,
+      world.activeVarkhulForgestormWarnings,
+    );
+  }
+
+  syncMeteorWarnings(
+    warnings: readonly MeteorWarningState[],
+    secondaryWarnings: readonly MeteorWarningState[] = [],
+    tertiaryWarnings: readonly MeteorWarningState[] = [],
+  ): void {
+    const activeIds = new Set<string>();
+    const syncWarning = (warning: MeteorWarningState): void => {
+      activeIds.add(warning.id);
+      if (this.resolvedPersistentMeteorIds.has(warning.id)) return;
+      const existing = this.meteors.find((meteor) => meteor.persistentId === warning.id);
+      if (existing) {
+        existing.snapshotManaged = true;
+        existing.duration = Math.max(0.05, warning.duration);
+        existing.warningLead = Math.min(existing.duration - 0.01, Math.max(0, warning.warningLead));
+        const authoritativeElapsed = Math.max(
+          existing.elapsed,
+          existing.duration - Math.min(existing.duration, warning.remaining),
+        );
+        if (existing.ignivarFireAoe) {
+          advanceGroundFireAoe(existing.ignivarFireAoe, authoritativeElapsed - existing.elapsed);
+        }
+        existing.elapsed = authoritativeElapsed;
+        return;
+      }
+      this.spawnMeteor({
+        x: warning.x,
+        z: warning.z,
+        radius: warning.radius,
+        duration: warning.duration,
+        warningLead: warning.warningLead,
+        persistentId: warning.id,
+        initialElapsed: warning.duration - warning.remaining,
+      });
+      const spawned = this.meteors.find((meteor) => meteor.persistentId === warning.id);
+      if (spawned) spawned.snapshotManaged = true;
+    };
+    for (const warning of warnings) syncWarning(warning);
+    for (const warning of secondaryWarnings) syncWarning(warning);
+    for (const warning of tertiaryWarnings) syncWarning(warning);
+    for (let i = this.meteors.length - 1; i >= 0; i--) {
+      const meteor = this.meteors[i];
+      if (!meteor.snapshotManaged || !meteor.persistentId || activeIds.has(meteor.persistentId)) {
+        continue;
+      }
+      this.disposeMeteor(meteor);
+      this.meteors.splice(i, 1);
+    }
+    for (const id of this.resolvedPersistentMeteorIds) {
+      if (!activeIds.has(id)) this.resolvedPersistentMeteorIds.delete(id);
+    }
+  }
+
+  /** Resolves a server-authored impact and consumes its pending warning exactly once. */
+  impactMeteor(persistentId: string, x: number, z: number): void {
+    if (this.resolvedPersistentMeteorIds.has(persistentId)) return;
+    this.resolvedPersistentMeteorIds.add(persistentId);
+    const index = this.meteors.findIndex((meteor) => meteor.persistentId === persistentId);
+    if (index < 0) {
+      this.onMeteorLand(x, z);
+      return;
+    }
+    const meteor = this.meteors[index];
+    const shouldBurst = !meteor.landed;
+    if (!shouldBurst) return;
+    meteor.landed = true;
+    meteor.elapsed = meteor.duration;
+    meteor.body.visible = false;
+    meteor.trail.visible = false;
+    meteor.boundaryMat.opacity = 0;
+    meteor.flameMat.opacity = 0;
+    meteor.flames.visible = false;
+    meteor.beaconEmberMat.opacity = 0;
+    meteor.beaconEmbers.visible = false;
+    meteor.ignivarFireAoe?.erupt();
+    this.onMeteorLand(x, z);
+  }
+
+  private disposeMeteor(meteor: MeteorFx): void {
+    meteor.ignivarFireAoe?.dispose();
+    this.scene.remove(meteor.root);
+    this.releaseMaterial('meteor-rock', meteor.rockMat);
+    this.releaseMaterial('meteor-magma', meteor.magmaMat);
+    this.releaseMaterial('meteor-corona', meteor.coronaMat);
+    this.releaseMaterial('meteor-trail-outer', meteor.trailOuterMat);
+    this.releaseMaterial('meteor-trail-inner', meteor.trailInnerMat);
+    this.releaseMaterial('meteor-ember', meteor.emberMat);
+    this.releaseMaterial('meteor-footprint', meteor.footprintMat);
+    this.releaseMaterial('meteor-boundary', meteor.boundaryMat);
+    this.releaseMaterial('meteor-countdown', meteor.countdownMat);
+    this.releaseMaterial('meteor-vein', meteor.veinMat);
+    this.releaseMaterial('meteor-flame', meteor.flameMat);
+    this.releaseMaterial('meteor-beacon-ember', meteor.beaconEmberMat);
+    meteor.flames.dispose();
+    for (const geometry of meteor.ownedGeometries) geometry.dispose();
   }
 
   private ensureMeteorGeometry(): {
@@ -475,88 +667,214 @@ export class MageGroundFx {
     };
   }
 
+  private writeMeteorCountdownRing(
+    positions: Float32Array,
+    x: number,
+    z: number,
+    radius: number,
+    progress: number,
+  ): void {
+    const clampedProgress = Math.min(1, Math.max(0, progress));
+    const collapse = clampedProgress * clampedProgress * (3 - 2 * clampedProgress);
+    const outerRadius = radius * (0.84 - collapse * 0.72);
+    const thickness = radius * (0.05 - collapse * 0.02);
+    const innerRadius = Math.max(radius * 0.06, outerRadius - thickness);
+    for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+      const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const outerX = x + cos * outerRadius;
+      const outerZ = z + sin * outerRadius;
+      const innerX = x + cos * innerRadius;
+      const innerZ = z + sin * innerRadius;
+      const offset = i * 6;
+      positions[offset] = outerX;
+      positions[offset + 1] = this.groundY(outerX, outerZ) + 0.085;
+      positions[offset + 2] = outerZ;
+      positions[offset + 3] = innerX;
+      positions[offset + 4] = this.groundY(innerX, innerZ) + 0.085;
+      positions[offset + 5] = innerZ;
+    }
+  }
+
   private buildMeteorTelegraph(
     opts: MeteorFallSpawn,
     flameGeometry: THREE.BufferGeometry,
+    initialProgress: number,
   ): {
     group: THREE.Group;
+    footprintMat: THREE.MeshBasicMaterial;
     boundaryMat: THREE.LineBasicMaterial;
-    innerRingMat: THREE.LineBasicMaterial;
+    countdownMat: THREE.MeshBasicMaterial;
     veinMat: THREE.LineBasicMaterial;
     flameMat: THREE.MeshBasicMaterial;
+    beaconEmberMat: THREE.PointsMaterial;
+    beaconEmbers: THREE.Points;
+    countdownRing: THREE.Mesh;
+    countdownPositions: Float32Array;
     flames: THREE.InstancedMesh;
     flameBases: ReadonlyArray<{ x: number; y: number; z: number; phase: number }>;
     ownedGeometries: THREE.BufferGeometry[];
   } {
     const group = new THREE.Group();
     group.name = 'mage-meteor-telegraph';
-    const boundaryPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 3);
-    const innerPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 3);
-    for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
-      const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
-      for (const [positions, radius, lift] of [
-        [boundaryPositions, opts.radius, 0.08],
-        [innerPositions, opts.radius * 0.62, 0.075],
-      ] as const) {
+
+    const footprintVertexCount = 1 + METEOR_FOOTPRINT_RADIAL_SEGMENTS * METEOR_TELEGRAPH_SEGMENTS;
+    const footprintPositions = new Float32Array(footprintVertexCount * 3);
+    footprintPositions[0] = opts.x;
+    footprintPositions[1] = this.groundY(opts.x, opts.z) + 0.045;
+    footprintPositions[2] = opts.z;
+    for (let ring = 1; ring <= METEOR_FOOTPRINT_RADIAL_SEGMENTS; ring++) {
+      const radius = (opts.radius * ring) / METEOR_FOOTPRINT_RADIAL_SEGMENTS;
+      const ringOffset = 1 + (ring - 1) * METEOR_TELEGRAPH_SEGMENTS;
+      for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+        const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
         const x = opts.x + Math.cos(angle) * radius;
         const z = opts.z + Math.sin(angle) * radius;
-        positions[i * 3] = x;
-        positions[i * 3 + 1] = this.groundY(x, z) + lift;
-        positions[i * 3 + 2] = z;
+        const offset = (ringOffset + i) * 3;
+        footprintPositions[offset] = x;
+        footprintPositions[offset + 1] = this.groundY(x, z) + 0.045;
+        footprintPositions[offset + 2] = z;
       }
+    }
+    const footprintIndices: number[] = [];
+    for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+      footprintIndices.push(0, 1 + i, 1 + ((i + 1) % METEOR_TELEGRAPH_SEGMENTS));
+    }
+    for (let ring = 2; ring <= METEOR_FOOTPRINT_RADIAL_SEGMENTS; ring++) {
+      const innerOffset = 1 + (ring - 2) * METEOR_TELEGRAPH_SEGMENTS;
+      const outerOffset = innerOffset + METEOR_TELEGRAPH_SEGMENTS;
+      for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+        const next = (i + 1) % METEOR_TELEGRAPH_SEGMENTS;
+        footprintIndices.push(
+          innerOffset + i,
+          outerOffset + i,
+          outerOffset + next,
+          innerOffset + i,
+          outerOffset + next,
+          innerOffset + next,
+        );
+      }
+    }
+    const footprintGeo = new THREE.BufferGeometry();
+    footprintGeo.setAttribute('position', new THREE.BufferAttribute(footprintPositions, 3));
+    footprintGeo.setIndex(footprintIndices);
+    const footprintMat = this.acquireMaterial(
+      'meteor-footprint',
+      0.2,
+      () =>
+        new THREE.MeshBasicMaterial({
+          color: 0x260407,
+          transparent: true,
+          opacity: 0.2,
+          blending: THREE.NormalBlending,
+          depthWrite: false,
+          side: THREE.DoubleSide,
+        }),
+    );
+    const footprint = new THREE.Mesh(footprintGeo, footprintMat);
+    footprint.name = 'mage-meteor-telegraph-footprint';
+    footprint.renderOrder = 5;
+    group.add(footprint);
+
+    const boundaryPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 3);
+    for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+      const angle = (i / METEOR_TELEGRAPH_SEGMENTS) * Math.PI * 2;
+      const x = opts.x + Math.cos(angle) * opts.radius;
+      const z = opts.z + Math.sin(angle) * opts.radius;
+      boundaryPositions[i * 3] = x;
+      boundaryPositions[i * 3 + 1] = this.groundY(x, z) + 0.09;
+      boundaryPositions[i * 3 + 2] = z;
     }
     const boundaryGeo = new THREE.BufferGeometry();
     boundaryGeo.setAttribute('position', new THREE.BufferAttribute(boundaryPositions, 3));
     const boundaryMat = this.acquireMaterial(
       'meteor-boundary',
-      0.42,
+      0.58,
       () =>
         new THREE.LineBasicMaterial({
-          color: 0xff6a12,
+          color: 0xff101c,
           transparent: true,
-          opacity: 0.42,
+          opacity: 0.58,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         }),
     );
     const boundary = new THREE.LineLoop(boundaryGeo, boundaryMat);
     boundary.name = 'mage-meteor-telegraph-boundary';
-    boundary.renderOrder = 8;
+    boundary.renderOrder = 9;
     group.add(boundary);
 
-    const innerGeo = new THREE.BufferGeometry();
-    innerGeo.setAttribute('position', new THREE.BufferAttribute(innerPositions, 3));
-    const innerRingMat = this.acquireMaterial(
-      'meteor-inner-ring',
-      0.22,
+    const countdownPositions = new Float32Array(METEOR_TELEGRAPH_SEGMENTS * 2 * 3);
+    this.writeMeteorCountdownRing(countdownPositions, opts.x, opts.z, opts.radius, initialProgress);
+    const countdownIndices: number[] = [];
+    for (let i = 0; i < METEOR_TELEGRAPH_SEGMENTS; i++) {
+      const next = (i + 1) % METEOR_TELEGRAPH_SEGMENTS;
+      const outer = i * 2;
+      const inner = outer + 1;
+      const nextOuter = next * 2;
+      const nextInner = nextOuter + 1;
+      countdownIndices.push(outer, nextOuter, nextInner, outer, nextInner, inner);
+    }
+    const countdownGeo = new THREE.BufferGeometry();
+    countdownGeo.setAttribute('position', new THREE.BufferAttribute(countdownPositions, 3));
+    countdownGeo.setIndex(countdownIndices);
+    const countdownMat = this.acquireMaterial(
+      'meteor-countdown',
+      0.34,
       () =>
-        new THREE.LineBasicMaterial({
-          color: 0xffb02e,
+        new THREE.MeshBasicMaterial({
+          color: 0xff1830,
           transparent: true,
-          opacity: 0.22,
+          opacity: 0.34,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
+          side: THREE.DoubleSide,
         }),
     );
-    const innerRing = new THREE.LineLoop(innerGeo, innerRingMat);
-    innerRing.name = 'mage-meteor-telegraph-inner-ring';
-    innerRing.renderOrder = 8;
-    group.add(innerRing);
+    const countdownRing = new THREE.Mesh(countdownGeo, countdownMat);
+    countdownRing.name = 'mage-meteor-telegraph-countdown-ring';
+    countdownRing.frustumCulled = false;
+    countdownRing.renderOrder = 8;
+    group.add(countdownRing);
 
     const veinVertices: number[] = [];
-    for (let branch = 0; branch < 10; branch++) {
-      const angle = (branch / 10) * Math.PI * 2 + (branch % 2) * 0.11;
-      const innerRadius = opts.radius * (0.18 + (branch % 3) * 0.035);
-      const outerRadius = opts.radius * (0.72 + (branch % 2) * 0.08);
-      const bendAngle = angle + (branch % 2 === 0 ? 0.13 : -0.12);
-      const segments = 5;
-      for (let segment = 0; segment < segments; segment++) {
-        for (const progress of [segment / segments, (segment + 1) / segments]) {
-          const radius = innerRadius + (outerRadius - innerRadius) * progress;
-          const sampleAngle = angle + (bendAngle - angle) * progress;
+    const veinBranchCount = 14;
+    const veinSegments = 7;
+    for (let branch = 0; branch < veinBranchCount; branch++) {
+      const baseAngle = (branch / veinBranchCount) * Math.PI * 2 + (branch % 2) * 0.09;
+      const innerRadius = opts.radius * (0.07 + (branch % 3) * 0.018);
+      const outerRadius = opts.radius * (0.76 + (branch % 4) * 0.025);
+      for (let segment = 0; segment < veinSegments; segment++) {
+        for (let endpoint = 0; endpoint < 2; endpoint++) {
+          const progress = (segment + endpoint) / veinSegments;
+          const zigzag = (segment + endpoint) % 2 === 0 ? 0.035 : -0.035;
+          const sampleAngle =
+            baseAngle +
+            Math.sin(branch * 4.19 + progress * 15.7) * 0.12 * (0.45 + progress) +
+            zigzag * progress;
+          const radius =
+            (innerRadius + (outerRadius - innerRadius) * progress) *
+            (1 + Math.sin(branch * 2.31 + progress * 20.3) * 0.025);
           const x = opts.x + Math.cos(sampleAngle) * radius;
           const z = opts.z + Math.sin(sampleAngle) * radius;
-          veinVertices.push(x, this.groundY(x, z) + 0.07, z);
+          veinVertices.push(x, this.groundY(x, z) + 0.075, z);
+        }
+      }
+      if (branch % 2 === 0) {
+        const branchStartRadius = innerRadius + (outerRadius - innerRadius) * 0.52;
+        const branchEndRadius = Math.min(opts.radius * 0.88, branchStartRadius + opts.radius * 0.2);
+        const branchTurn = branch % 4 === 0 ? 0.3 : -0.3;
+        for (let segment = 0; segment < 3; segment++) {
+          for (let endpoint = 0; endpoint < 2; endpoint++) {
+            const progress = (segment + endpoint) / 3;
+            const sampleAngle =
+              baseAngle + branchTurn * progress + Math.sin(branch * 3.07 + progress * 11.9) * 0.055;
+            const radius = branchStartRadius + (branchEndRadius - branchStartRadius) * progress;
+            const x = opts.x + Math.cos(sampleAngle) * radius;
+            const z = opts.z + Math.sin(sampleAngle) * radius;
+            veinVertices.push(x, this.groundY(x, z) + 0.075, z);
+          }
         }
       }
     }
@@ -564,12 +882,12 @@ export class MageGroundFx {
     veinGeo.setAttribute('position', new THREE.Float32BufferAttribute(veinVertices, 3));
     const veinMat = this.acquireMaterial(
       'meteor-vein',
-      0.18,
+      0.34,
       () =>
         new THREE.LineBasicMaterial({
-          color: 0xff3d06,
+          color: 0xff0818,
           transparent: true,
-          opacity: 0.18,
+          opacity: 0.34,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
         }),
@@ -581,12 +899,12 @@ export class MageGroundFx {
 
     const flameMat = this.acquireMaterial(
       'meteor-flame',
-      0.44,
+      0.24,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0xff5f0b,
+          color: 0xff2a12,
           transparent: true,
-          opacity: 0.44,
+          opacity: 0.24,
           blending: THREE.AdditiveBlending,
           depthWrite: false,
           side: THREE.DoubleSide,
@@ -607,22 +925,58 @@ export class MageGroundFx {
       flameBases.push({ x, y, z, phase: i * 1.73 });
       dummy.position.set(x, y, z);
       dummy.rotation.y = -angle;
-      dummy.scale.set(0.85, 0.75 + (i % 3) * 0.15, 0.85);
+      dummy.scale.set(0.7, 0.58 + (i % 3) * 0.12, 0.7);
       dummy.updateMatrix();
       flames.setMatrixAt(i, dummy.matrix);
     }
     flames.instanceMatrix.needsUpdate = true;
     group.add(flames);
 
+    const beaconPositions = new Float32Array(METEOR_BEACON_EMBER_COUNT * 3);
+    for (let i = 0; i < METEOR_BEACON_EMBER_COUNT; i++) {
+      const phase = i / (METEOR_BEACON_EMBER_COUNT - 1);
+      const angle = i * 2.39996;
+      const radius = 0.07 + (i % 4) * 0.035;
+      beaconPositions[i * 3] = Math.cos(angle) * radius;
+      beaconPositions[i * 3 + 1] = 0.25 + phase * 4.45;
+      beaconPositions[i * 3 + 2] = Math.sin(angle) * radius;
+    }
+    const beaconGeo = new THREE.BufferGeometry();
+    beaconGeo.setAttribute('position', new THREE.BufferAttribute(beaconPositions, 3));
+    const beaconEmberMat = this.acquireMaterial(
+      'meteor-beacon-ember',
+      0.18,
+      () =>
+        new THREE.PointsMaterial({
+          color: 0xff3820,
+          size: 0.14,
+          transparent: true,
+          opacity: 0.18,
+          blending: THREE.AdditiveBlending,
+          depthWrite: false,
+          sizeAttenuation: true,
+        }),
+    );
+    const beaconEmbers = new THREE.Points(beaconGeo, beaconEmberMat);
+    beaconEmbers.name = 'mage-meteor-telegraph-beacon-embers';
+    beaconEmbers.position.set(opts.x, this.groundY(opts.x, opts.z) + 0.1, opts.z);
+    beaconEmbers.renderOrder = 8;
+    group.add(beaconEmbers);
+
     return {
       group,
+      footprintMat,
       boundaryMat,
-      innerRingMat,
+      countdownMat,
       veinMat,
       flameMat,
+      beaconEmberMat,
+      beaconEmbers,
+      countdownRing,
+      countdownPositions,
       flames,
       flameBases,
-      ownedGeometries: [boundaryGeo, innerGeo, veinGeo],
+      ownedGeometries: [footprintGeo, boundaryGeo, countdownGeo, veinGeo, beaconGeo],
     };
   }
 
@@ -1037,10 +1391,12 @@ export class MageGroundFx {
         meteor.trailOuterMat,
         meteor.trailInnerMat,
         meteor.emberMat,
+        meteor.footprintMat,
         meteor.boundaryMat,
-        meteor.innerRingMat,
+        meteor.countdownMat,
         meteor.veinMat,
         meteor.flameMat,
+        meteor.beaconEmberMat,
       ]) {
         materials.add(material);
       }
@@ -1124,6 +1480,7 @@ export class MageGroundFx {
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
       m.elapsed += dt;
+      m.ignivarFireAoe?.update(dt);
       const t = Math.min(1, m.elapsed / m.duration);
       if (!m.landed && t >= 1) {
         m.landed = true;
@@ -1132,6 +1489,9 @@ export class MageGroundFx {
         m.boundaryMat.opacity = 0;
         m.flameMat.opacity = 0;
         m.flames.visible = false;
+        m.beaconEmberMat.opacity = 0;
+        m.beaconEmbers.visible = false;
+        m.ignivarFireAoe?.erupt();
         this.onMeteorLand(m.x, m.z, m.spawn);
       }
       if (m.landed) {
@@ -1139,28 +1499,25 @@ export class MageGroundFx {
         if (scorchElapsed < METEOR_SCORCH_LINGER) {
           const fade = 1 - scorchElapsed / METEOR_SCORCH_LINGER;
           const firePulse = 0.84 + Math.sin(scorchElapsed * 11) * 0.16;
-          m.innerRingMat.opacity = 0.58 * fade * firePulse;
-          m.veinMat.opacity = 0.5 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
+          if (!m.contributorOwnsGroundDetail) m.footprintMat.opacity = 0.14 * fade;
+          m.countdownMat.opacity = 0.58 * fade * firePulse;
+          if (!m.contributorOwnsGroundDetail) {
+            m.veinMat.opacity = 0.56 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
+          }
+          if (scorchElapsed > METEOR_SCORCH_LINGER - 1) m.ignivarFireAoe?.stop();
           continue;
         }
-        this.scene.remove(m.root);
-        this.releaseMaterial('meteor-rock', m.rockMat);
-        this.releaseMaterial('meteor-magma', m.magmaMat);
-        this.releaseMaterial('meteor-corona', m.coronaMat);
-        this.releaseMaterial('meteor-trail-outer', m.trailOuterMat);
-        this.releaseMaterial('meteor-trail-inner', m.trailInnerMat);
-        this.releaseMaterial('meteor-ember', m.emberMat);
-        this.releaseMaterial('meteor-boundary', m.boundaryMat);
-        this.releaseMaterial('meteor-inner-ring', m.innerRingMat);
-        this.releaseMaterial('meteor-vein', m.veinMat);
-        this.releaseMaterial('meteor-flame', m.flameMat);
-        m.flames.dispose();
-        for (const geometry of m.ownedGeometries) geometry.dispose();
+        this.disposeMeteor(m);
         this.meteors.splice(i, 1);
         continue;
       }
+      const fallDuration = m.duration - m.warningLead;
+      const fallT = Math.min(1, Math.max(0, (m.elapsed - m.warningLead) / fallDuration));
+      const falling = m.elapsed >= m.warningLead;
+      m.body.visible = falling;
+      m.trail.visible = falling;
       // Ease-in fall: slow release, violent finish, like a real drop.
-      const eased = t * t;
+      const eased = fallT * fallT;
       const meteorY = m.groundY + METEOR_DROP_HEIGHT * (1 - eased) + METEOR_RADIUS;
       m.body.position.y = meteorY;
       m.trail.position.y = meteorY;
@@ -1168,27 +1525,43 @@ export class MageGroundFx {
       m.body.rotation.x += 1.7 * dt;
       const heatPulse = 0.88 + Math.sin(m.elapsed * 10) * 0.12;
       m.magmaMat.opacity = 0.82 + heatPulse * 0.16;
-      m.coronaMat.opacity = (0.12 + t * 0.12) * heatPulse;
-      m.trailOuterMat.opacity = (0.4 + t * 0.12) * heatPulse;
-      m.trailInnerMat.opacity = (0.24 + t * 0.12) * heatPulse;
-      m.emberMat.opacity = 0.72 + t * 0.24;
+      m.coronaMat.opacity = (0.12 + fallT * 0.12) * heatPulse;
+      m.trailOuterMat.opacity = (0.4 + fallT * 0.12) * heatPulse;
+      m.trailInnerMat.opacity = (0.24 + fallT * 0.12) * heatPulse;
+      m.emberMat.opacity = 0.72 + fallT * 0.24;
       m.trail.rotation.y -= dt * 0.45;
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;
-      m.boundaryMat.opacity = (0.42 + t * 0.42) * warningPulse;
-      m.innerRingMat.opacity = (0.22 + t * 0.34) * warningPulse;
-      m.veinMat.opacity = (0.18 + t * 0.42) * warningPulse;
-      m.flameMat.opacity = (0.38 + t * 0.3) * warningPulse;
-      for (let flameIndex = 0; flameIndex < m.flameBases.length; flameIndex++) {
-        const base = m.flameBases[flameIndex];
-        const flicker = 0.74 + Math.sin(m.elapsed * 9 + base.phase) * 0.18 + t * 0.3;
-        m.flameDummy.position.set(base.x, base.y + Math.max(0, flicker - 0.72) * 0.18, base.z);
-        m.flameDummy.rotation.set(0, -base.phase * 0.22 + m.elapsed * 0.35, 0);
-        m.flameDummy.scale.set(0.78 + t * 0.22, flicker, 0.78 + t * 0.22);
-        m.flameDummy.updateMatrix();
-        m.flames.setMatrixAt(flameIndex, m.flameDummy.matrix);
+      m.boundaryMat.opacity = (0.58 + t * 0.25) * warningPulse;
+      m.countdownMat.opacity = (0.34 + t * 0.5) * warningPulse;
+      if (!m.contributorOwnsGroundDetail) {
+        m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
+        m.veinMat.opacity = (0.34 + t * 0.46) * warningPulse;
+        m.flameMat.opacity = (0.22 + t * 0.16) * warningPulse;
+        m.beaconEmberMat.opacity = (0.14 + t * 0.14) * warningPulse;
+        m.beaconEmbers.rotation.y += dt * (0.2 + t * 0.35);
       }
-      m.flames.instanceMatrix.needsUpdate = true;
+      // Terrain-draping the two moving rims costs 144 height samples. Five raid
+      // warnings used to repeat that work and upload five buffers every render
+      // frame; 20 Hz stays visually continuous while bounding the CPU/GPU churn.
+      m.countdownGeometryUpdateElapsed += dt;
+      if (m.countdownGeometryUpdateElapsed >= METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS) {
+        m.countdownGeometryUpdateElapsed %= METEOR_COUNTDOWN_GEOMETRY_UPDATE_SECONDS;
+        this.writeMeteorCountdownRing(m.countdownPositions, m.x, m.z, m.radius, t);
+        m.countdownRing.geometry.attributes.position.needsUpdate = true;
+      }
+      if (!m.contributorOwnsGroundDetail) {
+        for (let flameIndex = 0; flameIndex < m.flameBases.length; flameIndex++) {
+          const base = m.flameBases[flameIndex];
+          const flicker = 0.58 + Math.sin(m.elapsed * 9 + base.phase) * 0.13 + t * 0.22;
+          m.flameDummy.position.set(base.x, base.y + Math.max(0, flicker - 0.56) * 0.14, base.z);
+          m.flameDummy.rotation.set(0, -base.phase * 0.22 + m.elapsed * 0.35, 0);
+          m.flameDummy.scale.set(0.66 + t * 0.16, flicker, 0.66 + t * 0.16);
+          m.flameDummy.updateMatrix();
+          m.flames.setMatrixAt(flameIndex, m.flameDummy.matrix);
+        }
+        m.flames.instanceMatrix.needsUpdate = true;
+      }
     }
     for (let i = this.runes.length - 1; i >= 0; i--) {
       const r = this.runes[i];
@@ -1244,4 +1617,65 @@ export class MageGroundFx {
       sfx.ring.rotation.z += 0.15 * dt; // a lazy drift so the edge reads alive
     }
   }
+}
+
+/** The 'spellfxAt' fx union, so a typo in a dispatch arm stays a compile error. */
+type SpellfxAtFx = Extract<SimEvent, { type: 'spellfxAt' }>['fx'];
+
+/** The 'spellfxAt' fields the meteor and rune arms read. */
+export interface MageGroundSpellfxEvent {
+  fx: SpellfxAtFx;
+  x: number;
+  z: number;
+  school: string;
+  radius?: number;
+  duration?: number;
+  sourceId?: number;
+  ability?: string;
+  warningLead?: number;
+  persistentId?: string;
+}
+
+/**
+ * Claim the stateful ground cues this module owns, moved verbatim from the
+ * renderer's event switch: a persistent-warning impact resolves that meteor in
+ * place, a fall (telegraphed or ambient) spawns the falling body, and a rune
+ * circle spawns the persistent inscription. Returns true when the event was
+ * consumed so the caller can break out of its switch arm; a 'meteorImpact'
+ * without a persistentId stays unclaimed and falls through to the caller's
+ * generic ground-impact burst.
+ */
+export function handleMageGroundSpellfxEvent(
+  fx: MageGroundFx,
+  ev: MageGroundSpellfxEvent,
+): boolean {
+  if (ev.fx === 'meteorImpact' && ev.persistentId) {
+    fx.impactMeteor(ev.persistentId, ev.x, ev.z);
+    return true;
+  }
+  if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
+    fx.spawnMeteor({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius ?? 8,
+      duration: ev.duration ?? 2,
+      sourceId: ev.sourceId,
+      ability: ev.ability,
+      showTelegraph: ev.fx !== 'ambientMeteorFall',
+      warningLead: ev.warningLead,
+      persistentId: ev.persistentId,
+    });
+    return true;
+  }
+  if (ev.fx === 'runeCircle') {
+    fx.spawnRune({
+      x: ev.x,
+      z: ev.z,
+      radius: ev.radius ?? 8,
+      duration: ev.duration ?? 15,
+      school: ev.school,
+    });
+    return true;
+  }
+  return false;
 }

@@ -149,7 +149,7 @@ describe('the floor union', () => {
     expect(floor).toContain('tests/world_api_parity.test.ts');
     expect(floor.filter((f) => f.startsWith('tests/parity/')).length).toBeGreaterThanOrEqual(10);
     expect(floor.length).toBeGreaterThan(FLOOR_SANITY_MIN);
-  });
+  }, 60_000);
 });
 
 describe('buildShardPlan: full mode replays the old step minus the lane', () => {

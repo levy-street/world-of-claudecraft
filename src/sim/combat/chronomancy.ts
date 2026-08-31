@@ -19,11 +19,13 @@
 // Date.now/performance.now (enforced by tests/architecture.test.ts).
 
 import { isDebuffAura, isPartyFrameRelevantAura } from '../aura_classify';
+import { CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE } from '../content/ignivar_set_bonuses';
 import { ABILITIES } from '../data';
 import { recordCascadeConversion, recordCascadeDamage } from '../dev/cascade_playtest';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
 import { consumeHealAbsorb, healingTakenMult, healingThreat } from './heal';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 // The mark aura kind and ability id (they share one string so the buff bar and
 // the tooltip resolve the icon/name straight from ABILITIES['temporal_echo']).
@@ -125,6 +127,14 @@ export function placeTemporalEcho(
   duration: number,
 ): void {
   stripIndividualEcho(ctx, caster.id); // one own individual mark -> re-cast moves it
+  // Chronoweave 2pc (Aetherweave Vestments): wearers place a 50% single-target
+  // mark. Baked HERE, the one placement write, so combat (echoConvertRate) and
+  // the aura tooltip (value) read the same rate; snapshot-at-placement means a
+  // gear swap keeps the placed rate until the echo is re-cast. Group/area
+  // rates stay base: the set copy promises single-target only. Draws no rng.
+  const singleRate = wearsSetBonus(ctx, caster, 'chronoweave', 2)
+    ? CHRONOWEAVE_2PC_ECHO_CONVERT_SINGLE
+    : ECHO_CONVERT_SINGLE;
   // applyAura replaces this caster's existing mark on `target` by (id, sourceId), so
   // casting the single echo onto an ally that carries this caster's GROUP echo UPGRADES
   // it to the 40% individual mark (owner rule: group -> individual). If that individual
@@ -137,11 +147,11 @@ export function placeTemporalEcho(
     duration,
     // Mirror the live single-target conversion coefficient in the generic value
     // field so online aura tooltips can show the exact rate without a bespoke wire.
-    value: ECHO_CONVERT_SINGLE,
+    value: singleRate,
     sourceId: caster.id,
     school: 'arcane',
     echoGroup: false,
-    echoConvertRate: ECHO_CONVERT_SINGLE,
+    echoConvertRate: singleRate,
   });
   // The identity beat: a temporal glyph blooms directly on the ally. It is
   // target-anchored (no wave, no projectile) and flows to the online client

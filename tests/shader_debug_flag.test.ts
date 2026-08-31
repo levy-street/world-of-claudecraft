@@ -53,6 +53,11 @@ describe('shaderDebugRequested', () => {
 // way tests/three_reflection_contract.test.ts pins the world renderer's line.
 const SECONDARY_CONTEXTS: ReadonlyArray<[string, string, string]> = [
   [
+    'the Guide model viewer',
+    '../src/guide/viewer/scene.ts',
+    'this.renderer.debug.checkShaderErrors = shaderDebugRequested();',
+  ],
+  [
     'the character-creation preview',
     '../src/render/characters/preview.ts',
     'this.renderer.debug.checkShaderErrors = shaderDebugRequested();',

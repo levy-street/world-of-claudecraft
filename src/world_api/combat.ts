@@ -1,5 +1,22 @@
+import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
 import type { ResolvedAbility } from '../sim/sim';
+import type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
+import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
+import type {
+  ActiveVarkhulCinderFire,
+  ActiveVarkhulCinderOrbProjectile,
+} from '../sim/varkhul_cinder_orbs';
+import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type { WorldInteractionOutcome } from './interaction';
+
+export type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+export type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
+export type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
+export type {
+  ActiveVarkhulCinderFire,
+  ActiveVarkhulCinderOrbProjectile,
+} from '../sim/varkhul_cinder_orbs';
+export type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 
 export interface ActiveFrostRing {
   id: string;
@@ -38,6 +55,12 @@ export interface IWorldCombat {
   known: ResolvedAbility[];
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
+  activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
+  activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
+  activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[];
+  activeVarkhulAssemblies: ActiveVarkhulAssembly[];
+  activeVarkhulCinderFires: ActiveVarkhulCinderFire[];
+  activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[];
   activeTemporalHourglasses: ActiveTemporalHourglass[];
   activeConsecrations: ActiveConsecration[];
   /** Remaining server-authoritative lifetime of a reactive ability window. */

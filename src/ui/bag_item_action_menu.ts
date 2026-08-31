@@ -38,6 +38,7 @@ import {
   type BagItemContextActionId,
   bagItemContextActions,
   destroyConsumesSpecialCopy,
+  vendorSellContextActions,
 } from './bag_item_context_menu';
 import { disenchantYieldLines } from './disenchant_yield_view';
 import {
@@ -117,7 +118,11 @@ export class BagItemActionMenu {
 
   /** Open the action menu for a bag stack. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row is
-   *  byte-identical to a plain click. */
+   *  byte-identical to a plain click. `vendorSellCount`, supplied only at an
+   *  open vendor for a sellable item (bags_window.ts), is every copy of this
+   *  item held across the bags: it swaps in the vendor-only row set (Sell,
+   *  plus Sell all when more than one copy is held) instead of the
+   *  enchanting-profession rows, which a vendor never offers. */
   open(
     def: ItemDef,
     itemId: string,
@@ -126,15 +131,28 @@ export class BagItemActionMenu {
     y: number,
     runDefault: () => void,
     instance?: ItemInstancePayload,
+    vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void {
-    const rows = bagItemContextActions(def, itemId, instance).map((action) => ({
+    const actions =
+      vendorSellCount === undefined
+        ? bagItemContextActions(def, itemId, instance)
+        : vendorSellContextActions(vendorSellCount);
+    const rows = actions.map((action) => ({
       act: action.id,
-      html: esc(t(action.labelKey)),
+      html: esc(
+        t(
+          action.labelKey,
+          action.count === undefined ? undefined : { count: itemNumber(action.count) },
+        ),
+      ),
     }));
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
+      else if (id === 'sellAll' && vendorSellCount !== undefined) {
+        runSellAll?.();
+      } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
       // Lock/unlock (issue 3042): a plain in-place toggle, never destructive,

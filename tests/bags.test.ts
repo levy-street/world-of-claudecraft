@@ -1000,14 +1000,14 @@ describe('two-pool capacity through the real gates and the real taxonomy', () =>
     expect(inv.every((s) => s.count === (s.itemId === MATERIAL ? 20 : 1))).toBe(true);
   });
 
-  it('the sim-side lazy material set IS the UI-side eager set, and both are the ruled 55', () => {
+  it('the sim-side lazy material set IS the UI-side eager set, and both are the ruled 56', () => {
     // Equality alone proves nothing (both delegate to the one derivation in
     // material_derivation.ts), so it is pinned alongside the literal count
     // tests/material_taxonomy.test.ts pins by exact-set equality, plus known
     // members and known NON-members on each side.
     const lazy = materialItemIds();
-    expect(lazy.size).toBe(55);
-    expect(MATERIAL_ITEM_IDS.size).toBe(55);
+    expect(lazy.size).toBe(56);
+    expect(MATERIAL_ITEM_IDS.size).toBe(56);
     expect(lazy.size).toBe(MATERIAL_ITEM_IDS.size);
     for (const id of lazy) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     for (const id of MATERIAL_ITEM_IDS) expect(lazy.has(id), id).toBe(true);

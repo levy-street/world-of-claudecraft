@@ -198,6 +198,8 @@ export const en_XA: AdminTranslations = {
   "usage.metric.walletChallengeRateLimited": "[Ŵáļļéţ çĥáļļéñĝé ţĥŕóţţļéð ŕéɋúéšţš]",
   "usage.metric.walletLinkRequest": "[Ŵáļļéţ ļíñķ ŕéɋúéšţš]",
   "usage.metric.walletLinkFailure": "[Ŵáļļéţ ļíñķ ƒáíļúŕéš]",
+  "usage.metric.walletUnlinkFailure": "[Ŵáļļéţ úñļíñķ ŕéƒúšáļš]",
+  "usage.metric.walletUnlinkSuccess": "[Ŵáļļéţ úñļíñķš çóɱþļéţéð]",
   "usage.metric.walletLinkRateLimited": "[Ŵáļļéţ ļíñķ ţĥŕóţţļéð ŕéɋúéšţš]",
   "usage.metric.cardPublishRequest": "[Þļáýéŕ çáŕð þúƀļíšĥ ŕéɋúéšţš]",
   "usage.metric.cardPublishRejected": "[Þļáýéŕ çáŕð ŕéĵéçţéð þúƀļíšĥéš]",

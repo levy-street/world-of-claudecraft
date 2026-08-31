@@ -61,9 +61,16 @@ describe('rift clear-loot pools', () => {
       // bumped an item's source level, this number would move.
       expect(itemLevel(item), `${id} item level`).toBe(31);
     }
-    // Every heroic five-man epic is present.
+    // Every heroic five-man epic is present. RAID bosses are excluded on
+    // both sides: the Ignivar raid's heroic-only appends (ilvl 35) never pay
+    // out of a rift clear, mirroring the Nythraxis exclusion.
+    const RAID_BOSS_IDS = new Set([
+      NYTHRAXIS_RAID_BOSS_ID,
+      'ignivar_herald_of_the_last_flame',
+      'varkhul_forgefather_of_the_last_flame',
+    ]);
     for (const [bossId, entries] of Object.entries(HEROIC_BOSS_LOOT)) {
-      if (bossId === NYTHRAXIS_RAID_BOSS_ID) continue;
+      if (RAID_BOSS_IDS.has(bossId)) continue;
       for (const entry of entries) {
         const item = entry.itemId ? ITEMS[entry.itemId] : undefined;
         if (!item?.slot || item.quality !== 'epic') continue;

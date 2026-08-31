@@ -983,9 +983,10 @@ function isThrottled(times: number[], windowStart: number): boolean {
  * stale failures but records NONE (only recordAuthFailure does). It DOES emit the
  * auth_failures_total{kind="throttled"} observability signal when the outcome is a
  * lockout rejection (allowed false), so /metrics can count throttled attempts.
- * That count is exact only under an assumption every current caller honors: the
- * three callers (server/auth_routes.ts, server/discord.ts, server/main.ts) all
- * gate on the result and reject the request when allowed is false, so one
+ * That count is exact only under an assumption every caller honors (today:
+ * server/auth_routes.ts, server/discord.ts, server/main.ts, server/apple_auth.ts,
+ * and the wallet re-auth pre-check in server/wallet.ts): every caller gates on
+ * the result and rejects the request when allowed is false, so one
  * lockout-outcome check equals one rejected attempt. A future caller that only
  * inspects the status without rejecting must split this predicate instead of
  * reusing it, or the metric would over-count. allowed is false once the account

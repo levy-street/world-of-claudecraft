@@ -264,8 +264,13 @@ describe('mount running audio', () => {
     // its manifest entry correctly carries loop: true, unlike every other
     // mount's plain per-stride gait clip.
     const ENGINE_LOOP_MOUNTS = new Set(['terrorspark_groundshaker']);
-    for (const mountKey of MOUNT_KEYS) {
-      const entry = SFX_CLIPS[`mount_run_${mountKey}`];
+    // The rickshaw ships no mount_run_ entry at all: it has only its
+    // continuous mount_loop_ cue (mountRun no-ops for it, see the "does not
+    // play a per-stride one-shot" test below), so it is excluded from this
+    // per-stride-manifest-entry check entirely.
+    const clips: Record<string, SfxEntry> = SFX_CLIPS;
+    for (const mountKey of MOUNT_KEYS.filter((k) => !(`mount_loop_${k}` in SFX_CLIPS))) {
+      const entry = clips[`mount_run_${mountKey}`];
       expect(entry).toMatchObject({
         loop: ENGINE_LOOP_MOUNTS.has(mountKey),
         spatial: true,
@@ -285,12 +290,16 @@ describe('mount running audio', () => {
 
   it('ships one non-empty MP3 asset for every catalog mount and no orphan mount clips', () => {
     const directory = new URL('../public/audio/sfx/', import.meta.url);
-    const expected = MOUNT_KEYS.flatMap((mountKey) => [
-      `mount_run_${mountKey}.mp3`,
-      ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
-        (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
-      ),
-    ]).sort();
+    // The rickshaw is excluded: it ships only mount_loop_rickshaw_mount.mp3,
+    // no mount_run_ file at all (mountRun no-ops for any mount with a loop).
+    const expected = MOUNT_KEYS.filter((k) => !(`mount_loop_${k}` in SFX_CLIPS))
+      .flatMap((mountKey) => [
+        `mount_run_${mountKey}.mp3`,
+        ...(ENGINE_MOUNT_EXTRA_SUFFIXES[mountKey] ?? []).map(
+          (suffix) => `mount_run_${mountKey}${suffix}.mp3`,
+        ),
+      ])
+      .sort();
     const actual = readdirSync(directory)
       .filter((file) => file.startsWith('mount_run_') && file.endsWith('.mp3'))
       .sort();
@@ -307,8 +316,16 @@ describe('mount running audio', () => {
   it('plays a distinct custom clip for every catalog mount', () => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     const played = new Set<unknown>();
+    // A mount with a continuous loop (currently just the rickshaw) does not
+    // also get mountRun's per-stride one-shot: mountRun no-ops for it by
+    // design (see its own comment in sfx.ts), checking the real SFX_CLIPS
+    // catalog for a mount_loop_* entry, so it is excluded here rather than
+    // asserted against a source mountRun never actually plays.
+    const stridedMountKeys = MOUNT_KEYS.filter(
+      (mountKey) => !(`mount_loop_${mountKey}` in SFX_CLIPS),
+    );
 
-    for (const mountKey of MOUNT_KEYS) {
+    for (const mountKey of stridedMountKeys) {
       nowT += 0.5;
       sfx.mountRun(0, 0, 0, mountKey, true);
       const src = sources.at(-1)!;
@@ -316,7 +333,15 @@ describe('mount running audio', () => {
       played.add(src.buffer);
     }
 
-    expect(played.size).toBe(MOUNT_KEYS.length);
+    expect(played.size).toBe(stridedMountKeys.length);
+  });
+
+  it('does not play a per-stride one-shot for a mount with a continuous loop', () => {
+    // mount_loop_rickshaw_mount is a real SFX_CLIPS entry (checked by
+    // mountRun itself), so no mock setup is needed here.
+    const before = sources.length;
+    sfx.mountRun(0, 0, 0, 'rickshaw_mount', true);
+    expect(sources.length).toBe(before);
   });
 
   it('plays independently of the optional on-foot footstep toggle', () => {
@@ -336,6 +361,50 @@ describe('mount running audio', () => {
     const before = sources.length;
     sfx.mountRun(0, 0, 0, 'unknown_mount', true);
     expect(sources.length).toBe(before);
+  });
+});
+
+describe('mount rolling loop', () => {
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set('mount_loop_rickshaw_mount', { duration: 7.8 });
+  });
+
+  it('holds one BufferSource across a moving flag flicker, ramping gain instead of restarting it', () => {
+    const loops = (sfx as unknown as { loops: Map<string, { target: number }> }).loops;
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    const held = sources[0];
+    expect(loops.get('mountloop_1')?.target).toBeGreaterThan(0);
+    // A single-frame flicker in `moving` (the exact failure the design doc
+    // comment on mountLoop warns about) must ramp gain, not tear down and
+    // recreate the source.
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', false);
+    expect(sources).toHaveLength(1);
+    expect(loops.get('mountloop_1')?.target).toBe(0);
+    sfx.mountLoop(1, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    expect(sources[0]).toBe(held);
+    expect(loops.get('mountloop_1')?.target).toBeGreaterThan(0);
+  });
+
+  it('creates no BufferSource for a mount with no mount_loop_* clip', () => {
+    sfx.mountLoop(2, 0, 0, 0, 'valorsteed', true);
+    expect(sources).toHaveLength(0);
+  });
+
+  it('stopMountLoop releases the held slot immediately, letting a later mountLoop start fresh', () => {
+    sfx.mountLoop(3, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(1);
+    const first = sources[0];
+    // unloop's fade schedules the real .stop() via setTimeout (a real fade
+    // out, so playback overlaps the teardown), but it deletes the loop slot
+    // synchronously: a mountLoop call right after must not reuse the old
+    // source or silently no-op against a slot that still looks occupied.
+    sfx.stopMountLoop(3);
+    sfx.mountLoop(3, 0, 0, 0, 'rickshaw_mount', true);
+    expect(sources).toHaveLength(2);
+    expect(sources[1]).not.toBe(first);
   });
 });
 

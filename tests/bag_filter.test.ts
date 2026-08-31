@@ -111,6 +111,7 @@ describe('applyBagFilter: category filtering', () => {
     ];
     const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(['iron_ore']);
+    expect(matchesCategory(REAL_ITEMS.lastflame_core, 'material')).toBe(true);
   });
 
   it('keeps only tools under the tool chip (the displaced implements)', () => {
@@ -488,7 +489,7 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'wolfhide_satchel',
   ] as const;
 
-  it('exactly the ruled 26 junk items plus the 13 bag-kind items match no chip', () => {
+  it('exactly the ruled junk and bag items match no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)

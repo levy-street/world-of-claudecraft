@@ -6,7 +6,7 @@
 import { pathToFileURL } from 'node:url';
 import { druidEngineOnLandedStrike } from '../src/sim/combat/druid_engines';
 import { MOBS } from '../src/sim/data';
-import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import { equipReferenceEpicKitForDev } from '../src/sim/dev/bis_gear';
 import { createMob } from '../src/sim/entity';
 import { updateMobTarget } from '../src/sim/mob/targeting';
 import { Sim } from '../src/sim/sim';
@@ -166,7 +166,7 @@ export function runDruidLiveMobProbe(
   ) {
     throw new Error(`could not configure ${arm}`);
   }
-  equipBestInSlotForDev(sim.ctx, sim.player.id);
+  equipReferenceEpicKitForDev(sim.ctx, sim.player.id);
   const player = sim.player;
   const mob = addLiveMob(sim, player);
   player.hp = player.maxHp = 1_000_000;
@@ -246,7 +246,7 @@ function bruinFixture(seed: number): Sim {
   if (!sim.applyTalents({ spec: 'feral', rows: {} })) {
     throw new Error('failed to apply feral');
   }
-  equipBestInSlotForDev(sim.ctx, sim.player.id);
+  equipReferenceEpicKitForDev(sim.ctx, sim.player.id);
   return sim;
 }
 

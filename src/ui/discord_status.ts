@@ -126,3 +126,48 @@ export function setDiscordPresence(value: DiscordPresenceState | null): void {
 export function onDiscordStatusChange(cb: () => void): void {
   listener = cb;
 }
+
+// ---------------------------------------------------------------------------
+// REST payload coercion (moved out of src/main.ts): the /api/discord/status
+// body is untrusted JSON, so every field is validated structurally before it
+// reaches the typed store above.
+// ---------------------------------------------------------------------------
+
+export function coerceDiscordStatus(d: Record<string, unknown>): DiscordAccountStatus {
+  return {
+    linked: d.linked === true,
+    username: typeof d.username === 'string' ? d.username : null,
+    avatar: typeof d.avatar === 'string' ? d.avatar : null,
+    guildMember: d.guildMember === true,
+    points: typeof d.points === 'number' ? d.points : 0,
+    lifetimePoints: typeof d.lifetimePoints === 'number' ? d.lifetimePoints : 0,
+    statusTier: typeof d.statusTier === 'number' ? d.statusTier : 0,
+    claimedSwagIds: Array.isArray(d.claimedSwagIds)
+      ? d.claimedSwagIds.filter((s): s is string => typeof s === 'string')
+      : [],
+    // Default true: only an explicit false (a Discord-provisioned account with no
+    // real password yet) makes unlink demand one.
+    passwordSet: d.passwordSet !== false,
+  };
+}
+
+export function coerceDiscordPresence(p: unknown): DiscordPresenceState {
+  const o = (p && typeof p === 'object' ? p : {}) as Record<string, unknown>;
+  const voice: DiscordVoiceMember[] = Array.isArray(o.voice)
+    ? o.voice.map((m) => {
+        const v = (m && typeof m === 'object' ? m : {}) as Record<string, unknown>;
+        return {
+          id: typeof v.id === 'string' ? v.id : '',
+          name: typeof v.name === 'string' ? v.name : '',
+          speaking: v.speaking === true,
+          selfMute: v.selfMute === true,
+        };
+      })
+    : [];
+  return {
+    onlineCount: typeof o.onlineCount === 'number' ? o.onlineCount : 0,
+    memberTotal: typeof o.memberTotal === 'number' ? o.memberTotal : 0,
+    voiceChannelName: typeof o.voiceChannelName === 'string' ? o.voiceChannelName : null,
+    voice,
+  };
+}

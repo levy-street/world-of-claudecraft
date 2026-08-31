@@ -1,0 +1,14 @@
+{
+  "label": "before",
+  "distances": {
+    "playerToFlag": 1.5,
+    "playerToSoulwell": 2.599999999999909
+  },
+  "soulStonesBefore": 0,
+  "soulStonesAfter": 0,
+  "errorText": "There is no flag within reach.",
+  "checks": {
+    "grantedStone": false,
+    "sawFlagError": true
+  }
+}

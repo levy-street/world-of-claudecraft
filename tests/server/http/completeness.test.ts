@@ -652,8 +652,9 @@ describe('registry completeness: oauth + internal surfaces (server/oauth.ts, ser
     // /internal/discord/flex-batch, GET /internal/discord/outbox, and the ops
     // dashboard's three Exchange reads, the stuck-custody readout included),
     // which have no legacy ladder arm by design and so are the internal rows
-    // with no twin.
-    expect(internalLadder.length).toBe(21);
+    // with no twin, plus the parked-review resolve arm (the surface's one
+    // write, registry-only like its read siblings).
+    expect(internalLadder.length).toBe(22);
     expect(opsFamilyRows.length).toBe(7);
   });
 

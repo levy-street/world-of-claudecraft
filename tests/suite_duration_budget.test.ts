@@ -64,6 +64,10 @@ const FILE_ALLOWANCE_LEDGER: ReadonlyMap<string, number> = new Map([
   ['tests/audit_conservation_property.test.ts', 2_700_000],
   ['tests/battleground_band.test.ts', 480_000],
   ['tests/chronomancy_balance_targets.test.ts', 420_000],
+  // The real-suite shard collection case walks the complete test corpus and
+  // needs a 60s allowance on low-worker hosts; the other timeout pins in this
+  // file keep the exact aggregate just above the default.
+  ['tests/ci_shard_plan.test.ts', 310_000],
   ['tests/discord_db_integration.test.ts', 420_000],
   ['tests/dragonkin_whelp_litter.test.ts', 420_000],
   ['tests/druid_balance_probe.test.ts', 540_000],

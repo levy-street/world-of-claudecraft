@@ -72,6 +72,7 @@ await page.evaluate(() => {
     'reins_thunderstrut_gobbler',
     'reins_drakemaw_raptor',
     'reins_terrorspark_groundshaker',
+    'reins_rickshaw_mount',
   ])
     sim.addItem(id, 1);
 });

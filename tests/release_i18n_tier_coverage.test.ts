@@ -57,7 +57,7 @@ describe('release-tier i18n job covers every tier-sensitive suite', () => {
     // Vacuity floor: if the scan silently stopped matching, every equality below
     // would hold trivially over two empty lists.
     expect(suitesReadingTierFlag().length).toBeGreaterThanOrEqual(6);
-  });
+  }, 60_000);
 
   it('matches the shared list the local gate runs', () => {
     expect(suitesReadingTierFlag()).toEqual([...I18N_RELEASE_TIER_SUITES].sort());

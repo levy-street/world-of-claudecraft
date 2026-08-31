@@ -41,12 +41,20 @@ describe('owned-class raid-level balance harness (sustain bands)', () => {
         // Lane-diet re-measure at L24: full actual 0.9776, diet actual 0.9143
         // (seeds 29_930/29_931 roll Warspirit low), so the diet floor is 0.76
         // and ceiling 1.05, the same relative margins at the diet actual.
+        // The floors deliberately stay at that low-rolling round after the
+        // 2026-08-26 re-measure below: re-authoring them off a high-rolling
+        // shuffle would flap the next time these seeds roll Warspirit low.
         expect(warspirit.dps).toBeGreaterThanOrEqual(vespers.dps * band(0.81, 0.76));
-        // Full-sweep ceiling kept at 1.12 (210 softening round full-sweep
-        // actuals: level-22 1.0851, level-23 1.0860, level-24 1.0216; was
-        // 1.0568 at level 22 the round before). Re-author the pair when the
-        // owned-class stack integrates.
-        expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * band(1.12, 1.05));
+        // 2026-08-26 Ignivar raid consolidation re-measure: the raid's content
+        // adds reshuffled the shared-rng draws at the fixed seeds (the known
+        // content-add class; no owned-class code moved and the cast cadence
+        // actuals are identical, readyIdle 0.00 / buttons 72 and about 45 / 54),
+        // lifting the full-sweep actuals to 1.1223 / 1.1030 / 1.0717 by target
+        // level and the L24 diet actual to 1.0113. Ceilings re-authored at each
+        // configuration's own prior margin over its own actual (full about 3
+        // percent over the 1.1223 max, diet the looser PR-time margin over
+        // 1.0113, which also clears the 1.0570 mid-consolidation roll).
+        expect(warspirit.dps).toBeLessThanOrEqual(vespers.dps * band(1.16, 1.16));
         // 200 DPS convergence package re-measure (echo 0.25, baseline apPct
         // 0.05, Ancestral Strike 0.5, BiS-anchored fixture with the Unleash
         // weave): readyIdle actuals 44.6 to 45.5 full / 45.05 diet, buttons

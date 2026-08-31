@@ -976,4 +976,33 @@ export const table: DeedLocaleTable = {
     desc: 'Illuminer siden Heroisk: Gravormens Helligdom i Relikvariet.',
     title: 'Helligdommens lys',
   },
+  soc_strongbox_outfitter: {
+    name: 'Udstyrer af Pengeskrinet',
+    desc: 'Lås din første banktaskeplads op.',
+  },
+  soc_four_bags_deep: {
+    name: 'Alle Fire Tasker',
+    desc: 'Lås alle fire banktaskepladser op.',
+  },
+  dgn_ignivar: {
+    name: 'Herolden Falder',
+    desc: 'Besejr Ignivar, Sidste Flammes Herold, i Sidste Kildes Smeltedigel.',
+  },
+  dgn_ignivar_heroic: {
+    name: 'Heroisk: Herolden Falder',
+    desc: 'Besejr Ignivar, Sidste Flammes Herold, på heroisk sværhedsgrad.',
+  },
+  dgn_varkhul: {
+    name: 'Essen Bliver Kold',
+    desc: 'Besejr Varkhul, Sidste Flammes Smedefader, i Den Indre Smeltedigel.',
+  },
+  dgn_varkhul_heroic: {
+    name: 'Heroisk: Essen Bliver Kold',
+    desc: 'Besejr Varkhul, Sidste Flammes Smedefader, på heroisk sværhedsgrad.',
+  },
+  dgn_varkhul_flawless: {
+    name: 'Ingen Glød Gik Tabt',
+    desc: 'Besejr Varkhul, Sidste Flammes Smedefader, på heroisk sværhedsgrad, uden at en eneste raider dør.',
+    title: 'den Uskadte',
+  },
 };

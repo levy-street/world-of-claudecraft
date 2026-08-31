@@ -956,7 +956,8 @@ export const ja_JP: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "日"
+      "durationUnitDays": "日",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -1386,6 +1387,7 @@ export const ja_JP: EnTranslations = {
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -1394,7 +1396,8 @@ export const ja_JP: EnTranslations = {
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
-      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。"
+      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -1564,6 +1567,7 @@ export const ja_JP: EnTranslations = {
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
+      "alwaysShowAllBuffs": "すべてのバフを常に表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
@@ -1573,6 +1577,8 @@ export const ja_JP: EnTranslations = {
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
+      "confirmVendorSell": "売却前に確認する",
+      "confirmVendorSellNote": "オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
@@ -1581,6 +1587,7 @@ export const ja_JP: EnTranslations = {
       "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showTargetSwingTimer": "ターゲットの攻撃タイマーを表示",
       "showPetFrame": "自分のペットを表示",
       "waterRipples": "水面の波紋（航跡）",
       "showAttackButton": "攻撃ボタンを表示",
@@ -2005,6 +2012,7 @@ export const ja_JP: EnTranslations = {
       "fromYour": "あなたの{stat}{value}による効果:",
       "names": {
         "spellPower": "呪文威力",
+        "healPower": "治癒力",
         "critRating": "クリティカルレーティング",
         "hasteRating": "ヘイストレーティング",
         "parry": "受け流し",
@@ -2139,6 +2147,12 @@ export const ja_JP: EnTranslations = {
         "few": "残り {count} 秒",
         "many": "残り {count} 秒",
         "other": "残り {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "few": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "many": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "other": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です"
       },
       "playtimeDays": {
         "one": "{count} 日",
@@ -2489,7 +2503,180 @@ export const ja_JP: EnTranslations = {
       "leather": "革",
       "mail": "鎖"
     },
+    "varkhulCallout": {
+      "leftPillarCharging": "左の鍛冶柱が充填中。3秒後に点火する！",
+      "rightPillarCharging": "右の鍛冶柱が充填中。3秒後に点火する！",
+      "bothPillarsCharging": "鍛冶柱が充填中。3秒後に点火する！",
+      "artificerApproaches": "灰燼の技工士が鍛冶炉へ近づいている！",
+      "leftPillar": "左の鍛冶柱が点火した！",
+      "rightPillar": "右の鍛冶柱が点火した！",
+      "bothPillars": "鍛冶柱が点火した！",
+      "portalsOpening": "鍛冶炉のポータルが開き始めた！",
+      "heat75": "鍛冶炉の熱が75%に達した！",
+      "heat90": "鍛冶炉メルトダウンが迫っている！",
+      "addsDefeated": "鍛冶軍団を倒した。ヴァークルが無防備になった！",
+      "worldfireBegins": "世界炎が部屋の外縁で燃え上がる。42秒後にるつぼ全体が炎に包まれる！",
+      "worldfireClosing": "世界炎が迫っている。中央へ移動せよ！",
+      "worldfireConsumed": "るつぼ全体が炎に包まれた！"
+    },
+    "varkhulWaveStatus": "ウェーブ {wave}/{waves} | 敵: {remaining}",
+    "raidBossGuide": {
+      "title": "ボス攻略",
+      "button": "攻略: {boss}",
+      "subtitle": "{boss} | {difficulty}",
+      "close": "ボス攻略を閉じる",
+      "bossesLabel": "レイドボス",
+      "difficultyLabel": "難易度",
+      "normal": "通常",
+      "heroic": "英雄",
+      "portraitAlt": "{boss}の戦闘ポートレート",
+      "overviewHeading": "概要",
+      "abilitiesHeading": "アビリティ",
+      "whatToDo": "対処法",
+      "whatToDoResponse": "対処法: {response}",
+      "rolesLabel": "ロール別の役割",
+      "flagsLabel": "メカニクス警告",
+      "roleTank": "タンク",
+      "roleHealer": "ヒーラー",
+      "roleDamage": "ダメージ",
+      "roleAll": "全ロール",
+      "flagDeadly": "致命的",
+      "flagInterruptible": "中断可能",
+      "flagImportant": "重要",
+      "flagCleansable": "解除可能",
+      "browseBoss": "{boss}を表示",
+      "chooseDifficulty": "{difficulty}のメカニクスを表示",
+      "expandAbility": "{ability}を展開",
+      "collapseAbility": "{ability}を折りたたむ",
+      "abilityControlLabel": "{action}。{details}",
+      "tooltipMeta": "{phase} | {difficulty}",
+      "ignivar": {
+        "overview": "ヴァークルはイグニヴァルを先触れ、生ける封印、そして内なるるつぼへの鍵として鍛造した。この戦闘では水路の制御、正確な移動、優先目標への素早い攻撃が試される。",
+        "phaseOpeningName": "先触れの目覚め",
+        "phaseOpeningSummary": "水路で火葬の印を処理しながら、イグニヴァルが繰り返す前方攻撃、空からの炎、回転光線、拡大する鍛冶波に対処する。",
+        "phaseApocalypseName": "幕間：黙示録",
+        "phaseApocalypseSummary": "体力{health}で、イグニヴァルは戦闘を終わらせようとするアッシュコーラーを召喚する。",
+        "phaseJudgmentName": "鍛冶場の審判",
+        "phaseJudgmentSummary": "体力{health}で、イグニヴァルは闘技場を燃やし、三つの避難所のうち一つだけ安全な場所を示す。",
+        "phaseJudgmentHeroicSummary": "体力{health}で、イグニヴァルは闘技場を燃やす。安全地帯の中でも有効な印が周囲のプレイヤーを脅かし続ける。",
+        "phaseFinaleName": "最終段階：最後の業火",
+        "phaseFinaleSummary": "体力{health}で、イグニヴァルは厳しい時間制限のある最終攻撃段階に入り、繰り返すメカニクスも加速する。",
+        "forgeStrikeName": "鍛冶の一撃",
+        "forgeStrikeSummary": "イグニヴァルは現在のタンクを攻撃し、イグニヴァルから受けるダメージを増加させる溶融鎧を付与する。",
+        "forgeStrikeResponse": "タンクは{stacks}スタックで交代する。ヒーラーは一撃と、新しいタンクが受ける最初の近接攻撃に備える。",
+        "brandName": "火葬の印",
+        "brandSummary": "イグニヴァルはタンク以外のプレイヤーに継続する炎ダメージの印を付ける。対象者は近くの味方も燃やす。",
+        "brandResponse": "散開する。灼熱の奔流を使用可能な水路へ向け、印を受けた各プレイヤーが一人ずつ有効になった水を渡って解除する。",
+        "brandHeroicResponse": "散開する。灼熱の奔流で水路を開き、印を一人ずつ解除する。解除するたびにレイド全体へ浄化の反動が発生する。",
+        "searingTorrentName": "灼熱の奔流",
+        "searingTorrentSummary": "イグニヴァルはプレイヤー一人を追跡し、広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。",
+        "searingTorrentHeroicSummary": "イグニヴァルはプレイヤー一人を追跡し、ほぼ致命的な広い前方攻撃を放つ。攻撃が使用可能な水路に当たると、短時間だけ有効になる。",
+        "searingTorrentResponse": "予告範囲を使用可能な水路一つだけに通す。他の全員は詠唱完了前に前方範囲から離れる。",
+        "rainName": "灰の雨",
+        "rainSummary": "三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへダメージを与える。",
+        "rainHeroicSummary": "三つの炎の区画と表示付き隕石が、予告範囲に残ったプレイヤーへ極めて大きなダメージを与える。",
+        "rainResponse": "印のない隙間へ移動し、着弾前にすべての隕石範囲から離れる。",
+        "raysName": "回転する業火",
+        "raysSummary": "回転する炎の光線がイグニヴァルの周囲を掃き、触れたプレイヤーへ繰り返しダメージを与える。",
+        "raysHeroicSummary": "回転する炎の光線がイグニヴァルの周囲を掃き、触れるたびに大きなダメージを繰り返し与える。",
+        "raysResponse": "光線の間の空間に合わせて動く。高速移動アビリティを使っても光線を横切らない。",
+        "forgeWaveName": "鍛冶波",
+        "forgeWaveSummary": "拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをノックバックする。",
+        "forgeWaveHeroicSummary": "拡大する炎の壁が闘技場を横切り、向かい合う二つの隙間を残して、命中したプレイヤーをさらに遠くへノックバックする。",
+        "forgeWaveResponse": "予告中にどちらかの隙間を見つけて位置を合わせ、闘技場の端へ飛ばされないようにする。",
+        "apocalypseName": "黙示録",
+        "apocalypseSummary": "イグニヴァルはアッシュコーラーを召喚する。追加敵が黙示録を唱え終えるとレイドは即座に敗北する。",
+        "apocalypseResponse": "攻撃できる全員がイグニヴァル・アッシュコーラーへ切り替え、詠唱完了前に倒す。",
+        "judgmentName": "鍛冶場の審判",
+        "judgmentSummary": "イグニヴァルは三つの避難所を示し、一つの安全地帯を特定した後、闘技場の残りを繰り返し燃やす。",
+        "judgmentHeroicSummary": "闘技場が燃える間、イグニヴァルは一つの安全地帯を示す。火葬の印は残り、近くの味方へダメージを与え続ける。",
+        "judgmentResponse": "予告中に特別な印の避難所を見分け、床が燃える前に全員で境界の内側へ入る。",
+        "chainsName": "鍛冶の鎖",
+        "chainsSummary": "イグニヴァルは近くの二人をつなぐ。離れすぎるか、別のペアの鎖を横切ると致命的なダメージを受ける。",
+        "chainsResponse": "つながった相手の近くで一緒に動き、他のプレイヤーを自分たちの鎖に通さない。",
+        "lastInfernoName": "最後の業火",
+        "lastInfernoSummary": "イグニヴァルは激怒して全滅攻撃を準備し、灰の雨、灼熱の奔流、回転する業火が加速する。",
+        "lastInfernoResponse": "残った攻撃と回復のクールダウンを使い、移動メカニクスを処理し続け、カウント終了前にイグニヴァルを倒す。",
+        "brand": "火葬の印: 散開する。灼熱の奔流を使用可能な水路へ向け、一人で水を渡って解除する。",
+        "movement": "移動: 灰の雨の扇形と隕石を避け、回転する業火に合わせて動き、鍛冶波の二つの隙間を使う。",
+        "apocalypse": "黙示録: 詠唱が終わる前にイグニヴァル・アッシュコーラーを倒す。",
+        "judgment": "鍛冶場の審判: 予告中に異なる避難所を見分け、床が燃えたら表示された境界内に集合する。",
+        "finale": "最後の業火: 加速した隕石、前方攻撃、回転する業火に対処しながら全滅前にイグニヴァルを倒す。",
+        "heroic": "英雄: 鍛冶の鎖ではペア同士が近くに留まり、審判中も印が残り、鍛冶波はプレイヤーをさらに遠くへ押し出す。"
+      },
+      "varkhul": {
+        "overview": "ヴァークルは死にゆく最後の泉を閉じ込めて生ける金属を鍛え、その罪を守るためにイグニヴァルを造った。この戦闘では個人の位置取りと、レイド全体による大鍛冶炉の制御が組み合わされる。",
+        "phaseOpeningName": "鍛冶の父",
+        "phaseOpeningSummary": "ヴァークルはタンクへの圧力、広い前方攻撃、移動する投射物、全員で受ける攻撃、隕石の波、大金床からの攻撃を繰り返す。",
+        "phaseAssemblyName": "幕間：師匠の組立",
+        "phaseAssemblySummary": "体力{health}でヴァークルは守られ、鍛冶軍団がポータルから現れる。柱の光線は鍛冶炉の崩壊を引き起こそうとする。",
+        "phaseFinaleName": "最終段階：解き放たれた傑作",
+        "phaseFinaleSummary": "体力{health}でヴァークルは攻撃が速くなり、ダメージが増え、最終期限までレイドへ炎を繰り返し放つ。",
+        "phaseFinaleHeroicSummary": "体力{health}でヴァークルは以前のメカニクスの大半をやめ、世界炎が内側へ迫ってるつぼを飲み込む。",
+        "makersBrandName": "創造者の印",
+        "makersBrandSummary": "ヴァークルは現在のタンクを攻撃し、自身から受けるすべてのダメージを増加させる累積効果を付与する。",
+        "makersBrandResponse": "タンクは{stacks}スタックで交代する。ヒーラーはヴァークルが対象を変える前に次のタンクを守る。",
+        "frontalName": "鍛冶の父の薙ぎ払い",
+        "frontalSummary": "ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へ大きな炎ダメージを与える。",
+        "frontalHeroicSummary": "ヴァークルは非常に広い前方薙ぎ払いを放ち、前方にいる全員へほぼ致命的な炎ダメージを与える。",
+        "frontalResponse": "ヴァークルを常にグループの反対へ向け、予告が出たらすぐ背後へ移動する。",
+        "orbsName": "灰のオーブ",
+        "orbsSummary": "印を受けたタンク以外のプレイヤーは残る炎の床を落とし、全方向へ炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。",
+        "orbsHeroicSummary": "印を受けたタンク以外のプレイヤーは高威力で残る炎の床を落とし、全方向へ危険な炎のオーブを放つ。赤熱した金属は受ける回復も吸収する。",
+        "orbsResponse": "印を部屋の外周へ運び、炎の床同士を離し、闘技場を横切るオーブを避ける。ヒーラーは回復吸収を素早く消す。",
+        "pyreName": "共有の火葬",
+        "pyreSummary": "移動する円が赤熱した金属のないプレイヤー一人を追う。ダメージは円内で分担され、不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。",
+        "pyreHeroicSummary": "移動する円が赤熱した金属のないプレイヤー一人を追い、より大きな一撃を分担する。不足する一人ごとにレイド全体が最大体力の{missingPenalty}のダメージを受ける。",
+        "pyreResponse": "円の中に少なくとも{players}人で集合し、詠唱が解決するまで対象者と一緒に動く。",
+        "forgestormName": "鍛冶嵐",
+        "forgestormSummary": "ヴァークルは闘技場全体へ、表示付き隕石を連続{waves}波降らせる。",
+        "forgestormHeroicSummary": "ヴァークルは極めて大きなダメージを与える表示付き隕石を連続{waves}波降らせる。",
+        "forgestormResponse": "地面に出る新しい予告を毎回確認し、その波が落ちる前に離れる。次の波を確認せず元の位置へ戻らない。",
+        "rayName": "焼き入れ光線",
+        "raySummary": "光線が印を受けたプレイヤーを長く追跡する。ヴァークルと対象の間に最初に入った別のプレイヤーが攻撃を受け、焼き入れの傷を得る。",
+        "rayResponse": "体力に余裕のある一人、通常はサブタンクを光線へ入れる。他のプレイヤーは離れ、焼き入れの傷が残る間は担当を交代する。",
+        "anvilName": "金床の布告",
+        "anvilSummary": "ヴァークルは大鍛冶炉へ歩き、{strikes}回打ってレイド全体へ増加するダメージを与える。",
+        "anvilHeroicSummary": "ヴァークルは大鍛冶炉を{strikes}回打って増加する全体ダメージを与え、同時に表示付き隕石をプレイヤーへ落とす。",
+        "anvilResponse": "全体回復のため集合し、最後の一撃には防御クールダウンを使う。",
+        "anvilHeroicResponse": "表示付き隕石をグループから離して散開し、ヒーラーと防御クールダウンで{strikes}回すべての一撃を耐える。",
+        "assemblyName": "師匠の組立",
+        "assemblySummary": "ヴァークルは守られて時間制限付きの組立を始める。鍛冶炉が傑作を完成させる前に、レイドはすべてのポータル波を倒さなければならない。",
+        "assemblyResponse": "光線の制御と優先追加敵の両方へ注意を分ける。組立時間が切れる前に鍛冶軍団をすべて倒す。",
+        "beamName": "るつぼの光線",
+        "beamSummary": "有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、光線が遮られるか無効なら熱が下がる。",
+        "beamHeroicSummary": "有効な柱の光線は、プレイヤーが遮らない限り鍛冶炉を加熱する。遮るプレイヤーは増加するるつぼの曝露ダメージを受け、鍛冶炉の熱は決して下がらない。",
+        "beamResponse": "有効な柱と鍛冶炉の間に立ち、曝露が危険になる前に担当を交代する。熱が満杯になると致命的な鍛冶炉の崩壊が起きる。",
+        "legionName": "鍛冶軍団",
+        "legionSummary": "るつぼの番人は鍛冶炉の熱を増やす、るつぼの地震を詠唱する。灰の技工士は修復手順でヴァークルを回復する。",
+        "legionResponse": "るつぼの地震と修復手順を中断し、危険な術者を優先してから残りの追加敵を倒す。",
+        "masterpieceName": "解き放たれた傑作",
+        "masterpieceSummary": "ヴァークルは攻撃が速くなり、ダメージが増え、最後の全滅までレイドを繰り返し燃やす。",
+        "masterpieceHeroicSummary": "ヴァークルは攻撃が速くなり、ダメージが増える。世界炎が以前のメカニクスの大半に代わって最終攻撃となる。",
+        "masterpieceResponse": "残った攻撃と防御のクールダウンを使い、最終カウントが終わる前にヴァークルを倒す。",
+        "worldfireName": "世界炎",
+        "worldfireSummary": "英雄では、炎が闘技場の外周から段階的に中央へ進み、最後にはるつぼ全体を燃やす。",
+        "worldfireResponse": "進む炎の帯より先に内側へ移動し、狭くなる安全地帯を保ち、中央が燃える前にヴァークルを倒す。",
+        "tanks": "タンク: 創造者の印が2スタックで交代し、ヴァークルを近接範囲に保つ。",
+        "orbs": "灰のオーブ: 対象者は部屋の外周へ散開する。炎の床は残り、放たれたオーブは部屋を横切る。",
+        "pyre": "共有の火葬: 赤熱した金属がない対象だけを選ぶ。難易度に関係なく、移動する円内に4人で集合する。1人不足するごとに、レイド全体が最大体力の15%のダメージを受ける。",
+        "forgestorm": "鍛冶嵐: 落下する隕石を確認し、3波それぞれが着弾する前に表示された範囲から離れる。",
+        "anvil": "金床の布告: ヴァークルは大鍛冶炉へ移動し、3回打って全体ダメージを与える。英雄では表示付き隕石も落ちる。",
+        "ray": "焼き入れ光線: 長い予告が終わる前に別のプレイヤー、通常はタンクが動く光線を遮る。被弾者は焼き入れの傷を受ける。",
+        "forge": "炉の柱: 光線が炉に届く前に遮り、るつぼの曝露が増えたら担当を交代する。熱が満杯になると炉が崩壊する。",
+        "assembly": "師匠の組立: 両方の炉光線を遮り、全ポータル波を倒し、るつぼの地震を中断し、灰の技工士の回復を止める。",
+        "worldfire": "世界炎: 英雄の最終段階では炎の外周が中央へ迫る。るつぼ全体が燃える前にヴァークルを倒す。",
+        "heroic": "英雄: 炉の熱は下がらず、金床の布告に隕石が加わり、最終段階は世界炎に集中する。"
+      }
+    },
     "auraEffect": {
+      "sharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。",
+      "varkhulSharedPyre": "各プレイヤーの最大体力の{total}%に相当するダメージを、サークル内のプレイヤーで分担する（{players}人の場合、1人あたり{perPlayer}%）。不足しているプレイヤー1人につき、サークル内を含むレイド全体が最大体力の{missingPenalty}%のダメージを受ける。",
+      "makersBrand": "{duration}秒間、1スタックごとにヴァルクルから受けるダメージが{pct}%増加する。最大{max}スタック。タンクは{swap}スタックで交代すること。",
+      "varkhulSentinelsGaze": "残り火の番兵に追われている。倒すまでレイドから離しておくこと。",
+      "varkhulMoltenCore": "このコアを炉へ運ぶ。溶融の重荷は{interval}秒ごとに最大体力の{min}%から{max}%まで増加するダメージを与える。",
+      "varkhulForgeLink": "作動中の柱の光線が鍛冶炉に届く前に遮断する。未遮断の光線は1秒ごとに熱を6%上昇させる。ノーマルでは遮断中と柱の停止中に冷却されるが、ヒロイックでは熱は下がらない。100%で致命的な鍛冶炉メルトダウンが発生する。",
+      "varkhulCrucibleExposure": "るつぼの光線を遮断すると、1秒ごとに最大体力基準のダメージが増加する。スタックはノーマルでは光線を離れて10秒後、ヒロイックでは60秒後にリセットされる。",
       "dot": "{interval}秒ごとに{value}の{school}ダメージを与える",
       "hot": "{interval}秒ごとに体力を{value}回復する",
       "mendingCurrent": "{value}の回復量を蓄え、時間経過または流転の癒しで消費して解放する",
@@ -2700,7 +2887,9 @@ export const ja_JP: EnTranslations = {
       "chestTitle": "宝箱",
       "takeLootButton": "戦利品を取る",
       "takeLootTooltip": "お金とドロップしたアイテムを受け取ります。採取の機会は消費しません。",
-      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。"
+      "unifiedPressHint": "相互作用キーを一度押すだけで、町のフォーカスに従って戦利品の回収と採取を同時に行います。",
+      "bindConfirmTitle": "拾うと魂縛される",
+      "bindConfirmBody": "この戦利品には、取得すると自分に魂縛されるアイテムが含まれています。魂縛されたアイテムは、同じドロップを分かち合ったプレイヤーとの間でのみ、限られた時間だけ取引できます。"
     },
     "spellbook": {
       "addToBarAria": "{name}をアクションバーに追加",
@@ -2778,11 +2967,11 @@ export const ja_JP: EnTranslations = {
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
         "steamWishlist": "ウィッシュリストの通知",
-        "menu": "Menu",
+        "menu": "メニュー",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "経験値バー",
+        "chat": "チャット",
         "actionBarGroup": "アクションバー",
         "playerFrame": "プレイヤー",
         "targetFrame": "ターゲット",
@@ -2800,7 +2989,7 @@ export const ja_JP: EnTranslations = {
       "actionBar2Vertical": "アクションバー 2 を縦向きに",
       "actionBar3Vertical": "アクションバー 3 を縦向きに",
       "menuRailHorizontal": "メニューを横向きに",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "グリッドにスナップ",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "サイズをリセット",
       "resetFrameSizeFor": "{name}のサイズをリセット",
@@ -2825,7 +3014,8 @@ export const ja_JP: EnTranslations = {
       "riftUpgrade": "リフト強化 {level}/{max}",
       "riftSockets": "リフト宝石 {used}/{total}",
       "statEnchanted": "+{value} {stat}（エンチャント）",
-      "enchantedFallback": "エンチャント済み"
+      "enchantedFallback": "エンチャント済み",
+      "partyTradeWindow": "このアイテムはあと{time}の間、同じドロップを分かち合ったプレイヤーと取引できます。装備すると取引期間は終了します。"
     },
     "materialHint": {
       "fineGrade": "上質な等級。素材より上位の道具で満位の採取地から採ったもので、通常版が求められる場所ではそのまま代用できます。",
@@ -3698,7 +3888,9 @@ export const ja_JP: EnTranslations = {
       "equip": "装備する",
       "disenchant": "魔力分解",
       "salvage": "解体",
-      "applyEnchant": "エンチャントを付与"
+      "applyEnchant": "エンチャントを付与",
+      "sell": "売却",
+      "sellAll": "すべて売却（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
@@ -4200,6 +4392,10 @@ export const ja_JP: EnTranslations = {
       "loading": "取引所を読み込み中...",
       "loadFailed": "取引所に接続できませんでした。しばらくしてからもう一度お試しください。",
       "disabledRealm": "このレルムでは $WOC 取引所を利用できません。",
+      "browserOnlyConfirmTitle": "ブラウザで $WOC 取引所を開きますか？",
+      "browserOnlyConfirmBody": "$WOC 取引所は World of ClaudeCraft のブラウザ版でのみ利用できます。ブラウザで World of ClaudeCraft を開きます。そこでログインして取引所を開けます。ゲームはそのまま続行されます。",
+      "browserOnlyConfirmOpen": "ブラウザで開く",
+      "browserOnlyConfirmCancel": "キャンセル",
       "pausedBanner": "取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。",
       "walletLinkedDisconnected": "公開アドレスはリンク済みです。$WOC で支払う際は、そのウォレットアプリに再接続してください。",
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
@@ -4520,7 +4716,13 @@ export const ja_JP: EnTranslations = {
       "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
     },
     "wallet": {
-      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。",
+      "reauth_required": "このウォレット変更を確認するには、アカウントのパスワードを入力してください。",
+      "reauth_two_factor": "このアカウントは二要素認証が有効です。確認のため認証コードを入力してください。",
+      "reauth_no_password": "まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+      "reauth_bad_signature": "ウォレットの署名を確認できませんでした。もう一度お試しください。",
+      "reauth_bad_password": "パスワードが正しくありません。",
+      "reauth_bad_two_factor": "そのコードは無効です。もう一度お試しください。"
     },
     "ota_updates": {
       "invalid_input": "入力が無効です。"
@@ -4978,6 +5180,7 @@ export const ja_JP: EnTranslations = {
       "ifPartySort": "パーティメンバーを並べる順序です。グループ順、ロール、名前から選べます。",
       "ifPartyShowAuras": "パーティフレームにバフとデバフを表示するかどうかです。同様のスイッチが、リソースバー、吸収、ペット、そして自分をパーティ一覧に含めるかどうかにも用意されています。",
       "ifAurasOnPlayerFrame": "自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。",
+      "ifAlwaysShowAllBuffs": "低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。",
       "ifTargetOfTarget": "ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。",
       "ifPetFrame": "ペット用のフレームを表示します。",
       "ifChatFontScale": "チャットの文字サイズです。",
@@ -7446,6 +7649,13 @@ export const ja_JP: EnTranslations = {
     "unlink": "連携解除",
     "unlinkTitle": "このアカウントからウォレット認証を削除",
     "unlinkAria": "このアカウントからウォレット認証を削除",
+    "reauthTitle": "ウォレット変更の確認",
+    "reauthUnlinkTitle": "ウォレット削除の確認",
+    "reauthHelp": "セキュリティ保護のため、この変更を許可するにはアカウントのパスワードを入力してください。",
+    "reauthNoPassword": "このアカウントはパスワードなしでサインインしています。まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+    "reauthConfirm": "確認",
+    "reauthCancel": "キャンセル",
+    "reauthClose": "閉じる",
     "signOut": "接続解除",
     "signOutTitle": "このブラウザでウォレットアプリの接続を解除",
     "signOutAria": "このブラウザでウォレットアプリの接続を解除",
@@ -7889,6 +8099,20 @@ export const ja_JP: EnTranslations = {
     "buyConfirmTitle": "購入の確認",
     "buyConfirmBody": "英雄の証{marks}個で{item}を購入しますか？証での購入は返金できません。",
     "buyConfirmAccept": "購入",
+    "buyConfirmCancel": "キャンセル"
+  },
+  "crucibleShop": {
+    "browse": "印章を交換する",
+    "browseAria": "{name}と坩堝の印章を交換する",
+    "empty": "あなたのクラスで交換できるセット装備はありません。",
+    "balance": "所持している印章: {list}",
+    "balanceEntry": "{name} x{count}",
+    "noSigils": "坩堝の印章を持っていません。",
+    "price": "{sigil} 1個",
+    "buyAria": "{sigil}を{item}と交換する",
+    "buyConfirmTitle": "交換の確認",
+    "buyConfirmBody": "{sigil}を{item}と交換しますか？消費した印章は払い戻せません。",
+    "buyConfirmAccept": "交換",
     "buyConfirmCancel": "キャンセル"
   },
   "cardDuel": {
@@ -8719,6 +8943,8 @@ export const ja_JP: EnTranslations = {
         "riftEntrance": "リフト入口：{name}",
         "hostileEnemy": "敵対対象",
         "aggressiveEnemy": "あなたを攻撃中の敵",
+        "bossEnemy": "ボス：{name}",
+        "bossAggressiveEnemy": "あなたを攻撃中のボス：{name}",
         "lootableEnemy": "戦利品を回収できる敵",
         "corpse": "自分の死体",
         "deathZone": "危険地帯",
@@ -9107,6 +9333,7 @@ export const ja_JP: EnTranslations = {
       "tradeExpired": "取引リクエストは期限切れです。",
       "tradeFailed": "取引失敗: アイテムまたは所持金が利用できません。",
       "tradeBound": "そのアイテムはバインドされているため取引できません。",
+      "tradeWindowIneligible": "それは同じドロップを分かち合ったプレイヤーにしか取引できません。",
       "marketListBound": "そのアイテムはバインドされているため出品できません。"
     },
     "logs": {
@@ -9770,7 +9997,8 @@ export const ja_JP: EnTranslations = {
       "greedAria": "{item}を強欲",
       "passAria": "{item}をパス",
       "everyonePassed": "全員が{item}をパスしました。",
-      "rolled": "{answered}/{total} がロール済み"
+      "rolled": "{answered}/{total} がロール済み",
+      "bindsOnPickup": "拾うと魂縛される"
     }
   },
   "entities": {
@@ -10551,7 +10779,7 @@ export const ja_JP: EnTranslations = {
       },
       "needle_of_fate": {
         "name": "運命の針",
-        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を5生成し、邪眼がなければ先に対象を指定します。"
+        "description": "敵を貫いて{damage}の影ダメージを与えます。対象に自分の邪眼があれば断罪を{needleDoom}生成し、邪眼がなければ先に対象を指定します。"
       },
       "sentence": {
         "name": "宣告",
@@ -10649,7 +10877,7 @@ export const ja_JP: EnTranslations = {
       },
       "moonseed": {
         "name": "月の種",
-        "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大6秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。"
+        "description": "月翼形態専用。{damage}の秘術ダメージを与え、月潮を1段階進め（最大3）、月の嵐を6秒延長する（1回の付与につき最大{duration}秒）。月潮が3段階のとき、このボタンはムーンサージに変化する：3段階すべてを消費し、240から285の秘術ダメージを与える即時攻撃。"
       },
       "rejuvenation": {
         "name": "野生の芽吹き",
@@ -10953,7 +11181,7 @@ export const ja_JP: EnTranslations = {
       },
       "conflagrate": {
         "name": "コンフラグレート",
-        "description": "灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを2つ持ちます。（破壊の象徴）"
+        "description": "灼熱の契約の先の刻みを一つ手前へ引き、続けて対象を燃やして{damage}の火炎ダメージを与えます。破滅的猛攻を1と破滅を1生みます。チャージを{charges}つ持ちます。（破壊の象徴）"
       },
       "moonkin_form": {
         "name": "ムーンキンフォーム",
@@ -10985,7 +11213,7 @@ export const ja_JP: EnTranslations = {
       },
       "overbloom": {
         "name": "満開",
-        "description": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の60%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
+        "description": "翠成を5消費する：自身の継続回復効果を持つすべての味方が、その効果の残り回復量の{buff}%分を即座に回復し、効果は除去され、対象には新しい野生の芽吹きが植えられる。"
       },
       "summon_imp": {
         "name": "エンバーキンの召喚",
@@ -11057,7 +11285,7 @@ export const ja_JP: EnTranslations = {
       },
       "iron_resolve": {
         "name": "鉄の決意",
-        "description": "歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき4のダメージを吸収します。最大10秒間持続します。（防御）"
+        "description": "歯を食いしばって痛みを堪え、最大40の怒り（最低20）を消費し、消費した怒り1につき{absorbPerRage}のダメージを吸収します。最大10秒間持続します。（防御）"
       },
       "faultline": {
         "name": "断層",
@@ -11434,7 +11662,7 @@ export const ja_JP: EnTranslations = {
       },
       "seraphic_vigil": {
         "name": "熾天使の見守り",
-        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を回復する。ベネディクション固有能力。"
+        "description": "味方1体に見守りの祝福を与え、危機に陥った時に体力を{buff}回復する。ベネディクション固有能力。"
       },
       "summon_tithefiend": {
         "name": "タイスフィーンド招来",
@@ -12977,6 +13205,9 @@ export const ja_JP: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "テラースパークの始動キー"
       },
+      "reins_rickshaw_mount": {
+        "name": "縛りの手綱：骨縛りの人力車"
+      },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
       },
@@ -13054,6 +13285,612 @@ export const ja_JP: EnTranslations = {
       },
       "ps_passing_stone": {
         "name": "たましいの石"
+      },
+      "lastflame_core": {
+        "name": "最後の炎の核"
+      },
+      "slagbreaker_helmet": {
+        "name": "スラグブレイカーの兜"
+      },
+      "slagbreaker_shoulder": {
+        "name": "スラグブレイカーの肩鎧"
+      },
+      "slagbreaker_chest": {
+        "name": "スラグブレイカーの鎖帷子"
+      },
+      "slagbreaker_gloves": {
+        "name": "スラグブレイカーのガントレット"
+      },
+      "slagbreaker_legs": {
+        "name": "スラグブレイカーの脚甲"
+      },
+      "emberfury_helmet": {
+        "name": "エンバーフューリーの兜"
+      },
+      "emberfury_shoulder": {
+        "name": "エンバーフューリーの肩鎧"
+      },
+      "emberfury_chest": {
+        "name": "エンバーフューリーの鎖帷子"
+      },
+      "emberfury_gloves": {
+        "name": "エンバーフューリーのガントレット"
+      },
+      "emberfury_legs": {
+        "name": "エンバーフューリーの脚甲"
+      },
+      "forgewall_helmet": {
+        "name": "フォージウォールの兜"
+      },
+      "forgewall_shoulder": {
+        "name": "フォージウォールの肩鎧"
+      },
+      "forgewall_chest": {
+        "name": "フォージウォールの鎖帷子"
+      },
+      "forgewall_gloves": {
+        "name": "フォージウォールのガントレット"
+      },
+      "forgewall_legs": {
+        "name": "フォージウォールの脚甲"
+      },
+      "dawnforged_helmet": {
+        "name": "ドーンフォージの兜"
+      },
+      "dawnforged_shoulder": {
+        "name": "ドーンフォージの肩鎧"
+      },
+      "dawnforged_chest": {
+        "name": "ドーンフォージの鎖帷子"
+      },
+      "dawnforged_gloves": {
+        "name": "ドーンフォージのガントレット"
+      },
+      "dawnforged_legs": {
+        "name": "ドーンフォージの脚甲"
+      },
+      "oathpyre_helmet": {
+        "name": "オースパイアの兜"
+      },
+      "oathpyre_shoulder": {
+        "name": "オースパイアの肩鎧"
+      },
+      "oathpyre_chest": {
+        "name": "オースパイアの鎖帷子"
+      },
+      "oathpyre_gloves": {
+        "name": "オースパイアのガントレット"
+      },
+      "oathpyre_legs": {
+        "name": "オースパイアの脚甲"
+      },
+      "zealfire_helmet": {
+        "name": "ジールファイアの兜"
+      },
+      "zealfire_shoulder": {
+        "name": "ジールファイアの肩鎧"
+      },
+      "zealfire_chest": {
+        "name": "ジールファイアの鎖帷子"
+      },
+      "zealfire_gloves": {
+        "name": "ジールファイアのガントレット"
+      },
+      "zealfire_legs": {
+        "name": "ジールファイアの脚甲"
+      },
+      "packlord_emberhide_helmet": {
+        "name": "パックロードの頭巾"
+      },
+      "packlord_emberhide_shoulder": {
+        "name": "パックロードの肩当て"
+      },
+      "packlord_emberhide_chest": {
+        "name": "パックロードのチュニック"
+      },
+      "packlord_emberhide_gloves": {
+        "name": "パックロードのグリップ"
+      },
+      "packlord_emberhide_legs": {
+        "name": "パックロードのブリーチズ"
+      },
+      "coldsight_trackers_helmet": {
+        "name": "コールドサイトの頭巾"
+      },
+      "coldsight_trackers_shoulder": {
+        "name": "コールドサイトの肩当て"
+      },
+      "coldsight_trackers_chest": {
+        "name": "コールドサイトのチュニック"
+      },
+      "coldsight_trackers_gloves": {
+        "name": "コールドサイトのグリップ"
+      },
+      "coldsight_trackers_legs": {
+        "name": "コールドサイトのブリーチズ"
+      },
+      "slagsnare_helmet": {
+        "name": "スラグスネアの頭巾"
+      },
+      "slagsnare_shoulder": {
+        "name": "スラグスネアの肩当て"
+      },
+      "slagsnare_chest": {
+        "name": "スラグスネアのチュニック"
+      },
+      "slagsnare_gloves": {
+        "name": "スラグスネアのグリップ"
+      },
+      "slagsnare_legs": {
+        "name": "スラグスネアのブリーチズ"
+      },
+      "cinderfang_helmet": {
+        "name": "シンダーファングの頭巾"
+      },
+      "cinderfang_shoulder": {
+        "name": "シンダーファングの肩当て"
+      },
+      "cinderfang_chest": {
+        "name": "シンダーファングのチュニック"
+      },
+      "cinderfang_gloves": {
+        "name": "シンダーファングのグリップ"
+      },
+      "cinderfang_legs": {
+        "name": "シンダーファングのブリーチズ"
+      },
+      "smolderstrike_helmet": {
+        "name": "スモルダーストライクの頭巾"
+      },
+      "smolderstrike_shoulder": {
+        "name": "スモルダーストライクの肩当て"
+      },
+      "smolderstrike_chest": {
+        "name": "スモルダーストライクのチュニック"
+      },
+      "smolderstrike_gloves": {
+        "name": "スモルダーストライクのグリップ"
+      },
+      "smolderstrike_legs": {
+        "name": "スモルダーストライクのブリーチズ"
+      },
+      "ashveil_helmet": {
+        "name": "アッシュヴェールの頭巾"
+      },
+      "ashveil_shoulder": {
+        "name": "アッシュヴェールの肩当て"
+      },
+      "ashveil_chest": {
+        "name": "アッシュヴェールのチュニック"
+      },
+      "ashveil_gloves": {
+        "name": "アッシュヴェールのグリップ"
+      },
+      "ashveil_legs": {
+        "name": "アッシュヴェールのブリーチズ"
+      },
+      "emberscreed_helmet": {
+        "name": "残り火の信条のフード"
+      },
+      "emberscreed_shoulder": {
+        "name": "残り火の信条の肩掛け"
+      },
+      "emberscreed_chest": {
+        "name": "残り火の信条のローブ"
+      },
+      "emberscreed_gloves": {
+        "name": "残り火の信条のハンドラップ"
+      },
+      "emberscreed_legs": {
+        "name": "残り火の信条のレギンス"
+      },
+      "benison_dawnweave_helmet": {
+        "name": "ドーンウィーブのフード"
+      },
+      "benison_dawnweave_shoulder": {
+        "name": "ドーンウィーブの肩掛け"
+      },
+      "benison_dawnweave_chest": {
+        "name": "ドーンウィーブのローブ"
+      },
+      "benison_dawnweave_gloves": {
+        "name": "ドーンウィーブのハンドラップ"
+      },
+      "benison_dawnweave_legs": {
+        "name": "ドーンウィーブのレギンス"
+      },
+      "vesperash_helmet": {
+        "name": "ヴェスパーアッシュのフード"
+      },
+      "vesperash_shoulder": {
+        "name": "ヴェスパーアッシュの肩掛け"
+      },
+      "vesperash_chest": {
+        "name": "ヴェスパーアッシュのローブ"
+      },
+      "vesperash_gloves": {
+        "name": "ヴェスパーアッシュのハンドラップ"
+      },
+      "vesperash_legs": {
+        "name": "ヴェスパーアッシュのレギンス"
+      },
+      "stormkindled_helmet": {
+        "name": "ストームキンドルの兜"
+      },
+      "stormkindled_shoulder": {
+        "name": "ストームキンドルの肩鎧"
+      },
+      "stormkindled_chest": {
+        "name": "ストームキンドルの鎖帷子"
+      },
+      "stormkindled_gloves": {
+        "name": "ストームキンドルのガントレット"
+      },
+      "stormkindled_legs": {
+        "name": "ストームキンドルの脚甲"
+      },
+      "warspirit_emberscale_helmet": {
+        "name": "エンバースケイルの兜"
+      },
+      "warspirit_emberscale_shoulder": {
+        "name": "エンバースケイルの肩鎧"
+      },
+      "warspirit_emberscale_chest": {
+        "name": "エンバースケイルの鎖帷子"
+      },
+      "warspirit_emberscale_gloves": {
+        "name": "エンバースケイルのガントレット"
+      },
+      "warspirit_emberscale_legs": {
+        "name": "エンバースケイルの脚甲"
+      },
+      "stonehearth_helmet": {
+        "name": "ストーンハースの兜"
+      },
+      "stonehearth_shoulder": {
+        "name": "ストーンハースの肩鎧"
+      },
+      "stonehearth_chest": {
+        "name": "ストーンハースの鎖帷子"
+      },
+      "stonehearth_gloves": {
+        "name": "ストーンハースのガントレット"
+      },
+      "stonehearth_legs": {
+        "name": "ストーンハースの脚甲"
+      },
+      "springmender_helmet": {
+        "name": "スプリングメンダーの兜"
+      },
+      "springmender_shoulder": {
+        "name": "スプリングメンダーの肩鎧"
+      },
+      "springmender_chest": {
+        "name": "スプリングメンダーの鎖帷子"
+      },
+      "springmender_gloves": {
+        "name": "スプリングメンダーのガントレット"
+      },
+      "springmender_legs": {
+        "name": "スプリングメンダーの脚甲"
+      },
+      "chronoweave_helmet": {
+        "name": "エーテルウィーブのフード"
+      },
+      "chronoweave_shoulder": {
+        "name": "エーテルウィーブの肩掛け"
+      },
+      "chronoweave_chest": {
+        "name": "エーテルウィーブのローブ"
+      },
+      "chronoweave_gloves": {
+        "name": "エーテルウィーブのハンドラップ"
+      },
+      "chronoweave_legs": {
+        "name": "エーテルウィーブのレギンス"
+      },
+      "pyroclast_helmet": {
+        "name": "パイロクラストのフード"
+      },
+      "pyroclast_shoulder": {
+        "name": "パイロクラストの肩掛け"
+      },
+      "pyroclast_chest": {
+        "name": "パイロクラストのローブ"
+      },
+      "pyroclast_gloves": {
+        "name": "パイロクラストのハンドラップ"
+      },
+      "pyroclast_legs": {
+        "name": "パイロクラストのレギンス"
+      },
+      "frostquench_helmet": {
+        "name": "フロストクエンチのフード"
+      },
+      "frostquench_shoulder": {
+        "name": "フロストクエンチの肩掛け"
+      },
+      "frostquench_chest": {
+        "name": "フロストクエンチのローブ"
+      },
+      "frostquench_gloves": {
+        "name": "フロストクエンチのハンドラップ"
+      },
+      "frostquench_legs": {
+        "name": "フロストクエンチのレギンス"
+      },
+      "hexthread_helmet": {
+        "name": "ヘクススレッドのフード"
+      },
+      "hexthread_shoulder": {
+        "name": "ヘクススレッドの肩掛け"
+      },
+      "hexthread_chest": {
+        "name": "ヘクススレッドのローブ"
+      },
+      "hexthread_gloves": {
+        "name": "ヘクススレッドのハンドラップ"
+      },
+      "hexthread_legs": {
+        "name": "ヘクススレッドのレギンス"
+      },
+      "gravebrand_helmet": {
+        "name": "グレイブブランドのフード"
+      },
+      "gravebrand_shoulder": {
+        "name": "グレイブブランドの肩掛け"
+      },
+      "gravebrand_chest": {
+        "name": "グレイブブランドのローブ"
+      },
+      "gravebrand_gloves": {
+        "name": "グレイブブランドのハンドラップ"
+      },
+      "gravebrand_legs": {
+        "name": "グレイブブランドのレギンス"
+      },
+      "ruincaller_helmet": {
+        "name": "ルインコーラーのフード"
+      },
+      "ruincaller_shoulder": {
+        "name": "ルインコーラーの肩掛け"
+      },
+      "ruincaller_chest": {
+        "name": "ルインコーラーのローブ"
+      },
+      "ruincaller_gloves": {
+        "name": "ルインコーラーのハンドラップ"
+      },
+      "ruincaller_legs": {
+        "name": "ルインコーラーのレギンス"
+      },
+      "moonscorch_helmet": {
+        "name": "ムーンスコーチの頭巾"
+      },
+      "moonscorch_shoulder": {
+        "name": "ムーンスコーチの肩当て"
+      },
+      "moonscorch_chest": {
+        "name": "ムーンスコーチのチュニック"
+      },
+      "moonscorch_gloves": {
+        "name": "ムーンスコーチのグリップ"
+      },
+      "moonscorch_legs": {
+        "name": "ムーンスコーチのブリーチズ"
+      },
+      "wildfang_emberhide_helmet": {
+        "name": "ワイルドファングの頭巾"
+      },
+      "wildfang_emberhide_shoulder": {
+        "name": "ワイルドファングの肩当て"
+      },
+      "wildfang_emberhide_chest": {
+        "name": "ワイルドファングのチュニック"
+      },
+      "wildfang_emberhide_gloves": {
+        "name": "ワイルドファングのグリップ"
+      },
+      "wildfang_emberhide_legs": {
+        "name": "ワイルドファングのブリーチズ"
+      },
+      "cinderbark_helmet": {
+        "name": "シンダーバークの頭巾"
+      },
+      "cinderbark_shoulder": {
+        "name": "シンダーバークの肩当て"
+      },
+      "cinderbark_chest": {
+        "name": "シンダーバークのチュニック"
+      },
+      "cinderbark_gloves": {
+        "name": "シンダーバークのグリップ"
+      },
+      "cinderbark_legs": {
+        "name": "シンダーバークのブリーチズ"
+      },
+      "grovespring_helmet": {
+        "name": "グローヴスプリングの頭巾"
+      },
+      "grovespring_shoulder": {
+        "name": "グローヴスプリングの肩当て"
+      },
+      "grovespring_chest": {
+        "name": "グローヴスプリングのチュニック"
+      },
+      "grovespring_gloves": {
+        "name": "グローヴスプリングのグリップ"
+      },
+      "grovespring_legs": {
+        "name": "グローヴスプリングのブリーチズ"
+      },
+      "sigil_anvil_helmet": {
+        "name": "金床の兜の印章"
+      },
+      "sigil_ember_helmet": {
+        "name": "残り火の兜の印章"
+      },
+      "sigil_tempest_helmet": {
+        "name": "大嵐の兜の印章"
+      },
+      "sigil_anvil_shoulder": {
+        "name": "金床の肩の印章"
+      },
+      "sigil_ember_shoulder": {
+        "name": "残り火の肩の印章"
+      },
+      "sigil_tempest_shoulder": {
+        "name": "大嵐の肩の印章"
+      },
+      "sigil_anvil_chest": {
+        "name": "金床のローブの印章"
+      },
+      "sigil_ember_chest": {
+        "name": "残り火のローブの印章"
+      },
+      "sigil_tempest_chest": {
+        "name": "大嵐のローブの印章"
+      },
+      "sigil_anvil_gloves": {
+        "name": "金床の篭手の印章"
+      },
+      "sigil_ember_gloves": {
+        "name": "残り火の篭手の印章"
+      },
+      "sigil_tempest_gloves": {
+        "name": "大嵐の篭手の印章"
+      },
+      "sigil_anvil_legs": {
+        "name": "金床の脚甲の印章"
+      },
+      "sigil_ember_legs": {
+        "name": "残り火の脚甲の印章"
+      },
+      "sigil_tempest_legs": {
+        "name": "大嵐の脚甲の印章"
+      },
+      "cord_of_the_last_flame": {
+        "name": "最後の炎のコード"
+      },
+      "cindersoaked_slippers": {
+        "name": "燃えかす染みのスリッパ"
+      },
+      "springbinder_sash": {
+        "name": "泉縛りのサッシュ"
+      },
+      "steps_of_quiet_water": {
+        "name": "静水のステップ"
+      },
+      "cinderbark_cinch": {
+        "name": "シンダーバークのシンチ"
+      },
+      "ashenbark_treads": {
+        "name": "灰樹皮のトレッド"
+      },
+      "slagstalker_belt": {
+        "name": "スラグストーカーのベルト"
+      },
+      "ashrunner_boots": {
+        "name": "アッシュランナーのブーツ"
+      },
+      "moonscorch_waistwrap": {
+        "name": "ムーンスコーチの腰帯"
+      },
+      "scorchgrove_striders": {
+        "name": "焦げ杜のストライダー"
+      },
+      "grovetender_belt": {
+        "name": "杜守りのベルト"
+      },
+      "dewfall_moccasins": {
+        "name": "露落ちのモカシン"
+      },
+      "forgewall_girdle": {
+        "name": "フォージウォールのガードル"
+      },
+      "anvilstance_sabatons": {
+        "name": "金床構えのサバトン"
+      },
+      "warforged_waistguard": {
+        "name": "ウォーフォージの腰当て"
+      },
+      "furnace_march_greaves": {
+        "name": "炉進軍のグリーヴ"
+      },
+      "stormkindled_chain": {
+        "name": "ストームキンドルのチェーン"
+      },
+      "thundershock_treads": {
+        "name": "サンダーショックのトレッド"
+      },
+      "tidebinder_links": {
+        "name": "潮縛りのリンク"
+      },
+      "springwarden_sabatons": {
+        "name": "泉守りのサバトン"
+      },
+      "pendant_of_the_first_tempering": {
+        "name": "最初の焼入れのペンダント"
+      },
+      "ignivars_ember_choker": {
+        "name": "イグニヴァルの燃えさし首飾り"
+      },
+      "locket_of_the_last_flame": {
+        "name": "最後の炎のロケット"
+      },
+      "heartspring_amulet": {
+        "name": "ハートスプリングのアミュレット"
+      },
+      "seal_of_the_forgewall": {
+        "name": "フォージウォールの印章指輪"
+      },
+      "band_of_marked_strikes": {
+        "name": "刻印打撃のバンド"
+      },
+      "circle_of_cinders": {
+        "name": "燃えかすのサークル"
+      },
+      "loop_of_quiet_springs": {
+        "name": "静かな泉のループ"
+      },
+      "bulwark_of_the_inner_crucible": {
+        "name": "内なる坩堝の防壁"
+      },
+      "ember_wardens_barrier": {
+        "name": "燃えさし番人のバリア"
+      },
+      "orb_of_the_last_spring": {
+        "name": "最後の泉のオーブ"
+      },
+      "cinder_of_the_first_design": {
+        "name": "最初の設計の燃えかす"
+      },
+      "forgefathers_warhammer": {
+        "name": "フォージファーザーのウォーハンマー"
+      },
+      "cinderfang_kris": {
+        "name": "シンダーファングのクリス"
+      },
+      "slagrender_cleaver": {
+        "name": "スラグレンダーのクリーバー"
+      },
+      "anvilguard_blade": {
+        "name": "アンヴィルガードのブレード"
+      },
+      "heart_of_the_end_greatblade": {
+        "name": "終焉の心臓のグレートブレード"
+      },
+      "staff_of_the_last_spring": {
+        "name": "最後の泉の杖"
+      },
+      "forgefire_spire": {
+        "name": "フォージファイアのスパイア"
+      },
+      "springtouched_crozier": {
+        "name": "泉触れの司教杖"
+      },
+      "wand_of_quenched_sparks": {
+        "name": "消えた火花のワンド"
       },
       "conjured_water4": {
         "name": "魔法の湧き水"
@@ -13831,6 +14668,12 @@ export const ja_JP: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "大七面鳥サンダーストラットの手綱"
+      },
+      "varkhul_forgebreaker": {
+        "name": "フォージブレイカー、ヴァルクールの機関"
+      },
+      "varkhul_emberward": {
+        "name": "エンバーウォード、ヴァルクールの大盾"
       }
     },
     "mobs": {
@@ -14025,6 +14868,27 @@ export const ja_JP: EnTranslations = {
       },
       "nythraxis_scourge_of_thornpeak": {
         "name": "ナイスラクシス、ソーンピークの災厄"
+      },
+      "ignivar_herald_of_the_last_flame": {
+        "name": "イグニヴァル、最後の炎の先触れ"
+      },
+      "ignivar_heart_of_the_end": {
+        "name": "イグニヴァル・アッシュコーラー"
+      },
+      "ignivar_ember_sentinel": {
+        "name": "残り火の番兵"
+      },
+      "ignivar_crucible_warden": {
+        "name": "るつぼの守護者"
+      },
+      "ignivar_cinder_artificer": {
+        "name": "火の粉の技工士"
+      },
+      "varkhul_forgefather_of_the_last_flame": {
+        "name": "最後の炎の鍛造父、ヴァルクル"
+      },
+      "derelict_mech": {
+        "name": "朽ちた機械兵"
       },
       "reliquary_ledger_wraith": {
         "name": "台帳の亡霊"
@@ -14685,6 +15549,21 @@ export const ja_JP: EnTranslations = {
         "name": "アルドリック修道士",
         "title": "谷の司祭",
         "greeting": "礼拝堂の墓地から世界の屋根まで... 足跡はここで終わります。山が耳を澄ませているのを感じます。"
+      },
+      "archivist_maelin_emberward": {
+        "name": "残り火守りの記録官メイリン",
+        "title": "るつぼの記録官",
+        "greeting": "ここに残る槌の跡は、どれも一つの文だ。ヴァルクルが隠そうとしたことを読み解くのを手伝ってくれ。"
+      },
+      "archivist_maelin_ember_projection": {
+        "name": "メイリンの残り火の投影",
+        "title": "残り火の投影",
+        "greeting": "残り火がメイリンの声を鍛冶場の奥へと届ける。"
+      },
+      "crucible_quartermaster": {
+        "name": "主計官ブロン・エンバーワード",
+        "title": "坩堝の主計官",
+        "greeting": "炉は己の者に印を刻む。坩堝の印章を持って来い、戦支度を整えてやろう。"
       },
       "brother_halven": {
         "name": "ハルヴェン修道士",
@@ -15831,6 +16710,39 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "ニスラクシスを撃破"
+          }
+        }
+      },
+      "q_ignivar_echoes_in_iron": {
+        "title": "鉄に響く記憶",
+        "text": "この自動人形たちは兵士ではない。試作品だ。各組立ラインを破壊し、最後の殻が倒れた時に耳を澄ませ。ヴァルクルが消そうとした記憶を、鍛冶場は覚えている。",
+        "completion": "響きはすべて一致している。ヴァルクルは枯れゆく最後の泉の水を生ける金属に縛りつけた。この自動人形たちは失敗作だった。耐え抜いたのはイグニヴァルだけだ。",
+        "objectives": {
+          "0": {
+            "label": "残り火の番兵を破壊"
+          },
+          "1": {
+            "label": "るつぼの守護者を破壊"
+          }
+        }
+      },
+      "q_ignivar_heralds_heart": {
+        "title": "先触れの心臓",
+        "text": "すべての響きが唯一の生存者、イグニヴァルを指している。ヴァルクルは彼を先触れ、封印、鍵と呼んだ。彼を倒せ。記録が正しければ、その死が彼の守るために鍛えられたものを明らかにする。",
+        "completion": "イグニヴァルは単なる守護者ではなかった。彼の心臓こそが鍵であり、最後の装甲板が下の封じられたるつぼを開いた。",
+        "objectives": {
+          "0": {
+            "label": "イグニヴァルを倒す"
+          }
+        }
+      },
+      "q_ignivar_the_forgefather": {
+        "title": "鍛造父",
+        "text": "下へ続く道の先には、最後の炎の鍛造父ヴァルクルがいる。彼は金属に命を与えるため最後の泉を幽閉し、その罪を封じるためイグニヴァルを鍛えた。内部るつぼに入り、彼の所業に終止符を打て。",
+        "completion": "ついに炉が静まった。泉は二度と元に戻らないかもしれない。しかしヴァルクルが命を再び鏖に鍛えることはない。",
+        "objectives": {
+          "0": {
+            "label": "ヴァルクルを倒す"
           }
         }
       },
@@ -17711,6 +18623,31 @@ export const ja_JP: EnTranslations = {
         "enterText": "封印された王家の扉を通り抜けます。",
         "leaveText": "ソーンピークの冷たい空気へ戻ります。"
       },
+      "ignivar_forge_lift": {
+        "name": "鍛冶昇降機",
+        "enterText": "鍛冶昇降機が軋みながら沈んでいく。鎚音が迫り上がってくる。",
+        "leaveText": "昇降機が城塞の外気の中へと引き上げてくれる。"
+      },
+      "ignivar_forge_approach": {
+        "name": "最初の鍛造の大広間",
+        "enterText": "槌音が最初の鍛造の大広間に響き渡る。",
+        "leaveText": "最初の炉から離れ、再び自由に息をつく。"
+      },
+      "ignivar_raid_arena": {
+        "name": "最後の泉のるつぼ",
+        "enterText": "るつぼの封じられた水面に熱気が揺らめいています。",
+        "leaveText": "るつぼを離れ、再び自由に息をつきます。"
+      },
+      "ignivar_molten_assembly": {
+        "name": "溶融組立場",
+        "enterText": "開いた門の先には、灼熱の組立ホールが続いている。",
+        "leaveText": "組立ラインを離れ、るつぼへ戻る。"
+      },
+      "ignivar_inner_crucible": {
+        "name": "内部るつぼ",
+        "enterText": "開かれた門はるつぼのさらなる深部へ続いている。",
+        "leaveText": "るつぼの静まり返った深部を後にする。"
+      },
       "wildheart_basin": {
         "name": "ワイルドハート盆地",
         "enterText": "温かな雨が古い石の上で音を立てる。ワイルドハート盆地が目の前に開けた。",
@@ -17942,53 +18879,183 @@ export const ja_JP: EnTranslations = {
       }
     },
     "itemSets": {
+      "ashveil": {
+        "name": "アッシュヴェールの装束",
+        "bonus2": "潜伏者の一撃のダメージが25%増加します。",
+        "bonus4": "ヴェールストライク中の最初の潜伏者の一撃が2倍ではなく3倍のダメージを与えます。"
+      },
+      "benison_dawnweave": {
+        "name": "ベニソン・ドーンウィーヴの法衣",
+        "bonus2": "熾天使の見守りの救援回復量が180から270に上昇します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "熾天使の見守りが発動すると、守られた味方はさらに10秒かけて最大体力の15%の回復を得ます。"
+      },
       "boundstone_vanguard": {
         "name": "束縛石の前衛",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
       },
+      "chronoweave": {
+        "name": "エーテルウィーブの祭服",
+        "bonus2": "時の残響が、単体対象への秘術ダメージの50%を回復に変換します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "時の連鎖のクールダウンが5秒短縮されます。"
+      },
+      "cinderbark": {
+        "name": "シンダーバークの守り",
+        "bonus2": "薙ぎ払う爪が30%の確率で古き血を追加で1蓄えます。",
+        "bonus4": "骨髄砕きのダメージが30%増加し、緊急時の護りが攻撃を置き換えなくなります。"
+      },
+      "cinderfang": {
+        "name": "シンダーファングの外套",
+        "bonus2": "毒の儀式が攻撃1回ごとに回復するエナジーが20に上昇します。",
+        "bonus4": "毒針のクールダウンが4秒に短縮されます。"
+      },
+      "coldsight_trackers": {
+        "name": "コールドサイトの追跡具",
+        "bonus2": "精密射撃が追加で5のフォーカスを回復します。",
+        "bonus4": "引き絞りのクリティカルヒットが冷徹集中を2秒延長します。1回の効果時間につき最大6秒まで延長されます。"
+      },
       "crownforged": {
         "name": "ボーンロートの戦装束",
-        "bonus2": "攻撃力が40上昇します。",
-        "bonus3": "筋力が15、スタミナが15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに8ダメージの出血を12秒間与えます。最大3回まで累積します。"
+        "bonus2": "筋力が10、スタミナが10上昇します。",
+        "bonus4": "攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。",
+        "bonus6": "攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。"
+      },
+      "dawnforged": {
+        "name": "ドーンフォージの祭服",
+        "bonus2": "光の標があなたの直接回復の55%を複製します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "光輝の共鳴で強化された暁の抱擁が即時発動になります。"
       },
       "deathlord": {
         "name": "バロウロードの戦装束",
-        "bonus2": "攻撃力が40上昇します。",
-        "bonus3": "筋力が15、スタミナが15上昇します。",
-        "bonus4": "武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間60上昇します。"
+        "bonus2": "筋力が10、スタミナが10上昇します。",
+        "bonus4": "攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「グレイブマイト」が発動し、攻撃力が10秒間40上昇します。",
+        "bonus6": "攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで対象に「ボーンスプリンター」を刻み、2秒ごとに5ダメージの出血を12秒間与えます。最大3回まで累積します。"
+      },
+      "emberfury": {
+        "name": "エンバーフューリーの装具",
+        "bonus2": "激昂の持続時間が4秒から6秒になります。",
+        "bonus4": "瀉血が必ずあなたを激昂させ、その回復量が最大体力の8%に上昇します。"
+      },
+      "emberscreed": {
+        "name": "エンバーズクリードの祭服",
+        "bonus2": "あなたのディシプリンの結びが、神聖ダメージをさらに10%多く回復に変換します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "守りの聖歌が完全に消費されると、10秒以内の次の浄めの聖歌が即時発動になります。この効果は15秒に1回まで発動します。"
+      },
+      "forgewall": {
+        "name": "フォージウォールの守り",
+        "bonus2": "鉄の決意の怒りの変換が、1ポイントにつき4から5の吸収に上昇します。",
+        "bonus4": "盾砕きを発動するたびに、鉄の決意の残りクールダウンが2秒短縮されます。"
+      },
+      "frostquench": {
+        "name": "フロストクエンチの織衣",
+        "bonus2": "霧氷の槍のクリティカルヒットで氷柱をもう1つ蓄えます。上限は5つのままです。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "ウィンターラッシュが付与するウィンターズ・チルが2チャージではなく3チャージになります。"
+      },
+      "gravebrand": {
+        "name": "グレイヴブランドの礼装",
+        "bonus2": "刈り取りの号令のクールダウンが2秒短縮されます。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "刈り取りの号令の一斉攻撃のダメージが25%増加します。"
       },
       "greyjaw_stalker": {
         "name": "グレイジョーの追跡者の装備",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
       },
+      "grovespring": {
+        "name": "グローヴスプリングの法衣",
+        "bonus2": "スウィフトメンドが自分の野生の芽吹きまたは二度目の開花を優先して消費し、回復量が25%増加します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "満開が残りの効果の75%を収穫し、その後翠成を1蓄えます。"
+      },
+      "hexthread": {
+        "name": "ヘックススレッドの外套",
+        "bonus2": "運命の針が断罪を追加で2生成します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "宣告を下すたびに断罪を10返還します。"
+      },
+      "moonscorch": {
+        "name": "ムーンスコーチの法衣",
+        "bonus2": "月の種が月の嵐を1回の付与につき2回まで延長できるようになり、合計最大12秒になります。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "ムーンサージと陽醒のダメージが25%増加します。"
+      },
       "necromancers": {
         "name": "モーンウィーヴの法衣",
-        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
-        "bonus3": "知力が10、スタミナが10上昇します。",
-        "bonus4": "呪文に10%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。"
+        "bonus2": "知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。",
+        "bonus4": "呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。",
+        "bonus6": "攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。"
       },
       "nighttalon": {
         "name": "ダイアファングの革装束",
-        "bonus2": "攻撃力が40上昇します。",
-        "bonus3": "敏捷性が15、クリティカル率が2%上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに6ダメージの出血を12秒間与えます。最大3回まで累積します。"
+        "bonus2": "敏捷性が10上昇し、クリティカル率が1%上昇します。",
+        "bonus4": "攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間15%上昇します。",
+        "bonus6": "攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに4ダメージの出血を12秒間与えます。最大3回まで累積します。"
+      },
+      "oathpyre": {
+        "name": "オースパイアの護り",
+        "bonus2": "誓守の一撃が太陽の報復を発動させる確率が30%に上昇し、ブロック成功時には40%の確率で発動します。",
+        "bonus4": "太陽の報復を消費すると、最大体力の6%を吸収する盾を10秒間得ます。"
+      },
+      "packlord_emberhide": {
+        "name": "パックロードの残火皮鎧",
+        "bonus2": "群れの指令のクールダウンが3秒に短縮されます。",
+        "bonus4": "群れの指令が獣群突撃のクールダウンをリセットする確率が30%に上昇します。"
+      },
+      "pyroclast": {
+        "name": "パイロクラストの礼装",
+        "bonus2": "灼きが、体力が35%以下の対象に必ずクリティカルヒットします。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "不死鳥のトランスの効果外で火炎呪文がクリティカルヒットするたび、その残りクールダウンが1.5秒短縮されます。"
+      },
+      "ruincaller": {
+        "name": "ルインコーラーの法衣",
+        "bonus2": "コンフラグレートがチャージを3つ持ちます。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "破滅の矢のダメージが20%増加します。"
+      },
+      "slagbreaker": {
+        "name": "スラグブレイカーの戦装束",
+        "bonus2": "血染めの手による次の重傷の一撃の強化が、1スタックにつき20%から30%に上昇します。",
+        "bonus4": "血染めの手を2回発動するごとに、崩し手の残りクールダウンが3秒短縮されます。"
+      },
+      "slagsnare": {
+        "name": "スラグスネアの装具",
+        "bonus2": "腹裂きの一撃がフォーカスを20生成します。",
+        "bonus4": "狩猟の勢いを3消費する傷裂きが、その勢いを保持します。この効果は8秒に1回まで発動します。"
+      },
+      "smolderstrike": {
+        "name": "スモルダーストライクの革鎧",
+        "bonus2": "ヘイメーカーのダメージが20%増加します。",
+        "bonus4": "消灯を発動するたびに、ブレードフラリーの残りクールダウンが6秒短縮されます。"
       },
       "soulflame": {
         "name": "レイスファイアの法衣",
-        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
-        "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
+        "bonus2": "知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。",
+        "bonus4": "呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。",
+        "bonus6": "攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。"
+      },
+      "springmender": {
+        "name": "スプリングメンダーの鱗鎧",
+        "bonus2": "潮呼びのクールダウンが4秒短縮されます。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "連なる癒しが4人目の味方に届き、治癒の奔流を150%で回収します。"
+      },
+      "stonehearth": {
+        "name": "ストーンハースの砦",
+        "bonus2": "石縛の間、ストームキャストの癒しの水流はマナを消費せず、回復量が25%増加します。",
+        "bonus4": "石縛の間、戦霊の律動を完了すると最大体力の3%を回復します。"
       },
       "stormcallers": {
         "name": "ゲイルコールの法衣",
-        "bonus2": "呪文の威力が20増加します。被ダメージによって詠唱が遅れなくなります（詠唱妨害耐性100%）。",
-        "bonus3": "知力が15、精神力が15上昇し、攻撃速度と詠唱速度が15%上昇します。",
-        "bonus4": "呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間40上昇します。"
+        "bonus2": "知力が10、精神力が10上昇します。被ダメージによる詠唱の遅れが半分になります（詠唱妨害耐性50%）。",
+        "bonus4": "呪文の威力が12増加します。呪文に6%の確率で「クリアキャスティング」が発動し、次の呪文が無償になります。",
+        "bonus6": "攻撃速度と詠唱速度が4%上昇します。呪文に10%の確率で「ソウルブレイズ」が発動し、呪文の威力が10秒間25上昇します。"
+      },
+      "stormkindled": {
+        "name": "ストームキンドルの礼装",
+        "bonus2": "火焔烙印中の武器解放で雷鳴を3獲得します。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "大地の衝撃の雷鳴ごとのボーナスが30%に上昇します。"
       },
       "vale_arcanist": {
         "name": "谷の秘術師の装束",
         "bonus3": "攻撃速度と詠唱速度が15%上昇します。"
+      },
+      "vesperash": {
+        "name": "ヴェスパーアッシュの外套",
+        "bonus2": "タイスフィーンド招来のクールダウンが6秒短縮されます。被ダメージで詠唱が遅れなくなります。",
+        "bonus4": "タイスフィーンドを招来すると精神粉砕のクールダウンがリセットされ、タイスフィーンドの攻撃ごとのマナ回復量が2倍になります。"
       },
       "warfare_ashstalker": {
         "name": "アッシュストーカーの装備",
@@ -18020,11 +19087,26 @@ export const ja_JP: EnTranslations = {
         "bonus4": "ウォーフェア攻撃レーティングが40上がり、敵対プレイヤーがあなたにかける行動制御の持続が15%短くなります。",
         "bonus7": "ウォーフェア攻撃・防御レーティングが80上がります。呪文に15%の確率で棘の守りが宿り、回避が6秒間15%上がります。"
       },
+      "warspirit_emberscale": {
+        "name": "ウォースピリットの残火鱗鎧",
+        "bonus2": "祖霊の一撃が戦霊の律動を3段階進めます。",
+        "bonus4": "祖霊の一撃のダメージが30%増加します。"
+      },
+      "wildfang_emberhide": {
+        "name": "ワイルドファングの燼皮鎧",
+        "bonus2": "血の収穫が回復するエナジーが30から45に増加します。",
+        "bonus4": "血の収穫が対象に新しい皮剥ぎを植え付けます。"
+      },
       "wyrmshadow": {
         "name": "ナイトファングの装束",
-        "bonus2": "攻撃力が40上昇します。",
-        "bonus3": "敏捷性が15、クリティカル率が2%上昇します。",
-        "bonus4": "武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間25%上昇します。"
+        "bonus2": "敏捷性が10上昇し、クリティカル率が1%上昇します。",
+        "bonus4": "攻撃力が25上昇します。武器のクリティカルヒット時に50%の確率で「ファングラッシュ」が発動し、攻撃速度が8秒間15%上昇します。",
+        "bonus6": "攻撃速度と詠唱速度が4%、命中が3%上昇します。武器のクリティカルヒットで「裂けた傷」を与え、対象に2秒ごとに4ダメージの出血を12秒間与えます。最大3回まで累積します。"
+      },
+      "zealfire": {
+        "name": "ジールファイアの戦鎧",
+        "bonus2": "最後の勅令と暁落としが互いの残りクールダウンを2秒ではなく3秒短縮します。",
+        "bonus4": "暁の憤怒の効果中に放つヘイマー・オヴ・ラースのダメージが20%ではなく40%増加します。"
       }
     }
   },

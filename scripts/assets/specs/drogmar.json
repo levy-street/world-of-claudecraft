@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/_Mob_Updates/built/drogmar_v02.glb",
+      "out": "models/creatures/drogmar.glb",
+      "type": "character",
+      "keepClips": ["Idle", "CombatIdle", "Walk", "Run", "Attack", "Hit", "Death"]
+    }
+  ]
+}

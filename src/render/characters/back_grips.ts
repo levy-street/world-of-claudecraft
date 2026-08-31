@@ -102,6 +102,12 @@ const BACK_GRIPS: Record<string, BackGripSpec> = {
   Round_Shield: { position: [0, 0.24, -0.32], euler: [0, Math.PI, 0] },
   Rectangle_Shield: { position: [0, 0.2, -0.32], euler: [0, Math.PI, 0] },
   Badge_Shield: { position: [0, 0.24, -0.32], euler: [0, Math.PI, 0] },
+  // The Ignivar legendary shield: same flat-to-spine carry as the KayKit
+  // shields. Its origin is the back grip bar (mid-plate), and the plate is a
+  // full unit tall at the legendary 1.1 grip scale, so it sits LOWER than the
+  // KayKit carries (y 0.05 vs 0.2) to keep the top edge at the shoulder line
+  // instead of poking past the chibi head.
+  Varkhul_Bulwark: { position: [0, 0.05, -0.36], euler: [0, Math.PI, 0] },
 };
 
 /** The grip families that have a tuned on-back carry. Every family the character

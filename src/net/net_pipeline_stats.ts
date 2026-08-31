@@ -47,7 +47,10 @@ export interface NetPipelineSummary {
   // Optional for compatibility with persisted pre-backpressure summaries.
   // New summaries always include this fixed-size client send diagnostic.
   inputBackpressure?: { sheds: number; peakBufferedBytes: number };
+  reconcile?: { match: number; replayed: number; ignored: number; stale: number; suspends: number };
 }
+
+export type NetReconcileOutcome = 'match' | 'replayed' | 'ignore' | 'stale' | 'suspend';
 
 const RING_CAPACITY = 1024;
 
@@ -107,6 +110,7 @@ export class NetPipelineStats {
   private histogram = { r0: 0, r1: 0, r2: 0, r3plus: 0 };
   private inputBackpressureSheds = 0;
   private inputBackpressurePeakBytes = 0;
+  private reconcileOutcomes = { match: 0, replayed: 0, ignored: 0, stale: 0, suspends: 0 };
   // Injected-clock bookkeeping, public for dev-console diagnostics only; the
   // summary record stays fixed-size without them.
   lastSnapshotAtMs = 0;
@@ -161,6 +165,12 @@ export class NetPipelineStats {
     this.inputBackpressurePeakBytes = Math.max(this.inputBackpressurePeakBytes, boundedBytes);
   }
 
+  noteReconcileOutcome(outcome: NetReconcileOutcome): void {
+    if (outcome === 'ignore') this.reconcileOutcomes.ignored++;
+    else if (outcome === 'suspend') this.reconcileOutcomes.suspends++;
+    else this.reconcileOutcomes[outcome]++;
+  }
+
   summary(): NetPipelineSummary {
     return {
       snapshots: this.snapshots,
@@ -176,6 +186,7 @@ export class NetPipelineStats {
         sheds: this.inputBackpressureSheds,
         peakBufferedBytes: this.inputBackpressurePeakBytes,
       },
+      reconcile: { ...this.reconcileOutcomes },
     };
   }
 }

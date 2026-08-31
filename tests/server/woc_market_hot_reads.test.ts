@@ -1208,6 +1208,10 @@ describe('production wiring (server/main.ts, source-pinned)', () => {
     // The extract-side serialize cost, the number the SAVE_IDLE sizing
     // argument rests on.
     expect(code).toContain('escrowSerialize: wocEscrowSerializeStats()');
+    // The custody mail overlay readout: pendingBake plus the last merge's
+    // counts and ok flag, the stuck-parcel signal an operator needs without
+    // a log grep.
+    expect(code).toContain('custodyOverlay: custodyOverlayStats()');
     // The character-save FIFO gauge reads the queue's live key count.
     expect(code).toContain('savePendingKeys: () => game.characterSaveQueues.pendingKeys()');
     // The drain rung's wiring: shutdown calls markDraining() first, and the

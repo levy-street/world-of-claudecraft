@@ -15,6 +15,7 @@ import {
   destroyConsumesSpecialCopy,
   isEnchantReagentItem,
   isSpecialCopy,
+  vendorSellContextActions,
 } from '../src/ui/bag_item_context_menu';
 
 function def(kind: string, quality?: string): ItemDef {
@@ -190,5 +191,29 @@ describe('bag_item_context_menu: confirm escalation predicate', () => {
   it('never warns when no copies are held at all', () => {
     expect(destroyConsumesSpecialCopy('disenchant', [])).toBe(false);
     expect(destroyConsumesSpecialCopy('salvage', [])).toBe(false);
+  });
+});
+
+describe('bag_item_context_menu: vendor Sell all row', () => {
+  it('offers only the classic Sell row when a single copy is held', () => {
+    expect(vendorSellContextActions(1)).toEqual([
+      { id: 'default', labelKey: 'hudChrome.itemMenu.sell' },
+    ]);
+  });
+
+  it('adds a Sell all row carrying the held total once more than one copy is held', () => {
+    expect(vendorSellContextActions(23)).toEqual([
+      { id: 'default', labelKey: 'hudChrome.itemMenu.sell' },
+      { id: 'sellAll', labelKey: 'hudChrome.itemMenu.sellAll', count: 23 },
+    ]);
+  });
+
+  it('never offers the enchanting-profession rows (a vendor never grants them)', () => {
+    const ids = vendorSellContextActions(5).map((row) => row.id);
+    expect(ids).not.toContain('disenchant');
+    expect(ids).not.toContain('salvage');
+    expect(ids).not.toContain('applyEnchant');
+    expect(ids).not.toContain('lock');
+    expect(ids).not.toContain('unlock');
   });
 });

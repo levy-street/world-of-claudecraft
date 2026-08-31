@@ -19,7 +19,11 @@
 // Renderer constructor). Hideables built later, notably the dungeon arena walls
 // emitted when an instance interior is built, are not in the scene when the
 // prewarm runs; their first fade goes through the fade gate instead
-// (occluder_fade_gate.ts), which links the twin before the flip.
+// (occluder_fade_gate.ts), which links the twin before the flip, and the raid
+// shells' backface walls stage their twins through the same gate on their
+// first advanced frame (stageOccluderFadeOnce in dungeon_wall_occlusion.ts)
+// and hold their re-show out of the fully hidden state until every twin is
+// ready, so the flip never draws a program the stage has not linked.
 //
 // One twin per distinct PROGRAM, not per ghost material: see
 // occluderGhostVariantKey for why a town of thousands of per-structure clones

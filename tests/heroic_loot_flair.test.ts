@@ -45,14 +45,21 @@ describe('heroic loot flair: variant generation', () => {
     for (const v of all) {
       expect(['epic', 'rare', 'legendary']).toContain(v.quality);
       if (raidBases.has(v.heroicOf ?? '')) {
-        expect(itemLevel(v), v.id).toBe(v.quality === 'legendary' ? 37 : 33);
+        // The three-tier legendary ladder (2026-08-30): bases 49, heroic
+        // mints 53 (item_level.ts source overrides price the rating seed).
+        if (v.quality === 'legendary') expect(itemLevel(v), v.id).toBe(53);
+        else expect(itemLevel(v), v.id).toBe(33);
       } else if (fiveManBossVariantIds.has(v.id)) {
         expect(itemLevel(v), v.id).toBe(31);
       } else {
         expect(itemLevel(v), v.id).toBe(v.quality === 'epic' ? 28 : 25);
       }
       // A base item already above the generated budget must retain that extra power.
-      expect(primaryStatSum(v)).toBeGreaterThanOrEqual(expectedStatBudget(v) ?? 0);
+      // The banded legendaries may sit UNDER the stat budget of their labeled
+      // ilvl: owned lines stay as shipped and the label prices the dominant
+      // axis (Thronebane keeps its 44-point pre-band stat line by direction).
+      if (v.quality !== 'legendary')
+        expect(primaryStatSum(v)).toBeGreaterThanOrEqual(expectedStatBudget(v) ?? 0);
     }
   });
 

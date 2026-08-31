@@ -28,6 +28,8 @@ import {
   occluderFadeReady,
   occluderFadeRecordFor,
   prefetchOccluderFade,
+  prefetchOccluderFadeWithin,
+  stageOccluderFadeOnce,
 } from '../src/render/occluder_fade';
 import { OCCLUDER_FADE_ALPHA, OCCLUDER_FADE_PREFETCH_YD } from '../src/render/occluder_fade_core';
 import {
@@ -357,6 +359,30 @@ describe('prefetch', () => {
     const cinematic = read('src/game/spawn_cinematic.ts');
     expect(cinematic).toContain('startDist: 55');
   });
+
+  it('stageOccluderFadeOnce asks once for every record, unconditionally, on the shared latch', () => {
+    const { host, compiles } = fakeHost();
+    installOccluderFadeGate(host);
+    const stone = new THREE.MeshStandardMaterial({ name: 'stone' });
+    const banner = new THREE.MeshLambertMaterial({ name: 'banner' });
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const mats = [
+      occluderFadeMat(stone, new THREE.InstancedMesh(geometry, stone, 2)),
+      occluderFadeMat(banner, new THREE.Mesh(geometry, banner)),
+    ];
+    stageOccluderFadeOnce(mats);
+    // No distance argument at all: the stage never consults the reach.
+    expect(compiles).toHaveLength(2);
+    expect(compiles.map((c) => c.imminent)).toEqual([false, false]);
+    expect(occluderFadeTwinCount()).toBe(2);
+    // Latched once per structure ...
+    stageOccluderFadeOnce(mats);
+    expect(compiles).toHaveLength(2);
+    // ... on the SAME latch the within-reach prefetch uses: a staged
+    // structure never asks again when it later comes within reach.
+    prefetchOccluderFadeWithin(mats, 0, 0, 0, 0);
+    expect(compiles).toHaveLength(2);
+  });
 });
 
 describe('the instanced-ghost pool', () => {
@@ -450,7 +476,6 @@ describe('wiring (source pins)', () => {
       'src/render/eastbrook_town.ts',
       'src/render/fenbridge_town.ts',
       'src/render/hollow_gates.ts',
-      'src/render/arena_wall_fade.ts',
     ]) {
       const src = read(file);
       expect(src, file).toContain('advanceOccluderFade(');
@@ -458,12 +483,61 @@ describe('wiring (source pins)', () => {
       expect(src, file).not.toContain('stepOccluderFade(');
       if (file !== 'src/render/props.ts') expect(src, file).not.toContain('applyOccluderFade(');
     }
-    // The dungeon drives its arena walls through the extracted module only.
+    // The dungeon drives its walls through the extracted module only.
     const dungeon = read('src/render/dungeon.ts');
-    expect(dungeon).toContain('advanceArenaWallFades(');
+    expect(dungeon).toContain('updateWallOcclusion(');
     expect(dungeon).not.toContain('stepOccluderFade(');
     expect(dungeon).not.toContain('applyOccluderFade(');
     expect(dungeon).not.toContain('advanceOccluderFade(');
+    // The wall driver gates every sightline fade; the raid backface cull is
+    // the pinned exception (its hide frame never draws the transparent twin,
+    // it hides the group outright, and gating the ease-back while VISIBLE
+    // would pop the re-shown wall opaque; rationale in
+    // dungeon_wall_occlusion.ts). The exception is paid for two ways: the
+    // arm's first advanced frame STAGES a twin for every record it will
+    // flip, and the re-show out of the fully hidden state CONSULTS
+    // readiness (an edge consult, so a pending prefetch escalates) and
+    // holds the wall hidden until every exact twin is ready. The staged
+    // set, the consulted set, and the flipped set are pinned to the SAME
+    // expression (h.mats): a backface material a registration adds lands in
+    // h.mats or the flip cannot touch it either. Exactly the two floor
+    // steps (wall arm, prop arm), the one wall-arm apply, the one
+    // unconditional stage, and the one re-show readiness consult.
+    const walls = read('src/render/dungeon_wall_occlusion.ts');
+    expect(walls).toContain('advanceOccluderFade(');
+    expect(walls).toContain('prefetchOccluderFadeWithin(');
+    expect(walls.match(/stepOccluderFade\(/g)).toHaveLength(2);
+    expect(walls).toContain('stepOccluderFade(h.alpha, hide, dt, reducedMotion, 0)');
+    expect(walls).toContain('stepOccluderFade(b.alpha, hide, dt, reducedMotion, 0)');
+    expect(walls.match(/applyOccluderFade\(/g)).toHaveLength(1);
+    expect(walls.match(/stageOccluderFadeOnce\(/g)).toHaveLength(1);
+    expect(walls).toContain('stageOccluderFadeOnce(h.mats)');
+    expect(walls).toContain('applyOccluderFade(h.mats, h.alpha)');
+    // The re-show flip consults readiness while the wall is still fully
+    // hidden (alpha 0), and only there: the hold cannot pop what is not
+    // showing, and a mid-ease (visible) wall never waits.
+    expect(walls.match(/occluderFadeReady\(/g)).toHaveLength(1);
+    expect(walls).toContain("!occluderFadeReady(h.mats, 'edge')");
+    expect(walls).toContain(
+      "if (h.alpha === 0 && next > 0 && next < 1 && !occluderFadeReady(h.mats, 'edge')) continue;",
+    );
+    // The consult sits AFTER the step and BEFORE the apply: it decides
+    // whether this frame writes, never how far the fade has eased.
+    expect(walls.indexOf("!occluderFadeReady(h.mats, 'edge')")).toBeLessThan(
+      walls.indexOf('applyOccluderFade(h.mats, h.alpha)'),
+    );
+    // The stage sits BEFORE the settled early-out, so it cannot wait on the
+    // first hide: a wall whose camera starts inside is staged all the same.
+    expect(walls.indexOf('stageOccluderFadeOnce(h.mats)')).toBeLessThan(
+      walls.indexOf('occluderFadeSettled(h.alpha, hide, 0)'),
+    );
+    // The prop arm restores off the WALL's recovered alpha, never its own
+    // proxy clock alone: a wall held for readiness keeps its mounted props
+    // held with it. The lazy owner-plus-plane link runs on the binding's
+    // first advanced frame so the cover consult always has a wall to read.
+    expect(walls).toContain('wallPropCoverAlpha(b) >= WALL_PROP_SHOW_ALPHA');
+    expect(walls).not.toContain('b.alpha >= WALL_PROP_SHOW_ALPHA');
+    expect(walls).toContain('if (b.walls === undefined) linkWallPropBinding(b, hideables);');
     // The one direct write left: the far-mode restore to the authored state,
     // which never flips to transparent and so never needs the gate.
     const props = read('src/render/props.ts');

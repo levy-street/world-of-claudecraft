@@ -1145,6 +1145,13 @@
     overflow-wrap: anywhere;
     text-shadow: 1px 1px 1px #000;
   }
+  /* Bind-on-pickup note under the item name on a roll prompt: the soulbound
+     gold the item tooltip's bound lines use, small so the name stays primary. */
+  .loot-roll-bind {
+    color: var(--gold);
+    font-size: 11px;
+    text-shadow: 1px 1px 1px #000;
+  }
   .loot-roll-timer {
     height: 7px;
     margin: 7px 0;

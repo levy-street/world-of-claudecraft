@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { onCastCompleted } from '../src/sim/combat/talent_procs';
 import { MOBS } from '../src/sim/data';
-import { equipBestInSlotForDev } from '../src/sim/dev/bis_gear';
+import { equipReferenceEpicKitForDev } from '../src/sim/dev/bis_gear';
 import { resetCombatForDev } from '../src/sim/dev_commands';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
@@ -331,8 +331,8 @@ describe('Skulduggery: the Gloam bank and its detonation', () => {
     (sim as unknown as { addEntity(e: Entity): void }).addEntity(mob);
     sim.targetEntity(mob.id);
     p.facing = 0;
-    equipBestInSlotForDev(
-      (sim as unknown as { ctx: Parameters<typeof equipBestInSlotForDev>[0] }).ctx,
+    equipReferenceEpicKitForDev(
+      (sim as unknown as { ctx: Parameters<typeof equipReferenceEpicKitForDev>[0] }).ctx,
       p.id,
     ); // Lurker's Strike requires a dagger
     p.critChance = 0; // crits keep kind 'hit' (crit flag), so pin them off

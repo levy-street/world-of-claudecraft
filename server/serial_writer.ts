@@ -6,10 +6,42 @@
 // freshest snapshot, so an out-of-order commit can never roll a shared blob back
 // over a newer one. A rejecting write is surfaced to its own caller but never
 // blocks the writes queued behind it.
-export function createSerialWriter(): <T>(write: () => Promise<T>) => Promise<T> {
+/**
+ * @param onWrite optional observer of each write's SYNCHRONOUS cost, in ms: the
+ *   part of the thunk that runs before its first await. That is where the shared
+ *   blob is built and stringified (the caller reads the snapshot inside the thunk,
+ *   see above), and it runs on the main thread. It is deliberately measured HERE
+ *   rather than at the enqueue site: `tail.then` defers the thunk to a microtask,
+ *   so a timer wrapped around the enqueue call sees the bookkeeping and nothing
+ *   else (measured: 0.02 ms around an enqueue whose write then blocked 250 ms).
+ *   The observer never throws into the write; a throwing observer would fail a
+ *   persistence write for a measurement.
+ */
+export function createSerialWriter<WriteContext = unknown>(
+  onWrite?: (syncMs: number, context: WriteContext | undefined) => void,
+): <T>(write: () => Promise<T>, context?: WriteContext) => Promise<T> {
   let tail: Promise<unknown> = Promise.resolve();
-  return <T>(write: () => Promise<T>): Promise<T> => {
-    const run = tail.then(write, write);
+  const timed = onWrite
+    ? <T>(write: () => Promise<T>, context: WriteContext | undefined): Promise<T> => {
+        const started = process.hrtime.bigint();
+        try {
+          return write();
+        } finally {
+          try {
+            onWrite(Number(process.hrtime.bigint() - started) / 1e6, context);
+          } catch {
+            /* an observer must never break a persistence write */
+          }
+        }
+      }
+    : undefined;
+  return <T>(write: () => Promise<T>, context?: WriteContext): Promise<T> => {
+    const run = timed
+      ? tail.then(
+          () => timed(write, context),
+          () => timed(write, context),
+        )
+      : tail.then(write, write);
     tail = run.catch(() => {});
     return run;
   };
@@ -84,19 +116,47 @@ interface KeyedWriteEntry<K> {
 // warns (rate-limited to once a minute) past `warnDepth`. GameServer's shared
 // market writer rides this so a dirty-book autosave pile-up is loud before it
 // becomes save latency; the message is the wrapper's one behavior, so it is
-// caller-supplied and unchanged by this move.
-export interface DepthWarnedSerialWriter {
-  <T>(write: () => Promise<T>): Promise<T>;
+// caller-supplied and unchanged by this move. `onWrite` observes the same
+// synchronous write window createSerialWriter reports, applied here because the
+// inner keyed writer takes no observer of its own.
+export interface DepthWarnedSerialWriter<WriteContext = unknown> {
+  <T>(write: () => Promise<T>, context?: WriteContext): Promise<T>;
   /** Cancel a queued shared-resource write before it starts. Once running, the
    *  job receives the caller-owned signal and owns active-I/O cancellation. */
-  enqueueCancellable<T>(signal: AbortSignal, write: () => Promise<T>): Promise<T>;
+  enqueueCancellable<T>(
+    signal: AbortSignal,
+    write: () => Promise<T>,
+    context?: WriteContext,
+  ): Promise<T>;
 }
 
-export function createDepthWarnedSerialWriter(
+export function createDepthWarnedSerialWriter<WriteContext = unknown>(
   warnDepth: number,
   message: (depth: number) => string,
-): DepthWarnedSerialWriter {
+  onWrite?: (syncMs: number, context: WriteContext | undefined) => void,
+): DepthWarnedSerialWriter<WriteContext> {
   const writer = createKeyedSerialWriter<'shared'>();
+  // Same contract as createSerialWriter's own shim: time the SYNCHRONOUS window
+  // only (the finally runs when write() returns its promise, not when that
+  // promise settles), and never let an observer throw into a persistence write.
+  const observed = <T>(
+    write: () => Promise<T>,
+    context: WriteContext | undefined,
+  ): (() => Promise<T>) => {
+    if (!onWrite) return write;
+    return () => {
+      const started = process.hrtime.bigint();
+      try {
+        return write();
+      } finally {
+        try {
+          onWrite(Number(process.hrtime.bigint() - started) / 1e6, context);
+        } catch {
+          /* an observer must never break a persistence write */
+        }
+      }
+    };
+  };
   let depth = 0;
   let lastWarnMs = 0;
   const track = <T>(enqueue: () => Promise<T>): Promise<T> => {
@@ -109,10 +169,16 @@ export function createDepthWarnedSerialWriter(
       depth--;
     });
   };
-  const enqueue = (<T>(write: () => Promise<T>): Promise<T> =>
-    track(() => writer.enqueue('shared', write))) as DepthWarnedSerialWriter;
-  enqueue.enqueueCancellable = <T>(signal: AbortSignal, write: () => Promise<T>): Promise<T> =>
-    track(() => writer.enqueueCancellable('shared', signal, write));
+  const enqueue = (<T>(write: () => Promise<T>, context?: WriteContext): Promise<T> =>
+    track(() =>
+      writer.enqueue('shared', observed(write, context)),
+    )) as DepthWarnedSerialWriter<WriteContext>;
+  enqueue.enqueueCancellable = <T>(
+    signal: AbortSignal,
+    write: () => Promise<T>,
+    context?: WriteContext,
+  ): Promise<T> =>
+    track(() => writer.enqueueCancellable('shared', signal, observed(write, context)));
   return enqueue;
 }
 

@@ -332,6 +332,11 @@ export function planStreetlamps(
 /** A planned site with the fixture identity resolved onto it. */
 export interface PlacedStreetlamp extends LampSite {
   style: StreetlampStyleId;
+  /** Hand-placed venue fixture (the Forgefather fortress lamps): stands
+   *  off the road network by design, so the road-relative layout
+   *  invariants (roadside clearance band, network spacing, road-facing
+   *  yaw) do not apply; its spacing is the owner's placement, verbatim. */
+  authored?: boolean;
 }
 
 /** The zone facts a site needs to know which fixture stands on it. */

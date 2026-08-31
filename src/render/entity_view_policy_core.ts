@@ -66,7 +66,15 @@ export function entityViewCandidatePriority(entity: Entity, player: Entity, d2: 
   if (entity.kind === 'npc' && d2 <= 45 * 45) return 1;
   const landmarkPriority = interactionLandmarkViewPriority(entity.templateId, d2);
   if (landmarkPriority !== null) return landmarkPriority;
-  if (entity.kind === 'object' && (entity.lootable || isPersistentPortalObject(entity))) return 2;
+  // bg_flag/bg_rune are always lootable:false (bg_flag_interact.ts) but a
+  // carried flag's position is actionable info that must never lag behind on
+  // a saturated view pool (the graphics-fairness invariant), so they keep the
+  // same priority tier an ordinary lootable object gets.
+  if (
+    entity.kind === 'object' &&
+    (entity.lootable || isPersistentPortalObject(entity) || entity.templateId?.startsWith('bg_'))
+  )
+    return 2;
   if (entity.kind === 'player') return 3;
   if (entity.kind === 'mob' && entity.hostile) return 4;
   if (entity.kind === 'mob') return 5;

@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Nhẫn Rạn Nứt',
     desc: 'Những chiếc nhẫn Rạn Nứt riêng, đúc cho mọi nhà vô địch trong tổ đội giành lượt hoàn thành đầu tiên của một Rạn Nứt xếp hạng. Mỗi nhân vật chỉ có thể giữ của riêng mình.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Chiến lợi phẩm sử thi từ Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Anh Hùng: Crucible of the Last Spring',
+    desc: 'Vũ khí chỉ rơi ở chế độ anh hùng từ Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Chiến lợi phẩm sử thi từ Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Anh Hùng: The Inner Crucible',
+    desc: 'Khiên và vũ khí chỉ rơi ở chế độ anh hùng từ Varkhul, Forgefather of the Last Flame.',
+  },
 };

@@ -204,6 +204,42 @@ describe('interior encounter prewarm pass (driven)', () => {
     expect(host.compiled.length).toBe(afterFirst);
   });
 
+  it('compiles and retains Varkhul, pillars, Tempering Ray, portals, and the Assembly', async () => {
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toContain('varkhul-encounter-prewarm-entity');
+    expect(host.compiled).toContain('varkhul-assembly-prewarm');
+    expect(host.compiled).toContain('varkhul-forge-beam-prewarm');
+    expect(host.compiled).toContain('varkhul-tempering-ray-prewarm');
+    expect(host.compiled).toContain('varkhul-forge-portal-prewarm');
+    expect(host.compiled).toContain('varkhul-worldfire-prewarm');
+
+    const afterFirst = host.compiled.length;
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toHaveLength(afterFirst);
+  });
+
+  it('compiles and retains the Ignivar mechanic visuals beside the Varkhul set', async () => {
+    // These are otherwise built lazily during per-frame encounter sync, after
+    // the view compile-gate enumeration, so first mechanic onset would link
+    // their programs (the unique Judgment charred-ground shader included) in a
+    // live frame. Each staged unit compiles as its own child of the pass group.
+    const host = fakeHost();
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toContain('ignivar-encounter-prewarm-entity');
+    expect(host.compiled).toContain('ignivar-rotating-rays-prewarm');
+    expect(host.compiled).toContain('ignivar-forge-judgment-prewarm');
+
+    // A second attach of the same interior rebuilds and recompiles nothing.
+    const afterFirst = host.compiled.length;
+    startInteriorEncounterPrewarm('ignivar_depths', host);
+    await drain();
+    expect(host.compiled).toHaveLength(afterFirst);
+  });
+
   it('retries an interior whose first prewarm pass failed', async () => {
     // The interior key is claimed BEFORE the work runs, so without the failure
     // arm giving it back a pass that rejected (a compile that threw, a queue

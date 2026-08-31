@@ -14,15 +14,18 @@ const SNAP = 0.01;
 /**
  * Advance one occluder's fade alpha. Occlusion snaps to the ghost target on
  * the first frame so information timing is tier-independent; restoration is
- * exponential unless reduced motion asks for a direct state change.
+ * exponential unless reduced motion asks for a direct state change. `floor`
+ * is the occluded resting alpha: the default 20% ghost, or 0 for the raid
+ * shells' backface cull, which hides the wall outright.
  */
 export function stepOccluderFade(
   alpha: number,
   occluded: boolean,
   dt: number,
   reducedMotion = false,
+  floor = OCCLUDER_FADE_ALPHA,
 ): number {
-  const target = occluded ? OCCLUDER_FADE_ALPHA : 1;
+  const target = occluded ? floor : 1;
   const start = Number.isFinite(alpha) ? Math.min(1, Math.max(0, alpha)) : 1;
   if (dt <= 0) return start;
   if (occluded || reducedMotion) return target;
@@ -31,8 +34,12 @@ export function stepOccluderFade(
 }
 
 /** Whether a fade is at rest for its current occlusion state (no work left). */
-export function occluderFadeSettled(alpha: number, occluded: boolean): boolean {
-  return alpha === (occluded ? OCCLUDER_FADE_ALPHA : 1);
+export function occluderFadeSettled(
+  alpha: number,
+  occluded: boolean,
+  floor = OCCLUDER_FADE_ALPHA,
+): boolean {
+  return alpha === (occluded ? floor : 1);
 }
 
 /**

@@ -618,3 +618,46 @@ describe('stale-client fallback wiring (source pins)', () => {
     expect(code.split('unknownItemIconHtml(').length - 1).toBe(3);
   });
 });
+
+describe('bind-on-pickup note on roll prompts', () => {
+  // heroic_mark is a live soulbound def; the note must be readable BEFORE the
+  // player rolls (they are choosing whether to take a binding drop).
+  const soulboundEvent = (): Extract<SimEvent, { type: 'lootRoll' }> => ({
+    type: 'lootRoll',
+    rollId: 7,
+    itemId: 'heroic_mark',
+    itemName: 'Heroic Mark',
+    quality: 'epic',
+    expiresAt: 60_000,
+  });
+
+  it('renders the note on a need/greed prompt for a soulbound item', () => {
+    const test = harness();
+    test.controller.showRoll(soulboundEvent());
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement | null;
+    expect(row?.innerHTML).toContain('loot-roll-bind');
+    expect(row?.innerHTML).toContain('Binds when picked up');
+  });
+
+  it('renders no note for an ordinary item', () => {
+    const test = harness();
+    test.controller.showRoll(rollEvent());
+    const row = test.root.querySelector<HTMLElement>('.loot-roll') as unknown as LootElement | null;
+    expect(row?.innerHTML).not.toContain('loot-roll-bind');
+  });
+
+  it('renders the note on the master-loot curate row too', () => {
+    const test = harness();
+    const { type: _needGreedType, ...soulboundFields } = soulboundEvent();
+    test.controller.showMasterRoll({
+      ...soulboundFields,
+      type: 'masterLoot',
+      candidates: [
+        { pid: 2, name: 'Aki' },
+        { pid: 3, name: 'Bex' },
+      ],
+    });
+    const row = test.root.querySelector<HTMLElement>('.master') as unknown as LootElement | null;
+    expect(row?.innerHTML).toContain('Binds when picked up');
+  });
+});

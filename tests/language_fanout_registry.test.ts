@@ -106,6 +106,7 @@ const FANOUT_ARMS: readonly string[] = [
   'this.delveTracker.relocalize|',
   'this.riftTracker.relocalize|',
   'this.partyFramesPainter.relocalize|',
+  'this.raidBossGuideWindow.relocalize|',
   'this.mapPainter.relocalize|',
   'this.delvePainter.relocalize|',
   'this.riftPainter.relocalize|',

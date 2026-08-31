@@ -100,6 +100,15 @@ export function buildSfxConformPolicy(catalog, discoveredEntries, sourceFilename
     if (direct) return direct.custom === true;
     const variant = parseCatalogSfxVariantStem(value, catalogKeys);
     if (variant) return catalogByKey.get(variant.key)?.custom === true;
+    // Dynamic mob subfamilies intentionally have no catalog row of their own
+    // (same reason expectedChannelsForStem above falls back for them), so the
+    // two lookups above can never match one. They are hand-recorded overrides
+    // of a family voice, so they inherit that family's row: resolving through
+    // it keeps one source of truth instead of hardcoding the answer here.
+    const mobVariant = parseMobSfxVariantStem(value);
+    if (mobVariant.kind === 'valid') {
+      return catalogByKey.get(`mob_${mobVariant.family}_${mobVariant.action}`)?.custom === true;
+    }
     return false;
   }
 

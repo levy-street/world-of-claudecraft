@@ -839,4 +839,36 @@ describe('coverage: each scenario fires its subsystem', () => {
     );
     expect(lineOfSightErrors).toHaveLength(1);
   });
+
+  it('ignivar_raid_tuning: pins live Heroic rays, final Brands, and wipe cooldown recovery', () => {
+    const rec = run('ignivar_raid_tuning');
+    const notes = rec.notes as Record<string, unknown>;
+    const events = rec.allEvents as Ev[];
+
+    expect(notes.rayHpAfterHit).toBe(500);
+    expect(notes.rayHpAfterAdjacentTick).toBe(500);
+    expect(notes.brandedPlayerIds as number[]).toHaveLength(3);
+    expect(notes.attemptParticipantIds as number[]).toHaveLength(4);
+    expect(notes.longCooldownReset).toBe(true);
+    expect(notes.encounterReset).toBe(true);
+    expect(
+      events.some(
+        (event) =>
+          event.type === 'damage' && event.ability === 'Revolving Inferno' && event.amount === 500,
+      ),
+    ).toBe(true);
+  });
+
+  it('varkhul_raid_tuning: excludes visitors, pins Heroic Forgestorm, and scopes wipe recovery', () => {
+    const rec = run('varkhul_raid_tuning');
+    const notes = rec.notes as Record<string, unknown>;
+
+    expect(notes.prePullParticipantIds).toEqual([]);
+    expect(notes.pullParticipantIds as number[]).toHaveLength(1);
+    expect(notes.forgestormHpAfterImpact).toBe(200);
+    expect(notes.forgestormDamageSeen).toBe(true);
+    expect(notes.visitorCooldownRetained).toBe(true);
+    expect(notes.raiderCooldownReset).toBe(true);
+    expect(notes.encounterReset).toBe(true);
+  });
 });

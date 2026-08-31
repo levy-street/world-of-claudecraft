@@ -371,7 +371,12 @@ describe('SFX production bundle', () => {
     } finally {
       rmSync(installFixture, { recursive: true, force: true });
     }
-  }, 90_000);
+    // Two full bundle builds (each ffprobe-validating every published track)
+    // plus the installer spawns measure ~63s solo on an M-class laptop; under
+    // bounded-worker gate contention the old 90s budget flaked while the SFX
+    // set itself was untouched. 180s keeps a genuine hang loud without
+    // re-flaking on a busy runner.
+  }, 180_000);
 
   it('exports numbered takes in exact round-robin order with runtime mix values', () => {
     const fixture = mkdtempSync(join(tmpdir(), 'woc-sfx-export-round-robin-'));

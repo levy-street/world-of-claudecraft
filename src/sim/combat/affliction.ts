@@ -1,7 +1,9 @@
+import { HEXTHREAD_4PC_SENTENCE_DOOM_REFUND } from '../content/ignivar_set_bonuses';
 import { MOBS } from '../data';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AbilityDef, Aura, Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 import { grantShadowCredit } from './warlock_talents';
 
 export const AFFLICTION_DOOM_MAX = 100;
@@ -485,7 +487,15 @@ export function completeNeedleOfFateCast(ctx: SimContext, warlock: Entity, targe
   grantFateThreads(ctx, warlock, Math.min(FATE_THREAD_MAX, (threads?.stacks ?? 0) + 1));
 }
 
-export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: Entity): void {
+// doomBase comes from the RESOLVED afflictionNeedle payload (authored 7 in
+// content/classes.ts; the Hexthread 2pc rewrite raises it for wearers), so
+// this site and the {needleDoom} tooltip splice read the one number.
+export function resolveNeedleOfFate(
+  ctx: SimContext,
+  warlock: Entity,
+  target: Entity,
+  doomBase: number,
+): void {
   if (!afflictionMeta(ctx, warlock)) return;
   const eye = eyeAura(target, warlock.id);
   if (!eye) return;
@@ -494,7 +504,7 @@ export function resolveNeedleOfFate(ctx: SimContext, warlock: Entity, target: En
     warlock,
     eyeGeneration(
       eye,
-      7 + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0),
+      doomBase + (hasAfflictionPossession(warlock) ? POSSESSED_NEEDLE_DOOM_BONUS : 0),
       warlock,
     ),
   );
@@ -735,6 +745,14 @@ export function resolveSentence(
   if (judgment && (judgment.charges ?? 0) > 0) {
     judgment.charges = Math.max(0, (judgment.charges ?? 0) - 1);
     gainDoom(ctx, warlock, judgment.value);
+  }
+  // Hexthread 4pc (the Crucible set doc): Passing Sentence refunds 10
+  // Condemnation, at the post-consume site, additive beside Hour of
+  // Judgment's once-per-90s charge above (near-moot overlap, stated).
+  // Draws no rng; runs only on a RESOLVED Sentence (the doom < 20 early
+  // return above already filtered).
+  if (wearsSetBonus(ctx, warlock, 'hexthread', 4)) {
+    gainDoom(ctx, warlock, HEXTHREAD_4PC_SENTENCE_DOOM_REFUND);
   }
   let primaryDamage = sharedDamage;
   // Never a training dummy (999,999 hp, "you can never really fell it"): the finisher

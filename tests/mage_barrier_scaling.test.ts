@@ -10,7 +10,13 @@ function castBarrier(
   const sim = new Sim({ seed: 707, playerClass: 'mage', autoEquip: true });
   sim.setPlayerLevel(level);
   expect(sim.setSpec(spec)).toBe(true);
-  if (spellPower !== undefined) sim.player.spellPower = spellPower;
+  if (spellPower !== undefined) {
+    // Absorb riders read the derived healPower (the healPower seam:
+    // healPower = spellPower + flat Healing Power); a direct spellPower poke
+    // bypasses recalcPlayerStats, so mirror the derivation by hand.
+    sim.player.spellPower = spellPower;
+    sim.player.healPower = spellPower;
+  }
   sim.player.resource = sim.player.maxResource;
   const manaBefore = sim.player.resource;
 
@@ -39,7 +45,9 @@ function castTemporalBarrier(
   const ally = sim.entities.get(allyId);
   if (!ally) throw new Error('missing barrier target');
   sim.targetEntity(allyId);
+  // See the harness above: absorbs read the derived healPower.
   sim.player.spellPower = spellPower;
+  sim.player.healPower = spellPower;
 
   sim.castAbility('temporal_barrier');
 

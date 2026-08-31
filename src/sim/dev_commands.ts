@@ -1,12 +1,18 @@
 import { applyCourserDaze } from './combat/hunter_shared';
 import { DEV_KIT_ROLES, devKitRole } from './content/dev_kit_roles';
-import { MOUNT_KEYS, TRAINING_MOUNT_KEY } from './content/mounts';
+import { MOUNT_KEYS } from './content/mounts';
 import { GATHERING_PROFESSIONS } from './content/professions';
 import { DUNGEONS, ITEMS, MOBS, NPCS } from './data';
 import { equipBestInSlotForDev } from './dev/bis_gear';
 import { applyDevKit } from './dev_kit';
 import { createGroundObject, createMob } from './entity';
-import { enterDungeon } from './instances/dungeons';
+import {
+  ignivarDevRaidTravelRoster,
+  setupIgnivarDevRaid,
+  stageIgnivarDevRaidAtApproach,
+} from './ignivar_dev_raid';
+import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from './ignivar_raid_ids';
+import { enterDungeon, instanceInfoAt } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
@@ -21,6 +27,7 @@ import type { SimContext } from './sim_context';
 import { bgQueueJoin, bgQueueSize, devEndBg, devStartBg } from './social/battleground';
 import { revivePlayerAt } from './spirit';
 import { MAX_LEVEL, type RiftTier } from './types';
+import { setupVarkhulDevRaid } from './varkhul_dev_raid';
 
 const MAX_DEV_SPAWNS = 20;
 const DEV_SPAWN_RADIUS = 4;
@@ -430,10 +437,25 @@ export function handleDevChat(
     return null;
   }
 
-  if (/^\/(?:dev\s+bis|devbis)\s*$/i.test(raw)) {
-    const equipped = equipBestInSlotForDev(ctx, pid);
+  const bisMatch = /^\/(?:dev\s+bis|devbis)(?:\s+(\S+))?\s*$/i.exec(raw);
+  if (bisMatch) {
+    const meta = ctx.players.get(pid);
+    if (!meta) return null;
+    const spec = bisMatch[1] ?? meta.talents.spec ?? null;
+    if (spec && !devKitRole(meta.cls, spec)) {
+      const known = (DEV_KIT_ROLES[meta.cls] ?? []).map((role) => role.spec).join(', ');
+      ctx.error(pid, `[dev] '${spec}' is not a ${meta.cls} spec. Try: ${known}.`);
+      return null;
+    }
+    const equipped = equipBestInSlotForDev(ctx, pid, spec ?? undefined);
     if (equipped === 0) ctx.error(pid, '[dev] Could not outfit best-in-slot gear.');
-    else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
+    else if (spec) {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Equipped the top-parse ${meta.cls} ${spec} loadout: ${equipped} pieces.`,
+      );
+    } else emitDevLog(ctx, pid, `[dev] Equipped ${equipped} best-in-slot epic pieces.`);
     return null;
   }
 
@@ -517,8 +539,9 @@ export function handleDevChat(
     }
     const difficulty = dungeonMatch[2]?.toLowerCase() === 'heroic' ? 'heroic' : 'normal';
     ctx.setDungeonDifficulty(difficulty, pid);
-    enterDungeon(ctx, dungeonId, pid, true);
-    emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    if (enterDungeon(ctx, dungeonId, pid, true)) {
+      emitDevLog(ctx, pid, `[dev] Entering ${dungeonId} (${difficulty}).`);
+    }
     return null;
   }
 
@@ -698,10 +721,130 @@ export function handleDevChat(
     if (entity) {
       entity.devGod = !entity.devGod;
       if (entity.devGod) {
+        entity.profilerInvulnerable = false;
         entity.hp = entity.maxHp;
         entity.resource = entity.maxResource;
       }
       emitDevLog(ctx, pid, `[dev] God mode ${entity.devGod ? 'ON' : 'OFF'}.`);
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+noaggro|devnoaggro)\s*$/i.test(raw)) {
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      entity.devNoAggro = !entity.devNoAggro;
+      emitDevLog(
+        ctx,
+        pid,
+        entity.devNoAggro
+          ? '[dev] No-aggro ON: mobs will not pull you (position them freely).'
+          : '[dev] No-aggro OFF.',
+      );
+    }
+    return null;
+  }
+
+  if (/^\/(?:dev\s+immortal|devimmortal)\s*$/i.test(raw)) {
+    const entity = ctx.entities.get(pid);
+    if (entity) {
+      entity.profilerInvulnerable = !entity.profilerInvulnerable;
+      if (entity.profilerInvulnerable) {
+        entity.devGod = false;
+        entity.hp = entity.maxHp;
+        entity.resource = entity.maxResource;
+      }
+      emitDevLog(
+        ctx,
+        pid,
+        entity.profilerInvulnerable
+          ? '[dev] Immortal mode ON (normal outgoing damage).'
+          : '[dev] Immortal mode OFF.',
+      );
+    }
+    return null;
+  }
+
+  const ignivarRaidMatch = raw.match(/^\/(?:dev\s+ignivarraid|devignivarraid)(?:\s+(boss))?\s*$/i);
+  if (ignivarRaidMatch) {
+    const player = ctx.entities.get(pid);
+    const currentRoom = player ? instanceInfoAt(ctx, player.pos)?.dungeonId : null;
+    const skipToBoss = ignivarRaidMatch[1]?.toLowerCase() === 'boss';
+    if (currentRoom === IGNIVAR_FORGE_APPROACH_ID && !skipToBoss) {
+      const result = stageIgnivarDevRaidAtApproach(ctx, pid);
+      if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+      else
+        emitDevLog(
+          ctx,
+          pid,
+          '[dev] Ignivar approach formation reset. Use /dev ignivarraid boss to move the practice raid directly to Ignivar.',
+        );
+      return null;
+    }
+    if (currentRoom !== IGNIVAR_RAID_ARENA_ID && !skipToBoss) {
+      ctx.setDungeonDifficulty('normal', pid);
+      if (!enterDungeon(ctx, IGNIVAR_RAID_ARENA_ID, pid, true)) return null;
+      const result = setupIgnivarDevRaid(ctx, pid);
+      if (!result.ok) {
+        ctx.error(pid, `[dev] ${result.message}`);
+        return null;
+      }
+      const raid = ctx.partyOf(pid);
+      if (!raid) {
+        ctx.error(pid, '[dev] The Ignivar test raid did not form.');
+        return null;
+      }
+      for (const memberId of raid.members) {
+        enterDungeon(ctx, IGNIVAR_FORGE_APPROACH_ID, memberId, true);
+      }
+      const staged = stageIgnivarDevRaidAtApproach(ctx, pid);
+      if (!staged.ok) {
+        ctx.error(pid, `[dev] ${staged.message}`);
+        return null;
+      }
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Ignivar raid ready: ${result.allies} stationary, invulnerable allies entered the Halls of the First Tempering in a spread formation. Defeat all five automaton packs to open the Herald gate, then use /dev ignivarraid again in Ignivar's room to place the soak pods. Use /dev ignivarraid boss to skip there now.`,
+      );
+      return null;
+    }
+    if (currentRoom !== IGNIVAR_RAID_ARENA_ID) {
+      if (currentRoom === null) ctx.setDungeonDifficulty('normal', pid);
+      const travelRoster = ignivarDevRaidTravelRoster(ctx, pid);
+      if (!travelRoster.ok) {
+        ctx.error(pid, `[dev] ${travelRoster.message}`);
+        return null;
+      }
+      for (const memberId of travelRoster.memberIds) {
+        if (!enterDungeon(ctx, IGNIVAR_RAID_ARENA_ID, memberId, true)) return null;
+      }
+    }
+    const result = setupIgnivarDevRaid(ctx, pid);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Ignivar raid ${result.reused ? 'reset' : 'ready'}: ${result.allies} stationary, invulnerable allies in spread soak pods. They stay outside Brand range; join the marked pod as the fourth Shared Pyre soaker. On Heroic, Chains of the Forge links all 10 players into five proximity pairs; stay within 10 yards of your partner, and never cross another pair's chain because it severs and kills the intruder.`,
+      );
+    }
+    return null;
+  }
+
+  const varkhulRaidMatch = raw.match(
+    /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
+  );
+  if (varkhulRaidMatch) {
+    const difficulty = varkhulRaidMatch[1]?.toLowerCase() as 'normal' | 'heroic' | undefined;
+    const result = setupVarkhulDevRaid(ctx, pid, difficulty);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Varkhul raid ${result.reused ? 'reset' : 'ready'} (${result.difficulty === 'heroic' ? 'Heroic' : 'Normal'}): ${result.allies} stationary, invulnerable allies spread around the Inner Crucible. Use /dev varkhulraid normal or /dev varkhulraid heroic to rebuild the room at that difficulty.`,
+      );
     }
     return null;
   }
@@ -782,7 +925,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }

@@ -138,3 +138,19 @@ painted pass:
 
 - [v1] `ps_castaway_crate`, Castaway Crate: a salt-bleached slat crate bound in tarred rope, one plank sprung, sand still in its seams.
 - [v1] `ps_ferry_bell`, Ferry Bell: a brass dockside bell on a weathered post bracket, rope pull knotted twice, morning light off the rim.
+
+## The Crucible of the Last Spring raid crests (2026-08-29)
+
+Five new ids from the Ignivar raid deeds pass (the loot PRD's obligations
+closeout), same delivery contract as above: one 512x512 RGBA PNG per deed,
+named exactly by deed id, ingested with `npm run assets:deeds <source-dir>`.
+All five ride the procedural dungeon category crest until the paintings land
+(enumerated in `DEED_ART_PENDING`, `src/ui/icons.ts`).
+
+Dungeon (the Crucible of the Last Spring raid):
+
+- [v1] `dgn_ignivar`, The Herald Falls: Ignivar's molten herald mask cracked through and going dark, sparks dying above sealed spring waters, forge orange on iron black.
+- [v1] `dgn_ignivar_heroic`, Heroic: The Herald Falls: the same cracked herald mask ringed by a gold heroic laurel, its last ember caught inside the wreath.
+- [v1] `dgn_varkhul`, The Forge Goes Cold: Varkhul's great anvil under a raised silent hammer, the forge glow fading to blue-grey ash, one thin line of spring water cutting through the coals.
+- [v1] `dgn_varkhul_heroic`, Heroic: The Forge Goes Cold: the cold anvil and hammer ringed by a gold heroic laurel, frost creeping over the anvil face.
+- [v1] `dgn_varkhul_flawless`, Not One Ember Lost: ten unbroken candle flames in a ring above the forge floor, none guttering, warm gold on deep bronze.

@@ -1,0 +1,14 @@
+{
+  "label": "after",
+  "distances": {
+    "playerToFlag": 1.5,
+    "playerToSoulwell": 2.599999999999909
+  },
+  "soulStonesBefore": 0,
+  "soulStonesAfter": 3,
+  "errorText": "",
+  "checks": {
+    "grantedStone": true,
+    "sawFlagError": false
+  }
+}

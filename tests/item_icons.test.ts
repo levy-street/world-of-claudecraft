@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
+import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import {
   ITEM_ART_PENDING,
@@ -308,7 +309,7 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(123);
+    expect(WEAPON_IMAGE_IDS.size).toBe(133);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -356,9 +357,11 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The Crucible wave is fully painted (crucible-set-icons-2026-08-29), so
+    // the ledger is back to the EMPTY set: no artless item can hide behind an
+    // open wave, and the next commissioned wave re-pins its exact membership
+    // here when it stages.
+    expect([...ITEM_ART_PENDING]).toEqual([]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });

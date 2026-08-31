@@ -20,6 +20,10 @@ export interface XpBarView {
   // portion of the bar the rested bonus will cover). 0 when not rested / at cap.
   restedFrac: number;
   label: string; // hover label
+  // Always-visible echo of the percent already stated inside `label`, so the
+  // bar reads without a hover (mobile has no hover at all). The same computed
+  // value, never a second source of truth.
+  percentText: string;
   postCap: boolean; // true → distinct prestige/gold styling
 }
 
@@ -49,10 +53,12 @@ export function xpBarView(input: XpBarInput): XpBarView {
     // the bonus to come.
     const restedFrac = rested > 0 && need > 0 ? clamp01((xp + rested) / need) - clamp01(frac) : 0;
     const restedLabel = rested > 0 ? `  ·  ${t('game.xp.rested')} +${formatXp(rested)}` : '';
+    const percentText = formatPercent(frac);
     return {
       fillFrac: clamp01(frac),
       restedFrac: Math.max(0, restedFrac),
-      label: `${formatXp(xp)} / ${formatXp(need)} ${t('game.xp.suffix')} (${formatPercent(frac)})${restedLabel}`,
+      label: `${formatXp(xp)} / ${formatXp(need)} ${t('game.xp.suffix')} (${percentText})${restedLabel}`,
+      percentText,
       postCap: false,
     };
   }
@@ -64,6 +70,7 @@ export function xpBarView(input: XpBarInput): XpBarView {
       fillFrac: 1,
       restedFrac: 0,
       label: `${t('game.xp.maxLevel')}  ·  ${formatXp(lifetimeXp)} ${t('game.xp.totalXp')}`,
+      percentText: formatPercent(1),
       postCap: false,
     };
   }
@@ -71,10 +78,17 @@ export function xpBarView(input: XpBarInput): XpBarView {
   // At/after the cap with overflow on: fill toward the next virtual level.
   const prog = virtualLevelProgress(lifetimeXp);
   const extra = prog.level - MAX_LEVEL;
+  const percentText = formatPercent(prog.into / prog.span);
   // FR-3.3 format: "Lv 20 (+7)  ·  1,284,500 total XP  ·  62% to next"
   const label =
     `${t('game.xp.lv')} ${MAX_LEVEL} (+${extra})  ·  ` +
     `${formatXp(lifetimeXp)} ${t('game.xp.totalXp')}  ·  ` +
-    `${formatPercent(prog.into / prog.span)} ${t('game.xp.toNext')}`;
-  return { fillFrac: clamp01(prog.into / prog.span), restedFrac: 0, label, postCap: true };
+    `${percentText} ${t('game.xp.toNext')}`;
+  return {
+    fillFrac: clamp01(prog.into / prog.span),
+    restedFrac: 0,
+    label,
+    percentText,
+    postCap: true,
+  };
 }

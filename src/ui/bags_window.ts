@@ -245,6 +245,10 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   dragState: ItemDragState;
   /** True on the touch HUD: the pointer drag replaces HTML5 drag-and-drop there. */
   isTouchHud(): boolean;
+  /** The confirmVendorSell setting (on by default): whether a vendor sale of
+   *  anything beyond true junk (vendorSellIsInstant) should confirm first.
+   *  False restores the classic one-click instant sale for every item. */
+  confirmVendorSell(): boolean;
   /** Light up (or clear) the paperdoll sockets that accept the stack in flight, so
    *  the drag advertises where it can land. Cleared on every drag teardown. */
   markEquipDropTargets(itemId: string | null): void;
@@ -261,10 +265,12 @@ export interface BagsWindowDeps extends PainterHostPresentation {
    *  RING position; the HUD resolves the underlying bar slot from the live
    *  page at drop time (the paged-ring mapping is HUD state). */
   dropOnActionRingSlot(itemId: string, ringIndex: number): void;
-  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant)
-   *  for a stack at a viewport point. `runDefault` runs the exact classic
-   *  left-click action for the clicked slot, so the menu's first row stays
-   *  byte-identical to a plain click. */
+  /** Open the bag-item action menu (Disenchant / Salvage / Apply Enchant, or
+   *  at an open vendor, Sell / Sell all) for a stack at a viewport point.
+   *  `runDefault` runs the exact classic left-click action for the clicked
+   *  slot, so the menu's first row stays byte-identical to a plain click.
+   *  `vendorSellCount` is every copy of this item held across the bags,
+   *  supplied only when it should show the vendor row set instead. */
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
@@ -273,6 +279,8 @@ export interface BagsWindowDeps extends PainterHostPresentation {
     y: number,
     runDefault: () => void,
     instance?: ItemInstancePayload,
+    vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void;
 }
 
@@ -1053,10 +1061,21 @@ export class BagsWindow {
         // (issue 3042) added Lock/Unlock to every item's menu, this is now
         // ALWAYS available (previously only for Disenchant / Salvage / Apply
         // Enchant items; a plain item tapped straight through). Long-press
-        // still peeks (handled above).
-        if (this.deps.isTouchHud() && this.itemMenuAvailable(item, s.itemId, s.instance)) {
-          this.openItemMenuFor(item, s, ev);
-          return;
+        // still peeks (handled above). At an open vendor the profession menu
+        // is unavailable (itemMenuAvailable excludes it, same as every other
+        // special mode), so a sellable item falls into the vendor row set
+        // instead: touch has no shift-click either, so this is its only way
+        // to reach Sell all.
+        if (this.deps.isTouchHud()) {
+          if (this.itemMenuAvailable(item, s.itemId, s.instance)) {
+            this.openItemMenuFor(item, s, ev);
+            return;
+          }
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+            return;
+          }
         }
         // runBagAction's use/feed/equip/deposit arms call this.render()
         // SYNCHRONOUSLY: the rebuild's focus-restore ladder re-seats focus
@@ -1093,13 +1112,24 @@ export class BagsWindow {
           ev.preventDefault();
           return;
         }
-        // At a vendor, Ctrl/Meta right-click owns the bulk-sell shortcut
-        // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
-        // split-stack quantity prompt).
         if (this.deps.vendorOpen()) {
-          if (!ev.ctrlKey && !ev.metaKey) return;
-          ev.preventDefault();
-          this.sellBagItem(item, s, ev);
+          // Ctrl/Meta right-click keeps its direct bulk-sell shortcut
+          // (sellBagItem's ctrl arm; the SHIFT arm, not this one, owns the
+          // split-stack quantity prompt), unchanged.
+          if (ev.ctrlKey || ev.metaKey) {
+            ev.preventDefault();
+            this.sellBagItem(item, s, ev);
+            return;
+          }
+          // Plain right-click opens the vendor row set (Sell, plus Sell all
+          // when more than one copy is held) for a sellable item; a blocked
+          // or soulbound item falls through to the native browser menu, same
+          // as before this row existed.
+          const vendorSellCount = this.vendorSellMenuCount(item, s);
+          if (vendorSellCount !== undefined) {
+            ev.preventDefault();
+            this.openItemMenuFor(item, s, ev, vendorSellCount);
+          }
           return;
         }
         ev.preventDefault();
@@ -1833,7 +1863,12 @@ export class BagsWindow {
   // Open the action menu at the event's viewport point (falling back to the row
   // box for a keyboard-activated click), passing the exact classic action for
   // this slot as the menu's first row.
-  private openItemMenuFor(item: ItemDef, s: InvSlot, ev: MouseEvent): void {
+  private openItemMenuFor(
+    item: ItemDef,
+    s: InvSlot,
+    ev: MouseEvent,
+    vendorSellCount?: number,
+  ): void {
     this.deps.hideTooltip();
     const rect = (ev.currentTarget as HTMLElement | null)?.getBoundingClientRect();
     const x = ev.clientX || rect?.left || 0;
@@ -1847,7 +1882,22 @@ export class BagsWindow {
       y,
       () => this.runBagAction(item, s, ev),
       s.instance,
+      vendorSellCount,
+      vendorSellCount === undefined
+        ? undefined
+        : () => this.sellAllBagItem(item, s, vendorSellCount),
     );
+  }
+
+  /** N for the vendor right-click/tap menu's Sell all (N) row: every copy of
+   *  this item held across the bags, or undefined when it cannot be
+   *  vendor-sold at all (mirrors bagItemAction's own vendorSell split, so a
+   *  blocked or soulbound item never grows a sell affordance the sim would
+   *  refuse). bagItemAction itself already gates on mode.vendorOpen, so this
+   *  is a no-op outside an open vendor. */
+  private vendorSellMenuCount(item: ItemDef, s: InvSlot): number | undefined {
+    if (bagItemAction(item, this.bagMode(), s.instance) !== 'vendorSell') return undefined;
+    return totalHeldCount(this.deps.world().inventory, s.itemId);
   }
 
   /** The copy selection for a clicked stack, or undefined when the stack is no
@@ -1864,7 +1914,15 @@ export class BagsWindow {
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
     const count = Math.max(1, Math.floor(slot.count));
-    const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
+    // The confirmVendorSell setting folds into the same instant gate
+    // vendorSellIsInstant already uses: turning it off (a player accepting the
+    // risk in exchange for speed) treats every item as instant for
+    // CONFIRMATION purposes, restoring the classic one-click sale. HOW MUCH
+    // sells is still decided below exactly as it already is for true junk
+    // (one unit on a plain click, the whole stack on ctrl/meta).
+    const instant =
+      !this.deps.confirmVendorSell() ||
+      vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);
     if (ev.ctrlKey || ev.metaKey) {
       if (instant) {
         this.deps.world().sellItem(slot.itemId, count);
@@ -1889,6 +1947,15 @@ export class BagsWindow {
       // its stackSize (commonly 20), so a player holding more sits in other slots.
       const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
       this.showSellQuantityPrompt(slot.itemId, heldTotal);
+    } else if (!instant && count > 1) {
+      // Mirrors the ctrl-click arm above: a plain click on a STACK (not true
+      // junk) used to confirm exactly ONE unit per click (showSellConfirmPrompt
+      // never took a quantity), so clearing a whole stack demanded one prompt
+      // PER UNIT. Route through the same bulk quantity prompt instead, so a
+      // single confirmation covers the whole stack (or whatever amount the
+      // player edits it down to).
+      const heldTotal = Math.max(count, totalHeldCount(this.deps.world().inventory, slot.itemId));
+      this.showSellQuantityPrompt(slot.itemId, heldTotal);
     } else if (!instant) {
       // Anything short of true junk (common+ quality, ANY instance payload:
       // an enchant, masterwork bake, signer, bound-to, or lock, or a crafted
@@ -1901,6 +1968,25 @@ export class BagsWindow {
     } else {
       this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
     }
+  }
+
+  private sellAllBagItem(item: ItemDef, slot: InvSlot, count: number): void {
+    const heldTotal = Math.max(1, Math.floor(count));
+    if (this.everyHeldCopyVendorSellIsInstant(item, slot.itemId)) {
+      this.deps.world().sellItem(slot.itemId, heldTotal);
+      return;
+    }
+    this.showSellQuantityPrompt(slot.itemId, heldTotal);
+  }
+
+  private everyHeldCopyVendorSellIsInstant(item: ItemDef, itemId: string): boolean {
+    let matched = false;
+    for (const slot of this.deps.world().inventory) {
+      if (slot.itemId !== itemId) continue;
+      matched = true;
+      if (!vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId)) return false;
+    }
+    return matched;
   }
 
   // WCAG 2.2 AA modal prompt wiring, the shared recipe (src/ui/prompt_dialog.ts):
@@ -1939,7 +2025,9 @@ export class BagsWindow {
       input.min = '1';
       input.max = String(maxCount);
       input.step = '1';
-      input.value = '1';
+      // Defaults to the FULL stack (a new player's expectation of "destroy
+      // this"), pre-filled and still editable for anyone who wants fewer.
+      input.value = String(maxCount);
       prompt.appendChild(input);
     }
     const confirm = document.createElement('button');
@@ -2005,7 +2093,10 @@ export class BagsWindow {
     input.min = '1';
     input.max = String(maxCount);
     input.step = '1';
-    input.value = '1';
+    // Defaults to the FULL held amount (a stray click on the confirm button
+    // sells the whole stack, the obvious intent of clearing it out), still
+    // editable down for anyone who wants to keep some.
+    input.value = String(maxCount);
     const confirm = document.createElement('button');
     confirm.className = 'btn';
     confirm.textContent = t('itemUi.vendor.sellQuantityConfirm');

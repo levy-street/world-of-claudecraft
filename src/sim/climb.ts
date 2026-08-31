@@ -21,7 +21,7 @@ import { MANTLE_REACH, supportHeightAt } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import { PLAYER_BODY_RADIUS } from './pathfind';
 import { findLedgeGrab, LEDGE_GRAB_MAX, LEDGE_GRAB_MIN } from './physics/ledge';
-import { GRAVITY, JUMP_VELOCITY } from './player_motion';
+import { FALL_SAFE_DISTANCE, GRAVITY, JUMP_VELOCITY } from './player_motion';
 import { DT, type Entity, type LedgeClimb } from './types';
 import { groundHeight } from './world';
 
@@ -42,6 +42,24 @@ const CLIMB_RISE_PHASE = 0.62;
 const CLIMB_SETTLE_EPS = 1e-3;
 /** A climb only starts while genuinely airborne and not already rising fast. */
 const CLIMB_MAX_RISE_SPEED = 2.5;
+
+/**
+ * The other end of the same gate: a grab zeroes the body's velocity and
+ * `advanceClimb` rebases `fallStartY` on completion, so catching a plunge
+ * erases its fall damage outright. This is the descent speed the sim's 20 Hz
+ * integrator reaches after exactly FALL_SAFE_DISTANCE of free fall, so a fall
+ * that already hurts can never be caught by a ledge on the way past.
+ *
+ * Derived, not hand-tuned: the discrete step (`vy -= GRAVITY * DT`, then
+ * `pos.y += vy * DT`) covers `(v^2 / GRAVITY + v * DT) / 2` yards by the time
+ * it reaches speed `v`, so the safe speed is the positive root of that at
+ * FALL_SAFE_DISTANCE.
+ */
+const CLIMB_FALL_STEP = GRAVITY * DT;
+export const CLIMB_MAX_FALL_SPEED =
+  (Math.sqrt(CLIMB_FALL_STEP * CLIMB_FALL_STEP + 8 * GRAVITY * FALL_SAFE_DISTANCE) -
+    CLIMB_FALL_STEP) /
+  2;
 
 /**
  * The pull-up is for lips ABOVE YOUR HEAD: a ledge lower than this over the
@@ -76,6 +94,9 @@ export function tryStartClimb(p: Entity, seed: number): boolean {
   // arc short and rob the player of the height they just bought. Wait for the
   // apex, which is also when a real climber's hands reach the lip.
   if (p.vy > CLIMB_MAX_RISE_SPEED) return false;
+  // Falling this fast means the fall is already a damaging one; a grab would
+  // zero the velocity and rebase the fall, refunding the damage for free.
+  if (p.vy < -CLIMB_MAX_FALL_SPEED) return false;
   if (isStunned(p) || isRooted(p)) return false;
   const grab = findLedgeGrab(
     { seed, radius: PLAYER_BODY_RADIUS, facing: p.facing, vx: p.vx, vz: p.vz },

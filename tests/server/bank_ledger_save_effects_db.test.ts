@@ -55,6 +55,7 @@ import {
 import {
   type BankLedgerSaveEffects,
   ensureSchema,
+  openMailPartitionWriteGate,
   openMarketWriteGate,
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
@@ -170,7 +171,30 @@ const STATE = {
   inventory: [],
 } as unknown as CharacterState;
 const MARKET = { listings: [], collections: [], nextListingId: 1 } as MarketSave;
-const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
+// One non-empty recipient partition: these tests assert BOTH escrow
+// world_state writes land (market + mail), and writeMailPartitions issues no
+// SQL at all for an empty array, which would silently drop that half.
+const MAIL_PARTITIONS: { recipientKey: string; letters: MailSave['mail'] }[] = [
+  {
+    recipientKey: 'char-42',
+    letters: [
+      {
+        id: 1,
+        recipientKey: 'char-42',
+        recipientName: 'Testchar',
+        senderName: 'System',
+        kind: 'system',
+        subject: 'Welcome',
+        body: '',
+        copper: 0,
+        items: [],
+        deliverIn: 0,
+        secondsLeft: -1,
+        read: false,
+      },
+    ],
+  },
+];
 
 function guildGoldBatch(batchKey: string, copperDelta: number) {
   const op = copperDelta >= 0 ? ('deposit_gold' as const) : ('withdraw_gold' as const);
@@ -299,6 +323,9 @@ beforeEach(() => {
   h.bootCalls.length = 0;
   h.bootQuery.mockClear();
   openMarketWriteGate();
+  // The fenced leave-path save now persists mail PARTITIONS, whose write is
+  // gated on the boot backfill marker exactly like the market row.
+  openMailPartitionWriteGate();
 });
 
 describe('fenced character save ledger effects', () => {
@@ -372,7 +399,7 @@ describe('fenced character save ledger effects', () => {
         7,
         STATE,
         MARKET,
-        MAIL,
+        MAIL_PARTITIONS,
         'nonce-1',
         undefined,
         undefined,
@@ -659,7 +686,7 @@ describe('fenced character save ledger effects', () => {
         7,
         STATE,
         MARKET,
-        MAIL,
+        MAIL_PARTITIONS,
         'nonce-1',
         undefined,
         undefined,
@@ -813,7 +840,7 @@ describe('fenced character save ledger effects', () => {
         7,
         STATE,
         MARKET,
-        MAIL,
+        MAIL_PARTITIONS,
         undefined,
         undefined,
         undefined,
@@ -860,7 +887,7 @@ describe('fenced character save ledger effects', () => {
         7,
         STATE,
         MARKET,
-        MAIL,
+        MAIL_PARTITIONS,
         undefined,
         undefined,
         undefined,

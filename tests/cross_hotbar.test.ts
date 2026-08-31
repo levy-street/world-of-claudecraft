@@ -15,6 +15,7 @@ import {
   defaultCrossHotbarLayout,
   INITIAL_CROSS_HOTBAR_TRIGGER_STATE,
   isCrossHotbarButton,
+  isCrossHotbarModifier,
   isCrossHotbarSeeded,
   nextCrossHotbarTriggerState,
   releaseCrossHotbarHold,
@@ -50,8 +51,8 @@ describe('cross hotbar geometry', () => {
     for (const button of [GP.A, GP.B, GP.X, GP.Y]) {
       expect(isCrossHotbarButton(button)).toBe(true);
     }
-    // The bumpers, stick clicks, Back/Start and the triggers themselves keep their
-    // own flat bindings: the cross hotbar must not swallow them.
+    // The bumpers, stick clicks, Back/Start and triggers are not layer buttons.
+    // Trigger modifier behavior is pinned separately below.
     for (const button of [GP.LB, GP.RB, GP.L3, GP.R3, GP.BACK, GP.START, GP.LT, GP.RT]) {
       expect(isCrossHotbarButton(button)).toBe(false);
     }
@@ -60,6 +61,11 @@ describe('cross hotbar geometry', () => {
   it('uses the triggers as the two layer modifiers', () => {
     expect(CROSS_HOTBAR_TRIGGERS.left).toBe(GP.LT);
     expect(CROSS_HOTBAR_TRIGGERS.right).toBe(GP.RT);
+    expect(isCrossHotbarModifier(GP.LT)).toBe(true);
+    expect(isCrossHotbarModifier(GP.RT)).toBe(true);
+    for (const button of CROSS_HOTBAR_LAYER_BUTTONS) {
+      expect(isCrossHotbarModifier(button)).toBe(false);
+    }
   });
 
   it('orders each diamond top, left, right, bottom', () => {

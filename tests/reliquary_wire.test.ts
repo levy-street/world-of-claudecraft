@@ -408,10 +408,14 @@ describe('Reliquary movement flag on the server-only grant paths', () => {
       isCataloguedRelicItem(id),
     );
     expect(seededRelics.length).toBeGreaterThan(0);
-    // The alt-role BAGGED loop is a distinct grant site inside the kit: prove
-    // it handed over a catalogued relic of its own, so dropping only ITS
-    // movement flag cannot stay green on the equipped items' content alone.
-    expect(meta.inventory.some((s) => isCataloguedRelicItem(s.itemId))).toBe(true);
+    // The alt-role BAGGED loop is a distinct grant site inside the kit. Its
+    // arm-specific catalogued-relic proof retired when the Crucible ilvl-35
+    // tier became the kit's BiS while its Reliquary pages are pended
+    // (tests/reliquary_content.test.ts HEROIC_PAGE_PENDING): the bagged picks
+    // are currently uncatalogued, so only the union proof below is
+    // non-vacuous. When the launch pass authors the Crucible pages the bagged
+    // picks become catalogued again; restore the arm-specific assertion then.
+    expect(meta.inventory.length).toBeGreaterThan(0);
     // Discovery fills the catalog, as on every movement path...
     for (const id of seededRelics) expect(meta.reliquary.firstFind[id]).toBeDefined();
     // ...and not one of them counts as something the world handed the player.

@@ -24,6 +24,7 @@ function makeHarness() {
     sim: {
       entities: Map<number, Entity>;
     };
+    views: Map<number, never>;
     time: number;
     triggerAttack: ReturnType<typeof vi.fn>;
     triggerHit: ReturnType<typeof vi.fn>;
@@ -39,6 +40,7 @@ function makeHarness() {
   renderer.sim = {
     entities: new Map<number, Entity>([[7, { auras: [] } as unknown as Entity]]),
   };
+  renderer.views = new Map<number, never>();
   renderer.time = 1;
   renderer.triggerAttack = vi.fn();
   renderer.triggerHit = vi.fn();

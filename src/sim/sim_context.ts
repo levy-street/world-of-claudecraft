@@ -402,6 +402,10 @@ export interface SimContextCallbacks {
   // the boundary (the authoritative server uses its realm-local 3 AM daily reset), so
   // the sim core never reads a time zone; offline/headless fall back to a flat 24h day.
   raidResetMs(nowMs: number): number;
+  // The next WEEKLY raid-reset instant for a given lockout "now": the boundary the
+  // raid rooms' normal and heroic lockouts expire on (host-owned like raidResetMs;
+  // offline/headless fall back to a flat 7-day week).
+  weeklyRaidResetMs(nowMs: number): number;
   instanceKeyFor(pid: number): string;
   instanceOriginOf(inst: InstanceSlot): { x: number; z: number };
   instanceClaimIdAt(pos: Vec3): number | null;
@@ -739,7 +743,7 @@ export interface SimContextCallbacks {
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
-  swingIntervalMult(e: Entity): number;
+  swingIntervalMult(e: Entity, channel?: 'melee' | 'ranged'): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
   // Exact swept player movement resolver, exposed for the local unstuck search.
@@ -950,6 +954,10 @@ export interface SimContextCallbacks {
     target: Entity | null,
     res: ResolvedAbility,
     attackAnimationStarted?: boolean,
+    // Cast-scoped outgoing-heal multiplier for the direct 'heal' effect
+    // (default 1; see the parameter note on combat/effect_dispatch.ts's
+    // runEffects). Today only the Stonehearth 2pc bend passes it.
+    castHealMult?: number,
   ): void;
 
   // P1a pet AI (src/sim/pet/pet_ai): the moved updatePet/petRangedAttack/petPickTarget
@@ -1447,6 +1455,7 @@ export function createSimContext(host: SimContextHost): SimContext {
     reserveVaultConsumption: host.reserveVaultConsumption,
     lockoutNowMs: host.lockoutNowMs,
     raidResetMs: host.raidResetMs,
+    weeklyRaidResetMs: host.weeklyRaidResetMs,
     instanceKeyFor: host.instanceKeyFor,
     instanceOriginOf: host.instanceOriginOf,
     instanceClaimIdAt: host.instanceClaimIdAt,

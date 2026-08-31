@@ -9,8 +9,9 @@
 // asserting the whole path stays clear of every rendered melt disc.
 
 import { describe, expect, it } from 'vitest';
+import { EMBER_LAVA_POOLS } from '../src/sim/ember_lava_layout';
 import { Sim } from '../src/sim/sim';
-import { EMBER_LAVA_POOLS, groundHeight, WATER_LEVEL } from '../src/sim/world';
+import { groundHeight, WATER_LEVEL } from '../src/sim/world';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 // The production seed: the reports are seed-pinned world geometry.

@@ -214,6 +214,10 @@ describe('no test file registers the same block twice (#2506)', () => {
     const chains = perFile.flatMap((f) => f.unresolved.map((u) => `${u.head}.${u.chain}`));
     expect([...new Set(chains)].sort()).toEqual([
       'test.attachTooltip.mock.calls.find',
+      // The declined-confirm rig in tests/loot_window_controller.test.ts:
+      // the harness's confirm mock reconfigured to swallow onOk (a callback
+      // accessor on the same `test` rig identifier as the row above).
+      'test.confirm.mockImplementation',
       'test.scheduled.some',
     ]);
   });

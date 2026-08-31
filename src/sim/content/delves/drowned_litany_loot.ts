@@ -35,7 +35,13 @@ const RARE = {
   ROG: 'widow_silk_hood',
   MAG: 'nhalias_litany_rod',
 } as const;
-// 3% prestige epic, bountiful-only.
+// 12% prestige epic, bountiful-only (raised 4x from the 3% launch tuning).
+// This compounds with the matching Bountiful-spawn bump in delves/runs.ts
+// claimDelveRun (Heroic 5%->20%, Normal 2%->8%): per heroic clear the
+// effective epic odds move from 0.05 * 0.03 = 0.15% (~1 in 667) to
+// 0.20 * 0.12 = 2.4% (~1 in 42), a 16x swing, not the 4x either constant
+// reads in isolation. Fixes the near-1-in-700 odds reported against the
+// live Reliquary catalog.
 const EPIC = {
   WAR: 'blackwater_vanguard_chest',
   ROG: 'siltstep_leggings',
@@ -62,10 +68,10 @@ export function drownedLitanyChestItemsForTier(
   const uncommonId = rng.chance(0.5) ? UNCOMMON_A[arch] : UNCOMMON_B[arch];
 
   if (bountiful) {
-    // Guaranteed uncommon + guaranteed rare + 3% epic (draw 2).
+    // Guaranteed uncommon + guaranteed rare + 12% epic (draw 2).
     result.push({ itemId: uncommonId, count: 1 });
     result.push({ itemId: RARE[arch], count: 1 });
-    if (rng.chance(0.03)) result.push({ itemId: EPIC[arch], count: 1 }); // draw 2
+    if (rng.chance(0.12)) result.push({ itemId: EPIC[arch], count: 1 }); // draw 2
     return result;
   }
 

@@ -116,6 +116,26 @@ describe('computeSfxGainCeilings', () => {
       rmSync(root, { force: true, recursive: true });
     }
   });
+
+  it('mints a ceiling for a discovered mob subfamily key via its family custom flag', () => {
+    const root = mkdtempSync(join(tmpdir(), 'wocc-gain-ceiling-'));
+    try {
+      const sfxDir = join(root, 'public/audio/sfx');
+      mkdirSync(sfxDir, { recursive: true });
+      // Subfamily keys have no catalog row of their own: the ceiling must come
+      // from the mob_elemental_attack family row's custom flag (the same
+      // resolution conform's isCustomMaster uses), and worst-case-across-takes
+      // still holds for the subfamily's own variants.
+      synthesizeTone(join(sfxDir, 'mob_elemental_ignivar_attack_1.mp3'), 0.5); // ~-6dBFS
+      synthesizeTone(join(sfxDir, 'mob_elemental_ignivar_attack_2.mp3'), 0.9); // hot take
+
+      const ceilings = computeSfxGainCeilings(root, ffmpegPath as string);
+      expect(ceilings.mob_elemental_ignivar_attack).toBeLessThan(3);
+      expect(ceilings.mob_elemental_ignivar_attack).toBeGreaterThanOrEqual(0);
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
 });
 
 describe('skip-unchanged fingerprint cache', () => {

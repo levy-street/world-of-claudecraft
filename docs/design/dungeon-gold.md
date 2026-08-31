@@ -37,6 +37,8 @@ All money rolls the roller's 0.6x to 1.4x band around the base.
 | Gravewyrm Sanctum | Korzul the Gravewyrm | 15000c | 100000c |
 | Wildheart Basin | Zulgar, Voice of the Basin | 15000c | 100000c |
 | Nythraxis raid | Nythraxis, Scourge of Thornpeak | 150000c | 200000c |
+| Ignivar raid (dev tier), Inner Crucible | Varkhul, Forgefather of the Last Flame | 150000c | 200000c |
+| Ignivar raid (dev tier), arena | Ignivar, Herald of the Last Flame | 150000c | 200000c |
 
 The heroic base is deliberately flat across the five-mans (they all tune to
 level 22; the clear effort is comparable) rather than a multiple of the

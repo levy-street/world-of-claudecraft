@@ -33,7 +33,11 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { measureSfxTruePeakDb } from './conform_audio.mjs';
-import { discoverSfxTracks } from './sfx_manifest_builder.mjs';
+import {
+  discoverSfxTracks,
+  isSfxMobExtensionKey,
+  SFX_MOB_EXTENSION_KEY_PATTERN,
+} from './sfx_manifest_builder.mjs';
 import { SFX } from './sfx_prompts.mjs';
 
 export const SFX_GAIN_CEILING_PATH = 'scripts/sfx/sfx_gain_ceiling.generated.json';
@@ -90,6 +94,18 @@ export function computeSfxGainCeilingRecords(repoRoot, ffmpegPath) {
   const customKeys = new Set(
     SFX.filter((entry) => entry.custom === true).map((entry) => entry.key),
   );
+  // Discovered mob subfamily keys (mob_<family>_<sub>_<action>) have no
+  // catalog row of their own, so the catalog filter above can never include
+  // one. They are hand-recorded overrides of a family voice: inherit the
+  // custom flag from the family row, the same resolution conform's
+  // isCustomMaster uses, so a subfamily pack's measured headroom becomes a
+  // claimable gain-map ceiling instead of silently capping at 0dB.
+  const customByKey = new Map(SFX.map((entry) => [entry.key, entry.custom === true]));
+  for (const key of Object.keys(discovered.entries)) {
+    if (customKeys.has(key) || !isSfxMobExtensionKey(key)) continue;
+    const match = key.match(SFX_MOB_EXTENSION_KEY_PATTERN);
+    if (match && customByKey.get(`mob_${match[1]}_${match[3]}`)) customKeys.add(key);
+  }
   const stored = readStoredGainCeilingRecordsTolerant(repoRoot);
   const records = {};
   for (const key of [...customKeys].sort()) {

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { DUNGEONS } from '../sim/data';
+import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import { RIFT_TIER_COLORS, type RiftTier } from '../sim/types';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
@@ -969,6 +970,24 @@ export function buildRiftPuzzleProp(
   return { body };
 }
 
+/** True when a door's visible body is authored outside this module, so
+ *  buildDoorBody renders only the invisible click-box. The Forgefather arm
+ *  is data-driven: it flips once the owner bakes a dungeon_entrance facade
+ *  into the fortress placements. */
+export function doorArchAuthoredElsewhere(
+  dungeonId: string | null | undefined,
+  placements: readonly { key: string }[] = FORGEFATHER_FORTRESS_PLACEMENTS,
+): boolean {
+  if (dungeonId === 'nythraxis_crypt') return true;
+  // The raid family's overworld door belongs to its chain HEAD (the
+  // Forge-Lift since the lift became the first room; the Halls id stays
+  // covered so a chain reshuffle can never resurrect the generic arch
+  // over the owner's facade).
+  if (dungeonId === 'ignivar_forge_lift' || dungeonId === 'ignivar_forge_approach')
+    return placements.some((p) => p.key === 'dungeon_entrance');
+  return false;
+}
+
 // Build a dungeon-door (entering) or dungeon-exit (leaving) body: a stone arch +
 // keystone + plinths framing an additive portal swirl. The Nythraxis crypt door
 // is a bespoke invisible click-box instead (the visible arch is baked into that
@@ -980,7 +999,16 @@ export function buildDoorBody(
   lowGfx: boolean,
 ): { body: THREE.Group; portal?: THREE.Mesh } {
   const body = new THREE.Group();
-  if (entering && dungeonId === 'nythraxis_crypt') {
+  // Doors whose visible arch is authored elsewhere render only an invisible
+  // click-box: the Nythraxis crypt arch is baked into that dungeon's
+  // geometry, and the Forgefather raid door yields to the owner's placed
+  // dungeon_entrance facade with its mist gate (ignivar_mist_gate.ts) the
+  // moment one is baked into the fortress table; until then it keeps the
+  // generic arch so the door is never invisible.
+  if (entering && doorArchAuthoredElsewhere(dungeonId)) {
+    // The shared 4.6x4.2 box is a deliberate one-size click affordance: it
+    // covers the crypt arch AND the facade's doorway (about 3.3yd wide at
+    // the owner's scale), and the walk-in trigger owns actual entry.
     const clickBox = new THREE.Mesh(doorNythraxisClickGeometry(), doorNythraxisClickMaterial());
     clickBox.position.y = 2.1;
     body.add(clickBox);

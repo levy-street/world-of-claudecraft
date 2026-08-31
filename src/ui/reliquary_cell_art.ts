@@ -35,6 +35,7 @@ import { WEAPON_SKINS } from '../sim/content/weapon_skins';
 import { ITEMS } from '../sim/data';
 import { mountItemId } from '../sim/mounts';
 import { deedCrestHasPaintedArt, deedCrestId } from './deeds_view';
+import { itemImageUrl, weaponIconUrl } from './icons';
 import { knownItemDef, ownEntry } from './known_item';
 import { MASTERWORK_SEAL_IMAGE_URL, professionImageUrl } from './profession_art';
 import type { ReliquaryRelicNameKind } from './reliquary_view';
@@ -213,7 +214,12 @@ export function reliquaryCellArt(slot: ReliquaryArtSlot): ReliquaryCellArt | nul
 export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
   if (art.kind === 'url') return art.url.startsWith(`${ARMORY_SKIN_ART_DIR}/`);
   if (art.kind === 'crest') return !deedCrestHasPaintedArt(art.crestId);
-  return false;
+  // An item with neither committed pipeline (no /ui/items webp, no
+  // /ui/weapons variant render) paints the procedural compositor's opaque
+  // radial tile, so it takes the crest-style answer: opaque exactly while
+  // its painted art is pending (the ITEM_ART_PENDING ledger in icons.ts,
+  // empty today; the next staged art wave becomes the live case).
+  return itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null;
 }
 
 /** Profession-sheet art for one lifetime mark. The masterwork family keys off

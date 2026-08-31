@@ -82,6 +82,24 @@ import {
 } from './guild_bank_receipt_db';
 import type { GuildBankSave, GuildBankWriteResult } from './guild_bank_state';
 import { isUniqueViolation } from './http_util';
+import {
+  advanceCustodyWatermarkIn,
+  confirmBakedCustodyRefs,
+  deleteBakedCustodyRefsIn,
+  MAIL_CUSTODY_PARCELS_SCHEMA,
+  snapshotPendingCustodyRefs,
+} from './mail_custody_overlay';
+import {
+  assertMailPartitionWriteGateOpen,
+  openMailPartitionWriteGate,
+  writeMailPartitions,
+  writeMailPartitionsInTransaction,
+} from './mail_db';
+import {
+  mailPartitionMarkerKey,
+  mailStateKey,
+  runMailPartitionBackfill,
+} from './mail_partition_backfill';
 import { MAPS_SCHEMA } from './maps_db';
 import {
   LEGACY_MARKET_KEY,
@@ -120,6 +138,9 @@ import { bustWocMarketActivity } from './woc_market_read_cache';
 
 export type { BankLedgerSaveEffects } from './bank_ledger_save_effects_db';
 export { GUILD_BANK_ROW_MAX_BYTES } from './guild_bank_receipt_db';
+// Re-export split mail helpers so existing callers keep the db.ts surface.
+export { closeMailPartitionWriteGateForTests, openMailPartitionWriteGate } from './mail_db';
+export { mailRecipientKey, mailStateKey } from './mail_partition_backfill';
 // The realm-market key helpers and the backfill marker key live in
 // server/market_backfill.ts (a *_db-style module with no db.ts dependency, so
 // db.ts can import it without a cycle). Only marketStateKey was ever part of
@@ -1311,6 +1332,11 @@ export async function ensureSchema(): Promise<void> {
     // (idempotent), like the other schema modules.
     await client.query(ACCOUNT_WEALTH_SCHEMA);
     await client.query(SUSPICION_FLAGS_SCHEMA);
+    // The $WOC custody mail overlay (server/mail_custody_overlay.ts): one
+    // durable row per booked parcel until the next full mail-book write
+    // bakes it. No FK on purpose: rows must survive character deletion long
+    // enough for an operator to attribute them.
+    await client.query(MAIL_CUSTODY_PARCELS_SCHEMA);
     // Map editor tables: saved/forked custom maps and uploaded GLB assets.
     // Both FK-reference accounts(id), so they run after SCHEMA. Applied
     // unconditionally (idempotent), like the other schema modules.
@@ -1349,6 +1375,22 @@ export async function ensureSchema(): Promise<void> {
         `[market-backfill] applied for realm ${REALM} (legacyRowFound=${backfill.legacyRowFound})`,
       );
     }
+    // Partitioned Ravenpost mail backfill (#3561): splits this realm's
+    // `mail:<realm>` blob per recipient so autosave can persist only what
+    // changed. Runs in the same advisory-lock transaction as the market
+    // backfill above, right before COMMIT, for the same reason: a racing
+    // autosave must never observe a half-migrated realm. See
+    // server/mail_partition_backfill.ts.
+    const mailBackfill = await runMailPartitionBackfill({
+      client,
+      realm: REALM,
+      log: (line) => console.log(line),
+    });
+    if (mailBackfill.ran) {
+      console.log(
+        `[mail-partition-backfill] applied for realm ${REALM} (legacyRowFound=${mailBackfill.legacyRowFound}, recipients=${mailBackfill.recipientCount})`,
+      );
+    }
     // Storage purchase parent triggers land late so their first-rollout table
     // locks are held only briefly before COMMIT.
     await client.query(STORAGE_PURCHASE_SCHEMA);
@@ -1376,6 +1418,9 @@ export async function ensureSchema(): Promise<void> {
     // no-op path where the marker already existed): no market write lands
     // before the marker is durable.
     openMarketWriteGate();
+    // Same discipline for the mail partition gate: no mail:<realm>:r:* write
+    // can land before this realm's marker is durable.
+    openMailPartitionWriteGate();
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});
     throw err;
@@ -3453,13 +3498,28 @@ export async function saveCharacterState(
   }
 }
 
-// Persist character plus this realm's market/mail escrow blobs atomically.
+// Persist a character row AND this realm's World Market + Ravenpost mail
+// state in ONE transaction. They live in different tables (characters /
+// world_state), but a Market listing and a mail attachment are both escrows:
+// the item leaves the character's bags (character state) and becomes a
+// listing / a letter parcel (world state) in the same Sim action. Saving them
+// as independent writes lets an unclean crash persist one half and not the
+// other, vaporising the item or duplicating it across bags and book. The
+// leave path uses this so a logout flush of bags can never tear away from
+// either escrow.
+//
+// mailPartitions carries only the recipient mailboxes dirtied since the last
+// mail save (Sim.takeDirtyMailPartitions, #3561), not the whole realm book:
+// the atomicity this function exists for only ever needed to protect the
+// one or two mailboxes THIS session's own action actually touched, the same
+// as the periodic autosave's incremental write. An empty array (no mail
+// mutation this session) issues no mail SQL at all.
 export async function saveCharacterAndMarketState(
   characterId: number,
   level: number,
   state: CharacterState,
   market: MarketSave,
-  mail: MailSave,
+  mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
   leaseNonce?: string,
   // Optional guild-book escrow halves dirtied by this session.
   guildBanks?: readonly GuildBankSave[],
@@ -3469,13 +3529,20 @@ export async function saveCharacterAndMarketState(
   ledgerEffects?: BankLedgerSaveEffects,
   signal?: AbortSignal,
 ): Promise<boolean> {
+  // Custody overlay bake, the saveMailState contract adjusted for partitioned
+  // mail: snapshot at entry before anything awaits, then delete only on the
+  // committed arm below when this transaction actually persisted mail
+  // partitions. The fence-refused false arm and every rollback keep the rows.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
   const ledger = prepareCharacterSaveEffects(
     characterId,
     storageEffects,
     ledgerEffects,
     guildBanks?.map((book) => book.guildId),
   );
-  // The market backfill gate must open before this shared-row write.
+  // Gate the escrow flush on the boot backfill just like saveMarketState:
+  // this writes the realm-market row, so it must not run before ensureSchema
+  // has confirmed the marker and opened the gate. Checked before any pool work.
   assertMarketWriteGateOpen();
   const guildReplay = prepareGuildBankReceiptReplay(guildBanks ?? [], ledger?.batches ?? []);
   const cleanState = sanitizeRemovedZone1Content(state).state;
@@ -3500,27 +3567,40 @@ export async function saveCharacterAndMarketState(
       await transaction.rollback();
       return false;
     }
+    // Every statement in this function goes through `transaction`, never the
+    // raw client: the wrapper owns the SET LOCAL statement/lock timeouts and
+    // the abort-driven pg_cancel_backend, so a raw client.query would run
+    // deadline-free inside a fenced save.
+    const inTx = (text: string, values: unknown[]) => transaction.query(text, values);
     ledgerWrite = await writeBankLedgerSaveEffectsOnClient(transaction, ledger);
-    await transaction.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      // Same realm-scoped key loadMarketState/saveMarketState use: the leave
-      // flush must land where the market is read back, or the escrowed listing
-      // is written to a key nothing loads and the item is stranded on next boot.
-      [marketStateKey(REALM), JSON.stringify(market)],
-    );
-    await transaction.query(
-      `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-       ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-      [mailStateKey(REALM), JSON.stringify(mail)],
-    );
+    // Same realm-scoped key loadMarketState/saveMarketState use: the leave
+    // flush must land where the market is read back, or the escrowed listing
+    // is written to a key nothing loads and the item is stranded on next boot.
+    await upsertWorldStateRowIn(inTx, marketStateKey(REALM), market);
+    const wroteMailPartitions = mailPartitions.length > 0;
+    if (wroteMailPartitions) {
+      // Same writeMailPartitions shape as saveMailPartitions (the periodic
+      // autosave path), just inside this transaction instead of the pool, and
+      // gated the same way: a leave flush must not persist mail:<realm>:r:*
+      // rows before ensureSchema's mail partition backfill has run.
+      assertMailPartitionWriteGateOpen();
+      await writeMailPartitions(transaction, REALM, mailPartitions);
+    }
     // Guild bank books ride the SAME fenced transaction (Guild Bank Phase 3):
     // the character UPDATE above already passed the lease fence, so these can
     // never land for a displaced session, and a failure anywhere rolls back
     // the character, market, mail, and book halves together.
     await writeClaimedGuildBankEffectsOnClient(transaction, guildReplay, ledgerWrite, results);
     await writeStorageAppliedEffectsOnClient(transaction, storageEffects);
+    // The custody bake and the watermark advance ride the same fenced
+    // transaction as the mail partition write (see saveMailState), so they land
+    // after every other effect and immediately before COMMIT.
+    if (wroteMailPartitions) {
+      await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
+      await advanceCustodyWatermarkIn(inTx);
+    }
     await transaction.commit();
+    if (wroteMailPartitions) confirmBakedCustodyRefs(bakedCustodyRefs);
     return true;
   } catch (err) {
     await transaction.rollback();
@@ -4363,6 +4443,22 @@ export async function loadWorldState<T>(key: string): Promise<T | null> {
   return (res.rows[0]?.data as T) ?? null;
 }
 
+/** The one world_state upsert shape, shared by the single-statement
+ *  saveWorldState and the in-transaction blob writers
+ *  (saveCharacterAndMarketState, saveMailState): one copy so the
+ *  ON CONFLICT contract cannot drift between them. */
+async function upsertWorldStateRowIn(
+  query: (text: string, values: unknown[]) => Promise<unknown>,
+  key: string,
+  data: unknown,
+): Promise<void> {
+  await query(
+    `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
+     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+    [key, JSON.stringify(data)],
+  );
+}
+
 export async function saveWorldState(key: string, data: unknown): Promise<void> {
   // The pre-scoping bare 'market' row is RETAINED as the rollback artifact for
   // the partitioned market backfill (server/market_backfill.ts) and is never
@@ -4378,11 +4474,7 @@ export async function saveWorldState(key: string, data: unknown): Promise<void> 
   if (key.startsWith(MARKET_KEY_PREFIX)) {
     assertMarketWriteGateOpen();
   }
-  await pool.query(
-    `INSERT INTO world_state (key, data, updated_at) VALUES ($1, $2, now())
-     ON CONFLICT (key) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
-    [key, JSON.stringify(data)],
-  );
+  await upsertWorldStateRowIn((text, values) => pool.query(text, values), key, data);
 }
 
 // Boot-ordering write gate for the World Market. Before ensureSchema's
@@ -4446,18 +4538,112 @@ export async function saveMarketState(save: MarketSave): Promise<void> {
   await saveWorldState(marketStateKey(REALM), save);
 }
 
-// The Ravenpost mail book: realm-scoped like the market, one JSONB blob per
-// realm under `mail:<realm>`. Born realm-scoped, so no legacy migration.
-export function mailStateKey(realm: string): string {
-  return `mail:${realm}`;
+// The Ravenpost mail book: realm-scoped like the market. Used to live as one
+// JSONB blob per realm under `mail:<realm>`; ensureSchema's partitioned
+// backfill (server/mail_partition_backfill.ts, #3561) now splits that into
+// one row per recipient (`mail:<realm>:r:<key>`) so the 30 s autosave persists
+// only the recipients that actually changed instead of re-serializing the
+// WHOLE book every cycle. The `mail:<realm>` key itself is RETAINED as the
+// rollback artifact and never written again after the backfill runs, mirroring
+// the market's legacy-blob retention.
+//
+// loadMailState is a pure READ: it serves the union of this realm's partition
+// rows, and only a pre-backfill database (no marker yet) falls back to the
+// retained legacy blob, exactly like loadMarketState.
+async function loadAllMailPartitions(realm: string): Promise<MailSave['mail']> {
+  // Half-open range on the key column selects every `mail:<realm>:r:*` row;
+  // ';' is the ASCII character immediately after ':', so this bounds the
+  // exact prefix UNDER BYTE ORDER ONLY. `>=`/`<` on `text` are themselves
+  // collation-sensitive (an earlier revision of this comment claimed the
+  // opposite): under a linguistic collation (glibc en_US.utf8, ICU), the
+  // default for a non-Alpine/non-C-locale Postgres, punctuation carries no
+  // primary weight, so 'mail:<realm>:r;' can sort BEFORE every real
+  // partition key and this range silently matches nothing. `COLLATE "C"`
+  // forces byte-order comparison regardless of the column's declared
+  // collation, on both sides, so this is correct everywhere; `ORDER BY` under
+  // the same collation keeps boot-to-boot mail order deterministic instead of
+  // plan-dependent (a seq scan and an index scan can otherwise disagree).
+  // Boot-time only, not a hot path, so the missing index for this collation
+  // is an accepted cost (see server/CLAUDE.md "SQL shape on hot paths").
+  const lo = `mail:${realm}:r:`;
+  const hi = `mail:${realm}:r;`;
+  const res = await pool.query(
+    `SELECT data FROM world_state
+      WHERE (key COLLATE "C") >= $1 AND (key COLLATE "C") < $2
+      ORDER BY key COLLATE "C"`,
+    [lo, hi],
+  );
+  const out: MailSave['mail'] = [];
+  for (const row of res.rows) {
+    const letters = (row.data as { mail?: MailSave['mail'] } | null)?.mail;
+    if (Array.isArray(letters)) out.push(...letters);
+  }
+  return out;
 }
 
 export async function loadMailState(): Promise<MailSave | null> {
+  const letters = await loadAllMailPartitions(REALM);
+  if (letters.length > 0) {
+    // nextMailId is deliberately NOT reconstructed from the partition rows:
+    // PostOffice.loadMail already derives it as
+    // max(this.nextMailId, save.nextMailId, every loaded letter's id + 1), so
+    // a neutral 1 here is exactly as safe as the market's per-realm nextListingId
+    // carry-forward, without needing a second synchronized counter row.
+    return { mail: letters, nextMailId: 1 };
+  }
+  // No partition rows. If the backfill has recorded its marker, this realm
+  // genuinely has an empty mailbook (never write or fall back): only a
+  // database that predates the backfill (no marker) still falls back to a
+  // back-compat READ of the retained legacy blob. On a normal boot this
+  // fallback is unreachable (ensureSchema always confirms the marker before
+  // game.loadMail runs); it is a defensive net for an out-of-band caller
+  // hitting a pre-backfill database.
+  const marker = await loadWorldState<unknown>(mailPartitionMarkerKey(REALM));
+  if (marker !== null) return null;
   return loadWorldState<MailSave>(mailStateKey(REALM));
 }
 
+// Test-only surface: many unrelated tests stub the whole `server/db` module
+// and reference this name, so it is retained for that, but no production path
+// calls it any more (see saveMailPartitions below). Post-backfill it writes
+// the legacy `mail:<realm>` key, which loadMailState never reads back once
+// the marker is set, so a caller here would be writing into the void; it
+// remains a correct, complete whole-book write for whatever still exercises it.
 export async function saveMailState(save: MailSave): Promise<void> {
-  await saveWorldState(mailStateKey(REALM), save);
+  // Custody overlay bake (mail_custody_overlay.ts): the snapshot runs before
+  // anything awaits, and no awaited gap separates the caller's
+  // serializeMail() from this entry, so every snapshotted parcel is inside
+  // `save` or durably collected out of it. The bake DELETE and the
+  // watermark advance ride the SAME transaction as the book upsert: the
+  // blob without a parcel and the row's removal must commit together, or a
+  // failed post-commit delete bracketing a collection could later replay a
+  // collected parcel. Every book write takes this one transactional path
+  // (no refs-empty shortcut) so the watermark keeps advancing on quiet
+  // realms too.
+  const bakedCustodyRefs = snapshotPendingCustodyRefs();
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const inTx = (text: string, values: unknown[]) => client.query(text, values);
+    await upsertWorldStateRowIn(inTx, mailStateKey(REALM), save);
+    await deleteBakedCustodyRefsIn(inTx, bakedCustodyRefs);
+    await advanceCustodyWatermarkIn(inTx);
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    throw err;
+  } finally {
+    client.release();
+  }
+  confirmBakedCustodyRefs(bakedCustodyRefs);
+}
+
+export async function saveMailPartitions(
+  partitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
+): Promise<void> {
+  if (partitions.length === 0) return;
+  assertMailPartitionWriteGateOpen();
+  await writeMailPartitionsInTransaction(pool, REALM, partitions);
 }
 
 // Shared Rift event history/scheduler, realm-scoped. Runtime group instances are

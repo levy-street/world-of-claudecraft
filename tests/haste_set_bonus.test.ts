@@ -16,9 +16,10 @@ import {
   SET_NIGHTTALON,
   SET_VALE_ARCANIST,
 } from '../src/sim/content/item_sets';
+import { emptyModifiers, type TalentModifiers } from '../src/sim/content/talents';
 import { ITEMS, MOBS } from '../src/sim/data';
 import { createMob, type PlayerEquipment, recalcPlayerStats } from '../src/sim/entity';
-import { Sim } from '../src/sim/sim';
+import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { Entity, ItemDef, PlayerClass } from '../src/sim/types';
 
 type AnySim = Sim & Record<string, any>;
@@ -98,17 +99,35 @@ describe('aggregated haste (pure resolver)', () => {
     expect(three.hasteRating).toBe(SET_HASTE_3PC_RATING);
   });
 
-  it('every tier-2 3-piece bonus includes haste; tier-1 bonuses do not', () => {
-    const t2 = ['crownforged', 'nighttalon', 'soulflame', 'stormcallers'];
-    for (const setId of t2) {
-      expect(aggregateSetBonuses(new Map([[setId, 3]])).hasteRating, `${setId} 3pc haste`).toBe(
-        SET_HASTE_3PC_RATING,
-      );
-      expect(aggregateSetBonuses(new Map([[setId, 2]])).hasteRating, `${setId} 2pc haste`).toBe(0);
+  it('lineage haste lives at the 6-piece capstone, never below it', () => {
+    // The retune: the incumbent families climb one 2/4/6 ladder per archetype
+    // and the haste payout is the capstone, so four pieces of any single
+    // family pay no haste and six pieces across the tiers do.
+    for (const setId of [
+      'crownforged',
+      'nighttalon',
+      'soulflame',
+      'stormcallers',
+      'deathlord',
+      'wyrmshadow',
+      'necromancers',
+    ]) {
+      expect(aggregateSetBonuses(new Map([[setId, 4]])).hasteRating, `${setId} 4pc haste`).toBe(0);
     }
-    for (const setId of ['deathlord', 'wyrmshadow', 'necromancers']) {
-      expect(aggregateSetBonuses(new Map([[setId, 3]])).hasteRating, `${setId} 3pc haste`).toBe(0);
-    }
+    const strengthSix = aggregateSetBonuses(
+      new Map([
+        ['deathlord', 3],
+        ['crownforged', 3],
+      ]),
+    );
+    expect(strengthSix.hasteRating).toBe(SET_HASTE_3PC_RATING);
+    const casterSix = aggregateSetBonuses(
+      new Map([
+        ['necromancers', 2],
+        ['soulflame', 4],
+      ]),
+    );
+    expect(casterSix.hasteRating).toBe(SET_HASTE_3PC_RATING);
   });
 });
 
@@ -125,19 +144,21 @@ describe('set-bonus haste derivation (recalcPlayerStats)', () => {
     expect(p.rangedHaste).toBe(SET_HASTE_3PC);
   });
 
-  it('the tier-2 Nighttalon 3-piece adds haste on top of its agi/crit bonus', () => {
+  it('the agility lineage capstone adds haste on top of the 2-piece agi/crit bonus', () => {
     const { p } = player('rogue');
-    recalcPlayerStats(
-      p,
-      'rogue',
-      equipmentOf(setMembers(SET_NIGHTTALON).slice(0, 3)),
-      undefined,
-      {},
-    );
+    // Four nighttalon slots plus the two wyrmshadow slots the other family
+    // does not occupy: six worn pieces of ONE lineage, no slot collisions.
+    const six = [
+      ...setMembers(SET_NIGHTTALON),
+      ...setMembers('wyrmshadow').filter((i) => i.slot === 'chest' || i.slot === 'feet'),
+    ];
+    expect(six).toHaveLength(6);
+    recalcPlayerStats(p, 'rogue', equipmentOf(six), undefined, {});
     expect(p.meleeHaste).toBe(SET_HASTE_3PC);
     expect(p.spellHaste).toBe(SET_HASTE_3PC);
-    // the pre-existing 3pc payload still applies alongside the haste
-    expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + 0.01);
+    // the lineage 2-piece payload (1% crit inside critRating) still applies
+    // alongside the capstone haste, on top of the flipped 20-crit piece seeds
+    expect(p.critChance).toBeCloseTo(0.05 + p.stats.agi * 0.0005 + p.critRating / 2000);
   });
 
   it('the tier-1 Deathlord 3-piece grants no haste', () => {
@@ -222,15 +243,117 @@ describe('melee / ranged haste shorten the swing interval', () => {
     const meta = sim.players.get(p.id)!;
     spawnDummy(sim, p, 12); // inside ranged max, outside the dead zone
     p.autoAttack = true;
+    p.swingTimer = 0;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    const unhasted = p.swingTimer;
+    expect(unhasted).toBeGreaterThan(0);
+    // recalcPlayerStats drives both channels off the one hasteFrac, so a set
+    // bonus lands on meleeHaste and rangedHaste together.
+    p.meleeHaste = SET_HASTE_3PC;
     p.rangedHaste = SET_HASTE_3PC;
     p.swingTimer = 0;
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeGreaterThan(0);
-    // the timer equals ranged.speed * mult / (1 + rangedHaste); cross-check the lift
-    const unhasted = p.swingTimer * (1 + SET_HASTE_3PC);
-    p.rangedHaste = 0;
+    expect(p.swingTimer).toBeCloseTo(unhasted / (1 + SET_HASTE_3PC), 6);
+  });
+});
+
+describe('ranged haste applies exactly once', () => {
+  // Regression: the auto-shot timer divided by swingIntervalMult (which already
+  // folds gear haste in) AND by rangedHaste, so gear haste double-dipped.
+  const MASTERY_MELEE_HASTE_PCT = 0.1;
+
+  function applyAura(sim: AnySim, p: AnyEntity, aura: object): void {
+    (sim as unknown as { applyAura(t: Entity, a: object): void }).applyAura(p, aura);
+  }
+
+  // Equips through meta.equipment so every later recalc (applyAura runs one)
+  // reproduces the same hasteFrac on BOTH channels, the way the game does.
+  function kitted(
+    cls: PlayerClass,
+    setId: string,
+    dz: number,
+    mods?: TalentModifiers,
+  ): { sim: AnySim; p: AnyEntity; meta: PlayerMeta } {
+    const { sim, p } = player(cls);
+    const meta = sim.players.get(p.id) as PlayerMeta;
+    meta.equipment = equipmentOf(setMembers(setId));
+    recalcPlayerStats(p, cls, meta.equipment, mods, meta.equipmentInstance);
+    expect(p.rangedHaste).toBe(SET_HASTE_3PC);
+    spawnDummy(sim, p, dz);
+    p.autoAttack = true;
     p.swingTimer = 0;
+    return { sim, p, meta };
+  }
+
+  function hastedHunter(mods?: TalentModifiers): { sim: AnySim; p: AnyEntity; meta: PlayerMeta } {
+    // 12 yd: inside the hunter's ranged max, outside the dead zone.
+    return kitted('hunter', SET_GREYJAW_STALKER, 12, mods);
+  }
+
+  it('divides the auto-shot cadence by gear haste once, not twice', () => {
+    const { sim, p, meta } = hastedHunter();
+    expect(p.meleeHaste).toBe(SET_HASTE_3PC);
+    const speed = p.weapon.speed;
     updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(p.swingTimer).toBeCloseTo(unhasted, 6);
+    expect(p.swingTimer).toBeCloseTo(speed / (1 + SET_HASTE_3PC), 6);
+    expect(p.swingTimer).not.toBeCloseTo(speed / (1 + SET_HASTE_3PC) ** 2, 6);
+  });
+
+  it('leaves the melee arm on the same single haste bucket', () => {
+    const { sim, p, meta } = kitted('warrior', SET_BOUNDSTONE_VANGUARD, 2);
+    expect(p.meleeHaste).toBe(SET_HASTE_3PC);
+    const speed = p.weapon.speed;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo(speed / (1 + SET_HASTE_3PC), 6);
+  });
+
+  it('a spec mastery melee haste speeds melee swings but not the auto-shot', () => {
+    const mods = emptyModifiers();
+    mods.global.meleeHastePct = MASTERY_MELEE_HASTE_PCT;
+    const { sim, p, meta } = hastedHunter(mods);
+    expect(p.meleeHaste).toBeCloseTo(SET_HASTE_3PC + MASTERY_MELEE_HASTE_PCT, 6);
+    const speed = p.weapon.speed;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo(speed / (1 + SET_HASTE_3PC), 6);
+    expect(sim.swingIntervalMult(p)).toBeCloseTo(
+      1 / (1 + SET_HASTE_3PC + MASTERY_MELEE_HASTE_PCT),
+      6,
+    );
+  });
+
+  it('folds a buff_haste aura into the same ranged bucket', () => {
+    const { sim, p, meta } = hastedHunter();
+    const bloodlust = 0.3;
+    applyAura(sim, p, {
+      id: 'bloodlust',
+      name: 'Bloodlust',
+      kind: 'buff_haste',
+      value: 1 + bloodlust,
+      remaining: 300,
+      duration: 300,
+      sourceId: p.id,
+      school: 'nature',
+    });
+    const speed = p.weapon.speed;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo(speed / (1 + SET_HASTE_3PC + bloodlust), 6);
+  });
+
+  it('keeps an attackspeed slow on its own multiplicative axis for ranged', () => {
+    const { sim, p, meta } = hastedHunter();
+    const slow = 1.2;
+    applyAura(sim, p, {
+      id: 'test_slow',
+      name: 'Test Slow',
+      kind: 'attackspeed',
+      value: slow,
+      remaining: 10,
+      duration: 10,
+      sourceId: p.id,
+      school: 'physical',
+    });
+    const speed = p.weapon.speed;
+    updatePlayerAutoAttack(sim.ctx, p, meta);
+    expect(p.swingTimer).toBeCloseTo((speed * slow) / (1 + SET_HASTE_3PC), 6);
   });
 });

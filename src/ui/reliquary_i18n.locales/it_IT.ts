@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Anelli dello Squarcio',
     desc: 'Gli anelli dello Squarcio personali, coniati per ogni campione del gruppo che ottiene la prima conquista di uno Squarcio classificato. Ogni personaggio può possedere solo il proprio.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Bottini epici di Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Eroico: Crucible of the Last Spring',
+    desc: 'Armi esclusive della modalità eroica di Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Bottini epici di Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Eroico: The Inner Crucible',
+    desc: 'Scudi e armi esclusivi della modalità eroica di Varkhul, Forgefather of the Last Flame.',
+  },
 };

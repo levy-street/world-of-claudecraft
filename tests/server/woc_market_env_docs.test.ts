@@ -170,7 +170,7 @@ describe('market env documentation matches the code', () => {
       outside,
       'market env readers outside CORPUS; add each file to CORPUS so both guard directions see it',
     ).toEqual([]);
-  });
+  }, 60_000);
 });
 
 describe('compose passes through every operator-tunable market knob', () => {

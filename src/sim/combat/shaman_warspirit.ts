@@ -5,6 +5,7 @@ import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { SimContext } from '../sim_context';
 import { TAUNT_FORCE_SECONDS, topThreatValue } from '../threat';
 import type { Entity } from '../types';
+import { stonehearthCadenceHeal } from './shaman_stonehearth';
 import {
   galeheartEchoMultiplier,
   primalExaltationActive,
@@ -28,6 +29,12 @@ export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
 export const WARSPIRIT_CADENCE_STEPS = 3;
 export const GALEHEART_ECHO_COUNT = 2;
 export const GALEHEART_ECHO_DAMAGE = 0.25;
+/** Living Weapon (sha_r20_tidal_waves): the share of EACH Galeheart echo that
+ *  splashes to nearby enemies, and how many of them it reaches. This is the
+ *  spec's only multi-target line, so it alone sets the area/single ratio the
+ *  role band pins (tests/owned_class_balance_role_bands.test.ts). */
+export const LIVING_WEAPON_CLEAVE_PERCENT = 0.4;
+export const LIVING_WEAPON_CLEAVE_TARGETS = 2;
 export const STORMCAST_DURATION = 12;
 // buff_armor_pct / buff_sta_pct store integer percentage points (40 = +40%).
 // v0.38 tank threat/survivability parity pass: armor 30 -> 40, stamina bonus
@@ -264,15 +271,17 @@ function tryProcStormsurge(ctx: SimContext, player: Entity): void {
 
 /**
  * Advances one shared cadence for either hand. `steps` is two for Ancestral
- * Strike and one for a landed base swing. Echoes copy resolved damage and draw
- * no RNG, so they cannot recursively advance the cadence.
+ * Strike (three for a Warspirit Emberscale 2pc wearer, the call-site
+ * selection in combat/auto_attack.ts) and one for a landed base swing.
+ * Echoes copy resolved damage and draw no RNG, so they cannot recursively
+ * advance the cadence.
  */
 export function advanceWarspiritCadence(
   ctx: SimContext,
   player: Entity,
   target: Entity,
   resolvedWeaponDamage: number,
-  steps: 1 | 2 = 1,
+  steps: 1 | 2 | 3 = 1,
 ): boolean {
   if (!isWarspirit(ctx, player) || warspiritPosture(player) === null) return false;
   const cadenceTarget = primalExaltationActive(player) ? 2 : WARSPIRIT_CADENCE_STEPS;
@@ -283,6 +292,11 @@ export function advanceWarspiritCadence(
   }
   setCadence(ctx, player, Math.min(cadenceTarget - 1, total - cadenceTarget));
   armStormcast(ctx, player);
+  // Stonehearth 4pc: completing a cadence while Stonebound heals 3 percent of
+  // max health (a HEAL at the completion point, distinct from Living Weapon's
+  // absorb which arms on the Stormcast CONSUME in onStormcastConsumed below).
+  // The module no-ops for non-wearers and draws no rng for anyone.
+  stonehearthCadenceHeal(ctx, player, warspiritPosture(player));
   if (warspiritPosture(player) !== 'galeheart' || target.dead) return true;
   const echoDamage = Math.max(
     1,
@@ -300,18 +314,28 @@ export function advanceWarspiritCadence(
         const rightDist = (right.pos.x - target.pos.x) ** 2 + (right.pos.z - target.pos.z) ** 2;
         return leftDist - rightDist || left.id - right.id;
       })
-      .slice(0, 2);
+      .slice(0, LIVING_WEAPON_CLEAVE_TARGETS);
+    // EVERY echo cleaves, not just one burst. The primary eats
+    // GALEHEART_ECHO_COUNT echoes while a secondary used to eat a single
+    // half-strength one, so each secondary took a quarter of the primary's
+    // echo line and Warspirit had effectively no AoE (a 3-target sustained
+    // window measured 1.04x its own single-target). Radius selection stays
+    // OUTSIDE the loop: it is the only non-trivial work here and the set
+    // cannot change between echoes, which draw no rng.
+    const cleaveDamage = Math.max(1, Math.round(echoDamage * LIVING_WEAPON_CLEAVE_PERCENT));
     for (const secondary of nearby) {
-      ctx.dealDamage(
-        player,
-        secondary,
-        Math.max(1, Math.round(echoDamage * 0.5)),
-        false,
-        'nature',
-        'Living Weapon',
-        'hit',
-        false,
-      );
+      for (let echo = 0; echo < GALEHEART_ECHO_COUNT && !secondary.dead; echo++) {
+        ctx.dealDamage(
+          player,
+          secondary,
+          cleaveDamage,
+          false,
+          'nature',
+          'Living Weapon',
+          'hit',
+          false,
+        );
+      }
     }
   }
   return true;

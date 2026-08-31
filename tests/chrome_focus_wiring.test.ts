@@ -108,11 +108,12 @@ describe('the wired roots (the surfaces the fix covers)', () => {
     ]);
   });
 
-  it('keeps the three trackers, keyed to their header (and quest row) controls', () => {
+  it('keeps the always-on pointer-blur roots keyed to their interactive controls', () => {
     expect(CHROME_TRACKER_BLURS).toEqual([
       ['#quest-tracker', '.qt-header, .qt-title'],
       ['#deed-tracker', '.dt-header'],
       ['#reliquary-tracker', '.dt-header'],
+      ['#minimap-disc', 'button'],
     ]);
   });
 });
@@ -150,7 +151,7 @@ describe('wireChromeFocus', () => {
     }
   });
 
-  it('binds the capture-phase click drop over every tracker, keyed to its own selector', () => {
+  it('binds the capture-phase click drop over every always-on overlay, keyed to its selector', () => {
     const { roots } = wire();
     for (const [trackerId, selector] of CHROME_TRACKER_BLURS) {
       const root = roots.get(trackerId);
@@ -158,12 +159,22 @@ describe('wireChromeFocus', () => {
       const types = root.listeners.map((l) => `${l.type}${l.capture ? ':capture' : ''}`);
       expect(types, trackerId).toEqual(['click:capture']);
       const header = new FakeControl(selector);
-      const other = new FakeControl('button');
+      const other = new FakeControl('.unrelated');
       root.dispatch('click', { detail: 1, target: header });
       root.dispatch('click', { detail: 1, target: other });
       expect(header.blurred, trackerId).toBe(1);
       expect(other.blurred, trackerId).toBe(0);
     }
+  });
+
+  it('blurs minimap-disc buttons before their click handlers, but keeps keyboard focus', () => {
+    const { roots } = wire();
+    const minimap = roots.get('#minimap-disc');
+    if (!minimap) throw new Error('unwired minimap disc');
+    const mail = new FakeControl('button');
+    minimap.dispatch('click', { detail: 1, target: mail });
+    minimap.dispatch('click', { detail: 0, target: mail });
+    expect(mail.blurred).toBe(1);
   });
 });
 

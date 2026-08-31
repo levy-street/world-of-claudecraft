@@ -52,7 +52,7 @@ export interface CharactersDb {
     level: number,
     state: CharacterState,
     market: MarketSave,
-    mail: MailSave,
+    mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
     leaseNonce?: string,
   ): Promise<boolean>;
   lifetimeXpStanding(
@@ -104,9 +104,10 @@ export class FakeCharactersDb implements CharactersDb {
   private readonly standings = new Map<number, { rank: number; total: number }>();
   private readonly guildNames = new Map<number, string>();
   private readonly recentDeeds = new Map<number, DeedsDb.RecentDeedRow[]>();
-  // The last market and mail blobs saved alongside a character, for assertions.
+  // The last market blob and dirty mail partitions saved alongside a
+  // character, for assertions.
   lastMarket: MarketSave | null = null;
-  lastMail: MailSave | null = null;
+  lastMailPartitions: { recipientKey: string; letters: MailSave['mail'] }[] | null = null;
 
   // Test seam: insert a fully-formed row and keep nextId ahead of it.
   seed(row: Db.CharacterRow): Db.CharacterRow {
@@ -222,12 +223,12 @@ export class FakeCharactersDb implements CharactersDb {
     level: number,
     state: CharacterState,
     market: MarketSave,
-    mail: MailSave,
+    mailPartitions: readonly { recipientKey: string; letters: MailSave['mail'] }[],
     _leaseNonce?: string,
   ): Promise<boolean> {
     await this.saveCharacterState(characterId, level, state);
     this.lastMarket = market;
-    this.lastMail = mail;
+    this.lastMailPartitions = [...mailPartitions];
     return true;
   }
 

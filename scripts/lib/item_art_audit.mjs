@@ -476,8 +476,19 @@ export async function buildItemArtAudit(options) {
     heroicWeaponArtAliases.every(([, item]) => fileIds.has(item.heroicOf)),
     'Every heroic weapon art alias must reference a shipping base-art file',
   );
+  // The enumerated art-pending ledger (ITEM_ART_PENDING and its content-side
+  // source list): ids whose painted wave has not landed yet ship the
+  // procedural icon and are excluded from the every-live-item sweep;
+  // tests/item_icons.test.ts A2/A3 force each entry out as its art lands.
+  const artPending = new Set(options.artPendingIds ?? []);
+  for (const id of artPending) {
+    assert(!fileIds.has(id), `${id} is art-pending but ships a WebP; drop it from the ledger`);
+  }
   const missingFiles = Object.entries(options.items)
-    .filter(([id, item]) => !fileIds.has(id) && !(item.kind === 'weapon' && item.heroicOf))
+    .filter(
+      ([id, item]) =>
+        !fileIds.has(id) && !(item.kind === 'weapon' && item.heroicOf) && !artPending.has(id),
+    )
     .map(([id]) => id);
   assert.deepEqual(
     missingFiles,
