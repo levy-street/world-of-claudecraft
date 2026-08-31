@@ -5,7 +5,9 @@
 // crafted arm too), and the five vendor stock rows the phase pulled (the four
 // Eastbrook gear rows on smith_haldren, elixir_of_the_bear on
 // alchemist_verane) stay pulled while every id keeps its def, price, and
-// recipe. All expectations are literals, never derived from the live tables.
+// recipe. Expectations are pinned to the ruling's literals; where an arm reads
+// the live tables instead (the crafted-only foodHp line, the food pairing
+// range) the derivation is spelled out at the arm.
 
 import { describe, expect, it } from 'vitest';
 import { DELVE_SHOPS } from '../src/sim/content/delves';
@@ -224,22 +226,86 @@ describe('the ladder: every vendor/crafted pair meets its rung margin', () => {
   );
 
   // The rung labels are not free text: each food row's tercile is re-derived
-  // from the pairing range (the crafted tiers that pair with vendor food).
-  // The endpoints come from the table's own craftedValue column and are then
-  // pinned, so the pin is where an endpoint retune fails first; the
-  // derivation documents where the endpoints come from rather than adding
-  // protection beyond the pin.
+  // from the pairing range, and the range now comes from the LIVE crafted food
+  // line rather than the table's own craftedValue column. The old form took its
+  // endpoints from PAIRS and then compared them against 90 and 980, which could
+  // only fail on a PAIRS table edited inconsistently with itself.
+  //
+  // The pairing set is DERIVED, never listed: the tier that answers a vendor
+  // food is the smallest crafted-only foodHp at or above that vendor's
+  // magnitude, the same relation the per-row arm above pins through
+  // minCraftedOnlyAtOrAbove. Six live tiers answer a vendor food (90 through
+  // 980), which is the settled six-tier pairing window; the seventh, apex 1392
+  // tier is live but answers none, and that is WHY the window stops at 980
+  // rather than at the top of the crafted line. Both halves are pinned below,
+  // so a crafted retune that moves a paired tier, or a vendor food stocked
+  // above the current top tier, reds here rather than silently re-terciling.
+  const liveVendorFoodValues = (): number[] =>
+    vendorStockedIdsBy(NPCS, (id) => liveMagnitude(id, 'foodHp') !== undefined).map((id) => {
+      const value = liveMagnitude(id, 'foodHp');
+      expect(value, `${id} has a live foodHp`).toBeTypeOf('number');
+      return value as number;
+    });
+
+  const craftedOnlyFoodTiers = (): number[] => {
+    const tiers = new Set<number>();
+    for (const id of RECIPE_RESULT_IDS) {
+      if (STOCKED_IDS.has(id)) continue;
+      const value = liveMagnitude(id, 'foodHp');
+      if (value !== undefined) tiers.add(value);
+    }
+    return [...tiers].sort((a, b) => a - b);
+  };
+
+  const pairedCraftedFoodTiers = (): number[] => {
+    const tiers = new Set<number>();
+    for (const value of liveVendorFoodValues()) {
+      const tier = minCraftedOnlyAtOrAbove('foodHp', value);
+      expect(tier, `a crafted-only foodHp tier answers the vendor magnitude ${value}`).toBeTypeOf(
+        'number',
+      );
+      tiers.add(tier as number);
+    }
+    return [...tiers].sort((a, b) => a - b);
+  };
+
+  it('the crafted food tiers that answer a live vendor food are the settled six', () => {
+    expect(pairedCraftedFoodTiers()).toEqual([90, 117, 243, 432, 552, 980]);
+  });
+
+  it('the apex crafted food tier is live and answers no vendor food', () => {
+    const paired = pairedCraftedFoodTiers();
+    const top = paired[paired.length - 1] as number;
+    // The apex tier really exists on the crafted line, so its absence from the
+    // paired set is an exclusion rather than a tier that quietly stopped being
+    // authored.
+    expect(craftedOnlyFoodTiers(), 'the live crafted-only foodHp tiers').toEqual([
+      90, 117, 243, 432, 552, 980, 1392,
+    ]);
+    expect(paired, 'the apex tier answers no vendor food').not.toContain(1392);
+    // The reason it answers none, stated as a live fact: no vendor food sits
+    // above the top paired tier, so nothing reaches past 980 into the apex.
+    expect(
+      Math.max(...liveVendorFoodValues()),
+      `no vendor food magnitude climbs above the top paired tier (${top})`,
+    ).toBeLessThan(top);
+  });
+
   it('each food rung label matches the magnitude tercile of its crafted tier', () => {
-    const foodRows = PAIRS.filter((r) => r.axis === 'foodHp');
-    const lo = Math.min(...foodRows.map((r) => r.craftedValue));
-    const hi = Math.max(...foodRows.map((r) => r.craftedValue));
+    const tiers = pairedCraftedFoodTiers();
+    const lo = tiers[0] as number;
+    const hi = tiers[tiers.length - 1] as number;
     expect(lo, 'pairing range low endpoint').toBe(90);
     expect(hi, 'pairing range high endpoint').toBe(980);
     const t1 = lo + (hi - lo) / 3;
     const t2 = lo + (2 * (hi - lo)) / 3;
-    for (const row of foodRows) {
-      const expected =
-        row.craftedValue <= t1 ? 'bottom' : row.craftedValue <= t2 ? 'middle' : 'top';
+    for (const row of PAIRS.filter((r) => r.axis === 'foodHp')) {
+      // The classified value is the LIVE crafted magnitude, so a retune that
+      // moves a tier across a tercile boundary reds on the label too.
+      const crafted = liveMagnitude(row.craftedId, 'foodHp');
+      expect(crafted, `${row.craftedId} has a live foodHp`).toBeTypeOf('number');
+      const value = crafted as number;
+      const expected = value <= t1 ? 'bottom' : value <= t2 ? 'middle' : 'top';
       expect(row.rung, `${row.vendorId} tercile over [${lo}, ${hi}]`).toBe(expected);
     }
   });

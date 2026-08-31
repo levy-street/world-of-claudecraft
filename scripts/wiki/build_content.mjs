@@ -11,14 +11,32 @@
 // rich localized prose (spec/mastery text) is resolved live at render time through
 // src/ui/talent_i18n.ts, not baked here.
 
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { assertFamiliesKnown } from './family_guard.mjs';
 import { stillUrl } from './still_key.mjs';
 
 const root = process.cwd();
-const outFile = path.join(root, 'src', 'guide', 'content.generated.ts');
+// Output-path plumbing. The bare invocation writes the committed file, byte for
+// byte as it always has. `--out <path>` writes elsewhere (relative to cwd): the
+// freshness gate in tests/guide.test.ts generates into a temp file and compares
+// bytes, so running the suite never dirties the tree (three agents had to
+// restore this file during Phase 11d). `--check` generates in memory, compares
+// against the file that WOULD have been written, writes nothing, and exits 1 on
+// drift, for a hand-run freshness probe.
+const cliArgs = process.argv.slice(2);
+const outFlagAt = cliArgs.indexOf('--out');
+if (outFlagAt >= 0 && !cliArgs[outFlagAt + 1]) {
+  throw new Error('build_content.mjs: --out needs a path');
+}
+const checkMode = cliArgs.includes('--check');
+const outFile =
+  outFlagAt >= 0
+    ? path.resolve(root, cliArgs[outFlagAt + 1])
+    : path.join(root, 'src', 'guide', 'content.generated.ts');
+const outRelative = path.relative(root, outFile);
+const outLabel = outRelative && !outRelative.startsWith('..') ? outRelative : outFile;
 
 const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
@@ -578,6 +596,7 @@ const RELIQUARY_MARK_GUIDE_NAMES = {
   'gather_event:pristine_vein': 'Pristine Vein',
   'gather_event:ancient_heartwood': 'Ancient Heartwood',
   'gather_event:moonlit_bloom': 'Moonlit Bloom',
+  'gather_event:golden_harvest': 'Golden Harvest',
   'gather_event:perfect_specimen': 'Perfect Specimen',
   // Rares of the Realm kill proofs (Phase 21). Rare display names are legal in
   // the generated file: the wiki spoiler scan bans only boss-flagged MOBS names
@@ -1633,34 +1652,50 @@ export interface GuideProfProvisioning {
 }
 `;
 
-writeFileSync(
-  outFile,
-  [
-    header,
-    `\nexport const GUIDE_CLASSES: GuideClassInfo[] = ${JSON.stringify(classes, null, 2)};\n`,
-    `\nexport const GUIDE_ZONES: GuideZoneInfo[] = ${JSON.stringify(zones, null, 2)};\n`,
-    `\nexport const GUIDE_DUNGEONS: GuideDungeon[] = ${JSON.stringify(dungeons, null, 2)};\n`,
-    `\nexport const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = ${JSON.stringify(warlockPets, null, 2)};\n`,
-    `\nexport const GUIDE_DRUID_FORMS: GuideDruidForm[] = ${JSON.stringify(druidForms, null, 2)};\n`,
-    `\nexport const GUIDE_FAMILIES: GuideFamily[] = ${JSON.stringify(families, null, 2)};\n`,
-    `\nexport const GUIDE_DELVES: GuideDelve[] = ${JSON.stringify(delves, null, 2)};\n`,
-    `\nexport const GUIDE_DEEDS: GuideDeed[] = ${JSON.stringify(deeds, null, 2)};\n`,
-    `\nexport const GUIDE_RELIQUARY: GuideReliquaryPage[] = ${JSON.stringify(reliquary, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_RING: GuideProfRingCraft[] = ${JSON.stringify(profRing, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = ${JSON.stringify(profArchetypes, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_CRAFTS: GuideProfCraft[] = ${JSON.stringify(profCrafts, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_GATHERING: GuideProfGathering[] = ${JSON.stringify(profGathering, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_CURVE: GuideProfCurve = ${JSON.stringify(profCurve, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = ${JSON.stringify(profEnchanting, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = ${JSON.stringify(profMasterwork, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_ECONOMY: GuideProfEconomy = ${JSON.stringify(profEconomy, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_STATIONS: GuideProfStations = ${JSON.stringify(profStationsOut, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = ${JSON.stringify(profProvisioning, null, 2)};\n`,
-    `\nexport const GUIDE_PROF_PAGES: string[] = ${JSON.stringify(profPages, null, 2)};\n`,
-    `\nexport const GUIDE_MODELS: Record<string, GuideModelSpec> = ${JSON.stringify(MODELS, null, 2)};\n`,
-  ].join(''),
-);
-// eslint-disable-next-line no-console
-console.log(
-  `generated src/guide/content.generated.ts (${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${reliquary.length} reliquary pages, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models)`,
-);
+const generated = [
+  header,
+  `\nexport const GUIDE_CLASSES: GuideClassInfo[] = ${JSON.stringify(classes, null, 2)};\n`,
+  `\nexport const GUIDE_ZONES: GuideZoneInfo[] = ${JSON.stringify(zones, null, 2)};\n`,
+  `\nexport const GUIDE_DUNGEONS: GuideDungeon[] = ${JSON.stringify(dungeons, null, 2)};\n`,
+  `\nexport const GUIDE_WARLOCK_PETS: GuideWarlockPet[] = ${JSON.stringify(warlockPets, null, 2)};\n`,
+  `\nexport const GUIDE_DRUID_FORMS: GuideDruidForm[] = ${JSON.stringify(druidForms, null, 2)};\n`,
+  `\nexport const GUIDE_FAMILIES: GuideFamily[] = ${JSON.stringify(families, null, 2)};\n`,
+  `\nexport const GUIDE_DELVES: GuideDelve[] = ${JSON.stringify(delves, null, 2)};\n`,
+  `\nexport const GUIDE_DEEDS: GuideDeed[] = ${JSON.stringify(deeds, null, 2)};\n`,
+  `\nexport const GUIDE_RELIQUARY: GuideReliquaryPage[] = ${JSON.stringify(reliquary, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_RING: GuideProfRingCraft[] = ${JSON.stringify(profRing, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_ARCHETYPES: GuideProfArchetype[] = ${JSON.stringify(profArchetypes, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_CRAFTS: GuideProfCraft[] = ${JSON.stringify(profCrafts, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_GATHERING: GuideProfGathering[] = ${JSON.stringify(profGathering, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_CURVE: GuideProfCurve = ${JSON.stringify(profCurve, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = ${JSON.stringify(profEnchanting, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_MASTERWORK: GuideProfMasterwork = ${JSON.stringify(profMasterwork, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_ECONOMY: GuideProfEconomy = ${JSON.stringify(profEconomy, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_STATIONS: GuideProfStations = ${JSON.stringify(profStationsOut, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_PROVISIONING: GuideProfProvisioning = ${JSON.stringify(profProvisioning, null, 2)};\n`,
+  `\nexport const GUIDE_PROF_PAGES: string[] = ${JSON.stringify(profPages, null, 2)};\n`,
+  `\nexport const GUIDE_MODELS: Record<string, GuideModelSpec> = ${JSON.stringify(MODELS, null, 2)};\n`,
+].join('');
+const summary = `${classes.length} classes, ${zones.length} zones, ${dungeons.length} dungeons, ${warlockPets.length} warlock pets, ${druidForms.length} druid forms, ${families.length} families, ${delves.length} delves, ${deeds.length} deeds, ${reliquary.length} reliquary pages, ${profCrafts.length} crafts, ${profGathering.length} gathering professions, ${Object.keys(MODELS).length} models`;
+if (checkMode) {
+  let onDisk = null;
+  try {
+    onDisk = readFileSync(outFile, 'utf8');
+  } catch {
+    onDisk = null;
+  }
+  if (onDisk === generated) {
+    // eslint-disable-next-line no-console
+    console.log(`fresh: ${outLabel} matches the current sim data (${summary})`);
+  } else {
+    console.error(
+      `STALE: ${outLabel} ${onDisk === null ? 'is missing' : 'differs from the current sim data'}; ` +
+        'run `npm run wiki:content` and commit the result',
+    );
+    process.exitCode = 1;
+  }
+} else {
+  writeFileSync(outFile, generated);
+  // eslint-disable-next-line no-console
+  console.log(`generated ${outLabel} (${summary})`);
+}
