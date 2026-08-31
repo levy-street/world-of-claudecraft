@@ -217,7 +217,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   // The Last Keep rebuild (the owner's second placer pass, 2026-08-30):
   // the walled grounds on the keep-site pad west of the fortress. The long
   // west wall and training yard, the raised temple court holding the
-  // keep's castle_door (the dungeon door: see the_last_keep in
+  // keep castle_door (the dungeon door: see the_last_keep in
   // content/dungeons.ts and the castle_door arm in render/door_portal.ts),
   // the paved plazas, the western boardwalk, and the triple-gate house at
   // the dune-fork road's terminus. The third pass below re-sat four of
@@ -347,7 +347,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'bridge_floor', x: 430, y: 2, z: 2150.35, ry: 270 * DEG, scale: 10 },
   { key: 'bridge_floor', x: 436, y: 2, z: 2150.35, ry: 270 * DEG, scale: 10 },
   { key: 'bridge_floor', x: 442, y: 2, z: 2150.35, ry: 270 * DEG, scale: 10 },
-  { key: 'staircase', x: 441.95, y: -0.5, z: 2157.15, ry: 270 * DEG, scale: 6 },
+  { key: 'staircase', x: 441.95, y: -0.25, z: 2157.15, ry: 270 * DEG, scale: 6 },
   { key: 'fortress_wall', x: 426.45, y: 3, z: 2179.2, ry: 270 * DEG, scale: 8 },
   { key: 'fortress_wall', x: 426.45, y: 3, z: 2171.7, ry: 270 * DEG, scale: 8 },
   { key: 'fortress_wall', x: 426.45, y: 3, z: 2164.2, ry: 270 * DEG, scale: 8 },
@@ -371,6 +371,8 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   // fence-lined rim, the north strand stair down to the strait bridges,
   // and the first Wyrmwatch rebuild wave (tavern row, stables and yard,
   // church with its gravestone garden, signpost). Appended verbatim.
+  // The fourth pass re-sat the east rim promenade decks flush with the
+  // plaza (1.75 to 1.5) and lifted the west plaza stair seat a quarter.
   // ---------------------------------------------------------------------
   { key: 'fortress_wall', x: 439.15, y: 3, z: 2145.1, ry: 180 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 443.3, y: 1.9, z: 2145.35, ry: 135 * DEG, scale: 9 },
@@ -443,22 +445,22 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'tower_pillar', x: 490.55, y: 0, z: 2180.5, ry: 195 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 493.55, y: 0, z: 2178.5, ry: 240 * DEG, scale: 7 },
   { key: 'tower_pillar', x: 492.8, y: 0, z: 2181.5, ry: 225 * DEG, scale: 6 },
-  { key: 'bridge_floor', x: 464.7, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 469.45, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 474.2, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 478.95, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 483.7, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 488.45, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 493.2, y: 1.75, z: 2184.2, ry: 0, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2184.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2181.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2178.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2175.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2172.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2169.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2166.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2163.2, ry: 180 * DEG, scale: 5 },
-  { key: 'bridge_floor', x: 497.95, y: 1.75, z: 2160.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 464.7, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 469.45, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 474.2, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 478.95, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 483.7, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 488.45, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 493.2, y: 1.5, z: 2184.2, ry: 0, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2184.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2181.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2178.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2175.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2172.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2169.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2166.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2163.2, ry: 180 * DEG, scale: 5 },
+  { key: 'bridge_floor', x: 497.95, y: 1.5, z: 2160.2, ry: 180 * DEG, scale: 5 },
   { key: 'tower_pillar', x: 495.4, y: 0, z: 2158.4, ry: 90 * DEG, scale: 9 },
   { key: 'tower_pillar', x: 498.4, y: -5, z: 2155.9, ry: 90 * DEG, scale: 9 },
   { key: 'tower_pillar', x: 499.4, y: -0.75, z: 2159.15, ry: 90 * DEG, scale: 8 },
@@ -512,6 +514,20 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'gravestone_2', x: 390.6, y: 4.6, z: 1882.2, ry: 45 * DEG, scale: 3 },
   { key: 'gravestone_2', x: 392.6, y: 4.6, z: 1878.7, ry: 15 * DEG, scale: 3 },
   { key: 'gravestone_3', x: 394.6, y: 4.85, z: 1880.7, ry: 0, scale: 3 },
+  // ---------------------------------------------------------------------
+  // The fourth placer pass (2026-08-31): the east-court pavers behind the
+  // keep, a cannon emplacement on the east rim pillar, and the two strand
+  // gate pillars by the northwest stair mouth.
+  // ---------------------------------------------------------------------
+  { key: 'stone_floor', x: 475.35, y: 1.55, z: 2178.6, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 482.35, y: 1.55, z: 2178.6, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 490.35, y: 1.55, z: 2178.6, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 491.35, y: 1.55, z: 2171.6, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 491.35, y: 1.55, z: 2161.6, ry: 0, scale: 8 },
+  { key: 'tower_pillar', x: 492.7, y: 2.5, z: 2180.6, ry: 90 * DEG, scale: 7 },
+  { key: 'cannon', x: 492.7, y: 9.25, z: 2180.6, ry: 45 * DEG, scale: 3 },
+  { key: 'tower_pillar', x: 437.6, y: 0.3, z: 2183.9, ry: 180 * DEG, scale: 8 },
+  { key: 'tower_pillar', x: 434.6, y: 0.3, z: 2183.9, ry: 180 * DEG, scale: 9 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as
@@ -645,6 +661,11 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
         z0: placement.z - halfZ,
         z1: placement.z + halfZ,
       };
+      // The plate blocks only from its slab down-face up: `passUnderY` lets a
+      // mover with height walk BENEATH an elevated deck (the balcony walk over
+      // the training yard), while a ground-level paver's underside sits at the
+      // dirt and the clause stays inert. Mobs (height-less) still see a
+      // full-height solid, keeping pathfinding out of the undercrofts.
       for (const rect of croppedPlateRects(aabb, top))
         colliders.push({
           type: 'obb',
@@ -656,6 +677,7 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
           moveTopY: top,
           cameraTopY: top,
           standable: true,
+          passUnderY: placement.y,
         });
       continue;
     }

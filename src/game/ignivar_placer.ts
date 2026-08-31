@@ -29,6 +29,7 @@ import {
   IGNIVAR_LIFT_LAYOUT,
   IGNIVAR_SECOND_WING_LAYOUT,
 } from '../sim/dungeon_layout';
+import { FORGEFATHER_FORTRESS_PLACEMENTS } from '../sim/forgefather_fortress';
 import type { Entity } from '../sim/types';
 
 export interface IgnivarPlacerDeps {
@@ -379,7 +380,19 @@ function rebuildGroup(): void {
   }
   state.group.position.set(room.ox, 0, room.oz);
   state.group.clear();
-  const placements = state.entries.map(toPlacement);
+  // A street_lamp row already baked into the fortress table renders through
+  // the world's streetlamp fixture pipeline (brazier model, night light, post
+  // collider), so drawing the raw GLB here too would show every baked lamp
+  // twice while the placer is open. A new or moved lamp row has no baked twin
+  // at its spot yet and keeps its ghost; the selection ring is drawn
+  // separately, so a hidden lamp stays editable.
+  const bakedLampAt = (p: IgnivarPropPlacement): boolean =>
+    p.key === 'street_lamp' &&
+    (state.room?.exterior ?? false) &&
+    FORGEFATHER_FORTRESS_PLACEMENTS.some(
+      (b) => b.key === 'street_lamp' && Math.abs(b.x - p.x) < 0.01 && Math.abs(b.z - p.z) < 0.01,
+    );
+  const placements = state.entries.map(toPlacement).filter((p) => !bakedLampAt(p));
   appendIgnivarEnvProps(state.group, placements, false);
   // Live fire preview for placed torches so lighting can be judged while
   // placing. Preview lights bypass the renderer's fire-light budget (throwaway

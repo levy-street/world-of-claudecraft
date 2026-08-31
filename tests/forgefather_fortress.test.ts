@@ -5,7 +5,7 @@
 // aerial stack members never block), and seawalls may stand submerged by
 // design.
 import { describe, expect, it } from 'vitest';
-import type { ObbCollider } from '../src/sim/colliders';
+import { type ObbCollider, resolveMovement } from '../src/sim/colliders';
 import {
   FORGEFATHER_FORTRESS_PLACEMENTS,
   FORTRESS_CYLINDRICAL_KEYS,
@@ -25,7 +25,7 @@ const GROUND_STAND_TOLERANCE = 2.5;
 
 describe('forgefather fortress bake', () => {
   it('every placement resolves a registered prop', () => {
-    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(466);
+    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(475);
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS)
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
@@ -60,6 +60,13 @@ describe('forgefather fortress bake', () => {
         pieces.length,
         `${placement.key} at (${placement.x}, ${placement.z})`,
       ).toBeGreaterThanOrEqual(1);
+      // Every plate carries its slab underside, so an elevated deck admits
+      // the walk beneath it (the balcony contract) while a ground paver's
+      // clause stays inert at the dirt.
+      for (const piece of pieces)
+        expect(piece.passUnderY, `${placement.key} at (${placement.x}, ${placement.z})`).toBe(
+          placement.y,
+        );
       // The crossing stays dry: every walking surface clears the waterline.
       expect(top, `${placement.key} deck at (${placement.x}, ${placement.z})`).toBeGreaterThan(
         WATER_LEVEL + 1,
@@ -115,6 +122,29 @@ describe('forgefather fortress bake', () => {
       expect(match?.moveTopY).toBeCloseTo(placement.y + native.hei * placement.scale, 9);
       expect(match?.standable).toBeUndefined();
     }
+  });
+
+  it('an elevated deck admits the walk beneath it, but stays a wall to height-less movers', () => {
+    // The training-yard balcony (the rampart walk decks at y 7.05, slab tops
+    // 7.75) hangs over the pavers at ground 2.3: a player walking the
+    // undercroft lane between the yard wall and the plaza must pass clean
+    // beneath the plates, while a mob (no MoverHeight) still treats each
+    // plate as a full-height solid and paths around.
+    const walker = { y: 2.3, lift: 0 };
+    const through = resolveMovement(
+      WORLD_SEED,
+      463.5,
+      2160.5,
+      463.5,
+      2150,
+      0.5,
+      false,
+      undefined,
+      walker,
+    );
+    expect(through.z).toBeCloseTo(2150, 1);
+    const walled = resolveMovement(WORLD_SEED, 463.5, 2160.5, 463.5, 2150, 0.5);
+    expect(walled.z).toBeGreaterThan(2158.5);
   });
 
   it('street lamp rows bake as Drakelands brazier streetlamp sites', () => {

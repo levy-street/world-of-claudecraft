@@ -2,6 +2,8 @@
 // terrain height, prop placement, and static collision contract for every
 // instance. All coordinates are instance-local and stay inside one 500 yd slot.
 
+import type { Collider } from './colliders';
+
 export type WildheartPropKind =
   | 'wildheart_limestone_cliff'
   | 'wildheart_jaguar_gate'
@@ -300,3 +302,29 @@ export const WILDHEART_FIELD_COLLIDER_SPECS: readonly WildheartColliderSpec[] =
       },
     ];
   });
+
+// Wildheart follows the same open-field contract, but its walkable bridges and
+// water ribbons are heightfield surfaces rather than blocking props, so the
+// static set is just the field walls plus the prop trunk circles (assembled
+// here beside its data per the colliders.ts extraction seam).
+export const WILDHEART_COLLIDERS: Collider[] = [
+  ...WILDHEART_FIELD_WALLS.map(
+    (wall): Collider => ({
+      type: 'obb',
+      x: wall.x,
+      z: wall.z,
+      hw: wall.hw,
+      hd: wall.hd,
+      rot: 0,
+    }),
+  ),
+  ...WILDHEART_FIELD_COLLIDER_SPECS.map(
+    (spec): Collider => ({
+      type: 'circle',
+      x: spec.x,
+      z: spec.z,
+      r: spec.r,
+      cameraTopY: spec.h,
+    }),
+  ),
+];

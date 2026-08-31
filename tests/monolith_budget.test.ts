@@ -434,7 +434,10 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered with the Last Keep castle removal: the keep's wall-ledge and
     // parapet collider loops retired (Dawnhold keeps its own). Exact
     // count, zero slack.
-    ceiling: 2577,
+    // Lowered again with the Wildheart static-set assembly moved beside its
+    // field data (wildheart_field.ts); the pass-under balcony clause rode
+    // the freed room. Exact count, zero slack.
+    ceiling: 2572,
     seam: 'per-zone collider data beside the zone content; shared logic stays here',
   },
   {
