@@ -23393,6 +23393,20 @@ record; the QA twin re-sweeps and diffs.
   cost is one missing "N beds ready" line in a narrow one-time case, accepted
   over a new persisted field.
 
+### TWO DEFECTS THE REVIEW ROUNDS FOUND IN CODE THE PACKET DID NOT WRITE
+
+Recorded because they are the phase's most valuable finds and neither was on
+the inventory: (1) the enchant action menu re-read the live bag at CLICK time
+while its comment claimed it named the copy the ROW described, so a splice
+between paint and click renamed the target (fixed by capturing the victim
+payload at paint; pinned, aa45b73435); (2) the plain-victim walk direction was
+untested tree-wide: reversing it (naming the lowest-index plain cell instead of
+the highest, which is the cell consumeOneScratch actually spends) left the
+suite green even on pristine HEAD, because no fixture ever held two plain cells
+of one id. The fixture now exists and reds on that mutation. Both were surfaced
+by an agent proving its OWN kept assertions decisive, which is the argument for
+the mutation discipline rather than a green suite.
+
 ### THE UNIT MAP (how the 207 bucket-A items were partitioned)
 
 Sixteen units, each owning a DISJOINT file set so parallel writers could not
