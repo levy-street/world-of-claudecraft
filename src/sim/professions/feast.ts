@@ -176,6 +176,19 @@ export interface FeastState {
    *  transient like the rest of FeastState (no save blob, no PlayerMeta, no
    *  wire field), so it is sim-local and adds no cross-platform surface. */
   dishItemId: string;
+  /** The CRAFTER'S signature, copied from the SOURCE INSTANCE at placement.
+   *  Absent when the spent copy carried no signer (an unsigned feast, and the
+   *  id-only spend, which names no copy to read one from).
+   *
+   *  Distinct from the placer, and that distinction is the point: a feast is a
+   *  tradable item, so the player who sets the table is routinely not the one
+   *  who cooked it. The placer's name already rides the entity as its wire
+   *  `name`; this is the second name, and without it the maker's mark a crafted
+   *  feast carries in the bags vanished the instant it was set down, which no
+   *  other signed item does (the shipped signer doctrine, mintsSignerPayload in
+   *  professions/crafting.ts). Mirrored to clients on the entity's own sparse
+   *  `feastSigner` field, so it needs no new wire mechanism. */
+  signer?: string;
   /** The per-player consumed ledger: one bite per player per feast. */
   eatenBy: Set<string>;
 }
@@ -285,6 +298,12 @@ export function placeFeastAction(
   // plantCrop, locked slots are never victims). Both mutate the slot array
   // only, so the quest hook fires once here (place_feast stays a
   // HEAVY_SELF_CMDS member for the self snapshot).
+  // Read the crafter's signature off the SOURCE copy BEFORE the spend, which
+  // is the only moment it exists: the consume splices the slot away, and the
+  // id-only walk below never names one to read. An unsigned copy, and every
+  // id-only spend, leave this undefined and the feast carries no mark, exactly
+  // as before.
+  const signer = selected?.instance?.signer;
   if (selected) {
     // Branch on the tri-state as item_copy_ref.ts demands. Nothing mutates
     // the inventory between the resolve above and this consume today, so a
@@ -307,6 +326,10 @@ export function placeFeastAction(
   e.templateId = info.templateId;
   e.objectItemId = null;
   e.lootable = false;
+  // The CRAFTER'S mark rides beside the placer's name, as a VALUE like it:
+  // sparse (absent on an unsigned or id-only spend) and display-only, so it
+  // costs an unsigned feast nothing on the wire.
+  if (signer) e.feastSigner = signer;
   // The object-respawn sweep in sim.ts's entity loop treats EVERY
   // lootable-false object as a cooling pickup (respawnTimer -= DT, re-arm
   // at zero), which re-armed the feast one second after placement and
@@ -343,6 +366,7 @@ export function placeFeastAction(
     charges: info.charges,
     expiresAtTick: ctx.tickCount + info.durationTicks,
     dishItemId: info.dishItemId,
+    signer,
     eatenBy: new Set(),
   });
   ctx.emit({ type: 'farmFeastPlaced', pid: meta.entityId, feastId: e.id });

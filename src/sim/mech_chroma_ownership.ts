@@ -1,6 +1,6 @@
 import type { AccountCosmetics } from '../world_api';
 import { mechChromaForSkin, mechChromaSkinIndex } from './content/skins';
-import type { SkinCatalog } from './types';
+import type { ItemUseResult, SkinCatalog } from './types';
 
 export function wornMechChromaId(catalog: SkinCatalog | undefined, skin: number): string | null {
   if (catalog !== 'mech') return null;
@@ -15,11 +15,6 @@ export function accountCosmeticsWithWornMechChroma(
   const chromaId = wornMechChromaId(catalog, skin);
   if (!chromaId || cosmetics.mechChromaIds.includes(chromaId)) return cosmetics;
   return { ...cosmetics, mechChromaIds: [...cosmetics.mechChromaIds, chromaId] };
-}
-
-export interface ItemUseResult {
-  type: 'mechChroma';
-  chromaId: string;
 }
 
 /** The Sim surface the ownership mutations touch; Sim satisfies it structurally

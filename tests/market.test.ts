@@ -510,6 +510,34 @@ describe('the World Market: the Merchant', () => {
       expect(info.collectionSalesOmitted).toBe(0);
     });
 
+    it("stamps the sold copy's CHOSEN name, and nothing for a plain copy", () => {
+      // The listing row is spliced away the line after the ledger write, so
+      // the sale is the last moment anything knows what the copy was called.
+      // Without the stamp a seller with two listings of one id reads two
+      // identical Collect rows.
+      const { sim, seller, buyer } = world();
+      const named = { name: 'Dawn Oath' } as never;
+      sim.addItemInstance('wolf_fang', named, seller, 1, { silent: true });
+      sim.marketListInstance('wolf_fang', 1000, named, seller);
+      sim.marketBuy(
+        listingBy(
+          sim,
+          (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
+          'named wolf_fang listing',
+        ).id,
+        buyer,
+      );
+      expect(marketInfo(sim, seller).collectionSales[0]).toMatchObject({
+        itemId: 'wolf_fang',
+        itemName: 'Dawn Oath',
+      });
+
+      // A PLAIN copy stamps nothing, so the field costs the common case zero
+      // bytes in the blob and on the wire.
+      const plain = sellOne(sim, seller, buyer, 'bone_fragments', 1, 500);
+      expect(plain.collectionSales[1].itemName).toBeUndefined();
+    });
+
     it('lists one row per sale, oldest first, and the rows sum to the proceeds', () => {
       const { sim, seller, buyer } = world();
 

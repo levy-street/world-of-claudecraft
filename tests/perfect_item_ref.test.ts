@@ -121,18 +121,28 @@ describe('parsePerfectItemName (Masterwrought phase 13)', () => {
 });
 
 describe('resolvePerfectItemName: the whole naming decision (the phase 13 QA K17 pin)', () => {
+  // The promotion probe the dispatch binds to the live sim. Named per case so
+  // each says which copy it is deciding over, and counted so the laziness
+  // claim (the sim read is paid only on a screen MATCH) is asserted, not
+  // assumed.
+  const promoting = () => vi.fn(() => true);
+  const unperfected = () => vi.fn(() => false);
+
   it('screens the NORMALIZED value, never the raw wire spelling, and passes it on', () => {
     // D13-5: the content screen prices the trimmed, whitespace-collapsed name,
     // so a spelling only normalization exposes cannot slip past a raw-token
     // screen, and there is no hidden coupling to the censorship normalizer's
     // own whitespace stripping.
     const screen = vi.fn((_name: string) => false);
-    expect(resolvePerfectItemName({ name: '  Oath   of  Vale ' }, screen)).toEqual({
+    const promote = promoting();
+    expect(resolvePerfectItemName({ name: '  Oath   of  Vale ' }, screen, promote)).toEqual({
       refused: false,
       name: 'Oath of Vale',
     });
     expect(screen).toHaveBeenCalledTimes(1);
     expect(screen).toHaveBeenCalledWith('Oath of Vale');
+    // A clean name never asks the sim anything, on a promotable copy or not.
+    expect(promote).not.toHaveBeenCalled();
   });
 
   it('a whitespace-run spelling past the raw ceiling normalizes to a live name on BOTH hosts', () => {
@@ -142,39 +152,73 @@ describe('resolvePerfectItemName: the whole naming decision (the phase 13 QA K17
     // shape refusal online, a promotion named 'Oath Z' offline); raw
     // pass-through lets the same normalizer answer 'Oath Z' on both hosts.
     const screen = vi.fn((_name: string) => false);
-    expect(resolvePerfectItemName({ name: `Oath${' '.repeat(60)}Z` }, screen)).toEqual({
-      refused: false,
-      name: 'Oath Z',
-    });
+    expect(resolvePerfectItemName({ name: `Oath${' '.repeat(60)}Z` }, screen, promoting())).toEqual(
+      {
+        refused: false,
+        name: 'Oath Z',
+      },
+    );
     expect(screen).toHaveBeenCalledWith('Oath Z');
     expect(`Oath${' '.repeat(60)}Z`.length).toBeGreaterThan(MAX_INSTANCE_STRING_LENGTH);
   });
 
-  it('refuses the frame on a match, with no name passed on', () => {
+  it('refuses the frame on a match ONLY when the copy would consume the name', () => {
+    // The phase 18 narrowing. `promoting` answers whether Sim.perfectItemAs
+    // would route this copy to the promotion ladder (payload.perfected), the
+    // only code that can stamp a name; a screened name there is refused whole,
+    // with no name passed on.
     const screen = vi.fn((name: string) => name === 'Bad Word');
-    expect(resolvePerfectItemName({ name: 'Bad   Word' }, screen)).toEqual({ refused: true });
+    const promote = promoting();
+    expect(resolvePerfectItemName({ name: 'Bad   Word' }, screen, promote)).toEqual({
+      refused: true,
+    });
     expect(screen).toHaveBeenCalledWith('Bad Word');
+    // Asked exactly once, and only because the screen matched.
+    expect(promote).toHaveBeenCalledTimes(1);
+  });
+
+  it('an offensive name on an UNPERFECTED copy is STRIPPED, and the attempt proceeds', () => {
+    // The other half of the narrowing, and the defect it fixes: the ordinary
+    // perfecting attempt ignores `name` entirely, so refusing the whole frame
+    // cost the player an attempt over a string the sim would never have
+    // written. The verdict is `refused: false` with NO name, which the
+    // dispatch already handles as an unnamed attempt with no new arm.
+    const screen = vi.fn((name: string) => name === 'Bad Word');
+    const probe = unperfected();
+    const verdict = resolvePerfectItemName({ name: 'Bad   Word' }, screen, probe);
+    expect(verdict).toEqual({ refused: false });
+    // Spelled out rather than left to toEqual: the strip is the ABSENCE of a
+    // name, and passing the normalized value on here would stamp it.
+    expect(verdict.refused).toBe(false);
+    expect(verdict.name).toBeUndefined();
+    expect(screen).toHaveBeenCalledWith('Bad Word');
+    expect(probe).toHaveBeenCalledTimes(1);
   });
 
   it('a shape-INVALID name skips the screen entirely and rides RAW for the sim to refuse', () => {
     const screen = vi.fn(() => true);
-    expect(resolvePerfectItemName({ name: '1Blade' }, screen)).toEqual({
+    const promote = promoting();
+    expect(resolvePerfectItemName({ name: '1Blade' }, screen, promote)).toEqual({
       refused: false,
       name: '1Blade',
     });
     expect(
-      resolvePerfectItemName({ name: 'z'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1) }, screen),
+      resolvePerfectItemName({ name: 'z'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1) }, screen, promote),
     ).toEqual({ refused: false, name: 'z'.repeat(MAX_LEGENDARY_NAME_LENGTH + 1) });
     expect(screen).not.toHaveBeenCalled();
+    // Shape-first: an unscreened name never reaches the sim read either.
+    expect(promote).not.toHaveBeenCalled();
   });
 
   it('no usable name field passes undefined without touching the screen', () => {
     const screen = vi.fn(() => true);
+    const promote = promoting();
     for (const msg of [{}, { name: 7 }, { name: '' }, { name: null }]) {
-      expect(resolvePerfectItemName(msg as { name?: unknown }, screen)).toEqual({
+      expect(resolvePerfectItemName(msg as { name?: unknown }, screen, promote)).toEqual({
         refused: false,
       });
     }
     expect(screen).not.toHaveBeenCalled();
+    expect(promote).not.toHaveBeenCalled();
   });
 });

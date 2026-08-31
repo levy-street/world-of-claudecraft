@@ -71,7 +71,12 @@ export interface TickPerfLineInputs {
   blobP99Bytes: number;
 }
 
-function round2(v: number): number {
+/** Two-decimal rounding for wire and log numerics. Exported because
+ *  server/game.ts carried a byte-identical private copy: the entity/self wire
+ *  encoder and this line formatter round the same way on purpose (a log figure
+ *  and the wire figure beside it must not disagree in their last digit), so the
+ *  rule lives once, here, and game.ts imports it. */
+export function round2(v: number): number {
   return Math.round(v * 100) / 100;
 }
 

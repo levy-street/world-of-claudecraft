@@ -376,6 +376,88 @@ describe('shared feast: placing', () => {
     expect(unlockedUnits(placer)).toBe(0);
   });
 
+  it("carries the CRAFTER'S signature from the spent copy onto the state and the entity", () => {
+    // A feast is tradable, so the cook and the host are routinely different
+    // people. The placer's name rides the entity as `name` (the title); the
+    // crafter's rides beside it, read off the SOURCE copy before the spend
+    // splices it away.
+    const { sim, placer } = world(0);
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'Mira' }, placer.pid, 1, { silent: true });
+    const idx = placer.meta.inventory.findIndex((s) => s.itemId === FARM_FEAST_ITEM_ID);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid, idx);
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+    const [state] = [...sim.ctx.feasts.values()];
+    expect(state.signer).toBe('Mira');
+    const [entity] = feastEntities(sim);
+    expect(entity.feastSigner).toBe('Mira');
+    // The two names are DISTINCT: the placer is still the title's name.
+    expect(entity.name).toBe(placer.meta.name);
+    expect(entity.name).not.toBe('Mira');
+  });
+
+  it('an UNSIGNED copy leaves the mark absent, on the state and the wire alike', () => {
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const idx = placer.meta.inventory.findIndex((s) => s.itemId === FARM_FEAST_ITEM_ID);
+    sim.placeFeast(placer.pid, idx);
+    const [state] = [...sim.ctx.feasts.values()];
+    expect(state.signer).toBeUndefined();
+    expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
+  });
+
+  it('an ID-ONLY spend names no copy, so it carries no mark (unchanged behavior)', () => {
+    const { sim, placer } = world(0);
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'Mira' }, placer.pid, 1, { silent: true });
+    sim.placeFeast(placer.pid);
+    expect([...sim.ctx.feasts.values()][0].signer).toBeUndefined();
+    expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
+  });
+
+  it('the placeFeast DELEGATE carries the named copy through to the spend', () => {
+    // The IWorld verb itself, not the action body: Sim.placeFeast folds its
+    // overloaded (pid | target) pair like every other item command, so the
+    // clicked copy reaches placeFeastAction. Before this, the delegate dropped
+    // the selection on the floor and every place ran the id-only walk.
+    const { sim, placer } = world(0);
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyA' }, placer.pid, 1, { silent: true });
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyB' }, placer.pid, 1, { silent: true });
+    const idxA = placer.meta.inventory.findIndex(
+      (s) => s.itemId === FARM_FEAST_ITEM_ID && s.instance?.signer === 'CopyA',
+    );
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid, idxA);
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+    const left = placer.meta.inventory.filter((s) => s.itemId === FARM_FEAST_ITEM_ID);
+    expect(left).toHaveLength(1);
+    // The END-slot copy survives, which is exactly what the id-only walk
+    // would have taken.
+    expect(left[0].instance?.signer).toBe('CopyB');
+  });
+
+  it('a BARE placeFeast still spends through the id-only walk (the Phase 11k default)', () => {
+    const { sim, placer } = world(0);
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyA' }, placer.pid, 1, { silent: true });
+    sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'CopyB' }, placer.pid, 1, { silent: true });
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid);
+    expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
+    const left = placer.meta.inventory.filter((s) => s.itemId === FARM_FEAST_ITEM_ID);
+    expect(left).toHaveLength(1);
+    // The highest-index copy went, unchanged from before the slot existed.
+    expect(left[0].instance?.signer).toBe('CopyA');
+  });
+
+  it('the delegate REFUSES a stale named selection rather than falling back', () => {
+    const { sim, placer } = world(0);
+    giveFeast(sim, placer);
+    const from = sim.events.length;
+    sim.placeFeast(placer.pid, 999);
+    expect(denyReason(sim, from)).toBe('no_feast');
+    expect(sim.countItem(FARM_FEAST_ITEM_ID, placer.pid)).toBe(1);
+    expect(feastEntities(sim)).toHaveLength(0);
+  });
+
   it('a stale named selection refuses without spending (the direct defensive arm)', () => {
     // The tri-state's null branch is unreachable through useItem (which
     // pre-validates the selection), so this drives placeFeastAction directly

@@ -75,6 +75,17 @@ function seedPerfecter(server: GameServer, pid: number): void {
   server.sim.addItem(APEX_NECK, 1, pid);
 }
 
+/** Stamp `perfected` on a bagged copy, the ONE payload field Sim.perfectItemAs
+ *  routes on: a perfected copy goes to the promotion ladder (which consumes
+ *  the legendary name), every other copy to the ordinary attempt (which
+ *  ignores it). The phase 18 name screen asks exactly this question, so the
+ *  refusal arm needs a copy that really answers yes. */
+function markPerfected(server: GameServer, pid: number, bag: number): void {
+  const slot = serverMeta(server, pid).inventory[bag];
+  expect(slot, `bag ${bag} holds a copy to perfect`).toBeTruthy();
+  slot.instance = { ...(slot.instance ?? {}), perfected: true };
+}
+
 function bagRefOf(
   server: GameServer,
   pid: number,
@@ -418,13 +429,17 @@ describe('perfect_item over the real online dispatch path', () => {
       .map((e: any) => e.text);
     expect(shapeInvalidErrors).not.toContain('That name is not allowed.');
     // The content screen (offensiveName, the pet_rename split) runs on the
-    // NORMALIZED value: the frame is answered with the refusal event and the
-    // sim is NEVER called, including a spelling only normalization exposes.
+    // NORMALIZED value, and phase 18 narrowed WHEN a match refuses the frame:
+    // only a copy the sim would route to the promotion ladder can consume the
+    // name, so the refusal needs a PERFECTED copy. Both spellings, including
+    // the one only normalization exposes.
+    const perfected = bagRefOf(server, pid, APEX_NECK);
+    markPerfected(server, pid, perfected.bag);
     for (const name of ['fuck', 'f   u   u   u   ck']) {
       const callsBefore = spy.mock.calls.length;
       fc.sent.length = 0;
       clock.tick();
-      cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name });
+      cmd(server, session, { cmd: 'perfect_item', ...wireOf(perfected), name });
       expect(spy.mock.calls.length, name).toBe(callsBefore);
       const errors = fc.sent
         .filter((m: any) => m.t === 'events')
@@ -433,6 +448,42 @@ describe('perfect_item over the real online dispatch path', () => {
         .map((e: any) => e.text);
       expect(errors, name).toContain('That name is not allowed.');
     }
+    spy.mockRestore();
+    clock.restore();
+  });
+
+  it('an offensive name on an UNPERFECTED copy is stripped, and the attempt still runs', () => {
+    // The other half of the phase 18 narrowing, over the real dispatch. The
+    // ordinary perfecting attempt ignores `name` entirely (Sim.perfectItemAs
+    // routes only a `payload.perfected` copy to the promotion ladder), so
+    // refusing the whole frame for a name the sim would have dropped cost the
+    // player their attempt. Now the name is STRIPPED: the sim is called
+    // UNNAMED, and the player reads no refusal line.
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 914, 'Stripper');
+    const pid = session.pid as number;
+    seedPerfecter(server, pid);
+    const spy = vi.spyOn(server.sim, 'perfectItemAs');
+    const clock = namedFrameClock();
+    const bagged = bagRefOf(server, pid, APEX_NECK);
+    // The copy is untouched: no `perfected`, so the promotion ladder is not
+    // where this frame is going. (The refusal arm above marks the twin.)
+    expect(serverMeta(server, pid).inventory[bagged.bag]?.instance?.perfected).toBeUndefined();
+    fc.sent.length = 0;
+    clock.tick();
+    cmd(server, session, { cmd: 'perfect_item', ...wireOf(bagged), name: 'fuck' });
+    // Reached the sim, and reached it with the name gone rather than passed on:
+    // a stripped name that still rode through would stamp it at the next
+    // promotion, which is the whole point of stripping instead of forwarding.
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenLastCalledWith(pid, { bag: bagged.bag, itemId: APEX_NECK }, undefined);
+    const errors = fc.sent
+      .filter((m: any) => m.t === 'events')
+      .flatMap((m: any) => m.list)
+      .filter((e: any) => e.type === 'error')
+      .map((e: any) => e.text);
+    expect(errors).not.toContain('That name is not allowed.');
     spy.mockRestore();
     clock.restore();
   });

@@ -13,11 +13,14 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { EquipSlot, ItemDef } from '../src/sim/types';
+import type { EquipSlot, InvSlot, ItemDef } from '../src/sim/types';
+import { itemCopyPin } from '../src/sim/item_copy_ref';
 import {
+  draggedCopySlotIndex,
   dropRequiredLevel,
   isPaperdollDraggable,
   paperdollDropAction,
+  resolveDraggedCopy,
 } from '../src/ui/equip_drop_core';
 import { Hud } from '../src/ui/hud';
 import { resolveDropTargetAt } from '../src/ui/item_drop_hit_test';
@@ -714,6 +717,128 @@ describe('char_window masterwrought mirror wiring (source pins)', () => {
     expect(src).toContain("this.deps.showError(tSim('error.masterwroughtCap'));");
     expect(src).toContain("case 'blockedMasterwroughtLegendary':");
     expect(src).toContain("this.deps.showError(tSim('error.masterwroughtLegendary'));");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The dragged-copy identity (resolveDraggedCopy / draggedCopySlotIndex). A drag
+// is a WINDOW during which the bags can move underneath it, so the pick-up index
+// stops being an identity the moment a snapshot lands.
+// ---------------------------------------------------------------------------
+describe('resolveDraggedCopy', () => {
+  /** An enchanted copy and its plain duplicate: the pair whose confusion is the
+   *  whole reason a pin exists. */
+  const enchanted = {
+    itemId: 'ring',
+    count: 1,
+    instance: { enchant: { id: 'ench_str' } },
+  } as unknown as InvSlot;
+  const plain = { itemId: 'ring', count: 1 } as unknown as InvSlot;
+  const other = { itemId: 'cloth', count: 4 } as unknown as InvSlot;
+
+  function refFor(inventory: readonly InvSlot[], index: number) {
+    return { index, copyPin: itemCopyPin(inventory[index]) };
+  }
+
+  it('resolves an untouched drag back to its own cell', () => {
+    const inv = [plain, enchanted, other];
+    expect(resolveDraggedCopy(inv, 'ring', refFor(inv, 1))).toEqual({ kind: 'held', index: 1 });
+  });
+
+  it('FOLLOWS the copy when the bags shift underneath the drag', () => {
+    // The cell below the dragged copy emptied mid-drag, so everything above it
+    // moved down one. The pick-up index (1) now names the enchanted copy's
+    // former neighbour; the pin finds the copy at its new index.
+    const before = [plain, enchanted, other];
+    const ref = refFor(before, 1);
+    const after = [enchanted, other];
+    expect(resolveDraggedCopy(after, 'ring', ref)).toEqual({ kind: 'held', index: 0 });
+  });
+
+  it('never redirects to a DIFFERENT copy of the same id (the silent failure)', () => {
+    // THE regression. After the shift, index 1 still holds a `ring`, so an
+    // index-plus-id check accepts it and the drop equips the plain duplicate
+    // instead of the enchanted piece the player dragged.
+    const before = [other, enchanted, plain];
+    const ref = refFor(before, 1);
+    const after = [other, plain, enchanted];
+    expect(after[ref.index].itemId).toBe('ring'); // an id check would be satisfied
+    expect(resolveDraggedCopy(after, 'ring', ref)).toEqual({ kind: 'held', index: 2 });
+  });
+
+  it('refuses when the dragged copy has left the bags', () => {
+    const before = [plain, enchanted];
+    const ref = refFor(before, 1);
+    expect(resolveDraggedCopy([plain], 'ring', ref)).toEqual({ kind: 'gone' });
+    expect(resolveDraggedCopy([], 'ring', ref)).toEqual({ kind: 'gone' });
+  });
+
+  it('treats an emptied cell as holding nothing', () => {
+    const before = [enchanted];
+    const ref = refFor(before, 0);
+    const emptied = [{ ...enchanted, count: 0 } as unknown as InvSlot];
+    expect(resolveDraggedCopy(emptied, 'ring', ref)).toEqual({ kind: 'gone' });
+  });
+
+  it('an UNPINNED drag keeps the pre-existing id-only behavior', () => {
+    // A sorted or filtered grid names no position, so it captures no identity;
+    // every consumer must behave exactly as it did before the pin existed.
+    const inv = [plain, enchanted];
+    expect(resolveDraggedCopy(inv, 'ring', { index: null, copyPin: '' })).toEqual({
+      kind: 'unpinned',
+    });
+    expect(resolveDraggedCopy(inv, 'ring', { index: 1, copyPin: '' })).toEqual({
+      kind: 'unpinned',
+    });
+  });
+
+  it('two indistinguishable copies resolve to either, which is correct', () => {
+    // The pin covers everything that DISTINGUISHES two copies, so a matching
+    // pair is interchangeable by definition. Deterministic: the pick-up index
+    // wins, otherwise the lowest match.
+    const inv = [plain, other, plain];
+    expect(resolveDraggedCopy(inv, 'ring', refFor(inv, 2))).toEqual({ kind: 'held', index: 2 });
+    expect(resolveDraggedCopy([other, plain], 'ring', refFor(inv, 2))).toEqual({
+      kind: 'held',
+      index: 1,
+    });
+  });
+
+  it('does not match a same-pin copy of a DIFFERENT item id', () => {
+    const inv = [plain];
+    expect(resolveDraggedCopy(inv, 'cloth', refFor(inv, 0))).toEqual({ kind: 'gone' });
+  });
+});
+
+describe('draggedCopySlotIndex (what a drop consumer sends)', () => {
+  const enchanted = {
+    itemId: 'ring',
+    count: 1,
+    instance: { enchant: { id: 'ench_str' } },
+  } as unknown as InvSlot;
+  const plain = { itemId: 'ring', count: 1 } as unknown as InvSlot;
+
+  it('names the copy at its CURRENT index', () => {
+    const before = [plain, enchanted];
+    const ref = { index: 1, copyPin: itemCopyPin(before[1]) };
+    expect(draggedCopySlotIndex(before, 'ring', ref)).toBe(1);
+    expect(draggedCopySlotIndex([enchanted], 'ring', ref)).toBe(0);
+  });
+
+  it('answers null (refuse) for a copy that is gone, never a fallback index', () => {
+    const before = [plain, enchanted];
+    const ref = { index: 1, copyPin: itemCopyPin(before[1]) };
+    // A plain `ring` is still held, so an id-only fallback would happily name
+    // it. Refusing is the point: the player dragged the enchanted one.
+    expect(draggedCopySlotIndex([plain], 'ring', ref)).toBeNull();
+  });
+
+  it('answers undefined (id-only fallback) for an unpinned drag with no position', () => {
+    expect(draggedCopySlotIndex([plain], 'ring', { index: null, copyPin: '' })).toBeUndefined();
+  });
+
+  it('answers the raw index for an unpinned drag that had one', () => {
+    expect(draggedCopySlotIndex([plain], 'ring', { index: 0, copyPin: '' })).toBe(0);
   });
 });
 

@@ -715,4 +715,66 @@ describe('routeEvents selection guards', () => {
     routeRaw(server, []);
     expect(fa.sent).toEqual([]);
   });
+
+  it('a spectator frame merges the anchor pid, its OWN pid, and the broadcast set in BATCH order', () => {
+    // The per-pid index (server/event_pid_index.ts) walks three separate lists
+    // for a spectating session; this is the case that would come out reordered
+    // if they were walked one after another instead of merged by original index.
+    // Authored so the three sources INTERLEAVE: own, broadcast, anchor, own,
+    // broadcast, anchor. A concatenating walk would emit them grouped instead.
+    const server = new GameServer();
+    const fWatcher = fakeWs();
+    const watcher = joinServer(server, fWatcher, 1, 'Watcher');
+    const fTarget = fakeWs();
+    const target = joinServer(server, fTarget, 2, 'Target');
+    const fSender = fakeWs();
+    const sender = joinServer(server, fSender, 3, 'Sender');
+    watcher.spectating = {
+      characterId: target.characterId,
+      name: 'Target',
+      savedPos: { ...entityPos(server, watcher.pid) },
+      priorGm: false,
+      stowedPet: null,
+    };
+    fWatcher.sent.length = 0;
+
+    const ownWhisper = (text: string): SimEvent => ({
+      type: 'chat',
+      fromPid: sender.pid,
+      from: 'Sender',
+      channel: 'whisper',
+      text,
+      pid: watcher.pid,
+    });
+    const worldSay = (text: string): SimEvent => ({
+      type: 'chat',
+      fromPid: sender.pid,
+      from: 'Sender',
+      channel: 'say',
+      text,
+    });
+    const anchorLoot = (itemId: string): SimEvent =>
+      ({ type: 'loot', pid: target.pid, itemId, count: 1 }) as unknown as SimEvent;
+
+    routeRaw(server, [
+      ownWhisper('own-1'),
+      worldSay('world-1'),
+      anchorLoot('anchor_1'),
+      ownWhisper('own-2'),
+      worldSay('world-2'),
+      anchorLoot('anchor_2'),
+    ]);
+
+    expect(fWatcher.sent).toHaveLength(1);
+    const list = (JSON.parse(fWatcher.sent[0]) as { list: { text?: string; itemId?: string }[] })
+      .list;
+    expect(list.map((ev) => ev.text ?? ev.itemId)).toEqual([
+      'own-1',
+      'world-1',
+      'anchor_1',
+      'own-2',
+      'world-2',
+      'anchor_2',
+    ]);
+  });
 });

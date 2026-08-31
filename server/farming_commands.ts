@@ -90,13 +90,23 @@ export function dispatchFarmingCommand(
       sim.convertHusks(pid);
       return true;
     case 'place_feast':
-      // The shared feast's place verb. NO payload to guard: the one feast
-      // item id, its charge count, its expiry, and the one-active-feast-per
-      // -placer rule all resolve sim-side (src/sim/professions/feast.ts)
-      // from the sender's own bags and the live feast table, so there is
-      // nothing on this frame to forge. Every refusal answers with the
-      // pid-scoped text-free farmDenied event.
-      sim.placeFeast(pid);
+      // The shared feast's place verb. The one feast item id, its charge
+      // count, its expiry, and the one-active-feast-per-placer rule all
+      // resolve sim-side (src/sim/professions/feast.ts) from the sender's own
+      // bags and the live feast table, so nothing on this frame decides an
+      // outcome. The one field it carries is `slot`, WHICH bag copy to spend:
+      // a TYPE boundary only (a non-negative integer), because the sim
+      // re-resolves the index against its own inventory and answers a
+      // mismatch with farmDenied 'no_feast'. An absent or malformed slot
+      // falls through to the id-only walk, which is the command's original
+      // meaning and what the Phase 11k pin holds. Every refusal answers with
+      // the pid-scoped text-free farmDenied event.
+      sim.placeFeast(
+        pid,
+        typeof msg.slot === 'number' && Number.isInteger(msg.slot) && msg.slot >= 0
+          ? msg.slot
+          : undefined,
+      );
       return true;
     case 'consume_feast':
       // The shared feast's eat verb: the feast ENTITY id and nothing else.

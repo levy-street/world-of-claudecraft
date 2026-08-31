@@ -1285,7 +1285,32 @@ const MONOLITHS: MonolithRow[] = [
     // and farming cases and the blobP99 heartbeat input. Extraction first, then
     // the phase's lines, netting 4 under (wc -l < server/game.ts after biome);
     // the ceiling follows the file down. Exact count, zero slack.
-    ceiling: 10294,
+    // LOWERED 10294 -> 10282 at Phase 18 (U-NET-WIRE addendum C, 2026-08-31):
+    // routeEvents' once-per-batch chat-flair prologue moved whole to
+    // server/chat_flair_stamp.ts (a pure function behind a two-call deps bag,
+    // paired suite tests/chat_flair_stamp.test.ts) and the private round2 copy
+    // was deleted for the one server/tick_perf_log.ts now exports. That paid
+    // for the per-pid routing index's wiring (server/event_pid_index.ts: the
+    // build call plus the merged per-session walk) with 12 lines to spare.
+    // Extraction first, then the phase's lines; measured with
+    // wc -l < server/game.ts after biome. Exact count, zero slack.
+    // RE-MEASURED 10282 -> 10294 in the same unit, after the wire half landed:
+    // the per-pid index's build call and merged walk, the three discard-class
+    // dispatch arms' copy-anchor parse, and the placed feast's crafter-mark
+    // wire line. The chat_flair_stamp and round2 extractions above paid the
+    // first 12 of those; the rest is the phase's own new surface, so the row
+    // sits back at its pre-unit value rather than below it. Exact count.
+    // LOWERED 10294 -> 10286 in the same unit, for the perfect_item name screen's
+    // narrowing (an offensive name now refuses the frame only on a copy the sim
+    // would route to the promotion ladder, and is stripped otherwise). The
+    // private chatChannelHint helper moved whole to server/chat_channel_hint.ts,
+    // narrowed from the whole ClientSession to the one field it read, which is
+    // what let its seven prefix rules get a paired suite at all
+    // (tests/chat_channel_hint.test.ts; nothing covered them before). That paid
+    // for the dispatch's promoting thunk with 8 lines to spare, so the ceiling
+    // follows the file down. Measured with wc -l < server/game.ts after biome.
+    // Exact count, zero slack.
+    ceiling: 10286,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

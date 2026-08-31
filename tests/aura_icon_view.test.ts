@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { POWERUPS } from '../src/sim/content/augments';
 import { CHOICE_ROWS } from '../src/sim/content/choice_rows';
+import { ITEMS } from '../src/sim/data';
 import {
   auraIconCssBackground,
   createAuraIconResolver,
@@ -623,5 +624,78 @@ describe('resolveAuraIconId', () => {
     );
     expect(runtime).toContain("(id) => cachedProceduralIconDataUrl('aura', id)");
     expect(runtime).toContain("crestIconUrl('status_combat')");
+  });
+});
+
+describe('the FLASK marker picks a distinct glyph from its elixir twin', () => {
+  // A flask, an elixir and a scroll of one stat mint the SAME aura id, so the
+  // id alone can never tell them apart and all three painted the shared
+  // aura_<kind> glyph. The wire's `fl` marker is what separates them, and a
+  // flask is the one worth separating: it survives death and cannot be
+  // right-clicked off.
+  const resolve = (aura: { id: string; kind: string; flask?: boolean }): string =>
+    resolveAuraIconId(aura, hasAbilityIconIdentity, hasAuraRecipe, hasAuraImageIdentity);
+
+  it('an UNMARKED buff keeps whatever it resolved to before, byte for byte', () => {
+    // The elixir family's own id carries a dedicated recipe, so an unmarked
+    // aura answers with the id. That IS the pre-existing behavior, and it is
+    // also why the flask arm has to outrank the id arm: the id is shared.
+    expect(hasAuraImageIdentity('elixir_buff_sta')).toBe(true);
+    expect(resolve({ id: 'elixir_buff_sta', kind: 'buff_sta' })).toBe('elixir_buff_sta');
+    expect(resolve({ id: 'elixir_buff_sta', kind: 'buff_sta', flask: false })).toBe(
+      'elixir_buff_sta',
+    );
+  });
+
+  it('a MARKED buff takes its own flask glyph, on every flask stat', () => {
+    for (const kind of ['buff_sta', 'buff_ap', 'buff_int']) {
+      expect(resolve({ id: `elixir_${kind}`, kind, flask: true }), kind).toBe(`flask_${kind}`);
+    }
+  });
+
+  it('falls back to the shared glyph for a marked kind with NO flask recipe', () => {
+    // The safe direction: adding the marker can never blank an icon.
+    expect(hasAuraRecipe('flask_buff_haste')).toBe(false);
+    expect(resolve({ id: 'unknown_probe_aura', kind: 'buff_haste', flask: true })).toBe(
+      'aura_buff_haste',
+    );
+  });
+
+  it('leaves an unrelated aura alone even if something marked it', () => {
+    // The marker only ever reaches a stat that HAS a flask recipe; a dot has
+    // none, so its own art stands.
+    expect(resolve({ id: 'moonfire', kind: 'dot', flask: true })).toBe('moonfire');
+  });
+
+  it('the RESOLVER cache keys on the marker, not the id and kind alone', () => {
+    // THE trap this closes: a flask and an elixir share an aura id, so a cache
+    // keyed on id+kind would hand the second one whichever glyph the first
+    // resolved, and the order would decide what the player saw.
+    const resolver = createAuraIconResolver(
+      hasAbilityIconIdentity,
+      hasAuraRecipe,
+      hasAuraImageIdentity,
+    );
+    expect(resolver({ id: 'elixir_buff_sta', kind: 'buff_sta' })).toBe('elixir_buff_sta');
+    expect(resolver({ id: 'elixir_buff_sta', kind: 'buff_sta', flask: true })).toBe(
+      'flask_buff_sta',
+    );
+    // ...and back, so neither order poisons the other.
+    expect(resolver({ id: 'elixir_buff_sta', kind: 'buff_sta' })).toBe('elixir_buff_sta');
+  });
+
+  it('every flask kind the CATALOG ships has a recipe (the family is complete)', () => {
+    // Derived from the live flask defs rather than a literal list: a new flask
+    // whose stat has no recipe silently falls back to the shared glyph, and
+    // this reds first. Non-vacuous by its own floor.
+    const kinds = new Set(
+      Object.values(ITEMS)
+        .filter((def) => def.kind === 'flask' && def.elixir)
+        .map((def) => def.elixir?.kind as string),
+    );
+    expect(kinds.size).toBeGreaterThanOrEqual(3);
+    for (const kind of kinds) {
+      expect(hasAuraRecipe(`flask_${kind}`), kind).toBe(true);
+    }
   });
 });

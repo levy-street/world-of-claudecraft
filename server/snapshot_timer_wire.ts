@@ -30,6 +30,11 @@ interface StableAuraRecord {
   sourceId: number;
   unbreakableControl: boolean;
   undispellable: boolean;
+  // A FLASK-sourced buff (src/sim/items.ts stamps Aura.flask on the flask arm
+  // alone). Presence-only, like undispellable beside it: the client reads it to
+  // paint the flask glyph, and never to decide an outcome. It is a stable
+  // property of the aura for its whole life, so it costs this cache no churn.
+  flask: boolean;
   // Presence of a break threshold (Lingering Dread), never the live soak value
   // - that decrements per hit and would churn this cache (see WireAura.bt below).
   breakArmed: boolean;
@@ -58,6 +63,8 @@ interface StableAuraWire {
   ub?: 1;
   und?: 1;
   bt?: 1;
+  /** Flask-sourced buff marker; see StableAuraRecord.flask. */
+  fl?: 1;
 }
 
 function round2(value: number): number {
@@ -112,6 +119,7 @@ function auraMatches(
     record.sourceId === aura.sourceId &&
     record.unbreakableControl === (aura.unbreakableControl === true) &&
     record.undispellable === (aura.undispellable === true) &&
+    record.flask === (aura.flask === true) &&
     record.breakArmed === (aura.breakThreshold !== undefined) &&
     record.paused === wirePaused &&
     record.permanent === permanent &&
@@ -137,6 +145,7 @@ function auraRecord(aura: Aura, simTime: number, paused: boolean): StableAuraRec
     sourceId: aura.sourceId,
     unbreakableControl: aura.unbreakableControl === true,
     undispellable: aura.undispellable === true,
+    flask: aura.flask === true,
     breakArmed: aura.breakThreshold !== undefined,
     paused: wirePaused,
     permanent: aura.permanent === true,
@@ -165,6 +174,7 @@ function auraWire(record: StableAuraRecord): StableAuraWire {
   if (record.sourceId) wire.src = record.sourceId;
   if (record.unbreakableControl) wire.ub = 1;
   if (record.undispellable) wire.und = 1;
+  if (record.flask) wire.fl = 1;
   if (record.breakArmed) wire.bt = 1;
   return wire;
 }
@@ -484,6 +494,14 @@ export interface WireAura {
   // the buff bar never offers a right-click cancel the server would refuse. Omitted for
   // ordinary auras, and an old server's omission decodes to undefined, as before.
   und?: 1;
+  // FLASK-sourced buff marker (src/sim/items.ts stamps Aura.flask on the flask
+  // arm alone). Presence only, like `und` above: the client reads it to paint a
+  // distinct glyph for a flask, which otherwise renders identically to the
+  // elixir and scroll sources of the same aura id, and never to decide an
+  // outcome. A stable property of the aura for its whole life, so the per-entity
+  // cache keeps eliding; omitted for every other aura, and an old server's
+  // omission decodes to undefined, leaving the shared glyph exactly as before.
+  fl?: 1;
   // Break-threshold ARMED marker (Lingering Dread's soak-before-snap fear):
   // presence only, never the live soak value - the number decrements per hit
   // and would churn the stable aura cache, while the client (the victim-worn
@@ -547,6 +565,10 @@ export function wireAura(a: Aura): WireAura {
   if (a.sourceId) w.src = a.sourceId;
   if (a.unbreakableControl) w.ub = 1;
   if (a.undispellable) w.und = 1;
+  // The flask marker, presence-only: the client paints a distinct glyph for a
+  // flask-sourced buff, which otherwise renders identically to the elixir and
+  // scroll sources of the same aura id.
+  if (a.flask) w.fl = 1;
   if (a.breakThreshold !== undefined) w.bt = 1;
   return w;
 }

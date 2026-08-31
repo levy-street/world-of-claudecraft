@@ -33,7 +33,7 @@
 
 import { ENCHANTS } from '../sim/content/enchants';
 import { ITEMS } from '../sim/data';
-import type { EquipSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
+import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload, ItemSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
 import {
   type BagItemContextActionId,
@@ -112,6 +112,23 @@ export interface CtxMenuSeam {
   bind(onActivate: (act: string) => void): void;
 }
 
+/** WHICH bag copy the menu was opened on. An index alone is not enough: it is
+ *  captured when the menu opens, and the bags can shift under a snapshot before
+ *  a row is clicked, after which it names either nothing or (silently, and
+ *  worse) a different copy of the same id. The slot REFERENCE lets an action
+ *  re-resolve the copy at the moment it runs, the confirmDestroy precedent. */
+export interface BagMenuTarget {
+  /** The clicked stack's index at menu-open time; -1 when the click was already
+   *  stale (bagStackIndex's own miss value, which the sim refuses outright). */
+  index: number;
+  /** The clicked slot object, for the re-resolve. Absent only for a caller that
+   *  cannot name one, which then keeps the raw-index behavior. */
+  slot?: InvSlot;
+  /** Refuse this action with the honest not-held toast. This menu has no error
+   *  surface of its own, so the bags window (which owns one) supplies it. */
+  refuseNotHeld(): void;
+}
+
 export interface BagItemActionMenuDeps {
   world(): IWorld;
   ctxMenu: CtxMenuSeam;
@@ -140,7 +157,7 @@ export class BagItemActionMenu {
   open(
     def: ItemDef,
     itemId: string,
-    slotIndex: number,
+    target: BagMenuTarget,
     x: number,
     y: number,
     runDefault: () => void,
@@ -153,20 +170,32 @@ export class BagItemActionMenu {
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, slotIndex);
-      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, slotIndex);
-      else if (id === 'sunder') this.confirmDestroy('sunder', itemId, slotIndex);
+      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
+      else if (id === 'salvage') this.confirmDestroy('salvage', itemId, target.index);
+      else if (id === 'sunder') this.confirmDestroy('sunder', itemId, target.index);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);
       // Lock/unlock (issue 3042): a plain in-place toggle, never destructive,
       // so it skips the confirm-dialog family every disenchant/salvage row
       // routes through and applies immediately like the classic default row.
-      else if (id === 'lock') this.setLocked(itemId, slotIndex, true);
-      else if (id === 'unlock') this.setLocked(itemId, slotIndex, false);
+      else if (id === 'lock') this.setLocked(itemId, target, true);
+      else if (id === 'unlock') this.setLocked(itemId, target, false);
     });
   }
 
-  private setLocked(itemId: string, slotIndex: number, locked: boolean): void {
-    this.deps.world().setItemLocked(itemId, locked, { slotIndex });
+  private setLocked(itemId: string, target: BagMenuTarget, locked: boolean): void {
+    // Re-resolve the clicked copy by REFERENCE at action time, the same rule
+    // confirmDestroy's submit applies. The index alone was captured at
+    // menu-open, and this row used to forward it raw: after a mid-menu bag
+    // shift that index either names nothing, or names a live cell holding a
+    // DIFFERENT copy of the same id, in which case the flip silently locked the
+    // wrong copy. Neither failure was visible to the player, because the Sim
+    // delegate drops setItemLocked's result, so the refusal is voiced here.
+    const at = target.slot ? bagStackIndex(this.deps.world().inventory, target.slot) : target.index;
+    if (at < 0) {
+      target.refuseNotHeld();
+      return;
+    }
+    this.deps.world().setItemLocked(itemId, locked, { slotIndex: at });
     this.deps.afterAction();
   }
 

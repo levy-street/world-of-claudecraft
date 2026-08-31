@@ -29,8 +29,19 @@ import { stripComments } from './helpers/strip_comments';
 // mapped-stat rows, the formatter options, and the escaping are each pinned
 // off-data (every shipped farming dish is a small-number buff_sta, which
 // exercises exactly one map row and no grouping, rounding, or escaping).
-function wellFedDef(record: NonNullable<FoodItemDef['wellFed']>): ItemDef {
-  return { ...(ITEMS.eastbrook_glazed_carrots as FoodItemDef), wellFed: record };
+// The record arrives as the WIDE shape and is cast at this ONE boundary,
+// deliberately. TimedStatBuffPayload.kind narrowed to TimedStatBuffAuraKind
+// (the three flat-stat kinds the live carriers use), so an unmapped kind is no
+// longer constructible through the def type; the probe reaches past the type to
+// keep exercising the view's unmapped-kind fallback, which is still the safety
+// net for the day the union widens without the stat map gaining the row.
+type ProbeWellFed = { aura: string; kind: AuraKind; value: number; duration: number };
+
+function wellFedDef(record: ProbeWellFed): ItemDef {
+  return {
+    ...(ITEMS.eastbrook_glazed_carrots as FoodItemDef),
+    wellFed: record as FoodItemDef['wellFed'],
+  };
 }
 
 describe('wellFedTooltipLines', () => {
@@ -96,7 +107,11 @@ describe('wellFedTooltipLines', () => {
   });
 
   it('maps every stat-buff kind to its own stat label', () => {
-    const cases: Array<[NonNullable<FoodItemDef['wellFed']>['kind'], string]> = [
+    // The PROBE's wide kind, not the def's narrowed one: two of these four rows
+    // (buff_agi, buff_armor) are stat labels the map still carries for a kind
+    // no shipped carrier uses, so they are only reachable through the cast
+    // boundary in wellFedDef above.
+    const cases: Array<[ProbeWellFed['kind'], string]> = [
       ['buff_int', 'Intellect'],
       ['buff_agi', 'Agility'],
       ['buff_armor', 'Armor'],

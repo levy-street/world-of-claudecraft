@@ -966,6 +966,43 @@ export type ItemKind =
   | 'bag'
   | 'mount'
   | 'recipe';
+// The aura kinds a timed FLAT STAT buff may carry. Narrower than AuraKind on
+// purpose: this payload's whole contract is "a flat stat buff for a while", and
+// its consumers act on that. The grant sites apply the kind as a plain stat aura
+// and let recalcPlayerStats fold it, and the one-flask singleton strip
+// (src/sim/items.ts useItem) sheds a worn one by splicing the aura and
+// recalculating, which is correct for a flat stat buff and silently WRONG for a
+// kind whose removal owes more than a recalc (a stealth or invisibility aura, a
+// percent-scaled buff, anything with a paired timer). Typing the field as the
+// whole AuraKind let a content author write one of those into a food or elixir
+// record and get no compiler complaint at all.
+//
+// The set is exactly the three kinds the live carriers use (the elixir, scroll
+// and flask defs plus the seven buff foods), derived rather than re-typed so it
+// cannot drift from AuraKind's own spelling. Widening it means auditing the
+// singleton strip in the same change, not just adding a row; FlaskAuraKind below
+// carries the same warning over the same three kinds, and
+// tests/wellfed.test.ts pins that the two stay identical.
+export type TimedStatBuffAuraKind = Extract<AuraKind, 'buff_sta' | 'buff_ap' | 'buff_int'>;
+
+// What a successful `useItem` reports back to its caller when the use did more
+// than consume the item. `undefined` is the ordinary answer (a potion, a food,
+// a scroll: the effect is already applied and there is nothing to say); a
+// variant means the caller has a follow-up of its own, which today is the
+// mech-chroma unlock the online host mirrors as an account-cosmetic change.
+//
+// Home moved here (masterwrought Phase 18) from mech_chroma_ownership.ts, where
+// it had been parked beside its ONLY variant. That home read as if the type
+// belonged to the chroma system rather than to `useItem`, so the next variant
+// would have had a choice between importing the cosmetic module for an
+// unrelated result and quietly starting a second result type. It is an
+// items-domain shape, so it lives with the other shared item types; sim.ts
+// keeps its public re-export so every foreign importer stands unchanged.
+export interface ItemUseResult {
+  type: 'mechChroma';
+  chromaId: string;
+}
+
 // One timed flat stat buff, the payload shape shared by the elixir/scroll/flask
 // `elixir` record, the role foods' `wellFed` record, and the meal in flight
 // (FoodConsuming.wellFed). Named once because three copies had grown (the repo's
@@ -973,7 +1010,7 @@ export type ItemKind =
 // makes them different mechanics, never the payload.
 export interface TimedStatBuffPayload {
   aura: string;
-  kind: AuraKind;
+  kind: TimedStatBuffAuraKind;
   value: number;
   duration: number;
 }
@@ -5210,6 +5247,13 @@ export interface Entity extends ClientMirroredEntityFields {
   devVendor?: boolean; // dev free-epic vendor (ptr_dev_vendor.ts)
   // object (ground interactable)
   objectItemId: string | null;
+  /** A placed feast's CRAFTER signature, copied from the spent copy's instance
+   *  payload at placement (professions/feast.ts). Display only, and a second
+   *  name beside `name`, which carries the PLACER: a feast is tradable, so the
+   *  cook and the host are routinely different people, and every other signed
+   *  item keeps its maker's mark visible. Sparse (absent on an unsigned feast
+   *  and on every non-feast object), so it costs nothing anywhere else. */
+  feastSigner?: string;
   // Runtime-only Soulwell ownership/eligibility state. The object itself is wired
   // through objectItemId; this authority data never needs to reach clients.
   soulwell?: {

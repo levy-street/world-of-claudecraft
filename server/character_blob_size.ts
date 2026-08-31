@@ -198,8 +198,16 @@ export function characterBlobBytesHighWater(): number {
 // most recent saves answers that: it moves only when the bulk of the realm's
 // blobs move. Windowed by COUNT, not time, so it is clock-free and its memory
 // is a fixed ring; nearest-rank on a sorted copy at read time, because reads
-// (a scrape every 15 to 60 s, the 5 s heartbeat) are orders of magnitude rarer
-// than records (one per save, ~33/s at 1,000 online on the 30 s autosave).
+// are orders of magnitude rarer than records (one per save, ~33/s at 1,000
+// online on the 30 s autosave). The most frequent reader is not the scrape
+// (every 15 to 60 s) or the 5 s heartbeat but the PERF_TICK_LOG over-budget arm
+// (server/game.ts maybeLogTickPerf), which prints on a stuttering tick at its
+// own throttle of one line per 20 ticks, i.e. UP TO 1/s, and reads this p99 for
+// the blobP99= token on every such line. Still two orders under the record
+// rate, and it only reaches that ceiling while the loop is already blowing its
+// budget, which is exactly when the sort must stay cheap: a 1,024-sample sort
+// is tens of microseconds, so even the sustained-stutter case costs well under
+// 0.1% of one 50 ms tick.
 // ---------------------------------------------------------------------------
 
 export interface WindowedPercentile {
@@ -272,8 +280,23 @@ export function characterBlobBytesP99(): number {
 // is written exactly once either way.
 // ---------------------------------------------------------------------------
 
+// The queue's hard bound. The PRACTICAL bound is already the 60 s dampener
+// above (reportCharacterBlobSize returns at most one line per
+// CHARACTER_BLOB_WARN_WINDOW_MS, so the steady state queues one line a minute
+// and the immediate drains it long before a second arrives), and this cap is
+// never reached on that path. It exists because the dampener is a policy the
+// CALLERS opt into, not a property of the queue: a future queuer that skips
+// the reporter, or a drain starved by a wedged event loop while an incident
+// prints, would otherwise grow an unbounded array of strings inside the very
+// process the incident is already straining. Small on purpose: past a handful
+// of lines the queue has stopped being a signal and become a backlog.
+export const CHARACTER_BLOB_WARN_QUEUE_MAX = 32;
+
 const queuedWarnLines: string[] = [];
 let warnFlushScheduled = false;
+// Lines refused by the cap since the last drain, reported as a tail line so a
+// truncated burst is never silently smaller than it was.
+let droppedWarnLines = 0;
 
 function writeWarnLine(line: string): void {
   try {
@@ -283,9 +306,12 @@ function writeWarnLine(line: string): void {
   }
 }
 
-/** Queue one dev-channel warn line for emission off the current call stack. */
+/** Queue one dev-channel warn line for emission off the current call stack.
+ *  At the cap the line is DROPPED and counted (the oldest lines are the
+ *  informative ones: the first crossing names the character and the size). */
 export function queueCharacterBlobWarning(line: string): void {
-  queuedWarnLines.push(line);
+  if (queuedWarnLines.length >= CHARACTER_BLOB_WARN_QUEUE_MAX) droppedWarnLines++;
+  else queuedWarnLines.push(line);
   if (warnFlushScheduled) return;
   warnFlushScheduled = true;
   setImmediate(flushQueuedCharacterBlobWarnings);
@@ -296,6 +322,13 @@ export function queueCharacterBlobWarning(line: string): void {
 export function flushQueuedCharacterBlobWarnings(): void {
   warnFlushScheduled = false;
   while (queuedWarnLines.length > 0) writeWarnLine(queuedWarnLines.shift() as string);
+  if (droppedWarnLines > 0) {
+    const dropped = droppedWarnLines;
+    droppedWarnLines = 0;
+    writeWarnLine(
+      `character save: ${dropped} further oversized-save warning line${dropped === 1 ? '' : 's'} were dropped at the ${CHARACTER_BLOB_WARN_QUEUE_MAX}-line queue cap.`,
+    );
+  }
 }
 
 /** Queued lines not yet written (the drain tests' probe). */

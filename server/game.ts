@@ -33,8 +33,8 @@ import {
 } from '../src/sim/data';
 import { devTierIndexForMergedPrs } from '../src/sim/dev_tier';
 import { parseRelayCommand } from '../src/sim/discord_relay';
-import { specialRoleChatTag } from '../src/sim/discord_roles';
 import type { GuildBankOpDelta } from '../src/sim/guild_bank';
+import { parseItemCopyAnchor } from '../src/sim/item_copy_anchor';
 import { itemInstancePayloadsEqual } from '../src/sim/item_instance_merge';
 import {
   isInJailCage,
@@ -158,6 +158,7 @@ import {
 import { characterBlobBytesP99 } from './character_blob_size';
 import { RESTORE_ITEM_MAX_COUNT } from './character_professions';
 import { applyCharacterSaveFixups } from './character_save_fixups';
+import { chatChannelHint } from './chat_channel_hint';
 import { ChatFilter } from './chat_filter';
 import {
   isChatFilterWrite,
@@ -165,6 +166,7 @@ import {
   parseChatFilterCommand,
 } from './chat_filter_commands';
 import { applyChatStrike, loadChatFilterState, recordChatViolation } from './chat_filter_db';
+import { stampChatSenderFlair } from './chat_flair_stamp';
 import { ChatLogger } from './chat_log';
 import {
   type ChatModerationHydration,
@@ -243,6 +245,7 @@ import { isUpdateDue } from './entity_update_cadence';
 import { reconcileOnLogin as reconcileEpicOnLogin } from './epic/mirror';
 import { eventAnchor, shouldDeliverCombatEventToViewer } from './event_delivery';
 import { assembleEventsFrame, filterRoutableEvents, serializeEventFragments } from './event_frame';
+import { buildEventPidIndex, forEachSelectedEventIndex } from './event_pid_index';
 import { appendFarmPlotsWire, dispatchFarmingCommand } from './farming_commands';
 import { fishingBandLabel, isKoi, isRodFeeRecipe } from './fishing_telemetry';
 import {
@@ -387,6 +390,7 @@ import {
   MOB_ZONE_PHASE_BY_ID,
   MOB_ZONE_PHASE_INSTANCE,
   MOB_ZONE_PHASE_OTHER,
+  round2,
   SIM_MOB_ZONE_PHASES,
 } from './tick_perf_log';
 import { TickProfiler } from './tick_profiler';
@@ -1308,6 +1312,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.dungeonId) out.dgn = e.dungeonId;
   if (e.riftTier) out.rt = e.riftTier; // ranked rift portal badge (render-only)
   if (e.objectItemId) out.obj = e.objectItemId;
+  if (e.feastSigner) out.fsg = e.feastSigner; // placed feast: the CRAFTER's mark (nm is the placer)
   if (e.scale !== 1) out.sc = e.scale;
   if (e.color !== 0xffffff) out.c = e.color;
   return out;
@@ -1500,10 +1505,6 @@ interface SnapshotAnchor {
   stableTimerWire: boolean;
 }
 
-function round2(v: number): number {
-  return Math.round(v * 100) / 100;
-}
-
 function emptyWireVariant(): EntityWireVariantCache {
   return {
     tick: -1,
@@ -1531,20 +1532,6 @@ function liteEntityJson(id: number, dynJson: string): string {
 
 function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
-}
-
-// Best-effort channel label for the violation log: the hard-word gate runs
-// before the message is routed, so infer the channel from its command prefix
-// (falling back to the player's last-used channel).
-function chatChannelHint(session: ClientSession, text: string): string {
-  if (/^\/(?:g|gu|guild)\s/i.test(text)) return 'guild';
-  if (/^\/(?:o|officer)\s/i.test(text)) return 'officer';
-  if (/^\/(?:w|whisper|t|tell|r|reply)\s/i.test(text)) return 'whisper';
-  if (/^\/(?:y|yell)\s/i.test(text)) return 'yell';
-  if (/^\/(?:p|party)\s/i.test(text)) return 'party';
-  if (/^\/(?:general|world)\s/i.test(text)) return 'general';
-  if (/^\/(?:s|say)\s/i.test(text)) return 'say';
-  return session.rememberedChat.channel;
 }
 
 function delay(ms: number): Promise<void> {
@@ -6681,13 +6668,17 @@ export class GameServer {
         if (typeof msg.item === 'string') {
           // The bag index the client named, re-validated in the sim against ITS
           // OWN inventory: an unrecognized value reads as undefined (the legacy
-          // id-only path), never as index 0.
+          // id-only path), never as index 0. The optional ord/n pair beside it
+          // is the COPY anchor: shape-checked here, re-derived and refused
+          // sim-side (src/sim/item_copy_anchor.ts). A malformed pair parses to
+          // undefined, which is the pre-anchor behavior, never a wrong copy.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
           sim.discardItem(
             msg.item,
             typeof msg.count === 'number' ? msg.count : undefined,
             pid,
             slot,
+            parseItemCopyAnchor(msg.ord, msg.n),
           );
         }
         break;
@@ -6697,7 +6688,7 @@ export class GameServer {
         // slot is simply refused inside the sim (selectedInventorySlot).
         if (typeof msg.item === 'string' && typeof msg.locked === 'boolean') {
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          sim.setItemLocked(msg.item, msg.locked, pid, slot);
+          sim.setItemLocked(msg.item, msg.locked, pid, slot, parseItemCopyAnchor(msg.ord, msg.n));
         }
         break;
       case 'buy':
@@ -6721,7 +6712,13 @@ export class GameServer {
           // OWN inventory: an unrecognized value reads as undefined (the legacy
           // id-only path), never as index 0.
           const slot = Number.isInteger(msg.slot) ? Number(msg.slot) : undefined;
-          sim.sellItem(msg.item, typeof msg.count === 'number' ? msg.count : undefined, pid, slot);
+          sim.sellItem(
+            msg.item,
+            typeof msg.count === 'number' ? msg.count : undefined,
+            pid,
+            slot,
+            parseItemCopyAnchor(msg.ord, msg.n),
+          );
         }
         break;
       case 'buyback':
@@ -6834,11 +6831,16 @@ export class GameServer {
         // plus the heavy self re-diff (perfect_item is a HEAVY_SELF_CMDS
         // member: an attempt spends materials and mutates a payload in place).
         // Phase 13: the optional legendary name's whole decision is the pure
-        // core resolvePerfectItemName (shape-first, screen NORMALIZED; the
-        // rationale and the judged unperfected-copy note live on the core).
+        // core resolvePerfectItemName (shape-first, screen NORMALIZED). Phase
+        // 18 narrows its refusal: only a copy the sim would route to the
+        // promotion ladder can consume the name, so this is the one site that
+        // can answer that (the frame cannot), and an offensive name on any
+        // other copy is STRIPPED rather than costing the attempt. The read is
+        // a thunk so it is paid only when the screen actually matches.
         const ref = parsePerfectItemRef(msg);
         if (ref) {
-          const named = resolvePerfectItemName(msg, offensiveName);
+          const promoting = () => sim.perfectingInfo(ref, pid)?.perfected === true;
+          const named = resolvePerfectItemName(msg, offensiveName, promoting);
           if (named.refused) this.sendChatNotice(session, 'That name is not allowed.');
           else {
             // Arm-marked: the heavy-self mark rides the frame that reaches the sim,
@@ -9481,28 +9483,13 @@ export class GameServer {
   private routeEvents(events: SimEvent[]): void {
     if (events.length === 0 || this.clients.size === 0) return;
     const eventTime = Date.now();
-    // Account flair of each chat line's SENDER, resolved once per event (not once
-    // per recipient) and read from the sender's SESSION rather than an entity:
-    // general/world/lfg chat reaches players far outside the sender's interest
-    // scope, where the recipient has no entity record for them. Sparse by design:
-    // an ordinary player's chat event is untouched.
-    for (const ev of events) {
-      if (ev.type !== 'chat') continue;
-      const flair = this.chatFlairForPid(ev.fromPid);
-      // The sender's top STAFF Discord role (the anti-impersonation chat tag)
-      // is composed here from the SENDER's entity rather than folded into the
-      // cached session.chatFlair: e.discordRole is written by the bot's
-      // members-meta push on its own cadence, so reading it live at fan-out
-      // cannot go stale. Gated on the catalog's chatTag flag so community
-      // roles (Artist, Content Creator, LEGEND, SHILL) stay nameplate-only
-      // and the chat tag remains a pure authority signal. Allocates only for
-      // staff senders.
-      const role = this.sim.entities.get(ev.fromPid)?.discordRole;
-      // `flair` may be undefined here; spreading undefined is a spec-defined
-      // no-op, so a role-only sender yields a clean { role } object.
-      if (role && specialRoleChatTag(role)) ev.flair = { ...flair, role };
-      else if (flair) ev.flair = flair;
-    }
+    // The once-per-batch chat-flair prologue (server/chat_flair_stamp.ts): the
+    // only SimEvent mutation on this path, and it must precede the serialization
+    // below so every recipient shares one fragment.
+    stampChatSenderFlair(events, {
+      flairForPid: (pid) => this.chatFlairForPid(pid),
+      discordRoleForPid: (pid) => this.sim.entities.get(pid)?.discordRole,
+    });
     // ignore list: social invites from blocked senders are resolved once per
     // batch (dropped for every session and declined in the sim), not per
     // receiving session, so spectators of the target never see them either.
@@ -9520,6 +9507,10 @@ export class GameServer {
     // tracking context and never the event; the once-per-batch flair stamp above is the
     // only event mutation and correctly precedes this serialization.
     const fragments = serializeEventFragments(routableEvents);
+    // Bucket the batch by pid ONCE (server/event_pid_index.ts) so the per-session
+    // pass below visits only the events that session can be delivered, instead of
+    // charging every session for every other session's pid-scoped copy.
+    const pidIndex = buildEventPidIndex(routableEvents);
     // Resolved once per batch, applied per session below against that session's
     // ANCHOR pid (so a spectator watching a fighter refreshes with them).
     const bgRespawnRefresh = this.bgRespawnRefreshPids(routableEvents);
@@ -9548,10 +9539,11 @@ export class GameServer {
         if (bgRespawnRefresh?.has(anchorPid)) session.lastBgWireTick = -BG_WIRE_INTERVAL_TICKS;
         const anchorParty = this.sim.partyOf(anchorPid);
         const mine: string[] = [];
-        for (let i = 0; i < routableEvents.length; i++) {
+        // Merged in batch order, so the frame's event order is unchanged.
+        forEachSelectedEventIndex(pidIndex, anchorPid, session.pid, (i) => {
           const ev = routableEvents[i];
-          if (suppressedInvites?.has(ev)) continue;
-          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) continue;
+          if (suppressedInvites?.has(ev)) return;
+          if (!shouldDeliverCombatEventToViewer(ev, anchorPid, anchorParty, ownerOf)) return;
           // ignore list: drop chat originating from a character this player has
           // blocked, before it ever reaches their client
           if (
@@ -9560,7 +9552,7 @@ export class GameServer {
             session.blockedIds.size > 0 &&
             this.isBlockedSender(session, ev.fromPid)
           )
-            continue;
+            return;
           // ignore list: drop PUBLIC chat from an ignored character. Unlike a
           // block this is chat-only, so their whispers and rolls still come through.
           if (
@@ -9570,7 +9562,7 @@ export class GameServer {
             isIgnorableChannel(ev.channel) &&
             this.isIgnoredSender(session, ev.fromPid)
           )
-            continue;
+            return;
           if (ev.pid !== undefined) {
             if (
               session.spectating &&
@@ -9579,13 +9571,13 @@ export class GameServer {
               ev.channel !== 'say' &&
               ev.channel !== 'yell'
             ) {
-              if (this.isBlockedSender(session, ev.fromPid)) continue;
+              if (this.isBlockedSender(session, ev.fromPid)) return;
               mine.push(fragments[i]);
               if (ev.channel === 'whisper' && ev.to === undefined && ev.fromPid !== session.pid) {
                 session.lastWhisperFrom = ev.from;
               }
               this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
-              continue;
+              return;
             }
             if (ev.pid === anchorPid) {
               if (
@@ -9594,7 +9586,7 @@ export class GameServer {
                 ev.channel !== 'say' &&
                 ev.channel !== 'yell'
               ) {
-                continue;
+                return;
               }
               mine.push(fragments[i]);
               // a sim-driven change to a heavy self field (loot, level-up, quest
@@ -9633,7 +9625,7 @@ export class GameServer {
                 this.botDetector.observeEvent(session.botTrackingContext, ev, eventTime);
               }
             }
-            continue;
+            return;
           }
           // world events: only those near this player
           const anchor = eventAnchor(ev, this.sim.entities);
@@ -9643,7 +9635,7 @@ export class GameServer {
               session.needsVarkhulPortalReplay = false;
             }
           }
-        }
+        });
         // sendRaw (not send) so the pre-serialized fragments are not re-stringified;
         // the assembled string is byte-identical to send({ t:'events', list: events }).
         if (mine.length > 0) this.sendRaw(session, assembleEventsFrame(mine));
@@ -10035,7 +10027,7 @@ export class GameServer {
     if (!hit) return false;
 
     const outcome = this.chatFilter.escalate(session.chatStrikes);
-    const channel = chatChannelHint(session, text);
+    const channel = chatChannelHint(text, session.rememberedChat.channel);
     // Optimistically advance the session so a rapid follow-up is already gated;
     // the DB write below returns the authoritative values and corrects any drift
     // (e.g. a second character on the same account raising strikes concurrently).

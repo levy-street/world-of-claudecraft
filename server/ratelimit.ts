@@ -948,7 +948,15 @@ export function resetAdminOversightRateLimits(): void {
 // Admin analytics dashboard reads (overview / activity / market metrics, the
 // analytics.read family). These are warm in-memory cached reads with zero
 // per-request DB cost, so the meter is about uniform admin-surface metering
-// (no read route is the unthrottled odd one out), not query protection. Own
+// (no read route is the unthrottled odd one out), not query protection. The
+// path's real per-request DB cost is upstream of the handler and upstream of
+// this meter: require_admin (server/http/middleware/require_admin.ts) awaits
+// accountAndScopeForToken then adminRolesForAccount on every admin request
+// before any handler runs, so a polled dashboard tab costs two reads per poll
+// whatever the handler caches. That pair is deliberately unmetered here
+// because the admin gate stays on the DIRECT db reads (never the marketplace
+// auth-guard cache), so the sizing below prices tab-equivalents, not queries.
+// Own
 // bucket pair, NOT the oversight maps above: the Overview landing page polls
 // at the dashboard's 5 s tick for every operator by default, and that routine
 // traffic must never burn the economy-oversight budget (whose exhaustion

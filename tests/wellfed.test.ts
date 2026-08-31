@@ -13,7 +13,14 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
-import type { Aura, Consuming, Entity, ItemDef } from '../src/sim/types';
+import type {
+  Aura,
+  Consuming,
+  Entity,
+  FlaskAuraKind,
+  ItemDef,
+  TimedStatBuffAuraKind,
+} from '../src/sim/types';
 import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { hasAuraRecipe } from '../src/ui/icons';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
@@ -124,6 +131,63 @@ describe('well fed: the one aura id', () => {
       (def) => def.use !== undefined && 'feast' in def && def.feast !== undefined,
     );
     expect(useAndFeast, 'no def may carry both use and feast').toEqual([]);
+  });
+
+  it('every live TimedStatBuffPayload carrier uses one of the three narrowed kinds', () => {
+    // TimedStatBuffPayload.kind is TimedStatBuffAuraKind, not the whole
+    // AuraKind: the payload's contract is "a flat stat buff for a while", and
+    // the one-flask singleton strip in items.ts is only correct for that. This
+    // is the DATA half of that narrowing (the compiler owns the def half): the
+    // union must stay exactly the set the shipped carriers use, so widening it
+    // for a kind nothing carries, or a carrier appearing outside it, is a
+    // deliberate change here and an audit of the strip.
+    const narrowed: readonly TimedStatBuffAuraKind[] = ['buff_ap', 'buff_int', 'buff_sta'];
+    const carried = new Set<string>();
+    for (const def of Object.values(ITEMS)) {
+      if (def.elixir) carried.add(def.elixir.kind);
+      if ('wellFed' in def && def.wellFed) carried.add(def.wellFed.kind);
+    }
+    expect([...carried].sort()).toEqual([...narrowed].sort());
+  });
+
+  it('FlaskAuraKind and TimedStatBuffAuraKind stay the same set', () => {
+    // Two headers, two warnings, one set. A flask IS a timed stat buff carrier,
+    // so the day one union widens without the other the flask arm and the
+    // shared payload disagree about what a carrier may be.
+    //
+    // TYPE-LEVEL, both directions: `Exact` resolves to `true` only when each
+    // union extends the other, so a WIDENING of either side and a NARROWING of
+    // either side both make the annotation below unsatisfiable and red tsc.
+    // The tuple wrappers are what make it decisive: bare `A extends B` would
+    // distribute over the union and answer per-member, which is a different
+    // (and much weaker) question. Note this arm is tsc's alone: vitest
+    // transpiles without type-checking, so a type-only regression here is red
+    // under `npx tsc --noEmit` and silent under a bare `vitest run`, the same
+    // way the two `@ts-expect-error` pins above are.
+    type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
+    const sameSet: Exact<FlaskAuraKind, TimedStatBuffAuraKind> = true;
+
+    // RUNTIME half, so the case is not a constant compared with itself: each
+    // union is spelled out as an exhaustive `Record`, which tsc checks in both
+    // directions on its own (a missing key reds on a widening, an excess
+    // property reds on a narrowing), and the two independently written key
+    // lists are then compared to each other. Adding a kind to one union and
+    // only one record is what this arm catches that the type-level one cannot.
+    const flaskKinds: Record<FlaskAuraKind, true> = {
+      buff_sta: true,
+      buff_ap: true,
+      buff_int: true,
+    };
+    const sharedKinds: Record<TimedStatBuffAuraKind, true> = {
+      buff_sta: true,
+      buff_ap: true,
+      buff_int: true,
+    };
+    expect(sameSet).toBe(true);
+    expect(Object.keys(flaskKinds).sort()).toEqual(Object.keys(sharedKinds).sort());
+    // ...and against the literal set, so re-spelling BOTH records the same
+    // wrong way still reds (the pair compare alone would not see it).
+    expect(Object.keys(flaskKinds).sort()).toEqual(['buff_ap', 'buff_int', 'buff_sta']);
   });
 });
 

@@ -73,21 +73,43 @@ export function parsePerfectItemName(msg: { name?: unknown }): string | undefine
  *  - shape-INVALID (normalizeLegendaryName null): skip the screen entirely
  *    and pass the RAW name through; the sim's own shape arm refuses it with
  *    its inscription line, so nothing is silently laundered;
- *  - shape-valid: screen the NORMALIZED value (no hidden coupling to the
- *    censorship normalizer's whitespace stripping), refuse on a match, and
- *    otherwise pass the normalized value to the sim.
- * Judged note: an offensive name on an UNPERFECTED copy refuses the whole
- * frame, ahead of every sim cost gate (conservative-safe; the UI only sends
- * a name from the promote flow).
+ *  - shape-valid and clean: pass the NORMALIZED value to the sim;
+ *  - shape-valid and offensive: refuse the frame only when the copy would
+ *    actually CONSUME the name, otherwise strip the name and let the attempt
+ *    proceed unnamed (`{ refused: false, name: undefined }`, which the
+ *    dispatch already handles as an unnamed attempt with no new arm).
+ *
+ * The screen always runs on the NORMALIZED value, never the raw wire
+ * spelling: there is then no hidden coupling to the censorship normalizer's
+ * own whitespace stripping, and a spelling only normalization exposes cannot
+ * slip past.
+ *
+ * `promoting` answers the one question the wire frame cannot: would this
+ * attempt reach the promotion ladder, the only code that can stamp the name?
+ * `Sim.perfectItemAs` routes a `payload.perfected === true` copy to
+ * `promoteResolvedTarget(name)` and every other copy to the ordinary
+ * attempt, which ignores `name` entirely. So an offensive name on an
+ * UNPERFECTED copy was never going to be written anywhere, and refusing the
+ * whole frame for it (the phase 13 behavior) cost the player their perfecting
+ * attempt over a string the sim would have dropped on the floor. It is a
+ * thunk, not a boolean, so the sim read is paid only on the rarest arm: a
+ * shape-valid name that actually matches the screen.
+ *
+ * Deliberately `perfected` alone, NOT `perfected && !promoted`: an already
+ * promoted copy still hands its name to the promotion ladder, and arm 1 of
+ * that ladder ("already legendary") is the ladder's own business. Keying the
+ * content screen on a deny arm's ordering would couple the two, so the screen
+ * asks only whether the name reaches the code that can stamp it.
  */
 export function resolvePerfectItemName(
   msg: { name?: unknown },
   offensive: (name: string) => boolean,
+  promoting: () => boolean,
 ): { refused: boolean; name?: string } {
   const raw = parsePerfectItemName(msg);
   if (raw === undefined) return { refused: false };
   const normalized = normalizeLegendaryName(raw);
   if (normalized === null) return { refused: false, name: raw };
-  if (offensive(normalized)) return { refused: true };
+  if (offensive(normalized)) return promoting() ? { refused: true } : { refused: false };
   return { refused: false, name: normalized };
 }

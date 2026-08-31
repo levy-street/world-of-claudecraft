@@ -20,6 +20,20 @@
 
 export interface MarketSaleRecord {
   itemId: string;
+  /** The sold copy's own CHOSEN name, when it had one. Stamped from the
+   *  listing's instance payload at the sale, because the listing row is spliced
+   *  away on the very next line and this is the last point that still knows
+   *  what the copy was called.
+   *
+   *  Absent for every plain copy, which is the common case and costs the blob
+   *  and the wire nothing. Why it is worth carrying at all: the ledger row
+   *  describes a PAST transaction, so nothing else can recover the name later,
+   *  and a seller who listed the legendary they named "Dawn Oath" would
+   *  otherwise read a Collect row naming only the def, unable to tell which of
+   *  two same-id listings had sold. A stamped VALUE, never localized here: the
+   *  sim stays language-agnostic and the client renders it raw, exactly as the
+   *  bag cell does. */
+  itemName?: string;
   count: number;
   /** Gross buyout the buyer paid for the whole stack. */
   price: number;

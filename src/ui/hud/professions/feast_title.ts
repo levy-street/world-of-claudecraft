@@ -48,6 +48,27 @@ export function feastTitleFor(
   return key === null ? null : t(key, { name: placerName });
 }
 
+/** The CRAFTER'S mark for a placed feast, or null when the table carries none.
+ *
+ *  Deliberately NOT folded into the title above, and the split is a design
+ *  call rather than a shortcut. The title answers "whose table is this", which
+ *  is the placer, and it is painted on a floating world label where every extra
+ *  word costs legibility. The maker's mark answers "who cooked it", which is
+ *  provenance a player asks for by TARGETING the table, so it belongs on the
+ *  surfaces that already carry per-copy provenance lines and not on a nameplate
+ *  a whole raid walks past. The two are different strings for different
+ *  questions; only the TITLE has the never-diverge rule this module was minted
+ *  for, and this helper keeps its own single home for the same reason.
+ *
+ *  Reuses the shipped signer wording (hudChrome.crafting.makersMark, the same
+ *  "Crafted by {name}" line a signed item's tooltip shows), so a feast on the
+ *  ground and the same feast in the bags credit its cook identically.
+ *  `signer` is the entity's wire `feastSigner`, a VALUE, never translated. */
+export function feastCrafterMarkFor(signer: string | null | undefined): string | null {
+  if (typeof signer !== 'string' || signer === '') return null;
+  return t('hudChrome.crafting.makersMark', { name: signer });
+}
+
 /** Every feast templateId the catalog ships, for the exhaustiveness pin. Kept
  *  here so the test imports ONE module rather than reaching into the sim. */
 export function feastTitleTemplateIds(): string[] {

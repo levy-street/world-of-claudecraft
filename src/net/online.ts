@@ -39,6 +39,7 @@ import {
 } from '../sim/data';
 import { deadTargetSelectable } from '../sim/dead_target';
 import { DEEDS_RECENT_CAP, freshDeedStats } from '../sim/deeds';
+import type { NamedSlotTarget } from '../sim/item_copy_ref';
 import { LEADERBOARD_PAGE_SIZE } from '../sim/leaderboard_page';
 import type { Ante, PickAction } from '../sim/lockpick';
 import type { MarketQuery } from '../sim/market_query';
@@ -179,6 +180,7 @@ import type {
   SalvageResultView,
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
+import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
 import {
@@ -241,28 +243,6 @@ interface PendingTransientInput {
   jump: boolean;
   turnLeft: boolean;
   turnRight: boolean;
-}
-
-interface ClientWireAura {
-  id: string;
-  name: string;
-  kind: Aura['kind'];
-  rem?: number;
-  exp?: number;
-  dur: number;
-  perm?: 1;
-  value?: number;
-  value2?: number;
-  value3?: number;
-  tickInterval?: number;
-  school?: Aura['school'];
-  stacks?: number;
-  charges?: number;
-  emp?: Aura['empowerAbilities'];
-  src?: number;
-  ub?: 1;
-  und?: 1;
-  bt?: 1;
 }
 
 // ---------------------------------------------------------------------------
@@ -1527,6 +1507,16 @@ function blankEntity(id: number): Entity {
     title: null,
     border: null,
   };
+}
+
+// The two wire fields a per-copy selection's ANCHOR rides on (`ord`/`n`), or
+// nothing at all when the caller named no anchor. Spread into the frame so an
+// unanchored command is byte-identical to what it always sent, which is what
+// keeps the golden traces still and an older server working unchanged; the
+// server re-derives the anchor against its own bags and refuses a mismatch
+// (src/sim/item_copy_anchor.ts).
+function anchorFields(target: NamedSlotTarget): { ord?: number; n?: number } {
+  return target.anchor ? { ord: target.anchor.ordinal, n: target.anchor.count } : {};
 }
 
 export class ClientWorld implements IWorld {
@@ -2939,14 +2929,6 @@ export class ClientWorld implements IWorld {
     const prevSelfFacing = prevSelf?.facing;
     const prevSelfDead = prevSelf?.dead ?? false;
 
-    const auraRemaining = (aura: ClientWireAura): number => {
-      if (aura.perm === 1) return Number.POSITIVE_INFINITY;
-      if (timerWire.mode !== 'stable' || timerWire.time === null) return Number(aura.rem);
-      const deadlineRemaining = stableDeadlineRemaining(aura.exp, timerWire.time);
-      if (deadlineRemaining !== null) return deadlineRemaining;
-      return typeof aura.rem === 'number' && Number.isFinite(aura.rem) ? aura.rem : 0;
-    };
-
     // `selfDelta` marks the one record that is not a peer broadcast: the
     // viewer's own extended state. Fields the server delta-gates per session
     // (bcastSelf's maybe/maybeRaw channel) are absent when unchanged there,
@@ -3047,6 +3029,10 @@ export class ClientWorld implements IWorld {
         e.dungeonId = w.dgn ?? null;
         e.riftTier = typeof w.rt === 'string' ? (w.rt as RiftTier) : undefined; // rift rank badge
         e.objectItemId = w.obj ?? null;
+        // A placed feast's CRAFTER mark, sparse on the wire: absent means an
+        // unsigned feast (or any other object), so it CLEARS rather than
+        // sticking, the way every other sparse mirror here does.
+        e.feastSigner = typeof w.fsg === 'string' ? w.fsg : undefined;
         e.guild = w.gd ?? '';
         e.pledgeGuild = w.pg ?? '';
         e.guildTier = w.gt ?? 0;
@@ -3217,89 +3203,14 @@ export class ClientWorld implements IWorld {
       // updates the existing Map in place: no per-entity Map churn at 20 Hz
       e.threat.clear();
       if (w.thr) for (const [tid, tv] of w.thr as [number, number][]) e.threat.set(tid, tv);
-      // The wire carries the aura magnitude (and imbue range / tick cadence / school) so buff
-      // and debuff hover tooltips show the real numbers online exactly as offline (aura_effect
-      // reads these). A 0/absent value decodes to 0 (value-less auras and an old server are
-      // unchanged), a missing school falls back to the physical default, and imbue range /
-      // tick cadence stay undefined when not sent. sourceId stays simplified (a separate
-      // pre-existing wire reduction, not read by the tooltip).
-      //
-      // Between snapshots the aura SET is usually unchanged (only `rem` ticks down), so when
-      // the incoming ids line up index-for-index with the existing records, update those
-      // records in place: no array + per-aura object allocation per entity at 20 Hz, and the
-      // preserved object identity matches the offline Sim (one live aura object across ticks).
-      // Any composition change (gain/fade/reorder) falls back to the fresh build below.
-      const shouldApplyAuras =
-        timerWire.mode === 'legacy' ||
-        (timerWire.mode === 'stable' && timerWire.time !== null && w.auras !== undefined);
-      if (shouldApplyAuras) {
-        const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
-        let sameAuraShape = e.auras.length === wireAuras.length;
-        if (sameAuraShape) {
-          for (let i = 0; i < wireAuras.length; i++) {
-            if (e.auras[i].id !== wireAuras[i].id) {
-              sameAuraShape = false;
-              break;
-            }
-          }
-        }
-        if (sameAuraShape) {
-          for (let i = 0; i < wireAuras.length; i++) {
-            const a = wireAuras[i];
-            const rec = e.auras[i];
-            rec.name = a.name;
-            rec.kind = a.kind;
-            rec.remaining = auraRemaining(a);
-            rec.duration = a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur;
-            rec.permanent = a.perm === 1;
-            rec.value = a.value ?? 0;
-            rec.value2 = a.value2;
-            rec.value3 = a.value3;
-            rec.tickInterval = a.tickInterval;
-            rec.school = a.school ?? 'physical';
-            rec.stacks = a.stacks;
-            // Mirror the charge count for a charge-limited aura (Lightning Shield); the wire
-            // sends it only when defined (server/game.ts), so an ordinary aura or an old server
-            // decodes to undefined and the badge falls back to the stacks path, exactly as before.
-            rec.charges = a.charges;
-            rec.empowerAbilities = a.emp;
-            // The caster's entity id, for the target strip's own-aura prominence
-            // (auras_view ownFirst). An old server omits it; 0 matches no player id.
-            rec.sourceId = a.src ?? 0;
-            rec.unbreakableControl = a.ub === 1 ? true : undefined;
-            // Presence-only mirror of the undispellable marker, so the client's
-            // isPlayerRemovableAura answers exactly as the server's does.
-            rec.undispellable = a.und === 1 ? true : undefined;
-            // Presence-only mirror of the break-threshold armed marker (the
-            // server emits bt = 1 when breakThreshold is defined): the one
-            // client reader is the Lingering Dread victim-band alias, which
-            // gates on breakThreshold !== undefined and never reads the
-            // value (ability_vfx/painter.ts). An old server omits it and the
-            // band stays off, exactly the offline-parity gap this closes.
-            rec.breakThreshold = a.bt === 1 ? 1 : undefined;
-          }
-        } else {
-          e.auras = wireAuras.map((a) => ({
-            id: a.id,
-            name: a.name,
-            kind: a.kind,
-            remaining: auraRemaining(a),
-            duration: a.perm === 1 ? Number.POSITIVE_INFINITY : a.dur,
-            permanent: a.perm === 1,
-            value: a.value ?? 0,
-            value2: a.value2,
-            value3: a.value3,
-            tickInterval: a.tickInterval,
-            sourceId: a.src ?? 0,
-            school: a.school ?? 'physical',
-            stacks: a.stacks,
-            charges: a.charges,
-            empowerAbilities: a.emp,
-            unbreakableControl: a.ub === 1 ? true : undefined,
-            undispellable: a.und === 1 ? true : undefined,
-            breakThreshold: a.bt === 1 ? 1 : undefined,
-          }));
-        }
+      // The aura family decodes in its own sibling (src/net/aura_wire_decode.ts):
+      // the deadline-vs-remaining clock, the in-place fast path that keeps a
+      // steady aura set allocation-free at 20 Hz, and every presence-only
+      // marker's absent-means-cleared handling live there, in ONE place rather
+      // than duplicated across the update and rebuild paths.
+      const wireAuras = (Array.isArray(w.auras) ? w.auras : []) as ClientWireAura[];
+      if (snapshotCarriesAuras(timerWire, w.auras)) {
+        e.auras = applyAuraWire(e.auras, wireAuras, timerWire);
       }
       e.loot = w.lootList ?? null;
       return e;
@@ -4199,12 +4110,25 @@ export class ClientWorld implements IWorld {
     if (target === undefined) this.cmd({ cmd: 'use', item: itemId });
     else this.cmd({ cmd: 'use', item: itemId, slot: target.slotIndex });
   }
-  discardItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+  discardItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'discard', item: itemId, count });
-    else this.cmd({ cmd: 'discard', item: itemId, count, slot: target.slotIndex });
+    else
+      this.cmd({
+        cmd: 'discard',
+        item: itemId,
+        count,
+        slot: target.slotIndex,
+        ...anchorFields(target),
+      });
   }
-  setItemLocked(itemId: string, locked: boolean, target: { slotIndex: number }): void {
-    this.cmd({ cmd: 'lock_item', item: itemId, locked, slot: target.slotIndex });
+  setItemLocked(itemId: string, locked: boolean, target: NamedSlotTarget): void {
+    this.cmd({
+      cmd: 'lock_item',
+      item: itemId,
+      locked,
+      slot: target.slotIndex,
+      ...anchorFields(target),
+    });
   }
   buyItem(npcId: number, itemId: string, opts?: VendorBuyOptions): void {
     // `bulk` and `count` each ride the wire only when non-default (the
@@ -4410,9 +4334,16 @@ export class ClientWorld implements IWorld {
   deliverCommissionOrder(orderId: number): void {
     this.cmd({ cmd: 'deliver_commission_order', order: orderId });
   }
-  sellItem(itemId: string, count?: number, target?: { slotIndex: number }): void {
+  sellItem(itemId: string, count?: number, target?: NamedSlotTarget): void {
     if (target === undefined) this.cmd({ cmd: 'sell', item: itemId, count });
-    else this.cmd({ cmd: 'sell', item: itemId, count, slot: target.slotIndex });
+    else
+      this.cmd({
+        cmd: 'sell',
+        item: itemId,
+        count,
+        slot: target.slotIndex,
+        ...anchorFields(target),
+      });
   }
   sellAllJunk(): void {
     this.cmd({ cmd: 'sell_all_junk' });
@@ -4663,12 +4594,14 @@ export class ClientWorld implements IWorld {
   convertHusks(): void {
     this.cmd({ cmd: 'convert_husks' });
   }
-  // The shared feast pair: payload-free place (the item id, charges, expiry
-  // and anti-abuse rule all resolve server-side) and an entity-id-only
-  // consume. Never predicted: the placed feast arrives on the normal entity
-  // snapshot and every refusal answers as a text-free farmDenied SimEvent.
-  placeFeast(): void {
-    this.cmd({ cmd: 'place_feast' });
+  // The shared feast pair: place (the item id, charges, expiry and anti-abuse
+  // rule all resolve server-side; only WHICH bag copy to spend rides the wire,
+  // and only when the caller named one) and an entity-id-only consume. Never
+  // predicted: the placed feast arrives on the normal entity snapshot and every
+  // refusal answers as a text-free farmDenied SimEvent.
+  placeFeast(target?: { slotIndex: number }): void {
+    if (target === undefined) this.cmd({ cmd: 'place_feast' });
+    else this.cmd({ cmd: 'place_feast', slot: target.slotIndex });
   }
   consumeFeast(feastId: number): void {
     this.cmd({ cmd: 'consume_feast', id: feastId });

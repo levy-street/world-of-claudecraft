@@ -104,6 +104,9 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
   // RETURN (the dialog repaints on OK instead), so afterAction has to be
   // countable for that contract to be pinnable at all.
   let afterActions = 0;
+  // Item ids whose action refused with the honest not-held toast (the bags
+  // window owns the error surface; the menu calls back into it).
+  const refusals: string[] = [];
   let activate: ((act: string) => void) | null = null;
   // The painter reads the worn payloads off IWorld.equipmentInstances, the
   // whole self `einst` mirror in both worlds (Masterwrought phase 12; before
@@ -165,7 +168,14 @@ function harness(innerHeight: number, stubOrInventory: WorldStub | InvSlot[] = {
     },
   });
   const openFor = (itemId: string, slotIndex = 0) =>
-    menu.open(ITEMS[itemId], itemId, slotIndex, 10, 10, () => {});
+    menu.open(
+      ITEMS[itemId],
+      itemId,
+      { index: slotIndex, refuseNotHeld: () => refusals.push(itemId) },
+      10,
+      10,
+      () => {},
+    );
   const openPlain = () => openFor(DUST);
   const openPicker = (reagentId = DUST) => {
     openFor(reagentId);

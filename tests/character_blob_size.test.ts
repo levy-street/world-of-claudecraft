@@ -38,6 +38,7 @@ vi.mock('pg', () => ({
 import {
   CHARACTER_BLOB_P99_WINDOW,
   CHARACTER_BLOB_WARN_BYTES,
+  CHARACTER_BLOB_WARN_QUEUE_MAX,
   CHARACTER_BLOB_WARN_WINDOW_MS,
   characterBlobBytesHighWater,
   characterBlobBytesP99,
@@ -493,6 +494,38 @@ describe('the deferred warn-line queue (the setImmediate shutdown trade, closed)
       expect(queuedCharacterBlobWarningCount()).toBe(0);
     } finally {
       warn.mockRestore();
+    }
+  });
+
+  it('caps the queue and reports the drop count as a tail line', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const over = 5;
+      for (let i = 0; i < CHARACTER_BLOB_WARN_QUEUE_MAX + over; i++) {
+        queueCharacterBlobWarning(`line ${i}`);
+      }
+      // The queue itself never grows past the cap, whatever the burst.
+      expect(queuedCharacterBlobWarningCount()).toBe(CHARACTER_BLOB_WARN_QUEUE_MAX);
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      const written = warn.mock.calls.map((c) => String(c[0]));
+      // The cap keeps the OLDEST lines (the first crossing is the informative
+      // one) plus one tail naming what it refused.
+      expect(written).toHaveLength(CHARACTER_BLOB_WARN_QUEUE_MAX + 1);
+      expect(written[0]).toBe('line 0');
+      expect(written[CHARACTER_BLOB_WARN_QUEUE_MAX - 1]).toBe(
+        `line ${CHARACTER_BLOB_WARN_QUEUE_MAX - 1}`,
+      );
+      expect(written[CHARACTER_BLOB_WARN_QUEUE_MAX]).toContain(String(over));
+      expect(written[CHARACTER_BLOB_WARN_QUEUE_MAX]).toContain('dropped');
+      expect(queuedCharacterBlobWarningCount()).toBe(0);
+      // The drop counter resets with the flush: a later single line prints
+      // alone, with no stale tail.
+      queueCharacterBlobWarning('after the drain');
+      flushQueuedCharacterBlobWarnings();
+      expect(warn.mock.calls.map((c) => String(c[0])).slice(-1)).toEqual(['after the drain']);
+    } finally {
+      warn.mockRestore();
+      flushQueuedCharacterBlobWarnings();
     }
   });
 

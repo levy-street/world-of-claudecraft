@@ -4048,6 +4048,19 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   aura_buff_ap_pct: r('fury', 'gold', ['fist', { p: 'sunburst', ...TR }], ['glow']),
   aura_buff_armor: r('steel', 'steel', ['shield']),
   aura_buff_int: r('arcane', 'arcanePink', ['eye']),
+  // The FLASK family: the three FlaskAuraKind stats, each the VESSEL primitive
+  // carrying the same stat motif its shared buff glyph uses, so a flask reads
+  // as "that buff, from the bottle" rather than as an unrelated icon. Keyed off
+  // the aura's flask marker (src/ui/aura_icon_view.ts flaskAuraIconId), which
+  // is why these ids are `flask_<kind>` and not `aura_<something>`: a flask, an
+  // elixir and a scroll of one stat share an aura id, and only the marker tells
+  // them apart. The added glow is what separates them at buff-bar size without
+  // relying on colour alone. Adding a fourth FlaskAuraKind means adding its
+  // recipe here, or the resolver falls back to the shared glyph, which is the
+  // safe direction.
+  flask_buff_sta: r('blood', 'blood', ['potion', { p: 'heart', ...BR }], ['glow']),
+  flask_buff_ap: r('fury', 'gold', ['potion', { p: 'fist', ...BR }], ['glow']),
+  flask_buff_int: r('arcane', 'arcanePink', ['potion', { p: 'eye', ...BR }], ['glow']),
   aura_buff_dodge: r('storm', 'sky', ['shield'], ['motion']),
   aura_buff_speed: r('earth', 'leather', ['boot'], ['motion']),
   aura_buff_haste: r('storm', 'sky', ['lightning']),

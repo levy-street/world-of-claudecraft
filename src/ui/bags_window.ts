@@ -21,6 +21,8 @@ import { audio } from '../game/audio';
 import { BACKPACK_SLOTS, bagSlotsOf } from '../sim/bags';
 import { ITEMS, QUESTS } from '../sim/data';
 import { FIREBOTTLE_COOLDOWN_SECS, FIREBOTTLE_ITEM_ID } from '../sim/interactions/firebottle_hut';
+import { baggedCopyAnchor } from '../sim/item_copy_anchor';
+import { itemCopyPin, type NamedSlotTarget } from '../sim/item_copy_ref';
 import { isItemLocked } from '../sim/item_lock';
 import { vaultMaterialIds } from '../sim/materials_vault';
 import type { EquipSlot, InvSlot, ItemDef, ItemInstancePayload } from '../sim/types';
@@ -40,6 +42,7 @@ import {
 } from './bag_filter';
 import { bagFineMark } from './bag_fine_mark_view';
 import { bagInstanceGlyphKind } from './bag_instance_glyph_view';
+import type { BagMenuTarget } from './bag_item_action_menu';
 import { bagItemHasContextActions } from './bag_item_context_menu';
 import { bagQuestMarkKind, bagQuestMarkProgressFromLog } from './bag_quest_mark_view';
 import { BagQuestTrackerHighlight } from './bag_quest_tracker_highlight';
@@ -70,7 +73,13 @@ import { showQuantityPrompt } from './bank_quantity_prompt';
 import { hasOpenBankSocket } from './bank_view';
 import { markDialogRoot } from './dialog_root';
 import { itemDisplayName } from './entity_i18n';
-import { isPaperdollDraggable } from './equip_drop_core';
+import {
+  type DraggedCopyRef,
+  type DraggedCopyResolution,
+  draggedCopySlotIndex,
+  isPaperdollDraggable,
+  resolveDraggedCopy,
+} from './equip_drop_core';
 import { esc } from './esc';
 import { captureFocusKey, focusedWithin, restoreFirstEnabled } from './focus_restore';
 import { encodeHotbarAction, HOTBAR_ACTION_MIME } from './hud/action_bar/hotbar';
@@ -271,7 +280,7 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   openItemActionMenu(
     def: ItemDef,
     itemId: string,
-    slotIndex: number,
+    target: BagMenuTarget,
     x: number,
     y: number,
     runDefault: () => void,
@@ -1133,6 +1142,7 @@ export class BagsWindow {
           itemId: s.itemId,
           count: Math.max(1, Math.floor(s.count)),
           index: index >= 0 ? index : null,
+          copyPin: itemCopyPin(s),
         };
         this.deps.dragState.begin(drag);
         if (this.deps.isHotbarItemId(s.itemId)) {
@@ -1172,6 +1182,7 @@ export class BagsWindow {
                 itemId: s.itemId,
                 count: Math.max(1, Math.floor(s.count)),
                 index: index >= 0 ? index : null,
+                copyPin: itemCopyPin(s),
               },
         ghostHtml: () => this.deps.itemIcon(item, wornItemCellParts(item, s.instance).quality),
         onStart: () => {
@@ -1189,21 +1200,25 @@ export class BagsWindow {
           // The paperdoll drop belongs to the character window (it owns the sockets
           // and the equip refusals); the world drop belongs here, where the destroy
           // prompt lives. Releasing anywhere else is a plain cancel.
+          // `index` was resolved at drag START; the bags can have shifted since,
+          // so the copy is re-resolved by its pin here rather than trusting the
+          // cell it came out of (equip_drop_core.ts resolveDraggedCopy).
+          const ref = { index: index >= 0 ? index : null, copyPin: itemCopyPin(s) };
           if (target.kind === 'equip') {
-            // `index` above is bagStackIndex over the live inventory, so it names
-            // the exact stack this drag started from.
-            this.deps.dropOnEquipSlot(
-              s.itemId,
-              target.slot,
-              index >= 0 ? { slotIndex: index } : undefined,
-            );
+            const named = draggedCopySlotIndex(this.deps.world().inventory, s.itemId, ref);
+            if (named === null) this.deps.showError(tSim('error.noItem'));
+            else
+              this.deps.dropOnEquipSlot(
+                s.itemId,
+                target.slot,
+                named === undefined ? undefined : { slotIndex: named },
+              );
           } else if (target.kind === 'bagCell')
             this.dropOnBagCell(index >= 0 ? index : null, target.index);
           else if (target.kind === 'actionSlot') this.deps.dropOnActionSlot(s.itemId, target.slot);
           else if (target.kind === 'actionRingSlot')
             this.deps.dropOnActionRingSlot(s.itemId, target.ringIndex);
-          else if (target.kind === 'world')
-            this.dropOnWorldToDestroy(s.itemId, count, index >= 0 ? index : null);
+          else if (target.kind === 'world') this.dropOnWorldToDestroy(s.itemId, count, ref);
         },
         onEnd: () => {
           this.deps.markEquipDropTargets(null);
@@ -1381,6 +1396,7 @@ export class BagsWindow {
         itemId: s.itemId,
         count: Math.max(1, Math.floor(s.count)),
         index: index >= 0 ? index : null,
+        copyPin: itemCopyPin(s),
       });
       if (e.dataTransfer) {
         e.dataTransfer.setData('text/plain', s.itemId);
@@ -1405,6 +1421,7 @@ export class BagsWindow {
               itemId: s.itemId,
               count: Math.max(1, Math.floor(s.count)),
               index: index >= 0 ? index : null,
+              copyPin: itemCopyPin(s),
             },
       ghostHtml: () => unknownItemIconHtml(s.itemId),
       onStart: () => {
@@ -1484,13 +1501,37 @@ export class BagsWindow {
   /** Open the destroy prompt for a stack dropped on the world. Public so the HUD's
    *  world-canvas drop target (the desktop arm of the same gesture) shares this one
    *  entry point with the touch arm above. */
-  promptDestroy(itemId: string, count: number, index: number | null = null): void {
-    // The prompt takes the COPY at the dragged index when that cell still
-    // holds this item id (the bags can shift under a snapshot mid-drag);
-    // otherwise the def alone, never a different copy's chosen name.
-    const slot = index === null ? undefined : this.deps.world().inventory[index];
-    const copy = slot?.itemId === itemId ? slot : undefined;
+  promptDestroy(itemId: string, count: number, ref: DraggedCopyRef | null = null): void {
+    // The prompt takes the COPY the player picked up, re-resolved against the
+    // LIVE bags by its pin: the bags can shift under a snapshot mid-drag, and
+    // an index-plus-id check accepts a stale index that now names a DIFFERENT
+    // copy of the same id, which is how a drag of the enchanted piece could
+    // open a prompt naming (and then destroying) the plain duplicate beside it.
+    // A copy that has left the bags resolves to nothing, so the prompt falls
+    // back to the def alone and the untargeted walk it uses is the honest
+    // answer to "this one is already gone".
+    const resolved =
+      ref === null ? null : resolveDraggedCopy(this.deps.world().inventory, itemId, ref);
+    const copy =
+      resolved?.kind === 'held'
+        ? this.deps.world().inventory[resolved.index]
+        : // An unpinned drag (a sorted or filtered grid names no copy) keeps the
+          // pre-existing index-plus-id read unchanged.
+          this.unpinnedDragCopy(itemId, resolved, ref);
     this.showDiscardItemPrompt(itemId, Math.max(1, Math.floor(count)), copy);
+  }
+
+  /** The pre-pin behavior, kept for a drag that captured no copy identity: the
+   *  slot at the dragged index when it still holds this id, else nothing. */
+  private unpinnedDragCopy(
+    itemId: string,
+    resolved: DraggedCopyResolution | null,
+    ref: DraggedCopyRef | null,
+  ): InvSlot | undefined {
+    if (resolved?.kind !== 'unpinned' || ref?.index === null || ref?.index === undefined)
+      return undefined;
+    const slot = this.deps.world().inventory[ref.index];
+    return slot?.itemId === itemId ? slot : undefined;
   }
 
   /** What dropping `itemId` on the world does right now (pure decision, shared with
@@ -1506,7 +1547,7 @@ export class BagsWindow {
     this.deps.showError(t('hudChrome.bags.cannotDestroy'));
   }
 
-  private dropOnWorldToDestroy(itemId: string, count: number, index: number | null): void {
+  private dropOnWorldToDestroy(itemId: string, count: number, ref: DraggedCopyRef | null): void {
     dropOnWorld(
       {
         destroyAction: (id) => this.destroyAction(id),
@@ -1515,7 +1556,7 @@ export class BagsWindow {
       },
       itemId,
       count,
-      index,
+      ref,
     );
   }
 
@@ -1590,16 +1631,19 @@ export class BagsWindow {
         // through the shared showError pipe), and send nothing.
         this.deps.showError(tSim('error.bankQuestItem'));
         return;
-      case 'bankSocketBag':
-        // The bank-aimed twin of equipBag below: the clicked payload-free bag
+      case 'bankSocketBag': // The bank-aimed twin of equipBag below: the clicked payload-free bag
         // sockets into the bank's first empty unlocked socket (the sim owns
         // the scan; no socket index is named), consuming the EXACT clicked
         // copy via the named-slot selector. The bank pane repaints through its
         // own signature (socketBags moves); the bags side repaints here.
-        this.deps.world().bankSocketBag(s.itemId, undefined, this.copyRefFor(s));
-        this.deps.hideTooltip();
-        this.render();
-        break;
+        {
+          const at = this.copyRefFor(s);
+          if (!at) return;
+          this.deps.world().bankSocketBag(s.itemId, undefined, at);
+          this.deps.hideTooltip();
+          this.render();
+          break;
+        }
       case 'bankDepositBlockedNoTarget':
         // The bank is open with no grid on screen to drop into (its guild pane's
         // Log view). SPEAK, do not go quiet: this is a deliberate click on an
@@ -1661,37 +1705,50 @@ export class BagsWindow {
       case 'petFeedBlocked':
         this.deps.showError(t('hud.pet.petEatsFoodOnly'));
         return;
-      case 'petFeed':
-        this.deps.world().feedPet(s.itemId, this.copyRefFor(s));
+      case 'petFeed': {
+        const at = this.copyRefFor(s);
+        if (!at) return;
+        this.deps.world().feedPet(s.itemId, at);
         this.deps.setPendingPetFeed(false);
         this.deps.resetPetBarSig();
         this.render();
         break;
+      }
       case 'discardQuest':
         this.showDiscardItemPrompt(s.itemId, Math.max(1, Math.floor(s.count)), s);
         break;
-      case 'equipBag':
-        this.deps.world().equipBag(s.itemId, undefined, this.copyRefFor(s));
+      case 'equipBag': {
+        const at = this.copyRefFor(s);
+        if (!at) return;
+        this.deps.world().equipBag(s.itemId, undefined, at);
         this.deps.hideTooltip();
         this.render();
         break;
-      case 'placeFeast':
+      }
+      case 'placeFeast': {
         // The shared feast (Farming Phase 12): the click is the PLACE verb,
-        // never plain useItem. The command carries no payload; the server
-        // spends the bag item and spawns the feast entity (or answers with a
-        // text-free farmDenied), so nothing is predicted here. The tooltip is
-        // hidden like the other spend arms: a successful place removes the
-        // hovered stack.
-        this.deps.world().placeFeast();
+        // never plain useItem. The server spends the bag item and spawns the
+        // feast entity (or answers with a text-free farmDenied), so nothing is
+        // predicted here; the one thing the click knows and the server cannot
+        // guess is WHICH copy was clicked, which now rides with it so a signed
+        // feast beside a plain one spends the one the player picked. The
+        // tooltip is hidden like the other spend arms: a successful place
+        // removes the hovered stack.
+        const at = this.copyRefFor(s);
+        if (!at) return;
+        this.deps.world().placeFeast(at);
         this.deps.hideTooltip();
         this.render();
         break;
+      }
       case 'use': {
         // Gathering tools (#2343) route through the interact-style handler
         // (nearest matching node + autorun stop) when main.ts has wired it;
         // everything else, and any unwired host, keeps the plain useItem.
         if (!item || !this.deps.useGatherTool(item)) {
-          this.deps.world().useItem(s.itemId, this.copyRefFor(s));
+          const at = this.copyRefFor(s);
+          if (!at) return;
+          this.deps.world().useItem(s.itemId, at);
         }
         this.render();
         this.deps.renderCharIfOpen();
@@ -1833,6 +1890,15 @@ export class BagsWindow {
   // the plain-use default mode (never trade / mail / market / vendor / bank /
   // pet-feed, whose own click owns the slot), mirroring bagDestroyAction's
   // transactional-mode gate, and only when the item has an eligible action.
+  //
+  // The VENDOR arm carries a second consequence worth stating before someone
+  // relaxes it: on touch there is no right-click, so a tap opens this menu
+  // instead of running the classic action. At a vendor the classic action is a
+  // sale, which already raises its own confirm, so admitting the menu there
+  // would put two dialogs between a tap and one sale (recorded at the phase 16
+  // QA as the mobile Sell route's double confirm). This gate is what keeps it
+  // to one; the flow is pinned end to end, both arms, in
+  // tests/bags_vendor_sell_confirm.test.ts.
   // The bank arm reads bankOpen for the same reason bagDestroyAction does: a
   // bank view with no deposit target is still the bank owning the slot, and the
   // menu's rows are the very use / equip / destroy actions this surface refuses.
@@ -1867,7 +1933,10 @@ export class BagsWindow {
     this.deps.openItemActionMenu(
       item,
       s.itemId,
-      index,
+      // The slot REFERENCE rides along so an action can re-resolve the clicked
+      // copy when it runs, rather than trusting an index captured at open; the
+      // menu owns no error surface, so the refusal toast is supplied from here.
+      { index, slot: s, refuseNotHeld: () => this.deps.showError(tSim('error.noItem')) },
       x,
       y,
       () => this.runBagAction(item, s, ev),
@@ -1875,16 +1944,33 @@ export class BagsWindow {
     );
   }
 
-  /** The copy selection for a clicked stack, or undefined when the stack is no
-   *  longer in the live inventory.
+  /** The copy selection for a clicked stack, or null when the stack has left the
+   *  live inventory and the action must REFUSE.
    *
-   *  bagStackIndex is indexOf, so a stale click yields -1. Sending -1 would be
-   *  REFUSED by the sim (the leaf rejects any out-of-range index by design), which
-   *  turns a stale click into a silent no-op. Falling back to no-selection keeps
-   *  the pre-feature behavior for exactly the case where we cannot name the copy. */
-  private copyRefFor(slot: InvSlot): { slotIndex: number } | undefined {
-    const index = bagStackIndex(this.deps.world().inventory, slot);
-    return index >= 0 ? { slotIndex: index } : undefined;
+   *  bagStackIndex is indexOf, so a stale click yields -1. This used to answer
+   *  `undefined` there and every caller then dispatched ID-ONLY, which is not
+   *  the pre-feature behavior it looks like: an id-only command runs the sim's
+   *  newest-match walk and spends an id-MATE the player never clicked. Refusing
+   *  is the repo's own settled direction for a stale click (the destroy menu's
+   *  fail-closed -1 and the discard prompt's re-resolve-then-refuse), and it is
+   *  the only answer that cannot destroy or spend the wrong copy.
+   *
+   *  Voices the refusal itself so no caller can forget to: every arm is a switch
+   *  case, and a silent null would read as "no selection" at a glance. */
+  private copyRefFor(slot: InvSlot): NamedSlotTarget | null {
+    const inventory = this.deps.world().inventory;
+    const index = bagStackIndex(inventory, slot);
+    if (index < 0) {
+      this.deps.showError(tSim('error.noItem'));
+      return null;
+    }
+    // The COPY anchor rides beside the index on the discard-class commands
+    // (src/sim/item_copy_anchor.ts). The index says which cell; the anchor says
+    // which same-id sibling that cell held when the player clicked, which is
+    // the half a lagging mirror actually loses. Null when the copy cannot be
+    // anchored, which simply sends the index alone, exactly as before.
+    const anchor = baggedCopyAnchor(inventory, slot.itemId, index) ?? undefined;
+    return { slotIndex: index, ...(anchor ? { anchor } : {}) };
   }
 
   private sellBagItem(item: ItemDef, slot: InvSlot, ev: MouseEvent): void {
@@ -1924,7 +2010,9 @@ export class BagsWindow {
       // item on a single stray click (the enchanted-offhand-vanishes report).
       this.showSellConfirmPrompt(item, slot);
     } else {
-      this.deps.world().sellItem(slot.itemId, undefined, this.copyRefFor(slot));
+      const at = this.copyRefFor(slot);
+      if (!at) return;
+      this.deps.world().sellItem(slot.itemId, undefined, at);
     }
   }
 

@@ -20,6 +20,7 @@ import type {
   ToolEffectSlotView,
 } from '../world_api';
 import type { GroundAimPointXZ } from '../world_api/combat';
+import { autoEquipFamilyConflict } from './auto_equip_gate';
 import * as bagsMod from './bags';
 import {
   addStacked,
@@ -43,6 +44,7 @@ import * as bankSocketsMod from './bank_sockets';
 import { extractTradableCopyImpl, grantTradableCopyImpl } from './broker_custody';
 import { campSpawnOffset } from './camp_scatter';
 import type { CharacterState, PetState } from './character_state';
+import type { ItemCopyAnchor } from './item_copy_anchor';
 
 export type { CharacterState, PetState } from './character_state';
 
@@ -266,13 +268,7 @@ import {
   runDespawnDecay,
   tickGroundAoEs,
 } from './entity_roster';
-import {
-  canEquipItem,
-  equipCandidateQuality,
-  masterwroughtConflictSlot,
-  resolveEquipSlot,
-  uniqueEquipConflictSlot,
-} from './equipment_rules';
+import { canEquipItem, resolveEquipSlot } from './equipment_rules';
 import * as escortMod from './escort';
 import { initEscorts as initEscortsImpl, updateEscorts as updateEscortsImpl } from './escort';
 import { fleeSpeed } from './flee_speed';
@@ -283,7 +279,7 @@ import * as guildBankMod from './guild_bank';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
-import { foldNamedSlotTarget } from './item_copy_ref';
+import { foldNamedSlotTarget, type NamedSlotTarget } from './item_copy_ref';
 import {
   boundCraftedRecipeIdOnLoad,
   sanitizeItemInstancePayloadOnLoad,
@@ -331,7 +327,6 @@ import type { MaterialsVaultState } from './materials_vault';
 import * as vaultMod from './materials_vault';
 import {
   accountCosmeticsWithWornMechChroma,
-  type ItemUseResult,
   unequipWornMechChroma,
   unlockMechChromaFromItem,
 } from './mech_chroma_ownership';
@@ -796,6 +791,7 @@ import {
   type InventoryUnit,
   type InvSlot,
   type ItemInstancePayload,
+  type ItemUseResult,
   isConsuming,
   isDungeonDifficulty,
   isEquipSlot,
@@ -1278,7 +1274,10 @@ export interface SkinClaimResult {
   chromaId?: string;
 }
 
-export type { ItemUseResult } from './mech_chroma_ownership';
+// The public re-export foreign importers resolve on the Sim facade (items.ts,
+// sim_context.ts). Its home moved to types.ts at masterwrought Phase 18; this
+// line is what lets that move touch no call site.
+export type { ItemUseResult } from './types';
 
 // Opt-in global chat channels a player can /join and /leave. `general` is
 // always-on (everyone hears /general), so it is intentionally not joinable here.
@@ -8581,21 +8580,23 @@ export class Sim {
   discardItem(
     itemId: string,
     count = 1,
-    pidOrTarget?: number | { slotIndex: number },
+    pidOrTarget?: number | NamedSlotTarget,
     slotIndex?: number,
+    anchor?: ItemCopyAnchor,
   ): void {
-    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
-    items.discardItem(this.ctx, itemId, count, pid, named);
+    const { pid, named, anchor: a } = foldNamedSlotTarget(pidOrTarget, slotIndex, anchor);
+    items.discardItem(this.ctx, itemId, count, pid, named, a);
   }
 
   setItemLocked(
     itemId: string,
     locked: boolean,
-    pidOrTarget?: number | { slotIndex: number },
+    pidOrTarget?: number | NamedSlotTarget,
     slotIndex?: number,
+    anchor?: ItemCopyAnchor,
   ): void {
-    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
-    setItemLockedCmd(this.ctx, itemId, locked, pid, named);
+    const { pid, named, anchor: a } = foldNamedSlotTarget(pidOrTarget, slotIndex, anchor);
+    setItemLockedCmd(this.ctx, itemId, locked, pid, named, a);
   }
 
   equipItem(
@@ -8661,11 +8662,12 @@ export class Sim {
   sellItem(
     itemId: string,
     count = 1,
-    pidOrTarget?: number | { slotIndex: number },
+    pidOrTarget?: number | NamedSlotTarget,
     slotIndex?: number,
+    anchor?: ItemCopyAnchor,
   ): void {
-    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
-    items.sellItem(this.ctx, itemId, count, pid, named);
+    const { pid, named, anchor: a } = foldNamedSlotTarget(pidOrTarget, slotIndex, anchor);
+    items.sellItem(this.ctx, itemId, count, pid, named, a);
   }
 
   sellAllJunk(pid?: number): void {
@@ -9174,25 +9176,12 @@ export class Sim {
     // "must be level N" message belongs.
     const e = this.entities.get(meta.entityId);
     if (e && !meetsLevelRequirement(e.level, def)) return;
-    // Skip silently when a copy of a unique-equipped (legendary) family is
-    // already worn anywhere: equipping the duplicate would be refused, and the
-    // explicit equip path is where that refusal toast belongs.
-    if (uniqueEquipConflictSlot(def, meta.equipment, (id) => ITEMS[id], [])) return;
-    // Same silent skip for the Masterwrought counted family (cap or legendary
-    // sub-cap). ignoreSlots stays empty like the rule above: auto-equip is a
-    // convenience, so it declines rather than reasoning about which worn piece
-    // a swap would free.
-    if (
-      masterwroughtConflictSlot(
-        def,
-        meta.equipment,
-        (id) => ITEMS[id],
-        [],
-        meta.equipmentInstance,
-        def.masterwrought ? equipCandidateQuality(meta.inventory, itemId, def) : undefined,
-      )
-    )
-      return;
+    // Skip silently when an explicit equip would be refused by a worn-family
+    // rule (the unique-equipped legendary family, or the Masterwrought counted
+    // cap): the refusal toast belongs to the explicit path. Both rules and the
+    // reason auto-equip declines rather than displacing live in
+    // src/sim/auto_equip_gate.ts.
+    if (autoEquipFamilyConflict(def, itemId, meta, (id) => ITEMS[id])) return;
     if (def.kind === 'weapon') {
       const cur = meta.equipment.mainhand ? ITEMS[meta.equipment.mainhand]?.weapon : null;
       const next = def.weapon;
@@ -11967,10 +11956,11 @@ export class Sim {
 
   // Set out a shared feast at the caller's feet (the D16 showcase). Thin
   // delegate; the whole lifecycle lives in professions/feast.ts, draw-free.
-  placeFeast(pid?: number): void {
+  placeFeast(pidOrTarget?: number | { slotIndex: number }, slotIndex?: number): void {
+    const { pid, named } = foldNamedSlotTarget(pidOrTarget, slotIndex);
     const r = this.ctx.resolve(pid);
     if (!r) return;
-    placeFeastAction(this.ctx, r.e, r.meta);
+    placeFeastAction(this.ctx, r.e, r.meta, named);
   }
 
   // Eat once from the placed feast entity `feastId`. Thin delegate; draw-free.

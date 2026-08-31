@@ -51,6 +51,7 @@ import { useBrinyLure } from './interactions/crab_summon';
 import { throwFirebottleAtNearestHut } from './interactions/firebottle_hut';
 import { moveStackToCell } from './inventory_order';
 import { sortInventoryStacks } from './inventory_sort';
+import type { ItemCopyAnchor } from './item_copy_anchor';
 import {
   consumeNewestInventoryUnit,
   consumeSelectedInventorySlot,
@@ -389,6 +390,7 @@ export function discardItem(
   count = 1,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -412,7 +414,11 @@ export function discardItem(
   // enchanted or signed copy standing longest.
   const single = discardCount === 1 && slotIndex !== undefined;
   if (single) {
-    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    // The anchor rides with the selection: the index proves the cell still
+    // holds this ITEM, the anchor proves it still holds this COPY. A mismatch
+    // answers null here, the same refusal a bad index already answered, so a
+    // stale discard destroys nothing instead of destroying an id-mate.
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
     if (taken === null) {
       ctx.error(meta.entityId, "You don't have that item.");
       return;
@@ -1370,6 +1376,7 @@ export function sellItem(
   count = 1,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): void {
   const r = ctx.resolve(pid);
   if (!r) return;
@@ -1466,8 +1473,10 @@ export function sellItem(
     }
     // `!taken` rather than `=== null`: the undefined arm cannot occur inside this
     // branch (slotIndex is defined), and narrowing on it keeps the type honest
-    // without an assertion.
-    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex);
+    // without an assertion. The anchor rides with the selection (the index
+    // proves the cell still holds this ITEM, the anchor that it still holds
+    // this COPY), so a stale sell refuses instead of vendoring an id-mate.
+    const taken = consumeSelectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
     if (!taken) {
       ctx.error(meta.entityId, "You don't have that item.");
       return;

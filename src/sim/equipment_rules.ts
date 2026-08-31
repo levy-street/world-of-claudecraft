@@ -180,8 +180,13 @@ export function equipCandidateIndex(
   ) {
     return slotIndex;
   }
+  // Same count >= 1 rule as the named-cell arm above: a cell that holds none of
+  // the item is not a unit anything can lift, so it must not be the copy the
+  // peek judges either. Without it a stale count-0 cell sitting above a real
+  // copy answered as the unit an id-only equip would take, which is the exact
+  // peek-consume disagreement the header says this function exists to prevent.
   for (let i = inventory.length - 1; i >= 0; i--) {
-    if (inventory[i].itemId === itemId) return i;
+    if (inventory[i].itemId === itemId && inventory[i].count >= 1) return i;
   }
   return -1;
 }

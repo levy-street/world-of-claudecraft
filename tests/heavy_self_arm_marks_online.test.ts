@@ -58,6 +58,12 @@ function joinServer(
 ): { session: ClientSession; sent: unknown[] } {
   const fc = fakeWs();
   const session = server.join(fc.ws as never, id, id, name, 'warrior', null);
+  // join() answers a refusal object rather than a session on a rejected join
+  // (a taken character, a lease it could not acquire). Narrow it, never cast
+  // past it: every case below drives a real session, so a refusal here is a
+  // broken fixture and should say so loudly instead of failing on a later
+  // property read. The house idiom (tests/audit_cur_conservation.test.ts).
+  if ('error' in session) throw new Error(session.error);
   return { session, sent: fc.sent };
 }
 
@@ -104,7 +110,17 @@ describe('perfect_item: the dispatch refusals mark nothing, the sim-bound frame 
   it('a screened legendary name answers the notice, never reaches the sim, and marks nothing', () => {
     const server = new GameServer();
     const { session, sent } = joinServer(server, 902, 'Namer');
+    const pid = session.pid as number;
     const spy = vi.spyOn(server.sim, 'perfectItemAs');
+    // The refusal needs a copy that would CONSUME the name (phase 18 narrowed
+    // the screen to exactly that): Sim.perfectItemAs routes a `perfected`
+    // payload to the promotion ladder and everything else to the ordinary
+    // attempt, which ignores the name. Worn on the neck, so the `slot` ref the
+    // other cases use resolves to it.
+    const meta = server.sim.meta(pid);
+    if (!meta) throw new Error('no meta');
+    meta.equipment.neck = 'wyrmfall_pendant';
+    meta.equipmentInstance.neck = { perfected: true };
     clearHeavyDirty(session);
     sent.length = 0;
     // Shape-valid AND offensive: the content screen refuses it (a digit-bearing
@@ -114,6 +130,25 @@ describe('perfect_item: the dispatch refusals mark nothing, the sim-bound frame 
     expect(spy).not.toHaveBeenCalled();
     expect(heavyDirty(session)).toBe(false);
     expect(noticeTexts(sent)).toContain('That name is not allowed.');
+  });
+
+  it('an offensive name on an UNPERFECTED copy is stripped, so the frame reaches the sim and MARKS', () => {
+    // The partition's newest member (phase 18): a screened name is no longer a
+    // dispatch refusal on every copy, only on one the promotion ladder would
+    // stamp it onto. On any other copy the name is stripped and the attempt
+    // proceeds, which puts the frame back in the sim-bound arm: it marks.
+    const server = new GameServer();
+    const { session, sent } = joinServer(server, 911, 'Stripped');
+    const spy = vi.spyOn(server.sim, 'perfectItemAs');
+    clearHeavyDirty(session);
+    sent.length = 0;
+    // Nothing worn on the neck, so nothing is perfected: the same frame the
+    // case above refuses now rides through UNNAMED and marks on the way in.
+    cmd(server, session, { cmd: 'perfect_item', slot: 'neck', name: 'fuck' });
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy).toHaveBeenLastCalledWith(session.pid, { slot: 'neck' }, undefined);
+    expect(heavyDirty(session)).toBe(true);
+    expect(noticeTexts(sent)).not.toContain('That name is not allowed.');
   });
 
   it('a well-formed frame marks the moment it reaches the sim (the sim then decides)', () => {

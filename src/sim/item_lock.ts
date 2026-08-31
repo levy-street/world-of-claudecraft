@@ -17,6 +17,7 @@
 // `src/sim`-pure: no DOM/render/ui/game/net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Draws no rng.
 
+import type { ItemCopyAnchor } from './item_copy_anchor';
 import { selectedInventorySlot } from './item_copy_ref';
 import { isItemLocked } from './item_lock_flag';
 import type { PlayerMeta } from './sim';
@@ -124,6 +125,7 @@ export function setItemLocked(
   locked: boolean,
   pid?: number,
   slotIndex?: number,
+  anchor?: ItemCopyAnchor,
 ): SetItemLockedResult {
   const r = ctx.resolve(pid);
   if (!r) return { ok: false, itemId, locked, reason: 'not_held' };
@@ -133,7 +135,11 @@ export function setItemLocked(
   // bank-container arm is ever added here, it must call bank.ts
   // bumpBankWireRev in the same change (bankInfoFor clones the mutated slot,
   // and the server's `bank` wire gate elides on that revision).
-  const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex);
+  // The anchor rides with the selection: the index proves the cell still holds
+  // this ITEM, the anchor that it still holds this COPY. A mismatch answers the
+  // same not_held the bad-index arm already answered, so a stale toggle never
+  // flips the lock on an id-mate the player never clicked.
+  const selected = selectedInventorySlot(meta.inventory, itemId, slotIndex, anchor);
   if (!selected) return { ok: false, itemId, locked, reason: 'not_held' };
   if (isItemLocked(selected.instance) === locked) return { ok: true, itemId, locked };
   if (!locked && selected.instance) {
