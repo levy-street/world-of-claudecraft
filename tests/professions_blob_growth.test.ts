@@ -532,9 +532,10 @@ function ceilingSim(nowMs?: number): Sim {
       // And it is MINT-REACHABLE, not hand-edit-only: the production
       // replacement mint fnv1a(`${bedId}:${plantedAtMs}:survival`) / 2^32
       // (farm_persist.ts deriveHiddenSlots) lands in that band about one key
-      // in a hundred thousand (verified against the module's own fnv1a:
-      // 'eastbrook_bed_1:13625:survival' yields 0.0000013611279428005219, 24
-      // characters). MEASURED since Phase 18 (F4's deliberately-unmeasured
+      // in a hundred thousand (verified against the module's own fnv1a with a
+      // real-shaped key, a live bed id plus a 13-digit epoch anchor:
+      // 'bed_eastbrook_1:1756600100591:survival' lands in the 24-character
+      // band). MEASURED since Phase 18 (F4's deliberately-unmeasured
       // note retired, reopened qr-18): the value below is a shortest-roundtrip
       // double inside [0, 1), so clampSurvivalRoll passes it through verbatim
       // and the settle stays a fixed point at the full 24-character width, +5

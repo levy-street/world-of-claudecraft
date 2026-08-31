@@ -439,6 +439,28 @@ describe('CI workflow parity', () => {
     const blankBlocks = screenshotSparseBlocks(withBlankSixth);
     expect(blankBlocks, 'a blank-line-split sixth block must be DISCOVERED whole').toHaveLength(6);
     expect(blankBlocks.filter((block) => block !== SPARSE_CONE)).toHaveLength(1);
+    // The closer half of the same immunity (the Phase 18 fresh-read control):
+    // a blank line parked between the last subtree row and the cone-mode
+    // closer must not drop the closer from the extracted block. The sixth
+    // copy here is the UNMODIFIED cone with that one blank inserted, so the
+    // post-fix extractor reads it EQUAL to SPARSE_CONE (six equal blocks);
+    // the pre-fix lines[end + 1] lookup lost the closer and read it unequal.
+    // The divergent cone cannot carry this control (it is unequal either
+    // way), which is why the body-split control above cannot see the closer.
+    const coneLines = SPARSE_CONE.split('\n');
+    const closerAt = coneLines.findIndex((line) =>
+      line.trim().startsWith('sparse-checkout-cone-mode:'),
+    );
+    expect(closerAt, 'the cone carries its cone-mode closer').toBeGreaterThan(0);
+    coneLines.splice(closerAt, 0, '');
+    const blankBeforeCloser = coneLines.join('\n');
+    const withBlankCloserSixth = `${workflow}\n  synthetic-drift-job:\n    steps:\n      - uses: actions/checkout@v5\n        with:\n${blankBeforeCloser}\n`;
+    const closerBlocks = screenshotSparseBlocks(withBlankCloserSixth);
+    expect(closerBlocks, 'a blank before the closer must not lose the block').toHaveLength(6);
+    expect(
+      closerBlocks.filter((block) => block !== SPARSE_CONE),
+      'a blank before the closer must not drop the closer from the block',
+    ).toHaveLength(0);
     const coneDirs = new Set<string>(
       [...SPARSE_CONE.matchAll(/\/docs\/screenshots\/([A-Za-z0-9._-]+)\//g)].map((m) => m[1]),
     );
