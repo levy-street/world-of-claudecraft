@@ -23212,6 +23212,50 @@ record; the QA twin re-sweeps and diffs.
   adminAnalyticsReadRateLimited meters all three routes plus both legacy arms
   on its own bucket. Hot-path review: 0 blocking, 3 should-fix, 4 nits, fix
   round in flight (recorded when landed).
+- U-SIM-FARM 5753d00f25 (11 items; a first commit swept in another unit's
+  git-mv renames and was repaired by soft reset before the tree moved):
+  consume-feast-existence-oracle (unseen and nonexistent feast ids answer ONE
+  feast_expired frame; feast_range stays in the wire union for stale clients),
+  feastownerkey-domain-mixing (character:/entity: tagged keys),
+  farm-crop-mark-zoneid-guard, near-farmer-scan-early-exit
+  (SpatialGrid.someInRadius), quest-credit-seam-fold (onCropFarmedForQuests
+  on SimContext), questobjectiveareas-fallthrough (exhaustive switch, never
+  default), withered-then-ready-reprojection (JUDGED SHAPE: a transient
+  PlayerMeta.farmWitheredAnnounced set; the correction rides the EXISTING
+  farmReady frame as a fresh ready count, so no new event, key, wire field or
+  client change; META_EXCLUDE row justified), prompt-slot-load-side-twin (in
+  tools.ts, the normalizer's real home), resetday-monotonic-guard (a
+  lexicographic-max accessor at the source, every daily gate covered),
+  sanitize-daily-sources-helper (delve and heroic fragments on the
+  daily_gate_load clamps; the non-iterable throw closed), wyrmfall-marks-
+  scan-dedup (claimedInstanceForMob resolved once at the hub, both award arms
+  take an optional claimed slot, 7 to 6 scans per final-boss death). sim.ts
+  LOWERED 12040 to 12038 via the extracted farm_load_report leaf; four census
+  rows; parity goldens unchanged twice over; 430 + 258 tests green.
+  Architecture review in flight.
+- U-PERSIST b2624cda7f (3 items): unfenced-offline-writers (the rename and
+  reclaim signer sweeps and the PBE roster save ride saveOfflineCharacterState,
+  which already carries the level column, so no db.ts variant; a live-lease
+  refusal logs one line and moves on, the caller-side online guard becomes
+  the fast path and the fence the guarantee; 14/14 real-Postgres arms against
+  the dev container), clear-item-name-select1 (a SELECT 1 existence probe in
+  the new server/clear_item_name_db.ts sibling replaces the second blob load
+  on the refusal arm; db.ts stays at its exact 4999), retired-id-per-cell-
+  targeting (the bag-cell itemId bound is the signer-doctrine shape, never
+  the ITEMS allowlist, so a retired id stays targetable). Two census rows.
+  The census doc was staged PARTIALLY (git plumbing) because the hot-path
+  writer's twenty in-flight rows shared the working copy. Database and
+  security reviews in flight.
+- U-CENSUS (lead, one item: census-fanout-helper): announceZoneCelebration
+  named in SIM_EVENT_FANOUT_HELPERS; the three celebration events left the
+  union-only pin and its mirrored test list (declared-but-unseen 11 to 8, pin-
+  consistent); the two simevent-emit deletion rows retired and the newly
+  visible merged-only legendaryForgedZone gained its explained-extras row;
+  the emits-class mutation guard re-run on a scratch copy of the export roots
+  (one dropped literal reds the census on exactly that emit, real tree
+  untouched). The QA bar "RESULT PASS with the union-only pin list shrunk and
+  the mutation guard re-run for the emits class" is met on this unit's
+  classes; the tree-wide RESULT rides the batch validation.
 
 ### JUDGED THIS PHASE (refusals this phase itself makes; each cites the ground)
 
@@ -23236,10 +23280,30 @@ record; the QA twin re-sweeps and diffs.
   previews 1 (the admission owns knownness and refuses recipe_not_learned), a
   deliberate symmetry with the gate, pinned; no live consumer renders the
   preview before the admission.
+- The farmDenied reason feast_range and its hudChrome.farming.denied.feast_range
+  key STAY as a reserved, currently-unemitted reason after the feast existence
+  oracle merged the range arm into feast_expired: retiring the key would
+  delete about twenty overlay rows (the maintainer's fill lane), and no live
+  press can reach the old line (the client proximity gate and the server
+  command both admit only in-range ids, so the residual is latency-only and now
+  reads "That feast is gone."). The header states honestly that nothing emits
+  it today; the QA twin re-judges at the release fill.
+- The withered-then-ready correction is a session-local memory riding the
+  existing farmReady frame: a skill rise that happened OFFLINE (the load-time
+  proficiency display heal) reconstructs as notified-plus-ready with an empty
+  memory and skips that one correction; the bed itself shows the truth, so the
+  cost is one missing "N beds ready" line in a narrow one-time case, accepted
+  over a new persisted field.
 
 ### RECORDED, NOT ACTED (maintainer reads this phase adds)
 
-Appended at STEP 4.
+- The resetDay monotonic clamp is a session-long hold: an OFFLINE client whose
+  device clock jumps forward and is then corrected holds the future key until
+  relog, so a daily gate stamped with that future key does not roll until the
+  next login (the server feeds its own realm calendar, so online play is
+  unaffected; the persisted gate date re-rolls on login). A wart the guard
+  trades for closing the backwards-read double payout; recorded, not tuned.
+- (more appended at STEP 4)
 
 ### VALIDATION
 
