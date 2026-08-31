@@ -58,6 +58,160 @@ five-way quality roll and `trivialAt` are retired. RNG in, determinism out:
 input randomness (node rarity, rare events, fishing, corpse components) is
 welcome; output randomness is only this proc, never a downgrade.
 
+### The Masterwrought apex tier
+The crafting endgame is the MASTERWROUGHT item family: the apex crafted
+epics whose defs carry the `masterwrought` flag, crafted from
+`APEX_ARMOR_RECIPES`, `APEX_GEAR_RECIPES` and `APEX_CONSUMABLE_RECIPES`
+(`src/sim/content/recipes.ts`). This is the crafting half of the
+masterwrought amendment whose gathering half is the masterwrought R17
+through masterwrought R21 paragraphs below; a packet ruling is always
+cited as "masterwrought R<n>" in full, because a bare R-number in this
+file means the shipped Professions 2.0 review series, a different
+namespace.
+
+**The worn cap.** A character wears at most `MASTERWROUGHT_EQUIP_CAP` (2)
+masterwrought pieces at once, and at most `MASTERWROUGHT_LEGENDARY_CAP` (1)
+of those may be legendary (`src/sim/equipment_rules.ts`;
+`masterwroughtConflictSlot` is the one conflict rule the equip path
+applies, reporting the piece cap and the legendary sub-cap apart so the
+refusal can say which one bit). A two-hander occupies one equipment slot
+and so consumes ONE of the cap slots (masterwrought R6). Wearing two copies
+of the same apex item is legal inside the cap (masterwrought R16: v1
+pieces are pure stats, so copies are harmless; revisit if v2 adds
+effects). The sub-cap reads INSTANCE-effective quality
+(`effectiveQuality`), and `isUniqueEquipped` is instance-aware for
+promotion-stamped (`perfected`) legendary-rolled copies, so the
+unique-equipped rule and the sub-cap count a promoted copy together.
+Retuning either cap is never a one-line edit: the refusal prose in
+`src/ui/sim_i18n.ts` spells the numbers out in every locale
+(`tests/masterwrought_cap.test.ts` is the reminder).
+
+**masterwrought R5, the power envelope, with masterwrought R14 and
+masterwrought R12 as its texture.** The full kit (two Perfected pieces
+plus apex enchants, flask and food) lands at most 5 percent total
+throughput over pre-packet raid BiS, measured via
+`docs/design/spell-balance-framework.md`; heroic raid and S-rift clear
+difficulty is the protected asset. v1 apex items carry PURE STATS and
+bounded utility only, no new proc effects anywhere in the family
+(masterwrought R14), and an apex crafted epic disenchants to the standard
+single arcane_shard (masterwrought R12, revisit only if shard prices
+misbehave). Every authored apex piece is swept against the formula budget
+and this texture by `tests/masterwrought_budget.test.ts`.
+
+**masterwrought R1, the Perfecting stage.** The above-raid step is a
+deliberate upgrade a wearer walks on an existing apex piece
+(`src/sim/professions/perfecting.ts`): a track of `PERFECTING_RANKS` (4)
+ranks at `PERFECTING_SUCCESS_CHANCE` (0.8) per attempt, every resolved
+attempt consuming the `PERFECTING_ATTEMPT_COST` bill (one Maker's Ember,
+one Sundered Essence, one Prismglass Setting) on success and failure
+alike. Fail-forward ONLY: a failed attempt consumes the materials and
+never harms or downgrades the piece. Perfecting is self-service and
+skill-gated at `PERFECTING_SKILL_REQ` (125) in the craft that made the
+piece (masterwrought R13; `craftForApexItem` resolves which craft that
+is). Reaching the top rank stamps `perfected` and merges the bonus
+`perfectedBonusStats` derives into `rolled.stats`: the primary-stat budget
+delta between the recipe's own level and `PERFECTED_SOURCE_LEVEL`,
+composed through the shipped item_budget primitives, never a magic
+number. The cadence is derived, not felt: the rank count and chance give
+an expected five attempts, the mid-band of the packet's 4-to-6-week
+target at one keystone per week (ruling qr-12-CADENCE). masterwrought R11 explicitly
+supersedes the "masterwork stays below the raid band" intent for this
+stage ONLY; the shipped masterwork proc math
+(`src/sim/professions/masterwork.ts`) is untouched. A resolved attempt
+draws exactly one rng roll and every deny arm draws zero (the module
+header owns the draw contract); `perfectingInfoFrom` is the one view
+builder both hosts answer through; the track, the bind, and the budget
+delta are pinned by `tests/perfecting.test.ts`.
+
+**masterwrought R2, base pieces trade, the first attempt binds.** A base
+apex piece is freely tradable; it binds the moment Perfecting begins (the
+Maker's Bond `boundTo` reuse, stamped on the FIRST attempt). The
+Perfecting bind is permanent: the unbind service refuses any copy on the
+track or holding the stamp (`isPerfectingBound` and the dedicated
+`unbind_perfecting` deny reason, `src/sim/professions/commission.ts`),
+while a commissioned apex copy that never attempted still unbinds for the
+ordinary quality-tier fee (`resolveUnbind`).
+
+**The masterwork head start.** The craft-time masterwork proc on an apex
+craft grants `PERFECTING_HEADSTART_RANK` on the track INSTEAD OF a
+quality bump (masterwrought R1's own words; the effect gate in
+`src/sim/professions/crafting.ts`, where `craftBonusStatsFor` returns
+null for a masterwrought def, so the two outcomes are mutually exclusive
+by construction and the single unconditional proc draw never moves). The
+archetype empowerment ceiling still gates it: a dormant, hobby,
+unattuned, or Jack craft earns no head start, exactly as it earned no
+bump. A head-started copy carries its track rank UNBOUND: the
+masterwrought R2 bind lands on the first attempt, never on the mint.
+
+**masterwrought R3, the orange promotion.** Orange is prestige and
+process only in v1. On an already-Perfected copy, the same perfect_item
+command performs a SEPARATE, DETERMINISTIC act: one Deed of Making
+(`LEGENDARY_PROMOTION_COST`; inscription's first skill-125 rung,
+`recipe_deed_of_making`, a trainer row whose output is tradable so an
+inscriptionist scribes it FOR the promoter) plus a valid player-chosen
+name promotes the copy to legendary PRESENTATION: `rolled.quality`
+becomes legendary and `payload.name` the normalized name, with the stats
+byte-identical (the masterwrought R5 bonus already landed at Perfected).
+No roll rides any arm of the promotion. The name's SHAPE is
+`normalizeLegendaryName` (`src/sim/professions/legendary_name.ts`); the
+online server screens CONTENT before the command reaches the sim
+(`resolvePerfectItemName`, `server/perfect_item_ref.ts`). No unique
+combat effects, ever, and the sub-cap above is the whole power story: at
+most one legendary-quality crafted piece equipped, inside the global cap.
+The packet's capstone deed `prog_legendmaker`
+(`src/sim/content/deeds.ts`) celebrates the first legendary,
+cosmetic-only per `docs/design/deeds.md`.
+
+**Sundering, the material faucet.** Sundered Essence comes from breaking
+raid-won epics: `extractEssence` and `completeSunderCast`
+(`src/sim/professions/sundering.ts`), a cast on the enchant-family
+session seam with the disenchant-style pinned-slot re-check at
+completion. Eligibility is `isSunderable`: an epic GEAR item (the
+explicit weapon, armor, and held-offhand kind allowlist) whose
+`itemFromRaid` source index says a raid encounter drops it; rift
+legendaries and heroic five-man epics are outside the index, and
+patterns, sigils, and other raid-sourced non-gear are outside the
+allowlist. The yield is a deterministic `SUNDERED_ESSENCE_YIELD` per
+epic, no rng anywhere. Any character can sunder, deliberately without a
+profession gate: the research's TBC-tailoring lesson bars stacking
+access gates on the apex chain, and the cost IS the epic.
+
+**masterwrought R8, the acquisition channels, with masterwrought R4 and
+masterwrought R9 on the chase-material side.** Apex recipes are
+acquisition ['drop'], taught by tradable kind-'recipe' pattern items
+(`APEX_PATTERN_ITEMS`, `src/sim/content/apex_patterns.ts`) that bind by
+consumption at learn time (`src/sim/professions/pattern_items.ts`), split
+across the three endgame pillars: the raid loot table carries the
+`APEX_GEAR_RECIPES` patterns (the appended pattern roll group in
+`src/sim/content/dungeons.ts`), winning rift clears roll the
+`APEX_ARMOR_RECIPES` patterns (`RIFT_PATTERN_ITEM_IDS`,
+`src/sim/rift/progression.ts`), and the Heroic Quartermaster sells the
+`APEX_CONSUMABLE_RECIPES` patterns (plus the apex rod schematic)
+deterministically for Heroic Marks, the day-one catch-up valve
+(`src/sim/content/heroic_vendor.ts`; the id contract and the pillar
+split are pinned by `tests/apex_pattern_items.test.ts` and
+`tests/apex_pattern_channels.test.ts`). No pattern takes a Reliquary
+page: the recipe-pattern exclusion is permanent
+(`docs/design/reliquary.md`). The keystone is the Maker's Ember
+(masterwrought R4): soulbound, one per week per character, BANKABLE
+(missed weeks accrue through `tryGrantMakersEmber` under
+`EMBER_ACCRUAL_GRANT_CAP`, with `grantRiftClearEmbers` as the rift-side
+arm; `src/sim/professions/masterwrought_materials.ts`), earnable from
+any endgame pillar. Wyrmfall Cores tie the bills to the pillars the same
+way: eligible final-boss kills award them (`awardWyrmfallCores`) and A
+and S rank rift first clears award them once per character per day
+(`awardRiftFirstClearMaterials`; masterwrought R9 is that rift faucet's
+ruling, and the daily gate is the cap because rifts have no lockout),
+all pinned by `tests/masterwrought_materials.test.ts`. The crafted
+reagent side rides `INTERMEDIATE_RECIPES` (masterwrought R13 places the
+intermediates a skill tier below the apex recipes): the Prismglass
+Setting is jewelcrafting's intermediate (`recipe_prismglass_setting`),
+and the whole chain paces off `recipe_quickening_catalyst`'s
+`oncePerDay` gate, the packet's one pacing gate, which is also why the
+provisioner firewall (masterwrought R17, below) names it: farm produce
+never feeds this chain, and gathering feeds it through the apex recipe
+bills instead (the supply matrix's endgame column).
+
 ### Gathering, rare events, corpse harvesting
 Gathering proficiencies (mining, logging, herbalism, plus fishing as a
 fourth row and farming as a fifth) are additive counters with enforced caps
