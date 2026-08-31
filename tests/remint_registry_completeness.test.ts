@@ -15,12 +15,14 @@
 // family authored later fails here on the day it ships instead of at the next
 // lockfile rename.
 //
-// TWO FAMILIES ARE OUT TODAY, and each carries a CHECKED premise rather than a
-// bare name, so an exemption cannot outlive its reason: ignivar_herald ships a
-// GLB with no sourceFingerprint extras at all (the registry would throw on it),
-// and farm_props is a REAL OPEN GAP, stamped and lockfile-derived but
-// unregistered, re-stamped through its own exporter instead. Registering
-// farm_props reds this file, which is the correct signal to delete its row here.
+// ONE FAMILY IS OUT TODAY, and it carries a CHECKED premise rather than a bare
+// name, so an exemption cannot outlive its reason: ignivar_herald ships a GLB
+// with no sourceFingerprint extras at all, so the registry would throw on it.
+// farm_props was the second row until 2026-08-31: it was a REAL OPEN GAP,
+// stamped and lockfile-derived but unregistered and re-stamped only through its
+// own exporter. Registering it (sixteen rows derived from FARM_PROP_CONTRACTS)
+// reddened the omission arm here, which is exactly the pairing this guard was
+// built to force, and its row is gone rather than rewritten.
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -70,7 +72,6 @@ function carriesSourceFingerprint(relative: string): boolean {
 // checks that reason against the tree rather than taking it on trust.
 const EXEMPT = {
   ignivar_herald: 'public/models/creatures/ignivar_herald.glb',
-  farm_props: 'public/models/props/farm_bed.glb',
 } as const;
 
 describe('remint registry completeness', () => {
@@ -113,7 +114,7 @@ describe('remint registry completeness', () => {
     // (a refactor to a different import spelling) cannot pass the arm above by
     // emptying the family side instead of the registry side. Held at the
     // shipped count, so a family dropped from BOTH sides still reds.
-    expect(registered.size, 'families wired into the registry').toBe(7);
+    expect(registered.size, 'families wired into the registry').toBe(8);
   });
 
   it('every family the registry imports still exists on disk', () => {
@@ -137,17 +138,5 @@ describe('remint registry completeness', () => {
       carriesSourceFingerprint(EXEMPT.ignivar_herald),
       'ignivar_herald ships an unstamped GLB',
     ).toBe(false);
-    // farm_props: a REAL open gap, not a construction. Its GLBs carry a stamp
-    // AND its fingerprint hashes the lockfile, which is exactly the pair that
-    // makes a lockfile rename move it, so it belongs in the registry and is
-    // instead re-stamped by scripts/assets/farm_props/export_farm_props.mjs.
-    expect(
-      carriesSourceFingerprint(EXEMPT.farm_props),
-      'farm_props ships a stamped GLB, so the gap is real',
-    ).toBe(true);
-    expect(
-      readFileSync(path.join(ASSETS_ROOT, 'farm_props', LEAF), 'utf8'),
-      'farm_props hashes the lockfile, so a lockfile rename moves it',
-    ).toContain('pnpm-lock.yaml');
   });
 });
