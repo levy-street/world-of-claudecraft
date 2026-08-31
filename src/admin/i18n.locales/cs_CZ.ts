@@ -779,6 +779,8 @@ export const cs_CZ: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Požadavky na výzvu peněženky omezené limitem',
   'usage.metric.walletChallengeRequest': 'Požadavky na výzvu peněženky',
   'usage.metric.walletLinkFailure': 'Selhání propojení peněženky',
+  'usage.metric.walletUnlinkFailure': 'Zamítnutá odpojení peněženky',
+  'usage.metric.walletUnlinkSuccess': 'Dokončená odpojení peněženky',
   'usage.metric.walletLinkRateLimited': 'Požadavky na propojení peněženky omezené limitem',
   'usage.metric.walletLinkRequest': 'Požadavky na propojení peněženky',
   'usage.metric.wocBalanceApi': 'Požadavky API na zůstatek $WOC',
@@ -1157,4 +1159,9 @@ export const cs_CZ: Record<string, string> = {
   'wealth.purse': 'Na postavách:',
   'wealth.total': 'Celkový:',
   'wealth.updatedAt': 'aktualizováno {when}',
+
+  // Release-tier autoFillable fill (cs_CZ), i18n-locale-fill skill.
+  'usage.metric.walletHandoffAuthorizationEvicted':
+    'Vyřazení autorizací počítačového předání peněženky',
+  'usage.metric.walletHandoffCreateRejected': 'Zamítnutí vytvoření počítačového předání peněženky',
 };

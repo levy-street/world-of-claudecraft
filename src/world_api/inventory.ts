@@ -6,8 +6,11 @@ export interface IWorldInventory {
   inventory: InvSlot[];
   // The 4 equippable bag sockets (kind:'bag' item ids, null = empty socket).
   bags: (string | null)[];
-  // Total pooled slot budget: the implicit 16-slot backpack plus every
-  // equipped bag's bagSlots (see src/sim/bags.ts). Used slots is inventory.length.
+  // Total pooled slot budget, both pools summed: the implicit 16-slot backpack
+  // plus every equipped bag's bagSlots (see src/sim/bags.ts). Used slots is
+  // inventory.length. Deliberately the TOTAL, not a fit answer: the bag grid
+  // and the used/total readout span both pools, while fit questions go through
+  // the PoolCapacity-taking gates (src/sim/bag_pools.ts).
   bagCapacity: number;
   vendorBuyback: InvSlot[];
   equipment: Partial<Record<EquipSlot, string>>;
@@ -72,4 +75,12 @@ export interface IWorldInventory {
   upgradeRiftItem(itemId: string, target?: { slotIndex: number }): void;
   enchantRiftItem(itemId: string, stat: string, target?: { slotIndex: number }): void;
   socketRiftGem(itemId: string, gemId: string, target?: { slotIndex: number }): void;
+  /** Milliseconds left before the bind-on-pickup party trade deadline
+   *  `untilMs` (an ItemInstancePayload.partyTrade.untilMs value), clamped to
+   *  zero. Host-aware on purpose: `untilMs` is stamped from the sim's
+   *  lockout clock (real epoch ms on the live server, tick-derived ms
+   *  offline), so only the world knows which "now" it compares against; a
+   *  raw Date.now() subtraction would be wrong offline. Fresh per call, like
+   *  raidLockouts(), so the tooltip countdown ticks without a snapshot. */
+  partyTradeMsRemaining(untilMs: number): number;
 }

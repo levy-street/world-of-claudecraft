@@ -29,6 +29,7 @@ const entrySource = `
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
   export { DELVE_SHOPS } from './src/sim/content/delves/shop.ts';
   export { DEEDS, DEED_ORDER } from './src/sim/content/deeds.ts';
+  export { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from './src/sim/deeds.ts';
   export { DEED_IMAGE_IDS } from './src/ui/deed_image_ids.ts';
   export { RELIQUARY_PAGES } from './src/sim/content/reliquary.ts';
   export { MOUNTS } from './src/sim/content/mounts.ts';
@@ -117,6 +118,8 @@ const {
   DEED_ORDER,
   DEED_IMAGE_IDS,
   RELIQUARY_PAGES,
+  FINAL_BOSS_DUNGEONS,
+  FLAWLESS_TASKS,
   MOUNTS,
   WEAPON_SKINS,
   armorySkinStrings,
@@ -320,7 +323,9 @@ const dungeonBand = (def) => {
   return min === Infinity ? { min: null, max: null } : { min, max };
 };
 const dungeons = Object.values(DUNGEONS)
-  .filter((d) => (d.suggestedPlayers ?? 0) >= 5)
+  // Development-only encounter rooms remain hidden until their progression,
+  // rewards, and public entrance are authored.
+  .filter((d) => (d.suggestedPlayers ?? 0) >= 5 && d.guideVisible !== false)
   .map((d) => {
     const isRaid = (d.suggestedPlayers ?? 0) >= 10;
     const band = dungeonBand(d);
@@ -502,8 +507,27 @@ const delves = DELVE_LIST.map((d) => {
 // The crest URL points at art the game client already ships publicly under /ui/deeds
 // (the id doubles as the filename), and it is only ever computed AFTER the hidden filter,
 // so no hidden deed's id can ride out through a crest path.
+// The guideVisible gate reaches the deed and reliquary catalogs too: a
+// development-gated encounter room (guideVisible false, the dungeons filter
+// above) must not leak its boss names, deed prose, or relic lists through
+// the spoiler-safe wiki. Clear deeds resolve through their trigger's
+// dungeon id; a flawless deed resolves through its boss's final-boss room.
+const guideHiddenDungeonIds = new Set(
+  Object.values(DUNGEONS)
+    .filter((d) => d.guideVisible === false)
+    .map((d) => d.id),
+);
+const guideHiddenDeedIds = new Set();
+for (const [bossId, dungeonId] of Object.entries(FINAL_BOSS_DUNGEONS)) {
+  if (!guideHiddenDungeonIds.has(dungeonId)) continue;
+  const flawlessDeed = FLAWLESS_TASKS[bossId];
+  if (flawlessDeed) guideHiddenDeedIds.add(flawlessDeed);
+}
+const isGuideHiddenDeed = (d) =>
+  guideHiddenDeedIds.has(d.id) ||
+  (d.trigger?.dungeonId !== undefined && guideHiddenDungeonIds.has(d.trigger.dungeonId));
 const deeds = DEED_ORDER.map((id) => DEEDS[id])
-  .filter((d) => d && !d.hidden)
+  .filter((d) => d && !d.hidden && !isGuideHiddenDeed(d))
   .map((d) => ({
     id: d.id,
     name: d.name,
@@ -612,7 +636,11 @@ const RELIQUARY_WIKI_PAGE_NAME = {
   conquerors_thunzharr: 'The Waking Peak (World Boss)',
 };
 
-const reliquary = RELIQUARY_PAGES.map((page) => ({
+const reliquary = RELIQUARY_PAGES.filter(
+  (page) =>
+    page.clearSource?.dungeonId === undefined ||
+    !guideHiddenDungeonIds.has(page.clearSource.dungeonId),
+).map((page) => ({
   id: page.id,
   shelf: page.shelf,
   name: RELIQUARY_WIKI_PAGE_NAME[page.id] ?? page.name,

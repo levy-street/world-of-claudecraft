@@ -1,8 +1,8 @@
-// Caster tier-set 2-piece: grants +20 spell power (mirroring the +40 attack power
-// the melee 2-sets give) AND 100% cast-pushback immunity: damage taken never
-// delays the wearer's cast timer (castPushbackReduction 1 makes pushbackCast a
-// no-op). It is NOT physical knockback resistance; that entity stat still works
-// (the applyKnockback suite below pins it) but no shipped set grants it.
+// Caster lineage (the 2/4/6 retune): the 2-piece grants Int/Spi and HALF
+// cast-pushback reduction (full immunity moved to the new raid tier's caster
+// sets); the 4-piece, reached across tier-1 plus tier-2 pieces, grants +12
+// spell power. It is NOT physical knockback resistance; that entity stat still
+// works (the applyKnockback suite below pins it) but no shipped set grants it.
 import { describe, expect, it } from 'vitest';
 import { aggregateSetBonuses, SET_NECROMANCERS } from '../src/sim/content/item_sets';
 import { MOBS } from '../src/sim/data';
@@ -19,29 +19,38 @@ function statsFor(cls: PlayerClass, level: number, equipment: Record<string, str
   return e;
 }
 
-describe('caster set 2-piece bonus', () => {
-  it('grants +20 spell power and 100% cast-pushback immunity at 2 pieces', () => {
+describe('caster lineage bonuses', () => {
+  it('grants half pushback reduction at 2 pieces and spell power only at 4', () => {
     const two = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 2 }));
-    expect(two.sp).toBe(20);
-    expect(two.castPushbackReduction).toBe(1);
+    expect(two.sp).toBe(0);
+    expect(two.castPushbackReduction).toBe(0.5);
     expect(two.knockbackResistance).toBe(0); // spell pushback, never physical knockback
-    // one piece: no 2-piece bonus yet
+    // one piece: no tier yet
     const one = aggregateSetBonuses(counts({ [SET_NECROMANCERS]: 1 }));
     expect(one.sp).toBe(0);
     expect(one.castPushbackReduction).toBe(0);
   });
 
-  it('folds the +20 spell power into the wearer, on top of gear', () => {
-    const eq = { chest: 'necromancers_starshroud', feet: 'necromancers_soulsteps' };
+  it('folds the 4-piece +12 spell power into the wearer, across both tiers', () => {
+    // Two tier-1 pieces plus two tier-2 pieces climb the SAME lineage ladder,
+    // so the wearer reaches the 4-piece spell-power tier. No worn piece
+    // carries flat spell power, so the wearer's spell power is exactly the
+    // int-derived term plus the lineage +12 (an integer, so it commutes with
+    // the rounding); a two-piece wearer has no flat term at all.
+    const eq = {
+      chest: 'necromancers_starshroud',
+      feet: 'necromancers_soulsteps',
+      helmet: 'soulflame_cowl',
+      shoulder: 'soulflame_mantle',
+    };
     const withSet = statsFor('mage', 20, eq);
-    expect(withSet.castPushbackReduction).toBe(1);
-    // Neither piece carries flat spell power, so the wearer's spell power is
-    // exactly the int-derived term plus the 2-piece flat +20 (an integer, so it
-    // commutes with the rounding); a one-piece wearer has no flat term at all.
-    // Together these pin that recalcPlayerStats actually folds the set bonus.
-    expect(withSet.spellPower).toBe(Math.round(withSet.stats.int * SPELL_POWER_PER_INT) + 20);
-    const onePiece = statsFor('mage', 20, { chest: 'necromancers_starshroud' });
-    expect(onePiece.spellPower).toBe(Math.round(onePiece.stats.int * SPELL_POWER_PER_INT));
+    expect(withSet.castPushbackReduction).toBe(0.5);
+    expect(withSet.spellPower).toBe(Math.round(withSet.stats.int * SPELL_POWER_PER_INT) + 12);
+    const twoPieces = statsFor('mage', 20, {
+      chest: 'necromancers_starshroud',
+      feet: 'necromancers_soulsteps',
+    });
+    expect(twoPieces.spellPower).toBe(Math.round(twoPieces.stats.int * SPELL_POWER_PER_INT));
   });
 });
 

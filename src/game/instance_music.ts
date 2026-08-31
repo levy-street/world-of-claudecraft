@@ -84,6 +84,11 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
   const instanceId = isDelvePos(input.playerPos.x)
     ? (delveAt(input.playerPos.x)?.id ?? FALLBACK_DELVE_ID)
     : (dungeon?.id ?? null);
+  // The Forge-Lift shares the approach's score (one shaft, one theme).
+  // Aliased here in the decision layer, zone selection only (the reset key
+  // keeps the real id), because music.ts sits at its monolith ceiling.
+  const scoredInstanceId =
+    instanceId === 'ignivar_forge_lift' ? 'ignivar_forge_approach' : instanceId;
   const riftFloor = input.riftFloor;
   const zone = riftFloor
     ? riftMusicZoneForTheme(riftFloor.themeName)
@@ -92,7 +97,7 @@ export function instanceMusicDecision(input: InstanceMusicInput): InstanceMusicD
         input.zone.biome,
         inHub,
         input.inDungeon || inRaidArena,
-        instanceId,
+        scoredInstanceId,
       );
   const musicInstanceId = riftFloor
     ? `rift:${riftFloor.instanceId}:${riftFloor.floorIndex}`

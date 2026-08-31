@@ -55,14 +55,26 @@ export interface IWorldDungeons {
   raidLockouts(): RaidLockout[];
   // The active procedural Rift floor for the local player (null outside a rift).
   riftFloor: RiftFloorView | null;
-  // Key into the per-Sim rift collision registry (sim/colliders.ts). The client
-  // threads this through findPlayerPath/resolvePlayerDestination (click-to-move)
-  // and the swept-landing crest re-resolve behind Blink, Shadowstep, and Heroic
-  // Leap (src/sim/combat/heroic_leap.ts), so those routes treat a rift wall as
-  // solid instead of open floor. Per world INSTANCE, not per seed; 0 (inert,
-  // matching outside-a-rift behavior) where no rift regions are registered, which
-  // is always true for the online ClientWorld: collision resolution there is
-  // server-authoritative, so it never registers a region of its own.
+  // Key into the per-Sim rift collision registry (sim/colliders.ts). Per world
+  // INSTANCE, not per seed; a fixed value allocated once per world (offline
+  // Sim or online ClientWorld). Note this member's client-side reach is
+  // narrower than the token's overall reach: the swept-landing crest
+  // re-resolve behind Blink, Shadowstep, and Heroic Leap
+  // (src/sim/combat/heroic_leap.ts) reads SimContext.riftCollisionToken,
+  // which is always the authoritative Sim (offline, or the server's own),
+  // never this ClientWorld member; that route was never inert online. This
+  // member instead feeds the client's OWN two consumers: click-to-move
+  // (findPlayerPath/resolvePlayerDestination in src/main.ts) and the
+  // display-only self-motion predictor (src/render/self_motion.ts). Movement
+  // resolution itself stays server-authoritative online either way; the
+  // ONLINE client registers a region under this token purely so those two
+  // local, display-only routes can resolve against real rift geometry
+  // instead of treating a rift wall as open floor (src/net/online.ts
+  // applyRiftStateEvent mirrors the riftFloor's colliders under it, and
+  // endSession clears the region on session end). The token carries no
+  // registered region (inert, matching outside-a-rift behavior) outside a
+  // rift; 0 itself is reserved for "no token" (a caller like mob pathing that
+  // never passes one).
   riftCollisionToken: number;
   // Live lethal death zones on the current rift boss floor (empty outside a rift or
   // before the A-rank mechanic fires). The renderer draws a pulsing red decal ring
@@ -81,4 +93,8 @@ export interface IWorldDungeons {
   // Buy one Heroic Quartermaster offer (src/sim/content/heroic_vendor.ts),
   // paying its Heroic Marks price from the buyer's bags. Server-validated.
   buyHeroicVendorItem(itemId: string): void;
+  // Redeem one Crucible Quartermaster set piece (src/sim/content/ignivar_loot.ts),
+  // paying its matching-slot sigil from the buyer's bags. Server-validated,
+  // class-gated sim-side.
+  buyCrucibleVendorItem(itemId: string): void;
 }

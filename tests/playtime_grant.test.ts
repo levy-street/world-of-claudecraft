@@ -41,6 +41,8 @@ vi.mock('../server/discord_db', () => ({
 import { pool } from '../server/db';
 import { grantRewardPoints } from '../server/discord_db';
 import { type ClientSession, GameServer } from '../server/game';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
+import { DT } from '../src/sim/types';
 
 function fakeWs() {
   const ws: any = {
@@ -73,6 +75,37 @@ async function runGrant(server: GameServer): Promise<void> {
 const grant = vi.mocked(grantRewardPoints);
 
 describe('playtime reward grant', () => {
+  it('stops v2 activity after consumed frames stop while the v1 timer stays active', async () => {
+    grant.mockClear();
+    const server = new GameServer();
+    const v2 = expectJoined(
+      server.join(fakeWs(), 11, 101, 'Backgrounded', 'warrior', null, false, {
+        movementWireVersion: 2,
+      }),
+    );
+    const v1 = expectJoined(server.join(fakeWs(), 12, 102, 'Foreground', 'warrior', null));
+
+    for (let tick = 0; tick < 20; tick++) {
+      if (tick === 0) {
+        server.handleMessage(v2, JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 1 } }));
+      }
+      server.handleMessage(v1, JSON.stringify({ t: 'input', seq: tick + 1, mi: { f: 1 } }));
+      consumeMovementFramesV2(server.sim, [v2]);
+      server.sim.tick();
+    }
+
+    const v2StoppedAt = v2.lastInputAt;
+    expect(server.sim.time - v2StoppedAt).toBeGreaterThan(0.75);
+    expect(server.sim.time - v1.lastInputAt).toBeCloseTo(DT, 6);
+
+    server.sim.time = v2StoppedAt + 301;
+    server.handleMessage(v1, JSON.stringify({ t: 'input', seq: 21, mi: { f: 0 } }));
+    await runGrant(server);
+
+    expect(grant).toHaveBeenCalledTimes(1);
+    expect(grant).toHaveBeenCalledWith(pool, 12, 10, 'playtime');
+  });
+
   it('grants a live, recently-active session its playtime points', async () => {
     grant.mockClear();
     const server = new GameServer();

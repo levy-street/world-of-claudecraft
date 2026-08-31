@@ -21,10 +21,15 @@
 // `src/sim`-pure: sibling sim modules + the SimContext seam only
 // (enforced by tests/architecture.test.ts).
 
+import {
+  FROSTQUENCH_2PC_CRIT_BONUS_ICICLES,
+  FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES,
+} from '../content/ignivar_set_bonuses';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { AbilityDef, Aura, Entity } from '../types';
 import { MOVEMENT_LOCK_AURA_KINDS } from './cc';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 export const FINGERS_OF_FROST_CHANCE = 0.15;
 export const FINGERS_OF_FROST_MAX_STACKS = 2;
@@ -181,13 +186,38 @@ export function rollFrostboltProcs(ctx: SimContext, p: Entity, meta: PlayerMeta)
   if (brain) gainBrainFreeze(ctx, p);
 }
 
+/** Frostquench 2pc (the Crucible set): a Rimelance CRITICAL banks a second
+ *  Icicle. Wired through the noteSpellHit seam exactly like the fire mage's
+ *  streak counter, because the base bank site (frostMageAfterCast) cannot see
+ *  the crit flag: it READS a crit already rolled and never draws dice, so
+ *  every rng stream stays byte-identical. gainIcicle's ICICLE_MAX cap stands
+ *  untouched (at 4 banked, a crit impact still tops out at 5); Frozen Orb
+ *  pulses stay single-bank (the set doc's disclosed dead zone). */
+export function frostMageOnSpellHit(
+  ctx: SimContext,
+  p: Entity,
+  abilityId: string | undefined,
+  crit: boolean,
+): void {
+  if (!crit || abilityId !== 'frostbolt' || p.kind !== 'player') return;
+  const meta = ctx.players.get(p.id);
+  if (!meta || !isCommittedFrost(ctx, meta)) return;
+  if (!wearsSetBonus(ctx, p, 'frostquench', 2)) return;
+  for (let i = 0; i < FROSTQUENCH_2PC_CRIT_BONUS_ICICLES; i++) gainIcicle(ctx, p);
+}
+
 /** Plant Winter's Chill (2 charges, 5s) on the target: Flurry's impact rider.
  *  applyAura's refresh-by-id keeps one debuff per target (a re-plant restores
- *  it to full charges). */
+ *  it to full charges). Frostquench 4pc: wearers plant 3 charges instead of 2
+ *  on BOTH branches; the debuff tooltip prints the live charge count, so the
+ *  wearer reads 3 dynamically. Draws no rng either way. */
 export function applyWintersChill(ctx: SimContext, p: Entity, target: Entity): void {
+  const charges = wearsSetBonus(ctx, p, 'frostquench', 4)
+    ? FROSTQUENCH_4PC_WINTERS_CHILL_CHARGES
+    : WINTERS_CHILL_CHARGES;
   const existing = target.auras.find((a) => a.id === 'winters_chill');
   if (existing) {
-    existing.charges = WINTERS_CHILL_CHARGES;
+    existing.charges = charges;
     existing.remaining = WINTERS_CHILL_DURATION;
     existing.duration = WINTERS_CHILL_DURATION;
     existing.sourceId = p.id;
@@ -198,7 +228,7 @@ export function applyWintersChill(ctx: SimContext, p: Entity, target: Entity): v
     name: "Winter's Chill",
     kind: 'winters_chill',
     value: 0,
-    charges: WINTERS_CHILL_CHARGES,
+    charges,
     remaining: WINTERS_CHILL_DURATION,
     duration: WINTERS_CHILL_DURATION,
     sourceId: p.id,

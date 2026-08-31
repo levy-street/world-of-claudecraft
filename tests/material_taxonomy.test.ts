@@ -13,6 +13,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import {
   HARVEST_COMPONENT_ITEMS,
@@ -66,6 +67,7 @@ const HONEST_MATERIALS = [
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
+  'lastflame_core',
   'linen_scrap',
   'prime_cut',
   'pristine_claw',
@@ -285,6 +287,13 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(junkReagents).toBeGreaterThan(30);
   });
 
+  it('contains every recipe-pending material', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+  });
+
   it('contains every disenchant output (the one source reached only via the reagent union)', () => {
     // The derive deliberately does not union the disenchant tables: the
     // no-dead-end rule in disenchant_reagents.ts says every output is consumed
@@ -322,6 +331,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     salvageMaterialByQuality: SALVAGE_MATERIAL_BY_QUALITY,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
+    recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.
@@ -376,6 +386,12 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
         },
       },
     ],
+    [
+      'recipe-pending material',
+      {
+        recipePendingMaterialItemIds: [...CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS, PROBE],
+      },
+    ],
   ];
   for (const [source, override] of CASES) {
     it(`a junk-kind id authored only as a ${source} row derives IN`, () => {
@@ -419,12 +435,15 @@ describe('isMaterialItem', () => {
   });
 });
 
-describe('no src/sim importer (the module-evaluation hard rule)', () => {
+describe('no src/sim importer (presentation-only taxonomy scope)', () => {
   // Two sim leaves carry the identical UI-only contract: material_taxonomy
   // (this file's module) and material_profession_affinity (same hazard class,
   // its header defers enforcement here). One walk guards both.
   // liveImporter is the known consumer outside src/sim that keeps the regex
   // honest as a positive control.
+  // material_ids.ts is the sim-safe canonical registry. This compatibility
+  // module remains presentation-only so production sim code cannot grow a
+  // dependency on an ItemDef-oriented UI predicate.
   const GUARDED_MODULES = [
     { name: 'material_taxonomy', liveImporter: '../src/ui/bag_filter.ts' },
     {
@@ -474,11 +493,8 @@ describe('no src/sim importer (the module-evaluation hard rule)', () => {
   });
 
   it('no src/sim file other than each module itself imports it', () => {
-    // Both modules derive at module evaluation by reading content tables; a
-    // content-side importer would pull that derive inside the tables' own
-    // evaluation cycle, where load order decides between a crash and a clean
-    // run (each module header states the rule), so only a static scan catches
-    // it reliably.
+    // Both modules are presentation classifiers. A static scan keeps the sim
+    // on its id-based/domain seams rather than importing UI-oriented helpers.
     const simRoot = fileURLToPath(new URL('../src/sim', import.meta.url));
     const guards = GUARDED_MODULES.map(({ name }) => ({
       re: importerReFor(name),

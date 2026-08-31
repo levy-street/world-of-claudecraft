@@ -3,6 +3,7 @@ import type { FightParticipant } from '../server/parse/contract';
 import { createParseCounters } from '../server/parse/counters';
 import { ParseRecorder } from '../server/parse/recorder';
 import type { InstanceSlotView, RecorderEntityView, RiftInstanceView } from '../server/parse/types';
+import { IGNIVAR_RAID_ROOM_IDS } from '../src/sim/ignivar_raid_ids';
 import type { SimEvent } from '../src/sim/types';
 import { FAKE_PARSE_FLAGS, type FakeSim, fakeSim } from './helpers/parse_fake_sim';
 
@@ -221,6 +222,23 @@ describe('DungeonSegmenter via ParseRecorder', () => {
     seedDungeon(sim, { dungeonId: 'nythraxis_boss_arena', mobIds: [500] });
     const boss = sim.entities.get(500);
     if (boss !== undefined) boss.templateId = 'nythraxis';
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([dmg(5, 500, 120)]);
+
+    expect(records.find((r) => r.t === 'fight_open')).toMatchObject({
+      surface: 'raid',
+      groupType: 'raid',
+      segment: 'boss',
+    });
+  });
+
+  test.each(IGNIVAR_RAID_ROOM_IDS)('%s fights record as raid fights', (dungeonId) => {
+    const sim = fakeSim();
+    seedDungeon(sim, { dungeonId, mobIds: [500] });
     const { recorder, records } = makeRecorder(sim);
 
     sim.tickCount = 10;

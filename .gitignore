@@ -46,6 +46,15 @@ tmp/
 public/models/sfx-studio-security-*.glb
 # PR-assist screenshot tour output + its CI-only ephemerals
 pr-shots*/
+# scripts/store_intent_durability_probe.mjs writes REAL-MONEY material: arm-<L>.json
+# carries a live Claudium idempotency key and profile-<L>/ is a Chromium profile
+# whose localStorage holds the durable purchase record. It now defaults into
+# .claude-scratch/, but these rows cover a run that sets OUT_DIR by hand.
+arm-[A-Z].json
+profile-[A-Z]/
+intent_durability_probe_*.txt
+no_charter_cards_*.png
+entry_stall.png
 pr.diff
 .devpid
 .codex-research/

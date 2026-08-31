@@ -54,31 +54,24 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
   session still holds an unflushed dirty mark for the guild's book: the guard proves live
   state only, and the cascade destroys the DURABLE row, so an unflushed emptying op must
   flush before a disband can pass (self-heals within one autosave interval).
-- Creation fee ordering (REVISED by Phase 3 QA; supersedes the original create-then-charge
-  line): RESERVE-AT-GATE. The fee is deducted synchronously at the guild_create dispatch
-  gate, before any DB work, and refunded on every refusal arm (guildCreate returns the
-  committed-success boolean; the error arm refunds too). The success arm consumes the
-  reservation (create_fee ledger row + escrow save). Rationale: charging after the commit
-  left a deterministic exploit (pipeline guild_create with a spend and found the guild for
-  the clamped residue, or log out before the commit and pay nothing, unaudited); the new
-  ordering's crash window loses at most the fee for at most one autosave interval, the
-  right trade. At most one reservation per character; a refund whose founder already left
-  is logged loudly for operator compensation.
-  THE CRASH WINDOW WAS DESCRIBED BACKWARDS and is now closed on the accounting side
-  (2026-08-03, review finding): logging out before the commit is the arm reserve-at-gate
-  closed, but create-then-never-persist-the-charge was still open. The fee reaches the
-  database only through the founder's CHARACTER half, so a save that never becomes durable
-  (a same-account takeover fence-out discards the session's live state; a crash loses it)
-  left the guild created and the durable purse untouched: a FREE guild. The book half
-  cannot rescue it, because `revertOwnGuildBookOps` replays BOOK deltas and the fee is not
-  one. `GameServer.persistGuildCreateFee` now AWAITS that save and writes the `create_fee`
-  row only after it commits (the durability ordering the deed publish already uses), so a
-  failed save books no payment; the arm that cannot self-heal (a live session's state being
-  thrown away, as opposed to a transient failure, where the deduction sits in the live
-  purse and the next save persists it) is counted as the `create_fee_unpaid` incident and
-  logged with the guild, the character, and the copper an operator has to collect. A guild
-  with no `create_fee` row is therefore exactly "a guild that was not paid for", findable
-  with one query.
+- Creation fee ordering (REVISED by the bank-storage PR review; supersedes both
+  create-then-charge and reserve-at-dispatch): PAID CREATION IS ONE FENCED TRANSACTION.
+  Dispatch performs only a fast UX funds check, validates the name through `SocialService`,
+  and admits one open request per character (two per process). At the head of that
+  character's save FIFO, `GameServer.createPaidGuildFor` revalidates the exact live session,
+  lease, funds, and pending effect shape; only then does it deduct the fee and capture the
+  exact post-charge character state. `createPaidGuildWithLeaderAtomic` commits the guild,
+  leader membership, empty guild-bank book, fenced character state, pending storage and
+  ledger prefixes, and the `create_fee` receipt in one PostgreSQL transaction. Therefore a
+  guild and its payment cannot become durable separately.
+  A conclusively rolled-back transaction refunds only the exact originating live session.
+  An ambiguous COMMIT performs a bounded fresh-client lookup for the exact receipt identity
+  and payload hash: an exact match upgrades the outcome to committed; absence, mismatch, or
+  read failure remains ambiguous, retains the fee reservation, quarantines the session, and
+  never guesses by refunding or retrying the transaction. A queued request aborts before it
+  starts after 70 seconds; once charging starts, logout waits for settlement before its final
+  save. The raw one-row outbox reservation holds only the fee's conservative byte allowance,
+  so unrelated ledger commands can continue while the database call is in flight.
 - Ledger: same `bank_ledger` table, `container = 'guild'`, `container_id = guild id`, ops
   `deposit_gold | withdraw_gold | deposit | withdraw | buy_slots | open_bank | create_fee`
   plus the three non-player rows `admin_purge | escrow_deficit | counterparty_orphan`.
@@ -118,7 +111,7 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
   are absent, so a restored pre-migration `pg_dump` (the incident DEPLOY.md points the
   tool at) degrades into the skip path instead of dying, INCLUDING when another visible
   schema holds a same-named table. `create_fee`'s counterparty is the founder's ACTUAL
-  purse movement, snapshotted at the reserve-at-gate charge, not derived from the
+  purse movement, snapshotted inside the atomic create transaction, not derived from the
   charged amount: deriving it made the identity algebraically zero for every input, a
   check that could not fail and therefore read as coverage it did not have.
   `escrow_deficit` rows carry a DERIVED purse aggregate as a direction report and take
@@ -170,15 +163,14 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
     (re-exported there, so every existing caller and test keeps its import path): it is
     a generic, and a guild bank module importing the Discord module for it would be the
     wrong seam.
-    Freshness does NOT rest on the TTL: `server/bank_ledger.ts recordGuildBankDeltas`
-    busts the guild entry for every VISIBLE-op row it writes, at the ONE writer so a
-    future write site cannot forget, and TWICE (immediately, and again once THAT CALL's
-    own inserts have SETTLED, because a read racing the write would otherwise
-    re-install a pre-op snapshot). The second bust chains on the promises that call
-    enqueued, never the process-global FIFO `tail`: on a slow database the tail can be
-    minutes long and the bust would land on an entry that is fresh by then. The two
-    hidden anomaly ops do NOT bust (their rows are filtered in SQL, so the refresh
-    would be provably identical, fired during a rollback storm).
+    Freshness does NOT rest on the TTL: each successful character-save acknowledgment
+    derives the guild ids carrying VISIBLE ops from the exact committed outbox prefix
+    and marks those cache entries dirty. Staging never busts: a command that is later
+    lease-fenced cannot appear as phantom history. The paid `create_fee` path uses the
+    same post-commit rule. The two hidden anomaly ops do NOT bust (their rows are
+    filtered in SQL, so the refresh would be provably identical during a rollback
+    storm). The game-server wiring test proves warm-before-commit, refreshed-after-
+    commit, and still-warm-after-fence behavior through the real dispatch/save seams.
   - THE COALESCING FLOOR (`GUILD_BANK_LOG_MIN_REFRESH_MS` = 2s), the database review's
     F1: a bust that DROPPED the entry made the cache useless in the one state it exists
     for. Any ledger write made the next read a query, and a guild actively working its
@@ -349,8 +341,9 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
 
 ## Constants (single source of truth for the plan; land in `src/sim/guild_bank.ts`)
 - `GUILD_CREATION_FEE_COPPER = 10_000` (1 gold; revised 2026-08-03, user-directed
-  pricing redesign: was 100_000/10g). Pure constant change: the reserve-at-gate
-  machinery, refund arms, and create_fee ledger row are untouched.
+  pricing redesign: was 100_000/10g). The authoritative FIFO-head funds re-check,
+  atomic character/guild transaction, proved-rollback refund, and `create_fee`
+  receipt all derive from this constant.
 - `GUILD_BANK_EXPANSION_SLOTS = 6`.
 - `GUILD_BANK_RUNG_SLOTS = [24, 6, 6, 6, 6, 6, 6]` and
   `GUILD_BANK_RUNG_PRICES = [90_000, 25_000, 50_000, 100_000, 250_000, 500_000,
@@ -571,23 +564,29 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
     inside the market serial writer.
   - Ledger ops (`server/bank_ledger.ts`): `GuildBankLedgerOp`
     (`deposit_gold | withdraw_gold | deposit | withdraw | buy_slots`), pure
-    `diffGuildBankOp` + `recordGuildBankDeltas` (+ `guildCreateFeeDelta`), shared FIFO
-    tail, container='guild', container_id = guild id, purchased_slots_after from the
-    AFTER book (0 for create_fee). Gold ops carry the TREASURY delta; create_fee the
-    founder's purse and is excluded from the audit treasury replay.
+    `diffGuildBankOp` + `buildGuildBankLedgerRows` (+ `guildCreateFeeDelta`). Normal
+    command rows enter the bounded character-owned outbox before mutation and commit
+    in the same fenced transaction as the character and guild-book delta; the legacy
+    FIFO writer remains only for terminal anomaly evidence after a session can no
+    longer save. Rows use container='guild', container_id = guild id, and
+    purchased_slots_after from the AFTER book (0 for create_fee). Gold ops carry the
+    TREASURY delta; create_fee the founder's purse and is excluded from the audit
+    treasury replay.
     `scripts/bank_audit.mjs`: guild rows group per GUILD, treasury replay, new shape
     checks (`item_on_gold_op`, `bad_gold_delta`, `nonnegative_create_fee`,
     `slots_on_create_fee`, `gold_op_outside_guild`, `missing_container_id`,
     `negative_treasury`, `treasury_mismatch`), `guild_banks` reconciliation
     (`auditBank({..., guildBanks?})`); personal report unchanged. Keep-forever comment
     at the `server/main.ts` retention `tables:` site.
-  - Fee wiring: dispatch gate in `server/game.ts` `guild_create` (refuse-poor before
-    any DB work; literal derived from `GUILD_CREATION_FEE_COPPER` via a `goldAmount`
-    local so the S3 probe matches the RULE); transport hook
-    `SocialTransport.onGuildCreated` fired in `guildCreate`'s success arm right after
-    the founder stamp (seed empty book -> `chargeGuildCreationFeeFor` -> create_fee row
-    -> escrow save). Disband: `guildBankHoldings` transport read (fail-closed on null)
-    guards `guildDisband`; `onGuildDisbanded` evicts via `Sim.evictGuildBank`.
+  - Fee wiring: the `server/game.ts` `guild_create` dispatch performs a UX-only funds
+    check and holds one exact ledger-row allowance. `SocialService.guildCreate` validates
+    and screens the name, then calls the injected paid creator. At the character FIFO
+    head the creator charges, captures the post-charge state and pending effect prefixes,
+    and calls `createPaidGuildWithLeaderAtomic`; the transport's post-commit membership,
+    empty-book, deed, notice, and snapshot hooks are isolated so a local hook failure can
+    never reclassify a known database commit. Disband: `guildBankHoldings` transport read
+    (fail-closed on null) guards `guildDisband`; `onGuildDisbanded` evicts via
+    `Sim.evictGuildBank`.
   - Sim additions (`src/sim/guild_bank.ts` + facade): `evictGuildBank`,
     `guildBankHoldings`, `chargeGuildCreationFee` (clamped, silent, no rng).
   - i18n: `guild.createFee` (parameterized, + RULES row) and `guild.bankNotEmpty`
@@ -595,13 +594,14 @@ gate green). Teardown of docs/guild-bank/ awaits the user's explicit confirmatio
     (8 blocks); byte-bound sample pins in `tests/server_i18n.test.ts`.
   - Phase 3 QA drift (fresh auditor; fixes landed as four fix commits on top of
     4a7d3c2b6):
-    - `SocialService.guildCreate` returns `Promise<boolean>`: true ONLY on the committed
-      success arm (after `onGuildCreated` consumed the fee reservation); false on every
-      refusal. The dispatch gate charges the fee synchronously BEFORE calling it
-      (reserve-at-gate, see the revised locked decision above) and refunds on
-      false/throw via `GameServer.refundGuildCreateFee` + `Sim.refundGuildCreationFeeFor`;
-      `pendingGuildCreateFees` (character id -> reservation) allows one in-flight create
-      per character and is consumed exactly once by success OR refund.
+    - `SocialService.guildCreate` returns `Promise<boolean>`: true only after the injected
+      creator reports a committed guild id, false on validation or typed refusal. The
+      production creator charges inside the character FIFO and refunds only a proved
+      rollback through `Sim.refundGuildCreationFeeFor`; ambiguous durability never
+      refunds. `pendingGuildCreateFees` allows one open pending-or-unresolved create per
+      character, while a process-wide cap admits at most two. Its exact raw outbox
+      reservation is released on known completion and retained through quarantine on an
+      unresolved outcome.
     - New sim surface: `revertGuildBankDeltas` / `refundGuildCreationFee` free functions
       (+ facade delegates) and the `GuildBankOpDelta` type; `BankOpDelta` (server) gained
       optional `craftedRecipeId`, populated for guild item deltas only (not a ledger
@@ -871,16 +871,15 @@ What remains accepted:
 - **A crash still loses whatever was not yet saved**, as it always did. The
   difference is that a crash can no longer leave value in two durable places:
   a save either committed both halves or committed neither.
-- Ledger rows for fenced-out (undone) ops remain in bank_ledger by design: the audit
-  script may flag them against the book; that finding points at the incident the loud
-  fence-out log recorded (see the operator caveat in scripts/bank_audit.mjs: audit a
-  quiesced realm).
-  RUNBOOK, loud on purpose because the failure mode looks alarming: a bank_audit run on a
-  LIVE realm can legitimately report `treasury_mismatch` and item drift. Rows of undone
-  ops stay by design, and a live book can be ahead of its durable row by an unflushed op
-  at the instant the audit reads. A live-realm finding is a LEAD, never a defect, and must
-  NOT be "fixed" by editing rows or books: re-run it against a quiesced realm (or after a
-  shutdown flush) and only act on what survives that.
+- Normal command rows are now the exact outbox prefix accepted by the save and commit
+  atomically with the character and guild book. A proven lease fence commits none of
+  those rows, so it cannot leave command evidence for an operation that was undone.
+  RUNBOOK: `bank_audit` reads the ledger, character rows, and guild books inside one
+  read-only, repeatable-read transaction, so a save cannot produce cross-query skew on
+  a LIVE realm. The snapshot may omit saves that commit after invocation; quiesce or
+  shutdown-flush first only when the report must cover everything through an exact
+  operational cutoff. Never "fix" rows or books without investigating the command and
+  transaction evidence named by the coherent finding.
 - RUNBOOK for an OVERSIZED or structurally malformed `guild_banks` row (the boot load skips
   it, so that guild has no live book and every op is silently inert): the operator purge
   CANNOT repair it, because the endpoint answers `that guild has no loaded bank` for
@@ -1011,8 +1010,10 @@ What remains accepted:
   which is a single-sample defect rather than a transient. `reconcile` counts one per
   GUILD whose unflushed log `revertOwnGuildBookOps` actually undid.
   ALERTING, stated so it is not left to taste: `escrow_quarantined`,
-  `counterparty_orphan`, `counterparty_unstamped` and `create_fee_unpaid` are single-sample
-  defects and are PAGE-worthy on `> 0`. `escrow_refused_retry` is alert-worthy on its RATE,
+  `counterparty_orphan`, `counterparty_unstamped` and the legacy-cardinality
+  `create_fee_unpaid` are single-sample defects and are PAGE-worthy on `> 0`; the current
+  atomic paid-create path cannot emit the latter, so any new sample implies mixed-release
+  traffic or an invariant breach. `escrow_refused_retry` is alert-worthy on its RATE,
   not its presence: it is ordinary two-officer concurrency on a healthy realm, so alert on
   a sustained rise (or a rate that tracks ONE guild), which is the shape that means a book
   is failing to converge rather than two officers sharing it. `escrow_save_failed`,
@@ -1025,11 +1026,11 @@ What remains accepted:
   somebody else's stranded book half. A narrower "drop the book half, keep the character
   half" arm would need a proof that the two halves are separable in that case, which is
   exactly the property the single transaction exists to deny; not attempted here.
-- A create-fee reservation whose refund arm finds the founder gone (refused create racing
-  a clean logout) cannot refund in the live sim; it is logged loudly for operator
-  compensation, and no create_fee ledger row is written for it. Watch item: a refund
-  landing on a RECONNECTED session's freshly loaded purse is correct only because the
-  leave flush persists the charged purse first (the mismatch arm logs loudly).
+- A paid-create refund is legal only after PostgreSQL proves the whole transaction rolled
+  back and only against the exact still-live origin object. A replacement session is never
+  credited. Losing that origin or failing to measure the exact refund quarantines the old
+  session rather than guessing. An unresolved COMMIT similarly retains the charge and
+  reservation until teardown; reconnect reloads the all-or-none durable transaction.
 - `GuildBankSimPort` exposes the raw `Sim.guildBanks` map read-only for the boot has()
   verification (the one facade bypass, read-only and test-visible); a future
   `Sim.hasGuildBank` could remove it.
@@ -1187,7 +1188,9 @@ the deployment premise the cache bust and the single-writer narrowing both rest 
 - `loadGuildBank` is load-once: it never clobbers a live book (unflushed deposits).
   Reload = delete the map entry, then load; always re-get the book after, never hold
   a reference across an evict. A null `serializeGuildBank` means the guild has no
-  loaded book: Phase 3 must SKIP that write, never persist an empty book over a row.
+  loaded book: Phase 3 must SKIP that book write, never persist an empty book over a
+  row. If accepted deltas made the book dirty, the skip refuses the entire escrow;
+  the character and matching ledger evidence must not commit without the book.
 - `sanitizeGuildBankState` accepts a parsed OBJECT only: a JSON string yields an
   empty book. The Phase 3 DB read must hand `loadGuildBank` parsed JSONB, pinned.
 - The membership stamp IS the guild bank's authorization. Never stamp from a DB

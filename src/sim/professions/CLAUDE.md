@@ -29,6 +29,23 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   the Eastbrook yields at 0), and the downward substitution planner the craft
   and quest consumption paths share. Upgrade needs the tool STRICTLY above the
   material AND a vein carrying that tier; substitution runs downward only.
+  `planRemovalOver` is the removal KERNEL (walk these ids, take this many,
+  emit no zero lines); `planGradeRemoval` is that kernel over the grade
+  ladder, and `reagent_sources.ts` runs it a second time over the same ids
+  against a different pool. One planner, many appliers: every site that
+  removes across grades applies a plan from here rather than walking its own.
+- `reagent_sources.ts`: pure leaf owning the ONE implementation of the
+  carried-first-then-vault order (`planReagentSourceDraw` -> a
+  `ReagentSourcePlan` of `carried` takes, `vault` takes, `planned`,
+  `shortfall`). Every site that resolves where a reagent's units come from
+  consumes this plan: the craft availability check, the bag-capacity scratch
+  gate, the real consume, the Create All batch simulation, and all six enchant
+  count/apply arms. A SECOND implementation of the order is a defect. Two
+  rules ride on the split it returns: only `carried` takes free bag space (a
+  capacity scratch that models `vault` takes over-credits room), and a caller
+  that plans several reagents before spending any must tally the vault side
+  itself, since nothing is decremented while planning. Whether the vault is in
+  play at all is `vault_craft_gate.ts`'s question, never this module's.
 - `fishing.ts`: the fourth gathering row (bite delay, reel window,
   `FISHING_TABLES_BY_BAND`, and since R19 the gain model: the schedule half
   `fishingCatchGain` composed with the water's teaching ceiling in
@@ -54,6 +71,13 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   def-quality outputs plus the single masterwork proc draw, skill gain), and
   chains the Phase 3 batch (`maxCraftCountForRecipe` simulates the batch
   craft by craft so the hold-keyed self-signed discount expires mid-batch).
+  Reagents come from the bags first and then the Materials Vault, and all four
+  of those sites resolve that through the shared `reagent_sources.ts` plan, so
+  the gate can never approve a draw the consume performs differently. Vault
+  units are reported on `CraftResult.vaultDraws`, present only when a unit
+  really moved. Two things stay INVENTORY-only on purpose: the #1145
+  self-signed discount and the masterwork signed-reagent term, because vault
+  stock is bare counts with no instance payloads and can carry no signer.
 - `craft_cast_duration.ts`: the pure content-band duration table
   (`craftCastDurationSec`: skillReq/combo band, floor/ceiling clamp; no rng,
   no player state).
@@ -97,6 +121,15 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `already_enchanted` reason on both arms. The identical-id re-apply denies
   `same_enchant` on both arms WITH the flag; unconfirmed it reads
   `already_enchanted`, because the flag check precedes the id compare.
+  Enchant REAGENTS source from bags-then-vault through the same
+  `reagent_sources.ts` plan crafting uses, at all six count arms (three
+  resolvers plus the three admission mirrors, which must agree or a cast is
+  refused at start for materials the resolve would have found), reported on
+  `ApplyEnchantResult.vaultDraws`. Reagents here stay grade-BLIND (the plan is
+  run over the reagent's own id alone: the two-pool mechanic moves where a
+  unit comes from, never how many are owed or what may substitute). The VICTIM
+  copy is out of scope and never routes through it. Disenchant, salvage,
+  unbind and tool recharge draw from the bags only.
 - `commission.ts`: the Maker's Bond (commission opt-in mints `bindOnTrade`,
   `resolveUnbind` + the quality-tier fee ladder).
 - `commission_order.ts`: the commission order board (#1298) layered on the
@@ -251,3 +284,13 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
 - The facet's member list is pinned by `tests/world_api_parity.test.ts`
   (`FACET_PROFESSIONS`) and exercised by `tests/professions_contracts.test.ts`;
   keep counts out of prose.
+
+## Pure table leaves (no SimContext import)
+
+- `gathering_materials.ts`: the `NODE_MATERIAL_TABLE` zone rows plus `nodeMaterialFor`
+  (the `byZone[zoneId] ?? byZone.eastbrook_vale` fallback), moved out of `gathering.ts`
+  so the eager `material_ids.ts` registry can read it at module evaluation without
+  entering the gathering system's import ring.
+- `salvage_materials.ts`: `SALVAGE_MATERIAL_BY_QUALITY` (frozen), the same extraction
+  for the salvage side; consumed by `salvage.ts` and the material registry derive.
+

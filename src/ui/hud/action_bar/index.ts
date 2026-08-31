@@ -4,6 +4,8 @@ export * from './action_bar_controller';
 export * from './action_bar_layout_core';
 export * from './action_bar_lock';
 export * from './action_bar_painter';
+export * from './action_bar_toggle_controller';
+export * from './action_bar_toggle_core';
 export * from './action_bar_view';
 export * from './action_bar_visibility_core';
 export * from './attack_on_ability';

@@ -18,7 +18,10 @@
 // a DIFFERENT real value (the misattribution case the craftedBy rule in
 // professions/tools.ts spells out), while an absent field is merely absent.
 // Every junk key drops ALONE, so one corrupt field never takes the legal
-// payload around it with it.
+// payload around it with it. The one exception is the `partyTrade` marker,
+// which is judged ATOMICALLY (see its arm below): the window is one
+// snapshot, so a corrupt half drops the whole marker rather than leaving a
+// partial residue, but never the sibling keys around it.
 //
 // NOT A WHITELIST, deliberately: an unknown key inside the size bounds
 // SURVIVES. The payload is an ADDITIVE shape that has grown a field at a
@@ -31,6 +34,7 @@
 // no rng, no clock. Total on `unknown`, so a corrupt row can never throw
 // inside a character load.
 
+import { isLoadablePartyTradeMarker } from './loot/bop_trade_window';
 import { isLegalCrafterName } from './professions/tools';
 import { MAX_KNOWN_RECIPE_ID_LENGTH } from './professions/training';
 import type { ItemInstancePayload } from './types';
@@ -51,11 +55,15 @@ export const MAX_INSTANCE_STRING_LENGTH = 64;
  */
 export const MAX_INSTANCE_PAYLOAD_KEYS = 24;
 
-/** The sub-objects whose own keys are scanned one level down. Both are
+/** The sub-objects whose own keys are scanned one level down. All are
  *  deep-copied by `cloneItemInstancePayload`, which is what makes it safe to
  *  delete keys inside them (see the ownership contract below); `rift` is
  *  deliberately NOT scanned, because its strings are already validated by
- *  the progression rebuild (rift/progression.ts). */
+ *  the progression rebuild (rift/progression.ts). `partyTrade` is NOT here
+ *  either: the per-key drop doctrine could strip its `eligible` list and
+ *  leave a partial `{ untilMs }` residue, while the trade gate reads the
+ *  window as ONE snapshot, so the marker takes its own ATOMIC arm below
+ *  (keep whole or drop whole; the same subtree JSON ceiling bounds it). */
 const SCANNED_SUB_OBJECT_KEYS: readonly string[] = ['rolled', 'charges'];
 
 /**
@@ -145,6 +153,12 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  *    count arm alone would let one megabyte-long key through);
  *  - `signer`: kept only when it is a name a legal mint could have stamped
  *    (`isLegalCrafterName`), else dropped;
+ *  - `partyTrade`: judged ATOMICALLY, the one exception to key-at-a-time
+ *    dropping. The bind-on-pickup window is one snapshot (untilMs plus the
+ *    eligibility data the trade gate reads together), so a marker whose
+ *    shape the loot module refuses (`isLoadablePartyTradeMarker`) or whose
+ *    serialized size passes the subtree JSON ceiling drops WHOLE, never
+ *    leaving a partial `{ untilMs }` residue to ride every autosave;
  *  - any other own string value past MAX_INSTANCE_STRING_LENGTH: dropped;
  *  - the same key and string rules one level into `rolled` and `charges`,
  *    each of which also takes the own-key COUNT ceiling (a flat ten-thousand
@@ -164,6 +178,17 @@ export function warnDroppedInstanceKeys(owner: string, dropped: readonly string[
  * objects would size-police the forward-compatibility surface this module
  * promises to admit.
  */
+/** Serialized size of one nested value, measured on the JSON the save path
+ *  would write; a value JSON cannot serialize is corrupt by definition on a
+ *  JSONB row and reads as infinitely large, so it always drops. */
+function savedJsonLength(value: unknown): number {
+  try {
+    return JSON.stringify(value)?.length ?? Number.POSITIVE_INFINITY;
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
+
 export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedItemInstancePayload {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
     return { payload: undefined, dropped: ['payload'] };
@@ -201,6 +226,20 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       // ecosystem compares it against live player names, and a value no
       // account can hold is corruption by definition.
       if (!isLegalCrafterName(value)) {
+        delete record[key];
+        dropped.push(key);
+      }
+      continue;
+    }
+    if (key === 'partyTrade') {
+      // The atomic marker arm (see the contract above): shape-refused or
+      // oversized, the whole window drops in one move. Before the generic
+      // string arm on purpose, so a string-valued marker is judged as a
+      // marker (dropped) rather than kept as a short string.
+      if (
+        !isLoadablePartyTradeMarker(value, MAX_INSTANCE_STRING_LENGTH) ||
+        savedJsonLength(value) > MAX_INSTANCE_SUBTREE_JSON_LENGTH
+      ) {
         delete record[key];
         dropped.push(key);
       }
@@ -245,13 +284,7 @@ export function sanitizeItemInstancePayloadOnLoad(payload: unknown): SanitizedIt
       // reach. Total on unknown: a value JSON cannot serialize is corrupt by
       // definition on a JSONB row and drops.
       if (subValue !== null && typeof subValue === 'object') {
-        let size = Number.POSITIVE_INFINITY;
-        try {
-          size = JSON.stringify(subValue)?.length ?? Number.POSITIVE_INFINITY;
-        } catch {
-          // fall through with the infinite size: drop below.
-        }
-        if (size > MAX_INSTANCE_SUBTREE_JSON_LENGTH) {
+        if (savedJsonLength(subValue) > MAX_INSTANCE_SUBTREE_JSON_LENGTH) {
           delete sub[subKey];
           dropped.push(`${key}.${subKey}`);
         }

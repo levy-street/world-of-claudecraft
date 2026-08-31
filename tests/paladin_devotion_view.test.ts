@@ -57,6 +57,30 @@ describe('paladin Devotion HUD view', () => {
     });
   });
 
+  it('shows all 7 charges once Extended Dawn raises the cap past the base 5', () => {
+    const view = createPaladinDevotionView(
+      String,
+      (value, max, charges, last) => `${value}/${max}:${last ? 'last' : charges}`,
+      'Final charge',
+    );
+    const player = {
+      templateId: 'paladin',
+      paladinDevotion: {
+        value: 0,
+        ascensionCharges: 7,
+        ascensionRemaining: 45,
+        outOfCombatTime: 0,
+        decayProgress: 0,
+        blockIcdRemaining: 0,
+      },
+    };
+
+    expect(view.tick(player)).toMatchObject({ ascended: true, charges: 7 });
+
+    player.paladinDevotion.ascensionCharges = 99;
+    expect(view.tick(player).charges).toBe(7);
+  });
+
   it('hides for other classes and reuses its output object', () => {
     const view = createPaladinDevotionView(String, () => '', '');
     const warrior = { templateId: 'warrior', paladinDevotion: undefined };

@@ -5,8 +5,18 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error - plain Node ESM script, no types
-import { classifyDiff, diffChangedPaths, resolveTargets } from '../scripts/pr_shot_targets.mjs';
+import {
+  classifyDiff,
+  diffChangedPaths,
+  resolveMobileViewport,
+  resolveTargets,
+  seedLowGraphicsPreset,
+  // The directive sits HERE, not above the statement: it applies to the next
+  // LINE, and a wrapped import reports its untyped-module error on the closing
+  // `from` line. Above the `import` keyword it is simply unused, which tsc
+  // reports as an error of its own.
+  // @ts-expect-error - plain Node ESM script, no types
+} from '../scripts/pr_shot_targets.mjs';
 import { ABILITIES } from '../src/sim/data';
 
 describe('classifyDiff', () => {
@@ -18,6 +28,7 @@ describe('classifyDiff', () => {
       4,
     );
     expect(script).toContain('localStorage.removeItem(key)');
+    expect(script).toContain("waitUntil: variant.landing ? 'domcontentloaded' : 'networkidle0'");
 
     const sliceBetween = (start: string, end: string, from = 0) => {
       const startIndex = script.indexOf(start, from);
@@ -79,18 +90,78 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
-  it('maps an options_view change to the graphics dial AND interface tab targets, in order', () => {
-    // Both targets key on 'ui/options_view'; the graphics-options entry sits
-    // first in the registry so the dial card is the lead capture. An
-    // ordering or selector regression here silently drops or duplicates the
-    // options-panel evidence.
+  it('maps the Steam wishlist owner to current web and borderless landing evidence', () => {
+    const plan = classifyDiff(['src/ui/steam_wishlist.ts']);
+    expect(plan.isVisual).toBe(true);
+    expect(plan.specific.map((target: { key: string }) => target.key)).toContain('steam-wishlist');
+    const target = plan.specific.find(
+      (candidate: { key: string }) => candidate.key === 'steam-wishlist',
+    );
+    expect(target?.variants).toEqual([
+      { key: 'homepage-header-web', landing: true, beforeLoad: expect.any(Function) },
+      {
+        key: 'homepage-header-borderless-1366',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        borderless: true,
+      },
+      {
+        key: 'homepage-footer-web',
+        landing: true,
+        beforeLoad: expect.any(Function),
+        footer: true,
+      },
+      {
+        key: 'desktop-community-tray',
+        beforeLoad: expect.any(Function),
+        communityTray: true,
+        charClass: 'warrior',
+        charName: 'Thorgar',
+      },
+      {
+        key: 'mobile-more-tray',
+        landing: true,
+        mobile: true,
+        beforeLoad: expect.any(Function),
+        moreTray: true,
+      },
+    ]);
+    expect(target?.variants[1].beforeLoad.toString()).toContain(
+      "localStorage.setItem('locale', 'de_DE')",
+    );
+    expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps an options_view change to the unlock, graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
+    // All four targets key on 'ui/options_view'; registry order is the
+    // capture order: interface-unlock leads, then the graphics dial, then
+    // interface tabs, then the confirm-vendor-sell toggle row (the last one
+    // added). An ordering or selector regression here silently drops or
+    // duplicates the options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'interface-unlock-option',
       'graphics-options-shadow-dial',
       'interface-options-tabs',
+      'interface-options-confirm-vendor-sell',
     ]);
     expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps controller option changes to remapped desktop and mobile evidence', () => {
+    const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'controller-options-button-layout',
+    ]);
+    expect(plan.specific[0].variants.map((v: { key: string }) => v.key)).toEqual([
+      'desktop',
+      'mobile',
+    ]);
+    const captureSource = plan.specific[0].capture.toString();
+    expect(captureSource).toContain('[aria-label="Cross"]');
+    expect(captureSource).toContain('buttons[1]?.click()');
+    expect(captureSource).toContain('#tutorial-greeting');
   });
 
   it('maps the player tooltip view to its focused hover target', () => {
@@ -302,9 +373,10 @@ describe('classifyDiff', () => {
     expect(plan.generic).toEqual(['hud-desktop']);
   });
 
-  it('adds the mobile HUD when the visual change touches the mobile surface', () => {
+  it('maps the mobile HUD stylesheet to the cross-hotbar target it can visually change', () => {
     const plan = classifyDiff(['src/styles/hud.mobile.css']);
-    expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('cross-hotbar');
+    expect(plan.generic).toHaveLength(0);
   });
 
   it('keeps the desktop HUD fallback for the shared component stylesheet', () => {
@@ -745,5 +817,167 @@ describe('the druid auto-unshift target', () => {
     for (const v of target.variants) expect(v.charClass).toBe('druid');
     expect(ABILITIES.healing_touch.class).toBe('druid');
     expect(ABILITIES.healing_touch.castTime).toBeGreaterThan(1);
+  });
+});
+
+describe('the bank-meter target routing (phase 08 QA)', () => {
+  it('both meter files classify to the bank-meter target with its two variants', () => {
+    // A `when` typo would silently disable the capture: nothing else pins
+    // that the meter's own files route to it (the market targets' precedent).
+    for (const path of [
+      'src/ui/bank_view.ts',
+      'src/ui/bank_window.ts',
+      // The extracted siblings that now own bank pixels (phase 17). Without these
+      // rows a bank change confined to one of them captures no bank evidence, and
+      // the loop below is the only thing that would ever say so.
+      'src/ui/bank_bonus_view.ts',
+      'src/ui/bank_rung_view.ts',
+      'src/ui/bank_rung_purchase_core.ts',
+      // Bank Storage phase 18's two: the chrome contract that decides whether
+      // the footer is inside the window at all, and the meter's own copy.
+      'src/ui/bank_chrome_layout_core.ts',
+      'src/ui/bank_meter_view.ts',
+    ]) {
+      const plan = classifyDiff([path]);
+      const keys = plan.specific.map((t: { key: string }) => t.key);
+      expect(keys, path).toContain('bank-meter');
+    }
+    const meter = classifyDiff(['src/ui/bank_view.ts']).specific.find(
+      (t: { key: string }) => t.key === 'bank-meter',
+    );
+    // THREE, since phase 18: the footer's defect was a height budget, so one
+    // mobile frame cannot show it. The second names its own viewport; the first
+    // deliberately does not, so it keeps tracking the house frame.
+    // Compared by SHAPE, not by identity, because beforeLoad is a function and
+    // toEqual would compare it structurally. The seed is asserted separately
+    // below so a leg that silently loses it is a failure, not a passing shot at
+    // the wrong tier.
+    expect(
+      (meter?.variants ?? []).map((v: Record<string, unknown>) => ({
+        key: v.key,
+        mobile: v.mobile,
+        viewport: v.viewport,
+      })),
+    ).toEqual([
+      { key: 'desktop', mobile: undefined, viewport: undefined },
+      { key: 'mobile', mobile: true, viewport: undefined },
+      { key: 'mobile-short', mobile: true, viewport: { width: 740, height: 360 } },
+    ]);
+    // The standing capture rule: every leg shoots the LOWEST graphics preset.
+    // The mobile legs go full frame, so the world behind the pane is in the shot
+    // and an unseeded leg is a different tier, not a cosmetic difference.
+    //
+    // IDENTITY, not `typeof === 'function'`: any function passes that, including
+    // a no-op or the deliberate HIGH comparison seed one target over. The
+    // subject here is a helper the target table shares with the runner, which is
+    // the case where a reference pin is the honest instrument rather than a
+    // self-comparison.
+    for (const v of meter?.variants ?? []) {
+      expect((v as { beforeLoad?: unknown }).beforeLoad, `${v.key} seeds LOW`).toBe(
+        seedLowGraphicsPreset,
+      );
+    }
+    // ...and that shared seeder really seeds the LOWEST preset. The identity pin
+    // above only says the table and the runner agree on WHICH function; both
+    // sides move together if its body changes, which is the self-comparison
+    // shape. The literal is what makes it LOW, so pin the literal once.
+    const targetSrc = readFileSync(join(__dirname, '../scripts/pr_shot_targets.mjs'), 'utf8');
+    const lowSeedBody = targetSrc.slice(
+      targetSrc.indexOf('async function seedLowGraphicsPreset'),
+      targetSrc.indexOf('async function seedHighGraphicsPreset'),
+    );
+    expect(lowSeedBody.length, 'the LOW seeder must be found').toBeGreaterThan(0);
+    expect(lowSeedBody).toContain('s.graphicsPreset = 1');
+  });
+
+  it('the RUNNER applies a variant viewport, not just the table that declares one', () => {
+    // The pin above proves the table says 740x360. Nothing there proves the
+    // screenshot runner reads it, and a wrong property name would silently shoot
+    // two identical house frames in the phase whose evidence is that the shorter
+    // one differs. Three legs, including the default arm.
+    expect(resolveMobileViewport({ key: 'mobile', mobile: true })).toEqual({
+      width: 844,
+      height: 390,
+    });
+    expect(
+      resolveMobileViewport({
+        key: 'mobile-short',
+        mobile: true,
+        viewport: { width: 740, height: 360 },
+      }),
+    ).toEqual({ width: 740, height: 360 });
+    // A partial override keeps the house value for the axis it does not name.
+    expect(resolveMobileViewport({ key: 'x', mobile: true, viewport: { height: 360 } })).toEqual({
+      width: 844,
+      height: 360,
+    });
+    // ...and the RUNNER really routes through it. Everything above is about the
+    // pure function; `resolveMobileViewport({})` at the call site would leave all
+    // of it green while both phone legs shot the house frame. A source pin,
+    // because pr_screenshots.mjs launches a browser at import time and can never
+    // be imported here. An occurrence BOUND, so a reintroduced inline default
+    // cannot sit beside the call.
+    const runner = readFileSync(join(__dirname, '../scripts/pr_screenshots.mjs'), 'utf8').replace(
+      /\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,
+      '',
+    );
+    expect(runner.match(/resolveMobileViewport\(variant\)/g)?.length).toBe(1);
+    expect(runner).not.toMatch(/width\s*=\s*844/);
+  });
+});
+
+describe('the Materials Vault evidence target', () => {
+  it('routes both vault modules and pins low graphics plus each intended theme', async () => {
+    for (const path of ['src/ui/vault_view.ts', 'src/ui/vault_window.ts']) {
+      expect(classifyDiff([path]).specific.map((target: { key: string }) => target.key)).toContain(
+        'bank-vault',
+      );
+    }
+    const target = classifyDiff(['src/ui/vault_window.ts']).specific.find(
+      (candidate: { key: string }) => candidate.key === 'bank-vault',
+    );
+    expect(target.variants.map((variant: { key: string }) => variant.key)).toEqual([
+      'locked',
+      'locked-mobile',
+      'desktop',
+      'mobile',
+      'parchment',
+      'high-contrast',
+      'fine',
+      'fine-mobile',
+    ]);
+    for (const variant of target.variants) {
+      const storageSeeds: string[] = [];
+      const mediaCalls: Array<{ method: string; payload: unknown }> = [];
+      await variant.beforeLoad({
+        async evaluateOnNewDocument(script: string) {
+          storageSeeds.push(script);
+        },
+        async createCDPSession() {
+          return {
+            async send(method: string, payload: unknown) {
+              mediaCalls.push({ method, payload });
+            },
+          };
+        },
+      });
+      expect(storageSeeds.join('\n')).toContain('s.graphicsPreset = 1');
+      const expectedTheme =
+        variant.key === 'parchment'
+          ? "preset: 'parchment'"
+          : variant.key === 'high-contrast'
+            ? "preset: 'highContrast'"
+            : "preset: 'classic'";
+      expect(storageSeeds.join('\n')).toContain(expectedTheme);
+      expect(mediaCalls).toHaveLength(variant.key === 'high-contrast' ? 1 : 0);
+    }
+    expect(
+      target.variants.find(
+        (variant: { key: string; forcedColors?: boolean }) => variant.key === 'high-contrast',
+      )?.forcedColors,
+    ).toBe(true);
+    expect(target.capture.toString()).toContain("matchMedia('(forced-colors: active)').matches");
+    expect(target.capture.toString()).toContain("getElementById('tutorial-greeting')");
+    expect(target.capture.toString()).toContain('signedSpecial');
   });
 });

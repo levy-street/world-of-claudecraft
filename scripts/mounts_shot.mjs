@@ -74,6 +74,7 @@ await page.evaluate(() => {
     'reins_goblin_rocket_sled',
     'reins_rallycart_rxt',
     'reins_terrorspark_groundshaker',
+    'reins_rickshaw_mount',
   ])
     sim.addItem(id, 1);
 });

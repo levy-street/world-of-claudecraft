@@ -83,6 +83,11 @@
     --color-focus: #d79a2b;
     --color-devotion: #e7b943;
     --color-ascension: #fff1a3;
+    /* Extended Dawn (pal_r17_extended_dawn) grants 2 charges beyond the base 5;
+       those bonus charge pips (.paladin-ascension-charges span:nth-child(n+6))
+       glow this color instead of --color-ascension so the empowered bonus reads
+       at a glance, including in peripheral vision. */
+    --color-ascension-bonus: #c88ef5;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;
@@ -150,6 +155,73 @@
     --panel-edge: #08080d;
     --color-text-error: #ff8f85;
     --color-text-success: #7fdc4f;
+    /* Raid boss journal palette. These tokens keep its forged-fire treatment in one
+       themeable source while the component sheets own only layout and composition. */
+    --color-rbg-frame-border-base: #2e180d;
+    --color-rbg-frame-flare: #2a160de8;
+    --color-rbg-frame-start: #15100d;
+    --color-rbg-frame-end: #090807;
+    --color-rbg-divider: #8f6a294f;
+    --color-rbg-nav-start: #0b0908dd;
+    --color-rbg-nav-end: #17100ddd;
+    --color-rbg-nav-grid: #ffffff05;
+    --color-rbg-tab-border: #5d4825;
+    --color-rbg-tab-start: #1a1714;
+    --color-rbg-tab-end: #0d0c0b;
+    --color-rbg-portrait-start: #3b2316;
+    --color-rbg-tab-active-start: #4a2b13;
+    --color-rbg-tab-active-glow: #f18b2822;
+    --color-rbg-hero-border: #75562875;
+    --color-rbg-hero-flare: #d66b192e;
+    --color-rbg-hero-start: #20130e;
+    --color-rbg-hero-end: #0d0b0a;
+    --color-rbg-shadow-soft: #0009;
+    --color-rbg-shadow: #000;
+    --color-rbg-model-border: #8c6b31;
+    --color-rbg-model-start: #4b2814;
+    --color-rbg-model-end: #0d0907;
+    --color-rbg-model-glow: #e36f1824;
+    --color-rbg-model-inset: #d8a84135;
+    --color-rbg-button-border: #b1843b;
+    --color-rbg-button-start: #4f3218;
+    --color-rbg-button-end: #20140c;
+    --color-rbg-button-text: #ffe3a0;
+    --color-rbg-button-text-hover: #fff3ca;
+    --color-rbg-status-text: #efd18a;
+    --color-rbg-heading: #f2d58a;
+    --color-rbg-kicker: #c79745;
+    --color-rbg-segment-border: #5e4828;
+    --color-rbg-control-bg: #080706;
+    --color-rbg-segment-active-start: #66401d;
+    --color-rbg-segment-active-end: #38210f;
+    --color-rbg-segment-active-text: #ffe6a6;
+    --color-rbg-segment-active-border: #b68135;
+    --color-rbg-phase-start: #ffbd50;
+    --color-rbg-phase-end: #6e2b0d;
+    --color-rbg-phase-glow: #f27c2d55;
+    --color-rbg-phase-title: #efc66d;
+    --color-rbg-ability-border: #4d3c25;
+    --color-rbg-ability-start: #17130f;
+    --color-rbg-ability-inset: #ffffff08;
+    --color-rbg-ability-expanded-border: #8d672d;
+    --color-rbg-ability-expanded-start: #20170f;
+    --color-rbg-icon-border: #8b6935;
+    --color-rbg-expand-mark: #d7a949;
+    --color-rbg-badge-border: #56472f;
+    --color-rbg-badge-bg: #0b0a09;
+    --color-rbg-badge-text: #cbb889;
+    --color-rbg-role-icon: #fff;
+    --color-rbg-role-tank-bg: #2878c8;
+    --color-rbg-role-healer-bg: #278a45;
+    --color-rbg-role-damage-bg: #b93b36;
+    --color-rbg-deadly-border: #9f332d;
+    --color-rbg-deadly-text: #ff786d;
+    --color-rbg-important-border: #a97828;
+    --color-rbg-important-text: #ffd15f;
+    --color-rbg-cleansable-border: #3f769b;
+    --color-rbg-cleansable-text: #85d2ff;
+    --color-rbg-detail-border: #a77830;
+    --color-rbg-detail-bg: #080706a8;
     /* Item-name color for an item with no quality (bags_window.ts uses this token
        as the fallback when QUALITY_COLOR has no entry, so the painter carries no
        raw hex). Exact pre-existing value. */
@@ -447,6 +519,33 @@
     --cursor-arrow: url("/ui/cursors/arrow.png") 7 2, default;
     --cursor-point: url("/ui/cursors/gauntlet.png") 6 4, pointer;
     --cursor-grab: url("/ui/cursors/hand-grab.png") 11 16, grabbing;
+    /* Arrange-mode manipulation cursors, matching the painted set's gold
+       blade on a near-black rim so editing never flips between the game
+       cursor and the OS one (PR #3284 review play-testing). Inline SVG (no
+       new raster assets); every declaration keeps its OS keyword fallback
+       for engines without SVG cursor support. Consumers: the unlocked frame
+       bodies (hud.css) and the inline border writes (cursorForFrameEdge in
+       src/ui/target_frame_pos.ts). */
+    --cursor-move:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M16%202%2021%209H18V14H23V11L30%2016%2023%2021V18H18V23H21L16%2030%2011%2023H14V18H9V21L2%2016%209%2011V14H14V9H11Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      move;
+    --cursor-resize-ns:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M16%202%2022%2010H19V22H22L16%2030%2010%2022H13V10H10Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      ns-resize;
+    --cursor-resize-ew:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M2%2016%2010%2010V13H22V10L30%2016%2022%2022V19H10V22Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      ew-resize;
+    --cursor-resize-nwse:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M4%204H13L9.9%207.1%2024.9%2022.1%2028%2019V28H19L22.1%2024.9%207.1%209.9%204%2013Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      nwse-resize;
+    --cursor-resize-nesw:
+      url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='32'%20height='32'%20viewBox='0%200%2032%2032'%3E%3Cpath%20d='M28%204H19L22.1%207.1%207.1%2022.1%204%2019V28H13L9.9%2024.9%2024.9%209.9%2028%2013Z'%20fill='%23e3b04b'%20stroke='%23241a06'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E")
+      16 16,
+      nesw-resize;
     /* Back-compat aliases */
     --cursor-hand: var(--cursor-arrow);
     --cursor-sword: var(--cursor-point);
@@ -490,6 +589,14 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent);
     --perf-ornament-edge-right: linear-gradient(transparent, transparent);
     --perf-ornament-gilt: var(--color-gold-700);
+    /* The Fancy Gold theme's gilded window frame (desktop .window.panel
+       under the .fancy-gold-ui root class; components.css):
+       applyWindowOrnamentVars overwrites this with the
+       12-layer tinted composite at boot. Same fallback contract as the
+       --perf-ornament-* masks above: consumed inside a `background-image`
+       list, so it needs a real (invisible) image value before boot, not an
+       unset property that would invalidate the whole declaration. */
+    --window-ornament-frame: linear-gradient(transparent, transparent);
     /* Minimap disc's gilded ring (hud.css "minimap" section /
        minimap_gilded_ornament.ts). Same fallback contract as
        --perf-ornament-gilt above: consumed as a whole `background`, so it
@@ -500,6 +607,17 @@
        compute to `none` (no image), not an invalid/empty string, the same
        reasoning as the --perf-ornament-* mask fallbacks above. */
     --minimap-speckle: none;
+    /* Bank capacity meter's gilded near-full treatment (Bank Storage phase 08),
+       the third reader of the section 4.3 gold ramp after --perf-ornament-gilt /
+       --minimap-gilt above. Flat colors only (no mask, no animation, no
+       per-frame cost): the track border/glow anchor stays on the same gold-700
+       step the other two gilt aliases use; the general fill steps up from its
+       resting --gold-dim to gold-400 and the meter text warms to gold-300. The
+       glow is a static box-shadow color (components.css "bank footer" section). */
+    --bank-meter-gilt: var(--color-gold-700);
+    --bank-meter-gilt-fill: var(--color-gold-400);
+    --bank-meter-gilt-text: var(--color-gold-300);
+    --bank-meter-gilt-glow: color-mix(in srgb, var(--color-gold-600) 55%, transparent);
   }
 
   /* Glass is dropped WHOLE-RULE at the low effect tier: a universal removal
@@ -550,9 +668,23 @@
     --perf-ornament-edge-left: linear-gradient(transparent, transparent) !important;
     --perf-ornament-edge-right: linear-gradient(transparent, transparent) !important;
     --perf-ornament-gilt: var(--color-gold-700) !important;
+    /* The Fancy Gold window frame is cosmetic filigree too, shed the same
+       way (the inline value applyWindowOrnamentVars sets is non-important,
+       so this stylesheet !important wins on the low tier). */
+    --window-ornament-frame: linear-gradient(transparent, transparent) !important;
     /* The minimap ring is purely cosmetic too (never actionable information),
        so it is shed at the low effect tier the same way. */
     --minimap-gilt: var(--color-gold-700) !important;
     --minimap-speckle: none !important;
+    /* The bank meter's gilt aliases are deliberately NOT shed: they are flat
+       colors with no per-frame or mask cost, and the near-full warmth is the
+       same at every tier (cosmetic emphasis with no tier knob, per the
+       graphics-fairness rule). Pinned here at their base values so the low
+       tier provably renders the identical treatment, the way the two gilt
+       aliases above stay paintable. */
+    --bank-meter-gilt: var(--color-gold-700) !important;
+    --bank-meter-gilt-fill: var(--color-gold-400) !important;
+    --bank-meter-gilt-text: var(--color-gold-300) !important;
+    --bank-meter-gilt-glow: color-mix(in srgb, var(--color-gold-600) 55%, transparent) !important;
   }
 }

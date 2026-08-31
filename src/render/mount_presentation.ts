@@ -11,7 +11,10 @@
 // The pieces it composes each own their own math:
 //   - `CharacterVisual.update` runs the baked gait clips.
 //   - `applyRocketSledAttitude` owns the rocket sled's jump nose-up and the
-//     rigid rider carry.
+//     rigid rider carry; `applyMountJumpAttitude` is the rickshaw arm's copy of
+//     the same idea, and exactly one of the two drives any given mount.
+//   - `rickshaw_mount` owns the rolling wheels and the puller that walks in the
+//     shafts.
 //   - `vehicle_suspension_fx` owns four-wheel terrain response, and composes
 //     ONTO the attitude above rather than replacing it.
 // Order matters: attitude first, suspension second, because the suspension
@@ -20,7 +23,9 @@
 import type * as THREE from 'three';
 import type { AnimState, CharacterVisual } from './characters/visual';
 import { applyRocketSledAttitude } from './goblin_rocket_sled_fx';
+import { applyMountJumpAttitude } from './mount_jump_attitude';
 import { type MountVisualSpec, mountBobY } from './mount_visuals';
+import { spinMountWheels, updateRickshawPuller } from './rickshaw_mount';
 import { RALLYCART_EXHAUST_PORTS } from './vehicle_exhaust_core';
 import {
   applyVehicleExhaust,
@@ -43,6 +48,12 @@ export interface MountPresentationHost {
   mountVisual: CharacterVisual | null;
   mountLift: number;
   rocketSledJumpPitch: number;
+  /** The rickshaw arm's own tip angle. Two damped pitches rather than one
+   *  because the two implementations still live side by side (see the attitude
+   *  call below); only ever one of them drives a given mount. */
+  mountJumpPitch: number;
+  mountWheels?: Parameters<typeof spinMountWheels>[0]['mountWheels'];
+  mountPullerVisual: Parameters<typeof updateRickshawPuller>[0]['mountPullerVisual'];
   /** Turning on the spot, for the engine audio's pitch bend. Written here
    *  rather than in renderer.ts because the suspension rig is what knows it. */
   mountPivot: boolean;
@@ -65,6 +76,11 @@ export interface MountPresentationInputs {
   facing: number;
   /** Raw vertical delta this frame, for the sled's jump attitude. */
   dyRaw: number;
+  /** RAW horizontal travel per second, NOT the smoothed locomotion speed: a
+   *  rolling wheel must agree with the distance the body actually covered this
+   *  frame, and loco.speed latches briefly after a stop (which the wheels rode
+   *  as a visible coast). */
+  rawSpeed: number;
   /** Scene clock, for the procedural bob phase. */
   time: number;
   /** False for a far-LOD or offscreen body: the rig advances but nothing that
@@ -87,26 +103,55 @@ export function updateMountPresentation(
   if (v.mountVisual && spec && input.shown) {
     if (!input.present) {
       v.mountVisual.advanceOffscreen(dt);
+      updateRickshawPuller(v, dt, input.anim, input.animate, false);
       return;
     }
     v.mountVisual.update(dt, input.anim, input.animate);
+    // RAW per-frame travel, not the smoothed locomotion speed: if the cart did
+    // not move this frame, its wheels must not turn this frame.
+    spinMountWheels(v, input.rawSpeed, input.anim.backwards, dt);
     // The rider floats WITH the procedural bob (the hover cycle's idle float),
     // not just the mount body.
     const bob = spec.groundLift + mountBobY(spec, input.time, input.moving);
     const riderRoot = v.visual?.root;
-    if (!riderRoot) return;
-    applyRocketSledAttitude(
-      v,
-      v.mountVisual.root,
-      riderRoot,
-      input.mountKey === 'goblin_rocket_sled',
-      input.airborne,
-      dt > 1e-4 ? input.dyRaw / dt : 0,
-      dt,
-      bob,
-      v.mountLift + bob,
-      spec.seatFwd,
-    );
+    if (!riderRoot) {
+      updateRickshawPuller(v, dt, input.anim, input.animate, true);
+      return;
+    }
+    // Exactly ONE attitude pass runs per mount. Both of these write the same
+    // three transforms (mount pitch, mount lift, and the rider carried around
+    // the vehicle origin), so running both would have them fight frame by
+    // frame. They are near-identical implementations that arrived on two
+    // branches: mount_jump_attitude.ts says so in its own header and expects
+    // the collapse. Unifying them is a real change with its own tuning risk,
+    // so this merge keeps each arm driving the mounts it was tuned against and
+    // leaves the collapse to a follow-up.
+    if (spec.jumpTips) {
+      applyMountJumpAttitude(
+        v,
+        v.mountVisual.root,
+        riderRoot,
+        spec,
+        input.time,
+        input.moving,
+        input.airborne,
+        dt > 1e-4 ? input.dyRaw / dt : 0,
+        dt,
+      );
+    } else {
+      applyRocketSledAttitude(
+        v,
+        v.mountVisual.root,
+        riderRoot,
+        input.mountKey === 'goblin_rocket_sled',
+        input.airborne,
+        dt > 1e-4 ? input.dyRaw / dt : 0,
+        dt,
+        bob,
+        v.mountLift + bob,
+        spec.seatFwd,
+      );
+    }
     // A wheeled mount reads the ground under each of its four wheels and
     // answers with body pitch/roll plus per-corner spring travel. The rig is
     // probed once per mount and cached as null for everything without
@@ -159,12 +204,16 @@ export function updateMountPresentation(
         dt,
       });
     }
+    // Last: the puller is parented into the cart, so it reads the attitude
+    // this pass just wrote rather than last frame's.
+    updateRickshawPuller(v, dt, input.anim, input.animate, true);
     return;
   }
   if (!input.shown && v.visual) {
     // Dismounted: relax every arm this pass drives, or the body keeps the
     // vehicle's last attitude after the vehicle is gone.
     v.rocketSledJumpPitch = 0;
+    v.mountJumpPitch = 0;
     v.mountPivot = false;
     v.visual.root.rotation.x = 0;
     v.visual.root.rotation.z = 0;

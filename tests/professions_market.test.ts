@@ -207,13 +207,20 @@ describe('save-on-leave atomicity for a profession-item listing (#1146)', () => 
   });
 
   it('writes the escrowed character bags and the market listing in one transaction', async () => {
-    const { saveCharacterAndMarketState, openMarketWriteGate, closeMarketWriteGateForTests } =
-      await import('../server/db');
+    const {
+      saveCharacterAndMarketState,
+      openMarketWriteGate,
+      closeMarketWriteGateForTests,
+      openMailPartitionWriteGate,
+    } = await import('../server/db');
     openMarketWriteGate();
+    openMailPartitionWriteGate(); // addPlayer's welcome letter dirties a mail partition too
     try {
       const client = {
         query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
         release: vi.fn(),
+        on: vi.fn(),
+        removeListener: vi.fn(),
       };
       dbMock.connect.mockResolvedValueOnce(client as any);
 
@@ -227,8 +234,14 @@ describe('save-on-leave atomicity for a profession-item listing (#1146)', () => 
       expect(state).not.toBeNull();
       const market = sim.serializeMarket();
 
-      const mail = sim.serializeMail();
-      await saveCharacterAndMarketState(1, sim.entities.get(seller)!.level, state!, market, mail);
+      const mailPartitions = sim.takeDirtyMailPartitions(); // no mail action here: empty
+      await saveCharacterAndMarketState(
+        1,
+        sim.entities.get(seller)!.level,
+        state!,
+        market,
+        mailPartitions,
+      );
 
       const sqls = client.query.mock.calls.map((c: unknown[]) => String(c[0]));
       expect(sqls[0]).toMatch(/^BEGIN/);

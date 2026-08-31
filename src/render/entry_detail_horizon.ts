@@ -8,6 +8,7 @@ import {
   ENTRY_DETAIL_HORIZON_HEADROOM_MS,
   ENTRY_DETAIL_HORIZON_STEPS,
   type EntryDetailHorizonState,
+  entrySceneryCullFar,
 } from './entry_detail_horizon_core';
 import { type InitialFrameCompileRecord, initialFrameDeferral } from './initial_frame_core';
 
@@ -32,6 +33,11 @@ export type EntryDetailHorizonHoldReason =
 export interface EntryDetailHorizonSnapshot {
   active: boolean;
   cap: number;
+  /** The ring the reveal-gated scenery culled at this frame (`sceneryCullFar`),
+   *  null once the horizon is inactive. Distinct from `cap`: before the far
+   *  stand-in is complete the horizon cannot tick and `cap` reads the target,
+   *  while scenery already culls at the open ring. */
+  sceneryCap: number | null;
   targetFar: number;
   nextCap: number | null;
   stableFrames: number;
@@ -136,10 +142,19 @@ export class EntryDetailHorizonAdmission {
     return this.demand;
   }
 
+  /** The cull far reveal-gated scenery consults this frame (entry_detail_horizon_core).
+   *  Holds at the open ring while the horizon is active even on the frames the
+   *  horizon cannot tick (before the far stand-in is complete `advanceFromFrame`
+   *  is not fed): that window is the one the rule exists for. */
+  sceneryCullFar(cullFar: number): number {
+    return this.active ? entrySceneryCullFar(cullFar, this.state) : cullFar;
+  }
+
   snapshot(): EntryDetailHorizonSnapshot {
     return {
       active: this.active,
       cap: this.demand,
+      sceneryCap: this.active ? this.state.cap : null,
       targetFar: this.targetFar,
       nextCap: this.active ? this.nextCap(this.targetFar) : null,
       stableFrames: this.state.stableFrames,

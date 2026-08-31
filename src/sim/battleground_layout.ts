@@ -48,6 +48,14 @@ export const BG_PLAY_HALF_X = 49;
 export const BG_PLAY_HALF_Z = 139;
 export const BG_FLAG_Z = 118; // |z| of each team's flag stand (keep court)
 
+// Reach for the flag action. The stand is paved ground, not a plinth: a
+// runner walks right up to the pole, so the reach stays tight. Lives here,
+// not with the rest of the mode's tuning in social/battleground.ts, because
+// the client's flag-entity proximity check (src/game/bg_flag_interact.ts)
+// needs it too, matching how BG_TEAM_COLORS above already crosses the same
+// boundary for render/battleground_props.ts.
+export const BG_PICKUP_RADIUS = 2.5;
+
 /** Keep enclosure, restated for the mode: the walls themselves come from the
  *  authored map, but the form-up containment has to agree with them. */
 export const KEEP_HALF_X = 16;

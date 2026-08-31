@@ -4,6 +4,8 @@
 // lives in hud.ts; this module only answers "given a desired box and a viewport,
 // what is the legal box, and how do we round-trip it through localStorage?".
 
+import { anchorAxis } from '../../target_frame_pos';
+
 // `left`/`top` are the chat *wrap*'s top-left in viewport px. `width` is the wrap
 // width; `height` is the scrollable chat *pane/frame* height (the tab strip sits
 // above it and is measured separately as `chromeH` when clamping).
@@ -12,6 +14,11 @@ export interface ChatBoxGeometry {
   top: number;
   width: number;
   height: number;
+  /** The visual viewport the box was saved under (both or neither), so a
+   *  later apply can re-anchor it when the window size changes (fullscreen
+   *  exit): see anchorAdjustedChatBox. */
+  vw?: number;
+  vh?: number;
 }
 
 export interface ChatBoxLimits {
@@ -125,11 +132,22 @@ export function placeChatBox(
 }
 
 export function serializeChatBox(geo: ChatBoxGeometry): string {
-  return JSON.stringify({ left: geo.left, top: geo.top, width: geo.width, height: geo.height });
+  const out: Record<string, number> = {
+    left: geo.left,
+    top: geo.top,
+    width: geo.width,
+    height: geo.height,
+  };
+  if (geo.vw !== undefined && geo.vh !== undefined) {
+    out.vw = Math.round(geo.vw);
+    out.vh = Math.round(geo.vh);
+  }
+  return JSON.stringify(out);
 }
 
 // Parse persisted geometry, returning null for missing/corrupt data so callers
-// fall back to the CSS default. Every field must be a finite number.
+// fall back to the CSS default. Every core field must be a finite number; the
+// saved-viewport pair is optional (older payloads), both fields or neither.
 export function parseChatBox(raw: string | null | undefined): ChatBoxGeometry | null {
   if (!raw) return null;
   try {
@@ -137,8 +155,41 @@ export function parseChatBox(raw: string | null | undefined): ChatBoxGeometry | 
     const nums = ['left', 'top', 'width', 'height'].map((k) => o[k]);
     if (nums.some((n) => typeof n !== 'number' || !Number.isFinite(n))) return null;
     const [left, top, width, height] = nums as number[];
-    return { left, top, width, height };
+    const out: ChatBoxGeometry = { left, top, width, height };
+    if (
+      typeof o.vw === 'number' &&
+      Number.isFinite(o.vw) &&
+      o.vw > 0 &&
+      typeof o.vh === 'number' &&
+      Number.isFinite(o.vh) &&
+      o.vh > 0
+    ) {
+      out.vw = o.vw;
+      out.vh = o.vh;
+    }
+    return out;
   } catch {
     return null;
   }
+}
+
+/** Re-anchor a saved chat box to the CURRENT viewport, exactly as
+ *  anchorAdjustedPos does for the movable frames (the shared anchorAxis rule:
+ *  each axis keeps its distance to whichever of start / center / end it sat
+ *  closest to when saved). The vertical extent includes the tab strip above
+ *  the pane, so a bottom-parked chat keeps its distance to the bottom edge.
+ *  A box saved by an older build carries no viewport and returns unchanged. */
+export function anchorAdjustedChatBox(
+  geo: ChatBoxGeometry,
+  chromeH: number,
+  viewport: { w: number; h: number },
+): ChatBoxGeometry {
+  const { vw, vh } = geo;
+  if (vw === undefined || vh === undefined) return geo;
+  if (vw === viewport.w && vh === viewport.h) return geo;
+  return {
+    ...geo,
+    left: anchorAxis(geo.left, geo.width, vw, viewport.w),
+    top: anchorAxis(geo.top, geo.height + Math.max(0, chromeH), vh, viewport.h),
+  };
 }

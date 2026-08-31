@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import { stripComments } from './helpers/strip_comments';
 
 // Pin the preload <-> main IPC channel-name contract by scanning the sources:
 // electron/*.cjs live outside tsc, so a rename on one side would otherwise
@@ -8,14 +9,13 @@ import { describe, expect, it } from 'vitest';
 const repoRoot = join(__dirname, '..');
 const read = (rel: string) => readFileSync(join(repoRoot, rel), 'utf8');
 
-// LINE comments first, then block comments (a bare /* inside a line comment
-// would otherwise swallow every real line to the next */), with the [^:] guard
-// keeping `://` scheme literals intact. Applied where a body is PINNED (the
-// discord handler slices below): main.cjs cannot run under vitest, so textual
-// robustness IS the coverage there, and a raw substring pin is satisfied by a
-// commented-out line: exactly the silent-dead-feature shape it must catch.
-const stripComments = (source: string): string =>
-  source.replace(/(^|[^:])\/\/[^\n]*/gm, '$1').replace(/\/\*[\s\S]*?\*\//g, '');
+// The shared order-safe stripper (tests/helpers/strip_comments.ts, imported
+// above) is applied where a body is PINNED (the handler slices below):
+// main.cjs cannot run under vitest, so textual robustness IS the coverage
+// there, and a raw substring pin is satisfied by a commented-out line, exactly
+// the silent-dead-feature shape it must catch. The shared helper's lookbehind
+// form also refuses a line comment that immediately follows a block-comment
+// closer, which the previous local consuming-guard copy let survive.
 
 // Stripped at the shared constants too, so EVERY substring pin in this suite
 // (not just the discord slices) refuses a commented-out line.
@@ -37,6 +37,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
         'desktop-epic-capability',
         'desktop-epic-link-proof',
         'desktop-epic-link-settled',
+        'desktop-exchange-capability',
         'desktop-app-quit',
         'desktop-gamepad-activity',
         'desktop-get-display-mode',
@@ -256,6 +257,29 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(missingWindowAt).toBeGreaterThan(trustAt);
     expect(destroyedWindowAt).toBeGreaterThan(missingWindowAt);
     expect(quitAt).toBeGreaterThan(destroyedWindowAt);
+  });
+
+  it('the exchange-capability handler is trusted-sender gated and answers a strict boolean', () => {
+    // The $WOC Exchange store gate (issue #3692): an untrusted frame and a
+    // store build must both read false, and the answer is the pure
+    // desktop_config verdict compared strictly, never a truthy passthrough or
+    // the collapsed resolveDistribution channel. Sliced from the STRIPPED
+    // mainSide so a commented-out verdict line cannot satisfy the pin.
+    const start = mainSide.indexOf("ipcMain.handle('desktop-exchange-capability'");
+    expect(start).toBeGreaterThan(-1);
+    const end = mainSide.indexOf('\n});', start);
+    // An unfound close would make the slice run to end-of-file, letting the
+    // pins below be satisfied by later handlers' text (the show-notification
+    // pin carries the same guard for the same reason).
+    expect(end).toBeGreaterThan(start);
+    const body = mainSide.slice(start, end);
+    expect(body).toContain('if (!trustedSender(event)) return false;');
+    expect(body).toContain('return desktopConfig.wocExchangeEnabled === true;');
+    // And the preload method must invoke THIS channel, not a sibling
+    // capability whose decision reads the collapsed distribution.
+    expect(preload).toContain(
+      "wocExchangeSupported: () => ipcRenderer.invoke('desktop-exchange-capability'),",
+    );
   });
 
   it('the show-notification handler validates, re-checks focus, then paces the OS surface', () => {
@@ -595,6 +619,7 @@ describe('electron IPC channel contract (preload <-> main)', () => {
       'epicLinkSupported',
       'epicLinkSettled',
       'walletConnectionSupported',
+      'wocExchangeSupported',
       'openWalletBrowser',
       'takeWalletHandoffCode',
       'onWalletHandoffCode',

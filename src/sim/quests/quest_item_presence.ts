@@ -7,7 +7,11 @@
 // or leave it escrowed on the market or unclaimed in the mailbox, abandon,
 // re-accept, and the fallback hands over another copy every time. Each place
 // this predicate adds is one the player can recover the item FROM by
-// themselves (bank withdrawal, listing reclaim, mailTake). The mail read
+// themselves (bank withdrawal, Materials Vault withdrawal, listing reclaim,
+// mailTake). The vault arm cannot fire for live content today (no
+// requiredItems quest names a material), but the vault is a self-recoverable
+// store, so it joins the predicate rather than the uncovered list below the
+// day it lands. The mail read
 // counts IN-FLIGHT letters too (mailTake requires delivery), a deliberate
 // asymmetry: during the delivery window the copy is neither retrievable nor
 // re-grantable, which errs toward no duplicate.
@@ -47,6 +51,10 @@ export function playerHoldsQuestItem(
 ): boolean {
   if (ctx.countItem(itemId, meta.entityId) > 0) return true;
   if (meta.bank.inventory.some((s) => s.itemId === itemId && s.count > 0)) return true;
+  // A hostile itemId ('toString') reads an inherited function here; NaN
+  // comparisons make that arm false, so no Object.hasOwn dance is needed.
+  if ((meta.vault.stock[itemId] ?? 0) > 0) return true;
+  if (meta.vault.special.some((slot) => slot.itemId === itemId && slot.count > 0)) return true;
   if (ctx.mailboxHoldsItem(meta, itemId)) return true;
   return ctx.marketListings.some(
     (l) => l.itemId === itemId && l.count > 0 && ctx.marketListingBelongsTo(l, meta),

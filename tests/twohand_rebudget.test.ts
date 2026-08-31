@@ -56,4 +56,31 @@ describe('v0.27.1 two-hand re-budget', () => {
       ).toBeLessThan(0.35);
     }
   });
+
+  // The 2026-08-30 ilvl-honesty round: the pre-budget Thronebane line ran 29
+  // percent above its curve and the heroic mint's above-curve retention
+  // carried it to ilvl 37, quietly making a legacy weapon the white-damage
+  // king of every later tier. Both legendaries were re-lined to their real
+  // ilvl curves, and this sweep now covers ONE-handers too so the next hot
+  // hand-authored line fails here instead of surfacing in a balance study.
+  // The two grandfathered leveling-era blips are pinned so they cannot grow.
+  it('every leveled one-hander sits at or under its ilvl dps ceiling', () => {
+    let checked = 0;
+    for (const item of Object.values(ITEMS)) {
+      if (item.kind !== 'weapon' || !item.weapon || item.hand === 'twohand') continue;
+      const level = itemLevel(item);
+      if (level === undefined) continue;
+      const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
+      // One-sided on purpose: leveling greens sit under budget by design;
+      // the guard only stops a line sneaking ABOVE its ilvl (the Thronebane
+      // failure mode).
+      const target = weaponDpsBudget(level);
+      expect(
+        dps - target,
+        `${item.id} dps ${dps.toFixed(2)} vs ceiling ${target.toFixed(2)}`,
+      ).toBeLessThan(0.35);
+      checked++;
+    }
+    expect(checked).toBeGreaterThan(20);
+  });
 });

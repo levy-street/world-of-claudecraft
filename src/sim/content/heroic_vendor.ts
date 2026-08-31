@@ -14,6 +14,11 @@ import type { ItemDef } from '../types';
 // identity picks its audience. Prices are tunable placeholders sized against
 // the four heroic-final-boss rewards available during each realm reset cycle.
 //
+// Deliberately NOT soulbound (maintainer ruling 2026-08-28): the newer
+// vendor-gear-binds rule covers the Crucible tier, but this jewelry has been
+// tradeable since it shipped and the live economy is built around that, so
+// it keeps its original behavior.
+//
 // Combat rating: every piece also carries ONE combat rating (hit / crit / haste)
 // at JEWELRY_RATING (25 -> 2.5%), chosen by its stat identity. Ratings are off the
 // primary-stat budget (like spellPower), so the sums above stay budget-enforced.
@@ -126,7 +131,7 @@ export const HEROIC_VENDOR_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     requiredLevel: 20,
     stats: { str: 6, agi: 6 },
-    hitRating: JEWELRY_RATING, // hybrid melee: Hit
+    hasteRating: JEWELRY_RATING, // hybrid melee: haste (the Hit lane keeps nine_oaths + round_table)
     sellValue: 6000,
   },
   medallion_of_endless_profit: {

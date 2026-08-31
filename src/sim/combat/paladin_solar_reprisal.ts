@@ -1,3 +1,11 @@
+import {
+  OATHPYRE_2PC_BLOCK_CHANCE,
+  OATHPYRE_2PC_VOWKEEPER_CHANCE,
+  OATHPYRE_4PC_SHIELD_DURATION_SEC,
+  OATHPYRE_4PC_SHIELD_PCT_MAX,
+  setBonusFlag,
+} from '../content/ignivar_set_bonuses';
+import type { TalentModifiers } from '../content/talents';
 import type { PlayerMeta, ResolvedAbility } from '../sim';
 import type { SimContext } from '../sim_context';
 import type { Aura, Entity } from '../types';
@@ -42,9 +50,11 @@ export function solarReprisalMakesAbilityFree(
   return abilityId === 'sunward_disc' && hasSolarReprisal(owner);
 }
 
-function isProtectionPaladin(ctx: SimContext, p: Entity): boolean {
+function protectionPaladinMods(ctx: SimContext, p: Entity): TalentModifiers | null {
   const meta: PlayerMeta | undefined = p.kind === 'player' ? ctx.players.get(p.id) : undefined;
-  return meta?.cls === 'paladin' && ctx.playerMods(meta).spec === 'protection';
+  if (meta?.cls !== 'paladin') return null;
+  const mods = ctx.playerMods(meta);
+  return mods.spec === 'protection' ? mods : null;
 }
 
 function emitFade(ctx: SimContext, p: Entity, aura: Aura): void {
@@ -83,11 +93,50 @@ export function tryGrantSolarReprisal(
   p: Entity,
   source: 'block' | 'vowkeeper',
 ): boolean {
-  if (!isProtectionPaladin(ctx, p)) return false;
-  const chance = source === 'block' ? SOLAR_REPRISAL_BLOCK_CHANCE : SOLAR_REPRISAL_VOWKEEPER_CHANCE;
+  const mods = protectionPaladinMods(ctx, p);
+  if (mods === null) return false;
+  // Oathpyre 2pc: the wearer's arm chances rise (vowkeeper 0.2 -> 0.3, block
+  // 0.25 -> 0.4). The same single rng draw happens either way, only the
+  // threshold moves, so neither wearers nor non-wearers shift the stream.
+  // There is no internal cooldown: arming while already armed refreshes the
+  // ONE aura (same id + source), the disclosed overwrite soft cap.
+  const wornOathpyre2 = mods.selected[setBonusFlag('oathpyre', 2)] === true;
+  const chance =
+    source === 'block'
+      ? wornOathpyre2
+        ? OATHPYRE_2PC_BLOCK_CHANCE
+        : SOLAR_REPRISAL_BLOCK_CHANCE
+      : wornOathpyre2
+        ? OATHPYRE_2PC_VOWKEEPER_CHANCE
+        : SOLAR_REPRISAL_VOWKEEPER_CHANCE;
   if (!ctx.rng.chance(chance)) return false;
   grantSolarReprisal(ctx, p);
   return true;
+}
+
+/** Oathpyre 4pc: the fixed shield aura id, so all three consumers refresh ONE
+ *  absorb (a refresh replaces the undrained remainder, same-id semantics). */
+export const OATHPYRE_4PC_BULWARK_AURA_ID = 'oathpyre_bulwark';
+
+// Oathpyre 4pc: consuming Solar Reprisal shields the wearer for 6 percent of
+// max health for 10 sec. The aura NAME deliberately reuses the localized
+// 'Solar Reprisal' string (the shield is the Reprisal's payoff and a new aura
+// name would need a full sim_i18n dictionary row across every locale); the
+// aura ID stays distinct so a fresh proc can never replace a running shield.
+function grantOathpyreBulwark(ctx: SimContext, p: Entity): void {
+  const meta: PlayerMeta | undefined = p.kind === 'player' ? ctx.players.get(p.id) : undefined;
+  if (meta === undefined) return;
+  if (ctx.playerMods(meta).selected[setBonusFlag('oathpyre', 4)] !== true) return;
+  ctx.applyAura(p, {
+    id: OATHPYRE_4PC_BULWARK_AURA_ID,
+    name: 'Solar Reprisal',
+    kind: 'absorb',
+    value: Math.max(1, Math.round(p.maxHp * OATHPYRE_4PC_SHIELD_PCT_MAX)),
+    remaining: OATHPYRE_4PC_SHIELD_DURATION_SEC,
+    duration: OATHPYRE_4PC_SHIELD_DURATION_SEC,
+    sourceId: p.id,
+    school: 'holy',
+  });
 }
 
 export function applySolarReprisalOverride(
@@ -100,6 +149,9 @@ export function applySolarReprisalOverride(
   if (index < 0) return res;
   const [aura] = p.auras.splice(index, 1);
   emitFade(ctx, p, aura);
+  // The 4pc shield rides EVERY consume, including the Mending Light route
+  // (a deliberate shield-through-heal path, disclosed by the set doc).
+  grantOathpyreBulwark(ctx, p);
 
   if (res.def.id === 'sunward_disc') {
     return {

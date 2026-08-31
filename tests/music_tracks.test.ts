@@ -97,6 +97,20 @@ describe('remastered soundtrack catalog', () => {
     expect(ZONE_STREAM_URLS.haunt).toBe(ZONE_STREAM_URLS.marsh);
   });
 
+  it('routes the three Ignivar rooms to three distinct matching remasters', () => {
+    const rooms = [
+      'ignivar_forge_approach',
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
+    ] as const;
+    const urls = rooms.map((room) => ZONE_STREAM_URLS[room]);
+
+    expect(new Set(urls).size).toBe(rooms.length);
+    for (const [index, room] of rooms.entries()) {
+      expect(urls[index]).toMatch(new RegExp(`/audio/music/${room}\\.mp3\\?v=[a-f0-9]{12}$`));
+    }
+  });
+
   it('ships the two battle themes and they exist on disk', () => {
     expect(COMBAT_STREAM_URLS).toHaveLength(2);
     for (const url of COMBAT_STREAM_URLS) {
@@ -131,6 +145,9 @@ describe('remastered soundtrack catalog', () => {
       'dungeon_hollow_crypt',
       'dungeon_sunken_bastion',
       'dungeon_gravewyrm_sanctum',
+      'ignivar_forge_approach',
+      'ignivar_raid_arena',
+      'ignivar_inner_crucible',
       'rift_frost',
       'rift_ember',
       'rift_venom',

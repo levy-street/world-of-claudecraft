@@ -103,6 +103,7 @@ describe('the Low vertex-color path covers every mount GLB that ships COLOR_0', 
     const withVertexColors = mountUrls.filter((url) => glbAttributes(url).has('COLOR_0'));
     expect(withVertexColors).toEqual([
       'models/mounts/goblin_rocket_sled.glb',
+      'models/mounts/rickshaw_mount.glb',
       'models/mounts/terrorspark_groundshaker.glb',
       'models/mounts/valorsteed.glb',
     ]);

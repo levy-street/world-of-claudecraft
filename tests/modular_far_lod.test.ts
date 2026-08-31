@@ -249,8 +249,12 @@ describe('far-LOD wiring (source pins)', () => {
     // the composed bake is shared per part set, which cannot represent one.
     const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
     expect(composed).toContain('bakeStaticPose(norm, composedFarMeshes(temp))');
+    // The fixed rig captures farBakeMeshes(temp) once, bakes the LOD off that
+    // walk, then derives the shadow bake from the same list (the raid mech's
+    // shadow-policy split), so the pin follows the capture plus the bake call.
     const fixed = fnBody('src/render/characters/assets.ts', 'export function prepareVisual(');
-    expect(fixed).toContain('bakeStaticPose(norm, farBakeMeshes(temp))');
+    expect(fixed).toContain('const farMeshes = farBakeMeshes(temp);');
+    expect(fixed).toContain('bakeStaticPose(norm, farMeshes)');
   });
 
   it('composes its throwaway with skipDecals: the flatten drops face decals, so none is minted', () => {

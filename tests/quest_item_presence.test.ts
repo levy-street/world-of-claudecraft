@@ -16,11 +16,20 @@ import {
   type QuestItemPresenceCtx,
 } from '../src/sim/quests/quest_item_presence';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
+import type { InvSlot } from '../src/sim/types';
 
 const TOOL = 'gathering_sickle';
 
-function fakeMeta(bankItems: { itemId: string; count: number }[] = []): PlayerMeta {
-  return { entityId: 7, bank: { inventory: bankItems } } as unknown as PlayerMeta;
+function fakeMeta(
+  bankItems: { itemId: string; count: number }[] = [],
+  vaultStock: Record<string, number> = {},
+  vaultSpecial: InvSlot[] = [],
+): PlayerMeta {
+  return {
+    entityId: 7,
+    bank: { inventory: bankItems },
+    vault: { stock: vaultStock, special: vaultSpecial, upgrades: 0 },
+  } as unknown as PlayerMeta;
 }
 
 function fakeCtx(overrides: Partial<QuestItemPresenceCtx> = {}): QuestItemPresenceCtx {
@@ -69,6 +78,45 @@ describe('playerHoldsQuestItem, one store at a time', () => {
     expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([{ itemId: TOOL, count: 0 }]), TOOL)).toBe(
       false,
     );
+  });
+
+  it('a copy in the Materials Vault counts, and a zeroed or unrelated row does not', () => {
+    // upgrades stays 0 in the fixture on purpose: presence is about the items,
+    // not the unlock, exactly as withdraw itself is un-gated on the rung.
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], { [TOOL]: 1 }), TOOL)).toBe(true);
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], { iron_ore: 5 }), TOOL)).toBe(false);
+    // A zeroed row is not a copy: loosening the comparison to >= 0 must redden
+    // here (deleting it outright stays green only because 0 is already falsy).
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], { [TOOL]: 0 }), TOOL)).toBe(false);
+    // The arm's hostile-id claim, enforced: a prototype-named id reads an
+    // inherited function off the empty stock record and the NaN comparison
+    // keeps the arm false, which is what lets it skip an Object.hasOwn guard.
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], {}), 'toString')).toBe(false);
+    expect(playerHoldsQuestItem(fakeCtx(), fakeMeta([], {}), '__proto__')).toBe(false);
+  });
+
+  it('an identity-preserving Materials Vault copy counts too', () => {
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: TOOL, count: 1, instance: { signer: 'Ada' } }]),
+        TOOL,
+      ),
+    ).toBe(true);
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: TOOL, count: 0, craftedRecipeId: 'recipe_x' }]),
+        TOOL,
+      ),
+    ).toBe(false);
+    expect(
+      playerHoldsQuestItem(
+        fakeCtx(),
+        fakeMeta([], {}, [{ itemId: 'iron_ore', count: 3, instance: { signer: 'Ada' } }]),
+        TOOL,
+      ),
+    ).toBe(false);
   });
 
   it('a mailbox attachment counts', () => {

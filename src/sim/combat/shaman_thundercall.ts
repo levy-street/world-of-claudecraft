@@ -1,8 +1,10 @@
 // Thundercall's deterministic build-and-vent engine. The bank rides an aura so
 // offline, hosted, reconnect, and replay state all use the same authority.
 
+import { STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE } from '../content/ignivar_set_bonuses';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
+import { wearsSetBonus } from './set_bonus_wearer';
 import {
   primalExaltationActive,
   pyrebrandBonusCharge,
@@ -115,7 +117,15 @@ export function thundercallDamageMultiplier(
     ? PRIMAL_MASTERY_VENT_BONUS
     : 0;
   if (abilityId === 'earth_shock') {
-    return (1 + charges * EARTHEN_JOLT_BONUS_PER_CHARGE) * (1 + primalBonus);
+    // Stormkindled 4pc (the Crucible set doc): the per-Thunder bonus rises
+    // 0.25 -> 0.30 for wearers (the full 5-charge vent goes 2.25x -> 2.5x).
+    // Primal Mastery's vent window still MULTIPLIES the result, so the
+    // in-window full vent is 2.5 x 1.25 = 3.125x (disclosed). Faultwake's
+    // earthquake coefficient below is deliberately untouched. Draws no rng.
+    const perCharge = wearsSetBonus(ctx, player, 'stormkindled', 4)
+      ? STORMKINDLED_4PC_EARTHEN_JOLT_BONUS_PER_CHARGE
+      : EARTHEN_JOLT_BONUS_PER_CHARGE;
+    return (1 + charges * perCharge) * (1 + primalBonus);
   }
   if (abilityId === 'earthquake') {
     return (1 + charges * FAULTWAKE_BONUS_PER_CHARGE) * (1 + primalBonus);

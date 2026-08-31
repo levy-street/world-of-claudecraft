@@ -14,7 +14,7 @@
 // + leave-path + tick() call sites resolve unchanged; this module draws no rng.
 
 import type { TradeInfo } from '../../world_api';
-import { addStacked, bagCapacity, countFit } from '../bags';
+import { addStacked, bagPools, countFit } from '../bags';
 import { RIFT_GEAR_ITEM_IDS } from '../content/rift/items';
 import { ITEMS } from '../data';
 import { itemCopyPin } from '../item_copy_ref';
@@ -24,6 +24,7 @@ import {
   sellerSignedCharmDeprioritize,
   type VendorRemovedUnit,
 } from '../items';
+import { partyTradeWindowAllows } from '../loot/bop_trade_window';
 import type { PlayerMeta, TradeSession } from '../sim';
 import type { SimContext } from '../sim_context';
 import { cloneItemInstancePayload, dist2d, type InvSlot, type ItemInstancePayload } from '../types';
@@ -42,6 +43,60 @@ const RIFT_GEAR_ITEMS = new Set<string>(RIFT_GEAR_ITEM_IDS);
 // offerCovered, and the removal preference in removeOffer/fitsAfterSwap.
 function isTradeLocked(instance: ItemInstancePayload | undefined): boolean {
   return instance?.boundTo !== undefined;
+}
+
+// The counterparty identity the window gate matches against: the display
+// name always, plus the stable character id where the host knows it (the
+// live server always does; the gate prefers ids, rename-proof).
+type TradeCounterparty = { name: string; characterId?: number };
+
+function tradeCounterparty(ctx: SimContext, pid: number): TradeCounterparty | null {
+  const meta = ctx.players.get(pid);
+  if (!meta) return null;
+  return { name: meta.name, characterId: meta.characterId };
+}
+
+// The per-copy exclusion for a SOULBOUND def traded to `counterparty` at
+// `nowMs`: the bound lock above, plus the bind-on-pickup party trade window
+// (bop_trade_window.ts). Only a copy whose window is unexpired AND covers
+// the counterparty may cross; a plain soulbound stack (instance undefined)
+// never qualifies, which keeps the historical everything-soulbound-is-refused
+// behavior for every copy that never carried a window.
+function soulboundOfferSkip(
+  counterparty: TradeCounterparty,
+  nowMs: number,
+): (instance: ItemInstancePayload | undefined) => boolean {
+  return (instance) =>
+    isTradeLocked(instance) || !partyTradeWindowAllows(instance, counterparty, nowMs);
+}
+
+// How many held copies of a soulbound itemId pass the window skip above. A
+// direct inventory walk (not a ctx.countItem subtraction): the windowed copies
+// are the ONLY offerable ones, so the count and the staging walk read the same
+// array and can never disagree about a plain remainder.
+function windowedOfferableCount(
+  meta: PlayerMeta,
+  itemId: string,
+  skip: (instance: ItemInstancePayload | undefined) => boolean,
+): number {
+  let n = 0;
+  for (const s of meta.inventory ?? []) {
+    if (s.itemId === itemId && !skip(s.instance)) n += s.count;
+  }
+  return n;
+}
+
+// Whether the player holds ANY copy of itemId carrying a party trade window at
+// all (valid or not). This is the cheap pre-gate the soulbound offer arm runs
+// BEFORE resolving the counterparty or the clock, so a decoupled test ctx with
+// no inventory (and no players map or lockout clock) takes the historical
+// silent-drop path without ever touching those members.
+function hasAnyWindowedCopy(meta: PlayerMeta, itemId: string): boolean {
+  for (const s of meta.inventory ?? []) {
+    if (s.itemId === itemId && s.instance?.partyTrade !== undefined && !isTradeLocked(s.instance))
+      return true;
+  }
+  return false;
 }
 
 // How many held copies of itemId are trade-locked (boundTo set). A bound copy
@@ -158,7 +213,12 @@ export function tradeAccept(ctx: SimContext, pid?: number): void {
  * line of six distinct instanced units becomes six slots), tens of rows at
  * the worst and the window renders them all uncapped.
  */
-function stagedOfferSlots(meta: PlayerMeta, itemId: string, count: number): InvSlot[] {
+function stagedOfferSlots(
+  meta: PlayerMeta,
+  itemId: string,
+  count: number,
+  skip: (instance: ItemInstancePayload | undefined) => boolean = isTradeLocked,
+): InvSlot[] {
   const scratch: InvSlot[] = (meta.inventory ?? []).map((s) => ({
     ...s,
     ...(s.instance === undefined ? {} : { instance: cloneItemInstancePayload(s.instance) }),
@@ -167,8 +227,12 @@ function stagedOfferSlots(meta: PlayerMeta, itemId: string, count: number): InvS
     scratch,
     itemId,
     count,
-    isTradeLocked,
+    skip,
     sellerSignedCharmDeprioritize(meta.name, itemId),
+    // A soulbound def's plain stacks can never validly ship (only a
+    // window-carrying instanced copy may cross), so the plain-first arm of
+    // the walk is closed for them.
+    ITEMS[itemId]?.soulbound === true,
   );
   const out: InvSlot[] = [];
   const key = (instance: ItemInstancePayload | undefined, crafted: string | undefined): string =>
@@ -212,7 +276,11 @@ export function tradeSetOffer(
     if (!slot || typeof slot.itemId !== 'string' || !Number.isFinite(slot.count)) continue;
     const count = Math.max(1, Math.floor(slot.count));
     const def = ITEMS[slot.itemId];
-    if (!def || def.kind === 'quest' || def.soulbound || RIFT_GEAR_ITEMS.has(slot.itemId)) {
+    // A soulbound def is no longer dropped HERE: the per-item loop below
+    // admits exactly the copies whose bind-on-pickup party trade window
+    // covers this counterparty, and silently drops the rest (the historical
+    // behavior for every windowless soulbound copy).
+    if (!def || def.kind === 'quest' || RIFT_GEAR_ITEMS.has(slot.itemId)) {
       continue;
     }
     merged.set(slot.itemId, (merged.get(slot.itemId) ?? 0) + count);
@@ -236,7 +304,32 @@ export function tradeSetOffer(
     if (attributed < count) staged.push({ itemId, count: count - attributed });
     return staged;
   };
+  // Set when a held WINDOWED soulbound copy could not be offered to THIS
+  // counterparty (wrong person, expired, or short of the requested count):
+  // unlike the historical plain-soulbound silent drop, this refusal depends
+  // on who is across the table and on the clock, so silence here left the
+  // player with no way to learn why the item vanished from the offer.
+  let windowDenied = false;
   for (const [itemId, count] of merged) {
+    // The soulbound arm: only copies whose party trade window is unexpired
+    // AND covers the counterparty may be offered. A windowless copy stays
+    // silently dropped (the historical posture). The windowed-copy pre-gate
+    // runs BEFORE the counterparty and clock resolve, so a decoupled ctx
+    // with no inventory never touches those members.
+    if (ITEMS[itemId]?.soulbound) {
+      if (!hasAnyWindowedCopy(r.meta, itemId)) continue;
+      const otherPid = session.a === r.meta.entityId ? session.b : session.a;
+      const counterparty = tradeCounterparty(ctx, otherPid);
+      if (counterparty === null) continue;
+      const skip = soulboundOfferSkip(counterparty, ctx.lockoutNowMs());
+      const windowed = windowedOfferableCount(r.meta, itemId, skip);
+      if (windowed < count) windowDenied = true;
+      if (windowed < 1) continue;
+      // No plain-remainder fallback: the count and the staging walk read the
+      // same inventory array with the same skip, so attribution is exact.
+      cleaned.push(...stagedOfferSlots(r.meta, itemId, Math.min(count, windowed), skip));
+      continue;
+    }
     if (ctx.countItem(itemId, r.meta.entityId) < count) continue;
     const unbound = offerableCount(ctx, r.meta, itemId);
     if (unbound < count) {
@@ -247,6 +340,9 @@ export function tradeSetOffer(
     cleaned.push(...stagedLine(itemId, count));
   }
   if (boundDenied) ctx.error(r.meta.entityId, 'That item is bound and cannot be traded.');
+  if (windowDenied) {
+    ctx.error(r.meta.entityId, 'That can only be traded to players who shared its drop.');
+  }
   const offer = {
     items: cleaned,
     copper: Math.max(0, Math.min(Math.floor(copper), r.meta.copper)),
@@ -327,10 +423,11 @@ function removeInstancedMatchingUnit(
   itemId: string,
   instance: ItemInstancePayload,
   craftedRecipeId: string | undefined,
+  skip: (instance: ItemInstancePayload | undefined) => boolean,
 ): VendorRemovedUnit | null {
   for (let i = inventory.length - 1; i >= 0; i--) {
     const s = inventory[i];
-    if (s.itemId !== itemId || !s.instance || isTradeLocked(s.instance)) continue;
+    if (s.itemId !== itemId || !s.instance || skip(s.instance)) continue;
     if (s.craftedRecipeId !== craftedRecipeId) continue;
     if (!itemInstancePayloadsEqual(s.instance, instance)) continue;
     const consumed = s.count === 1 ? s.instance : cloneItemInstancePayload(s.instance);
@@ -352,13 +449,32 @@ function shippedOfferUnits(
   ctx: SimContext,
   items: InvSlot[],
   fromPid: number,
+  toPid: number,
   inventory: InvSlot[] | null,
+  nowMsFor: () => number,
 ): PendingGrant[] {
   const grants: PendingGrant[] = [];
   // The copy-choice fix: when an instanced CHARM copy must ship, the
   // seller's own self-signed copies go last (sellerSignedCharmDeprioritize
   // above owns the predicate and its scope).
   const meta = ctx.resolve(fromPid)?.meta;
+  // The soulbound skip for THIS recipient, resolved lazily (an offer with no
+  // soulbound line never touches the players map or the clock, which
+  // decoupled test ctxs may not model). `nowMsFor` is tradeConfirm's ONE
+  // memoized clock read, shared with offerCovered and both fitsAfterSwap
+  // walks, so a window cannot expire between validation and removal and
+  // ship one side of the swap empty. `null` records an unresolvable
+  // recipient: a soulbound line then ships nothing, exactly what the real
+  // swap would deliver to a departed player.
+  let soulboundSkip: ((instance: ItemInstancePayload | undefined) => boolean) | null | undefined;
+  const skipFor = (itemId: string): ((instance: ItemInstancePayload | undefined) => boolean) => {
+    if (ITEMS[itemId]?.soulbound !== true) return isTradeLocked;
+    if (soulboundSkip === undefined) {
+      const counterparty = tradeCounterparty(ctx, toPid);
+      soulboundSkip = counterparty === null ? null : soulboundOfferSkip(counterparty, nowMsFor());
+    }
+    return soulboundSkip ?? (() => true);
+  };
   for (const s of items) {
     // The staged slots carry the EXACT copies the stage-time preview
     // selected (stagedOfferSlots), so the swap consumes those copies first:
@@ -376,11 +492,15 @@ function shippedOfferUnits(
     // self-signed charm copies go last.
     const units: VendorRemovedUnit[] = [];
     if (meta && inventory) {
+      const skip = skipFor(s.itemId);
+      const soulbound = ITEMS[s.itemId]?.soulbound === true;
       for (let unit = 0; unit < s.count; unit++) {
         const matched =
           s.instance !== undefined
-            ? removeInstancedMatchingUnit(inventory, s.itemId, s.instance, s.craftedRecipeId)
-            : removePlainMatchingUnit(inventory, s.itemId, s.craftedRecipeId);
+            ? removeInstancedMatchingUnit(inventory, s.itemId, s.instance, s.craftedRecipeId, skip)
+            : soulbound
+              ? null // a soulbound line is always instanced; never pin-match a plain copy
+              : removePlainMatchingUnit(inventory, s.itemId, s.craftedRecipeId);
         if (matched) {
           units.push(matched);
           continue;
@@ -390,14 +510,17 @@ function shippedOfferUnits(
         // copy), so a staged copy that LEFT the bags can ship a
         // marker-differing twin. The shipped unit still carries its own true
         // marker, so nothing is forged; it is the documented "some eligible
-        // copy" posture, same as the plain twin's.
+        // copy" posture, same as the plain twin's. A soulbound line keeps
+        // both its window skip and the closed plain arm here too, so the
+        // fallback can never widen what the staged selection was allowed.
         units.push(
           ...removeSellUnitsFromInventory(
             inventory,
             s.itemId,
             1,
-            isTradeLocked,
+            skip,
             sellerSignedCharmDeprioritize(meta.name, s.itemId),
+            soulbound,
           ),
         );
       }
@@ -407,9 +530,22 @@ function shippedOfferUnits(
   return grants;
 }
 
-function removeOffer(ctx: SimContext, items: InvSlot[], fromPid: number): PendingGrant[] {
+function removeOffer(
+  ctx: SimContext,
+  items: InvSlot[],
+  fromPid: number,
+  toPid: number,
+  nowMsFor: () => number,
+): PendingGrant[] {
   const meta = ctx.resolve(fromPid)?.meta;
-  const grants = shippedOfferUnits(ctx, items, fromPid, meta ? (meta.inventory ?? []) : null);
+  const grants = shippedOfferUnits(
+    ctx,
+    items,
+    fromPid,
+    toPid,
+    meta ? (meta.inventory ?? []) : null,
+    nowMsFor,
+  );
   // ONE quest-hook fire per removal batch: the hook is a whole-log recompute
   // that emits only deltas, and every fire here would see the same final
   // state, so a single call carries the same delta SET as N per-id (or
@@ -476,12 +612,21 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     tradeCancel(ctx, session.a);
     return;
   }
+  // ONE clock read for the whole confirm, resolved lazily (only a soulbound
+  // line ever asks) and then shared by validation, the capacity model, and
+  // the removal walks: three independent reads let a window expire mid-swap,
+  // shipping one side empty while the other side's goods still crossed.
+  let confirmNowMs: number | undefined;
+  const nowMsFor = (): number => {
+    confirmNowMs ??= ctx.lockoutNowMs();
+    return confirmNowMs;
+  };
   // final validation before the atomic swap
   const valid =
     session.offerA.copper <= metaA.copper &&
     session.offerB.copper <= metaB.copper &&
-    offerCovered(ctx, session.offerA.items, session.a) &&
-    offerCovered(ctx, session.offerB.items, session.b);
+    offerCovered(ctx, session.offerA.items, session.a, session.b, nowMsFor) &&
+    offerCovered(ctx, session.offerB.items, session.b, session.a, nowMsFor);
   if (!valid) {
     for (const tPid of [session.a, session.b])
       ctx.error(tPid, 'Trade failed: items or money no longer available.');
@@ -513,13 +658,20 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
     // walk (an instanced give frees exactly its own slot, which an id-keyed
     // stack removal could miss).
     const scratchOwn = meta.inventory.map((s) => ({ ...s }));
-    shippedOfferUnits(ctx, gives, meta.entityId, scratchOwn);
-    const capacity = bagCapacity(meta.bags);
+    shippedOfferUnits(ctx, gives, meta.entityId, giver.entityId, scratchOwn, nowMsFor);
+    const pools = bagPools(meta.bags);
     // What the GIVER ships, resolved by the same walk over the giver's own
     // scratch, then landed unit by unit (sequential add-then-check, so a
     // stack with room for one of three units refuses the third, #2473).
     const scratchGiver = giver.inventory.map((s) => ({ ...s }));
-    const shipped = shippedOfferUnits(ctx, receives, giver.entityId, scratchGiver);
+    const shipped = shippedOfferUnits(
+      ctx,
+      receives,
+      giver.entityId,
+      meta.entityId,
+      scratchGiver,
+      nowMsFor,
+    );
     for (const g of shipped) {
       for (const u of g.units) {
         // Model the payload AS IT ARRIVES: grantOffer stamps boundTo onto an
@@ -533,7 +685,7 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
           u.instance.boundTo === undefined
             ? { ...u.instance, boundTo: meta.entityId }
             : u.instance;
-        if (countFit(scratchOwn, capacity, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
+        if (countFit(scratchOwn, pools, g.itemId, 1, arrival, u.craftedRecipeId) < 1) {
           return false;
         }
         addStacked(scratchOwn, g.itemId, 1, arrival, u.craftedRecipeId);
@@ -553,8 +705,8 @@ export function tradeConfirm(ctx: SimContext, pid?: number): void {
   // swap
   metaA.copper = metaA.copper - session.offerA.copper + session.offerB.copper;
   metaB.copper = metaB.copper - session.offerB.copper + session.offerA.copper;
-  const grantsToB = removeOffer(ctx, session.offerA.items, session.a);
-  const grantsToA = removeOffer(ctx, session.offerB.items, session.b);
+  const grantsToB = removeOffer(ctx, session.offerA.items, session.a, session.b, nowMsFor);
+  const grantsToA = removeOffer(ctx, session.offerB.items, session.b, session.a, nowMsFor);
   grantOffer(ctx, grantsToB, session.b);
   grantOffer(ctx, grantsToA, session.a);
   for (const tPid of [session.a, session.b]) {
@@ -612,12 +764,29 @@ export function tradeClose(ctx: SimContext, pid?: number): void {
 // duplicate slots: a per-slot check would let duplicates each pass alone.
 // Counts against the UNBOUND copies only (unboundCount), the same
 // exclusion tradeSetOffer applies, so a copy bound between set-offer and
-// confirm can never slip through final validation into the swap.
-function offerCovered(ctx: SimContext, items: InvSlot[], pid: number): boolean {
+// confirm can never slip through final validation into the swap. A soulbound
+// line re-runs the window count against `otherPid` at a FRESH clock read, so
+// a window that expired between set-offer and confirm fails validation here
+// instead of shipping.
+function offerCovered(
+  ctx: SimContext,
+  items: InvSlot[],
+  pid: number,
+  otherPid: number,
+  nowMsFor: () => number,
+): boolean {
   const meta = ctx.players.get(pid);
   const totals = new Map<string, number>();
   for (const s of items) totals.set(s.itemId, (totals.get(s.itemId) ?? 0) + s.count);
   for (const [itemId, count] of totals) {
+    if (ITEMS[itemId]?.soulbound) {
+      if (!meta) return false;
+      const counterparty = tradeCounterparty(ctx, otherPid);
+      if (counterparty === null) return false;
+      const skip = soulboundOfferSkip(counterparty, nowMsFor());
+      if (windowedOfferableCount(meta, itemId, skip) < count) return false;
+      continue;
+    }
     const available = meta ? offerableCount(ctx, meta, itemId) : ctx.countItem(itemId, pid);
     if (available < count) return false;
   }

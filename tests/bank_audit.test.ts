@@ -1,16 +1,75 @@
-import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { describe, expect, it, vi } from 'vitest';
+
+const cliDb = vi.hoisted(() => ({ events: [] as string[] }));
+
+vi.mock('pg', () => ({
+  Pool: class {
+    async connect() {
+      cliDb.events.push('connect');
+      return {
+        query: async (statement: string) => {
+          const sql = statement.replace(/\s+/g, ' ').trim();
+          cliDb.events.push(`query:${sql}`);
+          if (sql.includes('FROM storage_purchases') && sql.includes('ORDER BY')) {
+            throw new Error('forced storage read failure');
+          }
+          if (sql.includes("to_regclass('bank_ledger')")) {
+            return {
+              rows: [
+                { column_name: 'counterparty_copper_delta' },
+                { column_name: 'counterparty_count' },
+              ],
+            };
+          }
+          if (sql.includes("to_regclass('storage_purchases')")) {
+            return { rows: [{ present: true }] };
+          }
+          return { rows: [] };
+        },
+        release: () => cliDb.events.push('release'),
+      };
+    }
+
+    async end() {
+      cliDb.events.push('pool.end');
+    }
+  },
+}));
 
 import {
+  BANK_SOCKET_PRICES as AUDIT_BANK_SOCKET_PRICES,
   auditBank,
+  auditStoragePurchases,
   type BankAuditFinding,
   type BankLedgerAuditRow,
   COUNTERPARTY_ORPHAN_OP,
   counterpartySelectList,
   formatReport,
+  formatStoragePurchaseReport,
   GUILD_BUY_POSITIONS,
+  KNOWN_CONTAINERS,
+  KNOWN_OPS,
   OPEN_BANK_SLOTS_AFTER,
+  STORAGE_PURCHASE_REPORT_LIMIT,
+  STORAGE_PURCHASE_STATUSES,
+  STORAGE_PURCHASE_STRANDED_HOURS,
+  type StoragePurchaseAuditRow,
+  VAULT_MAX_RUNG,
 } from '../scripts/bank_audit.mjs';
+import { BANK_SOCKET_PRICES } from '../src/sim/bank';
 import { GUILD_BANK_LADDER_POSITIONS, GUILD_BANK_RUNG_SLOTS } from '../src/sim/guild_bank';
+import { VAULT_UPGRADE_PRICES } from '../src/sim/materials_vault';
+
+// A raw-source .toContain() is comment-gameable: commenting the pinned line out
+// leaves its text sitting in the comment, so the pin stays falsely green while
+// the code is dead. Strip whole-line /* */ blocks (line-anchored, so a '/*'
+// inside a // comment cannot open a false block), then // line comments,
+// keeping :// protocol slashes. (The same helper tests/server/tunables.test.ts
+// uses.)
+const codeOnly = (src: string): string =>
+  src.replace(/^[ \t]*\/\*[\s\S]*?\*\/[ \t]*$/gm, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
 
 // Fill a bank_ledger row's defaults (snake_case, as Postgres returns it); pass only
 // the fields a case cares about. Every row is 'personal' with realm Claudemoon.
@@ -187,6 +246,1153 @@ describe('auditBank', () => {
     expect(findingKindsFor(findings, 62)).toEqual(['count_on_buy']);
     expect(findingKindsFor(findings, 63)).toEqual(['nonnegative_buy_cost']);
   });
+
+  it('the claudium buy rail: zero copper is clean, any copper is flagged', () => {
+    // Bank Storage phase 11 added this branch and nothing exercised either
+    // arm, so both were unkilled: the exemption could be inverted or deleted
+    // with the audit suite green. A claudium buy_slots row moves NO copper
+    // (its debit lives in the service-side claudium_ledger), so exactly 0 is
+    // the whole contract.
+    const clean = auditBank({
+      ledgerRows: [
+        L({
+          id: 1,
+          character_id: 60,
+          op: 'buy_slots',
+          item_id: 'strongbox_rung_01',
+          instance: { paidWith: 'claudium' },
+          copper_delta: 0,
+          purchased_slots_after: 6,
+        }),
+      ],
+      characters: [],
+    });
+    expect(findingKindsFor(clean, 60)).toEqual([]);
+    // The SAME row shape a gold buy would use is a defect on the claudium
+    // rail: copper moved where none may.
+    const dirty = auditBank({
+      ledgerRows: [
+        L({
+          id: 2,
+          character_id: 61,
+          op: 'buy_slots',
+          item_id: 'strongbox_rung_01',
+          instance: { paidWith: 'claudium' },
+          copper_delta: -500,
+          purchased_slots_after: 6,
+        }),
+      ],
+      characters: [],
+    });
+    expect(findingKindsFor(dirty, 61)).toEqual(['copper_on_claudium_buy']);
+    // And the exemption must not leak to the OTHER rails: an unstamped or
+    // gold-stamped free buy still trips nonnegative_buy_cost, which is what
+    // the claudium arm is carving an exception out of.
+    for (const instance of [null, { paidWith: 'gold' }]) {
+      const free = auditBank({
+        ledgerRows: [
+          L({
+            id: 3,
+            character_id: 62,
+            op: 'buy_slots',
+            instance,
+            copper_delta: 0,
+            purchased_slots_after: 6,
+          }),
+        ],
+        characters: [],
+      });
+      expect(findingKindsFor(free, 62)).toEqual(['nonnegative_buy_cost']);
+    }
+  });
+
+  it('the claudium exemption is PERSONAL-only: a stamped guild or vault row is itself a finding', () => {
+    // Without the container scope a forged guild row carrying
+    // {"paidWith":"claudium"} inherits the zero-copper exemption and walks
+    // past nonnegative_buy_cost, which is the only check standing between the
+    // audit and a free guild expansion. Guild and vault rails are single-rail
+    // by design and stay unstamped, so the stamp itself is the anomaly.
+    const guild = auditBank({
+      ledgerRows: [
+        L({
+          id: 1,
+          character_id: 70,
+          op: 'buy_slots',
+          container: 'guild',
+          container_id: 913,
+          instance: { paidWith: 'claudium' },
+          copper_delta: 0,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [],
+    });
+    // Both fire: the stamp is wrong AND the free buy is no longer exempt.
+    expect(guild.map((f) => f.kind)).toContain('claudium_rail_off_personal');
+    expect(guild.map((f) => f.kind)).toContain('nonnegative_buy_cost');
+    const vault = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 71,
+          op: 'buy_slots',
+          instance: { paidWith: 'claudium' },
+          copper_delta: 0,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [],
+    });
+    expect(vault.map((f) => f.kind)).toContain('claudium_rail_off_personal');
+    expect(vault.map((f) => f.kind)).toContain('nonnegative_buy_cost');
+  });
+
+  it('flags a row whose container no reconciliation pass knows', () => {
+    // A typo'd container is the one shape that used to escape everything: the
+    // grouping pass builds it a group, but personal / vault / guild each
+    // reconcile on their own literal, so the row moved value no pass read and
+    // no finding named. It must surface as itself, not as silence.
+    const findings = auditBank({
+      ledgerRows: [
+        L({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 3,
+          container: 'vualt',
+        }),
+      ],
+      characters: [],
+    });
+    expect(findings.map((f) => f.kind)).toEqual(['unknown_container']);
+    expect(findings[0]).toMatchObject({ container: 'vualt', realm: 'Claudemoon', characterId: 1 });
+    // The detail names the row and the offending value, so an operator can
+    // find the writer that produced it.
+    expect(findings[0].detail).toContain('row 1');
+    expect(findings[0].detail).toContain('vualt');
+    // The three known containers stay silent on this check.
+    for (const container of ['personal', 'vault', 'guild']) {
+      const known = auditBank({
+        ledgerRows: [
+          L({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 3,
+            container,
+            container_id: container === 'guild' ? 913 : null,
+          }),
+        ],
+        characters: [],
+      });
+      expect(`${container}:${known.map((f) => f.kind).join(',')}`).toBe(`${container}:`);
+    }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The Materials Vault container (Bank Storage Phase 2). Vault rows reuse the
+// personal op vocabulary ('deposit' / 'withdraw' / 'buy_slots') and group per
+// character like the personal bank, but reconcile against characters.state.vault:
+// pooled stock plus an identity-preserving special multiset, and an `upgrades`
+// rung that purchased_slots_after mirrors.
+// ---------------------------------------------------------------------------
+
+// A vault row's defaults: container 'vault' with no container_id. NOTE: L's
+// purchased_slots_after default is 0, which the vault rung tripwire reads as
+// out-of-ladder on a buy_slots row, so a vault buy_slots fixture must always
+// set an explicit rung (1..VAULT_MAX_RUNG) unless the tripwire is its target.
+function V(o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow {
+  return L({ container: 'vault', ...o });
+}
+
+describe('auditBank (vault container)', () => {
+  it('a clean vault round trip reconciles against state.vault with zero findings', () => {
+    expect(
+      auditBank({
+        ledgerRows: [
+          {
+            id: 1,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -20000,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 6,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 3,
+            character_id: 1,
+            op: 'withdraw',
+            item_id: 'copper_ore',
+            count: 2,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 4,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -50000,
+            purchased_slots_after: 2,
+          },
+        ].map(V),
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { vault: { stock: { copper_ore: 4 }, upgrades: 2 } },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('reconciles pooled and exact-versioned special identities as separate multisets', () => {
+    const identity = {
+      vaultSpecial: 1,
+      instance: { signer: 'Ada', rolled: { quality: 'rare' } },
+      craftedRecipeId: 'smelt_copper',
+    };
+    expect(
+      auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 4,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 3,
+            instance: identity,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 3,
+            character_id: 1,
+            op: 'withdraw',
+            item_id: 'copper_ore',
+            count: 1,
+            instance: identity,
+            purchased_slots_after: 1,
+          }),
+        ],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              vault: {
+                stock: { copper_ore: 4 },
+                special: [
+                  {
+                    itemId: 'copper_ore',
+                    count: 2,
+                    instance: identity.instance,
+                    craftedRecipeId: 'smelt_copper',
+                  },
+                ],
+                upgrades: 1,
+              },
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('flags a tampered state.vault stock as a ledger_state_mismatch', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        {
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 6,
+          purchased_slots_after: 1,
+        },
+      ].map(V),
+      characters: [
+        // The stock claims 9 where the ledger only ever explains 6: three
+        // copies appeared without an op, the mint signature this audit exists
+        // for.
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { vault: { stock: { copper_ore: 9 }, upgrades: 1 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['ledger_state_mismatch']);
+    expect(findings[0]).toMatchObject({ container: 'vault', realm: 'Claudemoon', characterId: 1 });
+    expect(findings[0].detail).toContain('copper_ore');
+    expect(findings[0].detail).toContain('state vault');
+  });
+
+  it('flags an out-of-ladder or non-integer vault rung as bad_buy_position', () => {
+    // The vault ladder is exactly rungs 1..VAULT_MAX_RUNG, so a writer-bug row
+    // outside it is caught AT the row, not only downstream where the final
+    // state happens to disagree. State matches the tampered rung in each red
+    // fixture so the tripwire, not purchased_mismatch, is what fires.
+    for (const rung of [6, 0, 2.5]) {
+      const findings = auditBank({
+        ledgerRows: [
+          {
+            id: 1,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -20000,
+            purchased_slots_after: rung,
+          },
+        ].map(V),
+        characters: [
+          { id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: rung } } },
+        ],
+      });
+      expect(findingKindsFor(findings, 1), `rung ${rung}`).toEqual(['bad_buy_position']);
+      expect(findings[0].detail).toContain('vault buy_slots row 1');
+    }
+    // The boundary control: the TOP rung is legal and fires nothing.
+    expect(
+      auditBank({
+        ledgerRows: [
+          {
+            id: 1,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -400000,
+            purchased_slots_after: 5,
+          },
+        ].map(V),
+        characters: [{ id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 5 } } }],
+      }),
+    ).toEqual([]);
+  });
+
+  it('reconciles a prototype-named stock key parsed from JSON, and reds when the counts differ', () => {
+    // vaultStateMultiset indexes stock[itemId] directly, which is correct for
+    // JSON.parse-created OWN keys (a dormant '__proto__' arrives as a data
+    // property from Postgres jsonb). The state arrives as a JSON STRING here,
+    // the fixture shape a pg_dump restore hands over, so the parse path is the
+    // real one; this pins that a future rewrite (spread merge, keyed rebuild)
+    // does not turn the dormant key into a prototype write or a zero-read.
+    const rows = [
+      {
+        id: 1,
+        character_id: 1,
+        op: 'deposit',
+        item_id: '__proto__',
+        count: 3,
+        purchased_slots_after: 1,
+      },
+    ].map(V);
+    expect(
+      auditBank({
+        ledgerRows: rows,
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: '{"vault":{"stock":{"__proto__":3},"upgrades":1}}',
+          },
+        ],
+      }),
+    ).toEqual([]);
+    const findings = auditBank({
+      ledgerRows: rows,
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: '{"vault":{"stock":{"__proto__":5},"upgrades":1}}',
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['ledger_state_mismatch']);
+    expect(findings[0].detail).toContain('__proto__');
+  });
+
+  it('flags a withdraw of material that was never deposited (negative_net)', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        {
+          id: 1,
+          character_id: 1,
+          op: 'withdraw',
+          item_id: 'iron_ore',
+          count: 3,
+          purchased_slots_after: 1,
+        },
+      ].map(V),
+      characters: [{ id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 1 } } }],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['negative_net', 'ledger_state_mismatch']);
+  });
+
+  it('flags a rung that REGRESSES across the row order and a final rung that disagrees with state', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        // character 1: the rung ladder walks backwards, which no legitimate op
+        // can do (a vault is never downgraded).
+        { id: 1, character_id: 1, op: 'buy_slots', copper_delta: -20000, purchased_slots_after: 2 },
+        { id: 2, character_id: 1, op: 'buy_slots', copper_delta: -50000, purchased_slots_after: 1 },
+        // character 2: a coherent ladder whose final rung the state contradicts.
+        { id: 3, character_id: 2, op: 'buy_slots', copper_delta: -20000, purchased_slots_after: 1 },
+      ].map(V),
+      characters: [
+        // Rung 1 matches character 1's LAST row, isolating the regression.
+        { id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 1 } } },
+        { id: 2, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 4 } } },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['purchased_regression']);
+    expect(findingKindsFor(findings, 2)).toEqual(['purchased_mismatch']);
+    expect(findings.find((f) => f.characterId === 2)?.detail).toContain('state vault upgrades 4');
+  });
+
+  it('reconciles vault rows against an EMPTY vault when the state carries none', () => {
+    // The personal container's corruption signature, in this container: rows
+    // claiming materials or rungs the save does not show must be reported, not
+    // skipped. A character with neither is a pre-vault save and stays silent.
+    const findings = auditBank({
+      ledgerRows: [
+        {
+          id: 1,
+          character_id: 50,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 5,
+          purchased_slots_after: 1,
+        },
+        {
+          id: 2,
+          character_id: 50,
+          op: 'buy_slots',
+          copper_delta: -20000,
+          purchased_slots_after: 1,
+        },
+        {
+          id: 3,
+          character_id: 51,
+          op: 'deposit',
+          item_id: 'iron_ore',
+          count: 2,
+          purchased_slots_after: 1,
+        },
+      ].map(V),
+      characters: [
+        { id: 50, realm: 'Claudemoon', state: null }, // NULL state, vault activity
+        { id: 51, realm: 'Claudemoon', state: { pos: { x: 0, z: 0 } } }, // state, no vault
+        { id: 52, realm: 'Claudemoon', state: null }, // pre-vault, no activity: skipped
+      ],
+    });
+    expect(findingKindsFor(findings, 50)).toEqual(['ledger_state_mismatch', 'purchased_mismatch']);
+    // Character 51 flags BOTH too, and that is the honest answer rather than an
+    // over-report: a deposit can only happen at rung 1 or above (a locked vault
+    // refuses every deposit), so a row claiming rung 1 against a save with no
+    // vault at all contradicts the state on the ladder as well as the stock.
+    expect(findingKindsFor(findings, 51)).toEqual(['ledger_state_mismatch', 'purchased_mismatch']);
+    expect(findingKindsFor(findings, 52)).toEqual([]);
+  });
+
+  it('reads an ARRAY-shaped stock as empty and still reports the honest mismatch', () => {
+    // The likely wrong guess is the bank's slot-list shape. Reading it as
+    // empty rather than throwing is what keeps the reconciliation running: a
+    // crash here would take the whole audit down instead of naming the one
+    // character whose vault got written in the wrong shape.
+    //
+    // The stock is a NON-EMPTY slot list on purpose. An empty [] would prove
+    // nothing: Object.keys([]) is already [], so it walks to the same empty
+    // multiset with or without the Array.isArray guard. With a slot in it, an
+    // audit missing that guard walks the ARRAY INDEX '0' as an item id and
+    // reports a second, nonsense mismatch beside the real one.
+    const findings = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 3,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { vault: { stock: [{ itemId: 'copper_ore', count: 3 }], upgrades: 1 } },
+        },
+      ],
+    });
+    // Exactly ONE finding, and it names the real item: the wrong-shaped stock
+    // held nothing the audit could read, so the ledger's 3 is unreconciled.
+    expect(findingKindsFor(findings, 1)).toEqual(['ledger_state_mismatch']);
+    expect(findings[0].detail).toContain('item copper_ore');
+    expect(findings[0].detail).toContain('ledger net 3 does not match state vault 0');
+  });
+
+  it('parses a state delivered as a JSON STRING, and survives a malformed one', () => {
+    const rows = [
+      V({
+        id: 1,
+        character_id: 1,
+        op: 'deposit',
+        item_id: 'copper_ore',
+        count: 4,
+        purchased_slots_after: 1,
+      }),
+    ];
+    // characters.state arrives parsed from Postgres, but a fixture (or a
+    // driver configured without JSON parsing) hands it over as text. The
+    // tolerant parse must reconcile that exactly like the object, so a clean
+    // round trip stays clean rather than reading as a bankless character.
+    expect(
+      auditBank({
+        ledgerRows: rows,
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: JSON.stringify({ vault: { stock: { copper_ore: 4 }, upgrades: 1 } }),
+          },
+        ],
+      }),
+    ).toEqual([]);
+    // Garbage text hits the catch arm: the character reads as having NO vault,
+    // which reconciles against an empty one and REPORTS both gaps. An audit
+    // that threw on one corrupt row would tell an operator nothing about the
+    // rest of the table.
+    const findings = auditBank({
+      ledgerRows: rows,
+      characters: [{ id: 1, realm: 'Claudemoon', state: '{not json' }],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['ledger_state_mismatch', 'purchased_mismatch']);
+  });
+
+  it('flags a negative count in the persisted vault stock itself', () => {
+    const findings = auditBank({
+      ledgerRows: [],
+      characters: [
+        {
+          id: 5,
+          realm: 'Claudemoon',
+          state: { vault: { stock: { copper_ore: -2 }, upgrades: 1 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 5)).toContain('negative_state_count');
+    expect(findings.every((f) => f.container === 'vault')).toBe(true);
+  });
+
+  it('flags a negative count in persisted special storage itself', () => {
+    const findings = auditBank({
+      ledgerRows: [],
+      characters: [
+        {
+          id: 6,
+          realm: 'Claudemoon',
+          state: {
+            vault: {
+              stock: {},
+              special: [{ itemId: 'copper_ore', count: -2, instance: { signer: 'Ada' } }],
+              upgrades: 1,
+            },
+          },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 6)).toContain('negative_state_count');
+    expect(findingKindsFor(findings, 6)).toContain('ledger_state_mismatch');
+  });
+
+  it('keeps the two per-character containers SEPARATE: neither replay papers over the other', () => {
+    // The same item id in both stores. The personal bank is short by 2 and the
+    // vault is long by 2, so a replay that pooled the containers would net to
+    // zero and report a clean character. Each must flag on its own side.
+    const findings = auditBank({
+      ledgerRows: [
+        L({ id: 1, character_id: 1, op: 'deposit', item_id: 'copper_ore', count: 5 }),
+        V({
+          id: 2,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 5,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: {
+            bank: { inventory: [{ itemId: 'copper_ore', count: 3 }], purchasedSlots: 0 },
+            vault: { stock: { copper_ore: 7 }, upgrades: 1 },
+          },
+        },
+      ],
+    });
+    expect(findings.map((f) => `${f.container}:${f.kind}`).sort()).toEqual([
+      'personal:ledger_state_mismatch',
+      'vault:ledger_state_mismatch',
+    ]);
+  });
+
+  it('a character whose two containers each reconcile is clean, with no cross-container leakage', () => {
+    expect(
+      auditBank({
+        ledgerRows: [
+          L({ id: 1, character_id: 1, op: 'deposit', item_id: 'copper_ore', count: 5 }),
+          L({
+            id: 2,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -500,
+            purchased_slots_after: 6,
+          }),
+          V({
+            id: 3,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 4,
+            purchased_slots_after: 1,
+          }),
+          V({
+            id: 4,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -50000,
+            purchased_slots_after: 2,
+          }),
+        ],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: {
+              // The bank's ladder is SLOTS (6) and the vault's is RUNGS (2):
+              // a reconciliation that read one container's ladder against the
+              // other's state would red here.
+              bank: { inventory: [{ itemId: 'copper_ore', count: 5 }], purchasedSlots: 6 },
+              vault: { stock: { copper_ore: 4 }, upgrades: 2 },
+            },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('shape-checks a vault row like any other item op, and never asks it for a container_id', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        V({ id: 1, character_id: 60, op: 'deposit', count: 2, purchased_slots_after: 1 }),
+        V({
+          id: 2,
+          character_id: 61,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 1,
+          copper_delta: 25,
+          purchased_slots_after: 1,
+        }),
+        V({ id: 3, character_id: 62, op: 'buy_slots', copper_delta: 0, purchased_slots_after: 1 }),
+      ],
+      characters: [],
+    });
+    expect(findingKindsFor(findings, 60)).toEqual(['missing_item_id']);
+    expect(findingKindsFor(findings, 61)).toEqual(['copper_on_item_op']);
+    expect(findingKindsFor(findings, 62)).toEqual(['nonnegative_buy_cost']);
+    // container_id is a GUILD requirement; a null on a vault row is correct and
+    // must not raise missing_container_id.
+    expect(findings.map((f) => f.kind)).not.toContain('missing_container_id');
+  });
+
+  it('flags ANY non-guild row that carries a container_id: neither has a second key', () => {
+    // Both per-character containers hardcode null because the character is the
+    // group key (server/db.ts states the contract on BankLedgerRow). A non-null
+    // one is a writer inventing a second key that the per-character grouping
+    // would then ignore, so the row would reconcile under the wrong identity
+    // with nothing saying so. The check is keyed on "not guild" rather than on
+    // 'vault' alone: a personal row is the same hazard, and there is no
+    // legitimate non-guild population with a container_id to false-positive on.
+    const findings = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 2,
+          purchased_slots_after: 1,
+          container_id: 913,
+        }),
+      ],
+      characters: [
+        { id: 1, realm: 'Claudemoon', state: { vault: { stock: { copper_ore: 2 }, upgrades: 1 } } },
+      ],
+    });
+    // Only the new shape finding: the replay itself still reconciles, which is
+    // exactly why nothing else would have caught this.
+    expect(findingKindsFor(findings, 1)).toEqual(['unexpected_container_id']);
+    expect(findings[0].detail).toContain('vault row 1');
+    expect(findings[0].detail).toContain('913');
+    expect(findings.map((f) => f.kind)).not.toContain('missing_container_id');
+
+    // The PERSONAL arm of the same check, which the vault-only form missed.
+    const personal = auditBank({
+      ledgerRows: [
+        L({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 2,
+          container_id: 913,
+        }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [{ itemId: 'wolf_fang', count: 2 }], purchasedSlots: 0 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(personal, 1)).toEqual(['unexpected_container_id']);
+    expect(personal[0].detail).toContain('personal row 1');
+    expect(personal[0].detail).toContain('913');
+
+    // A GUILD row with a container_id is the correct shape and stays silent on
+    // this check: the widened condition must not have swallowed the exemption.
+    const guild = auditBank({
+      ledgerRows: [
+        L({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'wolf_fang',
+          count: 2,
+          container: 'guild',
+          container_id: 913,
+        }),
+      ],
+      characters: [],
+    });
+    expect(guild.map((f) => f.kind)).not.toContain('unexpected_container_id');
+  });
+
+  it('accepts only the exact special identity wrapper on vault deposit/withdraw rows', () => {
+    const identity = {
+      vaultSpecial: 1,
+      instance: { signer: 'Ada' },
+      craftedRecipeId: null,
+    };
+    const clean = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 2,
+          purchased_slots_after: 1,
+          instance: identity,
+        }),
+        L({
+          id: 2,
+          character_id: 2,
+          op: 'deposit',
+          item_id: 'iron_sword',
+          count: 1,
+          instance: { ilvl: 5 },
+        }),
+      ],
+      characters: [],
+    });
+    expect(clean.map((f) => f.kind)).not.toContain('unexpected_instance');
+
+    for (const instance of [
+      { ilvl: 5 },
+      { ...identity, vaultSpecial: 2 },
+      { ...identity, extra: true },
+      { vaultSpecial: 1, instance: { signer: 'Ada' } },
+    ]) {
+      const findings = auditBank({
+        ledgerRows: [
+          V({
+            id: 1,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 2,
+            purchased_slots_after: 1,
+            instance,
+          }),
+        ],
+        characters: [],
+      });
+      expect(
+        findings.map((f) => f.kind),
+        JSON.stringify(instance),
+      ).toContain('unexpected_instance');
+    }
+
+    const craft = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'craft_consume',
+          item_id: 'copper_ore',
+          count: 1,
+          purchased_slots_after: 1,
+          instance: identity,
+        }),
+      ],
+      characters: [],
+    });
+    expect(craft.map((f) => f.kind)).toContain('unexpected_instance');
+  });
+
+  it('a guild-only op wearing the vault container is flagged', () => {
+    // deposit_gold has no meaning in a per-character material store; the
+    // container guard must catch it rather than let it into a vault replay.
+    const findings = auditBank({
+      ledgerRows: [V({ id: 1, character_id: 1, op: 'deposit_gold', copper_delta: 100 })],
+      characters: [],
+    });
+    expect(findings.map((f) => f.kind)).toContain('gold_op_outside_guild');
+  });
+
+  it('formatReport names the vault container in its summary and FINDING lines', () => {
+    const rows = [
+      V({
+        id: 1,
+        character_id: 1,
+        op: 'deposit',
+        item_id: 'copper_ore',
+        count: 6,
+        purchased_slots_after: 1,
+      }),
+    ];
+    const findings = auditBank({
+      ledgerRows: rows,
+      characters: [
+        { id: 1, realm: 'Claudemoon', state: { vault: { stock: { copper_ore: 9 }, upgrades: 1 } } },
+      ],
+    });
+    const report = formatReport(rows, findings);
+    expect(report).toContain('container vault: ledger rows 1: findings 1');
+    expect(report).toContain('FINDING: container vault: realm Claudemoon: character 1:');
+    // The counterparty summary lines are GUILD-only: a personal-style container
+    // records no counterparty side, so claiming "N unbalanceable rows" for it
+    // would invent a gap that does not exist.
+    expect(report).not.toContain('container vault: rows with no recorded counterparty side');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Vault craft consumption (Bank Storage Phase 04): op 'craft_consume' rows
+// written through the reservation journal at admission time
+// (bankLedgerJournal.reserveVaultConsumption; the tick-side
+// recordVaultCraftConsume observer is retired), replayed as removals beside
+// deposit/withdraw.
+// ---------------------------------------------------------------------------
+describe('auditBank (vault craft consumption, Phase 04)', () => {
+  it('a history with craft_consume rows reconciles against state.vault with zero findings', () => {
+    expect(
+      auditBank({
+        ledgerRows: [
+          {
+            id: 1,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -20000,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 6,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 3,
+            character_id: 1,
+            op: 'craft_consume',
+            item_id: 'copper_ore',
+            count: 4,
+            purchased_slots_after: 1,
+          },
+        ].map(V),
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { vault: { stock: { copper_ore: 2 }, upgrades: 1 } },
+          },
+        ],
+      }),
+    ).toEqual([]);
+  });
+
+  it('a row drawn to zero reconciles against the DELETED stock key, not a written 0', () => {
+    // The consumption writer deletes a key it zeroes (the vaultWithdraw shape),
+    // so the honest final state has NO copper_ore key at all. A written 0 would
+    // also reconcile (0 == 0), which is exactly why the delete rule is pinned
+    // sim-side; this arm pins that the audit accepts the deleted-key shape.
+    expect(
+      auditBank({
+        ledgerRows: [
+          {
+            id: 1,
+            character_id: 1,
+            op: 'buy_slots',
+            copper_delta: -20000,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 2,
+            character_id: 1,
+            op: 'deposit',
+            item_id: 'copper_ore',
+            count: 6,
+            purchased_slots_after: 1,
+          },
+          {
+            id: 3,
+            character_id: 1,
+            op: 'craft_consume',
+            item_id: 'copper_ore',
+            count: 6,
+            purchased_slots_after: 1,
+          },
+        ].map(V),
+        characters: [{ id: 1, realm: 'Claudemoon', state: { vault: { stock: {}, upgrades: 1 } } }],
+      }),
+    ).toEqual([]);
+  });
+
+  it('an UNLEDGERED consumption reads as ledger_state_mismatch (why the recorder exists)', () => {
+    // The Phase 04 handoff's failure mode, pinned on purpose: if a craft
+    // consumed vault stock and no craft_consume row landed, the state is
+    // LOWER than the replayed net and the character reconciles dirty forever.
+    const findings = auditBank({
+      ledgerRows: [
+        { id: 1, character_id: 1, op: 'buy_slots', copper_delta: -20000, purchased_slots_after: 1 },
+        {
+          id: 2,
+          character_id: 1,
+          op: 'deposit',
+          item_id: 'copper_ore',
+          count: 6,
+          purchased_slots_after: 1,
+        },
+      ].map(V),
+      characters: [
+        { id: 1, realm: 'Claudemoon', state: { vault: { stock: { copper_ore: 2 }, upgrades: 1 } } },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['ledger_state_mismatch']);
+    expect(findings[0].detail).toContain('copper_ore');
+  });
+
+  it('shape arms: bad_count, missing_item_id, and copper_on_item_op each fire per dimension', () => {
+    for (const [row, kind] of [
+      [{ id: 1, op: 'craft_consume', item_id: 'copper_ore', count: 0 }, 'bad_count'],
+      [{ id: 1, op: 'craft_consume', item_id: 'copper_ore', count: -2 }, 'bad_count'],
+      [{ id: 1, op: 'craft_consume', count: 2 }, 'missing_item_id'],
+      [
+        { id: 1, op: 'craft_consume', item_id: 'copper_ore', count: 2, copper_delta: -5 },
+        'copper_on_item_op',
+      ],
+    ] as const) {
+      const findings = auditBank({
+        ledgerRows: [V({ purchased_slots_after: 1, ...row })],
+        characters: [
+          {
+            id: 1,
+            realm: 'Claudemoon',
+            state: { vault: { stock: { copper_ore: 2 }, upgrades: 1 } },
+          },
+        ],
+      });
+      expect(
+        findingKindsFor(findings, 1).includes(kind),
+        `${JSON.stringify(row)} should raise ${kind}`,
+      ).toBe(true);
+    }
+  });
+
+  it('craft_consume outside the vault container raises vault_op_outside_vault', () => {
+    // Personal replay nets the removal (3 in, 2 consumed, state shows 1) so
+    // the guard is the ONLY finding: the fixture isolates the container rule.
+    const findings = auditBank({
+      ledgerRows: [
+        L({ id: 1, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+        L({ id: 2, character_id: 1, op: 'craft_consume', item_id: 'wolf_fang', count: 2 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [{ itemId: 'wolf_fang', count: 1 }], purchasedSlots: 0 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['vault_op_outside_vault']);
+    expect(findings[0].detail).toContain("craft_consume row 2 has container 'personal'");
+    // The GUILD arm of the same comparison (the coverage audit's nit): the
+    // guard keys on container !== 'vault', so a guild-container craft row
+    // must trip it identically.
+    const guildFindings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 1, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 2, character_id: 1, op: 'craft_consume', item_id: 'wolf_fang', count: 2 }),
+      ],
+      characters: [],
+      guildBanks: [],
+    });
+    expect(
+      guildFindings.filter((f) => f.kind === 'vault_op_outside_vault').map((f) => f.detail),
+    ).toEqual([expect.stringContaining("craft_consume row 2 has container 'guild'")]);
+  });
+
+  it('an op the vocabulary does not know raises unknown_op instead of vanishing', () => {
+    // The op-side twin of unknown_container, added with this phase: before it,
+    // an unrecognized op got no shape checks and no replay, silently.
+    const findings = auditBank({
+      ledgerRows: [V({ id: 1, op: 'transmute', item_id: 'copper_ore', count: 2 })],
+      characters: [],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['unknown_op']);
+    expect(findings[0].detail).toContain("1 row(s) carry an unrecognized op 'transmute'");
+    expect(findings[0].detail).toContain('first at row 1');
+  });
+
+  it('a SYSTEMATIC unknown op dedupes to ONE finding per op value with the count (F4)', () => {
+    // The flaggedNegative discipline: a typo'd writer (or an old audit behind
+    // a newer server) makes an entire op class unknown, and per-row emission
+    // on a keep-forever table would flood the report exactly when an operator
+    // most needs it. One finding per VALUE, count in the detail.
+    const findings = auditBank({
+      ledgerRows: [
+        V({ id: 1, op: 'transmute', item_id: 'copper_ore', count: 2 }),
+        V({ id: 2, op: 'transmute', item_id: 'tin_ore', count: 1 }),
+        V({ id: 3, op: 'transmute', item_id: 'iron_ore', count: 4, character_id: 2 }),
+        V({ id: 4, op: 'evaporate', item_id: 'iron_ore', count: 4 }),
+      ],
+      characters: [],
+    });
+    const unknown = findings.filter((f) => f.kind === 'unknown_op');
+    expect(unknown).toHaveLength(2);
+    expect(unknown[0].detail).toContain("3 row(s) carry an unrecognized op 'transmute'");
+    expect(unknown[0].detail).toContain('first at row 1');
+    expect(unknown[1].detail).toContain("1 row(s) carry an unrecognized op 'evaporate'");
+    // The reach clause: the finding names the FIRST row's group but must say
+    // how many container/character groups the op class spans, or an operator
+    // filtering by character reads a systematic writer bug as one character's
+    // corruption (rows 1+2 are one character, row 3 another).
+    expect(unknown[0].detail).toContain('across 2 container/character group(s)');
+    expect(unknown[1].detail).toContain('across 1 container/character group(s)');
+  });
+
+  it('every KNOWN op passes the vocabulary chain without an unknown_op finding (F5)', () => {
+    // A table-driven guard over the full BankLedgerRow.op union: restructuring
+    // the shape chain so a legitimate op falls off it would otherwise turn
+    // that op into a per-value finding storm with no red test. Each fixture is
+    // minimally valid for its op's own shape arm; the assertion is ONLY about
+    // unknown_op (other shape findings are each arm's own suites' business).
+    const KNOWN_OP_ROWS: BankLedgerAuditRow[] = [
+      V({ id: 1, op: 'deposit', item_id: 'copper_ore', count: 2, purchased_slots_after: 1 }),
+      V({ id: 2, op: 'withdraw', item_id: 'copper_ore', count: 1, purchased_slots_after: 1 }),
+      V({ id: 3, op: 'buy_slots', copper_delta: -20000, purchased_slots_after: 1 }),
+      V({
+        id: 4,
+        op: 'craft_consume',
+        item_id: 'copper_ore',
+        count: 1,
+        purchased_slots_after: 1,
+      }),
+      G({ id: 5, op: 'deposit_gold', copper_delta: 500 }),
+      G({ id: 6, op: 'withdraw_gold', copper_delta: -200 }),
+      G({ id: 7, op: 'create_fee', copper_delta: -1000, purchased_slots_after: 0 }),
+      G({ id: 8, op: 'open_bank', copper_delta: -5000, purchased_slots_after: 24 }),
+      G({ id: 9, op: 'admin_purge', item_id: 'wolf_fang', count: 1 }),
+      G({ id: 10, op: 'escrow_deficit', copper_delta: -100 }),
+      G({ id: 11, op: 'counterparty_orphan' }),
+      // The bank socket trio (phase 07): personal-container rows, each
+      // minimally valid for its own shape arm (the unlock at the first
+      // ladder price, the movers at exactly one bag).
+      L({ id: 12, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+      L({ id: 13, op: 'socket_bag', item_id: 'travelers_knapsack', count: 1 }),
+      L({ id: 14, op: 'unsocket_bag', item_id: 'travelers_knapsack', count: 1 }),
+    ];
+    // The fixture is forced to track KNOWN_OPS: an op added to the set with no
+    // fixture row here reds THIS assertion, and a fixture row whose op the
+    // chain has no arm for reds the zero-unknown_op assertion below. Together
+    // with the db.ts lockstep scrape this closes the two-way vocabulary chain
+    // union -> KNOWN_OPS -> fixture -> shape arms.
+    expect(KNOWN_OP_ROWS.map((r) => String(r.op)).sort()).toEqual(Array.from(KNOWN_OPS).sort());
+    const findings = auditBank({ ledgerRows: KNOWN_OP_ROWS, characters: [] });
+    expect(findings.filter((f) => f.kind === 'unknown_op')).toEqual([]);
+  });
+
+  it('craft_consume rows participate in the rung monotonicity scan', () => {
+    // purchased_slots_after on a craft row carries the live rung; a regressed
+    // value is a tampered row and must trip exactly like any other vault row.
+    const findings = auditBank({
+      ledgerRows: [
+        { id: 1, character_id: 1, op: 'buy_slots', copper_delta: -50000, purchased_slots_after: 2 },
+        {
+          id: 2,
+          character_id: 1,
+          op: 'craft_consume',
+          item_id: 'copper_ore',
+          count: 1,
+          purchased_slots_after: 1,
+        },
+      ].map(V),
+      characters: [],
+    });
+    expect(findingKindsFor(findings, 1)).toContain('purchased_regression');
+  });
+
+  it('consuming more than was ever deposited raises negative_net', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        V({
+          id: 1,
+          character_id: 1,
+          op: 'craft_consume',
+          item_id: 'copper_ore',
+          count: 3,
+          purchased_slots_after: 1,
+        }),
+      ],
+      characters: [],
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['negative_net']);
+  });
 });
 
 describe('formatReport', () => {
@@ -237,6 +1443,157 @@ describe('the audit ladder mirror (lockstep with src/sim/guild_bank.ts)', () => 
     // Guild buy_slots (rungs 1+) after-positions are every ladder position
     // past the opened base.
     expect([...GUILD_BUY_POSITIONS]).toEqual([...GUILD_BANK_LADDER_POSITIONS].slice(2));
+    // The vault ladder's top rung, the same redeclaration hazard: a sixth
+    // upgrade landing in materials_vault.ts without the .mjs mirror would make
+    // the tripwire flag every legitimate rung-6 purchase.
+    expect(VAULT_MAX_RUNG).toBe(VAULT_UPGRADE_PRICES.length);
+    // The bank socket ladder (phase 07), the same hazard again: a socket
+    // price retune landing in bank.ts without the .mjs mirror would make the
+    // per-position price check flag every legitimate unlock.
+    expect([...AUDIT_BANK_SOCKET_PRICES]).toEqual([...BANK_SOCKET_PRICES]);
+  });
+});
+
+describe('the audit op vocabulary (lockstep with server/db.ts)', () => {
+  it('pins the .mjs KNOWN_OPS set to the BankLedgerRow op union', () => {
+    // Same redeclaration hazard as the container set below: the .mjs never
+    // imports the TS server, so a NEW op added to BankLedgerRow.op (plus
+    // a writer) with no audit arm would red NO test before this pin existed;
+    // the new op's rows would surface only as runtime unknown_op findings in
+    // production audits (one-way coverage). The db.ts side is scraped from
+    // RAW SOURCE (a type union is erased at runtime): the declaration is
+    // sliced from the BankLedgerRow interface head to the union's terminating
+    // semicolon AFTER comment-stripping, so a commented-out member cannot
+    // stay counted, and the multi-line member list is tolerated (no
+    // single-line literal arm to break on a reformat).
+    const dbSrc = codeOnly(readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8'));
+    const ifaceStart = dbSrc.indexOf('export interface BankLedgerRow {');
+    expect(ifaceStart).toBeGreaterThan(-1);
+    const opStart = dbSrc.indexOf('\n  op:', ifaceStart) + 1;
+    expect(
+      opStart,
+      'the op: field anchor (newline plus two-space indent, so a field merely ENDING in op cannot reroute the slice)',
+    ).toBeGreaterThan(ifaceStart);
+    const opEnd = dbSrc.indexOf(';', opStart);
+    expect(opEnd).toBeGreaterThan(opStart);
+    const unionBody = dbSrc.slice(opStart, opEnd);
+    const members = Array.from(unionBody.matchAll(/'([a-z_]+)'/g), (m) => m[1]);
+    // Set equality in BOTH directions: a union member the audit does not know
+    // reds here, and a KNOWN_OPS entry the union dropped reds here too.
+    expect(members.sort()).toEqual(Array.from(KNOWN_OPS).sort());
+  });
+});
+
+describe('the audit container vocabulary (lockstep with server/db.ts)', () => {
+  it('pins the .mjs container set to the BankLedgerRow union', () => {
+    // Same redeclaration hazard as the ladder above: the .mjs never imports the
+    // TS server, so the writer's vocabulary (BankLedgerRow.container) and the
+    // auditor's (KNOWN_CONTAINERS) are two independent literals. Widening ONE
+    // is the failure that matters: a new container the writer emits but the
+    // auditor does not know gets a group that no reconciliation pass reads
+    // (only unknown_container names it), and a container the auditor knows but
+    // no writer emits is a dead branch pretending to be coverage.
+    expect(Array.from(KNOWN_CONTAINERS).sort()).toEqual(['guild', 'personal', 'vault']);
+    // The db.ts side by RAW SOURCE, not by an imported type (a type union is
+    // erased at runtime and cannot be asserted on). Single-line literal arm:
+    // the union is written on one line, so this reds the moment a fourth
+    // member is added or one is removed.
+    const dbSrc = readFileSync(new URL('../server/db.ts', import.meta.url), 'utf8');
+    expect(codeOnly(dbSrc)).toContain("  container: 'personal' | 'guild' | 'vault';");
+  });
+});
+
+describe('the characters read (source pin)', () => {
+  it('projects BOTH per-character container slices out of the state blob', () => {
+    // The audit reconciles two independent stores per character. Dropping
+    // either extraction would not fail: the missing slice would read as "no
+    // state" and reconcile that whole container against an empty one, turning
+    // every real mismatch in it into silence.
+    //
+    // Pinned by RAW SOURCE (the repo's source-pin idiom, tests/server/
+    // tunables.test.ts), not through the imported constant: the imported value
+    // is what the module evaluated, so an assertion on it is a constant
+    // self-comparison that a rewritten projection would satisfy just as well.
+    // Comments are stripped first, so a commented-out projection cannot keep
+    // this green.
+    const auditSrc = codeOnly(
+      readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
+    );
+    // The constant is only load-bearing if main() still runs it.
+    expect(auditSrc).toContain('await client.query(CHARACTERS_SQL)');
+    // Then the declaration's own BODY, sliced to its closing backtick, so an
+    // arm matching somewhere else in the file (a neighbouring query, a prose
+    // mention) can never satisfy it.
+    const declStart = auditSrc.indexOf('export const CHARACTERS_SQL = `');
+    expect(declStart).toBeGreaterThan(-1);
+    const declEnd = auditSrc.indexOf('`;', declStart);
+    expect(declEnd).toBeGreaterThan(declStart);
+    const body = auditSrc.slice(declStart, declEnd);
+    // Both slices in ONE single-line literal arm: dropping either one reds.
+    expect(body).toContain(
+      "jsonb_build_object('bank', state->'bank', 'vault', state->'vault') AS state",
+    );
+    expect(body).toContain('FROM characters');
+  });
+});
+
+describe('the CLI snapshot boundary', () => {
+  it('reconciles every table through one read-only repeatable-read client', () => {
+    const auditSrc = codeOnly(
+      readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
+    );
+    expect(auditSrc).toContain(
+      "await client.query('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY')",
+    );
+    expect(auditSrc).toContain("await client.query('COMMIT')");
+    expect(auditSrc).toContain("await client.query('ROLLBACK')");
+    expect(auditSrc).not.toContain('await pool.query(');
+  });
+
+  it('begins before every read and rolls back then releases after a failed read', async () => {
+    const scriptPath = fileURLToPath(new URL('../scripts/bank_audit.mjs', import.meta.url));
+    const previousArgv1 = process.argv[1];
+    const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousExitCode = process.exitCode;
+    const exit = vi.spyOn(process, 'exit').mockImplementation(() => undefined as never);
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    cliDb.events.length = 0;
+
+    try {
+      process.argv[1] = scriptPath;
+      process.env.DATABASE_URL = 'postgres://bank-audit-test';
+      vi.resetModules();
+      await import('../scripts/bank_audit.mjs');
+      await vi.waitFor(() => expect(exit).toHaveBeenCalledWith(1));
+
+      const queries = cliDb.events.filter((event) => event.startsWith('query:'));
+      expect(queries[0]).toBe('query:BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+      const reads = queries.filter((event) => event.startsWith('query:SELECT'));
+      expect(reads).toHaveLength(6);
+      expect(reads.every((event) => queries.indexOf(event) > 0)).toBe(true);
+
+      const failedRead = cliDb.events.findIndex(
+        (event) => event.includes('FROM storage_purchases') && event.includes('ORDER BY'),
+      );
+      const rollback = cliDb.events.indexOf('query:ROLLBACK');
+      const release = cliDb.events.indexOf('release');
+      const poolEnd = cliDb.events.indexOf('pool.end');
+      expect(failedRead).toBeGreaterThan(0);
+      expect(rollback).toBeGreaterThan(failedRead);
+      expect(release).toBeGreaterThan(rollback);
+      expect(poolEnd).toBeGreaterThan(release);
+      expect(cliDb.events).not.toContain('query:COMMIT');
+    } finally {
+      process.argv[1] = previousArgv1;
+      if (previousDatabaseUrl === undefined) delete process.env.DATABASE_URL;
+      else process.env.DATABASE_URL = previousDatabaseUrl;
+      process.exitCode = previousExitCode;
+      exit.mockRestore();
+      log.mockRestore();
+      error.mockRestore();
+      vi.resetModules();
+    }
   });
 });
 
@@ -585,6 +1942,47 @@ describe('auditBank (guild container)', () => {
     expect(findings).toEqual([]);
   });
 
+  it('allows a delayed guild bystander row without hiding ladder-command regressions', () => {
+    const book = [
+      {
+        guild_id: 913,
+        realm: 'Claudemoon',
+        data: { treasury: 1_000, inventory: [], purchasedSlots: 30 },
+      },
+    ];
+    const delayedBystander = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'open_bank', copper_delta: -90_000, purchased_slots_after: 24 }),
+        G({ id: 2, op: 'deposit_gold', copper_delta: 25_000, purchased_slots_after: 24 }),
+        G({ id: 3, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 30 }),
+        // This officer acted before row 3 but saved afterwards. It moved no
+        // ladder state, so its captured rung is a legitimate stale witness.
+        G({ id: 4, op: 'deposit_gold', copper_delta: 1_000, purchased_slots_after: 24 }),
+      ],
+      characters: [],
+      guildBanks: book,
+    });
+    expect(delayedBystander).toEqual([]);
+
+    const regressedPurchase = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'open_bank', copper_delta: -90_000, purchased_slots_after: 24 }),
+        G({ id: 2, op: 'deposit_gold', copper_delta: 50_000, purchased_slots_after: 24 }),
+        G({ id: 3, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 30 }),
+        G({ id: 4, op: 'buy_slots', copper_delta: -25_000, purchased_slots_after: 24 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 0, inventory: [], purchasedSlots: 30 },
+        },
+      ],
+    });
+    expect(guildKindsFor(regressedPurchase, 913)).toContain('purchased_regression');
+  });
+
   it('conservation holds per GUILD, not per character: a cross-officer withdraw is clean', () => {
     // Officer 2 withdraws what officer 1 deposited. A per-character grouping
     // (the personal rule) would flag officer 2 with negative_net; the pipe
@@ -597,6 +1995,35 @@ describe('auditBank (guild container)', () => {
       characters: [],
     });
     expect(findings).toEqual([]);
+  });
+
+  it('accepts a netted-rescue round trip while still rejecting a negative final guild net', () => {
+    const clean = auditBank({
+      ledgerRows: [
+        G({ id: 1, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 2, op: 'withdraw', item_id: 'wolf_fang', count: 3 }),
+        // A later transaction withdrew and returned the same copies. Its
+        // ordered replay can dip below zero, while the DB's netted rescue
+        // applies the equivalent zero-net batch safely.
+        G({ id: 3, op: 'withdraw', item_id: 'wolf_fang', count: 3 }),
+        G({ id: 4, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 0, inventory: [], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(clean).toEqual([]);
+
+    const corrupt = auditBank({
+      ledgerRows: [G({ id: 1, op: 'withdraw', item_id: 'wolf_fang', count: 1 })],
+      characters: [],
+    });
+    expect(guildKindsFor(corrupt, 913)).toEqual(['negative_net']);
   });
 
   it('flags a guild withdraw of items that were never deposited (negative_net)', () => {
@@ -617,6 +2044,24 @@ describe('auditBank (guild container)', () => {
       characters: [],
     });
     expect(guildKindsFor(findings, 913)).toEqual(['negative_treasury']);
+  });
+
+  it('accepts a transient negative treasury that later cross-officer activity restores', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        G({ id: 1, character_id: 2, op: 'withdraw_gold', copper_delta: -8_000 }),
+        G({ id: 2, character_id: 1, op: 'deposit_gold', copper_delta: 10_000 }),
+      ],
+      characters: [],
+      guildBanks: [
+        {
+          guild_id: 913,
+          realm: 'Claudemoon',
+          data: { treasury: 2_000, inventory: [], purchasedSlots: 0 },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
   });
 
   it('create_fee and open_bank are PURSE copper, excluded from the treasury replay', () => {
@@ -1095,5 +2540,484 @@ describe('the escrow-rollback anomaly row', () => {
     expect(findings.map((f) => f.kind).sort()).toEqual(
       ['escrow_deficit', 'gold_op_outside_guild'].sort(),
     );
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The bank socket store (Bank Storage phase 07): unlock_socket replays the
+// copper ladder against state.bank.unlockedSockets; socket_bag / unsocket_bag
+// replay the socketed-bag multiset against state.bank.socketBags, in maps
+// SEPARATE from the slot replay's.
+// ---------------------------------------------------------------------------
+describe('auditBank (bank socket store, Phase 07)', () => {
+  it('a clean socket history reconciles against state.bank with zero findings', () => {
+    // Two unlocks at the exact ladder prices, one bag socketed and left, a
+    // second socketed and taken back out (the swap writes exactly this row
+    // pair), beside an ordinary slot deposit so both replays coexist.
+    const findings = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -2000000, purchased_slots_after: 0 }),
+        L({ id: 3, op: 'socket_bag', item_id: 'bag_a', count: 1 }),
+        L({ id: 4, op: 'socket_bag', item_id: 'bag_b', count: 1 }),
+        L({ id: 5, op: 'unsocket_bag', item_id: 'bag_b', count: 1 }),
+        L({ id: 6, op: 'deposit', item_id: 'wolf_fang', count: 3 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: {
+            bank: {
+              inventory: [{ itemId: 'wolf_fang', count: 3 }],
+              purchasedSlots: 0,
+              unlockedSockets: 2,
+              socketBags: ['bag_a', null, null, null],
+            },
+          },
+        },
+      ],
+    });
+    expect(findings).toEqual([]);
+  });
+
+  it('keeps the socket store and the slot bank SEPARATE for the same bag id', () => {
+    // The same bag id sits in a slot AS an item and in a socket AS capacity:
+    // both replays reconcile independently.
+    const rows = [
+      L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+      L({ id: 2, op: 'deposit', item_id: 'bag_a', count: 1 }),
+      L({ id: 3, op: 'socket_bag', item_id: 'bag_a', count: 1 }),
+    ];
+    const stateFor = (socketBags: (string | null)[]) => [
+      {
+        id: 1,
+        realm: 'Claudemoon',
+        state: {
+          bank: {
+            inventory: [{ itemId: 'bag_a', count: 1 }],
+            purchasedSlots: 0,
+            unlockedSockets: 1,
+            socketBags,
+          },
+        },
+      },
+    ];
+    expect(
+      auditBank({ ledgerRows: rows, characters: stateFor(['bag_a', null, null, null]) }),
+    ).toEqual([]);
+    // The discriminating arm: the slot side still balances, but the socket
+    // store lost its copy, and the SEPARATE replay is what catches it (a
+    // merged multiset would read 1 ledger vs 1 state and stay silent).
+    const findings = auditBank({
+      ledgerRows: rows,
+      characters: stateFor([null, null, null, null]),
+    });
+    expect(findingKindsFor(findings, 1)).toEqual(['socket_ledger_state_mismatch']);
+    expect(findings[0].detail).toContain(
+      'bag_a: socket ledger net 1 does not match state socketBags 0',
+    );
+  });
+
+  it('flags an unsocket of a bag that was never socketed (negative_socket_net)', () => {
+    const findings = auditBank({
+      ledgerRows: [L({ id: 1, op: 'unsocket_bag', item_id: 'bag_a', count: 1 })],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 0 } },
+        },
+      ],
+    });
+    // The mint signature in B, then the net (-1 vs 0) mismatch in C: both are
+    // real, separately-worded facts about the same forged row.
+    expect(findingKindsFor(findings, 1).sort()).toEqual(
+      ['negative_socket_net', 'socket_ledger_state_mismatch'].sort(),
+    );
+  });
+
+  it('flags a wrong-price unlock and a fifth unlock past the ladder', () => {
+    const wrongPrice = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -999999, purchased_slots_after: 0 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 0, unlockedSockets: 1 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(wrongPrice, 1)).toEqual(['bad_socket_price']);
+    expect(wrongPrice[0].detail).toContain('expected -1000000');
+
+    const pastLadder = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 0 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -2000000, purchased_slots_after: 0 }),
+        L({ id: 3, op: 'unlock_socket', copper_delta: -3500000, purchased_slots_after: 0 }),
+        L({ id: 4, op: 'unlock_socket', copper_delta: -5000000, purchased_slots_after: 0 }),
+        L({ id: 5, op: 'unlock_socket', copper_delta: -5000000, purchased_slots_after: 0 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 0, unlockedSockets: 4 } },
+        },
+      ],
+    });
+    // The fifth row is past the four-rung ladder AND makes the unlock count
+    // disagree with the state's ceiling-clamped 4.
+    expect(findingKindsFor(pastLadder, 1).sort()).toEqual(
+      ['socket_unlock_mismatch', 'socket_unlock_past_ladder'].sort(),
+    );
+  });
+
+  it('flags socket state no ledger row explains (the birth-complete direction)', () => {
+    // A state.bank holding a socketed bag and an unlocked rung with ZERO
+    // socket rows: rows claim nothing, the state claims both. The ordinary
+    // deposit row is NOT what admits the character to the reconciliation
+    // pass (persisted bank state alone does that: the pass gate is
+    // `!bank && !hasLedgerActivity`, pinned by the ledgerRows: [] arm
+    // earlier in this file); it BALANCES the fixture's wolf_fang slot so the
+    // slot replay reconciles clean and the assertion below stays an exact
+    // two-finding set, proving the socket findings coexist with an
+    // otherwise-healthy slot history rather than riding a noisy one.
+    const findings = auditBank({
+      ledgerRows: [L({ id: 1, op: 'deposit', item_id: 'wolf_fang', count: 1 })],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: {
+            bank: {
+              inventory: [{ itemId: 'wolf_fang', count: 1 }],
+              purchasedSlots: 0,
+              unlockedSockets: 1,
+              socketBags: ['bag_a', null, null, null],
+            },
+          },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 1).sort()).toEqual(
+      ['socket_ledger_state_mismatch', 'socket_unlock_mismatch'].sort(),
+    );
+  });
+
+  it('shape-checks each socket-row dimension independently', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        // A two-bag socket move cannot exist (sockets hold one bare id).
+        L({ id: 1, op: 'socket_bag', item_id: 'bag_a', count: 2 }),
+        // A socket move with no bag named.
+        L({ id: 2, op: 'unsocket_bag', count: 1 }),
+        // A socket move carrying copper.
+        L({ id: 3, op: 'socket_bag', item_id: 'bag_a', count: 1, copper_delta: -5 }),
+        // An unlock carrying item fields / a count / non-negative copper.
+        L({ id: 4, op: 'unlock_socket', item_id: 'bag_a', copper_delta: -1000000 }),
+        L({ id: 5, op: 'unlock_socket', count: 1, copper_delta: -2000000 }),
+        L({ id: 6, op: 'unlock_socket', copper_delta: 0 }),
+        // A socket row carrying an instance payload: sockets store bare ids
+        // (the sim's #2837 peek refuses a payload-bearing bag), so this is a
+        // mint signature the count reconcile would otherwise absorb.
+        L({
+          id: 7,
+          op: 'socket_bag',
+          item_id: 'bag_a',
+          count: 1,
+          instance: { signer: 'Minty' },
+        }),
+      ],
+      characters: [],
+    });
+    // Each kind BOUND to the row designed to produce it (a bare
+    // kinds.toContain would let a cross-trip on a neighbouring row keep a
+    // deleted check green): the detail string names the row id.
+    const detailOf = (kind: string) =>
+      findings
+        .filter((f) => f.kind === kind)
+        .map((f) => f.detail)
+        .join('\n');
+    expect(detailOf('bad_count')).toContain('row 1');
+    expect(detailOf('missing_item_id')).toContain('row 2');
+    expect(detailOf('copper_on_item_op')).toContain('row 3');
+    expect(detailOf('item_on_gold_op')).toContain('row 4');
+    expect(detailOf('count_on_buy')).toContain('row 5');
+    expect(detailOf('nonnegative_buy_cost')).toContain('row 6');
+    expect(detailOf('unexpected_instance')).toContain('row 7');
+    // No socket row falls off the vocabulary chain.
+    expect(findings.map((f) => f.kind)).not.toContain('unknown_op');
+  });
+
+  it('flags a socket op on any container but personal', () => {
+    const findings = auditBank({
+      ledgerRows: [
+        V({ id: 1, op: 'socket_bag', item_id: 'bag_a', count: 1 }),
+        G({ id: 2, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 24 }),
+      ],
+      characters: [],
+      guildBanks: [],
+    });
+    const outside = findings.filter((f) => f.kind === 'socket_op_outside_personal');
+    expect(outside.map((f) => f.detail)).toEqual([
+      expect.stringContaining("socket_bag row 1 has container 'vault'"),
+      expect.stringContaining("unlock_socket row 2 has container 'guild'"),
+    ]);
+  });
+
+  it('socket rows participate in the rung monotonicity scan as bystanders', () => {
+    // Every socket row stamps purchased_slots_after with the live SLOT ladder
+    // position (recordBankSocketOp's bystander rule); a writer stamping
+    // something else (a socket count) reads as a ladder regression here.
+    const findings = auditBank({
+      ledgerRows: [
+        L({ id: 1, op: 'buy_slots', copper_delta: -500, purchased_slots_after: 6 }),
+        L({ id: 2, op: 'unlock_socket', copper_delta: -1000000, purchased_slots_after: 1 }),
+      ],
+      characters: [
+        {
+          id: 1,
+          realm: 'Claudemoon',
+          state: { bank: { inventory: [], purchasedSlots: 6, unlockedSockets: 1 } },
+        },
+      ],
+    });
+    expect(findingKindsFor(findings, 1)).toContain('purchased_regression');
+  });
+});
+
+// Bank Storage phase 14: the operator surface for storage_purchases. Before it
+// there was no admin route, no metric, and nothing in this tool read `status`;
+// the only signal that a player had been charged and held no slots was a
+// console warn on a server nobody was tailing.
+describe('the storage purchase operator arm', () => {
+  const HOUR = 3_600_000;
+  const NOW = Date.parse('2026-08-22T12:00:00Z');
+  const agoIso = (hours: number): string => new Date(NOW - hours * HOUR).toISOString();
+
+  /** One storage_purchases row as pg returns it; pass only what a case cares
+   *  about. */
+  const P = (o: Partial<StoragePurchaseAuditRow>): StoragePurchaseAuditRow => ({
+    id: 1,
+    realm: 'Claudemoon',
+    account_id: 7,
+    character_id: 42,
+    item_id: 'strongbox_rung_01',
+    expected_cost_claudium: 100,
+    idempotency_key: 'key-1',
+    status: 'pending',
+    created_at: agoIso(1),
+    resolved_at: null,
+    ...o,
+  });
+
+  it('reports an unresolved row: the player was charged and holds no slots', () => {
+    const findings = auditStoragePurchases({
+      rows: [P({ status: 'unresolved', resolved_at: agoIso(5), idempotency_key: 'stuck-1' })],
+      nowMs: NOW,
+    });
+    expect(findings).toHaveLength(1);
+    expect(findings[0].kind).toBe('storage_purchase_unresolved');
+    // The operator needs to identify the purchase and the player from the line
+    // alone, so each of those is asserted rather than the sentence as a whole.
+    expect(findings[0].characterId).toBe(42);
+    expect(findings[0].accountId).toBe(7);
+    expect(findings[0].key).toBe('stuck-1');
+    expect(findings[0].detail).toContain('stuck-1');
+    expect(findings[0].detail).toContain('strongbox_rung_01');
+    expect(findings[0].detail).toContain('100 Claudium');
+    expect(findings[0].detail).toContain('5h');
+    // The remediation has to name phase 14's OWN expected cause: after the
+    // ambiguity yield, the usual way a row lands here is that the player bought
+    // that rung with gold while the purchase was open, and granting by hand in
+    // that case over-grants the ladder.
+    expect(findings[0].detail).toContain('bank_ledger');
+  });
+
+  it('a pending row is an incident only once it is old enough to be one', () => {
+    // The threshold's BOTH sides, because a report that flagged every in-flight
+    // purchase would be noise an operator learns to ignore.
+    const fresh = auditStoragePurchases({
+      rows: [P({ created_at: agoIso(STORAGE_PURCHASE_STRANDED_HOURS - 1) })],
+      nowMs: NOW,
+    });
+    expect(fresh).toEqual([]);
+    const stranded = auditStoragePurchases({
+      rows: [P({ created_at: agoIso(STORAGE_PURCHASE_STRANDED_HOURS), idempotency_key: 'old-1' })],
+      nowMs: NOW,
+    });
+    expect(stranded).toHaveLength(1);
+    expect(stranded[0].kind).toBe('storage_purchase_stranded');
+    expect(stranded[0].key).toBe('old-1');
+    // It says what the benign explanation is, so nobody treats a returning
+    // player's row as a money incident.
+    expect(stranded[0].detail).toContain('has not come back');
+  });
+
+  // THE LITERAL ANCHOR. Both arms above express the boundary THROUGH
+  // STORAGE_PURCHASE_STRANDED_HOURS, so they follow the constant wherever it
+  // goes: dropping it to an hour moves the fixtures with it and both stay
+  // green. What that would actually do is turn every ordinary offline player
+  // into a reported incident, which is the failure mode that makes an operator
+  // stop reading the report at all. This arm fixes the age in the FIXTURE
+  // instead, so the threshold cannot be tightened without a decision.
+  // The CLI's own query is not reachable from these unit arms (it needs a live
+  // pool), so its ORDER BY is pinned as anchored SOURCE text. A source pin is
+  // weaker than an executed one and is used here only because the alternative
+  // is no pin at all: what it protects is the property that a truncated report
+  // can never hide a charged player. The clause is anchored contiguously with
+  // its own LIMIT so the pin cannot drift onto some other statement.
+  it('reads UNRESOLVED storage rows before PENDING ones, so truncation cannot hide a debit', () => {
+    const src = readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8');
+    const clause =
+      "WHERE status <> 'applied'\n          ORDER BY (status = 'unresolved') DESC, id\n          LIMIT $1";
+    expect(src.split(clause).length - 1).toBe(1);
+    // The plain id ordering it replaced is gone, so a revert fails here rather
+    // than silently changing which rows an operator gets to see.
+    expect(src).not.toContain('ORDER BY id\n          LIMIT $1');
+  });
+
+  it("reports whole-table totals over a truncated read, not the slice's own tally", () => {
+    // The incident that truncates this report is a mass-pending event, which is
+    // exactly when an operator needs the real numbers. Counting the SLICE would
+    // answer "unresolved 2" when the table holds 40, and the count would look
+    // like a measurement rather than an artefact of the limit.
+    const rows = [P({ status: 'unresolved', resolved_at: agoIso(5) })];
+    const totals = [
+      { status: 'pending', n: 900 },
+      { status: 'unresolved', n: 40 },
+    ];
+    const withTotals = formatStoragePurchaseReport(rows, [], true, totals);
+    expect(withTotals).toContain('pending 900');
+    expect(withTotals).toContain('unresolved 40');
+    expect(withTotals).toContain('of 940');
+    // The truncation notice has to say WHICH rows were dropped, because the
+    // read is ordered so the money-losing ones never are.
+    expect(withTotals).toContain('UNRESOLVED rows are read first');
+    // Without totals it still works, describing only what it read.
+    const sliceOnly = formatStoragePurchaseReport(rows, [], false);
+    expect(sliceOnly).toContain('unresolved 1');
+  });
+
+  it('does not turn an ordinary offline character into an incident', () => {
+    expect(STORAGE_PURCHASE_STRANDED_HOURS).toBe(24);
+    // Long enough that a login-recovery cycle and an ambiguity backoff both
+    // fit inside it; short enough to still surface a genuinely stuck row the
+    // same day.
+    expect(STORAGE_PURCHASE_STRANDED_HOURS).toBeGreaterThanOrEqual(12);
+    expect(STORAGE_PURCHASE_STRANDED_HOURS).toBeLessThanOrEqual(72);
+    // A player who bought a rung and logged out six hours ago is ordinary
+    // in-flight work, whatever the constant is retuned to inside that band.
+    expect(auditStoragePurchases({ rows: [P({ created_at: agoIso(6) })], nowMs: NOW })).toEqual([]);
+  });
+
+  it('never reports the terminal happy path, and always reports an unknown status', () => {
+    expect(
+      auditStoragePurchases({
+        rows: [P({ status: 'applied', resolved_at: agoIso(900) })],
+        nowMs: NOW,
+      }),
+    ).toEqual([]);
+    // The database CHECK rejects these values now. The audit still reports one
+    // if a stale schema, disabled constraint, or corrupt restore exposes it.
+    for (const status of ['refused', 'settled']) {
+      const odd = auditStoragePurchases({ rows: [P({ status })], nowMs: NOW });
+      expect(odd).toHaveLength(1);
+      expect(odd[0].kind).toBe('storage_purchase_bad_status');
+      expect(odd[0].detail).toContain(JSON.stringify(status));
+    }
+  });
+
+  it('reads a Date as readily as a string, and never invents an age it cannot read', () => {
+    const asDate = auditStoragePurchases({
+      rows: [P({ created_at: new Date(NOW - 48 * HOUR) })],
+      nowMs: NOW,
+    });
+    expect(asDate).toHaveLength(1);
+    expect(asDate[0].detail).toContain('48h');
+    // An unreadable timestamp must still SURFACE the row (a stranded purchase
+    // with a corrupt created_at is not less of an incident) and must not print
+    // a made-up number.
+    const broken = auditStoragePurchases({ rows: [P({ created_at: null })], nowMs: NOW });
+    expect(broken).toHaveLength(1);
+    expect(broken[0].kind).toBe('storage_purchase_stranded');
+    expect(broken[0].detail).toContain('an unreadable age');
+    expect(broken[0].detail).not.toMatch(/\bNaNh?\b/);
+  });
+
+  it('the report says what it READ, so a clean section is not mistaken for an unqueried one', () => {
+    const rows = [P({ status: 'pending' }), P({ status: 'pending' }), P({ status: 'unresolved' })];
+    const clean = formatStoragePurchaseReport([], []);
+    expect(clean).toContain('open rows read 0');
+    expect(clean).toContain('OK: no unresolved or stranded storage purchases.');
+    const noisy = formatStoragePurchaseReport(
+      rows,
+      auditStoragePurchases({ rows: [rows[2]], nowMs: NOW }),
+    );
+    expect(noisy).toContain('open rows read 3');
+    expect(noisy).toContain('pending 2');
+    expect(noisy).toContain('unresolved 1');
+    expect(noisy).toContain('findings 1');
+    expect(noisy).toContain('FINDING: storage purchase: realm Claudemoon: character 42:');
+    expect(noisy).not.toContain('OK: no unresolved');
+  });
+
+  it('says so when it truncates, rather than printing a tidy prefix', () => {
+    // A truncated report that LOOKS complete is worse than none: the incident
+    // that makes this report interesting is the one that could make it huge.
+    const clean = formatStoragePurchaseReport([P({})], [], false);
+    expect(clean).not.toContain('TRUNCATED');
+    const cut = formatStoragePurchaseReport([P({})], [], true);
+    expect(cut).toContain('TRUNCATED');
+    expect(cut).toContain(String(STORAGE_PURCHASE_REPORT_LIMIT));
+    expect(cut).toContain('NOT listed');
+    // The warning leads, so it cannot be lost under a long finding list.
+    expect(cut.split('\n')[0]).toContain('TRUNCATED');
+  });
+
+  it('main() reads one row past the limit so it can TELL that it truncated', () => {
+    // Off-by-one that matters: asking for exactly the limit makes a full page
+    // indistinguishable from a truncated one, so the report would go quiet at
+    // precisely the wrong moment.
+    const src = codeOnly(
+      readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
+    );
+    expect(src).toContain('STORAGE_PURCHASE_REPORT_LIMIT + 1');
+    expect(src).toContain('purchases.rows.length > STORAGE_PURCHASE_REPORT_LIMIT');
+    expect(src).toContain('LIMIT $1');
+  });
+
+  it('pins the .mjs status vocabulary to StoragePurchaseStatus', () => {
+    // Same redeclaration hazard as KNOWN_OPS: the .mjs never imports the TS
+    // server, so a status added there with no audit arm would be reported as
+    // bad_status in production instead of being understood.
+    const src = codeOnly(
+      readFileSync(new URL('../server/storage_purchase_db.ts', import.meta.url), 'utf8'),
+    );
+    const start = src.indexOf('export type StoragePurchaseStatus');
+    expect(start).toBeGreaterThan(-1);
+    const end = src.indexOf(';', start);
+    expect(end).toBeGreaterThan(start);
+    const members = Array.from(src.slice(start, end).matchAll(/'([a-z_]+)'/g), (m) => m[1]);
+    expect(members.sort()).toEqual(Array.from(STORAGE_PURCHASE_STATUSES).sort());
+  });
+
+  it('main() degrades on a database with no storage_purchases, and reads only OPEN rows', () => {
+    // Both are source pins because main() talks to Postgres; the executed twin
+    // lives in the database-gated suite. Comment-stripped, so commenting the
+    // guard out cannot leave the pin green over dead code.
+    const src = codeOnly(
+      readFileSync(new URL('../scripts/bank_audit.mjs', import.meta.url), 'utf8'),
+    );
+    expect(src).toContain("SELECT to_regclass('storage_purchases') IS NOT NULL AS present");
+    expect(src).toContain("WHERE status <> 'applied'");
+    expect(src).not.toContain("status <> 'refused'");
+    // The exit code has to count BOTH sets, or an unresolved purchase would
+    // print and still exit 0 on an otherwise clean ledger.
+    expect(src).toContain('findings.length + storageFindings.length > 0 ? 1 : 0');
   });
 });

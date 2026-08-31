@@ -311,6 +311,8 @@ export const pl_PL: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Ograniczone żądania wyzwania portfela',
   'usage.metric.walletLinkRequest': 'Żądania połączenia portfela',
   'usage.metric.walletLinkFailure': 'Niepowodzenia połączenia portfela',
+  'usage.metric.walletUnlinkFailure': 'Odmowy odłączenia portfela',
+  'usage.metric.walletUnlinkSuccess': 'Ukończone odłączenia portfela',
   'usage.metric.walletLinkRateLimited': 'Ograniczone żądania połączenia portfela',
   'usage.metric.cardPublishRequest': 'Żądania publikacji karty gracza',
   'usage.metric.cardPublishRejected': 'Odrzucone publikacje karty gracza',
@@ -1165,4 +1167,8 @@ export const pl_PL: Record<string, string> = {
   'wealth.purse': 'Na postaciach:',
   'wealth.total': 'Całkowity:',
   'wealth.updatedAt': 'zaktualizowano {when}',
+  // v0.41 release i18n fill (pl_PL autoFillable batch).
+  'usage.metric.walletHandoffAuthorizationEvicted':
+    'Usunięcia autoryzacji przekazania portfela z komputera',
+  'usage.metric.walletHandoffCreateRejected': 'Odrzucenia przekazania portfela z komputera',
 };

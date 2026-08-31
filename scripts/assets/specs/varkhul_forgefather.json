@@ -1,0 +1,22 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/_Mob_Updates/New_Raid/built/varkhul_forgefather.glb",
+      "out": "models/creatures/varkhul_forgefather.glb",
+      "type": "character",
+      "maxTex": 1024,
+      "keepClips": [
+        "Idle",
+        "Walk",
+        "Run",
+        "Slash",
+        "Slam",
+        "Casting",
+        "PowerUp",
+        "Jump",
+        "Death",
+        "Forging"
+      ]
+    }
+  ]
+}

@@ -213,6 +213,9 @@ describe('held weapon models', () => {
       .map((item) => item.id)
       .sort();
     expect(unmapped).toEqual([
+      // The two Crucible held offhands follow the wraithfire_orb precedent
+      // (a held orb/censer with no dedicated GLB yet).
+      'cinder_of_the_first_design',
       'cragmaw_huntquiver',
       'direfang_quiver',
       'gravewyrm_bone_quiver',
@@ -220,6 +223,7 @@ describe('held weapon models', () => {
       'heroic_gravewyrm_bone_quiver',
       'heroic_wraithfire_orb',
       'moggers_hide_quiver',
+      'orb_of_the_last_spring',
       'valefire_lantern',
       'wraithfire_orb',
     ]);

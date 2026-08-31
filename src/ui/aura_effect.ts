@@ -35,6 +35,22 @@ import {
   GALEHEART_ECHO_DAMAGE,
   WARSPIRIT_CADENCE_STEPS,
 } from '../sim/combat/shaman_warspirit';
+import {
+  IGNIVAR_SOAK_REQUIRED_PLAYERS,
+  IGNIVAR_SOAK_SHARED_MAX_HP,
+} from '../sim/encounters/ignivar';
+import {
+  VARKHUL_ASSEMBLY_CORE_AURA_ID,
+  VARKHUL_ASSEMBLY_FIXATE_AURA_ID,
+  VARKHUL_ASSEMBLY_LINK_AURA_ID,
+  VARKHUL_CINDER_ORBS_AURA_ID,
+  VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID,
+  VARKHUL_MAKERS_BRAND_AURA_ID,
+  VARKHUL_MAKERS_BRAND_DURATION,
+  VARKHUL_MAKERS_BRAND_MAX_STACKS,
+  VARKHUL_MAKERS_BRAND_PER_STACK,
+  VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+} from '../sim/encounters/varkhul';
 import type { AuraKind } from '../sim/types';
 import {
   ENRAGE_DMG_DONE,
@@ -44,6 +60,14 @@ import {
   RECKLESSNESS_RAGE_GEN,
   SUNDER_ARMOR_PCT_PER_STACK,
 } from '../sim/types';
+import { VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS } from '../sim/varkhul_assembly';
+import {
+  VARKHUL_SHARED_PYRE_AURA_ID,
+  VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
+  VARKHUL_SHARED_PYRE_REQUIRED_NORMAL,
+  VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
+  VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
+} from '../sim/varkhul_shared_pyre';
 
 export type AuraSchool = 'physical' | 'fire' | 'frost' | 'arcane' | 'shadow' | 'holy' | 'nature';
 
@@ -94,10 +118,73 @@ const flatStat = (statKey: string, value: number): AuraEffectDescriptor => ({
  * adding an AuraKind without player-facing explanation is a compile-time error.
  */
 export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor | null {
+  // This is a four-second placement marker, not a damage-taken modifier. Its
+  // countdown and localized name are the complete tooltip; the generic
+  // vulnerability copy would misleadingly claim that it adds 0% damage taken.
+  if (a.id === VARKHUL_CINDER_ORBS_AURA_ID) return null;
+  if (a.id === VARKHUL_ASSEMBLY_FIXATE_AURA_ID) {
+    return { key: `${KEY}.varkhulSentinelsGaze`, nums: {} };
+  }
+  if (a.id === VARKHUL_ASSEMBLY_CORE_AURA_ID) {
+    return {
+      key: `${KEY}.varkhulMoltenCore`,
+      nums: { interval: VARKHUL_ASSEMBLY_BURDEN_TICK_SECONDS, min: 2, max: 10 },
+    };
+  }
+  if (a.id === VARKHUL_ASSEMBLY_LINK_AURA_ID) {
+    return {
+      key: `${KEY}.varkhulForgeLink`,
+      nums: {},
+    };
+  }
+  if (a.id === VARKHUL_FORGE_BEAM_EXPOSURE_AURA_ID) {
+    return { key: `${KEY}.varkhulCrucibleExposure`, nums: {} };
+  }
   if (a.id === 'shaman_mending_current') {
     return a.poolPct !== undefined
       ? { key: `${KEY}.mendingCurrentPercent`, nums: { pct: round(a.poolPct) } }
       : { key: `${KEY}.mendingCurrent`, nums: { value: round(a.value) } };
+  }
+  if (a.id === 'ignivar_shared_pyre') {
+    const total = pctFromFrac(IGNIVAR_SOAK_SHARED_MAX_HP);
+    return {
+      key: `${KEY}.sharedPyre`,
+      nums: {
+        total,
+        players: IGNIVAR_SOAK_REQUIRED_PLAYERS,
+        perPlayer: round(total / IGNIVAR_SOAK_REQUIRED_PLAYERS),
+      },
+    };
+  }
+  if (a.id === VARKHUL_SHARED_PYRE_AURA_ID) {
+    const players = Math.max(1, Math.floor(a.stacks ?? VARKHUL_SHARED_PYRE_REQUIRED_NORMAL));
+    const total = pctFromFrac(
+      a.value2 !== undefined && a.value2 > 0
+        ? a.value2
+        : players > VARKHUL_SHARED_PYRE_REQUIRED_NORMAL
+          ? VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC
+          : VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_NORMAL,
+    );
+    return {
+      key: `${KEY}.varkhulSharedPyre`,
+      nums: {
+        total,
+        players,
+        perPlayer: round(total / players),
+        missingPenalty: pctFromFrac(VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING),
+      },
+    };
+  }
+  if (a.id === VARKHUL_MAKERS_BRAND_AURA_ID) {
+    return {
+      key: `${KEY}.makersBrand`,
+      nums: {
+        duration: VARKHUL_MAKERS_BRAND_DURATION,
+        max: VARKHUL_MAKERS_BRAND_MAX_STACKS,
+        pct: pctFromFrac(VARKHUL_MAKERS_BRAND_PER_STACK),
+        swap: VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
+      },
+    };
   }
   if (a.id === 'temporal_hourglass' && a.kind === 'stasis') {
     return { key: `${KEY}.temporalHourglass`, nums: {} };

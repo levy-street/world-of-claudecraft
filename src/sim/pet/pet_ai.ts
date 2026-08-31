@@ -144,7 +144,10 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
   if (!target && !owner.dead) target = petPickTarget(ctx, pet, owner);
   pet.aggroTargetId = target?.id ?? null;
   pet.inCombat = target !== null;
-  if (!target) pet.petManualTauntPending = false;
+  if (!target) {
+    pet.petManualTauntPending = false;
+    pet.autoAttack = false;
+  }
 
   if (target) {
     // ranged demon (imp) holds its distance and hurls bolts; melee pets close
@@ -162,6 +165,7 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
       if (!ctx.isRooted(pet))
         ctx.moveToward(pet, target.pos, pet.moveSpeed * ctx.moveSpeedMult(pet));
       pet.swingTimer = Math.max(0, pet.swingTimer - DT);
+      pet.autoAttack = false; // out of range, not swinging
     } else {
       pet.facing = steadyAngleTo(pet.pos, target.pos, pet.facing);
       if (
@@ -198,12 +202,14 @@ export function updatePet(ctx: SimContext, pet: Entity): void {
           (pet.weapon.speed * ctx.swingIntervalMult(pet)) /
           (petHasteMult(pet) * packlordPetHasteMultiplier(ctx, pet));
       }
+      pet.autoAttack = true; // in range and melee-engaged
     }
     return;
   }
 
   // heel
   pet.swingTimer = Math.max(0, pet.swingTimer - DT);
+  pet.autoAttack = false; // heeling, not engaged
   petFollow(ctx, pet, owner);
 }
 
@@ -235,6 +241,7 @@ function clearWaterJetChannel(ctx: SimContext, pet: Entity, canceled: boolean): 
  * consumed by the channel (including its completion/cancel tick). */
 function updateWaterJetChannel(ctx: SimContext, pet: Entity): boolean {
   if (pet.castingAbility !== 'water_jet' || !pet.channeling) return false;
+  pet.autoAttack = false;
   const target = pet.castTargetId !== null ? (ctx.entities.get(pet.castTargetId) ?? null) : null;
   const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
   const canceled =
@@ -545,6 +552,7 @@ export function startWaterJet(
   target: Entity,
   jet: NonNullable<NonNullable<(typeof MOBS)[string]['petRanged']>['jet']>,
 ): void {
+  pet.autoAttack = false;
   const perTick = Math.max(1, Math.round(jet.total / (jet.duration / jet.interval)));
   ctx.emit({
     type: 'spellfx',

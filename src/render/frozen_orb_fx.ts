@@ -20,6 +20,7 @@
 // is the renderer, the determinism ban is sim-only.
 
 import * as THREE from 'three';
+import type { SimEvent } from '../sim/types';
 import { SCHOOL_COLORS } from './vfx';
 
 const ORB_HOVER = 1.15; // yards the sphere floats above the terrain
@@ -358,4 +359,44 @@ export class FrozenOrbFx {
     orb.trail.geometry.dispose();
     this.orbs.splice(index, 1);
   }
+}
+
+/** The 'spellfxAt' fields the orb flight reads; the fx union keeps a typo in
+ *  the dispatch arm a compile error. */
+export interface FrozenOrbSpellfxEvent {
+  fx: Extract<SimEvent, { type: 'spellfxAt' }>['fx'];
+  x: number;
+  z: number;
+  sourceId?: number;
+  phase?: 'release' | 'halt' | 'resume';
+  dirX?: number;
+  dirZ?: number;
+  speed?: number;
+  duration?: number;
+}
+
+/**
+ * The Frozen Orb flight, animated locally from its three moments: 'release'
+ * starts the drift, 'halt'/'resume' freeze and restart it at the server's
+ * real coordinates when the orb latches onto an enemy. The caller's pulse
+ * novas stay the area telegraph, so no actionable information rides on this
+ * mesh. Moved verbatim from the renderer's event switch; returns true when
+ * the event was consumed.
+ */
+export function handleFrozenOrbSpellfxEvent(fx: FrozenOrbFx, ev: FrozenOrbSpellfxEvent): boolean {
+  if (ev.fx !== 'orb') return false;
+  const orbSource = ev.sourceId ?? -1;
+  if (ev.phase === 'halt') fx.halt(orbSource, ev.x, ev.z);
+  else if (ev.phase === 'resume') fx.resume(orbSource, ev.x, ev.z);
+  else
+    fx.spawn({
+      sourceId: orbSource,
+      x: ev.x,
+      z: ev.z,
+      dirX: ev.dirX ?? 0,
+      dirZ: ev.dirZ ?? 1,
+      speed: ev.speed ?? 2.5,
+      duration: ev.duration ?? 8,
+    });
+  return true;
 }

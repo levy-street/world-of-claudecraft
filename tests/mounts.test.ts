@@ -103,10 +103,10 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly eleven mounts with the horse first and the developer tank last', () => {
-    expect(MOUNT_KEYS).toHaveLength(11);
+  it('has exactly twelve mounts with the horse first and the developer rickshaw last', () => {
+    expect(MOUNT_KEYS).toHaveLength(12);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
-    expect(MOUNT_KEYS.at(-1)).toBe('terrorspark_groundshaker');
+    expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
   });
 
@@ -124,6 +124,7 @@ describe('mount catalog', () => {
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('goblin_rocket_sled')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
+    expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
     // requiredLevel and every source is level-20 content) and leaving it would
     // invite a second gate to grow back beside ridingTrained.
@@ -176,6 +177,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       'goblin_rocket_sled',
       'rallycart_rxt',
       'terrorspark_groundshaker',
+      'rickshaw_mount',
     ]);
     for (const key of MOUNT_KEYS) {
       const items = reinsFor(key);
@@ -263,7 +265,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
 
     for (const key of MOUNT_KEYS) {
       if (key === 'valorsteed') continue; // the purchase, not a drop
-      if (key === 'terrorspark_groundshaker') continue; // developer-only, pinned separately below
+      if (key === 'terrorspark_groundshaker' || key === 'rickshaw_mount') continue; // developer-only, pinned separately below
       const itemId = mountItemId(key)!;
       const rarity = MOUNTS[key].rarity;
       // No mount is ever on a NORMAL mob table, at any rarity.
@@ -333,6 +335,67 @@ describe('mount reins items (the collection: owning the item is owning the mount
     expect(item).toMatchObject({
       kind: 'mount',
       mount: 'terrorspark_groundshaker',
+      quality: 'epic',
+      soulbound: true,
+      noDiscard: true,
+      sellValue: 0,
+    });
+    expect(item.buyValue).toBeUndefined();
+
+    for (const mob of Object.values(MOBS)) {
+      expect(
+        mob.loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on ${mob.id}`,
+      ).toBe(false);
+    }
+    for (const [bossId, loot] of Object.entries(HEROIC_BOSS_LOOT)) {
+      expect(
+        loot.some((entry) => entry.itemId === itemId),
+        `${itemId} must not be on heroic boss ${bossId}`,
+      ).toBe(false);
+    }
+    expect([
+      ...RIFT_GREEN_MOUNT_REINS,
+      ...RIFT_BLUE_MOUNT_REINS,
+      ...RIFT_EPIC_MOUNT_REINS,
+    ]).not.toContain(itemId);
+    for (const npc of Object.values(NPCS)) {
+      expect(npc.vendorItems ?? [], `${itemId} must not be sold by ${npc.id}`).not.toContain(
+        itemId,
+      );
+    }
+    expect(
+      HEROIC_VENDOR_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be sold by the Heroic Quartermaster`,
+    ).not.toContain(itemId);
+    for (const [delveId, offers] of Object.entries(DELVE_SHOPS)) {
+      expect(
+        offers.map((offer) => offer.itemId),
+        `${itemId} must not be sold by delve shop ${delveId}`,
+      ).not.toContain(itemId);
+    }
+    expect(
+      MARKET_HOUSE_STOCK.map((offer) => offer.itemId),
+      `${itemId} must not be seeded by the World Market`,
+    ).not.toContain(itemId);
+    for (const quest of Object.values(QUESTS)) {
+      expect(
+        Object.values(quest.itemRewards),
+        `${itemId} must not be rewarded by ${quest.id}`,
+      ).not.toContain(itemId);
+      expect(
+        quest.requiredItems ?? [],
+        `${itemId} must not be required by ${quest.id}`,
+      ).not.toContain(itemId);
+    }
+  });
+
+  it('keeps the rickshaw developer-only and absent from every normal acquisition table', () => {
+    const itemId = 'reins_rickshaw_mount';
+    const item = ITEMS[itemId] as MountItemDef;
+    expect(item).toMatchObject({
+      kind: 'mount',
+      mount: 'rickshaw_mount',
       quality: 'epic',
       soulbound: true,
       noDiscard: true,

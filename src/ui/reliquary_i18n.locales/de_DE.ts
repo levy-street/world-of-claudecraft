@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Rissbande',
     desc: 'Die persönlichen Rissbande, geprägt für jeden Champion der Gruppe, die den ersten Durchgang eines gewerteten Risses gewinnt. Ein Charakter kann immer nur das eigene besitzen.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Epische Beute von Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroisch: Crucible of the Last Spring',
+    desc: 'Nur heroisch erhältliche Waffen von Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Epische Beute von Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroisch: The Inner Crucible',
+    desc: 'Nur heroisch erhältliche Schilde und Waffen von Varkhul, Forgefather of the Last Flame.',
+  },
 };

@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
+import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import {
   ITEM_ART_PENDING,
@@ -48,17 +50,65 @@ function walk(dir: string): string[] {
   return out;
 }
 
-// The 6 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
+// The 13 equippable bags. Pinned as a literal (guard F walks it for the per-bag license
 // override), so a renamed bag or a drifted `kind` fails loudly instead of dropping out of
-// the coverage.
+// the coverage. Grew from 6 when phase 05 of the bank-storage packet shipped the bag
+// catalog and its materials-only satchels. Seven phase-05 placeholders were replaced by the
+// bank-storage-painted-bags batch; the literal remains the complete current bag inventory.
 const BAG_IDS = [
+  'burlap_reagent_pouch',
+  'duskweave_bag',
+  'foragers_haversack',
   'gravewoven_bag',
   'linen_pouch',
+  'loombound_reagent_satchel',
   'mistcallers_duffel',
+  'necromancers_reagent_satchel',
+  'resonant_weave_bag',
   'silkspun_satchel',
   'travelers_knapsack',
+  'wayfarers_backpack',
   'wolfhide_satchel',
-];
+] as const;
+
+const BANK_STORAGE_PAINTED_BAG_IDS = [
+  'burlap_reagent_pouch',
+  'duskweave_bag',
+  'foragers_haversack',
+  'loombound_reagent_satchel',
+  'necromancers_reagent_satchel',
+  'resonant_weave_bag',
+  'wayfarers_backpack',
+] as const;
+
+const RETIRED_BANK_STORAGE_PLACEHOLDER_SHA256: Record<
+  (typeof BANK_STORAGE_PAINTED_BAG_IDS)[number],
+  string
+> = {
+  burlap_reagent_pouch: '8d6e1ba9750e81622402c9fc86ed8900b4d07ba590bb5ac46e28b9eaa727eeaa',
+  duskweave_bag: '75e90a5425b048b71ad4dae1e051fa5c2dac54b8efb26b9be6b71851bc6ea58b',
+  foragers_haversack: 'ade843921aa31c029214ad4f0855b84cd3e3308ed66fea7bf7c94573f777000c',
+  loombound_reagent_satchel: '35d2e9d7b33d7f23c80ee5f23604d1aff29749324944397f878e672ca921405f',
+  necromancers_reagent_satchel: 'c4c790a68df5e0a4cddf6cd8ef10339f3d17e4092d12d781b185d1e279d9880f',
+  resonant_weave_bag: 'd71d93594c087677a39db4e9a80861060f9307e06082265b834c5928ca596af4',
+  wayfarers_backpack: 'b424eb9dc027e8d7d8074752ab0cac2fe369614de7f6a8d3072c70864070119e',
+};
+
+const ACCEPTED_BANK_STORAGE_PAINTING_SHA256: Record<
+  (typeof BANK_STORAGE_PAINTED_BAG_IDS)[number],
+  string
+> = {
+  burlap_reagent_pouch: '1458914f29069f66b4cdcf295aae48d2867850809fa88844ef069e9b48dcfd96',
+  duskweave_bag: 'ceb7d9bba4c420e888e5e0a511fd5e279d5c8bf9d97b9865c29dd184d9667166',
+  foragers_haversack: '2106f6437a0b45e4d21238daca453e5ea67a5cfa40823c7d60a24dd5d04ded07',
+  loombound_reagent_satchel: '002c543130544418fd7022339ace468efcad71909075fdfc3440a84527ff668a',
+  necromancers_reagent_satchel: '3c934789670d42e9ebcae00ce646f6ba3b0559479d78951840e245e6b8e339ae',
+  resonant_weave_bag: '4e8f897412df77417a3df2674819b2ce1b6666846fa9ab7080da7b4835713714',
+  wayfarers_backpack: '90c931f7884ed7807f0bc60756c8b40e34988ee19624f2b84bc2f245ef0427f6',
+};
+
+const BANK_STORAGE_PAINTED_BAG_MANIFEST =
+  'docs/achievements/bank-storage-painted-bags-2026-08-25/accepted-art.json';
 
 // Professions 2.0 materials commissioned as one coherent painted set. This literal pin makes
 // dropping a single prepared material from the registry, public tree, or provenance map fail
@@ -231,10 +281,15 @@ type Mapping = {
     license?: string;
   }[];
   generatedBatches?: {
+    batchId?: string;
     source: string;
+    owner?: string;
     license: string;
     styleReference: string;
+    styleContract?: { id: string; document: string };
     commonPrompt: string;
+    provenanceRecord?: string;
+    provenanceRecords?: string[];
     itemIds: string[];
   }[];
 };
@@ -254,7 +309,7 @@ function missingPaintedWaveItemIds(): string[] {
 describe('item webp icons', () => {
   it('has image-backed item ids wired (guards the fixture)', () => {
     expect(ITEM_IMAGE_IDS.size).toBeGreaterThan(0);
-    expect(WEAPON_IMAGE_IDS.size).toBe(123);
+    expect(WEAPON_IMAGE_IDS.size).toBe(133);
   });
 
   it('A) every image-backed item and weapon resolves to a committed, decodable .webp', async () => {
@@ -302,9 +357,11 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    expect(ITEM_ART_PENDING.size, 'the accepted painted-art wave clears all enumerated debt').toBe(
-      0,
-    );
+    // The Crucible wave is fully painted (crucible-set-icons-2026-08-29), so
+    // the ledger is back to the EMPTY set: no artless item can hide behind an
+    // open wave, and the next commissioned wave re-pins its exact membership
+    // here when it stages.
+    expect([...ITEM_ART_PENDING]).toEqual([]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
@@ -377,12 +434,21 @@ describe('item webp icons', () => {
     // Pinned to the literal set, not just a count: a renamed bag (or one whose kind drifts off
     // 'bag') would otherwise drop silently out of the loop below and take its coverage with it.
     // A NEW bag belongs here AND in ITEM_IMAGE_IDS: adding it without art fails this test.
+    // Phase 05 of the bank-storage packet added the seven-bag catalog (three materials-only
+    // satchels among them); their tracked generated batch now owns the accepted paintings.
     expect(bagIds).toEqual([
+      'burlap_reagent_pouch',
+      'duskweave_bag',
+      'foragers_haversack',
       'gravewoven_bag',
       'linen_pouch',
+      'loombound_reagent_satchel',
       'mistcallers_duffel',
+      'necromancers_reagent_satchel',
+      'resonant_weave_bag',
       'silkspun_satchel',
       'travelers_knapsack',
+      'wayfarers_backpack',
       'wolfhide_satchel',
     ]);
     // The backpack is the bag bar's first socket and has no ITEMS record, so it is wired as a
@@ -427,22 +493,44 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The legacy bag family is project-owned art, so each ordinary entry carries its own
-    // project license. Silkspun Satchel is separately generated and therefore belongs only to
-    // generatedBatches, never to the project-owned ordinary entries.
-    for (const id of [...BAG_IDS.filter((bagId) => bagId !== 'silkspun_satchel'), 'backpack']) {
+    // The remaining legacy bag family is project-owned ordinary art. Silkspun Satchel and the
+    // seven replacement paintings belong only to generatedBatches.
+    const generatedBagIds = new Set<string>([...BANK_STORAGE_PAINTED_BAG_IDS, 'silkspun_satchel']);
+    for (const id of [...BAG_IDS.filter((bagId) => !generatedBagIds.has(bagId)), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(
         'World of ClaudeCraft original art',
       );
     }
-    expect(m.entries.some((entry) => entry.itemId === 'silkspun_satchel')).toBe(false);
+    for (const id of generatedBagIds) {
+      expect(
+        m.entries.some((entry) => entry.itemId === id),
+        `${id} ordinary owner`,
+      ).toBe(false);
+    }
     const silkspunOwners = (m.generatedBatches ?? []).filter((batch) =>
       batch.itemIds.includes('silkspun_satchel'),
     );
     expect(silkspunOwners, 'silkspun_satchel generated-art owner').toHaveLength(1);
     expect(silkspunOwners[0].source).toBe('OpenAI built-in image generation');
     expect(silkspunOwners[0].license).toContain('project asset');
+
+    const replacementBatch = (m.generatedBatches ?? []).filter(
+      ({ batchId }) => batchId === 'bank-storage-painted-bags-2026-08-25',
+    );
+    expect(replacementBatch, 'bank-storage painted bag provenance owner').toHaveLength(1);
+    expect(replacementBatch[0]).toMatchObject({
+      source: 'OpenAI built-in image generation',
+      owner: 'World of ClaudeCraft',
+      license: 'World of ClaudeCraft project-generated art, project asset, rights reserved',
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      provenanceRecord: 'docs/achievements/bank-storage-painted-bags-2026-08-25/',
+      provenanceRecords: [BANK_STORAGE_PAINTED_BAG_MANIFEST],
+    });
+    expect(replacementBatch[0].itemIds).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
   });
 
   it('F1) pins the canonical item-art style contract and its approved visual anchors', () => {
@@ -654,6 +742,117 @@ describe('item webp icons', () => {
       expect(owners, `${id} must have one generated provenance owner`).toHaveLength(1);
       expect(owners[0].source).toBe('OpenAI built-in image generation');
       expect(owners[0].license).toContain('project asset');
+    }
+  });
+
+  it('F5) pins the accepted bank-storage bag paintings and retired placeholder lineage', async () => {
+    const value = JSON.parse(
+      readFileSync(path.join(repoRoot, BANK_STORAGE_PAINTED_BAG_MANIFEST), 'utf8'),
+    ) as {
+      batch: {
+        id: string;
+        acceptedDate: string;
+        rasterGenerator: string;
+        owner: string;
+        license: string;
+        styleContractId: string;
+      };
+      targetSets: { items: string[] };
+      assets: Array<{
+        id: string;
+        acceptedSha256: string;
+        acceptedBytes: number;
+        generation: {
+          promptRecord: { verbatimToolCallAvailable: boolean; commonPrompt: string };
+        };
+      }>;
+      supersedes: Array<{
+        itemId: string;
+        previous: {
+          shipping: { commit: string; sha256: string; bytes: number };
+          provenanceClass: string;
+          owner: { ownerType: string; sourcePack: string; license: string };
+        };
+        replacement: { batchId: string; acceptedSha256: string; acceptedBytes: number };
+      }>;
+    };
+    expect(() => validateAcceptedArtManifest(value)).not.toThrow();
+    expect(value.batch).toEqual({
+      id: 'bank-storage-painted-bags-2026-08-25',
+      acceptedDate: '2026-08-25',
+      rasterGenerator: 'OpenAI built-in image generation',
+      owner: 'World of ClaudeCraft',
+      license: 'World of ClaudeCraft project-generated art, project asset, rights reserved',
+      styleContractId: 'woc-item-icon-v1',
+    });
+    expect(value.targetSets.items).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
+    expect(value.assets.map(({ id }) => id)).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
+    expect(value.supersedes.map(({ itemId }) => itemId)).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
+
+    const m = mapping();
+    const assetById = new Map(value.assets.map((asset) => [asset.id, asset]));
+    const supersessionById = new Map(value.supersedes.map((record) => [record.itemId, record]));
+    for (const id of BANK_STORAGE_PAINTED_BAG_IDS) {
+      const file = path.join(itemsDir, `${id}.webp`);
+      const bytes = readFileSync(file);
+      const hash = createHash('sha256').update(bytes).digest('hex');
+      const asset = assetById.get(id);
+      const supersession = supersessionById.get(id);
+
+      expect(bytes.length, `${id} item-icon weight budget`).toBeLessThanOrEqual(15 * 1024);
+      expect(hash, `${id} must not regress to its retired SVG placeholder`).not.toBe(
+        RETIRED_BANK_STORAGE_PLACEHOLDER_SHA256[id],
+      );
+      expect(hash, `${id} accepted painting`).toBe(ACCEPTED_BANK_STORAGE_PAINTING_SHA256[id]);
+      expect(asset, `${id} accepted-art asset`).toMatchObject({
+        acceptedSha256: ACCEPTED_BANK_STORAGE_PAINTING_SHA256[id],
+        acceptedBytes: bytes.length,
+      });
+      expect(asset?.generation.promptRecord.verbatimToolCallAvailable).toBe(true);
+      expect(asset?.generation.promptRecord.commonPrompt).toBe(
+        (m.generatedBatches ?? []).find(
+          ({ batchId }) => batchId === 'bank-storage-painted-bags-2026-08-25',
+        )?.commonPrompt,
+      );
+
+      const decoded = await sharp(file).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      expect(decoded.info.width, `${id} decoded width`).toBe(128);
+      expect(decoded.info.height, `${id} decoded height`).toBe(128);
+      const alpha = decoded.data.filter((_, index) => index % decoded.info.channels === 3);
+      expect(
+        alpha.every((channel) => channel === 255),
+        `${id} opaque backdrop`,
+      ).toBe(true);
+
+      expect(supersession, `${id} supersession record`).toMatchObject({
+        previous: {
+          shipping: {
+            commit: '62d2cb0c5478c300a305e147b6f807a031c0bf4a',
+            sha256: RETIRED_BANK_STORAGE_PLACEHOLDER_SHA256[id],
+          },
+          provenanceClass: 'projectOwnedProgrammaticPlaceholder',
+          owner: {
+            ownerType: 'ordinaryEntry',
+            sourcePack: 'woc_original_svg',
+            license:
+              'World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the woc_bags style)',
+          },
+        },
+        replacement: {
+          batchId: 'bank-storage-painted-bags-2026-08-25',
+          acceptedSha256: ACCEPTED_BANK_STORAGE_PAINTING_SHA256[id],
+          acceptedBytes: bytes.length,
+        },
+      });
+
+      expect(
+        m.entries.some(({ itemId }) => itemId === id),
+        `${id} retired ordinary owner`,
+      ).toBe(false);
+      expect(
+        (m.generatedBatches ?? []).filter(({ itemIds }) => itemIds.includes(id)),
+        `${id} one current generated owner`,
+      ).toHaveLength(1);
     }
   });
 

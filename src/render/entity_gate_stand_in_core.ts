@@ -133,8 +133,9 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
   {
     gate: 'gateViewOnCompile',
     file: 'src/render/renderer.ts',
-    callSite: 'view.compileReady = this.gateViewOnCompile(view, group, requiredForEntry);',
-    hides: 'the arriving entity whole 3D group, for EVERY non-self view, objects included',
+    callSite: 'view.compileReady = this.gateViewOnCompile(',
+    hides:
+      'the arriving entity whole 3D group, for EVERY non-self view, objects included (for the Ignivar boss, once its rig exists, only that cosmetic rig hides: the group stays visible so the floor telegraphs keep drawing)',
     standIn:
       'the nameplate, forced on by entityHasNoBody: while the gate holds, the plate ignores both nameplate toggles, the 55 yd nameplate range and the plateless-object rule (nameplate_view.ts), so a gated ground-loot pile, chest or quest object is represented too, out to the view-create radius of about 80 yd. It stays hidden only where no body is being hidden from the player: a looted corpse, the deliberately label-less sealed crypt door and the Vale Cup ball',
   },

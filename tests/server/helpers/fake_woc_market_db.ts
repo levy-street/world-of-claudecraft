@@ -31,7 +31,6 @@ import type {
   WocListingResolution,
   WocListingRow,
   WocMarketDb,
-  WocOpsP2pTradeRow,
   WocSaleRow,
   WocSellerProfile,
   WocSettlementRow,
@@ -39,6 +38,11 @@ import type {
   WocStuckCustodyClasses,
 } from '../../../server/woc_market';
 import { SETTLED_OFFER_GRACE_MS } from '../../../server/woc_market_db';
+import type {
+  WocOpsListingRow,
+  WocOpsListingStatus,
+  WocOpsP2pTradeRow,
+} from '../../../server/woc_market_ops';
 import type { WocBidStatus, WocSettlementState } from '../../../server/woc_market_rules';
 import {
   WOC_MARKET_ABANDON_EXEMPT_FAIL_REASONS,
@@ -360,12 +364,12 @@ export class FakeWocMarketDb implements WocMarketDb {
    *  INCLUSIVE at both ends, and status narrowed unless 'all'. */
   async opsListings(q: {
     realm: string;
-    status: 'active' | 'ending' | 'settling' | 'closed' | 'all';
+    status: WocOpsListingStatus;
     fromMs: number;
     toMs: number;
     page: number;
     pageSize: number;
-  }): Promise<{ rows: WocListingRow[]; hasMore: boolean }> {
+  }): Promise<{ rows: WocOpsListingRow[]; hasMore: boolean }> {
     const matched = [...this.listings.values()]
       .filter(
         (r) =>
@@ -373,7 +377,10 @@ export class FakeWocMarketDb implements WocMarketDb {
           r.directedBuyerAccount === null &&
           r.createdAtMs >= q.fromMs &&
           r.createdAtMs <= q.toMs &&
-          (q.status === 'all' || r.status === q.status),
+          (q.status === 'all' ||
+            (q.status === 'sold' || q.status === 'cancelled'
+              ? r.status === 'closed' && r.resolution === q.status
+              : r.status === q.status)),
       )
       .sort((a, b) => b.createdAtMs - a.createdAtMs || b.id - a.id);
     const pageSize = Math.min(Math.max(1, q.pageSize), 200);
@@ -381,7 +388,18 @@ export class FakeWocMarketDb implements WocMarketDb {
     const page = matched.slice(offset, offset + pageSize + 1);
     const hasMore = page.length > pageSize;
     return {
-      rows: (hasMore ? page.slice(0, pageSize) : page).map((r) => this.listingOut(r)),
+      rows: (hasMore ? page.slice(0, pageSize) : page).map((r) => {
+        const sale =
+          r.status === 'closed' && r.resolution === 'sold'
+            ? [...this.sales.values()].find((s) => s.listingId === r.id && !s.excluded)
+            : undefined;
+        return {
+          ...this.listingOut(r),
+          buyerAccount: sale?.buyerAccount ?? null,
+          buyerName: sale?.buyerName ?? null,
+          soldAtMs: sale?.atMs ?? null,
+        };
+      }),
       hasMore,
     };
   }
@@ -2001,6 +2019,29 @@ export class FakeWocMarketDb implements WocMarketDb {
     rec.failReason = failReason ?? rec.failReason;
     this.touchSettlement(id);
     return true;
+  }
+
+  /** The parked-review arm's realm-scoped CAS twin: the rec carries realm
+   *  internally (see the type note above), so a wrong-realm caller misses,
+   *  matching the SQL's AND realm = $2. */
+  async transitionSettlementInRealm(
+    realm: string,
+    id: number,
+    from: WocSettlementState[],
+    to: WocSettlementState,
+    failReason?: string,
+  ): Promise<boolean> {
+    const rec = this.settlements.get(id);
+    if (!rec || rec.realm !== realm) return false;
+    return this.transitionSettlement(id, from, to, failReason);
+  }
+
+  async settlementStateInRealm(
+    realm: string,
+    id: number,
+  ): Promise<{ state: WocSettlementState } | null> {
+    const rec = this.settlements.get(id);
+    return rec && rec.realm === realm ? { state: rec.state } : null;
   }
 
   async confirmingSettlements(realm: string, limit: number): Promise<WocSettlementRow[]> {

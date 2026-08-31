@@ -18,6 +18,7 @@ import type { GuildRank as ServerGuildRank } from '../server/social';
 import { ClientWorld } from '../src/net/online';
 import { bagCapacity, stackSizeOf } from '../src/sim/bags';
 import { sanitizeBankState } from '../src/sim/bank';
+import { RIFT_ESSENCE_ITEM_ID } from '../src/sim/content/rift/items';
 import { BUILTIN_WORLD, ITEMS, QUESTS } from '../src/sim/data';
 import {
   applyGuildBankDeltasTo,
@@ -939,6 +940,37 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     expect(hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.')).toBe(true);
   });
 
+  // Rift Essence (rift forge currency) deliberately does NOT carry noMarketList
+  // (content/rift/items.ts): unlike the personal riftbound rings, it is boss
+  // loot bound by the ranked portal spawn cadence, not a re-grantable faucet,
+  // so it rides every anonymous pipe, guild bank included.
+  it('permits Rift Essence: forge currency, not the personal rift gear the pipe policy blocks', () => {
+    const sim = makeOfficerSim();
+    expect(ITEMS[RIFT_ESSENCE_ITEM_ID]?.noMarketList).toBeUndefined(); // fixture guard
+    sim.addItem(RIFT_ESSENCE_ITEM_ID, 5);
+    sim.drainEvents();
+    sim.guildBankDepositFor(
+      sim.playerId,
+      meta(sim).inventory.findIndex((s) => s.itemId === RIFT_ESSENCE_ITEM_ID),
+    );
+    expect(hasErr(sim.drainEvents(), 'That item cannot be stored in the guild bank.')).toBe(false);
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, sim.playerId)).toBe(0);
+    expect(
+      book(sim).inventory.some((s) => s.itemId === RIFT_ESSENCE_ITEM_ID && s.count === 5),
+    ).toBe(true);
+
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(
+      sim.playerId,
+      book(sim).inventory.findIndex((s) => s.itemId === RIFT_ESSENCE_ITEM_ID),
+    );
+    expect(hasErr(sim.drainEvents(), 'That item cannot be withdrawn from the guild bank.')).toBe(
+      false,
+    );
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, sim.playerId)).toBe(5);
+    expect(book(sim).inventory.some((s) => s.itemId === RIFT_ESSENCE_ITEM_ID)).toBe(false);
+  });
+
   it('refuses transfer-locked copies on deposit: bound (boundTo) and armed (bindOnTrade)', () => {
     for (const instance of [{ boundTo: 424242 }, { bindOnTrade: true }]) {
       const sim = makeOfficerSim();
@@ -1163,6 +1195,113 @@ describe('guildBankDepositFor / guildBankWithdrawFor (items)', () => {
     sim.guildBankWithdrawFor(sim.playerId, 0);
     expect(fingerprint(sim)).toBe(before);
     expect(hasErr(sim.drainEvents(), 'Your bags are full.')).toBe(true);
+  });
+
+  it('a granularity deposit refusal gets its own line, never "The guild bank is full."', () => {
+    // The personal-bank deposit arm's discrimination, mirrored: a hand-shaped
+    // multi-unit charges stack (every sim-built charges slot is count 1)
+    // against a book with ONE free slot. One unit would land; three cannot,
+    // and "full" would lie about the free slot on screen. Charges are not a
+    // per-copy transfer lock, so the pipe policy passes and the capacity gate
+    // is the arm that answers.
+    const sim = makeOfficerSim();
+    for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 1; i++) {
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+    }
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in the guild bank.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'The guild bank is full.')).toBe(false);
+  });
+
+  it('a MERGEABLE over-cap deposit short of slots gets the full line, never the split line', () => {
+    // The emit boundary of the mergeable gate, personal-bank twin in
+    // tests/bank.test.ts: a hand-shaped over-stackSize MERGEABLE instanced
+    // stack (signer payloads merge; only the load clamp keeps sim-built
+    // stacks at or under cap) against a book with free slots, but too few.
+    // The gate reads the shortfall as pool exhaustion ('space'), so the
+    // deposit names the full book and must NOT claim the stack cannot be
+    // split: a later re-widening of the granularity cause cannot silently
+    // restore the wrong literal here.
+    const sim = makeOfficerSim();
+    for (let i = 0; i < GUILD_BANK_RUNG_SLOTS[0] - 2; i++) {
+      book(sim).inventory.push({ itemId: 'wolf_fang', count: 1, instance: { signer: `S${i}` } });
+    }
+    meta(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankDepositFor(sim.playerId, meta(sim).inventory.length - 1);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'The guild bank is full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in the guild bank.')).toBe(
+      false,
+    );
+  });
+
+  it('a granularity withdraw refusal gets the bags-direction line, never "bags are full"', () => {
+    // The mirror into the officer's bags: the hand-shaped charges stack sits
+    // in the book, the bags keep ONE free slot, and the refusal names the
+    // stack's indivisibility rather than claiming the bags are full.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 3, instance: { charges: { heal: 2 } } });
+    const m = meta(sim);
+    const cap = bagCapacity(m.bags);
+    while (m.inventory.length < cap - 1) {
+      m.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: `B${m.inventory.length}` },
+      });
+    }
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      true,
+    );
+    expect(hasErr(evs, 'Your bags are full.')).toBe(false);
+  });
+
+  it('a MERGEABLE over-cap withdraw short of slots gets the bags-full line, never the split line', () => {
+    // The deposit arm's mergeable negative (above), mirrored at the withdraw
+    // emit boundary: a hand-shaped over-stackSize MERGEABLE instanced stack
+    // (signer payloads merge; only the load clamp keeps sim-built stacks at
+    // or under cap) in the book, against bags with free slots, but too few
+    // (45 needs 20+20+5: three slots, two exist). The gate reads the
+    // shortfall as pool exhaustion, so the withdraw must emit the pool-honest
+    // full line and must NOT claim the stack cannot be split: a later
+    // re-widening of the granularity cause cannot silently restore the wrong
+    // literal on this arm. The bag filler carries DISTINCT signer payloads,
+    // so nothing tops up and the three fresh slots stay the only landing.
+    const sim = makeOfficerSim();
+    book(sim).inventory.push({ itemId: 'wolf_fang', count: 45, instance: { signer: 'Ana' } });
+    const m = meta(sim);
+    const cap = bagCapacity(m.bags);
+    while (m.inventory.length < cap - 2) {
+      m.inventory.push({
+        itemId: 'wolf_fang',
+        count: 1,
+        instance: { signer: `B${m.inventory.length}` },
+      });
+    }
+    const before = fingerprint(sim);
+    sim.drainEvents();
+    sim.guildBankWithdrawFor(sim.playerId, 0);
+    expect(fingerprint(sim)).toBe(before);
+    const evs = sim.drainEvents();
+    expect(hasErr(evs, 'Your bags are full.')).toBe(true);
+    expect(hasErr(evs, 'That stack cannot be split to fit the space left in your bags.')).toBe(
+      false,
+    );
   });
 
   it('deposits a partial count, decrements the source, and emits the item notice', () => {
@@ -1542,7 +1681,7 @@ describe('guild bank ops: the stale-rank scenario and determinism', () => {
 
 // ---------------------------------------------------------------------------
 // Phase 3: the persistence-facing sim helpers the server wires up (the evict,
-// the disband-guard holdings read, and the reserve-at-gate fee charge/refund).
+// the disband-guard holdings read, and the atomic-create fee charge/refund).
 // The SQL side lives in server/db.ts and is pinned in the server suites.
 // ---------------------------------------------------------------------------
 
@@ -1596,7 +1735,7 @@ describe('evictGuildBank (the sanctioned evict) + guildBankHoldings', () => {
   });
 });
 
-describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
+describe('chargeGuildCreationFeeFor (atomic-create purse mutation)', () => {
   it('charges exactly the fee once when the purse covers it', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;
@@ -1604,10 +1743,9 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
     expect(meta(sim).copper).toBe(140_000);
   });
 
-  it('clamps to the purse on a shortfall (never negative); the GATE refuses a short charge', () => {
-    // The dispatch gate checks the purse and charges in the same synchronous
-    // block, refusing (and refunding) when the charge comes back short, so
-    // the clamp here is defensive only.
+  it('clamps to the purse on a shortfall (never negative); the FIFO re-check refuses it', () => {
+    // The authoritative funds check and this charge share one character-save
+    // FIFO task, so the clamp is defensive against an invalid direct caller.
     const sim = freshSim();
     meta(sim).copper = 4_000;
     expect(sim.chargeGuildCreationFeeFor(sim.playerId)).toBe(4_000);
@@ -1638,7 +1776,7 @@ describe('chargeGuildCreationFeeFor (reserve-at-gate, the sim half)', () => {
   });
 });
 
-describe('refundGuildCreationFeeFor (the reserve-at-gate refusal arm)', () => {
+describe('refundGuildCreationFeeFor (proved atomic rollback)', () => {
   it('returns exactly the reserved fee to the purse', () => {
     const sim = freshSim();
     meta(sim).copper = 150_000;

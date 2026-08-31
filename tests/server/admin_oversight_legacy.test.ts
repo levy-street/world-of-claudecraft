@@ -62,7 +62,6 @@ vi.mock('../../server/suspicion_flags_db', async (importOriginal) => {
 import {
   configureTopWealthHolders,
   LARGE_GOLD_MOVEMENT_LIMIT,
-  LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
   resetTopWealthHoldersForTests,
 } from '../../server/account_wealth';
 import {
@@ -360,11 +359,7 @@ describe('legacy handleAdminApi arm: happy paths', () => {
   it('GET /admin/api/accounts/:id/wealth appends the large movements to the breakdown', async () => {
     const r = await authed({ url: '/admin/api/accounts/42/wealth' });
     expect(accountWealthBreakdown).toHaveBeenCalledWith(42);
-    expect(largeGoldMovementsForAccount).toHaveBeenCalledWith(
-      42,
-      LARGE_GOLD_MOVEMENT_THRESHOLD_COPPER,
-      LARGE_GOLD_MOVEMENT_LIMIT,
-    );
+    expect(largeGoldMovementsForAccount).toHaveBeenCalledWith(42, LARGE_GOLD_MOVEMENT_LIMIT);
     expect(r).toEqual({
       status: 200,
       body: { success: true, data: { ...BREAKDOWN, largeMovements: MOVEMENTS }, error: null },

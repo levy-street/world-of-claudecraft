@@ -13,10 +13,11 @@
 import type * as THREE from 'three';
 import type { CharacterVisual } from './characters/visual';
 import type { GoblinRocketSledFx } from './goblin_rocket_sled_fx';
+import { type RickshawMountViewState, releaseRickshawMountState } from './rickshaw_mount';
 import type { VehicleSuspensionRig } from './vehicle_suspension_fx';
 
 /** The EntityView slice this teardown touches: a caller-owned view record. */
-export interface MountVisualHost {
+export interface MountVisualHost extends RickshawMountViewState {
   group: THREE.Object3D;
   mountVisual: CharacterVisual | null;
   mountVisualKey: string;
@@ -41,6 +42,10 @@ export function releaseMountFx(view: MountVisualHost): void {
  *  even loadable yet. */
 export function releaseMountVisual(view: MountVisualHost): void {
   releaseMountFx(view);
+  // The rickshaw's puller and wheel cache hang off the same rig, so they die
+  // with it. Folded in here rather than left as a second call beside every
+  // release site, which is the duplication this module exists to prevent.
+  releaseRickshawMountState(view, true);
   if (view.mountVisual) {
     view.group.remove(view.mountVisual.root);
     view.mountVisual.dispose();

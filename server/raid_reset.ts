@@ -123,6 +123,45 @@ export function nextRaidResetMs(
   return today > nowMs ? today : zoneResetInstant(y, mo, d + 1, zone);
 }
 
+// The civil weekday (0 Sunday .. 6 Saturday) of the reset-zone calendar date the
+// instant falls on. Weekday is pure calendar arithmetic once the civil date is
+// known, so Date.UTC on the date parts answers it without another zone lookup.
+function zoneWeekday(instantMs: number, zone: string): number {
+  const { y, mo, d } = zoneDate(instantMs, zone);
+  return new Date(Date.UTC(y, mo - 1, d)).getUTCDay();
+}
+
+// The weekly raid reset weekday: Tuesday, the classic-era US reset day. Chosen
+// against 28 days of measured prod concurrency (2026-08): the population is
+// EU-evening / US-afternoon shaped (weekly peak Sunday ~18:00-20:00 UTC, daily
+// trough 00:00-06:00 UTC), so Tuesday RAID_RESET_HOUR US Eastern lands in the
+// dead band, every lockout week keeps one full weekend, and the boundary reuses
+// the daily-reset hour players already know.
+export const WEEKLY_RESET_WEEKDAY = 2;
+
+/**
+ * The next WEEKLY raid reset strictly after nowMs: RAID_RESET_HOUR:00 zone-local
+ * time on the configured weekday (default Tuesday). A kill in the small hours of
+ * reset day unlocks at that same morning's boundary; the boundary instant itself
+ * belongs to the next week (the same strictly-after contract nextRaidResetMs
+ * keeps). DST transitions resolve through zoneResetInstant exactly like the
+ * daily boundary.
+ */
+export function nextWeeklyRaidResetMs(
+  nowMs: number,
+  zone: string = DEFAULT_RAID_RESET_TIME_ZONE,
+  weekday: number = WEEKLY_RESET_WEEKDAY,
+): number {
+  const { y, mo, d } = zoneDate(nowMs, zone);
+  for (let offset = 0; offset <= 7; offset += 1) {
+    const candidate = zoneResetInstant(y, mo, d + offset, zone);
+    if (candidate > nowMs && zoneWeekday(candidate, zone) === weekday) return candidate;
+  }
+  // Unreachable: eight consecutive civil days always contain the weekday with a
+  // future reset instant; kept as a loud failure rather than a silent lock.
+  throw new Error(`nextWeeklyRaidResetMs found no boundary after ${nowMs} in ${zone}`);
+}
+
 function pad2(n: number): string {
   return n < 10 ? `0${n}` : `${n}`;
 }

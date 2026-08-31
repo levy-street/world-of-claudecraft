@@ -3,7 +3,7 @@
 // special case. Three.js runs headless in Node (no WebGL needed for geometry).
 import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
-import { buildDoorBody } from '../src/render/door_portal';
+import { buildDoorBody, doorArchAuthoredElsewhere } from '../src/render/door_portal';
 import { isSharedGeometry, isSharedMaterial } from '../src/render/shared_resource';
 
 const meshes = (body: THREE.Group): THREE.Mesh[] =>
@@ -49,6 +49,25 @@ describe('buildDoorBody: Nythraxis crypt click-box', () => {
     const { body, portal } = buildDoorBody(false, 'nythraxis_crypt', false);
     expect(meshes(body).length).toBe(5);
     expect(portal).toBeDefined();
+  });
+
+  it('the Forgefather raid door yields to the facade only once one is baked', () => {
+    // no facade in the table: the generic arch keeps the door visible
+    expect(doorArchAuthoredElsewhere('ignivar_forge_lift', [{ key: 'stone_floor' }])).toBe(false);
+    // a baked dungeon_entrance facade takes over as the visible door,
+    // keyed to the chain HEAD (the Forge-Lift owns the overworld door now)
+    expect(doorArchAuthoredElsewhere('ignivar_forge_lift', [{ key: 'dungeon_entrance' }])).toBe(
+      true,
+    );
+    expect(doorArchAuthoredElsewhere('ignivar_forge_approach', [{ key: 'dungeon_entrance' }])).toBe(
+      true,
+    );
+    // the crypt stays a click-box regardless, other doors keep their arch
+    expect(doorArchAuthoredElsewhere('nythraxis_crypt', [])).toBe(true);
+    expect(doorArchAuthoredElsewhere('wildheart_basin', [{ key: 'dungeon_entrance' }])).toBe(false);
+    // the lift back out of the approach keeps the normal leaving portal
+    const exit = buildDoorBody(false, 'ignivar_forge_approach', false);
+    expect(exit.portal).toBeDefined();
   });
 });
 

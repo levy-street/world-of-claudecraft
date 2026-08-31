@@ -635,14 +635,15 @@ describe('missing painted deed and Heroic weapon integration', () => {
     // Later releases appended more deeds after this historical wave. The
     // release art audit painted those additions, so the wave's own claim is
     // unchanged: every deed that existed when it landed is painted. The only
-    // artless ids are the walk-in castle visit pair appended after the audit,
-    // riding the category-crest fallback the Icons authoring rule in
+    // artless ids are the post-audit appends (the walk-in castle visit pair,
+    // the Proving Shore graduation, and the Crucible raid block), riding the
+    // category-crest fallback the Icons authoring rule in
     // docs/design/deeds.md sanctions until their 512px sources are
     // commissioned (flagged in docs/achievements/icon-brief.md). Read from
     // DEED_ART_PENDING, the one enumeration of that debt (src/ui/icons.ts),
     // so this file cannot end up naming a different pending set than the
-    // other two art suites. Exhaustive: a third artless deed still reds here.
-    expect(DEED_ORDER).toHaveLength(274);
+    // other two art suites. Exhaustive: another artless deed still reds here.
+    expect(DEED_ORDER).toHaveLength(281);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const provenance = readFileSync(

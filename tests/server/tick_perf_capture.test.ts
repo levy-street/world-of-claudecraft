@@ -28,6 +28,7 @@ import { createMob } from '../../src/sim/entity';
 import { Sim } from '../../src/sim/sim';
 import type { Entity, MobFamily } from '../../src/sim/types';
 import { terrainHeight } from '../../src/sim/world';
+import { fakeWs, joinServer } from '../helpers/bare_client';
 
 // Compile-time assertion that T is exactly `never` (same idiom as the IWorld facet
 // pins in tests/world_api_parity.test.ts). A MobFamily value with no matching
@@ -48,6 +49,15 @@ type MobScanCaptureFields =
   | 'aggroVisitsMaxPerTick'
   | 'threatVisitsTotal'
   | 'threatVisitsMaxPerTick';
+type MovementTimelineCaptureFields =
+  | 'movementConsumedTotal'
+  | 'movementStarvedTotal'
+  | 'movementExtrapolatedTotal'
+  | 'movementDiscardedLateTotal'
+  | 'movementDroppedOldestTotal'
+  | 'movementRejectedAnchoredWindowTotal'
+  | 'movementRejectedSanityBoundTotal'
+  | 'movementResyncsTotal';
 type _AdminMirrorCarriesMobScanFields = AssertTrue<
   Pick<ServerPerfCaptureResult, MobScanCaptureFields> extends Pick<
     AdminPerfCaptureResult,
@@ -56,6 +66,19 @@ type _AdminMirrorCarriesMobScanFields = AssertTrue<
     ? Pick<AdminPerfCaptureResult, MobScanCaptureFields> extends Pick<
         ServerPerfCaptureResult,
         MobScanCaptureFields
+      >
+      ? true
+      : false
+    : false
+>;
+type _AdminMirrorCarriesMovementTimelineFields = AssertTrue<
+  Pick<ServerPerfCaptureResult, MovementTimelineCaptureFields> extends Pick<
+    AdminPerfCaptureResult,
+    MovementTimelineCaptureFields
+  >
+    ? Pick<AdminPerfCaptureResult, MovementTimelineCaptureFields> extends Pick<
+        ServerPerfCaptureResult,
+        MovementTimelineCaptureFields
       >
       ? true
       : false
@@ -132,6 +155,16 @@ describe('tick perf capture lifecycle', () => {
     expect(status.last!.aggroVisitsMaxPerTick).toBe(0);
     expect(status.last!.threatVisitsTotal).toBe(0);
     expect(status.last!.threatVisitsMaxPerTick).toBe(0);
+    expect(status.last).toMatchObject({
+      movementConsumedTotal: 0,
+      movementStarvedTotal: 0,
+      movementExtrapolatedTotal: 0,
+      movementDiscardedLateTotal: 0,
+      movementDroppedOldestTotal: 0,
+      movementRejectedAnchoredWindowTotal: 0,
+      movementRejectedSanityBoundTotal: 0,
+      movementResyncsTotal: 0,
+    });
     // The frozen profile reflects the window's samples (7 ms every tick -> mean 7).
     expect(status.last!.profile.phases.total.mean).toBe(7);
     // A 3s window at 20 Hz is 60 committed ticks.
@@ -509,6 +542,18 @@ describe('tick perf capture lifecycle', () => {
     // call, swapping its aggro/threat arguments, or inverting its capturing gate
     // reddens this test.
     const server = new GameServer();
+    const movementSession = joinServer(
+      server,
+      fakeWs(),
+      990_403,
+      'MovementStatsTarget',
+      'warrior',
+      { movementWireVersion: 2 },
+    );
+    server.handleMessage(
+      movementSession,
+      JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 1 } }),
+    );
     const sim = (server as unknown as { sim: Sim }).sim;
     const seed = (sim as unknown as { cfg: { seed: number } }).cfg.seed;
     // One DEAD player 10 units from an idle wolf, far outside the world's camps
@@ -565,6 +610,9 @@ describe('tick perf capture lifecycle', () => {
     // Nothing entered combat, so the threat side stays exactly zero.
     expect(first!.threatVisitsTotal).toBe(0);
     expect(first!.threatVisitsMaxPerTick).toBe(0);
+    expect(first!.movementConsumedTotal).toBeGreaterThanOrEqual(1);
+    expect(first!.movementStarvedTotal).toBeGreaterThanOrEqual(1);
+    expect(first!.movementExtrapolatedTotal).toBeGreaterThanOrEqual(1);
 
     // A fresh capture must start from zeroed accumulators (startPerfCapture calls
     // resetMobScanCaptureAccumulators): finalize it with the loop stopped and the
@@ -578,6 +626,16 @@ describe('tick perf capture lifecycle', () => {
     expect(second!.aggroVisitsMaxPerTick).toBe(0);
     expect(second!.threatVisitsTotal).toBe(0);
     expect(second!.threatVisitsMaxPerTick).toBe(0);
+    expect(second).toMatchObject({
+      movementConsumedTotal: 0,
+      movementStarvedTotal: 0,
+      movementExtrapolatedTotal: 0,
+      movementDiscardedLateTotal: 0,
+      movementDroppedOldestTotal: 0,
+      movementRejectedAnchoredWindowTotal: 0,
+      movementRejectedSanityBoundTotal: 0,
+      movementResyncsTotal: 0,
+    });
   });
 
   it('prints the two visit tokens on the [perf] heartbeat line', () => {
@@ -595,6 +653,28 @@ describe('tick perf capture lifecycle', () => {
       ).mobScanTickStats;
       stats.lastAggroScanVisits = 12;
       stats.lastThreatEntryVisits = 7;
+      const movementStats = (
+        server as unknown as {
+          movementTimelineTickStats: {
+            lastConsumed: number;
+            lastStarved: number;
+            lastExtrapolated: number;
+            lastDiscardedLate: number;
+            lastDroppedOldest: number;
+            lastRejectedAnchoredWindow: number;
+            lastRejectedSanityBound: number;
+            lastResyncs: number;
+          };
+        }
+      ).movementTimelineTickStats;
+      movementStats.lastConsumed = 1;
+      movementStats.lastStarved = 2;
+      movementStats.lastExtrapolated = 3;
+      movementStats.lastDiscardedLate = 4;
+      movementStats.lastDroppedOldest = 5;
+      movementStats.lastRejectedAnchoredWindow = 6;
+      movementStats.lastRejectedSanityBound = 7;
+      movementStats.lastResyncs = 8;
       // Force the heartbeat branch (tickCount 0 minus -100 clears the 100-tick gap).
       (server as unknown as { lastPerfLogTick: number }).lastPerfLogTick = -100;
       (server as unknown as { maybeLogTickPerf: (ms: number) => void }).maybeLogTickPerf(5);
@@ -602,6 +682,14 @@ describe('tick perf capture lifecycle', () => {
       expect(perfLine).toBeDefined();
       expect(perfLine).toContain('aggroVisits=12');
       expect(perfLine).toContain('threatVisits=7');
+      expect(perfLine).toContain('moveConsumed=1');
+      expect(perfLine).toContain('moveStarved=2');
+      expect(perfLine).toContain('moveExtrapolated=3');
+      expect(perfLine).toContain('moveLate=4');
+      expect(perfLine).toContain('moveDropOldest=5');
+      expect(perfLine).toContain('moveRejectWindow=6');
+      expect(perfLine).toContain('moveRejectSanity=7');
+      expect(perfLine).toContain('moveResyncs=8');
     } finally {
       log.mockRestore();
       vi.unstubAllEnvs();

@@ -17,6 +17,11 @@ import { IN_GAME_MODERATION_MESSAGES } from './server_i18n_moderation';
 
 export const DICT: Record<string, Record<string, string>> = {
   en: {
+    // The gold-buy refusal while a Claudium storage purchase holds the
+    // per-character mutex (server/bank_wire.ts, Bank Storage phase 11). Moved
+    // here from sim_i18n beside its true origin: the emit is a SERVER
+    // module's, and localizeErrorText runs this matcher before the sim one.
+    'error.bankPurchaseInProgress': 'Your bank has a purchase in progress.',
     'friends.specifyName': 'Specify a character name.',
     'friends.noCharExists': "No character named '{name}' exists.",
     'friends.cannotBefriendSelf': 'You cannot befriend yourself.',
@@ -158,6 +163,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'time.day': '{count} day',
   },
   en_CA: {
+    'error.bankPurchaseInProgress': 'Your bank has a purchase in progress.',
     'chat.filterMutedRemaining': "You are muted and can't chat for another {duration}.",
     'chat.filterMuted': "That language isn't allowed here. You're muted for {duration}.",
     'chat.filterWarning': "Warning: that language isn't allowed here. Continued use will mute you.",
@@ -293,6 +299,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Unknown',
   },
   es: {
+    'error.bankPurchaseInProgress': 'Tu banco tiene una compra en curso.',
     'chat.filterMutedRemaining': 'Estás silenciado y no puedes chatear durante {duration} más.',
     'chat.filterMuted': 'Ese lenguaje no está permitido aquí. Estás silenciado durante {duration}.',
     'chat.filterWarning':
@@ -438,6 +445,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Desconocida',
   },
   es_ES: {
+    'error.bankPurchaseInProgress': 'Tu banco tiene una compra en curso.',
     'chat.filterMutedRemaining': 'Estás silenciado y no puedes chatear durante {duration} más.',
     'chat.filterMuted': 'Ese lenguaje no está permitido aquí. Estás silenciado durante {duration}.',
     'chat.filterWarning':
@@ -584,6 +592,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Desconocido',
   },
   fr_FR: {
+    'error.bankPurchaseInProgress': 'Votre banque a un achat en cours.',
     'pledge.noGuild': 'Aucune guilde de ce nom.',
     'pledge.noneToWithdraw': "Vous n'avez aucun serment à retirer.",
     'pledge.onlyOfficers': 'Seuls les officiers et le Maître de guilde peuvent gérer les serments.',
@@ -728,6 +737,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Inconnu',
   },
   fr_CA: {
+    'error.bankPurchaseInProgress': 'Votre banque a un achat en cours.',
     'pledge.noGuild': 'Aucune guilde de ce nom.',
     'pledge.noneToWithdraw': "Vous n'avez aucun serment à retirer.",
     'pledge.onlyOfficers': 'Seuls les officiers et le Maître de guilde peuvent gérer les serments.',
@@ -873,6 +883,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Inconnu',
   },
   it_IT: {
+    'error.bankPurchaseInProgress': 'La tua banca ha un acquisto in corso.',
     'chat.filterMutedRemaining': 'Sei silenziato e non puoi chattare per altri {duration}.',
     'chat.filterMuted': 'Quel linguaggio non è consentito qui. Sei silenziato per {duration}.',
     'chat.filterWarning':
@@ -1012,6 +1023,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Sconosciuta',
   },
   de_DE: {
+    'error.bankPurchaseInProgress': 'Eure Bank hat einen laufenden Kauf.',
     'chat.filterMutedRemaining':
       'Ihr seid stummgeschaltet und könnt noch {duration} lang nicht chatten.',
     'chat.filterMuted':
@@ -1157,6 +1169,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Unbekannt',
   },
   zh_CN: {
+    'error.bankPurchaseInProgress': '你的银行有一笔购买正在处理中。',
     'chat.filterMutedRemaining': '你已被禁言，还需 {duration} 才能聊天。',
     'chat.filterMuted': '此处不允许这种言论。你已被禁言 {duration}。',
     'chat.filterWarning': '警告：此处不允许这种言论。继续使用将会被禁言。',
@@ -1290,6 +1303,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': '未知',
   },
   zh_TW: {
+    'error.bankPurchaseInProgress': '你的銀行有一筆購買正在處理中。',
     'chat.filterMutedRemaining': '你已被禁言，還需 {duration} 才能再次發言。',
     'chat.filterMuted': '此處不允許這種言語。你已被禁言 {duration}。',
     'chat.filterWarning': '警告：此處不允許這種言語。繼續使用將會被禁言。',
@@ -1423,6 +1437,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': '未知',
   },
   ko_KR: {
+    'error.bankPurchaseInProgress': '은행에 처리 중인 구매가 있습니다.',
     'chat.filterMutedRemaining': '채팅이 금지되어 {duration} 동안 더 채팅할 수 없습니다.',
     'chat.filterMuted': '여기서는 허용되지 않는 표현입니다. {duration} 동안 채팅이 금지되었습니다.',
     'chat.filterWarning':
@@ -1558,6 +1573,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': '알 수 없음',
   },
   ja_JP: {
+    'error.bankPurchaseInProgress': '銀行で処理中の購入があります。',
     'chat.filterMutedRemaining': '発言禁止中です。あと{duration}発言できません。',
     'chat.filterMuted': 'その言葉はここでは使用できません。{duration}の間、発言禁止となります。',
     'chat.filterWarning':
@@ -1696,6 +1712,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': '不明',
   },
   pt_BR: {
+    'error.bankPurchaseInProgress': 'Seu banco tem uma compra em andamento.',
     'chat.filterMutedRemaining': 'Você está silenciado e não pode usar o chat por mais {duration}.',
     'chat.filterMuted':
       'Esse tipo de linguagem não é permitido aqui. Você foi silenciado por {duration}.',
@@ -1838,6 +1855,7 @@ export const DICT: Record<string, Record<string, string>> = {
     'who.zoneUnknown': 'Desconhecida',
   },
   ru_RU: {
+    'error.bankPurchaseInProgress': 'В вашем банке уже выполняется покупка.',
     'chat.filterMutedRemaining': 'Вам выдан мьют, и вы не сможете писать в чат ещё {duration}.',
     'chat.filterMuted': 'Такие выражения здесь запрещены. Вам выдан мьют на {duration}.',
     'chat.filterWarning':

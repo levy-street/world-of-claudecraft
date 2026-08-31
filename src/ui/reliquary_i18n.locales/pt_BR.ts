@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Anéis de Fenda',
     desc: 'Os anéis de Fenda pessoais, cunhados para cada campeão do grupo que vence a primeira conquista de uma Fenda classificada. Cada personagem só pode ter o seu.',
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: 'Espólios épicos de Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Heroico: Crucible of the Last Spring',
+    desc: 'Armas exclusivas do modo heroico de Ignivar, Herald of the Last Flame.',
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: 'Espólios épicos de Varkhul, Forgefather of the Last Flame.',
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Heroico: The Inner Crucible',
+    desc: 'Escudos e armas exclusivos do modo heroico de Varkhul, Forgefather of the Last Flame.',
+  },
 };

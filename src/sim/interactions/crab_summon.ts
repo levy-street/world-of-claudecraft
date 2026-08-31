@@ -19,6 +19,8 @@ export const CRAB_MOB_ID = 'mister_crabs';
 export const CRAB_SUMMON_SITE = { x: -398, z: -17 } as const;
 /** Must be standing AT the pool: the lesson is "go to the marked spot". */
 export const CRAB_SUMMON_RANGE = 8;
+/** A raised king returns to the shallows after five minutes, even mid-fight. */
+const CRAB_DESPAWN_SECONDS = 5 * 60;
 
 export type CrabSummonReason = 'notOnQuest' | 'questDone' | 'tooFar' | 'alreadyProwling';
 export type CrabSummonResult = { ok: true } | { ok: false; reason: CrabSummonReason };
@@ -78,6 +80,6 @@ export function useBrinyLure(ctx: SimContext, player: Entity, meta: PlayerMeta):
     CRAB_MOB_ID,
     { x: CRAB_SUMMON_SITE.x, y: 0, z: CRAB_SUMMON_SITE.z },
     meta.entityId,
-    { perOwner: true },
+    { perOwner: true, hardDespawnSeconds: CRAB_DESPAWN_SECONDS },
   );
 }

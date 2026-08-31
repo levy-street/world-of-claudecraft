@@ -10,15 +10,14 @@
 
 import { bulwarkClear } from './bulwark_layout';
 import { castleClear } from './castle_layout';
-import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberNearestOnLink } from './ember_lava_layout';
-import { hash2 } from './rng';
 import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
   EMBER_LAVA_POOLS,
-  EMBER_VOLCANOES,
-  generateDecorationsInBounds,
-  roadDistance,
-  terrainHeight,
-} from './world';
+  emberNearestOnLink,
+} from './ember_lava_layout';
+import { hash2 } from './rng';
+import { EMBER_VOLCANOES, generateDecorationsInBounds, roadDistance, terrainHeight } from './world';
 
 export interface EmberLily {
   x: number;

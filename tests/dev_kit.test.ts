@@ -7,6 +7,7 @@ import { talentsFor } from '../src/sim/content/talents';
 import { ITEMS } from '../src/sim/data';
 import {
   applyDevKit,
+  bestKitBag,
   buildDevKit,
   DEV_KIT_EXCLUDED_DUNGEON,
   DEV_KIT_LEVEL,
@@ -321,6 +322,32 @@ describe('/dev kit against a real Sim', () => {
     sim.chat(`/dev kit ${spec}`);
     return sim;
   }
+
+  it('fills the sockets with the largest GENERAL bag, never a materials-only satchel', () => {
+    // The kit puts ONE bag in every socket, so the choice decides the whole carried
+    // budget. A materialsOnly bag feeds the materials pool instead of the general one
+    // (src/sim/bag_pools.ts): picking the biggest bag outright would leave the tester a
+    // bare backpack for gear and four sockets only raw materials could use, which is the
+    // opposite of what a gear command is for.
+    const best = bestKitBag();
+    expect(best).not.toBeNull();
+    expect(best?.materialsOnly).toBeUndefined();
+    const generalMax = Math.max(
+      ...Object.values(ITEMS)
+        .filter((item) => item.kind === 'bag' && item.materialsOnly !== true)
+        .map((item) => item.bagSlots ?? 0),
+    );
+    expect(best?.bagSlots).toBe(generalMax);
+    // Non-vacuity: the exclusion only proves something while a materials-only bag that
+    // WOULD have won exists. If the catalog ever loses that bag, this arm must be
+    // re-derived rather than left quietly passing.
+    const materialsOnlyMax = Math.max(
+      ...Object.values(ITEMS)
+        .filter((item) => item.kind === 'bag' && item.materialsOnly === true)
+        .map((item) => item.bagSlots ?? 0),
+    );
+    expect(materialsOnlyMax).toBeGreaterThan(generalMax);
+  });
 
   it('dresses the character and fills all four bag sockets', () => {
     const sim = kitted('warrior', 'prot');

@@ -7,12 +7,18 @@
 // the renderer's rank-culled fireLights budget.
 import * as THREE from 'three';
 import { CASTLE_CRYSTALS } from '../sim/castle_layout';
-import { EMBER_FLAT_POOLS, EMBER_LAVA_LINKS, emberLinkPolyline } from '../sim/ember_lava_layout';
+import {
+  EMBER_FLAT_POOLS,
+  EMBER_LAVA_LINKS,
+  EMBER_LAVA_POOLS,
+  emberLinkPolyline,
+} from '../sim/ember_lava_layout';
 import { EMBER_DENS, emberLilySpots, emberScatterClear } from '../sim/ember_lilies';
 import { hash2 } from '../sim/rng';
-import { EMBER_LAVA_POOLS, terrainHeight } from '../sim/world';
+import { terrainHeight } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { buildForgefatherFortress } from './forgefather_fortress';
 import { GFX } from './gfx';
 import { lavaChainPlacements } from './lava_chain_core';
 
@@ -466,6 +472,10 @@ export function buildEmberFeatures(seed: number): EmberFeaturesView {
       group.add(mesh);
     }
   }
+
+  // The Forgefather's Isle fortress rides this view: same zone, same
+  // gated attach and shadow policy (forgefather_fortress.ts carries why).
+  group.add(buildForgefatherFortress());
 
   return {
     group,

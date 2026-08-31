@@ -22,6 +22,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   rallycart_rxt: 'hudChrome.mounts.name_rallycart_rxt',
   drakemaw_raptor: 'hudChrome.mounts.name_drakemaw_raptor',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
+  rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
 };
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
@@ -36,6 +37,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   rallycart_rxt: 'hudChrome.mounts.desc_rallycart_rxt',
   drakemaw_raptor: 'hudChrome.mounts.desc_drakemaw_raptor',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
+  rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
 };
 
 /** The localized mount name, falling back to the catalog's English label and

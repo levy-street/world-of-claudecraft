@@ -30,6 +30,7 @@ import {
   terrainSteepnessAt,
   WATER_LEVEL,
 } from '../src/sim/world';
+import { WORLD_SEED } from '../src/sim/world_seed';
 
 // Parkour movement and height-aware prop collision:
 //  - low prop tops (moveTopY) pass a mover whose feet clear them, so a jump
@@ -187,6 +188,34 @@ describe('supportHeightAt: standable prop tops', () => {
     const top = groundHeight(rock.x, rock.z, SEED) + rockHeightOf(rock, SEED);
     expect(supportHeightAt(SEED, rock.x, rock.z, 0.5, top + 1)).toBeCloseTo(top, 6);
   });
+
+  it('reports a decorProps standableTop (e.g. a cannonball pile) as a landable surface', () => {
+    const standableTop = 2.25;
+    setActiveWorldContent(
+      world({
+        decorProps: [{ key: 'hexCannonballs', x: CX, z: CZ, scale: 7, r: 1.2, standableTop }],
+      }),
+    );
+    const top = groundHeight(CX, CZ, SEED) + standableTop;
+    expect(supportHeightAt(SEED, CX, CZ, 0.5, top + 1)).toBeCloseTo(top, 6);
+    // A top above the allowed reach never supports (no levitation).
+    expect(supportHeightAt(SEED, CX, CZ, 0.5, top - 0.2)).toBe(-Infinity);
+  });
+
+  it('the Dawnhold cannonball piles are standable on the shipped world, not walk-through (issue: cant jump on balls)', () => {
+    setActiveWorldContent(null);
+    const piles = (BUILTIN_WORLD.props.decorProps ?? []).filter((d) => d.key === 'hexCannonballs');
+    expect(piles.length).toBeGreaterThan(0);
+    for (const pile of piles) {
+      expect(pile.r).toBeGreaterThan(0);
+      expect(pile.standableTop).toBeGreaterThan(0);
+      if (!pile.r || !pile.standableTop) continue;
+      // The shipped seed, not the synthetic test-course SEED: this is the
+      // terrain height every real client and server actually sees there.
+      const top = groundHeight(pile.x, pile.z, WORLD_SEED) + pile.standableTop;
+      expect(supportHeightAt(WORLD_SEED, pile.x, pile.z, 0.5, top + 1)).toBeCloseTo(top, 6);
+    }
+  });
 });
 
 describe('seatGroundedAt: instant-relocation end points', () => {
@@ -270,6 +299,33 @@ describe('height-gated prop collision', () => {
     expect(Math.hypot(res.x - CX, res.z - CZ)).toBeGreaterThan(1e-4);
     expect(isBlocked(SEED, CX, CZ, 0.5)).toBe(true);
   });
+
+  it('decorProps standableTop (e.g. a cannonball pile) passes a mover on its top and mantling within reach, still walls a grounded approach', () => {
+    setActiveWorldContent(
+      world({
+        decorProps: [{ key: 'hexCannonballs', x: CX, z: CZ, scale: 7, r: 1.2, standableTop: 2.25 }],
+      }),
+    );
+    const g = groundHeight(CX, CZ, SEED);
+    // Grounded: the pile is a wall, same as before the standableTop fix.
+    const grounded = resolvePosition(SEED, CX, CZ, 0.5, false, undefined, { y: g, lift: 0 });
+    expect(Math.hypot(grounded.x - CX, grounded.z - CZ)).toBeGreaterThan(1e-4);
+    const top = g + 2.25;
+    const onTop = resolvePosition(SEED, CX, CZ, 0.5, false, undefined, { y: top, lift: 0 });
+    expect(onTop.x).toBe(CX);
+    expect(onTop.z).toBe(CZ);
+    const mantling = resolvePosition(SEED, CX, CZ, 0.5, false, undefined, {
+      y: top - MANTLE_REACH + 0.01,
+      lift: MANTLE_REACH,
+    });
+    expect(mantling.x).toBe(CX);
+    expect(mantling.z).toBe(CZ);
+    const below = resolvePosition(SEED, CX, CZ, 0.5, false, undefined, {
+      y: top - MANTLE_REACH - 0.2,
+      lift: MANTLE_REACH,
+    });
+    expect(Math.hypot(below.x - CX, below.z - CZ)).toBeGreaterThan(1e-4);
+  });
 });
 
 describe('parkour kernel: jump-over, mantle, momentum, coyote, air control', () => {
@@ -319,6 +375,42 @@ describe('parkour kernel: jump-over, mantle, momentum, coyote, air control', () 
     expect(actor.pos.z).toBeGreaterThan(crateZ + 1.2);
     expect(actor.onGround).toBe(true);
     expect(actor.pos.y).toBeCloseTo(groundHeight(actor.pos.x, actor.pos.z, SEED), 6);
+  });
+
+  it('a jump at the Dawnhold cannonball pile climbs onto its top (issue: cant jump on balls)', () => {
+    // At 2.25yd the pile is above MANTLE_REACH's plain-vault range (the crate
+    // case above), so this exercises the ledge-grab system instead (same
+    // family as the stall canopies and the dock hut roof), which is driven
+    // through the full Sim tick, not the bare stepPlayerMotion kernel.
+    const pileZ = COURSE.z0 + 5;
+    setActiveWorldContent(
+      world({
+        decorProps: [
+          { key: 'hexCannonballs', x: CX, z: pileZ, scale: 7, r: 1.2, standableTop: 2.25 },
+        ],
+      }),
+    );
+    const sim = makeSim();
+    teleport(sim, CX, pileZ - 3);
+    const meta = sim.players.get(sim.player.id);
+    if (!meta) throw new Error('missing player meta');
+    const top = groundHeight(CX, pileZ, SEED) + 2.25;
+
+    // Walk in and settle against the pile's base (a full-height wall below
+    // the climb band), then one real jump press (held a few ticks, like an
+    // actual key press, not spammed every tick).
+    for (let i = 0; i < 60; i++) {
+      Object.assign(meta.moveInput, mi({ forward: true }));
+      sim.tick();
+    }
+    let stoodOnTop = false;
+    for (let i = 0; i < 120 && !stoodOnTop; i++) {
+      Object.assign(meta.moveInput, mi({ forward: true, jump: i < 3 }));
+      sim.tick();
+      if (sim.player.onGround && Math.abs(sim.player.pos.y - top) < 1e-6) stoodOnTop = true;
+    }
+    expect(stoodOnTop).toBe(true);
+    expect(sim.player.pos.y).toBeCloseTo(top, 6);
   });
 
   it('walking off a crate keeps horizontal momentum through the fall', () => {

@@ -83,6 +83,51 @@ describe('resolveDirectPickEntityId', () => {
     expect(resolveDirectPickEntityId([30], map)).toBe(30);
   });
 
+  describe('overlapping live targets', () => {
+    it('cycles through live targets on repeated direct clicks', () => {
+      const map = entities([
+        { id: 10, kind: 'mob' },
+        { id: 11, kind: 'mob' },
+        { id: 12, kind: 'mob' },
+      ]);
+
+      expect(resolveDirectPickEntityId([10, 11, 12], map)).toBe(10);
+      expect(resolveDirectPickEntityId([10, 11, 12], map, 10)).toBe(11);
+      expect(resolveDirectPickEntityId([10, 11, 12], map, 11)).toBe(12);
+      expect(resolveDirectPickEntityId([10, 11, 12], map, 12)).toBe(10);
+    });
+
+    it('dedupes repeated child hits before cycling live targets', () => {
+      const map = entities([
+        { id: 10, kind: 'mob' },
+        { id: 11, kind: 'mob' },
+      ]);
+
+      expect(resolveDirectPickEntityId([10, 10, 11], map, 10)).toBe(11);
+    });
+
+    it('keeps the nearest live target when the current target is outside the hit set', () => {
+      const map = entities([
+        { id: 10, kind: 'mob' },
+        { id: 11, kind: 'mob' },
+      ]);
+
+      expect(resolveDirectPickEntityId([10, 11], map, 99)).toBe(10);
+    });
+
+    it('cycles live targets even when a lootable corpse is the frontmost hit', () => {
+      const map = entities([
+        { id: 9, kind: 'mob', dead: true, lootable: true },
+        { id: 10, kind: 'mob' },
+        { id: 11, kind: 'mob' },
+      ]);
+
+      expect(resolveDirectPickEntityId([9, 10, 11], map)).toBe(10);
+      expect(resolveDirectPickEntityId([9, 10, 11], map, 10)).toBe(11);
+      expect(resolveDirectPickEntityId([9, 10, 11], map, 11)).toBe(10);
+    });
+  });
+
   describe('issue #2787: live mob wins over an overlapping corpse', () => {
     it('prefers a live mob behind the frontmost corpse instead of opening loot', () => {
       const map = entities([

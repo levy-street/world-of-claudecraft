@@ -114,6 +114,38 @@ describe('Hunter v0.29 choice-row mechanics', () => {
     );
   });
 
+  // Regression for the reported exploit: right-clicking the Enduring Courser
+  // internal-cooldown aura (its wire kind is 'internal_cd', the same
+  // engine-state marker every class's internal-cooldown gates ride) used to
+  // pass isCancelableAura's debuff check, so a player could strip the 20s
+  // gate the instant it landed and immediately recast Aspect of the Cheetah
+  // for a fresh 3s/60% burst, chained every GCD for 100% uptime in arena/BG.
+  it("right-clicking Enduring Courser's internal cooldown cannot farm 100% burst uptime", () => {
+    const sim = hunter('survival', { 5: 'hun_r5_enduring_courser' }, 2927);
+
+    sim.castAbility('aspect_of_the_cheetah');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      true,
+    );
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_icd')).toBe(true);
+
+    // The exploit: right-click the ICD gate to cancel it.
+    sim.cancelAura('hunter_enduring_courser_icd');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_icd')).toBe(true);
+
+    advance(sim, 3); // let the original 3s burst fully expire on its own
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      false,
+    );
+
+    // Recast well inside the real 20s internal cooldown: no fresh burst.
+    ready(sim, 'aspect_of_the_cheetah');
+    sim.castAbility('aspect_of_the_cheetah');
+    expect(sim.player.auras.some((entry) => entry.id === 'hunter_enduring_courser_burst')).toBe(
+      false,
+    );
+  });
+
   it("Predator's Pace follows a successful Focus generator and respects its cooldown", () => {
     const sim = hunter('marksmanship', { 5: 'hun_r5_predators_pace' }, 2928);
     const target = addMob(sim, 20);

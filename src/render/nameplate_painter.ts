@@ -12,6 +12,7 @@ import {
   strongerQuestMarker,
 } from '../sim/quests/quest_marker_kind';
 import { type Entity, GATHER_CAST_ID } from '../sim/types';
+import { abilityDisplayNameFromSource } from '../ui/ability_display_name';
 import { cheaterTagLabel } from '../ui/cheater_tag';
 import { deedBorderSlug } from '../ui/deed_border_view';
 import { deedTitleText } from '../ui/deed_i18n';
@@ -36,6 +37,7 @@ import {
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
   isProjectedNameplateAnchorVisible,
@@ -119,7 +121,7 @@ export class NameplatePainter {
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
   private readonly plan: NameplatePlan = newNameplatePlan();
-  private readonly anchorScratch: NameplateAnchor[] = [];
+  private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
   private anchorCount = 0;
   private i18nRevision = -1;
   // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
@@ -239,8 +241,21 @@ export class NameplatePainter {
         anchor.sx = screenX;
         anchor.sy = screenY;
         anchor.extraLift = extraLift;
+        anchor.hpVisible = state.hpVisible;
+        anchor.castVisible = state.castVisible;
+        anchor.boss = state.frame === 'boss';
+        anchor.pickable = id !== player.id && !entity.dead;
       } else {
-        this.anchorScratch.push({ id, sx: screenX, sy: screenY, extraLift });
+        this.anchorScratch.push({
+          id,
+          sx: screenX,
+          sy: screenY,
+          extraLift,
+          hpVisible: state.hpVisible,
+          castVisible: state.castVisible,
+          boss: state.frame === 'boss',
+          pickable: id !== player.id && !entity.dead,
+        });
       }
       this.anchorCount++;
     }
@@ -262,9 +277,20 @@ export class NameplatePainter {
 
   remove(id: number): void {
     this.states.delete(id);
+    for (let i = 0; i < this.anchorCount; i++) {
+      const anchor = this.anchorScratch[i];
+      if (anchor.id !== id) continue;
+      anchor.pickable = false;
+      break;
+    }
+  }
+
+  pickEntityAt(clientX: number, clientY: number): number | null {
+    return pickNameplateHealthBarAt(this.anchorScratch, this.anchorCount, clientX, clientY);
   }
 
   dispose(): void {
+    this.anchorCount = 0;
     this.states.clear();
     this.surface.dispose();
   }
@@ -300,7 +326,7 @@ export class NameplatePainter {
           ? t('abilityUi.cast.gathering')
           : ABILITIES[cast.label]
             ? tEntity({ kind: 'ability', id: cast.label, field: 'name' })
-            : cast.label;
+            : abilityDisplayNameFromSource(cast.label);
     } else if (!cast.visible) {
       state.castSource = '';
       state.castLabel = '';

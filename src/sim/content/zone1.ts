@@ -740,6 +740,9 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
       'gathering_sickle',
       'ironreel_fishing_rod',
       'silverstream_fishing_rod',
+      // The one materials-only satchel a vendor stocks, sold beside the two
+      // general pouches above so the two-pool trade is legible at the counter.
+      'burlap_reagent_pouch',
     ],
     greeting: 'Fresh bread, clean water, fair prices. What can I get you?',
   },
@@ -910,7 +913,13 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     // and the vendor-only thread staple. thorium_ore used to sit here as a
     // premium reagent; it is a node yield, and no NPC stocks a gathered
     // material (professions.md, Locked rulings).
-    vendorItems: ['linen_pouch', 'travelers_knapsack', 'gathering_sickle', 'spool_of_thread'],
+    vendorItems: [
+      'linen_pouch',
+      'travelers_knapsack',
+      'gathering_sickle',
+      'spool_of_thread',
+      'burlap_reagent_pouch',
+    ],
     greeting: 'Mind the threads, $C. A steady hand at the loom beats a strong one.',
   },
   tinker_gizzel: {
@@ -1033,7 +1042,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Sableweb Menace',
     giverNpcId: 'apothecary_lin',
     turnInNpcId: 'apothecary_lin',
-    text: 'The lurkers in the northeastern woods spin a silk I need for my poultices — and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
+    text: 'The lurkers in the northeastern woods spin a silk I need for my poultices, and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
     completionText: "Ugh, still twitching. Perfect. Here, you've earned this.",
     objectives: [
       { type: 'kill', targetMobId: 'webwood_spider', count: 6, label: 'Sableweb Lurker slain' },
@@ -1270,7 +1279,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Bandits of the Vale',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out — slay 10 Vale Bandits.',
+    text: 'A pack of cutthroats has made camp in the northwest hills. They have robbed three wagons this week. Drive them out: slay 10 Vale Bandits.',
     completionText: 'Ten fewer knives in the dark. Take this — you have earned it.',
     objectives: [
       { type: 'kill', targetMobId: 'vale_bandit', count: 10, label: 'Vale Bandit slain' },

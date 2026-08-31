@@ -9,7 +9,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). The market draws NO rng.
 
-import { bagCapacity, canGrantCopies, instancedCountCap } from './bags';
+import { bagPools, canGrantCopies, instancedCountCap } from './bags';
 import { rekeySigner } from './character_rename';
 import { ITEMS } from './data';
 import { formatMoney } from './format_money';
@@ -102,6 +102,10 @@ export const MARKET_HOUSE_STOCK = [
   // grows over it. See market_listing_ids.ts, #2463.)
   { itemId: 'linen_pouch', count: 1, price: 250 },
   { itemId: 'travelers_knapsack', count: 1, price: 2000 },
+  // APPENDED per the rule above. Only the vendor-sold bag is seeded: the house
+  // row exists so the auction floor never undercuts the counter, and the
+  // crafted and drop-only bags have no counter price to anchor against.
+  { itemId: 'burlap_reagent_pouch', count: 1, price: 1000 },
 ] as const;
 // The current lowest active listing price for `itemId`, PER UNIT (issue #3043):
 // `MarketListing.price` is the total buyout for the whole stack, but the Sell
@@ -785,7 +789,7 @@ export class Market {
     if (
       !canGrantCopies(
         meta.inventory,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         listing.itemId,
         listing.count,
         listing.instance,
@@ -856,7 +860,7 @@ export class Market {
     if (
       !canGrantCopies(
         meta.inventory,
-        bagCapacity(meta.bags),
+        bagPools(meta.bags),
         listing.itemId,
         listing.count,
         listing.instance,
@@ -929,7 +933,7 @@ export class Market {
       if (
         canGrantCopies(
           meta.inventory,
-          bagCapacity(meta.bags),
+          bagPools(meta.bags),
           s.itemId,
           s.count,
           s.instance,

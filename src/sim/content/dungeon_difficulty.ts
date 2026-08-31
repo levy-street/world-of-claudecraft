@@ -1,3 +1,4 @@
+import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_MOLTEN_ASSEMBLY_ID } from '../ignivar_raid_ids';
 import type { DungeonDifficulty } from '../types';
 
 // The participation token awarded directly to every eligible player when a
@@ -10,10 +11,10 @@ export const HEROIC_MARK_ITEM_ID = 'heroic_mark';
 // it for the normal copper base on the same single rng draw). Heroic runs
 // sit behind the per-dungeon daily lockout, so this rewards the legitimate
 // clear while the modest normal-mode bases stay the anti-farm line.
-// Five-man finales pay 10g nominal (rolls 6g to 14g); the Nythraxis raid
-// finale pays 20g nominal (rolls 12g to 28g). Full ladder + the daily
-// circuit ceiling: docs/design/dungeon-gold.md; pinned by
-// tests/heroic_finale_gold.test.ts.
+// Five-man finales pay 10g nominal (rolls 6g to 14g); a raid finale
+// (Nythraxis, and the Ignivar herald with it) pays 20g nominal (rolls 12g
+// to 28g). Full ladder + the daily circuit ceiling:
+// docs/design/dungeon-gold.md; pinned by tests/heroic_finale_gold.test.ts.
 export const HEROIC_FINALE_COPPER = 100000;
 export const NYTHRAXIS_HEROIC_COPPER = 200000;
 
@@ -37,6 +38,10 @@ export interface HeroicDungeonTuning {
   // Nythraxis encounter-script adds (spawned with NO summonedAdd role, and
   // spanning a 2x spread in base weapon damage).
   damageMultiplierByMob?: Record<string, number>;
+  // Optional per-mob overrides for encounter mechanics that must be decoupled
+  // from melee after the level-22 transform.
+  mechanicDamageMultiplierByMob?: Record<string, number>;
+  burnDamageMultiplierByMob?: Record<string, number>;
   // Per-mob HEALTH override (same shape as the damage map): a mob listed here
   // takes this factor instead of the dungeon-wide healthMultiplier. Added for
   // the 2026-07-24 heroic Nythraxis nerf (skeleton waves at 1.2x their
@@ -49,6 +54,8 @@ export interface HeroicDungeonTuning {
   // Marks awarded directly to each eligible participant at kill time.
   marksPerParticipant: number;
 }
+
+export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPerParticipant'>;
 
 // Tuning model (economy retune, 2026-07): every heroic mob is pinned to LEVEL
 // 22 (two above the level-20 player cap). The calibration target is a FLOOR,
@@ -140,6 +147,36 @@ export interface NormalDungeonTuning {
 // both of which pass this seam. Pinned by
 // tests/heroic_difficulty_floors.test.ts.
 export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
+  [IGNIVAR_FORGE_APPROACH_ID]: {
+    id: IGNIVAR_FORGE_APPROACH_ID,
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 1.5,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 1.5,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.25,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 2,
+    },
+  },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    difficulty: 'normal',
+    healthMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 1.5,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 1.5,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.25,
+      ignivar_ember_sentinel: 1.5,
+      ignivar_crucible_warden: 2,
+    },
+  },
   gravewyrm_sanctum: {
     id: 'gravewyrm_sanctum',
     difficulty: 'normal',
@@ -212,6 +249,65 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
       wildheart_stalker: 2.7,
       wildheart_hexcaller: 2.5,
     },
+  },
+};
+
+// These rooms support Heroic mob transforms but are not finale instances:
+// they must not carry final-boss rewards or lockouts. Keeping them outside
+// HEROIC_DUNGEON_TUNING scopes the pressure pass to the two preboss spawn
+// lists and prevents Varkhul's encounter summons from inheriting it.
+export const HEROIC_MOB_TUNING: Record<string, HeroicMobTuning> = {
+  [IGNIVAR_FORGE_APPROACH_ID]: {
+    id: IGNIVAR_FORGE_APPROACH_ID,
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 5 / 3,
+    healthMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    damageMultiplier: 1,
+    addDamageMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 2,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.75,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 4,
+    },
+    burnDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+    },
+    armorMultiplier: 1.2,
+  },
+  [IGNIVAR_MOLTEN_ASSEMBLY_ID]: {
+    id: IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 5 / 3,
+    healthMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    damageMultiplier: 1,
+    addDamageMultiplier: 1,
+    damageMultiplierByMob: {
+      derelict_mech: 2,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 2,
+    },
+    mechanicDamageMultiplierByMob: {
+      derelict_mech: 1.75,
+      ignivar_ember_sentinel: 2,
+      ignivar_crucible_warden: 4,
+    },
+    burnDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 2,
+    },
+    armorMultiplier: 1.2,
   },
 };
 
@@ -342,6 +438,55 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',
+    marksPerParticipant: 3,
+  },
+  // Ignivar's development raid tier. This record makes an explicit Heroic
+  // claim possible while Normal continues to use the untouched base template.
+  // The multipliers remain provisional while full-raid telemetry is gathered.
+  // A parse-calibrated full-BiS raid simulation reduced the initial health and
+  // damage values, which prevented every tested composition from killing.
+  // Damage tuning applies to spawn-time weapon values. Encounter-owned max-HP
+  // mechanics keep their authored percentages. The Heart has no attacks, so its
+  // add multiplier is currently an inert mirror of the dungeon-wide value.
+  ignivar_raid_arena: {
+    id: 'ignivar_raid_arena',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 1.75,
+    damageMultiplier: 2,
+    addDamageMultiplier: 2,
+    armorMultiplier: 1.2,
+    finalBossId: 'ignivar_herald_of_the_last_flame',
+    marksPerParticipant: 3,
+  },
+  ignivar_inner_crucible: {
+    id: 'ignivar_inner_crucible',
+    difficulty: 'heroic',
+    level: 22,
+    healthMultiplier: 5 / 3,
+    // Boss: 120k -> 200k. Add overrides pin the requested per-role Heroic
+    // progression after the shared level transform: Sentinel +20%, Warden
+    // +25%, Artificer +30%.
+    healthMultiplierByMob: {
+      ignivar_ember_sentinel: (1200 * 1.2) / 1300,
+      ignivar_crucible_warden: (1395 * 1.25) / 1505,
+      ignivar_cinder_artificer: (2170 * 1.3) / 2330,
+    },
+    damageMultiplier: (251.5 * 1.35) / 272.5,
+    addDamageMultiplier: 1,
+    damageMultiplierByMob: {
+      ignivar_ember_sentinel: (101.8 * 1.25) / 110.2,
+      ignivar_crucible_warden: (92.2 * 1.25) / 99.8,
+      ignivar_cinder_artificer: 1,
+    },
+    mechanicDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 1.25,
+    },
+    burnDamageMultiplierByMob: {
+      ignivar_ember_sentinel: 1.25,
+    },
+    armorMultiplier: 1.2,
+    finalBossId: 'varkhul_forgefather_of_the_last_flame',
     marksPerParticipant: 3,
   },
 };

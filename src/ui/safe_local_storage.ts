@@ -16,8 +16,13 @@
  * is unavailable (SSR/no browser) or a read throws (storage disabled, private-mode
  * quota lockouts on some browsers). Callers still wrap their own getItem/setItem in
  * try/catch: a storage object handed back here can still throw on individual calls.
+ *
+ * `removeItem` is here because a row a caller can write but never remove has no
+ * bounded lifetime, and src/ui/purchase_intent_durability.ts persists a REAL
+ * MONEY artifact that must be removable the moment its purchase settles. Widening
+ * the returned type leaves every existing caller's narrower `Pick` satisfied.
  */
-export function safeLocalStorage(): Pick<Storage, 'getItem' | 'setItem'> | null {
+export function safeLocalStorage(): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null {
   try {
     return typeof localStorage !== 'undefined' ? localStorage : null;
   } catch {

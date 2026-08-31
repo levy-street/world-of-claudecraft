@@ -354,12 +354,20 @@ grew organically. Tighten module boundaries, kill dead/duplicated code, and land
 - A run can roll **Bountiful**, which adds a bonus **Bountiful Coffer** at the end
   containing **higher item-level gear**.
 - **Roll chance (ultra-rare):** **Heroic = 5%**, **Normal = 2%**. Use `this.rng`
-  (deterministic), rolled at run start.
+  (deterministic), rolled at run start. Historical record, per `docs/CLAUDE.md`:
+  the shipped rate has since moved (raised 4x to Heroic 20% / Normal 8%, see
+  `claimDelveRun` in `src/sim/delves/runs.ts`) because the compounded odds of
+  a Drowned Litany chase epic landed near 1 in 700 per heroic clear; this line
+  is left as-is to record the original decision, not re-edited to track it.
 - **DECIDED — gating REQUIRES "Hard Premium Cache" completion to OPEN.** The
   Bountiful Coffer **requires a Hard-tier + Premium-ante lockpick solve to open**
   (`DELVE_LOCKPICK_MINIGAME.md` ante/tier system) — not merely to roll. The roll
   decides whether a (locked) purple coffer appears; opening it is gated on the
-  hard-premium solve.
+  hard-premium solve. Implemented for the Collapsed Reliquary's lockpick coffer
+  (`lockpick_controller.ts`, gated on `solved &&`); The Drowned Litany's later
+  Drowned Reliquary Rite coffer (`drowned_litany_rite.ts` `openDrownedReliquary`)
+  does not carry the same solve gate, a pre-existing gap outside this doc's
+  scope to fix.
 - **DECIDED — UI must force Hard when the prize is purple; no easier options.**
   When the coffer is **purple** (Bountiful / ultra-rare), the lockpick ante selector
   must present **only the Hard (Premium) path** — do **not** offer the lower

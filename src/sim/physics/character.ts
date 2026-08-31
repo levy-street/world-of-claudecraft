@@ -57,6 +57,13 @@ import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
  * Pinned against the rock size model by tests/physics_character.test.ts.
  */
 export const MAX_STEP_HEIGHT = 0.9;
+
+/** Feet more than this far above the raw ground mean the body stands on a
+ *  collider (a deck, a tread, a crate), not the terrain. The steep-ground
+ *  control strip (player_motion.ts) and the grounded terrain wall gate
+ *  below both yield to a carried body, because neither is judging the
+ *  surface that body actually walks on. */
+export const PLATFORM_CARRY_CLEARANCE = 0.5;
 /** Slide passes per move. Four resolves a corner (two planes) plus slack. */
 const MAX_SLIDE_ITERATIONS = 4;
 /** Depenetration passes when the body starts embedded. */
@@ -427,7 +434,23 @@ export function moveCharacter(
   let groundEnd = Math.max(rawEnd, wls);
   const run = Math.hypot(dx, dz);
   const airborneClears = !params.grounded && groundEnd <= feetY;
-  if (!params.swimming && !airborneClears && groundEnd > groundStart && run > 1e-5) {
+  // A grounded body CARRIED by a standable platform (feet well above the
+  // raw ground: a fortress floor plate crossing a ramp band's buried edge)
+  // is not walking the heightfield it stands over, so the wall rule yields
+  // whenever the ground ahead still tops out within an ordinary step of
+  // the feet and the vertical pass can simply seat onto it. Ground rising
+  // PAST the feet stays a wall: a carried body never walks into a mass.
+  const carriedClears =
+    params.grounded &&
+    feetY > groundStart + PLATFORM_CARRY_CLEARANCE &&
+    groundEnd <= feetY + MAX_STEP_HEIGHT;
+  if (
+    !params.swimming &&
+    !airborneClears &&
+    !carriedClears &&
+    groundEnd > groundStart &&
+    run > 1e-5
+  ) {
     const rise = groundEnd - groundStart;
     const unwalkable =
       (rise / run > params.maxSlope ||

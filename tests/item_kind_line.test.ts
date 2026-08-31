@@ -68,6 +68,15 @@ describe('the tooltip kind line for material grades', () => {
     expect(tooltipHtml('game_meat')).not.toMatch(/\bJunk\b/);
   });
 
+  it('Core of the Last Flame reads Epic Material, not Epic Junk', () => {
+    expect(ITEMS.lastflame_core.kind).toBe('junk');
+    expect(MATERIAL_ITEM_IDS.has('lastflame_core')).toBe(true);
+    expect(itemKindLabel('junk', 'lastflame_core')).toBe('Material');
+    const html = tooltipHtml('lastflame_core');
+    expect(html).toContain('Epic Material');
+    expect(html).not.toContain('Epic Junk');
+  });
+
   it('ordinary junk-kind items keep the Junk line when not honest materials', () => {
     const junkId = Object.keys(ITEMS).find(
       (id) =>

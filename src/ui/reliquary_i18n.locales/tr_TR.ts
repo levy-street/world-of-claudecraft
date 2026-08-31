@@ -150,4 +150,20 @@ export const table: ReliquaryLocaleTable = {
     name: 'Yarık Halkaları',
     desc: "Kişisel Yarık halkaları: dereceli bir Yarık'ın ilk tamamlamasını kazanan gruptaki her şampiyon için basılır. Bir karakter yalnızca kendisininkini taşıyabilir.",
   },
+  conquerors_ignivar: {
+    name: 'Crucible of the Last Spring',
+    desc: "Ignivar, Herald of the Last Flame'den çıkan epik ganimetler.",
+  },
+  conquerors_ignivar_heroic: {
+    name: 'Kahramanca: Crucible of the Last Spring',
+    desc: "Ignivar, Herald of the Last Flame'den yalnızca kahramanca modda düşen silahlar.",
+  },
+  conquerors_varkhul: {
+    name: 'The Inner Crucible',
+    desc: "Varkhul, Forgefather of the Last Flame'den çıkan epik ganimetler.",
+  },
+  conquerors_varkhul_heroic: {
+    name: 'Kahramanca: The Inner Crucible',
+    desc: "Varkhul, Forgefather of the Last Flame'den yalnızca kahramanca modda düşen kalkanlar ve silahlar.",
+  },
 };

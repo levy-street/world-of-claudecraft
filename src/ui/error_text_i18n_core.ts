@@ -46,6 +46,20 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
       });
     }
   }
+  // Normal-difficulty raid lockout (the weekly rooms): the same enrichment
+  // keyed on the plain dungeon id. The negative lookahead keeps "Heroic X"
+  // for the heroic arm below instead of relying on arm ordering.
+  const normalLock = /^You are locked to (?!Heroic )(.+)\.$/.exec(text);
+  if (normalLock) {
+    const base = DUNGEON_LIST.find((d) => d.name === normalLock[1]);
+    const lock = base ? deps.raidLockouts().find((l) => l.id === base.id) : undefined;
+    if (base && lock) {
+      return t('hudChrome.raidLockout.lockedToast', {
+        raid: dungeonDisplayName(base.id),
+        time: deps.formatLockoutDuration(lock.msRemaining),
+      });
+    }
+  }
   // Heroic daily lockout (any heroic instance): resolve the dungeon name and
   // enrich with the live countdown when the mirrored lockout is present.
   const heroicLock = /^You are locked to Heroic (.+)\.$/.exec(text);
@@ -132,6 +146,7 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
     'The trade request has expired.': 'hud.errors.tradeExpired',
     'Trade failed: items or money no longer available.': 'hud.errors.tradeFailed',
     'That item is bound and cannot be traded.': 'hud.errors.tradeBound',
+    'That can only be traded to players who shared its drop.': 'hud.errors.tradeWindowIneligible',
     'That item is bound and cannot be listed.': 'hud.errors.marketListBound',
     'That quest is not available.': 'questUi.errors.unavailable',
     'That quest is not in your log.': 'questUi.errors.notInLog',

@@ -894,11 +894,17 @@ export function generateRiftFloor(
   return upgradedFloor(plan, upgrade);
 }
 
-/** Instance-local collider set for a rift floor (pure, from the generated layout). */
+/** Instance-local collider set for a rift floor (pure, from the generated
+ *  layout). `upgrade` never changes the returned colliders today
+ *  (applyRiftUpgrade only ever rewrites name/themeName/style/spawns, never
+ *  layout), but accepting and threading it keeps this mirror
+ *  shape-equivalent to generateRiftFloor rather than resting on that
+ *  invariant staying true forever. */
 export function riftFloorColliders(
   seed: number,
   baseLevel: number,
   floorIndex: number,
+  upgrade?: RiftUpgradeManifest | null,
 ): Collider[] {
-  return layoutColliders(generateRiftFloor(seed, baseLevel, floorIndex).layout);
+  return layoutColliders(generateRiftFloor(seed, baseLevel, floorIndex, upgrade).layout);
 }

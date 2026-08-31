@@ -12,6 +12,7 @@ import {
   steadyAngleTo,
 } from '../types';
 import { chainPullTransitHoldsLeash, clearChainPullInbound } from './chain_pull_transit';
+import { updateDerelictBomber } from './derelict_bomber';
 import { dragonkinEngageShout } from './dragonkin_brood';
 import { NYTHRAXIS_SPIRIT_MENDING_CAST_ID } from './healer_channel';
 import { chaseStalledUnreachable } from './reachability';
@@ -32,6 +33,7 @@ type EngagedTickHook = () => void;
 function startEvadeHome(mob: Entity): void {
   mob.aiState = 'evade';
   mob.aggroTargetId = null;
+  mob.autoAttack = false; // leashing home: not swinging, whatever it was doing before
   clearThreat(mob);
   mob.leashAnchor = null;
   clearChainPullInbound(mob);
@@ -57,8 +59,12 @@ export function mobEffectiveMeleeRange(mob: Entity): number {
 }
 
 export function tryMobMeleeSwingInRange(ctx: SimContext, mob: Entity, target: Entity): boolean {
-  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) return false;
+  if (dist2d(mob.pos, target.pos) > mobEffectiveMeleeRange(mob)) {
+    mob.autoAttack = false;
+    return false;
+  }
   mob.aiState = 'attack';
+  mob.autoAttack = true;
   mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
   if (mob.swingTimer <= 0) {
     ctx.mobSwing(mob, target);
@@ -84,6 +90,7 @@ export function updateMobCombatProfile(
   updateMobTarget(ctx, mob);
   const target = mob.aggroTargetId !== null ? ctx.entities.get(mob.aggroTargetId) : null;
   if (!target || target.dead) {
+    mob.autoAttack = false;
     retargetMob(ctx, mob);
     return 'done';
   }
@@ -94,7 +101,7 @@ export function updateMobCombatProfile(
     // and ignores the flee-recovery grace: past it the mob goes home, however
     // the fight has been dragged. Checked before the soft leash so a tethered
     // mob can never be walked out one anchor-refresh at a time.
-    const hardLeash = MOBS[mob.templateId]?.hardLeashRadius;
+    const hardLeash = mob.ignoreHardLeash ? undefined : MOBS[mob.templateId]?.hardLeashRadius;
     if (hardLeash !== undefined && dist2d(mob.pos, mob.spawnPos) > hardLeash) {
       startEvadeHome(mob);
       return 'done';
@@ -120,6 +127,13 @@ export function updateMobCombatProfile(
     }
   }
 
+  // Suicide-bomber mechs own their whole engaged tick (face-before-move approach,
+  // arming windup, detonation) in place of the normal pursuit + melee swing.
+  if (MOBS[mob.templateId]?.meleeBomb) {
+    updateDerelictBomber(ctx, mob, target, profile);
+    return 'done';
+  }
+
   onEngagedTick?.();
 
   // Dragonkin engage shout: the brood bellows BEFORE it walks. Fires once per
@@ -138,6 +152,7 @@ export function updateMobCombatProfile(
     if (mob.shoutIntroUntil !== undefined && ctx.time < mob.shoutIntroUntil) {
       mob.facing = steadyAngleTo(mob.pos, target.pos, mob.facing);
       mob.aiState = 'attack';
+      mob.autoAttack = false; // standing through the shout window, not swinging yet
       return 'done';
     }
   }
@@ -200,6 +215,7 @@ function updateHealerHold(ctx: SimContext, mob: Entity): MobCombatProfileResult 
     mob.healProtecteeId = protectee?.id ?? null;
   }
   if (!protectee) return null; // nobody to heal: fall back to melee AI
+  mob.autoAttack = false; // healing/standing off, never melee, in every branch below
   mob.facing = Math.atan2(protectee.pos.x - mob.pos.x, protectee.pos.z - mob.pos.z);
   const clearBar = () => {
     mob.castingAbility = null;
@@ -248,6 +264,7 @@ function updateCasterCombat(
       mob.aiState = 'chase';
       return 'done';
     }
+    mob.autoAttack = false; // casting from range, not swinging
     ctx.updateRangedPetAttack(mob, target, spell);
     return 'done';
   }
@@ -277,6 +294,7 @@ function updatePursuitProfileCombat(
   target: Entity,
   profile: MobCombatProfile,
 ): void {
+  mob.autoAttack = false; // default: tryMobMeleeSwingInRange will overwrite to true if genuinely in range
   mob.swingTimer = Math.max(0, mob.swingTimer - DT);
   if (profile.swingWhilePursuing || mob.aiState === 'attack') {
     tryMobMeleeSwingInRange(ctx, mob, target);

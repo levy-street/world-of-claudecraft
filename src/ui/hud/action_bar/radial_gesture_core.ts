@@ -22,6 +22,22 @@ export type RadialGestureOutcome =
   | { kind: 'cancel' }
   | { kind: 'none' };
 
+export type RadialPressOutcome = { kind: 'cancel-aim' } | { kind: 'continue' };
+
+export interface RadialPressInput {
+  /** Whether the active ground aim belongs to any direction on this button. */
+  aimOwnedByButton: boolean;
+}
+
+/**
+ * An active ground aim owned by the physical button takes the whole press. The
+ * decision runs before the drag and tap-menu tables, so the raw centre gesture
+ * cannot cast or open over an aim started from one of the button's petals.
+ */
+export function resolveRadialPress(input: RadialPressInput): RadialPressOutcome {
+  return input.aimOwnedByButton ? { kind: 'cancel-aim' } : { kind: 'continue' };
+}
+
 export interface RadialReleaseInput {
   /** The direction the drag resolved to at release. */
   direction: RadialDirection;

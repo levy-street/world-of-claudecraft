@@ -19,6 +19,7 @@ import {
   LAMP_SCALE,
 } from '../src/render/streetlamps';
 import { BUILTIN_WORLD, setActiveWorldContent } from '../src/sim/data';
+import { forgefatherStreetlampSites } from '../src/sim/forgefather_fortress';
 import { LAMP_LIGHT_AXIS_MIN } from '../src/sim/streetlamp_layout';
 import { roadDistance } from '../src/sim/world';
 
@@ -344,6 +345,14 @@ describe('streetlamp GLB preparation', () => {
       for (let i = 0; i < object.count; i++) {
         object.getMatrixAt(i, matrix);
         matrix.decompose(position, quaternion, scale);
+        // the authored fortress lamps stand off the road network by design:
+        // the road-relative hang contract covers the planned network only
+        if (
+          forgefatherStreetlampSites().some(
+            (site) => Math.abs(site.x - position.x) < 0.01 && Math.abs(site.z - position.z) < 0.01,
+          )
+        )
+          continue;
         const stand = roadDistance(position.x, position.z);
         const lit = scratch.copy(socket).applyQuaternion(quaternion).add(position);
         const base = scratch.clone().copy(foot).applyQuaternion(quaternion).add(position);
@@ -380,7 +389,11 @@ describe('streetlamp GLB preparation', () => {
 
     setActiveWorldContent({ ...BUILTIN_WORLD, roads: [] });
     buildStreetlamps(0);
-    expect(nightLightStaticCount()).toBe(0);
+    // The ROAD network clears with the roads; the authored fortress lamps
+    // are venue fixtures the builtin world carries regardless, so exactly
+    // that set remains (the point of this case is that no stale road lamp
+    // lingers from the previous build).
+    expect(nightLightStaticCount()).toBe(forgefatherStreetlampSites().length);
   });
 });
 

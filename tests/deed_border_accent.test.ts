@@ -637,7 +637,7 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
   });
 
   it('E56: canvas and social-surface metal stay independent of every theme', () => {
-    expect(PRESET_ORDER).toEqual(['classic', 'midnight', 'parchment', 'highContrast']);
+    expect(PRESET_ORDER).toEqual(['classic', 'fancyGold', 'midnight', 'parchment', 'highContrast']);
     expect(THEME_PRESETS.parchment.panel).toBe('#ece0c4');
     const themeSource = read('src/ui/theme.ts');
     expect(themeSource).not.toContain('--border-accent-frame');
@@ -1134,8 +1134,8 @@ describe('border accent graphics fairness (cosmetic identity, preset-identical)'
     }
     expect(
       allTierShadowDeclarations,
-      'the style graph owns 29 reviewed tier-shadow uses',
-    ).toHaveLength(29);
+      'the style graph owns 30 reviewed tier-shadow uses',
+    ).toHaveLength(30);
 
     for (const [name, body] of [
       [

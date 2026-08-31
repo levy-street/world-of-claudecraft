@@ -22,7 +22,7 @@
 // is kept: the partition should plan for the expensive occurrence.
 
 import { execFileSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parseWeightLines } from './lib/ci_shard_weight_parse.mjs';
 
@@ -75,5 +75,34 @@ const out = {
   ...sorted,
 };
 const target = resolve(import.meta.dirname, 'ci_shard_weights.generated.json');
+// A wholesale re-harvest replaces any locally measured rows a release sync
+// merged in. The checked-in provenance uses sibling mergedLocal/mergedFiles;
+// accept the older nested localMerge shape too so either table warns.
+try {
+  const provenance = JSON.parse(readFileSync(target, 'utf8')).__provenance;
+  const measured = provenance?.mergedLocal ?? provenance?.localMerge?.measured;
+  const files = provenance?.mergedFiles ?? provenance?.localMerge?.files;
+  if (typeof measured === 'string' && measured && Number.isInteger(files) && files > 0) {
+    console.log(
+      `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
+    );
+  } else if (
+    provenance &&
+    typeof provenance === 'object' &&
+    Object.keys(provenance).some((k) => !['run', 'harvested', 'files'].includes(k))
+  ) {
+    // The provenance carries keys beyond this script's own plain-harvest
+    // output, but neither known local-merge shape parsed: a THIRD shape the
+    // advisory above cannot see. Say so instead of silently overwriting
+    // whatever locally measured rows that shape recorded.
+    console.warn(
+      `[harvest] unrecognized __provenance shape (keys: ${Object.keys(provenance).join(', ')}); ` +
+        'the prior table may carry locally measured rows this rewrite DISCARDS. Inspect the ' +
+        'old provenance before trusting the new table.',
+    );
+  }
+} catch {
+  // No prior table (or unreadable): nothing to report.
+}
 writeFileSync(target, `${JSON.stringify(out, null, 2)}\n`);
 console.log(`[harvest] wrote ${Object.keys(sorted).length} weights to ${target}`);

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
-import { FrozenOrbFx } from '../src/render/frozen_orb_fx';
+import { describe, expect, it, vi } from 'vitest';
+import { FrozenOrbFx, handleFrozenOrbSpellfxEvent } from '../src/render/frozen_orb_fx';
 
 interface OrbInternals {
   shellMat: THREE.MeshStandardMaterial;
@@ -85,5 +85,43 @@ describe('Frozen Orb visual', () => {
     // Every one of the CAP new orbs drew its shell material from the
     // surviving pool: no fresh allocation past the cap.
     for (const mat of secondBatch) expect(pooled.has(mat)).toBe(true);
+  });
+});
+
+describe('handleFrozenOrbSpellfxEvent (the renderer orb dispatch, moved verbatim)', () => {
+  function stub() {
+    return { spawn: vi.fn(), halt: vi.fn(), resume: vi.fn() };
+  }
+
+  it('routes the three flight moments and applies the release defaults', () => {
+    const fx = stub();
+    const orb = fx as unknown as FrozenOrbFx;
+    expect(handleFrozenOrbSpellfxEvent(orb, { fx: 'orb', x: 3, z: 4, sourceId: 9 })).toBe(true);
+    expect(fx.spawn).toHaveBeenCalledWith({
+      sourceId: 9,
+      x: 3,
+      z: 4,
+      dirX: 0,
+      dirZ: 1,
+      speed: 2.5,
+      duration: 8,
+    });
+    expect(
+      handleFrozenOrbSpellfxEvent(orb, { fx: 'orb', phase: 'halt', x: 5, z: 6, sourceId: 9 }),
+    ).toBe(true);
+    expect(fx.halt).toHaveBeenCalledWith(9, 5, 6);
+    expect(handleFrozenOrbSpellfxEvent(orb, { fx: 'orb', phase: 'resume', x: 7, z: 8 })).toBe(true);
+    // A missing sourceId keys the shared -1 slot, exactly the old inline default.
+    expect(fx.resume).toHaveBeenCalledWith(-1, 7, 8);
+  });
+
+  it('leaves every non-orb cue unclaimed for the arms behind it', () => {
+    const fx = stub();
+    const orb = fx as unknown as FrozenOrbFx;
+    expect(handleFrozenOrbSpellfxEvent(orb, { fx: 'snowZone', x: 1, z: 2 })).toBe(false);
+    expect(handleFrozenOrbSpellfxEvent(orb, { fx: 'burst', x: 1, z: 2 })).toBe(false);
+    expect(fx.spawn).not.toHaveBeenCalled();
+    expect(fx.halt).not.toHaveBeenCalled();
+    expect(fx.resume).not.toHaveBeenCalled();
   });
 });

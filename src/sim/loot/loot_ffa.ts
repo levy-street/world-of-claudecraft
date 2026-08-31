@@ -43,3 +43,23 @@ export function hasSharedLootRights(
     !!tapperPartyMemberIds?.includes(pid)
   );
 }
+
+/**
+ * Is `pid` part of the group the corpse's loot is owed to: the tapper, their current
+ * party, or the kill-time recipient snapshot?
+ *
+ * The permission counterpart {@link hasSharedLootRights} also says yes to an outsider
+ * once the corpse goes FFA. Party loot strategies bind only this group, so the two
+ * questions must stay separate: distribution asks this one, or an FFA outsider's loot
+ * gets routed to a party that never came back for it.
+ */
+export function isTapGroupMember(
+  pid: number,
+  tappedById: number | null,
+  tapperPartyMemberIds: readonly number[] | null,
+  lootRecipientIds: readonly number[] | null,
+): boolean {
+  return (
+    tappedById === pid || !!tapperPartyMemberIds?.includes(pid) || !!lootRecipientIds?.includes(pid)
+  );
+}

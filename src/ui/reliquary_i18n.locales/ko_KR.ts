@@ -176,4 +176,20 @@ export const table: ReliquaryLocaleTable = {
     name: '균열결속',
     desc: '개인 전용 균열의 고리. 등급 균열의 첫 클리어를 따낸 파티의 용사 한 명 한 명을 위해 벼려집니다. 캐릭터는 자기 것만 가질 수 있습니다.',
   },
+  conquerors_ignivar: {
+    name: '마지막 샘의 도가니',
+    desc: '이그니바르, 마지막 불꽃의 전령에게서 나오는 서사 전리품.',
+  },
+  conquerors_ignivar_heroic: {
+    name: '영웅: 마지막 샘의 도가니',
+    desc: '이그니바르, 마지막 불꽃의 전령에게서 영웅 난이도에서만 나오는 무기.',
+  },
+  conquerors_varkhul: {
+    name: '내부 용광로',
+    desc: '마지막 불꽃의 대장장이 발쿨에게서 나오는 서사 전리품.',
+  },
+  conquerors_varkhul_heroic: {
+    name: '영웅: 내부 용광로',
+    desc: '마지막 불꽃의 대장장이 발쿨에게서 영웅 난이도에서만 나오는 방패와 무기.',
+  },
 };

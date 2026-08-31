@@ -34,6 +34,13 @@ describe('character state JSONB back-compat', () => {
       inventory: [{ itemId: 'wolf_fang', count: 3 }],
       purchasedSlots: 6,
       bonusSlots: 0,
+      // Live meta always carries the socket fields and the applied
+      // storage-purchase keys (sanitize materializes all three); at their
+      // defaults the serializer omits them, which the 3-field state.bank
+      // expectation below deliberately pins.
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
     };
 
     const state = sim.serializeCharacter(pid)!;
@@ -77,7 +84,14 @@ describe('character state JSONB back-compat', () => {
     expect(reloadedMeta.vendorBuyback).toEqual([]);
     expect(reloadedMeta.delveClears).toEqual({});
     expect(reloadedMeta.companionUpgrades).toEqual({});
-    expect(reloadedMeta.bank).toEqual({ inventory: [], purchasedSlots: 0, bonusSlots: 0 });
+    expect(reloadedMeta.bank).toEqual({
+      inventory: [],
+      purchasedSlots: 0,
+      bonusSlots: 0,
+      unlockedSockets: 0,
+      socketBags: [null, null, null, null],
+      appliedStorageKeys: [],
+    });
 
     // And it re-serializes cleanly with the defaults in place.
     const reserialized = sim2.serializeCharacter(reloadedPid)!;

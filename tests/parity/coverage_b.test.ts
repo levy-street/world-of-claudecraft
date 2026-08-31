@@ -441,11 +441,21 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(ev.some((e) => e.type === 'heal2' && e.ability === hotAbility && e.amount > 0)).toBe(
       true,
     );
+    // The HoT arm drains heal-absorb like every other heal, so a blighted
+    // Rejuvenation cannot tick at full value: some tick reports what the shield ate.
+    expect(
+      ev.some((e) => e.type === 'heal2' && e.ability === hotAbility && (e.absorbed ?? 0) > 0),
+    ).toBe(true);
     const ents = entities(rec);
     const tank = ents.find((e) => e.id === rec.notes.tankPid);
-    // consumeHealAbsorb: the small shield depleted + was filtered out; the big survived.
+    // consumeHealAbsorb: the small shield depleted + was filtered out; the big one
+    // survived heal 4 (which landed for nothing, soaking past absorb_small's 200
+    // budget) and the shrunk remainder was then drained away by the HoT ticks.
     expect(tank.auras?.some((a: Ev) => a.id === 'absorb_small')).toBe(false);
-    expect(tank.auras?.some((a: Ev) => a.id === 'absorb_big')).toBe(true);
+    const soaked = ev.find((e) => e.type === 'heal2' && e.ability === 'Healing Wave');
+    expect(soaked!.amount).toBe(0);
+    expect(soaked!.absorbed).toBeGreaterThan(200);
+    expect(tank.auras?.some((a: Ev) => a.id === 'absorb_big')).toBe(false);
     // healingThreat split landed: each aware mob now lists healer ids in its hate table.
     const healerIds = rec.notes.healerIds as number[];
     const m1 = ents.find((e) => e.id === rec.notes.m1Id);

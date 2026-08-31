@@ -8,6 +8,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync 
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { readSfxGainCeilings } from './sfx_gain_ceiling.mjs';
+import { isSfxMobExtensionKey } from './sfx_manifest_builder.mjs';
 import { SFX } from './sfx_prompts.mjs';
 
 export const DEFAULT_SFX_PROFILE_REPO_ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -33,6 +34,15 @@ const PLAYBACK_RATE_MIN = 0.25;
 const PLAYBACK_RATE_MAX = 4;
 const SFX_KEYS = new Set(SFX.map((entry) => entry.key));
 const CATEGORY_SET = new Set(SFX_PLAYBACK_CATEGORIES);
+
+// A key the playback maps may address: a fixed catalog row, or a discovered
+// mob subfamily extension key (mob_<family>_<sub>_<action>), which the
+// manifest builder mints from the filesystem with no catalog row of its own.
+// Both may carry gain trims and playback rates; anything else is a typo and
+// must throw rather than silently dropping an authored entry.
+export function isAddressableSfxKey(key) {
+  return SFX_KEYS.has(key) || isSfxMobExtensionKey(key);
+}
 // Computed per-key headroom for custom (hand-mastered) keys only, see
 // sfx_gain_ceiling.mjs: a key with a real generated entry here may resolve
 // ABOVE RESOLVED_GAIN_MAX_DB, up to its own measured-headroom ceiling. Every
@@ -146,7 +156,7 @@ export function normalizeSfxGainMap(raw) {
 
   const keyTrimDb = {};
   for (const key of Object.keys(rawTrims).sort()) {
-    if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX gain key: ${key}`);
+    if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX gain key: ${key}`);
     keyTrimDb[key] = boundedNumber(
       rawTrims[key],
       KEY_TRIM_MIN_DB,
@@ -157,6 +167,13 @@ export function normalizeSfxGainMap(raw) {
 
   const normalized = { version: 1, categoryBaselineDb, keyTrimDb };
   for (const { key } of SFX) resolvedGainDb(key, normalized);
+  // Extension keys sit outside the catalog sweep above, so a trimmed one is
+  // validated here or not at all: its resolved gain must clear the same
+  // per-key ceiling check (a trim past the computed custom-master headroom
+  // fails the build, exactly like a catalog key's would).
+  for (const key of Object.keys(keyTrimDb)) {
+    if (!SFX_KEYS.has(key)) resolvedGainDb(key, normalized);
+  }
   return normalized;
 }
 
@@ -167,7 +184,7 @@ export function normalizeSfxSpeedMap(raw) {
   const rawRates = assertObject(value.rateByKey, 'rateByKey');
   const rateByKey = {};
   for (const key of Object.keys(rawRates).sort()) {
-    if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX speed key: ${key}`);
+    if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX speed key: ${key}`);
     rateByKey[key] = boundedNumber(
       rawRates[key],
       PLAYBACK_RATE_MIN,
@@ -216,7 +233,7 @@ export function readSfxPlaybackProfile(repoRoot = DEFAULT_SFX_PROFILE_REPO_ROOT)
 }
 
 export function resolveSfxPlaybackProfile(key, rawProfile = {}) {
-  if (!SFX_KEYS.has(key)) throw new Error(`unknown SFX playback key: ${key}`);
+  if (!isAddressableSfxKey(key)) throw new Error(`unknown SFX playback key: ${key}`);
   const gainMap = normalizeSfxGainMap(rawProfile.gainMap ?? DEFAULT_SFX_GAIN_MAP);
   const speedMap = normalizeSfxSpeedMap(rawProfile.speedMap ?? DEFAULT_SFX_SPEED_MAP);
   const gainDb = resolvedGainDb(key, gainMap);

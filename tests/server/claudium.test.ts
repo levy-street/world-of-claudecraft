@@ -46,6 +46,12 @@ import { FakeRes, fakeCtx, makeReq } from './helpers';
 const spendMock = vi.mocked(claudiumSpend);
 const storeMock = vi.mocked(claudiumStore);
 const grantWeaponSkins = vi.fn();
+const storagePurchase = vi.fn(async () => ({
+  granted: false,
+  balance: null,
+  costClaudium: null,
+  reason: 'unavailable' as string | null,
+}));
 
 const MONETARY_MUTATION_ROUTES = [
   {
@@ -69,7 +75,7 @@ const MONETARY_MUTATION_ROUTES = [
 beforeEach(() => {
   vi.clearAllMocks();
   resetClaudiumMutationRateLimits();
-  configureClaudiumRuntime({ grantWeaponSkins });
+  configureClaudiumRuntime({ grantWeaponSkins, storagePurchase });
 });
 
 afterEach(() => {

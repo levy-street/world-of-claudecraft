@@ -31,7 +31,10 @@
 // consistent with what the game itself would produce.
 
 import { randomInt } from 'node:crypto';
+import { bagSlotsOf, isMaterialsOnlyBag } from '../src/sim/bag_pools';
 import { BAG_SOCKETS } from '../src/sim/bags';
+import { IGNIVAR_DROP_PLACEHOLDER_IDS } from '../src/sim/content/ignivar_drops';
+import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { ITEMS } from '../src/sim/data';
 import {
   canDualWield,
@@ -204,6 +207,11 @@ export interface BoostRole {
   weights: Partial<Record<WeightableStat, number>>;
   /** Melee roles value weapon dps; caster roles value spell power. */
   melee: boolean;
+  /** Healer roles additionally value Healing Power. The flag is explicit
+   *  because the directionality contract runs one way: Spell Power heals
+   *  too, but Healing Power never damages, so a DAMAGE caster must not
+   *  score it or the ilvl-35 healer pieces outbid its own set. */
+  healer?: true;
   /** Tank kits: armor always counts as an identity stat and shield block
    *  value scores, so a sta-first kit never discounts the armor it exists
    *  for (sta is deliberately not in IDENTITY_STATS). */
@@ -238,7 +246,7 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
     // int/spi weight let the giant heroic healer staff outscore the 2H swords
     // and a retribution paladin spawned holding a resto stick.
     { id: 'retribution', weights: { str: 1, sta: 0.8, agi: 0.2 }, melee: true },
-    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
+    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false, healer: true },
     {
       id: 'protection',
       weights: { sta: 1, str: 0.5, int: 0.2 },
@@ -250,7 +258,7 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   hunter: [{ id: 'marksmanship', weights: { agi: 1, sta: 0.6, int: 0.2 }, melee: true }],
   rogue: [{ id: 'combat', weights: { agi: 1, sta: 0.6, str: 0.4 }, melee: true }],
   priest: [
-    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false },
+    { id: 'holy', weights: { int: 1, spi: 0.8, sta: 0.4 }, melee: false, healer: true },
     // The heroic/raid cloth pool differentiates healer (spi-heavy) from
     // shadow (sta/int) pieces, so shadow earns its own bagged kit (the old
     // single-kit tripwire fired the moment the heroic pool opened).
@@ -258,13 +266,13 @@ export const CLASS_ROLES: Record<PlayerClass, readonly BoostRole[]> = {
   ],
   shaman: [
     { id: 'elemental', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'enhancement', weights: { agi: 1, str: 0.8, sta: 0.6 }, melee: true },
+    { id: 'enhancement', weights: { str: 1, agi: 0.6, sta: 0.5 }, melee: true },
   ],
   mage: [{ id: 'frost', weights: { int: 1, spi: 0.6, sta: 0.4 }, melee: false }],
   warlock: [{ id: 'demonology', weights: { int: 1, sta: 0.6, spi: 0.5 }, melee: false }],
   druid: [
     { id: 'balance', weights: { int: 1, spi: 0.7, sta: 0.5 }, melee: false },
-    { id: 'feral', weights: { agi: 1, str: 0.6, sta: 0.6 }, melee: true },
+    { id: 'feral', weights: { str: 1, agi: 0.6, sta: 0.6 }, melee: true },
   ],
 };
 
@@ -291,7 +299,7 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
   for (const stat of IDENTITY_STATS) {
     identity += (item.stats?.[stat] ?? 0) * (role.weights[stat] ?? 0);
   }
-  if (!role.melee) identity += item.spellPower ?? 0;
+  if (!role.melee) identity += (item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0);
   // Tanks exist for armor: it is their identity stat, never a dead stat.
   if (role.tank) identity += item.stats?.armor ?? 0;
   score +=
@@ -300,7 +308,9 @@ export function roleItemScore(role: BoostRole, item: ItemDef): number {
     const dps = (item.weapon.min + item.weapon.max) / 2 / item.weapon.speed;
     score += dps * (role.melee ? MELEE_DPS_WEIGHT : CASTER_DPS_WEIGHT);
   }
-  if (!role.melee) score += (item.spellPower ?? 0) * SPELL_POWER_WEIGHT;
+  if (!role.melee)
+    score +=
+      ((item.spellPower ?? 0) + (role.healer ? (item.healPower ?? 0) : 0)) * SPELL_POWER_WEIGHT;
   if (role.tank && isShieldItem(item)) score += (item.blockValue ?? 0) * BLOCK_VALUE_WEIGHT;
   score += ((item.critRating ?? 0) + (item.hasteRating ?? 0)) * RATING_WEIGHT;
   return score;
@@ -319,7 +329,19 @@ function eligibleForBoost(cls: PlayerClass, item: ItemDef): boolean {
   }
   // WARFARE (honor vendor) gear only: PvP-budgeted pieces are never PvE BiS.
   if (item.pvpOffenseRating !== undefined || item.pvpDefenseRating !== undefined) return false;
+  // A set piece whose set id is not registered in ITEM_SETS is Phase A
+  // content: its bonuses have not landed, so wearing it FORFEITS the old
+  // lineage stack's live bonuses for raw stats alone, which is a net loss for
+  // casters (the warlock anchors collapsed 15 percent when the bonus-less
+  // Crucible pieces entered this pool). Self-healing: the moment the set
+  // registers, the kit adopts it with no further change here.
+  if (item.set !== undefined && ITEM_SETS[item.set] === undefined) return false;
   if (item.priceHonor !== undefined) return false;
+  // Handover placeholders (defined but not yet obtainable anywhere) are never
+  // BiS: without this the sourceless Ignivar legendaries argmax straight into
+  // every melee/tank kit. Table membership, not level inference (see the
+  // matching rule in src/sim/dev_kit.ts isFreshTwentyItem).
+  if (IGNIVAR_DROP_PLACEHOLDER_IDS.has(item.id)) return false;
   if (!canEquipItem(cls, item)) return false;
   // canEquipItem checks requiredClass for weapons only; class-locked armor
   // (the tier sets) declares intent through requiredClass too, so honor it.
@@ -455,13 +477,26 @@ export function bisKit(cls: PlayerClass): Partial<Record<EquipSlot, string>> {
   return bisKitForRole(cls, CLASS_ROLES[cls][0]);
 }
 
-/** The best bag in the game: strictly the most slots (no tiebreak needed; the
- *  content has a single largest bag, and the test pins its id). */
+/** The best GENERAL bag in the game: the most slots, ties broken by ascending
+ *  id, the SAME deterministic argmax rule as dev_kit.ts bestBy, so the boost
+ *  and the dev kit can never disagree on the answer and a content-file
+ *  reorder can never flip which bag a boosted character persists (two general
+ *  bags tie at 16 slots since phase 05). */
 export function bestBoostBag(): string {
   let best: ItemDef | null = null;
   for (const item of Object.values(ITEMS)) {
     if (item.kind !== 'bag') continue;
-    if (!best || (item.bagSlots ?? 0) > (best.bagSlots ?? 0)) best = item;
+    // Materials-only bags are skipped: this one bag goes into EVERY socket, and
+    // a materials-only bag feeds the materials pool rather than the general one
+    // (src/sim/bag_pools.ts). Taking the biggest bag outright would hand a
+    // boosted character 4 sockets of materials capacity and a bare 16-slot
+    // backpack for their gear, which is the opposite of what the boost is for.
+    if (isMaterialsOnlyBag(item)) continue;
+    const slots = item.bagSlots ?? 0;
+    const bestSlots = best ? (best.bagSlots ?? 0) : Number.NEGATIVE_INFINITY;
+    if (slots > bestSlots || (slots === bestSlots && best !== null && item.id < best.id)) {
+      best = item;
+    }
   }
   if (!best) throw new Error('no bag items in content');
   return best.id;
@@ -493,18 +528,31 @@ export const NYTHRAXIS_ATTUNEMENT_QUESTS: readonly string[] = [
  *  whole PvE ladder incl. heroic/raid/rift gear, riding trained. v3: ret
  *  paladin weights go pure physical (the heroic healer staff outscored the
  *  2H swords through the old int/spi weights). */
-export const BOOST_KIT_VERSION = 3;
+// v4: the Crucible ilvl-35 tier entered the BiS pool and healer roles now
+// score Healing Power, so every kit's contents changed; the bump re-kits
+// existing PBE accounts on their next join.
+// v5: the Varkhul legendaries went live (launch wiring), the emberward wins
+// the tank offhands, and the registered Crucible set bonuses make the tier
+// pieces the true kit; the bump re-kits the fleet.
+// v6: the str-AP identity fix (shaman/druid melee AP is str x 2, agi pays
+// them nothing): enhancement and feral role weights flip str-first and the
+// four agi-lined Crucible sets re-stat to str-primary, moving several
+// enhancement and feral kit picks; the bump re-kits the fleet.
+export const BOOST_KIT_VERSION = 6;
 
 /**
- * Bring one live player up to the current boost kit: level 20, four
- * best-in-game bags, the primary role's true-BiS kit equipped, every
- * alternate role's kit carried in the bags, riding trained, and the
- * Nythraxis attunement completed. Idempotent per BOOST_KIT_VERSION through
- * the persisted meta stamp; returns whether anything was applied. Shared by
- * the fresh-roster builder below and the world-join top-up (server/game.ts),
- * so a character created before the boost existed, or before a kit revision
- * (the PvP-geared pbe2 roster), is re-kitted at its next login. Displaced
- * gear and bags land in the (upgraded) bags; nothing is ever deleted.
+ * Bring one live player up to the current boost kit: level 20, the best
+ * general bag in every socket not already carrying an equal or larger one,
+ * the primary role's true-BiS kit equipped, every alternate role's kit
+ * carried in the bags, riding trained, and the Nythraxis attunement
+ * completed. Bag capacity only ever grows (a fresh roster, whose sockets are
+ * all empty, takes the boost bag in all four). Idempotent per
+ * BOOST_KIT_VERSION through the persisted meta stamp; returns whether
+ * anything was applied. Shared by the fresh-roster builder below and the
+ * world-join top-up (server/game.ts), so a character created before the boost
+ * existed, or before a kit revision (the PvP-geared pbe2 roster), is re-kitted
+ * at its next login. Displaced gear and bags land in the (upgraded) bags;
+ * nothing is ever deleted.
  */
 export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   const meta = sim.ctx.resolve(pid)?.meta;
@@ -514,13 +562,47 @@ export function applyBoostKitToPlayer(sim: Sim, pid: number): boolean {
   const cls = meta.cls;
   if (e.level < BOOST_LEVEL) sim.setPlayerLevel(BOOST_LEVEL, pid);
   // Bags first so the pooled capacity exists before the kits land. Equipping
-  // over an occupied socket swaps the old bag into the pool (src/sim/bags.ts)
-  // and the boost bag is the largest in the game, so capacity only grows.
+  // over an occupied socket swaps the old bag into the pool (src/sim/bags.ts
+  // equipBag), which REFUSES whenever the post-swap inventory would sit above
+  // the summed bagCapacity of the new bag set. The boost bag is the largest
+  // GENERAL bag, not the largest bag in the game: the materials-only satchels
+  // are bigger. So a socket whose incumbent bag is equal or larger is skipped.
+  //
+  // NOT because such a bag already serves the boost: an equal-or-larger
+  // MATERIALS satchel contributes ZERO general capacity (bestBoostBag's own
+  // rationale above), so it does not serve the boost's general-capacity
+  // purpose at all. It is skipped because swapping it out would override the
+  // player's deliberate satchel choice, and both outcomes of attempting that
+  // are bad. On a LIGHT inventory the shrinking swap SUCCEEDS (equipBag's
+  // guard refuses only when the post-swap load exceeds the NEW total, never
+  // merely because the budget shrank), yanking the satchel out of its socket
+  // and into the pool. On a loaded inventory it refuses and strands the
+  // grant. Skipping avoids both.
+  //
+  // Accepted consequence: a character wearing four large satchels keeps a
+  // general capacity of 16 (the backpack alone), so the alternate-role kits
+  // below land in the tolerated over-capacity state (non-destructive:
+  // Sim.addItem has no capacity gate). That is the price of never overriding
+  // a player's own bags.
+  //
+  // Skipping also keeps the "capacity only grows" invariant by construction:
+  // every equip attempted below either fills an empty socket or strictly
+  // grows the summed budget.
   const bagId = bestBoostBag();
+  const boostSlots = bagSlotsOf(ITEMS[bagId]);
   for (let socket = 0; socket < BOOST_BAG_SOCKETS; socket++) {
-    if (meta.bags[socket] === bagId) continue;
+    const incumbent = meta.bags[socket];
+    if (incumbent && bagSlotsOf(ITEMS[incumbent]) >= boostSlots) continue;
     sim.addItem(bagId, 1, pid, MOVEMENT);
     sim.equipBag(bagId, socket, pid);
+    // A growing swap can still be refused from a deeply over-capacity legacy
+    // state (an inventory longer than even the grown total), so take the
+    // granted bag back out instead of leaving it loose in the pool. Known
+    // residue: the addItem above already emitted its "You receive" line and
+    // entered the bag into the persisted deed discovery ledger, and removeItem
+    // undoes neither. Tolerated because deeds are cosmetic-only (titles and
+    // Renown, never power) and this is a PBE-only refusal recovery.
+    if (meta.bags[socket] !== bagId) sim.removeItem(bagId, 1, pid);
   }
   // Nythraxis attunement: run the chain through the real quest cores (accept,
   // satisfy objectives, turn in), never by poking questsDone, so XP, copper,

@@ -2,38 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   cameraFovOffset,
   createCameraFeel,
-  LEAD_MAX,
-  LEAD_TIME,
   punchCameraFov,
-  SPEED_FOV_MAX,
+  resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
 } from '../src/render/camera_feel_core';
 import { RUN_SPEED } from '../src/sim/types';
-
-// The camera feel layer: look-ahead lead, speed/impulse FOV, and the
-// display-derived landing detector.
-
-describe('look-ahead lead', () => {
-  it('converges toward the capped velocity lead and recenters at rest', () => {
-    const s = createCameraFeel();
-    for (let i = 0; i < 240; i++) stepCameraFeel(s, 0, RUN_SPEED, 1 / 60);
-    const expected = Math.min(LEAD_MAX, RUN_SPEED * LEAD_TIME);
-    expect(s.leadZ).toBeGreaterThan(expected * 0.9);
-    expect(s.leadZ).toBeLessThanOrEqual(expected + 1e-6);
-    expect(Math.abs(s.leadX)).toBeLessThan(1e-6);
-    for (let i = 0; i < 240; i++) stepCameraFeel(s, 0, 0, 1 / 60);
-    expect(Math.abs(s.leadZ)).toBeLessThan(0.02);
-  });
-
-  it('eases home when disabled (reduced motion)', () => {
-    const s = createCameraFeel();
-    for (let i = 0; i < 120; i++) stepCameraFeel(s, RUN_SPEED, 0, 1 / 60);
-    expect(s.leadX).toBeGreaterThan(0.5);
-    for (let i = 0; i < 240; i++) stepCameraFeel(s, RUN_SPEED, 0, 1 / 60, false);
-    expect(Math.abs(s.leadX)).toBeLessThan(0.02);
-  });
-});
 
 describe('FOV kicks', () => {
   it('gives no speed kick at base run speed, near-max at travel-form speed', () => {
@@ -41,7 +15,16 @@ describe('FOV kicks', () => {
     for (let i = 0; i < 300; i++) stepCameraFeel(s, 0, RUN_SPEED, 1 / 60);
     expect(s.speedKick).toBeLessThan(0.3);
     for (let i = 0; i < 300; i++) stepCameraFeel(s, 0, RUN_SPEED * 1.4, 1 / 60);
-    expect(s.speedKick).toBeGreaterThan(SPEED_FOV_MAX * 0.85);
+    expect(s.speedKick).toBeGreaterThan(5.1);
+    expect(s.speedKick).toBeLessThanOrEqual(6);
+  });
+
+  it('eases a running speed kick to zero when reduced motion is enabled', () => {
+    const s = createCameraFeel();
+    for (let i = 0; i < 300; i++) stepCameraFeel(s, 0, RUN_SPEED * 1.4, 1 / 60);
+    expect(s.speedKick).toBeGreaterThan(5.1);
+    for (let i = 0; i < 300; i++) stepCameraFeel(s, 0, RUN_SPEED * 1.4, 1 / 60, false);
+    expect(Math.abs(s.speedKick)).toBeLessThan(0.001);
   });
 
   it('punch impulses decay on their own and the total offset stays clamped', () => {
@@ -51,9 +34,33 @@ describe('FOV kicks', () => {
     for (let i = 0; i < 90; i++) stepCameraFeel(s, 0, 0, 1 / 60); // 1.5 s
     expect(Math.abs(cameraFovOffset(s))).toBeLessThan(0.1);
     punchCameraFov(s, 100);
-    expect(cameraFovOffset(s)).toBeLessThanOrEqual(12);
+    expect(cameraFovOffset(s)).toBe(12);
     punchCameraFov(s, -300);
-    expect(cameraFovOffset(s)).toBeGreaterThanOrEqual(-8);
+    expect(cameraFovOffset(s)).toBe(-8);
+  });
+});
+
+describe('resolveCameraFov (the player-configured FOV slider)', () => {
+  it('honors a non-default base FOV at rest, instead of snapping back to a hard-coded 60', () => {
+    const s = createCameraFeel();
+    expect(resolveCameraFov(80, s)).toBeCloseTo(80, 5);
+    expect(resolveCameraFov(55, s)).toBeCloseTo(55, 5);
+    expect(resolveCameraFov(100, s)).toBeCloseTo(100, 5);
+  });
+
+  it('applies the feel kicks on top of the configured base, not on top of a fixed default', () => {
+    const s = createCameraFeel();
+    punchCameraFov(s, 5);
+    expect(resolveCameraFov(70, s)).toBeCloseTo(75, 5);
+    expect(resolveCameraFov(60, s)).toBeCloseTo(65, 5);
+  });
+
+  it('still clamps the combined result to the 50..100 envelope at either extreme', () => {
+    const s = createCameraFeel();
+    punchCameraFov(s, 50);
+    expect(resolveCameraFov(100, s)).toBe(100);
+    punchCameraFov(s, -200);
+    expect(resolveCameraFov(55, s)).toBe(50);
   });
 });
 
@@ -74,10 +81,17 @@ describe('landing detector', () => {
     const s = createCameraFeel();
     stepLandingDetector(s, 10, 1 / 60); // arm
     const hard = fall(s, -14, 20);
-    expect(hard).toBeGreaterThan(0.3);
-    expect(hard).toBeLessThanOrEqual(1);
+    expect(hard).toBeCloseTo(7 / 13, 5);
     // settled: no further thumps
     expect(stepLandingDetector(s, 10 - (14 * 20) / 60, 1 / 60)).toBe(0);
+  });
+
+  it('scales landing thumps with sustained fall speed', () => {
+    const medium = createCameraFeel();
+    stepLandingDetector(medium, 10, 1 / 60);
+    const hard = createCameraFeel();
+    stepLandingDetector(hard, 10, 1 / 60);
+    expect(fall(hard, -18, 20)).toBeGreaterThan(fall(medium, -10, 20));
   });
 
   it('ignores gentle landings and teleports', () => {

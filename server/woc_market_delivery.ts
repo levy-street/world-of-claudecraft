@@ -10,7 +10,6 @@
 
 import type { InvSlot } from '../src/sim/types';
 import type {
-  CharacterSaveArgs,
   WocDeliveryScope,
   WocListingRow,
   WocMarketCustody,
@@ -223,7 +222,7 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
    *  new binary the tail cannot tear, so this converges a FINITE set and runs
    *  at minute scale over a bounded id page. The FINALIZE work per beat is
    *  bounded at ctx.sweepBatch like every other arm (each finalized row also
-   *  costs a realm mail-book write on the shared serial writer, and the one
+   *  costs a durable custody parcel row write, and the one
    *  time residue is plentiful, the first boot after a legacy upgrade, is
    *  exactly when the realm can least absorb an unbounded burst); a truncated
    *  page resumes right behind the last processed row on the next beat. */
@@ -493,8 +492,15 @@ export function createWocMarketDeliveryArms(ctx: WocDeliveryCtx): WocMarketDeliv
   ): Promise<'handed' | 'abort' | 'abort_busy'> {
     let out: 'booked' | 'lease_lost' | 'claim_missing' | 'busy' | 'session_lost';
     try {
-      out = await ctx.custody.persistGrantSerialized(accountId, characterId, leaseNonce, (save) =>
-        ctx.db.saveDeliveredCharacterBooked(save, custodyRef),
+      out = await ctx.custody.persistGrantSerialized(
+        accountId,
+        characterId,
+        leaseNonce,
+        async (save) => {
+          const result = await ctx.db.saveDeliveredCharacterBooked(save, custodyRef);
+          if (result === 'booked') ctx.custody.acknowledgeCharacterSave?.(save);
+          return result;
+        },
       );
     } catch (err) {
       // Transient throw (pool exhaustion, timeout, connection reset): the

@@ -3,6 +3,7 @@ import { DUNGEON_FLOOR_Y, isRiftPos, riftInstanceOrigin } from '../src/sim/data'
 import { layoutColliders } from '../src/sim/dungeon_layout';
 import { solveLockActions } from '../src/sim/lockpick';
 import { generateRiftFloor, isSetPieceSeed, riftPlatformLift } from '../src/sim/rift/rift_gen';
+import { updateRiftTriggers } from '../src/sim/rift/runs';
 import type { RiftFloorPlan } from '../src/sim/rift/types';
 import { Sim } from '../src/sim/sim';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -307,6 +308,38 @@ describe('rift mechanics: switch-gate', () => {
     sim.tick();
     expect(sim.player.pos.z - origin.z, 'passes once open').toBeGreaterThan(gate.z);
   });
+
+  it('a released spirit cannot throw the switch; the same spot still works alive', () => {
+    let seed = -1;
+    for (let s = 1; s < 400 && seed < 0; s++) {
+      if (isSetPieceSeed(s)) continue;
+      if (generateRiftFloor(s, 20, 0).gate) seed = s;
+    }
+    expect(seed, 'found a floor-0 gate').toBeGreaterThan(0);
+    const sim = enter(seed);
+    const inst = active(sim);
+    expect(inst.gateOpen).toBe(false);
+    const sw = sim.entities.get(inst.switchId!)!;
+
+    // Release the player's spirit standing right on the switch plate.
+    sim.player.hp = 0;
+    sim.player.dead = true;
+    sim.player.ghost = true;
+    sim.player.pos = { ...sw.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(inst.gateOpen, 'a ghost cannot throw the switch').toBe(false);
+
+    // The identical spot, alive: still opens it (a live regression net, and proof
+    // this test actually exercises the tick-wired ghost arm, not a dead spot).
+    sim.player.dead = false;
+    sim.player.ghost = false;
+    sim.player.hp = sim.player.maxHp;
+    sim.player.pos = { ...sw.pos };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.tick();
+    expect(inst.gateOpen, 'a living player still throws the switch').toBe(true);
+  });
 });
 
 describe('rift generator: rank level bands', () => {
@@ -364,6 +397,45 @@ describe('rift mechanics: strength boulders', () => {
     for (const id of inst.boulderIds) {
       expect(sim.entities.get(id)?.templateId).toBe('rift_boulder_placed');
     }
+  });
+
+  it('a live player walking into a boulder shoves it forward', () => {
+    const seed = seedWithFloor0(
+      (f) => f.puzzle.kind === 'boulder_push' && f.objects.some((o) => o.kind === 'boulder'),
+    );
+    const sim = enter(seed);
+    const inst = active(sim);
+    const b = sim.entities.get(inst.boulderIds[0])!;
+    const startZ = b.pos.z;
+    // Stand just south of the boulder, already walking north into it (the pad sits
+    // further north, per rift_gen's "shove the boulder straight north" layout). Calls
+    // the per-tick driver directly, the same way `sim.tick()` does, without routing
+    // through the movement kernel (which would immediately re-snapshot prevPos).
+    sim.player.hp = sim.player.maxHp;
+    sim.player.pos = { x: b.pos.x, y: 0, z: b.pos.z - 1 };
+    sim.player.prevPos = { x: b.pos.x, y: 0, z: b.pos.z - 1.5 };
+    updateRiftTriggers(sim.ctx, sim.player);
+    expect(b.pos.z, 'a living player shoves the boulder north').toBeGreaterThan(startZ);
+  });
+
+  it('a released spirit (ghost form) cannot shove a boulder', () => {
+    const seed = seedWithFloor0(
+      (f) => f.puzzle.kind === 'boulder_push' && f.objects.some((o) => o.kind === 'boulder'),
+    );
+    const sim = enter(seed);
+    const inst = active(sim);
+    const b = sim.entities.get(inst.boulderIds[0])!;
+    const startPos = { ...b.pos };
+    // Reported live: a released spirit walks into a strength boulder puzzle risk-free
+    // and shoves it onto its socket while intangible. Same walk-in as the live-player
+    // case above, but released as a ghost first.
+    sim.player.hp = 0;
+    sim.player.dead = true;
+    sim.player.ghost = true;
+    sim.player.pos = { x: b.pos.x, y: 0, z: b.pos.z - 1 };
+    sim.player.prevPos = { x: b.pos.x, y: 0, z: b.pos.z - 1.5 };
+    updateRiftTriggers(sim.ctx, sim.player);
+    expect(b.pos, 'a ghost must not be able to shove a puzzle boulder').toEqual(startPos);
   });
 });
 
@@ -523,6 +595,28 @@ describe('rift mechanics: verticality (raised sanctum tier)', () => {
     sim.player.prevPos = { ...sim.player.pos };
     sim.tick();
     expect(sim.player.pos.y).toBeCloseTo(DUNGEON_FLOOR_Y, 1);
+  });
+
+  it('a released spirit standing on the raised tier is not sunk by the lift', () => {
+    // updatePlayerMovement strips the prior tick's lift every tick, live or dead
+    // (src/sim/sim.ts), trusting updateRiftTriggers to re-apply it; the puzzle-
+    // trigger ghost gate must not take that re-application down with it, or a
+    // ghost on the deck sinks a little further below the platform every tick.
+    const seed = seedWithFloor0((f) => f.platform !== null);
+    const sim = enter(seed);
+    const floor = generateRiftFloor(seed, 20, 0);
+    const plat = floor.platform!;
+    const origin = riftInstanceOrigin(active(sim).slot, 0);
+    sim.player.pos = { x: origin.x, y: DUNGEON_FLOOR_Y, z: origin.z + plat.rampZ1 + 4 };
+    sim.player.prevPos = { ...sim.player.pos };
+    sim.player.hp = 0;
+    sim.player.dead = true;
+    sim.player.ghost = true;
+    for (let i = 0; i < 5; i++) sim.tick();
+    expect(
+      sim.player.pos.y,
+      'a ghost keeps the raised-tier lift across ticks, it does not sink',
+    ).toBeCloseTo(DUNGEON_FLOOR_Y + plat.height, 1);
   });
 });
 

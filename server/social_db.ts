@@ -233,6 +233,12 @@ export class PgSocialDb implements SocialDb {
 
   constructor(private readonly pool: Pool) {}
 
+  /** Atomic paid creation lives outside the SocialDb interface, but it still
+   *  has to invalidate this instance-local roster cache after commit. */
+  bustGuildRoster(guildId: number): void {
+    this.guildRoster.bust(guildId);
+  }
+
   async findCharacterByName(name: string): Promise<CharInfo | null> {
     // scoped to this realm: you can only friend/ignore/invite characters that
     // live on the same world as you. exact case wins; otherwise an unambiguous
@@ -391,6 +397,10 @@ export class PgSocialDb implements SocialDb {
         await client.query('ROLLBACK');
         return { error: 'already_in_guild' };
       }
+      // Founding a guild is joining one: clear any standing pledge in the
+      // same transaction, so no stale request lingers on another guild's
+      // board (docs/prd/guild-pledge-board.md).
+      await client.query('DELETE FROM guild_pledges WHERE character_id = $1', [leaderId]);
       await client.query('COMMIT');
       this.guildRoster.bust(guildId);
       bustAdminGuildListReads();
@@ -427,7 +437,8 @@ export class PgSocialDb implements SocialDb {
     charId: number,
     rank: GuildRank,
     limit: number,
-  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild'> {
+    requirePledge = false,
+  ): Promise<'ok' | 'full' | 'already_member' | 'no_guild' | 'no_pledge'> {
     const client = await this.pool.connect();
     try {
       await client.query('BEGIN');
@@ -464,6 +475,19 @@ export class PgSocialDb implements SocialDb {
       if (ins.rowCount === 0) {
         await client.query('ROLLBACK');
         return 'already_member';
+      }
+      if (requirePledge) {
+        // The pledge is the seat's consent: consume it in the same
+        // transaction, so a withdraw or decline racing the caller's pledge
+        // read rolls the seat back instead of seating a player who said no.
+        const consumed = await client.query(
+          'DELETE FROM guild_pledges WHERE character_id = $1 AND guild_id = $2',
+          [charId, guildId],
+        );
+        if ((consumed.rowCount ?? 0) === 0) {
+          await client.query('ROLLBACK');
+          return 'no_pledge';
+        }
       }
       await client.query('COMMIT');
       this.guildRoster.bust(guildId);

@@ -17,13 +17,13 @@ function makeWarlock(
 }
 
 describe('Warlock Umbral Anchor', () => {
-  it('is a shared level-5 Warlock ability in all three specializations', () => {
+  it('is a shared level-3 Warlock ability in all three specializations', () => {
     for (const spec of ['affliction', 'demonology', 'destruction'] as const) {
-      const before = abilitiesKnownAt('warlock', 4, {
+      const before = abilitiesKnownAt('warlock', 2, {
         ...emptyModifiers(),
         spec,
       }).map((entry) => entry.def.id);
-      const known = abilitiesKnownAt('warlock', 5, {
+      const known = abilitiesKnownAt('warlock', 3, {
         ...emptyModifiers(),
         spec,
       }).map((entry) => entry.def.id);

@@ -1,7 +1,11 @@
+import type { PartyInfo } from '../world_api';
 import { isPartyFrameRelevantAura } from './aura_classify';
 import { echoVisibleTo, partyAuraPriority } from './combat/chronomancy';
+import { damageTakenWithin } from './combat/damage_history';
+import { rewindHealAmount } from './combat/rewind';
 import { MENDING_CURRENT_ID } from './combat/shaman_spiritmend';
 import type { Role } from './content/talents';
+import type { SimContext } from './sim_context';
 import type { AbilityEffect, Aura, Entity } from './types';
 import { PARTY_MEMBER_AURA_CAP } from './types';
 
@@ -149,4 +153,62 @@ export function partyFrameIncomingHeals(
 
 export function partyFrameRole(role: Role | null): Role {
   return role ?? 'dps';
+}
+
+/** The primary-viewer party frame projection (IWorld partyInfo): one PartyInfo
+ * snapshot of the viewer's party built from the live SimContext views. Pure
+ * read; Sim keeps a thin getter that delegates here. */
+export function collectPartyInfo(ctx: SimContext): PartyInfo | null {
+  const party = ctx.partyOf(ctx.primaryId);
+  if (!party) return null;
+  const aggroTargets = partyFrameAggroTargets(ctx.entities.values());
+  const incomingHeals = partyFrameIncomingHeals(ctx.entities.values(), (abilityId, casterId) =>
+    ctx.resolvedAbility(abilityId, casterId),
+  );
+  return {
+    leader: party.leader,
+    raid: party.raid,
+    master: { ...party.lootStrategies.master },
+    members: party.members.flatMap((mPid) => {
+      const meta = ctx.players.get(mPid);
+      const e = ctx.entities.get(mPid);
+      return meta && e
+        ? [
+            {
+              pid: mPid,
+              name: meta.name,
+              cls: meta.cls,
+              level: e.level,
+              hp: e.hp,
+              mhp: e.maxHp,
+              res: Math.round(e.resource),
+              mres: e.maxResource,
+              rtype: e.resourceType,
+              x: e.pos.x,
+              z: e.pos.z,
+              dead: e.dead ? 1 : 0,
+              inCombat: e.inCombat ? 1 : 0,
+              group: party.raidGroups.get(mPid) ?? 1,
+              absorb: partyFrameAbsorb(e.auras),
+              role: partyFrameRole(meta.talentMods.role),
+              // Effective health Rewind could currently restore to this member
+              // (combat/rewind.ts); 0 for members with no recent recorded loss.
+              rewind: rewindHealAmount(damageTakenWithin(e, ctx.tickCount), e.hp, e.maxHp),
+              connected: 1,
+              hasAggro: aggroTargets.has(mPid) ? 1 : 0,
+              incomingHeal: incomingHeals.get(mPid) ?? 0,
+              // Temporal Echo marks are filtered to the LOCAL player's own (owner
+              // 2026-07-12): other chronomancers' echoes still heal in the sim but
+              // never show in this viewer's group/raid strip. echoVisibleTo reads
+              // the real aura sourceId, so no wire field is added.
+              auras: partyFrameAuras(
+                e.auras.filter((a) => echoVisibleTo(a, ctx.primaryId)),
+                undefined,
+                e.maxHp,
+              ),
+            },
+          ]
+        : [];
+    }),
+  };
 }

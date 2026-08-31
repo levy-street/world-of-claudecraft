@@ -60,6 +60,15 @@ function candidateKey(candidates: { pid: number; name: string }[]): string {
   return candidates.map((candidate) => `${candidate.pid}:${candidate.name}`).join('|');
 }
 
+// The bind-on-pickup note under the item name on a roll prompt (need/greed
+// and the master curate row alike): the player is choosing whether to take a
+// soulbound drop, so the binding consequence must be readable BEFORE the win.
+// A stale-client unknown def renders nothing rather than guessing.
+function bindsOnPickupNoteHtml(item: ItemDef | undefined): string {
+  if (!item?.soulbound) return '';
+  return `<div class="loot-roll-bind">${esc(t('itemUi.lootRoll.bindsOnPickup'))}</div>`;
+}
+
 /** Owns loot-roll prompt state, authoritative reconciliation, timers, and DOM. */
 export class LootRollController {
   private readonly activeRolls = new Map<number, TimedRoll<LootRollEvent>>();
@@ -463,6 +472,7 @@ export class LootRollController {
           <div class="loot-roll-copy">
             <div class="loot-roll-title">${esc(t('itemUi.lootRoll.title'))}</div>
             <div class="loot-roll-name" style="color:${nameColor}">${esc(itemName)}</div>
+            ${bindsOnPickupNoteHtml(item)}
           </div>
         </div>
         <div class="loot-roll-timer" aria-hidden="true"><span></span></div>
@@ -540,6 +550,7 @@ export class LootRollController {
         <div class="loot-roll-copy">
           <div class="loot-roll-title">${esc(t('hudChrome.masterLoot.assignPrompt', { item: itemName }))}</div>
           <div class="loot-roll-name" style="color:${nameColor}">${esc(itemName)}</div>
+          ${bindsOnPickupNoteHtml(item)}
         </div>
       </div>
       <div class="loot-roll-timer" aria-hidden="true"><span></span></div>

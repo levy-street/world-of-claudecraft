@@ -8,6 +8,7 @@
 //     guess that could vendor a DIFFERENT copy of the same id).
 //   - focus after a confirmed sale lands on the close button, not a detached cell.
 import { describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
@@ -26,6 +27,20 @@ const valuableId = Object.keys(ITEMS).find((id) => {
   const d = ITEMS[id];
   return d.kind === 'weapon' && d.quality !== 'poor' && !d.noVendorSell && !d.soulbound;
 }) as string;
+// A non-junk item that actually STACKS (quality above poor, no instance
+// payload possible on a plain fungible stack), for the "can't sell full
+// stacks" regression: unlike valuableId (a weapon, always count 1) this id
+// can carry a slot count above 1.
+const stackableValuableId = Object.keys(ITEMS).find((id) => {
+  const d = ITEMS[id];
+  return (
+    d.quality !== 'poor' &&
+    d.kind !== 'quest' &&
+    !d.noVendorSell &&
+    !d.soulbound &&
+    stackSizeOf(d) > 1
+  );
+}) as string;
 
 interface Harness {
   root: HTMLElement;
@@ -33,7 +48,7 @@ interface Harness {
   errors: string[];
 }
 
-function harness(inventory: InvSlot[]): Harness {
+function harness(inventory: InvSlot[], opts?: { confirmVendorSell?: boolean }): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const calls: string[] = [];
   const errors: string[] = [];
@@ -88,6 +103,7 @@ function harness(inventory: InvSlot[]): Harness {
     isBankOpen: () => false,
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
+    isVaultBankTab: () => false,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -105,6 +121,7 @@ function harness(inventory: InvSlot[]): Harness {
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => false,
+    confirmVendorSell: () => opts?.confirmVendorSell ?? true,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,
@@ -129,9 +146,19 @@ function confirmPrompt(): HTMLElement | null {
   return document.querySelector('.sell-confirm-prompt');
 }
 
+function quantityPrompt(): HTMLElement | null {
+  return document.querySelector('.sell-quantity-prompt');
+}
+
 function clickPromptConfirmButton(): void {
   const btn = confirmPrompt()?.querySelector('button.btn');
   expect(btn, 'no confirm button in the open prompt').toBeTruthy();
+  (btn as HTMLElement).click();
+}
+
+function clickQuantityPromptConfirmButton(): void {
+  const btn = quantityPrompt()?.querySelector('button.btn');
+  expect(btn, 'no confirm button in the open quantity prompt').toBeTruthy();
   (btn as HTMLElement).click();
 }
 
@@ -216,5 +243,77 @@ describe('vendor ctrl/meta click on a non-junk item still confirms', () => {
     clickCellFor(h.root, junkId, { ctrl: true });
     expect(confirmPrompt()).toBeNull();
     expect(h.calls).toEqual([`sellItem:${junkId},3`]);
+  });
+});
+
+describe('vendor plain click on a non-junk STACK opens the bulk quantity prompt, not a 1-unit confirm', () => {
+  // Regression: showSellConfirmPrompt never took a quantity, so a plain click
+  // on anything short of true junk sold exactly one unit per confirmation,
+  // and clearing an N-unit stack demanded N separate prompts. Mirrors what
+  // ctrl-click already did for the same case.
+  it('opens .sell-quantity-prompt, not .sell-confirm-prompt, and defaults to the FULL held count', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    expect(h.calls).toEqual([]);
+    expect(confirmPrompt()).toBeNull();
+    const prompt = quantityPrompt();
+    expect(prompt).not.toBeNull();
+    const input = prompt?.querySelector('input.prompt-number') as HTMLInputElement;
+    expect(input.value).toBe('5');
+    expect(input.max).toBe('5');
+  });
+
+  it('a single confirm click sells the whole stack in one action', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    clickQuantityPromptConfirmButton();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},5`]);
+    expect(quantityPrompt()).toBeNull();
+  });
+
+  it('the quantity is still editable down to sell fewer', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    const input = quantityPrompt()?.querySelector('input.prompt-number') as HTMLInputElement;
+    input.value = '2';
+    clickQuantityPromptConfirmButton();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},2`]);
+  });
+
+  it('a single-count copy of the same item still opens the per-slot confirm prompt (unchanged)', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 1 }]);
+    clickCellFor(h.root, stackableValuableId);
+    expect(quantityPrompt()).toBeNull();
+    expect(confirmPrompt()).not.toBeNull();
+  });
+});
+
+describe('confirmVendorSell setting off: every vendor sale skips confirmation', () => {
+  it('a plain click on a non-junk single item sells instantly, no prompt (matches junk)', () => {
+    const h = harness([{ itemId: valuableId, count: 1 }], { confirmVendorSell: false });
+    clickCellFor(h.root, valuableId);
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${valuableId},{"slotIndex":0}`]);
+  });
+
+  it('a plain click on a non-junk stack sells one unit instantly, no prompt (classic one-click sale)', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }], { confirmVendorSell: false });
+    clickCellFor(h.root, stackableValuableId);
+    expect(quantityPrompt()).toBeNull();
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},{"slotIndex":0}`]);
+  });
+
+  it('a ctrl-click on a non-junk stack still bulk-sells the whole stack instantly', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }], { confirmVendorSell: false });
+    clickCellFor(h.root, stackableValuableId, { ctrl: true });
+    expect(quantityPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},5`]);
+  });
+
+  it('true junk is unaffected either way', () => {
+    const h = harness([{ itemId: junkId, count: 1 }], { confirmVendorSell: false });
+    clickCellFor(h.root, junkId);
+    expect(h.calls).toEqual([`sellItem:${junkId},{"slotIndex":0}`]);
   });
 });

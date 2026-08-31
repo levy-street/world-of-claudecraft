@@ -35,7 +35,15 @@ const SERVER = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8
  * per command instead of assuming one name: `apply_enchant`'s `slot` is an equip
  * slot too, so "the command has a slot field" would have been a vacuous check.
  */
-const ADDRESSED_COMMANDS: ReadonlyArray<{ cmd: string; field: string; why?: string }> = [
+const ADDRESSED_COMMANDS: ReadonlyArray<{
+  cmd: string;
+  field: string;
+  why?: string;
+  /** Repo-relative module holding the command's dispatch arm, for commands
+   *  whose game.ts case is a delegating label group (the vault_wire.ts /
+   *  bank_wire.ts seam). Defaults to server/game.ts. */
+  dispatchIn?: string;
+}> = [
   { cmd: 'salvage_item', field: 'slot' },
   { cmd: 'disenchant_item', field: 'slot', why: 'the original precise surface' },
   { cmd: 'discard', field: 'slot' },
@@ -44,6 +52,10 @@ const ADDRESSED_COMMANDS: ReadonlyArray<{ cmd: string; field: string; why?: stri
   { cmd: 'use', field: 'slot' },
   { cmd: 'pet_feed', field: 'slot' },
   { cmd: 'equip_bag', field: 'slot' },
+  // The bank-aimed twin of equip_bag (Bank Storage phase 07): the bags-side
+  // socket click always names the exact carried copy. Its parse arm lives in
+  // the delegated dispatch module, not game.ts's label group.
+  { cmd: 'bank_socket_bag', field: 'slot', dispatchIn: 'server/bank_wire.ts' },
   { cmd: 'rift_upgrade_item', field: 'slot' },
   { cmd: 'rift_enchant_item', field: 'slot' },
   { cmd: 'rift_socket_gem', field: 'slot' },
@@ -121,34 +133,67 @@ describe('every item command can name the copy it acts on', () => {
     expect(body, `${cmd} must be able to send a ${field}`).toContain(field);
   });
 
-  it.each(ADDRESSED_COMMANDS)('$cmd is parsed and forwarded server-side', ({ cmd, field }) => {
-    // The client being able to SEND it is half the contract; the server arm has
-    // to read it, or the selection is silently dropped at the authority boundary,
-    // which is indistinguishable from the bug.
-    //
-    // The window ENDS at the next `case '`, which is load-bearing. A fixed-length
-    // slice bleeds into neighbouring arms, and since most of them do parse a
-    // selection, this assertion passed even with the arm under test reverted:
-    // verified by reverting `use` and watching it stay green. Bounding the arm is
-    // what gives it teeth.
-    const at = SERVER.indexOf(`case '${cmd}':`);
-    expect(at, `no dispatch arm for ${cmd}`).toBeGreaterThan(-1);
-    const rest = SERVER.slice(at + `case '${cmd}':`.length);
-    const nextCase = rest.indexOf("case '");
-    const arm = nextCase === -1 ? rest : rest.slice(0, nextCase);
-    expect(arm, `${cmd} must parse msg.${field} in its OWN dispatch arm`).toContain(
-      `Number.isInteger(msg.${field})`,
-    );
-    // Parsing is half of it. An arm that reads the field and then calls the sim
-    // without it drops the selection at the authority boundary, which is
-    // indistinguishable from never having sent it. Require the parsed local to
-    // reach a sim call in the same arm.
-    const local = field === 'bagSlot' ? 'bag' : 'slot';
-    const simCall = arm.slice(arm.indexOf('sim.'));
-    expect(simCall, `${cmd} must FORWARD the parsed ${local} to the sim call`).toMatch(
-      new RegExp(`\\b${local}\\b`),
-    );
-  });
+  it.each(ADDRESSED_COMMANDS)(
+    '$cmd is parsed and forwarded server-side',
+    ({ cmd, field, dispatchIn }) => {
+      // The client being able to SEND it is half the contract; the server arm has
+      // to read it, or the selection is silently dropped at the authority boundary,
+      // which is indistinguishable from the bug.
+      //
+      // The window ENDS at the next `case '`, which is load-bearing. A fixed-length
+      // slice bleeds into neighbouring arms, and since most of them do parse a
+      // selection, this assertion passed even with the arm under test reverted:
+      // verified by reverting `use` and watching it stay green. Bounding the arm is
+      // what gives it teeth.
+      //
+      // A row naming dispatchIn reads its arm from THAT module: a delegated
+      // command's game.ts case is a bare label in a fall-through group (empty by
+      // this slicing on purpose), and the parse lives behind the seam. The
+      // delegation itself is asserted too, or deleting the game.ts call would
+      // keep this guard green while the command silently dropped: the label's
+      // fall-through group must reach a dispatch*Command call before the next
+      // non-case statement block ends (the executed round trip in
+      // tests/bank_wire.test.ts proves the wiring end to end; this keeps the
+      // guard honest about what it covers).
+      if (dispatchIn) {
+        const labelAt = SERVER.indexOf(`case '${cmd}':`);
+        expect(labelAt, `no game.ts label for delegated ${cmd}`).toBeGreaterThan(-1);
+        const group = SERVER.slice(labelAt, labelAt + 400);
+        // The expected dispatcher is DERIVED from the row's own module name
+        // (bank_wire.ts -> dispatchBankCommand), never the generic
+        // dispatch\w+Command pattern: the window is a char count, so a
+        // NEIGHBORING group's delegation call (vault_wire's sits ~150 chars
+        // past the edge today) could drift inside it under comment shrinkage
+        // and satisfy a generic match while THIS command's call was deleted.
+        // Naming the dispatcher makes the wrong module's call unable to pass.
+        const domain = dispatchIn.replace(/^server\//, '').split('_')[0];
+        const dispatcher = `dispatch${domain[0].toUpperCase()}${domain.slice(1)}Command(`;
+        expect(group, `${cmd}'s game.ts group must delegate to ${dispatcher}`).toContain(
+          dispatcher,
+        );
+      }
+      const src = dispatchIn
+        ? readFileSync(new URL(`../${dispatchIn}`, import.meta.url), 'utf8')
+        : SERVER;
+      const at = src.indexOf(`case '${cmd}':`);
+      expect(at, `no dispatch arm for ${cmd}`).toBeGreaterThan(-1);
+      const rest = src.slice(at + `case '${cmd}':`.length);
+      const nextCase = rest.indexOf("case '");
+      const arm = nextCase === -1 ? rest : rest.slice(0, nextCase);
+      expect(arm, `${cmd} must parse msg.${field} in its OWN dispatch arm`).toContain(
+        `Number.isInteger(msg.${field})`,
+      );
+      // Parsing is half of it. An arm that reads the field and then calls the sim
+      // without it drops the selection at the authority boundary, which is
+      // indistinguishable from never having sent it. Require the parsed local to
+      // reach a sim call in the same arm.
+      const local = field === 'bagSlot' ? 'bag' : 'slot';
+      const simCall = arm.slice(arm.indexOf('sim.'));
+      expect(simCall, `${cmd} must FORWARD the parsed ${local} to the sim call`).toMatch(
+        new RegExp(`\\b${local}\\b`),
+      );
+    },
+  );
 
   it('exempts only commands with a written reason, and no command is in both lists', () => {
     // Guards the guard. An exemption with no reason, or a command quietly living

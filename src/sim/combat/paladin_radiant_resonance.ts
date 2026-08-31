@@ -1,3 +1,5 @@
+import { DAWNFORGED_4PC_DAWN_CAST_TIME, setBonusFlag } from '../content/ignivar_set_bonuses';
+import type { TalentModifiers } from '../content/talents';
 import type { SimContext } from '../sim_context';
 import type { Entity } from '../types';
 
@@ -69,13 +71,21 @@ export function radiantResonanceCastTime(
   entity: Entity,
   abilityId: string,
   castTime: number,
+  mods?: TalentModifiers,
 ): number {
   if (
     abilityId !== 'dawns_embrace' ||
-    (!hasRadiantResonance(entity) && entity.castRadiantResonance !== true) ||
-    castTime <= RADIANT_RESONANCE_DAWN_CAST_TIME
+    (!hasRadiantResonance(entity) && entity.castRadiantResonance !== true)
   ) {
     return castTime;
   }
-  return RADIANT_RESONANCE_DAWN_CAST_TIME;
+  // Dawnforged 4pc: the empowered Dawn's Embrace is INSTANT for wearers
+  // (base cap 1.5 sec). Min-combined so an already-instant resolve (the
+  // Ascension castTime 0) is never stretched, and gated on abilityId above so
+  // the Mending Light instant arm and every other cast stay untouched.
+  const empoweredCastTime =
+    mods?.selected[setBonusFlag('dawnforged', 4)] === true
+      ? DAWNFORGED_4PC_DAWN_CAST_TIME
+      : RADIANT_RESONANCE_DAWN_CAST_TIME;
+  return Math.min(castTime, empoweredCastTime);
 }

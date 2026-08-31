@@ -10,6 +10,8 @@ import {
   DEFAULT_GROUND_AOE_RADIUS,
   enterGroundAim,
   shouldUseGroundAim,
+  smartSeedPoint,
+  withinMinRange,
 } from '../src/ui/hud/action_bar/ground_aim';
 
 function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
@@ -17,15 +19,17 @@ function casterAt(x: number, z: number): Pick<Entity, 'pos'> {
 }
 
 describe('ground_aim', () => {
-  it('opens touch placement for Meteor without changing other mobile ground casts', () => {
-    expect(shouldUseGroundAim('meteor', true, false)).toBe(true);
-    expect(shouldUseGroundAim('flamestrike', true, true)).toBe(false);
+  it('uses the precise touch preference for every mobile ground cast', () => {
+    expect(shouldUseGroundAim(true, false, true)).toBe(true);
+    expect(shouldUseGroundAim(true, true, true)).toBe(true);
+    expect(shouldUseGroundAim(true, true, false)).toBe(false);
+    expect(shouldUseGroundAim(true, false, false)).toBe(false);
   });
 
   it('keeps desktop ground placement controlled by its preference', () => {
-    expect(shouldUseGroundAim('meteor', false, true)).toBe(true);
-    expect(shouldUseGroundAim('meteor', false, false)).toBe(false);
-    expect(shouldUseGroundAim('flamestrike', false, true)).toBe(true);
+    expect(shouldUseGroundAim(false, true, false)).toBe(true);
+    expect(shouldUseGroundAim(false, false, true)).toBe(false);
+    expect(shouldUseGroundAim(false, true, false)).toBe(true);
   });
 
   it('passes through points inside range', () => {
@@ -41,6 +45,41 @@ describe('ground_aim', () => {
     expect(Math.hypot(dx, dz)).toBeCloseTo(13, 6);
     expect(aim.point.x).toBeCloseTo(15, 6);
     expect(aim.point.z).toBeCloseTo(8, 6);
+  });
+
+  it('clamps a selected target seed to the ability range', () => {
+    const seed = smartSeedPoint({ pos: { x: 10, y: 0, z: -4 }, facing: 0 }, { x: 60, z: -4 }, 30);
+
+    expect(seed).toEqual({ x: 40, z: -4 });
+  });
+
+  it('seeds halfway forward when no target is selected', () => {
+    const seed = smartSeedPoint({ pos: { x: 10, y: 0, z: -4 }, facing: 0 }, null, 30);
+
+    expect(seed).toEqual({ x: 10, z: 11 });
+    expect(seed).not.toEqual({ x: 10, z: -4 });
+  });
+
+  it('uses a five yard effective range when the authored range is not positive', () => {
+    const seed = smartSeedPoint({ pos: { x: 10, y: 0, z: -4 }, facing: 0 }, null, 0);
+
+    expect(seed).toEqual({ x: 10, z: -1.5 });
+  });
+
+  it('uses the player motion sin and cos facing basis', () => {
+    const facing = Math.PI / 3;
+    const seed = smartSeedPoint({ pos: { x: 2, y: 0, z: 5 }, facing }, null, 20);
+
+    expect(seed.x).toBeCloseTo(2 + Math.sin(facing) * 10, 6);
+    expect(seed.z).toBeCloseTo(5 + Math.cos(facing) * 10, 6);
+  });
+
+  it('recognizes only points inside an authored minimum range', () => {
+    const caster = casterAt(10, -4);
+
+    expect(withinMinRange(caster, { x: 13, z: 0 }, 6)).toBe(true);
+    expect(withinMinRange(caster, { x: 16, z: -4 }, 6)).toBe(false);
+    expect(withinMinRange(caster, { x: 10, z: -4 }, undefined)).toBe(false);
   });
 
   it('resolves radius from the first aoeDamage, groundAoE, or channel pulse effect', () => {

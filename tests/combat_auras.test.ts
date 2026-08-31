@@ -119,6 +119,26 @@ describe('auras: updateAuras DoT tick', () => {
     expect(mob.hp).toBeLessThan(hp0);
   });
 
+  it('ramps an authored periodic DoT after each resolved tick and respects its stack cap', () => {
+    const sim = makeSim();
+    const mob = spawnMob(sim, 1000);
+    const dot = aura('dot', 10, {
+      tickInterval: DT,
+      stacks: 1,
+      maxTickStacks: 3,
+      school: 'fire',
+      finalDamage: true,
+    });
+    mob.auras.push(dot);
+
+    updateAuras(sim.ctx, mob);
+    expect(dot).toMatchObject({ stacks: 2, value: 20 });
+    updateAuras(sim.ctx, mob);
+    expect(dot).toMatchObject({ stacks: 3, value: 30 });
+    updateAuras(sim.ctx, mob);
+    expect(dot).toMatchObject({ stacks: 3, value: 30 });
+  });
+
   it('the post-DoT e.dead guard fires once a DoT tick kills the carrier', () => {
     const sim = makeSim();
     const mob = spawnMob(sim, 50);

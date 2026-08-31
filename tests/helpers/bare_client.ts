@@ -70,6 +70,16 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   };
   c.accountAdmin = false;
   c.petSpecialCommandsSupported = false;
+  c.movementWireVersion = 1;
+  c.reconAuthoritativeX = null;
+  c.reconAuthoritativeY = null;
+  c.reconAuthoritativeZ = null;
+  c.reconPreviousAuthoritativeFacing = null;
+  c.reconAuthoritativeFacing = null;
+  c.reconAckClientTick = -1;
+  c.reconOverrideEpoch = 0;
+  c.reconOverrideActive = false;
+  c.reconMoveSpeedMult = 1;
   c.xp = 0;
   c.lifetimeXp = 0;
   c.prestigeRank = 0;
@@ -105,6 +115,9 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.mailInfo = null;
   c.mailUnread = 0;
   c.bankInfo = null;
+  c.bankPurchasedSlots = null;
+  c.vaultInfo = null;
+  c.craftVaultStock = null;
   c.deedsEarned = new Map();
   c.deedStats = freshDeedStats();
   // IWorldReliquary sparse mirrors (heavy self `reliq`); empty until a snap.
@@ -118,6 +131,10 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.delveRun = null;
   c.companionState = null;
   c.riftFloor = null;
+  // The reserved "no token" sentinel (src/sim/colliders.ts allocRiftCollisionToken
+  // never allocates 0), deliberate here: this bare fixture never runs the real
+  // ClientWorld constructor or applyRiftStateEvent, so it never has a real rift
+  // region to register a token for in the first place.
   c.riftCollisionToken = 0;
   c.lockpickState = null;
   c.delveMarks = 0;
@@ -165,18 +182,28 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.connected = true;
   c.eventQueue = [];
   c.activeFrostRings = [];
+  c.activeIgnivarMeteors = [];
+  c.activeVarkhulForgestormWarnings = [];
+  c.activeVarkhulCinderFires = [];
+  c.activeVarkhulCinderOrbProjectiles = [];
+  c.activeVarkhulAnvilMeteors = [];
+  c.activeVarkhulAssemblies = [];
   c.activeTemporalHourglasses = [];
   c.activeConsecrations = [];
   c.profanityWords = [];
   c.mouselookFacing = null;
   c.lastInputSentAt = 0;
   c.lastInputSig = '';
+  c.lastInputFacingSent = null;
+  c.lastInputFacingSentSeq = 0;
   c.inputSeq = 0;
   c.pendingInputSeqSentAt = new Map();
   c.ackedInputSeq = 0;
   c.inputEchoSamples = [];
   c.spectateFacingPending = false;
   c.pendingSpectateFacing = null;
+  c.dungeonEntrySeq = null;
+  c.pendingDungeonEntryFacing = null;
   c.lootRollPrompts = [];
   c.lootRollGroup = [];
   c.masterLootPrompts = [];
@@ -225,14 +252,14 @@ export function bareClient(pid: number, overrides: BareClientOverrides = {}): Cl
   c.onDisconnect = null;
   c.onConnectionLost = null;
   c.onReconnected = null;
+  c.onMovementWireNegotiated = null;
+  c.onMovementWireNeutral = null;
 
   Object.assign(c, rest);
   return c;
 }
 
 export interface FakeClient {
-  // biome-ignore lint/suspicious/noExplicitAny: sent frames are untyped wire JSON, read all
-  // over the calling suites (msg.t, msg.list, ...); matches the idiom's prior local type.
   sent: any[];
   // biome-ignore lint/suspicious/noExplicitAny: mirrors the `ws` field GameServer.join expects
   ws: any;

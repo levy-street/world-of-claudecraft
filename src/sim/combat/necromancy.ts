@@ -1,3 +1,4 @@
+import { GRAVEBRAND_4PC_UNISON_DAMAGE_MULT } from '../content/ignivar_set_bonuses';
 import { isTemporaryNecromancyUndeadTemplateId } from '../content/necromancy';
 import { MOBS } from '../data';
 import { createMob } from '../entity';
@@ -12,6 +13,7 @@ import {
   NECROMANCY_DOMINION_CAP,
   selectCorpseExplosionServant,
 } from './necromancy_dominion';
+import { wearsSetBonus } from './set_bonus_wearer';
 
 export const SOUL_FRAGMENT_CAP = 5;
 export const SOUL_FRAGMENT_OUT_OF_COMBAT_CAP = 3;
@@ -431,7 +433,10 @@ export function commandUndead(
   }
 }
 
-function reapingDamage(ctx: SimContext, undead: Entity, target: Entity): number {
+// `mult` is the owner-side unison multiplier (the Gravebrand 4pc; 1 for
+// everyone else), applied before the round so the Gravewing cleave derived
+// from this damage carries it too.
+function reapingDamage(ctx: SimContext, undead: Entity, target: Entity, mult: number): number {
   let damage =
     (undead.weapon.min + undead.weapon.max) / 2 +
     (ctx.effectiveAttackPower(undead) / 14) * undead.weapon.speed;
@@ -439,6 +444,7 @@ function reapingDamage(ctx: SimContext, undead: Entity, target: Entity): number 
   if (!MOBS[undead.templateId]?.petRanged) {
     damage *= 1 - armorReduction(ctx.effectiveArmor(target), undead.level);
   }
+  damage *= mult;
   return Math.max(1, Math.round(damage));
 }
 
@@ -513,6 +519,12 @@ export function reapWithUndead(
   target: Entity,
   abilityName: string,
 ): void {
+  // Gravebrand 4pc (the Crucible set doc): unison strikes deal 25 percent
+  // more. Owner-side flag, read ONCE per command; the multiplier rides into
+  // reapingDamage (and through it the Gravewing cleave). Draws no rng.
+  const unisonMult = wearsSetBonus(ctx, owner, 'gravebrand', 4)
+    ? GRAVEBRAND_4PC_UNISON_DAMAGE_MULT
+    : 1;
   const intents = ownedNecromancyUndead(ctx, owner.id)
     .sort((a, b) => a.id - b.id)
     .flatMap((undead) => {
@@ -521,7 +533,7 @@ export function reapWithUndead(
       if (!ctx.hasLineOfSight(undead, target)) return [];
       const ranged = MOBS[undead.templateId]?.petRanged;
       const school = ranged?.school ?? 'physical';
-      const damage = reapingDamage(ctx, undead, target);
+      const damage = reapingDamage(ctx, undead, target, unisonMult);
       const cleave = MOBS[undead.templateId]?.petCleave;
       const secondaries = cleave
         ? ctx

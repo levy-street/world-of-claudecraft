@@ -16,7 +16,7 @@
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). The post draws NO rng.
 
-import { bagCapacity, canGrantCopies, instancedCountCap } from '../bags';
+import { bagPools, canGrantCopies, instancedCountCap } from '../bags';
 import { rekeySigner } from '../character_rename';
 import {
   HEROIC_MARK_LETTER,
@@ -58,6 +58,17 @@ const MAIL_EXPIRY_SECONDS = 14 * 24 * 3600; // sim-seconds a read/plain letter l
 // sender, and the returned letter's second window before the sweep deletes it.
 export const MAIL_ATTACHMENT_EXPIRY_SECONDS = 30 * 24 * 3600;
 const MAIL_MAX_PER_RECIPIENT = 100; // stored letters per mailbox (full = refuse new)
+// #3561: the window every still-live letter with a finite expiresAt gets its
+// persisted deliverIn/secondsLeft refreshed at least once, staggered by id
+// (one ~1/3600th slice of the book per sim-second, never a synchronized
+// whole-book burst): bounds staleness against both the 30-day attachment
+// window it protects (MAIL_ATTACHMENT_EXPIRY_SECONDS, at roughly 0.14%) and
+// the 14-day plain-letter expiry window (MAIL_EXPIRY_SECONDS, at roughly
+// 0.3%), nowhere near the tight ~30s bound the old whole-book autosave
+// incidentally provided but never actually needed. See PostOffice.update.
+// Exported so tests can compute a letter's exact stagger slot (id %
+// MAIL_PERSIST_REFRESH_SECONDS) instead of guessing how long to tick.
+export const MAIL_PERSIST_REFRESH_SECONDS = 3600;
 export const MAIL_SUBJECT_MAX = 64;
 export const MAIL_BODY_MAX = 600;
 
@@ -189,12 +200,33 @@ export class PostOffice {
     // former per-call scan at the exact tick (never a per-second lag). Iterates
     // only the small in-flight set, not the whole book, and touches no rng/event
     // stream (the arrival toast keeps its own per-second cadence below). A
-    // landing changes what mailInfoFor shows purely by time passing, so it is
-    // a rev bump like any other mutation (the wire gate would otherwise serve
-    // the pre-landing view until its staleness backstop).
+    // landing changes what mailInfoFor shows and what deliverIn persists, so it
+    // is a rev bump and a dirty-partition mark like any other mutation.
     if (this.index.deliverDue(this.ctx.time) > 0) this.bumpRev();
     if (this.ctx.tickCount % 20 !== 0) return;
     const now = this.ctx.time;
+    // #3561: serializeLetter's deliverIn/secondsLeft are computed relative to
+    // "now" at the moment a letter is actually persisted, not stored as
+    // absolute times (sim.time resets to 0 every boot). The old whole-book
+    // autosave refreshed every letter every 30 s regardless, so staleness was
+    // bounded to one autosave cycle; incremental persistence only refreshes a
+    // letter when something dirties it, so a letter nobody touches could
+    // otherwise drift for the rest of the boot's uptime and grant itself extra
+    // life across an eventual restart: an escrowed parcel's attachment window
+    // stretches out, or (a P0 originally missed here) a plain letter's 14-day
+    // read/expiry clock never advances at all, so it effectively never expires
+    // across a restart, since realms restart far more often than 14 days. Both
+    // silently defeat the reclaim sweep #3561 exists to keep working, so
+    // re-dirty every still-live letter with a finite expiresAt, escrowed or
+    // plain alike, on the same bounded cadence below: its persisted countdown
+    // can never be staler than the old design ever allowed. Staggered by id,
+    // one slice of the book per sim-second (below), never the whole book on
+    // the same tick: a synchronized whole-book burst every
+    // MAIL_PERSIST_REFRESH_SECONDS would itself reopen the #3555 stall class
+    // at the book's scale. Cheap even so: roughly book-size /
+    // MAIL_PERSIST_REFRESH_SECONDS dirty marks per second (about 42/s at the
+    // #3561 150k-letter benchmark), and a dirty mark is O(1), not a write.
+    const refreshSlot = Math.floor(now) % MAIL_PERSIST_REFRESH_SECONDS;
     for (let i = this.mail.length - 1; i >= 0; i--) {
       const m = this.mail[i];
       if (!m.announced && now >= m.deliverAt) {
@@ -209,13 +241,14 @@ export class PostOffice {
           });
         }
       }
+      const hasEscrow = m.items.length > 0 || m.copper > 0;
       // Attachment expiry, player mail ONLY: a system/npc parcel holds
       // expiresAt = Infinity, so it can never trip this arm; the kind filter is
       // the belt-and-braces behind that by-construction exemption. An unclaimed
       // parcel first flies home; deletion with attachments aboard requires the
       // returned flag, so no item is ever destroyed without the return cycle
       // having run.
-      if (m.kind === 'player' && now >= m.expiresAt && (m.items.length > 0 || m.copper > 0)) {
+      if (m.kind === 'player' && now >= m.expiresAt && hasEscrow) {
         if (m.returned) {
           // The one sanctioned destruction: the return flight already happened.
           this.index.untrack(m, now);
@@ -226,12 +259,16 @@ export class PostOffice {
         }
         continue;
       }
-      if (now >= m.expiresAt && m.items.length === 0 && m.copper <= 0) {
+      if (now >= m.expiresAt && !hasEscrow) {
         // An expired letter leaves the buckets and, if delivered-and-unread,
         // the unread count (untrack re-derives both from the letter's state).
         this.index.untrack(m, now);
         this.mail.splice(i, 1);
         this.bumpRev();
+        continue;
+      }
+      if (Number.isFinite(m.expiresAt) && m.id % MAIL_PERSIST_REFRESH_SECONDS === refreshSlot) {
+        this.index.markDirty(m.recipientKey);
       }
     }
   }
@@ -605,7 +642,7 @@ export class PostOffice {
       if (
         canGrantCopies(
           meta.inventory,
-          bagCapacity(meta.bags),
+          bagPools(meta.bags),
           s.itemId,
           s.count,
           s.instance,
@@ -624,7 +661,19 @@ export class PostOffice {
       this.index.markRead(m, this.ctx.time);
       mutated = true;
     }
-    if (mutated) this.bumpRev();
+    if (mutated) {
+      this.bumpRev();
+      // #3561: markRead above only dirties on the read-flag's FIRST flip
+      // (its own guard), but copper/item removal and the expiresAt reset
+      // below are content changes with no structural bucket move, so
+      // index.track/untrack/rekey never sees them either. Without this, a
+      // take on an ALREADY-READ letter (the ordinary flow: open the letter
+      // in the mailbox UI, which reads it, then click Take) would leave the
+      // stale pre-take copper/items sitting in the last-persisted partition
+      // row forever, restoring them on the next restart while the purse and
+      // bags already hold the real ones: a gold/item duplication.
+      this.index.markDirty(m.recipientKey);
+    }
     if (kept.length > 0) {
       // Attachments remain: expiresAt is untouched here, so the letter's
       // existing clock keeps running. That is Infinity for system/npc mail
@@ -904,6 +953,11 @@ export class PostOffice {
         m.senderKey = key;
         m.senderName = newName;
         changed = true;
+        // This letter's recipientKey (whoever it was addressed to, unrelated
+        // to the renaming character) is untouched structurally, so index.rekey
+        // never sees it: mark its row dirty directly, the same restamp
+        // purgeMailOwner's outgoing arm needs below.
+        this.index.markDirty(m.recipientKey);
       }
       if (m.recipientKey === key || m.recipientKey === oldName || m.recipientKey === newName) {
         if (m.recipientKey !== key || m.recipientName !== newName) changed = true;
@@ -912,6 +966,10 @@ export class PostOffice {
         // contract: delivered-and-unread only, a same-key call is a no-op).
         this.index.rekey(m, key, this.ctx.time);
         m.recipientName = newName;
+        // A repeat rename of an already id-keyed character is a no-op rekey
+        // (index.rekey marks nothing dirty then), but recipientName still
+        // just changed above: mark explicitly so that restamp persists.
+        this.index.markDirty(key);
       }
       // The escrowed payloads follow their owner through the rename the same
       // way the blob sweep's buyback arm does (the fix-round review): a
@@ -983,6 +1041,9 @@ export class PostOffice {
       ) {
         m.senderKey = key;
         changed = true;
+        // Same as rekeyMailOwner's outgoing arm: this letter's recipientKey is
+        // untouched structurally, so mark its row dirty directly.
+        this.index.markDirty(m.recipientKey);
       }
       if (!owns(m.recipientKey)) continue;
       changed = true;
@@ -1015,33 +1076,75 @@ export class PostOffice {
     return changed;
   }
 
-  // Persist every letter; durations survive the boot-time clock reset as
-  // seconds-left (the market pattern).
+  // One letter's persisted shape; durations survive the boot-time clock reset
+  // as seconds-left (the market pattern). Shared by the full serialize below
+  // and the incremental per-recipient partition serialize.
+  private serializeLetter(m: MailMessage, now: number): MailSave['mail'][number] {
+    return {
+      id: m.id,
+      recipientKey: m.recipientKey,
+      recipientName: m.recipientName,
+      senderName: m.senderName,
+      senderKey: m.senderKey,
+      kind: m.kind,
+      letterId: m.letterId,
+      subject: m.subject,
+      body: m.body,
+      copper: m.copper,
+      // cloneInvSlot, not a shallow spread: an instanced parcel's payload
+      // must not alias between the live book and the serialized blob.
+      items: m.items.map(cloneInvSlot),
+      deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
+      secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
+      read: m.read,
+      custodyRef: m.custodyRef,
+      returned: m.returned,
+    };
+  }
+
+  // Persist every letter: the full-book shape (the boot-load reconstruction
+  // target, and the retained legacy whole-blob path).
   serializeMail(): MailSave {
     const now = this.ctx.time;
     return {
-      mail: this.mail.map((m) => ({
-        id: m.id,
-        recipientKey: m.recipientKey,
-        recipientName: m.recipientName,
-        senderName: m.senderName,
-        senderKey: m.senderKey,
-        kind: m.kind,
-        letterId: m.letterId,
-        subject: m.subject,
-        body: m.body,
-        copper: m.copper,
-        // cloneInvSlot, not a shallow spread: an instanced parcel's payload
-        // must not alias between the live book and the serialized blob.
-        items: m.items.map(cloneInvSlot),
-        deliverIn: Math.max(0, Math.round(m.deliverAt - now)),
-        secondsLeft: Number.isFinite(m.expiresAt) ? Math.max(0, Math.round(m.expiresAt - now)) : -1,
-        read: m.read,
-        custodyRef: m.custodyRef,
-        returned: m.returned,
-      })),
+      mail: this.mail.map((m) => this.serializeLetter(m, now)),
       nextMailId: this.nextMailId,
     };
+  }
+
+  // Every recipient key whose bucket changed since the last call, each with
+  // its FULL current bucket content (never just the delta within a mailbox:
+  // a player mailbox is bounded by MAIL_MAX_PER_RECIPIENT, so re-writing its
+  // whole bucket is cheap; a quiet interval with no mutations returns an
+  // empty array and the caller writes nothing). This is the incremental-
+  // autosave seam #3561 exists for: steady-state autosave cost becomes
+  // proportional to what changed, not to total book size. Known gap:
+  // MAIL_MAX_PER_RECIPIENT is a send-time gate in mailSendResolved only;
+  // book() (system/npc/quest mail) enforces no per-recipient cap, so a
+  // high-volume system-mail recipient's bucket is NOT actually bounded here.
+  // Pre-existing (book() never capped this before #3561 either); tracked as
+  // a follow-up, not fixed in this change.
+  takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[] {
+    const now = this.ctx.time;
+    return this.index.takeDirty().map((recipientKey) => ({
+      recipientKey,
+      letters: this.index.bucketFor(recipientKey).map((m) => this.serializeLetter(m, now)),
+    }));
+  }
+
+  // Undo half of takeDirtyMailPartitions: re-mark these recipients dirty after
+  // a drained batch failed to reach durable storage (a DB error, a refused
+  // escrow transaction). Without this a failed write silently loses the
+  // change forever, since nothing else re-dirties a recipient whose mailbox
+  // nobody touches again; the old whole-book autosave self-healed from this
+  // exact failure by unconditionally re-serializing everything next cycle,
+  // and this restores the same guarantee for the incremental path. Safe to
+  // call with recipients already dirty again from a newer mutation (the
+  // dirty set is idempotent), and safe to call with recipients that ended up
+  // with zero letters (an empty bucket is still a legitimate row to persist,
+  // namely by deleting it).
+  markPartitionsDirty(recipientKeys: readonly string[]): void {
+    for (const key of recipientKeys) this.index.markDirty(key);
   }
 
   loadMail(save: MailSave | null | undefined): void {
@@ -1057,6 +1160,12 @@ export class PostOffice {
       items: InvSlot[];
       delaySeconds: number;
     }[] = [];
+    // #3561: the soulbound-migration strip below mutates a loaded letter's
+    // content (items stripped) relative to what is actually on disk, so its
+    // OWN recipient needs an explicit dirty mark too, alongside the returned
+    // parcel's book() call: rebuild() alone would call the stripped-but-not-
+    // yet-persisted version "already durable" and never re-persist it.
+    const strippedRecipientKeys = new Set<string>();
     // One aggregated dev-channel line per BOOK load (the character-load
     // idiom): the escrow bound reports what it dropped without logging per
     // row on a systematically corrupt save.
@@ -1119,6 +1228,7 @@ export class PostOffice {
           items: returnedItems,
           delaySeconds: 0,
         });
+        strippedRecipientKeys.add(m.recipientKey);
       }
       const deliverIn = Number.isFinite(m.deliverIn) ? Math.max(0, m.deliverIn) : 0;
       const copper = Math.max(0, Math.floor(m.copper) || 0);
@@ -1161,12 +1271,24 @@ export class PostOffice {
     warnDroppedInstanceKeys('mail book', escrowDrops);
     const maxId = this.mail.reduce((mx, m) => Math.max(mx, m.id + 1), 1);
     this.nextMailId = Math.max(this.nextMailId, save.nextMailId ?? 1, maxId);
-    for (const parcel of returnedParcels) this.book(parcel);
     // Buckets, unread counts, and the in-flight set are derived state, never
-    // persisted: rebuild them from the freshly loaded book. The wire revision
-    // advances too (book() above already bumped for any returned parcel, but a
-    // plain load must invalidate viewers as well).
+    // persisted: rebuild them from the freshly loaded book BEFORE booking any
+    // returned parcel below. Order matters (#3561): rebuild() clears the
+    // whole dirty set (a plain load reconstructs already-durable state, so it
+    // marks nothing dirty), and book() marks dirty through the normal
+    // index.track path. Booking first and rebuilding after would silently
+    // wipe the very dirty mark a freshly-minted return parcel needs to ever
+    // reach disk, re-running this migration every boot forever and risking a
+    // duplicate once the OTHER half (the letter it was split off) is later
+    // dirtied by something unrelated.
     this.index.rebuild(this.mail, this.ctx.time);
+    for (const parcel of returnedParcels) this.book(parcel);
+    // The OTHER half of the same migration: the original letter's own
+    // recipient, whose stored items no longer match what is on disk (the
+    // soulbound item was just stripped off, above).
+    for (const key of strippedRecipientKeys) this.index.markDirty(key);
+    // The wire revision advances too (book() above already bumped for any
+    // returned parcel, but a plain load must invalidate viewers as well).
     this.bumpRev();
   }
 }

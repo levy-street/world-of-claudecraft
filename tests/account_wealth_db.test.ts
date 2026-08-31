@@ -34,6 +34,7 @@ vi.mock('../server/db', () => ({
 import {
   ACCOUNT_WEALTH_SWEEP_LOCK_KEY,
   accountWealthBreakdown,
+  aggregateEscrowTotals,
   applyEscrowTotals,
   LARGE_GOLD_MOVEMENTS_TIMEOUT_MS,
   largeGoldMovementsForAccount,
@@ -109,6 +110,100 @@ describe('listEscrowStateRows', () => {
     const rows = await listEscrowStateRows();
     expect(rows).toEqual([{ key: 'mail:eastbrook', data: { mail: [] } }]);
     expect(query.mock.calls[0][0]).toMatch(/key LIKE 'mail:%' OR key LIKE 'market:%'/);
+    expect(query.mock.calls[0][0]).toMatch(/key LIKE 'mail_partition_done:%'/);
+  });
+});
+
+describe('aggregateEscrowTotals', () => {
+  it('aggregates inside Postgres on the heavy allowance, never shipping a blob to Node', async () => {
+    // First statement under the transaction is the work_mem raise.
+    query.mockResolvedValueOnce(queryResult([]));
+    query.mockResolvedValueOnce(
+      queryResult([
+        {
+          character_id: '12',
+          character_name: null,
+          realm: null,
+          mail_copper: '750',
+          market_copper: '0',
+        },
+        {
+          character_id: null,
+          character_name: 'Oldname',
+          realm: 'eastbrook',
+          mail_copper: '0',
+          market_copper: '300',
+        },
+      ]),
+    );
+    const totals = await aggregateEscrowTotals();
+    expect(totals).toEqual([
+      { characterId: 12, characterName: null, realm: null, mailCopper: 750, marketCopper: 0 },
+      {
+        characterId: null,
+        characterName: 'Oldname',
+        realm: 'eastbrook',
+        mailCopper: 0,
+        marketCopper: 300,
+      },
+    ]);
+    // Rides the heavy allowance like the purse scan (the expansion detoasts
+    // every realm's blobs), never the bare pool default.
+    expect(runWithStatementTimeout).toHaveBeenCalledTimes(1);
+    expect(runWithStatementTimeout.mock.calls[0][0]).toBe(60_000);
+    // Two statements under the one transaction: the per-statement work_mem
+    // raise (at the stock 4 MB the production-size expansion spills ~145 MB
+    // of temp file per pass; see ESCROW_AGGREGATE_WORK_MEM), then the
+    // aggregate itself.
+    expect(boundedQuery).toHaveBeenCalledTimes(2);
+    expect(boundedQuery.mock.calls[0][0]).toBe("SET LOCAL work_mem = '256MB'");
+    const sql = boundedQuery.mock.calls[1][0];
+    // The core of the fix: the data column is expanded in SQL, never selected
+    // whole for a Node-side parse.
+    expect(sql).not.toMatch(/SELECT key, data/);
+    expect(sql).toMatch(/jsonb_array_elements/);
+    // Realm scoping matches the retired Node fold: realm-keyed blobs only,
+    // never the bare legacy 'market' rollback row.
+    expect(sql).toMatch(/key LIKE 'mail:%'/);
+    expect(sql).toMatch(/key LIKE 'market:%'/);
+    expect(sql).toMatch(/mail_partition_done:%/);
+    expect(sql).toMatch(/:r:/);
+    expect(sql).toMatch(/migrated_mail_realms/);
+    // The single-detoast barrier: each blob's array datum is computed once
+    // inside an OFFSET 0 subquery, then guarded; inlining the -> into both
+    // the typeof and the value would detoast the 89 MB blob twice.
+    expect(sql).toMatch(
+      /SELECT substr\(w\.key, strpos\(w\.key, ':'\) \+ 1\) AS rest, w\.data\s+FROM world_state w WHERE w\.key LIKE 'mail:%' OFFSET 0/,
+    );
+    expect(sql).toMatch(/data->'mail' AS arr/);
+    expect(sql).toMatch(
+      /w\.data->'collections' AS arr\s+FROM world_state w WHERE w\.key LIKE 'market:%' OFFSET 0/,
+    );
+    // The malformed-blob guard: the lateral input is CASE-guarded on
+    // jsonb_typeof so a non-array 'mail'/'collections' yields zero rows
+    // instead of failing the whole sweep statement.
+    expect(sql).toMatch(/CASE WHEN jsonb_typeof\(arr\) = 'array' THEN arr END/);
+    // Entry guards mirror positiveCopper + the string-key requirement, with
+    // the absurd-copper upper bound that keeps the bigint pipeline alive.
+    // The ::numeric cast on copper is CASE-armored behind the jsonb_typeof
+    // check (PostgreSQL guarantees no AND evaluation order, so a bare AND
+    // chain could cast a non-number copper and abort the sweep), and that
+    // guarded expression is the ONLY place the cast appears.
+    expect(sql).toMatch(
+      /CASE WHEN jsonb_typeof\(elem->'copper'\) = 'number'\s+THEN \(elem->>'copper'\)::numeric END AS copper_numeric/,
+    );
+    expect(sql.match(/\(elem->>'copper'\)::numeric/g)).toHaveLength(1);
+    expect(sql).toMatch(/cn\.copper_numeric >= 1/);
+    expect(sql).toMatch(/cn\.copper_numeric < 9007199254740992/);
+    // The id-key line: a digit-bounding regex runs BEFORE the ::numeric cast
+    // in a NESTED CASE (PostgreSQL guarantees no AND short-circuit order),
+    // the bound is Number.MAX_SAFE_INTEGER like the oracle's isSafeInteger,
+    // and the house-stock '' key is skipped.
+    expect(sql).toMatch(/raw_key ~ '\^0\*\[0-9\]\{1,16\}\$'/);
+    expect(sql).toMatch(
+      /CASE WHEN raw_key ~ [\s\S]*THEN\s+CASE WHEN raw_key::numeric <= 9007199254740991/,
+    );
+    expect(sql).toMatch(/raw_key <> ''/);
   });
 });
 
@@ -292,11 +387,17 @@ describe('largeGoldMovementsForAccount', () => {
         },
       ]),
     );
-    const rows = await largeGoldMovementsForAccount(42, 100_000, 25);
-    expect(query.mock.calls[0][0]).toMatch(/abs\(l\.copper_delta\) >= \$2/);
-    expect(query.mock.calls[0][1]).toEqual([42, 100_000, 25]);
-    // The read depends on the CONCURRENTLY-built bank_ledger_account_recent
-    // index, which a realm can serve before it exists (server/db.ts, the
+    const rows = await largeGoldMovementsForAccount(42, 25);
+    const sql = query.mock.calls[0][0];
+    // The threshold is a production-fixed literal, not a bind parameter. That
+    // lets PostgreSQL prove the query implies the matching partial-index
+    // predicate even when the driver/server selects a generic prepared plan.
+    expect(sql).toMatch(/abs\(copper_delta\) >= 100000/);
+    expect(sql).not.toMatch(/abs\(copper_delta\) >= \$\d/);
+    expect(sql).toMatch(/LIMIT \$2/);
+    expect(query.mock.calls[0][1]).toEqual([42, 25]);
+    // The read depends on the CONCURRENTLY-built partial account index, which
+    // a realm can serve before it exists (server/db.ts, the
     // runConcurrentIndexMigrations rule): it carries its own bound, far below
     // the 15 s pool default, so a full ledger scan fails this one read instead
     // of pinning pooled clients.

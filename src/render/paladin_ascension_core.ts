@@ -1,3 +1,5 @@
+import { MAX_ASCENSION_CHARGES } from '../sim/paladin_devotion';
+
 export interface PaladinAscensionVisualSource {
   templateId: string;
   dead: boolean;
@@ -30,7 +32,10 @@ export function paladinAscensionVisualPlanInto(
     out.lastCharge = false;
     return out;
   }
-  const charges = Math.max(1, Math.min(5, Math.floor(devotion.ascensionCharges)));
+  const charges = Math.max(
+    1,
+    Math.min(MAX_ASCENSION_CHARGES, Math.floor(devotion.ascensionCharges)),
+  );
   out.active = true;
   out.charges = charges;
   out.lastCharge = charges === 1;

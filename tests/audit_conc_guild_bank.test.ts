@@ -13,6 +13,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const durable = {
   chars: new Map<number, { copper: number; inventory: { itemId: string; count: number }[] }>(),
   books: new Map<number, unknown>(),
+  ledger: [] as BankLedgerAuditRow[],
+  committedLedgerBatches: new Set<string>(),
+  nextLedgerId: 0,
 };
 
 const dbMock = vi.hoisted(() => ({
@@ -20,7 +23,9 @@ const dbMock = vi.hoisted(() => ({
   saveCharacterAndGuildBankState: vi.fn(),
   saveCharacterAndMarketState: vi.fn(),
   insertBankLedgerRow: vi.fn(async () => {}),
+  insertBankLedgerRows: vi.fn(async () => {}),
   loadGuildBankRows: vi.fn(async (): Promise<unknown[]> => []),
+  loadGuildBankRow: vi.fn(async () => null),
 }));
 
 vi.mock('../server/db', () => ({
@@ -30,16 +35,22 @@ vi.mock('../server/db', () => ({
   saveCharacterAndGuildBankState: dbMock.saveCharacterAndGuildBankState,
   saveCharacterAndMarketState: dbMock.saveCharacterAndMarketState,
   insertBankLedgerRow: dbMock.insertBankLedgerRow,
+  insertBankLedgerRows: dbMock.insertBankLedgerRows,
   loadGuildBankRows: dbMock.loadGuildBankRows,
+  loadGuildBankRow: dbMock.loadGuildBankRow,
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
   insertChatLogs: vi.fn(async () => {}),
+  walletForAccount: vi.fn(async () => null),
+  loadAccountFlair: vi.fn(async () => ({ ai: false, streamer: false, links: {} })),
   markAccountQuestComplete: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   grantAccountMechChroma: vi.fn(async () => ({ completedQuestIds: [], mechChromaIds: [] })),
   releaseCharacterLease: vi.fn(async () => {}),
 }));
 
+import { auditBank, type BankLedgerAuditRow } from '../scripts/bank_audit.mjs';
+import type { BankLedgerSaveEffects } from '../server/bank_ledger_save_effects_db';
 import { type ClientSession, GameServer } from '../server/game';
 import {
   GuildBankEscrowRefused,
@@ -47,6 +58,7 @@ import {
   type GuildBankWriteResult,
   mergeGuildBankRow,
 } from '../server/guild_bank_state';
+import { REALM } from '../server/realm';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 
@@ -55,6 +67,67 @@ const STALE = 'stale-nonce';
 const BANKERS = ['bursar_fernando', 'bursar_petra_vell', 'bursar_aldous_crane'];
 
 type CharState = { copper: number; inventory: { itemId: string; count: number }[] };
+
+function countItem(
+  inventory: readonly { itemId: string; count: number }[],
+  itemId: string,
+): number {
+  return inventory.reduce((total, slot) => total + (slot.itemId === itemId ? slot.count : 0), 0);
+}
+
+function preparedLedgerBatches(effects: BankLedgerSaveEffects | undefined): {
+  batchKey: string;
+  rows: BankLedgerAuditRow[];
+}[] {
+  const prepared: { batchKey: string; rows: BankLedgerAuditRow[] }[] = [];
+  let nextLedgerId = durable.nextLedgerId;
+  for (const batch of effects?.batches ?? []) {
+    if (durable.committedLedgerBatches.has(batch.batchKey)) continue;
+    prepared.push({
+      batchKey: batch.batchKey,
+      rows: batch.rows.map((row) => {
+        nextLedgerId += 1;
+        return {
+          id: nextLedgerId,
+          realm: row.realm,
+          character_id: row.characterId,
+          op: row.op,
+          item_id: row.itemId,
+          count: row.count,
+          instance: row.instanceJson === null ? null : JSON.parse(row.instanceJson),
+          copper_delta: row.copperDelta,
+          purchased_slots_after: row.purchasedSlotsAfter,
+          container: row.container,
+          container_id: row.containerId,
+          counterparty_copper_delta: row.counterpartyCopperDelta,
+          counterparty_count: row.counterpartyCount,
+        };
+      }),
+    });
+  }
+  return prepared;
+}
+
+function auditDurableGuildBank(): ReturnType<typeof auditBank> {
+  return auditBank({
+    ledgerRows: durable.ledger,
+    characters: [],
+    guildBanks: [...durable.books.entries()].map(([guild_id, data]) => ({
+      guild_id,
+      realm: REALM,
+      data,
+    })),
+  });
+}
+
+function guildMutationStateBytes(server: GameServer, session: ClientSession): string {
+  return JSON.stringify({
+    character: server.sim.serializeCharacter(session.pid),
+    book: server.sim.serializeGuildBank(GUILD_ID),
+    dirtyGuildBanks: [...session.dirtyGuildBanks],
+    unflushedGuildBankOps: [...session.unflushedGuildBankOps],
+  });
+}
 
 // The fake durable store: a lease-fenced write that actually records, and a
 // book read served from what was recorded.
@@ -66,6 +139,7 @@ function installDurableStore(): void {
     state: CharState,
     books: readonly GuildBankSave[] | undefined,
     results: GuildBankWriteResult[] | undefined,
+    ledgerEffects: BankLedgerSaveEffects | undefined,
   ) => {
     // A refused book half aborts the whole transaction, character row
     // included, exactly as server/db.ts does it.
@@ -78,13 +152,27 @@ function installDurableStore(): void {
     }
     results?.push(...written);
     if (written.some((r) => !r.written)) throw new GuildBankEscrowRefused(written);
+    const pendingLedger = preparedLedgerBatches(ledgerEffects);
+    const pendingCharacter = JSON.parse(JSON.stringify(state)) as CharState;
     for (const [guildId, data] of pending) durable.books.set(guildId, data);
-    durable.chars.set(charId, JSON.parse(JSON.stringify(state)));
+    durable.chars.set(charId, pendingCharacter);
+    for (const batch of pendingLedger) {
+      durable.ledger.push(...batch.rows);
+      durable.nextLedgerId += batch.rows.length;
+      durable.committedLedgerBatches.add(batch.batchKey);
+    }
   };
   dbMock.saveCharacterState.mockImplementation(
-    async (charId: number, _level: number, state: CharState, nonce?: string) => {
+    async (
+      charId: number,
+      _level: number,
+      state: CharState,
+      nonce?: string,
+      _storageEffects?: unknown,
+      ledgerEffects?: BankLedgerSaveEffects,
+    ) => {
       if (nonce === STALE) return false;
-      commit(charId, state, [], undefined);
+      commit(charId, state, [], undefined, ledgerEffects);
       return true;
     },
   );
@@ -96,9 +184,11 @@ function installDurableStore(): void {
       books: readonly GuildBankSave[],
       nonce?: string,
       results?: GuildBankWriteResult[],
+      _storageEffects?: unknown,
+      ledgerEffects?: BankLedgerSaveEffects,
     ) => {
       if (nonce === STALE) return false; // fence miss: the WHOLE txn rolls back
-      commit(charId, state, books, results);
+      commit(charId, state, books, results, ledgerEffects);
       return true;
     },
   );
@@ -112,9 +202,11 @@ function installDurableStore(): void {
       nonce?: string,
       books?: readonly GuildBankSave[],
       results?: GuildBankWriteResult[],
+      _storageEffects?: unknown,
+      ledgerEffects?: BankLedgerSaveEffects,
     ) => {
       if (nonce === STALE) return false;
-      commit(charId, state, books, results);
+      commit(charId, state, books, results, ledgerEffects);
       return true;
     },
   );
@@ -205,6 +297,9 @@ function restamp(
 beforeEach(() => {
   durable.chars.clear();
   durable.books.clear();
+  durable.ledger.length = 0;
+  durable.committedLedgerBatches.clear();
+  durable.nextLedgerId = 0;
   for (const m of Object.values(dbMock)) (m as { mockClear?: () => void }).mockClear?.();
   installDurableStore();
 });
@@ -269,6 +364,12 @@ describe('a fenced-out op vs a book another officer already flushed', () => {
       (durable.chars.get(2)?.copper ?? 0) +
       ((durable.books.get(GUILD_ID) as { treasury: number }).treasury ?? 0);
     expect(total).toBe(1_000_000);
+    expect(durable.ledger.map((row) => [row.character_id, row.op])).toEqual([
+      [b.characterId, 'deposit_gold'],
+    ]);
+    expect(dbMock.insertBankLedgerRow).not.toHaveBeenCalled();
+    expect(dbMock.insertBankLedgerRows).not.toHaveBeenCalled();
+    expect(auditDurableGuildBank()).toEqual([]);
   });
 
   it('conserves an item: the same shape with a stack instead of copper', async () => {
@@ -292,7 +393,7 @@ describe('a fenced-out op vs a book another officer already flushed', () => {
     const idx = aMeta.inventory.findIndex((s) => s.itemId === 'wolf_fang');
     dispatch(server, a, { cmd: 'guild_bank_deposit', slot: idx, count: 4 });
     dispatch(server, b, { cmd: 'guild_bank_deposit_gold', amount: 1 });
-    await priv(server).saveCharacter(b); // flushes the book WITH A's stack
+    await priv(server).saveCharacter(b); // flushes only B's own penny delta
     restamp(server, a);
 
     a.leaseNonce = STALE;
@@ -301,13 +402,16 @@ describe('a fenced-out op vs a book another officer already flushed', () => {
     // A's deposit is gone from the LIVE book (undone) and was never in B's
     // payload, so it is in neither durable half but A's own bags.
     expect(bookOf(server)?.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(false);
-    const rowInv = (durable.books.get(GUILD_ID) as { inventory: { itemId: string }[] }).inventory;
-    const inDurableBook = rowInv.some((s) => s.itemId === 'wolf_fang');
-    const inDurableBags = (durable.chars.get(1)?.inventory ?? []).some(
-      (s) => s.itemId === 'wolf_fang',
-    );
-    // Exactly one of the two durable halves may hold the stack.
-    expect([inDurableBook, inDurableBags]).not.toEqual([true, true]);
+    const rowInv = (
+      durable.books.get(GUILD_ID) as { inventory: { itemId: string; count: number }[] }
+    ).inventory;
+    const durableBookCount = countItem(rowInv, 'wolf_fang');
+    const durableBagCountAfter = countItem(durable.chars.get(1)?.inventory ?? [], 'wolf_fang');
+    // The fenced deposit committed nowhere; the original durable bags remain
+    // the one exact owner of all four items.
+    expect([durableBookCount, durableBagCountAfter]).toEqual([0, 4]);
+    expect(durable.ledger.some((row) => row.character_id === a.characterId)).toBe(false);
+    expect(auditDurableGuildBank()).toEqual([]);
   });
 
   it("an undo landing INSIDE another save's write window cannot be shadowed", async () => {
@@ -361,17 +465,20 @@ describe('a fenced-out op vs a book another officer already flushed', () => {
       (durable.chars.get(2)?.copper ?? 0) +
       ((durable.books.get(GUILD_ID) as { treasury: number }).treasury ?? 0);
     expect(total).toBe(1_000_000);
+    expect(durable.ledger.some((row) => row.character_id === a.characterId)).toBe(false);
+    expect(auditDurableGuildBank()).toEqual([]);
   });
 });
 
 // ---------------------------------------------------------------------------
-// B: the revertLost (overflowed log) fallback destroys / duplicates the OTHER
-// session's unflushed ops.
+// B: audit-outbox pressure while another session holds unflushed ops. Capacity
+// is acquired before the Sim call, so a saturated session cannot create an op
+// that later needs a lossy compaction or cross-session rollback.
 // ---------------------------------------------------------------------------
-describe('an overflowing op log while another session holds unflushed ops', () => {
-  it("conserves an item: the cap COMPACTS the log, so B's withdrawal is never restored", async () => {
+describe('a saturated audit outbox while another session holds unflushed ops', () => {
+  it("conserves an item: A is refused before mutation, so B's withdrawal is never restored", async () => {
     const server = new GameServer();
-    const a = joinServer(server, 1, 'OverflowA');
+    const a = joinServer(server, 1, 'SaturatedA');
     const b = joinServer(server, 2, 'WithdrawB');
     officer(server, a);
     officer(server, b);
@@ -391,28 +498,30 @@ describe('an overflowing op log while another session holds unflushed ops', () =
     if (!bMeta) throw new Error('missing meta');
     expect(bMeta.inventory.some((s) => s.itemId === 'wolf_fang')).toBe(true);
 
-    // A's unflushed log overflows the cap (a DB outage plus sustained ops).
-    // The cap COMPACTS it rather than dropping it, so A keeps a faithful undo
-    // list and there is no fallback arm to reload the book from.
-    a.unflushedGuildBankOps.set(
-      GUILD_ID,
-      Array.from({ length: 500 }, () => ({
-        op: 'deposit_gold' as const,
-        itemId: null,
-        count: null,
-        instance: null,
-        // Filler that only fills the CAP: it stands for ops this fixture never
-        // ran against the live book, and the undo is honest now, so a non-zero
-        // delta here would subtract copper the book never gained.
-        copperDelta: 0,
-        purchasedSlotsBefore: 24,
-        purchasedSlotsAfter: 24,
-      })),
-    );
+    // Fill A's exact session budget without inventing operations that never ran
+    // against the book. The next command must be refused by admission before
+    // either A's purse or the shared book can move.
+    const outbox = a.bankLedgerJournal.outbox;
+    const saturation = outbox.tryReserve({
+      maxRows: outbox.limits.maxRows,
+      maxEncodedBytes: outbox.limits.maxEncodedBytes,
+    });
+    if (!saturation) throw new Error('expected to saturate A ledger outbox');
+    const aMeta = server.sim.players.get(a.pid);
+    if (!aMeta) throw new Error('missing A meta');
+    const beforeCopper = aMeta.copper;
+    const beforeMutation = guildMutationStateBytes(server, a);
+    const saturatedUsage = outbox.usage;
     dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 500 });
-    expect((a.unflushedGuildBankOps.get(GUILD_ID) ?? []).length).toBeLessThan(500);
+    expect(aMeta.copper).toBe(beforeCopper);
+    expect(guildMutationStateBytes(server, a)).toBe(beforeMutation);
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    expect(a.unflushedGuildBankOps.size).toBe(0);
+    expect(outbox.snapshot().rowCount).toBe(0);
+    expect(outbox.usage).toEqual(saturatedUsage);
+    expect(outbox.cancel(saturation)).toBe(true);
 
-    // A fences out while B is dirty: only A's own ops are undone.
+    // A can fence out while B is dirty without any A op to undo.
     a.leaseNonce = STALE;
     await priv(server).saveCharacter(a);
     restamp(server, b);
@@ -420,15 +529,18 @@ describe('an overflowing op log while another session holds unflushed ops', () =
 
     // B's escrow save now commits both halves in one transaction.
     await priv(server).saveCharacter(b);
-    const rowInv = (durable.books.get(GUILD_ID) as { inventory: { itemId: string }[] }).inventory;
-    const inBook = rowInv.some((s) => s.itemId === 'wolf_fang');
-    const inBags = (durable.chars.get(2)?.inventory ?? []).some((s) => s.itemId === 'wolf_fang');
-    expect([inBook, inBags]).not.toEqual([true, true]);
+    const rowInv = (
+      durable.books.get(GUILD_ID) as { inventory: { itemId: string; count: number }[] }
+    ).inventory;
+    const durableBookCount = countItem(rowInv, 'wolf_fang');
+    const durableBagCount = countItem(durable.chars.get(2)?.inventory ?? [], 'wolf_fang');
+    expect([durableBookCount, durableBagCount]).toEqual([0, 4]);
+    expect(durable.ledger.filter((row) => row.character_id === a.characterId)).toEqual([]);
   });
 
-  it("conserves copper: the same overflow never erases B's unflushed deposit", async () => {
+  it("conserves copper: the same refusal never erases B's unflushed deposit", async () => {
     const server = new GameServer();
-    const a = joinServer(server, 1, 'OverflowA');
+    const a = joinServer(server, 1, 'SaturatedA');
     const b = joinServer(server, 2, 'DepositB');
     officer(server, a);
     officer(server, b);
@@ -440,22 +552,25 @@ describe('an overflowing op log while another session holds unflushed ops', () =
     if (!bMeta) throw new Error('missing meta');
     expect(bMeta.copper).toBe(450_000); // charged, not yet durable
 
-    a.unflushedGuildBankOps.set(
-      GUILD_ID,
-      Array.from({ length: 500 }, () => ({
-        op: 'deposit_gold' as const,
-        itemId: null,
-        count: null,
-        instance: null,
-        // Filler that only fills the CAP: it stands for ops this fixture never
-        // ran against the live book, and the undo is honest now, so a non-zero
-        // delta here would subtract copper the book never gained.
-        copperDelta: 0,
-        purchasedSlotsBefore: 24,
-        purchasedSlotsAfter: 24,
-      })),
-    );
+    const outbox = a.bankLedgerJournal.outbox;
+    const saturation = outbox.tryReserve({
+      maxRows: outbox.limits.maxRows,
+      maxEncodedBytes: outbox.limits.maxEncodedBytes,
+    });
+    if (!saturation) throw new Error('expected to saturate A ledger outbox');
+    const aMeta = server.sim.players.get(a.pid);
+    if (!aMeta) throw new Error('missing A meta');
+    const beforeMutation = guildMutationStateBytes(server, a);
+    const saturatedUsage = outbox.usage;
     dispatch(server, a, { cmd: 'guild_bank_deposit_gold', amount: 500 });
+    expect(aMeta.copper).toBe(500_000);
+    expect(bookOf(server)?.treasury).toBe(150_000);
+    expect(guildMutationStateBytes(server, a)).toBe(beforeMutation);
+    expect(a.dirtyGuildBanks.size).toBe(0);
+    expect(a.unflushedGuildBankOps.size).toBe(0);
+    expect(outbox.snapshot().rowCount).toBe(0);
+    expect(outbox.usage).toEqual(saturatedUsage);
+    expect(outbox.cancel(saturation)).toBe(true);
     a.leaseNonce = STALE;
     await priv(server).saveCharacter(a);
     restamp(server, b);
@@ -469,6 +584,7 @@ describe('an overflowing op log while another session holds unflushed ops', () =
     // B started with 500_000 copper and the book with 100_000: nothing legitimate
     // left the pair, so the two durable halves must still sum to 600_000.
     expect(total).toBe(600_000);
+    expect(durable.ledger.filter((row) => row.character_id === a.characterId)).toEqual([]);
   });
 });
 
@@ -694,6 +810,8 @@ describe('AUDIT controls (these must PASS)', () => {
     await priv(server).saveCharacter(a);
     expect(bookOf(server)?.treasury).toBe(0);
     expect(durable.chars.get(1)?.copper).toBe(500_000);
+    expect(durable.ledger).toEqual([]);
+    expect(auditDurableGuildBank()).toEqual([]);
   });
 
   it('two officers with both halves flushed conserve exactly', async () => {
@@ -712,6 +830,8 @@ describe('AUDIT controls (these must PASS)', () => {
       (durable.chars.get(2)?.copper ?? 0) +
       ((durable.books.get(GUILD_ID) as { treasury: number }).treasury ?? 0);
     expect(total).toBe(1_000_000);
+    expect(durable.ledger.map((row) => row.op)).toEqual(['deposit_gold', 'deposit_gold']);
+    expect(auditDurableGuildBank()).toEqual([]);
   });
 
   it('the sim boot-load of a serialized book is a faithful round trip', () => {

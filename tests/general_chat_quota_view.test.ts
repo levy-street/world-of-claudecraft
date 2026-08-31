@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { SimEvent } from '../src/sim/types';
+import { BankWindow } from '../src/ui/bank_window';
 import { generalChatQuotaView } from '../src/ui/general_chat_quota_view';
 import { ChatAnnouncer } from '../src/ui/hud/chat/chat_announcer';
 import { ChatWindowController } from '../src/ui/hud/chat/chat_window_controller';
@@ -222,6 +223,20 @@ describe('structured General chat quota UI routing', () => {
     expect(errorCase).toContain(
       'this.showLocalizedError(quota.text, quota.channel, quota.announceWhenFiltered)',
     );
-    expect(errorCase).toContain('this.showError(this.localizeErrorText(ev.text))');
+    expect(errorCase).toContain(
+      'this.showError(this.localizeErrorText(this.bankWindow.observeStorageText(ev.text)))',
+    );
+  });
+
+  it('passes unrecognized prose through the storage observer unchanged', () => {
+    const prose = 'An older server sent an unstructured refusal.';
+    const bankWindow = {
+      guildPane: { onDefinitivePurchaseRefusal: () => false },
+      vaultPane: { onDefinitivePurchaseRefusal: () => false },
+      socketPurchase: { observeText: () => false },
+      opened: false,
+    } as unknown as BankWindow;
+
+    expect(BankWindow.prototype.observeStorageText.call(bankWindow, prose)).toBe(prose);
   });
 });

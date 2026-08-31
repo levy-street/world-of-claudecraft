@@ -71,6 +71,7 @@ import { itemCopyPin } from '../item_copy_ref';
 import { equipItem as equipItemImpl } from '../items';
 import { buildGearSet, planGearSwap, type SavedGearSet, wornAsBagSlot } from '../loadout_gear';
 import { despawnPersistentPet, petOf } from '../pet/pet_commands';
+import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { ALL_EQUIP_SLOTS, type Entity, type EquipSlot, isFormAuraKind } from '../types';
@@ -191,6 +192,34 @@ function normalizeAbilityCharges(
   if (Object.keys(player.abilityCharges).length === 0) player.abilityCharges = undefined;
 }
 
+/** The EQUIPMENT-change recompute (the Crucible set-bonus seam, Phase B):
+ *  rebuilds the character's modifiers from talents plus the newly worn set,
+ *  silently re-resolves known abilities so the rewrite-list bends (resolved
+ *  durations, buff values, absorb rates) land, and runs the same charge and
+ *  proc-state hygiene the talent recompute below runs, so an equip swap can
+ *  never refresh ability charges nor strand a dropped set-proc's counter.
+ *  Call BEFORE the site's recalcPlayerStats (the stats pass reads the fresh
+ *  mods). No announcements and no wireRev: the online client derives set
+ *  bonuses from its own equipment mirror. */
+export function refreshModsForEquipmentChange(ctx: SimContext, meta: PlayerMeta): void {
+  const e = ctx.entities.get(meta.entityId);
+  const previousMods = meta.talentMods;
+  const previousChargeCaps = new Map(
+    meta.known.map((ability) => [ability.def.id, ability.charges ?? 1] as const),
+  );
+  meta.talentMods = computeCharacterModifiers(
+    meta.cls,
+    meta.talents,
+    e?.level ?? 20,
+    meta.equipment,
+  );
+  ctx.refreshKnownAbilities(meta, false);
+  if (e) {
+    cleanRemovedProcState(ctx, e, previousMods, meta.talentMods);
+    normalizeAbilityCharges(e, meta, previousChargeCaps);
+  }
+}
+
 // The ONLY place a talent tree is walked. Re-resolves the flat modifier struct and
 // refreshes the stat pass + known-ability resolver that consume it.
 function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
@@ -199,7 +228,12 @@ function recomputeTalents(ctx: SimContext, meta: PlayerMeta): void {
   const previousChargeCaps = new Map(
     meta.known.map((ability) => [ability.def.id, ability.charges ?? 1] as const),
   );
-  meta.talentMods = computeTalentModifiers(meta.cls, meta.talents, e?.level ?? 20);
+  meta.talentMods = computeCharacterModifiers(
+    meta.cls,
+    meta.talents,
+    e?.level ?? 20,
+    meta.equipment,
+  );
   if (e)
     recalcPlayerStats(e, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   // Announce newly granted abilities (spec signature, active nodes): emits `learnAbility`

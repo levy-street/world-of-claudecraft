@@ -401,6 +401,14 @@ export const ZONE2_MOBS: Record<string, MobTemplate> = {
       { itemId: 'bogiron_nugget', chance: 0.3 },
       { itemId: 'elixir_of_the_bear', chance: 0.008 },
       { itemId: 'marshlight_hauberk', chance: 0.012 },
+      // The rare world-drop bag, and the middle of its three ordinary-mob rows
+      // (the others are on zone3's Deeprock Tunneler and Thornpeak Ogre). All
+      // three hosts rob the roads, so the pack turns up on the humanoids that
+      // would have taken it off a traveller. A rare 16-slot bag is a genuine
+      // chase item, so all three rows sit inside the classic normal-mob blue
+      // band (tests/loot_quality_rates.test.ts); the elevated row is on a rare
+      // mob, not here.
+      { itemId: 'wayfarers_backpack', chance: 0.0015 },
     ],
     scale: 1.15,
     color: 0x229954,

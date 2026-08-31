@@ -23,6 +23,7 @@
 // MOVED VERBATIM from terrain.ts. The geometry pin proves it byte for byte.
 
 import * as THREE from 'three';
+import { forgefatherIsleRockWeight } from '../sim/content/ember_coast';
 import {
   COLUMN_ZONES,
   columnBlendAt,
@@ -275,6 +276,7 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
       lerpSplat(w, 1, dryW * 0.45);
     }
   }
+  let isleRock = 0;
   if (biome === 'ember') {
     // the gatewood is green in the south near Wyrmwatch and dries into sand
     // northward; the volcanic belt then darkens toward scorched basalt
@@ -294,6 +296,14 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     if (valley > 0) {
       cTmp.lerp(emberForestC, valley * 0.8);
       lerpSplat(w, 0, valley * 0.6);
+    }
+    // The Forgefather's Isle is bare volcanic rock, never sand (the shared
+    // sim weight keeps the world, vista, and map tiers in agreement).
+    isleRock = forgefatherIsleRockWeight(x, z);
+    if (isleRock > 0) {
+      cTmp.lerp(emberScorchC, isleRock * 0.75);
+      cTmp.lerp(emberBasaltC, isleRock * 0.45);
+      lerpSplat(w, 2, isleRock * 0.85);
     }
   }
   // the marsh reads muddier: patches of wet dirt across the lowland
@@ -315,8 +325,18 @@ function sampleVertex(state: ChunkGeometryBuildState, ci: number, cj: number): V
     cTmp.lerp(wetRockC, shore);
     lerpSplat(w, 2, shore);
   } else {
-    cTmp.lerp(sandC, shore);
-    lerpSplat(w, 3, shore);
+    // the isle's strand is dark wet gravel, not gold sand: the shore blend
+    // splits by the same rock weight so the ring fades with the feather
+    const rockShore = shore * isleRock;
+    const sandShore = shore - rockShore;
+    if (sandShore > 0) {
+      cTmp.lerp(sandC, sandShore);
+      lerpSplat(w, 3, sandShore);
+    }
+    if (rockShore > 0) {
+      cTmp.lerp(wetRockC, rockShore);
+      lerpSplat(w, 2, rockShore);
+    }
   }
   // New Eastbrook's strand (owner refinement): the vale's beach band reads as
   // full sand well above the wet lip, so the shore is unambiguous sand rather

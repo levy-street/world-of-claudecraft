@@ -111,6 +111,7 @@ describe('applyBagFilter: category filtering', () => {
     ];
     const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(['iron_ore']);
+    expect(matchesCategory(REAL_ITEMS.lastflame_core, 'material')).toBe(true);
   });
 
   it('keeps only tools under the tool chip (the displaced implements)', () => {
@@ -440,7 +441,9 @@ describe('chip reachability census: the All-only set, pinned', () => {
   // (tests/market_filters.test.ts); the bags/bank chips deliberately do NOT
   // carry it: the 2026-08-01 settlement ruled grey trash and the five trophy
   // oddments out of every chip (Q3/Q4), and the six bag-kind items matched no
-  // chip before the narrowing either. This census makes the ruling
+  // chip before the narrowing either (phase 05 of the bank-storage packet grew
+  // that bag family from six to thirteen, materials-only satchels included:
+  // still no chip, since matchesCategory has no bag arm). This census makes the ruling
   // enforceable: a chip or taxonomy edit that strands MORE items (or quietly
   // rescues one the settlement excluded) reds an exact-set diff naming it.
   const ALL_ONLY = [
@@ -448,13 +451,16 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'bandit_bandana',
     'bogiron_nugget',
     'briny_idol',
+    'burlap_reagent_pouch',
     'chipped_tusk',
     'cracked_fetish',
     'cracked_ogre_tusk',
     'cracked_wyrm_scale',
     'dawnhold_posy',
     'deepfen_pearl',
+    'duskweave_bag',
     'emberwing_cinderscale',
+    'foragers_haversack',
     'frayed_prayer_beads',
     'gleamstag_charm',
     'gravewoven_bag',
@@ -462,12 +468,15 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'inert_storm_shard',
     'last_keep_signet',
     'linen_pouch',
+    'loombound_reagent_satchel',
     'mistcallers_duffel',
     'moonpale_scale',
     'mudfin_scale',
+    'necromancers_reagent_satchel',
     'ogre_toe_ring',
     'old_cragmaws_pelt',
     'pale_pearl',
+    'resonant_weave_bag',
     'silkspun_satchel',
     'soft_down',
     'soggy_boot',
@@ -476,10 +485,11 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'tallow_candle',
     'tangled_weed',
     'travelers_knapsack',
+    'wayfarers_backpack',
     'wolfhide_satchel',
   ] as const;
 
-  it('exactly the ruled 26 junk items plus the 6 bag-kind items match no chip', () => {
+  it('exactly the ruled junk and bag items match no chip', () => {
     const allOnly = Object.values(REAL_ITEMS)
       .filter((def) => !BAG_CATEGORIES.some((c) => c !== 'all' && matchesCategory(def, c)))
       .map((d) => d.id)

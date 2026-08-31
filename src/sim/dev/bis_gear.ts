@@ -1,11 +1,10 @@
-// /dev bis: outfit the caller with a deterministic best-in-slot epic set so
-// playtesting at the level cap never starts with a vendor shopping trip. Two
-// consumers: the dev-gated /dev bis command, and the friendly practice dummy's
-// reference vitals (mob/practice_dummies.ts), which run at every world
-// construction, production included, so this module is NOT dev-only despite
-// its home. Picks are pure functions of the item table, the player's class,
-// and the selected spec, so repeated runs equip the identical set. Draws no
-// rng.
+// /dev bis: outfit the caller with the strongest observed parse loadout for the
+// selected spec so level-cap playtesting matches real players. The generic epic
+// scorer remains the fallback for a character with no spec, the friendly
+// practice dummy's reference vitals (mob/practice_dummies.ts), which run at every
+// world construction, production included, and the balance probes' reference
+// kit (equipReferenceEpicKitForDev), whose pinned DPS bands must not move when
+// a new parse capture lands. Draws no rng.
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random or
 // Date.now (enforced by tests/architecture.test.ts).
@@ -13,9 +12,11 @@
 import { ITEMS } from '../data';
 import { recalcPlayerStats } from '../entity';
 import { canEquipItemInSlot } from '../equipment_rules';
+import { refreshModsForEquipmentChange } from '../progression/talents';
 import type { SimContext } from '../sim_context';
 import type { EquipSlot, ItemDef } from '../types';
 import { ALL_EQUIP_SLOTS } from '../types';
+import { parseBisGearFor } from './parse_bis_loadouts';
 
 // Rough single-number item power: weapon dps dominates for weapons, stat
 // budget plus armor carries the rest. Only used to ORDER epics per slot.
@@ -76,20 +77,53 @@ export function bestEpicGearFor(
   return picks;
 }
 
-// Applies the picks to the caller: dev-only direct equipment write, cleared
+// Applies picks to the caller: dev-only direct equipment write, cleared
 // crafted-instance payloads, one stat recalc. Returns the equipped count.
-export function equipBestInSlotForDev(ctx: SimContext, pid: number): number {
+function applyDevGear(
+  ctx: SimContext,
+  pid: number,
+  picks: Partial<Record<EquipSlot, string>>,
+  clearStaleSlots: boolean,
+): number {
   const meta = ctx.players.get(pid);
   const player = ctx.entities.get(pid);
   if (!meta || !player) return 0;
-  const picks = bestEpicGearFor(meta.cls, meta.talents?.spec ?? null);
+  if (clearStaleSlots) {
+    for (const slot of ALL_EQUIP_SLOTS) {
+      delete meta.equipment[slot];
+      if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
+    }
+  }
   let equipped = 0;
   for (const [slot, itemId] of Object.entries(picks) as [EquipSlot, string][]) {
     meta.equipment[slot] = itemId;
     if (meta.equipmentInstance) delete meta.equipmentInstance[slot];
     equipped++;
   }
+  refreshModsForEquipmentChange(ctx, meta);
   recalcPlayerStats(player, meta.cls, meta.equipment, ctx.playerMods(meta), meta.equipmentInstance);
   player.hp = player.maxHp;
   return equipped;
+}
+
+// The /dev bis command: the selected spec's frozen top-parse loadout, with the
+// generic epic scorer as the spec-less fallback. Clears every slot first so a
+// two-handed loadout cannot retain a stale shield or offhand.
+export function equipBestInSlotForDev(ctx: SimContext, pid: number, selectedSpec?: string): number {
+  const meta = ctx.players.get(pid);
+  if (!meta) return 0;
+  const spec = selectedSpec ?? meta.talents?.spec ?? null;
+  const picks = (spec ? parseBisGearFor(meta.cls, spec) : null) ?? bestEpicGearFor(meta.cls, spec);
+  return applyDevGear(ctx, pid, picks, true);
+}
+
+// The deterministic reference kit for the balance probes and their pinned DPS
+// bands (scripts/rogue_dps_probe.ts, scripts/druid_balance_probe.ts): always
+// the pure item-table scorer, never the parse snapshot, and no slot clearing,
+// so the accepted fixtures stay stable when a new parse capture lands.
+export function equipReferenceEpicKitForDev(ctx: SimContext, pid: number): number {
+  const meta = ctx.players.get(pid);
+  if (!meta) return 0;
+  const picks = bestEpicGearFor(meta.cls, meta.talents?.spec ?? null);
+  return applyDevGear(ctx, pid, picks, false);
 }

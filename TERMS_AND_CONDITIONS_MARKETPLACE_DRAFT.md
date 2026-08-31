@@ -1,6 +1,14 @@
 # Terms and Conditions (marketplace revision)
 
-**DRAFT FOR COUNSEL. NOT IN FORCE.**
+**DRAFT FOR COUNSEL. PUBLISHED 25 AUGUST 2026 BY OWNER DECISION, AHEAD OF COUNSEL SIGN-OFF.**
+
+The owner elected to publish this revision as the live Terms on 25 August 2026
+without waiting for counsel review. The published text is this draft's
+marketplace changes applied onto the RICHER live page text (the live
+`public/terms.html` carried a newer Section 5 and Section 6 than this draft's
+base; see the publication commit). The `[COUNSEL]` questions below remain OPEN:
+counsel review of the published text is still owed, and this file remains the
+counsel working copy.
 
 This document is a proposed revision of `TERMS_AND_CONDITIONS.md` (the live
 Terms, last updated 22 July 2026). It is kept beside the live Terms and does not

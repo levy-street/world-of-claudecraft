@@ -65,6 +65,18 @@ services:
       # Empty (unset) yields the built-in default of 10; accepted range is 1 to
       # 97 and anything else falls back to the default with an error at boot.
       DB_POOL_MAX_CLIENTS: ${DB_POOL_MAX_CLIENTS:-}
+      # Runtime: storage price override (server/storage_prices.ts), one JSON object
+      # of copper price lists, e.g. {"bankSockets":[4 ints]} (bankExpansions and
+      # vaultUpgrades too), kept on ONE line in a .env file. Empty (unset) keeps the
+      # compiled defaults; a rejected dimension falls back by itself and is reported
+      # on the console at boot.
+      STORAGE_PRICES: ${STORAGE_PRICES:-}
+      # Runtime: database-wide lifetime insert ceiling for the keep-forever
+      # bank_ledger (server/bank_ledger_growth_budget.ts). Empty (unset) yields
+      # the built-in default of 10,000,000 rows. Every process sharing
+      # DATABASE_URL must use the same value as the stored singleton or boot
+      # fails; raising it is a maintenance-window operation (DEPLOY.md).
+      BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS: ${BANK_LEDGER_GROWTH_HARD_LIMIT_ROWS:-}
       # Community test realms can opt in to a ready-made level-20 roster for
       # every newly created account. The production-safe default is disabled.
       PROVISION_TEST_ACCOUNTS: ${PROVISION_TEST_ACCOUNTS:-0}
