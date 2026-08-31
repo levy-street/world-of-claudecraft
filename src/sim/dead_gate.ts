@@ -1,5 +1,5 @@
 // Shared while-dead refusal for command families that must not run for a
-// dead player (released ghost included). Call sites fall into two shapes:
+// dead player (released ghost included). Call sites fall into these shapes:
 //
 // 1. Sim wrappers that emit a result event unconditionally after the
 //    resolver (craft/train/salvage/disenchant/enchant-apply/unbind): the

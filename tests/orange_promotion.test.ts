@@ -748,6 +748,12 @@ describe('the shared deny head runs once per routed promotion, and gates the dir
     // the head's current cost (dead gate + ladder), not a contract, so a
     // future cleanup that threads the resolved player into the gate may
     // lower it without failing here (the phase 18 review's reading).
+    // The floor guards the spy itself: a successful promotion must resolve
+    // the player at least once (the export takes only a pid), so if the
+    // countResolves instrumentation ever stops seeing the live resolve,
+    // both counters read 0 and this arm reds instead of the pair passing
+    // vacuously (the fresh-read finding on the relaxed pin).
+    expect(aloneCalls(), 'a promotion resolves the player at least once').toBeGreaterThanOrEqual(1);
     expect(aloneCalls(), 'the standalone entry: at most dead gate + ladder').toBeLessThanOrEqual(2);
     expect(routedCalls(), 'the routed entry costs not one resolution more').toBe(aloneCalls());
   });

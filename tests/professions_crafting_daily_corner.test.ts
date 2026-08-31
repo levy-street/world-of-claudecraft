@@ -9,7 +9,7 @@
 // must never promote a tampered stamp into a daily_limit answer for a recipe
 // the character could not craft today anyway.
 import { describe, expect, it } from 'vitest';
-import { evaluateCraftAdmission } from '../src/sim/professions/crafting';
+import { evaluateCraftAdmission, maxCraftCountForRecipe } from '../src/sim/professions/crafting';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import { EMPTY_TEST_WORLD } from './sim_shared';
@@ -75,6 +75,23 @@ describe('the daily-before-not_learned ladder corner (a DB-tampered stamp)', () 
       expect(tamperedDenial, recipe.id).toEqual(cleanDenial);
       expect(cleanDenial?.reason, recipe.id).toBeDefined();
     }
+  });
+
+  it('the preview daily cap carries the same knownness term as the gate', () => {
+    // The tampered corner through the PREVIEW read: a stamped UNKNOWN
+    // recipe previews 1 (the stamp no longer encodes a knownness rule the
+    // preview would apply on its own; the admission owns knownness and
+    // refuses recipe_not_learned before any batch starts), while the
+    // stamped KNOWN recipe still previews 0. Keeps maxCraftCountForRecipe
+    // term-for-term in step with evaluateCraftAdmission (the fix-round
+    // fresh-read's missing pin).
+    const tampered = world(10);
+    stamp(tampered.meta, GATED_DAILY.id);
+    expect(maxCraftCountForRecipe(tampered.sim.ctx, GATED_DAILY, tampered.pid)).toBe(1);
+    const known = world(10);
+    known.meta.knownRecipes.add(GATED_DAILY.id);
+    stamp(known.meta, GATED_DAILY.id);
+    expect(maxCraftCountForRecipe(known.sim.ctx, GATED_DAILY, known.pid)).toBe(0);
   });
 
   it('the deliberate daily-first order survives for a KNOWN recipe', () => {
