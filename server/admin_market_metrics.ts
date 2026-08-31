@@ -199,7 +199,11 @@ export function readAdminMarketMetrics(): Promise<AdminMarketMetrics> {
     );
   }
   const source = metricsSource;
-  metricsCache ??= createCachedRead(async () => source(), {
+  // One snapshot object is served by reference to every reader in a TTL
+  // window (and its serialized envelope is memoized on that identity by the
+  // route, server/ok_response_memo.ts); freeze it so no consumer can poison
+  // the shared readout or desync the memoized bytes.
+  metricsCache ??= createCachedRead(async () => Object.freeze(source()), {
     ttlMs: ADMIN_MARKET_METRICS_TTL_MS,
   });
   return metricsCache.read();

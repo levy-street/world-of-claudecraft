@@ -945,6 +945,46 @@ export function resetAdminOversightRateLimits(): void {
 }
 
 // ---------------------------------------------------------------------------
+// Admin analytics dashboard reads (overview / activity / market metrics, the
+// analytics.read family). These are warm in-memory cached reads with zero
+// per-request DB cost, so the meter is about uniform admin-surface metering
+// (no read route is the unthrottled odd one out), not query protection. Own
+// bucket pair, NOT the oversight maps above: the Overview landing page polls
+// at the dashboard's 5 s tick for every operator by default, and that routine
+// traffic must never burn the economy-oversight budget (whose exhaustion
+// would 429 the moderation Flagged workflow), nor vice versa. Same headroom
+// as the oversight reads: several admins behind one NAT, each with a few
+// polled dashboard tabs open.
+// ---------------------------------------------------------------------------
+export const ADMIN_ANALYTICS_READ_MAX_PER_MINUTE = 120;
+
+const adminAnalyticsReadIpAttempts = new Map<string, number[]>();
+const adminAnalyticsReadAccountAttempts = new Map<number, number[]>();
+
+export function adminAnalyticsReadRateLimited(
+  req: http.IncomingMessage,
+  accountId: number,
+): RateLimitOutcome {
+  const ip = recordSlidingWindowAttempt(
+    adminAnalyticsReadIpAttempts,
+    requestIp(req),
+    ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+  );
+  const account = recordSlidingWindowAttempt(
+    adminAnalyticsReadAccountAttempts,
+    accountId,
+    ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+  );
+  return mergeFusedOutcomes(ip, account);
+}
+
+/** Reset admin analytics-read throttles. Test-only. */
+export function resetAdminAnalyticsRateLimits(): void {
+  adminAnalyticsReadIpAttempts.clear();
+  adminAnalyticsReadAccountAttempts.clear();
+}
+
+// ---------------------------------------------------------------------------
 // Per-account failed-login throttle (#93)
 //
 // The per-IP limiter above can't stop credential stuffing: a botnet spreads

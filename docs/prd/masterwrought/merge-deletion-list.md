@@ -1250,6 +1250,20 @@ the same change (the doc tables are consumed, so the census fails until it does)
 | exports | `characterBlobBytesHighWater` | 17 | branch commit 80760030c3 (fix(server): blob high-water gauge, deferred size warn, offline realm fence); the Phase 17 database and security review closes | the high-water read the metrics endpoint scrapes (server/character_blob_size.ts) |
 | exports | `WOC_CHARACTER_STATE_BYTES_MAX` | 17 | branch commit 80760030c3 (fix(server): blob high-water gauge, deferred size warn, offline realm fence); the Phase 17 database and security review closes | the gauge's metric-name constant, woc_character_state_bytes_max (server/http/game_metrics.ts) |
 
+## Explained extras (2026-08-31, the Phase 18 perfection sweep)
+
+Names authored by the Phase 18 units; per the standing rule every unit that
+authors a new name appends its rows in the same change.
+
+| Class | Name | Phase | Ruling | Reason |
+|---|---|---|---|---|
+| exports | `createOkResponseMemo` | 18 | qr-18-REOPEN, item admin-metrics-serialize-once | the serialize-once REST envelope memo seam the admin analytics family shares (server/ok_response_memo.ts) |
+| exports | `OkResponseMemo` | 18 | qr-18-REOPEN, item admin-metrics-serialize-once | the memo's interface (server/ok_response_memo.ts) |
+| exports | `OkResponseMemoStats` | 18 | qr-18-REOPEN, item admin-metrics-serialize-once | the memo's stringify-count stats shape the byte-identity tests read (server/ok_response_memo.ts) |
+| exports | `ADMIN_ANALYTICS_READ_MAX_PER_MINUTE` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the analytics read bucket's per-minute budget, scoped apart from the oversight bucket (server/ratelimit.ts) |
+| exports | `adminAnalyticsReadRateLimited` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the fused IP-plus-account limiter the three analytics.read routes consult (server/ratelimit.ts) |
+| exports | `resetAdminAnalyticsRateLimits` | 18 | qr-18-REOPEN, item admin-metrics-rate-limiter | the test-only window reset, the sibling of the oversight family's (server/ratelimit.ts) |
+
 ## Literal-only records (not symbols in any census class; kept for the reader)
 
 | Class | Old name | New name | Phase | Ruling | Reason |

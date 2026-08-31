@@ -3,18 +3,25 @@
 // rateLimited() serves, so dashboard polling and flag-workflow clicks can
 // never burn anyone's login budget (and a login flood can never lock an
 // operator out of the oversight pages). This pins that isolation in both
-// directions, plus the two buckets' independence from each other and the
-// per-account fusion each carries.
+// directions, plus the buckets' independence from each other and the
+// per-account fusion each carries. The analytics read bucket (the
+// overview/activity/market-metrics dashboard family) is scoped the same way:
+// its own pair, so the Overview landing page's default 5s poll can never burn
+// the economy-oversight budget (whose exhaustion would 429 the moderation
+// Flagged workflow), and an oversight burst can never blank the dashboards.
 import { EventEmitter } from 'node:events';
 import type * as http from 'node:http';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
   ADMIN_FLAG_WRITE_MAX_PER_MINUTE,
   ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
   AUTH_MAX_PER_MINUTE,
+  adminAnalyticsReadRateLimited,
   adminFlagWriteRateLimited,
   adminOversightReadRateLimited,
   rateLimited,
+  resetAdminAnalyticsRateLimits,
   resetAdminOversightRateLimits,
   resetRateLimitClock,
   resetRateLimits,
@@ -47,11 +54,13 @@ beforeEach(() => {
   setRateLimitClock(() => FIXED_NOW_MS);
   resetRateLimits();
   resetAdminOversightRateLimits();
+  resetAdminAnalyticsRateLimits();
 });
 
 afterEach(() => {
   resetRateLimits();
   resetAdminOversightRateLimits();
+  resetAdminAnalyticsRateLimits();
   resetRateLimitClock();
 });
 
@@ -142,5 +151,72 @@ describe('admin oversight rate-limit buckets', () => {
     setRateLimitClock(() => FIXED_NOW_MS + 60_001);
     expect(adminFlagWriteRateLimited(reqFrom(ip), OPERATOR).allowed).toBe(true);
     expect(adminOversightReadRateLimited(reqFrom(ip), OPERATOR).allowed).toBe(true);
+  });
+});
+
+describe('admin analytics read bucket', () => {
+  it('pins the budget with the same polling headroom as the oversight reads', () => {
+    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(120);
+    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE);
+  });
+
+  it('an analytics burst never consumes the oversight, flag-write, or login buckets', () => {
+    const ip = '203.0.113.20';
+    exhaust(
+      () => adminAnalyticsReadRateLimited(reqFrom(ip), OPERATOR),
+      ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+      'analytics read',
+    );
+    const read = adminOversightReadRateLimited(reqFrom(ip), OPERATOR);
+    expect(read.allowed).toBe(true);
+    expect(read.remaining).toBe(ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE - 1);
+    const write = adminFlagWriteRateLimited(reqFrom(ip), OPERATOR);
+    expect(write.allowed).toBe(true);
+    expect(write.remaining).toBe(ADMIN_FLAG_WRITE_MAX_PER_MINUTE - 1);
+    const login = rateLimited(reqFrom(ip));
+    expect(login.allowed).toBe(true);
+    expect(login.remaining).toBe(AUTH_MAX_PER_MINUTE - 1);
+  });
+
+  it('an oversight burst never locks the analytics dashboards', () => {
+    const ip = '203.0.113.21';
+    exhaust(
+      () => adminOversightReadRateLimited(reqFrom(ip), OPERATOR),
+      ADMIN_OVERSIGHT_READ_MAX_PER_MINUTE,
+      'oversight read',
+    );
+    const analytics = adminAnalyticsReadRateLimited(reqFrom(ip), OPERATOR);
+    expect(analytics.allowed).toBe(true);
+    expect(analytics.remaining).toBe(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE - 1);
+  });
+
+  it('an exhausted login bucket never locks the analytics reads', () => {
+    const ip = '203.0.113.22';
+    exhaust(() => rateLimited(reqFrom(ip)), AUTH_MAX_PER_MINUTE, 'login');
+    const analytics = adminAnalyticsReadRateLimited(reqFrom(ip), OPERATOR);
+    expect(analytics.allowed).toBe(true);
+    expect(analytics.remaining).toBe(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE - 1);
+  });
+
+  it('fuses a per-account key so one operator cannot dodge the bucket by rotating IPs', () => {
+    let n = 0;
+    exhaust(
+      () => adminAnalyticsReadRateLimited(reqFrom(`198.51.100.${(n++ % 200) + 1}`), OPERATOR),
+      ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+      'rotating-ip analytics read',
+    );
+    // A different operator behind one of those IPs is unaffected.
+    expect(adminAnalyticsReadRateLimited(reqFrom('198.51.100.1'), OPERATOR + 1).allowed).toBe(true);
+  });
+
+  it('releases the bucket once the sliding window has passed', () => {
+    const ip = '203.0.113.23';
+    exhaust(
+      () => adminAnalyticsReadRateLimited(reqFrom(ip), OPERATOR),
+      ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
+      'analytics read',
+    );
+    setRateLimitClock(() => FIXED_NOW_MS + 60_001);
+    expect(adminAnalyticsReadRateLimited(reqFrom(ip), OPERATOR).allowed).toBe(true);
   });
 });

@@ -18,15 +18,18 @@ import {
 import {
   accountDetail,
   associationsForIp,
+  type BucketCount,
   characterProfessionsRow,
   clientPerfRaw,
   clientPerfSummary,
+  type DayPoint,
   dailyRewardPointEvents,
   listAccounts,
   listCharacters,
   listModerationActions,
   listSharedIps,
   onlineHistory,
+  type SessionDayPoint,
 } from './admin_db';
 import {
   type AdminGeneralChatRateLimitDeps,
@@ -159,8 +162,10 @@ import {
   setDailyRewardsIpBan,
 } from './moderation_db';
 import { readModerationQueue } from './moderation_queue_cache';
+import { createOkResponseMemo } from './ok_response_memo';
 import { providerUsageSnapshot } from './provider_usage';
 import {
+  adminAnalyticsReadRateLimited,
   adminFlagWriteRateLimited,
   adminOversightReadRateLimited,
   authThrottled,
@@ -215,7 +220,9 @@ const ADMIN_LOGIN_MAX_PER_MINUTE = 10;
 const ADMIN_LOGIN_TOO_MANY_FAILED_ATTEMPTS =
   'too many failed attempts, wait a few minutes and try again';
 
-// Economy-oversight endpoints (player search / wealth / flagged workflow).
+// Economy-oversight endpoints (player search / wealth / flagged workflow)
+// plus the analytics dashboard reads (overview / activity / market metrics),
+// which share the same 429 literal on their own bucket.
 // Error literals are reverse-mapped to i18n keys by the admin client
 // (ADMIN_ERROR_KEYS in src/admin/i18n.ts); change one and the mapping in the
 // SAME change.
@@ -622,6 +629,36 @@ function ok(res: http.ServerResponse, data: unknown): void {
 
 function fail(res: http.ServerResponse, status: number, error: string): void {
   json(res, status, { success: false, data: null, error });
+}
+
+// Serialize-once envelope memo for the analytics dashboard reads whose
+// response is a pure function of a TTL-cached snapshot (market metrics, and
+// the activity bundle via sendActivityOk below). ONE instance shared by both
+// dispatch arms, so a cache window costs one stringify however the request
+// arrives. The overview read stays on plain ok(): its response embeds the
+// per-request live adminStats() merge, so memoized bytes could never match
+// what ok() would produce (see overviewHandler).
+const analyticsOkMemo = createOkResponseMemo();
+
+/**
+ * Serve the activity response (both dispatch arms call this with the four
+ * cache-stable arrays off the shared admin_activity_cache bundle). The
+ * composed wrapper object is fresh per request, so the memo keys on the parts
+ * tuple: stable identities inside a TTL window hit the memoized bytes, and a
+ * torn read across a turnover re-stringifies rather than serving stale bytes.
+ */
+function sendActivityOk(
+  res: http.ServerResponse,
+  registrations: DayPoint[],
+  sessions: SessionDayPoint[],
+  classes: BucketCount[],
+  levels: BucketCount[],
+): void {
+  analyticsOkMemo.send(
+    res,
+    { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels },
+    [registrations, sessions, classes, levels],
+  );
 }
 
 async function sendAdminGuildList(
@@ -1529,6 +1566,9 @@ export async function handleAdminApi(
     }
 
     if (path === '/admin/api/overview') {
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
       const counts = await readOverviewCounts();
       const serverStats = game.adminStats();
       return ok(res, {
@@ -1573,13 +1613,16 @@ export async function handleAdminApi(
       return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
     }
     if (path === '/admin/api/activity') {
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
       const [registrations, sessions, classes, levels] = await Promise.all([
         registrationsByDay(ACTIVITY_WINDOW_DAYS),
         sessionsByDay(ACTIVITY_WINDOW_DAYS),
         classDistribution(),
         levelDistribution(),
       ]);
-      return ok(res, { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels });
+      return sendActivityOk(res, registrations, sessions, classes, levels);
     }
     if (path === '/admin/api/perf/summary') {
       const hours = Number(url.searchParams.get('hours') ?? '24');
@@ -2171,6 +2214,11 @@ function makeRealAdminDb() {
     activeSuspicionFlagCounts,
     adminOversightReadRateLimited,
     adminFlagWriteRateLimited,
+    // Analytics dashboard read metering (overview / activity / market
+    // metrics): its own bucket, deliberately not the oversight pair, so the
+    // landing page's default poll can never starve the moderation Flagged
+    // workflow (see server/ratelimit.ts).
+    adminAnalyticsReadRateLimited,
   };
 }
 
@@ -2275,8 +2323,16 @@ async function loginHandler(ctx: Ctx): Promise<void> {
   });
 }
 
-/** GET /admin/api/overview: headline counts merged with live server stats. */
+/** GET /admin/api/overview: headline counts merged with live server stats.
+ *  Metered on the analytics read bucket like its activity/metrics siblings,
+ *  but EXEMPT from the family's serialize-once memo (analyticsOkMemo): the
+ *  response embeds the per-request live adminStats() merge (online, uptime,
+ *  memory), so memoized bytes could never stay byte-identical with what ok()
+ *  produces. Only the DB counts are cached (admin_overview_cache.ts). */
 async function overviewHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   const rt = useAdminRuntime();
   const counts = await adminDb().overviewCounts();
   const serverStats = rt.adminStats();
@@ -2293,11 +2349,17 @@ async function overviewHandler(ctx: Ctx): Promise<void> {
 }
 
 /** GET /admin/api/market/metrics: live World Market listing aggregates over the
- *  tracked supply buckets (server/admin_market_metrics.ts). No rate limiter:
- *  the read is a warm in-memory cache with zero DB cost, the overview
- *  precedent; adminOversightReadRateLimited meters DB-cost oversight reads. */
+ *  tracked supply buckets (server/admin_market_metrics.ts). Metered on the
+ *  analytics read bucket: the read itself is a warm in-memory cache with zero
+ *  DB cost, but metering is uniform across the admin read families so no
+ *  route is the unthrottled odd one out (the oversight bucket stays scoped to
+ *  the DB-cost economy-oversight reads). The response IS the cached snapshot,
+ *  so the envelope bytes are memoized per cache turnover (analyticsOkMemo). */
 async function marketMetricsHandler(ctx: Ctx): Promise<void> {
-  ok(ctx.res, await readAdminMarketMetrics());
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
+  analyticsOkMemo.send(ctx.res, await readAdminMarketMetrics());
 }
 
 /** GET /admin/api/me: the caller's own staff identity (any staff role). */
@@ -2441,13 +2503,16 @@ async function onlineHistoryHandler(ctx: Ctx): Promise<void> {
 
 /** GET /admin/api/activity: registrations + sessions + class/level distributions. */
 async function activityHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   const [registrations, sessions, classes, levels] = await Promise.all([
     adminDb().registrationsByDay(ACTIVITY_WINDOW_DAYS),
     adminDb().sessionsByDay(ACTIVITY_WINDOW_DAYS),
     adminDb().classDistribution(),
     adminDb().levelDistribution(),
   ]);
-  ok(ctx.res, { days: ACTIVITY_WINDOW_DAYS, registrations, sessions, classes, levels });
+  sendActivityOk(ctx.res, registrations, sessions, classes, levels);
 }
 
 /** GET /admin/api/perf/summary: aggregated client-perf percentiles. */

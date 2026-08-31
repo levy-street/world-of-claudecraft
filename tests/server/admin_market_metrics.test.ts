@@ -23,6 +23,7 @@ import {
 import { compose } from '../../server/http/compose';
 import { withErrors } from '../../server/http/middleware/with_errors';
 import type { Method, Middleware } from '../../server/http/types';
+import { resetAdminAnalyticsRateLimits } from '../../server/ratelimit';
 import {
   FARM_CROPS,
   FARM_SUPPLY_ITEM_IDS,
@@ -245,16 +246,34 @@ const BEARER = `Bearer ${'a'.repeat(64)}`;
 const ADMIN_ACCOUNT_ID = 7;
 const METRICS_PATH = '/admin/api/market/metrics';
 
-function authedAdminDb(roles: string[] = ['superadmin']): void {
+function authedAdminDb(
+  roles: string[] = ['superadmin'],
+  overrides: Record<string, unknown> = {},
+): void {
   setAdminDbForTests({
     accountAndScopeForToken: async () => ({ accountId: ADMIN_ACCOUNT_ID, scope: 'full' }),
     adminRolesForAccount: async (id: number) =>
       id === ADMIN_ACCOUNT_ID ? { username: 'op', roles } : null,
     isAdminAccount: async (id: number) => id === ADMIN_ACCOUNT_ID,
+    ...overrides,
   } as Parameters<typeof setAdminDbForTests>[0]);
 }
 
-function readRes(res: http.ServerResponse): { status: number; body: unknown } {
+// Rate-limit outcome stubs typed off the real bundle (the admin_oversight
+// harness shape): a RateLimitOutcome shape change fails at tsc.
+type AdminDbBundle = Parameters<typeof setAdminDbForTests>[0];
+const allowed = (): ReturnType<NonNullable<AdminDbBundle['adminAnalyticsReadRateLimited']>> => ({
+  allowed: true,
+  remaining: 1,
+  resetSeconds: 0,
+});
+const denied = (): ReturnType<NonNullable<AdminDbBundle['adminAnalyticsReadRateLimited']>> => ({
+  allowed: false,
+  remaining: 0,
+  resetSeconds: 30,
+});
+
+function readRes(res: http.ServerResponse): { status: number; body: unknown; rawBody: string } {
   const fake = res as unknown as FakeRes;
   let body: unknown;
   try {
@@ -262,7 +281,7 @@ function readRes(res: http.ServerResponse): { status: number; body: unknown } {
   } catch {
     body = undefined;
   }
-  return { status: fake.statusCode, body };
+  return { status: fake.statusCode, body, rawBody: fake.body };
 }
 
 async function runMetricsRoute(headers: Record<string, string> = {}) {
@@ -288,10 +307,12 @@ const SAMPLE_METRICS: AdminMarketMetrics = buildAdminMarketMetrics(FIXTURE, 'eas
 describe('GET /admin/api/market/metrics', () => {
   beforeEach(() => {
     resetAdminMarketMetricsForTests();
+    resetAdminAnalyticsRateLimits();
   });
 
   afterEach(() => {
     resetAdminMarketMetricsForTests();
+    resetAdminAnalyticsRateLimits();
     resetAdminDbForTests();
     vi.restoreAllMocks();
   });
@@ -342,5 +363,65 @@ describe('GET /admin/api/market/metrics', () => {
 
   it('fails loudly when the boot wiring never ran', () => {
     expect(() => readAdminMarketMetrics()).toThrow('call configureAdminMarketMetrics');
+  });
+
+  it('429s on the analytics read bucket BEFORE touching the metrics read', async () => {
+    const source = vi.fn(() => SAMPLE_METRICS);
+    configureAdminMarketMetrics(source);
+    authedAdminDb(['viewer'], { adminAnalyticsReadRateLimited: vi.fn(denied) });
+    const r = await runMetricsRoute({ authorization: BEARER });
+    expect(r.status).toBe(429);
+    expect(r.body).toEqual({
+      success: false,
+      data: null,
+      error: 'too many requests, wait a moment and try again',
+    });
+    expect(source).not.toHaveBeenCalled();
+  });
+
+  it('meters on the ANALYTICS bucket, never the oversight bucket (scoping pin)', async () => {
+    const analytics = vi.fn(allowed);
+    const oversight = vi.fn(allowed);
+    configureAdminMarketMetrics(() => SAMPLE_METRICS);
+    authedAdminDb(['viewer'], {
+      adminAnalyticsReadRateLimited: analytics,
+      adminOversightReadRateLimited: oversight,
+    });
+    const r = await runMetricsRoute({ authorization: BEARER });
+    expect(r.status).toBe(200);
+    expect(analytics).toHaveBeenCalledTimes(1);
+    expect(analytics).toHaveBeenCalledWith(expect.anything(), ADMIN_ACCOUNT_ID);
+    expect(oversight).not.toHaveBeenCalled();
+  });
+
+  it('serializes the envelope ONCE per cache turnover and serves the memoized bytes', async () => {
+    authedAdminDb(['viewer']);
+    // A fresh object identity per configure, so this test's stringify count
+    // can never be satisfied by another test's warm memo entry.
+    const metrics = buildAdminMarketMetrics(FIXTURE, 'memo-realm');
+    configureAdminMarketMetrics(() => metrics);
+    const stringify = vi.spyOn(JSON, 'stringify');
+    const first = await runMetricsRoute({ authorization: BEARER });
+    const second = await runMetricsRoute({ authorization: BEARER });
+    const envelopeCalls = stringify.mock.calls.filter(
+      ([value]) => (value as { data?: unknown } | null)?.data === metrics,
+    );
+    stringify.mockRestore();
+    expect(first.status).toBe(200);
+    expect(second.status).toBe(200);
+    // One stringify served both requests inside the TTL window.
+    expect(envelopeCalls.length).toBe(1);
+    // And the served bytes are EXACTLY what ok() would have produced.
+    expect(first.rawBody).toBe(JSON.stringify({ success: true, data: metrics, error: null }));
+    expect(second.rawBody).toBe(first.rawBody);
+  });
+
+  it('installs a frozen snapshot so the memoized bytes cannot be poisoned', async () => {
+    configureAdminMarketMetrics(() => buildAdminMarketMetrics(FIXTURE, 'eastbrook'));
+    const first = await readAdminMarketMetrics();
+    const second = await readAdminMarketMetrics();
+    expect(Object.isFrozen(first)).toBe(true);
+    // Same installed object inside the TTL: the identity the memo keys on.
+    expect(second).toBe(first);
   });
 });
