@@ -23393,6 +23393,35 @@ record; the QA twin re-sweeps and diffs.
   cost is one missing "N beds ready" line in a narrow one-time case, accepted
   over a new persisted field.
 
+### THE UNIT MAP (how the 207 bucket-A items were partitioned)
+
+Sixteen units, each owning a DISJOINT file set so parallel writers could not
+collide, plus per-unit typed reviewers and fresh readers. Committed units are
+recorded above; the remaining units and their item counts: render (9, the farm
+prepared-producer plus the two-leg offline tour), tools (9, one carried),
+i18n (11), pbe-trade (5 wait, 6 with the seed re-derivation), net-wire (17),
+content-parity (11, the sole golden re-recorder this window), tests-2 (12),
+admin-svelte (3), sim-misc (5), measure (3), sfx-ui (5), e2e-shots (7),
+wikiseed (3), plus the two frontend review rounds and the farm micro round.
+A coverage script over the derived list (scratchpad unassigned.mjs) proved the
+partition complete: 175 assigned at the last check, the remainder queued to the
+agent holding the file each one needs (the deferred set below).
+
+DEFERRED, NOT DROPPED (each waits on a file another unit holds RIGHT NOW; the
+lead re-queues it to that unit as it lands): apex-feast-distinct-prop,
+autosave-transactional-writes, farming-zero-blob-serialization,
+guide-vendor-mirror-shared-expression, harvest-feast-wiki-effect-cell,
+live-session-name-strip-cut, mail-arm-relog-repay,
+rift-mechanic-name-matcher-gap, sport-layout-form-token,
+tutorial-greeting-union-member, vendor-partial-sell-locked-toast,
+voidbound-grimoire-tome-glb, wiki-craft-gain-clamp,
+wiki-craft-table-baked-english, wrapper-count-pin-evasions, and the
+plant-sheet arm of focuskey-css-escape-login-replay. NOTE for the QA twin:
+wiki-craft-gain-clamp's item text says CLAMP, but the Phase 16-era ledger and
+the guide's own pins argue REWORD (a clamp reds the decisive curve arm and a
+literal row in tests/guide.test.ts); whichever the executing unit picks must
+carry that argument in its record.
+
 ### CARRIED (bucket-A items this phase cannot execute, each with its reason)
 
 - castle-deed-art-pending: generating the two castle deed paintings from
