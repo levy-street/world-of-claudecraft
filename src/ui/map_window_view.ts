@@ -155,14 +155,8 @@ export const MAP_NPC_GLYPH_HIT_RADIUS = 10;
  *  the type silhouette and soft glow). Same nearest-wins rule as NPC glyphs. */
 export const MAP_GATHER_NODE_HIT_RADIUS = 10;
 
-/** Hit radius for a crafting-station badge on the zone map. */
-export const MAP_STATION_HIT_RADIUS = 10;
-
 /** Hit radius for a civic-service badge on the zone map. */
 export const MAP_SERVICE_HIT_RADIUS = 10;
-
-/** Hit radius for a farm-patch badge on the zone map. */
-export const MAP_FARM_PATCH_HIT_RADIUS = 10;
 
 /** Navigation paintings are larger than resource/service badges and remain
  * comfortably hoverable across their full keyed silhouette. */
@@ -290,26 +284,6 @@ export interface MapStationMarker {
   type: StationType;
 }
 
-/** The nearest crafting-station badge within its hit radius, or null. */
-export function stationMarkerAt(
-  stations: readonly MapStationMarker[],
-  mx: number,
-  my: number,
-): MapStationMarker | null {
-  let best: MapStationMarker | null = null;
-  let bestD2 = MAP_STATION_HIT_RADIUS * MAP_STATION_HIT_RADIUS;
-  for (const station of stations) {
-    const dx = mx - station.mx;
-    const dy = my - station.my;
-    const d2 = dx * dx + dy * dy;
-    if (d2 <= bestD2) {
-      bestD2 = d2;
-      best = station;
-    }
-  }
-  return best;
-}
-
 /** A farming garden-bed site on the zone map. Patches are STATIC content
  * positions (the crafting-station doctrine, never entities and never per-viewer
  * state), so both IWorld hosts project the same badge; the badge can be
@@ -320,26 +294,6 @@ export interface MapFarmPatchMarker {
   my: number;
   patchId: string;
   zoneId: string;
-}
-
-/** The nearest farm-patch badge within its hit radius, or null. */
-export function farmPatchMarkerAt(
-  patches: readonly MapFarmPatchMarker[],
-  mx: number,
-  my: number,
-): MapFarmPatchMarker | null {
-  let best: MapFarmPatchMarker | null = null;
-  let bestD2 = MAP_FARM_PATCH_HIT_RADIUS * MAP_FARM_PATCH_HIT_RADIUS;
-  for (const patch of patches) {
-    const dx = mx - patch.mx;
-    const dy = my - patch.my;
-    const d2 = dx * dx + dy * dy;
-    if (d2 <= bestD2) {
-      bestD2 = d2;
-      best = patch;
-    }
-  }
-  return best;
 }
 
 /** A static mailbox or interactive noticeboard on the zone map. Positions

@@ -34,6 +34,8 @@ const MASTER_GAINS_DB = {
   // recording can drop in without a mix re-balance.
   ui_farm_plant: 0,
   ui_farm_harvest: 0,
+  // The withered-outcome PLACEHOLDER, unity gain with its five siblings.
+  ui_farm_withered: 0,
   // The ready-notice PLACEHOLDER, unity gain with its two siblings.
   ui_farm_ready: 0,
   // The golden-harvest sting PLACEHOLDER, unity gain with its three siblings.
@@ -183,6 +185,24 @@ export const UI_SFX_SPECS = [
     noise('white', 0, 0.18, 0.05, { highpass: 2200, lowpass: 7000 }),
     tone(420, 0.02, 0.16, 0.12, { wave: 'triangle' }),
     tone(620, 0.16, 0.3, 0.1, { wave: 'triangle', endFrequency: 880 }),
+  ]),
+  // Farming PLACEHOLDER (the deferred Phase 8/10 disappointment sting, landed
+  // at the Phase 18 sweep), for the sound engineer: the harvest that paid
+  // husks instead of produce. Deliberately the harvest cue's OWN vocabulary
+  // (the same leaf rustle, the same triangle body) so the player still hears
+  // the action they took land, with the tail INVERTED: ui_farm_harvest lifts
+  // 620 to 880, this one sags 294 to 220, the falling-because-something-was-
+  // lost shape ui_sunder_complete uses. The difference is PITCH SHAPE, not
+  // level: both cues sit under the 1.0s threshold, so the conform pass
+  // peak-normalizes each to the same ceiling and a quieter authoring gain
+  // would just be normalized back (cross-clip trim is a sfx_gain_map.json
+  // entry, and this cue takes none, unity like its siblings). It must never
+  // be silence: a mute arm reads as an input that never registered. Swap for
+  // a real recording when one lands, exactly as its farming siblings.
+  cue('ui_farm_withered', 0.6, 'Dry husk rustle sagging into a soft two-note downward sigh.', [
+    noise('white', 0, 0.16, 0.04, { highpass: 1800, lowpass: 5200 }),
+    tone(392, 0.02, 0.18, 0.1, { wave: 'triangle' }),
+    tone(294, 0.16, 0.34, 0.09, { wave: 'triangle', endFrequency: 220 }),
   ]),
   // Farming PLACEHOLDER (the ready-notice phase), for the sound engineer: the
   // unprompted "your crops are in" chime. Deliberately the QUIETEST and

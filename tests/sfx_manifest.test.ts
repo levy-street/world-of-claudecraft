@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 9 mount cues, and all 71 UI cues in one 273-key inventory', () => {
+  it('keeps the release catalog, all 9 mount cues, and all 72 UI cues in one 274-key inventory', () => {
     // 265 -> 267 and 63 -> 65 UI cues with the Farming render/juice placeholder
     // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG, then
     // 267 -> 268 and 65 -> 66 with the ready-notice placeholder
@@ -178,13 +178,16 @@ describe('buildManifest', () => {
     // cues, measured from scripts/sfx/sfx_prompts.mjs on the merged tree.
     // Masterwrought phase 14 then added its four crafting-UX synth cues
     // (ui_perfecting_attempt, ui_perfecting_success, ui_legendary_forged,
-    // ui_sunder_complete): 269 -> 273 keys and 67 -> 71 UI cues.
+    // ui_sunder_complete): 269 -> 273 keys and 67 -> 71 UI cues. The Phase 18
+    // sweep then closed the deferred withered disappointment sting
+    // (ui_farm_withered): 273 -> 274 keys and 71 -> 72 UI cues.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(273);
-    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(71);
+    expect(keys.size).toBe(274);
+    expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(72);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
+    expect(keys.has('ui_farm_withered')).toBe(true);
     expect(keys.has('ui_farm_ready')).toBe(true);
     expect(keys.has('ui_farm_golden')).toBe(true);
     expect(keys.has('ui_farm_feast')).toBe(true);
@@ -267,7 +270,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(273);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(274);
   });
 });
 

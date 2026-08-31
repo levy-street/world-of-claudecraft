@@ -135,10 +135,15 @@ export const UI_CUES = {
   // Farming (the render / juice phase): the plant ACTION and the harvest
   // RESULT, the same cast/result split the gathering family uses. Both are
   // procedural placeholders in scripts/sfx/ui_sfx.mjs until real recordings
-  // land; the withered outcome deliberately shares farmHarvest (it is the
-  // same harvest action resolving, just unluckily).
+  // land.
   farmPlant: 'ui_farm_plant',
   farmHarvest: 'ui_farm_harvest',
+  // The withered outcome's own sting (the deferred Phase 8/10 cue, landed at
+  // the Phase 18 sweep). It shared farmHarvest through the interim, which
+  // sounded like the crop came in; it is the same action resolving, so the
+  // cue keeps the harvest's vocabulary and inverts its tail rather than
+  // reaching for an unrelated failure sound.
+  farmWithered: 'ui_farm_withered',
   // The ready notice (the ready-notice phase): its own cue rather than a
   // borrowed one, because it is the only farming sound the player did not
   // just ask for by pressing something, and it must not read as a harvest
@@ -491,6 +496,13 @@ export class GameAudio {
   // notifications (loot, gather, craftSuccess).
   farmHarvest(): void {
     this.playFeedback(UI_CUES.farmHarvest);
+  }
+
+  // Farming withered outcome: the harvest's unlucky twin, so it takes the
+  // same feedback gate as farmHarvest rather than the ungated affordance arm
+  // the plant press rides.
+  farmWithered(): void {
+    this.playFeedback(UI_CUES.farmWithered);
   }
 
   // Farming ready notice: a NOTIFICATION, not an affordance (nothing was

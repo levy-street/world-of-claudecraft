@@ -99,3 +99,15 @@ Kept at `src/ui/` root on purpose; do not pull them in without a reason:
 - `professions_view.ts`'s simplified-mode body is governed by an OPEN
   maintainer ruling ((be), `docs/prd/masterwrought/farming/state.md`): do
   not restructure the simplified-mode gathering rows without that ruling.
+- `farm_press_affordance_controller.ts` states a COMPARATIVE claim on
+  purpose ("the feast before the bed"), never "your press does X". Every
+  other arm of `tryNearbyInteraction` (corpses, delve objects, lootable
+  objects, npcs, escorts, gather nodes) outranks BOTH farming arms, so an
+  absolute promise is false whenever one of those is also in reach, while
+  the pair claim holds under ruling 11b-R3c-1 whatever else is standing
+  there. Making the absolute version honest needs a decide/dispatch split
+  of `src/game/nearby_interaction.ts` (resolve the winning arm, then
+  dispatch it) so the notice and the press read one answer; that is the
+  follow-up, not a wording change. The resolution itself lives in
+  `src/game/farm_press_target_core.ts`, beside the two resolvers it
+  composes, so that split can consume it without a game to ui import.

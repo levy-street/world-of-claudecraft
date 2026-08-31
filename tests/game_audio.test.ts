@@ -82,6 +82,7 @@ describe('sampled GameAudio facade', () => {
       ['cardShuffle', 'ui_card_shuffle'],
       ['farmPlant', 'ui_farm_plant'],
       ['farmHarvest', 'ui_farm_harvest'],
+      ['farmWithered', 'ui_farm_withered'],
       ['farmReady', 'ui_farm_ready'],
       ['farmGolden', 'ui_farm_golden'],
       ['farmFeast', 'ui_farm_feast'],
@@ -138,6 +139,10 @@ describe('sampled GameAudio facade', () => {
       // The farming RESULT half. Its plant twin is on the ungated arm below,
       // which is the whole point of the split.
       'farmHarvest',
+      // The withered twin of that result: the same action resolving, so it
+      // takes the same gate as the harvest it replaces, never the ungated
+      // affordance arm the press itself rides.
+      'farmWithered',
       // The ready NOTICE: nothing was pressed, so it rides the feedback gate
       // like the mail and quest chimes and falls silent with them.
       'farmReady',
@@ -320,7 +325,7 @@ describe('sampled GameAudio facade', () => {
 });
 
 describe('deterministic UI SFX catalog', () => {
-  it('adds 24 unique UI cues to the authoritative studio inventory', () => {
+  it('adds 25 unique UI cues to the authoritative studio inventory', () => {
     // 13 pre-12b cues plus the Phase 12b gathering-rhythm placeholder
     // (ui_gather_cast) plus the Craft Cast System Phase 6 craft-family
     // cast-start placeholder (ui_craft_cast) plus the Farming render/juice
@@ -335,14 +340,18 @@ describe('deterministic UI SFX catalog', () => {
     // landed at 20 on the merged tree: the release's 15 plus the five farm
     // cues. Masterwrought phase 14 then added its four crafting-UX cues
     // (ui_perfecting_attempt, ui_perfecting_success, ui_legendary_forged,
-    // ui_sunder_complete): 20 -> 24, measured from UI_SFX_CATALOG.
+    // ui_sunder_complete): 20 -> 24, measured from UI_SFX_CATALOG. The Phase
+    // 18 sweep then closed the deferred withered sting (ui_farm_withered,
+    // the disappointment cue farmWithered borrowed from farmHarvest until
+    // now): 24 -> 25.
     const keys = UI_SFX_CATALOG.map((cue: { key: string }) => cue.key);
     const fullCatalogKeys = new Set(SFX.map((cue: { key: string }) => cue.key));
 
-    expect(keys).toHaveLength(24);
+    expect(keys).toHaveLength(25);
     expect(keys).toContain('ui_craft_cast');
     expect(keys).toContain('ui_farm_plant');
     expect(keys).toContain('ui_farm_harvest');
+    expect(keys).toContain('ui_farm_withered');
     expect(keys).toContain('ui_farm_ready');
     expect(keys).toContain('ui_farm_golden');
     expect(keys).toContain('ui_farm_feast');

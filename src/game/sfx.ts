@@ -362,8 +362,7 @@ class Sfx {
       const nd = noise.getChannelData(0);
       for (let i = 0; i < noiseLen; i++) nd[i] = Math.random() * 2 - 1;
       this.synthNoise = noise;
-      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6, false));
-      this.buffers.set('vcup_crowd_roar', this.makeCrowdBuffer(ctx, 2.6, true));
+      this.buffers.set('amb_crowd', this.makeCrowdBuffer(ctx, 6));
       for (const cue of [
         'aggro',
         'attack',
@@ -379,10 +378,12 @@ class Sfx {
     }
   }
 
-  /** Procedural crowd noise. Bed mode is a seamless 6s murmur loop (filtered
-   *  noise under slow integer-cycle swells, so the wrap point is silent-clean);
-   *  roar mode bakes a crescendo-decay envelope for a goal-roar one-shot. */
-  private makeCrowdBuffer(ctx: AudioContext, seconds: number, roar: boolean): AudioBuffer {
+  /** Procedural crowd noise: a seamless murmur bed (filtered noise under slow
+   *  integer-cycle swells, so the wrap point is silent-clean). The one-shot
+   *  roar mode left with the Vale Cup: its buffer had no player and its
+   *  crowdRoar() entry point had no caller, so the envelope branch went with
+   *  them rather than staying as an unreachable parameter. */
+  private makeCrowdBuffer(ctx: AudioContext, seconds: number): AudioBuffer {
     const sr = ctx.sampleRate;
     const len = Math.floor(seconds * sr);
     const buf = ctx.createBuffer(2, len, sr);
@@ -401,20 +402,14 @@ class Sfx {
           0.22 * Math.sin(2 * Math.PI * 3 * t + phase) +
           0.16 * Math.sin(2 * Math.PI * 7 * t + phase * 1.31);
         const voiceBand = (lpMid - lpDeep) * 0.9;
-        let sample = (lpDeep * 2.2 + voiceBand) * swell;
-        if (roar) {
-          const envelope = t < 0.18 ? t / 0.18 : t < 0.55 ? 1 : 1 - (t - 0.55) / 0.45;
-          sample = (lpDeep * 1.6 + voiceBand * 2.4 + w * 0.06) * envelope * 1.5;
-        }
+        const sample = (lpDeep * 2.2 + voiceBand) * swell;
         data[i] = Math.max(-1, Math.min(1, sample));
       }
-      if (!roar) {
-        const fade = Math.floor(0.25 * sr);
-        for (let i = 0; i < fade; i++) {
-          const amount = i / fade;
-          data[len - fade + i] =
-            data[len - fade + i] * Math.sqrt(1 - amount) + data[i] * Math.sqrt(amount);
-        }
+      const fade = Math.floor(0.25 * sr);
+      for (let i = 0; i < fade; i++) {
+        const amount = i / fade;
+        data[len - fade + i] =
+          data[len - fade + i] * Math.sqrt(1 - amount) + data[i] * Math.sqrt(amount);
       }
     }
     return buf;
@@ -1237,11 +1232,6 @@ class Sfx {
     };
     blast(196, 0, 0.5);
     blast(261.6, 0.42, 0.9);
-  }
-
-  /** The stands erupt: the baked crescendo-decay crowd roar (procedural). */
-  crowdRoar(gain = 0.9): void {
-    this.playUi('vcup_crowd_roar', { gain, cooldown: 0.4 });
   }
 
   // --- Per-ability procedural combat audio (src/render/ability_vfx) --------

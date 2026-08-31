@@ -41,9 +41,7 @@ import { isNodeToolLockedFor } from '../src/ui/hud/professions/gathering_view';
 import { STABLE_MAP_NAVIGATION_LANDMARKS } from '../src/ui/map_navigation_landmarks_core';
 import {
   buildOverworldMapModel,
-  farmPatchMarkerAt,
   gatherNodeMarkerAt,
-  MAP_FARM_PATCH_HIT_RADIUS,
   MAP_GATHER_NODE_HIT_RADIUS,
   MAP_LANDMARK_MAX_NUDGE_YD,
   MAP_LANDMARK_PLACEMENT_BY_PROFILE,
@@ -52,7 +50,6 @@ import {
   MAP_NAVIGATION_HIT_RADIUS,
   MAP_NPC_GLYPH_HIT_RADIUS,
   MAP_SERVICE_HIT_RADIUS,
-  MAP_STATION_HIT_RADIUS,
   MAP_STATION_NPC_SEPARATION,
   MAP_TOUCH_POINT_HIT_RADIUS_CSS_PX,
   type MapPointMarkerHit,
@@ -65,7 +62,6 @@ import {
   questAreaObjectivesAt,
   questAreaObjectivesAtInto,
   serviceMarkerAt,
-  stationMarkerAt,
 } from '../src/ui/map_window_view';
 import type { IWorld } from '../src/world_api';
 
@@ -1883,22 +1879,6 @@ describe('zone-map crafting stations', () => {
     expect(model.stations[0]).toMatchObject({ stationId: 'custom_forge', type: 'forge' });
   });
 
-  it('hit-tests the nearest painted station and misses outside its touch radius', () => {
-    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
-    const marker = model.stations[0];
-    expect(marker).toBeDefined();
-    if (!marker) return;
-    expect(stationMarkerAt(model.stations, marker.mx, marker.my)).toBe(marker);
-    // Under the nudge cap the town's stations cluster at their true spots,
-    // so probe from a point past the hit radius of EVERY station: straight
-    // up from the topmost badge, where the vertical gap alone exceeds it.
-    const topMy = Math.min(...model.stations.map((candidate) => candidate.my));
-    expect(
-      stationMarkerAt(model.stations, marker.mx, topMy - MAP_STATION_HIT_RADIUS - 0.5),
-    ).toBeNull();
-    expect(stationMarkerAt([], marker.mx, marker.my)).toBeNull();
-  });
-
   it('pushes a station badge clear of an overlapping quest glyph only within the world-yard cap', () => {
     const world = makeOverworldWorld('sim') as unknown as {
       questState: () => 'available';
@@ -2034,21 +2014,6 @@ describe('zone-map farm patches', () => {
     const world = makeOverworldWorld('sim') as unknown as { farmPatches: unknown[] };
     world.farmPatches = [];
     expect(buildOverworldMapModel(input(world as unknown as IWorld, 1)).farmPatches).toEqual([]);
-  });
-
-  it('hit-tests the nearest painted patch and misses outside its touch radius', () => {
-    const model = buildOverworldMapModel(input(makeOverworldWorld('sim'), 1));
-    const marker = model.farmPatches[0];
-    expect(marker).toBeDefined();
-    if (!marker) return;
-    expect(farmPatchMarkerAt(model.farmPatches, marker.mx, marker.my)).toBe(marker);
-    expect(
-      farmPatchMarkerAt(model.farmPatches, marker.mx + MAP_FARM_PATCH_HIT_RADIUS, marker.my),
-    ).toBe(marker);
-    expect(
-      farmPatchMarkerAt(model.farmPatches, marker.mx + MAP_FARM_PATCH_HIT_RADIUS + 0.5, marker.my),
-    ).toBeNull();
-    expect(farmPatchMarkerAt([], marker.mx, marker.my)).toBeNull();
   });
 
   it('joins the shared landmark layer, so a patch badge clears every quest glyph', () => {

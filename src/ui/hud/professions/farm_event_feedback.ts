@@ -153,11 +153,13 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // the no-cost-miss register (gotAwayLine): a withered crop costs the
       // seed and the wait, never the bed, and the line says so plainly
       // rather than dressing a failure as a yield.
-      // The SAME harvest cue as the arm above on purpose: the player took the
-      // identical action and it resolved, only unluckily. A distinct
-      // disappointment sting is a later phase's call, not a silent arm here
-      // (silence would read as an input that never registered).
-      audio.farmHarvest();
+      // Its OWN cue, not the harvest one it borrowed through the interim
+      // (the deferred Phase 8/10 sting, landed at the Phase 18 sweep): the
+      // player took the identical action, so the sound keeps the harvest's
+      // vocabulary, but its tail falls where the harvest's lifts, because
+      // what came back was husks. Never a silent arm: silence would read as
+      // an input that never registered.
+      audio.farmWithered();
       host.log(
         t(farmWitheredLineKey(ev.count), {
           name: grantItemToken(FARM_WITHERED_HUSK_ITEM_ID),
