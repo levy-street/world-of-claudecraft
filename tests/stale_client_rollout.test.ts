@@ -110,10 +110,15 @@ describe('new release item ids stay out of loot containers (deploy window)', () 
     // is a new deployed-bundle throw arm and must be a deliberate decision
     // recorded here, the way the Wildheart six were. The Crucible raid loot
     // branch admits the Ignivar and Varkhul heroic-only append ids (sigils,
-    // shields, weapons) the same recorded way: the raid is development-only
-    // (no player can claim a heroic Crucible kill on a deployed realm), so
-    // no stale bundle can be handed one of these ids during a window. Release-scoped like
-    // the file: delete with it once clients roll. The snapshot is
+    // shields, weapons) as another release-owned residual arm: a raid group
+    // can reach the live Forge-Lift and select Heroic, so DEPLOY.md records
+    // these ids as reachable by a stale client. The 2026-08-31 Emberward
+    // correction narrows that exposure: varkhul_emberward was already live
+    // on Varkhul's Normal table in this release and moved into the existing
+    // Heroic shield append. Its snapshot admission records that table move
+    // without introducing another unknown item id.
+    // Release-scoped like the file: delete with it once clients roll. The
+    // snapshot is
     // `vitest -u`-updatable, so the literal reins array below is the real
     // teeth: never blanket-update this snapshot while the deploy window is
     // open without recording the decision; a diff here IS the finding.

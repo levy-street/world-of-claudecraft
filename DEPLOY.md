@@ -404,11 +404,20 @@ For off-box safety, sync the directory to S3 occasionally:
   heroic_duskwhisper, the generated heroic variant of the rogue re-band's
   Duskwhisper dagger on the Fanglord Beastmaster's heroic table, at an
   ordinary heroic drop rate; a stale bundle renders it through the
-  unknown-item fallback exactly like the Wildheart six. Rift-run loot is a second release-content arm on
-  the same window (the run builders push the rift catalog onto boss corpse
-  lists at runtime, outside every content-table sweep); it requires the
-  stale tab to get inside a rift at all, and whether the old bundle's
-  generic object interaction reaches a rift portal has not been verified
+  unknown-item fallback exactly like the Wildheart six. The v0.41.0 Crucible
+  raid widens the same arm with its Ignivar and Varkhul Heroic-only sigils,
+  shields, and weapons. This content is reachable in production: a raid group
+  can enter through the live Forge-Lift and select Heroic, so a stale client
+  can receive one of those ids. The 2026-08-31 Emberward correction moved
+  varkhul_emberward from Varkhul's Normal table into the Heroic shield group
+  at the same 3 percent rate. That narrows its exposure but does not make the
+  stale-client path unreachable; the frozen snapshot deliberately admits the
+  move alongside the other Crucible append ids. Rift-run loot is a second
+  release-content arm on the same window (the run builders push the rift
+  catalog onto boss corpse lists at runtime, outside every content-table
+  sweep); it requires a stale tab to get inside a rift at all, and whether
+  the old bundle's generic object interaction reaches a rift portal has not
+  been verified
   either way. Both arms are inputs to the surfaced
   forced-refresh-at-deploy question. Two more
   deployed-bundle arms need no loot table at all, because the
