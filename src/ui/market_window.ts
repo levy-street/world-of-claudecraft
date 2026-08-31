@@ -1111,7 +1111,7 @@ export class MarketWindow {
     if (sales.length === 0 && omitted === 0) return;
     const list = document.createElement('div');
     list.className = 'mkt-sale-list';
-    for (const { item, count, proceeds, buyerName } of sales) {
+    for (const { item, itemName, count, proceeds, buyerName } of sales) {
       const qColor = marketNameColor(item.quality);
       const row = document.createElement('div');
       row.className = 'mkt-sale';
@@ -1119,13 +1119,18 @@ export class MarketWindow {
         count > 1
           ? ` ${t('itemUi.market.stackCount', { count: formatNumber(count, { maximumFractionDigits: 0 }) })}`
           : '';
-      // esc on the buyer: a player-authored name reaching innerHTML raw is the
-      // exact hole src/ui/CLAUDE.md names.
-      // The sale ledger carries no copy payload (what sold is gone), so the
-      // row describes the def on both halves, stated rather than defaulted.
+      // esc on BOTH names: a chosen name and a buyer name are player-authored
+      // text, and either reaching innerHTML raw is the exact hole
+      // src/ui/CLAUDE.md names.
+      // The sold copy itself is gone, so the ICON still shows the def (there is
+      // no payload left to shade it by), but the NAME is the one the copy
+      // carried when it sold: the ledger stamped it at the sale, because
+      // nothing afterwards can recover it and two listings of one id otherwise
+      // read as two identical rows.
+      const saleName = itemName ?? itemDisplayName(item);
       row.innerHTML =
         `<span class="mkt-collect-item">${this.deps.itemIcon(item, item.quality)}` +
-        `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(itemDisplayName(item))}${esc(stack)}</span>` +
+        `<span class="mkt-sale-name"><span style="color:${qColor}">${esc(saleName)}${esc(stack)}</span>` +
         `<span class="mkt-sale-buyer">${esc(t('itemUi.market.saleBuyer', { buyer: buyerName }))}</span></span></span>` +
         `<span class="mkt-price">${this.deps.moneyHtml(proceeds)}</span>`;
       this.deps.attachTooltip(row, () => this.deps.itemTooltip(item));
