@@ -188,6 +188,16 @@ Rules of the road:
   `npm run ota:publish` does not check this; the CI workflow does, via
   `scripts/ota/check_server_layout.mjs`, so prefer the workflow for real
   publishes and run that script by hand before a manual one.
+  The Masterwrought and farming go-live is another such epoch-bumping release.
+  `ONLINE_WORLD_LAYOUT_VERSION` advances because equipped-instance snapshots carry
+  required Perfecting fields and the self wire carries the `fplot` farm-plot delta,
+  so an older client can render neither a Perfected copy nor a farm and an older
+  server omits both. Deploy the server FIRST, then publish the OTA bundle: the
+  visible update gate (`src/net/ota_update_gate.ts`) turns an
+  `ONLINE_WORLD_INCOMPATIBLE_MESSAGE` refusal into download-then-apply, so the
+  shells survive the window with no store re-ship, and
+  `scripts/ota/check_server_layout.mjs` is the preflight that proves the running
+  server speaks the checkout's discriminator.
 - Keep a hotfix bundle close to the deployed commit anyway, for a softer reason:
   server-sent player strings are re-localized by a client-side matcher
   (`src/ui/server_i18n.ts`), so a bundle far ahead of the server can expect
