@@ -15506,6 +15506,20 @@ OPEN maintainer item from six entries across four rows to nine across seven. At
 1 it contributes 40 and clears BOTH readings. A content phase should not spend
 the maintainer's open items, so this phase leaves that decision exactly as
 expensive as it found it.
+RULED (qr-19-apex-feast-crop-count, 2026-09-01, under qr-19-best-for-project): DETERMINED,
+AND THE CROP STAYS AT 1 ON ALL THREE APEX FEASTS. The contingency this paragraph records is
+spent. The qr-19-crop-accent-cap-refusal ruling landed on the rejection list below rules
+RULE 2's standing value-half reading and says in terms that the contingent apex-feast
+crop-count row stays at 1, so this row is determined rather than pending and nothing here is
+left for a later phase to re-open. Re-derived rather than carried across: evergarden_greens
+prices at 40, so at 2 the row would contribute 80 against a count-reading reference of 56
+(raw_deepbarb_catfish, count 4 at 14, the bill's largest count), which the alternative
+reading refuses, while at 1 it contributes 40 and clears both. The refused-entry census in
+tests/provisioning_supply_line.test.ts still measures six entries across four shipped rows,
+unmoved. All three bills carry evergarden_greens 1 today (recipe_stonepot_feast,
+recipe_warspice_feast, recipe_sageleaf_feast), so the ruled state is the shipped state and
+no code moves: no recipe edit, no test pin, no wiki regen, no i18n row, no deed or Reliquary
+record, no art park, and R5 untouched.
 
 **EIGHT REAGENT ENTRIES TIES recipe_laden_hearth** rather than beating it, and
 the tie is the design statement: the consumed provisioning capstone asks for as
