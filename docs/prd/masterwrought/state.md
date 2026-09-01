@@ -12513,6 +12513,35 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
   resolver fails OPEN, so it would ship ungated; recorded in brainstorm.md as
   future-tier intent instead.
 - A numeric floor on bills per band, on either arm.
+  RULED (qr-19-band-numeric-floor, under qr-19-best-for-project, 2026-09-01): PRESENCE-ONLY
+  COVERAGE STANDS and this rejection row is ratified as recorded design. No numeric floor is
+  adopted on either arm, `tests/gathering_supply_coverage.test.ts` is unchanged, and no bill
+  is authored to fill a quota. The reason is arithmetic rather than taste: the only floor
+  integer the shipped tree anchors is 1, on both arms, and over integers a floor of 1 IS the
+  predicate the guard already asserts, `length > 0` on the supply side (both the empty-band
+  arm and the endgame arm) and `consumers > 0` on the R21 arm whose own name reads "presence
+  only, never a count". Anything above 1 is a policy pick with nothing behind it, and the
+  tree prices it at once: the band matrix above, reproduced independently from the content
+  tables by the 11j QA, puts logging at b2 with a single bill, so a floor of 2 reds the suite
+  the day it lands and decision E's own rejected "at least three" reds far more. The demand
+  arm is thinner still, since all six families carry at least one material at exactly one
+  consumer (fine_iron_ore, the three logging rows, fine_sunpetal_herb, raw_mirror_trout,
+  farming's ten fine twins, curved_tusk and its two siblings), beside the substitution rows
+  that carry zero direct consumers by design. A floor could only be met by padding, which is
+  the failure the guard's own header names.
+  A COUNT WOULD ALSO BE DOC ROT BY CONSTRUCTION. The repo anchor rule (CLAUDE.md) says to
+  cite stable paths, exported symbols and pinned tests, never literal counts or line numbers
+  that rot; a per-band count is exactly a literal count pinned against content every later
+  phase edits, so every future band change would inherit it. The gate row's own cite of this
+  bullet, line 12302, already reads 213 lines off the live file, which is that rot in
+  miniature.
+  WHAT SURVIVES UNCHANGED: the counts stay recorded as a judgment surface (the band matrix
+  and the demand ratio table above), so nothing a floor would have protected goes unseen; the
+  anti-vacuity block at the bottom of the guard keeps its exact SUBJECT-SIZE pins, which is
+  what tests/CLAUDE.md's vacuity-floor guidance asks for and is a different thing from a floor
+  on content; and 11m-FLOOR ("presence is the only assertable fact, ratios are recorded and
+  asserted nowhere"), which the arcane_shard sink decision reasons under, keeps its basis
+  instead of reopening.
 - The apex hoe at engineering 150. Unlearnable through every shipped channel.
 - Leaving `osmium_hoe` off the Marks counter while the apex hoe joins it.
 - An exemption list inside the coverage test. The three eastbrook grades were
@@ -14600,6 +14629,36 @@ recorded here so it is found rather than rediscovered.
   as comfort items. The three land rows at each rung are unaffected. Re-deriving
   two Marks prices is a delve-economy decision with no ruling behind it, so 11i
   recorded the invalidation and changed no number.
+  RULED (qr-19-delve-rod-marks-prices, 2026-09-01, under qr-19-best-for-project):
+  24 and 56 are RATIFIED as the two rod prices, read now as ACCESS prices rather
+  than comfort prices, and no number moves. The derivation this finding called
+  missing is one the tree already carries: a Marks price is a function of the
+  RUNG an item sits on inside its counter's existing point set, and what the item
+  OPENS is not an input to it. content/heroic_vendor.ts is the precedent, on a
+  stronger case than this one: pattern_clockreel_fishing_rod teaches the rod that
+  GATES catch band 5 and is priced 16, the same neck point as the five other
+  rung-125 rows there, which gate nothing (the two capstone patterns and the
+  three apex feasts), under that file's own written rule, "PRICED BY THE RUNG
+  EACH TEACHES ... No third price point is minted". The delve counter says it
+  again in its own table: at each gated rung the rod carries the same number as
+  the land tools beside it, which open no content at either rung, and at
+  heroicClear the same 56 as the two signature rares. Re-deriving on an access
+  basis would mean minting a third price point, which this counter refuses in
+  terms ("NO NEW PRICE RUNGS AND NO NEW GATES") and which breaks the pin that
+  every Litany slot costs exactly 2x its Collapsed Reliquary tier
+  (tests/delve_shop.test.ts), in order to raise a price on catch bands already
+  shipped behind it.
+  AMENDING THIS FINDING IN PLACE on one figure: "three land rows at each rung" is
+  stale, because Phase 11j added osmium_hoe (24, clears:3) and evergarden_hoe
+  (56, heroicClear). The live table carries FOUR land rows per rung against one
+  rod row; that none of them is affected stands, only the count was overtaken.
+  Owed in code is the row's own option 1 and nothing else: the comment touch-up
+  in content/delves/shop.ts retiring the stale comfort-ladder premise (the
+  RE-CHECK TRIGGER's "opens no content" wording, the half-false paragraph under
+  it, and its own stale "three LAND rows"), plus the third of the three reasons
+  the tier-6 apex rod's delve-row absence rests on, which leaned on these prices
+  being pending re-derivation and which this ruling dissolves. That absence keeps
+  its first two reasons and does not reopen. No number, pin, or wiki page moves.
 - **R20 IS SATISFIED FOR FISHING BUT NOT YET PINNED**, which is the completion
   pass's job by design. The row ids are in the ledger above; what 11j inherits is
   a profession that already passes, so its guard test can be written to the real
@@ -16699,6 +16758,50 @@ rather than decided:
   the standard kept.
 - A rung-50 output above the 460 ceiling for the ogre tusk (every zone3-band
   uncrafted weapon sells 700 or more): a new ceiling and a stretched bill.
+  RULED (qr-19-tusk-rung50-ceiling, 2026-09-01) under qr-19-best-for-project ("do what is
+  best for the project and feature ... something incredible that is safe, performant, and
+  perfect"): the rejection STANDS. No ceiling is raised and no rung-50 ogre-tusk output is
+  authored. This is a DERIVED refusal, not a deferral, so the arithmetic is recorded here in
+  place of the taste call. Re-derived in the live tree today: a ceiling at 700 admits exactly
+  three uncrafted weapons at that price, and all three are the archetype arms of ONE quest
+  reward (q_palecoil, minLevel 16, src/sim/content/temple.ts): moonscale_saber (uncommon,
+  17-28 at 2.4 = 9.38 dps, str 5 sta 2, warrior arm), palecoil_rod (18-31 at 3.0 = 8.17 dps,
+  int 6 spi 2, mage arm), tideglass_dirk (11-18 at 1.7 = 8.53 dps, agi 6, rogue arm). Each
+  loses on every axis to weaponcrafting's OWN trainer rung-50 rare, the comparand the
+  chipped_tusk exclusion already used: the saber to thorium_warblade (rare, 20-32 at 2.5 =
+  10.40 dps, str 9 sta 4, no class lock), the rod to elderwood_battle_staff (rare, 19-31 at
+  3.0 = 8.33 dps, int 9 spi 4, no lock), the dirk to arcanite_war_axe (rare, 22-34 at 2.7 =
+  10.37 dps, agi 9 sta 4, no lock) on everything but the dagger flag that gates Craven Thrust
+  and the Duskveil openers (src/sim/combat/casting_lifecycle.ts, "You must wield a dagger."),
+  and on that one axis the trainer's own rung-25 recipe_whetted_iron_dirk (16-24 at 1.8 =
+  11.1 dps, agi 5 sta 2, no lock, a 50-copper bill) beats it on damage, stamina, class access
+  and bill, conceding only one point of agility against two of stamina at 77 percent of its
+  damage. So 700 buys no shippable row: under R21 no output is a prize, the doctrine's own
+  exclusion clause, and the stretched bill would be spent minting a strictly worse copy of a
+  quest reward. Flavor puts the target further out, not closer: the only ogre-flavored zone3
+  weapons are Brutok Skullsmasher's own chase rares (brutoks_maul, crag_warden_cudgel,
+  skullsplitter_dirk, all 2000), and crafting a mob's chase drop out of its guaranteed drop is
+  the shape the pelt was re-picked away from twice. Value is not power here either, the point
+  qr-19-apex-vendor-value-asymmetry ratified on this same tree: the packet's own apex epic
+  duskforged_warblade (30-50 at 2.5 = 16.0 dps) vendors at 320, UNDER the ceiling, so a
+  700-copper uncommon would be a bigger number, not a better prize. Two record corrections,
+  AMENDED IN PLACE rather than rewritten. First, this line's "every zone3-band uncrafted
+  weapon sells 700 or more" reads literally false and always did: Armorer Hode's Highwatch
+  vendor whites are zone3-band uncrafted weapons under 700 (highwatch_warblade 600,
+  craghorn_staff 600, icevein_dirk 600, highwatch_greatsword 680), shipped with the original
+  1-20 expansion content long before 11l. Read it as "every zone3-band uncrafted weapon a
+  rung-50 crafter would want", because admitting the four moves nothing: each is a statless or
+  near-statless common sold over a counter and dominated by the same trainer rows (the
+  greatsword, 26-40 at 3.4 = 9.71 dps and no stats, by the rung-25 ironshod_maul, 36-51 at 3.3
+  = 13.18 dps, str 5 sta 3), and mirejaw_biteblade at 480 only ties the rung-25 dirk's agi 5
+  sta 2 while losing damage (6.47 against 11.1) and class access. Second, the ceiling literal
+  needs its scope said out loud now that the packet has shipped: 460 is the top crafted GEAR
+  output (boundstone_helm), and the only crafted outputs above it are bags
+  (resonant_weave_bag 900, loombound_reagent_satchel 1200), which no weapon band touches, so a
+  reader re-deriving "the crafted ceiling" from ALL_RECIPES must not read 1200 as this
+  bullet's number. The tusk is not left orphaned by any of this: it keeps its rung-50 row at
+  recipe_fenshadow_maul (uncommon, 420, under the ceiling, one named-elite kill per craft at
+  the discounted bill), so the standing rejection costs the feature nothing.
 - A rung-25 tailoring row for the bandana on the strength of its two level-20
   galecrest sources: the zone1 band carries two of four sources (vale_bandit,
   gorrak), a tie the QA counted; the tie-break is that galecrest is a level-20
@@ -16719,6 +16822,81 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as per-item-material-
 - Pricing non-gathered reagents in the mastery model (the trophy rows win
   its tie-breaks because a mob drop costs it nothing): a model question for
   the maintainer, recorded with the moved literal.
+  RULED (qr-19-mastery-model-nongathered-pricing, 2026-09-01) under qr-19-best-for-project
+  ("do what is best for the project and feature", "something incredible that is safe,
+  performant, and perfect"): ZERO-COST MOB DROPS ARE RATIFIED. The mastery model keeps pricing
+  vendor and mob-drop units at zero hours, and every current tie-break winner stands. AMENDED
+  IN PLACE, because this bullet's premise no longer describes the tree: no trophy row wins the
+  model's tie-breaks, and none is even in its pool. The crafts-to-mastery cost model walks
+  armorcrafting only (CRAFT is 'armorcrafting' in tests/professions_crafts_to_mastery.test.ts)
+  and TROPHY_RECIPES carries no armorcrafting row at all (four leatherworking, one each of
+  weaponcrafting, alchemy and tailoring), because the 11l QA excluded the bogiron nugget and
+  deleted recipe_hobnail_boots. The moved literal moved back with it: iron_ore is pinned at 100
+  again beside recipe_ironlink_spaulders at exactly 25 crafts, and the file runs green in the
+  live tree (14 tests).
+  RE-DERIVED RATHER THAN TAKEN ON THE RECORD'S WORD, and the derivation inverts the premise:
+  non-gathered units are not weightless in the model, they are its SECOND tie-break key (fewest
+  gathered units, then fewest TOTAL units, then recipe id), and that key picked two of the four
+  winners. Rung 25 ties at 4 gathered iron between recipe_ironlink_legguards (bone 3, flux 2)
+  and recipe_ironlink_spaulders (hide 1, flux 1), and the spaulders win on 6 total units against
+  9. Rung 50 ties at 3 gathered thorium between recipe_thoriumscale_leggings and
+  recipe_thoriumscale_greathelm, and the greathelm wins on 8 total against 9. The mob-drop and
+  vendor half already decides those rungs; pricing it would change the units it is counted in,
+  not who wins.
+  AND A PRICED MODEL PICKS THE SAME ROWS. Give every non-gathered unit a weight w and fold it
+  into the first key: rung 0 recipe_coppermail_gauntlets (3 + 3w) beats every rival standing at
+  4 gathered for every w at or above zero; rung 25 the spaulders (4 + 2w) beat the legguards
+  (4 + 5w) and recipe_ironlink_hauberk (5 + 4w) for every w; rung 50 the greathelm (3 + 5w)
+  beats recipe_thoriumscale_cuirass (8 + 3w) for every w under 2.5, and well past that once
+  thorium's real hours ride along (5.00 of the 6.94, itself a pinned literal); and rung 75 has
+  exactly ONE candidate in the pool (recipe_sootscale_mantle, with recipe_forgefold_plating out
+  on the daily-gated quickening_catalyst chain), so half the 150 crafts have no tie-break to
+  lose. The four winners reconcile the whole pinned bill exactly, discount included
+  (materialDiscountPct 0.2 from skill 75, so sootscale's 7 thorium and 5 flux are charged 5 and
+  4): copper 75, iron 100, thorium 450, rough_hide 100, bone_fragments 50, arcanite_bar 25,
+  smithing_flux 375.
+  THE SECOND BASIS IS REAL, AND WORSE THAN THE ROW STATES: the non-gathered half is three
+  faucets, not one. bone_fragments is mob loot (sellValue 7, no buyValue), rough_hide is a
+  corpse-harvest component whose only supply is harvesting a tagged corpse (sellValue 5, no
+  buyValue, src/sim/content/profession_items.ts), and smithing_flux and arcanite_bar are vendor
+  stock (buyValue 20 and 160). A buyValue basis does not exist for two of the four ids, and a
+  gold basis has no axis in an hours model, so "price mob drops" is at least two rulings, not
+  one, and this packet holds neither.
+  THE KILL-SUPPLY CEILING TWIN OF THE HARVEST FORMULA WAS INVESTIGATED AND DID NOT SURVIVE ITS
+  OWN INFERENCE. The twin is already in the tree: campYield (tests/helpers/farm_yield.ts)
+  computes camp.count / respawnSeconds * 3600, the literal analogue of the harvest ceiling's
+  nodes * 3600 / respawnSeconds, and tests/camp_density.test.ts pins ten mobs on a 60 second
+  respawn at 600 sustainable kills an hour. Three reasons it cannot price a reagent. ONE, it is
+  a SHARED faucet: node readiness is per player (meta.nodeHarvestReadyAt,
+  src/sim/professions/gathering.ts), which is exactly why the harvest ceiling is honest as a
+  personal rate, while mob respawn is one world timer (TRASH_RESPAWN_SECONDS 60,
+  src/sim/respawn_policy.ts), so the identical arithmetic would report a camp's shared supply as
+  one player's rate. TWO, it is not the binding term: respawn_policy.ts records supply exceeding
+  demand at every authored camp (5 to 8 kills a minute of supply against 3 to 6 a minute of
+  demand including the walk), where for harvest the respawn IS binding (the model's own note:
+  450 thorium casts over six nodes is five hours of respawn against roughly nineteen minutes of
+  casting). Dividing a bill by a ceiling deliberately set above player demand returns a number
+  that looks derived and is not: 50 bone_fragments against a 600-kill hour is five minutes,
+  which moves no winner and no window while teaching every later reader that kill time is
+  priced. THREE, the honest term is time-to-kill, and the sim exposes no clockless read of it:
+  the suite's only time-to-kill (tests/warfare_balance_harness.test.ts) is a RATIO between two
+  fixture kits for PvP balance, never a wall clock, and an absolute figure varies by level,
+  gear, class, spec and group size, which is precisely the invented balance number CLAUDE.md
+  forbids. Drop chance compounds it (bone_fragments runs 0.4 to 1 across zones and dungeons), so
+  one unit would price differently per source, and mob loot has no analogue of the
+  one-granting-zone refusal gatheredSources throws on: the per-camp pick, not the arithmetic,
+  would set the number.
+  AND THE TREE ALREADY HOLDS THE HONEST REMEDY for the failure this row fears. Where a
+  non-gathered reagent really did distort the walk (the Quickening Catalyst, hard-capped at one
+  per character per reset day, which made the Phase 07 forgefold row read as the cheapest
+  skill-75 rung by a path no leveling player can walk), the packet did not invent a price: it
+  excluded the daily-gated chain from the pool, transitively, and pinned the exclusion. Mob loot
+  carries no such cap (0.4 to 1 per kill off ordinary camps whose supply already exceeds
+  demand), so its zero hides no unwalkable rung. The model's stated bias list already carries
+  "Zero hours for vendor and mob-drop reagents: biases DOWN" and asserts nonGatheredUnits above
+  zero so the bucket can never vanish unnoticed. Best for the feature is the model that states
+  its bias, not one that swaps a stated zero for a fabricated small number, buying false
+  precision and moving nothing. Nothing to build; the pins stand as they are.
 - Authoring a `prog_enchanting_rare` deed to force an enchanting row through
   a rare output: a deed minted to make a mapping true.
 
@@ -18813,6 +18991,34 @@ closing commit. Judged lists BINDING; do not re-raise.
 - Two pre-existing per-point price inversions in the food line did not
   worsen (boar vs venison narrowed 2.24 to 2.18; hardtack vs eel is
   cross-zone).
+  RULED 2026-09-01 (qr-19-food-per-point-inversions, under qr-19-best-for-project): both
+  reads are RATIFIED, and this line AMENDS the "two pre-existing per-point price inversions"
+  wording above in place rather than rewriting it. There is ONE inversion in the food line,
+  not two. The boar-versus-venison pair is not an inversion at all: the shipped per-point
+  ladder RISES there, brightwood_venison 35 copper over 81 foodHp (0.432 per point) then
+  roasted_boar 100 over 106 (0.943), both zone-1 rungs, re-read live in
+  src/sim/content/items.ts. The recorded 2.24-to-2.18 figure is the RATIO between two rising
+  rungs, not the size of a backward step: the pre-11n pair was 117 and 92 foodHp at the same
+  unchanged prices (0.855 against 0.380, ratio 2.247), so the 11n nerf narrowed a step on a
+  rising ladder and never closed an inverted one. That is the shape this phase already
+  recorded above, "Cost per point still rises with tier, the classic shape". The ONE real
+  backward step is the cross-zone seam, and it STANDS as classic-shaped pricing: smoked_eel
+  1000 over 375 (2.667, zone 2, src/sim/content/zone2.ts) against trail_hardtack 1200 over
+  480 (2.500, zone 3, src/sim/content/zone3.ts). Every other rung of the vendor food line is
+  monotone (bread and jerky tied at 0.410, then venison 0.432, boar 0.943, rye 1.818, and
+  goat 3.064 on top), and the seam itself kept its shape through 11n rather than narrowing:
+  both magnitudes fell together, 2.315 over 2.174 before against 2.667 over 2.500 now, a
+  ratio of 1.065 then and 1.067 today. NO LEVER IS FREE on the magnitude side. All four
+  foods sit EXACTLY at their 11n margin ceiling: 81, 106, 375 and 480 are each the largest
+  integer that still clears the pinned pair margin in tests/vendor_floor.test.ts, achieving
+  11.1, 10.4, 15.2 and 15.0 percent, where 82 would give 9.8 percent against
+  pan_seared_perch 90, 107 would give 9.3 against hunters_game_skewer 117, 376 would give
+  14.9 against frostgill_chowder 432, and 481 would give 14.8 against silvered_carp_supper
+  552. Smoothing the seam would therefore have to move the round vendor coin prices
+  themselves (25/35/100/400/1000/1200/2500), which is the classic pricing being ratified
+  here. NOTHING moves: no def, no price, no test, no wiki regen, and the
+  ALLOWED_FOOD_CURVE_POINTS read above stands untouched with its crafted points where they
+  are.
 - The oiled-boots house-listing margin and the quest-gated silk ruling
   remain the 11m maintainer reads, untouched here.
 - Tooling: vitest 4.1.10 EXITS 0 on an unknown --reporter flag after
@@ -19274,6 +19480,49 @@ passed inside the frozen run.
 - The Reliquary capstone is ONE owner decision from earnable: the two
   pended mounts are all that remain after the un-pend. feat: true
   still prevents a dead-end; visibility read only.
+  RULED (qr-19-reliquary-pended-mounts-decision, 2026-09-01, under
+  qr-19-best-for-project): BUILD THE PER-RELIC UNEARNABLE FLAG; invent no
+  acquisition for any pended mount. Three corrections, each re-verified on
+  the live tree today. (1) The pended set is THREE, not two:
+  drakemaw_raptor (no acquisition path at all), terrorspark_groundshaker
+  and rickshaw_mount (dev-grant only, both soulbound with noDiscard and
+  sellValue 0). tests/reliquary_content.test.ts pins exactly that ordered
+  set ("the surviving pending rows are the three mounts content awards no
+  route at all"), and the MOUNT_SOURCES comment in
+  src/sim/content/reliquary.ts names all three; rickshaw_mount arrived from
+  the release line (5d065e6da9, 2026-08-10) and reached the branch at the
+  tenth sync, which is why this bullet and every sibling record still say
+  two. (2) The shape is the one docs/design/reliquary.md already names in
+  its own words, in the "Open owner calls" unfillable-slot nudge: "The
+  clean shapes are a per-relic unearnable flag that the nearly-complete
+  rule skips, or landing the three slots." The deeper ground is rule 7,
+  "No permanently missable relics" for live content: three dev-only slots
+  on a live page ARE permanently missable relics, and rule 7's own remedy
+  (out of BOTH sides of every completion pair and all completion deeds,
+  visible and labeled rather than silently deleted, the page-local pair
+  still rendering) is written page-wide only because no smaller unit
+  existed. excludeFromCompletion is a ReliquaryPageDef field, PAGE level
+  only, so it cannot drop three slots from horizons_mounts, a page that
+  also holds seven earnable mounts; that mismatch, not an oversight, is why
+  the machinery was never applied here. The flag is rule 7's per-relic
+  peer, on the same both-sides, stay-visible terms. (3) What it closes:
+  col_reliquary_complete becomes reachable, and its shipped desc already
+  promises this reading ("every relic in The Reliquary that a character can
+  keep"), so the flag makes that text true rather than rewriting it; the
+  Overview nearly-complete strip and the HUD tracker default rows stop
+  parking horizons_mounts at the top forever for a player holding
+  everything earnable; and the deploy HOLD on registering the capstone
+  achievement is met by a route its own text does not predict (the slots
+  never land, they leave the denominator), so that rider is amended, not
+  merely ticked. NOT ruled here and not to be inferred from silence:
+  feat: true stays as shipped, so the capstone stays out of
+  BOOK_COMPLETE_REQUIREMENTS until the maintainer opens that separately.
+  Code lands in wave 19A, which owes in the same commit the stale
+  two-versus-three records (the deeds.ts col_reliquary_complete comment,
+  the horizons_mounts page comment's "Seven of the nine mounts" and "the
+  two that remain", the reliquary.md unfillable-slot text) and a re-ground
+  of SOURCE_PENDING_RULING, whose name still claims a pending ruling that
+  this line answers.
 - The five non-Latin archetypesBody translations are condensed
   summaries predating the reword (no false claim; pre-existing drift,
   deliberately untouched).
@@ -20194,6 +20443,27 @@ file's own acceptance overturns (retired dated, D13-4).
   maintainer read, see the Phase 13 QA ledger). Fail-open on the banlist
   file is now stale-on-error: a missing, unreadable, or over-ceiling file
   keeps serving the last list read, warned once per state transition.
+  RULED 2026-09-01 (qr-19-stripped-legendary-rename-affordance, under
+  qr-19-best-for-project): PERMANENT-NAMELESS is RATIFIED and no re-name affordance is
+  built. The maintainer's reading: the arm-1 re-promotion refusal is load-bearing against
+  a strip-then-rename loop, losing the name is a coherent deterrent for a name that earned
+  a strip, and the affordance would need a moderation-cleared flag plus an abuse story,
+  which is a policy question rather than a derivable one. Verified live rather than taken
+  from this record: arm 1 tests rolled.quality, NOT the name (perfecting.ts
+  promotePerfectedCopy, 'That work is already legendary.'), and the ONE write of
+  payload.name anywhere in the sim is the stamp inside that same function, so a stripped
+  copy has no path back to a name at all. server/clear_item_name.ts stripName deletes ONLY
+  ItemInstancePayload.name, leaving rolled.quality, the R5 stats, the signer and the bind
+  state standing, and both deed credits ride meta (markItemDiscovered's quality:legendary
+  mark feeding col_first_legendary, the legendariesForged bump feeding prog_legendmaker),
+  so the strip takes the offending words and nothing else, which is what keeps the
+  deterrent proportionate. The refusal is already pinned, on a SECOND name at that:
+  tests/orange_promotion.test.ts 'an already-legendary copy refuses with the already line,
+  deed intact' asserts the deny with no draw, no deed spend and no wireRev bump. Nothing
+  moves: no code, no pin, no regen, no fill, no content row, the R5 surface untouched, and
+  moderation.clearItemName stays SUPERADMIN-ONLY with its audited reason. The decision
+  table's line cite for this record (state.md:19702-19712) has drifted and now reads at
+  this D13-5 bullet; the bullet is the anchor, not the number.
 - D13-6 recipe_deed_of_making at inscription 125 (trainer,
   apothecary), the craft's first 125 rung per R13 and the phase file;
   bill 3 sablewax_vellum + 1 wyrmfall_core + 2 sunpetal_herb +
@@ -21890,6 +22160,35 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as druid-balance-harn
   oncePerDay), so an alchemist at 75 without a flask pattern has one
   catalyst a day or a hundred grey-rate crafts. Cannot be closed by tuning
   down; new content is out of scope.
+  RULED (qr-19-alchemy-band3-repeatable, 2026-09-01, under qr-19-best-for-project): RATIFY
+  THE GAP AND PIN IT. Alchemy keeps no repeatable band-3 rung and no row is authored to fill
+  it. The catalyst is the packet's ONE pacing gate and the apex demand math rests on its
+  oncePerDay, so funding the rung means a NEW output, and this packet's records do not hold
+  that output's identity, bill or value. Minting them at the rulings gate would be inventing
+  balance numbers, which CLAUDE.md forbids, so the gap stands as the deliberate consequence
+  of putting the gate on alchemy's own intermediate. Re-verified today by parsing every
+  record in src/sim/content/recipes.ts with comments stripped (170 records, alchemy 18):
+  alchemy's repeatable skillReq set is 0, 25, 50, 100, 125, its only 75 seat is the
+  oncePerDay recipe_quickening_catalyst, and it is the only craft of the ten with no
+  repeatable trainer row at 75 or above, while the other nine all keep their R13
+  intermediate there (billet, plating, cording, bolt, setting, chassis, stock, reagent,
+  vellum, each skillReq 75, trainer-taught, not oncePerDay).
+  AMENDED (same ruling), the wording rider, because the sentence above is wrong twice over:
+  "a hundred grey-rate crafts" survives neither in the number nor in the word. At skill 75
+  the capability tier is 3 and the rung-50 draughts are exactly one tier below, so they pay
+  the 0.5 yellow multiplier and the 75 to 100 leg is 50 crafts, which is what
+  power-verification.md 12.2 itself derives. A hundred crafts is the 100 to 125 leg, where
+  those same rows are two tiers below and pay 0.25, which is GREEN, not gray; gray is three
+  or more tiers below and pays exactly zero (tierProgressMultiplier in
+  src/sim/professions/wheel.ts against CRAFT_SKILL_GAIN 1 in crafting.ts), so no quantity of
+  gray crafts advances anything at all. The correction is docs-only: the shipped player copy
+  already reads the corrected way (the alchemy routeBody in src/ui/i18n.catalog/guide.ts
+  calls the 100 to 125 stretch a deliberate trickle), so no wiki regen, no guide reword, no
+  item id, no art, no i18n key and no merge-census row ride this ruling.
+  OWED: one new tripwire arm asserting alchemy's live repeatable skillReq set (0, 25, 50,
+  100, 125) beside the rung arms in tests/recipe_economy.test.ts, so a later authored row
+  reds this record rather than rotting it silently, plus the same AMENDED line on
+  power-verification.md 12.4's first bullet.
 - The public wiki prints craft gain boundaries above the reachable cap (63
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-craft-gain-clamp.
   of 166 rows, all 12 skill-125 rows print all three; 63 of 170 after the
