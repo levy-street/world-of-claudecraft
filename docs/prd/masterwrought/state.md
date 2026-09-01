@@ -26002,3 +26002,137 @@ Two of them are worth carrying forward as lessons rather than line items:
 - The 27 `FLAGGED FOR THE MAINTAINER` banners tree-wide are NOT swept here.
   This wave retires only the ones its own rulings falsify. Sweeping the rest is
   a maintainer call and D039's class, not this wave's to take.
+
+## Phase 19B ledger (2026-09-01, the UI wave of the rulings gate)
+
+STATUS: **COMPLETE, 11 of 11 units executed, ZERO escalations.** One commit per
+unit, every ruling written where its open record actually stands rather than
+into the decision table, following the qr-19 pattern.
+
+### What moved, stated as narrowly as it is true
+Only TWO of the eleven units land executable code. D035 gives the twelve farm
+fine produce ids the `Fine Material` kind line through a new
+`FARM_FINE_PRODUCE_ITEM_IDS` set, kept deliberately separate from
+`FARM_MATERIAL_ITEM_IDS` (which also carries seeds, base produce, husks and the
+two knob supplies, so an arm over it would label a seed) and deliberately NOT a
+`MATERIAL_GRADES` widening (a twin inside that table would begin satisfying a
+recipe asking for base produce). D111 gives the report window a real focus trap
+through the shared `makeWindowFocus` bridge, an exported `closeReportWindow`
+that every close path routes through, and dialog semantics. The other nine are
+record and comment work. Both new exported symbols carry their census rows in
+`merge-deletion-list.md`, and no wiki regen, i18n key, M16 fill, deed record,
+Reliquary page, art park, parity golden or monolith ceiling was owed or taken.
+
+### The real pins, and their proofs
+Every new pin was mutated and watched fail ALONE, with the mutant restored from
+a disk copy rather than `git checkout --` (which would take the uncommitted
+feature edit with it) and the tree grepped clean of probe markers afterward.
+The two registry floors are the wave's sharpest finding: `CASE_COUNT` and
+`MARKUP_COUNT` were EACH seven under the live count (40 against 47 cases, 38
+against 45 markup ids), and both were re-measured by running the suite's own
+producers rather than trusting the constants. D167's fairness arms drive the
+real `selectShedSlots` in four directions plus a cap-zero sibling, with the apex
+duration DERIVED from the shipped catalog and the slot's `shortDuration` derived
+from that, so a retune to short plates reds the block instead of leaving it
+quietly true.
+
+### Fifty-one corrections to the wave's own instructions
+Every unit's obligations bullet needed correction, all amended IN PLACE and
+dated: 51 enumerated corrections across the eleven units, plus three added
+obligations. The classes:
+- **All six handoff-row anchors** were transcribed with their markdown table
+  pipes flattened to spaces, so `grep -cF` returned 0. This is 19A's own defect
+  arriving again in the next wave's document; a verbatim executor would have
+  silently no-opped every status-cell flip.
+- **Line addresses rot inside a single wave.** Eight units cite one; six were
+  stale at execution, and D076's `(ba)` anchor then moved AGAIN before the close,
+  :3491 to :3515.
+- **Three insertion anchors were unexecutable**, and D013's was dangerous: a
+  standalone dated line after a table ROW at farming/state.md:586, inside a table
+  running unbroken :528 to :650, would have TERMINATED the table and orphaned the
+  64 rows below it.
+- **Five premises were falsified**, none reopening a ruling because each failed
+  for an unrelated cause (four palettes not five; a `pendingSend` that does not
+  exist under `src/net`; a "zero-headroom" hud.ts that had twenty lines of slack;
+  hard-counting arms that hard-count nothing; an unpinnable count claim).
+
+### Reviews
+Six distinct domain reviewers were dispatched FRESH, never the implementer:
+frontend-seam, test-coverage, render-performance, architecture, cross-platform
+sync, and qa-checklist. Every finding was applied, blocking, should-fix and nits
+alike. Two independently found the same D111 defect and were right.
+
+### The fix rounds, and what they say about the wave
+The guards were green through every one of the following, which is the finding.
+Two real bugs in D111: a PER-OPEN focus bridge, where the other 33
+`this.windowFocus(...)` call sites in `hud.ts` all run once per Hud (seven named
+fields, the rest inline spreads inside field initializers) and this one sat
+inside the per-open method, which leaves `makeWindowFocus`'s own defensive
+`handle?.release(false)` dead on a null handle; and a hazard
+the round itself created, since `markDialogRoot` stamps `role=dialog`, the
+pointer-focus park selector, so a click inside could park focus on the root, be
+recorded as its own opener, and send the close down `restoreFocus`'s in-window
+branch, which returns WITHOUT releasing. Then A FIX THAT WAS ITSELF A
+REGRESSION: the close-before-reopen added to repair the first bug was wrong, not
+merely redundant, because `FocusManager.restore` defers by a tick, so the return
+landed after the re-open and parked focus on the previous opener, outside the
+window on screen, leaving the fresh trap armed but inert. Alongside those: one
+FALSE claim written into the permanent record (the reduced-motion exemption
+stated as an absolute, when the foliage subsystem does thread the flag into
+`tree_hide_fade`'s occluder ghost ramp), a vacuous assertion introduced while
+fixing a vacuous assertion, a count repaired two lines from an identical one
+left open, and two arm titles claiming more than their assertions proved.
+
+**The blind spot that let the regression ship:** every arm in
+`tests/report_window.test.ts` drove a FAKE bridge, and a `vi.fn()` restore
+cannot observe a deferred focus move, so by construction not one of them could
+see where focus lands. The answer is a block driving the REAL `makeWindowFocus`
+over a REAL `FocusManager`, asserting on `document.activeElement`.
+
+**The fresh read (criterion 3) then found four MORE false or overstated claims
+and two soft pins**, in commit `6733a698d7`: a crafting-window trap attributed
+to #2525 when it landed at #2876 (#2525 is the town-focus window's own issue,
+named three lines above); "41 cases at the tip" that was neither the stale
+constant (40) nor the live count (47); "fifteen CLOSED-flips, seventeen dated
+rows" that measured neither, now replaced by no count at all and a prescribed
+grep; a wind binding-time sentence true of one of three paths; the anti-vacuity
+arm that was itself vacuous, since opening never moves focus (PROVEN both ways:
+the old form left 6 failures under the mutant, the repaired form makes 7); and a
+buff-bar tier pin whose fixed-width regex window reached into the sibling
+painter's arguments and passed the mutant that moved the call there.
+
+### Validation
+- `npx tsc --noEmit`: **EXIT 0**.
+- The guards green at the tip: architecture, monolith budget, world_api parity,
+  and the wave's own affected suites (633 passed across 10 files).
+- `node scripts/merge_audit/symbol_census.mjs`: **RESULT PASS, EXIT 0**, run
+  without a pipe so the exit code is real.
+- `npm run ci:changed` after the LAST commit: **EXIT 0**, zero errors and zero
+  format diffs (warnings only).
+- The pg arm PROVEN before the gate: the account-wealth integration suite skips
+  3 unset and passes 3 armed.
+- `node scripts/gate_select.mjs`, pg-armed: **EXIT 0, PASS, all 12 steps
+  green**, planner correctly falling back to the full suite (mode=full, 2083
+  changed paths against origin/release/v0.42.0), vitest 714.81s at 8 workers.
+  Reading: **3667 passed / 1 skipped (3668 files), 54464 passed / 11 expected
+  fail / 28 skipped (54503)**; browser suite 332 passed across 38 files.
+- **DRIFT versus the 19A stamp: fully attributed, none unexplained.** Files are
+  identical at 3668 (the wave adds no test FILE). Cases are +29 against 54474:
+  +7 from 19A's own fix round, and +22 from this wave, MEASURED rather than
+  predicted (the five test files 19B touches register 61 cases at the base
+  e056a4e0b2 and 83 at HEAD; the advance estimate of +19 was three low). The
+  fresh-read round contributes +0, confirmed by the same measurement at
+  65bb8a2a21. The eleven R5 pins stay at 11 expected fail, untouched.
+
+### JUDGED, and not re-raised
+- The eleven units, their rulings, and every earlier reviewer finding are
+  SETTLED. Two sweep findings were REFUTED rather than applied, judged here:
+  `tests/tooltip_line_core.test.ts` DOES hold an importer set (`CONSUMERS`), and
+  the fairness fixture DOES connect its derived apex duration to the shed
+  decision.
+- Four items are CARRIED for the maintainer and not taken unilaterally:
+  `#report-window`'s absence from `CHROME_GUARDED_PANELS` (its list is pinned
+  with `toEqual`); giving the stale-reject path a voice; the `hud.ts` monolith
+  row's comment still reading "Exact merged count, zero slack" while eleven
+  lines remain under the 18728 pin; and root `src/CLAUDE.md`'s
+  dependency-direction section versus the live `ui -> sim/content` imports.
