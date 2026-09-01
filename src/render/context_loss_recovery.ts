@@ -165,7 +165,7 @@ export class WebglContextWatchdog {
 }
 
 export interface ContextRecoveryCallbacks {
-  /** Runs on every loss, restorable or not (existing diagnostics/KTX2 hooks). */
+  /** Runs on every distinct loss, restorable or not (existing diagnostics/KTX2 hooks). */
   onLost(): void;
   onRestored(): void;
   /** Runs once if the loss is still unrestored after the escalation window. */
@@ -209,12 +209,19 @@ export function attachContextRecoveryHandlers(
     visibility: options.visibility,
     isStillLost,
   });
+  let lossObserved = false;
+  const observeLoss = (): void => {
+    watchdog.lost();
+    if (lossObserved) return;
+    lossObserved = true;
+    callbacks.onLost();
+  };
   canvas.addEventListener('webglcontextlost', (event) => {
     event.preventDefault();
-    watchdog.lost();
-    callbacks.onLost();
+    observeLoss();
   });
   canvas.addEventListener('webglcontextrestored', () => {
+    lossObserved = false;
     watchdog.restored();
     callbacks.onRestored();
   });
@@ -223,6 +230,6 @@ export function attachContextRecoveryHandlers(
     if (!(event as PageTransitionEvent).persisted) watchdog.dispose();
   });
   pageTeardown?.addEventListener('pageshow', (event) => {
-    if ((event as PageTransitionEvent).persisted && isStillLost()) watchdog.lost();
+    if ((event as PageTransitionEvent).persisted && isStillLost()) observeLoss();
   });
 }
