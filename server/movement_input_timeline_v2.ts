@@ -83,14 +83,18 @@ export function applyMovementInputFrame(
     facing: decision.facing,
   };
   if (session.movementWireVersion === 2) {
+    let accepted = false;
     if (frame.ct !== null) {
-      session.movementTimeline?.enqueue({
-        ct: frame.ct,
-        mi: frame.moveInput,
-        facing: frame.facing,
-      });
+      accepted =
+        session.movementTimeline?.enqueue({
+          ct: frame.ct,
+          mi: frame.moveInput,
+          facing: frame.facing,
+        }) === true;
     }
-    if (ctx) noteBattlegroundWallPressure(ctx, meta, entity, frame.moveInput);
+    if (accepted && ctx) {
+      noteBattlegroundWallPressure(ctx, meta, entity, frame.moveInput);
+    }
     return frame;
   }
   if (ctx) noteBattlegroundWallPressure(ctx, meta, entity);

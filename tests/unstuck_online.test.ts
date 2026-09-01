@@ -443,6 +443,29 @@ describe('online unstuck command wiring', () => {
     expect(meta.moveInput.forward).toBe(false);
   });
 
+  it('the Settings command ignores wall pressure from rejected v2 input frames', () => {
+    const server = new GameServer();
+    const { session } = join(server, 28);
+    Object.assign(session, createMovementInputSessionState(2));
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    forceIntoBgWallContact(server, match, pid, false);
+
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 0 } }));
+    server.handleMessage(session, JSON.stringify({ t: 'input', seq: 2, ct: 0, mi: { f: 1 } }));
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(server.sim.meta(pid)?.pendingUnstuck).toBeNull();
+    expect(server.sim.drainEvents()).toContainEqual(
+      expect.objectContaining({
+        type: 'unstuck',
+        phase: 'blocked',
+        reason: 'competitive',
+        pid,
+      }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+  });
+
   it('the Settings command completes for a penetrated battleground wall trap after ESC clears movement', () => {
     const server = new GameServer();
     const { session } = join(server, 23);
