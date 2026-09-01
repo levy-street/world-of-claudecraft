@@ -9,25 +9,160 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "es_ES": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "fr_FR": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "fr_CA": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "de_DE": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "nl_NL": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "pl_PL": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "id_ID": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "tr_TR": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "sv_SE": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "vi_VN": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ],
+  "da_DK": [
+    "hudChrome.finder.mech.ancestral_sap",
+    "hudChrome.finder.mech.beast_pit_quake",
+    "hudChrome.finder.mech.bloodmane_rend",
+    "hudChrome.finder.mech.call_of_the_hunt",
+    "hudChrome.finder.mech.jaguar_roar",
+    "hudChrome.finder.mech.thickhide_ward",
+    "hudChrome.finder.mech.tusk_sweep",
+    "hudChrome.finder.mech.wildheart_pulse"
+  ]
 };

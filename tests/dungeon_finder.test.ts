@@ -96,7 +96,7 @@ function acceptAll(sim: Sim, pids: number[]): SimEvent[] {
 // ---------------------------------------------------------------------------
 
 describe('finder catalogue metadata', () => {
-  it('pins the 11 activity ids in catalogue order', () => {
+  it('pins the 13 activity ids in catalogue order', () => {
     expect(FINDER_ACTIVITIES.map((a) => a.id)).toEqual([
       'hollow_crypt_normal',
       'sunken_bastion_normal',
@@ -106,6 +106,8 @@ describe('finder catalogue metadata', () => {
       'sunken_bastion_heroic',
       'drowned_temple_heroic',
       'gravewyrm_sanctum_heroic',
+      'wildheart_basin_normal',
+      'wildheart_basin_heroic',
       'nythraxis_crypt_normal',
       'nythraxis_boss_arena_normal',
       'nythraxis_boss_arena_heroic',
@@ -125,6 +127,8 @@ describe('finder catalogue metadata', () => {
       sunken_bastion_heroic: [20, 20],
       drowned_temple_heroic: [20, 20],
       gravewyrm_sanctum_heroic: [20, 20],
+      wildheart_basin_normal: [20, 20],
+      wildheart_basin_heroic: [20, 20],
       nythraxis_crypt_normal: [20, 20],
       nythraxis_boss_arena_normal: [20, 20],
       nythraxis_boss_arena_heroic: [20, 20],

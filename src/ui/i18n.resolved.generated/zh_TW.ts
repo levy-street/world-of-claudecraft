@@ -4158,7 +4158,15 @@ export const zh_TW: EnTranslations = {
         "soul_rend": "靈魂撕裂（被標記者需分散並接受治療）",
         "deathless_rage": "不死之怒（需在護符石處打斷）",
         "wardstones": "護符石引導（階段轉換）",
-        "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）"
+        "dread_curse": "恐懼詛咒（僅英雄難度，累加坦克輪換減益）",
+        "bloodmane_rend": "血鬃撕裂（流血，注意目標切換）",
+        "tusk_sweep": "獠牙橫掃（正面順劈）",
+        "ancestral_sap": "祖靈汁液（治療其盟友）",
+        "call_of_the_hunt": "狩獵召喚（加速附近盟友）",
+        "thickhide_ward": "厚皮護盾（護盾附近盟友）",
+        "beast_pit_quake": "獸坑震擊（範圍傷害）",
+        "wildheart_pulse": "狂野之心脈衝（週期性範圍傷害）",
+        "jaguar_roar": "美洲豹咆哮（擊退）"
       }
     },
     "reliquary": {

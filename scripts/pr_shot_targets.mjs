@@ -11669,6 +11669,60 @@ export const TARGETS = [
     },
   },
   {
+    key: 'dungeon-finder-catalogue',
+    label: 'Dungeon Finder window: Catalogue tab list and activity detail pane',
+    // FINDER_ACTIVITIES is hand-authored data-as-code (docs/prd/dungeon-finder.md); a new
+    // entry there is exactly the kind of change this target exists to catch, since it never
+    // touches a VISUAL_PREFIXES path on its own.
+    when: ['src/sim/content/dungeon_finder.ts'],
+    variants: [
+      { key: 'catalogue-desktop', charClass: 'warrior', charName: 'Thorgar' },
+      {
+        key: 'detail-desktop',
+        charClass: 'warrior',
+        charName: 'Thorgar',
+        selectActivity: 'wildheart_basin_normal',
+      },
+      { key: 'catalogue-mobile', charClass: 'warrior', charName: 'Thorgar', mobile: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        // A fresh offline character can also fire the once-ever Proving Shore
+        // spawn greeting (tutorial_greeting_window.ts, #tutorial-greeting); its
+        // first button dismisses either the two-choice greeting or a one-button
+        // note variant.
+        document.getElementById('tutorial-greeting')?.querySelector('button')?.click();
+      });
+      await wait(300);
+      await page.evaluate(() => window.__game?.hud.toggleDungeonFinder());
+      const open = await pollForSize(page, '#dungeon-finder-window .df-row', 20, 300);
+      if (!open) throw new Error('dungeon finder catalogue rows did not render');
+      // The rail is a long scrollable list (docs/prd/dungeon-finder.md's hand-authored
+      // registry order): scroll a recently registered activity into view before shooting
+      // or selecting it, else it sits below the fold in every variant.
+      await page.evaluate(() => {
+        document
+          .querySelector('#dungeon-finder-window [data-row="wildheart_basin_normal"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      if (variant?.selectActivity) {
+        const clicked = await page.evaluate((id) => {
+          const btn = document.querySelector(`#dungeon-finder-window [data-row="${id}"]`);
+          if (!(btn instanceof HTMLElement)) return false;
+          btn.click();
+          return true;
+        }, variant.selectActivity);
+        if (!clicked) throw new Error(`catalogue row ${variant.selectActivity} not found`);
+        const detailOpen = await pollForSize(page, '#dungeon-finder-window .df-encounter', 20, 300);
+        if (!detailOpen) throw new Error('activity detail pane did not render');
+      }
+      return { clip: '#dungeon-finder-window' };
+    },
+  },
+  {
     key: 'ground-aim-placement',
     when: [
       'action_bar/ground_aim',

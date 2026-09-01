@@ -4158,7 +4158,15 @@ export const ko_KR: EnTranslations = {
         "soul_rend": "영혼 가르기(표식 대상은 산개 후 치유 필요)",
         "deathless_rage": "불사의 격노(수호석에서 저지)",
         "wardstones": "수호석 정신집중(단계 전환)",
-        "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
+        "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)",
+        "bloodmane_rend": "블러드메인 렌드(출혈, 대상 교체 주의)",
+        "tusk_sweep": "터스크 스윕(전방 휩쓸기)",
+        "ancestral_sap": "조상의 수액(아군 치유)",
+        "call_of_the_hunt": "사냥의 부름(주변 아군 가속)",
+        "thickhide_ward": "두꺼운 가죽 결계(주변 아군 보호막)",
+        "beast_pit_quake": "야수 구덩이 진동(광역 피해)",
+        "wildheart_pulse": "와일드하트 펄스(주기적 광역 피해)",
+        "jaguar_roar": "재규어의 포효(넉백)"
       }
     },
     "reliquary": {

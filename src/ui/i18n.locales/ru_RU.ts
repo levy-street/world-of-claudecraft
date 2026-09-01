@@ -10526,6 +10526,16 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.finder.mech.wardstones': 'Охранные камни (смена фазы)',
   'hudChrome.finder.mech.dread_curse':
     'Проклятие ужаса (только на героическом, накапливающийся дебафф смены танка)',
+  'hudChrome.finder.mech.bloodmane_rend': 'Кровавый разрыв (кровотечение, следите за сменой цели)',
+  'hudChrome.finder.mech.tusk_sweep': 'Удар бивнями (рассекающий удар спереди)',
+  'hudChrome.finder.mech.ancestral_sap': 'Соки предков (лечит союзников)',
+  'hudChrome.finder.mech.call_of_the_hunt': 'Зов охоты (ускоряет союзников поблизости)',
+  'hudChrome.finder.mech.thickhide_ward':
+    'Толстокожая защита (щит для союзников поблизости)',
+  'hudChrome.finder.mech.beast_pit_quake': 'Тряска звериной ямы (урон по области)',
+  'hudChrome.finder.mech.wildheart_pulse':
+    'Пульс дикого сердца (периодический урон по области)',
+  'hudChrome.finder.mech.jaguar_roar': 'Рёв ягуара (отбрасывание)',
   'hudChrome.steam.link': 'Привязать Steam',
   'hudChrome.steam.unlink': 'Отвязать Steam',
   'hudChrome.steam.linked': 'Привязан аккаунт Steam {id}',
