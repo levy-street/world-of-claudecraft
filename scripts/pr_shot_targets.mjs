@@ -6405,6 +6405,62 @@ export const TARGETS = [
     },
   },
   {
+    key: 'deeds-vale-cup-feat',
+    label: 'Book of Deeds: Vale Cup deeds marked Feat of Strength on Chronicle and PvP and Sport',
+    // Feat status never moves a deed off its home category shelf
+    // (deedDisplayCategory keys only on `category`, not `feat`; the
+    // col_reliquary_complete precedent stays on Collection), so
+    // chr_vale_cup_debut stays on Chronicle and the ten pvp_vcup_* deeds stay
+    // on the PvP and Sport tab. The visible change is the feat ribbon chip
+    // plus the updated retirement sentence in the desc.
+    when: ['sim/content/deeds.ts'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      const opened = await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        // The Proving Shore's one-time Ferryman Odo arrival note (the shared
+        // Card Duel modal shell, hudChrome.tutorialGreeting), which otherwise
+        // pops over the freshly opened Book of Deeds.
+        document.querySelector('button.cd-ok[data-close]')?.click();
+        const game = window.__game;
+        if (!game?.hud) return { ok: false, reason: 'offline world is unavailable' };
+        game.hud.openDeeds('pvp');
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      const ready = await pollForSize(page, '#deeds-window');
+      if (!ready) return { skip: 'the deeds window never became visible' };
+      // The arrival note can render on its own timer after entry, sometimes
+      // landing on top of the already-open Book of Deeds; poll for it across
+      // a short settle window and dismiss it once, rather than assuming a
+      // single early click (before it exists) is enough.
+      for (let i = 0; i < 6; i++) {
+        const dismissed = await page.evaluate(() => {
+          const btn = document.querySelector('button.cd-ok[data-close]');
+          if (!(btn instanceof HTMLElement)) return false;
+          btn.click();
+          return true;
+        });
+        if (dismissed) break;
+        await wait(300);
+      }
+      const scrolled = await page.evaluate(() => {
+        const card = document.querySelector('.deed-card[data-deed="pvp_vcup_wins_25"]');
+        if (!card) return false;
+        card.scrollIntoView({ block: 'center' });
+        return true;
+      });
+      if (!scrolled) return { skip: 'the pvp_vcup_wins_25 card is not on the PvP tab' };
+      await wait(300);
+      return { clip: '#deeds-window' };
+    },
+  },
+  {
     key: 'inspect-border-cartouche',
     label: 'Inspect Deed Heraldry banner: seal, motif pattern, title, and granting deed',
     when: ['ui/deed_border_view', 'ui/inspect_window', 'ui/inspect_view', 'styles/shell.css'],

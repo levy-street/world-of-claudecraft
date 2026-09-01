@@ -63,21 +63,22 @@ const PREFIX_CATEGORY: Record<string, DeedCategory> = {
 };
 
 describe('audited launch totals (literals: update deliberately with the catalog)', () => {
-  it('ships exactly 281 deeds worth 3275 total Renown', () => {
+  it('ships exactly 281 deeds worth 3125 total Renown', () => {
     // MEASURED across the release/v0.42 candidate merge rather than
     // reconciled by arithmetic, because each arm can only count its own
     // additions. The candidate ships the bank socket pair, walk-in castle
     // visit pair, Proving Shore graduation deed, and five Crucible raid deeds;
-    // this branch keeps every deed shipped, then turns the seven pvp_fiesta_*
-    // rows into Feats (renown 0, feat: true) when Fiesta retired from the
-    // queueable bracket list, dropping 65 Renown (5 + 10*6). A Feat still
-    // ships, so the deed count stays at 281.
+    // this merge keeps every deed shipped, then turns the seven pvp_fiesta_*
+    // rows and eleven Vale Cup rows into Feats (renown 0, feat: true) as their
+    // activities retire. The combined conversion drops 215 Renown
+    // (65 Fiesta + 150 Vale Cup). Feats still ship, so the deed count stays at
+    // 281.
     //
     // The NAME carries the numbers too, deliberately: vitest prints it in the
     // failure header, and a stale name there is the one part of this pin a
     // reader can act on without seeing the diff. It went stale once already.
     expect(DEED_ORDER.length).toBe(281);
-    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3275);
+    expect(ALL.reduce((sum, d) => sum + d.renown, 0)).toBe(3125);
   });
 
   it('ships the audited per-category counts', () => {
@@ -657,19 +658,12 @@ describe('frozen trigger + renown catalog (design rule 9: never retro-edit a tri
   // (on the new tutorialGraduations stat), and the Crucible of the Last
   // Spring raid deeds (the obligations closeout, docs/prd/ignivar-raid-loot.md)
   // at the tail. MEASURED on the merged tree.
-  // Re-baselined for the Fiesta Feat conversion: renown dropped to 0 on the
-  // seven pvp_fiesta_* deeds (5+10*6 = 65 Renown), a deliberate renown
-  // change per the Ravenrift PvP-window merge retiring Fiesta from the
-  // queueable bracket list. ONE deliberate shipped-trigger change the hash
-  // correctly caught, the feat_book_complete class again: BOOK_COMPLETE_REQUIREMENTS
-  // is derived from every non-feat, non-hidden id, so feat-flagging the seven
-  // Fiesta deeds shrinks feat_book_complete's meta.deedIds from 263 to 256
-  // entries. This un-strands the capstone rather than re-scoping it: those
-  // seven sat inside the requirement as ordinary deeds before this change,
-  // dead-ending The Whole Book for anyone who had not earned them
-  // pre-retirement (see "un-strands the capstone" below). No other trigger
-  // changed on any deed.
-  const FROZEN_CATALOG_SHA256 = '70729f99f4f2647c143b3c1f1f0197d8e1f561ffd3e235f832be07131bef42d4';
+  // Re-baselined for both Feat conversions: the seven pvp_fiesta_* deeds and
+  // the eleven Vale Cup deeds now have 0 Renown and feat: true because their
+  // activities retired. That deliberately shrinks derived completion triggers
+  // by excluding the newly feat-flagged rows from BOOK_COMPLETE_REQUIREMENTS;
+  // no other deed trigger changed.
+  const FROZEN_CATALOG_SHA256 = '00e8b88f1596729e5450183e8b8365db8c2d600a4f3cfc2bb4bc36c8d1e544ba';
 
   it('every shipped deed keeps its trigger and renown unchanged', () => {
     const canonical = JSON.stringify(
@@ -891,10 +885,9 @@ describe('table shape', () => {
     // feat: true because it is a dynamic meta over a growing catalog (the
     // feat_book_complete class) and the flag is what keeps it out of
     // BOOK_COMPLETE_REQUIREMENTS: three catalog slots are owner-pended today
-    // (masterwork:engineering, both pending reins), so a non-feat capstone
     // would dead-end The Whole Book for every player. The seven pvp_fiesta_*
-    // deeds joined it when the Ravenrift PvP-window merge retired Fiesta from
-    // the queueable bracket list (deeds.md rule 5, the feat_brightwood_relic
+    // deeds, chr_vale_cup_debut, and the ten pvp_vcup_* deeds joined it when
+    // their activities retired (deeds.md rule 5, the feat_brightwood_relic
     // class): renaming to a feat_ id would silently drop the deed from every
     // veteran's earned set, since PlayerMeta.deedsEarned keys on the id
     // verbatim. Growing this set is a deliberate design act; prefer the
@@ -908,6 +901,17 @@ describe('table shape', () => {
       'pvp_fiesta_full_build',
       'pvp_fiesta_powerups',
       'pvp_fiesta_five_kills',
+      'chr_vale_cup_debut',
+      'pvp_vcup_first_match',
+      'pvp_vcup_first_win',
+      'pvp_vcup_wins_10',
+      'pvp_vcup_wins_25',
+      'pvp_vcup_first_goal',
+      'pvp_vcup_hat_trick',
+      'pvp_vcup_golden_goal',
+      'pvp_vcup_first_save',
+      'pvp_vcup_clean_sheet',
+      'pvp_vcup_guild_win',
     ]);
     for (const def of ALL) {
       const expectFeat = def.id.startsWith('feat_') || OFF_PREFIX_FEATS.has(def.id);

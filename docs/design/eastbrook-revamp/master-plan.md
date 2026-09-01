@@ -247,13 +247,19 @@ maintainer's, and slices S5 to S7 depend on them.
 
 ## 6. Decisions that are the maintainer's (do not guess in a slice)
 
-1. Player-earned records: the 11 vale cup deeds sit in players' persisted
-   `deedsEarned` with Renown attached, and `pvp_vcup_wins_25` grants the
-   "Boarball Legend" title (a locked glossary term). Deleting the deed
-   catalog rows wipes earned progress; the shipped-content precedent
-   (`RETIRED_HEROIC_ITEMS`) suggests RETIRING instead: keep the records,
-   remove every acquisition path. The deeds table is append-only by its own
-   header, which argues retirement too. Needs an explicit call.
+1. **RESOLVED (maintainer call):** the 11 vale cup deeds (`chr_vale_cup_debut`
+   plus the ten `pvp_vcup_*` rows) move to Feats of Strength: `feat: true`,
+   `renown: 0`, following the `feat_brightwood_relic` class docs/design/deeds.md
+   rule 5 already covers. The catalog rows and every player's earned records
+   (including `pvp_vcup_wins_25`'s "Boarball Legend" title) stay exactly as
+   earned; only the acquisition path is gone, which the feat flag now states
+   directly in each desc. `chr_vale_chapter_ii`'s meta trigger drops
+   `chr_vale_cup_debut` from its prerequisites in the same change (that
+   prerequisite is now permanently unearnable, and rule 5 forbids a
+   permanently missable deed). Ids keep the `pvp_`/`chr_` prefix rather than
+   renaming to `feat_` (renaming would silently drop the deed from every
+   veteran's earned `deedsEarned` set); see `OFF_PREFIX_FEATS` in
+   `tests/deeds_content.test.ts`.
 2. The eight persisted `vcup*` meta counters in player saves: migration,
    or dead-field tolerance.
 3. Steam/Epic achievements already unlocked externally cannot be revoked:

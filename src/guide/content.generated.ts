@@ -4128,8 +4128,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "chr_vale_cup_debut",
     "name": "Copper Pail Contender",
     "category": "chronicle",
-    "renown": 5,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/chr_vale_cup_debut.webp"
   },
   {
@@ -4542,32 +4542,32 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "pvp_vcup_first_match",
     "name": "Boots on the Pitch",
     "category": "pvp",
-    "renown": 5,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_first_match.webp"
   },
   {
     "id": "pvp_vcup_first_win",
     "name": "First Silverware",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_first_win.webp"
   },
   {
     "id": "pvp_vcup_wins_10",
     "name": "Seasoned Boarballer",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_wins_10.webp"
   },
   {
     "id": "pvp_vcup_wins_25",
     "name": "Boarball Legend",
     "category": "pvp",
-    "renown": 25,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "rewardTitle": "Boarball Legend",
     "crest": "/ui/deeds/pvp_vcup_wins_25.webp"
   },
@@ -4575,48 +4575,48 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "id": "pvp_vcup_first_goal",
     "name": "Off the Mark",
     "category": "pvp",
-    "renown": 5,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_first_goal.webp"
   },
   {
     "id": "pvp_vcup_hat_trick",
     "name": "Hat Trick Hero",
     "category": "pvp",
-    "renown": 25,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_hat_trick.webp"
   },
   {
     "id": "pvp_vcup_golden_goal",
     "name": "Golden Moment",
     "category": "pvp",
-    "renown": 25,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_golden_goal.webp"
   },
   {
     "id": "pvp_vcup_first_save",
     "name": "Safe Hands",
     "category": "pvp",
-    "renown": 5,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_first_save.webp"
   },
   {
     "id": "pvp_vcup_clean_sheet",
     "name": "Nothing Gets Past Me",
     "category": "pvp",
-    "renown": 25,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_clean_sheet.webp"
   },
   {
     "id": "pvp_vcup_guild_win",
     "name": "For the Banner",
     "category": "pvp",
-    "renown": 10,
-    "feat": false,
+    "renown": 0,
+    "feat": true,
     "crest": "/ui/deeds/pvp_vcup_guild_win.webp"
   },
   {
