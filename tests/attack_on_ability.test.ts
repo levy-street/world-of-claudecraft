@@ -33,6 +33,18 @@ describe('abilityStartsAutoAttack', () => {
     expect(abilityStartsAutoAttack(effectsOf('hour_of_judgment'))).toBe(false);
   });
 
+  it('does not engage on a friendly groundAoE ally buff (Rune of Power)', () => {
+    // Rune of Power's groundAoE carries allyBuffPct with min/max both 0 (no damage,
+    // "min/max are ignored" per its AbilityEffect comment): it must not be classified
+    // as an attack, or the "Attack on Ability Use" QoL engages a white swing (and can
+    // pull a hostile mob) on a purely defensive/support cast that has no target.
+    expect(abilityStartsAutoAttack(effectsOf('rune_of_power'))).toBe(false);
+  });
+
+  it('still engages on a damaging groundAoE with no allyBuffPct rider (Blizzard)', () => {
+    expect(abilityStartsAutoAttack(effectsOf('blizzard'))).toBe(true);
+  });
+
   it('does not engage on pure crowd control', () => {
     expect(abilityStartsAutoAttack(effectsOf('polymorph'))).toBe(false); // polymorph only
     expect(abilityStartsAutoAttack(effectsOf('sap'))).toBe(false); // incapacitate only
