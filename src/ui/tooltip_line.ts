@@ -1,7 +1,24 @@
 // Generic tooltip body line via createElement + textContent.
 // Used by raw-cooking-catch purpose hints (and any later tt-desc / tt-sub
 // call site that wants a createElement path without HTML template strings).
-// Not a pure core: needs document. Prefer this over new innerHTML builders.
+// Not a pure core: needs document. This is the node-returning path: it hands
+// back a detached div for a caller that wants an element rather than markup.
+//
+// RULED (qr-19-tooltip-line-doctrine, 2026-09-01, under
+// qr-19-best-for-project): the header's old "prefer this over new innerHTML
+// builders" line is RETIRED as a stated preference, deliberately rather than
+// dropped. It lost on the merits: this module has ONE importer while the
+// HTML-string line family (tooltip_line_core.ts) has four modules and 27 call
+// sites, and a preference the tree has contradicted that thoroughly is worse
+// than no preference. NOTHING ABOUT SAFETY CHANGES. The string path is not the
+// unsafe one, every line's text goes through esc(), and src/ui/CLAUDE.md's
+// standing rule against writing raw player or server text as markup is
+// untouched. Pick between the two mechanisms by RETURN TYPE: this one returns
+// an HTMLDivElement, tooltipLine returns a string. And note what the tree
+// actually does with the node, since calling this "the node-returning path"
+// alone would overstate it: both live callers take the element and bridge it
+// straight back into the composed tooltip string, so today this path buys
+// text-set-by-construction at the mint, not a separate render.
 //
 // THE CLASS VOCABULARY IS NOT OWNED HERE. tooltip_line_core.ts owns the one
 // TooltipLineClass union for the whole tooltip-line family, and this module

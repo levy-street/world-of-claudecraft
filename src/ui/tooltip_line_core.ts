@@ -22,6 +22,16 @@
 // members and an author got whichever the autoimport picked. Widening here
 // widens what that path may narrow FROM; it never silently widens the path
 // itself, which names its own subset.
+//
+// WHICH MECHANISM A NEW CALLER PICKS is the return type, not a preference.
+// Take this builder when the caller is composing a markup string (the
+// item-card path, where the four consumers above live), and tooltip_line.ts
+// createTooltipLine when it appends an element to a live node. Neither is the
+// safe one and neither is deprecated: the text is escaped here and set with
+// textContent there. Recorded because the sibling module used to state a
+// preference for its own path that the tree had long since contradicted, and
+// retiring that preference (qr-19-tooltip-line-doctrine, 2026-09-01) is only
+// useful if something says how to choose instead.
 
 import { esc } from './esc';
 
