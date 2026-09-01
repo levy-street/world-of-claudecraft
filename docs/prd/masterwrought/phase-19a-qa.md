@@ -54,8 +54,11 @@ Phase 18 QA gate reading on every figure. Zero drift is the CORRECT answer for a
 wave that adds no test file and no test case, not a lucky one. The nine R5
 escalation pins stay at 11 expected fail, untouched.
 
-The fix round then adds six cases across five files, so a later stamp will differ
-by exactly that, by construction and attributably.
+The fix round and its repair then add SEVEN cases across five files (two in the
+corpse-harvest suite, two in the quest-fallback suite, one each in the trophy,
+heroic-floors and farm-recipe suites), so a later stamp differs by exactly that,
+by construction and attributably. Counted from the diff rather than from memory:
+an earlier draft of this line said six.
 
 ## The escalation
 
@@ -88,8 +91,8 @@ fixes are unreviewed code.
 ### The fresh read found the fix round itself defective, and that is recorded, not smoothed over
 
 The first fresh reader died on an API error; the relaunched one returned findings
-that **invalidated the verdict as first written**. Of the six arms the fix round
-added, one was VACUOUS and two were weaker than claimed:
+that **invalidated the verdict as first written**. Of the seven arms the fix
+round added, one was VACUOUS and two were weaker than claimed:
 
 - The turn-in gate arm called `countFit` directly instead of driving
   `turnInQuest`, so **deleting the shipped gate outright would not have failed
@@ -109,7 +112,7 @@ control's stated reason was false (the seventh carrier is a dungeon mob that
 structurally cannot hold a camp row, not a campless spread decision).
 
 All repaired in `c8171095fc`, each re-proved by mutation. **The lesson is the
-finding: I wrote six pins to close an unmeasured-claim gap and three of them
+finding: I wrote seven pins to close an unmeasured-claim gap and three of them
 reproduced the same class of defect they were closing.** A pin authored by the
 person who wrote the claim it defends needs an independent read before it counts,
 which is what exit criterion 3 is for and why it is not a formality.
@@ -134,7 +137,7 @@ the reference tank, which is exactly what D143 ratified it into being.
    What caught it was reading `git status` against intent. On a comment-only
    wave, tests are not the safety net; the diff review is.
 2. **A pin its own author wrote is not evidence until someone else reads it.**
-   Six arms were added to close an unmeasured-claim gap; three reproduced the
+   Seven arms were added to close an unmeasured-claim gap; three reproduced the
    same defect class, one of them unfailable. Exit criterion 3 is what caught it,
    which is the argument for never treating that criterion as a formality, and
    for never recording a verdict while it is still outstanding.
@@ -152,7 +155,7 @@ the reference tank, which is exactly what D143 ratified it into being.
 | 1 | Every unit executed, or escalated with a dated reason | MET (17 executed, 1 escalated with its record) |
 | 2 | Domain reviewers dispatched FRESH, all findings applied | MET (4 reviewers, 10 findings, all applied) |
 | 3 | The fix round re-read by a fresh reader | MET, and it FOUND REAL DEFECTS (see above); repairs in c8171095fc |
-| 4 | Every new pin mutated and watched go red | MET only after the repair: three of the six first-draft pins did NOT bite, one could not fail at all |
+| 4 | Every new pin mutated and watched go red | MET only after the repair: three of the seven first-draft pins did NOT bite, one could not fail at all |
 | 5 | tsc clean, guards green, census PASS, `ci:changed` after the last commit | MET |
 | 6 | `gate_select.mjs` on the committed tree, judged by exit code | MET, EXIT 0 |
 | 7 | This document written and its verdict recorded before 19B opens | MET |

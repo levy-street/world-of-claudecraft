@@ -25876,7 +25876,9 @@ both-hosts claim holds on the client half too.
   in place. The nine R5 escalation pins stay at 11 expected fail, untouched
   and never re-tuned.
 - The FIX ROUND then added five new arms (commit 133f19560f), so the counts
-  move at the next run BY CONSTRUCTION: six new cases across five files. That
+  move at the next run BY CONSTRUCTION: SEVEN new cases across five files (two
+  corpse-harvest, two quest-fallback, one each trophy, heroic-floors and farm
+  recipes), counted from the diff rather than from memory. That
   is a deliberate, attributable delta, not drift, and it is the first thing to
   re-measure if a later stamp is compared against this one.
 
