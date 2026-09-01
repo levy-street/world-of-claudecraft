@@ -68,7 +68,7 @@ const THEME_BIOMES: Readonly<Record<string, readonly string[]>> = {
   infernal_citadel: ['ember', 'night', 'dusk'],
 };
 
-const ABILITY_KEYS = [
+export const ABILITY_KEYS = [
   'aoePulse',
   'bigCast',
   'summonAdds',
@@ -90,6 +90,33 @@ const ABILITY_KEYS = [
   'stomp',
   'knockback',
 ] as const;
+
+/** Player-facing phrase for each ability key. `abilitiesFor` below stores the
+ * raw `MobTemplate` field key (selection metadata, never shown as-is); any
+ * text surfaced to a player must resolve through this map instead of joining
+ * the raw keys, or the sentence reads as leaked camelCase identifiers. */
+export const RIFT_ABILITY_LABELS: Readonly<Record<(typeof ABILITY_KEYS)[number], string>> = {
+  aoePulse: 'area pulses',
+  bigCast: 'a devastating cast',
+  summonAdds: 'summoned adds',
+  enrage: 'enrage',
+  desperateHeal: 'a desperate heal',
+  rampage: 'a rampage',
+  chillOnHit: 'chilling strikes',
+  frostbite: 'frostbite',
+  cinder: 'cinder burns',
+  smolder: 'smoldering damage',
+  venom: 'venom',
+  ensnare: 'ensnares',
+  bleed: 'bleeds',
+  frenzyOnHit: 'frenzy on hit',
+  cleave: 'cleaving strikes',
+  manaBurn: 'mana burn',
+  arcaneRot: 'arcane rot',
+  soulrot: 'soul rot',
+  stomp: 'a ground stomp',
+  knockback: 'knockback',
+};
 
 function roleFor(template: MobTemplate): RiftMonsterRole {
   const mob = template as MobTemplate & Record<string, unknown>;
