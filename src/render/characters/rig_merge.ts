@@ -435,6 +435,15 @@ export function mergeSkinnedParts(
     const kinds = morphed.length > 0 ? morphKindUnion(parts) : [];
     if (!kinds) continue;
     const union = kinds.length > 0 ? morphUnionPlan(targetNames) : null;
+    // With no plan every rebake keeps its own morph keys, and `mergeGeometries`
+    // refuses a set that disagrees on them. A present-but-EMPTY list is the
+    // only way to get here (a target list is what puts a kind in the union), and
+    // it is not the same variant as an absent one, so it cannot be normalized
+    // away: refuse here rather than let three log its own refusal.
+    if (!union) {
+      const keys = parts.map((part) => Object.keys(part.geometry.morphAttributes).sort().join(','));
+      if (keys.some((k) => k !== keys[0])) continue;
+    }
 
     const geometries = parts.map((part, i) =>
       rebakeGeometry(

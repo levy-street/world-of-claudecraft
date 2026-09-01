@@ -597,6 +597,27 @@ describe('mergeSkinnedParts', () => {
     expect(countSkinned(root)).toBe(2);
   });
 
+  it('refuses a bucket whose parts disagree on which morph kinds are present', () => {
+    // three defines USE_MORPHTARGETS on PRESENCE, so a present-but-empty list
+    // is a different program variant from an absent one and cannot be
+    // normalized away; mergeGeometries refuses such a set outright.
+    const bones = makeBones();
+    const inverses = restInverses(bones);
+    const material = new THREE.MeshBasicMaterial();
+    const root = new THREE.Object3D();
+    root.add(bones[0]);
+    const pos = [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7];
+    const plain = makePart(bones, inverses, pos, material);
+    const empty = makePart(bones, inverses, pos, material);
+    empty.geometry.morphAttributes.position = [];
+    root.add(plain, empty);
+
+    mergeSkinnedParts(root);
+
+    expect(countSkinned(root)).toBe(2);
+    expect(empty.geometry.morphAttributes.position).toEqual([]);
+  });
+
   it('refuses a bucket whose parts disagree on morph relativity', () => {
     const bones = makeBones();
     const inverses = restInverses(bones);
