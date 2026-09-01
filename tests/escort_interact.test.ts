@@ -17,7 +17,7 @@ import {
   isEscorteeEntity,
 } from '../src/game/escort_interact';
 import { handlePickedEntity, hoverCursorKind } from '../src/game/interactions';
-import { tryNearbyInteraction } from '../src/game/nearby_interaction';
+import { resolveNearbyInteraction, tryNearbyInteraction } from '../src/game/nearby_interaction';
 import { ESCORTS } from '../src/sim/data';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
@@ -289,7 +289,7 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
     };
     const press = (nodes: Parameters<typeof tryNearbyInteraction>[2] = []) =>
       tryNearbyInteraction(world, hud, nodes, null, 'too far', 'not ready', AWAY_TEXT, 'nothing');
-    return { press, calls };
+    return { press, calls, world };
   }
 
   it('dispatches the interact command for an idle escortee (was: dead press)', () => {
@@ -298,6 +298,19 @@ describe('the Interact action reaches the escort run (tryNearbyInteraction)', ()
 
     expect(r.press()).toBe(true);
     expect(r.calls).toEqual([`target:${wren.id}`, 'interact']);
+  });
+
+  it('exposes the escortee entity anchor to the shared semantic resolver', () => {
+    const wren = escorteeAt();
+    const r = rig([wren], playerAt(WREN.start.x + 1, WREN.start.z));
+
+    expect(resolveNearbyInteraction(r.world, [], null)).toMatchObject({
+      interactionKind: 'escort',
+      eligible: true,
+      anchor: { kind: 'entity', entityId: wren.id },
+      name: { entityKind: 'mob', templateId: WREN.npcMobId },
+    });
+    expect(r.calls).toEqual([]);
   });
 
   it('explains an empty post instead of the generic nothing-to-interact line', () => {

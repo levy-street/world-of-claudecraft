@@ -4,6 +4,7 @@ import { CrossHotbarBindings } from '../src/game/cross_hotbar_bindings';
 import {
   cancelPadFocus,
   clearPadFocus,
+  cycleHudFocus,
   hasPadFocus,
   moveDpadFocus,
   setPadNavSpansWindows,
@@ -23,7 +24,7 @@ import {
   STANDARD_BUTTON_COUNT,
 } from '../src/game/gamepad_map';
 import { Input, type InputCallbacks } from '../src/game/input';
-import { markPadActivity } from '../src/game/input_hint_mode';
+import { currentInputHintMode, markPadActivity } from '../src/game/input_hint_mode';
 import { Keybinds } from '../src/game/keybinds';
 
 // Every export still runs for real; three are wrapped because the module keeps the
@@ -875,11 +876,19 @@ describe('GamepadManager cross hotbar', () => {
 
   function setupCrossHotbar(enabled: boolean) {
     let windowFocused = true;
+    const bodyClasses = new Set<string>();
     vi.stubGlobal('document', {
       hasFocus: () => windowFocused,
       // Cursor mode builds the virtual pointer element on entry.
       createElement: () => ({ className: '', style: {}, setAttribute: vi.fn() }),
-      body: { appendChild: vi.fn() },
+      body: {
+        appendChild: vi.fn(),
+        classList: {
+          add: (name: string) => bodyClasses.add(name),
+          remove: (name: string) => bodyClasses.delete(name),
+          contains: (name: string) => bodyClasses.has(name),
+        },
+      },
       // UI navigation queries these; an empty HUD means every move falls back to
       // nudging the cursor, which is the behaviour these cases care about.
       querySelectorAll: () => [],
@@ -1295,6 +1304,69 @@ describe('GamepadManager cross hotbar', () => {
     expect(h.onAction).toHaveBeenCalledWith('cycleHud');
   });
 
+  it('routes focus-mode verbs through their remapped semantic bindings', () => {
+    const h = setupCrossHotbar(true);
+    h.setPointerMode(true);
+    h.bindings.bind(GP.X, GAMEPAD_CONFIRM);
+    h.bindings.bind(GP.Y, GAMEPAD_CANCEL);
+    h.bindings.bind(GP.A, 'cycleHud');
+    h.bindings.bind(GP.R3, 'subcommands');
+
+    h.press(GP.X);
+    h.press();
+    h.press(GP.Y);
+    h.press();
+    h.press(GP.A);
+    h.press();
+    h.press(GP.R3);
+
+    expect(h.onAction).toHaveBeenCalledWith(GAMEPAD_CANCEL);
+    expect(h.onAction).toHaveBeenCalledWith('cycleHud');
+    expect(h.onAction).toHaveBeenCalledWith('subcommands');
+  });
+
+  it('keeps Start mapped to Escape without treating it as remapped Cancel', () => {
+    const h = setupCrossHotbar(true);
+    h.setPointerMode(true);
+    h.bindings.bind(GP.Y, GAMEPAD_CANCEL);
+    h.bindings.bind(GP.B, 'map');
+
+    h.press(GP.B);
+    h.press();
+    h.press(GP.START);
+
+    expect(h.onAction.mock.calls.filter(([action]) => action === 'escape')).toHaveLength(1);
+    expect(h.onAction).not.toHaveBeenCalledWith(GAMEPAD_CANCEL);
+  });
+
+  it('releases controller ownership and virtual mouse on disconnect', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.start();
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+
+    expect(h.manager.isVirtualMouseMode()).toBe(true);
+    expect(currentInputHintMode()).toBe('pad');
+    h.disconnectPad(0);
+
+    expect(h.manager.isVirtualMouseMode()).toBe(false);
+    expect(currentInputHintMode()).toBe('keyboard');
+  });
+
+  it('releases controller ownership and virtual mouse when the manager stops', () => {
+    const h = setupCrossHotbar(true);
+    h.manager.start();
+    h.press(GP.LB);
+    h.press(GP.LB, GP.R3);
+
+    expect(h.manager.isVirtualMouseMode()).toBe(true);
+    expect(currentInputHintMode()).toBe('pad');
+    h.manager.stop();
+
+    expect(h.manager.isVirtualMouseMode()).toBe(false);
+    expect(currentInputHintMode()).toBe('keyboard');
+  });
+
   it('swaps the standing set on the right bumper', () => {
     // The bar has two sets and, before this, the only way to the second was
     // tapping the opposite trigger mid-hold. The bumper is the standing switch.
@@ -1437,10 +1509,52 @@ describe('GamepadManager cross hotbar', () => {
       querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
       activeElement: null,
     };
+    h.press(GP.A);
+    h.press();
     h.setPointerMode(true);
     h.press();
     h.press();
     expect(focused).toEqual(['focus']);
+  });
+
+  it('does not auto-focus a window for an idle connected pad', () => {
+    const h = setupCrossHotbar(true);
+    const focus = vi.fn();
+    const btn = {
+      focus,
+      classList: { add: vi.fn(), remove: vi.fn() },
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 10,
+        bottom: 10,
+        width: 10,
+        height: 10,
+      }),
+      hasAttribute: () => false,
+    };
+    const dialog = {
+      getBoundingClientRect: () => ({
+        left: 0,
+        top: 0,
+        right: 99,
+        bottom: 99,
+        width: 99,
+        height: 99,
+      }),
+      querySelectorAll: () => [btn],
+    };
+    const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+    (globalThis as unknown as { document: Record<string, unknown> }).document = {
+      ...baseDoc,
+      querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
+      activeElement: null,
+    };
+
+    h.setPointerMode(true);
+    h.press();
+
+    expect(focus).not.toHaveBeenCalled();
   });
 
   it('drops the pad pointer when the window closes', () => {
@@ -1477,6 +1591,8 @@ describe('GamepadManager cross hotbar', () => {
       querySelectorAll: (sel: string) => (sel.includes('dialog') ? [dialog] : [btn]),
       activeElement: null,
     };
+    h.press(GP.A);
+    h.press();
     h.setPointerMode(true);
     h.press(); // window opens, focus lands inside it
     h.setPointerMode(false);
@@ -1903,19 +2019,35 @@ describe('GamepadManager cross hotbar', () => {
         hasAttribute: () => false,
       };
       const baseDoc = (globalThis as unknown as { document: Record<string, unknown> }).document;
+      const launcher = {
+        classList: { add: () => {}, remove: () => {} },
+        getBoundingClientRect: () => ({
+          left: 0,
+          top: 0,
+          right: 20,
+          bottom: 20,
+          width: 20,
+          height: 20,
+        }),
+        hasAttribute: (name: string) => name === 'data-pad-launcher-root',
+        querySelectorAll: () => [marked],
+      };
       const doc = {
         ...baseDoc,
-        querySelectorAll: (sel: string) => (sel.includes('dialog') ? [] : [marked]),
-        // Nothing focused yet, so the first d-pad step lands on (and marks) it.
+        querySelectorAll: (sel: string) =>
+          sel === '[data-pad-launcher-root]'
+            ? [launcher]
+            : sel.includes('dialog') || sel === '[data-pad-nav-root]'
+              ? []
+              : [marked],
         activeElement: null as unknown,
-        body: {},
       };
       (globalThis as unknown as { document: Record<string, unknown> }).document = doc;
       marked.focus = () => {
         doc.activeElement = marked;
       };
       h.setPointerMode(false);
-      h.press(GP.DPAD_DOWN); // the pad marks what it stepped onto
+      expect(cycleHudFocus()).toBe(true);
       h.move();
       expect(removed).toContain('pad-focus');
       Reflect.deleteProperty(globalThis, 'document');

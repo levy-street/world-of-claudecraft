@@ -210,7 +210,7 @@ describe('renderer CPU hot path', () => {
     const timingIndex = renderer.indexOf(
       "phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);",
     );
-    const painterIndex = renderer.lastIndexOf('this.nameplatePainter.update(fullNameplatePass);');
+    const painterIndex = renderer.lastIndexOf('this.nameplatePainter.update(');
 
     expect(painterIndex).toBeGreaterThan(-1);
     expect(timingIndex).toBeGreaterThan(painterIndex);

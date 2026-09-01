@@ -116,6 +116,12 @@ per-tier cadence lever (`ui_tier_knobs.nameplateIntervalSec`) is applied by
 cadence logic of its own. Narrow helpers:
 `nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
 (shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
+Controller A prompts use `controller_world_prompt_view.ts` for the pure visibility
+and anchor plan, `controller_world_prompt_painter.ts` for projection and placement,
+and `controller_world_prompt_canvas.ts` for the button chip. `nameplate_update_core.ts`
+keeps prewarm and live nameplate passes consistent. Prompts prefer an entity label,
+then a projected world point for gather nodes and fishing bobbers, then the viewport
+fallback; they are never planned outside controller-owned input.
 
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (the `GfxTier` ladder; ranks are monotone, so gate a

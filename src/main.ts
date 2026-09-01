@@ -19,7 +19,7 @@ import {
 import { runBlockingArrivalWarmup, settleWorldEntryCover } from './game/arrival_warmup';
 import { audio } from './game/audio';
 import { AutoLoot } from './game/autoloot';
-import { shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
+import { resolveBgFlagInteraction, shouldRouteInteractToBgFlag } from './game/bg_flag_interact';
 import {
   BROWSER_BODY_CLASSES,
   browserBodyClasses,
@@ -46,6 +46,12 @@ import {
 } from './game/click_move';
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
+import {
+  type ControllerPromptResolveInput,
+  createBootcampConfirmClaim,
+  createControllerPromptCoordinator,
+} from './game/controller_prompt_coordinator';
+import { createControllerUiPromptCoordinator } from './game/controller_ui_prompt_coordinator';
 import { localPartyMemberIds } from './game/corpse_loot_availability';
 import { createCrossHotbar, measureCrossHotbarLift } from './game/cross_hotbar_wiring';
 import { tryDayNightDevCommand } from './game/daynight_dev_command';
@@ -69,7 +75,7 @@ import {
   readDiscordChoice,
 } from './game/discord_login_choice';
 import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
-import { cycleHudFocus } from './game/dpad_focus_nav';
+import { cycleHudFocus, hasPadFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
   clearEntryProbe,
@@ -88,9 +94,9 @@ import {
 } from './game/entry_diagnostics';
 import { ferryPrewarmTargetFor } from './game/ferry_prewarm';
 import { GamepadManager } from './game/gamepad';
+import { createGamepadActionDispatcher } from './game/gamepad_action_dispatcher';
 import { createGamepadActivityNotifier } from './game/gamepad_activity_notify';
 import { GamepadBindings } from './game/gamepad_bindings';
-import { GAMEPAD_CANCEL, GAMEPAD_CYCLE_HUD, GAMEPAD_SUBCOMMANDS } from './game/gamepad_map';
 import { shouldUseGamepadPointerMode } from './game/gamepad_pointer_mode';
 import { createGamepadSettingApplier } from './game/gamepad_settings';
 import { isGameplayInputBlocked } from './game/gameplay_input_gate';
@@ -113,6 +119,7 @@ import {
 import { tryIgnivarPlacerCommand } from './game/ignivar_placer';
 import { Input } from './game/input';
 import { InputActivityMeter, installInputActivityTracking } from './game/input_activity';
+import { currentInputHintMode } from './game/input_hint_mode';
 import { stopAutorunForInteraction } from './game/interaction_autorun';
 import {
   activePvpOpponentIds,
@@ -157,16 +164,15 @@ import { watchMobileMoreState } from './game/mobile_more_diagnostics';
 import { mouselookReleaseFacing } from './game/mouselook_release';
 import { diagonalMovementVisualFacing } from './game/movement_visual';
 import { music } from './game/music';
-import { tryNearbyInteraction } from './game/nearby_interaction';
-import { nextNpcTarget } from './game/npc_cycle';
+import { resolveNearbyInteraction, tryNearbyInteraction } from './game/nearby_interaction';
 import { isOfflineModeAvailable } from './game/offline_mode_gate';
 import { interpolatedOnlineSelfFacing } from './game/online_facing_mirror';
 import { sendOnlineMovementFrame } from './game/online_movement_frame';
 import { padCastPress, padCastRelease } from './game/pad_cast_routing';
 import { createGroundAimReticleSync, padGroundAimCallbacks } from './game/pad_ground_aim_wiring';
-import { padReelItemId } from './game/pad_reel';
+import { type PadReelLifecycle, padReelItemId, padReelPromptItemId } from './game/pad_reel';
 import { openTargetSubcommands } from './game/pad_subcommands';
-import { createPadTargetPick } from './game/pad_target_pick';
+import { createPadTargetPick, resolvePadPreferredNpcId } from './game/pad_target_pick';
 import { createPerfMonitor } from './game/perf';
 import { initPerfNudge } from './game/perf_nudge';
 import { startPerfReporter } from './game/perf_reporter';
@@ -339,6 +345,7 @@ import {
   graphicsPresetLabel,
   resolveGfxProfile,
 } from './render/gfx';
+import type { ControllerWorldPromptSource } from './render/nameplate_update_core';
 import { createInitialPrewarmResumeStartGate } from './render/prewarm_resume_start_gate';
 import { Renderer } from './render/renderer';
 import { hasAuthoritativeSelfPositionDiscontinuity } from './render/self_motion';
@@ -380,7 +387,7 @@ import {
   RUN_SPEED,
   type WorldContent,
 } from './sim/types';
-import { zoneBiomeAt } from './sim/world';
+import { groundHeight, zoneBiomeAt } from './sim/world';
 import { WORLD_SEED } from './sim/world_seed';
 import { startSitePresence } from './site_presence';
 import {
@@ -1302,6 +1309,7 @@ async function startGame(
   }
   let renderer!: Renderer;
   let rendererReady = false;
+  let controllerPromptSource: ControllerWorldPromptSource | null = null;
   // The world and socket stay live, but every client-frame owner pauses while
   // the renderer is recycled. The frame loop also clears its offline backlog.
   let graphicsRebuildPaused = false;
@@ -2167,184 +2175,30 @@ async function startGame(
   const gamepadBindings = new GamepadBindings();
   const crossHotbar = createCrossHotbar(() => hud, keybindScope);
   const canUseGameKeysNow = () => !gameplayInputBlocked();
-  function dispatchGamepadAction(id: string): void {
-    // Cancel backs out one step at a time: the top window, then the target. Only
-    // once there is nothing left to leave does the game menu come up, which is
-    // what keeps this distinct from the menu button rather than a second copy.
-    if (id === GAMEPAD_CANCEL) {
-      if (dismissCameraPrompt() || hud.cancelGroundAim() || hud.closeAll()) return;
-      world.targetEntity(null);
-      return;
-    }
-    if (id === GAMEPAD_CYCLE_HUD) {
-      cycleHudFocus();
-      return;
-    }
-    if (id === 'escape') {
-      if (hud.cancelGroundAim()) return;
-      if (!hud.closeAll()) hud.toggleOptionsMenu();
-      return;
-    }
-    if (!canUseGameKeysNow()) return; // suppress play actions while a modal/chat is up
-    if (id.startsWith('slot')) {
-      hud.pressSlot(Number(id.slice(4)));
-      return;
-    }
-    hud.cancelGroundAim();
-    switch (id) {
-      case 'target':
-        world.tabTarget();
-        break;
-      case 'targetPrev':
-        world.tabTargetPrev();
-        break;
-      case 'targetFriendly':
-        world.targetNearestFriendly();
-        break;
-      // Selecting the people you talk to. The sim's friendly cycle answers heal
-      // eligibility and so skips every quest giver, which left a pad player with
-      // no way to pick one; targetEntity is the seam that already exists for it.
-      case 'targetNpcNext':
-      case 'targetNpcPrev': {
-        const next = nextNpcTarget(
-          world.entities.values(),
-          world.player.pos,
-          world.player.targetId ?? null,
-          id === 'targetNpcNext' ? 1 : -1,
-        );
-        if (next !== null) world.targetEntity(next);
-        break;
-      }
-      case 'targetFriendlyNext':
-        world.friendlyTabTarget();
-        break;
-      case 'interact': {
-        // The pad reel (the UX pass): mid fishing cast, the interact press
-        // answers the bite by re-using the rod (the sim's armed-window arm),
-        // instead of running a nearby scan over a live bobber and forcing
-        // the angler into cursor-mode bag clicks. Resolves the B-button
-        // interact conflict for pad anglers; keyboard anglers keep their
-        // hotbar/bags press unchanged.
-        const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
-        if (reelRod !== null) {
-          world.useItem(reelRod);
-          break;
-        }
-        padTargetPick.interact();
-        break;
-      }
-      case 'bags':
-        hud.toggleBags();
-        break;
-      case 'char':
-        hud.toggleChar();
-        break;
-      case 'spellbook':
-        hud.toggleSpellbook();
-        break;
-      case 'questlog':
-        hud.toggleQuestLog();
-        break;
-      case 'map':
-        hud.toggleMap();
-        break;
-      // The target's subcommands, or the map when there is no target: one button
-      // for "what can I do with this", the way a console MMO spends its left face
-      // button. The menu itself is the one the mouse opens by right-clicking, so
-      // there is no second menu to keep in step with it.
-      case GAMEPAD_SUBCOMMANDS: {
-        if (!openTargetSubcommands()) hud.toggleMap();
-        break;
-      }
-      case 'nameplates':
-        renderer.showNameplates = !renderer.showNameplates;
-        break;
-      case 'talents':
-        hud.toggleTalents();
-        break;
-      case 'meters':
-        hud.toggleMeters();
-        break;
-      case 'targetAuras':
-        hud.toggleTargetAuras();
-        break;
-      case 'social':
-        hud.toggleSocial();
-        break;
-      case 'arena':
-        hud.toggleArena();
-        break;
-      case 'bgFlag':
-        bgFlagKey();
-        break;
-      case 'mount':
-        world.toggleMounted();
-        break;
-      case 'leaderboard':
-        hud.toggleLeaderboard();
-        break;
-      case 'calendar':
-        hud.toggleCalendar();
-        break;
-      case 'discord':
-        toggleDiscordPanel();
-        break;
-      case 'deeds':
-        hud.toggleDeeds();
-        break;
-      case 'professions':
-        hud.toggleProfessions();
-        break;
-      case 'reliquary':
-        hud.toggleReliquary();
-        break;
-      case 'crafting':
-        // The controller panel has always OFFERED this bind (it lists every
-        // edge keybind action); the dispatch dropped it silently.
-        hud.toggleCrafting();
-        break;
-      case 'petStop':
-        // The pet edges, the dungeon finder, and the sheathe toggle: the
-        // same offered-but-dropped sweep that found Crafting (the controller
-        // panel lists every edge keybind action), each wired to its exact
-        // keyboard handler.
-        world.setPetMode('passive');
-        break;
-      case 'petTaunt':
-        world.petTaunt();
-        break;
-      case 'petAttack':
-        world.petAttack();
-        break;
-      case 'petDefensive':
-        world.setPetMode('defensive');
-        break;
-      case 'petAggressive':
-        world.setPetMode('aggressive');
-        break;
-      case 'targetPet':
-        hud.targetOwnPet();
-        break;
-      case 'dungeonFinder':
-        hud.toggleDungeonFinder();
-        break;
-      case 'sheathe': {
-        // The keyboard arm's exact rule: the world owns the gate, the cue
-        // plays only when the state moved.
-        const wasStowed = world.player.weaponStowed;
-        world.toggleWeaponStow();
-        if (world.player.weaponStowed !== wasStowed) {
-          if (world.player.weaponStowed) audio.weaponSheathe();
-          else audio.weaponUnsheathe();
-        }
-        break;
-      }
-      case 'chat':
-        openChat();
-        break;
-    }
-  }
-  const syncXhbPadMode = () => crossHotbar.syncPadMode(gamepad);
+  const dispatchGamepadAction = createGamepadActionDispatcher({
+    world,
+    hud,
+    canUseGameKeys: canUseGameKeysNow,
+    dismissCameraPrompt,
+    cycleHudFocus,
+    interact: () => {
+      const reelRod = padReelItemId(world.player.castingAbility, world.inventory);
+      if (reelRod !== null) world.useItem(reelRod);
+      else padTargetPick.interact();
+    },
+    openTargetSubcommands,
+    toggleNameplates: () => (renderer.showNameplates = !renderer.showNameplates),
+    bgFlag: bgFlagKey,
+    toggleDiscord: toggleDiscordPanel,
+    openChat,
+    weaponSheathe: () => audio.weaponSheathe(),
+    weaponUnsheathe: () => audio.weaponUnsheathe(),
+  });
+  let controllerUiPrompts: ReturnType<typeof createControllerUiPromptCoordinator> | null = null;
+  const syncXhbPadMode = () => {
+    crossHotbar.syncPadMode(gamepad);
+    controllerUiPrompts?.refreshBindings();
+  };
   const gamepad = new GamepadManager(input, gamepadBindings, {
     onAction: (id) => dispatchGamepadAction(id),
     onInputEdge: () => inputMeter.record(performance.now()),
@@ -2368,6 +2222,16 @@ async function startGame(
     onOpenSpellbook: () => hud.openSpellbook(),
     ...crossHotbar.padCallbacks(() => gamepad.getKind()),
   });
+  controllerUiPrompts = createControllerUiPromptCoordinator(
+    document.getElementById('side-buttons-cycle-hint') as HTMLElement,
+    {
+      entries: () => gamepadBindings.entries(),
+      kind: () => gamepad.getKind(),
+      gameplayAllowed: () => canUseGameKeysNow() && (!online || online.spectating === null),
+      virtualMouse: () => gamepad.isVirtualMouseMode(),
+    },
+  );
+  controllerUiPrompts.refreshBindings();
   crossHotbar.attach(gamepad);
   const applyPadSetting = createGamepadSettingApplier(gamepad, settings, syncXhbPadMode);
   // The startup apply-all loop (below) calls applySetting('gamepadEnabled', ...)
@@ -2980,6 +2844,7 @@ async function startGame(
         context: recycled.context,
         initializeGfx: false,
       });
+      next.setControllerWorldPromptSource(controllerPromptSource);
       configureRebuiltRenderer(next);
       ktx2RestoreUploadQueue.publish(next.backgroundGpuWork);
       return next;
@@ -3157,8 +3022,14 @@ async function startGame(
     },
     gamepad: {
       entries: () => gamepadBindings.entries(),
-      bind: (button, action) => gamepadBindings.bind(button, action),
-      reset: () => gamepadBindings.reset(),
+      bind: (button, action) => {
+        gamepadBindings.bind(button, action);
+        controllerUiPrompts?.refreshBindings();
+      },
+      reset: () => {
+        gamepadBindings.reset();
+        controllerUiPrompts?.refreshBindings();
+      },
       ...crossHotbar.hooks,
       // The connected pad's brand lives on the manager, not the (hardware-agnostic)
       // bindings, so surface it here for the Controller panel's glyph labels.
@@ -3513,6 +3384,102 @@ async function startGame(
   // The pad's own selection rules (which npc a talk press addresses, which enemy
   // a cast picks) live in src/game/pad_target_pick.ts; this carries the calls.
   const padTargetPick = createPadTargetPick({ world, interactKey });
+
+  const bootcampClaimsConfirm = createBootcampConfirmClaim(
+    () => controllerUiPrompts?.confirmLabel() ?? null,
+  );
+  const fishingPoint = { x: 0, y: 0, z: 0 };
+  const resolveControllerPrompt = (lifecycle: PadReelLifecycle): ControllerPromptResolveInput => {
+    const padActive = currentInputHintMode() === 'pad' && (!online || online.spectating === null);
+    const virtualMouse = gamepad.isVirtualMouseMode();
+    const confirmLabel = controllerUiPrompts?.confirmLabel() ?? null;
+    const death = world.player.dead;
+    const crossHotbar = gamepad.isCrossHotbarHolding();
+    const crossHotbarEdit = gamepad.isCrossHotbarEditing();
+    const bootcamp = bootcampClaimsConfirm();
+    const uiFocused = hasPadFocus();
+    const base = {
+      padActive,
+      virtualMouse,
+      confirmLabel,
+      uiFocused,
+      death,
+      crossHotbar,
+      crossHotbarEdit,
+      bootcamp,
+    };
+    if (
+      !padActive ||
+      virtualMouse ||
+      !confirmLabel ||
+      death ||
+      crossHotbar ||
+      crossHotbarEdit ||
+      bootcamp ||
+      uiFocused
+    ) {
+      return {
+        ...base,
+        groundAim: null,
+        fishing: null,
+        bgFlag: null,
+        nearby: null,
+        gatherWorldPoint: null,
+      };
+    }
+    const reticle = hud.groundAimReticle();
+    const groundAim = reticle
+      ? {
+          point: {
+            x: reticle.point.x,
+            y: groundHeight(reticle.point.x, reticle.point.z, world.cfg.seed) + 0.25,
+            z: reticle.point.z,
+          },
+          blocked: reticle.blocked,
+        }
+      : null;
+    const fishing =
+      !groundAim &&
+      padReelPromptItemId(lifecycle, world.player.castingAbility, world.inventory) !== null
+        ? {
+            point: renderer.localFishingBobberWorldPointInto(fishingPoint) ? fishingPoint : null,
+          }
+        : null;
+    const bgFlag =
+      !groundAim && !fishing
+        ? resolveBgFlagInteraction(world.bgInfo, world.player, world.entities)
+        : null;
+    const nearby =
+      !groundAim && !fishing && !bgFlag
+        ? resolveNearbyInteraction(
+            world,
+            GATHER_NODES,
+            (node) => gatherNodeToolGateFor(world, node),
+            true,
+            resolvePadPreferredNpcId(world),
+          )
+        : null;
+    const gatherWorldPoint =
+      nearby?.interactionKind === 'gather'
+        ? {
+            x: nearby.nodePos.x,
+            y: groundHeight(nearby.nodePos.x, nearby.nodePos.z, world.cfg.seed) + 0.65,
+            z: nearby.nodePos.z,
+          }
+        : null;
+    return { ...base, groundAim, fishing, bgFlag, nearby, gatherWorldPoint };
+  };
+  const controllerPrompts = createControllerPromptCoordinator({
+    playerId: () => world.playerId,
+    castingAbility: () => world.player.castingAbility,
+    playerDead: () => world.player.dead,
+    resolve: resolveControllerPrompt,
+  });
+  controllerPromptSource = () => {
+    controllerUiPrompts?.syncFrame();
+    return controllerPrompts.frame();
+  };
+  renderer.setControllerWorldPromptSource(controllerPromptSource);
 
   function attackNearest(): void {
     const p = world.player;
@@ -4568,6 +4535,7 @@ async function startGame(
         const eventsLength = events.length;
         desktopNotifyOnSimEvents(events, offlineSim.playerId);
         desktopPresenceOnFrame(offlineSim);
+        controllerPrompts.onEvents(events);
         const eventsStart = perf.startTime();
         traceStart = perf.startTrace();
         try {
@@ -4748,6 +4716,7 @@ async function startGame(
     if (net.spectating === null) desktopNotifyOnSimEvents(drainedEvents, net.playerId);
     // Same gate, second reason: a spectator's zone must not leak to presence.
     if (net.spectating === null) desktopPresenceOnFrame(net);
+    controllerPrompts.onEvents(drainedEvents);
     const eventsStart = perf.startTime();
     traceStart = perf.startTrace();
     try {

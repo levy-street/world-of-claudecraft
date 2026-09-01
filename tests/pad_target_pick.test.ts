@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { CROSS_HOTBAR_ATTACK_ID } from '../src/game/cross_hotbar';
-import { createPadTargetPick, type PadTargetPickWorld } from '../src/game/pad_target_pick';
+import {
+  createPadTargetPick,
+  type PadTargetPickWorld,
+  resolvePadPreferredNpcId,
+} from '../src/game/pad_target_pick';
 import type { ResolvedAbility } from '../src/sim/sim';
 import { type Entity, INTERACT_RANGE } from '../src/sim/types';
 
@@ -54,6 +58,28 @@ const swapsIntoTargeted = {
 const OUT_OF_REACH = INTERACT_RANGE + 5;
 
 describe('padTargetPick.interact', () => {
+  it('exposes the same selected-NPC preference without dispatching or retargeting', () => {
+    const targetEntity = vi.fn();
+    const world = {
+      player: {
+        id: PLAYER_ID,
+        pos: { x: 0, y: 0, z: 0 },
+        targetId: 7,
+        auras: [],
+      },
+      playerId: PLAYER_ID,
+      entities: new Map([
+        [7, entity(7, 'npc', 4)],
+        [8, entity(8, 'npc', 1)],
+      ]),
+      known: [],
+      targetEntity,
+    } as unknown as PadTargetPickWorld;
+
+    expect(resolvePadPreferredNpcId(world)).toBe(7);
+    expect(targetEntity).not.toHaveBeenCalled();
+  });
+
   it('keeps an npc that is already selected and within reach', () => {
     const { pick, targetEntity, interactKey } = harness(
       [entity(7, 'npc', 1), entity(8, 'npc', 2)],

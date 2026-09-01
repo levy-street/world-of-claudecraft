@@ -2,8 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   cancelPadFocus,
   clearPadFocus,
+  cycleHudFocus,
   focusFirstInWindow,
   followDomFocus,
+  handoffPadFocus,
+  hasPadFocus,
   moveDpadFocus,
   pressDpadFocus,
   restorePadFocus,
@@ -17,6 +20,7 @@ import {
 // repo's hand-rolled-fake rule (tests/CLAUDE.md, "DOM in tests").
 interface FakeEl {
   tag: string;
+  id?: string;
   role?: string;
   cls: string[];
   rect: { left: number; top: number; right: number; bottom: number };
@@ -48,10 +52,11 @@ function el(
   tag: string,
   x: number,
   y: number,
-  opts: { role?: string; cls?: string[]; visible?: boolean; disabled?: boolean } = {},
+  opts: { id?: string; role?: string; cls?: string[]; visible?: boolean; disabled?: boolean } = {},
 ): FakeEl {
   const node: FakeEl = {
     tag,
+    id: opts.id,
     role: opts.role,
     cls: opts.cls ?? [],
     rect: { left: x, top: y, right: x + 40, bottom: y + 20 },
@@ -89,6 +94,15 @@ function el(
 
 // Only the two selectors the module actually passes.
 function matches(node: FakeEl, selector: string): boolean {
+  if (selector.includes('data-pad-launcher-entry-column')) {
+    return node.attrs?.['data-pad-launcher-entry-column'] !== undefined;
+  }
+  if (selector.includes('data-pad-launcher-entry')) {
+    return node.attrs?.['data-pad-launcher-entry'] !== undefined;
+  }
+  if (selector.includes('data-pad-launcher-root')) {
+    return node.attrs?.['data-pad-launcher-root'] !== undefined;
+  }
   if (selector.includes('data-pad-nav-root')) {
     return node.attrs?.['data-pad-nav-root'] !== undefined;
   }
@@ -132,6 +146,7 @@ function install(padActive = false): void {
       },
       appendChild: () => {},
     },
+    getElementById: (id: string) => allEls.find((node) => node.id === id) ?? null,
     createElement: () => {
       const node = { id: '', style: {} as Record<string, string>, setAttribute: () => {} };
       padCursorStyle = node.style;
@@ -245,7 +260,7 @@ describe('moveDpadFocus', () => {
 
   it('answers null on a surface with no focusable controls at all', () => {
     allEls = [el('DIV', 0, 0)];
-    install();
+    install(true);
     expect(moveDpadFocus('up')).toBeNull();
   });
 
@@ -253,7 +268,7 @@ describe('moveDpadFocus', () => {
     const a = el('BUTTON', 0, 0);
     const b = el('BUTTON', 0, 50);
     allEls = [a, b];
-    install();
+    install(true);
     expect(moveDpadFocus('down')).not.toBeNull();
     expect(active).toBe(a);
   });
@@ -266,7 +281,7 @@ describe('moveDpadFocus', () => {
     const inside2 = el('BUTTON', 10, 60);
     const railButton = el('BUTTON', 900, 60);
     allEls = [dialog, inside1, inside2, railButton];
-    install();
+    install(true);
     inside1.focus();
 
     moveDpadFocus('down');
@@ -282,7 +297,7 @@ describe('moveDpadFocus', () => {
     const disabled = el('BUTTON', 0, 80, { disabled: true });
     const reachable = el('BUTTON', 0, 120);
     allEls = [a, hidden, disabled, reachable];
-    install();
+    install(true);
     a.focus();
     moveDpadFocus('down');
     expect(active).toBe(reachable);
@@ -296,7 +311,7 @@ describe('focusFirstInWindow', () => {
     const first = el('BUTTON', 10, 10);
     const second = el('BUTTON', 10, 60);
     allEls = [dialog, first, second];
-    install();
+    install(true);
 
     expect(focusFirstInWindow()).toBe(true);
     expect(active).toBe(first);
@@ -308,7 +323,7 @@ describe('focusFirstInWindow', () => {
     // Auto-focusing the document on any state change would yank focus around the
     // HUD instead of landing inside the thing that opened.
     allEls = [el('BUTTON', 0, 0)];
-    install();
+    install(true);
     expect(focusFirstInWindow()).toBe(false);
     expect(active).toBeNull();
   });
@@ -317,7 +332,7 @@ describe('focusFirstInWindow', () => {
     const dialog = el('DIV', 0, 0, { role: 'dialog' });
     dialog.rect = { left: 0, top: 0, right: 300, bottom: 300 };
     allEls = [dialog, el('DIV', 10, 10)];
-    install();
+    install(true);
     expect(focusFirstInWindow()).toBe(false);
   });
 });
@@ -422,14 +437,14 @@ describe('syncWindowFocus', () => {
     // selection stays behind in the dialogue and the player has to walk it over.
     const first = windowWith(0, 'a', 'b');
     allEls = [first.dlg, ...first.buttons];
-    install();
+    install(true);
     focusFirstInWindow();
     expect(active).toBe(first.buttons[0]);
 
     // the quest window mounts after it in document order, so it is on top
     const second = windowWith(400, 'x', 'y');
     allEls = [...allEls, second.dlg, ...second.buttons];
-    install();
+    install(true);
     expect(syncWindowFocus()).toBe(true);
     expect(active).toBe(second.buttons[0]);
   });
@@ -437,7 +452,7 @@ describe('syncWindowFocus', () => {
   it('leaves the selection alone while the same window stays on top', () => {
     const w = windowWith(0, 'a', 'b');
     allEls = [w.dlg, ...w.buttons];
-    install();
+    install(true);
     focusFirstInWindow();
     moveDpadFocus('down');
     expect(active).toBe(w.buttons[1]);
@@ -449,25 +464,35 @@ describe('syncWindowFocus', () => {
   it('recovers when the focused control is rebuilt away under the pad', () => {
     const w = windowWith(0, 'a', 'b');
     allEls = [w.dlg, ...w.buttons];
-    install();
+    install(true);
     focusFirstInWindow();
     // the window swaps its contents; the focused node is gone
     const rebuilt = el('BUTTON', 10, 10);
     allEls = [w.dlg, rebuilt];
-    install();
+    install(true);
     expect(syncWindowFocus()).toBe(true);
     expect(active).toBe(rebuilt);
   });
 });
 
 describe('pressDpadFocus', () => {
-  it('clicks whatever the d-pad focused', () => {
+  it('clicks only the control the pad marked', () => {
+    const a = el('BUTTON', 0, 0);
+    allEls = [a];
+    install();
+    moveDpadFocus('down');
+    expect(pressDpadFocus()).toBe(true);
+    expect(a.clicks).toBe(1);
+  });
+
+  it('refuses an otherwise reachable control focused by the keyboard', () => {
     const a = el('BUTTON', 0, 0);
     allEls = [a];
     install();
     a.focus();
-    expect(pressDpadFocus()).toBe(true);
-    expect(a.clicks).toBe(1);
+
+    expect(pressDpadFocus()).toBe(false);
+    expect(a.clicks).toBe(0);
   });
 
   it('refuses when nothing is focused, so A falls back to the cursor', () => {
@@ -558,6 +583,70 @@ describe('clearPadFocus', () => {
   });
 });
 
+describe('input-family handoff', () => {
+  it('clears pad ownership and visuals without blurring DOM focus', () => {
+    const btn = el('BUTTON', 10, 10);
+    let blurred = false;
+    (btn as unknown as { blur: () => void }).blur = () => {
+      blurred = true;
+    };
+    allEls = [btn];
+    install(true);
+    moveDpadFocus('down');
+
+    handoffPadFocus();
+
+    expect(hasPadFocus()).toBe(false);
+    expect(btn.classes.has('pad-focus')).toBe(false);
+    expect(padCursorClasses.has('pad-nav')).toBe(false);
+    expect(padCursorStyle.display).toBe('none');
+    expect(active).toBe(btn);
+    expect(blurred).toBe(false);
+  });
+});
+
+describe('cycleHudFocus', () => {
+  it('enters the launcher at the first visible enabled control in column A', () => {
+    const launcher = el('DIV', 800, 0, { id: 'side-buttons' });
+    launcher.rect = { left: 800, top: 0, right: 1000, bottom: 600 };
+    launcher.attrs = { 'data-pad-launcher-root': '' };
+    const columnA = el('DIV', 800, 0, { id: 'side-buttons-col-a' });
+    columnA.rect = { left: 800, top: 0, right: 890, bottom: 600 };
+    columnA.attrs = { 'data-pad-launcher-entry-column': '' };
+    const hidden = el('BUTTON', 810, 10, { visible: false });
+    hidden.attrs = { 'data-pad-launcher-entry': '' };
+    const character = el('BUTTON', 810, 50);
+    const columnB = el('DIV', 900, 0, { id: 'side-buttons-col-b' });
+    columnB.rect = { left: 900, top: 0, right: 990, bottom: 600 };
+    const rewards = el('BUTTON', 910, 10);
+    allEls = [launcher, columnA, hidden, character, columnB, rewards];
+    install(true);
+
+    expect(cycleHudFocus()).toBe(true);
+    expect(active).toBe(character);
+    expect(character.classes.has('pad-focus')).toBe(true);
+  });
+
+  it('cycles within the launcher after entry', () => {
+    const launcher = el('DIV', 800, 0, { id: 'side-buttons' });
+    launcher.rect = { left: 800, top: 0, right: 1000, bottom: 600 };
+    launcher.attrs = { 'data-pad-launcher-root': '' };
+    const columnA = el('DIV', 800, 0, { id: 'side-buttons-col-a' });
+    columnA.rect = { left: 800, top: 0, right: 890, bottom: 600 };
+    columnA.attrs = { 'data-pad-launcher-entry-column': '' };
+    const character = el('BUTTON', 810, 10);
+    character.attrs = { 'data-pad-launcher-entry': '' };
+    const spellbook = el('BUTTON', 810, 50);
+    allEls = [launcher, columnA, character, spellbook];
+    install(true);
+
+    cycleHudFocus();
+    cycleHudFocus();
+
+    expect(active).toBe(spellbook);
+  });
+});
+
 describe('landing focus on a surface', () => {
   it('skips the dismiss button', () => {
     // Landing on the close X is worse than landing nowhere: the quest dialog
@@ -570,7 +659,7 @@ describe('landing focus on a surface', () => {
     close.attrs = { 'data-close': '' };
     const accept = el('BUTTON', 20, 200);
     allEls = [dialog, close, accept];
-    install();
+    install(true);
 
     expect(focusFirstInWindow()).toBe(true);
     expect(active).toBe(accept);
@@ -583,7 +672,7 @@ describe('landing focus on a surface', () => {
     const close = el('BUTTON', 250, 4);
     close.attrs = { 'data-close': '' };
     allEls = [dialog, close];
-    install();
+    install(true);
     expect(focusFirstInWindow()).toBe(true);
     expect(active).toBe(close);
   });
@@ -597,7 +686,7 @@ describe('followDomFocus', () => {
     const a = el('BUTTON', 10, 10);
     const b = el('BUTTON', 10, 60);
     allEls = [a, b];
-    install();
+    install(true);
     moveDpadFocus('down');
     const marked = a.classes.has('pad-focus') ? a : b;
     const other = marked === a ? b : a;
@@ -623,5 +712,15 @@ describe('followDomFocus', () => {
     install();
     active = stray;
     expect(followDomFocus()).toBe(false);
+  });
+
+  it('does not turn ordinary keyboard focus into pad ownership', () => {
+    const only = el('BUTTON', 10, 10);
+    allEls = [only];
+    install(true);
+    only.focus();
+
+    expect(followDomFocus()).toBe(false);
+    expect(hasPadFocus()).toBe(false);
   });
 });

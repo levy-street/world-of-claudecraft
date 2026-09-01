@@ -155,8 +155,9 @@ describe('side rail height budget', () => {
   const DAILY_CHEST_BLOCK_PX = 128;
 
   function wrapperMarkup(html: string): string {
-    const start = html.indexOf('<div id="side-buttons">');
-    if (start < 0) return '';
+    const opening = /<div id="side-buttons"(?:\s[^>]*)?>/.exec(html);
+    if (!opening) return '';
+    const start = opening.index;
     let depth = 0;
     const token = /<div\b|<\/div>/g;
     token.lastIndex = start;

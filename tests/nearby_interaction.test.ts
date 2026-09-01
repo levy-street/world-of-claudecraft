@@ -1,7 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { tryNearbyInteraction } from '../src/game/nearby_interaction';
+import {
+  dispatchNearbyInteraction,
+  resolveNearbyInteraction,
+  tryNearbyInteraction,
+} from '../src/game/nearby_interaction';
 import { ITEMS } from '../src/sim/data';
-import type { Entity, GatherNodeDef, QuestProgress } from '../src/sim/types';
+import {
+  type Entity,
+  type GatherNodeDef,
+  INTERACT_RANGE,
+  type QuestProgress,
+} from '../src/sim/types';
 
 function entity(overrides: Partial<Entity> & Pick<Entity, 'id' | 'kind'>): Entity {
   return {
@@ -53,7 +62,7 @@ function rig(targets: Entity[] = [], nodes: GatherNodeDef[] = []) {
       calls.push('leave');
       return true;
     },
-    pickUpObject: (id: number) => {
+    pickUpObject: (id: number): boolean | Promise<boolean> => {
       calls.push(`pickup:${id}`);
       return true;
     },
@@ -91,6 +100,221 @@ function interact(r: ReturnType<typeof rig>) {
     'nothing',
   );
 }
+
+function resolve(r: ReturnType<typeof rig>, preferNpcId?: number | null) {
+  return resolveNearbyInteraction(r.world, r.nodes, null, true, preferNpcId);
+}
+
+describe('resolveNearbyInteraction', () => {
+  it.each([
+    ['dungeonEnter', 'dungeon_door', { dungeonId: 'crypt' }],
+    ['dungeonExit', 'dungeon_exit', {}],
+    ['mailbox', 'mailbox', {}],
+    ['objectPickup', 'ordinary_pickup', {}],
+  ] as const)('identifies the %s object action and entity anchor', (kind, templateId, extra) => {
+    const r = rig([entity({ id: 22, kind: 'object', templateId, lootable: true, ...extra })]);
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: kind,
+      eligible: true,
+      anchor: { kind: 'entity', entityId: 22 },
+      name: { kind: 'entity', entityKind: 'object', templateId },
+    });
+  });
+
+  it.each([
+    ['npc', 'elder_maren'],
+    ['delveBoard', 'brother_halven'],
+  ] as const)('identifies the %s NPC action', (kind, templateId) => {
+    const r = rig([entity({ id: 23, kind: 'npc', templateId })]);
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: kind,
+      anchor: { kind: 'entity', entityId: 23 },
+      name: { entityKind: 'npc', templateId },
+    });
+  });
+
+  it('identifies the spirit-healer action only for a ghost', () => {
+    const r = rig([entity({ id: 24, kind: 'npc', templateId: 'spirit_healer' })]);
+    r.player.dead = true;
+    r.player.ghost = true;
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: 'spiritHealer',
+      anchor: { kind: 'entity', entityId: 24 },
+    });
+  });
+
+  it('carries the exact corpse halves that dispatch consumes', () => {
+    const r = rig([
+      entity({
+        id: 25,
+        kind: 'mob',
+        templateId: 'forest_wolf',
+        dead: true,
+        lootable: true,
+        loot: { copper: 2, items: [] },
+      }),
+    ]);
+    const candidate = resolve(r);
+
+    expect(candidate).toMatchObject({
+      interactionKind: 'corpse',
+      harvestable: true,
+      hasLoot: true,
+      anchor: { kind: 'entity', entityId: 25 },
+    });
+    expect(
+      dispatchNearbyInteraction(candidate, r.world, r.hud, {
+        tooFar: 'too far',
+        notReady: 'not ready',
+        escortAway: 'escort away',
+        nothing: 'nothing',
+      }),
+    ).toBe(true);
+    expect(r.calls).toEqual(['harvestCorpse:25', 'loot:25']);
+  });
+
+  it('identifies delve objects ahead of ordinary objects', () => {
+    const r = rig([
+      entity({ id: 26, kind: 'object', templateId: 'ordinary', lootable: true }),
+      entity({ id: 27, kind: 'object', templateId: 'delve_locked_chest' }),
+    ]);
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: 'delve',
+      anchor: { kind: 'entity', entityId: 27 },
+    });
+  });
+
+  it('uses the visible quest pickup item id as its localization discriminator', () => {
+    const questId = ITEMS.supply_crate.questId;
+    if (!questId) throw new Error('expected supply_crate quest');
+    const r = rig([
+      entity({
+        id: 28,
+        kind: 'object',
+        templateId: 'ground_supply_crate',
+        objectItemId: 'supply_crate',
+        lootable: true,
+      }),
+    ]);
+    r.world.questLog.set(questId, { questId, counts: [0], state: 'active' });
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: 'objectPickup',
+      name: { objectItemId: 'supply_crate' },
+    });
+  });
+
+  it.each([
+    ['ore', 'ore_1'],
+    ['herb', 'herb_1'],
+    ['wood', 'wood_1'],
+  ] as const)('identifies an eligible %s node by stable string identity', (type, id) => {
+    const r = rig([], [{ id, zoneId: 'zone', type, tier: 1, level: 1, pos: { x: 1, z: 0 } }]);
+
+    expect(resolve(r)).toMatchObject({
+      interactionKind: 'gather',
+      eligible: true,
+      verdict: 'harvest',
+      anchor: { kind: 'gatherNode', nodeId: id },
+      name: { kind: 'gatherNode', nodeType: type, nodeTier: 1 },
+    });
+  });
+
+  it('exposes blocked node eligibility without changing which node won', () => {
+    const node = {
+      id: 'ore_locked',
+      zoneId: 'zone',
+      type: 'ore',
+      tier: 2,
+      level: 10,
+      pos: { x: 1, z: 0 },
+    } as const;
+    const r = rig([], [node]);
+    const candidate = resolveNearbyInteraction(
+      r.world,
+      [node],
+      () => ({ nodeTier: 2, viewerToolTier: 1, unmetText: 'locked' }),
+      true,
+    );
+
+    expect(candidate).toMatchObject({
+      interactionKind: 'gather',
+      eligible: false,
+      verdict: 'tool_tier',
+      anchor: { kind: 'gatherNode', nodeId: 'ore_locked' },
+    });
+  });
+
+  it('returns null when no interaction arm is eligible', () => {
+    expect(resolve(rig())).toBeNull();
+  });
+
+  it.each([
+    ['corpse', INTERACT_RANGE - 0.001, INTERACT_RANGE],
+    ['objectPickup', INTERACT_RANGE - 0.001, INTERACT_RANGE],
+    ['gather', INTERACT_RANGE - 0.001, INTERACT_RANGE],
+    ['delve', INTERACT_RANGE + 0.999, INTERACT_RANGE + 1],
+    ['npc', INTERACT_RANGE + 0.999, INTERACT_RANGE + 1],
+  ] as const)(
+    'preserves the strict %s scan boundary',
+    (kind, acceptedDistance, rejectedDistance) => {
+      const at = (distance: number) => {
+        if (kind === 'corpse') {
+          return rig([
+            entity({
+              id: 30,
+              kind: 'mob',
+              dead: true,
+              lootable: true,
+              loot: { copper: 1, items: [] },
+              pos: { x: distance, y: 0, z: 0 },
+            }),
+          ]);
+        }
+        if (kind === 'objectPickup') {
+          return rig([
+            entity({
+              id: 30,
+              kind: 'object',
+              lootable: true,
+              pos: { x: distance, y: 0, z: 0 },
+            }),
+          ]);
+        }
+        if (kind === 'gather') {
+          return rig(
+            [],
+            [
+              {
+                id: 'boundary_node',
+                zoneId: 'zone',
+                type: 'ore',
+                tier: 1,
+                level: 1,
+                pos: { x: distance, z: 0 },
+              },
+            ],
+          );
+        }
+        return rig([
+          entity({
+            id: 30,
+            kind: kind === 'npc' ? 'npc' : 'object',
+            templateId: kind === 'npc' ? 'elder_maren' : 'delve_chest',
+            pos: { x: distance, y: 0, z: 0 },
+          }),
+        ]);
+      };
+
+      expect(resolve(at(acceptedDistance))).toMatchObject({ interactionKind: kind });
+      expect(resolve(at(rejectedDistance))).toBeNull();
+    },
+  );
+});
 
 describe('tryNearbyInteraction', () => {
   it('dispatches the nearest visible corpse loot', () => {
@@ -369,7 +593,7 @@ describe('tryNearbyInteraction', () => {
   it('returns a rejected authoritative pickup result', async () => {
     const target = entity({ id: 2, kind: 'object', lootable: true });
     const r = rig([target]);
-    (r.world as any).pickUpObject = async (id: number) => {
+    r.world.pickUpObject = async (id: number) => {
       r.calls.push(`pickup:${id}`);
       return false;
     };

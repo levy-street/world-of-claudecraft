@@ -47,8 +47,10 @@ import {
   fallingEdges,
   GAMEPAD_CANCEL,
   GAMEPAD_CONFIRM,
+  GAMEPAD_CYCLE_HUD,
   GAMEPAD_CYCLE_SET,
   GAMEPAD_NONE,
+  GAMEPAD_SUBCOMMANDS,
   GAMEPAD_ZOOM_IN,
   GAMEPAD_ZOOM_OUT,
   GAMEPAD_ZOOM_STEP,
@@ -62,7 +64,7 @@ import {
   TRIGGER_THRESHOLD,
 } from './gamepad_map';
 import type { Input } from './input';
-import { markPadActivity } from './input_hint_mode';
+import { clearPadActivity, currentInputHintMode, markPadActivity } from './input_hint_mode';
 import { focusedPadAction } from './pad_focus_action';
 import { clickPadMouse, hidePadMouse, updatePadMouse } from './pad_mouse_cursor';
 
@@ -240,6 +242,7 @@ export class GamepadManager {
     this.releaseCrossHotbar();
     this.exitNavMode();
     this.mouseMode = false;
+    clearPadActivity();
     hidePadMouse();
   }
 
@@ -346,6 +349,18 @@ export class GamepadManager {
     return crossHotbarActiveSet(this.triggerState);
   }
 
+  isVirtualMouseMode(): boolean {
+    return this.mouseMode;
+  }
+
+  isCrossHotbarHolding(): boolean {
+    return this.triggerState.hold !== null;
+  }
+
+  isCrossHotbarEditing(): boolean {
+    return this.edit.active;
+  }
+
   // Latch a pad as the active one and classify its brand from the id string.
   private acquire(pad: Gamepad): void {
     this.index = pad.index;
@@ -373,6 +388,9 @@ export class GamepadManager {
       this.placementActive = false;
       this.releaseCrossHotbarEdit();
       this.releaseCrossHotbar();
+      this.mouseMode = false;
+      clearPadActivity();
+      hidePadMouse();
       this.cb.onConnectionChange?.();
     }
   }
@@ -448,6 +466,13 @@ export class GamepadManager {
       return;
     }
 
+    const padOwnedBeforePoll = currentInputHintMode() === 'pad';
+    const padActiveThisFrame =
+      cur.some(Boolean) ||
+      Math.hypot(pad.axes[AXIS.LEFT_X] ?? 0, pad.axes[AXIS.LEFT_Y] ?? 0) > this.deadzone ||
+      Math.hypot(pad.axes[AXIS.RIGHT_X] ?? 0, pad.axes[AXIS.RIGHT_Y] ?? 0) > this.deadzone;
+    if (padActiveThisFrame) markPadActivity();
+
     this.retryCrossHotbarSeed(dt);
 
     this.checkRumble();
@@ -471,8 +496,6 @@ export class GamepadManager {
 
       this.updateCrossHotbarTriggers(cur);
 
-      const padActiveThisFrame = cur.some(Boolean) || stick.x !== 0 || stick.y !== 0 || look.active;
-      if (padActiveThisFrame) markPadActivity();
       let acted = stick.x !== 0 || stick.y !== 0 || look.active;
       for (const idx of risingEdges(this.prevPressed, cur)) {
         acted = true;
@@ -562,13 +585,14 @@ export class GamepadManager {
       return;
     }
 
-    // A window just opened while a pad is driving: put focus on its first control
-    // so the player is already inside it. This runs only from the pad's own poll
-    // with a live pad, so a keyboard-and-mouse session never reaches it.
+    // A window just opened while a pad already owns the interface: put focus on
+    // its first control so the player is already inside it. The prior ownership
+    // check keeps an idle connected pad from claiming a mouse-opened window.
     const pointerMode = this.cb.isPointerMode();
     // Not while arranging: the spellbook opens BECAUSE the player asked for
     // something to put on a cell, and yanking focus into it loses the cell.
-    if (pointerMode && !this.prevPointerMode && !this.edit.active) focusFirstInWindow();
+    if (pointerMode && !this.prevPointerMode && !this.edit.active && padOwnedBeforePoll)
+      focusFirstInWindow();
     // The window closed: put the selection back where the player opened it from,
     // or drop the highlight and the pointer when there is nothing to go back to,
     // rather than leaving them over a surface that is no longer there.
@@ -638,11 +662,6 @@ export class GamepadManager {
     // Establish the last-used input family before a death action may claim
     // focus. This lets the same first A press both reveal its pad selection and
     // activate it, while an idle connected controller cannot steal chat focus.
-    const padActiveThisFrame =
-      cur.some(Boolean) ||
-      Math.max(Math.abs(lx), Math.abs(ly), Math.abs(rx), Math.abs(ry)) > this.deadzone;
-    if (padActiveThisFrame) markPadActivity();
-
     // Moving is playing, not pointing. Drop the pad selection the moment the stick
     // does anything, so a reflexive confirm does what the player expects instead of
     // activating whatever the cursor happened to be resting on. Only outside pointer
@@ -963,15 +982,23 @@ export class GamepadManager {
       // opens its window over the dialogue), so look again next poll.
       this.resyncFocus = true;
       this.cb.onInputEdge();
+      const action = this.bindings.actionFor(idx);
+      if (action === GAMEPAD_CONFIRM) {
+        pressDpadFocus();
+        continue;
+      }
+      if (
+        action === GAMEPAD_CANCEL ||
+        action === GAMEPAD_CYCLE_HUD ||
+        action === GAMEPAD_SUBCOMMANDS ||
+        action === 'escape'
+      ) {
+        this.cb.onAction(action);
+        continue;
+      }
       const dir = DPAD_NAV_DIRECTIONS[idx];
       if (dir !== undefined) {
         moveDpadFocus(dir);
-        continue;
-      }
-      if (this.bindings.actionFor(idx) === GAMEPAD_CONFIRM) {
-        pressDpadFocus();
-      } else if (idx === GP.B || idx === GP.START) {
-        this.cb.onAction('escape');
       }
     }
     return acted;

@@ -559,9 +559,13 @@
     <div id="emote-editor" class="window panel"></div>
     <div id="social-window" class="window panel"></div>
     <div id="report-window" class="window panel"></div>
-    <div id="side-buttons">
-      <div id="side-buttons-col-a" class="side-buttons-col">
-        <button type="button" class="micro-btn" id="mm-char" data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
+    <div id="side-buttons" data-pad-launcher-root>
+      <div id="side-buttons-cycle-hint" class="launcher-cycle-hint" hidden>
+        <span class="launcher-cycle-hint-key tut-keycap"></span>
+        <span class="launcher-cycle-hint-label" data-i18n="hudChrome.controller.cycleHudAction">Cycle Interface</span>
+      </div>
+      <div id="side-buttons-col-a" class="side-buttons-col" data-pad-launcher-entry-column>
+        <button type="button" class="micro-btn" id="mm-char" data-pad-launcher-entry data-i18n-title="hud.keybinds.actions.char" data-i18n-aria="hud.keybinds.actions.char" title="Character" aria-label="Character" data-icon="character"><span class="keybind">c</span></button>
         <button type="button" class="micro-btn" id="mm-spell" data-i18n-title="abilityUi.spellbook.title" data-i18n-aria="abilityUi.spellbook.title" title="Spellbook" aria-label="Spellbook" data-icon="spellbook"><span class="keybind">p</span></button>
         <button type="button" class="micro-btn" id="mm-talents" data-i18n-title="game.talents.title" data-i18n-aria="game.talents.title" title="Talents" aria-label="Talents" data-icon="talents"><span class="keybind">n</span></button>
         <button type="button" class="micro-btn" id="mm-town-focus" style="display:none" data-i18n-title="hudChrome.townFocus.title" data-i18n-aria="hudChrome.townFocus.title" title="Town Focus" aria-label="Town Focus" data-icon="map"></button>

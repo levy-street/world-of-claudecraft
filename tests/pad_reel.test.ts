@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { BIND_ACTIONS } from '../src/game/keybinds';
-import { padReelItemId } from '../src/game/pad_reel';
+import { padReelItemId, padReelPromptItemId, reducePadReelLifecycle } from '../src/game/pad_reel';
 import { ITEMS } from '../src/sim/data';
 import { FISHING_CAST_ID, GATHER_CAST_ID } from '../src/sim/types';
 
@@ -61,12 +61,9 @@ describe('padReelItemId', () => {
       /^\s*\/\/.*$/gm,
       '',
     );
-    // The braced form is unique to the pad dispatch (the keyboard Input
-    // callbacks carry their own unbraced interact/bags pair earlier), so the
-    // bags terminator must be searched FROM the pad case.
-    const start = mainTs.indexOf("case 'interact': {");
+    const start = mainTs.indexOf('interact: () => {');
     expect(start).toBeGreaterThan(-1);
-    const end = mainTs.indexOf("case 'bags':", start);
+    const end = mainTs.indexOf('openTargetSubcommands,', start);
     expect(end).toBeGreaterThan(start);
     const interactCase = mainTs.slice(start, end);
     expect(interactCase).toContain(
@@ -81,6 +78,32 @@ describe('padReelItemId', () => {
   });
 });
 
+describe('pad reel prompt lifecycle', () => {
+  const pole = [{ itemId: 'simple_fishing_pole', count: 1 }];
+
+  it('waits through the cast and becomes eligible only on the personal bite signal', () => {
+    const waiting = reducePadReelLifecycle('idle', FISHING_CAST_ID, []);
+    expect(waiting).toBe('waiting');
+    expect(padReelPromptItemId(waiting, FISHING_CAST_ID, pole)).toBeNull();
+
+    const bite = reducePadReelLifecycle(waiting, FISHING_CAST_ID, [{ type: 'fishingBite' }]);
+    expect(bite).toBe('bite');
+    expect(padReelPromptItemId(bite, FISHING_CAST_ID, pole)).toBe('simple_fishing_pole');
+  });
+
+  it.each(['fishingResult', 'fishingGotAway', 'fishingEarlyReel', 'fishingEmptyHook'] as const)(
+    'clears a bite on %s',
+    (type) => {
+      expect(reducePadReelLifecycle('bite', FISHING_CAST_ID, [{ type }])).toBe('idle');
+    },
+  );
+
+  it('clears stale bite state as soon as the fishing cast ends', () => {
+    expect(reducePadReelLifecycle('bite', null, [])).toBe('idle');
+    expect(padReelPromptItemId('bite', null, pole)).toBeNull();
+  });
+});
+
 // The offered-but-dropped guard: the controller panel offers EVERY edge
 // keybind action plus its own explicit escape row (options_window.ts
 // gamepadActionOptions), so every one of them must have a dispatch arm, or
@@ -88,16 +111,13 @@ describe('padReelItemId', () => {
 // dungeon finder, sheathe, and three pet edges dead on the pad).
 describe('gamepad dispatch covers every action the controller panel offers', () => {
   const strip = (src: string): string => src.replace(/^\s*\/\/.*$/gm, '');
-  const mainTs = strip(readFileSync(join(__dirname, '../src/main.ts'), 'utf8'));
+  const dispatchTs = strip(
+    readFileSync(join(__dirname, '../src/game/gamepad_action_dispatcher.ts'), 'utf8'),
+  );
   const dispatchBody = (): string => {
-    const start = mainTs.indexOf('function dispatchGamepadAction');
+    const start = dispatchTs.indexOf('export function createGamepadActionDispatcher');
     expect(start).toBeGreaterThan(-1);
-    const end = mainTs.indexOf('const gamepad = new GamepadManager', start);
-    // The end anchor must resolve AFTER the start (the phase 14 QA: an
-    // unasserted -1 would slice to the end of the file and every arm would
-    // pass vacuously).
-    expect(end).toBeGreaterThan(start);
-    return mainTs.slice(start, end);
+    return dispatchTs.slice(start);
   };
 
   it('every offered edge action id has a case in dispatchGamepadAction', () => {
@@ -134,7 +154,9 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     // never checks it; pin the offer and the dispatch arm directly.
     expect(panel).toContain("{ value: 'escape', label: t('hudChrome.controller.menuAction') }");
     expect(body).toContain("if (id === 'escape') {");
-    expect(body).toContain('if (!hud.closeAll()) hud.toggleOptionsMenu();');
+    expect(body).toContain(
+      'if (!hud.cancelGroundAim() && !hud.closeAll()) hud.toggleOptionsMenu();',
+    );
   });
 
   it('the eight rewired actions dispatch to their exact keyboard handlers', () => {
@@ -163,7 +185,10 @@ describe('gamepad dispatch covers every action the controller panel offers', () 
     expect(sheathe).toContain('const wasStowed = world.player.weaponStowed;');
     expect(sheathe).toContain('world.toggleWeaponStow();');
     expect(sheathe).toContain('if (world.player.weaponStowed !== wasStowed) {');
-    expect(sheathe).toContain('audio.weaponSheathe();');
-    expect(sheathe).toContain('audio.weaponUnsheathe();');
+    expect(sheathe).toContain('deps.weaponSheathe();');
+    expect(sheathe).toContain('deps.weaponUnsheathe();');
+    const mainTs = strip(readFileSync(join(__dirname, '../src/main.ts'), 'utf8'));
+    expect(mainTs).toContain('weaponSheathe: () => audio.weaponSheathe(),');
+    expect(mainTs).toContain('weaponUnsheathe: () => audio.weaponUnsheathe(),');
   });
 });

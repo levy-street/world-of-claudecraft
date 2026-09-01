@@ -351,7 +351,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Lowered after the nameplate prompt source and cadence state moved to
+    // nameplate_update_core.ts. Exact count.
+    ceiling: 13241,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -767,7 +769,9 @@ const MONOLITHS: MonolithRow[] = [
     // (+70, one line under the old pin on its own tree) and this branch's
     // pledge nameplate line (+13) compound in the merged file. Exact count,
     // zero slack.
-    ceiling: 864,
+    // Lowered after extracting shared canvas geometry and controller prompt
+    // drawing into controller_world_prompt_canvas.ts. Exact count.
+    ceiling: 853,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

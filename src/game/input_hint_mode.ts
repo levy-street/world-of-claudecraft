@@ -10,9 +10,9 @@
 //
 // This module is that signal. GamepadManager.poll marks activity whenever the
 // pad actually produces input (a button down or a stick past the deadzone);
-// the first mark lazily installs window listeners that clear the flag the
-// moment a key or mouse button is pressed, so the hint mode always tracks the
-// device the player touched last. Touch wins outright: the mobile interface
+// the first mark lazily installs window listeners that clear the flag on trusted
+// keyboard, mouse, pointer, or touch activity, so hint mode tracks the device
+// the player touched last. Touch wins outright: the mobile interface
 // replaces the control scheme entirely, while a pad merely coexists with the
 // keyboard.
 //
@@ -35,17 +35,25 @@ const hasDom = (): boolean =>
   typeof document.body.classList.contains === 'function';
 
 let clearsInstalled = false;
+const inputHandoffListeners = new Set<() => void>();
 
-function clearPadActivity(): void {
-  if (hasDom()) document.body.classList.remove(PAD_ACTIVE_CLASS);
+function clearPadActivityOnInput(event: Event): void {
+  if (!event.isTrusted || !hasDom() || !document.body.classList.contains(PAD_ACTIVE_CLASS)) return;
+  clearPadActivity();
 }
 
-function clearPadActivityOnMouseMove(event: MouseEvent): void {
-  // A 1000 Hz mouse fires this per event forever once a pad was seen; skip the
-  // classList write unless there is actually a mark to clear.
-  if (!event.isTrusted) return;
+export function clearPadActivity(): void {
   if (!hasDom() || !document.body.classList.contains(PAD_ACTIVE_CLASS)) return;
-  clearPadActivity();
+  document.body.classList.remove(PAD_ACTIVE_CLASS);
+  for (const listener of inputHandoffListeners) listener();
+}
+
+/** Subscribe controller-owned UI state to trusted keyboard, pointer, mouse, and
+ * touch handoff. The DOM listener stays centralized so every consumer agrees on
+ * which input family owns the interface. */
+export function registerInputHandoff(listener: () => void): () => void {
+  inputHandoffListeners.add(listener);
+  return () => inputHandoffListeners.delete(listener);
 }
 
 /** Called by GamepadManager.poll whenever the pad produced real input this
@@ -54,9 +62,12 @@ export function markPadActivity(): void {
   if (!hasDom()) return;
   if (!clearsInstalled) {
     clearsInstalled = true;
-    window.addEventListener('keydown', clearPadActivity);
-    window.addEventListener('mousedown', clearPadActivity);
-    window.addEventListener('mousemove', clearPadActivityOnMouseMove, { passive: true });
+    window.addEventListener('keydown', clearPadActivityOnInput);
+    window.addEventListener('mousedown', clearPadActivityOnInput);
+    window.addEventListener('mousemove', clearPadActivityOnInput, { passive: true });
+    window.addEventListener('pointerdown', clearPadActivityOnInput, { passive: true });
+    window.addEventListener('pointermove', clearPadActivityOnInput, { passive: true });
+    window.addEventListener('touchstart', clearPadActivityOnInput, { passive: true });
   }
   document.body.classList.add(PAD_ACTIVE_CLASS);
 }

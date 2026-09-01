@@ -10,6 +10,49 @@
 import { ITEMS } from '../sim/data';
 import { FISHING_CAST_ID, type InvSlot } from '../sim/types';
 
+export type PadReelLifecycle = 'idle' | 'waiting' | 'bite';
+
+export type PadReelLifecycleEvent = {
+  type:
+    | 'fishingBite'
+    | 'fishingResult'
+    | 'fishingGotAway'
+    | 'fishingEarlyReel'
+    | 'fishingEmptyHook';
+};
+
+const TERMINAL_FISHING_EVENTS = new Set<PadReelLifecycleEvent['type']>([
+  'fishingResult',
+  'fishingGotAway',
+  'fishingEarlyReel',
+  'fishingEmptyHook',
+]);
+
+/** Fold the personal bite event into prompt state without inferring it from the hidden timer. */
+export function reducePadReelLifecycle(
+  current: PadReelLifecycle,
+  castingAbility: string | null,
+  events: readonly PadReelLifecycleEvent[],
+): PadReelLifecycle {
+  if (castingAbility !== FISHING_CAST_ID) return 'idle';
+  let next: PadReelLifecycle = current === 'idle' ? 'waiting' : current;
+  for (const event of events) {
+    if (event.type === 'fishingBite') next = 'bite';
+    else if (TERMINAL_FISHING_EVENTS.has(event.type)) next = 'idle';
+  }
+  return next;
+}
+
+function fishingImplementId(inventory: readonly InvSlot[]): string | null {
+  for (const slot of inventory) {
+    const use = ITEMS[slot.itemId]?.use;
+    if (use === undefined) continue;
+    if (use.type === 'fishing') return slot.itemId;
+    if (use.type === 'gatherTool' && use.professionId === 'fishing') return slot.itemId;
+  }
+  return null;
+}
+
 /**
  * The rod item id an interact press should re-use to answer the bite, or
  * null when the press is a plain interact: no live fishing cast, or no
@@ -24,11 +67,15 @@ export function padReelItemId(
   inventory: readonly InvSlot[],
 ): string | null {
   if (castingAbility !== FISHING_CAST_ID) return null;
-  for (const slot of inventory) {
-    const use = ITEMS[slot.itemId]?.use;
-    if (use === undefined) continue;
-    if (use.type === 'fishing') return slot.itemId;
-    if (use.type === 'gatherTool' && use.professionId === 'fishing') return slot.itemId;
-  }
-  return null;
+  return fishingImplementId(inventory);
+}
+
+/** A truthful reel prompt appears only after the personal bite event opens the window. */
+export function padReelPromptItemId(
+  lifecycle: PadReelLifecycle,
+  castingAbility: string | null,
+  inventory: readonly InvSlot[],
+): string | null {
+  if (lifecycle !== 'bite' || castingAbility !== FISHING_CAST_ID) return null;
+  return fishingImplementId(inventory);
 }
