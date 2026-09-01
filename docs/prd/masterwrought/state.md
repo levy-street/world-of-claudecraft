@@ -25755,3 +25755,161 @@ stale, or in this case a red whose cause looks like source and is not.
 - One environment trap paid for on the way, recorded above: a sync that changes
   a PATCHED dependency's patch needs pnpm install BEFORE the gate, or a suite
   reads a library the tree no longer describes.
+
+## Phase 19A ledger (2026-09-01, the content wave of the rulings gate)
+
+STATUS: **COMPLETE, 17 of 18 units executed, 1 ESCALATED.** One commit per unit,
+every ruling written where its open record actually stands rather than into the
+decision table, following the qr-19 pattern the 68-ruling commit set.
+
+### What moved, stated as narrowly as it is true
+The wave is COMMENT-AND-LEDGER ONLY, and that is proven rather than asserted:
+stripping comment and blank lines from the whole diff over `src/` and `scripts/`
+leaves ZERO changed executable lines. Over `tests/`, exactly five lines moved:
+one new const, one assertion tightened, and three prose strings (a describe
+name, a case name, an assertion label). No numeric pin moved anywhere in the
+wave. So no wiki regen, no i18n key, no M16 fill, no deed record, no Reliquary
+page, no art park, no census row, no parity golden and no monolith ceiling was
+owed, and none was taken.
+
+### The one real pin, and its proof
+`tests/farm_recipes.test.ts` asserted `growth_tonic` sellValue only
+`toBeGreaterThan(0)`, so every value from 1 to 19 passed silently under the
+strict input bound: the one number D158 ratifies was the only number in the row
+nothing pinned. It now reads `toBe(TONIC_EXPECTED_SELL_VALUE)` with the const at
+6. MUTATION-PROVED: setting the def to 7 reds it with `expected 7 to be 6`
+(1 failed / 40 passed), the mutant was reverted to 41 passed, and the file was
+grepped clean of any probe marker. The old arm would have stayed green at 7.
+
+### The escalation, and why it is one
+D009+D170 is NOT executed. Its direction is confirmed against the tree and is
+right, but TWO premises are falsified, so under this phase's own rule it is an
+escalation rather than an execution.
+1. The unit states "no parity golden". `src/sim/loot/loot_roll.ts` draws one
+   `ctx.rng.chance` per plain loot entry and `tests/parity` pins draw ORDER and
+   per-frame draw COUNT, so any new loot row on a mob a recorded scenario kills
+   forks the stream. Measured: 25 of the 81 goldens name `forest_wolf`, 2 name
+   `wild_boar`, 0 name `shore_scuttler`. A reviewed `UPDATE_PARITY=1` re-record
+   commit is in the real price.
+2. The stated 13-to-16 reach is not deliverable on existing templates. Neither
+   starter zone has an antlered or a feathered creature, so the antler and the
+   down have no flavour-true carrier and the honest reach is 13-to-14, which
+   still closes D009's affordance gap because the deed arm is a
+   `toBeLessThanOrEqual`.
+The record carries three priced shapes. What the maintainer owes is the carrier
+assignment and whether sixteen is wanted at all. The drop CHANCES are not owed:
+0.35 ordinary, 0.5 tougher, 1 named derives from the two shipped zone-3 gray
+drops.
+
+### Sixteen corrections to the wave's own instructions
+The phase file's per-unit instructions were verified against the tree before any
+byte moved, and a verification fan-out found them wrong in sixteen places. Every
+one is amended IN PLACE rather than rewritten:
+- **All six handoff-row anchors** were transcribed with their markdown table
+  pipes flattened to spaces, so `grep -cF` returned 0, not 1. A verbatim executor
+  would have silently no-opped every status-cell flip. The pipe forms are used
+  instead.
+- **Four insertion anchors ended mid-sentence**, which would have split a
+  sentence or orphaned list items; D010's would have divorced its ruling from its
+  own numbered block. Each was moved to the true clause or sentence boundary.
+- **D002** cited the ruling it rests on 59 lines off, labelled the paragraph
+  "Phase 15c" when that label appears nowhere in the ledger, and priced the
+  contingent arm against three test files that carry no such pin.
+- **D010** attributed `prog_legendmaker` to the release when it is the packet's
+  own Phase 13 row, and its stale figures read 44 and 8 against a live 81 and 20.
+- **D048's** live-code cite pointed at a `sim.ts` call site that no longer exists
+  (the gate was extracted).
+- **D053's** status-cell string occurs twice, on exactly the two rows in play, so
+  a global replace would have corrupted one.
+- **D157's** stated warrant, a "D039 teardown-citations family", does not exist:
+  D039 is an open row recommending its own deferral.
+- **D159** claimed the eight plain dishes' `wellFed` fields stay untouched; they
+  carry no `wellFed` field at all, which strengthens rather than weakens the
+  not-owed conclusion.
+- **D160's** closing clause named two hoe-only twins where live code carries
+  three, and the shipped pins already knew.
+- **D163's** blast radius was understated at six `requiredItems` quests against a
+  measured nine.
+- **D008+D089** omitted the file holding the canonical acceptance text it exists
+  to amend, and that file still carried the retired farming-50-and-nothing-else
+  claim the wiki was corrected for.
+- **D123's** file list omitted the recipes.ts header that is the actual record.
+
+### Reviews
+Four domain reviewers were dispatched FRESH (never the implementer): content
+obligations, test coverage and pin quality, sim determinism and the SimContext
+seam, and three-host parity. The parity review returned zero critical and zero
+warnings, verified the flask wire route and the escalation's golden counts
+exactly, and raised five precision nits, ALL APPLIED: the flask ruling had
+attributed the dead read to the encoder rather than its caller, generalized the
+stable v3 wire's rem/exp split to "the wire" when the legacy encoder sends a
+remaining unconditionally, implied the named snapshot pin exercises a flask when
+it pins the mechanism on a plain retained aura, overstated the rng-fork argument
+as fact when it follows from the obvious implementation rather than every
+possible one, and read a golden denominator of 83 against a measured 81. The
+review's one NOT VERIFIED item was closed here rather than left: the online
+client's `acceptQuest` is a bare pass-through with no bag-full gate, so D163's
+both-hosts claim holds on the client half too.
+
+### Validation
+- `npx tsc --noEmit`: **EXIT 0**.
+- The guards green at the tip: architecture, monolith budget, world_api parity,
+  the S3 i18n guard, guide freshness, deeds content, reliquary content and
+  shipped item ids (850 passed / 3 skipped).
+- `node scripts/merge_audit/symbol_census.mjs`: **RESULT PASS, EXIT 0**, zero
+  unexplained in every class. Run without a pipe, so the exit code is real.
+- `npm run ci:changed` after the last commit: **EXIT 0**, zero errors and zero
+  format diffs (warnings only, which the repo does not gate on).
+- The pg arm was PROVEN before the gate rather than assumed: the same suite
+  skips 2 with the database vars unset and passes 2 with
+  `TEST_DATABASE_URL` set, so a wrong URL cannot have shown a false green.
+- `node scripts/gate_select.mjs` on the COMMITTED tree at ac606bcbc9, pg-armed:
+  **EXIT 0**, porcelain clean before and after, 13 minutes. Its planner fell
+  back to the full suite, correctly (the change set spans a release span), and
+  the full-suite reading is **3667 passed / 1 skipped (3668 files), 54435
+  passed / 11 expected fail / 28 skipped (54474)**.
+- **DRIFT versus the Phase 18 QA gate reading: ZERO, on every figure.** That
+  stamp read 3667 / 1 (3668) and 54435 / 11 / 28 (54474), and this one is
+  byte-identical to it. That is the right answer rather than a lucky one: a
+  wave that adds no test file and no test case cannot move a suite count, and
+  this wave's only test-side change at that point was ONE assertion tightened
+  in place. The nine R5 escalation pins stay at 11 expected fail, untouched
+  and never re-tuned.
+- The FIX ROUND then added five new arms (commit 133f19560f), so the counts
+  move at the next run BY CONSTRUCTION: six new cases across five files. That
+  is a deliberate, attributable delta, not drift, and it is the first thing to
+  re-measure if a later stamp is compared against this one.
+
+### The fix round, and what it says about the wave
+Four fresh domain reviewers returned ZERO blocking and ZERO critical findings.
+They returned TEN defects, and the honest reading is that most were introduced
+by the ruling prose itself rather than inherited: five were claims a ruling
+newly RELIED on that no test measured, which is exactly the
+guard-comment-is-an-unmeasured-claim trap this packet already has on its books.
+All ten are applied in 133f19560f, each of the five new arms mutation-proved
+with the mutant reverted and the tree grepped clean of probe markers.
+
+Two of them are worth carrying forward as lessons rather than line items:
+1. **A new arm caught its own author.** The refused-candidate pin was first
+   written to assert that `dune_troll` carries NO specimen-less family. It
+   carries `fang`. The refusal was never about carrying none, it was about a
+   SECOND family landing beside the first, which is what the pre-gate premise
+   actually guards. The arm was wrong on its first draft and the run said so.
+2. **A pin sited inside a sibling arm is not a pin.** The three-member
+   hoe-only set was first asserted after two existing assertions in the same
+   `it()`, so any content change that could break it broke one of those first
+   and the new line was unreachable. It now has its own case, and the mutation
+   proof shows it failing alone with every sibling skipped.
+
+### JUDGED, and not re-raised
+- The reviewers' precision nits on the flask ruling (encoder attribution, the
+  legacy-wire generalization, the pin exercising a plain retained aura rather
+  than a flask, the rng-fork argument stated too strongly) are all APPLIED, not
+  refused. The conclusion they qualify, escalate rather than carve out, is
+  unchanged by any of them.
+- The buff-dish tier 3/4 proposal banner is DELIBERATELY still open: it is
+  11c-D-2 surface, outside qr-19-dish-curve-point-assignments, and now says so
+  in place rather than reading as an instance the ruling missed.
+- The 27 `FLAGGED FOR THE MAINTAINER` banners tree-wide are NOT swept here.
+  This wave retires only the ones its own rulings falsify. Sweeping the rest is
+  a maintainer call and D039's class, not this wave's to take.
