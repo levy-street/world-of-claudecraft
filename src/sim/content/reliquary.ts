@@ -1403,12 +1403,17 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       // shelf, which catalogues three crafted rods; what actually decides it is
       // that arcanite_mining_pick, elderwood_axe and sunpetal_sickle carry no
       // relic row either, so the pick, axe, sickle and hoe are consistent and
-      // only the ROD family is catalogued. Known residual, recorded rather
-      // than left implicit: the reliquary is now the one surface where the
-      // completed tier-5 tool family reads asymmetric, one of five. Authoring
-      // a hoe page later also means growing the DOC_RELICS pin in
+      // only the ROD family is catalogued. Known residual, now RATIFIED and no
+      // longer an unruled one: RULED (qr-19-apex-hoe-reliquary-decline,
+      // 2026-09-01, under qr-19-best-for-project) keeps the decline on that
+      // corrected ground, as the Reliquary twin of the deed decline
+      // (qr-19-apex-hoe-deed-decline). The reliquary is the one surface where
+      // the completed tier-5 tool family reads asymmetric, one of five.
+      // Authoring a hoe page later also means growing the DOC_RELICS pin in
       // tests/delve_shop.test.ts in the same change, since both hoe rungs sit
-      // on a delve counter.
+      // on a delve counter, AND the exact-set procedural list in
+      // tests/reliquary_cell_art.test.ts plus its ceiling of one, since both
+      // hoes are ITEM_ART_PENDING members with no committed painting.
     ),
   },
 
