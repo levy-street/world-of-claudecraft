@@ -28,7 +28,13 @@
 // entity-iteration order and guards are unchanged. In-place Entity mutation
 // (`pet.hp = ...`, `pet.auras = pet.auras.filter(...)`, `m.threat.delete(...)`,
 // `r.meta.lastActiveTick = ...`, `delvePetStash.set/delete`) is intentional under
-// the refactor's immutability waiver.
+// the refactor's immutability waiver. ONE DELIBERATE post-extraction exception: an
+// evade check (isEvadingWildMob, mob/evade_immunity.ts) on petAttack/petTaunt/
+// petWaterJet/petSpecial now refuses a mob mid-evade outright, so the mobSwing/
+// Water Jet channel/petRangedAttack impact draws that command would otherwise arm
+// on a later tick (always voided downstream by dealDamage's own evade-immunity
+// gate) never fire. No golden re-mint: no parity scenario drives a pet command
+// against an evading mob.
 //
 // `src/sim`-pure: no DOM/Three/render/ui/game/net imports, no Math.random/Date.now
 // (enforced by tests/architecture.test.ts). data/entity/threat/types are imported
@@ -41,6 +47,7 @@ import { isTemporaryNecromancyUndead } from '../combat/necromancy';
 import { ABILITIES, DUNGEON_X_THRESHOLD, ITEMS, isDelvePos, MOBS } from '../data';
 import { createMob } from '../entity';
 import { consumeSelectedInventorySlot } from '../item_copy_ref';
+import { isEvadingWildMob } from '../mob/evade_immunity';
 import { questGateBlocksAggro } from '../mob/quest_gated_aggro';
 import type { PetState, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
@@ -637,7 +644,7 @@ export function petAttack(ctx: SimContext, pid?: number): void {
     return;
   }
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(pets[0], target)) {
+  if (!target || target.dead || isEvadingWildMob(target) || !ctx.isHostileTo(pets[0], target)) {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
@@ -677,7 +684,13 @@ export function petTaunt(ctx: SimContext, pid?: number): void {
       : r.e.targetId !== null
         ? (ctx.entities.get(r.e.targetId) ?? null)
         : null;
-  if (target?.kind !== 'mob' || target.dead || !target.hostile || target.ownerId !== null) {
+  if (
+    target?.kind !== 'mob' ||
+    target.dead ||
+    !target.hostile ||
+    target.ownerId !== null ||
+    isEvadingWildMob(target)
+  ) {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }
@@ -702,7 +715,7 @@ export function petWaterJet(ctx: SimContext, pid?: number): void {
   const jet = pet ? MOBS[pet.templateId]?.petRanged?.jet : undefined;
   if (!pet || !jet || pet.dead || pet.castingAbility || pet.petTauntTimer > 0) return;
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(pet, target)) return;
+  if (!target || target.dead || isEvadingWildMob(target) || !ctx.isHostileTo(pet, target)) return;
   if (questGateBlocksAggro(ctx.players, target, pet)) return;
   const range = MOBS[pet.templateId]?.petRanged?.range ?? 0;
   if (dist2d(pet.pos, target.pos) > range) return;
@@ -732,7 +745,7 @@ export function petSpecial(ctx: SimContext, pid?: number): void {
   if (ctx.isStunned(pet)) return;
   if (!templateHasPetSpecial(pet.templateId) || (pet.petSkillTimer ?? 0) > 0) return;
   const target = r.e.targetId !== null ? ctx.entities.get(r.e.targetId) : null;
-  if (!target || target.dead || !ctx.isHostileTo(pet, target)) {
+  if (!target || target.dead || isEvadingWildMob(target) || !ctx.isHostileTo(pet, target)) {
     ctx.error(r.e.id, 'Your pet needs a hostile target.');
     return;
   }

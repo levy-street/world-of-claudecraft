@@ -102,6 +102,22 @@ describe('Warlock pet signature skills', () => {
     );
   });
 
+  it('refuses the ranged-active signature skill against an evading mob', () => {
+    const { sim, owner, pet, target } = rig('emberkin');
+    owner.targetId = target.id;
+    target.aiState = 'evade'; // leashed home mid-reset: damage/threat-immune
+
+    expect(useWarlockPetSkill(sim.ctx, pet, target, petRangedAttack)).toBe(false);
+    expect(pet.petSkillTimer ?? 0).toBe(0);
+    expect(sim.drainEvents().some((e) => e.type === 'spellfx' && e.sourceId === pet.id)).toBe(
+      false,
+    );
+
+    target.aiState = 'idle'; // control: works once it stops evading
+    expect(useWarlockPetSkill(sim.ctx, pet, target, petRangedAttack)).toBe(true);
+    expect(pet.petSkillTimer).toBe(8);
+  });
+
   it('only auto-casts a signature skill while its pet-bar autocast is armed', () => {
     const disabled = rig('emberkin');
     disabled.pet.petAutoSkill = false;
