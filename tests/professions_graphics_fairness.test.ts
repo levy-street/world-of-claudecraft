@@ -379,10 +379,20 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // and the two selectShedSlots calls below are its real content.
     expect(Number.isFinite(auraVisibleCap('low'))).toBe(true);
     expect(auraVisibleCap('ultra')).toBe(Number.POSITIVE_INFINITY);
+    // The override is Hud's, so the setting-to-tier link is source-pinned: a
+    // behavioural arm here drives auraVisibleCap directly and would stay green
+    // if buffBarFxTier stopped reporting 'ultra', which is the whole mechanism
+    // the ruling leans on.
+    const hud = read('src/ui/hud.ts');
+    expect(hud).toContain("return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();");
+    expect(hud).toContain('this.buffBarFxTier()');
     const slots: AuraSlotState[] = Array.from({ length: 20 }, (_, i) => auraSlot({ key: `b${i}` }));
     const shed: boolean[] = [];
     expect(selectShedSlots(slots, slots.length, auraVisibleCap('ultra'), shed)).toBe(0);
-    // Not vacuous: the same 20 slots DO shed on the real low cap.
-    expect(selectShedSlots(slots, slots.length, auraVisibleCap('low'), shed)).toBeGreaterThan(0);
+    // EXACT, not a floor: the low cap leaves exactly `cap` ordinary buffs
+    // standing, so this pins selectShedSlots' budget arithmetic rather than
+    // merely that something was shed.
+    const shedLow = selectShedSlots(slots, slots.length, auraVisibleCap('low'), shed);
+    expect(slots.length - shedLow).toBe(auraVisibleCap('low'));
   });
 });

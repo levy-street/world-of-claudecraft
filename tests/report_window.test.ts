@@ -327,7 +327,9 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
     expect(restoreFocus).toHaveBeenLastCalledWith(second);
   });
 
-  it('the exported close() is the one Hud.closeManagedWindow calls, and is idempotent', () => {
+  // The Hud link itself is source-pinned in tests/managed_window_close_registry
+  // (the parsed `case 'report-window':` body); this arm owns the idempotence.
+  it('close() is idempotent, so a second close does not re-fire the focus return', () => {
     open({ submit: vi.fn().mockResolvedValue(undefined) });
     closeReportWindow();
     expect(el.style.display).toBe('none');
@@ -374,6 +376,41 @@ describe('report window: a stale submit never touches a reopened window', () => 
     // But the reopened window is untouched: still open, its trap still armed.
     expect(el.style.display).toBe('block');
     expect(restoreFocus).not.toHaveBeenCalled();
+  });
+
+  it('a resolve landing after a plain CLOSE, with no reopen, leaves the window shut', async () => {
+    // The player submits, closes, and never comes back: the log still fires,
+    // the window stays shut, and the focus return does NOT fire a second time.
+    //
+    // What this does NOT pin, stated rather than implied: the `openEpoch++`
+    // inside closeReportWindow is DEFENSIVE and has no observable consequence
+    // today. Removing it leaves this arm green, because the stale resolve then
+    // simply re-enters close() on an already-closed window, which is a no-op
+    // (openState is null, so no second restore) and the stale reject paints a
+    // hidden panel the next open rebuilds anyway. Proven by mutation, not
+    // assumed. It is kept so "one epoch identifies one open session" is total
+    // rather than incidental; if that ever stops being free, delete it rather
+    // than inventing an arm for it.
+    let settle: (() => void) | undefined;
+    const hooks: Hooks = {
+      submit: vi.fn().mockReturnValue(
+        new Promise<void>((res) => {
+          settle = res;
+        }),
+      ),
+    };
+    openReportWindow(
+      makeDeps(() => hooks),
+      { pid: 7, name: 'Rega' },
+    );
+    el.querySelector<HTMLElement>('#report-submit')?.click();
+    closeReportWindow();
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
+    settle?.();
+    await flush();
+    expect(log).toHaveBeenCalledWith('Report submitted for Rega.', 'var(--gold)');
+    expect(el.style.display).toBe('none');
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
   });
 
   it('a reject landing after a reopen does not paint the old error into the new window', async () => {

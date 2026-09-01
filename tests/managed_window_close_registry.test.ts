@@ -159,12 +159,15 @@ function readPanelIds(html: string): string[] {
 // case list counts markup panels that have a case PLUS the code-built ones (five today, see
 // CODE_BUILT), while the markup list counts every `.window.panel` id in either shell,
 // including the ones deliberately excused below.
-// Both were RE-MEASURED against the live tree at the Masterwrought Phase 19B close, where the
-// case floor had drifted SEVEN under: 41 at the tip before this wave, 48 with D111's report
-// window arm. A floor sitting below the real count is exactly the room a case needs to leave
-// unnoticed, which is what the comment above the assertion warns about.
+// BOTH were RE-MEASURED against the live tree at the Masterwrought Phase 19B close, and BOTH
+// had drifted SEVEN under, which is exactly the room a departing case or a departing panel
+// needs to leave unnoticed. Cases: 41 at the tip before this wave, 48 with D111's report
+// window arm. Markup ids: 45 in each shell and 45 in the union, against a floor still reading
+// 38. The markup half was caught only because a coverage audit re-ran readPanelIds itself
+// rather than trusting the constant, which is the lesson: re-measure a floor when you touch
+// its sibling, or you repair one and leave the identical hole open two lines away.
 const CASE_COUNT = 48;
-const MARKUP_COUNT = 38;
+const MARKUP_COUNT = 45;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);
 const caseIds = closeSwitch.cases;
