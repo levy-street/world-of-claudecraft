@@ -161,6 +161,7 @@ import {
   SWIM_EXIT_FEET_DEPTH,
   shouldTriggerWaterImpact,
   waterContactFrameMode,
+  weaponStowedOverlay,
 } from './characters/anim_state';
 import { logAssetMissOnce } from './characters/asset_miss_log';
 import {
@@ -10870,12 +10871,9 @@ export class Renderer {
       v.visual.setFerocityStage(petFrenzy ? 3 : ferocityStage);
       v.visual.setPresentationScale(hunterPetVisualScale(ferocityStage, petFrenzy));
 
-      // live sheathe toggle (Z key): the sim's weaponStowed bit moves held
-      // props between the hands and the on-back pose (self or a peer)
-      if (e.weaponStowed !== v.weaponStowed) {
-        v.weaponStowed = e.weaponStowed;
-        v.visual.setWeaponStowed(e.weaponStowed);
-      }
+      // The live sheathe toggle (Z key) is diffed further down, folded into
+      // the swim/mount stow overlay. Do NOT re-add a second diff here:
+      // `v.weaponStowed` takes exactly one writer (weaponStowedOverlay).
 
       // lazy form visuals, swapped by visibility like the old sheep/bear rigs
       // (build, compile gate and encounter prewarm all live in buildFormVisual)
@@ -11053,7 +11051,10 @@ export class Renderer {
       // drawn, and a peer's weapon rides their back the moment they start
       // swimming without any wire traffic. (This diff sits here, after the swim
       // latch, precisely so both halves are known in the same frame.)
-      const stowed = e.weaponStowed || swimming;
+      // Mounting folds into the SAME overlay for the same reason (nobody rides
+      // with a sword in hand); it must stay the single writer of
+      // `v.weaponStowed` (see weaponStowedOverlay's header).
+      const stowed = weaponStowedOverlay(e.weaponStowed, swimming, e.mountKey !== '');
       if (stowed !== v.weaponStowed) {
         v.weaponStowed = stowed;
         v.visual.setWeaponStowed(stowed);

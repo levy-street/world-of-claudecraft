@@ -1025,6 +1025,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the weapon-stow overlay fix (renderer.ts: single-writer
+// removal + the mount sheathe clause): the renderer integration leaf moved.
+// No capture was retaken.
 // Re-minted for the Ignivar raid consolidation (the v0.41.0 base merge plus
 // the renderer extraction round moved the renderer integration leaf). No
 // capture was retaken.
@@ -1034,10 +1037,15 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+// branch (the merged renderer.ts carries this branch's mount sheathe overlay
+// beside the release's forge-lift room and Drakelands entrance render
+// integrations, so the composite matches neither parent). No capture was
+// retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'f24d6913a954abb75057e3639b32e9c75efaf8eb500bd60bed7839eb8fc38cfe';
+  'b28cc64c4703c3e72db280960adc738a49b64c0e9394bb8c6039a65f7014f3aa';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd4cb44e6b0bd8f8cba4970ccff485413124ca884e6c7b07bff0fefde5e139f7c';
+  'd91b63085fc8b63209f994616448ed46d9c546e28fa42b907efb5929d1ce90c7';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2184,16 +2192,21 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
     // both sides): same order, the composite first, then this seal. No capture
     // was retaken.
+    // Re-minted for the weapon-stow overlay fix (renderer.ts): same order,
+    // the composite first, then this seal. No capture was retaken.
     // Re-minted for PR #3740's forge-lift room: the first-order composite
     // follows the lift room's renderer.ts hookup, then this second-order
     // performance seal follows the swept evidence bytes. No capture was
     // retaken.
+    // Re-minted for the Drakelands entrance merge into the raid branch: the
+    // composite first, then this seal. No capture was retaken.
+    // Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+    // branch: same order, the composite first, then this seal. No capture was
+    // retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-      // Re-minted for the Drakelands entrance merge into the raid branch: the
-      // composite first, then this seal. No capture was retaken.
-    ).toBe('e54c237a5355b5e46ac24e68911b64988f382156cf0aa89a8afbd9be69af64be');
+    ).toBe('1b526f1def73b75f95bb423514f3ba76e55e765f4fb546e8080d14c11688b5fe');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {
