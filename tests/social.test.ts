@@ -128,6 +128,84 @@ describe('parties', () => {
     }
   });
 
+  // This bug class (a permanent paladin party aura outliving the party relationship)
+  // shipped and had to be re-fixed six times across a month of releases before landing
+  // for good in removeFromParty. The two tests above only exercise the voluntary-leave
+  // path; the three below pin the other exit routes that also fall through
+  // removeFromParty (kick, disconnect, and a full 10-player raid split across both
+  // groups) so a future refactor of that shared teardown cannot silently regress one
+  // of them while the voluntary-leave tests stay green.
+  it('removes persistent paladin auras from remaining members when the paladin is kicked from the party', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const leader = sim.addPlayer('warrior', 'Leader');
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(paladin, leader);
+      sim.partyAccept(paladin);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(leader)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.partyKick(paladin, leader);
+
+      expect(sim.entities.get(leader)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.entities.get(paladin)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+    }
+  });
+
+  it('removes persistent paladin auras from the remaining member when the paladin disconnects', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      const member = sim.addPlayer('warrior', 'Member');
+      sim.setPlayerLevel(16, paladin);
+      sim.partyInvite(member, paladin);
+      sim.partyAccept(member);
+
+      sim.castAbility(persistentAura, paladin);
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+
+      sim.removePlayer(paladin);
+
+      expect(sim.entities.get(member)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      expect(sim.partyOf(member)).toBe(null);
+    }
+  });
+
+  it('removes persistent paladin auras from every member of a ten player raid, both groups, when the caster leaves', () => {
+    for (const persistentAura of ['devotion_ward', 'retribution_aura'] as const) {
+      const sim = makeWorld();
+      const paladin = sim.addPlayer('paladin', 'Paladin');
+      sim.setPlayerLevel(16, paladin);
+      const pids = Array.from({ length: 9 }, (_, i) => sim.addPlayer('priest', `Raid${i}`));
+      for (const pid of pids.slice(0, 4)) {
+        sim.partyInvite(pid, paladin);
+        sim.partyAccept(pid);
+      }
+      sim.convertPartyToRaid(paladin);
+      for (const pid of pids.slice(4)) {
+        sim.partyInvite(pid, paladin);
+        sim.partyAccept(pid);
+      }
+      const party = mustParty(sim, paladin);
+      expect(party.members).toHaveLength(10);
+      expect(party.members.filter((pid) => party.raidGroups.get(pid) === 1)).toHaveLength(5);
+      expect(party.members.filter((pid) => party.raidGroups.get(pid) === 2)).toHaveLength(5);
+
+      sim.castAbility(persistentAura, paladin);
+      for (const pid of pids) {
+        expect(sim.entities.get(pid)?.auras.find((a) => a.id === persistentAura)).toBeDefined();
+      }
+
+      sim.partyLeave(paladin);
+
+      for (const pid of pids) {
+        expect(sim.entities.get(pid)?.auras.find((a) => a.id === persistentAura)).toBeUndefined();
+      }
+    }
+  });
+
   it('does not replace a pending party invite', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('warrior', 'Aleph');
