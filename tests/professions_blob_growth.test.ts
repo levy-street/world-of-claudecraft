@@ -1805,8 +1805,16 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
       'means re-measure and re-base, and the band is re-measured ONCE MORE at the ' +
       'phase close after the LAST content unit lands. The close measurement is the ' +
       'one the QA twin freezes.';
-    expect(bytes, reMint).toBeGreaterThan(151144);
-    expect(bytes, reMint).toBeLessThan(151526);
+    // RE-BASED at the Phase 18 QA close, the measurement the twin freezes:
+    // 151,584 bytes, up 59 from the 151,525 the sweep measured. The mover is the
+    // tenth release sync (release/v0.42.0), whose content the fixture now walks;
+    // no packet unit added a field to the blob in the QA round, and the shape is
+    // unchanged (the same containers at the same ceilings, still a fixed point).
+    // Re-measured and re-based per the rule above, never widened: the floor is
+    // the measurement minus 380 and the edge the measurement plus one, so the
+    // band keeps the exact 381-byte width it has always had.
+    expect(bytes, reMint).toBeGreaterThan(151203);
+    expect(bytes, reMint).toBeLessThan(151585);
 
     // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, recorded rather
     // than tuned. The signal's own derivation (server/character_blob_size.ts)
