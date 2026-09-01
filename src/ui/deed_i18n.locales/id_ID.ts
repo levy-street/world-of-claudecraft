@@ -377,7 +377,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Kronik Lembah, Bab II',
-    desc: 'Selesaikan bab kedua kronik Saul: bandit, murloc, dan hama tambang ditumpas, laga di Sowfield dimainkan, dan Reliquary dijajal.',
   },
   chr_vale_chapter_iii: {
     name: 'Kronik Sang Lembah',
@@ -398,7 +397,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Penantang Ember Tembaga',
-    desc: 'Turun ke lapangan dan sentuh bola dalam sebuah pertandingan Piala Lembah di Sowfield.',
   },
   chr_vale_rares: {
     name: 'Teror-Teror Lembah',
@@ -586,69 +584,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Turun ke Lapangan',
-    desc: 'Selesaikan satu pertandingan Piala Lembah secara penuh di Sowfield, menang ataupun kalah.',
   },
   pvp_vcup_first_win: {
     name: 'Trofi Pertama',
-    desc: 'Menangkan satu pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_wins_10: {
     name: 'Pebola Babi Hutan Kawakan',
-    desc: 'Menangkan 10 pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_wins_25: {
     name: 'Legenda Bola Babi Hutan',
-    desc: 'Menangkan 25 pertandingan Piala Lembah berperingkat.',
     title: 'Legenda Bola Babi Hutan',
   },
   pvp_vcup_first_goal: {
     name: 'Pecah Telur',
-    desc: 'Cetak satu gol dalam pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_hat_trick: {
     name: 'Pahlawan Hat-trick',
-    desc: 'Cetak tiga gol dalam satu pertandingan Piala Lembah berperingkat, di divisi 3v3 atau lebih besar.',
   },
   pvp_vcup_golden_goal: {
     name: 'Momen Emas',
-    desc: 'Cetak gol emas yang menentukan hasil sebuah pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_first_save: {
     name: 'Tangan Andal',
-    desc: 'Lakukan satu penyelamatan sebagai kiper dalam pertandingan Piala Lembah berperingkat.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Tak Satu Pun Lolos',
-    desc: 'Menangkan pertandingan Piala Lembah berperingkat sebagai kiper tanpa kebobolan satu gol pun.',
   },
   pvp_vcup_guild_win: {
     name: 'Demi Sang Panji',
-    desc: 'Menangkan pertandingan Piala Lembah berperingkat yang diikuti di bawah panji guild-mu.',
   },
   pvp_fiesta_first_bout: {
     name: 'Penyusup Pesta',
-    desc: 'Bertarunglah dalam satu laga Fiesta 2v2 secara penuh, menang ataupun kalah.',
   },
-  pvp_fiesta_first_win: { name: 'Bintang Fiesta', desc: 'Menangkan satu laga Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: 'Bintang Fiesta' },
   pvp_fiesta_double: {
     name: 'Sekali Dayung, Dua Tumbang',
-    desc: 'Robohkan dua lawan Fiesta dalam rentang empat detik.',
   },
   pvp_fiesta_shutdown: {
     name: 'Perusak Pesta',
-    desc: 'Robohkan lawan Fiesta yang tengah berada dalam rentetan tiga atau lebih.',
   },
   pvp_fiesta_full_build: {
     name: 'Berdandan untuk Pesta',
-    desc: 'Menangkan laga Fiesta dengan augmen terkunci dari ketiga gelombang.',
   },
   pvp_fiesta_powerups: {
     name: 'Cicipi Semuanya',
-    desc: 'Ambil masing-masing dari keempat power-up gelanggang setidaknya sekali: Setan Kecepatan, Raksasa, Bot Bulan, dan Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Tulang Punggung Pesta',
-    desc: 'Robohkan lima lawan dalam satu laga Fiesta.',
   },
   soc_first_party: {
     name: 'Lebih Baik Bersama',

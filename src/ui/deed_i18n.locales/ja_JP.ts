@@ -358,7 +358,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: '渓谷年代記 第二章',
-    desc: 'ソールの年代記の第二章を仕上げる：盗賊、泥ひれの潜伏者、鉱山の害獣どもを退治し、ソウフィールドで試合をこなし、聖遺物庫へ挑む。',
   },
   chr_vale_chapter_iii: {
     name: '渓谷の年代記',
@@ -376,7 +375,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: '群れ崩し', desc: '10秒以内に森の狼を3体倒す。' },
   chr_vale_cup_debut: {
     name: '銅の手桶の挑戦者',
-    desc: 'ソウフィールドでのヴェイルカップの試合に出場し、ボールに触れる。',
   },
   chr_vale_rares: {
     name: '渓谷の恐怖',
@@ -549,55 +547,44 @@ export const table: DeedLocaleTable = {
   pvp_duel_grace: { name: '謙虚さの心得', desc: '威厳をおおむね保ったまま、決闘に敗れる。' },
   pvp_vcup_first_match: {
     name: 'ピッチに立つ',
-    desc: '勝ち負けを問わず、ソウフィールドでのヴェイルカップの試合を最後まで戦い抜く。',
   },
-  pvp_vcup_first_win: { name: '初めての銀杯', desc: 'ヴェイルカップのレート戦に勝利する。' },
-  pvp_vcup_wins_10: { name: '熟練ボアボーラー', desc: 'ヴェイルカップのレート戦で10勝する。' },
+  pvp_vcup_first_win: { name: '初めての銀杯' },
+  pvp_vcup_wins_10: { name: '熟練ボアボーラー' },
   pvp_vcup_wins_25: {
     name: 'ボアボールの伝説',
-    desc: 'ヴェイルカップのレート戦で25勝する。',
     title: 'ボアボールの伝説',
   },
-  pvp_vcup_first_goal: { name: 'まずは一点', desc: 'ヴェイルカップのレート戦でゴールを決める。' },
+  pvp_vcup_first_goal: { name: 'まずは一点' },
   pvp_vcup_hat_trick: {
     name: 'ハットトリックの英雄',
-    desc: '3v3以上の部門で、ヴェイルカップのレート戦1試合中に3ゴールを決める。',
   },
   pvp_vcup_golden_goal: {
     name: '黄金の瞬間',
-    desc: 'ヴェイルカップのレート戦に決着をつけるゴールデンゴールを叩き込む。',
   },
   pvp_vcup_first_save: {
     name: '鉄壁の両手',
-    desc: 'ヴェイルカップのレート戦でキーパーとしてセーブを決める。',
   },
   pvp_vcup_clean_sheet: {
     name: '何ひとつ通さない',
-    desc: 'キーパーとして無失点のまま、ヴェイルカップのレート戦に勝利する。',
   },
   pvp_vcup_guild_win: {
     name: '旗の名にかけて',
-    desc: 'ギルドの旗を掲げて出場したヴェイルカップのレート戦に勝利する。',
   },
   pvp_fiesta_first_bout: {
     name: '宴への乱入者',
-    desc: '勝ち負けを問わず、2v2フィエスタの一戦を最後まで戦い抜く。',
   },
-  pvp_fiesta_first_win: { name: '宴の主役', desc: '2v2フィエスタの一戦に勝利する。' },
-  pvp_fiesta_double: { name: '二丁上がり', desc: 'フィエスタで4秒以内に2回の撃破を決める。' },
+  pvp_fiesta_first_win: { name: '宴の主役' },
+  pvp_fiesta_double: { name: '二丁上がり' },
   pvp_fiesta_shutdown: {
     name: '祭りに水を差す者',
-    desc: 'フィエスタで、3連続撃破以上の勢いに乗った敵を仕留める。',
   },
   pvp_fiesta_full_build: {
     name: '宴の正装',
-    desc: '3回のウェーブすべてで強化を確定させた状態で、フィエスタの一戦に勝利する。',
   },
   pvp_fiesta_powerups: {
     name: '全部ひとつずつ',
-    desc: 'リングの4種のパワーアップ、スピードデーモン、コロッサス、ムーンブーツ、バーサーカーをそれぞれ1回以上手に入れる。',
   },
-  pvp_fiesta_five_kills: { name: '宴を背負う者', desc: 'フィエスタの一戦で5回の撃破を決める。' },
+  pvp_fiesta_five_kills: { name: '宴を背負う者' },
   soc_first_party: { name: '持つべきものは仲間', desc: '他のプレイヤーとパーティを組む。' },
   soc_full_house: { name: 'フルハウス', desc: '5人満員のパーティでダンジョンを攻略する。' },
   soc_guild_joined: { name: '同じ旗の下に', desc: 'ギルドの一員になる。' },

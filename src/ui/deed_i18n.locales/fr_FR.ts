@@ -395,7 +395,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Chronique du Val, chapitre II',
-    desc: 'Terminer le deuxième chapitre de la chronique de Saul : bandits, murlocs et vermine de la mine abattus, un match disputé au Pré de la Truie et le Reliquaire bravé.',
   },
   chr_vale_chapter_iii: {
     name: 'Chronique du Val',
@@ -416,7 +415,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Prétendant au Seau de cuivre',
-    desc: "Entrer sur le terrain et toucher le ballon lors d'un match de Coupe du Val au Pré de la Truie.",
   },
   chr_vale_rares: {
     name: 'Les terreurs du Val',
@@ -616,69 +614,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Crampons sur le pré',
-    desc: "Disputez un match de la Coupe du Val jusqu'à son terme au Pré de la Truie, victoire ou défaite.",
   },
   pvp_vcup_first_win: {
     name: 'Premier trophée',
-    desc: 'Remportez un match classé de la Coupe du Val.',
   },
   pvp_vcup_wins_10: {
     name: 'Briscard de la balle au sanglier',
-    desc: 'Remportez 10 matchs classés de la Coupe du Val.',
   },
   pvp_vcup_wins_25: {
     name: 'Légende de la balle au sanglier',
-    desc: 'Remportez 25 matchs classés de la Coupe du Val.',
     title: 'Légende de la balle au sanglier',
   },
   pvp_vcup_first_goal: {
     name: 'Compteur débloqué',
-    desc: "Marquez un but lors d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_hat_trick: {
     name: 'Coup du chapeau',
-    desc: 'Marquez trois buts dans un même match classé de la Coupe du Val, en catégorie 3v3 ou plus.',
   },
   pvp_vcup_golden_goal: {
     name: 'Instant en or',
-    desc: "Marquez le but en or qui décide d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_first_save: {
     name: 'Des mains sûres',
-    desc: "Réalisez un arrêt en tant que gardien lors d'un match classé de la Coupe du Val.",
   },
   pvp_vcup_clean_sheet: {
     name: 'Rien ne passe',
-    desc: 'Remportez un match classé de la Coupe du Val en tant que gardien sans encaisser de but.',
   },
   pvp_vcup_guild_win: {
     name: 'Pour la bannière',
-    desc: 'Remportez un match classé de la Coupe du Val disputé sous la bannière de votre guilde.',
   },
   pvp_fiesta_first_bout: {
     name: "Taper l'incruste",
-    desc: "Disputez un combat de Fiesta 2v2 jusqu'au bout, victoire ou défaite.",
   },
-  pvp_fiesta_first_win: { name: "L'âme de la Fiesta", desc: 'Remportez un combat de Fiesta 2v2.' },
+  pvp_fiesta_first_win: { name: "L'âme de la Fiesta" },
   pvp_fiesta_double: {
     name: 'Coup double',
-    desc: "Réussissez deux mises au tapis en Fiesta en l'espace de quatre secondes.",
   },
   pvp_fiesta_shutdown: {
     name: 'Trouble-fête',
-    desc: 'Mettez au tapis un adversaire de Fiesta en pleine série de trois ou plus.',
   },
   pvp_fiesta_full_build: {
     name: 'Sur son trente-et-un',
-    desc: 'Remportez un combat de Fiesta avec une amélioration verrouillée à chacune des trois vagues.',
   },
   pvp_fiesta_powerups: {
     name: 'Un de chaque',
-    desc: 'Ramassez au moins une fois chacun des quatre bonus du ring : Démon de vitesse, Colosse, Bottes lunaires et Berserker.',
   },
   pvp_fiesta_five_kills: {
     name: 'Toute la fête sur le dos',
-    desc: 'Réussissez cinq mises au tapis en un seul combat de Fiesta.',
   },
   soc_first_party: {
     name: "L'union fait la force",

@@ -362,7 +362,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Dalskrönikan, kapitel II',
-    desc: 'Avsluta det andra kapitlet i Sauls krönika: banditer, murlocker och gruvans ohyra nedgjorda, Suggfältet spelat och relikvariet trotsat.',
   },
   chr_vale_chapter_iii: {
     name: 'Dalens krönika',
@@ -380,7 +379,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Flockbrytare', desc: 'Dräp 3 skogsvargar inom 10 sekunder.' },
   chr_vale_cup_debut: {
     name: 'Kopparspannens utmanare',
-    desc: 'Gå ut på planen och rör bollen i en Dalcupsmatch på Suggfältet.',
   },
   chr_vale_rares: {
     name: 'Dalens fasor',
@@ -559,63 +557,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Stövlar på planen',
-    desc: 'Spela färdigt en hel Dalcupsmatch på Suggfältet, oavsett vinst eller förlust.',
   },
-  pvp_vcup_first_win: { name: 'Första bucklan', desc: 'Vinn en rankad Dalcupsmatch.' },
-  pvp_vcup_wins_10: { name: 'Rutinerad vildsvinsbollare', desc: 'Vinn 10 rankade Dalcupsmatcher.' },
+  pvp_vcup_first_win: { name: 'Första bucklan' },
+  pvp_vcup_wins_10: { name: 'Rutinerad vildsvinsbollare' },
   pvp_vcup_wins_25: {
     name: 'Vildsvinsbollslegend',
-    desc: 'Vinn 25 rankade Dalcupsmatcher.',
     title: 'Vildsvinsbollslegend',
   },
-  pvp_vcup_first_goal: { name: 'Målkontot öppnat', desc: 'Gör ett mål i en rankad Dalcupsmatch.' },
+  pvp_vcup_first_goal: { name: 'Målkontot öppnat' },
   pvp_vcup_hat_trick: {
     name: 'Hattrickhjälte',
-    desc: 'Gör tre mål i en och samma rankade Dalcupsmatch, i 3 mot 3-divisionen eller större.',
   },
   pvp_vcup_golden_goal: {
     name: 'Gyllene ögonblick',
-    desc: 'Gör det gyllene mål som avgör en rankad Dalcupsmatch.',
   },
   pvp_vcup_first_save: {
     name: 'Säkra händer',
-    desc: 'Gör en räddning som målvakt i en rankad Dalcupsmatch.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Här kommer inget förbi',
-    desc: 'Vinn en rankad Dalcupsmatch som målvakt utan att släppa in ett mål.',
   },
   pvp_vcup_guild_win: {
     name: 'För baneret',
-    desc: 'Vinn en rankad Dalcupsmatch spelad under ditt gilles baner.',
   },
   pvp_fiesta_first_bout: {
     name: 'Objuden gäst',
-    desc: 'Utkämpa en hel 2 mot 2-drabbning i Fiestan, oavsett vinst eller förlust.',
   },
   pvp_fiesta_first_win: {
     name: 'Festens medelpunkt',
-    desc: 'Vinn en 2 mot 2-drabbning i Fiestan.',
   },
   pvp_fiesta_double: {
     name: 'Två flugor i en smäll',
-    desc: 'Fäll två motståndare i Fiestan inom fyra sekunder.',
   },
   pvp_fiesta_shutdown: {
     name: 'Glädjedödare',
-    desc: 'Fäll en Fiestamotståndare som är inne på en svit om tre eller fler.',
   },
   pvp_fiesta_full_build: {
     name: 'Klädd för tillfället',
-    desc: 'Vinn en Fiestadrabbning med en förstärkning låst från var och en av de tre vågorna.',
   },
   pvp_fiesta_powerups: {
     name: 'En av varje',
-    desc: 'Plocka upp var och en av ringens fyra kraftbonusar minst en gång: Fartdemon, Koloss, Månkängor och Bärsärk.',
   },
   pvp_fiesta_five_kills: {
     name: 'Bär hela festen',
-    desc: 'Fäll fem motståndare i en och samma Fiestadrabbning.',
   },
   soc_first_party: { name: 'Bättre tillsammans', desc: 'Gå med i en grupp med en annan spelare.' },
   soc_full_house: { name: 'Fullt hus', desc: 'Rensa ett fängelsehål med en full grupp om fem.' },
