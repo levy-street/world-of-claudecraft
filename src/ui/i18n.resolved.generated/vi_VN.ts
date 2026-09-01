@@ -4257,6 +4257,7 @@ export const vi_VN: EnTranslations = {
       "sourceProfession": "Nhận được nhờ {profession}",
       "sourceDeed": "Được trao bởi kỳ công {deed}",
       "sourceVendor": "Do {vendor} bán",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Rơi từ {boss} tại {zone}",
       "sourceDelve": "Tìm thấy trong hang sâu {delve}",
       "sourceRift": "Rơi từ các lượt hoàn thành Rạn Nứt hạng {rank}",

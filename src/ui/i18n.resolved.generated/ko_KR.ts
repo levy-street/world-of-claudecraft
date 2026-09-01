@@ -4257,6 +4257,7 @@ export const ko_KR: EnTranslations = {
       "sourceProfession": "{profession}(으)로 획득",
       "sourceDeed": "업적 \"{deed}\" 보상",
       "sourceVendor": "{vendor} 판매",
+      "sourceVendorGated": "{vendor} 판매 ({requirement})",
       "sourceBossZone": "{zone}의 {boss}에게서 획득",
       "sourceDelve": "탐굴 \"{delve}\"에서 발견",
       "sourceRift": "{rank} 등급 균열 클리어에서 획득",

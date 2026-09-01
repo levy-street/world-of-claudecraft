@@ -4257,6 +4257,7 @@ export const en_XA: EnTranslations = {
       "sourceProfession": "[Éáŕñéð ţĥŕóúĝĥ {profession}]",
       "sourceDeed": "[Áŵáŕðéð ƀý ţĥé ðééð {deed}]",
       "sourceVendor": "[Šóļð ƀý {vendor}]",
+      "sourceVendorGated": "[Šóļð ƀý {vendor} ({requirement})]",
       "sourceBossZone": "[Ðŕóþš ƒŕóɱ {boss} íñ {zone}]",
       "sourceDelve": "[Ƒóúñð íñ ţĥé ðéļʋé {delve}]",
       "sourceRift": "[Ðŕóþš ƒŕóɱ {rank}-ŕáñķ Ŕíƒţ çļéáŕš]",

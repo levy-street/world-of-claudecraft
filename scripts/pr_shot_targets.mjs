@@ -5799,6 +5799,48 @@ export const TARGETS = [
       return { clip: '#reliquary-window' };
     },
   },
+  {
+    key: 'reliquary-drowned-litany-vendor-gate',
+    label: "The Reliquary: The Drowned Litany names a Marks relic's Heroic-clear gate",
+    when: ['ui/reliquary_view', 'ui/reliquary_labels', 'sim/content/delves/shop'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('#gpu-notice')?.remove();
+        document.querySelector('.camera-prompt-confirm')?.click();
+        // A fresh offline character may receive Ferryman Odo's one-time
+        // arrival note after entry settles; unrelated to this window and
+        // otherwise sits on top of it.
+        document.querySelector('#tutorial-greeting')?.remove();
+        window.__game?.hud?.openReliquary?.();
+      });
+      const opened = await pollForSize(page, '#reliquary-window');
+      if (!opened) throw new Error('reliquary window did not open');
+      await page.evaluate(() => {
+        const win = document.querySelector('#reliquary-window');
+        win?.querySelector('[data-nav="conquerors"]')?.click();
+        win?.querySelector('[data-page="conquerors_drowned_litany"]')?.click();
+      });
+      await wait(200);
+      await page.evaluate(() => {
+        // The Marks-only signature rare the bug report named: gated behind a
+        // Heroic clear on the real vendor, which the page's source line never
+        // used to say. attachTooltip binds focusin (never pointerenter), so
+        // focus is the sturdier synthetic trigger here.
+        document
+          .querySelector('#reliquary-window [data-cell-id="sister_nhalia_choir_plate"]')
+          ?.focus?.();
+      });
+      await wait(300);
+      // No clip: the cell sits near the grid's right edge, so its tooltip
+      // floats past the window's own bounding box and a window-cropped shot
+      // would truncate the very sentence this target exists to show.
+      return {};
+    },
+  },
   // ---- Phase 21 catalog-growth surfaces. Each variant seeds the LOW graphics
   // preset (the capture rule: every rig shoots the lowest preset so shots stay
   // comparable; only gfx-comparison rigs keep their own). ----

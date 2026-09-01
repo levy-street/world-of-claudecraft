@@ -4257,6 +4257,7 @@ export const tr_TR: EnTranslations = {
       "sourceProfession": "{profession} yoluyla kazanılır",
       "sourceDeed": "{deed} yiğitliğiyle verilir",
       "sourceVendor": "{vendor} satar",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "{zone} bölgesindeki {boss} düşürür",
       "sourceDelve": "{delve} mağara seferinde bulunur",
       "sourceRift": "{rank} derecesindeki Yarık tamamlamalarından düşer",

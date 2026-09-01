@@ -11598,6 +11598,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceProfession': '{profession}(으)로 획득',
   'hudChrome.reliquary.sourceDeed': '업적 "{deed}" 보상',
   'hudChrome.reliquary.sourceVendor': '{vendor} 판매',
+  'hudChrome.reliquary.sourceVendorGated': '{vendor} 판매 ({requirement})',
   'hudChrome.reliquary.sourceBossZone': '{zone}의 {boss}에게서 획득',
   'hudChrome.reliquary.sourceDelve': '탐굴 "{delve}"에서 발견',
   'hudChrome.reliquary.sourceRift': '{rank} 등급 균열 클리어에서 획득',

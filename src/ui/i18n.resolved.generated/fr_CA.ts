@@ -4257,6 +4257,7 @@ export const fr_CA: EnTranslations = {
       "sourceProfession": "Obtenue grâce à {profession}",
       "sourceDeed": "Accordée par le haut fait {deed}",
       "sourceVendor": "Vendue par {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Butin de {boss} dans {zone}",
       "sourceDelve": "Trouvée dans la plongée {delve}",
       "sourceRift": "Butin des conquêtes de Failles de rang {rank}",

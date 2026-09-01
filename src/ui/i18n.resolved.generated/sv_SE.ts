@@ -4257,6 +4257,7 @@ export const sv_SE: EnTranslations = {
       "sourceProfession": "Förtjänas genom {profession}",
       "sourceDeed": "Ges av bedriften {deed}",
       "sourceVendor": "Säljs av {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Fälls av {boss} i {zone}",
       "sourceDelve": "Hittas i delven {delve}",
       "sourceRift": "Fälls vid klarningar av Revor med rang {rank}",

@@ -3,6 +3,7 @@
 // in the Sim).
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
+import { delveShopGateClears, delveShopGateForItem } from '../src/sim/content/delves';
 import { isCataloguedRelicItem } from '../src/sim/content/reliquary';
 import { DELVE_SHOPS, DELVES, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
@@ -316,5 +317,43 @@ describe('Drowned Litany shop stock (data pins)', () => {
     const tiers = (entries: typeof reliquary) =>
       [...new Set(entries.map((e) => e.marks))].sort((a, b) => a - b);
     expect(tiers(litany)).toEqual(tiers(reliquary).map((m) => m * 2));
+  });
+});
+
+describe('delveShopGateForItem (static, player-independent lookup)', () => {
+  it("finds the gate on the NAMED delve's own shop", () => {
+    expect(delveShopGateForItem('drowned_litany', 'litany_legs')).toBe('available');
+    expect(delveShopGateForItem('drowned_litany', 'litany_helm')).toBe('clears:3');
+    expect(delveShopGateForItem('drowned_litany', 'sister_nhalia_choir_plate')).toBe('heroicClear');
+    expect(delveShopGateForItem('drowned_litany', 'drowned_choir_fang')).toBe('heroicClear');
+    // Same gate vocabulary, a different shop table entirely.
+    expect(delveShopGateForItem('collapsed_reliquary', 'deacon_reliquary_helm')).toBe(
+      'heroicClear',
+    );
+  });
+
+  it('refuses an item real for one delve but asked of a DIFFERENT delve', () => {
+    // The whole point of keying on (delveId, itemId) rather than itemId alone:
+    // a page must never be told a gate for a vendor it did not itself name.
+    expect(delveShopGateForItem('collapsed_reliquary', 'litany_legs')).toBeUndefined();
+    expect(delveShopGateForItem('drowned_litany', 'deacon_reliquary_helm')).toBeUndefined();
+  });
+
+  it('returns undefined for an item no DELVE_SHOPS table stocks, or an unknown delve', () => {
+    expect(delveShopGateForItem('drowned_litany', 'worn_sword')).toBeUndefined();
+    expect(delveShopGateForItem('drowned_litany', 'not_a_real_item_id')).toBeUndefined();
+    expect(delveShopGateForItem('no_such_delve', 'litany_legs')).toBeUndefined();
+  });
+});
+
+describe('delveShopGateClears (the one clears:N parse)', () => {
+  it('parses the count out of a clears:N gate', () => {
+    expect(delveShopGateClears('clears:3')).toBe(3);
+    expect(delveShopGateClears('clears:0')).toBe(0);
+  });
+
+  it('answers null for the two non-numeric gates', () => {
+    expect(delveShopGateClears('available')).toBeNull();
+    expect(delveShopGateClears('heroicClear')).toBeNull();
   });
 });

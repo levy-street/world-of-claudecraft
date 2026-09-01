@@ -11086,6 +11086,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceProfession': '透過{profession}獲得',
   'hudChrome.reliquary.sourceDeed': '功績「{deed}」獎勵',
   'hudChrome.reliquary.sourceVendor': '由{vendor}販售',
+  'hudChrome.reliquary.sourceVendorGated': '由{vendor}販售（{requirement}）',
   'hudChrome.reliquary.sourceBossZone': '由{zone}的{boss}掉落',
   'hudChrome.reliquary.sourceDelve': '在秘探「{delve}」中獲得',
   'hudChrome.reliquary.sourceRift': '通關{rank}級裂隙時掉落',

@@ -19,7 +19,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "es_ES": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -31,7 +32,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "fr_FR": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -43,7 +45,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "fr_CA": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -55,7 +58,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "en_CA": [],
   "it_IT": [
@@ -68,7 +72,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "de_DE": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -80,7 +85,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -96,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -109,7 +116,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "nl_NL": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -121,7 +129,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "pl_PL": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -133,7 +142,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "id_ID": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -145,7 +155,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "tr_TR": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -157,7 +168,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "sv_SE": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -169,7 +181,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "vi_VN": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -181,7 +194,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ],
   "da_DK": [
     "guide.settingsPage.ifAuraBarBelowFrame",
@@ -193,6 +207,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
     "hudChrome.finder.mech.wildheart_pulse",
-    "hudChrome.options.auraBarBelowFrame"
+    "hudChrome.options.auraBarBelowFrame",
+    "hudChrome.reliquary.sourceVendorGated"
   ]
 };

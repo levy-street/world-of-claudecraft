@@ -45,7 +45,7 @@ import {
 import { reliquaryPageDesc, reliquaryPageName } from '../src/ui/reliquary_i18n';
 import { reliquaryRelicDisplayName, reliquarySourceLineText } from '../src/ui/reliquary_labels';
 import { RELIQUARY_TRACK_CAP } from '../src/ui/reliquary_tracker_view';
-import { reliquarySourceLinePlan } from '../src/ui/reliquary_view';
+import { relicVendorGate, reliquarySourceLinePlan } from '../src/ui/reliquary_view';
 import {
   type ReliquaryNavId,
   ReliquaryWindow,
@@ -130,7 +130,11 @@ function sourceLinesFor(pageId: string, index: number): string[] {
   const def = pageDef(pageId);
   const relic = def.relics[index];
   if (!relic) throw new Error(`content premise: ${pageId} has a relic at ${index}`);
-  return reliquarySourceLinePlan(reliquaryRelicSource(def, relic), def.clearSource)
+  return reliquarySourceLinePlan(
+    reliquaryRelicSource(def, relic),
+    def.clearSource,
+    relicVendorGate(def, relic),
+  )
     .map((plan) => reliquarySourceLineText(plan))
     .filter((line) => line !== '');
 }
@@ -892,6 +896,26 @@ describe('ReliquaryWindow: cell tooltips and aria labels', () => {
     expect(node.getAttribute('aria-label')).toBe(
       t('hudChrome.reliquary.cellMissingSourceAria', { name, source: joinSourceLines(lines) }),
     );
+  });
+
+  it("names the vendor's Heroic-clear gate on a gated Drowned Litany relic's tooltip", () => {
+    // The real player report this change closes: the page's vendor source
+    // line never used to say WHY a Marks-only signature rare was not for sale
+    // yet. Driven through the real ReliquaryWindow (not just the pure core),
+    // so a divergence between production and its test oracle cannot hide.
+    const DROWNED_LITANY_PAGE_ID = 'conquerors_drowned_litany';
+    const GATED_RELIC_ID = 'sister_nhalia_choir_plate';
+    const rig = openPage(baseState(), DROWNED_LITANY_PAGE_ID, 'conquerors');
+    const index = relicIds(DROWNED_LITANY_PAGE_ID).indexOf(GATED_RELIC_ID);
+    expect(index, 'content premise: the page holds this relic').toBeGreaterThanOrEqual(0);
+    const node = must(rig.el, `[data-cell-id="${GATED_RELIC_ID}"]`);
+    expect(node.dataset.cellOwned).toBe('0');
+    const lines = sourceLinesFor(DROWNED_LITANY_PAGE_ID, index);
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toContain(t('delveUi.shop.reqHeroic'));
+
+    const html = tooltipFor(rig, node)?.() ?? '';
+    expect(html).toContain(esc(lines[0] ?? ''));
   });
 
   it('renders no source line at all for a relic the catalog leaves un-hinted', () => {
@@ -1713,10 +1737,11 @@ describe('ReliquaryWindow: search filtering', () => {
       const relic = page?.relics.find((r) => r.kind === 'mount' && r.mountId === slot);
       expect(relic, `catalog premise: ${slot}`).toBeTruthy();
       const hints = relic && page ? reliquaryRelicSource(page, relic) : [];
+      const vendorGate = relic && page ? relicVendorGate(page, relic) : undefined;
       // RESOLVED lines, not authored plans: the painter stamps what the
       // tooltip will really paint, so a plan whose id went stale never
       // inflates the count the shot picker chases.
-      const lines = reliquarySourceLinePlan(hints, page?.clearSource)
+      const lines = reliquarySourceLinePlan(hints, page?.clearSource, vendorGate)
         .map((plan) => reliquarySourceLineText(plan))
         .filter((line) => line !== '');
       if (slot === OWNED_HINTED_MOUNT) {

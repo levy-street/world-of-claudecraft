@@ -143,6 +143,43 @@ export const DELVE_SHOPS: Record<string, DelveShopEntry[]> = {
   drowned_litany: DROWNED_LITANY_SHOP,
 };
 
+// The one place a `clears:N` gate's number is parsed out: every caller that
+// used to hand-roll `gate.slice('clears:'.length)` (delveShopGateUnlocked and
+// resolveDelveShopOffers below, plus the Reliquary label resolver in
+// src/ui/reliquary_labels.ts) reads it from here instead, so a fourth copy of
+// the same parse can never drift from the other three. Guarded by a prefix
+// check rather than excluding the two named literals: a future DelveShopGate
+// variant that is not 'clears:N'-shaped answers null instead of silently
+// mis-parsing whatever bytes follow its own colon.
+export function delveShopGateClears(gate: DelveShopGate): number | null {
+  if (!gate.startsWith('clears:')) return null;
+  const count = Number(gate.slice('clears:'.length));
+  return Number.isFinite(count) ? count : null;
+}
+
+// Static, player-independent lookup: (item id, delve id) -> the DELVE_SHOPS
+// gate that item sits behind IN THAT DELVE's shop, built once at module load.
+// Keyed by BOTH ids, not item id alone: a relic could in principle be stocked
+// by more than one delve's shop at different gates, and naming the wrong
+// delve's gate against a specific vendor would be a silent content bug no
+// runtime check would catch. Consumed by the Reliquary source-line resolver
+// (src/ui/reliquary_labels.ts) so a relic's "Sold by {vendor}" line can also
+// name the unlock condition: without it, a gated signature rare (e.g. the
+// Drowned Litany's sister_nhalia_choir_plate) reads as an ordinary,
+// always-available vendor row, and a player who has not met the gate finds
+// nothing to buy there and wrongly concludes the item was removed.
+const DELVE_SHOP_GATE_BY_ITEM_AND_DELVE: ReadonlyMap<string, DelveShopGate> = new Map(
+  Object.entries(DELVE_SHOPS).flatMap(([delveId, entries]) =>
+    entries.map((e) => [`${delveId}:${e.itemId}`, e.gate] as const),
+  ),
+);
+
+// Returns undefined when this delve's shop does not stock the item at all
+// (the item is not delve-shop stock, or it is sold by a DIFFERENT delve).
+export function delveShopGateForItem(delveId: string, itemId: string): DelveShopGate | undefined {
+  return DELVE_SHOP_GATE_BY_ITEM_AND_DELVE.get(`${delveId}:${itemId}`);
+}
+
 // Pure gate check, shared by the Sim (server-authoritative buy) and the client UI
 // (ClientWorld, for the lock badge) so the lock state the player sees matches what
 // the purchase will actually allow. `clears` is the player's persisted
@@ -154,8 +191,8 @@ export function delveShopGateUnlocked(
 ): boolean {
   if (gate === 'available') return true;
   if (gate === 'heroicClear') return (clears[`${delveId}:heroic`] ?? 0) > 0;
-  const need = Number(gate.slice('clears:'.length));
-  if (!Number.isFinite(need)) return false;
+  const need = delveShopGateClears(gate);
+  if (need === null) return false;
   const total = Object.entries(clears)
     .filter(([key]) => key.startsWith(`${delveId}:`))
     .reduce((sum, [, count]) => sum + count, 0);
@@ -183,6 +220,6 @@ export function resolveDelveShopOffers(
     marks: e.marks,
     unlocked: delveShopGateUnlocked(clears, delveId, e.gate),
     requiresHeroicClear: e.gate === 'heroicClear',
-    requiresClears: e.gate.startsWith('clears:') ? Number(e.gate.slice('clears:'.length)) : 0,
+    requiresClears: delveShopGateClears(e.gate) ?? 0,
   }));
 }

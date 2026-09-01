@@ -4257,6 +4257,7 @@ export const id_ID: EnTranslations = {
       "sourceProfession": "Diraih melalui {profession}",
       "sourceDeed": "Diberikan oleh jasa {deed}",
       "sourceVendor": "Dijual oleh {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Jatuh dari {boss} di {zone}",
       "sourceDelve": "Ditemukan di delve {delve}",
       "sourceRift": "Jatuh dari penyelesaian Rift peringkat {rank}",

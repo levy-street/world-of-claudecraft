@@ -10666,6 +10666,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.reliquary.sourceRift'
   | 'hudChrome.reliquary.sourceStore'
   | 'hudChrome.reliquary.sourceVendor'
+  | 'hudChrome.reliquary.sourceVendorGated'
   | 'hudChrome.reliquary.sourceZone'
   | 'hudChrome.reliquary.srankClearsLabel'
   | 'hudChrome.reliquary.stripNoMatch'
