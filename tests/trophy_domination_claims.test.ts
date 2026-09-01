@@ -15,8 +15,9 @@
 // derivation of WHICH trophies were adopted; this pins the reasoning behind the
 // ones that were not.
 //
-// ONE CLAIM IS ALREADY STALE and is pinned as a live census with the
-// contradiction named rather than quietly re-worded: see the jewelcrafting arm.
+// THE JEWELCRAFTING CLAIM WAS AMENDED at masterwrought Phase 19
+// (qr-19-jewelcrafting-exclusion-stale, 2026-09-01), and its arm below pins the
+// live census the amended record now states.
 import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
@@ -198,24 +199,27 @@ describe('the bogiron nugget armorcrafting exclusion, recomputed', () => {
   });
 });
 
-describe('the jewelcrafting exclusion, recomputed: the header is now STALE', () => {
-  it('the neck and ring census no longer matches the header, and is pinned live', () => {
-    // The header claims "the uncrafted neck and ring pool is 25 items: 9 honor
-    // pieces at sellValue 0 and 16 above 600 ... nothing in (25, 460]". The
-    // live tree answers a bigger pool and one row inside the band, because
-    // content shipped after the record was written. This arm does NOT re-word
-    // the header (that is a content decision): it pins the live census so the
-    // drift is visible in a run rather than sitting in prose, and so the next
-    // move of it is deliberate. OPEN FINDING for the maintainer: the
-    // jewelcrafting exclusion's stated ground no longer holds.
+describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
+  it('the neck and ring census holds at the amended figures', () => {
+    // The header's census was RULED and amended at masterwrought Phase 19
+    // (qr-19-jewelcrafting-exclusion-stale, 2026-09-01): the pool is 34 rows,
+    // not 25, the high half is 24 rows rather than 16, and one row sits inside
+    // the band the original sentence called empty. All four jewelcrafting
+    // exclusions stand on the narrower ground the amendment states: the one
+    // in-band row is mother_of_pearl, the Proving Shore keepsake ring, a
+    // tutorial quest reward rather than a jewelcrafting-register output, and
+    // dominated by the trainer's own rung-0 rings besides. This arm is the
+    // derivation the record defers to, so these four numbers are re-derived
+    // here and never pasted from prose: a second row landing in the band reds
+    // this arm instead of leaving the amendment quietly false.
     const jewelry = pool((d) => d.kind === 'armor' && (d.slot === 'neck' || d.slot === 'ring'));
     expect(jewelry.length, 'uncrafted neck and ring pool').toBe(34);
     expect(jewelry.filter((d) => d.sellValue === 0).length, 'honor pieces at 0').toBe(9);
     expect(jewelry.filter((d) => d.sellValue > 600).length, 'pieces above 600').toBe(24);
-    // The header says NOTHING sits here. One row does.
+    // Exactly one row sits here, and the amended record names it.
     expect(
       jewelry.filter((d) => inBand(d, 25, 460)).map((d) => d.id),
-      'uncrafted neck/ring inside the rung ceiling band the header calls empty',
+      'uncrafted neck/ring inside the rung ceiling band, the amended one-row set',
     ).toEqual(['mother_of_pearl']);
     expect(ITEMS.mother_of_pearl.sellValue, 'the in-band row value').toBe(50);
   });

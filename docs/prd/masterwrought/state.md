@@ -16673,6 +16673,29 @@ OUTPUT-EXCLUDED, the six the doctrine adds, each with the derivation:
   Jewelcrafting's lane goes EMPTY, like engineering's, and the phase file's
   "jewelcrafting and inscription are the point" is intent the doctrine could
   not honour on this catalog.
+  RULED (qr-19-jewelcrafting-exclusion-stale, 2026-09-01, under
+  qr-19-best-for-project): ALL FOUR JEWELCRAFTING EXCLUSIONS STAND, and the
+  census above is AMENDED here rather than rewritten. Re-derived at execution
+  against the merged catalog (the arm is
+  tests/trophy_domination_claims.test.ts): the uncrafted neck and ring
+  register answers 34 rows, not 25. The 9 WARFARE honor pieces at sellValue 0
+  are unchanged; the high half is 24 rows, not 16 (22 epic, one rare,
+  `abyssal_loop` 5000, and one legendary, `heart_of_the_rift` 50000). The band
+  the sentence above calls empty holds exactly ONE row, `mother_of_pearl`: the
+  Proving Shore keepsake ring, uncommon, requiredLevel 1, one point in each of
+  the five stats, sellValue 50, granted to every class by q_ps_mother_of_pearl
+  in `proving_shore.ts`. It does not reopen the lane. It is a tutorial-island
+  quest reward rather than a jewelcrafting-register output, and read as one it
+  is dominated by the trainer's OWN rung-0 rings, which pay 4 points of
+  FOCUSED primary at 46 (`riveted_iron_signet` str 3 sta 1,
+  `etched_iron_loop` int 3 sta 1) against its 5 points spread one per stat at
+  50. So the lane stays EMPTY as recorded, the two output exclusions rest from
+  here on that register-and-domination ground rather than on an empty band,
+  and the two value exclusions are untouched (`gleamstag_charm` 2500 and
+  `deepfen_pearl` 600 both sit above the 460 crafted ceiling on arithmetic
+  that did not move). The VALUE-EXCLUDED paragraph above takes the same
+  24-row correction. Figures re-derived at execution, never pasted, per the
+  rule this record states of itself.
 - `briny_idol` 32, `frayed_prayer_beads` 30, `moonpale_scale` 26
   (inscription). Inscription's register is caster held-offhands and scrolls.
   The uncrafted scroll pool is EMPTY; the uncrafted held-offhand pool is six

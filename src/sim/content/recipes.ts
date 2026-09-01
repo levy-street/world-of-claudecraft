@@ -4270,6 +4270,21 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
 //   pale_pearl 30: output-excluded, jewelcrafting (no uncrafted neck or ring
 //     in (25, 460]: the same 25-item pool).
 //   ogre_toe_ring 25: output-excluded, jewelcrafting (the same gap).
+//   AMENDED 2026-09-01 (masterwrought Phase 19,
+//     qr-19-jewelcrafting-exclusion-stale): the four jewelcrafting lines above
+//     STAND, on a narrower ground, and their census is corrected here rather
+//     than rewritten. Re-derived at execution, the uncrafted neck and ring
+//     register answers 34 rows, not 25: the same 9 honor pieces at sellValue
+//     0, then 24 rows above 600 (22 epic, one rare, one legendary, 4500 to
+//     50000), and ONE row inside the band these lines call empty,
+//     mother_of_pearl (Proving Shore quest keepsake, uncommon ring,
+//     requiredLevel 1, one point in each of five stats, sellValue 50). It is a
+//     tutorial-island quest reward rather than a jewelcrafting-register
+//     output, and read as one it is dominated by the trainer's own rung-0
+//     rings (riveted_iron_signet str 3 sta 1 and etched_iron_loop int 3 sta 1,
+//     both at 46), so the lane stays empty.
+//     tests/trophy_domination_claims.test.ts pins the live census: re-derive
+//     there, never from this comment.
 //   briny_idol 32: output-excluded, inscription (register: caster held-offhands
 //     and scrolls; the uncrafted scroll pool is empty, and the one uncrafted
 //     caster offhand below the rung ceiling, valefire_lantern, is itself
