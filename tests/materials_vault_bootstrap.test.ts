@@ -18,11 +18,13 @@ import { vaultMaterialIds } from '../src/sim/materials_vault';
 describe('materials_vault as the first-evaluated sim module', () => {
   it('derives the full material set with no import of data.ts ahead of it', () => {
     const ids = vaultMaterialIds();
-    // Recomputed at the merge of release/v0.41.0 (tip e19d832b47): the ruled
+    // Re-derived at every release merge, never picked from a side: the ruled
     // 55 plus the packet's masterwrought reagents and the farming absorb's 39
-    // yields compose to a measured 116 on the merged catalog (both parents'
-    // own derivations, one union; no rule changed).
-    expect(ids.size).toBe(116);
+    // yields measured 116 at release/v0.41.0, and release/v0.42.0 adds the
+    // Core of the Last Flame (the recipe-pending crucible reagent that the
+    // release promoted out of vendor junk) for 117 on the merged catalog.
+    // Both parents' own derivations, one union; no rule changed.
+    expect(ids.size).toBe(117);
     expect(ids.has('iron_ore')).toBe(true);
     expect(ids.has('arcanite_bar')).toBe(true);
     expect(ids.has('guardian_core')).toBe(false);

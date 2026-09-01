@@ -131,6 +131,7 @@ describe('applyBagFilter: category filtering', () => {
     ];
     const out = applyBagFilter(inv, lookup, { category: 'material', sort: 'recent', search: '' });
     expect(ids(out)).toEqual(['iron_ore']);
+    expect(matchesCategory(REAL_ITEMS.lastflame_core, 'material')).toBe(true);
   });
 
   it('keeps only tools under the tool chip (the displaced implements)', () => {
@@ -540,9 +541,6 @@ describe('chip reachability census: the All-only set, pinned', () => {
     'harvest_feast',
     'inert_storm_shard',
     'last_keep_signet',
-    // Staged ahead of its recipes (PR 3704): the core matches the materials
-    // chip the moment a recipe consumes it, and this row moves out then.
-    'lastflame_core',
     'linen_pouch',
     'loombound_reagent_satchel',
     'mistcallers_duffel',

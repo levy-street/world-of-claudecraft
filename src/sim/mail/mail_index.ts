@@ -55,11 +55,26 @@ export class MailIndex<M extends IndexedLetter> {
   // unique, but the index must stay correct even if two letters ever carry
   // one ref (an untrack of one must not erase the other's presence).
   private custodyRefs = new Map<string, number>();
+  // Recipient keys whose bucket CONTENT (not just delivery/unread
+  // bookkeeping) changed since the last takeDirty(): the persistence seam for
+  // #3561's incremental autosave. track/untrack/rekey/markRead each mark the
+  // key(s) whose serialized row would now differ. rebuild() (a fresh load)
+  // deliberately does NOT mark dirty: nothing changed, it is reconstructing
+  // already-persisted state, and marking it dirty would force a needless
+  // rewrite of the entire book on the very next autosave.
+  private dirty = new Set<string>();
 
   // Fold a freshly booked or loaded letter in: an already-due letter counts as
   // unread now (unless read); one still on the wing waits in `undelivered`
   // until deliverDue lands it.
   track(m: M, now: number): void {
+    this.trackQuiet(m, now);
+    this.dirty.add(m.recipientKey);
+  }
+
+  // track()'s structural half, with no dirty marking: the rebuild() bulk-load
+  // path.
+  private trackQuiet(m: M, now: number): void {
     this.bucketAdd(m);
     if (m.custodyRef !== undefined) {
       this.custodyRefs.set(m.custodyRef, (this.custodyRefs.get(m.custodyRef) ?? 0) + 1);
@@ -84,20 +99,28 @@ export class MailIndex<M extends IndexedLetter> {
     }
     if (!m.read && now >= m.deliverAt) this.dec(m.recipientKey);
     this.undelivered.delete(m);
+    this.dirty.add(m.recipientKey);
   }
 
   // Recipient change (rename rekey, purge normalization): moves the letter's
   // bucket entry and its delivered-and-unread contribution, then stamps the
-  // new key on the letter. A same-key call refreshes nothing and costs nothing.
+  // new key on the letter. A same-key call refreshes nothing and costs nothing
+  // (no dirty mark either: nothing about the persisted row changed here,
+  // though a caller that ALSO restamps a field like recipientName on a same-key
+  // call must markDirty itself, since that content change is invisible to this
+  // structural bookkeeping).
   rekey(m: M, newKey: string, now: number): void {
     if (m.recipientKey === newKey) return;
+    const oldKey = m.recipientKey;
     const removed = this.bucketRemove(m);
     if (removed && !m.read && now >= m.deliverAt) {
-      this.dec(m.recipientKey);
+      this.dec(oldKey);
       this.inc(newKey);
     }
     m.recipientKey = newKey;
     this.bucketAdd(m);
+    this.dirty.add(oldKey);
+    this.dirty.add(newKey);
   }
 
   // The read flip (mailTake, mailMarkRead): drops the letter's unread
@@ -107,14 +130,33 @@ export class MailIndex<M extends IndexedLetter> {
     if (m.read) return;
     if (now >= m.deliverAt) this.dec(m.recipientKey);
     m.read = true;
+    this.dirty.add(m.recipientKey);
+  }
+
+  // Mark one recipient's row for the next incremental save without any
+  // structural bucket change: the escape hatch for a mutation that patches a
+  // letter's OTHER persisted fields in place (a sender-identity restamp on a
+  // letter this key did not send/receive the structural side of, or a
+  // recipientName restamp on a same-key rekey() no-op). Idempotent.
+  markDirty(key: string): void {
+    this.dirty.add(key);
+  }
+
+  // Drain and clear the dirty set: the autosave boundary. A quiet interval
+  // with no mutations returns an empty array, so the caller can skip writing
+  // anything at all.
+  takeDirty(): string[] {
+    if (this.dirty.size === 0) return [];
+    const out = [...this.dirty];
+    this.dirty.clear();
+    return out;
   }
 
   // Per-tick: land any in-flight letter whose delivery time has arrived,
-  // moving it from `undelivered` into the unread count. Returns how many
-  // landed so the caller can advance its wire revision only when the visible
-  // mailbox contents actually changed. Draws no rng and emits nothing (the
-  // arrival toast stays on its own per-second cadence in PostOffice.update()),
-  // so it never perturbs the deterministic event/rng stream.
+  // moving it from `undelivered` into the unread count and dirtying only the
+  // recipients whose persisted deliverIn must now be 0. Draws no rng and emits
+  // nothing (arrival toasts stay in PostOffice.update()), so it never perturbs
+  // the deterministic event/rng stream.
   deliverDue(now: number): number {
     if (this.undelivered.size === 0) return 0;
     let landed = 0;
@@ -122,19 +164,23 @@ export class MailIndex<M extends IndexedLetter> {
       if (now < m.deliverAt) continue;
       this.undelivered.delete(m);
       if (!m.read) this.inc(m.recipientKey);
+      this.dirty.add(m.recipientKey);
       landed++;
     }
     return landed;
   }
 
   // Rebuild everything from the canonical book (after a deserialize/load, so
-  // none of this state is ever persisted).
+  // none of this state is ever persisted). Uses the quiet structural path:
+  // this is reconstructing state that is already durable, not creating new
+  // work for the next incremental autosave.
   rebuild(book: readonly M[], now: number): void {
     this.buckets.clear();
     this.unread.clear();
     this.undelivered.clear();
     this.custodyRefs.clear();
-    for (const m of book) this.track(m, now);
+    this.dirty.clear();
+    for (const m of book) this.trackQuiet(m, now);
   }
 
   // Is any letter in the book a custody parcel for this ref? The Exchange

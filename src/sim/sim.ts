@@ -6501,10 +6501,10 @@ export class Sim {
   // Bloodlust 1.3 x Wildfang Rally 1.05 x Enrage 1.25 = 1.71x attack speed
   // instead of the additive 1.6x. Single-source cases are unchanged
   // (1/(1 + x) === 1/mult for one aura). Slows keep their own multiplicative
-  // axis so layered slows are not weakened by the haste change.
-  swingIntervalMult(e: Entity): number {
+  // axis so layered slows are not weakened by the haste change; `channel` picks the seed stat.
+  swingIntervalMult(e: Entity, channel: 'melee' | 'ranged' = 'melee'): number {
     let slow = 1;
-    let haste = e.meleeHaste;
+    let haste = channel === 'ranged' ? e.rangedHaste : e.meleeHaste;
     for (const a of e.auras) {
       if (a.kind === 'attackspeed' || a.kind === 'sanguine') slow *= a.value;
       if (a.kind === 'buff_haste') haste += a.value - 1;
@@ -6732,10 +6732,10 @@ export class Sim {
     // The rest of the step (turn integration, wish vector, slope gates, swept
     // static collision, the vertical pass with fall damage) moved VERBATIM to
     // player_motion.ts (MV1), which also eases the body off terrain walls at the
-    // end (the standoff); playerMotionDeps binds the live Sim callbacks (fiesta-
-    // aware moveSpeedMult, delve-aware resolveMove, cancelCast/standUp/dealDamage)
-    // so behavior and the rng draw order are unchanged.
+    // end (the standoff); playerMotionDeps binds the live Sim callbacks
+    // (moveSpeedMult, resolveMove, cancelCast/standUp/dealDamage), preserving rng order.
     stepPlayerMotion(this.playerMotionDeps, p, meta.moveInput);
+    unstuckMod.noteBattlegroundWallPressure(this.ctx, meta, p);
   }
 
   private standUp(p: Entity): void {
@@ -10799,10 +10799,8 @@ export class Sim {
   // The Ravenpost: in-game mail
   // -------------------------------------------------------------------------
 
-  // Thin delegates to the PostOffice instance (this.postOffice), which owns the
-  // mail book / id counter / mailbox entity ids (mail/post_office.ts, the
-  // market.ts shape). server/game.ts and the IWorld surface call these
-  // unchanged; the inventory hub stays on Sim, reached via the SimContext.
+  // Thin delegates to PostOffice (this.postOffice), the mail book/id-counter/
+  // mailbox-ids owner (mail/post_office.ts, the market.ts shape).
 
   mailSend(
     to: string,
@@ -10850,9 +10848,7 @@ export class Sim {
     return this.postOffice.mailRevFor(pid);
   }
 
-  // Custody mail (the server's $WOC Exchange escrow returns and deliveries):
-  // thin delegates so a foreign caller resolves these on the Sim facade like
-  // every other mail entry, instead of reaching into sim.postOffice directly.
+  // Custody mail ($WOC Exchange escrow returns and deliveries).
   mailSystemParcel(
     recipient: { key: string; name: string },
     letter: import('./content/letters').LetterDef,
@@ -10881,6 +10877,14 @@ export class Sim {
 
   serializeMail(): MailSave {
     return this.postOffice.serializeMail();
+  }
+
+  takeDirtyMailPartitions(): { recipientKey: string; letters: MailSave['mail'] }[] {
+    return this.postOffice.takeDirtyMailPartitions();
+  }
+
+  markMailPartitionsDirty(recipientKeys: readonly string[]): void {
+    this.postOffice.markPartitionsDirty(recipientKeys);
   }
 
   loadMail(save: MailSave | null | undefined): void {
@@ -12008,10 +12012,8 @@ export class Sim {
     return this.delveDailyWire(this.primaryId);
   }
 
-  // Gathering profession proficiency (Mining/Logging/Herbalism), the real
-  // read surface for #1119, mapped onto the settled #1164 shape. Crafting/
-  // secondary professions still contribute nothing until #1120/#1125/#1126/
-  // #1140 land.
+  // Gathering profession proficiency; crafting/secondary professions still
+  // contribute nothing until #1120/#1125/#1126/#1140 land.
   professionsStateFor(pid: number): PlayerProfessionsView {
     const proficiency = this.players.get(pid)?.gatheringProficiency ?? emptyGatheringProficiency();
     return { skills: gatheringSkillsView(proficiency) };
@@ -12022,7 +12024,5 @@ export class Sim {
   }
 }
 
-// formatMoney now lives in ./format_money (a leaf module, to break the value-cycle
-// with market.ts and loot/loot_roll.ts). Re-exported here so existing importers
-// (e.g. tests/gold_command.test.ts) that import it from './sim' keep working.
+// Re-export for existing importers while the implementation lives in ./format_money.
 export { formatMoney };

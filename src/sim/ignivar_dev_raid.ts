@@ -1,5 +1,5 @@
 import { DUNGEONS } from './data';
-import { IGNIVAR_FORGE_APPROACH_ID } from './ignivar_raid_ids';
+import { IGNIVAR_FORGE_APPROACH_ID, isIgnivarRaidRoom } from './ignivar_raid_ids';
 import { resetRaidDevBot } from './raid_dev_bot';
 import type { SimContext } from './sim_context';
 
@@ -137,6 +137,7 @@ export function setupIgnivarDevRaid(ctx: SimContext, pid: number): IgnivarDevRai
   if (instance.partyKey !== ctx.instanceKeyFor(pid)) {
     return { ok: false, message: 'This live Ignivar claim belongs to another group.' };
   }
+  const priorPartyKey = instance.partyKey;
 
   const expectedNames = expectedBotNames();
   const expectedLowerNames = new Set(expectedNames.map((name) => name.toLowerCase()));
@@ -201,10 +202,15 @@ export function setupIgnivarDevRaid(ctx: SimContext, pid: number): IgnivarDevRai
     if (!party) return { ok: false, message: 'Could not form the Ignivar test raid.' };
   }
 
-  // The tester claimed the room while solo. Once the dev raid exists, transfer
-  // that same live claim to its authoritative party key so re-entry and cleanup
-  // continue to resolve to the room already on screen.
-  instance.partyKey = `party:${party.id}`;
+  // The tester may have walked through earlier floors while solo. Once the dev
+  // raid exists, transfer that whole live claim family to its authoritative
+  // party key so backward portals can still find every previous floor.
+  const partyKey = `party:${party.id}`;
+  for (const claim of ctx.instances) {
+    if (claim.partyKey === priorPartyKey && isIgnivarRaidRoom(claim.dungeonId)) {
+      claim.partyKey = partyKey;
+    }
+  }
   instance.enteredBy.add(pid);
   const origin = ctx.instanceOriginOf(instance);
 

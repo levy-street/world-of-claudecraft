@@ -267,6 +267,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'thunderstrut_gobbler',
   'drakemaw_raptor',
   'terrorspark_groundshaker',
+  'rickshaw_mount',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -282,12 +283,14 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor and terrorspark_groundshaker are absent, and that absence IS
-// the answer: no live table awards either (drakemaw_raptor has no acquisition
-// path, terrorspark_groundshaker is dev-grant only). They are the catalog's
-// two SOURCE_PENDING_RULING mounts; masterwork:engineering was the third
-// pending slot (QA ruling 2026-08-07) until masterwrought Phase 11o's
-// stats-bearing ocular un-pended it on that ruling's own condition.
+// drakemaw_raptor, terrorspark_groundshaker, and rickshaw_mount are absent,
+// and that absence IS the answer: no live table awards any of them
+// (drakemaw_raptor has no acquisition path, terrorspark_groundshaker and
+// rickshaw_mount are dev-grant only). They are the catalog's three
+// SOURCE_PENDING_RULING mounts; masterwork:engineering was a fourth pending
+// slot (QA ruling 2026-08-07) until masterwrought Phase 11o's stats-bearing
+// ocular un-pended it on that ruling's own condition, so the pending list is
+// mounts-only now.
 //
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
@@ -775,6 +778,7 @@ export const RELIQUARY_HEROIC_GEAR = {
   varkhul_forgefather_of_the_last_flame: [
     'bulwark_of_the_inner_crucible',
     'ember_wardens_barrier',
+    'varkhul_emberward',
     'heart_of_the_end_greatblade',
     'forgefire_spire',
     'staff_of_the_last_spring',
@@ -1669,13 +1673,10 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
   // growth and the measured autosave cost per catalogued id; if the sets
   // earn a prestige surface it should be an authored per-lineage page shape
   // (the honor-stock precedent), a curator decision recorded for the
-  // maintainer. The two Varkhul legendaries
-  // (varkhul_forgebreaker, varkhul_emberward) are deliberately ABSENT: no
-  // live table awards either yet (IGNIVAR_DROP_PLACEHOLDER_IDS,
-  // content/ignivar_drops.ts), and an unearnable slot must never sit on a
-  // conquerors page (it would dead-end col_reliquary_conquerors, the pin in
-  // tests/reliquary_content.test.ts); their page rows land with the drop
-  // wiring, as the ignivar_drops.ts contract records.
+  // maintainer. Emberward is catalogued on Varkhul's heroic page because its
+  // 3 percent roll is heroic-only. Forgebreaker remains absent while its
+  // crafting route is pending; an unearnable slot must never sit on a
+  // conquerors page because it would dead-end col_reliquary_conquerors.
   {
     id: 'conquerors_ignivar',
     shelf: 'conquerors',
@@ -1719,15 +1720,12 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'The Inner Crucible',
     desc: 'Epic spoils claimed from Varkhul, Forgefather of the Last Flame.',
     clearSource: { kind: 'dungeon', dungeonId: 'ignivar_inner_crucible', difficulty: 'normal' },
-    // The wing's one boss drops every relic on the page, including the
-    // legendary shield (the kingsbane 3 percent precedent; see
-    // content/ignivar_drops.ts). Forgebreaker is deliberately NOT paged:
-    // the maintainer pulled it from the loot table to route it through the
-    // crafting professions (2026-08-30), and a relic page row requires a
-    // conquerable source; it re-pages with its recipe chain.
+    // The wing's one boss drops every normal relic on the page. Emberward is
+    // heroic-only and lives on the heroic page below. Forgebreaker is not
+    // paged while its crafting route is pending; a relic row requires a live
+    // source, so it pages with its recipe chain.
     sourceDefault: fromBoss('varkhul_forgefather_of_the_last_flame'),
     relics: items(
-      'varkhul_emberward',
       'orb_of_the_last_spring',
       'cinder_of_the_first_design',
       'seal_of_the_forgewall',

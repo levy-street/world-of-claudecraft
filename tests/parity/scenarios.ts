@@ -2584,9 +2584,10 @@ function multiClassHeal(): Scenario {
       'applyHeal core: crit branch (rng.chance(spellCrit) draw), overheal clamp, heal2 emit',
       'hexOutputMult outgoing cut (hex on source) + healingTakenMult Mortal-Wound cut (target)',
       'consumeHealAbsorb soak: small shield depletes+filters, big shield survives',
+      'consumeHealAbsorb from HoT ticks: the periodic arm drains the shield too',
       'healingThreat even split across multiple aware mobs (entities.values insertion order)',
       'threatEntryMatchesEntity direct-target + pet-owner branches',
-      'hot aura-tick heal path (healingTakenMult ~3089 + healingThreat ~3101)',
+      'hot aura-tick heal path (healingTakenMult + consumeHealAbsorb + healingThreat)',
       'dealDamage consumers: critVulnBonus (crit-only) + hexOutputMult on a damage hit',
       'multi-class healers: priest/paladin/druid/shaman',
     ],
@@ -2727,9 +2728,10 @@ function multiClassHeal(): Scenario {
       rec.snapshot('crit-vuln-damage');
 
       // HoT path: a druid Rejuvenation on the tank ticks through the `hot` aura
-      // branch -> healingTakenMult(~3089) + healingThreat(~3101) foreign callers.
-      // (The surviving absorb_big rides along untouched: the hot branch never calls
-      // consumeHealAbsorb, only applyHeal does.)
+      // branch -> healingTakenMult + consumeHealAbsorb + healingThreat. The shield
+      // that survived heal 4 is shrunk to a HoT-sized pool first, so the ticks pin
+      // the whole periodic-absorb arc: eaten, drained to nothing, then landing.
+      (tank.auras.find((a: Aura) => a.id === 'absorb_big') as Aura).value = 400;
       tank.hp = 2000;
       tank.auras.push(
         aura({

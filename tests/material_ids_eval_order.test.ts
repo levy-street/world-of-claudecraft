@@ -47,6 +47,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     // require exact agreement.
     const derivation = await import('../src/sim/material_derivation');
     const professions = await import('../src/sim/content/professions');
+    const crucible = await import('../src/sim/content/crucible_professions');
     const enchants = await import('../src/sim/content/enchants');
     const farmCrops = await import('../src/sim/content/farm_crops');
     const gathering = await import('../src/sim/professions/gathering_materials');
@@ -61,6 +62,7 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
       farmMaterialItemIds: farmCrops.FARM_MATERIAL_ITEM_IDS,
       recipes: data.ALL_RECIPES,
       enchants: enchants.ENCHANTS,
+      recipePendingMaterialItemIds: crucible.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
       items: data.ITEMS,
     });
     expect([...set].sort()).toEqual([...rederived].sort());
@@ -80,6 +82,13 @@ describe('material_ids evaluation-order probe (pure table leaves keep the regist
     const ids = await import('../src/sim/material_ids');
     expect(ids.materialItemIds().size).toBeGreaterThan(0);
     expect(ids.isMaterialItemId('copper_ore')).toBe(true);
+  });
+
+  it('evaluates cleanly with the recipe-pending material table as the entry module', async () => {
+    const mod = await import('../src/sim/content/crucible_professions');
+    expect(mod.CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS).toContain('lastflame_core');
+    const ids = await import('../src/sim/material_ids');
+    expect(ids.isMaterialItemId('lastflame_core')).toBe(true);
   });
 
   it('evaluates cleanly with professions/gathering.ts as the entry module', async () => {

@@ -15,8 +15,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
-      "state": "4b2065e3",
+      "nextId": 1003,
+      "state": "c22ade12",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -61,7 +61,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -105,7 +105,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -119,7 +119,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 999,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -163,9 +163,9 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1015,
-      "state": "32d7e836",
-      "events": "ea23a2ef",
+      "nextId": 1014,
+      "state": "1e82e9c0",
+      "events": "0424cf85",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -174,9 +174,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1015,
-      "state": "fa5b1d64",
-      "events": "e7ccc8cd",
+      "nextId": 1014,
+      "state": "470eb17a",
+      "events": "3cb91461",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -185,9 +185,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 1015,
-      "state": "0209368d",
-      "events": "19cd74bb",
+      "nextId": 1014,
+      "state": "394ff3ce",
+      "events": "a0f9533f",
       "rng": {
         "draws": 1,
         "digest": "3650680b"
@@ -196,8 +196,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1015,
-      "state": "692b1348",
+      "nextId": 1014,
+      "state": "a2254967",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -207,8 +207,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1015,
-      "state": "692b1348",
+      "nextId": 1014,
+      "state": "a2254967",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -282,7 +282,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -295,6 +295,105 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 167200,
@@ -512,105 +611,6 @@
             "stock": {}
           },
           "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1014,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 55,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -625,7 +625,7 @@
               "name": "Battle Stance",
               "remaining": 3599.8,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -638,7 +638,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 5,
           "hp": 500,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -679,8 +679,9 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 998,
           "aiState": "attack",
+          "autoAttack": true,
           "castRemaining": 7.9,
           "castTotal": 10,
           "castingAbility": "Revolving Inferno",
@@ -695,13 +696,13 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1003,
           "ignivar": {
             "attemptParticipantIds": [
-              999,
+              998,
+              1011,
               1012,
-              1013,
-              1014
+              1013
             ],
             "brandTimer": 998.95,
             "conduitTimers": {},
@@ -720,7 +721,7 @@
             "rotatingRaysDirection": 1,
             "rotatingRaysFacing": 0.031416,
             "rotatingRaysHitCooldownByPlayerId": {
-              "999": 0.45
+              "998": 0.45
             },
             "rotatingRaysNextDirection": -1,
             "rotatingRaysPulseTimer": 0.45,
@@ -772,7 +773,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1012,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -821,7 +822,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1013,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -870,7 +871,7 @@
           "fiveSecondRule": 99.2,
           "healPower": 41,
           "hp": 1000,
-          "id": 1014,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -913,9 +914,9 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1015,
-      "state": "b128222f",
-      "events": "1df75ce4",
+      "nextId": 1014,
+      "state": "ff847f04",
+      "events": "e6e79e42",
       "rng": {
         "draws": 4,
         "digest": "6869608b"
@@ -924,8 +925,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1015,
-      "state": "b128222f",
+      "nextId": 1014,
+      "state": "ff847f04",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -999,7 +1000,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1012,6 +1013,105 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 167200,
@@ -1229,105 +1329,6 @@
             "stock": {}
           },
           "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1014,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 55,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -1342,7 +1343,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -1355,7 +1356,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 5,
           "hp": 500,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1396,14 +1397,15 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 998,
           "aiState": "attack",
+          "autoAttack": true,
           "castAim": {
             "x": 116800.471161,
             "z": -1230.607402
           },
           "castRemaining": 3,
-          "castTargetId": 999,
+          "castTargetId": 998,
           "castTotal": 3,
           "castingAbility": "Searing Torrent",
           "ccImmune": true,
@@ -1416,13 +1418,13 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1003,
           "ignivar": {
             "attemptParticipantIds": [
-              999,
+              998,
+              1011,
               1012,
-              1013,
-              1014
+              1013
             ],
             "brandTimer": 12,
             "conduitTimers": {},
@@ -1444,7 +1446,7 @@
             "rotatingRaysDirection": 1,
             "rotatingRaysFacing": 0.031416,
             "rotatingRaysHitCooldownByPlayerId": {
-              "999": 0.45
+              "998": 0.45
             },
             "rotatingRaysNextDirection": -1,
             "rotatingRaysPulseTimer": 0.45,
@@ -1499,7 +1501,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1003,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1514,7 +1516,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1012,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1566,7 +1568,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1003,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1581,7 +1583,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1013,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1633,7 +1635,7 @@
               "name": "Brand of the Pyre",
               "remaining": 600,
               "school": "fire",
-              "sourceId": 1004,
+              "sourceId": 1003,
               "stacks": 1,
               "tickInterval": 2,
               "tickTimer": 2,
@@ -1648,7 +1650,7 @@
           "fiveSecondRule": 99.25,
           "healPower": 41,
           "hp": 418,
-          "id": 1014,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -1691,8 +1693,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "61974225",
+      "nextId": 1014,
+      "state": "eda0c6cf",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -1702,8 +1704,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "61974225",
+      "nextId": 1014,
+      "state": "eda0c6cf",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -1777,7 +1779,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1790,6 +1792,105 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 167200,
@@ -2007,105 +2108,6 @@
             "stock": {}
           },
           "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1014,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 55,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2120,7 +2122,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -2133,7 +2135,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.3,
           "healPower": 5,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2174,8 +2176,9 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 998,
           "aiState": "idle",
+          "autoAttack": true,
           "ccImmune": true,
           "combatTimer": 0.15,
           "comboUntil": -1,
@@ -2187,7 +2190,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1003,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -2231,7 +2234,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1012,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2280,7 +2283,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1013,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2329,7 +2332,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1014,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2372,8 +2375,8 @@
     {
       "tick": 6,
       "time": 0.3,
-      "nextId": 1015,
-      "state": "61974225",
+      "nextId": 1014,
+      "state": "eda0c6cf",
       "events": "741638a5",
       "rng": {
         "draws": 5,
@@ -2447,7 +2450,7 @@
           "delveClears": {},
           "delveDaily": {},
           "dungeonDifficulty": "heroic",
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -2460,6 +2463,105 @@
             {
               "count": 5,
               "itemId": "baked_bread"
+            }
+          ],
+          "lifetimeXp": 167200,
+          "mailWelcomed": true,
+          "nodeHarvestReadyAt": {},
+          "recipesGrandfathered": true,
+          "reliquary": {
+            "counts": {},
+            "firstFind": {}
+          },
+          "renown": 55,
+          "talents": {
+            "rows": {}
+          },
+          "townFocus": {},
+          "vault": {
+            "stock": {}
+          },
+          "wyrmfallDaily": {}
+        },
+        {
+          "activeLoadout": -1,
+          "archetype": {},
+          "arena2v2Rating": 1500,
+          "arenaRating": 1500,
+          "bags": [
+            null,
+            null,
+            null,
+            null
+          ],
+          "bank": {
+            "socketBags": [
+              null,
+              null,
+              null,
+              null
+            ]
+          },
+          "bgRating": 1500,
+          "cls": "mage",
+          "companionUpgrades": {},
+          "counters": {},
+          "craftDaily": {},
+          "craftSkills": {},
+          "deedStats": {
+            "counters": {},
+            "dungeonClears": {},
+            "itemsDiscovered": [
+              "apprentice_robe",
+              "baked_bread",
+              "gnarled_staff",
+              "spring_water"
+            ]
+          },
+          "deedsEarned": [
+            [
+              "feat_era_cap",
+              ""
+            ],
+            [
+              "prog_double_digits",
+              ""
+            ],
+            [
+              "prog_finding_your_feet",
+              ""
+            ],
+            [
+              "prog_first_steps",
+              ""
+            ],
+            [
+              "prog_level_cap",
+              ""
+            ],
+            [
+              "prog_the_long_middle",
+              ""
+            ]
+          ],
+          "delveClears": {},
+          "delveDaily": {},
+          "entityId": 1011,
+          "equipment": {
+            "chest": "apprentice_robe",
+            "mainhand": "gnarled_staff"
+          },
+          "equipmentInstance": {},
+          "gatheringProficiency": {},
+          "heroicDaily": {},
+          "inventory": [
+            {
+              "count": 5,
+              "itemId": "baked_bread"
+            },
+            {
+              "count": 5,
+              "itemId": "spring_water"
             }
           ],
           "lifetimeXp": 167200,
@@ -2677,105 +2779,6 @@
             "stock": {}
           },
           "wyrmfallDaily": {}
-        },
-        {
-          "activeLoadout": -1,
-          "archetype": {},
-          "arena2v2Rating": 1500,
-          "arenaRating": 1500,
-          "bags": [
-            null,
-            null,
-            null,
-            null
-          ],
-          "bank": {
-            "socketBags": [
-              null,
-              null,
-              null,
-              null
-            ]
-          },
-          "bgRating": 1500,
-          "cls": "mage",
-          "companionUpgrades": {},
-          "counters": {},
-          "craftDaily": {},
-          "craftSkills": {},
-          "deedStats": {
-            "counters": {},
-            "dungeonClears": {},
-            "itemsDiscovered": [
-              "apprentice_robe",
-              "baked_bread",
-              "gnarled_staff",
-              "spring_water"
-            ]
-          },
-          "deedsEarned": [
-            [
-              "feat_era_cap",
-              ""
-            ],
-            [
-              "prog_double_digits",
-              ""
-            ],
-            [
-              "prog_finding_your_feet",
-              ""
-            ],
-            [
-              "prog_first_steps",
-              ""
-            ],
-            [
-              "prog_level_cap",
-              ""
-            ],
-            [
-              "prog_the_long_middle",
-              ""
-            ]
-          ],
-          "delveClears": {},
-          "delveDaily": {},
-          "entityId": 1014,
-          "equipment": {
-            "chest": "apprentice_robe",
-            "mainhand": "gnarled_staff"
-          },
-          "equipmentInstance": {},
-          "gatheringProficiency": {},
-          "heroicDaily": {},
-          "inventory": [
-            {
-              "count": 5,
-              "itemId": "baked_bread"
-            },
-            {
-              "count": 5,
-              "itemId": "spring_water"
-            }
-          ],
-          "lifetimeXp": 167200,
-          "mailWelcomed": true,
-          "nodeHarvestReadyAt": {},
-          "recipesGrandfathered": true,
-          "reliquary": {
-            "counts": {},
-            "firstFind": {}
-          },
-          "renown": 55,
-          "talents": {
-            "rows": {}
-          },
-          "townFocus": {},
-          "vault": {
-            "stock": {}
-          },
-          "wyrmfallDaily": {}
         }
       ],
       "entities": [
@@ -2790,7 +2793,7 @@
               "name": "Battle Stance",
               "remaining": 3599.75,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -2803,7 +2806,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.3,
           "healPower": 5,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -2844,8 +2847,9 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 998,
           "aiState": "idle",
+          "autoAttack": true,
           "ccImmune": true,
           "combatTimer": 0.15,
           "comboUntil": -1,
@@ -2857,7 +2861,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 210000,
-          "id": 1004,
+          "id": 1003,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -2901,7 +2905,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1012,
+          "id": 1011,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2950,7 +2954,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1013,
+          "id": 1012,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",
@@ -2999,7 +3003,7 @@
           "dodgeChance": 0.056,
           "fiveSecondRule": 99.3,
           "healPower": 41,
-          "id": 1014,
+          "id": 1013,
           "kind": "player",
           "level": 20,
           "lootFfaTimer": "Infinity",

@@ -29,6 +29,12 @@ export const STONEBOUND_WARD_SMOOTH_ID = 'shaman_stonebound_ward_smooth';
 export const WARSPIRIT_CADENCE_STEPS = 3;
 export const GALEHEART_ECHO_COUNT = 2;
 export const GALEHEART_ECHO_DAMAGE = 0.25;
+/** Living Weapon (sha_r20_tidal_waves): the share of EACH Galeheart echo that
+ *  splashes to nearby enemies, and how many of them it reaches. This is the
+ *  spec's only multi-target line, so it alone sets the area/single ratio the
+ *  role band pins (tests/owned_class_balance_role_bands.test.ts). */
+export const LIVING_WEAPON_CLEAVE_PERCENT = 0.4;
+export const LIVING_WEAPON_CLEAVE_TARGETS = 2;
 export const STORMCAST_DURATION = 12;
 // buff_armor_pct / buff_sta_pct store integer percentage points (40 = +40%).
 // v0.38 tank threat/survivability parity pass: armor 30 -> 40, stamina bonus
@@ -308,18 +314,28 @@ export function advanceWarspiritCadence(
         const rightDist = (right.pos.x - target.pos.x) ** 2 + (right.pos.z - target.pos.z) ** 2;
         return leftDist - rightDist || left.id - right.id;
       })
-      .slice(0, 2);
+      .slice(0, LIVING_WEAPON_CLEAVE_TARGETS);
+    // EVERY echo cleaves, not just one burst. The primary eats
+    // GALEHEART_ECHO_COUNT echoes while a secondary used to eat a single
+    // half-strength one, so each secondary took a quarter of the primary's
+    // echo line and Warspirit had effectively no AoE (a 3-target sustained
+    // window measured 1.04x its own single-target). Radius selection stays
+    // OUTSIDE the loop: it is the only non-trivial work here and the set
+    // cannot change between echoes, which draw no rng.
+    const cleaveDamage = Math.max(1, Math.round(echoDamage * LIVING_WEAPON_CLEAVE_PERCENT));
     for (const secondary of nearby) {
-      ctx.dealDamage(
-        player,
-        secondary,
-        Math.max(1, Math.round(echoDamage * 0.5)),
-        false,
-        'nature',
-        'Living Weapon',
-        'hit',
-        false,
-      );
+      for (let echo = 0; echo < GALEHEART_ECHO_COUNT && !secondary.dead; echo++) {
+        ctx.dealDamage(
+          player,
+          secondary,
+          cleaveDamage,
+          false,
+          'nature',
+          'Living Weapon',
+          'hit',
+          false,
+        );
+      }
     }
   }
   return true;

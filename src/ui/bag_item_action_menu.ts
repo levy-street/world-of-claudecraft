@@ -39,6 +39,7 @@ import {
   type BagItemContextActionId,
   bagItemContextActions,
   destroyConsumesSpecialCopy,
+  vendorSellContextActions,
 } from './bag_item_context_menu';
 import { bagStackIndex } from './bags_view';
 import { itemDisplayName } from './entity_i18n';
@@ -153,7 +154,15 @@ export class BagItemActionMenu {
 
   /** Open the action menu for a bag stack. `runDefault` runs the exact classic
    *  left-click action for the clicked slot, so the menu's first row is
-   *  byte-identical to a plain click. */
+   *  byte-identical to a plain click. `vendorSellCount`, supplied only at an
+   *  open vendor for a sellable item (bags_window.ts), is every copy of this
+   *  item held across the bags: it swaps in the vendor-only row set (Sell,
+   *  plus Sell all when more than one copy is held) instead of the profession
+   *  rows and the lock toggle, which a vendor never offers. `target` carries
+   *  the clicked slot REFERENCE, so a row that re-resolves it at action time
+   *  (the lock toggle) is proof against a mid-menu bag shift; the destroy rows
+   *  still forward `target.index` alone and lean on confirmDestroy's own
+   *  same-id guard, which a shift that swaps in an id-mate still passes. */
   open(
     def: ItemDef,
     itemId: string,
@@ -162,15 +171,28 @@ export class BagItemActionMenu {
     y: number,
     runDefault: () => void,
     instance?: ItemInstancePayload,
+    vendorSellCount?: number,
+    runSellAll?: () => void,
   ): void {
-    const rows = bagItemContextActions(def, itemId, instance).map((action) => ({
+    const actions =
+      vendorSellCount === undefined
+        ? bagItemContextActions(def, itemId, instance)
+        : vendorSellContextActions(vendorSellCount);
+    const rows = actions.map((action) => ({
       act: action.id,
-      html: esc(t(action.labelKey)),
+      html: esc(
+        t(
+          action.labelKey,
+          action.count === undefined ? undefined : { count: itemNumber(action.count) },
+        ),
+      ),
     }));
     this.paint(rows, x, y, (act) => {
       const id = act as BagItemContextActionId;
       if (id === 'default') runDefault();
-      else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
+      else if (id === 'sellAll' && vendorSellCount !== undefined) {
+        runSellAll?.();
+      } else if (id === 'disenchant') this.confirmDestroy('disenchant', itemId, target.index);
       else if (id === 'salvage') this.confirmDestroy('salvage', itemId, target.index);
       else if (id === 'sunder') this.confirmDestroy('sunder', itemId, target.index);
       else if (id === 'applyEnchant') this.openEnchantPicker(itemId, x, y);

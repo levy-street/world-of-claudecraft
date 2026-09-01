@@ -271,6 +271,25 @@
   body.mobile-touch.mobile-chat-open #mobile-move-zone {
     display: none;
   }
+  /* Pairing a controller to a phone: the cross hotbar becomes the ONLY
+     hotbar and stands ALONE (further below, body.mobile-touch:not(.xhb-mode)
+     .xhb), so the movement/camera joysticks and the combat action ring --
+     exactly what the pad replaces (movement, camera look, abilities via its
+     own bindings and the cross hotbar, which is also seeded with the class's
+     stance) -- stand down entirely rather than sitting on screen unused.
+     Menu-access chrome (Chat/Social/the Quick Actions seat) is NOT part of
+     this: only the direct gameplay-input surfaces yield. Keyed off XHB MODE
+     (.xhb-mode, cross_hotbar_wiring.ts's syncPadMode: enabled AND connected),
+     not raw pad connection, so a player who turns the cross-hotbar overlay
+     off keeps this touch chrome instead of losing both: they still drive
+     movement/camera/attack through the pad's base bindings, but with no
+     overlay to replace the ring they need it on screen. */
+  body.mobile-touch.xhb-mode #mobile-move-zone,
+  body.mobile-touch.xhb-mode #mobile-move-joystick,
+  body.mobile-touch.xhb-mode #mobile-camera-joystick,
+  body.mobile-touch.xhb-mode #mobile-action-ring {
+    display: none;
+  }
   body.mobile-touch #mobile-move-joystick {
     opacity: 0.5;
     transition: opacity 0.12s linear;
@@ -440,6 +459,19 @@
     gap: 8px;
     pointer-events: auto;
     z-index: 30;
+  }
+  /* The seat above sits past the now-hidden movement wheel, squarely inside the
+     XHB's own centred band (confirmed live: fully inside the bar's box at the
+     844x390 reference landscape viewport). The wheel it seats next to is hidden
+     in this mode too, so sliding it further left, clear of the bar's left edge,
+     costs nothing: nothing else lives in that reclaimed strip while a pad drives
+     movement. Split in two because the left-handed mirror below flips left/right
+     rather than just re-deriving the same offset. */
+  body.mobile-touch.xhb-mode:not(.mobile-left-handed) #mobile-combat-controls {
+    left: max(12px, env(safe-area-inset-left));
+  }
+  body.mobile-touch.xhb-mode.mobile-left-handed #mobile-combat-controls {
+    right: max(12px, env(safe-area-inset-right));
   }
   /* A true CIRCLE at the shared --menu-btn-size, not the row's 58x54 oval, and
      scaled by the same --btn-scale the ring uses about the seat's own bottom
@@ -2247,6 +2279,26 @@
     );
     box-shadow: 0 0 9px rgba(245, 200, 67, 0.34);
   }
+  /* The always-visible XP percent (new-player-first-hour): touch has no
+     hover at all and #xpbar itself (plus its .label) is hidden here, so the
+     ring was the ONLY XP surface with no numeric readout whatsoever. Reads
+     the same data-percent attribute the painter already writes onto
+     #player-frame alongside --xp-fill (the ring's own established
+     dual-target pattern), captioned just under the ring rather than over the
+     portrait face. */
+  body.mobile-touch #player-frame::after {
+    content: attr(data-percent);
+    position: absolute;
+    left: -5px;
+    top: 68px;
+    width: 73px;
+    z-index: 2;
+    font-size: 9px;
+    color: #fff;
+    text-align: center;
+    text-shadow: 1px 1px 1px #000;
+    pointer-events: none;
+  }
   body.mobile-touch #xpbar .fill,
   body.mobile-touch #xpbar .ticks {
     display: none;
@@ -2281,6 +2333,16 @@
   body.mobile-touch #castbar .label {
     display: none;
   }
+  /* xhb-mode's lift (hud.css's body.xhb-mode #castbar, translateY only) never
+     reaches this bar: transform is a single property, this file loads after
+     components (hud-mobile outranks it in the cascade), and the rule right
+     above already claims transform for the mobile centring translate. Compose
+     the lift into THAT translate instead of relying on the desktop rule to
+     add it, or the bar stays parked on the button row's line while the XHB
+     visibly claims the same band. */
+  body.mobile-touch.xhb-mode #castbar {
+    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)));
+  }
   /* The swing timer had no mobile seat at all (unlike #castbar above): it fell
      back to the desktop `bottom: 234px` fixed value, which on a short mobile
      landscape viewport lands mid-screen and covers enemy nameplates and their
@@ -2301,6 +2363,25 @@
     opacity: 0.9;
   }
   body.mobile-touch #swingbar .label {
+    display: none;
+  }
+  /* Off-hand swing timer (dual-wield only): stacked directly above the
+     main-hand bar, same seat/scale contract, so both independent melee-weaving
+     clocks stay clear of nameplates on a short landscape viewport. */
+  body.mobile-touch #swingbar-offhand {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--mobile-button-row-lift) + 23px);
+    width: calc(300px * 0.82 * var(--mobile-chrome-scale, 1));
+    min-width: 0;
+    height: 5px;
+    transform: translateX(-50%);
+    z-index: 19;
+    border-width: 1px;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  body.mobile-touch #swingbar-offhand .label {
     display: none;
   }
   body.mobile-touch #actionbar-row {
@@ -2383,12 +2464,154 @@
   /* Daily chest (issue 1577): the top-right rail button used to sit right next
      to the minimap and overlap the buff/debuff bars at the landscape breakpoint.
      It is folded into the More tray (#mobile-daily-rewards, styled with the rest
-     of #mobile-extra-grid) instead, so the whole #side-buttons rail (every
-     .micro-btn on it is already hidden below) and the standalone chest button
-     are hidden on mobile; the desktop rail and #daily-rewards-window are
-     untouched. */
-  body.mobile-touch #side-buttons {
+     of #mobile-extra-grid) instead, so the whole #side-buttons rail and the
+     standalone chest button are hidden on mobile (below); the desktop rail and
+     #daily-rewards-window are untouched.
+     UNLESS a pad is actively driving the XHB (.xhb-mode): its right-stick
+     mouse mode (src/game/gamepad.ts) is the same pointer-plus-click scheme
+     desktop uses to reach this rail, and Quick Actions' tap/hold/swipe touch
+     gestures are not reachable one-handed off the pad. The rail stands back up
+     for the pad's cursor exactly as it does on desktop (trimmed further below);
+     the Quick Actions seat stays available too, so the touch path and the pad
+     path coexist. The standalone chest button stays hidden either way (below):
+     its mobile equivalent already lives in the More tray, so it never needs the
+     desktop rail's copy back. */
+  body.mobile-touch:not(.xhb-mode) #side-buttons {
     display: none;
+  }
+  /* The desktop rail is bottom-anchored and grows upward; on a landscape phone
+     that runs it straight into the minimap cluster claiming the top-right
+     corner (confirmed live: the two overlapped by ~65px at the standard
+     844x390 landscape viewport). Re-anchored from the top instead, below the
+     minimap, using the same 140px clearance #buff-bar/#debuff-bar already use
+     for this exact problem. */
+  body.mobile-touch.xhb-mode #side-buttons {
+    top: max(140px, env(safe-area-inset-top));
+    bottom: auto;
+  }
+  /* #right-tracker-stack (below) rests at this SAME top:140px clearance, so the
+     revived rail sat squarely on top of it (confirmed live: their boxes
+     overlapped by ~50px at the reference viewport, and the deed/reliquary
+     tracker's compact-tier hit-box extension, z-index 20 to the rail's 19,
+     painted over the rail's top buttons and stole their taps and pad-cursor
+     clicks). Deed/reliquary are progress chrome, not actionable combat info
+     (no graphics-fairness concern), so they stand down here; the More tray
+     (#mobile-extra-controls) and the rail's own Book of Deeds / Reliquary
+     launchers still open the full windows. #delve-tracker and #rift-tracker
+     are the exceptions
+     (the stack's own re-seat below): a live delve run's objective and affix
+     info, and a live rift run's pacing, ARE actionable. */
+  body.mobile-touch.xhb-mode #deed-tracker,
+  body.mobile-touch.xhb-mode #reliquary-tracker {
+    display: none;
+  }
+  /* The stack itself re-seats to the left edge instead of standing down,
+     mirroring the quest tracker's own left-side standdown seat (#quest-strip,
+     above): that is the one corner this mode leaves clear (the touch
+     move-zone/joystick it used to share it with are hidden in xhb-mode too,
+     and Quick Actions' revived seat sits lower, at the bottom-left).
+     #delve-tracker and #rift-tracker are the live children left visible above,
+     so they move with the stack; no per-child positioning override needed,
+     since both are plain flex children of this box.
+
+     BOTTOM-anchored, not top: both this stack and .xhb live inside the same
+     #ui, which carries `zoom: var(--ui-scale)` (src/ui/ui_scale.ts), so every
+     author length here is multiplied by the live UI Scale setting (0.85 to
+     1.4, src/game/settings.ts) when rendered. .xhb's own seat (`bottom:
+     var(--xhb-bottom, 18px)`) plus its measured rest height (confirmed live:
+     142px at UI Scale 1) puts its rendered top at approximately
+     `#ui`'s-bottom-edge minus 160px times the SAME scale. Anchoring this
+     stack from the bottom by the same kind of flat, unscaled-by-app-vh
+     literal (172px: that 160px footprint plus a 12px gap) means both boxes
+     move in lockstep under any UI Scale, so the gap between them stays
+     proportional instead of a flat `top` (tried first; confirmed live to
+     land the tracker fully inside the XHB band at UI Scale 1.4, since a
+     top-anchored box does not move as .xhb's bottom-anchored one does).
+     !important: top is otherwise a live DOM write from
+     tracker_stack_anchor.ts (re-seating the box under the minimap column
+     every 500ms), and an inline style beats any plain rule regardless of
+     specificity, the same reason --xhb-lift above needs it; bottom/left/
+     right have no competing writer.
+
+     left matches the column's own convention (#target-frame, #party-frames
+     both use this exact expression), not a new one-off value, so the seat
+     lines up with its column neighbours on a notched phone instead of
+     sitting 10px further in.
+
+     z-index drops from the stack's usual 20 (the rail click-steal fix
+     above) to UNDER #party-frames' 5: an expanded duo party (delves cap at
+     2 players, src/sim/delves/runs.ts's maxPlayers gate) can reach into
+     this same corner (confirmed live: a 2-member #party-frames reaches
+     y180 at UI Scale 1, and this seat's own content can start as high as
+     y128), and party HP is the kind of actionable info the graphics-
+     fairness rule protects, so it must win the paint order over a
+     progress-style delve tracker on the rare overlap rather than the other
+     way around; #right-tracker-stack carries no clickable full-width area
+     here to lose by yielding (only .dt-affix-row, itself unaffected by
+     paint order for its own hit-testing). */
+  body.mobile-touch.xhb-mode #right-tracker-stack {
+    left: max(20px, calc(env(safe-area-inset-left) + 10px));
+    right: auto;
+    top: auto !important;
+    bottom: 172px;
+    z-index: 4;
+  }
+  /* Bounded the same way #quest-strip's own objectives block is (above): a
+     run's objective/affix/pacing lines are unbounded in height (the delve and
+     rift tracker controllers write the whole innerHTML per update), and
+     this seat sits between the quest strip above and the XHB band below.
+     Scale-aware, the same idiom #meters-window uses just above, but the
+     subtraction order matters here: #quest-strip is NOT zoomed (it is a
+     sibling of #ui, inside the unzoomed #mobile-controls, so its ~128px
+     real footprint never moves), while this box and its 172px bottom anchor
+     ARE (both live inside #ui, zoomed by --ui-scale). Subtracting the
+     unzoomed 128px from --app-vh FIRST, in real px, then dividing the
+     REMAINDER by --ui-scale, converts that fixed real budget into the
+     logical units this box is measured in; dividing the whole --app-vh (as
+     a first attempt did) instead scales the quest-strip clearance right
+     along with everything else and goes negative at UI Scale 1.4 (clamping
+     max-height to 0: invisible, the same loss this fix exists to undo).
+     This shrinks the cap as the footprint grows, so the box never claims
+     more of the fixed viewport than is actually free; content that still
+     does not fit scrolls (below) rather than clipping silently or
+     overlapping the strip. pointer-events: auto is required for that
+     scroll to be a real affordance, not decoration: both live trackers' OWN
+     base rules (hud.css) are pointer-events: none (every tracker in this
+     stack floats over the game world unclickable except its one
+     interactive row), so without this a touch drag here falls through to
+     the canvas instead of scrolling. It shares this corner only with
+     #party-frames on an expanded duo party (the z-index note above), which
+     already wins the paint order there and is unaffected by this element's
+     own pointer-events, so claiming touches back here is safe the way it
+     would not have been at the old right-side seat (the .dt-affix-row
+     click-steal precedent this stack's z-index comment above describes). */
+  body.mobile-touch.xhb-mode #delve-tracker,
+  body.mobile-touch.xhb-mode #rift-tracker {
+    max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+  /* Trimmed to the launchers with no other pad-reachable path: Quick Actions'
+     own strip (#mobile-menu-strip, kept up alongside this rail per the review
+     above) already covers Character, Spellbook, World Map, Bags, Quest Log,
+     Friends & Guild and the Game Menu, so duplicating them here would only
+     cost height the rail cannot spare at this floor (below) without also
+     re-litigating the touch-floor math the desktop short-viewport rescue
+     already settled. Every hidden id has a live Quick Actions equivalent:
+     mm-char/mm-spell/mm-quest/mm-map/mm-bag/mm-social/mm-options pair with
+     mobile-menu-char/mobile-menu-spellbook/mobile-quest/mobile-menu-map/
+     mobile-menu-bags/mobile-social/mobile-menu respectively. */
+  body.mobile-touch.xhb-mode #mm-char,
+  body.mobile-touch.xhb-mode #mm-spell,
+  body.mobile-touch.xhb-mode #mm-quest,
+  body.mobile-touch.xhb-mode #mm-map,
+  body.mobile-touch.xhb-mode #mm-bag,
+  body.mobile-touch.xhb-mode #mm-social,
+  body.mobile-touch.xhb-mode #mm-options {
+    display: none;
+  }
+  body.mobile-touch.xhb-mode .side-buttons-col {
+    gap: 0;
   }
   body.mobile-touch #daily-rewards-button {
     display: none !important;
@@ -2489,25 +2712,23 @@
   body.mobile-touch #actionbar {
     display: none;
   }
-  /* Pairing a pad to a phone changes the INPUT, not the layout. The action ring
-     above already owns this band, so the cross hotbar stands down here rather
-     than drawing its bar across the ring and shoving the touch seats around. */
-  body.mobile-touch .xhb {
+  /* The action ring above owns the touch action-bar band, so the cross
+     hotbar overlay stands down here to avoid drawing its bar across the ring
+     and shoving the touch seats around -- UNLESS a pad is actively driving it
+     (.xhb-mode): then the ring already stood itself down (above), the XHB is
+     the only hotbar left, and it takes over the band the ring vacated instead
+     of leaving the player with no hotbar at all. */
+  body.mobile-touch:not(.xhb-mode) .xhb {
     display: none;
   }
-  /* !important because cross_hotbar_wiring writes the measured lift inline on
-     body, which a stylesheet declaration alone cannot outrank. */
-  body.mobile-touch {
+  /* Zeroed only when the bar is not shown: with it visible (.xhb-mode) the
+     lift is what moves #player-frame and #castbar clear of it (hud.css's
+     body.xhb-mode #player-frame), so zeroing it there would sit the player
+     frame on top of the bar. !important because cross_hotbar_wiring writes
+     the measured lift inline on body, which a stylesheet declaration alone
+     cannot outrank. */
+  body.mobile-touch:not(.xhb-mode) {
     --xhb-lift: 0px !important;
-  }
-  /* Pad mode stands the desktop stance ROW down because the cross hotbar is
-     seeded with the stances, and on touch the cross hotbar itself stands down
-     (above), which would leave a warrior no way to switch stance at all. The
-     touch shape is no longer that row, so the exemption moves with it: the ring's
-     stance control is not #stancebar and pad mode never hides it. Kept as a rule
-     rather than deleted so the reasoning survives next to what it guards. */
-  body.mobile-touch.xhb-mode #mobile-stance-anchor {
-    visibility: visible;
   }
   /* The community-links rail (Discord/GitHub/Donate) is hidden in-game on
      touch: its two-person toggle icon under the minimap read as a Friends
@@ -2795,6 +3016,18 @@
     transform: translateX(-50%) scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
     transform-origin: center top;
   }
+  /* xhb-mode's lift (hud.css's body.xhb-mode #player-frame, translateY only)
+     never reaches this frame for the same reason as #castbar above: transform
+     is a single property and this rule already claims it for centring plus
+     the scale. Composed here instead of relying on the desktop rule to add
+     it, or the frame sits on the button row's line while the XHB visibly
+     claims the same band. The landscape-only touch HUD has its own scale
+     override further down (0.6, not 0.82) that needs the identical
+     treatment; see the matching rule inside @media (orientation: landscape). */
+  body.mobile-touch.xhb-mode #player-frame {
+    transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
+      scale(calc(0.82 * var(--mobile-chrome-scale, 1)));
+  }
   body.mobile-touch .warlock-doom-frame {
     position: fixed;
     z-index: 21;
@@ -2881,7 +3114,7 @@
   body.mobile-touch .paladin-ascension-charges {
     top: -4px;
     left: 8px;
-    width: 56px;
+    width: 78px;
   }
   body.mobile-touch .paladin-ascension-charges span {
     width: 9px;
@@ -7602,6 +7835,11 @@
       min-width: 0;
       height: 4px;
     }
+    body.mobile-touch #swingbar-offhand {
+      width: calc(300px * 0.6 * var(--mobile-chrome-scale, 1));
+      min-width: 0;
+      height: 4px;
+    }
     /* Same bottom-centre column as portrait, at the landscape frame scale so the
        strip matches the player frame's width.
        0.6 renders the frame ~33px, under the 40px touch floor: deliberately the
@@ -7659,6 +7897,14 @@
       left: 50%;
       width: 300px;
       transform: translateX(-50%) scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
+    }
+    /* Landscape's own scale (0.6, not the portrait rule's 0.82 above) needs the
+       SAME composed lift, or a pad paired on the landscape-only touch HUD (the
+       only orientation it ever runs in) gets the un-lifted frame regardless of
+       the portrait-scoped fix. */
+    body.mobile-touch.xhb-mode #player-frame {
+      transform: translateX(-50%) translateY(calc(-1 * var(--xhb-lift, 56px)))
+        scale(calc(0.6 * var(--mobile-chrome-scale, 1)));
     }
     body.mobile-touch #player-frame .uf-bars {
       width: 224px;
@@ -8001,6 +8247,7 @@
   }
   body.mobile-touch.hud-mobile-compact #castbar,
   body.mobile-touch.hud-mobile-compact #swingbar,
+  body.mobile-touch.hud-mobile-compact #swingbar-offhand,
   body.mobile-touch.hud-mobile-compact #pet-frame {
     left: calc(50% - 15px);
   }
@@ -8011,6 +8258,7 @@
   }
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+  body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar-offhand,
   body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
     left: calc(50% + 15px);
   }
@@ -8032,6 +8280,7 @@
     body.mobile-touch.hud-mobile-compact #player-frame,
     body.mobile-touch.hud-mobile-compact #castbar,
     body.mobile-touch.hud-mobile-compact #swingbar,
+    body.mobile-touch.hud-mobile-compact #swingbar-offhand,
     body.mobile-touch.hud-mobile-compact #pet-frame {
       left: calc(50% - 44px);
     }
@@ -8039,6 +8288,7 @@
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #castbar,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-compact.mobile-left-handed #swingbar-offhand,
     body.mobile-touch.hud-mobile-compact.mobile-left-handed #pet-frame {
       left: calc(50% + 44px);
     }
@@ -8081,6 +8331,7 @@
     body.mobile-touch.hud-mobile-tablet #player-frame,
     body.mobile-touch.hud-mobile-tablet #castbar,
     body.mobile-touch.hud-mobile-tablet #swingbar,
+    body.mobile-touch.hud-mobile-tablet #swingbar-offhand,
     body.mobile-touch.hud-mobile-tablet #pet-frame {
       left: calc(50% - 10px);
     }
@@ -8088,6 +8339,7 @@
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,
+    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar-offhand,
     body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {
       left: calc(50% + 10px);
     }

@@ -335,6 +335,28 @@ For off-box safety, sync the directory to S3 occasionally:
   the clear-item-name remediation endpoint is unavailable (registry-only, no
   legacy arm; it 404s rather than serving unauthorized), so a rollback that
   coincides with a name report waits for the roll-forward.
+- **Mail partition backfill rollback**: the Ravenpost mail persistence migration
+  (`server/mail_partition_backfill.ts`, #3561) partitions a realm's legacy
+  `mail:<realm>` blob into one row per recipient (`mail:<realm>:r:<key>`) inside
+  `ensureSchema`, and retains the legacy row as a rollback artifact, mirroring the
+  market backfill. Its rollback is WEAKER than market's: market's legacy row was
+  already dormant by the time market added realm scoping, so reverting a binary
+  never lost live writes, but mail's `mail:<realm>` row was the LIVE,
+  actively-written key right up to the instant the migration ran. Reverting to a
+  pre-#3561 binary after ANY post-migration mail activity (a send, a take, a
+  delete, a rename) is a ONE-WAY trapdoor: the old binary reads and writes only
+  the frozen legacy blob, so every mutation since the migration becomes invisible
+  to it, and a later roll-forward never re-adopts that window's mail either (the
+  migration marker makes the backfill a permanent no-op). Recovery after any such
+  activity means a database restore, not a binary revert. A rolling deploy that
+  runs an old and a new binary against the SAME realm concurrently has the same
+  blind spot in miniature, so stop the old process before starting the new one
+  per realm rather than overlapping them. Never delete the migration's marker row
+  on a realm with live mail traffic to force a re-run: a re-run blind-upserts
+  only the recipients present in the legacy blob (unchanged since the original
+  migration) while leaving every partition row written since then in place, and
+  `loadMail` does not de-duplicate by letter id, so the next load can contain the
+  same letter, and its escrow, twice.
 - **Bank Storage rollback caveats**: same governing rule as the professions bullet
   above, and here it is ITEM-DESTRUCTIVE rather than capacity-lossy, so treat a
   rollback past this release as destructive and plan a restore from backup.
@@ -469,11 +491,20 @@ For off-box safety, sync the directory to S3 occasionally:
   heroic_duskwhisper, the generated heroic variant of the rogue re-band's
   Duskwhisper dagger on the Fanglord Beastmaster's heroic table, at an
   ordinary heroic drop rate; a stale bundle renders it through the
-  unknown-item fallback exactly like the Wildheart six. Rift-run loot is a second release-content arm on
-  the same window (the run builders push the rift catalog onto boss corpse
-  lists at runtime, outside every content-table sweep); it requires the
-  stale tab to get inside a rift at all, and whether the old bundle's
-  generic object interaction reaches a rift portal has not been verified
+  unknown-item fallback exactly like the Wildheart six. The v0.41.0 Crucible
+  raid widens the same arm with its Ignivar and Varkhul Heroic-only sigils,
+  shields, and weapons. This content is reachable in production: a raid group
+  can enter through the live Forge-Lift and select Heroic, so a stale client
+  can receive one of those ids. The 2026-08-31 Emberward correction moved
+  varkhul_emberward from Varkhul's Normal table into the Heroic shield group
+  at the same 3 percent rate. That narrows its exposure but does not make the
+  stale-client path unreachable; the frozen snapshot deliberately admits the
+  move alongside the other Crucible append ids. Rift-run loot is a second
+  release-content arm on the same window (the run builders push the rift
+  catalog onto boss corpse lists at runtime, outside every content-table
+  sweep); it requires a stale tab to get inside a rift at all, and whether
+  the old bundle's generic object interaction reaches a rift portal has not
+  been verified
   either way. Both arms are inputs to the surfaced
   forced-refresh-at-deploy question. Two more
   deployed-bundle arms need no loot table at all, because the
@@ -673,14 +704,17 @@ For off-box safety, sync the directory to S3 occasionally:
   no transaction, no funds), so a seller whose wallet is linked but
   unavailable at the moment cannot list; no knob controls this and no env
   change accompanies it (the dev economy pair alone enables the devsig arm).
-  Security framing (be precise with operators): the step-up RAISES THE BAR and
-  makes a custody move require a live, attributable wallet signature; it is not
-  by itself an absolute "a stolen session cannot move custody" guarantee,
-  because the wallet-link relink path needs only the incoming wallet's
-  signature, so a bearer thief could relink to their own wallet first. Closing
-  that (outgoing-wallet signature on relink, a link-age cooldown, or refusing
-  relink while escrow is live) is a tracked pre-enable security follow-up in
-  docs/woc-marketplace-hardening/state.md.
+  Security framing (be precise with operators): the step-up makes a custody
+  move require a live, attributable wallet signature, and the R11 wallet-link
+  re-auth gate (server/wallet_reauth.ts) closes the relink-first hole that
+  used to sit beside it: changing an existing wallet link now demands the
+  CURRENT wallet's co-signature or the account password plus its second
+  factor, removing one demands the password arm, and every link change emails
+  the account. Client-version note: desktop/native bundles older than R11
+  ship the pre-R11 client, which never shows the password prompt, so on
+  those builds a relink/unlink answers the generic verify-failed flash
+  until the bundle updates (the web client updates with the deploy).
+  History: docs/woc-marketplace-hardening/state.md (R11).
 - **Ops dashboard market reads**: `DASHBOARD_INTERNAL_SECRET` gates the ops
   dashboard's `/internal/woc-market/*` reads; unset leaves them 404 (names
   only here, the values live in deployment secrets).
@@ -804,6 +838,16 @@ For off-box safety, sync the directory to S3 occasionally:
   `delete_busy` 503s; `in_flight` stuck at the cap with no delete traffic is a
   leaked sub slot. Client-gone abandonments (a player closing the tab
   mid-wait) count in neither series.
+  `woc_offline_fence_refusals_total` (labeled by writer family over
+  `rename_sweep`, `reclaim_sweep`, `pbe_roster`) is the one to watch after an
+  operator action that writes a character while it is OFFLINE. The lease fence
+  means the write is REFUSED rather than applied when the character has come
+  back online, and a refusal is silent to the operator: the durable effect
+  simply did not land, with nothing in the tree to re-trigger it. A rename
+  sweep is the worst of the three, because the rename itself commits first, so
+  a refusal leaves the character renamed with every crafted copy still signed
+  with the old name. Any sustained `increase()` here means operator work is
+  being dropped; the remedy is to disconnect the character and retry.
 - **Discord bot series (Grafana)**: the bot reports its rate-limit governor
   counters on the presence push it already sends, so `/metrics` carries them with
   no extra scrape target and no bot-side endpoint. Cumulative counters

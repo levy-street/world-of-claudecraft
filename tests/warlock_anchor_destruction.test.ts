@@ -50,8 +50,12 @@ describe('destruction 200 DPS anchors at 120 seconds', () => {
     // 209.8 measured at the 2026-08-23 re-anchor; about plus or minus 5%, so
     // the tripwire trips on a real collapse or runaway, not on engine drift.
     // Post-retune measurement 190.5 (see the heroic anchor note above).
+    // Re-anchored 2026-08-30 at the OSSBrain v0.41.0 base merge: the new gear
+    // lifts the level-20 dummy to 207.2, so the old 206 ceiling was measuring
+    // the gear, not drift. Ceiling moves to measurement plus 5% (218); the
+    // floor stays where it was, since it still guards a real collapse.
     expect(mean('dps')).toBeGreaterThanOrEqual(182);
-    expect(mean('dps')).toBeLessThanOrEqual(206);
+    expect(mean('dps')).toBeLessThanOrEqual(218);
     expect(mean('starvedPct')).toBeLessThan(0.1);
   }, 240_000);
 });

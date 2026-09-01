@@ -1112,19 +1112,21 @@ describe('two-pool capacity through the real gates and the real taxonomy', () =>
     expect(inv.every((s) => s.count === (s.itemId === MATERIAL ? 20 : 1))).toBe(true);
   });
 
-  it('the sim-side lazy material set IS the UI-side eager set, and both are the merged 116', () => {
+  it('the sim-side lazy material set IS the UI-side eager set, and both are the merged 117', () => {
     // Equality alone proves nothing (both delegate to the one derivation in
     // material_derivation.ts), so it is pinned alongside the literal count
     // tests/material_taxonomy.test.ts pins by exact-set equality, plus known
     // members and known NON-members on each side.
-    // Recomputed at the merge of release/v0.41.0 (tip e19d832b47) into
-    // feature/masterwrought: the release's ruled 55 plus the packet's
-    // masterwrought reagents and the farming absorb's 39 yields compose to a
-    // measured 116 on the merged catalog (both parents' own derivations, one
-    // union; no rule changed).
+    // Recomputed at every release merge, never picked from a side. At the
+    // release/v0.41.0 merge the release's ruled 55 plus the packet's
+    // masterwrought reagents and the farming absorb's 39 yields composed to a
+    // measured 116 on the merged catalog. release/v0.42.0 then ruled one more
+    // material in on its own side, the Crucible's lastflame_core, and the two
+    // sides' additions are disjoint, so the merged catalog measures 117 (both
+    // parents' own derivations, one union; no rule changed).
     const lazy = materialItemIds();
-    expect(lazy.size).toBe(116);
-    expect(MATERIAL_ITEM_IDS.size).toBe(116);
+    expect(lazy.size).toBe(117);
+    expect(MATERIAL_ITEM_IDS.size).toBe(117);
     expect(lazy.size).toBe(MATERIAL_ITEM_IDS.size);
     for (const id of lazy) expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
     for (const id of MATERIAL_ITEM_IDS) expect(lazy.has(id), id).toBe(true);

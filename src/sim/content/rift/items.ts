@@ -101,6 +101,18 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
       },
     ],
   },
+  // Forge currency (rift/progression.ts spends these on rift gear upgrades),
+  // NOT the personal reward gear below (the three riftbound_band_of_* rings,
+  // RIFT_GEAR_ITEM_IDS): deliberately NOT noMarketList. noMarketList in this
+  // codebase fences exactly two cases (see the copper_mining_pick comment
+  // block above in items.ts): a re-grantable faucet's value route (accept,
+  // sell, abandon, repeat mints copper from nothing) or a store SKU kept off
+  // the gold market. Neither applies here: essence and gems are boss loot
+  // from a natural first clear, gated by the ranked portal spawn cadence
+  // (docs/design/rift-portals.md), never re-granted by a repeatable quest.
+  // Trade-legal-but-pipe-refused IS a real, intentional pattern here (R10),
+  // so being tradeable via trade.ts alone would not by itself justify this;
+  // it is the faucet/SKU test above that does.
   rift_essence: {
     id: 'rift_essence',
     name: 'Rift Essence',
@@ -108,7 +120,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'rare',
     stackSize: 20,
     sellValue: 0,
-    noMarketList: true,
   },
   rift_gem_crimson: {
     id: 'rift_gem_crimson',
@@ -117,7 +128,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stackSize: 20,
     sellValue: 0,
-    noMarketList: true,
   },
   rift_gem_azure: {
     id: 'rift_gem_azure',
@@ -126,7 +136,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stackSize: 20,
     sellValue: 0,
-    noMarketList: true,
   },
   rift_gem_verdant: {
     id: 'rift_gem_verdant',
@@ -135,7 +144,6 @@ export const RIFT_ITEMS: Record<string, ItemDef> = {
     quality: 'epic',
     stackSize: 20,
     sellValue: 0,
-    noMarketList: true,
   },
   riftbound_band_of_might: {
     id: 'riftbound_band_of_might',

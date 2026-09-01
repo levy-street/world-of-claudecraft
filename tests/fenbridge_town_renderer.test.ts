@@ -357,9 +357,13 @@ describe('Fenbridge dedicated town renderer', () => {
     expect({ questTriangles, questDraws }).toEqual({ questTriangles: 204, questDraws: 1 });
     triangleCountByAsset[fenbridgeTownInternalsForTest.questAssetUrl] = questTriangles;
     expect(fenbridgeTownTriangleBudget(triangleCountByAsset)).toMatchObject({
-      assetTriangles: 81_524,
+      // Re-minted for the OSSBrain v0.41.0 base merge's Fenbridge re-export:
+      // release's compress_glb_textures.mjs change shrank six assets and moved
+      // their topology (whole town 81_524 -> 80_344). Sibling pins live in
+      // tests/fenbridge_town_assets.test.ts EXPECTED_TOTALS; move both together.
+      assetTriangles: 80_344,
       maximumFoundationTriangles: 84,
-      maximumRuntimeTriangles: 81_608,
+      maximumRuntimeTriangles: 80_428,
       hardCeiling: 88_000,
       withinHardCeiling: true,
     });
@@ -377,13 +381,14 @@ describe('Fenbridge dedicated town renderer', () => {
       colorDraws: 20,
       shadowDraws: 10,
       // placement-weighted shipping geometry after R16-30 densify + 12 boardwalks
-      triangles: 81_188,
+      // (re-minted with the v0.41.0 Fenbridge re-export: 81_188 -> 80_008)
+      triangles: 80_008,
     });
     expect({
       colorDraws: standardRoot.colorDraws + questDraws * 2,
       shadowDraws: standardRoot.shadowDraws,
-      triangles: 81_188 + 84 * 2,
-    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 81_356 });
+      triangles: 80_008 + 84 * 2,
+    }).toEqual({ colorDraws: 22, shadowDraws: 10, triangles: 80_176 });
 
     setGfx({
       standardMaterials: false,
@@ -393,7 +398,7 @@ describe('Fenbridge dedicated town renderer', () => {
     });
     const low = fenbridgeTownInternalsForTest.buildFromSources(sources, ground, true);
     const lowRoot = fenbridgeTownDrawStats(low.group);
-    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 81_188 });
+    expect(lowRoot).toMatchObject({ colorDraws: 11, shadowDraws: 0, triangles: 80_008 });
     expect(lowRoot.colorDraws + questDraws * 2).toBe(13);
   });
 

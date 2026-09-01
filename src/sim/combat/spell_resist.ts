@@ -7,7 +7,9 @@
 // path (sim.ts), and the player pet bolt path (pet/pet_ai.ts petRangedAttack)
 // so all three label the outcome the same way.
 
-import { type Entity, MOB_VS_PLAYER_MAX_MISS, spellHitChance } from '../types';
+import type { SimContext } from '../sim_context';
+import { creditAbilityDrill } from '../tutorial/ability_drill';
+import { type AbilityDef, type Entity, MOB_VS_PLAYER_MAX_MISS, spellHitChance } from '../types';
 
 // Effective spell-hit chance including the caster's gear Hit rating (hitBonus, a
 // fraction that reduces resist). Capped at 1. hitBonus defaults to 0, so a caster
@@ -72,4 +74,34 @@ export function isMobSpellResisted(
   const playerSide = target.kind === 'player' || target.ownerId !== null;
   const flooredHit = mobAttacker && playerSide ? Math.max(hit, 1 - MOB_VS_PLAYER_MAX_RESIST) : hit;
   return !rng.chance(flooredHit);
+}
+
+// The one resist resolution both hostile-spell delivery arms in
+// combat/casting_lifecycle.ts share (a bolt resolving on impact, an instant
+// resolving at cast completion), so an ability's delivery flag can never opt it
+// out of avoidance. True means the cast was resisted: its effects must not run.
+export function resolveHostileSpellResist(
+  ctx: SimContext,
+  src: Entity,
+  tgt: Entity,
+  ability: AbilityDef,
+): boolean {
+  if (!isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) return false;
+  ctx.emit({
+    type: 'damage',
+    sourceId: src.id,
+    targetId: tgt.id,
+    amount: 0,
+    crit: false,
+    school: ability.school,
+    ability: ability.name,
+    kind: 'resist',
+  });
+  // A resisted cast never reaches runEffects, but the player still pressed the
+  // button the island asked for, so the drill credits here too. Without this the
+  // lesson stalls on an unlucky roll and the coach keeps asking for a press that
+  // already happened.
+  creditAbilityDrill(ctx, src, tgt, ability.id);
+  ctx.enterCombat(src, tgt);
+  return true;
 }

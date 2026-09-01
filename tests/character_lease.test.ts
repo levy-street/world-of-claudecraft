@@ -18,6 +18,7 @@ import {
   acquireCharacterLease,
   heartbeatCharacterLeases,
   LEASE_TTL_SECONDS,
+  openMailPartitionWriteGate,
   openMarketWriteGate,
   PROCESS_LEASE_HOLDER,
   releaseAllCharacterLeases,
@@ -217,7 +218,31 @@ const STATE = {
   inventory: [],
 } as unknown as CharacterState;
 const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
-const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
+// A non-empty single-recipient partition: these tests assert BOTH escrow
+// world_state writes land (market + mail), so an empty partitions array
+// (which now issues no mail SQL at all, see save_character_and_market.test.ts)
+// would silently drop that half of the coverage.
+const MAIL_PARTITIONS: { recipientKey: string; letters: MailSave['mail'] }[] = [
+  {
+    recipientKey: 'char-42',
+    letters: [
+      {
+        id: 1,
+        recipientKey: 'char-42',
+        recipientName: 'Testchar',
+        senderName: 'System',
+        kind: 'system',
+        subject: 'Welcome',
+        body: '',
+        copper: 0,
+        items: [],
+        deliverIn: 0,
+        secondsLeft: -1,
+        read: false,
+      },
+    ],
+  },
+];
 const STORAGE_EFFECT: StorageAppliedEffect = {
   realm: REALM,
   accountId: 7,
@@ -382,16 +407,18 @@ describe('saveCharacterStateOnClient storage effects', () => {
 describe('saveCharacterAndMarketState lease fence', () => {
   beforeEach(() => {
     dbMock.connect.mockReset();
-    // The escrow flush writes the realm-market row, so it is gated on the boot
-    // backfill; open the gate so the transaction runs.
+    // The escrow flush writes the realm-market row and, when it carries any
+    // dirty mail partition, the realm-scoped mail rows too; both are gated on
+    // their own boot backfill. Open both so the transaction runs.
     openMarketWriteGate();
+    openMailPartitionWriteGate();
   });
 
   it('the happy path writes both world_state escrows then COMMIT and resolves true', async () => {
     const client = checkedOutClient(1);
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1');
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, 'nonce-1');
     expect(ok).toBe(true);
 
     const stmts = client.query.mock.calls.map((c) => String(c[0]));
@@ -406,9 +433,17 @@ describe('saveCharacterAndMarketState lease fence', () => {
     dbMock.connect.mockResolvedValueOnce(client as any);
 
     await expect(
-      saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1', undefined, undefined, [
-        STORAGE_EFFECT,
-      ]),
+      saveCharacterAndMarketState(
+        42,
+        7,
+        STATE,
+        MARKET,
+        MAIL_PARTITIONS,
+        'nonce-1',
+        undefined,
+        undefined,
+        [STORAGE_EFFECT],
+      ),
     ).resolves.toBe(true);
     const sqls = client.query.mock.calls.map((call) => String(call[0]));
     const account = sqls.findIndex((sql) => /SELECT id FROM accounts/.test(sql));
@@ -430,7 +465,7 @@ describe('saveCharacterAndMarketState lease fence', () => {
     const client = checkedOutClient(0);
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'nonce-1');
+    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL_PARTITIONS, 'nonce-1');
     expect(ok).toBe(false);
 
     const stmts = client.query.mock.calls.map((c) => String(c[0]));
@@ -448,7 +483,14 @@ describe('saveCharacterAndMarketState lease fence', () => {
     const client = checkedOutClient(0);
     dbMock.connect.mockResolvedValueOnce(client as any);
 
-    const ok = await saveCharacterAndMarketState(42, 7, STATE, MARKET, MAIL, 'stale-nonce');
+    const ok = await saveCharacterAndMarketState(
+      42,
+      7,
+      STATE,
+      MARKET,
+      MAIL_PARTITIONS,
+      'stale-nonce',
+    );
     expect(ok).toBe(false);
 
     const charCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));

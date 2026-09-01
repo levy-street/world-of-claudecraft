@@ -687,6 +687,8 @@ export function buildInterfaceControls(
     boolToggle(s, 'showReliquaryTracker', 'hudChrome.options.showReliquaryTracker'),
     boolToggle(s, 'showOwnNameplate', 'hudChrome.options.showOwnNameplate'),
     boolToggle(s, 'showPlayerNameplates', 'hudChrome.options.showPlayerNameplates'),
+    boolToggle(s, 'confirmVendorSell', 'hudChrome.options.confirmVendorSell'),
+    note('hudChrome.options.confirmVendorSellNote'),
   ];
   // The desktop shell's GPU preference, last in the tab so the web arm's row
   // order is untouched. Gated on the bridge CAPABILITY, so it renders only in a
@@ -743,7 +745,9 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+      boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
+      boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),
       boolToggle(s, 'showPetFrame', 'hudChrome.options.showPetFrame'),
     ]),
     ...tag('chat', [

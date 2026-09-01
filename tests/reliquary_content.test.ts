@@ -431,8 +431,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Crucible raid pages (the 2026-08-30 sync merge) add the release's 43
     // distinct new item ids (its own chain read 385 = 342 + 43): 391. The
     // masterwrought Phase 18 golden-harvest field note is the 392nd, retiring
-    // the farming phase's ledgered cell deferral.
-    expect(full).toEqual({ owned: 392, total: 392 });
+    // the farming phase's ledgered cell deferral. The release/v0.42.0 merge
+    // adds one relic more, the Bonebound Rickshaw's horizons_mounts slot (the
+    // release's own chain read 386 = 340 + 1 + 45): 393, MEASURED on the
+    // merged tree. Moving Emberward from Varkhul's normal page to its heroic
+    // page in the same release re-slots a relic already catalogued, so it
+    // moves neither this pair nor the character pair below.
+    expect(full).toEqual({ owned: 393, total: 393 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -448,7 +453,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // by the same one as the overview: 319 on the merged tree before the raid
     // pages (317 + 2), 362 with them, and 363 with the Phase 18
     // golden-harvest MARK, which is character-scoped like every other mark.
-    expect(character).toEqual({ owned: 363, total: 363 });
+    // 364 with the release/v0.42.0 Bonebound Rickshaw: a MOUNT is
+    // character-scoped too, so it moves this pair by the same one as the
+    // overview (only the weapon skins are account-scoped).
+    expect(character).toEqual({ owned: 364, total: 364 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -467,7 +475,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // on horizons_titles: 380, and the Masterwrought phase 11i apex fishing rod
     // slot on professions_specimens: 381, and the two bank-storage bag drops
     // the release/v0.41.0 merge paged (wayfarers_backpack on Spoils,
-    // necromancers_reagent_satchel on Gravewyrm Sanctum): 383 total.
+    // necromancers_reagent_satchel on Gravewyrm Sanctum): 383, and the
+    // Bonebound Rickshaw slot the release/v0.42.0 merge added to
+    // horizons_mounts: 384 total.
     // Slots, not unique relics: the seven excludeFromCompletion slots (four
     // vault, three bands) count here while adding zero to every completion
     // pair, and every duplicate ITEM slot counts again here where the overview
@@ -482,11 +492,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Varkhul legendaries at the launch wiring: 419; then 418 when the
     // maintainer pulled Forgebreaker to route it through crafting. The
     // masterwrought Phase 18 golden-harvest field note is the one slot after
-    // that: 427.
+    // that: 427, and the release/v0.42.0 Bonebound Rickshaw mount slot the
+    // next: 428. Moving Emberward from Varkhul's normal page to its heroic
+    // page in the same release re-slots it and keeps this total fixed.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(427);
+    ).toBe(428);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -1696,7 +1708,7 @@ const EQUALITY_PAGES: Record<string, { pageId: string; floor: number }> = {
   // sigil redemption tokens by kind; the token-liveness arm below proves the
   // filter excludes something real.
   ignivar_raid_arena: { pageId: 'conquerors_ignivar', floor: 17 },
-  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 16 },
+  ignivar_inner_crucible: { pageId: 'conquerors_varkhul', floor: 15 },
 };
 
 describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
@@ -1776,24 +1788,30 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     }
   });
 
-  it('the Varkhul legendaries: the shield drops and pages, Forgebreaker is craft-pending', () => {
-    // The 2026-08-30 landed state: Emberward drops from Varkhul's normal
-    // table (3 percent, the kingsbane precedent) and sits on the
-    // conquerors_varkhul page. Forgebreaker is deliberately OFF the table
-    // and OFF the pages: the maintainer is routing it through the crafting
-    // professions, and a relic page row requires a conquerable source. This
-    // pin holds drop and page membership as one unit in BOTH directions:
-    // re-wiring the drop without re-paging (or vice versa) reds here, and
-    // so does the recipe chain landing without flipping this pin.
+  it('the Varkhul legendaries: Emberward is Heroic-only and Forgebreaker is craft-pending', () => {
+    // Emberward's drop and museum route move as one unit: it is absent from
+    // Varkhul's normal table and page, present in the heroic append and page,
+    // and remains catalogued globally. Forgebreaker is deliberately off both
+    // tables and pages while its crafting route is pending.
+    const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
+      (entry) => entry.itemId,
+    );
+    const heroicLootIds = (HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []).map(
+      (entry) => entry.itemId,
+    );
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
     expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
-    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_emberward')).toBe(
-      true,
+    expect(normalLootIds).not.toContain('varkhul_emberward');
+    expect(heroicLootIds).toContain('varkhul_emberward');
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul)).not.toContain(
+      'varkhul_emberward',
+    );
+    expect(itemRelicIds(RELIQUARY_PAGES_BY_ID.conquerors_varkhul_heroic)).toContain(
+      'varkhul_emberward',
     );
     expect(isCataloguedRelicItem('varkhul_forgebreaker')).toBe(false);
-    expect(dungeonRarePlusLootIds('ignivar_inner_crucible').includes('varkhul_forgebreaker')).toBe(
-      false,
-    );
+    expect(normalLootIds).not.toContain('varkhul_forgebreaker');
+    expect(heroicLootIds).not.toContain('varkhul_forgebreaker');
   });
 
   it('the mob walk really reaches boss-summoned adds', () => {
@@ -2811,7 +2829,10 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // slot stays listed and sourceless until the mount gets a route.
   // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker'],
+  // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
+  // no player-facing acquisition path yet (see the def comment in
+  // content/mounts.ts).
+  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3845,19 +3866,20 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the two mounts content awards no route at all', () => {
+  it('the surviving pending rows are the three mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
     // RELIQUARY_HORIZON_WEAPON_SKINS are gone with them. What is left is a
     // hand-listed set of CONTENT gaps, and hand-listing is the point: a new
     // mount must now be authored or deliberately added here, never auto-enrol.
-    // (masterwork:engineering was the third row until masterwrought Phase
+    // (masterwork:engineering was a row here too until masterwrought Phase
     // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'terrorspark_groundshaker',
+      'rickshaw_mount',
     ]);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {

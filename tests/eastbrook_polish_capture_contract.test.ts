@@ -533,8 +533,22 @@ interface AttributionTargetFixture {
 // and the shadow arm's body extracted to src/render/shadow_depth_compile.ts).
 // Run over the finished unit, after every renderer.ts byte was final and
 // after biome left the file unchanged. No capture was retaken.
+// The release re-minted this composite again over its v0.42.0 span, without a
+// comment of its own: renderer.ts moved 207 lines there (the validated local
+// locomotion and client movement prediction, the self-pose frame seams pulled
+// into pure modules, the FOV slider fix, and the Bonebound Rickshaw render arm).
+//
+// Parent values for the record: ours 161370d0, the release 89c8a62f.
+// RE-MINTED at the TENTH release sync, the merge of release/v0.42.0 (tip
+// 22e909839f) into feature/masterwrought (base e6b8edb375).
+// BOTH parents moved renderer.ts, so the merged tree is a
+// third content and neither parent's literal described it; the tool was run
+// over the fully resolved tree, LAST, after every renderer.ts byte was final
+// and after biome left the file unchanged. The four polish evidence JSONs were
+// swept by the tool in the same run and are committed with these pins. No
+// capture was retaken; ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT is untouched.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '161370d0857d868f0e4dabf0af40006ad69330326faf07a8613d8d35c43ffab2';
+  '0228ced2c09a5fe015effdc6f50f382098d7905c2a263e3f9a05a88e3949a089';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

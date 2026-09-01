@@ -204,6 +204,8 @@ export const en = {
   'usage.metric.walletChallengeRateLimited': 'Wallet challenge throttled requests',
   'usage.metric.walletLinkRequest': 'Wallet link requests',
   'usage.metric.walletLinkFailure': 'Wallet link failures',
+  'usage.metric.walletUnlinkFailure': 'Wallet unlink refusals',
+  'usage.metric.walletUnlinkSuccess': 'Wallet unlinks completed',
   'usage.metric.walletLinkRateLimited': 'Wallet link throttled requests',
   'usage.metric.cardPublishRequest': 'Player card publish requests',
   'usage.metric.cardPublishRejected': 'Player card rejected publishes',
@@ -762,6 +764,7 @@ export const en = {
     'character came online before the strip landed; kick them and retry',
   'error.clearItemNameLeased':
     'character holds a live session lease; kick them (or wait out the lease) and retry',
+  'error.clearItemNameWentOffline': 'character went offline before the strip landed; retry',
   'error.chatMuteFailed': 'chat mute failed',
   'error.chatUnmuteFailed': 'chat unmute failed',
   'error.accountNotChatMuted': 'account is not chat muted',

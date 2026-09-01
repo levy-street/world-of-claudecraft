@@ -130,7 +130,11 @@ export interface GuideReliquaryPage {
 // row against the live defs. Display names are baked English proper nouns
 // (the GUIDE_DEEDS precedent); ids/slugs localize client-side via t().
 
-export interface GuideProfMaterial { name: string; count: number; }
+/** One reagent line of a recipe or enchant bill. itemId is the LOCALIZED half:
+ *  the craft page resolves the display name through the item-name translation
+ *  key rather than printing name, which is the English source the accuracy
+ *  guards pin the id against and which stays emitted for them. */
+export interface GuideProfMaterial { itemId: string; name: string; count: number; }
 
 export interface GuideProfRecipe {
   id: string;
@@ -150,8 +154,18 @@ export interface GuideProfRecipe {
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
   /** Consumable effect facts from the live output def (absent for a
    *  non-consumable): the craft page composes them through the
-   *  guide.profPages.effect* templates. */
+   *  guide.profPages.effect* templates.
+   *
+   *  A placeable FEAST carries the feast record and takes its food/wellfed
+   *  values from the dish it SERVES, not from itself (it has neither field of
+   *  its own); the page then composes the feast-serving templates instead of
+   *  the eat-it-yourself ones.
+   *
+   *  NOTE for whoever edits this block: it is emitted from inside a template
+   *  literal in scripts/wiki/build_content.mjs, so a backtick here is a
+   *  SyntaxError in the generator itself, not a comment. Name symbols plainly. */
   effect?: {
+    feast?: { servings: number; minutes: number };
     food?: { amount: number; seconds: number };
     wellfed?: { aura: string; kind: string; value: number; minutes: number };
   };
@@ -6732,6 +6746,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       {
         "kind": "mount",
         "name": "Dreadspark Groundshaker"
+      },
+      {
+        "kind": "mount",
+        "name": "Bonebound Rickshaw"
       }
     ]
   },
@@ -7761,10 +7779,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_iron_ore",
             "name": "Fine Iron Ore",
             "count": 4
           },
           {
+            "itemId": "mithril_mining_pick",
             "name": "Skysilver Mining Pick",
             "count": 1
           }
@@ -7792,14 +7812,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 2
           },
           {
+            "itemId": "fine_thorium_ore",
             "name": "Fine Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "thorium_mining_pick",
             "name": "Osmium Mining Pick",
             "count": 1
           }
@@ -7827,10 +7850,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_ashwood_log",
             "name": "Fine Ashwood Log",
             "count": 4
           },
           {
+            "itemId": "ironbark_axe",
             "name": "Ironbark Axe",
             "count": 1
           }
@@ -7858,10 +7883,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_elderwood_log",
             "name": "Fine Highpine Log",
             "count": 2
           },
           {
+            "itemId": "ashwood_axe",
             "name": "Ashwood Axe",
             "count": 1
           }
@@ -7889,10 +7916,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_goldleaf_herb",
             "name": "Fine Goldleaf Herb",
             "count": 4
           },
           {
+            "itemId": "silverleaf_sickle",
             "name": "Sheenleaf Sickle",
             "count": 1
           }
@@ -7920,10 +7949,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_sunpetal_herb",
             "name": "Fine Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_sickle",
             "name": "Goldleaf Sickle",
             "count": 1
           }
@@ -7951,10 +7982,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "glimmerfin_koi",
             "name": "Sunglint Koi",
             "count": 4
           },
           {
+            "itemId": "silverstream_fishing_rod",
             "name": "Silverstream Fishing Rod",
             "count": 1
           }
@@ -7982,14 +8015,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 160000,
         "materials": [
           {
+            "itemId": "glimmerfin_koi",
             "name": "Sunglint Koi",
             "count": 2
           },
           {
+            "itemId": "raw_stonescale_carp",
             "name": "Raw Slatefin Carp",
             "count": 8
           },
           {
+            "itemId": "stormreel_fishing_rod",
             "name": "Stormreel Fishing Rod",
             "count": 1
           }
@@ -8017,14 +8053,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "glimmerfin_koi",
             "name": "Sunglint Koi",
             "count": 2
           },
           {
+            "itemId": "raw_hollowgill_sturgeon",
             "name": "Raw Hollowgill Sturgeon",
             "count": 10
           },
           {
+            "itemId": "tidewrought_fishing_rod",
             "name": "Tidewrought Fishing Rod",
             "count": 1
           }
@@ -8052,18 +8091,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           },
           {
+            "itemId": "cogwheel_blank",
             "name": "Cogwheel Blank",
             "count": 1
           }
@@ -8091,18 +8134,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "precision_chassis",
             "name": "Precision Chassis",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 4
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           }
@@ -8130,18 +8177,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "precision_chassis",
             "name": "Precision Chassis",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 4
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           }
@@ -8169,18 +8220,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "precision_chassis",
             "name": "Precision Chassis",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 4
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           }
@@ -8208,10 +8263,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "fine_vale_wheat",
             "name": "Fine Vale Wheat",
             "count": 4
           },
           {
+            "itemId": "garden_hoe",
             "name": "Garden Hoe",
             "count": 1
           }
@@ -8239,10 +8296,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "fine_marsh_rice",
             "name": "Fine Marsh Rice",
             "count": 4
           },
           {
+            "itemId": "bronze_hoe",
             "name": "Bronze Hoe",
             "count": 1
           }
@@ -8270,10 +8329,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "fine_highland_barley",
             "name": "Fine Highland Barley",
             "count": 4
           },
           {
+            "itemId": "skysilver_hoe",
             "name": "Skysilver Hoe",
             "count": 1
           }
@@ -8301,10 +8362,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 160000,
         "materials": [
           {
+            "itemId": "fine_evergarden_greens",
             "name": "Fine Evergarden Greens",
             "count": 2
           },
           {
+            "itemId": "osmium_hoe",
             "name": "Osmium Hoe",
             "count": 1
           }
@@ -8332,10 +8395,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -8363,14 +8428,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "cogwheel_blank",
             "name": "Cogwheel Blank",
             "count": 1
           },
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 2
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 3
           }
@@ -8418,14 +8486,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 1
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           }
@@ -8453,18 +8524,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 2
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8498,10 +8573,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 4
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8529,10 +8606,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 3
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8560,18 +8639,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 1
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8599,14 +8682,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8634,10 +8720,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8665,18 +8753,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 3
           },
           {
+            "itemId": "bog_beet",
             "name": "Bog Beet",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8704,14 +8796,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 3
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8739,14 +8834,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8774,22 +8872,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_venom_gland",
             "name": "Pristine Venom Gland",
             "count": 1
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "frost_gourd",
             "name": "Frost Gourd",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8817,18 +8920,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8856,26 +8963,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           },
           {
+            "itemId": "pristine_venom_gland",
             "name": "Pristine Venom Gland",
             "count": 1
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8903,26 +9016,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           },
           {
+            "itemId": "pristine_venom_gland",
             "name": "Pristine Venom Gland",
             "count": 1
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8950,26 +9069,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           },
           {
+            "itemId": "pristine_venom_gland",
             "name": "Pristine Venom Gland",
             "count": 1
           },
           {
+            "itemId": "venom_gland",
             "name": "Venom Gland",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -8997,26 +9122,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "gilded_sunmelon",
             "name": "Gilded Sunmelon",
             "count": 2
           },
           {
+            "itemId": "fine_gilded_sunmelon",
             "name": "Fine Gilded Sunmelon",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           }
@@ -9044,10 +9175,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -9075,14 +9208,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "tallow_candle",
             "name": "Greasy Tallow Lump",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -9130,6 +9266,7 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           }
@@ -9163,10 +9300,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_river_perch",
             "name": "Raw River Perch",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9200,14 +9339,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 2
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9241,14 +9383,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_marsh_pike",
             "name": "Raw Marsh Pike",
             "count": 2
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9282,14 +9427,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "raw_bog_eel",
             "name": "Raw Bog Eel",
             "count": 2
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9323,22 +9471,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 3
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 2
           },
           {
+            "itemId": "bog_beet",
             "name": "Bog Beet",
             "count": 1
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9372,18 +9525,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "raw_frostgill_trout",
             "name": "Raw Frostgill Trout",
             "count": 2
           },
           {
+            "itemId": "brook_carrot",
             "name": "Brook Carrot",
             "count": 1
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9417,22 +9574,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "raw_stonescale_carp",
             "name": "Raw Slatefin Carp",
             "count": 3
           },
           {
+            "itemId": "raw_mirror_trout",
             "name": "Raw Mirror Trout",
             "count": 1
           },
           {
+            "itemId": "marsh_rice",
             "name": "Marsh Rice",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -9466,18 +9628,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "raw_frostgill_trout",
             "name": "Raw Frostgill Trout",
             "count": 2
           },
           {
+            "itemId": "raw_bog_eel",
             "name": "Raw Bog Eel",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9511,26 +9677,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 1
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 2
           },
           {
+            "itemId": "frost_gourd",
             "name": "Frost Gourd",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9564,26 +9736,32 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 1
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 3
           },
           {
+            "itemId": "marsh_rice",
             "name": "Marsh Rice",
             "count": 2
           },
           {
+            "itemId": "bog_beet",
             "name": "Bog Beet",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -9611,30 +9789,37 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 1
           },
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 2
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "frost_gourd",
             "name": "Frost Gourd",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           }
@@ -9674,30 +9859,37 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 1
           },
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 2
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           }
@@ -9737,30 +9929,37 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 1
           },
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 2
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "thornpeak_cabbage",
             "name": "Thornpeak Cabbage",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           }
@@ -9800,34 +9999,42 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "prime_cut",
             "name": "Prime Cut",
             "count": 4
           },
           {
+            "itemId": "game_meat",
             "name": "Game Meat",
             "count": 4
           },
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 2
           },
           {
+            "itemId": "fine_evergarden_greens",
             "name": "Fine Evergarden Greens",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           }
@@ -9855,14 +10062,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9896,18 +10106,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "raw_hollowgill_sturgeon",
             "name": "Raw Hollowgill Sturgeon",
             "count": 4
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -9941,34 +10155,42 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 1
           },
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           },
           {
+            "itemId": "raw_hollowgill_sturgeon",
             "name": "Raw Hollowgill Sturgeon",
             "count": 3
           },
           {
+            "itemId": "raw_stillmere_salmon",
             "name": "Raw Stillmere Salmon",
             "count": 2
           }
@@ -9984,6 +10206,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 6,
+            "minutes": 15
+          }
         }
       },
       {
@@ -9996,34 +10234,42 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 1
           },
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           },
           {
+            "itemId": "raw_hollowgill_sturgeon",
             "name": "Raw Hollowgill Sturgeon",
             "count": 3
           },
           {
+            "itemId": "raw_stillmere_salmon",
             "name": "Raw Stillmere Salmon",
             "count": 2
           }
@@ -10039,6 +10285,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_ap",
+            "value": 6,
+            "minutes": 15
+          }
         }
       },
       {
@@ -10051,34 +10313,42 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "seasoned_stock",
             "name": "Seasoned Stock",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 1
           },
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           },
           {
+            "itemId": "raw_deepbarb_catfish",
             "name": "Raw Deepbarb Catfish",
             "count": 4
           },
           {
+            "itemId": "raw_hollowgill_sturgeon",
             "name": "Raw Hollowgill Sturgeon",
             "count": 3
           },
           {
+            "itemId": "raw_stillmere_salmon",
             "name": "Raw Stillmere Salmon",
             "count": 2
           }
@@ -10094,6 +10364,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 150,
           "minimalAt": 175,
           "zeroAt": 200
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 1392,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_int",
+            "value": 6,
+            "minutes": 15
+          }
         }
       },
       {
@@ -10106,10 +10392,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 3
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10143,14 +10431,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "brook_carrot",
             "name": "Brook Carrot",
             "count": 2
           },
           {
+            "itemId": "fine_brook_carrot",
             "name": "Fine Brook Carrot",
             "count": 1
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 1
           }
@@ -10184,10 +10475,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "marsh_rice",
             "name": "Marsh Rice",
             "count": 4
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10221,10 +10514,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "bog_beet",
             "name": "Bog Beet",
             "count": 3
           },
           {
+            "itemId": "fine_bog_beet",
             "name": "Fine Bog Beet",
             "count": 1
           }
@@ -10258,18 +10553,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 4
           },
           {
+            "itemId": "thornpeak_cabbage",
             "name": "Thornpeak Cabbage",
             "count": 2
           },
           {
+            "itemId": "fine_thornpeak_cabbage",
             "name": "Fine Thornpeak Cabbage",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -10303,22 +10602,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "frost_gourd",
             "name": "Frost Gourd",
             "count": 3
           },
           {
+            "itemId": "fine_frost_gourd",
             "name": "Fine Frost Gourd",
             "count": 1
           },
           {
+            "itemId": "frost_lentils",
             "name": "Frost Lentils",
             "count": 2
           },
           {
+            "itemId": "fine_frost_lentils",
             "name": "Fine Frost Lentils",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10352,22 +10656,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "gilded_sunmelon",
             "name": "Gilded Sunmelon",
             "count": 3
           },
           {
+            "itemId": "fine_gilded_sunmelon",
             "name": "Fine Gilded Sunmelon",
             "count": 1
           },
           {
+            "itemId": "gilded_yam",
             "name": "Gilded Yam",
             "count": 2
           },
           {
+            "itemId": "fine_gilded_yam",
             "name": "Fine Gilded Yam",
             "count": 1
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 2
           }
@@ -10401,22 +10710,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 3
           },
           {
+            "itemId": "fine_evergarden_greens",
             "name": "Fine Evergarden Greens",
             "count": 1
           },
           {
+            "itemId": "evergarden_pumpkin",
             "name": "Evergarden Pumpkin",
             "count": 2
           },
           {
+            "itemId": "fine_evergarden_pumpkin",
             "name": "Fine Evergarden Pumpkin",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -10450,14 +10764,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "brook_carrot",
             "name": "Brook Carrot",
             "count": 4
           },
           {
+            "itemId": "vale_wheat",
             "name": "Vale Wheat",
             "count": 1
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10497,10 +10814,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "marsh_rice",
             "name": "Marsh Rice",
             "count": 4
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10540,10 +10859,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "highland_barley",
             "name": "Highland Barley",
             "count": 4
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10583,10 +10904,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 4
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 1
           }
@@ -10626,14 +10949,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "evergarden_greens",
             "name": "Evergarden Greens",
             "count": 4
           },
           {
+            "itemId": "gilded_sunmelon",
             "name": "Gilded Sunmelon",
             "count": 4
           },
           {
+            "itemId": "cooking_salt",
             "name": "Cooking Salt",
             "count": 2
           }
@@ -10649,6 +10975,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
           "reducedAt": 125,
           "minimalAt": 150,
           "zeroAt": 175
+        },
+        "effect": {
+          "feast": {
+            "servings": 10,
+            "minutes": 3
+          },
+          "food": {
+            "amount": 980,
+            "seconds": 18
+          },
+          "wellfed": {
+            "aura": "Well Fed",
+            "kind": "buff_sta",
+            "value": 5,
+            "minutes": 10
+          }
         }
       }
     ]
@@ -10681,14 +11023,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -10716,14 +11061,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 5
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -10751,18 +11099,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 6
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 3
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10790,14 +11142,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10825,10 +11180,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10856,14 +11213,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10891,14 +11251,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10926,14 +11289,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10961,14 +11327,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 3
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -10996,18 +11365,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 2
           }
@@ -11035,14 +11408,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 5
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -11070,22 +11446,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_claw",
             "name": "Pristine Claw",
             "count": 1
           },
           {
+            "itemId": "sharp_claw",
             "name": "Sharp Claw",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           }
@@ -11113,18 +11494,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -11152,18 +11537,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "wyrmhide_cording",
             "name": "Wyrmhide Cording",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           }
@@ -11191,18 +11580,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "wyrmhide_cording",
             "name": "Wyrmhide Cording",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           }
@@ -11230,18 +11623,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "wyrmhide_cording",
             "name": "Wyrmhide Cording",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 4
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 1
           }
@@ -11269,18 +11666,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "mudfin_scale",
             "name": "Slimy Mudfin Scale",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 6
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 2
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 2
           }
@@ -11308,18 +11709,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "cracked_wyrm_scale",
             "name": "Cracked Wyrm Scale",
             "count": 3
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -11347,18 +11752,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "old_cragmaws_pelt",
             "name": "Old Cragmaw's Pelt",
             "count": 1
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 3
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -11386,18 +11795,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "emberwing_cinderscale",
             "name": "Emberwing Cinderscale",
             "count": 1
           },
           {
+            "itemId": "pristine_hide",
             "name": "Pristine Hide",
             "count": 3
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 1
           },
           {
+            "itemId": "tanning_agent",
             "name": "Tanning Agent",
             "count": 1
           }
@@ -11445,10 +11858,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 9
           }
@@ -11476,18 +11891,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 3
           },
           {
+            "itemId": "spider_leg",
             "name": "Twitching Spider Leg",
             "count": 1
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 5
           }
@@ -11515,22 +11934,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -11558,14 +11982,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -11593,10 +12020,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -11624,14 +12053,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 3
           },
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -11659,14 +12091,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -11694,14 +12129,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -11729,14 +12167,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 6
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -11764,18 +12205,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -11803,14 +12248,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 2
           }
@@ -11838,18 +12286,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 1
           }
@@ -11877,14 +12329,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 8
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 3
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 3
           }
@@ -11912,18 +12367,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 3
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 6
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 3
           }
@@ -11951,18 +12410,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "resonant_thread",
             "name": "Resonant Thread",
             "count": 8
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 4
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 4
           }
@@ -11990,22 +12453,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "resonant_thread",
             "name": "Resonant Thread",
             "count": 12
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 6
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 5
           },
           {
+            "itemId": "homespun_cloth",
             "name": "Homespun Cloth",
             "count": 8
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 6
           }
@@ -12033,18 +12501,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -12072,18 +12544,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunspun_bolt",
             "name": "Sunspun Bolt",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           }
@@ -12111,18 +12587,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunspun_bolt",
             "name": "Sunspun Bolt",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           }
@@ -12150,18 +12630,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunspun_bolt",
             "name": "Sunspun Bolt",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           }
@@ -12189,18 +12673,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sunspun_bolt",
             "name": "Sunspun Bolt",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "spider_silk",
             "name": "Spider Silk",
             "count": 4
           },
           {
+            "itemId": "pristine_silk",
             "name": "Pristine Silk",
             "count": 1
           }
@@ -12228,14 +12716,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "bandit_bandana",
             "name": "Red Bandana",
             "count": 2
           },
           {
+            "itemId": "linen_scrap",
             "name": "Linen Scrap",
             "count": 4
           },
           {
+            "itemId": "spool_of_thread",
             "name": "Spool of Thread",
             "count": 4
           }
@@ -12283,14 +12774,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 3
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12318,14 +12812,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "silverleaf_herb",
             "name": "Sheenleaf Herb",
             "count": 2
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12353,14 +12850,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12388,14 +12888,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 1
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 1
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12423,18 +12926,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           },
           {
+            "itemId": "goldleaf_herb",
             "name": "Goldleaf Herb",
             "count": 2
           }
@@ -12462,18 +12969,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 1
           }
@@ -12501,22 +13012,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 160000,
         "materials": [
           {
+            "itemId": "sablewax_vellum",
             "name": "Sablewax Vellum",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 1
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12544,18 +13060,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 1
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -12583,22 +13103,27 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "sablewax_vellum",
             "name": "Sablewax Vellum",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "sunpetal_herb",
             "name": "Sunpetal Herb",
             "count": 2
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "glass_vial",
             "name": "Glass Vial",
             "count": 1
           }
@@ -12640,14 +13165,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcane_shard",
             "name": "Chime Shard",
             "count": 5
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 6
           }
@@ -12675,14 +13203,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcane_shard",
             "name": "Chime Shard",
             "count": 5
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 6
           }
@@ -12710,14 +13241,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 3
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 4
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -12765,14 +13299,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12800,14 +13337,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12835,14 +13375,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 5
           },
           {
+            "itemId": "arcane_dust",
             "name": "Chime Dust",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12870,14 +13413,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12905,14 +13451,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 3
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12940,14 +13489,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 5
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -12975,18 +13527,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13014,18 +13570,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13053,18 +13613,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13092,14 +13656,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -13127,18 +13694,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "prismglass_setting",
             "name": "Prismglass Setting",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           }
@@ -13166,18 +13737,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "prismglass_setting",
             "name": "Prismglass Setting",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           }
@@ -13205,18 +13780,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "prismglass_setting",
             "name": "Prismglass Setting",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2
           }
@@ -13264,14 +13843,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "wolf_fang",
             "name": "Cracked Wolf Fang",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 6
           }
@@ -13299,14 +13881,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 6
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -13340,14 +13925,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "ironbark_log",
             "name": "Ironbark Log",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13375,14 +13963,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 3
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13410,18 +14001,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "curved_tusk",
             "name": "Curved Tusk",
             "count": 2
           },
           {
+            "itemId": "ironbark_log",
             "name": "Ironbark Log",
             "count": 3
           },
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13449,14 +14044,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13484,14 +14082,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 3
           },
           {
+            "itemId": "ashwood_log",
             "name": "Ashwood Log",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13519,14 +14120,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13554,14 +14158,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -13589,18 +14196,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13628,18 +14239,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "elderwood_log",
             "name": "Highpine Log",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -13667,14 +14282,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -13702,18 +14320,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "duskforged_billet",
             "name": "Duskforged Billet",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13741,18 +14363,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "duskforged_billet",
             "name": "Duskforged Billet",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13780,18 +14406,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "duskforged_billet",
             "name": "Duskforged Billet",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -13819,14 +14449,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "cracked_ogre_tusk",
             "name": "Cracked Ogre Tusk",
             "count": 2
           },
           {
+            "itemId": "elderwood_log",
             "name": "Highpine Log",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -13874,10 +14507,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 9
           }
@@ -13905,14 +14540,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 3
           },
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 4
           }
@@ -13940,10 +14578,12 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 7
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 5
           }
@@ -13971,18 +14611,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 5
           },
           {
+            "itemId": "wolf_fang",
             "name": "Cracked Wolf Fang",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -14016,14 +14660,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -14051,14 +14698,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -14086,14 +14736,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "copper_ore",
             "name": "Copper Ore",
             "count": 3
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           }
@@ -14121,14 +14774,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 5
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -14156,14 +14812,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 3
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -14191,14 +14850,17 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 2500,
         "materials": [
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 1
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -14226,18 +14888,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -14265,18 +14931,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 2
           }
@@ -14304,18 +14974,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 10000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "arcanite_bar",
             "name": "Glyphsteel Bar",
             "count": 1
           },
           {
+            "itemId": "bone_fragments",
             "name": "Bone Fragments",
             "count": 4
           },
           {
+            "itemId": "smithing_flux",
             "name": "Smithing Flux",
             "count": 1
           }
@@ -14343,18 +15017,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 40000,
         "materials": [
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 3
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           },
           {
+            "itemId": "rough_hide",
             "name": "Rough Hide",
             "count": 2
           },
           {
+            "itemId": "quickening_catalyst",
             "name": "Quickening Catalyst",
             "count": 1
           }
@@ -14382,18 +15060,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "forgefold_plating",
             "name": "Forgefold Plating",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -14421,18 +15103,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "forgefold_plating",
             "name": "Forgefold Plating",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -14460,18 +15146,22 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
         "feeCopper": 0,
         "materials": [
           {
+            "itemId": "forgefold_plating",
             "name": "Forgefold Plating",
             "count": 3
           },
           {
+            "itemId": "wyrmfall_core",
             "name": "Wyrmfall Core",
             "count": 2
           },
           {
+            "itemId": "thorium_ore",
             "name": "Osmium Ore",
             "count": 4
           },
           {
+            "itemId": "iron_ore",
             "name": "Iron Ore",
             "count": 2
           }
@@ -16118,6 +16808,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16138,6 +16829,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16158,6 +16850,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16178,6 +16871,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16198,6 +16892,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16218,6 +16913,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16238,10 +16934,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16262,6 +16960,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16282,10 +16981,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16306,6 +17007,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16326,6 +17028,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16346,6 +17049,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16366,6 +17070,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16386,6 +17091,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16406,10 +17112,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16430,10 +17138,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 1
         }
@@ -16454,6 +17164,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16474,6 +17185,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16494,6 +17206,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16514,6 +17227,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16534,10 +17248,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16558,10 +17274,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16582,6 +17300,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16602,6 +17321,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16622,10 +17342,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16646,6 +17368,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 5
         }
@@ -16666,6 +17389,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16686,6 +17410,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16706,6 +17431,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16726,6 +17452,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16746,6 +17473,7 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 3
         }
@@ -16766,10 +17494,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16790,10 +17520,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16814,10 +17546,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16838,10 +17572,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 3
         }
@@ -16862,10 +17598,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 3
         }
@@ -16886,10 +17624,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -16910,10 +17650,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_steel",
           "name": "Resonant Steel",
           "count": 1
         }
@@ -16934,10 +17676,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_timber",
           "name": "Resonant Timber",
           "count": 1
         }
@@ -16958,10 +17702,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_thread",
           "name": "Resonant Thread",
           "count": 1
         }
@@ -16982,10 +17728,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_hide",
           "name": "Resonant Hide",
           "count": 1
         }
@@ -17006,10 +17754,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         },
         {
+          "itemId": "resonant_links",
           "name": "Resonant Links",
           "count": 1
         }
@@ -17030,14 +17780,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "lucent_reagent",
           "name": "Lucent Reagent",
           "count": 1
         },
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -17058,14 +17811,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "lucent_reagent",
           "name": "Lucent Reagent",
           "count": 1
         },
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 2
         }
@@ -17086,14 +17842,17 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "lucent_reagent",
           "name": "Lucent Reagent",
           "count": 1
         },
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 1
         },
         {
+          "itemId": "arcane_essence",
           "name": "Chime Essence",
           "count": 3
         }
@@ -17114,10 +17873,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": false,
       "reagents": [
         {
+          "itemId": "lucent_reagent",
           "name": "Lucent Reagent",
           "count": 1
         },
         {
+          "itemId": "arcane_dust",
           "name": "Chime Dust",
           "count": 4
         }
@@ -17138,10 +17899,12 @@ export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {
       "perfectedOnly": true,
       "reagents": [
         {
+          "itemId": "lucent_reagent",
           "name": "Lucent Reagent",
           "count": 3
         },
         {
+          "itemId": "arcane_shard",
           "name": "Chime Shard",
           "count": 2
         }

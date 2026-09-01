@@ -961,7 +961,8 @@ export const ru_RU: EnTranslations = {
       "durationUnitSeconds": "с",
       "durationUnitMinutes": "м",
       "durationUnitHours": "ч",
-      "durationUnitDays": "д"
+      "durationUnitDays": "д",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Предпросмотр модели персонажа"
@@ -1391,6 +1392,7 @@ export const ru_RU: EnTranslations = {
       "name_thunderstrut_gobbler": "Громоступ, великий индюк",
       "name_terrorspark_groundshaker": "Ужасоискр, сотрясатель земли",
       "name_drakemaw_raptor": "Раптор Дрейкмо",
+      "name_rickshaw_mount": "Костяная рикша",
       "desc_valorsteed": "Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.",
       "desc_grag_bear": "Выносливый и твердо стоящий на лапах медведь, повышающий скорость передвижения.",
       "desc_stalkglider_snail": "Стойкая неторопливая улитка, повышающая скорость передвижения.",
@@ -1399,7 +1401,8 @@ export const ru_RU: EnTranslations = {
       "desc_stormfeather_griffin": "Величавый штормовой грифон, ступающий по земле на рунных когтях со сложенными крыльями.",
       "desc_thunderstrut_gobbler": "Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.",
       "desc_terrorspark_groundshaker": "Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.",
-      "desc_drakemaw_raptor": "Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом."
+      "desc_drakemaw_raptor": "Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.",
+      "desc_rickshaw_mount": "Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор."
     },
     "mountTraining": {
       "mountPrompt": "Нажми {key}, чтобы оседлать учебного Доблестного скакуна.",
@@ -1569,6 +1572,7 @@ export const ru_RU: EnTranslations = {
       "playerFrameScale": "Размер рамки игрока",
       "targetFrameScale": "Размер рамки цели",
       "aurasOnPlayerFrame": "Баффы у рамки игрока",
+      "alwaysShowAllBuffs": "Всегда показывать все баффы",
       "highContrastBackground": "Фон высокой контрастности",
       "startAttackOnAbility": "Автоатака при использовании способности",
       "stopAutoAttackOnTargetSwitch": "Останавливать автоатаку при смене цели",
@@ -1578,6 +1582,8 @@ export const ru_RU: EnTranslations = {
       "stickyTarget": "Сохранять цель при клике по земле",
       "showItemLevel": "Показывать уровень предмета",
       "showReliquaryTracker": "Показывать список Реликвария",
+      "confirmVendorSell": "Подтверждать продажу",
+      "confirmVendorSellNote": "Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.",
       "itemLevelLine": "Уровень предмета {level}",
       "itemScoreLine": "Оценка {score}",
       "showSecondaryActionBar": "Показывать вторичную панель действий",
@@ -1586,6 +1592,7 @@ export const ru_RU: EnTranslations = {
       "hideUnusedActionSlots": "Скрыть неиспользуемые ячейки действий",
       "lockActionBars": "Заблокировать панели действий",
       "showTargetOfTarget": "Показывать цель цели",
+      "showTargetSwingTimer": "Показывать таймер замаха цели",
       "showPetFrame": "Показывать вашего питомца",
       "waterRipples": "Рябь на воде (кильватер)",
       "showAttackButton": "Показывать кнопку атаки",
@@ -2166,6 +2173,12 @@ export const ru_RU: EnTranslations = {
         "few": "Осталось {count} сек.",
         "many": "Осталось {count} сек.",
         "other": "Осталось {count} сек."
+      },
+      "buffsHidden": {
+        "one": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "few": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "many": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики",
+        "other": "Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики"
       },
       "playtimeDays": {
         "one": "{count} день",
@@ -2980,11 +2993,11 @@ export const ru_RU: EnTranslations = {
         "actionBar2": "Панель команд 2",
         "actionBar3": "Панель команд 3",
         "steamWishlist": "Напоминание о списке желаемого",
-        "menu": "Menu",
+        "menu": "Меню",
         "minimap": "Мини-карта",
         "stanceBar": "Панель стоек",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "Полоса опыта",
+        "chat": "Чат",
         "actionBarGroup": "Панели действий",
         "playerFrame": "Игрок",
         "targetFrame": "Цель",
@@ -3002,7 +3015,7 @@ export const ru_RU: EnTranslations = {
       "actionBar2Vertical": "Вертикальная панель команд 2",
       "actionBar3Vertical": "Вертикальная панель команд 3",
       "menuRailHorizontal": "Горизонтальное меню",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "Привязка к сетке",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "Сбросить размер",
       "resetFrameSizeFor": "Сбросить размер: {name}",
@@ -4038,7 +4051,9 @@ export const ru_RU: EnTranslations = {
       "disenchant": "Распылить",
       "salvage": "Разобрать",
       "applyEnchant": "Наложить чары",
-      "sunder": "Расколоть"
+      "sunder": "Расколоть",
+      "sell": "Продать",
+      "sellAll": "Продать все ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Вы распыляете {item}.",
@@ -4596,6 +4611,10 @@ export const ru_RU: EnTranslations = {
       "loading": "Загрузка биржи...",
       "loadFailed": "Не удалось связаться с биржей. Попробуйте чуть позже.",
       "disabledRealm": "Биржа $WOC недоступна в этом мире.",
+      "browserOnlyConfirmTitle": "Открыть Биржу $WOC в браузере?",
+      "browserOnlyConfirmBody": "Биржа $WOC доступна только в браузерной версии World of ClaudeCraft. В браузере откроется World of ClaudeCraft, где вы сможете войти и открыть биржу, игра продолжит работать здесь.",
+      "browserOnlyConfirmOpen": "Открыть в браузере",
+      "browserOnlyConfirmCancel": "Отмена",
       "pausedBanner": "Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.",
       "walletLinkedDisconnected": "Ваш публичный адрес привязан. Чтобы платить в $WOC, снова подключите это приложение-кошелёк.",
       "walletLinkedConnected": "Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.",
@@ -4917,7 +4936,13 @@ export const ru_RU: EnTranslations = {
       "upstream": "Epic не отвечает. Повторите попытку чуть позже."
     },
     "wallet": {
-      "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку."
+      "handoff_invalid": "Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.",
+      "reauth_required": "Подтвердите это изменение кошелька паролем учетной записи.",
+      "reauth_two_factor": "В вашей учетной записи включена двухфакторная аутентификация. Введите код для подтверждения.",
+      "reauth_no_password": "Сначала установите пароль в настройках учетной записи, затем повторите попытку.",
+      "reauth_bad_signature": "Не удалось проверить подпись кошелька. Попробуйте ещё раз.",
+      "reauth_bad_password": "Неверный пароль.",
+      "reauth_bad_two_factor": "Этот код недействителен, попробуйте ещё раз."
     },
     "ota_updates": {
       "invalid_input": "Недопустимые данные."
@@ -5376,6 +5401,7 @@ export const ru_RU: EnTranslations = {
       "ifPartySort": "Порядок, в котором перечислены участники группы: порядок в группе, роль или имя.",
       "ifPartyShowAuras": "Показывать ли усиления и ослабления на рамках группы. Такие же переключатели отвечают за полоски ресурса, поглощение, питомцев и за то, показываетесь ли вы сами в своём списке группы.",
       "ifAurasOnPlayerFrame": "Показывает ваши усиления и ослабления не только на панели аур, но и на вашей собственной рамке персонажа.",
+      "ifAlwaysShowAllBuffs": "Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.",
       "ifTargetOfTarget": "Показывает, кого держит целью ваша цель, — классический способ понять, удерживает ли её ещё танк.",
       "ifPetFrame": "Показывает рамку вашего питомца.",
       "ifChatFontScale": "Размер текста в чате.",
@@ -6583,6 +6609,9 @@ export const ru_RU: EnTranslations = {
       "effectFood": "Восстанавливает {amount} здоровья за {seconds} сек. при еде.",
       "effectWellFed": "Сытость после еды: +{value} к характеристике {stat} на {minutes} мин.",
       "effectWellFedAura": "Дает {aura} на {minutes} мин., когда вы доедаете.",
+      "effectFeast": "Накрывает пир, из которого едят другие, по одной порции каждому: {servings} порций на {minutes} мин.",
+      "effectFeastServing": "Каждая порция восстанавливает {amount} здоровья за {seconds} сек.",
+      "effectFeastWellFed": "Сытость после порции: +{value} к характеристике {stat} на {minutes} мин.",
       "sourceTrainerFee": "Учитель, {fee}",
       "sourceTrainerFree": "Учитель, бесплатно",
       "sourceKnown": "Известен с самого начала",
@@ -6590,6 +6619,7 @@ export const ru_RU: EnTranslations = {
       "sourceVendor": "Продаётся у героического интенданта",
       "sourceDropAndVendor": "Из найденной схемы или у героического интенданта",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "никогда",
       "colRecipe": "Рецепт",
       "colSkill": "Навык",
       "colSource": "Источник",
@@ -7917,6 +7947,13 @@ export const ru_RU: EnTranslations = {
     "unlink": "Отвязать",
     "unlinkTitle": "Удалить подтверждение кошелька из этой учетной записи",
     "unlinkAria": "Удалить подтверждение кошелька из этой учетной записи",
+    "reauthTitle": "Подтверждение изменения кошелька",
+    "reauthUnlinkTitle": "Подтверждение удаления кошелька",
+    "reauthHelp": "В целях безопасности введите пароль учетной записи, чтобы разрешить это изменение.",
+    "reauthNoPassword": "Эта учетная запись входит без пароля. Сначала установите пароль в настройках учетной записи, затем повторите попытку.",
+    "reauthConfirm": "Подтвердить",
+    "reauthCancel": "Отмена",
+    "reauthClose": "Закрыть",
     "signOut": "Отключить",
     "signOutTitle": "Отключить приложение кошелька в этом браузере",
     "signOutAria": "Отключить приложение кошелька в этом браузере",
@@ -9621,6 +9658,8 @@ export const ru_RU: EnTranslations = {
       "soldJunkMany": "Вы продали серые предметы ({count}) за {money}.",
       "keptBoundOne": "Оставлена {count} привязанная копия.",
       "keptBoundMany": "Оставлены привязанные копии ({count}).",
+      "keptLockedOne": "Оставлена {count} заблокированная копия.",
+      "keptLockedMany": "Оставлены заблокированные копии ({count}).",
       "friendOnline": "{name} вошел в игру.",
       "friendOffline": "{name} вышел из игры."
     },
@@ -13479,6 +13518,9 @@ export const ru_RU: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ключ зажигания Ужасоискра"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Связанные поводья: Костяная рикша"
       },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"

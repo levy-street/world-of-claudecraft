@@ -55,7 +55,7 @@ import {
   VARKHUL_RED_HOT_METAL_TICK_SECONDS,
   varkhulForgestormPattern,
 } from '../src/sim/encounters/varkhul';
-import { IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
+import { IGNIVAR_MOLTEN_ASSEMBLY_ID, IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Sim } from '../src/sim/sim';
 import { revivePlayerAt } from '../src/sim/spirit';
@@ -1552,6 +1552,12 @@ describe('Varkhul encounter behavior', () => {
       },
     );
 
+    // The exit portal is sealed while Varkhul is engaged, so the fight lulls
+    // first; the assembly claim gives the crucible's floor-chain exit a live
+    // room to route to, and stepping back in takes its real portal out.
+    boss.inCombat = false;
+    expect(enterDungeon(sim.ctx, IGNIVAR_MOLTEN_ASSEMBLY_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_SECOND_WING_ID, sim.player.id, true)).toBe(true);
     expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
 
     expect(

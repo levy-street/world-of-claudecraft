@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { OptionsWindow } from '../src/ui/options_window';
 
 // Source-level guards for the options painter. The pure control descriptors +
 // the per-kind dispatch coercion are unit-tested in options_view.test.ts; here we
@@ -186,6 +187,18 @@ describe('options_window: WCAG 2.2 AA', () => {
     // name, so it is not an unnamed role=listbox (WCAG 4.1.2).
     expect(painter).toContain('ariaLabel: buttonLabel');
     expect(painter).toContain("ariaLabel: t('hud.options.language')");
+  });
+
+  it('keeps bare face and d-pad bindings editable when the cross hotbar is enabled', () => {
+    const controller = painter.slice(
+      painter.indexOf('private renderController(): void {'),
+      painter.indexOf('private renderCrossHotbarRows('),
+    );
+    expect(controller).toContain(
+      'if (crossHotbarOwned && isCrossHotbarModifier(button)) continue;',
+    );
+    expect(controller).not.toContain('isCrossHotbarButton(button)');
+    expect(controller).not.toContain('crossHotbarOwnsButtons');
   });
 });
 
@@ -423,6 +436,13 @@ describe('options_window: bug-report dispatch + async states (cluster 2)', () =>
 });
 
 describe('options_window: keybind rebind dispatch (cluster 5)', () => {
+  function gamepadActionValues(crossHotbarOwned = false): string[] {
+    const window = new OptionsWindow({ slotActionName: () => null } as never) as unknown as {
+      gamepadActionOptions(crossHotbarOwned?: boolean): { value: string; label: string }[];
+    };
+    return window.gamepadActionOptions(crossHotbarOwned).map((option) => option.value);
+  }
+
   it('localizes the Target Buffs and Debuffs row through its chrome key', () => {
     expect(painter).toContain("targetAuras: 'hudChrome.targetAuras.keybindLabel'");
     const displayName = painter.slice(
@@ -451,6 +471,24 @@ describe('options_window: keybind rebind dispatch (cluster 5)', () => {
     const hintIdx = keybinds.indexOf("t('hudChrome.keybinds.mouseHint')");
     const gateIdx = keybinds.lastIndexOf('if (!useTouchInterface()) {', hintIdx);
     expect(gateIdx).toBeGreaterThan(-1);
+  });
+
+  it('removes dead slot choices from controller remaps while the cross hotbar is on', () => {
+    expect(gamepadActionValues()).toEqual(expect.arrayContaining(['slot0', 'slot33']));
+    expect(gamepadActionValues(true).some((value) => value.startsWith('slot'))).toBe(false);
+    expect(gamepadActionValues(true)).toEqual(expect.arrayContaining(['none', 'jump', 'escape']));
+  });
+
+  it('renders slot-bound pad buttons as effectively unbound while filtering slot choices', () => {
+    const controller = painter.slice(
+      painter.indexOf('private renderController(): void {'),
+      painter.indexOf('private renderCrossHotbarRows('),
+    );
+    expect(controller).toContain('const opts = this.gamepadActionOptions(crossHotbarOwned);');
+    expect(controller).toContain(
+      "const current = crossHotbarOwned && action.startsWith('slot') ? GAMEPAD_NONE : action;",
+    );
+    expect(controller).toContain('opts,\n          current,');
   });
 });
 

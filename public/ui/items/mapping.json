@@ -922,6 +922,14 @@
       "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
       "confidence": "high",
       "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+    },
+    {
+      "itemId": "reins_rickshaw_mount",
+      "name": "Bonebound Rickshaw Reins",
+      "sourcePack": "woc_item_icon_v1_generated",
+      "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
     }
   ],
   "generatedBatches": [

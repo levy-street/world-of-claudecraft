@@ -54,10 +54,10 @@ describe('the Forge-Lift room', () => {
       guideVisible: false,
       suggestedPlayers: 10,
     });
-    // The Halls keep the raid branch's Eastbrook walk-up testing door
-    // beside the lift chain (the walk-up reverts at launch; the lift's
-    // exit portal is the chain's own way in either way).
-    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).not.toBe(false);
+    // The Eastbrook walk-up testing door is retired: the Halls are an
+    // interior-only room, so the lift's exit portal is the chain's only
+    // way in and its gate seal governs first entry.
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBe(false);
   }, 40000);
 
   it('seals the car through the ride: locked gate, no walk-through, entry refused', () => {
@@ -118,6 +118,7 @@ describe('the Forge-Lift room', () => {
   }, 40000);
 
   it('exposes the ride predicate for the sweep', () => {
+    expect(IGNIVAR_LIFT_RIDE_SECONDS).toBe(9);
     expect(ignivarLiftArrived(undefined, 100)).toBe(false);
     expect(ignivarLiftArrived(10, 10 + IGNIVAR_LIFT_RIDE_SECONDS - 0.5)).toBe(false);
     expect(ignivarLiftArrived(10, 10 + IGNIVAR_LIFT_RIDE_SECONDS)).toBe(true);

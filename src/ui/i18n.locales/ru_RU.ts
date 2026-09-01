@@ -158,6 +158,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.roleTag.legend': 'ЛЕГЕНДА',
   'hudChrome.discord.roleTag.shill': 'ГЛАШАТАЙ',
   'guide.profPages.gainFmt': '{reduced} / {minimal} / {zero}',
+  'guide.profPages.gainNever': 'никогда',
   'guide.profPages.colWield': 'Нужно мастерство',
   'guide.profPages.wieldNone': 'Любое',
   'guide.profPages.fish.pctFmt': '{pct}%',
@@ -568,6 +569,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.charter.outage': 'Не удалось подтвердить покупку. Повторите попытку этой кнопкой, и средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.wocStore.charter.outageStale': 'Вернитесь в магазин и снова используйте то же действие «Купить грамоту». Средства не спишутся дважды. Перезагрузка игры перед повтором может лишить этой защиты.',
   'hudChrome.wocStore.charter.failed': 'Не удалось завершить покупку.',
+  'hudChrome.wocStore.charter.resultContext': '{item} ({sku}): {message}',
   'hudChrome.wocStore.charter.names.strongbox_charter_1': 'Малая грамота на сундук',
   'hudChrome.wocStore.charter.names.strongbox_charter_2': 'Большая грамота на сундук',
   'hudChrome.wocStore.charter.names.strongbox_charter_3': 'Великая грамота на сундук',
@@ -804,11 +806,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.playerFrame': 'Игрок',
   'hudChrome.interfaceUnlock.frameNames.targetFrame': 'Цель',
   'hudChrome.interfaceUnlock.frameNames.partyFrames': 'Группа',
+  'hudChrome.interfaceUnlock.frameNames.chat': 'Чат',
+  'hudChrome.interfaceUnlock.frameNames.menu': 'Меню',
+  'hudChrome.interfaceUnlock.frameNames.xpBar': 'Полоса опыта',
   'hudChrome.options.combineActionBars': 'Объединить панели действий',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'Панели действий',
   'hudChrome.interfaceUnlock.frameNames.swingBar': 'Автоатака',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
+  'hudChrome.interfaceUnlock.snapToGrid': 'Привязка к сетке',
   'hudChrome.interfaceUnlock.buffsLeftToRight': 'Усиления слева направо',
   'hudChrome.interfaceUnlock.debuffsLeftToRight': 'Ослабления слева направо',
   'hudChrome.interfaceUnlock.lockPlayerFrameToBar': 'Закрепить фрейм игрока над панелью действий',
@@ -823,6 +829,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.framesMenuTitle':
     'Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.',
   'hudChrome.interfaceUnlock.previewSpell': 'Пример заклинания',
+  'hudChrome.interfaceUnlock.previewMemberName': '{className} {number}',
   'hudChrome.transfer.frameLayout': 'Расположение фреймов',
   'hudChrome.transfer.allSettings': 'Все настройки',
   'hudChrome.transfer.exportAction': 'Экспорт',
@@ -842,6 +849,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
+  'hudChrome.options.alwaysShowAllBuffs': 'Всегда показывать все баффы',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
   'hud.core.mapMarkerDescription': '{area}. {markers}',
@@ -963,6 +971,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.durationUnitMinutes': 'м',
   'hudChrome.unitFrame.durationUnitHours': 'ч',
   'hudChrome.unitFrame.durationUnitDays': 'д',
+  'hudChrome.unitFrame.buffOverflowLabel': '+{n}',
   'hudChrome.unitFrame.partyLabel': 'Ваша группа',
   'hudChrome.unitFrame.partyChip': 'Группа',
   'hudChrome.unitFrame.playerLabel': 'Ваш персонаж',
@@ -1543,6 +1552,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.highContrastBackground': 'Фон высокой контрастности',
   'hudChrome.options.showItemLevel': 'Показывать уровень предмета',
   'hudChrome.options.showReliquaryTracker': 'Показывать список Реликвария',
+  'hudChrome.options.confirmVendorSell': 'Подтверждать продажу',
+  'hudChrome.options.confirmVendorSellNote':
+    'Если отключить, предметы будут продаваться одним кликом без подтверждения, и при смещении ячейки сумки можно продать не тот предмет.',
   'hudChrome.options.showSecondaryActionBar': 'Показывать вторичную панель действий',
   'hudChrome.options.showThirdActionBar': 'Показывать третью панель действий',
   'hudChrome.options.hideUnusedActionSlots': 'Скрыть неиспользуемые ячейки действий',
@@ -1806,6 +1818,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'wallet.unlink': 'Отвязать',
   'wallet.unlinkTitle': 'Удалить подтверждение кошелька из этой учетной записи',
   'wallet.unlinkAria': 'Удалить подтверждение кошелька из этой учетной записи',
+  'wallet.reauthTitle': 'Подтверждение изменения кошелька',
+  'wallet.reauthUnlinkTitle': 'Подтверждение удаления кошелька',
+  'wallet.reauthHelp':
+    'В целях безопасности введите пароль учетной записи, чтобы разрешить это изменение.',
+  'wallet.reauthNoPassword':
+    'Эта учетная запись входит без пароля. Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'wallet.reauthConfirm': 'Подтвердить',
+  'wallet.reauthCancel': 'Отмена',
+  'wallet.reauthClose': 'Закрыть',
   'wallet.signOut': 'Отключить',
   'wallet.signOutTitle': 'Отключить приложение кошелька в этом браузере',
   'wallet.signOutAria': 'Отключить приложение кошелька в этом браузере',
@@ -2618,6 +2639,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.logs.soldJunkMany': 'Вы продали серые предметы ({count}) за {money}.',
   'hud.logs.keptBoundOne': 'Оставлена {count} привязанная копия.',
   'hud.logs.keptBoundMany': 'Оставлены привязанные копии ({count}).',
+  'hud.logs.keptLockedOne': 'Оставлена {count} заблокированная копия.',
+  'hud.logs.keptLockedMany': 'Оставлены заблокированные копии ({count}).',
   'hud.logs.friendOnline': '{name} вошел в игру.',
   'hud.logs.friendOffline': '{name} вышел из игры.',
   'hud.markers.names.star': 'Звезда',
@@ -6151,6 +6174,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.plurals.secondsRemaining.few': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.many': 'Осталось {count} сек.',
   'hudChrome.plurals.secondsRemaining.other': 'Осталось {count} сек.',
+  'hudChrome.plurals.buffsHidden.one': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.few': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.many': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
+  'hudChrome.plurals.buffsHidden.other': 'Ещё активно {count} эффектов, но их значки скрыты из-за настроек графики',
   'hudChrome.plurals.playtimeDays.one': '{count} день',
   'hudChrome.plurals.playtimeDays.few': '{count} дня',
   'hudChrome.plurals.playtimeDays.many': '{count} дней',
@@ -9341,6 +9368,15 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.steam.disabled': 'Привязка Steam сейчас недоступна.',
   'apiError.wallet.handoff_invalid':
     'Срок действия авторизации кошелька истек или ее не удалось проверить. Повторите попытку.',
+  'apiError.wallet.reauth_required': 'Подтвердите это изменение кошелька паролем учетной записи.',
+  'apiError.wallet.reauth_two_factor':
+    'В вашей учетной записи включена двухфакторная аутентификация. Введите код для подтверждения.',
+  'apiError.wallet.reauth_no_password':
+    'Сначала установите пароль в настройках учетной записи, затем повторите попытку.',
+  'apiError.wallet.reauth_bad_signature':
+    'Не удалось проверить подпись кошелька. Попробуйте ещё раз.',
+  'apiError.wallet.reauth_bad_password': 'Неверный пароль.',
+  'apiError.wallet.reauth_bad_two_factor': 'Этот код недействителен, попробуйте ещё раз.',
   'apiError.seeker.native_only': 'Права Seeker доступны только в нативном приложении.',
   'apiError.seeker.attestation_failed': 'Не удалось подтвердить устройство. Повторите попытку.',
   'apiError.seeker.solana_artifact_required': 'Продолжите в версии приложения из Solana Store.',
@@ -9662,6 +9698,11 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.loading': 'Загрузка биржи...',
   'hudChrome.wocMarket.loadFailed': 'Не удалось связаться с биржей. Попробуйте чуть позже.',
   'hudChrome.wocMarket.disabledRealm': 'Биржа $WOC недоступна в этом мире.',
+  'hudChrome.wocMarket.browserOnlyConfirmTitle': 'Открыть Биржу $WOC в браузере?',
+  'hudChrome.wocMarket.browserOnlyConfirmBody':
+    'Биржа $WOC доступна только в браузерной версии World of ClaudeCraft. В браузере откроется World of ClaudeCraft, где вы сможете войти и открыть биржу, игра продолжит работать здесь.',
+  'hudChrome.wocMarket.browserOnlyConfirmOpen': 'Открыть в браузере',
+  'hudChrome.wocMarket.browserOnlyConfirmCancel': 'Отмена',
   'hudChrome.wocMarket.pausedBanner':
     'Торги приостановлены. Отсчёт аукционов продолжается; новые лоты, ставки, предложения и платежи ждут возобновления торгов, а уже отправленный платёж всё равно будет проведён.',
   'hudChrome.wocMarket.walletLinkedDisconnected':
@@ -9669,6 +9710,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocMarket.walletLinkedConnected':
     'Привязанное приложение-кошелёк подключено и готово к платежам в $WOC.',
   'hudChrome.wocMarket.walletUsdUnknown': 'Неизвестно',
+  'hudChrome.wocMarket.walletUsdBalance': '{amount} USD',
   'hudChrome.wocMarket.rateNote': 'Курс: около {tokens} $WOC за доллар США по состоянию на {time}.',
   'hudChrome.wocMarket.estimateNote': '{usd} по текущему курсу составляет около {tokens} $WOC.',
   'hudChrome.wocMarket.browseEmpty': 'Лотов пока нет. Загляните позже.',
@@ -10871,6 +10913,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Ужасоискр, сотрясатель земли',
+  'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
   'hudChrome.mounts.desc_grag_bear':
@@ -10887,6 +10930,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
+  'hudChrome.mounts.desc_rickshaw_mount':
+    'Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
   'hudChrome.mounts.emptyStableHint':
     'Достигните 20 уровня и возьмите урок верховой езды у старшей конюшей Марлы в конюшнях к западу от Хайвотча.',
@@ -11348,6 +11393,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.combat.blockedTaken': 'Вы блокируете атаку {source}, получая {amount} урона.',
   'hudChrome.options.mouseoverCast': 'Применение по наведению на рамки группы',
   'hudChrome.options.showTargetOfTarget': 'Показывать цель цели',
+  'hudChrome.options.showTargetSwingTimer': 'Показывать таймер замаха цели',
   'hudChrome.options.showPetFrame': 'Показывать вашего питомца',
   'hudChrome.options.stickyTarget': 'Сохранять цель при клике по земле',
   'hudChrome.unitFrame.targetOfTargetLabel': 'Цель цели',
@@ -11786,6 +11832,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Ужасоискра',
+  'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
   'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',
@@ -12551,6 +12598,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.effectFood': 'Восстанавливает {amount} здоровья за {seconds} сек. при еде.',
   'guide.profPages.effectWellFed': 'Сытость после еды: +{value} к характеристике {stat} на {minutes} мин.',
   'guide.profPages.effectWellFedAura': 'Дает {aura} на {minutes} мин., когда вы доедаете.',
+  'guide.profPages.effectFeast': 'Накрывает пир, из которого едят другие, по одной порции каждому: {servings} порций на {minutes} мин.',
+  'guide.profPages.effectFeastServing': 'Каждая порция восстанавливает {amount} здоровья за {seconds} сек.',
+  'guide.profPages.effectFeastWellFed': 'Сытость после порции: +{value} к характеристике {stat} на {minutes} мин.',
   'guide.profPages.sourceTrainerFee': 'Учитель, {fee}',
   'guide.profPages.sourceTrainerFree': 'Учитель, бесплатно',
   'guide.profPages.sourceKnown': 'Известен с самого начала',
@@ -14196,6 +14246,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': 'Что такое разлом',
   'guide.settingsPage.advancedLadder': 'Сдвиньте любой из них, и пресет качества переключится на «Расширенное», взяв за основу ровно те уровни, что были у вас перед глазами, так что ваше сочетание начинается с уже увиденного, а не с чистого листа. Когда понравится, нажмите «Применить». Именно поэтому «Расширенное» стоит в конце списка пресетов: это профиль для знатоков, где живёт ваше собственное сочетание.',
   'guide.settingsPage.ifAurasOnPlayerFrame': 'Показывает ваши усиления и ослабления не только на панели аур, но и на вашей собственной рамке персонажа.',
+  'guide.settingsPage.ifAlwaysShowAllBuffs':
+    'Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.',
   'guide.settingsPage.ifChatFontScale': 'Размер текста в чате.',
   'guide.settingsPage.ifChatIntro': 'Как читается окно чата. Здесь же лежит сброс самих окон чата.',
   'guide.settingsPage.ifChatOpacity': 'Насколько плотный фон у чата.',
@@ -15093,6 +15145,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.abilities.nightshade_coating.name': 'Покрытие паслёном',
   'entities.abilities.nightshade_coating.description':
     'Покрывает цель паслёном, нанося {damage} ед. урона от сил природы и снижая получаемое ею исцеление на 25% на 12 сек.',
+  // v0.41 release i18n fill.
+  'hudChrome.itemMenu.sell': 'Продать',
+  'hudChrome.itemMenu.sellAll': 'Продать все ({count})',
   // Ignivar raid loot (Crucible of the Last Spring): the M16 same-change
   // fills for the new wordy item names (src/sim/content/ignivar_loot.ts).
   'entities.items.slagbreaker_helmet.name': 'Шлем шлаколома',
@@ -15363,4 +15418,5 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.perfecting.nameSubmit': 'Выковать легенду',
   'hudChrome.perfecting.nameSubmitBusy': 'Куём',
   'hudChrome.perfecting.nameCancel': 'Отмена',
+  'crucibleShop.balanceEntry': '{name} x{count}',
 };

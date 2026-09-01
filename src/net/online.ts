@@ -12,6 +12,7 @@ import {
 } from '../sim/account_flair';
 import { bagCapacity } from '../sim/bags';
 import { signChallenge } from '../sim/client_challenge';
+import { allocRiftCollisionToken, clearRiftRegion, setRiftRegion } from '../sim/colliders';
 import { heroicLeapPlacementPreview } from '../sim/combat/heroic_leap';
 import { FARM_PATCHES } from '../sim/content/farm_patches';
 import { type MountKey, normalizeMountKey } from '../sim/content/mounts';
@@ -63,6 +64,7 @@ import {
   restoreReliquaryState,
   type SavedReliquaryState,
 } from '../sim/reliquary';
+import { riftFloorColliders } from '../sim/rift/rift_gen';
 import { computeCharacterModifiers } from '../sim/set_bonus_mods';
 import type { ResolvedAbility } from '../sim/sim';
 import { parseTalentAllocation } from '../sim/talent_allocation_input';
@@ -144,7 +146,6 @@ import {
   type MailInfo,
   type MarketInfo,
   type MountRaceView,
-  ONLINE_WORLD_AUTH_TYPE,
   ONLINE_WORLD_INCOMPATIBLE_MESSAGE,
   type OverheadEmoteId,
   type PartyInfo,
@@ -180,6 +181,7 @@ import type {
   SalvageResultView,
 } from '../world_api/professions';
 import { normalizeAccountCosmetics } from './account_cosmetics_wire';
+import { apiErrorFromBody } from './api_error';
 import { applyAuraWire, type ClientWireAura, snapshotCarriesAuras } from './aura_wire_decode';
 import { computeBackoffDelay } from './backoff';
 import { applyBankSelfWire } from './bank_snapshot_wire';
@@ -187,6 +189,7 @@ import {
   type CivicServicePlacementsReader,
   createCivicServicePlacementsReader,
 } from './civic_service_placements';
+import { applySelfCombatScalars } from './combat_scalar_wire';
 import {
   decodeCraftingIdentity,
   decodeMobileStationCrafts,
@@ -206,20 +209,29 @@ import {
   decodeVarkhulForgestormWarnings,
 } from './ground_telegraph_wire';
 import { decodeGuildBankLogFrame, GUILD_BANK_LOG_TTL_MS } from './guild_bank_log_wire';
+import { foldInputAck } from './input_ack';
 import { INPUT_SEND_TIMER_INTERVAL_MS, inputFlushGateOpen } from './input_send_cadence';
+import { inputSignature } from './input_signature';
 import {
   applyMountRaceEventToMirror,
   decodeMountRaceView,
   type MountRaceMirror,
 } from './mount_race_wire';
+import {
+  type MovementFrameV2,
+  MovementFrameV2Outbox,
+  trackPendingInputSequence,
+  trackPendingInputSequenceRange,
+} from './movement_frame_v2_wire';
+import { applyReconSelfWire, ReconWireState } from './movement_reconciliation_wire';
 import { createNativeAttestationProof } from './native_attestation';
 import { createNetPipelineStats, type NetPipelineStats } from './net_pipeline_stats';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
 import { isInputSendBackpressured } from './send_backpressure';
+import { snapshotAlpha } from './snapshot_alpha';
 import {
   type SnapshotTimerWireMode,
-  STABLE_TIMER_WIRE_VERSION,
   type StableCooldownWire,
   snapshotTimerWireMode,
   stableCooldownRemaining,
@@ -231,6 +243,9 @@ import {
   decodeVarkhulCinderOrbProjectiles,
 } from './varkhul_cinder_orb_wire';
 import { vaultWithdrawPayload } from './vault_snapshot_wire';
+import { buildWebSocketAuthMessage } from './world_auth_message';
+
+export { buildWebSocketAuthMessage } from './world_auth_message';
 
 // The online mirror decodes terse legacy wire JSON. Runtime guards below narrow
 // individual fields as they are consumed; this alias keeps the decoder local.
@@ -238,6 +253,9 @@ import { vaultWithdrawPayload } from './vault_snapshot_wire';
 type LooseJson = any;
 
 type InputSendMode = 'periodic' | 'changed' | 'forced-neutral' | 'forced-facing';
+
+const inputFacingsMatch = (a: number, b: number): boolean =>
+  Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b))) <= 1e-12;
 
 interface PendingTransientInput {
   jump: boolean;
@@ -311,30 +329,6 @@ export {
   NATIVE_APP,
 } from '../client_origin';
 
-export function buildWebSocketAuthMessage(
-  token: string,
-  characterId: number,
-  clientSeed = '',
-): {
-  t: typeof ONLINE_WORLD_AUTH_TYPE;
-  token: string;
-  character: number;
-  clientSeed: string;
-  dungeonEntryFacingWire: typeof DUNGEON_ENTRY_FACING_WIRE_VERSION;
-  timerWire: typeof STABLE_TIMER_WIRE_VERSION;
-  petSpecialWire: typeof PET_SPECIAL_WIRE_VERSION;
-} {
-  return {
-    t: ONLINE_WORLD_AUTH_TYPE,
-    token,
-    character: characterId,
-    clientSeed,
-    dungeonEntryFacingWire: DUNGEON_ENTRY_FACING_WIRE_VERSION,
-    timerWire: STABLE_TIMER_WIRE_VERSION,
-    petSpecialWire: PET_SPECIAL_WIRE_VERSION,
-  };
-}
-
 export type RealmType = 'Normal' | 'PvP' | 'RP' | 'RP-PvP';
 
 export interface RealmEntry {
@@ -374,46 +368,21 @@ export interface AccountInfo {
   passwordSet: boolean;
 }
 
-// Carries the HTTP status alongside the server's error text so callers can
-// distinguish an auth failure (401/403 → clear the stored session) from a
-// transient 5xx/network blip (keep the token; the session may still be valid).
-export class ApiError extends Error {
-  constructor(
-    message: string,
-    readonly status: number,
-    // The stable machine code from the server's error body (RFC 9457 problem+json
-    // `code`, or the additive `code` on a migrated legacy body), when present. The
-    // client matcher (src/ui/api_error_i18n.ts) prefers it over the English message.
-    readonly code?: string,
-    // The parsed error body, so the matcher can read code params (e.g.
-    // retryAfterSeconds, date) that ride top-level alongside the code.
-    readonly params?: Record<string, unknown>,
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-}
+// The shared REST error value lives in its own module (the ratchet payment
+// for the wallet re-auth params below); re-exported so importers are unchanged.
+export { ApiError, apiErrorFromBody, isAuthError } from './api_error';
 
 export interface SeekerEntitlementStatus {
   entitled: boolean;
   mint: string | null;
 }
 
-// Builds the ApiError for a non-ok JSON response, capturing the stable `code` and
-// the body params when the server sent them (both problem+json and the migrated
-// legacy `{ error, code, ... }` bodies carry a top-level `code`).
-function apiErrorFromBody(data: unknown, status: number): ApiError {
-  const body = data && typeof data === 'object' ? (data as Record<string, unknown>) : undefined;
-  const rawError = body?.error;
-  const message = typeof rawError === 'string' ? rawError : `request failed (${status})`;
-  const rawCode = body?.code;
-  const code = typeof rawCode === 'string' && rawCode.length > 0 ? rawCode : undefined;
-  return new ApiError(message, status, code, code ? body : undefined);
-}
-
-/** True for an auth-class failure where a stored token should be discarded. */
-export function isAuthError(err: unknown): boolean {
-  return err instanceof ApiError && (err.status === 401 || err.status === 403);
+/** Account proof for a wallet-link CHANGE (the R11 relink gate): the password
+ *  arm, plus the second factor when the account has one enrolled. */
+export interface WalletReauthProof {
+  password: string;
+  totp?: string;
+  recoveryCode?: string;
 }
 
 export class Api {
@@ -946,8 +915,17 @@ export class Api {
   }
 
   // Step 2: submit the wallet's signature; server verifies + persists the link.
-  async linkWallet(address: string, signature: string, nonce: string): Promise<{ pubkey: string }> {
-    return this.post('/api/wallet/link', { address, signature, nonce });
+  // CHANGING an existing link (and unlinking below) is re-authorized (the R11
+  // relink gate): pass the account password, plus the second factor when
+  // enrolled. Without it the server answers 401 code wallet.reauth_required.
+  async linkWallet(
+    address: string,
+    signature: string,
+    nonce: string,
+    reauth?: WalletReauthProof,
+  ): Promise<{ pubkey: string }> {
+    // Proof spreads FIRST so the identity fields can never be shadowed.
+    return this.post('/api/wallet/link', { ...(reauth ?? {}), address, signature, nonce });
   }
 
   // Current account's linked wallet (null when none).
@@ -956,8 +934,8 @@ export class Api {
     return data.wallet ?? null;
   }
 
-  async unlinkWallet(): Promise<void> {
-    await this.delete('/api/wallet/link', {});
+  async unlinkWallet(reauth?: WalletReauthProof): Promise<void> {
+    await this.delete('/api/wallet/link', reauth ?? {});
   }
 
   async seekerEntitlement(): Promise<SeekerEntitlementStatus> {
@@ -1419,6 +1397,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    riftSliding: false,
     afk: false,
     weaponStowed: false,
     helmHidden: false,
@@ -1519,7 +1498,7 @@ function anchorFields(target: NamedSlotTarget): { ord?: number; n?: number } {
   return target.anchor ? { ord: target.anchor.ordinal, n: target.anchor.count } : {};
 }
 
-export class ClientWorld implements IWorld {
+export class ClientWorld extends ReconWireState implements IWorld {
   // --- IWorldEntityRoster: roster + player reads, mirrored from snapshots. The
   // `player` getter lives below the ctor (it reads `entities`/`playerId`). `known`
   // is IWorldCombat-owned but rides here as a self-wire mirror field with the rest
@@ -1693,11 +1672,17 @@ export class ClientWorld implements IWorld {
   // Active procedural Rift floor, rebuilt from the riftState event (no snapshot
   // field). The renderer regenerates geometry/style from this descriptor.
   riftFloor: RiftFloorView | null = null;
-  // The online client never registers a rift collision region of its own (collision
-  // resolution is server-authoritative); 0 keeps findPlayerPath/resolvePlayerDestination
-  // and the swept-landing crest re-resolve (see world_api/dungeons.ts) inert here, same
-  // as outside a rift.
-  readonly riftCollisionToken = 0;
+  // A real per-ClientWorld token (issue #3479): applyRiftStateEvent registers the
+  // mirrored floor's colliders under it (the same pure generator + layoutColliders
+  // the server ran, so no geometry travels the wire), which is what lets the
+  // self-motion predictor (src/render/self_motion.ts) resolve rift walls locally
+  // instead of rendering the full echo latency, and also feeds
+  // findPlayerPath/resolvePlayerDestination and the swept-landing crest re-resolve
+  // (see below) real rift geometry for the first time. The token itself is a fixed
+  // value allocated once at construction (like the live Sim's own
+  // riftCollisionToken), but it carries no registered region (inert, matching
+  // outside-a-rift behavior) until the first riftState event registers one.
+  readonly riftCollisionToken = allocRiftCollisionToken();
   // The riftState event's expiresAtMs mirrored verbatim: an epoch-ms deadline the
   // server computed via ctx.lockoutNowMs() (real Date.now() on the live server, the
   // same clock raidLockouts() already relies on). Null while riftFloor is null or
@@ -1904,9 +1889,9 @@ export class ClientWorld implements IWorld {
   // server-measured achieved sim tick rate (Hz), mirrored from the snap head;
   // null until the server's meter warms up (perf overlay hides the row)
   serverTickHz: number | null = null;
-  // False until a negotiated server snapshot advertises support. This keeps a
-  // new client from showing inert buttons while connected to an older server.
+  // False until a negotiated server snapshot advertises support.
   petSpecialCommandsSupported = false;
+  movementWireVersion: 1 | 2 = 1;
   // Stable timer-wire decode state. These stay separate from the public
   // remaining-time mirrors so an omitted v2 field can be re-derived from the
   // server simulation clock without accumulating client-frame drift.
@@ -2017,9 +2002,16 @@ export class ClientWorld implements IWorld {
   private sendTimer: number | undefined;
   private lastInputSentAt = 0;
   private lastInputSig = '';
+  private lastInputFacingSent: number | null = null;
+  private lastInputFacingSentSeq = 0;
   private inputSeq = 0;
   private pendingInputSeqSentAt = new Map<number, number>();
-  // Lazy because bare ClientWorld fixtures skip field initializers.
+  private movementFrameOutbox: MovementFrameV2Outbox | undefined;
+  onMovementWireNegotiated: ((version: 1 | 2, now: number) => void) | null = null;
+  onMovementWireNeutral: ((now: number) => boolean) | null = null;
+  // No initializer on purpose: bare ClientWorld test fixtures skip field
+  // initializers, and the lazy accessor below keeps that construction idiom
+  // equivalent to a real instance.
   private pendingTransientInput: PendingTransientInput | undefined;
   private ackedInputSeq = 0;
   private inputEchoSamples: number[] = [];
@@ -2029,6 +2021,7 @@ export class ClientWorld implements IWorld {
   private pendingDungeonEntryFacing: number | null = null;
 
   constructor(token: string, characterId: number, cls: PlayerClass, base = '', clientSeed = '') {
+    super();
     this.characterId = characterId;
     this.token = token;
     this.base = normalizeOrigin(base) || NATIVE_API_ORIGIN || DESKTOP_API_ORIGIN;
@@ -2040,7 +2033,10 @@ export class ClientWorld implements IWorld {
     this.openSocket();
     // unconditional input stream beat; constants + gate shared with the
     // cadence-model matrix via input_send_cadence.ts (R13)
-    this.sendTimer = window.setInterval(() => this.sendInput(), INPUT_SEND_TIMER_INTERVAL_MS);
+    this.sendTimer = window.setInterval(
+      () => this.sendMovementTimerTick(),
+      INPUT_SEND_TIMER_INTERVAL_MS,
+    );
     if (typeof document !== 'undefined') {
       document.addEventListener('visibilitychange', this.handleVisibilityChange);
     }
@@ -2217,6 +2213,16 @@ export class ClientWorld implements IWorld {
     this.flushActionBarLayoutSave();
     this.sessionEnded = true;
     this.failPendingCommandOutcomes();
+    // RIFT_REGIONS (src/sim/colliders.ts) is a module-level registry keyed by
+    // riftCollisionToken, outside this instance: a session that ends while
+    // mirroring a floor would otherwise strand that region under a token
+    // nothing queries again once this ClientWorld is dropped, on every close/
+    // logout/reconnect-exhausted path that reaches here.
+    if (this.riftFloor) {
+      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
+    }
+    // Clear the descriptor too; late riftState frames after teardown are ignored below.
+    this.riftFloor = null;
     clearInterval(this.sendTimer);
     if (this.reconnectTimer !== undefined) clearTimeout(this.reconnectTimer);
     if (typeof document !== 'undefined') {
@@ -2269,22 +2275,78 @@ export class ClientWorld implements IWorld {
     this.mouselookFacing = normalizeMoveFacing(facing);
   }
 
+  inputFacingAcknowledged(facing: number | null): boolean {
+    if (facing === null || typeof this.lastInputFacingSent !== 'number') return false;
+    const sentSeq = this.lastInputFacingSentSeq ?? 0;
+    return (
+      inputFacingsMatch(facing, this.lastInputFacingSent) &&
+      sentSeq > 0 &&
+      (this.ackedInputSeq ?? 0) >= sentSeq
+    );
+  }
+
   flushInput(now = performance.now()): boolean {
     return this.sendInput(now, 'changed');
   }
+  movementWireIsOpen(): boolean {
+    return (
+      typeof this.spectating !== 'string' && this.connected && this.ws.readyState === WebSocket.OPEN
+    );
+  }
+  sendMovementFrame(
+    frame: MovementFrameV2,
+    now = performance.now(),
+    bypassBackpressure = false,
+  ): boolean {
+    const firstSeq = this.inputSeq + 1;
+    this.movementFrameOutbox ??= new MovementFrameV2Outbox();
+    const result = this.movementFrameOutbox.send(
+      this.ws,
+      this.movementWireIsOpen(),
+      frame,
+      this.inputSeq,
+      bypassBackpressure,
+    );
+    this.inputSeq = result.lastSeq;
+    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
+    if (!result.accepted) return false;
+    const facingSeq = Math.max(firstSeq, result.lastSeq);
+    if (frame.facing === null) {
+      this.lastInputFacingSent = null;
+      this.lastInputFacingSentSeq = 0;
+    } else if (
+      typeof this.lastInputFacingSent !== 'number' ||
+      !inputFacingsMatch(frame.facing, this.lastInputFacingSent)
+    ) {
+      this.lastInputFacingSent = frame.facing;
+      this.lastInputFacingSentSeq = facingSeq;
+    }
+    return true;
+  }
 
-  /**
-   * Drop every mirrored movement bit and send an unconditional neutral packet
-   * before the client pauses for an in-place renderer transition. This bypasses
-   * the changed-only cadence gate so a matching signature or a just-sent input
-   * can never leave the authoritative player moving during the pause.
-   */
+  private sendMovementTimerTick(now = performance.now()): void {
+    if (this.movementWireVersion !== 2) return void this.sendInput(now);
+    const firstSeq = this.inputSeq + 1;
+    const result = this.movementFrameOutbox?.flush(
+      this.ws,
+      this.movementWireIsOpen(),
+      this.inputSeq,
+    );
+    if (!result) return;
+    this.inputSeq = result.lastSeq;
+    trackPendingInputSequenceRange(this.pendingInputSeqSentAt, firstSeq, result.lastSeq, now);
+  }
+
+  /** Send unconditional neutral input before an in-place renderer transition. */
   neutralizeInputForClientPause(now = performance.now()): boolean {
     Object.assign(this.moveInput, emptyMoveInput());
     this.mouselookFacing = null;
     // On an open socket the forced path admits exactly one neutral frame
     // despite a saturated browser buffer. The accepted neutral frame consumes
     // any pre-pause engagement intent without putting it on the wire.
+    if (this.movementWireVersion === 2) {
+      return this.onMovementWireNeutral?.(now) ?? false;
+    }
     return this.sendInput(now, 'forced-neutral');
   }
 
@@ -2304,28 +2366,6 @@ export class ClientWorld implements IWorld {
     const facing = this.pendingDungeonEntryFacing ?? null;
     this.pendingDungeonEntryFacing = null;
     return facing;
-  }
-
-  private inputSignature(): string {
-    const mi = this.moveInput;
-    const facing =
-      this.mouselookFacing === null ? '' : Math.round(this.mouselookFacing * 10000).toString();
-    return [
-      mi.forward ? 1 : 0,
-      mi.back ? 1 : 0,
-      mi.turnLeft ? 1 : 0,
-      mi.turnRight ? 1 : 0,
-      mi.strafeLeft ? 1 : 0,
-      mi.strafeRight ? 1 : 0,
-      mi.jump ? 1 : 0,
-      mi.dive ? 1 : 0,
-      mi.surface ? 1 : 0,
-      // Quantised upstream (input.ts SWIM_STEER_STEPS) precisely so that it can
-      // sit in the change-detection signature without a mouse-move resending
-      // the frame every time the camera twitches.
-      mi.swimSteer ?? 1,
-      facing,
-    ].join(',');
   }
 
   private pendingTransientInputState(): PendingTransientInput {
@@ -2367,7 +2407,7 @@ export class ClientWorld implements IWorld {
       this.netPipeline().noteInputBackpressure(this.ws.bufferedAmount);
       return false;
     }
-    const sig = this.inputSignature();
+    const sig = inputSignature(this.moveInput, this.mouselookFacing);
     const hasPendingTransientInput = this.hasPendingTransientInput();
     if (mode === 'changed') {
       if (!hasPendingTransientInput && sig === this.lastInputSig) return false;
@@ -2377,6 +2417,8 @@ export class ClientWorld implements IWorld {
     const includePendingTransientInput = mode !== 'forced-neutral';
     const msg: Record<string, unknown> = {
       t: 'input',
+      mv: 2,
+      mt: now,
       seq: ++this.inputSeq,
       mi: {
         f: mi.forward ? 1 : 0,
@@ -2412,13 +2454,17 @@ export class ClientWorld implements IWorld {
     this.pendingTransientInput = undefined;
     this.lastInputSentAt = now;
     this.lastInputSig = sig;
-    this.pendingInputSeqSentAt.set(this.inputSeq, now);
-    if (this.pendingInputSeqSentAt.size > 120) {
-      const stale = this.inputSeq - 120;
-      for (const seq of this.pendingInputSeqSentAt.keys()) {
-        if (seq <= stale) this.pendingInputSeqSentAt.delete(seq);
-      }
+    if (this.mouselookFacing === null) {
+      this.lastInputFacingSent = null;
+      this.lastInputFacingSentSeq = 0;
+    } else if (
+      typeof this.lastInputFacingSent !== 'number' ||
+      !inputFacingsMatch(this.mouselookFacing, this.lastInputFacingSent)
+    ) {
+      this.lastInputFacingSent = this.mouselookFacing;
+      this.lastInputFacingSentSeq = this.inputSeq;
     }
+    trackPendingInputSequence(this.pendingInputSeqSentAt, this.inputSeq, now);
     return true;
   }
 
@@ -2515,6 +2561,9 @@ export class ClientWorld implements IWorld {
       return;
     }
     if (msg.t === 'hello') {
+      this.movementWireVersion = msg.movementWire === 2 ? 2 : 1;
+      this.movementFrameOutbox?.reset();
+      this.onMovementWireNegotiated?.(this.movementWireVersion, performance.now());
       this.playerId = msg.pid;
       this.ownPlayerId = msg.pid;
       this.cfg.seed = msg.seed;
@@ -2535,6 +2584,8 @@ export class ClientWorld implements IWorld {
         this.inputSeq = 0;
         this.lastInputSig = '';
         this.lastInputSentAt = 0;
+        this.lastInputFacingSent = null;
+        this.lastInputFacingSentSeq = 0;
         this.pendingTransientInput = undefined;
         this.pendingInputSeqSentAt.clear();
         this.ackedInputSeq = 0;
@@ -2584,6 +2635,7 @@ export class ClientWorld implements IWorld {
       this.pendingTargetEcho = null;
       this.pendingInputSeqSentAt.clear();
       this.inputEchoSamples = [];
+      this.resetReconWireState();
       if (typeof this.spectating !== 'string') {
         this.playerId = this.ownPlayerId;
         this.cfg.playerClass = this.ownPlayerClass;
@@ -2894,10 +2946,7 @@ export class ClientWorld implements IWorld {
     // the interpolation alpha the render loop reached on its last frame
     // (same formula and caps as main.ts); used below to re-anchor the new
     // interpolation segment at the pose currently on screen
-    const contAlpha =
-      this.lastSnapAt > 0
-        ? Math.min(1.25, (now - this.lastSnapAt) / Math.max(20, this.snapInterval))
-        : 1;
+    const contAlpha = snapshotAlpha(now, this.lastSnapAt, this.snapInterval);
     if (this.lastSnapAt > 0) {
       const gap = now - this.lastSnapAt;
       if (gap > 5 && gap < 500) this.snapInterval = this.snapInterval * 0.9 + gap * 0.1;
@@ -3157,6 +3206,11 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.castTargetId = w.castTgt ?? null;
       e.channeling = !!w.chan;
+      // General (non-self) auto-attack/swing mirror: absent w.swing means not
+      // auto-attacking, matching dynamicFields' autoAttack-gated omission.
+      // Overwritten below for the self entity by the richer self-only fields.
+      e.autoAttack = w.swing !== undefined;
+      e.swingTimer = typeof w.swing === 'number' ? w.swing : 0;
       // Mount summon/dismount transition (volatile): absent decodes to idle. Feeds
       // the summon FX / call pose and (for the local player) the self-extrapolator's
       // movement root, which reads mountCastRemaining.
@@ -3229,6 +3283,7 @@ export class ClientWorld implements IWorld {
     const s = snap.self;
     const e = s ? applyWire(s, true) : null;
     if (s && e) {
+      applyReconSelfWire(this, s, this.movementWireVersion);
       const counterfangRemaining =
         typeof s.opRem === 'number' && Number.isFinite(s.opRem)
           ? Math.min(5, Math.max(0, s.opRem))
@@ -3244,16 +3299,13 @@ export class ClientWorld implements IWorld {
         this.pendingSpectateFacing = e.facing;
       }
       seen.add(s.id);
-      if (typeof s.ack === 'number' && s.ack > this.ackedInputSeq) {
-        for (let seq = this.ackedInputSeq + 1; seq <= s.ack; seq++) {
-          const sentAt = this.pendingInputSeqSentAt.get(seq);
-          if (sentAt !== undefined) {
-            this.inputEchoSamples.push(now - sentAt);
-            this.pendingInputSeqSentAt.delete(seq);
-          }
-        }
-        this.ackedInputSeq = s.ack;
-      }
+      this.ackedInputSeq = foldInputAck(
+        s.ack,
+        this.ackedInputSeq,
+        this.pendingInputSeqSentAt,
+        this.inputEchoSamples,
+        now,
+      );
       e.resource = s.res;
       e.maxResource = s.mres;
       e.resourceType = s.rtype;
@@ -3410,6 +3462,7 @@ export class ClientWorld implements IWorld {
       this.applySelfTargetFromServer(e, s.target ?? null, true);
       e.autoAttack = !!s.auto;
       e.swingTimer = s.swing ?? e.swingTimer;
+      e.offhandSwingTimer = s.swingOff ?? e.offhandSwingTimer;
       e.queuedOnSwing = s.queued ?? null;
       // A rolling deploy can pair this client with an older server whose stats
       // object predates WARFARE. Preserve numeric PvP fields instead of letting
@@ -3417,30 +3470,7 @@ export class ClientWorld implements IWorld {
       if (s.stats !== undefined) {
         e.stats = { pvpOffense: 0, pvpDefense: 0, ...s.stats };
       }
-      // Static combat-rating scalars (ap/sp/sh/crit/dodge/blk/bval/crat/hrat/hirat):
-      // delta-guarded on selfWireJson like the rest of this record (server/game.ts),
-      // so an omitted key means unchanged, not zero. Fall back to the prior mirrored
-      // value, the same `s.X ?? e.X` shape already used for `weapon` below.
-      e.attackPower = s.ap ?? e.attackPower;
-      e.rangedPower = s.rp ?? 0;
-      e.spellPower = s.sp ?? e.spellPower;
-      e.healPower = s.hpw ?? e.healPower;
-      // Spell haste feeds the hasted-cast-time tooltip; melee/ranged haste need
-      // no wiring (the swing timers already ride the snapshot).
-      e.spellHaste = s.sh ?? e.spellHaste;
-      e.critChance = s.crit ?? e.critChance;
-      e.dodgeChance = s.dodge ?? e.dodgeChance;
-      e.blockChance = s.blk ?? e.blockChance;
-      e.blockValue = s.bval ?? e.blockValue;
-      // Crit/haste/hit RATING are informational paper-doll stats (combat values ride
-      // crit/sh above, and hit resolves server-side); delta-guarded like the rest of
-      // this record so the online character sheet keeps showing the last-known value
-      // between gear/talent changes instead of flashing back to the blankEntity 0.
-      // Server-recomputed.
-      e.critRating = s.crat ?? e.critRating;
-      e.hasteRating = s.hrat ?? e.hasteRating;
-      e.hitRating = s.hirat ?? e.hitRating;
-      e.weapon = s.weapon ?? e.weapon;
+      applySelfCombatScalars(e, s);
       // ticksElapsed is a sim-internal sfx-cadence counter (consume_sfx.ts):
       // the client never derives a sound decision from this local shadow (the
       // server's heal SimEvents already carry sfxTick), so 0 is an inert
@@ -5394,6 +5424,15 @@ export class ClientWorld implements IWorld {
   // The event still flows to the HUD (drainEvents) for a toast/log line.
   private applyRiftStateEvent(ev: SimEvent): void {
     if (ev.type !== 'riftState') return;
+    if (this.sessionEnded) return;
+    // Mirror the server's floor collision lifecycle (spawnRiftFloor /
+    // freeRiftFloorEntities in src/sim/rift/runs.ts): the previously mirrored
+    // floor's region is always cleared before a new one is registered, whether
+    // this event is a descent (a new floor replacing the old one) or a real
+    // exit (no new floor to replace it with).
+    if (this.riftFloor) {
+      clearRiftRegion(this.riftCollisionToken, this.riftFloor.origin.x, this.riftFloor.origin.z);
+    }
     this.riftFloor = ev.active
       ? {
           eventId: ev.eventId,
@@ -5411,6 +5450,19 @@ export class ClientWorld implements IWorld {
           tier: ev.tier,
         }
       : null;
+    if (this.riftFloor) {
+      setRiftRegion(
+        this.riftCollisionToken,
+        this.riftFloor.origin.x,
+        this.riftFloor.origin.z,
+        riftFloorColliders(
+          this.riftFloor.seed,
+          this.riftFloor.baseLevel,
+          this.riftFloor.floorIndex,
+          this.riftFloor.upgrade,
+        ),
+      );
+    }
     this.riftEventExpiresAtMs = ev.active ? ev.expiresAtMs : null;
     // Clear death zones on rift exit so stale rings from a previous run never
     // bleed into a new one. Mid-run cancellations (boss death, evade, floor

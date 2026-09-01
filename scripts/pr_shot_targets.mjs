@@ -82,6 +82,23 @@ const lowGraphicsSeed = async (page) => {
   );
 };
 
+// Controller layout evidence needs the cross hotbar enabled, PlayStation glyphs,
+// and the reported remap already staged: Cross jumps while Triangle is unbound.
+// Seed before boot so both the manager and the options painter read one state.
+const controllerRemapSeed = async (page) => {
+  await lowGraphicsSeed(page);
+  await page.evaluateOnNewDocument(
+    `try {
+       const settingsKey = 'woc_settings';
+       const settings = JSON.parse(localStorage.getItem(settingsKey) || '{}');
+       settings.gamepadCrossHotbar = true;
+       settings.gamepadGlyphStyle = 2;
+       localStorage.setItem(settingsKey, JSON.stringify(settings));
+       localStorage.setItem('woc_gamepad', JSON.stringify({ 0: 'jump', 3: 'none' }));
+     } catch {}`,
+  );
+};
+
 // --- The touch HUD tiers -----------------------------------------------------
 // The touch rework ships two visibly different layouts and pr_screenshots'
 // `mobile: true` emulation is one fixed phone box, so a tier frame restates its
@@ -1969,6 +1986,64 @@ export const TARGETS = [
       if (Object.values(surfaces).some((present) => !present)) {
         throw new Error(`missing ability surfaces: ${JSON.stringify(surfaces)}`);
       }
+      return {};
+    },
+  },
+  {
+    key: 'paladin-ascension-charges',
+    // Extended Dawn (pal_r17_extended_dawn) raises Divine Ascension from 5 to 7
+    // charges; the HUD medallion must light all 7 pips, not just the base 5.
+    label: 'Ascension charge pips (Extended Dawn bonus)',
+    when: [
+      'src/ui/paladin_devotion_view.ts',
+      'src/render/paladin_ascension_core.ts',
+      'paladin-ascension-charges',
+    ],
+    variants: [
+      { key: 'desktop', charClass: 'paladin', charName: 'Dawnrise' },
+      { key: 'mobile', charClass: 'paladin', charName: 'Dawnrise', mobile: true },
+    ],
+    async capture(page, variant) {
+      // enterOfflineGame already dismissed the intro/tutorial/camera-prompt
+      // overlays before capture() runs; a stray Escape here has nothing left
+      // to close and instead TOGGLES the Options window open.
+      const armed = await page.evaluate(() => {
+        const devotion = window.__game?.sim?.player?.paladinDevotion;
+        if (!devotion) return false;
+        devotion.value = 0;
+        devotion.ascensionCharges = 7;
+        devotion.ascensionRemaining = 45;
+        return true;
+      });
+      if (!armed) throw new Error('player has no paladinDevotion state');
+      const ready = await pollForSize(
+        page,
+        '.paladin-devotion.ascended .paladin-ascension-charges',
+        20,
+        250,
+      );
+      if (!ready) throw new Error('ascension charges did not become visible');
+      // The charge-pip strip (.paladin-ascension-charges) is positioned partly
+      // outside the 96x96 medallion frame box (top:-6px, and its right edge
+      // overflows the frame's own width), plus each lit pip's glow extends a
+      // few px further: pad generously rather than clip it off.
+      const box = await page.evaluate(() => {
+        const frame = document.getElementById('paladin-devotion-frame');
+        if (!frame) return null;
+        const r = frame.getBoundingClientRect();
+        return { x: r.x, y: r.y, width: r.width, height: r.height };
+      });
+      if (!box) throw new Error('#paladin-devotion-frame not found');
+      const pad = 28;
+      const vp = page.viewport() ?? { width: 1600, height: 900 };
+      const x = Math.max(0, box.x - pad);
+      const y = Math.max(0, box.y - pad);
+      const width = Math.min(vp.width, box.x + box.width + pad) - x;
+      const height = Math.min(vp.height, box.y + box.height + pad) - y;
+      await page.screenshot({
+        path: `${process.env.SHOTS_DIR ?? 'pr-shots'}/paladin-ascension-charges-${variant.key}-closeup.png`,
+        clip: { x, y, width, height },
+      });
       return {};
     },
   },
@@ -6565,6 +6640,48 @@ export const TARGETS = [
     },
   },
   {
+    key: 'controller-options-button-layout',
+    label: 'Controller options panel (remapped face-button layout)',
+    when: ['ui/options_window', 'game/gamepad_bindings', 'game/gamepad_map'],
+    variants: [
+      { key: 'desktop', beforeLoad: controllerRemapSeed },
+      { key: 'mobile', mobile: true, beforeLoad: controllerRemapSeed },
+    ],
+    async capture(page) {
+      // Fresh offline characters can surface the one-time greeting after the
+      // shared entry helper has returned. Close both its choice and note forms
+      // through their real buttons so they cannot cover the settings evidence.
+      await pollForSize(page, '#tutorial-greeting', 32, 250);
+      for (let i = 0; i < 3; i++) {
+        await page.evaluate(() => {
+          const greeting = document.querySelector('#tutorial-greeting');
+          const close = greeting?.querySelector('[data-close], [data-skip]');
+          if (close instanceof HTMLElement) close.click();
+        });
+        await wait(300);
+      }
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Controller is the second button on the offline main options menu.
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[1]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      await page.evaluate(() => {
+        const heading = document.querySelector('#options-menu .kb-cat');
+        const cross = document.querySelector('#options-menu [aria-label="Cross"]');
+        if (heading) heading.scrollIntoView({ block: 'start' });
+        else if (cross) cross.closest('.set-row')?.scrollIntoView({ block: 'start' });
+      });
+      return { clip: '#options-menu' };
+    },
+  },
+  {
     key: 'interface-options-tabs',
     label: 'Interface options panel (four-tab split)',
     when: ['ui/options_window', 'ui/options_view'],
@@ -6585,6 +6702,36 @@ export const TARGETS = [
       });
       const open = await pollForSize(page, '#options-menu .set-rows');
       return open ? { clip: '#options-menu' } : {};
+    },
+  },
+  {
+    key: 'interface-options-confirm-vendor-sell',
+    label: 'Interface options panel: new "Confirm Before Selling" toggle',
+    when: ['ui/options_view', 'game/settings'],
+    variants: [{ key: 'desktop' }],
+    async capture(page) {
+      await page.evaluate(() => {
+        const hud = window.__game?.hud;
+        if (!hud) return;
+        // Clear any zone-greeting note an earlier target's teleport left up;
+        // incidental to this shot and would otherwise sit on top of it.
+        document.getElementById('tutorial-greeting')?.remove();
+        const win = document.querySelector('#options-menu');
+        if (win && getComputedStyle(win).display !== 'none') hud.toggleOptionsMenu();
+        hud.toggleOptionsMenu();
+        // Interface is the fourth button on the main options menu (offline).
+        const buttons = Array.from(document.querySelectorAll('#options-menu .opt-btn'));
+        buttons[3]?.click();
+      });
+      const open = await pollForSize(page, '#options-menu .set-rows');
+      if (!open) return {};
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        document
+          .querySelector('[data-setting-key="confirmVendorSell"]')
+          ?.scrollIntoView({ block: 'center' });
+      });
+      return { clip: '#options-menu' };
     },
   },
   {
@@ -10173,6 +10320,125 @@ export const TARGETS = [
     },
   },
   {
+    key: 'p14-vendor-sell-all',
+    label:
+      'Vendor right-click menu Sell all (N), and the destroy prompt defaulting to the full stack',
+    when: [
+      'bag_item_context_menu',
+      'bag_item_action_menu',
+      'ui/bags_window',
+      'ui/vendor_sell_quantity',
+    ],
+    // Two states this diff adds: the vendor right-click/tap menu's new Sell
+    // all (N) row (desktop and mobile), and the destroy-quantity prompt now
+    // defaulting to the FULL held count instead of 1. The destroy variant
+    // never opens a vendor: discardQuest only reaches the prompt outside
+    // vendor mode (bagItemAction resolves the vendor branch first).
+    variants: [
+      { key: 'sell-all-desktop' },
+      { key: 'sell-all-mobile', mobile: true },
+      { key: 'destroy-default', destroy: true },
+    ],
+    async capture(page, variant) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+      });
+      await wait(300);
+      if (variant?.destroy) {
+        // A held quest stack, no vendor: boar_hide is a real inert quest item
+        // (no `use`), so a plain click resolves to discardQuest.
+        const staged = await page.evaluate(() => {
+          const game = window.__game;
+          const sim = game?.sim;
+          if (!sim?.player) return { ok: false, reason: 'offline world unavailable' };
+          sim.addItem('boar_hide', 4);
+          return { ok: true };
+        });
+        if (!staged.ok) throw new Error(`destroy-default setup failed: ${staged.reason}`);
+        await page.evaluate(() => {
+          const game = window.__game;
+          if (!document.querySelector('#bags')?.checkVisibility?.()) game.hud.toggleBags();
+        });
+        if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+        const clicked = await page.evaluate(() => {
+          const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+          const el =
+            rows.find((r) => (r.getAttribute('aria-label') ?? '').includes('Bristly Boar Hide')) ??
+            rows[rows.length - 1];
+          if (!el) return false;
+          el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+          return true;
+        });
+        if (!clicked) throw new Error('no bag row to click for the destroy prompt');
+        if (!(await pollForSize(page, '.discard-item-prompt')))
+          throw new Error('destroy prompt did not open');
+        await wait(200);
+        return { clip: '#ui' };
+      }
+      // The vendor Sell all (N) scene: open a vendor (its bags companion opens
+      // automatically, openVendor's own wiring; calling toggleBags() again
+      // here would just close it, per PR #3547's screenshot post-mortem), grant
+      // a multi-copy sellable stack, then right-click it (desktop) or tap it
+      // (mobile) to open the menu through the real handler.
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        const bree = [...sim.entities.values()].find((e) => e.templateId === 'quartermaster_bree');
+        if (!bree) return { ok: false, reason: 'no quartermaster_bree entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = bree.pos.x + 2;
+        p.pos.z = bree.pos.z;
+        p.prevPos = { ...p.pos };
+        sim.addItem('baked_bread', 8);
+        const el = document.querySelector('#vendor-window');
+        // Force hidden first so the size poll cannot pass on a window left up
+        // by an earlier target in the same run (the vendor-tool-gate precedent).
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(bree.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor-sell-all setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#vendor-window')))
+        throw new Error('vendor window did not open');
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags companion did not open');
+      await wait(200);
+      const opened = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll('#bags .bag-item:not(.empty)')];
+        const el =
+          rows.find((r) => (r.getAttribute('aria-label') ?? '').includes('Cottage Loaf')) ??
+          rows[rows.length - 1];
+        if (!el) return false;
+        const r = el.getBoundingClientRect();
+        const ev = new MouseEvent(
+          document.body.classList.contains('mobile-touch') ? 'click' : 'contextmenu',
+          {
+            bubbles: true,
+            cancelable: true,
+            clientX: r.x + r.width / 2,
+            clientY: r.y + r.height / 2,
+          },
+        );
+        el.dispatchEvent(ev);
+        return true;
+      });
+      if (!opened) throw new Error('no bag row to open the vendor menu on');
+      if (!(await pollForSize(page, '#ctx-menu'))) throw new Error('vendor menu did not open');
+      const hasSellAll = await page.evaluate(() =>
+        [...document.querySelectorAll('#ctx-menu .ctx-item')].some(
+          (r) => r.getAttribute('data-act') === 'sellAll',
+        ),
+      );
+      if (!hasSellAll) throw new Error('the Sell all row did not paint');
+      await wait(300);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'chrome-icons',
     label: 'HUD chrome icons (side rail, mobile bar, More tray)',
     when: ['ui/ui_icons', 'ui/chrome_icon_art', 'public/ui/chrome'],
@@ -11594,6 +11860,11 @@ export const TARGETS = [
       'game/gamepad.ts',
       'game/gamepad_map.ts',
       'ui/hud/cross_hotbar/',
+      // hud.css carries the whole .xhb rule family (the overlay's own layout
+      // plus the body.mobile-touch .xhb standdown), so a change there is a
+      // cross-hotbar visual change too.
+      'styles/hud.css',
+      'styles/hud.mobile.css',
     ],
     // The bar only exists while a pad is connected, and headless Chrome has no
     // Gamepad API surface at all, so every variant except `no-pad` installs a
@@ -11605,6 +11876,10 @@ export const TARGETS = [
       { key: 'left-trigger', beforeLoad: fakePadSeed, pad: [GP_LT] },
       { key: 'expanded', beforeLoad: fakePadSeed, expand: true },
       { key: 'arranging', beforeLoad: fakePadSeed, pad: [], arrange: true },
+      // Pairing a pad to a phone: the touch interface AND a connected
+      // controller at once (an MFi/Bluetooth pad on iOS). In .xhb-mode the XHB
+      // stands up as the pad surface while the touch action ring stands down.
+      { key: 'mobile-controller', beforeLoad: fakePadSeed, pad: [], mobile: true },
     ],
     async capture(page, variant) {
       for (let i = 0; i < 12; i++) {

@@ -2730,6 +2730,17 @@
       }
     ]
   },
+  "mount_loop_rickshaw_mount": {
+    "ceilingDb": 5,
+    "tracks": [
+      {
+        "filename": "mount_loop_rickshaw_mount.mp3",
+        "sha256": "90fafb2c1bb702068d31a596b5e2758605c089f4c2c0b95547eb5e520f824f00",
+        "size": 187497,
+        "peakDb": -6
+      }
+    ]
+  },
   "mount_run_aether_hover_cycle": {
     "ceilingDb": 5.2,
     "tracks": [
@@ -2848,6 +2859,17 @@
         "sha256": "d4e79277b2cb1da5d5941c6116136f2ca7104376e12d455c6306919a3e862002",
         "size": 10701,
         "peakDb": -6.2
+      }
+    ]
+  },
+  "mount_summon_rickshaw_mount": {
+    "ceilingDb": 6.3,
+    "tracks": [
+      {
+        "filename": "mount_summon_rickshaw_mount.mp3",
+        "sha256": "4f9ba1123aa480436c91e1222e9b55d2922b21f41d4ddc535df1475dc902560d",
+        "size": 38913,
+        "peakDb": -7.3
       }
     ]
   },
@@ -2996,6 +3018,29 @@
       }
     ]
   },
+  "player_death_female": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "player_death_female_1.mp3",
+        "sha256": "38149e3ea49a7c013fcb91cf26bd6b7841877c3409a878c66dd12360597e665c",
+        "size": 15716,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "player_death_female_2.mp3",
+        "sha256": "23417a0647534a6b9c389dc6f53c86089106a67943db975d730bff9b98a6c1f1",
+        "size": 16343,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "player_death_female_3.mp3",
+        "sha256": "280ce1bc8c527f82530239a24abebd97755fb68c0cda6de915c5dfd0c6b3e74a",
+        "size": 11954,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "player_drink_potion": {
     "ceilingDb": 9.1,
     "tracks": [
@@ -3060,6 +3105,41 @@
         "filename": "player_hurt_5.mp3",
         "sha256": "91cc3fa9711ab089a7df033284c2b7294c6f47a4acfda02304f0278daf2ab276",
         "size": 19478,
+        "peakDb": -6.3
+      }
+    ]
+  },
+  "player_hurt_female": {
+    "ceilingDb": 5.2,
+    "tracks": [
+      {
+        "filename": "player_hurt_female_1.mp3",
+        "sha256": "ca0ee6e2fed4941ba2757cc2f67b6c1ff3ccb45d8433155986d5f2597c41ddfb",
+        "size": 8820,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "player_hurt_female_2.mp3",
+        "sha256": "723bd54bb5b98b53373effe57085b72a980ab0a0cb8fa205b3904506b5c4a40b",
+        "size": 8820,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "player_hurt_female_3.mp3",
+        "sha256": "43e728e4618a12becbb34d6424140e1557f37b0356b7b00997428272ab4e1d1d",
+        "size": 6939,
+        "peakDb": -6.3
+      },
+      {
+        "filename": "player_hurt_female_4.mp3",
+        "sha256": "352422af5d17c3f92112494a77f2b8cec120c0ff8c5a85d927858aee83d83065",
+        "size": 21359,
+        "peakDb": -6.2
+      },
+      {
+        "filename": "player_hurt_female_5.mp3",
+        "sha256": "8767c95081fa43b18f854bfd16e4096d64ea60b4e59bd81208fe9960a4616b3c",
+        "size": 13835,
         "peakDb": -6.3
       }
     ]

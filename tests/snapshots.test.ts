@@ -13,6 +13,7 @@ vi.mock('../server/db', () => ({
   saveCharacterAndMarketState: vi.fn(async () => {}),
   saveMarketState: vi.fn(async () => {}),
   saveMailState: vi.fn(async () => {}),
+  saveMailPartitions: vi.fn(async () => {}),
   openPlaySession: vi.fn(async () => 1),
   touchCharacterLogin: vi.fn(async () => {}),
   closePlaySession: vi.fn(async () => {}),
@@ -35,11 +36,14 @@ import {
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveMailPartitions,
   saveMailState,
   saveMarketState,
 } from '../server/db';
 import { type ClientSession, GameServer, wireEntity } from '../server/game';
 import { gameMetricsCounters } from '../server/http/game_signals';
+import { consumeMovementFramesV2 } from '../server/movement_input_timeline_v2';
+import { updateMovementOverrideEpochs } from '../server/movement_override_epoch';
 import { KeyedSerialWriteAborted } from '../server/serial_writer';
 import { corpseLootAvailability } from '../src/game/corpse_loot_availability';
 import { EMPTY_MST_CRAFTS } from '../src/net/crafting_wire';
@@ -63,7 +67,13 @@ import { petOf, serializePet, summonPet } from '../src/sim/pet/pet_commands';
 import { livePlaytimeSeconds } from '../src/sim/playtime';
 import { noteRelicItemFind, noteRelicObtain } from '../src/sim/reliquary';
 import { Sim } from '../src/sim/sim';
-import { type Aura, DT, type PlayerClass, type WorldContent } from '../src/sim/types';
+import {
+  type Aura,
+  DT,
+  emptyMoveInput,
+  type PlayerClass,
+  type WorldContent,
+} from '../src/sim/types';
 import {
   VARKHUL_SHARED_PYRE_AURA_ID,
   VARKHUL_SHARED_PYRE_NAME,
@@ -107,6 +117,7 @@ const DELTA_KEYS = [
   'cds',
   'stats',
   'weapon',
+  'offhandWeapon',
   'party',
   'trade',
   'duel',
@@ -352,6 +363,45 @@ describe('self talent wire decode (IWorldTalents facet)', () => {
 });
 
 describe('spectate client POV', () => {
+  it('clears movement reconciliation state when the observed identity changes', () => {
+    const client = bareClient(1, {
+      movementWireVersion: 2,
+      reconAuthoritativeX: 1,
+      reconAuthoritativeY: 2,
+      reconAuthoritativeZ: 3,
+      reconPreviousAuthoritativeFacing: 0.25,
+      reconAuthoritativeFacing: 0.5,
+      reconAckClientTick: 17,
+      reconOverrideEpoch: 4,
+      reconOverrideActive: true,
+      reconMoveSpeedMult: 1.5,
+    });
+
+    (client as any).onMessage(JSON.stringify({ t: 'spectate', name: 'Suspect' }));
+
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      previousFacing: client.reconPreviousAuthoritativeFacing,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: null,
+      y: null,
+      z: null,
+      previousFacing: null,
+      facing: null,
+      ackCt: -1,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: 1,
+    });
+  });
+
   it('follows observed self, aligns on entry and respawn, then restores identity', () => {
     const client = bareClient(1);
     const internals = client as unknown as {
@@ -619,6 +669,52 @@ describe('pet signature skill over the wire', () => {
     const mirrored = client.entities.get(pet.id)!;
     expect(mirrored.petSkillTimer).toBe(0);
     expect(mirrored.petAutoSkill).toBe(false);
+  });
+});
+
+describe('target swing timer over the wire', () => {
+  it('mirrors a non-self mob auto-attacking, gated on autoAttack', () => {
+    const mob = createMob(9310, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    mob.autoAttack = true;
+    mob.swingTimer = 1.42;
+
+    const wire = wireEntity(mob);
+    expect(wire.swing).toBe(1.42);
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({ t: 'snap', ents: [wire] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.autoAttack).toBe(true);
+    expect(mirrored.swingTimer).toBe(1.42);
+  });
+
+  it('omits swing and resets a stale mirror when the mob is not auto-attacking', () => {
+    const mob = createMob(9311, MOBS.forest_wolf, 5, { x: 0, y: 0, z: 0 });
+    mob.autoAttack = false;
+    mob.swingTimer = 0.5; // stale/frozen value while disengaged; must not ride the wire
+
+    const idleWire = wireEntity(mob);
+    expect(idleWire).not.toHaveProperty('swing');
+
+    const client = bareClient(42);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [
+        {
+          ...idleWire,
+          id: mob.id,
+          k: 'mob',
+          tid: mob.templateId,
+          nm: mob.name,
+          lv: mob.level,
+          swing: 1.1,
+        },
+      ],
+    });
+    (client as any).applySnapshot({ t: 'snap', ents: [idleWire] });
+    const mirrored = client.entities.get(mob.id)!;
+    expect(mirrored.autoAttack).toBe(false);
+    expect(mirrored.swingTimer).toBe(0);
   });
 });
 
@@ -1189,7 +1285,7 @@ describe('delta snapshots', () => {
     // the always-on fields are still present every snapshot. xp/copper moved
     // behind the delta gate alongside the rest of the static combat-rating/
     // progression cohort (server/game.ts), so they are no longer in this list.
-    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'target']) {
+    for (const key of ['x', 'z', 'hp', 'mhp', 'res', 'gcd', 'pcd', 'swing', 'swingOff', 'target']) {
       expect(snap.self).toHaveProperty(key);
     }
     // xp/copper are unchanged since the first broadcast, so they delta-elide here.
@@ -1207,6 +1303,44 @@ describe('delta snapshots', () => {
     const client = bareClient(session.pid);
     (client as any).applySnapshot(snap);
     expect(client.player.swingTimer).toBeCloseTo(1.7, 1);
+  });
+
+  it('mirrors the off-hand swing timer and weapon for the melee-weaving HUD bar; dualWielding is derived client-side', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.dualWielding = true;
+    player.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
+    player.offhandSwingTimer = 0.9;
+    broadcast(server);
+    const snap = lastSnap(fc.sent);
+    expect(snap.self.swingOff).toBeCloseTo(0.9, 1);
+    expect(snap.self.offhandWeapon).toMatchObject({ speed: 1.8 });
+    // dualWielding rides no wire key of its own: it is always exactly
+    // offhandWeapon !== null (src/sim/entity.ts), so it is absent from the
+    // wire and derived by applySelfCombatScalars instead.
+    expect(snap.self).not.toHaveProperty('dualWielding');
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(snap);
+    expect(client.player.offhandSwingTimer).toBeCloseTo(0.9, 1);
+    expect(client.player.dualWielding).toBe(true);
+    expect(client.player.offhandWeapon).toMatchObject({ speed: 1.8 });
+  });
+
+  it('clears a mirrored off-hand weapon back to null when it is unequipped, and re-derives dualWielding false', () => {
+    const player = server.sim.entities.get(session.pid)!;
+    player.dualWielding = true;
+    player.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
+    broadcast(server);
+    const client = bareClient(session.pid);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.player.offhandWeapon).not.toBeNull();
+    expect(client.player.dualWielding).toBe(true);
+
+    player.dualWielding = false;
+    player.offhandWeapon = null;
+    broadcast(server);
+    (client as any).applySnapshot(lastSnap(fc.sent));
+    expect(client.player.offhandWeapon).toBeNull();
+    expect(client.player.dualWielding).toBe(false);
   });
 
   it('mirrors the shared potion cooldown to the online client for the action-bar swipe', () => {
@@ -1297,13 +1431,207 @@ describe('delta snapshots', () => {
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 7, mi: { f: 1 } }));
     broadcast(server);
     const snap = lastSnap(fc.sent);
-    expect(snap.self.ack).toBe(7);
+    expect({
+      ack: snap.self.ack,
+      ...('ackCt' in snap.self ? { ackCt: snap.self.ackCt } : {}),
+    }).toEqual({ ack: 7 });
+    expect(snap.self).not.toHaveProperty('rpx');
+    expect(snap.self).not.toHaveProperty('rpy');
+    expect(snap.self).not.toHaveProperty('rpz');
+    expect(snap.self).not.toHaveProperty('rpf');
+    expect(snap.self).not.toHaveProperty('ovE');
+    expect(snap.self).not.toHaveProperty('ovA');
+    expect(snap.self).not.toHaveProperty('msm');
 
     server.handleMessage(session, JSON.stringify({ t: 'input', seq: 6, mi: { f: 0 } }));
     fc.sent.length = 0;
     broadcast(server);
     expect(lastSnap(fc.sent).self.ack).toBe(7);
   });
+
+  it('adds the consumed client tick beside the legacy ack only for movement v2', () => {
+    const v2Server = new GameServer();
+    const v2Client = fakeWs();
+    const v2Session = joinServer(v2Server, v2Client, 2, 'Ticked', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const meta = v2Server.sim.meta(v2Session.pid)!;
+    const entity = v2Server.sim.entities.get(v2Session.pid)!;
+    const facingBeforeArrival = entity.facing;
+    const lastInputAtBeforeArrival = v2Session.lastInputAt;
+    v2Server.handleMessage(
+      v2Session,
+      JSON.stringify({ t: 'input', seq: 4, ct: 0, mi: { f: 1 }, facing: 0.25 }),
+    );
+
+    expect(meta.moveInput.forward).toBe(false);
+    expect(entity.facing).toBe(facingBeforeArrival);
+    expect(v2Session.lastInputAt).toBe(lastInputAtBeforeArrival);
+    consumeMovementFramesV2(v2Server.sim, [v2Session]);
+    expect(meta.moveInput.forward).toBe(true);
+    expect(entity.facing).toBe(0.25);
+    expect(v2Session.lastConsumedCt).toBe(0);
+    expect(v2Session.lastInputAt).toBe(v2Server.sim.time);
+    v2Server.sim.tick();
+    entity.pos.x = 1 / 3;
+    entity.pos.y = 2 / 3;
+    entity.pos.z = 4 / 3;
+    entity.facing = Math.PI / 7;
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    broadcast(v2Server);
+    const self = lastSnap(v2Client.sent).self;
+
+    expect({
+      ack: self.ack,
+      ackCt: self.ackCt,
+      rpx: self.rpx,
+      rpy: self.rpy,
+      rpz: self.rpz,
+      rpf: self.rpf,
+      ovE: self.ovE,
+    }).toEqual({
+      ack: 4,
+      ackCt: 0,
+      rpx: 1 / 3,
+      rpy: 2 / 3,
+      rpz: 4 / 3,
+      rpf: Math.PI / 7,
+      ovE: 0,
+    });
+    expect(self).not.toHaveProperty('msm');
+    expect({ x: self.x, y: self.y, z: self.z, f: self.f }).toEqual({
+      x: 0.33,
+      y: 0.67,
+      z: 1.33,
+      f: 0.45,
+    });
+
+    const client = bareClient(v2Session.pid, { movementWireVersion: 2 });
+    client.reconMoveSpeedMult = 2;
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect({
+      x: client.reconAuthoritativeX,
+      y: client.reconAuthoritativeY,
+      z: client.reconAuthoritativeZ,
+      previousFacing: client.reconPreviousAuthoritativeFacing,
+      facing: client.reconAuthoritativeFacing,
+      ackCt: client.reconAckClientTick,
+      epoch: client.reconOverrideEpoch,
+      active: client.reconOverrideActive,
+      moveSpeedMult: client.reconMoveSpeedMult,
+    }).toEqual({
+      x: 1 / 3,
+      y: 2 / 3,
+      z: 4 / 3,
+      previousFacing: Math.PI / 7,
+      facing: Math.PI / 7,
+      ackCt: 0,
+      epoch: 0,
+      active: false,
+      moveSpeedMult: 1,
+    });
+    expect(client.player.pos).toEqual({ x: 0.33, y: 0.67, z: 1.33 });
+    expect(client.player.petAutoSkill).toBe(false);
+
+    entity.auras.push({
+      id: 'test_root',
+      name: 'Root',
+      kind: 'root',
+      remaining: 1,
+      duration: 1,
+      value: 0,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    expect(lastSnap(v2Client.sent).self).toMatchObject({ ovE: 1, ovA: 1 });
+
+    entity.auras.push({
+      id: 'test_speed',
+      name: 'Speed',
+      kind: 'buff_speed',
+      remaining: 1,
+      duration: 1,
+      value: 1.5,
+      sourceId: entity.id,
+      school: 'physical',
+    });
+    updateMovementOverrideEpochs(v2Server.sim, [v2Session]);
+    v2Client.sent.length = 0;
+    broadcast(v2Server);
+    const spedSelf = lastSnap(v2Client.sent).self;
+    expect(spedSelf.msm).toBe(1.5);
+    (client as any).applySnapshot(lastSnap(v2Client.sent));
+    expect(client.reconMoveSpeedMult).toBe(1.5);
+  });
+
+  it('omits movement reconciliation fields from a spectating v2 self record', () => {
+    const spectateServer = new GameServer();
+    const moderatorWs = fakeWs();
+    const targetWs = fakeWs();
+    const moderator = joinServer(spectateServer, moderatorWs, 4, 'Moderator', 'warrior', {
+      movementWireVersion: 2,
+    });
+    const target = joinServer(spectateServer, targetWs, 5, 'Observed');
+    (spectateServer as any).enterSpectate(moderator, target);
+    moderatorWs.sent.length = 0;
+
+    broadcast(spectateServer);
+
+    const self = lastSnap(moderatorWs.sent).self;
+    expect(self.id).toBe(target.pid);
+    for (const key of ['rpx', 'rpy', 'rpz', 'rpf', 'ackCt', 'ovE', 'ovA', 'msm']) {
+      expect(self).not.toHaveProperty(key);
+    }
+  });
+
+  it.each([
+    ['unreleased corpse', true, false, false, false],
+    ['released ghost', true, true, false, true],
+    ['stunned player', false, false, true, false],
+  ] as const)(
+    'applies v2 facing guards at consumption for a %s',
+    (_name, dead, ghost, stunned, appliesFacing) => {
+      const facingServer = new GameServer();
+      const facingClient = fakeWs();
+      const facingSession = joinServer(
+        facingServer,
+        facingClient,
+        3,
+        `Facing ${_name}`,
+        'warrior',
+        {
+          movementWireVersion: 2,
+        },
+      );
+      const entity = facingServer.sim.entities.get(facingSession.pid)!;
+      entity.facing = 0.25;
+      entity.dead = dead;
+      entity.ghost = ghost;
+      if (stunned) {
+        entity.auras.push({
+          id: 'test_stun',
+          name: 'Test Stun',
+          kind: 'stun',
+          remaining: 5,
+          duration: 5,
+          value: 0,
+          sourceId: entity.id,
+          school: 'physical',
+        } satisfies Aura);
+      }
+
+      facingServer.handleMessage(
+        facingSession,
+        JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: {}, facing: 1.25 }),
+      );
+      consumeMovementFramesV2(facingServer.sim, [facingSession]);
+
+      expect(entity.facing).toBe(appliesFacing ? 1.25 : 0.25);
+    },
+  );
 
   it('turns echoed input acks into client latency samples', () => {
     const client = bareClient(1);
@@ -2130,6 +2458,8 @@ describe('autosaves', () => {
     vi.mocked(saveMarketState).mockResolvedValue();
     vi.mocked(saveMailState).mockReset();
     vi.mocked(saveMailState).mockResolvedValue();
+    vi.mocked(saveMailPartitions).mockReset();
+    vi.mocked(saveMailPartitions).mockResolvedValue();
   });
 
   it('skips overlapping saveAll runs while saving each current session once', async () => {
@@ -2330,7 +2660,10 @@ describe('autosaves', () => {
       expect(gate.stats().inFlight).toBe(1);
       return true;
     });
-    vi.mocked(saveMailState).mockImplementationOnce(async () => {
+    // Mail persistence rides the partitioned writer (#3561); a freshly joined
+    // character already has dirty welcome-letter partitions, so the innermost
+    // DB call still fires and can assert the permit is held.
+    vi.mocked(saveMailPartitions).mockImplementationOnce(async () => {
       expect(gate.stats().inFlight).toBe(1);
     });
 
@@ -2338,7 +2671,7 @@ describe('autosaves', () => {
     await server.persistMailBlob();
 
     expect(saveCharacterAndGuildBankState).toHaveBeenCalledTimes(1);
-    expect(saveMailState).toHaveBeenCalledTimes(1);
+    expect(saveMailPartitions).toHaveBeenCalledTimes(1);
     expect(gate.stats()).toMatchObject({ inFlight: 0, waiting: 0, acquired: 2 });
   });
 
@@ -2513,7 +2846,13 @@ describe('client-side delta merge', () => {
       });
       expect(client.flushInput(100)).toBe(true);
       expect(sent).toEqual([
-        { t: 'input', seq: 1, mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 } },
+        {
+          t: 'input',
+          seq: 1,
+          mv: 2,
+          mt: 100,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
+        },
       ]);
 
       expect(client.flushInput(105)).toBe(false);
@@ -2527,8 +2866,73 @@ describe('client-side delta merge', () => {
       expect(sent.at(-1)).toEqual({
         t: 'input',
         seq: 2,
+        mv: 2,
+        mt: 120,
         mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 0, sr: 1, j: 0, dv: 0, sf: 0 },
       });
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('sends movement v2 frames with client ticks and nullable facing', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    const sent: any[] = [];
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: (payload: string) => sent.push(JSON.parse(payload)),
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      expect(
+        client.sendMovementFrame(
+          { ct: 5, mi: { ...client.moveInput, forward: true }, facing: null },
+          100,
+        ),
+      ).toBe(true);
+      expect(
+        client.sendMovementFrame(
+          { ct: 6, mi: { ...client.moveInput, strafeLeft: true }, facing: 0.25 },
+          150,
+        ),
+      ).toBe(true);
+      expect(sent).toEqual([
+        {
+          t: 'input',
+          seq: 1,
+          ct: 5,
+          mi: { f: 1, b: 0, tl: 0, tr: 0, sl: 0, sr: 0, j: 0, dv: 0, sf: 0 },
+        },
+        {
+          t: 'input',
+          seq: 2,
+          ct: 6,
+          mi: { f: 0, b: 0, tl: 0, tr: 0, sl: 1, sr: 0, j: 0, dv: 0, sf: 0 },
+          facing: 0.25,
+        },
+      ]);
+    } finally {
+      (globalThis as any).WebSocket = oldWebSocket;
+    }
+  });
+
+  it('bounds movement v2 input echo telemetry to the legacy window', () => {
+    const client = bareClient(1, { movementWireVersion: 2 });
+    (client as any).ws = {
+      readyState: 1,
+      bufferedAmount: 0,
+      send: () => {},
+    };
+    const oldWebSocket = (globalThis as any).WebSocket;
+    (globalThis as any).WebSocket = { OPEN: 1 };
+    try {
+      for (let ct = 0; ct < 121; ct++) {
+        expect(client.sendMovementFrame({ ct, mi: client.moveInput, facing: null }, ct)).toBe(true);
+      }
+      expect((client as any).pendingInputSeqSentAt.size).toBe(120);
+      expect([...(client as any).pendingInputSeqSentAt.keys()].slice(0, 2)).toEqual([2, 3]);
     } finally {
       (globalThis as any).WebSocket = oldWebSocket;
     }
@@ -4699,6 +5103,7 @@ const ALL_DELTA_KEYS = [
   'mntRtd',
   'mst',
   'ncd',
+  'offhandWeapon',
   'party',
   'prk',
   'prof',
@@ -5091,6 +5496,9 @@ function dirtyEveryDeltaField(): {
   };
   p.stats = { ...p.stats, str: 12345, pvpOffense: 0.17, pvpDefense: 0.13 };
   p.weapon = { ...p.weapon, min: 999 };
+  // dualWielding is not a delta key (derived client-side from offhandWeapon,
+  // src/net/combat_scalar_wire.ts); setting offhandWeapon alone dirties it.
+  p.offhandWeapon = { min: 3, max: 6, speed: 1.8 };
   p.resource = 42;
   p.maxResource = 150;
   // corpse: the ghost-run body marker (self-only delta). Non-null = a ghost with a
@@ -5863,7 +6271,7 @@ describe('gather node cooldown wire round trip (ncd)', () => {
 });
 
 describe('delta-key contract pins (anti-drift)', () => {
-  it('ALL_DELTA_KEYS contains exactly 90 unique keys in sorted order', () => {
+  it('ALL_DELTA_KEYS contains exactly 91 unique keys in sorted order', () => {
     // +1: guildBank (Guild Bank Phase 2), +1: the battleground bg key, +1: the
     // commission order board's corder key (issue #1298), +1: the character
     // sheet's lifetime played-time key ptime, for 67, then +16: the static
@@ -5896,9 +6304,13 @@ describe('delta-key contract pins (anti-drift)', () => {
     // no de yet). Every release sync conflicts here because each side pins its
     // own additions alone; the 2026-08-30 v0.41.0 sync carries both arms
     // (fplot in beside hpw, auras and de), for 90, measured on the merged
-    // tree.
-    expect(ALL_DELTA_KEYS).toHaveLength(90);
-    expect(new Set(ALL_DELTA_KEYS).size).toBe(90);
+    // tree. The v0.42.0 sync then brings the release's melee-weaving off-hand
+    // bar key offhandWeapon (delta-guarded like weapon/stats: a gear swap, not
+    // a per-tick change; dualWielding rides no key of its own, it is always
+    // exactly offhandWeapon !== null, so the client derives it), for 91,
+    // counted from the merged registry above rather than from either side.
+    expect(ALL_DELTA_KEYS).toHaveLength(91);
+    expect(new Set(ALL_DELTA_KEYS).size).toBe(91);
     expect([...ALL_DELTA_KEYS]).toEqual([...ALL_DELTA_KEYS].sort());
   });
 
@@ -6053,8 +6465,9 @@ describe('delta-key contract pins (anti-drift)', () => {
     // Storage Phase 2 then adds bpsl, vault, and cvault, for 87. The
     // maybeSerialized arm of the scrape then surfaces the two capability-gated
     // direct emits, auras and de, for 89. Farming's own-plot key fplot (the
-    // Masterwrought branch) then makes 90 on the merged tree.
-    expect(scraped.size).toBe(90);
+    // Masterwrought branch) then makes 90, and the release's off-hand bar key
+    // offhandWeapon makes 91 on the merged tree.
+    expect(scraped.size).toBe(91);
     expect([...scraped].sort()).toEqual([...ALL_DELTA_KEYS].sort());
   });
 

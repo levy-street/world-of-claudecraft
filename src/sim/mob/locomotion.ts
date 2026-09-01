@@ -467,7 +467,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     } else if (isVarkhul) {
       updateVarkhulEncounter(ctx, mob, true);
       return;
-    } else {
+    } else if (mob.aiState !== 'evade') {
+      // Scoped to the generic boss kit on purpose: the scripted raid encounters
+      // above own their own state and returned already. inCombat deliberately
+      // survives startEvadeHome (other systems key on it), so the kit is gated
+      // on the evade state instead: a mob walking home is damage-immune and
+      // untargetable, and must not heal, ward, or enrage its camp back up while
+      // nothing can touch it.
       ctx.updateBossMechanics(mob);
     }
   }
@@ -1504,6 +1510,7 @@ export function resetEvadingMob(ctx: SimContext, mob: Entity): void {
   mob.firedSummons = 0;
   mob.enraged = false;
   mob.healedThisPull = false;
+  mob.pulseTimer = MOBS[mob.templateId]?.aoePulse?.every ?? 0;
   mob.stompTimer = MOBS[mob.templateId]?.stomp?.every ?? 0;
   resetDungeonMinibossStomp(mob);
   resetIgnivarTrashAutomaton(mob);

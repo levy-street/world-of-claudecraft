@@ -961,7 +961,8 @@ export const en: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Character Model Preview"
@@ -1391,6 +1392,7 @@ export const en: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_rickshaw_mount": "Bonebound Rickshaw",
       "desc_valorsteed": "A hardy, sure-footed steed that provides enhanced travel speed.",
       "desc_grag_bear": "A hardy, sure-footed bear that provides enhanced travel speed.",
       "desc_stalkglider_snail": "A hearty, slow-burning snail that provides enhanced travel speed.",
@@ -1399,7 +1401,8 @@ export const en: EnTranslations = {
       "desc_stormfeather_griffin": "A regal storm griffin that stalks the ground on rune-shod talons, wings furled.",
       "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
-      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash."
+      "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
+      "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
     },
     "mountTraining": {
       "mountPrompt": "Press {key} to mount the training Valorsteed.",
@@ -1569,6 +1572,7 @@ export const en: EnTranslations = {
       "playerFrameScale": "Player Frame Scale",
       "targetFrameScale": "Target Frame Scale",
       "aurasOnPlayerFrame": "Buffs on the Player Frame",
+      "alwaysShowAllBuffs": "Always Show All Buffs",
       "highContrastBackground": "High-Contrast Background",
       "startAttackOnAbility": "Auto-Attack on Ability Use",
       "stopAutoAttackOnTargetSwitch": "Stop Auto-Attack on Target Switch",
@@ -1578,6 +1582,8 @@ export const en: EnTranslations = {
       "stickyTarget": "Keep Target on Ground Click",
       "showItemLevel": "Show Item Level",
       "showReliquaryTracker": "Show Reliquary Tracker",
+      "confirmVendorSell": "Confirm Before Selling",
+      "confirmVendorSellNote": "Turning this off sells items with a single click and no confirmation, so a shifted bag slot could vendor the wrong item.",
       "itemLevelLine": "Item Level {level}",
       "itemScoreLine": "Score {score}",
       "showSecondaryActionBar": "Show Secondary Action Bar",
@@ -1586,6 +1592,7 @@ export const en: EnTranslations = {
       "hideUnusedActionSlots": "Hide Unused Action Slots",
       "lockActionBars": "Lock Action Bars",
       "showTargetOfTarget": "Show Target of Target",
+      "showTargetSwingTimer": "Show Target Swing Timer",
       "showPetFrame": "Show Your Pet",
       "waterRipples": "Water Ripples (Wakes)",
       "showAttackButton": "Show Attack Button",
@@ -2166,6 +2173,12 @@ export const en: EnTranslations = {
         "few": "{count} seconds remaining",
         "many": "{count} seconds remaining",
         "other": "{count} seconds remaining"
+      },
+      "buffsHidden": {
+        "one": "{count} more buff is active but hidden on this graphics preset",
+        "few": "{count} more buffs are active but hidden on this graphics preset",
+        "many": "{count} more buffs are active but hidden on this graphics preset",
+        "other": "{count} more buffs are active but hidden on this graphics preset"
       },
       "playtimeDays": {
         "one": "{count} day",
@@ -4038,7 +4051,9 @@ export const en: EnTranslations = {
       "disenchant": "Disenchant",
       "salvage": "Salvage",
       "applyEnchant": "Apply Enchant",
-      "sunder": "Sunder"
+      "sunder": "Sunder",
+      "sell": "Sell",
+      "sellAll": "Sell all ({count})"
     },
     "enchanting": {
       "disenchantedLine": "You disenchant {item}.",
@@ -4596,6 +4611,10 @@ export const en: EnTranslations = {
       "loading": "Loading the Exchange...",
       "loadFailed": "The Exchange could not be reached. Try again shortly.",
       "disabledRealm": "The $WOC Exchange is not available on this realm.",
+      "browserOnlyConfirmTitle": "Open the $WOC Exchange in your browser?",
+      "browserOnlyConfirmBody": "The $WOC Exchange runs on the browser version of World of ClaudeCraft only. This opens World of ClaudeCraft in your browser, where you can sign in and open the Exchange; the game keeps running here.",
+      "browserOnlyConfirmOpen": "Open in Browser",
+      "browserOnlyConfirmCancel": "Cancel",
       "pausedBanner": "Trading is paused. Auctions keep counting down; new listings, bids, offers, and payments wait until trading resumes, and a payment already sent still settles.",
       "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
       "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
@@ -4917,7 +4936,13 @@ export const en: EnTranslations = {
       "upstream": "Epic did not respond. Try again in a moment."
     },
     "wallet": {
-      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again."
+      "handoff_invalid": "That wallet authorization expired or could not be verified. Try again.",
+      "reauth_required": "Confirm this wallet change with your account password.",
+      "reauth_two_factor": "Your account has two-factor enabled. Enter your code to confirm.",
+      "reauth_no_password": "Set a password in account settings first, then try again.",
+      "reauth_bad_signature": "That wallet signature could not be verified. Try again.",
+      "reauth_bad_password": "Your password is incorrect.",
+      "reauth_bad_two_factor": "That code is not valid, try again."
     },
     "ota_updates": {
       "invalid_input": "Invalid input."
@@ -5376,6 +5401,7 @@ export const en: EnTranslations = {
       "ifPartySort": "The order party members are listed in: group order, role, or name.",
       "ifPartyShowAuras": "Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.",
       "ifAurasOnPlayerFrame": "Puts your buffs and debuffs on your own unit frame as well as the aura bar.",
+      "ifAlwaysShowAllBuffs": "Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.",
       "ifTargetOfTarget": "Shows who your target is targeting, the classic way to tell whether the tank still has it.",
       "ifPetFrame": "Shows a frame for your pet.",
       "ifChatFontScale": "Chat text size.",
@@ -5447,7 +5473,7 @@ export const en: EnTranslations = {
       "framePetBody": "Hunters, warlocks, and anyone else with a pet out get a small frame for it beside their own, with its name, level, and health. Clicking that frame selects your pet, and Ctrl+6 does the same from the keyboard.",
       "framesMoveBody": "Your frame, your target frame, and your party frames can all be moved. Each carries a small move button in its corner: unlock it, drag the frame where you want it, and lock it again so a stray click cannot shift it. If they end up somewhere you regret, Reset Frame Positions in the options snaps them all back to where they started.",
       "barsTitle": "Bars, timers, and combat text",
-      "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
+      "barsBody": "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
       "aurasTitle": "Buffs and debuffs",
       "aurasBody": "Your own buffs show as a row of small icons in the top right corner beside the minimap, each counting down the time it has left, with your debuffs in a row below them. Right-clicking one of your own buffs drops it, as long as it is one you are allowed to drop; debuffs never are, and your target's strip is read-only.\n\nBuffs on the Player Frame, an option that is off to begin with, moves your buff row onto your own unit frame and leaves the whole corner to your debuffs. It is a desktop setting: the phone and tablet layout places your auras for you.\n\nYour target's buffs and debuffs sit together in a strip under its frame. When you want more room for them, Shift+J opens a separate Target Buffs and Debuffs window that you can move, filter down to just buffs or just debuffs, and leave open.",
       "actionBarsTitle": "Your action bars",
@@ -6583,6 +6609,9 @@ export const en: EnTranslations = {
       "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
       "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
       "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Trainer, {fee}",
       "sourceTrainerFree": "Trainer, free",
       "sourceKnown": "Known from the start",
@@ -6590,6 +6619,7 @@ export const en: EnTranslations = {
       "sourceVendor": "Sold by the Heroic Quartermaster",
       "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Recipe",
       "colSkill": "Skill",
       "colSource": "Source",
@@ -7917,6 +7947,13 @@ export const en: EnTranslations = {
     "unlink": "Unlink",
     "unlinkTitle": "Remove wallet verification from this account",
     "unlinkAria": "Remove wallet verification from this account",
+    "reauthTitle": "Confirm wallet change",
+    "reauthUnlinkTitle": "Confirm wallet removal",
+    "reauthHelp": "For your security, enter your account password to authorize this change.",
+    "reauthNoPassword": "This account signs in without a password. Set a password in account settings first, then try again.",
+    "reauthConfirm": "Confirm",
+    "reauthCancel": "Cancel",
+    "reauthClose": "Close",
     "signOut": "Disconnect",
     "signOutTitle": "Disconnect the wallet app on this browser",
     "signOutAria": "Disconnect the wallet app on this browser",
@@ -9621,6 +9658,8 @@ export const en: EnTranslations = {
       "soldJunkMany": "Sold {count} junk items for {money}.",
       "keptBoundOne": "Kept {count} bound copy.",
       "keptBoundMany": "Kept {count} bound copies.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} has come online.",
       "friendOffline": "{name} has gone offline."
     },
@@ -11516,7 +11555,7 @@ export const en: EnTranslations = {
       },
       "summon_doomguard": {
         "name": "Summon Wraithborn",
-        "description": "Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time."
+        "description": "Binds a Wraithborn to your will: an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time."
       },
       "battle_stance": {
         "name": "Battle Stance",
@@ -13479,6 +13518,9 @@ export const en: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Dreadspark Groundshaker"
+      },
+      "reins_rickshaw_mount": {
+        "name": "Bound Reins: Bonebound Rickshaw"
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
@@ -19485,7 +19527,7 @@ export const en: EnTranslations = {
       },
       "drowned_temple": {
         "name": "The Drowned Temple",
-        "enterText": "You step through the moongate — the air turns to cold water and pale light, and the singing closes over your head.",
+        "enterText": "You step through the moongate: the air turns to cold water and pale light, and the singing closes over your head.",
         "leaveText": "You surface through the moongate into the mountain night."
       }
     },

@@ -18,13 +18,19 @@
 // Three lifetime totals whose truth already lives in their emitting modules (the
 // bank-ledger FIFO's dropped rows, the two backend-cancel counts) are instead
 // SYNCED from the GameStateSource at scrape time; see their registration below.
+// The offline-writer fence refusals sync the same way but read their emitting
+// module DIRECTLY (server/offline_fence_refusals.ts), like the bank-ledger
+// growth budget and the auth-guard cache stats already do: the counters are
+// process-local and monotonic there, and routing them through
+// GameStateSource would only add a hop GameServer has no part in.
 //
 // CARDINALITY IS BOUNDED BY DESIGN, same contract as server/http/metrics.ts: the
 // only label values are the fixed tick-phase names, the two per-phase stats
 // (p95, max), the two ws directions (in, out), the fixed inbound drop
 // causes (WS_DROP_CAUSES), the fixed guild-bank incident kinds
 // (GUILD_BANK_INCIDENTS), the fixed vault-ledger incident kinds
-// (VAULT_LEDGER_INCIDENTS), and the content-derived economy and fishing
+// (VAULT_LEDGER_INCIDENTS), the fixed offline-writer families
+// (OFFLINE_FENCE_WRITERS), and the content-derived economy and fishing
 // vocabularies (COPPER_FLOW_SOURCES, HARVEST_BANDS, NODE_TIERS, FISHING_BANDS,
 // ROD_FEE_RECIPE_IDS). Nothing per-player and nothing per-guild (account id,
 // character id, guild id, name, ip) is ever a label. The tick-phase series count is fixed at
@@ -71,6 +77,7 @@ import {
   ROD_FEE_RECIPE_IDS,
   rodFeeForRecipe,
 } from '../fishing_telemetry';
+import { OFFLINE_FENCE_WRITERS, offlineFenceRefusals } from '../offline_fence_refusals';
 import { wocAuthGuardCacheStats } from '../woc_auth_guard_cache';
 import {
   type GameMetricsCounters,
@@ -96,6 +103,12 @@ export const WOC_CHARACTER_STATE_BYTES_MAX = 'woc_character_state_bytes_max';
 /** The p99 serialized character blob over the most recent saves: the fleet-creep
  *  read the monotonic max cannot give (server/character_blob_size.ts). */
 export const WOC_CHARACTER_STATE_BYTES_P99 = 'woc_character_state_bytes_p99';
+
+/** Lease-fence refusals by offline character-blob writer family
+ *  (server/offline_fence_refusals.ts). A refusal means a durable effect
+ *  silently did NOT land and nothing in the tree re-triggers it, which is why
+ *  this is a scraped series and not only a log line. */
+export const WOC_OFFLINE_FENCE_REFUSALS_TOTAL = 'woc_offline_fence_refusals_total';
 
 /** Distinct accounts online (a single account may hold several sessions). */
 export const WOC_ACCOUNTS_ONLINE = 'woc_accounts_online';
@@ -321,6 +334,26 @@ export const WOC_TICK_PHASES = [
   'bcastGrid',
   'bcastSelf',
   'social',
+  // Main-thread cost of the shared-blob persistence writes: the whole market book,
+  // the whole mail book, and the rift blob, each measured INSIDE its queued write
+  // thunk (server/serial_writer.ts) rather than where it is enqueued. That
+  // distinction is the whole value of the series: the writers defer the thunk to a
+  // microtask, so a timer at the enqueue site reads the bookkeeping and nothing
+  // else (0.02 ms measured around an enqueue whose write then blocked 250 ms).
+  //
+  // SCOPE, so a flat reading is not over-read: per-character blobs ride their own
+  // queue and are NOT counted here, and neither is any DB round trip. A stall this
+  // series does not explain still shows in `lateness`.
+  'saves',
+  // How late each callback fired, in seconds. Not a body phase: it is the gap
+  // BETWEEN callbacks, and it is the only series that can see the loop blocked by
+  // something the profiler never entered (a deferred write thunk, an off-loop
+  // timer, a GC pause, the host descheduling the process).
+  //
+  // Read `max`, not `p95`. The ring holds 1200 samples (about 60 s of callbacks),
+  // so a stall on a 30 s cadence is two samples per window and sits far below the
+  // 95th percentile: p95 stays flat through exactly the incident this exists for.
+  'lateness',
 ] as const;
 
 /** The two per-phase stats exposed for each phase. */
@@ -519,16 +552,31 @@ export function registerGameStateMetrics(
     },
   });
 
-  // TODO(team-lead, Phase 18 U-SRV-HOT hand-off): expose the offline-writer
-  // fence refusals here once server/offline_fence_refusals.ts lands (it was not
-  // in the tree when this unit closed). Intended shape, mirroring the
-  // scrape-time-synced counters below: `woc_offline_fence_refusals_total`, a
-  // Counter with a fixed `writer` label over the module's family vocabulary
-  // (rename_sweep, reclaim_sweep, pbe_roster), zero-backfilled per family at
-  // registration, and replayed at collect() via reset() + inc() from the
-  // module's read function (the truth stays in that module, like the
-  // backend-cancel counts). Add the name constant beside
-  // WOC_CHARACTER_STATE_BYTES_P99 and its census row in the same change.
+  // The offline-writer lease-fence refusals (the Phase 18 U-SRV-HOT hand-off,
+  // landed in the QA fix round now that server/offline_fence_refusals.ts is in
+  // the tree). Same scrape-time-synced shape as the backend-cancel counters
+  // below: the truth lives in the emitting module and is monotonic per
+  // process, so collect() replays the absolute total via reset() + inc().
+  // NO separate zero-backfill loop, unlike the pushed counters further down:
+  // collect() walks the WHOLE family vocabulary every scrape, so all three
+  // series exist from the first scrape and an operator can tell "no refusals"
+  // from "the series never existed". (Measured, not assumed: an explicit
+  // backfill was written first and removed once the pin proved it changed
+  // nothing.) A refusal is not an error the caller retries: a durable effect
+  // (a rename or reclaim signer sweep, a boosted character's level column)
+  // silently did NOT land and nothing re-triggers it, which is why this is the
+  // series worth alerting on rather than a logged line.
+  new Counter({
+    name: WOC_OFFLINE_FENCE_REFUSALS_TOTAL,
+    help: 'Total offline character-blob writes refused by the load-lease fence, by writer family (rename_sweep, reclaim_sweep, pbe_roster). Each refusal is a durable effect that did not land and that nothing re-triggers; alert on any sustained increase. Counts the FENCE refusal only (the 0-row answer), never a thrown write, which is a different failure with a different operator response.',
+    labelNames: ['writer'],
+    registers: [registry],
+    collect() {
+      this.reset();
+      const refusals = offlineFenceRefusals();
+      for (const writer of OFFLINE_FENCE_WRITERS) this.inc({ writer }, refusals[writer]);
+    },
+  });
 
   new Gauge({
     name: WOC_ACCOUNTS_ONLINE,

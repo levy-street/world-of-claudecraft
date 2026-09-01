@@ -13,6 +13,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import {
@@ -122,6 +123,7 @@ const HONEST_MATERIALS = [
   'homespun_cloth',
   'iron_ore',
   'ironbark_log',
+  'lastflame_core',
   'linen_scrap',
   // Masterwrought phase 10: derives IN as the reagent all five Lucent
   // (apex) ENCHANTS consume (the weapon int twin joined at the head of
@@ -203,18 +205,19 @@ const HONEST_MATERIALS = [
   'wyrmhide_cording',
 ] as const;
 
-// The ONLY non-poor junk allowed outside the material set, all eight of them:
+// The ONLY non-poor junk allowed outside the material set, all nine of them:
 // two rare-mob signature trophies (dawnhold_posy, gleamstag_charm), the
 // guardian_core and last_keep_signet oddments (the Quickening Catalyst is
 // deliberately NOT here, it derives IN via its nine in-phase consumers), the
 // Phase 12 harvest_feast (a crafted PLACEABLE, not a material: nothing crafts
-// FROM it, and its one consumer is the place_feast command), and the three
+// FROM it, and its one consumer is the place_feast command), the three
 // Masterwrought phase 11k apex role feasts on the same footing
-// (sageleaf_feast, stonepot_feast, warspice_feast). A new junk item landing in
-// this assertion's diff must be classified: either author it into a source
-// table (a node yield, grade, component, specimen, salvage return, or
-// junk-kind reagent) so it derives IN, or add it here as a deliberate
-// non-material with the maintainer's sign-off.
+// (sageleaf_feast, stonepot_feast, warspice_feast), and the Phase 13
+// deed_of_making promotion writ. A new junk item landing in this assertion's
+// diff must be classified: either author it into a source table (a node yield,
+// grade, component, specimen, salvage return, or junk-kind reagent) so it
+// derives IN, or add it here as a deliberate non-material with the
+// maintainer's sign-off.
 const ALLOWED_UNCLASSIFIED_JUNK = [
   'dawnhold_posy',
   // Masterwrought Phase 13 (2026-08-27): the promotion writ. Rare kind-junk
@@ -233,11 +236,6 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   'guardian_core',
   'harvest_feast',
   'last_keep_signet',
-  // Staged AHEAD of its recipes (the professions fast-follow, PR 3704): the
-  // Core of the Last Flame drops now so crafters bank it, and the moment a
-  // recipe consumes it the derivation classifies it IN and this row must
-  // move to the classified list (3704 carries exactly that move).
-  'lastflame_core',
   // masterwrought Phase 11k's three apex role feasts: kind 'junk' by the same
   // tonic precedent harvest_feast set, and nothing crafts FROM any of them, so
   // all three are deliberate non-materials on the harvest_feast footing above.
@@ -259,6 +257,13 @@ const ALLOWED_UNCLASSIFIED_JUNK = [
   // Phase 10 also removed seasoned_stock: the three role foods and The Laden
   // Hearth (APEX_CONSUMABLE_RECIPES) are its consumers, the same derivation
   // the phase 08/09 intermediates took.
+  // release/v0.42.0 removed lastflame_core, which sat here staged AHEAD of
+  // its recipes (the professions fast-follow, PR 3704): the release gave the
+  // derivation an explicit recipe-pending source
+  // (CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS), so the Core of the Last
+  // Flame classifies IN today and its row moved to HONEST_MATERIALS above.
+  // The caveat it carried still holds: the moment a live recipe consumes it,
+  // reagent derivation owns it and its id leaves that pending list.
 ] as const;
 
 // The six vendor-buyable crafting staples, ruled IN by name (Q6).
@@ -505,6 +510,13 @@ describe('MATERIAL_ITEM_IDS: every source table is fully represented', () => {
     expect(junkReagents).toBeGreaterThan(30);
   });
 
+  it('contains every recipe-pending material', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+    }
+  });
+
   it('contains every disenchant output (the one source reached only via the reagent union)', () => {
     // The derive deliberately does not union the disenchant tables: the
     // no-dead-end rule in disenchant_reagents.ts says every output is consumed
@@ -543,6 +555,7 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
     farmMaterialItemIds: FARM_MATERIAL_ITEM_IDS,
     recipes: ALL_RECIPES,
     enchants: ENCHANTS,
+    recipePendingMaterialItemIds: CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS,
     items: ITEMS,
   };
   // The probe def rides the real catalog so the junk-kind filter sees it.
@@ -596,6 +609,12 @@ describe('deriveMaterialItemIds: every source table is actually consulted (injec
           ...ENCHANTS,
           zzz_probe_enchant: { ...anyEnchant, reagents: [{ itemId: PROBE, count: 1 }] },
         },
+      },
+    ],
+    [
+      'recipe-pending material',
+      {
+        recipePendingMaterialItemIds: [...CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS, PROBE],
       },
     ],
   ];

@@ -418,7 +418,17 @@ const MONOLITHS: MonolithRow[] = [
     // (tests/target_flair_line_view.test.ts). Net -25 after the two arms, with
     // four import statements going with the move. Measured with
     // wc -l < src/ui/hud.ts after biome. Exact count, zero slack.
-    ceiling: 18686,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 18686, the release 18905. Measured on
+    // the merged tree with wc -l < src/ui/hud.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 18728,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
@@ -1317,7 +1327,17 @@ const MONOLITHS: MonolithRow[] = [
     // for the dispatch's promoting thunk with 8 lines to spare, so the ceiling
     // follows the file down. Measured with wc -l < server/game.ts after biome.
     // Exact count, zero slack.
-    ceiling: 10286,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 10286, the release 10641. Measured on
+    // the merged tree with wc -l < server/game.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 10350,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -1443,7 +1463,17 @@ const MONOLITHS: MonolithRow[] = [
     // the place_feast slot, the discard-class anchor fields and their sender
     // helper) with 67 lines to spare, so the row follows the file down.
     // Measured with wc -l < src/net/online.ts after biome. Exact count.
-    ceiling: 5823,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 5823, the release 5908. Measured on
+    // the merged tree with wc -l < src/net/online.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 5875,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {
@@ -1534,7 +1564,25 @@ const MONOLITHS: MonolithRow[] = [
     // The growth they paid for is createCharacterCapped's optional level
     // parameter, which removes the boost roster's nine redundant full-blob
     // rewrites per registration. Exact count, zero slack.
-    ceiling: 4937,
+    // bank_ledger_growth_budget.ts); what remains here is coordinator wiring
+    // none of those can own: the readback issue-and-warn before COMMIT, the
+    // post-listen VALIDATE call in the concurrent-index runner, and the
+    // delete call-site handing the dedicated canceller. Lowered -1 at the
+    // fourth-round fixes: the notice filter moved to schema_notices.ts (both
+    // boot clients now attach the shared forwarder) and the connection-budget
+    // arithmetic to db_connection_budget.ts, paying for the VALIDATE's
+    // post-unlock restructure in place. Exact count, zero slack.
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    // RE-PINNED at the TENTH release sync, the merge of release/v0.42.0 (tip
+    // 22e909839f, 380 commits) into feature/masterwrought (base e6b8edb375).
+    // BOTH parent pins for the record: ours 4937, the release 5145. Measured on
+    // the merged tree with wc -l < server/db.ts after the phase-close
+    // regeneration, never reconciled by arithmetic: the two arms' extractions
+    // compose, so the merged file is BELOW the higher parent. Exact merged
+    // count, zero slack: any further growth reds again.
+    ceiling: 5123,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {
@@ -1589,7 +1637,10 @@ const MONOLITHS: MonolithRow[] = [
     // the operator-listing batch above): the merged file again lands below
     // both parent pins and the ratchet follows it down. Measured on the
     // merged tree. Exact count.
-    ceiling: 3918,
+    // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
+    // merge: both parents had already ratcheted for their own work, so
+    // the composite is the honest size. Exact count, zero slack.
+    ceiling: 3945,
     seam: 'a woc_market_<thing>.ts sibling behind WocMarketDeps (the drift-warn split is the template)',
   },
   {

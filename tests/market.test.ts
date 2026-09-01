@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { RIFT_ESSENCE_ITEM_ID, RIFT_GEM_IDS } from '../src/sim/content/rift/items';
 import { ITEMS } from '../src/sim/data';
 import type { MarketCollection } from '../src/sim/market';
 import { MARKET_PLAYER_LISTING_ID_BASE } from '../src/sim/market_listing_ids';
@@ -670,6 +671,33 @@ describe('the World Market: the Merchant', () => {
       expect(reloaded?.sales.omitted).toBe(0);
     });
 
+    it("the sold copy's chosen name survives the round-trip too", () => {
+      // The arm above sells a PLAIN copy, so it could never see the name: the
+      // load path rebuilt each row from itemId/count/price/proceeds/buyerName
+      // and silently dropped itemName, which is exactly the logout the stamp
+      // exists to survive.
+      const { sim, seller, buyer } = world();
+      const named = { name: 'Dawn Oath' } as never;
+      sim.addItemInstance('wolf_fang', named, seller, 1, { silent: true });
+      sim.marketListInstance('wolf_fang', 1000, named, seller);
+      sim.marketBuy(
+        listingBy(
+          sim,
+          (l) => l.sellerKey === marketSellerKey(seller) && l.itemId === 'wolf_fang',
+          'named wolf_fang listing',
+        ).id,
+        buyer,
+      );
+      expect(marketInfo(sim, seller).collectionSales[0].itemName).toBe('Dawn Oath');
+
+      const sim2 = makeWorld();
+      sim2.loadMarket(sim.serializeMarket());
+      const reloaded = (
+        sim2.market as unknown as { marketCollections: Map<string, MarketCollection> }
+      ).marketCollections.get(marketSellerKey(seller));
+      expect(reloaded?.sales.entries[0].itemName).toBe('Dawn Oath');
+    });
+
     it('writes no sales key for a collection holding only returns (old blobs unchanged)', () => {
       const { sim, seller } = world();
       sim.addItem('bone_fragments', 1, seller);
@@ -956,6 +984,41 @@ describe('the World Market: the Merchant', () => {
     expect(errorsSince(sim).join(' ')).toMatch(/cannot be listed on the World Market/i);
     expect(sim.countItem('alien_armor_plate', seller)).toBe(1);
     expect(sim.marketListings.some((l) => l.sellerKey === marketSellerKey(seller))).toBe(false);
+  });
+
+  it('lists Rift Essence and Rift Gems: forge currency, not the personal rift gear it is spent on', () => {
+    const sim = makeWorld();
+    const seller = sim.addPlayer('warrior', 'Seller');
+    standAtMerchant(sim, seller);
+    sim.addItem(RIFT_ESSENCE_ITEM_ID, 5, seller);
+    for (const gemId of RIFT_GEM_IDS) sim.addItem(gemId, 5, seller);
+    sim.events.length = 0;
+
+    sim.marketList(RIFT_ESSENCE_ITEM_ID, 5, 100, seller);
+    for (const gemId of RIFT_GEM_IDS) sim.marketList(gemId, 5, 100, seller);
+
+    expect(errorsSince(sim)).toEqual([]);
+    expect(sim.countItem(RIFT_ESSENCE_ITEM_ID, seller)).toBe(0);
+    expect(
+      sim.marketListings.some(
+        (l) => l.itemId === RIFT_ESSENCE_ITEM_ID && l.sellerKey === marketSellerKey(seller),
+      ),
+    ).toBe(true);
+    for (const gemId of RIFT_GEM_IDS) {
+      expect(sim.countItem(gemId, seller)).toBe(0);
+      expect(
+        sim.marketListings.some(
+          (l) => l.itemId === gemId && l.sellerKey === marketSellerKey(seller),
+        ),
+      ).toBe(true);
+    }
+
+    // Mirror host: the personal rift rings (RIFT_GEAR_ITEM_IDS) stay blocked,
+    // unlike the currency above; the fix must not loosen that def-level rule.
+    sim.addItem('riftbound_band_of_might', 1, seller);
+    sim.events.length = 0;
+    sim.marketList('riftbound_band_of_might', 1, 100, seller);
+    expect(errorsSince(sim).join(' ')).toMatch(/cannot be listed on the World Market/i);
   });
 
   it('caps how many listings one seller may keep', () => {

@@ -61,7 +61,6 @@ import { HEROIC_MARK_ITEM_ID } from '../sim/content/dungeon_difficulty';
 import { HEROIC_VENDOR_STOCK } from '../sim/content/heroic_vendor';
 import { CRUCIBLE_VENDOR_STOCK } from '../sim/content/ignivar_loot';
 import { isOnMountRaceStartPlatform, MOUNTS } from '../sim/content/mounts';
-import { PROVING_SHORE_ARRIVAL } from '../sim/content/proving_shore';
 import { recipeById } from '../sim/content/recipes';
 import { RELIQUARY_PAGES, RELIQUARY_PAGES_BY_ID } from '../sim/content/reliquary';
 import { FIRST_TALENT_LEVEL, type TalentAllocation, talentsFor } from '../sim/content/talents';
@@ -222,12 +221,11 @@ import {
   dispatchVarkhulCalloutSfx,
   groundTickAbilityCue,
   impactCueForDamage,
-  type MobVoiceAction,
   mobVoiceActionForDamage,
-  mobVoiceCue,
   mobVoiceCueWithFallback,
   novaAbilityCue,
   playerSwingCueForDamage,
+  playerVoiceCue,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
@@ -590,6 +588,7 @@ import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from 
 import { WocTradeController } from './hud/woc_trade';
 import { unitFrameCurrentMaxText } from './hud_frames';
 import { BG_END_LOG_COLORS, CHROME_TONE, HUD_LOG, MAP_TONE } from './hud_tones';
+import { availableMobVoiceCue, sfxHasCue, yellVoiceKey } from './hud_voice_cues';
 import {
   formatMoney as formatLocalizedMoney,
   formatNumber,
@@ -813,8 +812,7 @@ import {
 import { clearOpenStoreResult } from './store_decision_prompt';
 import { mountStorePromoCard, type StorePromoCardController } from './store_promo_card';
 import { nearestSubzone } from './subzone';
-import { swingTimerState } from './swing_timer';
-import { SwingTimerPainter } from './swing_timer_painter';
+import { SwingTimerBars } from './swing_timer_bars';
 import { TalentsWindow } from './talents_window';
 import { targetAuraSourceName } from './target_auras_view';
 import { TargetAurasWindow } from './target_auras_window';
@@ -827,6 +825,7 @@ import {
 import { targetOfTargetId } from './target_of_target';
 import { targetPortraitSourceId, targetPortraitUrl } from './target_portrait_view';
 import { targetRankView, targetUsesEliteFrame } from './target_rank_view';
+import { TargetSwingTimerBars } from './target_swing_timer_bars';
 import type { PresetId, ThemeKnob, ThemeState } from './theme';
 import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
@@ -848,11 +847,9 @@ import { TutorialOverlay } from './tutorial';
 import {
   buildFerryBellHomeNote,
   buildFerryIslandArrivalNote,
-  buildTutorialDeclineNote,
-  buildTutorialGreetingModel,
   type TutorialGreetingNote,
 } from './tutorial_greeting_view';
-import { renderTutorialGreeting, renderTutorialGreetingNote } from './tutorial_greeting_window';
+import { renderTutorialGreetingNote } from './tutorial_greeting_window';
 import { svgIcon } from './ui_icons';
 import { getUiScale } from './ui_scale';
 import { newUnitFrameBuffer, type UnitFrameDescriptor, unitFrameViewInto } from './unit_frame';
@@ -876,8 +873,10 @@ import {
 } from './window_drag';
 import { makeWindowFocus } from './window_focus';
 import { syncWindowOpenBodyClasses } from './window_open_state';
+import { windowPixelPosition } from './window_position_core';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { wocBalanceChipHtml } from './woc_balance_chip';
+import { promptWocMarketBrowserVisit, wocMarketToggleAction } from './woc_market_link';
 import { type WocMarketHooks, WocMarketWindow } from './woc_market_window';
 import { installWorldDropTarget } from './world_drop_target';
 import { formatXp, type XpBarView, xpBarView } from './xp_bar';
@@ -1246,21 +1245,6 @@ function appendChildSpan(parent: HTMLElement, className: string): HTMLElement {
   return span;
 }
 
-function availableMobVoiceCue(templateId: string, action: MobVoiceAction): string | null {
-  return mobVoiceCue(templateId, action, (key) => sfx.hasVariants(key), voice.isAudible());
-}
-
-// Stable voice-clip key for a spoken yell line. MUST match the generator slug in
-// scripts/voices/extra_lines.mjs (yellKey) so encounter dialogue (e.g. the
-// Nythraxis raid) plays the right clip from the live chat event text.
-function yellVoiceKey(text: string): string {
-  return `yell__${text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '')
-    .slice(0, 60)}`;
-}
-
 const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 
 /** Named Curator rank for rank-up toast/banner (cosmetic chrome only). */
@@ -1544,6 +1528,10 @@ export class Hud {
   // Cached showTargetOfTarget preference (set from main.ts applySetting via
   // setShowTargetOfTarget); when off, the frame is painted hidden every frame.
   private showTargetOfTarget = false;
+  // Cached showTargetSwingTimer preference (set from main.ts applySetting via
+  // setShowTargetSwingTimer); independent of showTargetOfTarget (that toggle
+  // is the unrelated portrait mini-frame). When off, both new bars stay hidden.
+  private showTargetSwingTimer = false;
   // Pet frame (showPetFrame option): element refs for the #pet-frame strip under the
   // player frame, resolved ONCE like the refs above. A FOURTH instance of the
   // unit_frame family (petFramePainter below), driven by pet_frame_view.ts.
@@ -1583,9 +1571,10 @@ export class Hud {
   private actionbarEl = $('#actionbar');
   private xpFillEl = $('#xpbar .fill');
   private xpLabelEl = $('#xpbar .label');
-  // XP + swing bar element refs cached once for their painters (the #xpbar /
-  // .rested / #player-frame / #swingbar refs were re-queried via $()/querySelector
-  // every frame, the leak this fixes).
+  // XP bar element refs cached once for its painter (the #xpbar / .rested /
+  // #player-frame refs were re-queried via $()/querySelector every frame,
+  // the leak this fixes). The swing-timer bars cache their own refs in
+  // src/ui/swing_timer_bars.ts.
   private xpbarEl = $('#xpbar');
   private xpRestedEl = $('#xpbar .rested');
   private playerFrameEl = $('#player-frame');
@@ -1598,9 +1587,6 @@ export class Hud {
   // The party-frames container, resolved once (was re-queried every frame); the
   // keyed-pool party painter owns its children.
   private partyFramesEl = $('#party-frames');
-  private swingbarEl = $('#swingbar');
-  private swingFillEl = this.swingbarEl.querySelector('.fill') as HTMLElement;
-  private swingLabelEl = this.swingbarEl.querySelector('.label') as HTMLElement;
   private deathOverlayEl = $('#death-overlay');
   private releaseSpiritBtnEl = $('#release-btn');
   private ghostPromptEl = $('#ghost-prompt');
@@ -1856,10 +1842,6 @@ export class Hud {
   private readonly riteController: RiteController;
   private readonly questTracker: QuestTrackerController;
   private readonly questDialog: QuestDialogController;
-  // swing timer: the period is captured from the reset edge (swingTimer jumping
-  // up), so the bar tracks real swing speed including haste / ranged weapons.
-  private swingPeriod = 0;
-  private lastSwingTimer = 0;
   private lastLowResourceInput = Number.NaN;
   private lastLowResourceMax = Number.NaN;
   private lastLowResourceType: ResourceType | null | undefined;
@@ -3421,27 +3403,22 @@ export class Hud {
     top: number,
     rect = el.getBoundingClientRect(),
   ): void {
-    const margin = 8;
-    // Callers pass coordinates in visual (zoomed) space: getBoundingClientRect()
-    // and pointer clientX/clientY are post-zoom, but style.left/top are author
-    // lengths the browser multiplies by #ui's `zoom`. Convert into author space
-    // (divide by the live UI scale) so the window lands where the pointer is, and
-    // clamp against the viewport expressed in that same author space. (Z=1 when
-    // uiScale is at its default, so this is a no-op for most players.)
-    const z = getUiScale();
-    const vw = window.innerWidth / z;
-    const vh = window.innerHeight / z;
-    const aLeft = left / z;
-    const aTop = top / z;
-    const width = Math.min(rect.width / z, vw - margin * 2);
-    const height = Math.min(rect.height / z, vh - margin * 2);
-    const maxLeft = Math.max(margin, vw - width - margin);
-    const maxTop = Math.max(margin, vh - height - margin);
-    el.style.left = `${Math.max(margin, Math.min(maxLeft, aLeft))}px`;
-    el.style.top = `${Math.max(margin, Math.min(maxTop, aTop))}px`;
+    const position = windowPixelPosition({
+      left,
+      top,
+      width: rect.width,
+      height: rect.height,
+      viewportWidth: window.innerWidth,
+      viewportHeight: window.innerHeight,
+      scale: getUiScale(),
+    });
+    el.style.left = `${position.left}px`;
+    el.style.top = `${position.top}px`;
     el.style.right = 'auto';
     el.style.bottom = 'auto';
     el.style.transform = 'none';
+    // Pixel positions are re-clamped after viewport changes and on reopen.
+    el.dataset.windowMoved = '1';
   }
 
   // Place a cursor-anchored popup (context menus, the loot window) at a viewport
@@ -4178,6 +4155,14 @@ export class Hud {
     this.applyAuraAnchor();
   }
 
+  // game.settings alwaysShowAllBuffs: bypasses the buff bar's low-tier
+  // overflow cap at its usual per-frame cost. Read by buffBarFxTier() below.
+  private alwaysShowAllBuffs = false;
+
+  setAlwaysShowAllBuffs(on: boolean): void {
+    this.alwaysShowAllBuffs = on;
+  }
+
   private applyAuraAnchor(): void {
     const on = this.aurasOnPlayerFrame && !this.isMobileLayout();
     document.body.classList.toggle('auras-on-frame', on);
@@ -4594,12 +4579,11 @@ export class Hud {
     this.xpLabelEl,
     this.playerFrameEl,
   );
-  private readonly swingTimerPainter = new SwingTimerPainter(
-    this.writerFacet,
-    this.swingbarEl,
-    this.swingFillEl,
-    this.swingLabelEl,
-  );
+  // Main-hand + off-hand (dual-wield melee weaving) swing-timer bars: both
+  // element caching, edge-tracking clocks, and painter instances live behind
+  // this one binding (src/ui/swing_timer_bars.ts).
+  private readonly swingTimerBars = new SwingTimerBars(this.writerFacet);
+  private readonly targetSwingTimerBars = new TargetSwingTimerBars(this.writerFacet);
   // The spell-activation proc overlay (the Rising Phoenix, owner design
   // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
   // (proc_overlay_drag), class-toggled per frame via the elided writers
@@ -5010,9 +4994,8 @@ export class Hud {
     this.buffBarEl,
     this.buffBarPainterDeps,
     document,
-    // Cap the visible aura count on the LOW static preset (never the
-    // governor).
-    () => this.fxTier(),
+    () => this.buffBarFxTier(), // fxTier(), unless "Always Show All Buffs" overrides it
+    true, // the buff bar is the one instance that shows the low-tier overflow badge
   );
   private readonly debuffBarPainter = new AurasPainter(
     this.writerFacet,
@@ -5148,6 +5131,7 @@ export class Hud {
     resetPetBarSig: () => {
       this.lastPetBarSig = '';
     },
+    confirmVendorSell: () => this.optionsHooks?.settings.get('confirmVendorSell') ?? true,
     isHotbarItemId: (itemId) => this.isHotbarItemId(itemId),
     useGatherTool: (item) => this.gatherToolUseHook?.(item) ?? false,
     setDragAction: (action) => {
@@ -5157,8 +5141,7 @@ export class Hud {
     dragState: this.itemDragState,
     isTouchHud: () => document.body.classList.contains('mobile-touch'),
     markEquipDropTargets: (itemId, slotIndex) => this.charWindow.markDropTargets(itemId, slotIndex),
-    dropOnEquipSlot: (itemId, slot, target) =>
-      this.charWindow.dropOnEquipSlot(itemId, slot, target),
+    dropOnEquipSlot: (...args) => this.charWindow.dropOnEquipSlot(...args),
     dropOnActionSlot: (itemId, slot) => this.placeHotbarItemFromTouch(itemId, slot),
     dropOnActionRingSlot: (itemId, ringIndex) => {
       // Bounded (the phase 14 QA): a stale data-mobile-index past the live
@@ -5167,8 +5150,8 @@ export class Hud {
       if (ringIndex >= this.mobileRingSlotBtns.length) return;
       this.placeHotbarItemFromTouch(itemId, this.mobileSourceSlotForButton(ringIndex));
     },
-    openItemActionMenu: (def, itemId, slotIndex, x, y, runDefault, instance) =>
-      this.bagItemActionMenu.open(def, itemId, slotIndex, x, y, runDefault, instance),
+    // Untouched forward (hud.ts is at its pinned line-count ceiling).
+    openItemActionMenu: (...args) => this.bagItemActionMenu.open(...args),
   });
   // Bag-item action menu (Professions 2.0): the right-click / touch
   // menu that surfaces Disenchant / Salvage / Apply Enchant on a bag stack.
@@ -5659,9 +5642,12 @@ export class Hud {
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
     maskPlayerText: (text) => this.maskChat(text),
   });
-  // The $WOC Exchange is online-only, browser web + website desktop. Its launcher
-  // stays hidden until main.ts attaches hooks (no Steam/Epic/Capacitor/offline).
+  // The $WOC Exchange is online-only, browser web + website desktop. Its
+  // launcher stays hidden until main.ts attaches hooks; a denied non-native
+  // desktop shell can instead reveal the SAME launcher wired to a browser
+  // hand-off (attachWocMarketBrowserOnlyNotice, src/ui/woc_market_link.ts).
   private wocMarketHooks: WocMarketHooks | null = null;
+  private wocMarketBrowserOnly = false;
 
   // The trade window and its $WOC arm live in the woc_trade domain
   // (src/ui/hud/woc_trade/); the controller owns the offer state machine and
@@ -5924,6 +5910,13 @@ export class Hud {
   // main.ts applySetting. When off, the per-frame update paints the frame hidden.
   setShowTargetOfTarget(on: boolean): void {
     this.showTargetOfTarget = on;
+  }
+
+  // Toggle the target / target-of-target swing-timer bars (showTargetSwingTimer
+  // option), driven from main.ts applySetting. Independent of
+  // setShowTargetOfTarget: the swing bars are unrelated to the portrait mini-frame.
+  setShowTargetSwingTimer(on: boolean): void {
+    this.showTargetSwingTimer = on;
   }
 
   // A pet is always a mob entity, so it uses the same committed portrait and
@@ -8833,6 +8826,12 @@ export class Hud {
     return coerceFxTier(document.documentElement.dataset.fxLevel);
   }
 
+  // fxTier(), unless alwaysShowAllBuffs overrides it to 'ultra' so
+  // auraVisibleCap never caps -- scoped to ONLY the buff-bar painter below.
+  private buffBarFxTier(): UiEffectsTier {
+    return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();
+  }
+
   private dailyRewardsEnabled(): boolean {
     return this.features.dailyRewardsEnabled;
   }
@@ -9409,15 +9408,14 @@ export class Hud {
     // activity signature is stable (no full rebuild per tick).
     this.paintOpenCraftingCastProgress();
 
-    // swing timer: fills between melee/ranged auto-attack swings. swingTimer
-    // counts DOWN to 0 (ready); swing_timer.ts recovers the full interval from the
-    // reset edge so the bar stays accurate under haste and for ranged weapons. The
-    // period/timer edge-tracking round-trips through the core (parameter-in /
-    // next-state-out): Hud holds the two scalars and feeds them back next frame.
-    const swing = swingTimerState(p, target ?? null, this.swingPeriod, this.lastSwingTimer);
-    this.swingPeriod = swing.nextPeriod;
-    this.lastSwingTimer = swing.nextTimer;
-    this.swingTimerPainter.paint(swing);
+    // Swing timers: fill between melee/ranged auto-attack swings (main-hand,
+    // and the off-hand clock for dual-wield melee weaving). See
+    // src/ui/swing_timer_bars.ts for the edge-tracking + painting detail.
+    this.swingTimerBars.update(p, target ?? null);
+    // Target / target-of-target swing timers: see
+    // src/ui/target_swing_timer_bars.ts for the visibility gating and the
+    // independent target-of-target resolution.
+    this.targetSwingTimerBars.update(target ?? null, sim.entities, this.showTargetSwingTimer);
     // The phoenix: Heating Up lights its left half, Hot Streak completes it,
     // spending puts it out (pure rule in proc_overlay_view; an unchanged state
     // writes nothing). On the FIRST frame in-world, preview the unlit bird for
@@ -11231,12 +11229,12 @@ export class Hud {
         }
         if (ev.crit && shouldPlayCritSfxForTarget(tgt))
           this.combat('combat_crit', tp.x, tp.y, tp.z, 1.0);
-        // pain vocalization only on a crit — never on ordinary hits.
-        // player_hurt_female_1..5 exist under public/audio/sfx but are unwired: no
-        // gender field exists on PlayerMeta yet. Once the model swap defines one,
-        // resolve here via the mobVoiceCue hasCue-fallback pattern (src/ui/combat_sfx.ts).
+        // pain vocalization only on a crit, never on ordinary hits. Voiced per
+        // the target's own authored gender (playerVoiceCue): a female look gets
+        // the female takes, everything else keeps the shipped male ones.
         if (ev.crit && ev.targetId === sim.playerId) {
-          this.combat('player_hurt', tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
+          const cue = playerVoiceCue(tgt?.modularAppearance, 'hurt', sfxHasCue);
+          this.combat(cue, tp.x, tp.y, tp.z, 1.0, { cooldown: 0.3 });
         } else {
           const mobAction = mobVoiceActionForDamage(ev, tgt);
           if (mobAction && shouldPlayMobVoiceSfxForEntity(tgt)) {
@@ -11402,11 +11400,13 @@ export class Hud {
           const voice = availableMobVoiceCue(ent.templateId, 'death');
           if (voice && shouldPlayMobVoiceSfxForEntity(ent)) this.combat(voice, p.x, p.y, p.z, 1.0);
         } else if (ent.kind === 'player' && ev.entityId !== sim.playerId) {
-          // player_death_female_1..3 exist under public/audio/sfx but are unwired,
-          // see the player_hurt note above. This branch is OTHER players dying;
-          // your OWN character's death sound is a separate trigger site,
-          // audio.playerDeath() in src/game/audio.ts.
-          this.combat('player_death', p.x, p.y, p.z, 1.0);
+          // This branch is OTHER players dying; your OWN character's death
+          // sound is a separate trigger site, audio.playerDeath() in
+          // src/game/audio.ts. Voiced per the dying player's own authored
+          // gender, which rides their identity wire, so a female character you
+          // watch die sounds female to you.
+          const cue = playerVoiceCue(ent.modularAppearance, 'death', sfxHasCue);
+          this.combat(cue, p.x, p.y, p.z, 1.0);
         }
         return;
       }
@@ -12185,12 +12185,6 @@ export class Hud {
           if (this.professionsWindow.isOpen) this.professionsWindow.render();
           break;
         }
-        case 'tutorialGreeting':
-          // The spawn greeting (tutorial island): the sim guarantees
-          // once-ever; this arm only opens the choice dialog with the
-          // first-character vs refresher copy the event decided.
-          this.openTutorialGreeting(ev.firstCharacter);
-          break;
         case 'ferryBellHome':
           // The island bell just set this player down in town: point out the
           // town's twin bell ONCE per device (the ride may have been a
@@ -13690,7 +13684,11 @@ export class Hud {
             : undefined;
           const feedback = deathRecapFeedback(killerName, ev.killerAbility, abilityName);
           this.log(t(feedback.key, feedback.values), HUD_LOG.DEATH_RECAP);
-          audio.playerDeath();
+          // Your OWN death cry, voiced by your authored gender. Resolved here
+          // rather than in audio.ts because picking it needs the appearance,
+          // which that host-agnostic cue facade has no access to.
+          const self = sim.entities.get(sim.playerId);
+          audio.playerDeath(playerVoiceCue(self?.modularAppearance, 'death', sfxHasCue));
           break;
         }
         case 'respawn':
@@ -14017,53 +14015,6 @@ export class Hud {
     document.getElementById('profession-tutorial')?.remove();
   }
 
-  // The one-time spawn greeting dialog (tutorial island): fired by
-  // tutorialGreeting (the sim guarantees once-ever). Reuses the confirm-dialog
-  // modal family via the tutorial_greeting_window painter; the Hud owns the
-  // focus trap and the z-index floor, the openProfessionTutorial precedent.
-  private openTutorialGreeting(firstCharacter: boolean): void {
-    this.tutorialGreetingTrap?.release(false);
-    this.tutorialGreetingTrap = null;
-    // Warm the island WHILE the choice is read: main.ts skips the blocking
-    // loading screen entirely once renderer.isZoneReadyAt is true at the
-    // arrival, so the seconds a player spends on this dialog buy a seamless
-    // ferry ride. IDLE pace: this fires in live play behind a dialog, not a
-    // loading curtain, so the gating arm's synchronous sky PMREM and fast
-    // terrain batches would cost visible frames (the ferry-prewarm lane's
-    // rule). Fire-and-forget; an instant click degrades to the classic
-    // screen rather than a void drop.
-    void Promise.all([
-      this.renderer.prepareZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, undefined, {
-        pace: 'idle',
-      }),
-      this.renderer.prewarmZoneAt(PROVING_SHORE_ARRIVAL.x, PROVING_SHORE_ARRIVAL.z, {
-        background: true,
-      }),
-    ]).catch(() => {
-      /* offline asset hiccup: the arrival falls back to the loading screen */
-    });
-    const el = renderTutorialGreeting(buildTutorialGreetingModel(firstCharacter), {
-      onPlay: () => {
-        // Fire-and-forget by design: the server re-validates and the >30 yd
-        // displacement drives the arrival flow. The Eastbrook coachmark is
-        // NOT latched here; it simply never engages while the player stands
-        // on the island (isFreshCharacter's position guard), so a dropped
-        // command costs nothing.
-        this.sim.startTutorial();
-        this.closeTutorialGreeting();
-      },
-      // Declining gets a follow-up note: the bell beside Bryn still rings
-      // the crossing any time, so a "no" is never a locked door.
-      onSkip: () => this.openTutorialGreetingNote(buildTutorialDeclineNote()),
-    });
-    this.bringWindowToFront(el);
-    // Above the mobile sheet (z-95) and the armory inspect overlay (z-90):
-    // the scoped-popup floor, so the one-shot never opens buried.
-    el.style.zIndex = String(Math.max(Number(el.style.zIndex) || 0, 96));
-    this.tutorialGreetingTrap = this.focusManager.open({ root: () => el });
-    el.querySelector<HTMLElement>('.cd-ok')?.focus();
-  }
-
   private closeTutorialGreeting(): void {
     this.tutorialGreetingTrap?.release();
     this.tutorialGreetingTrap = null;
@@ -14075,9 +14026,12 @@ export class Hud {
     this.syncAnyWindowOpenState();
   }
 
-  // The greeting dialog's single-button note variant (decline follow-up,
-  // first bell homecoming): same shell, trap, and z-index floor as the
-  // two-choice dialog, so the managed-close registry covers it unchanged.
+  // The #tutorial-greeting note dialog (the town bell homecoming, Ferryman
+  // Odo's island welcome): one speaker, one closing affordance, trapped and
+  // floored above the mobile sheet so a one-shot never opens buried. It is
+  // the only thing that mints this shell now, and the managed-close registry
+  // covers it unchanged: the two-choice greeting it grew out of went with the
+  // tutorialGreeting event at the Phase 18 dead-union sweep.
   private openTutorialGreetingNote(note: TutorialGreetingNote): void {
     this.tutorialGreetingTrap?.release(false);
     this.tutorialGreetingTrap = null;
@@ -14606,6 +14560,26 @@ export class Hud {
     };
     const key = exact[text];
     if (key) return t(key);
+    // The DEPLOY-WINDOW alias for the one wire-carried reword this packet makes
+    // (Masterwrought phase 18 QA, the Drowned Temple enterText de-dash). The sim
+    // emits enterText as RAW ENGLISH and this loop matches it by exact bytes, so
+    // the CONTENT copy is the match key: a server that has not restarted yet still
+    // sends the pre-reword sentence, which the new client would fail to match and
+    // render raw, em dash and all, which is the very thing the reword removed.
+    // Same practice as the phase 03 wire-carried renames (pinned in
+    // tests/localization_fixes.test.ts) and the same shape as the arena queue
+    // line's ellipsis twin below. Retire this arm once every realm has restarted
+    // past the reword; D150 carries the ruling.
+    // The old separator is spelled as an ESCAPE, never as the byte: the repo
+    // forbids an em dash in source, and this branch already learned the general
+    // form of that lesson the hard way (a guard keyed on raw NUL bytes made git
+    // classify the whole file as binary). Write the escape, never the byte.
+    if (
+      text ===
+      `You step through the moongate \u2014 the air turns to cold water and pale light, and the singing closes over your head.`
+    ) {
+      return dungeonText('drowned_temple', 'enterText');
+    }
     for (const dungeon of DUNGEON_LIST) {
       if (text === dungeon.enterText) return dungeonText(dungeon.id, 'enterText');
       if (text === dungeon.leaveText) return dungeonText(dungeon.id, 'leaveText');
@@ -14745,6 +14719,19 @@ export class Hud {
     if (match) {
       const n = Number(match[1]);
       return t(n === 1 ? 'hud.logs.keptBoundOne' : 'hud.logs.keptBoundMany', {
+        count: formatNumber(n, { maximumFractionDigits: 0 }),
+      });
+    }
+    // The LOCKED twin (Masterwrought phase 18 QA, item
+    // vendor-partial-sell-locked-toast): a partial vendor sale used to report every
+    // spared copy as bound, including the ones spared because the player had LOCKED
+    // them, so the summary named the wrong reason and the player had nothing to act
+    // on. src/sim/items.ts now splits the two counts and emits this line beside the
+    // bound one, so the matcher needs both arms or the locked half ships raw English.
+    match = /^Kept (\d+) locked cop(?:y|ies)\.$/.exec(text);
+    if (match) {
+      const n = Number(match[1]);
+      return t(n === 1 ? 'hud.logs.keptLockedOne' : 'hud.logs.keptLockedMany', {
         count: formatNumber(n, { maximumFractionDigits: 0 }),
       });
     }
@@ -17378,14 +17365,49 @@ export class Hud {
    *  desktop only) and reveal its launcher; else the surface stays absent. */
   attachWocMarket(hooks: WocMarketHooks): void {
     this.wocMarketHooks = hooks;
+    // Clears a browser-only notice this Hud instance may have carried from an
+    // earlier attach attempt, so a later real attach can never be shadowed by
+    // it (wocMarketToggleAction checks browserOnly first).
+    this.wocMarketBrowserOnly = false;
+    this.revealWocMarketLauncher();
+  }
+
+  /** Reveal the SAME launcher on a wrapped DESKTOP shell (Steam/Electron/the
+   *  packaged website build), where the Exchange itself stays fail-closed
+   *  (main.ts, via src/game/woc_market_wiring.ts): toggleWocMarket hands off
+   *  to the browser instead of opening the window, so the icon never reads
+   *  as just missing. Never called for Capacitor native (see the wiring
+   *  module's header). */
+  attachWocMarketBrowserOnlyNotice(): void {
+    this.wocMarketBrowserOnly = true;
+    this.revealWocMarketLauncher();
+  }
+
+  private revealWocMarketLauncher(): void {
     for (const id of ['mm-wocmarket', 'mobile-wocmarket']) {
       document.getElementById(id)?.removeAttribute('hidden');
     }
   }
 
   toggleWocMarket(): void {
-    if (this.wocMarketHooks === null) return;
-    this.wocMarketWindow.toggle();
+    switch (
+      wocMarketToggleAction({
+        browserOnly: this.wocMarketBrowserOnly,
+        hasHooks: this.wocMarketHooks !== null,
+      })
+    ) {
+      case 'handoff':
+        promptWocMarketBrowserVisit({
+          confirm: (title, body, okText, cancelText, onOk) =>
+            this.confirmDialog(title, body, okText, cancelText, onOk),
+        });
+        return;
+      case 'toggle':
+        this.wocMarketWindow.toggle();
+        return;
+      case 'none':
+        return;
+    }
   }
 
   /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */

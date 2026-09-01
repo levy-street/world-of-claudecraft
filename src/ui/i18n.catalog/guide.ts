@@ -570,6 +570,8 @@ export const guideStrings = {
       'Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.',
     ifAurasOnPlayerFrame:
       'Puts your buffs and debuffs on your own unit frame as well as the aura bar.',
+    ifAlwaysShowAllBuffs:
+      'Shows every active buff even on the Low graphics preset, bypassing its usual buff-icon cap.',
     ifTargetOfTarget:
       'Shows who your target is targeting, the classic way to tell whether the tank still has it.',
     ifPetFrame: 'Shows a frame for your pet.',
@@ -706,7 +708,7 @@ export const guideStrings = {
 
     barsTitle: 'Bars, timers, and combat text',
     barsBody:
-      "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
+      "Your cast bar appears in the middle of the screen, just above your action bars, whenever you cast or channel, and carries the spell's name and the time left. Your target gets a cast bar of its own on its frame, so you can see what is coming and answer it.\n\nA thin swing bar sits under your cast bar and fills between your weapon swings, so a melee or ranged attacker can see when the next automatic hit lands. Fighting with a weapon in each hand adds a second bar right below it, filling on its own separate clock, so you can time your abilities between BOTH swings instead of just one.\n\nYour experience bar runs the full width under your action bars, ticked into segments, with a lighter stretch showing the rested experience you have banked.\n\nSwim under water and a blue breath bar appears at the top of the screen. It drains while your head is under, flashes red once it runs out and you begin to drown, and refills quickly the moment you surface. Space swims you up, and the Swim Down key, Ctrl by default, takes you deeper.\n\nDamage and healing float up over whatever they landed on as small numbers, so you can read a fight without reading text. The Combat tab in your chat box keeps the full written record.",
 
     aurasTitle: 'Buffs and debuffs',
     aurasBody:
@@ -2656,6 +2658,21 @@ export const guideStrings = {
     effectFood: 'Restores {amount} health over {seconds} sec when eaten.',
     effectWellFed: 'Well Fed when you finish eating: +{value} {stat} for {minutes} min.',
     effectWellFedAura: 'Grants {aura} for {minutes} min when you finish eating.',
+    // The feast SERVING lines (Masterwrought phase 18 QA, item
+    // harvest-feast-wiki-effect-cell): a placeable feast has no foodHp of its
+    // own, so the row follows feast.dishItemId to the dish it serves and states
+    // what one serving pays. Feast-flavoured rather than the dish's own
+    // effectFood / effectWellFed keys, because the player SERVES a feast and
+    // never eats it. "Well Fed" is baked into the template the way
+    // effectWellFed bakes it, with no {aura} slot, so the guide bundle never
+    // has to reach for the sim aura matcher (localizeSimAuraName pulls
+    // src/sim/sim plus ITEMS/MOBS/ZONES, which is both a bundle and a spoiler
+    // regression here). The unmapped-buff-kind fallback reuses
+    // effectWellFedAura above rather than minting a fourth key.
+    effectFeast:
+      'Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.',
+    effectFeastServing: 'Each serving restores {amount} health over {seconds} sec.',
+    effectFeastWellFed: 'Well Fed when a serving is finished: +{value} {stat} for {minutes} min.',
     sourceTrainerFee: 'Trainer, {fee}',
     sourceTrainerFree: 'Trainer, free',
     sourceKnown: 'Known from the start',
@@ -2668,6 +2685,12 @@ export const guideStrings = {
     // both or it sends a reader to one and hides the other.
     sourceDropAndVendor: 'From a found pattern, or the Heroic Quartermaster',
     gainFmt: '{reduced} / {minimal} / {zero}',
+    // A gain boundary above the craft's enforced maxSkill cap is unreachable,
+    // so the cell says so rather than printing a skill number no player can
+    // ever hold (63 of 170 rows did, Masterwrought phase 18 QA, item
+    // wiki-craft-gain-clamp). Slots into gainFmt's {reduced} / {minimal} /
+    // {zero}, so it stays lower case and short.
+    gainNever: 'never',
     colRecipe: 'Recipe',
     colSkill: 'Skill',
     colSource: 'Source',

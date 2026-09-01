@@ -1217,10 +1217,26 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // farm drive, and the shadow arm extracted to shadow_depth_compile.ts): the
 // first-order composite follows renderer.ts, then the metadata authority
 // follows the swept evidence bytes. No capture was retaken.
+// The release side re-minted both of these again over its v0.42.0 span, without
+// a comment of its own: renderer.ts moved 207 lines there (the validated local
+// locomotion and client movement prediction, the self-pose frame seams pulled
+// into pure modules, the FOV slider fix, and the Bonebound Rickshaw render arm)
+// and it re-minted its four committed evidence seals to match.
+//
+// Parent values for the record: metadata sha256 ours 05909586, the release
+// a5c2116d; composite ours 161370d0, the release 89c8a62f.
+// RE-MINTED at the TENTH release sync, the merge of release/v0.42.0 (tip
+// 22e909839f) into feature/masterwrought (base e6b8edb375).
+// BOTH parents moved renderer.ts, so the merged tree is a
+// third content and neither parent's literal described it; the tool was run
+// over the fully resolved tree, LAST, after every renderer.ts byte was final
+// and after biome left the file unchanged. The four polish evidence JSONs were
+// swept by the tool in the same run and are committed with these pins. No
+// capture was retaken; ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT is untouched.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '05909586d68b70d4fe8351b35bd60bf4cd999d1668c02df9dc90d2d69b993e37';
+  '1ce078c449d921deef96b98efa2773ac4b8f7e30d79084769b11f28fca061d3e';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '161370d0857d868f0e4dabf0af40006ad69330326faf07a8613d8d35c43ffab2';
+  '0228ced2c09a5fe015effdc6f50f382098d7905c2a263e3f9a05a88e3949a089';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2481,7 +2497,20 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // performance seal follows the swept evidence bytes, recomputed LAST per
       // REMINT_COMMAND after every renderer.ts byte was final. No capture was
       // retaken.
-    ).toBe('8b3ee805c3409443f3f77d742bb4685fa46b6f7970e1e3f6ac08bf4ab342ad19');
+      // The release's own half over the v0.42.0 span, kept rather than dropped:
+      // it re-minted this seal once more after the Drakelands entrance merge,
+      // for the client-prediction and self-pose renderer round and the rickshaw
+      // mount's render arm, sweeping its four evidence files to match. Same
+      // order there too, the composite first, then this seal.
+      // RE-MINTED at the TENTH release sync, the merge of release/v0.42.0 (tip
+      // 22e909839f) into feature/masterwrought (base e6b8edb375). Both parents
+      // moved renderer.ts and the swept evidence bytes again, so the merged
+      // tree is a third content and neither parent's literal described it.
+      // Parent values for the record: ours 8b3ee805, the release eca47332. The
+      // literal below was recomputed LAST per REMINT_COMMAND over the fully
+      // resolved tree, after the composite and after every renderer.ts byte was
+      // final. No capture was retaken.
+    ).toBe('18756e0a7dc5ccfe513fd7c5da4d2b37df39749f37afc0ca27044f2eea2ab46d');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

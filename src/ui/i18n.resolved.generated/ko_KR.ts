@@ -961,7 +961,8 @@ export const ko_KR: EnTranslations = {
       "durationUnitSeconds": "초",
       "durationUnitMinutes": "분",
       "durationUnitHours": "시",
-      "durationUnitDays": "일"
+      "durationUnitDays": "일",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "캐릭터 모델 미리보기"
@@ -1391,6 +1392,7 @@ export const ko_KR: EnTranslations = {
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 드레드스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_rickshaw_mount": "뼈에 묶인 인력거",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
       "desc_stalkglider_snail": "여행 속도를 높여 주는 끈질기고 느긋한 달팽이입니다.",
@@ -1399,7 +1401,8 @@ export const ko_KR: EnTranslations = {
       "desc_stormfeather_griffin": "룬 발톱으로 땅을 누비는 위엄 있는 폭풍 그리핀입니다. 날개는 접혀 있습니다.",
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
-      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다."
+      "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
     "mountTraining": {
       "mountPrompt": "{key} 키를 눌러 훈련용 발러스티드에 탑승한다.",
@@ -1569,6 +1572,7 @@ export const ko_KR: EnTranslations = {
       "playerFrameScale": "플레이어 프레임 크기",
       "targetFrameScale": "대상 프레임 크기",
       "aurasOnPlayerFrame": "버프를 플레이어 프레임에 표시",
+      "alwaysShowAllBuffs": "모든 버프를 항상 표시",
       "highContrastBackground": "고대비 배경",
       "startAttackOnAbility": "스킬 사용 시 자동 공격",
       "stopAutoAttackOnTargetSwitch": "대상 전환 시 자동 공격 중지",
@@ -1578,6 +1582,8 @@ export const ko_KR: EnTranslations = {
       "stickyTarget": "지면 클릭 시 대상 유지",
       "showItemLevel": "아이템 레벨 표시",
       "showReliquaryTracker": "성물고 추적기 표시",
+      "confirmVendorSell": "판매 전 확인",
+      "confirmVendorSellNote": "이 설정을 끄면 확인 없이 한 번의 클릭으로 아이템을 판매하므로, 가방 칸이 바뀌면 잘못된 아이템이 팔릴 수 있습니다.",
       "itemLevelLine": "아이템 레벨 {level}",
       "itemScoreLine": "점수 {score}",
       "showSecondaryActionBar": "보조 액션 바 표시",
@@ -1586,6 +1592,7 @@ export const ko_KR: EnTranslations = {
       "hideUnusedActionSlots": "사용하지 않는 행동 칸 숨기기",
       "lockActionBars": "액션 바 잠금",
       "showTargetOfTarget": "대상의 대상 표시",
+      "showTargetSwingTimer": "대상의 공격 타이머 표시",
       "showPetFrame": "내 펫 표시",
       "waterRipples": "수면 물결 (물살)",
       "showAttackButton": "공격 버튼 표시",
@@ -2166,6 +2173,12 @@ export const ko_KR: EnTranslations = {
         "few": "{count}초 남음",
         "many": "{count}초 남음",
         "other": "{count}초 남음"
+      },
+      "buffsHidden": {
+        "one": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "few": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "many": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다",
+        "other": "{count}개의 버프가 활성 상태이지만 그래픽 설정으로 아이콘이 숨겨져 있습니다"
       },
       "playtimeDays": {
         "one": "{count}일",
@@ -2980,11 +2993,11 @@ export const ko_KR: EnTranslations = {
         "actionBar2": "행동 단축바 2",
         "actionBar3": "행동 단축바 3",
         "steamWishlist": "찜 목록 알림",
-        "menu": "Menu",
+        "menu": "메뉴",
         "minimap": "미니맵",
         "stanceBar": "태세 바",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "경험치 바",
+        "chat": "채팅",
         "actionBarGroup": "액션 바",
         "playerFrame": "플레이어",
         "targetFrame": "대상",
@@ -3002,7 +3015,7 @@ export const ko_KR: EnTranslations = {
       "actionBar2Vertical": "액션 바 2 세로 배치",
       "actionBar3Vertical": "액션 바 3 세로 배치",
       "menuRailHorizontal": "메뉴 가로 배치",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "격자에 맞추기",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "크기 초기화",
       "resetFrameSizeFor": "{name} 크기 초기화",
@@ -4038,7 +4051,9 @@ export const ko_KR: EnTranslations = {
       "disenchant": "마력 추출",
       "salvage": "분해",
       "applyEnchant": "마법부여 적용",
-      "sunder": "가르기"
+      "sunder": "가르기",
+      "sell": "판매",
+      "sellAll": "모두 판매 ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item}의 마력을 추출했습니다.",
@@ -4596,6 +4611,10 @@ export const ko_KR: EnTranslations = {
       "loading": "거래소를 불러오는 중...",
       "loadFailed": "거래소에 연결할 수 없습니다. 잠시 후 다시 시도하세요.",
       "disabledRealm": "이 서버에서는 $WOC 거래소를 이용할 수 없습니다.",
+      "browserOnlyConfirmTitle": "브라우저에서 $WOC 거래소를 열까요?",
+      "browserOnlyConfirmBody": "$WOC 거래소는 World of ClaudeCraft의 브라우저 버전에서만 이용할 수 있습니다. 브라우저에서 World of ClaudeCraft를 엽니다. 그곳에서 로그인하고 거래소를 열 수 있습니다. 게임은 계속 실행됩니다.",
+      "browserOnlyConfirmOpen": "브라우저에서 열기",
+      "browserOnlyConfirmCancel": "취소",
       "pausedBanner": "거래가 일시 중지되었습니다. 경매 카운트다운은 계속됩니다. 새 등록, 입찰, 제안, 결제는 거래가 재개될 때까지 대기하지만, 이미 전송된 결제는 그대로 정산됩니다.",
       "walletLinkedDisconnected": "공개 주소가 연결되어 있습니다. $WOC로 결제하려면 해당 지갑 앱을 다시 연결하세요.",
       "walletLinkedConnected": "연결된 지갑 앱이 접속되어 $WOC로 결제할 준비가 되었습니다.",
@@ -4917,7 +4936,13 @@ export const ko_KR: EnTranslations = {
       "upstream": "Epic이 응답하지 않습니다. 잠시 후 다시 시도해 주세요."
     },
     "wallet": {
-      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요."
+      "handoff_invalid": "지갑 인증이 만료되었거나 확인할 수 없습니다. 다시 시도해 주세요.",
+      "reauth_required": "이 지갑 변경을 확인하려면 계정 비밀번호를 입력하세요.",
+      "reauth_two_factor": "이 계정은 2단계 인증이 활성화되어 있습니다. 확인하려면 인증 코드를 입력하세요.",
+      "reauth_no_password": "먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+      "reauth_bad_signature": "지갑 서명을 확인할 수 없습니다. 다시 시도하세요.",
+      "reauth_bad_password": "비밀번호가 올바르지 않습니다.",
+      "reauth_bad_two_factor": "코드가 올바르지 않습니다. 다시 시도하세요."
     },
     "ota_updates": {
       "invalid_input": "입력이 올바르지 않습니다."
@@ -5376,6 +5401,7 @@ export const ko_KR: EnTranslations = {
       "ifPartySort": "파티원을 나열하는 순서입니다. 파티 순서, 역할, 또는 이름 중에서 고릅니다.",
       "ifPartyShowAuras": "파티 프레임에 강화 효과와 약화 효과를 표시할지 정합니다. 자원 막대, 보호막, 소환수, 그리고 내 파티 목록에 나 자신이 나타날지에 대해서도 같은 방식의 스위치가 마련되어 있습니다.",
       "ifAurasOnPlayerFrame": "내 강화 효과와 약화 효과를 오라 막대뿐 아니라 내 유닛 프레임에도 표시합니다.",
+      "ifAlwaysShowAllBuffs": "낮음 그래픽 설정에서도 평소의 버프 아이콘 상한을 무시하고 활성화된 모든 버프를 표시합니다.",
       "ifTargetOfTarget": "내 대상이 누구를 노리고 있는지 보여 줍니다. 탱커가 아직 붙잡고 있는지 확인하는 클래식한 방법입니다.",
       "ifPetFrame": "소환수의 프레임을 표시합니다.",
       "ifChatFontScale": "채팅 글자 크기입니다.",
@@ -6583,6 +6609,9 @@ export const ko_KR: EnTranslations = {
       "effectFood": "먹으면 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
       "effectWellFed": "식사를 마치면 잘 먹음: {minutes}분간 {stat} +{value}.",
       "effectWellFedAura": "식사를 마치면 {minutes}분간 {aura} 효과를 얻습니다.",
+      "effectFeast": "다른 사람들이 먹을 수 있는 잔치를 차립니다. 1인 1인분: 총 {servings}인분, {minutes}분간 유지.",
+      "effectFeastServing": "1인분마다 {seconds}초에 걸쳐 생명력을 {amount} 회복합니다.",
+      "effectFeastWellFed": "1인분을 다 먹으면 잘 먹음: {minutes}분간 {stat} +{value}.",
       "sourceTrainerFee": "훈련사, {fee}",
       "sourceTrainerFree": "훈련사, 무료",
       "sourceKnown": "처음부터 습득",
@@ -6590,6 +6619,7 @@ export const ko_KR: EnTranslations = {
       "sourceVendor": "영웅 병참장교가 판매",
       "sourceDropAndVendor": "발견한 도안으로 습득, 또는 영웅 병참장교가 판매",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "없음",
       "colRecipe": "제조법",
       "colSkill": "기술",
       "colSource": "출처",
@@ -7917,6 +7947,13 @@ export const ko_KR: EnTranslations = {
     "unlink": "연결 해제",
     "unlinkTitle": "이 계정에서 지갑 인증 제거",
     "unlinkAria": "이 계정에서 지갑 인증 제거",
+    "reauthTitle": "지갑 변경 확인",
+    "reauthUnlinkTitle": "지갑 제거 확인",
+    "reauthHelp": "보안을 위해 이 변경을 승인하려면 계정 비밀번호를 입력하세요.",
+    "reauthNoPassword": "이 계정은 비밀번호 없이 로그인합니다. 먼저 계정 설정에서 비밀번호를 설정한 다음 다시 시도하세요.",
+    "reauthConfirm": "확인",
+    "reauthCancel": "취소",
+    "reauthClose": "닫기",
     "signOut": "연결 끊기",
     "signOutTitle": "이 브라우저에서 지갑 앱 연결 끊기",
     "signOutAria": "이 브라우저에서 지갑 앱 연결 끊기",
@@ -9621,6 +9658,8 @@ export const ko_KR: EnTranslations = {
       "soldJunkMany": "잡동사니 아이템 {count}개를 {money}에 팔았습니다.",
       "keptBoundOne": "귀속된 아이템 {count}개는 팔지 않고 남겼습니다.",
       "keptBoundMany": "귀속된 아이템 {count}개는 팔지 않고 남겼습니다.",
+      "keptLockedOne": "잠긴 아이템 {count}개는 팔지 않고 남겼습니다.",
+      "keptLockedMany": "잠긴 아이템 {count}개는 팔지 않고 남겼습니다.",
       "friendOnline": "{name}님이 접속했습니다.",
       "friendOffline": "{name}님이 접속을 종료했습니다."
     },
@@ -13479,6 +13518,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "드레드스파크 시동 열쇠"
+      },
+      "reins_rickshaw_mount": {
+        "name": "결속된 고삐: 뼈에 묶인 인력거"
       },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"

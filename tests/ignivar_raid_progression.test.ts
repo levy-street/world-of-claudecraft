@@ -60,7 +60,7 @@ function guardianMobs(sim: Sim) {
 }
 
 describe('Ignivar raid progression', () => {
-  it('authors an ordered raid family behind the Eastbrook walk-up door', () => {
+  it('authors an ordered raid family behind the keep forge-lift door', () => {
     expect(IGNIVAR_RAID_ROOM_IDS).toEqual([
       IGNIVAR_LIFT_ROOM_ID,
       IGNIVAR_FORGE_APPROACH_ID,
@@ -73,16 +73,15 @@ describe('Ignivar raid progression', () => {
     expect(ignivarPreviousRaidRoom(IGNIVAR_RAID_ARENA_ID)).toBe(IGNIVAR_FORGE_APPROACH_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_MOLTEN_ASSEMBLY_ID)).toBe(IGNIVAR_RAID_ARENA_ID);
     expect(ignivarPreviousRaidRoom(IGNIVAR_SECOND_WING_ID)).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
-    // The front room carries the family's walk-up door (the Eastbrook testing
-    // entrance, tests/ignivar_eastbrook_entrance.test.ts); the family stays
-    // off the Guide, and the deeper rooms stay interior-only below.
+    // The Halls are reached through the lift and stay interior-only. The raid
+    // family remains off the Guide.
     expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID]).toMatchObject({
       id: IGNIVAR_FORGE_APPROACH_ID,
       guideVisible: false,
       interior: 'ignivar_approach',
       suggestedPlayers: 10,
     });
-    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).not.toBe(false);
+    expect(DUNGEONS[IGNIVAR_FORGE_APPROACH_ID].overworldDoor).toBe(false);
     expect(INTERIOR_LAYOUTS.ignivar_approach).toBe(IGNIVAR_FORGE_APPROACH_LAYOUT);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMin).toBe(-58);
     expect(IGNIVAR_FORGE_APPROACH_LAYOUT.zMax).toBe(58);
@@ -95,10 +94,9 @@ describe('Ignivar raid progression', () => {
       suggestedPlayers: 10,
     });
     expect(DUNGEONS[IGNIVAR_MOLTEN_ASSEMBLY_ID].spawns).toHaveLength(9);
-    // The raid chain's own front door stands in the OVERWORLD, on the
-    // Forge-Lift: the keep facade's portal boards the lift (the raid's
-    // first room). The Halls additionally keep the Eastbrook walk-up
-    // testing door asserted above; the deeper rooms stay interior-only.
+    // The raid chain's only front door stands in the overworld, on the
+    // Forge-Lift: the keep facade's portal boards the lift first. Every room
+    // past it stays interior-only.
     expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].overworldDoor).toBeUndefined();
     expect(DUNGEONS[IGNIVAR_LIFT_ROOM_ID].doorPos).toMatchObject({ x: 503.05, z: 2243.7 });
     expect(DUNGEONS[IGNIVAR_RAID_ARENA_ID].overworldDoor).toBe(false);

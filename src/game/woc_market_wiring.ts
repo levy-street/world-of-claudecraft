@@ -8,6 +8,17 @@
 // live NATIVE_APP / DESKTOP_APP constants plus the live native and desktop
 // bridges while staying injectable so the gate is unit-testable without a
 // Capacitor or Electron host.
+//
+// A wrapped DESKTOP shell denied by that gate still gets a launcher:
+// attachWocMarketBrowserOnlyNotice reveals the SAME menu icon wired to the
+// browser hand-off (src/ui/woc_market_link.ts) instead of leaving it silently
+// hidden, which used to read as a missing feature rather than an out-of-scope
+// one. Capacitor NATIVE (iOS/Android) gets neither the real Exchange nor the
+// hand-off notice and stays exactly as silent as before: steering a
+// mobile-app-store build to an external real-money marketplace is the
+// anti-steering shape those stores restrict, and the PRD's counsel-gated
+// scope has not signed off on that. No Exchange UI, wallet code, or trading
+// flow attaches on a denied wrapped-shell path.
 import { DESKTOP_APP, NATIVE_APP } from '../client_origin';
 import type {
   DesktopWalletBrowserAction,
@@ -34,7 +45,11 @@ export interface WocMarketShell {
 }
 
 export interface WocMarketWiringDeps {
-  hud: { attachWocMarket(hooks: WocMarketHooks): void };
+  hud: {
+    attachWocMarket(hooks: WocMarketHooks): void;
+    /** Reveal the launcher on a wrapped DESKTOP shell, wired to the browser hand-off. */
+    attachWocMarketBrowserOnlyNotice?(): void;
+  };
   /** The live REST session: `token` is read at request time, `base` once. */
   api: { readonly token: string | null; readonly base: string };
   online: { readonly characterId: number };
@@ -76,8 +91,19 @@ export async function wocMarketAttachAllowed(shell: WocMarketShell): Promise<boo
   }
 }
 
+/** True for a wrapped DESKTOP shell only (Electron, Steam, the packaged
+ *  website build): the platform the reported bug covers. Capacitor native
+ *  (iOS/Android) gets neither the real Exchange NOR this hand-off launcher
+ *  (see the module header); a shell that is somehow both stays on the
+ *  conservative, fully-silent native side. */
+export function wocMarketBrowserHandoffAllowed(shell: WocMarketShell): boolean {
+  return shell.desktopApp && !shell.nativeApp;
+}
+
 /** Attach the $WOC Exchange hooks on browser web, verified Seeker Solana-store
- *  Android, and website-distributed desktop. Resolves to whether it attached. */
+ *  Android, and website-distributed desktop; reveal the browser-hand-off
+ *  launcher on a denied wrapped desktop shell. Resolves to whether the real
+ *  Exchange attached. */
 export async function attachWocMarketExchange(
   deps: WocMarketWiringDeps,
   shell: WocMarketShell = {
@@ -87,7 +113,10 @@ export async function attachWocMarketExchange(
     mobileBridge: NATIVE_APP ? nativeSolanaMobileBridge : null,
   },
 ): Promise<boolean> {
-  if (!(await wocMarketAttachAllowed(shell))) return false;
+  if (!(await wocMarketAttachAllowed(shell))) {
+    if (wocMarketBrowserHandoffAllowed(shell)) deps.hud.attachWocMarketBrowserOnlyNotice?.();
+    return false;
+  }
   const { api, online, wallet } = deps;
   deps.hud.attachWocMarket({
     client: new WocMarketClient({ token: () => api.token, base: api.base }),

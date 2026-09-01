@@ -796,33 +796,33 @@ export const tr_TR: EnTranslations = {
       "detach": "Görünümü Kaldır",
       "equipHint": "Bu görünümü uygulamak için bir {type} donatın.",
       "charter": {
-        "eyebrow": "Strongbox",
-        "title": "Strongbox Charters",
-        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
-        "grant": "Adds {slots} bank slots",
-        "buy": "Purchase Charter",
-        "buyAria": "Purchase {item}",
-        "confirmTitle": "Confirm Charter Purchase",
-        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "eyebrow": "Yaldızlı Kasa",
+        "title": "Kasa Beratları",
+        "scope": "Bir berat yalnızca bu karakterin bankasını genişletir. Veznedar aynı yuvaları altın karşılığında satar.",
+        "grant": "{slots} banka yuvası ekler",
+        "buy": "Berat Satın Al",
+        "buyAria": "{item} satın al",
+        "confirmTitle": "Berat Satın Almayı Onayla",
+        "confirmBody": "{cost} Claudium için {item} satın alınsın mı?",
         "resultContext": "{item} ({sku}): {message}",
-        "granted": "The charter was applied. The bank of this character is larger now.",
-        "alreadyGranted": "This charter is already on this character. You were not charged again.",
-        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
-        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
-        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
-        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
-        "notPurchasable": "This charter cannot be purchased right now.",
-        "noRoom": "The bank of this character has no room left for a charter.",
-        "noCharterFits": "No charter fits the room left in the bank of this character.",
-        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
-        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
-        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
-        "failed": "The purchase could not be completed.",
+        "granted": "Berat uygulandı. Bu karakterin bankası artık daha büyük.",
+        "alreadyGranted": "Bu berat zaten bu karakterde. Tekrar ücretlendirilmedin.",
+        "applyDeferred": "Ödeme tamamlandı. Yuvalar, bu karakter bir sonraki girişinde otomatik olarak uygulanır.",
+        "grantUnresolved": "Ödeme tamamlandı, ancak yuvalar henüz uygulanamadı. Satın alma kaydedildi ve destek ekibi bunu senin için tamamlayabilir.",
+        "inProgress": "Bu karakter için bir satın alma hâlâ tamamlanıyor. Birazdan tekrar dene.",
+        "doesNotFit": "Bu karakterin bankası bu beratın tam bağışına yer vermiyor.",
+        "notPurchasable": "Bu berat şu anda satın alınamaz.",
+        "noRoom": "Bu karakterin bankasında bir berat için yer kalmadı.",
+        "noCharterFits": "Bu karakterin bankasında kalan yere hiçbir berat sığmıyor.",
+        "someHiddenByFit": "Bu karakterin bankasında kalan yer için çok büyük olan beratlar gösterilmez.",
+        "outage": "Satın alma onaylanamadı. Bu düğmeyle tekrar dene, iki kez ücretlendirilmezsin. Önce oyunu yeniden yüklemek bu korumayı kaybettirebilir.",
+        "outageStale": "Mağazaya dön ve aynı Berat Satın Al eylemini tekrar kullan. İki kez ücretlendirilmezsin. Önce oyunu yeniden yüklemek bu korumayı kaybettirebilir.",
+        "failed": "Satın alma tamamlanamadı.",
         "names": {
-          "strongbox_charter_1": "Lesser Strongbox Charter",
-          "strongbox_charter_2": "Greater Strongbox Charter",
-          "strongbox_charter_3": "Grand Strongbox Charter",
-          "strongbox_charter_complete": "Complete Strongbox Charter"
+          "strongbox_charter_1": "Küçük Kasa Beratı",
+          "strongbox_charter_2": "Büyük Kasa Beratı",
+          "strongbox_charter_3": "Ulu Kasa Beratı",
+          "strongbox_charter_complete": "Tam Kasa Beratı"
         }
       }
     },
@@ -880,7 +880,7 @@ export const tr_TR: EnTranslations = {
       "reset": "Sıfırla",
       "presets": {
         "classic": "Klasik Altın",
-        "fancyGold": "Fancy Gold (WIP)",
+        "fancyGold": "Süslü Altın (Yapım Aşamasında)",
         "midnight": "Gece Yarısı",
         "parchment": "Parşömen",
         "highContrast": "Yüksek Kontrast"
@@ -961,7 +961,8 @@ export const tr_TR: EnTranslations = {
       "durationUnitSeconds": "sn",
       "durationUnitMinutes": "dk",
       "durationUnitHours": "sa",
-      "durationUnitDays": "g"
+      "durationUnitDays": "g",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Karakter Modeli Önizlemesi"
@@ -1357,11 +1358,11 @@ export const tr_TR: EnTranslations = {
       "reset": "Sıfırla",
       "done": "Bitti",
       "cancel": "İptal",
-      "showExtraBar": "Show Another Action Bar",
-      "hideExtraBar": "Hide an Action Bar",
-      "conflictTitle": "Key Already Bound",
-      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
-      "conflictAccept": "Rebind Anyway",
+      "showExtraBar": "Başka Bir Eylem Çubuğu Göster",
+      "hideExtraBar": "Bir Eylem Çubuğunu Gizle",
+      "conflictTitle": "Tuş Zaten Atanmış",
+      "conflictBody": "{key} tuşu zaten {other} eylemine atanmış. Onu {action} eylemine atamak {other} eylemini serbest bırakır.",
+      "conflictAccept": "Yine de Yeniden Ata",
       "resetConfirmTitle": "Eylem çubuğu tuşları sıfırlansın mı?",
       "resetConfirmBody": "İlk çubuk varsayılan tuşlarına döner. İkinci ve üçüncü çubukların tuş atamaları kaldırılır. Bu geri alınamaz."
     },
@@ -1391,6 +1392,7 @@ export const tr_TR: EnTranslations = {
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
+      "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
       "desc_stalkglider_snail": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve yavaş yanan bir salyangoz.",
@@ -1399,7 +1401,8 @@ export const tr_TR: EnTranslations = {
       "desc_stormfeather_griffin": "Rün nallı pençeleriyle yerde süzülen, kanatları katlı, asil bir fırtına grifonu.",
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
-      "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor."
+      "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
+      "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
     "mountTraining": {
       "mountPrompt": "Eğitim Yiğit Küheylanına binmek için {key} tuşuna bas.",
@@ -1569,6 +1572,7 @@ export const tr_TR: EnTranslations = {
       "playerFrameScale": "Oyuncu Çerçevesi Ölçeği",
       "targetFrameScale": "Hedef Çerçevesi Ölçeği",
       "aurasOnPlayerFrame": "Oyuncu Çerçevesinde Güçlendirmeler",
+      "alwaysShowAllBuffs": "Her Zaman Tüm Güçlendirmeleri Göster",
       "highContrastBackground": "Yüksek Kontrastlı Arka Plan",
       "startAttackOnAbility": "Yetenek Kullanımında Otomatik Saldırı",
       "stopAutoAttackOnTargetSwitch": "Hedef Değiştirince Otomatik Saldırıyı Durdur",
@@ -1578,22 +1582,25 @@ export const tr_TR: EnTranslations = {
       "stickyTarget": "Yere Tıklayınca Hedefi Koru",
       "showItemLevel": "Eşya Seviyesini Göster",
       "showReliquaryTracker": "Emanet Takibini Göster",
+      "confirmVendorSell": "Satmadan Önce Onayla",
+      "confirmVendorSellNote": "Bunu kapatmak eşyaları tek tıkla ve onaysız satar, bu yüzden kayan bir çanta yuvası yanlış eşyayı satıcıya satabilir.",
       "itemLevelLine": "Eşya Seviyesi {level}",
       "itemScoreLine": "Puan {score}",
       "showSecondaryActionBar": "İkincil Eylem Çubuğunu Göster",
       "showThirdActionBar": "Üçüncü Eylem Çubuğunu Göster",
-      "combineActionBars": "Combine Action Bars",
+      "combineActionBars": "Eylem Çubuklarını Birleştir",
       "hideUnusedActionSlots": "Kullanılmayan Eylem Alanlarını Gizle",
       "lockActionBars": "Eylem Çubuklarını Kilitle",
       "showTargetOfTarget": "Hedefin Hedefini Göster",
+      "showTargetSwingTimer": "Hedefin savurma zamanlayıcısını göster",
       "showPetFrame": "Yoldaşını Göster",
       "waterRipples": "Su Dalgacıkları (İz Dalgaları)",
       "showAttackButton": "Saldırı Düğmesini Göster",
       "showDailyRewardsChest": "Günlük Ödül Sandığını Göster",
       "mobileCameraJoystick": "Kamera joystick'i",
       "mobileLeftHanded": "Solak düzen",
-      "touchPreciseAim": "Precise Ground Targeting",
-      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
+      "touchPreciseAim": "Hassas Yer Hedeflemesi",
+      "touchPreciseAimNote": "Yere büyü yapmadan önce nişan al. Önerilen noktada anında büyü yapmak için kapat.",
       "touchTapMenus": "Dokunmatik menüler",
       "touchTapMenusNote": "Eylem, sarf malzemesi ve menü denetimlerini kaydırma yerine dokunarak aç. Kullanmak için bir ögeye dokun, olağan eylemi için denetime tekrar dokun, ya da kapatmak için dışarıya dokun."
     },
@@ -1629,7 +1636,7 @@ export const tr_TR: EnTranslations = {
       "invertY": "Kamerayı Ters Çevir (Y)",
       "deadzone": "Çubuk Ölü Bölgesi",
       "cameraSpeed": "Kamera Hızı",
-      "reticleSpeed": "Reticle Speed",
+      "reticleSpeed": "Nişangah Hızı",
       "vibration": "Titreşim",
       "buttons": "Tuş Düzeni",
       "resetButtons": "Tuş Düzenini Sıfırla",
@@ -2010,7 +2017,7 @@ export const tr_TR: EnTranslations = {
       "fromYour": "{value} {stat} değerinden:",
       "names": {
         "spellPower": "Büyü Gücü",
-        "healPower": "Healing Power",
+        "healPower": "İyileştirme Gücü",
         "critRating": "Kritik Puanı",
         "hasteRating": "Hız Puanı",
         "parry": "Karşılama",
@@ -2166,6 +2173,12 @@ export const tr_TR: EnTranslations = {
         "few": "{count} saniye kaldı",
         "many": "{count} saniye kaldı",
         "other": "{count} saniye kaldı"
+      },
+      "buffsHidden": {
+        "one": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "few": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "many": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli",
+        "other": "{count} güçlendirme daha etkin, ancak bu grafik ön ayarında gizli"
       },
       "playtimeDays": {
         "one": "{count} gün",
@@ -2501,9 +2514,9 @@ export const tr_TR: EnTranslations = {
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Boş çanta yuvası",
       "unequipHint": "Bu çantayı çıkarmak için tıkla",
-      "poolGeneral": "General: {used} of {total}",
-      "poolMaterials": "Materials: {used} of {total}",
-      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
+      "poolGeneral": "Genel: {used} / {total}",
+      "poolMaterials": "Malzemeler: {used} / {total}",
+      "capacityPoolsAria": "Kullanılan çanta yuvaları: {used} / {total}. Genel eşyalar: {generalUsed} / {generalTotal}. Malzemeler: {materialsUsed} / {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Akının yeniden gruba dönüştü.",
@@ -2517,179 +2530,179 @@ export const tr_TR: EnTranslations = {
       "mail": "Zincir"
     },
     "varkhulCallout": {
-      "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
-      "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
-      "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
-      "artificerApproaches": "A Cinder Artificer is approaching the forge!",
-      "leftPillar": "The left forge pillar ignites!",
-      "rightPillar": "The right forge pillar ignites!",
-      "bothPillars": "The forge pillars ignite!",
-      "portalsOpening": "The forge portals are opening!",
-      "heat75": "The forge is at 75% heat!",
-      "heat90": "Forge Meltdown is imminent!",
-      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!",
-      "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
-      "worldfireClosing": "Worldfire closes in. Move toward the center!",
-      "worldfireConsumed": "The entire crucible is burning!"
+      "leftPillarCharging": "Sol demirhane sütunu yükleniyor. 3 saniye içinde alev alacak!",
+      "rightPillarCharging": "Sağ demirhane sütunu yükleniyor. 3 saniye içinde alev alacak!",
+      "bothPillarsCharging": "Demirhane sütunları yükleniyor. 3 saniye içinde alev alacaklar!",
+      "artificerApproaches": "Bir Kor Zanaatkârı demirhaneye yaklaşıyor!",
+      "leftPillar": "Sol demirhane sütunu alev alıyor!",
+      "rightPillar": "Sağ demirhane sütunu alev alıyor!",
+      "bothPillars": "Demirhane sütunları alev alıyor!",
+      "portalsOpening": "Demirhane portalları açılıyor!",
+      "heat75": "Demirhane %75 ısıda!",
+      "heat90": "Demirhane Erimesi yakın!",
+      "addsDefeated": "Demirhane lejyonu yenildi: Varkhul açığa çıktı!",
+      "worldfireBegins": "Dünya Yangını odanın kenarında alevleniyor. Pota 42 saniye içinde tükenecek!",
+      "worldfireClosing": "Dünya Yangını yaklaşıyor. Merkeze doğru hareket edin!",
+      "worldfireConsumed": "Koca pota yanıyor!"
     },
-    "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "varkhulWaveStatus": "Dalga {wave}/{waves} | Düşmanlar: {remaining}",
     "raidBossGuide": {
-      "title": "Boss Guide",
-      "button": "Boss Guide: {boss}",
+      "title": "Patron Rehberi",
+      "button": "Patron Rehberi: {boss}",
       "subtitle": "{boss} | {difficulty}",
-      "close": "Close boss guide",
-      "bossesLabel": "Raid bosses",
-      "difficultyLabel": "Difficulty",
+      "close": "Patron rehberini kapat",
+      "bossesLabel": "Akın patronları",
+      "difficultyLabel": "Zorluk",
       "normal": "Normal",
-      "heroic": "Heroic",
-      "portraitAlt": "{boss} encounter portrait",
-      "overviewHeading": "Overview",
-      "abilitiesHeading": "Abilities",
-      "whatToDo": "What to do",
-      "whatToDoResponse": "What to do: {response}",
-      "rolesLabel": "Role responsibilities",
-      "flagsLabel": "Mechanic warnings",
+      "heroic": "Kahramanca",
+      "portraitAlt": "{boss} karşılaşma portresi",
+      "overviewHeading": "Genel Bakış",
+      "abilitiesHeading": "Yetenekler",
+      "whatToDo": "Ne yapmalı",
+      "whatToDoResponse": "Ne yapmalı: {response}",
+      "rolesLabel": "Rol sorumlulukları",
+      "flagsLabel": "Mekanik uyarıları",
       "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDamage": "Damage",
-      "roleAll": "All roles",
-      "flagDeadly": "Deadly",
-      "flagInterruptible": "Interruptible",
-      "flagImportant": "Important",
-      "flagCleansable": "Cleansable",
-      "browseBoss": "View {boss}",
-      "chooseDifficulty": "View {difficulty} mechanics",
-      "expandAbility": "Expand {ability}",
-      "collapseAbility": "Collapse {ability}",
+      "roleHealer": "Şifacı",
+      "roleDamage": "Hasar",
+      "roleAll": "Tüm roller",
+      "flagDeadly": "Ölümcül",
+      "flagInterruptible": "Kesilebilir",
+      "flagImportant": "Önemli",
+      "flagCleansable": "Arındırılabilir",
+      "browseBoss": "{boss} görüntüle",
+      "chooseDifficulty": "{difficulty} mekaniklerini görüntüle",
+      "expandAbility": "{ability} yeteneğini genişlet",
+      "collapseAbility": "{ability} yeteneğini daralt",
       "abilityControlLabel": "{action}. {details}",
       "tooltipMeta": "{phase} | {difficulty}",
       "ignivar": {
-        "overview": "Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.",
-        "phaseOpeningName": "The Herald Awakens",
-        "phaseOpeningSummary": "Control Brand of the Pyre with the water conduits while handling Ignivar's repeating frontal, skyfire, rotating rays, and expanding Forge Wave.",
-        "phaseApocalypseName": "Intermission: Apocalypse",
-        "phaseApocalypseSummary": "At {health} health, Ignivar calls an Ashcaller that attempts to end the encounter.",
-        "phaseJudgmentName": "Judgment of the Forge",
-        "phaseJudgmentSummary": "At {health} health, Ignivar ignites the arena and reveals one safe refuge among three shelters.",
-        "phaseJudgmentHeroicSummary": "At {health} health, Ignivar ignites the arena while active Brands continue to threaten nearby players inside the refuge.",
-        "phaseFinaleName": "Finale: Last Inferno",
-        "phaseFinaleSummary": "At {health} health, Ignivar begins a final burn phase with a hard deadline and faster repeating mechanics.",
-        "forgeStrikeName": "Forge Strike",
-        "forgeStrikeSummary": "Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar.",
-        "forgeStrikeResponse": "Tanks swap at {stacks} stacks. Healers prepare for the strike and the new tank's first melee swings.",
-        "brandName": "Brand of the Pyre",
-        "brandSummary": "Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies.",
-        "brandResponse": "Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse.",
-        "brandHeroicResponse": "Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash.",
-        "searingTorrentName": "Searing Torrent",
-        "searingTorrentSummary": "Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
-        "searingTorrentHeroicSummary": "Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
-        "searingTorrentResponse": "Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes.",
-        "rainName": "Rain of Cinders",
-        "rainSummary": "Three fire sectors and marked meteor impacts punish players who remain inside their warnings.",
-        "rainHeroicSummary": "Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings.",
-        "rainResponse": "Move into an unmarked gap and leave every meteor circle before impact.",
-        "raysName": "Revolving Inferno",
-        "raysSummary": "Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them.",
-        "raysHeroicSummary": "Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact.",
-        "raysResponse": "Move with the open space between rays. Do not cut through a ray, even with a fast movement ability.",
-        "forgeWaveName": "Forge Wave",
-        "forgeWaveSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits.",
-        "forgeWaveHeroicSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther.",
-        "forgeWaveResponse": "Find either gap during the windup, align with it, and avoid being knocked toward the arena edge.",
-        "apocalypseName": "Apocalypse",
-        "apocalypseSummary": "Ignivar summons an Ashcaller. If the add finishes Apocalypse, the raid is defeated immediately.",
-        "apocalypseResponse": "Switch all available damage to the Ignivar Ashcaller and defeat it before the cast completes.",
-        "judgmentName": "Judgment of the Forge",
-        "judgmentSummary": "Ignivar marks three shelters, identifies one safe refuge, and then repeatedly burns the rest of the arena.",
-        "judgmentHeroicSummary": "Ignivar marks one safe refuge while the arena burns. Brand of the Pyre remains active and still damages nearby allies.",
-        "judgmentResponse": "Identify the uniquely marked refuge during the warning and stack fully inside its boundary before the floor ignites.",
-        "chainsName": "Chains of the Forge",
-        "chainsSummary": "Ignivar links nearby pairs. Separating too far or crossing another pair's chain causes lethal damage.",
-        "chainsResponse": "Stay close to your linked partner, move together, and keep every other player from passing through your chain.",
-        "lastInfernoName": "Last Inferno",
-        "lastInfernoSummary": "Ignivar enrages and prepares a hard wipe while Rain of Cinders, Searing Torrent, and Revolving Inferno accelerate.",
-        "lastInfernoResponse": "Use remaining damage and healing cooldowns, keep executing the movement mechanics, and defeat Ignivar before the countdown ends.",
-        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
-        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
-        "apocalypse": "Apocalypse: kill Ignivar Ashcaller before its cast completes.",
-        "judgment": "Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
-        "finale": "Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.",
-        "heroic": "Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther."
+        "overview": "Varkhul, Ignivar'ı bir haberci, yaşayan bir mühür ve Inner Crucible'ın anahtarı olarak dövdü. Bu karşılaşma su kanalı kontrolünü, hassas hareketi ve hızlı öncelik hasarını sınar.",
+        "phaseOpeningName": "Haberci Uyanıyor",
+        "phaseOpeningSummary": "Ignivar'ın tekrarlayan önden saldırısını, gökten düşen ateşi, dönen ışınlarını ve genişleyen Demirhane Dalgasını idare ederken Alaz Damgasını su kanallarıyla kontrol et.",
+        "phaseApocalypseName": "Ara Bölüm: Kıyamet",
+        "phaseApocalypseSummary": "{health} canda, Ignivar karşılaşmayı bitirmeye çalışan bir Kül Çağırıcı çağırır.",
+        "phaseJudgmentName": "Demirhanenin Yargısı",
+        "phaseJudgmentSummary": "{health} canda, Ignivar arenayı ateşe verir ve üç sığınaktan birini güvenli sığınak olarak ortaya çıkarır.",
+        "phaseJudgmentHeroicSummary": "{health} canda, Ignivar arenayı ateşe verirken etkin Damgalar sığınak içindeki yakın oyuncuları tehdit etmeye devam eder.",
+        "phaseFinaleName": "Final: Son Alev",
+        "phaseFinaleSummary": "{health} canda, Ignivar kesin bir son tarihi olan ve daha hızlı tekrarlayan mekanikler içeren son bir yanma evresine başlar.",
+        "forgeStrikeName": "Demirhane Darbesi",
+        "forgeStrikeSummary": "Ignivar mevcut tankına vurur ve Ignivar'dan alınan hasarı artıran Ergimiş Zırh uygular.",
+        "forgeStrikeResponse": "Tanklar {stacks} yığında değişim yapar. Şifacılar darbeye ve yeni tankın ilk yakın dövüş vuruşlarına hazırlansın.",
+        "brandName": "Alaz Damgası",
+        "brandSummary": "Ignivar, tank olmayan oyuncuları sürekli ateş hasarıyla işaretler. Damgalanan oyuncular yakındaki müttefikleri de yakar.",
+        "brandResponse": "Dağılın. Yakıcı Seli hazır bir su kanalına nişanlayın, sonra her işaretli oyuncunun arınmak için etkinleşen suyu tek başına geçmesini sağlayın.",
+        "brandHeroicResponse": "Dağılın. Yakıcı Sel ile bir kanal açın ve her seferinde tek bir işaretli oyuncuyu arındırın. Her arınma akın genelinde Arınma Tepkisini tetikler.",
+        "searingTorrentName": "Yakıcı Sel",
+        "searingTorrentSummary": "Ignivar bir oyuncuyu izler, ardından geniş önden bir patlama salar. Patlamanın vurduğu hazır bir su kanalı kısa bir süreliğine etkinleşir.",
+        "searingTorrentHeroicSummary": "Ignivar bir oyuncuyu izler, ardından neredeyse ölümcül önden bir patlama salar. Patlamanın vurduğu hazır bir su kanalı kısa bir süreliğine etkinleşir.",
+        "searingTorrentResponse": "Uyarıyı tam olarak bir hazır kanaldan geçirerek nişanla. Diğer herkes büyü tamamlanmadan önden saldırı alanını terk etsin.",
+        "rainName": "Kor Yağmuru",
+        "rainSummary": "Üç ateş dilimi ve işaretli göktaşı çarpmaları, uyarılarının içinde kalan oyuncuları cezalandırır.",
+        "rainHeroicSummary": "Üç ateş dilimi ve işaretli göktaşı çarpmaları, uyarılarının içinde kalan oyunculara aşırı hasar verir.",
+        "rainResponse": "İşaretlenmemiş bir boşluğa geç ve çarpmadan önce her göktaşı çemberini terk et.",
+        "raysName": "Dönen Alev",
+        "raysSummary": "Dönen ateş ışınları Ignivar'ın etrafını süpürür ve onlara dokunan oyunculara tekrar tekrar hasar verir.",
+        "raysHeroicSummary": "Dönen ateş ışınları Ignivar'ın etrafını süpürür ve temas hâlinde şiddetli, tekrarlanan hasar verir.",
+        "raysResponse": "Işınlar arasındaki açık alanla birlikte hareket et. Hızlı bir hareket yeteneğiyle bile bir ışının içinden geçme.",
+        "forgeWaveName": "Demirhane Dalgası",
+        "forgeWaveSummary": "Genişleyen bir ateş duvarı arenayı boydan boya kat eder, karşılıklı iki boşluk bırakır ve vurduğu oyuncuları geri savurur.",
+        "forgeWaveHeroicSummary": "Genişleyen bir ateş duvarı arenayı boydan boya kat eder, karşılıklı iki boşluk bırakır ve vurulan oyuncuları çok daha uzağa savurur.",
+        "forgeWaveResponse": "Hazırlık sırasında iki boşluktan birini bul, onunla hizalan ve arena kenarına doğru savrulmaktan kaçın.",
+        "apocalypseName": "Kıyamet",
+        "apocalypseSummary": "Ignivar bir Kül Çağırıcı çağırır. Ek canavar Kıyameti tamamlarsa akın anında yenilir.",
+        "apocalypseResponse": "Tüm mevcut hasarı Ignivar Kül Çağırıcısına yönlendir ve büyü tamamlanmadan onu alt et.",
+        "judgmentName": "Demirhanenin Yargısı",
+        "judgmentSummary": "Ignivar üç sığınak işaretler, birini güvenli sığınak olarak belirler, ardından arenanın geri kalanını tekrar tekrar yakar.",
+        "judgmentHeroicSummary": "Arena yanarken Ignivar tek bir güvenli sığınak işaretler. Alaz Damgası etkin kalmaya devam eder ve yakındaki müttefiklere hâlâ hasar verir.",
+        "judgmentResponse": "Uyarı sırasında benzersiz şekilde işaretlenmiş sığınağı belirle ve zemin alev almadan önce sınırının tamamen içinde topla.",
+        "chainsName": "Demirhanenin Zincirleri",
+        "chainsSummary": "Ignivar yakındaki çiftleri birbirine bağlar. Çok fazla uzaklaşmak ya da başka bir çiftin zincirinden geçmek ölümcül hasara yol açar.",
+        "chainsResponse": "Bağlı olduğun ortağına yakın kal, birlikte hareket edin ve diğer tüm oyuncuların zincirinizin içinden geçmesini engelleyin.",
+        "lastInfernoName": "Son Alev",
+        "lastInfernoSummary": "Kor Yağmuru, Yakıcı Sel ve Dönen Alev hızlanırken Ignivar öfkelenir ve kesin bir akın silinmesine hazırlanır.",
+        "lastInfernoResponse": "Kalan hasar ve iyileştirme bekleme sürelerini kullan, hareket mekaniklerini uygulamaya devam et ve geri sayım bitmeden Ignivar'ı alt et.",
+        "brand": "Alaz Damgası: dağılın. Yakıcı Seli hazır bir su kanalına nişanlayın, sonra arınmak için suyu tek başına geçin.",
+        "movement": "Hareket: Kor Yağmuru konilerinden ve göktaşlarından kaçın, Dönen Alev ile birlikte hareket edin ve Demirhane Dalgasının iki boşluğunu kullanın.",
+        "apocalypse": "Kıyamet: Ignivar Kül Çağırıcısını büyüsü tamamlanmadan öldür.",
+        "judgment": "Demirhanenin Yargısı: uyarı sırasında tek sığınağı belirle, ardından zemin alev aldığında işaretli sınırının içinde topla.",
+        "finale": "Son Alev: daha hızlı göktaşları, önden saldırılar ve Dönen Alev devam ederken kesin akın silinmesinden önce Ignivar'ı bitir.",
+        "heroic": "Kahramanca: Demirhanenin Zincirleri sırasında eşleşen oyuncular yakın kalır, Yargı içinde Damga etkin kalmaya devam eder ve Demirhane Dalgası daha uzağa iter."
       },
       "varkhul": {
-        "overview": "Varkhul imprisoned the dying Last Spring to forge living metal, then created Ignivar to guard the crime. His encounter combines personal positioning with raid-wide control of the grand forge.",
-        "phaseOpeningName": "The Forgefather",
-        "phaseOpeningSummary": "Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.",
-        "phaseAssemblyName": "Intermission: The Master's Assembly",
-        "phaseAssemblySummary": "At {health} health, Varkhul becomes protected while his forge legion enters through portals and the pillar beams threaten a Forge Meltdown.",
-        "phaseFinaleName": "Finale: Masterpiece Unbound",
-        "phaseFinaleSummary": "At {health} health, Varkhul attacks faster, deals more damage, and pulses fire through the raid until the final deadline.",
-        "phaseFinaleHeroicSummary": "At {health} health, Varkhul abandons most earlier mechanics as Worldfire closes inward and consumes the crucible.",
-        "makersBrandName": "Maker's Brand",
-        "makersBrandSummary": "Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him.",
-        "makersBrandResponse": "Tanks swap at {stacks} stacks. Healers prepare the incoming tank before Varkhul changes targets.",
-        "frontalName": "Forgefather's Sweep",
-        "frontalSummary": "Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him.",
-        "frontalHeroicSummary": "Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him.",
-        "frontalResponse": "Keep Varkhul facing away from the group and move behind him as soon as the warning appears.",
-        "orbsName": "Cinder Orbs",
-        "orbsSummary": "Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
-        "orbsHeroicSummary": "Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
-        "orbsResponse": "Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly.",
-        "pyreName": "Shared Pyre",
-        "pyreSummary": "A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals {missingPenalty} maximum-health damage to the entire raid.",
-        "pyreHeroicSummary": "A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals {missingPenalty} maximum-health damage to the entire raid.",
-        "pyreResponse": "Stack at least {players} players inside the circle and move with its target until the cast resolves.",
-        "forgestormName": "Forgestorm",
-        "forgestormSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts across the arena.",
-        "forgestormHeroicSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts that deal extreme damage.",
-        "forgestormResponse": "Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave.",
-        "rayName": "Tempering Ray",
-        "raySummary": "A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound.",
-        "rayResponse": "Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active.",
-        "anvilName": "Anvil's Decree",
-        "anvilSummary": "Varkhul walks to the grand forge and strikes it {strikes} times, dealing increasing raid-wide damage.",
-        "anvilHeroicSummary": "Varkhul strikes the grand forge {strikes} times for increasing raid damage while marked meteors fall on players.",
-        "anvilResponse": "Group for raid healing and use defensive cooldowns for the final strike.",
-        "anvilHeroicResponse": "Spread marked meteors away from the group while healers and defensive cooldowns cover all {strikes} strikes.",
-        "assemblyName": "The Master's Assembly",
-        "assemblySummary": "Varkhul becomes protected and starts a timed assembly. The raid must defeat every portal wave before the forge completes his masterpiece.",
-        "assemblyResponse": "Split attention between beam control and priority adds. Defeat the full forge legion before the assembly timer expires.",
-        "beamName": "Crucible Beam",
-        "beamSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, while blocked and inactive beams let heat fall.",
-        "beamHeroicSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, and forge heat never decreases.",
-        "beamResponse": "Stand between each active pillar and the forge, then rotate blockers before exposure becomes dangerous. Reaching full heat causes a lethal Forge Meltdown.",
-        "legionName": "Forge Legion",
-        "legionSummary": "Crucible Wardens cast Crucible Quake to add forge heat, while Cinder Artificers use Repair Protocol to heal Varkhul.",
-        "legionResponse": "Interrupt Crucible Quake, stop Repair Protocol, and focus each dangerous caster before clearing the remaining adds.",
-        "masterpieceName": "Masterpiece Unbound",
-        "masterpieceSummary": "Varkhul attacks faster, deals more damage, and repeatedly burns the raid until the final wipe.",
-        "masterpieceHeroicSummary": "Varkhul attacks faster and deals more damage while Worldfire replaces most earlier mechanics for the final burn.",
-        "masterpieceResponse": "Commit remaining offensive and defensive cooldowns and defeat Varkhul before the final countdown ends.",
-        "worldfireName": "Worldfire",
-        "worldfireSummary": "On Heroic, fire advances from the arena edge toward the center in stages until the entire crucible burns.",
-        "worldfireResponse": "Move inward ahead of each advancing fire band, preserve the shrinking safe space, and finish Varkhul before the center ignites.",
-        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
-        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.",
-        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.",
-        "forgestorm": "Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.",
-        "anvil": "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
-        "ray": "Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.",
-        "forge": "Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.",
-        "assembly": "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
-        "worldfire": "Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.",
-        "heroic": "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire."
+        "overview": "Varkhul, yaşayan metal dövmek için can çekişen Last Spring'i hapsetti, ardından bu suçu korumak için Ignivar'ı yarattı. Onun karşılaşması kişisel konumlanmayı büyük demirhanenin akın geneli kontrolüyle birleştirir.",
+        "phaseOpeningName": "Demirci Atası",
+        "phaseOpeningSummary": "Varkhul; tank baskısı, geniş önden saldırılar, hareket eden mermiler, grup soğurmaları, göktaşı dalgaları ve büyük örsten saldırılar arasında döngü yapar.",
+        "phaseAssemblyName": "Ara Bölüm: Ustanın Meclisi",
+        "phaseAssemblySummary": "{health} canda, demirhane lejyonu portallardan girerken ve sütun ışınları bir Demirhane Erimesiyle tehdit ederken Varkhul korunmaya girer.",
+        "phaseFinaleName": "Final: Başıboş Şaheser",
+        "phaseFinaleSummary": "{health} canda, Varkhul daha hızlı saldırır, daha fazla hasar verir ve son süre dolana kadar akın boyunca ateş dalgaları yayar.",
+        "phaseFinaleHeroicSummary": "{health} canda, Dünya Yangını içe doğru kapanıp potayı tüketirken Varkhul önceki mekaniklerin çoğunu terk eder.",
+        "makersBrandName": "Ustanın Damgası",
+        "makersBrandSummary": "Varkhul mevcut tankına vurur ve ondan alınan tüm hasarı artıran, yığılan bir etki uygular.",
+        "makersBrandResponse": "Tanklar {stacks} yığında değişim yapar. Şifacılar, Varkhul hedef değiştirmeden önce gelen tanka hazırlansın.",
+        "frontalName": "Demirci Atasının Savurması",
+        "frontalSummary": "Varkhul, önündeki herkese ağır ateş hasarı veren çok geniş önden bir savuruş salar.",
+        "frontalHeroicSummary": "Varkhul, önündeki herkese neredeyse ölümcül ateş hasarı veren çok geniş önden bir savuruş salar.",
+        "frontalResponse": "Varkhul'u gruptan uzağa baktır ve uyarı belirir belirmez arkasına geç.",
+        "orbsName": "Kor Küreleri",
+        "orbsSummary": "İşaretli tank olmayanlar kalıcı kor gölcükleri bırakır ve her yöne ateş küreleri salar. Kızgın Metal ayrıca gelen iyileştirmeyi emer.",
+        "orbsHeroicSummary": "İşaretli tank olmayanlar, yüksek hasarlı kalıcı kor gölcükleri bırakır ve her yöne tehlikeli ateş küreleri salar. Kızgın Metal ayrıca gelen iyileştirmeyi emer.",
+        "orbsResponse": "Her işareti odanın kenarına taşı, gölcükleri birbirinden ayır, ardından küreler arenayı geçerken onlardan kaç. Şifacılar emilimi hızlıca temizlesin.",
+        "pyreName": "Paylaşılan Alaz",
+        "pyreSummary": "Hareket eden bir çember, Kızgın Metali olmayan bir oyuncuyu takip eder. Hasarı içindeki oyuncular arasında bölünür ve eksik her oyuncu tüm akına {missingPenalty} azami can hasarı verir.",
+        "pyreHeroicSummary": "Hareket eden bir çember, Kızgın Metali olmayan bir oyuncuyu takip eder ve daha büyük bir vuruşu böler. Eksik her oyuncu ayrıca tüm akına {missingPenalty} azami can hasarı verir.",
+        "pyreResponse": "Çemberin içinde en az {players} oyuncu toplayın ve büyü sonuçlanana kadar hedefiyle birlikte hareket edin.",
+        "forgestormName": "Demirhane Fırtınası",
+        "forgestormSummary": "Varkhul, arena genelinde işaretli göktaşı çarpmalarının {waves} ardışık dalgasını çağırır.",
+        "forgestormHeroicSummary": "Varkhul, aşırı hasar veren işaretli göktaşı çarpmalarının {waves} ardışık dalgasını çağırır.",
+        "forgestormResponse": "Her yeni yer uyarısı setini izle ve o dalga inmeden önce oradan uzaklaş. Bir sonraki dalgayı kontrol etmeden önceki konuma dönme.",
+        "rayName": "Tavlama Işını",
+        "raySummary": "Bir ışın, uzun bir hazırlık boyunca işaretli bir oyuncuyu izler. Varkhul ile hedef arasındaki ilk diğer oyuncu vuruşu karşılar ve Tavlanmış Yara alır.",
+        "rayResponse": "Genellikle yardımcı tank olan sağlıklı bir oyuncuyu çizgiye girmesi için görevlendir. Diğer oyuncuları dışarıda tut ve Tavlanmış Yara etkinken karşılayanları değiştir.",
+        "anvilName": "Örsün Fermanı",
+        "anvilSummary": "Varkhul büyük demirhaneye yürür ve artan akın geneli hasar vererek ona {strikes} kez vurur.",
+        "anvilHeroicSummary": "İşaretli göktaşları oyuncuların üzerine düşerken Varkhul büyük demirhaneye artan akın hasarı için {strikes} kez vurur.",
+        "anvilResponse": "Akın iyileştirmesi için toplanın ve son darbe için savunma bekleme sürelerini kullanın.",
+        "anvilHeroicResponse": "Şifacılar ve savunma bekleme süreleri tüm {strikes} darbeyi karşılarken işaretli göktaşlarını gruptan uzağa dağıtın.",
+        "assemblyName": "Ustanın Meclisi",
+        "assemblySummary": "Varkhul korunmaya girer ve zamanlanmış bir meclis başlatır. Demirhane şaheserini tamamlamadan önce akın her portal dalgasını alt etmelidir.",
+        "assemblyResponse": "Dikkati ışın kontrolü ile öncelikli ek canavarlar arasında paylaştır. Meclis zamanlayıcısı bitmeden tüm demirhane lejyonunu alt et.",
+        "beamName": "Pota Işını",
+        "beamSummary": "Bir oyuncu engellemedikçe etkin sütun ışınları demirhaneyi ısıtır. Engelleyenler Pota Maruziyetinden artan hasar alır, engellenen ve etkin olmayan ışınlar ise ısının düşmesine izin verir.",
+        "beamHeroicSummary": "Bir oyuncu engellemedikçe etkin sütun ışınları demirhaneyi ısıtır. Engelleyenler Pota Maruziyetinden artan hasar alır ve demirhane ısısı asla azalmaz.",
+        "beamResponse": "Her etkin sütun ile demirhane arasında dur, ardından maruziyet tehlikeli hale gelmeden önce engelleyicileri değiştir. Tam ısıya ulaşmak ölümcül bir Demirhane Erimesine yol açar.",
+        "legionName": "Demirhane Lejyonu",
+        "legionSummary": "Pota Muhafızları demirhane ısısını artırmak için Pota Depremi büyüsü yaparken Kor Zanaatkârları Varkhul'u iyileştirmek için Onarım Protokolünü kullanır.",
+        "legionResponse": "Pota Depremini kes, Onarım Protokolünü durdur ve kalan ek canavarları temizlemeden önce her tehlikeli büyücüye odaklan.",
+        "masterpieceName": "Başıboş Şaheser",
+        "masterpieceSummary": "Varkhul daha hızlı saldırır, daha fazla hasar verir ve son silinmeye kadar akını tekrar tekrar yakar.",
+        "masterpieceHeroicSummary": "Dünya Yangını son yanma için önceki mekaniklerin çoğunun yerini alırken Varkhul daha hızlı saldırır ve daha fazla hasar verir.",
+        "masterpieceResponse": "Kalan saldırı ve savunma bekleme sürelerini kullan ve son geri sayım bitmeden Varkhul'u alt et.",
+        "worldfireName": "Dünya Yangını",
+        "worldfireSummary": "Kahramanca'da, koca pota tümüyle yanana kadar ateş, arena kenarından merkeze doğru aşama aşama ilerler.",
+        "worldfireResponse": "Her ilerleyen ateş şeridinin önünde içe doğru hareket et, küçülen güvenli alanı koru ve merkez alev almadan Varkhul'u bitir.",
+        "tanks": "Tanklar: Ustanın Damgasının iki yığınında değişim yapın ve Varkhul'u yakın dövüş menzilinde tutun.",
+        "orbs": "Kor Küreleri: işaretli oyuncular odanın kenarına dağılır. Ateş gölcükleri kalıcıdır ve salınan küreler odayı boydan boya geçer.",
+        "pyre": "Paylaşılan Alaz: yalnızca Kızgın Metali olmayan bir oyuncu seçilir. Her iki zorlukta da hareket eden çemberin içinde dört oyuncu toplanın. Eksik her oyuncu tüm akına azami canın %15'i kadar hasar verir.",
+        "forgestorm": "Demirhane Fırtınası: düşen göktaşlarını izleyin ve üç dalganın her biri inmeden önce her işaretli çarpma noktasını terk edin.",
+        "anvil": "Örsün Fermanı: Varkhul büyük demirhaneye gider ve akın hasarı için ona üç kez vurur. Kahramanca'da ayrıca işaretli göktaşları düşer.",
+        "ray": "Tavlama Işını: genellikle bir tank olan başka bir oyuncu, uzun hazırlık bitmeden önce hareket eden çizgiyi karşılar. Vurulan oyuncu Tavlanmış Yara alır.",
+        "forge": "Demirhane sütunları: etkin ışınları demirhaneye ulaşmadan engelleyin ve Pota Maruziyeti arttıkça engelleyicileri değiştirin. Dolu bir ısı göstergesi Demirhane Erimesine yol açar.",
+        "assembly": "Ustanın Meclisi: her iki demirhane ışınını engelleyin, her portal dalgasını öldürün, Pota Depremini kesintiye uğratın ve Kor Zanaatkârlarının Varkhul'u iyileştirmesini durdurun.",
+        "worldfire": "Dünya Yangını: Kahramanca'da, yanan kenar son evre boyunca merkeze doğru kapanır. Koca pota tümüyle yanmadan Varkhul'u alt et.",
+        "heroic": "Kahramanca: demirhane ısısı asla soğumaz, Örsün Fermanı göktaşları ekler ve son evre, Dünya Yangınına odaklanmak için mekaniklerin çoğunu kaldırır."
       }
     },
     "auraEffect": {
-      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
-      "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
-      "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
+      "sharedPyre": "Her oyuncunun azami canının %{total} kadarını, çemberin içindeki oyuncu sayısına bölerek verir ({players} oyuncuyla her birine %{perPlayer}).",
+      "varkhulSharedPyre": "Her oyuncunun azami canının %{total} kadarını, çemberin içindeki oyuncular arasında bölerek verir ({players} oyuncuyla her birine %{perPlayer}). Eksik her oyuncu ayrıca, çemberin içindekiler dahil tüm akına azami canın %{missingPenalty} kadarı hasar verir.",
+      "makersBrand": "{duration} sn boyunca her yığın, Varkhul'dan alınan hasarı %{pct} artırır. En fazla {max} kez yığılır. Tanklar {swap} yığında değişim yapmalı.",
+      "varkhulSentinelsGaze": "Kor Nöbetçisi seni kovalıyor. Yok edilene kadar onu akından uzak tut.",
+      "varkhulMoltenCore": "Bu çekirdeği demirhaneye taşı. Ergimiş Yük, her {interval} sn'de azami canın %{min} ila %{max} arasında artan hasar verir.",
+      "varkhulForgeLink": "Etkin bir sütun ışınını demirhaneye ulaşmadan önce durdur. Açık ışınlar saniyede %6 ısı ekler. Normal'de engellenen ışınlar ve etkin olmayan sütunlar demirhaneyi soğutur; Kahramanca'da ısı hiç düşmez. %100'de demirhane ölümcül bir Erime yaşar.",
+      "varkhulCrucibleExposure": "Bir Pota Işınını engellemek, her saniye artan azami can hasarı verir. Yığınlar Normal'de bir ışından ayrıldıktan 10 saniye sonra, Kahramanca'da ise 60 saniye sonra sıfırlanır.",
       "dot": "Her {interval} sn {value} {school} hasarı verir",
       "hot": "Her {interval} sn {value} sağlık yeniler",
       "mendingCurrent": "{value} iyileştirme biriktirir; zamanla salınır veya Şelale Onarımı tarafından tüketilir",
@@ -2901,8 +2914,8 @@ export const tr_TR: EnTranslations = {
       "takeLootButton": "Yağmayı Al",
       "takeLootTooltip": "Altınları ve düşen eşyaları alır. Toplama hakkını kullanmaz.",
       "unifiedPressHint": "Etkileşim tuşu, kasaba odağınızı kullanarak tek tuşla yağmalar ve toplar.",
-      "bindConfirmTitle": "Binds when picked up",
-      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
+      "bindConfirmTitle": "Alındığında bağlanır",
+      "bindConfirmBody": "Bu ganimet, alındığında sana bağlanacak bir eşya içeriyor. Bağlı bir eşya yalnızca düşüşünü paylaşan oyunculara ve yalnızca sınırlı bir süre için takas edilebilir."
     },
     "spellbook": {
       "addToBarAria": "{name} yeteneğini eylem çubuğuna ekle",
@@ -2934,7 +2947,7 @@ export const tr_TR: EnTranslations = {
     },
     "partyFrames": {
       "section": "Grup ve Akın Çerçeveleri",
-      "optionsSection": "Party Frame Options",
+      "optionsSection": "Grup Çerçevesi Seçenekleri",
       "unlock": "Grup ve akın çerçevelerini taşı",
       "lock": "Grup ve akın çerçevelerini kilitle",
       "style": "Çerçeve Stili",
@@ -2966,60 +2979,60 @@ export const tr_TR: EnTranslations = {
       "label": "Çerçeve Konumlarını Sıfırla"
     },
     "interfaceUnlock": {
-      "label": "Edit Frames",
-      "unlock": "Unlock interface",
-      "lock": "Lock interface",
-      "lockAll": "Lock Interface",
-      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
-      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
-      "unlockFrame": "Unlock this frame",
-      "lockFrame": "Lock this frame",
-      "resizeFrame": "Resize this frame",
+      "label": "Çerçeveleri Düzenle",
+      "unlock": "Arayüzün kilidini aç",
+      "lock": "Arayüzü kilitle",
+      "lockAll": "Arayüzü Kilitle",
+      "barsNote": "Düzenlerken yalnızca açtığın eylem çubukları görünür. Daha fazla çubuk yerleştirmek için önce ana eylem çubuğundaki artı ve eksi düğmeleriyle onları ekle.",
+      "frozenNote": "Düzenlerken arayüz ve kamera donar: düğmeler ve çerçeveler yalnızca düzenlenecek sabit resimlerdir, tıklamalar oyun dünyasına ulaşmaz.",
+      "unlockFrame": "Bu çerçevenin kilidini aç",
+      "lockFrame": "Bu çerçeveyi kilitle",
+      "resizeFrame": "Bu çerçeveyi yeniden boyutlandır",
       "frameNames": {
-        "actionBar1": "Action Bar",
-        "actionBar2": "Action Bar 2",
-        "actionBar3": "Action Bar 3",
-        "steamWishlist": "Wishlist Reminder",
-        "menu": "Menu",
-        "minimap": "Minimap",
-        "stanceBar": "Stance Bar",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
-        "actionBarGroup": "Action Bars",
-        "playerFrame": "Player",
-        "targetFrame": "Target",
-        "partyFrames": "Party",
-        "swingBar": "Auto Attack"
+        "actionBar1": "Eylem Çubuğu",
+        "actionBar2": "Eylem Çubuğu 2",
+        "actionBar3": "Eylem Çubuğu 3",
+        "steamWishlist": "İstek Listesi Hatırlatması",
+        "menu": "Menü",
+        "minimap": "Mini Harita",
+        "stanceBar": "Duruş Çubuğu",
+        "xpBar": "XP Çubuğu",
+        "chat": "Sohbet",
+        "actionBarGroup": "Eylem Çubukları",
+        "playerFrame": "Oyuncu",
+        "targetFrame": "Hedef",
+        "partyFrames": "Grup",
+        "swingBar": "Otomatik Saldırı"
       },
-      "framesMenu": "Frames Settings",
-      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
-      "showHideFrames": "Show or Hide Frames",
-      "buffsLeftToRight": "Buffs left to right",
-      "debuffsLeftToRight": "Debuffs left to right",
-      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
-      "actionBarsVertical": "Vertical Action Bars",
-      "actionBar1Vertical": "Vertical Action Bar",
-      "actionBar2Vertical": "Vertical Action Bar 2",
-      "actionBar3Vertical": "Vertical Action Bar 3",
-      "menuRailHorizontal": "Horizontal Menu",
-      "snapToGrid": "Snap to Grid",
+      "framesMenu": "Çerçeve Ayarları",
+      "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",
+      "showHideFrames": "Çerçeveleri Göster ya da Gizle",
+      "buffsLeftToRight": "Güçlendirmeler soldan sağa",
+      "debuffsLeftToRight": "Zayıflatmalar soldan sağa",
+      "lockPlayerFrameToBar": "Oyuncu Çerçevesini Eylem Çubuğuna Kilitle",
+      "actionBarsVertical": "Dikey Eylem Çubukları",
+      "actionBar1Vertical": "Dikey Eylem Çubuğu",
+      "actionBar2Vertical": "Dikey Eylem Çubuğu 2",
+      "actionBar3Vertical": "Dikey Eylem Çubuğu 3",
+      "menuRailHorizontal": "Yatay Menü",
+      "snapToGrid": "Izgaraya Hizala",
       "previewMemberName": "{className} {number}",
-      "resetFrameSize": "Reset size",
-      "resetFrameSizeFor": "Reset size for {name}",
-      "previewSpell": "Example Spell"
+      "resetFrameSize": "Boyutu sıfırla",
+      "resetFrameSizeFor": "{name} için boyutu sıfırla",
+      "previewSpell": "Örnek Büyü"
     },
     "transfer": {
-      "frameLayout": "Frame Layout",
-      "allSettings": "All Settings",
-      "exportAction": "Export",
-      "importAction": "Import",
-      "copy": "Copy",
-      "copied": "Copied to clipboard.",
-      "copyFailed": "Copy failed. Select the code and copy it yourself.",
-      "applyReload": "Apply and Reload",
-      "pastePlaceholder": "Paste an exported code here.",
-      "invalid": "That is not a valid export code.",
-      "wrongKind": "That code is a different export type."
+      "frameLayout": "Çerçeve Düzeni",
+      "allSettings": "Tüm Ayarlar",
+      "exportAction": "Dışa Aktar",
+      "importAction": "İçe Aktar",
+      "copy": "Kopyala",
+      "copied": "Panoya kopyalandı.",
+      "copyFailed": "Kopyalama başarısız. Kodu seçip kendin kopyala.",
+      "applyReload": "Uygula ve Yeniden Yükle",
+      "pastePlaceholder": "Dışa aktarılmış bir kodu buraya yapıştır.",
+      "invalid": "Bu geçerli bir dışa aktarma kodu değil.",
+      "wrongKind": "Bu kod farklı bir dışa aktarma türüne ait."
     },
     "itemTooltip": {
       "requiresLevel": "Gereken Seviye {level}",
@@ -3028,7 +3041,7 @@ export const tr_TR: EnTranslations = {
       "riftSockets": "Yarık mücevherleri {used}/{total}",
       "statEnchanted": "+{value} {stat} (Büyülü)",
       "enchantedFallback": "Büyülü",
-      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window.",
+      "partyTradeWindow": "Bu eşyayı, düşüşünü paylaşan oyunculara önümüzdeki {time} boyunca takas edebilirsin. Kuşanmak takas penceresini sona erdirir.",
       "perfectedBadge": "Perfected",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
@@ -3244,9 +3257,9 @@ export const tr_TR: EnTranslations = {
       "linked": "Bağlı Steam hesabı: {id}",
       "benefits": "Kazandığın yiğitliklerin Steam başarımlarına yansıması için Steam hesabını masaüstü uygulamasından bağla.",
       "noTicket": "Steam bir bağlantı bileti vermedi. Steam'i başlat, sonra tekrar dene.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Steam'de istek listesine ekle",
+      "wishlistAria": "Steam'de istek listesine ekle: World of ClaudeCraft mağaza sayfasını aç",
+      "wishlistShort": "İstek listesi"
     },
     "epic": {
       "title": "Epic",
@@ -3332,26 +3345,26 @@ export const tr_TR: EnTranslations = {
       "buySlotsMaxed": "Tamamen genişletildi",
       "buyConfirm": "{price} karşılığında {count} ek banka yuvası satın alınsın mı?",
       "buyConfirmAccept": "Satın Al",
-      "meterLabel": "{used} of {total} slots",
-      "meterPoolGeneral": "General: {used} of {total}",
-      "meterPoolMaterials": "Materials: {used} of {total}",
-      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
-      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
-      "priceDisclaimer": "Prices may change with the game economy.",
-      "rungItemName": "{count} bank slots",
-      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
-      "buyConfirmDual": "Purchase {count} additional bank slots?",
-      "buyConfirmGold": "Purchase for {price}",
-      "buyConfirmClaudium": "Purchase for {cost} Claudium",
-      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
-      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
-      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
-      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
-      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
-      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
-      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
-      "rungFailed": "The purchase could not be completed.",
-      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+      "meterLabel": "{used} / {total} yuva",
+      "meterPoolGeneral": "Genel: {used} / {total}",
+      "meterPoolMaterials": "Malzemeler: {used} / {total}",
+      "meterPoolsAria": "Kullanılan banka yuvaları: {used} / {total}. Genel eşyalar: {generalUsed} / {generalTotal}. Malzemeler: {materialsUsed} / {materialsTotal}.",
+      "meterMaterialsNote": "Takılı torbalardan gelen yalnızca malzemeye özel alan. Diğer eşyalar bunu kullanamaz.",
+      "priceDisclaimer": "Fiyatlar oyun ekonomisiyle birlikte değişebilir.",
+      "rungItemName": "{count} banka yuvası",
+      "buySlotsDualAria": "{count} yuvayı {price} veya {cost} Claudium karşılığında satın al",
+      "buyConfirmDual": "{count} ek banka yuvası satın alınsın mı?",
+      "buyConfirmGold": "{price} karşılığında satın al",
+      "buyConfirmClaudium": "{cost} Claudium karşılığında satın al",
+      "rungGranted": "Banka yuvaları eklendi. Bu karakterin bankası artık daha büyük.",
+      "rungAlreadyGranted": "Bu yuvalar zaten bu karakterde. Tekrar ücretlendirilmedin.",
+      "rungApplyDeferred": "Ödeme tamamlandı. Yuvalar, bu karakter bir sonraki girişinde otomatik olarak uygulanır.",
+      "rungGrantUnresolved": "Ödeme tamamlandı, ancak yuvalar henüz uygulanamadı. Satın alma kaydedildi ve destek ekibi bunu senin için tamamlayabilir.",
+      "rungInProgress": "Bu karakter için bir satın alma hâlâ tamamlanıyor. Birazdan tekrar dene.",
+      "rungDoesNotFit": "Bu karakterin bankası başka bir genişletmeye yer vermiyor.",
+      "rungNotPurchasable": "Bu banka yuvaları şu anda satın alınamaz.",
+      "rungFailed": "Satın alma tamamlanamadı.",
+      "rungOutage": "Satın alma onaylanamadı. Bu düğmeyle tekrar dene, iki kez ücretlendirilmezsin. Önce oyunu yeniden yüklemek bu korumayı kaybettirebilir.",
       "withdrawHint": "Çekmek için tıkla",
       "withdrawPartialHint": "Bir kısmını çekmek için Shift ile tıkla",
       "depositHint": "Yatırmak için tıkla",
@@ -3364,9 +3377,9 @@ export const tr_TR: EnTranslations = {
       "withdrawQuantityTitle": "{item} çek",
       "withdrawQuantityInput": "Çekilecek miktar",
       "withdrawQuantityConfirm": "Çek",
-      "vaultRowWithdrawName": "Withdraw {item}",
-      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Quantity to withdraw: {item}",
+      "vaultRowWithdrawName": "{item} Çek",
+      "priceChanged": "Satın alma tamamlanmadan önce fiyat değişti. Yenilenen fiyatı gözden geçirip tekrar onayla.",
+      "withdrawQuantityAction": "Çekilecek miktar: {item}",
       "filterGroupAria": "Bankayı kategoriye göre filtrele",
       "sortAria": "Banka eşyalarını sırala",
       "searchAria": "Banka eşyalarını ada göre ara",
@@ -3388,34 +3401,34 @@ export const tr_TR: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Bir arkadaşını davet et: arkadaşın 10. seviyeye ulaştığında ikiniz de 2 yuva kazanırsınız (en fazla 5 arkadaş).",
       "bonusSectionAria": "Bonus banka yuvaları ve daha fazlasını kazanmanın yolları",
-      "socketRowAria": "Bank bag sockets",
-      "socketEmpty": "Empty bank bag socket",
-      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
-      "socketLocked": "Locked bag socket",
-      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
-      "socketUnlockAria": "Unlock a bank bag socket for {price}",
-      "socketUnlockHint": "Click to unlock this bag socket",
-      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
-      "socketUnlockAccept": "Unlock",
-      "unsocketHint": "Click to return this bag to your bags",
-      "socketHint": "Click to socket this bag into your bank",
-      "vaultTab": "Vault",
-      "vaultCapacityNote": "Each material holds up to {cap}.",
-      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
-      "vaultRowAria": "{item}: {count} of {cap} stored",
-      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
-      "vaultUnlockButton": "Unlock the Materials Vault",
-      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
-      "vaultUpgrade": "Widen every ceiling to {cap}",
-      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
-      "vaultDepositAll": "Deposit all materials",
-      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
-      "vaultDepositAllDone": "Materials deposited: {count}.",
-      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
-      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
-      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
-      "vaultDepositHint": "Click to deposit into your vault",
-      "vaultCannotDeposit": "Cannot go in the vault",
+      "socketRowAria": "Banka çanta yuvaları",
+      "socketEmpty": "Boş banka çanta yuvası",
+      "socketEmptyHint": "Bankada saklamak için çantalarındaki bir çantaya tıkla",
+      "socketLocked": "Kilitli çanta yuvası",
+      "socketLockedLater": "Çanta yuvalarının kilidi sırayla açılır, önce en ucuzu",
+      "socketUnlockAria": "{price} karşılığında bir banka çanta yuvasının kilidini aç",
+      "socketUnlockHint": "Bu çanta yuvasının kilidini açmak için tıkla",
+      "socketUnlockConfirm": "{price} karşılığında bir banka çanta yuvasının kilidi açılsın mı?",
+      "socketUnlockAccept": "Kilidi Aç",
+      "unsocketHint": "Bu çantayı çantalarına geri döndürmek için tıkla",
+      "socketHint": "Bu çantayı bankana yerleştirmek için tıkla",
+      "vaultTab": "Kasa",
+      "vaultCapacityNote": "Her malzeme en fazla {cap} adet tutar.",
+      "vaultEmpty": "Kasan boş. Yatırmak için çantalarındaki bir malzemeye tıkla.",
+      "vaultRowAria": "{item}, {cap} üzerinden {count} depolandı",
+      "vaultLockedIntro": "Zanaat malzemelerini bankanın yanında biriktirmek için Malzeme Kasasının kilidini aç. Her malzeme, kendi başına {cap} adede kadar kendi bölmesini alır.",
+      "vaultUnlockButton": "Malzeme Kasasının Kilidini Aç",
+      "vaultUnlockConfirm": "Malzeme Kasasının kilidi {price} karşılığında açılsın mı?",
+      "vaultUpgrade": "Her sınırı {cap} adede genişlet",
+      "vaultUpgradeConfirm": "Her malzeme sınırı {price} karşılığında {cap} adede genişletilsin mi?",
+      "vaultDepositAll": "Tüm malzemeleri yatır",
+      "vaultDepositAllTooltip": "Çantalarındaki tüm malzemeleri tek seferde kasana gönderir, her malzemeyi kendi sınırına kadar doldurur. Teçhizat, aletler, görev eşyaları ve sarf malzemeleri asla dokunulmaz.",
+      "vaultDepositAllDone": "Yatırılan malzeme: {count}.",
+      "vaultDepositAllFull": "Yatırılan malzeme: {count}. Bazı sınırlar dolu.",
+      "vaultDepositAllNone": "Kasa sınırları dolu: hiçbir şey yatırılmadı.",
+      "vaultWithdrawShort": "Çantalarına {count} üzerinden yalnızca {fit} tanesi sığar.",
+      "vaultDepositHint": "Kasana yatırmak için tıkla",
+      "vaultCannotDeposit": "Kasaya konulamaz",
       "tabsAria": "Banka sekmeleri",
       "personalTab": "Kişisel",
       "guildTab": "Lonca",
@@ -3926,8 +3939,8 @@ export const tr_TR: EnTranslations = {
       "reagentsNeeded": "Gereklilikler:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "({count} adet kaliteli harcar)",
-      "reagentVaultDraw": "(draws {count} from your vault)",
-      "vaultUnreachable": "The Materials Vault is out of reach here.",
+      "reagentVaultDraw": "(kasandan {count} çeker)",
+      "vaultUnreachable": "Malzeme Kasası burada erişilemez durumda.",
       "craftFeeLine": "Üretim ücreti: her biri {fee}",
       "empty": "Henüz bilinen bir tarif yok.",
       "resultAria": "{name} zanaatı",
@@ -4038,7 +4051,9 @@ export const tr_TR: EnTranslations = {
       "disenchant": "Büyüyü Boz",
       "salvage": "Kurtar",
       "applyEnchant": "Büyü Uygula",
-      "sunder": "Sunder"
+      "sunder": "Sunder",
+      "sell": "Sat",
+      "sellAll": "Tümünü sat ({count})"
     },
     "enchanting": {
       "disenchantedLine": "{item} büyüsünü bozdunuz.",
@@ -4596,11 +4611,15 @@ export const tr_TR: EnTranslations = {
       "loading": "Borsa yükleniyor...",
       "loadFailed": "Borsa'ya ulaşılamadı. Kısa süre sonra tekrar dene.",
       "disabledRealm": "$WOC Borsası bu sunucuda kullanılamıyor.",
+      "browserOnlyConfirmTitle": "$WOC Borsası tarayıcıda açılsın mı?",
+      "browserOnlyConfirmBody": "$WOC Borsası yalnızca World of ClaudeCraft tarayıcı sürümünde çalışır. Bu, World of ClaudeCraft oyununu tarayıcınızda açar; orada giriş yapıp Borsayı açabilirsiniz. Oyun burada çalışmaya devam eder.",
+      "browserOnlyConfirmOpen": "Tarayıcıda Aç",
+      "browserOnlyConfirmCancel": "İptal",
       "pausedBanner": "Alım satım duraklatıldı. Açık artırmaların geri sayımı sürüyor; yeni ilanlar, teklifler, öneriler ve ödemeler alım satım devam edene kadar bekler, ve gönderilmiş bir ödeme yine de sonuçlanır.",
-      "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
-      "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
+      "walletLinkedDisconnected": "Herkese açık adresin bağlı. $WOC ile ödeme yapmak istediğinde o cüzdan uygulamasını yeniden bağla.",
+      "walletLinkedConnected": "Bağlı cüzdan uygulaman bağlı ve $WOC satın alımları için hazır.",
       "walletUsdBalance": "{amount} USD",
-      "walletUsdUnknown": "Unknown",
+      "walletUsdUnknown": "Bilinmiyor",
       "rateNote": "Kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "rateNotePaused": "Son bilinen kur: {time} itibarıyla 1,00 USD başına yaklaşık {tokens} $WOC.",
       "estimateNote": "Güncel kura göre {usd} karşılığında yaklaşık {tokens} $WOC.",
@@ -4855,8 +4874,8 @@ export const tr_TR: EnTranslations = {
       "online": "Karakter şu anda çevrimiçi.",
       "rename_not_permitted": "Bu karakterin yeniden adlandırılmasına izin verilmiyor.",
       "delete_confirm": "Silmeyi onaylamak için karakter adını yazın.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Bu karakter silinmeden önce depolama satın alımının tamamlanması veya çözümlenmesi gerekir.",
+      "delete_busy": "Diyar meşgul. Birazdan bu karakteri tekrar silmeyi deneyin.",
       "already_in_world": "Karakter zaten dünyada.",
       "taken_over": "Karakteriniz başka bir oturum tarafından devralındı.",
       "rename_required": "Bu karakter dünyaya girmeden önce yeniden adlandırılmalıdır.",
@@ -4917,7 +4936,13 @@ export const tr_TR: EnTranslations = {
       "upstream": "Epic yanıt vermedi. Birazdan tekrar deneyin."
     },
     "wallet": {
-      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene."
+      "handoff_invalid": "Cüzdan yetkilendirmesi süresi dolmuş veya doğrulanamadı. Tekrar dene.",
+      "reauth_required": "Bu cüzdan değişikliğini hesap parolanızla onaylayın.",
+      "reauth_two_factor": "Hesabınızda iki adımlı kimlik doğrulama etkin. Onaylamak için kodunuzu girin.",
+      "reauth_no_password": "Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+      "reauth_bad_signature": "Cüzdan imzası doğrulanamadı. Tekrar deneyin.",
+      "reauth_bad_password": "Parolanız yanlış.",
+      "reauth_bad_two_factor": "Bu kod geçerli değil, tekrar deneyin."
     },
     "ota_updates": {
       "invalid_input": "Geçersiz girdi."
@@ -5376,6 +5401,7 @@ export const tr_TR: EnTranslations = {
       "ifPartySort": "Grup üyelerinin listelenme sırası: grup sırası, rol ya da ad.",
       "ifPartyShowAuras": "Güçlendirmelerin ve zayıflatmaların grup çerçevelerinde gösterilip gösterilmeyeceği. Eşleşen anahtarlar kaynak çubuklarını, emilimleri, evcil hayvanları ve kendi grup listenizde görünüp görünmeyeceğinizi de kapsar.",
       "ifAurasOnPlayerFrame": "Güçlendirmelerinizi ve zayıflatmalarınızı, aura çubuğunun yanı sıra kendi birim çerçevenize de yerleştirir.",
+      "ifAlwaysShowAllBuffs": "Düşük grafik ön ayarında bile etkin olan tüm güçlendirmeleri gösterir ve güçlendirme simgeleri için uygulanan olağan sınırı kaldırır.",
       "ifTargetOfTarget": "Hedefinizin kimi hedeflediğini gösterir; tankın canavarı hâlâ tutup tutmadığını anlamanın klasik yolu.",
       "ifPetFrame": "Evcil hayvanınız için bir çerçeve gösterir.",
       "ifChatFontScale": "Sohbet metni boyutu.",
@@ -6583,6 +6609,9 @@ export const tr_TR: EnTranslations = {
       "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
       "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
       "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Eğitmen, {fee}",
       "sourceTrainerFree": "Eğitmen, ücretsiz",
       "sourceKnown": "Başlangıçtan bilinir",
@@ -6590,6 +6619,7 @@ export const tr_TR: EnTranslations = {
       "sourceVendor": "Sold by the Heroic Quartermaster",
       "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Tarif",
       "colSkill": "Beceri",
       "colSource": "Kaynak",
@@ -6935,7 +6965,7 @@ export const tr_TR: EnTranslations = {
       "bankBody": "Her merkez kasabada diyarın bankacılık müessesesi olan Yaldızlı Kasa'nın bir şubesi bulunur. Oradaki veznedarla konuşarak kasanı aç: çantalarının ötesinde, karakterinin ömür boyu elinde tuttuğu özel bir depo. Oraya bıraktığın her şey, bir sonraki sefer hangi şubeye uğrarsan uğra, güvenle bekler.",
       "bankHow": "Kasan açıkken, çantandaki bir eşyaya tıklayarak onu yatır; kasadaki eşyaya tıklayarak geri al. Kasa yalnızca eşya tutar, asla para tutmaz; görev eşyaları da sende kalır. Yol ortasında çantaların dolduğunda, tek bir düğme bütün zanaat malzemelerini bir seferde içeri süpürür.",
       "bankSlots": "Yeni açılmış bir kasa küçük başlar ve seninle birlikte büyür. Veznedar, giderek artan fiyatlarla para karşılığında ek yuvalar satar; çevrimiçi oynamak ise bunun üzerine bonus yer kazandırır: doğrulanmış bir e-posta, bağlanmış hesaplar ve oyuna getirdiğin arkadaşlar gibi şeyler için.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Yuva basamaklarının ötesinde, veznedar gittikçe yükselen fiyatlarla sırayla açılan dört çanta yuvasına kadar satar. Taşıma takımındaki yedek bir çantayı yuvaya yerleştirince yuvaları kasa odana katılır: sıradan bir çanta tüm depoyu genişletirken, malzeme kesesi yalnızca zanaat malzemelerinin kullanabileceği yer ekler. Yerleştirmek için çantalarındaki bir çantaya, geri almak için yuvaya tıkla. Geri almak, depoladığın hiçbir şeyi kaybettirmez: kasa küçülen alanından daha dolu hale gelirse her şey yerinde kalır ve yeni yatırmalar yer açılmasını bekler.",
       "buyingTitle": "Alım ve satım",
       "buyingBody": "Bir tüccarla konuşun ve mallarına göz atmayı seçin; dükkanları üç sekmeyle açılır: Göz At, Sat ve Geri Al. Göz At sekmesi stokladıkları her şeyi tutar, paranız yeterse sizindir. Sat sekmesi çantalarınızdan para ödeyecekleri şeyleri sıralar; kendi zar atışıyla belirlenmiş bir kaliteye sahip bir parçayı satarken önce onay istenir, böylece değerli bir nüsha yanlışlıkla asla elden kaçmaz. Pişman olduğunuz bir şeyden ayrılırsanız, Geri Al sekmesi son satışlarınızı tutar ve onları size ödenen parayla geri alabilirsiniz.",
       "junkTitle": "Hurdaları temizleme",
@@ -7917,6 +7947,13 @@ export const tr_TR: EnTranslations = {
     "unlink": "Bağlantıyı Kaldır",
     "unlinkTitle": "Bu hesaptan cüzdan doğrulamasını kaldır",
     "unlinkAria": "Bu hesaptan cüzdan doğrulamasını kaldır",
+    "reauthTitle": "Cüzdan değişikliğini onayla",
+    "reauthUnlinkTitle": "Cüzdan kaldırmayı onayla",
+    "reauthHelp": "Güvenliğiniz için bu değişikliğe izin vermek üzere hesap parolanızı girin.",
+    "reauthNoPassword": "Bu hesap parolasız giriş yapıyor. Önce hesap ayarlarından bir parola belirleyin, sonra tekrar deneyin.",
+    "reauthConfirm": "Onayla",
+    "reauthCancel": "İptal",
+    "reauthClose": "Kapat",
     "signOut": "Bağlantıyı Kes",
     "signOutTitle": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
     "signOutAria": "Bu tarayıcıdaki cüzdan uygulamasının bağlantısını kes",
@@ -7972,7 +8009,7 @@ export const tr_TR: EnTranslations = {
       "title": "Solana Cüzdanı Bağla",
       "linkBody": "Bu tarayıcıda bir cüzdan uzantısı seç. Bir doğrulama mesajı imzalayacak, ardından masaüstü uygulamasına döneceksin.",
       "paymentBody": "Hesabına bağlı cüzdanı seç ve bu tarayıcıda işlemi onayla.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Hesabına bağlı cüzdanı seç ve $WOC Borsası yetkilendirme mesajını imzala. İmzalamak ücretsizdir ve hiçbir para hareket ettirmez.",
       "extensionHelp": "Uyumlu cüzdan uzantısı bulunamadı. Phantom, Solflare veya başka bir Solana tarayıcı cüzdanını yükle ya da kilidini aç, ardından tekrar dene.",
       "safety": "World of ClaudeCraft hiçbir zaman kurtarma ifadeni veya özel anahtarını istemez.",
       "continueWith": "{wallet} ile devam et",
@@ -8359,18 +8396,18 @@ export const tr_TR: EnTranslations = {
     "buyConfirmCancel": "İptal etmek"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Mühürleri bozdur",
+    "browseAria": "{name} ile Pota mühürlerini bozdur",
+    "empty": "Sınıfın için bozdurulabilecek set parçası yok.",
+    "balance": "Mühürlerin: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Pota mührün yok.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "{sigil} karşılığında {item} al",
+    "buyConfirmTitle": "Bozdurmayı onayla",
+    "buyConfirmBody": "{sigil} karşılığında {item} alınsın mı? Harcanan mühür iade edilemez.",
+    "buyConfirmAccept": "Bozdur",
+    "buyConfirmCancel": "İptal"
   },
   "cardDuel": {
     "title": "Kart Düellosu",
@@ -9201,8 +9238,8 @@ export const tr_TR: EnTranslations = {
         "riftEntrance": "Yarık girişi: {name}",
         "hostileEnemy": "Düşman",
         "aggressiveEnemy": "Sana saldıran düşman",
-        "bossEnemy": "Boss: {name}",
-        "bossAggressiveEnemy": "Boss attacking you: {name}",
+        "bossEnemy": "Patron: {name}",
+        "bossAggressiveEnemy": "Sana saldıran patron: {name}",
         "lootableEnemy": "Yağmalanabilir düşman",
         "corpse": "Cesedin",
         "deathZone": "Tehlikeli bölge",
@@ -9591,7 +9628,7 @@ export const tr_TR: EnTranslations = {
       "tradeExpired": "Takas isteğinin süresi doldu.",
       "tradeFailed": "Takas başarısız: eşyalar ya da para artık mevcut değil.",
       "tradeBound": "O eşya bağlı ve takas edilemez.",
-      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
+      "tradeWindowIneligible": "Bu yalnızca eşyanın düşüşünü paylaşan oyunculara takas edilebilir.",
       "marketListBound": "O eşya bağlı ve satışa çıkarılamaz."
     },
     "logs": {
@@ -9621,6 +9658,8 @@ export const tr_TR: EnTranslations = {
       "soldJunkMany": "{count} değersiz eşya {money} karşılığında satıldı.",
       "keptBoundOne": "{count} adet bağlı kopya tutuldu.",
       "keptBoundMany": "{count} adet bağlı kopya tutuldu.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} çevrimiçi oldu.",
       "friendOffline": "{name} çevrimdışı oldu."
     },
@@ -10273,7 +10312,7 @@ export const tr_TR: EnTranslations = {
       "passAria": "{item} için pas geç",
       "everyonePassed": "Herkes {item} için pas geçti.",
       "rolled": "{answered}/{total} zar attı",
-      "bindsOnPickup": "Binds when picked up"
+      "bindsOnPickup": "Alındığında bağlanır"
     }
   },
   "entities": {
@@ -13480,6 +13519,9 @@ export const tr_TR: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Dreadspark Groundshaker"
       },
+      "reins_rickshaw_mount": {
+        "name": "Bağlı Dizginler: Kemikbağlı Çekçek"
+      },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },
@@ -13526,25 +13568,25 @@ export const tr_TR: EnTranslations = {
         "name": "Dawnhold Bahçesi Çiçek Demeti"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Gezginin Sırt Çantası"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Çuval Bezi Reaktif Kesesi"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Nekromcunun Reaktif Çantası"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Alacakaranlık Dokuması Çantası"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Tınıtlı Dokuma Çantası"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Toplayıcının Heybesi"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Tezgâha Bağlı Reaktif Çantası"
       },
       "hammered_copper_band": {
         "name": "Hammered Copper Band"
@@ -14036,610 +14078,610 @@ export const tr_TR: EnTranslations = {
         "name": "Geçiş Taşı"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Son Alevin Özü"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Cüruf Kıranın Miğferi"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Cüruf Kıranın Omuz Zırhları"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Cüruf Kıranın Hauberki"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Cüruf Kıranın Zırhlı Eldivenleri"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Cüruf Kıranın Baldır Zırhları"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Kor Öfkesi Başlığı"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Kor Öfkesi Omuzlukları"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Kor Öfkesi Göğüslüğü"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Kor Öfkesi Eldivenleri"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Kor Öfkesi Tozlukları"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Dövme Duvarı Başlığı"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Dövme Duvarı Omuzlukları"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Dövme Duvarı Göğüslüğü"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Dövme Duvarı Eldivenleri"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Dövme Duvarı Tozlukları"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Şafak Dövmesi Başlığı"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Şafak Dövmesi Omuzlukları"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Şafak Dövmesi Göğüslüğü"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Şafak Dövmesi Eldivenleri"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Şafak Dövmesi Tozlukları"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Yemin Ateşi Miğferi"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Yemin Ateşi Omuz Zırhları"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Yemin Ateşi Hauberki"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Yemin Ateşi Zırhlı Eldivenleri"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Yemin Ateşi Baldır Zırhları"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Şevk Ateşi Miğferi"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Şevk Ateşi Omuzlukları"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Şevk Ateşi Hauberki"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Şevk Ateşi Zırhlı Eldivenleri"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Şevk Ateşi Baldır Zırhları"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Sürü Efendisinin Başlığı"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Sürü Efendisinin Omuzlukları"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Sürü Efendisinin Tuniği"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Sürü Efendisinin Eldivenleri"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Sürü Efendisinin Pantolonu"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Soğuk Görüş Başlığı"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Soğuk Görüş Omuzlukları"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Soğuk Görüş Tuniği"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Soğuk Görüş Eldivenleri"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Soğuk Görüş Pantolonu"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Cüruf Tuzakçısının Başlığı"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Cüruf Tuzakçısının Omuzlukları"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Cüruf Tuzakçısının Tuniği"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Cüruf Tuzakçısının Kavrama Eldivenleri"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Cüruf Tuzakçısının Pantolonu"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kor Dişi Başlığı"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Kor Dişi Omuzlukları"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Kor Dişi Tuniği"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Kor Dişi Eldivenleri"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Kor Dişi Pantolonu"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Tüten Vuruş Başlığı"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Tüten Vuruş Omuzlukları"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Tüten Vuruş Tuniği"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Tüten Vuruş Kavrama Eldivenleri"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Tüten Vuruş Pantolonu"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kül Örtüsü Başlığı"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Kül Örtüsü Omuzlukları"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Kül Örtüsü Tuniği"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Kül Örtüsü Eldivenleri"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Kül Örtüsü Pantolonu"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Korlar İnancı Başlığı"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Korlar İnancı Omuz Pelerini"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Korlar İnancı Cübbesi"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Korlar İnancı El Sargıları"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Korlar İnancı Tozlukları"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Şafak Dokuması Başlığı"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Şafak Dokuması Omuz Pelerini"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Şafak Dokuması Cübbesi"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Şafak Dokuması El Sargıları"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Şafak Dokuması Tozlukları"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Akşam Külü Başlığı"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Akşam Külü Omuz Pelerini"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Akşam Külü Cübbesi"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Akşam Külü El Sargıları"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Akşam Külü Tozlukları"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Fırtınayla Tutuşmuş Miğfer"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Fırtınayla Tutuşmuş Omuz Zırhları"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Fırtınayla Tutuşmuş Hauberk"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Fırtınayla Tutuşmuş Zırhlı Eldivenler"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Fırtınayla Tutuşmuş Baldır Zırhları"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Kor Pullu Savaş Ruhu Miğferi"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Kor Pullu Savaş Ruhu Omuzlukları"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Kor Pullu Savaş Ruhu Hauberki"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Kor Pullu Savaş Ruhu Zırhlı Eldivenleri"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Kor Pullu Savaş Ruhu Baldır Zırhları"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Taşyürek Miğferi"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Taşyürek Omuz Zırhları"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Taşyürek Hauberki"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Taşyürek Zırhlı Eldivenleri"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Taşyürek Baldır Zırhları"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Pınar Onarıcının Miğferi"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Pınar Onarıcının Omuz Zırhları"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Pınar Onarıcının Hauberki"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Pınar Onarıcının Zırhlı Eldivenleri"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Pınar Onarıcının Baldır Zırhları"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Aether Dokuması Başlığı"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Aether Dokuması Omuz Pelerini"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Aether Dokuması Cübbesi"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Aether Dokuması El Sargıları"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Aether Dokuması Tozlukları"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Piroklast Başlığı"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Piroklast Omuz Pelerini"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Piroklast Cübbesi"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Piroklast El Sargıları"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Piroklast Tozlukları"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Don Söndüren Başlığı"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Don Söndüren Omuz Pelerini"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Don Söndüren Cübbe"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Don Söndüren El Sargıları"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Don Söndüren Tozlukları"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Uğursuz İplik Başlığı"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Uğursuz İplik Omuz Pelerini"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Uğursuz İplik Cübbesi"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Uğursuz İplik El Sargıları"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Uğursuz İplik Tozlukları"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Mezar Damgası Başlığı"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Mezar Damgası Omuz Pelerini"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Mezar Damgası Cübbesi"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Mezar Damgası El Sargıları"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Mezar Damgası Tozlukları"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Yıkım Çağıranın Başlığı"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Yıkım Çağıranın Omuz Pelerini"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Yıkım Çağıranın Cübbesi"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Yıkım Çağıranın El Sargıları"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Yıkım Çağıranın Tozlukları"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Ay Yanığı Başlığı"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Ay Yanığı Omuzlukları"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Ay Yanığı Tuniği"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Ay Yanığı Eldivenleri"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Ay Yanığı Pantolonu"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Yabani Diş Kor Derisi Başlığı"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Yabani Diş Kor Derisi Omuzlukları"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Yabani Diş Kor Derisi Tuniği"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Yabani Diş Kor Derisi Eldivenleri"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Yabani Diş Kor Derisi Pantolonu"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kor Kabuğu Başlığı"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Kor Kabuğu Omuzlukları"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Kor Kabuğu Tuniği"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Kor Kabuğu Eldivenleri"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Kor Kabuğu Pantolonu"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Koruluk Pınarı Başlığı"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Koruluk Pınarı Omuzlukları"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Koruluk Pınarı Tuniği"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Koruluk Pınarı Eldivenleri"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Koruluk Pınarı Pantolonu"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Örsün Miğfer Mührü"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Korun Miğfer Mührü"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Fırtınanın Miğfer Mührü"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Örsün Omuz Pelerini Mührü"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Korun Omuz Pelerini Mührü"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Fırtınanın Omuz Pelerini Mührü"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Örsün Cübbe Mührü"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Korun Cübbe Mührü"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Fırtınanın Cübbe Mührü"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Örsün Kavrama Mührü"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Korun Kavrama Mührü"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Fırtınanın Kavrama Mührü"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Örsün Tozluk Mührü"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Korun Tozluk Mührü"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Fırtınanın Tozluk Mührü"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Son Alevin Kordonu"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Kora Bulanmış Terlikler"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Pınar Bağlayıcının Kuşağı"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Sessiz Suyun Adımları"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Kor Kabuğu Kuşağı"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Kül Kabuğu Pabuçları"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Cüruf İz Sürücüsü Kemeri"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Kül Koşucusu Çizmeleri"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Ay Yanığı Bel Sargısı"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Kavrulmuş Koruluk Yürüyüşçüleri"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Koruluk Bekçisi Kemeri"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Çiy Düşüşü Mokasenleri"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Dövme Duvarı Kuşağı"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Örs Duruşu Savaş Çizmeleri"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Savaş Dövmesi Bel Koruması"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Fırın Yürüyüşü Baldır Zırhı"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Fırtınayla Tutuşmuş Zincir"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Gök Gürültüsü Şoku Yürüyüşçüleri"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Gelgit Bağlayıcının Halkaları"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Pınar Muhafızının Savaş Çizmeleri"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "İlk Tavlamanın Kolyesi"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Ignivar'ın Kor Gerdanlığı"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Son Alevin Madalyonu"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Yürek Pınarı Muskası"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Dövme Duvarı Mührü"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "İşaretli Darbeler Yüzüğü"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Korlar Çemberi"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Sessiz Pınarlar Halkası"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "İç Pota Siperliği"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Kor Muhafızının Bariyeri"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Son Pınarın Küresi"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "İlk Tasarımın Kor Parçası"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Demirci Atanın Savaş Çekici"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kor Dişi Krisi"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Cüruf Yaran Satır"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Örs Muhafızı Kılıcı"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Sonun Yüce Kılıcı"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Son Pınarın Asası"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Dövme Ateşi Kulesi"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Pınar Dokunuşlu Papaz Asası"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Sönmüş Kıvılcımların Asası"
       },
       "cogwheel_blank": {
         "name": "Cogwheel Blank"
@@ -15437,10 +15479,10 @@ export const tr_TR: EnTranslations = {
         "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Dövme Kıran, Varkhul Motoru"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Kor Muhafızı, Varkhul Siper Duvarı"
       }
     },
     "mobs": {
@@ -15637,25 +15679,25 @@ export const tr_TR: EnTranslations = {
         "name": "Nythraxis, Dikenzirve Belası"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Son Alevin Habercisi"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Sonun Kalbi"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Ignivar Kor Nöbetçisi"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Ignivar Pota Muhafızı"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Ignivar Kül Zanaatkârı"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Son Alevin Demirhane Babası"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Terk Edilmiş Mekanizma"
       },
       "reliquary_ledger_wraith": {
         "name": "Defter Hayaleti"
@@ -16318,19 +16360,19 @@ export const tr_TR: EnTranslations = {
         "greeting": "Vadi'deki bir şapel avlusundan dünyanın çatısına... izlediğimiz iz burada bitiyor. Dağın dinlediğini hissedebiliyorum."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Arşivci Maelin Kor Muhafızı",
+        "title": "Kor Muhafızı",
+        "greeting": "Demirhanenin kayıtlarına hoş geldin."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Arşivci Maelin Kor Yansıması",
+        "title": "Kor Yansıması",
+        "greeting": "Kül yankılarında hoş geldin."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Pota Levazım Sorumlusu",
+        "title": "Mühür Tüccarı",
+        "greeting": "Pota mühürlerini mi arıyorsun?"
       },
       "brother_halven": {
         "name": "Birader Halven",
@@ -17514,35 +17556,35 @@ export const tr_TR: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Demirdeki Yankılar",
+        "text": "Bu otomatlar asker değil. Bunlar ilk tasarımlar. Her üretim hattını kır ve son kabuk düştüğünde dinle. Demirhane, Varkhul’un silmeye çalıştığı şeyi hatırlıyor.",
+        "completion": "Demirhanenin yankıları artık sustu.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Demir yankılarını araştır"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Pota Muhafızını yen"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Habercinin Kalbi",
+        "text": "Her yankıda adı geçen hayatta kalan Ignivar. Varkhul ona haberci, mühür ve anahtar dedi. Onu yen. Kayıtlar doğruysa ölümü, neyi korumak üzere dövüldüğünü ortaya çıkaracak.",
+        "completion": "Ignivar hiçbir zaman yalnızca bir muhafız değildi. Kalbi anahtardı ve son plakaları aşağıdaki mühürlü potayı açtı.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Ignivar’ı yen"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Demirhane Babası",
+        "text": "Aşağıdaki yol, Son Alevin Demirhane Babası Varkhul’a çıkıyor. Metale hayat vermek için Son Pınar’ı hapse attı, ardından suçunu mühürlü tutmak için Ignivar’ı dövdü. İç Potaya gir ve onun işini sona erdir.",
+        "completion": "Demirhane nihayet sustu. Pınar asla toparlanamayabilir, ancak Varkhul artık hiçbir hayatı zincire dönüştürerek şekillendiremeyecek.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Varkhul yenildi"
           }
         }
       },
@@ -19444,29 +19486,29 @@ export const tr_TR: EnTranslations = {
         "leaveText": "Dikenzirve'nin soğuk havasına geri dönersin."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Demirhane Asansörü",
+        "enterText": "Demirhane asansörü sarsılarak aşağı iner; Çekiç Darbesi seni karşılamak üzere yükselir.",
+        "leaveText": "Asansör seni kalenin açık havasına geri çıkarır."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "İlk Dövme Salonları",
+        "enterText": "Çekiç Darbesi, İlk Dövme Salonlarında yankılanıyor.",
+        "leaveText": "İlk demirhaneden uzaklaşıyorsun ve yeniden özgürce nefes alıyorsun."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Son Pınar Potası",
+        "enterText": "Pota’nın mühürlü sularının üzerinde sıcaklık dalgalanıyor.",
+        "leaveText": "Pota’dan uzaklaşıyor ve yeniden özgürce nefes alıyorsun."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Erimiş Montaj Salonu",
+        "enterText": "Açılan kapı, erimiş bir montaj salonuna çıkıyor.",
+        "leaveText": "Montaj hattından ayrılıp Pota’ya dönüyorsun."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "İç Pota",
+        "enterText": "Açılan kapı Pota’nın daha derinlerine götürüyor.",
+        "leaveText": "Pota’nın sessiz derinliklerinden ayrılıyorsun."
       },
       "wildheart_basin": {
         "name": "Yaban Yürek Çukuru",
@@ -19705,182 +19747,182 @@ export const tr_TR: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Kül Örtüsü Kuşamı",
+        "bonus2": "Sinsi Vuruş %25 daha fazla hasar verir.",
+        "bonus4": "Örtülü Keskinlik vuruşun iki yerine üç kat hasar verir."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Lütuflu Şafak Dokuması",
+        "bonus2": "Serafik Nöbet’in kurtarma iyileştirmesi 180 yerine 270 olur. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Serafik Nöbet tetiklendiğinde müttefiki de 10 saniye boyunca azami sağlığının %15’i kadar iyileştirilir."
       },
       "boundstone_vanguard": {
         "name": "Bağlıtaş Öncüsü",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Aether Dokuması Giysileri",
+        "bonus2": "Zamansal Yankı, tek hedefli Gizemli hasarının %50’sini iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Zamansal Çağlayanın bekleme süresi 5 saniye azalır."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Kül Kabuğu Muhafızı",
+        "bonus2": "Süpürücü Pençelerin ek Eski Kan biriktirme şansı %30’dur.",
+        "bonus4": "İlik Kırma %30 daha fazla hasar verir ve acil savunması artık Vuruş’un yerini almaz."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Kül Dişi Örtüsü",
+        "bonus2": "Zehir Ritüeli enerji iadesi, her biriktirmede 20 olur.",
+        "bonus4": "Zehir Oku bekleme süresi 4 saniyeye düşer."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Soğuk Görüş İz Sürücüleri",
+        "bonus2": "Ölçülü Atış 5 ek Odak yeniler.",
+        "bonus4": "Uzun Çekiş kritik vuruşları Soğuk Odağı 2 saniye uzatır; her etkinleştirmede en fazla 6 saniye."
       },
       "crownforged": {
         "name": "Bonewrought Kıyafetleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşların hedefi Kemikkıymık ile parçalar, 12 sn boyunca her 2 sn'de 8 kanama hasarı verir. 3 kata kadar üst üste binebilir.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları hedefi Kemik Yarığı ile parçalar ve 12 saniye boyunca her 2 saniyede 5 hasar vererek kanatır. En fazla 3 kez birikir."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Şafak Dövmesi Giysileri",
+        "bonus2": "Işık Feneri doğrudan iyileştirmelerinin %55'ini kopyalar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Parlak Rezonans'ın güçlendirilmiş Şafağın Kucaklayışı anında gerçekleşir."
       },
       "deathlord": {
         "name": "Barrowlord Savaş Takımı",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşlarının %50 ihtimalle Mezargücü kazandırır, 10 sn boyunca saldırı gücünü 60 artırır.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları hedefi Kemik Yarığı ile parçalar ve 12 saniye boyunca her 2 saniyede 5 hasar vererek kanatır. En fazla 3 kez birikir."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Kor Öfkesi Kuşamı",
+        "bonus2": "Öfkelenmen 4 yerine 6 saniye sürer.",
+        "bonus4": "Kan Akıtma seni her zaman Öfkelendirir ve iyileştirmesi azami sağlığının %8'ine çıkar."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Korlar İnancının Giysileri",
+        "bonus2": "Öğreti bağın, Kutsal hasarının %10 daha fazlasını iyileştirmeye dönüştürür. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Koruma İlahin tamamen tüketildiğinde, 10 saniye içinde kullandığın sonraki Arındırma İlahisi anında gerçekleşir. 15 saniyede birden fazla tetiklenemez."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Dövme Duvarı Aegis",
+        "bonus2": "Demir Kararlılık, öfkeyi puan başına 4 yerine 5 emmeye dönüştürür.",
+        "bonus4": "Kalkan Çatlağı kullanmak Demir Kararlılığın kalan bekleme süresini 2 saniye azaltır."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Don Söndüren Dokuma",
+        "bonus2": "Kırağı Mızrağının kritik vuruşları en fazla 5 olacak şekilde ikinci bir Buz Sarkıtı depolar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Kış Yarası, 2 yerine 3 Kış Soğuğu yükü uygular."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Mezar Damgası Asaleti",
+        "bonus2": "Biçim Emrinin bekleme süresi 2 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Biçim Emrinin birlik vuruşları %25 daha fazla hasar verir."
       },
       "greyjaw_stalker": {
         "name": "Greyjaw İzsürücü takımı",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Koruluk Pınarı Giysisi",
+        "bonus2": "Çabuk İyileştirme önce kendi Yaban Çiçeğini veya İkinci Çiçeklenmeni tüketir ve %25 daha fazla iyileştirir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Aşırı Çiçeklenme kalan etkilerinin %75'ini hasat eder ve ardından 1 Yeşerme depolar."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Uğursuz İplik Örtüsü",
+        "bonus2": "Kader İğnesi 2 ek Mahkûmiyet kazandırır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Geçen Hüküm 10 Mahkûmiyet iade eder."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Ay Yanığı Giysisi",
+        "bonus2": "Ay Tohumu, Ay Fırtınasını her uygulamada iki kez, en fazla 12 saniyeye kadar uzatabilir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Ay Dalgası ve Güneş Uyanışı %25 daha sert vurur."
       },
       "necromancers": {
         "name": "Mournweave Giysileri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Berrak Büyü kazandırır, bir sonraki büyünü bedava yapar.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; bu, büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "nighttalon": {
         "name": "Direfang Postu",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşların bir Pürüzlü Yarık açar, hedefi 12 sn boyunca her 2 sn'de 6 kanama hasarıyla kanatır. 3 kata kadar üst üste binebilir.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Yemin Ateşi Burcu",
+        "bonus2": "Yemin Bekçisinin Vuruşunun Güneş Misillemesini hazırlama şansı %30'a çıkar; bir saldırıyı engellemek de onu %40 oranında hazırlar.",
+        "bonus4": "Güneş Misillemesini tüketmek, 10 saniye boyunca azami sağlığının %6'sı kadar kalkan sağlar."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Sürü Efendisinin Kor Derisi",
+        "bonus2": "Sürü Emrinin bekleme süresi 3 saniyeye düşer.",
+        "bonus4": "Sürü Emrinin Çiğneme bekleme süresini sıfırlama şansı %30'a çıkar."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Piroklast Asaleti",
+        "bonus2": "Kavurma, sağlığı %35 veya altında olan hedeflere her zaman kritik vurur. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Anka Vecdi dışındaki Ateş büyülerinin kritik vuruşları kalan bekleme süresini 1,5 saniye azaltır."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Yıkım Çağıranın Giysileri",
+        "bonus2": "Büyük Yangın 3 yük tutar. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Yıkım Oku %20 daha sert vurur."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Cüruf Kıranın Savaş Donanımı",
+        "bonus2": "Kızıl El, her yükte sonraki Sakatlayıcı Vuruşu %20 yerine %30 güçlendirir.",
+        "bonus4": "Kızıl Elin her ikinci kullanımı, Yarık Açanın kalan bekleme süresini 3 saniye azaltır."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Cüruf Tuzakçısının Donanımı",
+        "bonus2": "İçini Boşaltan Vuruş 20 Odak üretir.",
+        "bonus4": "3 Avlanma İvmesi tüketen Yara Yırtma bunları korur. 8 saniyede birden fazla gerçekleşemez."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Tüten Vuruşun Derileri",
+        "bonus2": "Balyoz %20 daha sert vurur.",
+        "bonus4": "Işıklar Sönsün, Aynalı Bıçakların kalan bekleme süresinden 6 saniye iade eder."
       },
       "soulflame": {
         "name": "Wraithfire Kıyafetleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Pınar Onarıcının Pulluğu",
+        "bonus2": "Gelgit Çağrısının bekleme süresi 4 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Çağlayan Onarım dördüncü bir müttefike ulaşır ve Onarım Akıntılarını %150 oranında hasat eder."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Taşyüreğin Burcu",
+        "bonus2": "Taşa Bağlı durumdayken, Fırtına Çağrısı Onarım Suları mana harcamaz ve %25 daha fazla iyileştirir.",
+        "bonus4": "Taşa Bağlı durumdayken bir ritmi tamamlamak azami sağlığının %3'ü kadar iyileştirir."
       },
       "stormcallers": {
         "name": "Galecall Cübbeleri",
         "bonus2": "Büyü gücünü 20 artırır. Alınan hasar artık büyü yapmanı geciktirmez (%100 büyü gecikme direnci).",
         "bonus4": "Büyülerinin %10 ihtimalle Ruhalazı kazandırır, 10 sn boyunca büyü gücünü 40 artırır.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Saldırı ve büyü yapma hızını %4 artırır. Büyülerinin %10 şansı Ruh Korunu kazandırır; büyü gücünü 10 saniye boyunca 25 artırır."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Fırtınayla Tutuşmuş Asalet",
+        "bonus2": "Ateş Damgasında Silahı Serbest Bırakmak 3 Gök Gürültüsü verir. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Toprak Sarsıntısının Gök Gürültüsü başına bonusu %30'a çıkar."
       },
       "vale_arcanist": {
         "name": "Vadi Arkanisti giysileri",
         "bonus3": "Saldırı ve büyü hızını %15 artırır."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Akşam Külünün Örtüsü",
+        "bonus2": "Öşür İblisini Çağırmanın bekleme süresi 6 saniye azalır. Alınan hasar artık büyü yapmanı geciktirmez.",
+        "bonus4": "Öşür İblisini çağırmak Zihin Yarığının bekleme süresini sıfırlar ve iblis vuruş başına iki kat mana döndürür."
       },
       "warfare_ashstalker": {
         "name": "Ashstalker Takımı",
@@ -19913,25 +19955,25 @@ export const tr_TR: EnTranslations = {
         "bonus7": "Harp Saldırı ve Savunma Derecesini 80 artırır. Büyülerinin %15 ihtimalle Diken Muhafızı verme şansı vardır, bu da kaçınmayı 6 sn boyunca %15 artırır."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Savaş Ruhu Kor Pulu",
+        "bonus2": "Ataların Vuruşu ritmini 3 adım ilerletir.",
+        "bonus4": "Ataların Vuruşu %30 daha sert vurur."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Yaban Dişinin Kor Derisi",
+        "bonus2": "Kızıl Hasat, 30 yerine 45 enerji yeniler.",
+        "bonus4": "Kızıl Hasat hedefe yeni bir Deri Yüzme etkisi uygular."
       },
       "wyrmshadow": {
         "name": "Nightfang Cübbeleri",
         "bonus2": "Saldırı gücünü 40 artırır.",
         "bonus4": "Silah kritik vuruşlarının %50 ihtimalle Dişhücumu kazandırır, 8 sn boyunca saldırı hızını %25 artırır.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Saldırı ve büyü yapma hızını %4, İsabeti %3 artırır. Silahlarının kritik vuruşları Pırtık Yara açarak hedefi 12 saniye boyunca her 2 saniyede 4 hasar için kanatır. En fazla 3 kez birikir."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Zel Ateşi Savaş Zırhı",
+        "bonus2": "Son Ferman ve Şafak Çöküşü birbirlerinin kalan bekleme süresini 2 yerine 3 saniye azaltır.",
+        "bonus4": "Şafağın Gazabı altında kullanılan Gazap Çekici, 20 yerine yüzde 40 daha sert vurur."
       }
     }
   },

@@ -12,6 +12,7 @@
 
 import {
   IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_RAID_ROOM_IDS,
   isIgnivarRaidRoom,
 } from '../ignivar_raid_ids';
@@ -47,16 +48,29 @@ export function furthestIgnivarRaidRoom(claims: readonly InstanceSlot[]): string
 
 /**
  * The room an outside entrant actually zones into: entering through the
- * overworld approach door re-points at the deepest room the group already
- * claims (the checkpoint), so a returning member rejoins the raid where it
- * is instead of back at the start. Any other requested room passes through.
+ * raid's front (the keep door requests the forge-lift; a direct approach
+ * request is honored the same way) re-points at the deepest room the group
+ * already claims ONCE that checkpoint sits past the Halls, so a returning
+ * member (a ghost corpse-running back included) rejoins the raid where it
+ * is instead of back at the start. A group no deeper than the Halls keeps
+ * the requested entry and boards the lift again (the ride is per-claim).
+ * Any other requested room passes through.
  */
 export function resolveIgnivarEntryRoom(
   requestedDungeonId: string,
   claims: readonly InstanceSlot[],
 ): string {
-  if (requestedDungeonId !== IGNIVAR_FORGE_APPROACH_ID) return requestedDungeonId;
-  return furthestIgnivarRaidRoom(claims) ?? requestedDungeonId;
+  if (
+    requestedDungeonId !== IGNIVAR_FORGE_APPROACH_ID &&
+    requestedDungeonId !== IGNIVAR_LIFT_ROOM_ID
+  ) {
+    return requestedDungeonId;
+  }
+  const furthest = furthestIgnivarRaidRoom(claims);
+  if (furthest === null) return requestedDungeonId;
+  const rooms = IGNIVAR_RAID_ROOM_IDS as readonly string[];
+  const checkpointFloor = rooms.indexOf(IGNIVAR_FORGE_APPROACH_ID) + 1;
+  return rooms.indexOf(furthest) >= checkpointFloor ? furthest : requestedDungeonId;
 }
 
 /**

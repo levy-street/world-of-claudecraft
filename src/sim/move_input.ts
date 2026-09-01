@@ -57,12 +57,14 @@ export function normalizeMoveFacing(raw: unknown): number | null {
 export interface MoveInputFrame {
   moveInput: MoveInput;
   facing: number | null;
+  ct: number | null;
 }
 
 export function parseMoveInputFrame(raw: unknown): MoveInputFrame {
-  if (!isRecord(raw)) return { moveInput: emptyMoveInput(), facing: null };
+  if (!isRecord(raw)) return { moveInput: emptyMoveInput(), facing: null, ct: null };
   return {
     moveInput: sanitizeMoveInput(raw.mi),
     facing: sanitizeMoveFacing(raw.facing),
+    ct: Number.isSafeInteger(raw.ct) && Number(raw.ct) >= 0 ? Number(raw.ct) : null,
   };
 }

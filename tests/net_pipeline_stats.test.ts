@@ -146,6 +146,33 @@ describe('net pipeline stats module', () => {
       peakBufferedBytes: 80_000,
     });
   });
+
+  it('folds every movement reconcile outcome into the fixed-size summary', () => {
+    const stats = createNetPipelineStats();
+    stats.noteReconcileOutcome('match');
+    stats.noteReconcileOutcome('replayed');
+    stats.noteReconcileOutcome('replayed');
+    stats.noteReconcileOutcome('ignore');
+    stats.noteReconcileOutcome('ignore');
+    stats.noteReconcileOutcome('ignore');
+    stats.noteReconcileOutcome('stale');
+    stats.noteReconcileOutcome('stale');
+    stats.noteReconcileOutcome('stale');
+    stats.noteReconcileOutcome('stale');
+    stats.noteReconcileOutcome('suspend');
+    stats.noteReconcileOutcome('suspend');
+    stats.noteReconcileOutcome('suspend');
+    stats.noteReconcileOutcome('suspend');
+    stats.noteReconcileOutcome('suspend');
+
+    expect(stats.summary().reconcile).toEqual({
+      match: 1,
+      replayed: 2,
+      ignored: 3,
+      stale: 4,
+      suspends: 5,
+    });
+  });
 });
 
 function wirePlayer(id: number, name: string) {

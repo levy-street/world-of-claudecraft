@@ -16,6 +16,7 @@ import {
   mobVoiceCueWithFallback,
   mobVoiceFamily,
   playerSwingCueForDamage,
+  playerVoiceCue,
   shouldPlayCombatImpactForTarget,
   shouldPlayCritSfxForTarget,
   shouldPlayMobVoiceSfxForEntity,
@@ -995,5 +996,53 @@ describe('combat SFX policy', () => {
     const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
     expect(hud).toContain("case 'varkhulCallout'");
     expect(hud).toContain('dispatchVarkhulCalloutSfx(');
+  });
+});
+
+describe('playerVoiceCue', () => {
+  // The 8 female takes shipped in PR #2320 but stayed unwired until the
+  // modular creator (v0.35.0) gave characters a real gender axis. These pin
+  // the rule that decides which voice a given character gets.
+  const female = { gender: 'female' };
+  const male = { gender: 'male' };
+  const hasAll = (): boolean => true;
+
+  it('diverts to the female take for an explicitly female look', () => {
+    expect(playerVoiceCue(female, 'hurt', hasAll)).toBe('player_hurt_female');
+    expect(playerVoiceCue(female, 'death', hasAll)).toBe('player_death_female');
+  });
+
+  it('keeps the shipped male take for every other look', () => {
+    // A male look, a character authored before the creator shipped (null),
+    // an absent field, and a garbage value all resolve the same way: no
+    // existing character's voice changes unless its owner chose female.
+    for (const appearance of [male, null, undefined, {}, { gender: 'other' }]) {
+      expect(playerVoiceCue(appearance, 'hurt', hasAll)).toBe('player_hurt');
+      expect(playerVoiceCue(appearance, 'death', hasAll)).toBe('player_death');
+    }
+  });
+
+  it('falls back to the male take when the female clip is not buffered', () => {
+    // Same hasCue-fallback contract mobVoiceCue uses: a cue that cannot play
+    // yet must resolve to one that can, never to silence.
+    const hasNone = (): boolean => false;
+    expect(playerVoiceCue(female, 'hurt', hasNone)).toBe('player_hurt');
+    expect(playerVoiceCue(female, 'death', hasNone)).toBe('player_death');
+  });
+
+  it('defaults to no-cue-available, so an unprobed call never returns an unplayable key', () => {
+    expect(playerVoiceCue(female, 'hurt')).toBe('player_hurt');
+    expect(playerVoiceCue(female, 'death')).toBe('player_death');
+  });
+
+  it('resolves every key it can return to a real catalog entry', () => {
+    for (const key of [
+      'player_hurt',
+      'player_death',
+      'player_hurt_female',
+      'player_death_female',
+    ]) {
+      expect(SFX_CLIPS, key).toHaveProperty(key);
+    }
   });
 });

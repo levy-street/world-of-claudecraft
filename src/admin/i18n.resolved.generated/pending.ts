@@ -20,6 +20,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -48,9 +49,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "es_ES": [
     "error.clearItemNameAllLiteral",
@@ -62,6 +61,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -90,9 +90,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "fr_FR": [
     "error.clearItemNameAllLiteral",
@@ -104,6 +102,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -132,9 +131,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "fr_CA": [
     "error.clearItemNameAllLiteral",
@@ -146,6 +143,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -174,9 +172,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "en_CA": [],
   "it_IT": [
@@ -189,6 +185,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -216,9 +213,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "de_DE": [
     "error.clearItemNameAllLiteral",
@@ -230,6 +225,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -258,11 +254,10 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "zh_CN": [
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -289,11 +284,10 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.realm",
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "zh_TW": [
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -320,11 +314,10 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.realm",
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "ko_KR": [
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -351,11 +344,10 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.realm",
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "ja_JP": [
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -382,9 +374,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.realm",
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "pt_BR": [
     "error.clearItemNameAllLiteral",
@@ -396,6 +386,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -424,11 +415,10 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "ru_RU": [
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -455,9 +445,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.realm",
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "cs_CZ": [
     "error.clearItemNameAllLiteral",
@@ -469,6 +457,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -497,9 +486,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "nl_NL": [
     "error.clearItemNameAllLiteral",
@@ -511,6 +498,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -539,9 +527,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
     "nav.marketMetrics",
-    "poi.thornpeak_heights.7",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "poi.thornpeak_heights.7"
   ],
   "pl_PL": [
     "error.clearItemNameAllLiteral",
@@ -553,6 +539,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -580,9 +567,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "id_ID": [
     "error.clearItemNameAllLiteral",
@@ -594,6 +579,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -621,9 +607,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "tr_TR": [
     "error.clearItemNameAllLiteral",
@@ -635,6 +619,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -662,9 +647,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "sv_SE": [
     "error.clearItemNameAllLiteral",
@@ -676,6 +659,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -703,9 +687,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "vi_VN": [
     "error.clearItemNameAllLiteral",
@@ -717,6 +699,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -744,9 +727,7 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ],
   "da_DK": [
     "error.clearItemNameAllLiteral",
@@ -758,6 +739,7 @@ export const pending: Record<string, readonly string[]> = {
     "error.clearItemNameOnline",
     "error.clearItemNameTargetForms",
     "error.clearItemNameUnknownSlot",
+    "error.clearItemNameWentOffline",
     "error.itemNameClearFailed",
     "loadFailure.forbiddenDetail",
     "loadFailure.forbiddenTitle",
@@ -785,8 +767,6 @@ export const pending: Record<string, readonly string[]> = {
     "marketMetrics.soldNone",
     "marketMetrics.soldUnavailable",
     "moderationHistory.actionClearItemName",
-    "nav.marketMetrics",
-    "usage.metric.walletHandoffAuthorizationEvicted",
-    "usage.metric.walletHandoffCreateRejected"
+    "nav.marketMetrics"
   ]
 };

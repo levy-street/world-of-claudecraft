@@ -209,7 +209,7 @@ describe("Chronoweave 4pc: Temporal Cascade's cooldown drops 17 to 12", () => {
   });
 });
 
-describe('Pyroclast 2pc: Scald always crits at or below 50 percent health', () => {
+describe('Pyroclast 2pc: Scald always crits at or below 35 percent health', () => {
   function critBand(wearer: boolean, hpFraction: number): boolean {
     const sim = liveMage(452, 'fire');
     if (wearer) equipSet(sim, 'pyroclast', 2);
@@ -240,7 +240,13 @@ describe('Pyroclast 2pc: Scald always crits at or below 50 percent health', () =
       if (wearer) equipSet(sim, 'pyroclast', 2);
       const mob = addHostileMob(sim);
       mob.hp = Math.round(mob.maxHp * 0.33);
-      sim.rng.chance = () => false; // no natural crit: isolate the override
+      // Deny the natural crit WITHOUT denying the cast: spell avoidance now
+      // rides the same rng.chance primitive (spell_resist.ts), so a blanket
+      // `() => false` resists the Scald outright (amount 0, kind 'resist')
+      // and the override never gets a hit to override. Discriminate by
+      // probability instead: the hit roll is a high chance, the crit roll a
+      // low one.
+      sim.rng.chance = (p: number) => p > 0.5;
       sim.player.resource = sim.player.maxResource;
       sim.targetEntity(mob.id);
       sim.drainEvents();

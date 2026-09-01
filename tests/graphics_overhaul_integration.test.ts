@@ -34,15 +34,22 @@ describe('graphics-overhaul integration', () => {
     expect(renderer).toContain(
       'const cx = px - Math.sin(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
     );
+    expect(renderer).toContain(
+      'const cy = Math.min(eyeY + Math.sin(pose.pitch) * pose.dist, underwaterCeilingY);',
+    );
+    expect(renderer).toContain(
+      'const cz = pz - Math.cos(pose.yaw) * Math.cos(pose.pitch) * pose.dist;',
+    );
     expect(renderer).toContain('this.camera.position.set(cx, Math.max(cy, groundY), cz);');
     const chaseCamera = renderer.slice(
-      renderer.indexOf('const cx = px - Math.sin(pose.yaw)'),
+      renderer.indexOf('const px = this.camBoom.x + this.camFeel.leadX;'),
       renderer.indexOf('// Spatial-audio listener'),
     );
-    expect(chaseCamera.match(/\bcx\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcy\s*=/g)).toHaveLength(1);
-    expect(chaseCamera.match(/\bcz\s*=/g)).toHaveLength(1);
-    expect(renderer).toContain('Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel))');
+    expect(chaseCamera).not.toMatch(/pose\.dist\s*[-+*/]?=/);
+    expect(chaseCamera.match(/\bconst cx =/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bconst cy =/g)).toHaveLength(1);
+    expect(chaseCamera.match(/\bconst cz =/g)).toHaveLength(1);
+    expect(renderer).toContain('resolveCameraFov(this.baseFov, this.camFeel)');
   });
 
   it('routes reduced motion through every occluder-fade consumer', () => {

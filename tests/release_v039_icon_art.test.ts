@@ -55,7 +55,22 @@ const SECOND_PASS_RECORD_SHA256 =
   // the Sowfield demolition), this branch holds the hotbar census at 75, the
   // record auto-merged carrying both again, and this seal is the merged
   // file's own bytes (shasum -a 256 of the record).
-  'a2ebdea69ee67e7448a8f0cf606a74139be11555e7d96e305e066f7e688de404';
+  // RE-MINTED at the v0.42.0 sync on 2026-08-31 (ours 2ab5c2f7d0, theirs
+  // 22e909839f, base e6b8edb375). Both parents moved exactly one number in the
+  // sealed record again, and nothing else: a line-by-line diff of the three
+  // sides shows base->ours and base->theirs each touching only the two
+  // runtimeClosure.hotbarItems lines. The base read 72 / 72; ours moved it to
+  // 75 / 75 for the three phase 10 role foods; the release moved it to 73 / 73
+  // for the Bonebound Rickshaw reins. Both additions are real hotbar items that
+  // ship committed painted art, so the merged census is 76 / 76, and the record
+  // was hand-merged to exactly that by substituting the two lines (never a JSON
+  // round trip, which would reformat bytes the merge never touched). 76 is not
+  // arithmetic: the "derives the sealed ability and hotbar-item totals from live
+  // production inventories" case below computes artSubjectHotbarItemIds from the
+  // live ITEMS inventory and independently asserts 76, and it read 76 against
+  // the un-merged 73 record before the fix. The seal is `shasum -a 256` of the
+  // merged file. No capture or asset was retaken.
+  '70c60f346c819b637a9780dd7625ec027ffbe4420650203f47197d7005cbd282';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -354,7 +369,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
         abilities: { live: 402, painted: 402 },
-        hotbarItems: { live: 75, painted: 75 },
+        // 76 at the v0.42.0 sync: the release's one new hotbar item, the
+        // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
+        // the census and ships committed painted art, so painted moves with
+        // live (the release's own arm read 72 to 73, without the three role
+        // foods).
+        hotbarItems: { live: 76, painted: 76 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -464,10 +484,16 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     // 10 role foods classify as hotbar items and ship painted art). Re-derived
     // on the merged tree at the farming absorb (Phase 11d): farming's 72 plus
     // masterwrought's three painted role foods.
+    // 76 at the v0.42.0 sync: the release's Bonebound Rickshaw reins
+    // (reins_rickshaw_mount) is a hotbar item that ships committed painted
+    // art, so it joins the art-subject term, not the parked term below. The
+    // release moved its own arm's plain live-count assertion 72 to 73; that
+    // assertion is this branch's art-subject split now, so its one id lands
+    // here instead.
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(75);
+    ).toHaveLength(76);
     // The farming branch's declared debt on the hotbar: eight plain farm
     // dishes plus the four Phase 11 buff dishes (kind 'food') and the hoe
     // ladder (use.type 'gatherTool'). Re-derived unchanged on

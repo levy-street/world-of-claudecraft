@@ -132,16 +132,10 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       { itemId: 'thundershock_treads', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'springwarden_sabatons', chance: 0.07, rollGroup: 'varkhul_offset' },
       { itemId: 'orb_of_the_last_spring', chance: 0.15, rollGroup: 'varkhul_offset' },
-      { itemId: 'cinder_of_the_first_design', chance: 0.12, rollGroup: 'varkhul_offset' },
-      // The legendary shield rides INSIDE the feet-and-held group at the
-      // kingsbane_last_oath 3 percent precedent (each group is an exclusive
-      // partition summing to exactly 1.00): the cinder, its off-hand
-      // slot-mate, pays the 0.03 while the orb sits back at its full 0.15.
-      // Forgebreaker deliberately does NOT drop here: the maintainer is
-      // routing it through the crafting professions (2026-08-30), so the
-      // item stays defined (dev-give, reliquary pending) with no loot row
-      // until its recipe chain lands.
-      { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_offset' },
+      { itemId: 'cinder_of_the_first_design', chance: 0.15, rollGroup: 'varkhul_offset' },
+      // Neither legendary drops on Normal. Emberward's 3 percent roll lives
+      // in Varkhul's heroic-only shield group; Forgebreaker remains reserved
+      // for the crafting professions until its recipe chain lands.
       { itemId: 'seal_of_the_forgewall', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'band_of_marked_strikes', chance: 0.25, rollGroup: 'varkhul_rings' },
       { itemId: 'circle_of_cinders', chance: 0.25, rollGroup: 'varkhul_rings' },
@@ -1339,12 +1333,11 @@ const IGNIVAR_INNER_CRUCIBLE_SPAWN_LIST: DungeonSpawn[] = [
   { mobId: VARKHUL_BOSS_ID, x: 0, z: 16, facing: 0 },
 ];
 
-// The Ignivar raid family's shared overworld door on the Eastbrook market
-// block: the forge approach's walk-up testing entrance, and the point players
-// are set down beside when leaving ANY raid room (detachFromDungeon reads the
-// left room's own doorPos). The raid's public front door, a Drakelands gate,
-// is still to be authored: docs/design/ignivar-entrance/plan.md.
-const IGNIVAR_EASTBROOK_DOOR_POS = { x: -24, z: -114 };
+// The Ignivar raid family's ONE overworld entrance: the keep tower door on
+// Forgefather's Isle (the forge-lift's walk-up). Every raid room's doorPos
+// points here so any outside displacement or front-room leave sets players
+// down beside the keep. The old Eastbrook walk-up testing door is retired.
+const IGNIVAR_KEEP_DOOR_POS = { x: 503.05, z: 2243.7 };
 
 export const DUNGEON_DEFS: Record<string, DungeonDef> = {
   hollow_crypt: {
@@ -1546,7 +1539,7 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     // that "rides down" for a fixed spell (the room never moves; the
     // shaft illusion sells it), then its exit gate becomes an ordinary
     // portal into the Halls. src/sim/ignivar_forge_lift.ts owns the ride.
-    doorPos: { x: 503.05, z: 2243.7 },
+    doorPos: IGNIVAR_KEEP_DOOR_POS,
     guideVisible: false,
     entry: { x: 0, z: -4 },
     exitOffset: { x: 0, z: -6.5 },
@@ -1572,13 +1565,16 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     id: IGNIVAR_FORGE_APPROACH_ID,
     name: 'Halls of the First Tempering',
     index: 10,
-    // Walk-up testing entrance: the raid family's front room takes the shared
-    // Eastbrook door so raid groups can zone in without /dev commands (the
-    // Forge-Lift's exit portal is the raid chain's own way in).
-    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    // Interior raid room reached through the Forge-Lift's opened gate; doorPos
+    // is only where leaving drops players, beside the keep entrance. The old
+    // Eastbrook walk-up testing door is retired.
+    doorPos: IGNIVAR_KEEP_DOOR_POS,
+    overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -50 },
     exitOffset: { x: 0, z: -54 },
+    // Return below the keep stair, clear of the lift door's walk-in trigger.
+    leaveOffset: { x: 0, z: -6.5 },
     spawns: IGNIVAR_FORGE_APPROACH_SPAWN_LIST,
     npcs: [
       { npcId: IGNIVAR_MAELIN_NPC_ID, x: 0, z: -47 },
@@ -1629,8 +1625,8 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'Crucible of the Last Spring',
     index: 11,
     // Internal raid room reached through the Herald gate in the approach;
-    // doorPos is only where leaving drops players, beside the Eastbrook door.
-    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    // doorPos is only where leaving drops players, beside the keep entrance.
+    doorPos: IGNIVAR_KEEP_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -27 },
@@ -1672,8 +1668,8 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'Molten Assembly',
     index: 13,
     // Internal raid route reached only through the gate behind Ignivar;
-    // doorPos is only where leaving drops players, beside the Eastbrook door.
-    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    // doorPos is only where leaving drops players, beside the keep entrance.
+    doorPos: IGNIVAR_KEEP_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -50 },
@@ -1701,8 +1697,8 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     name: 'The Inner Crucible',
     index: 12,
     // Internal raid wing reached only through the Molten Assembly gate;
-    // doorPos is only where leaving drops players, beside the Eastbrook door.
-    doorPos: IGNIVAR_EASTBROOK_DOOR_POS,
+    // doorPos is only where leaving drops players, beside the keep entrance.
+    doorPos: IGNIVAR_KEEP_DOOR_POS,
     overworldDoor: false,
     guideVisible: false,
     entry: { x: 0, z: -34 },

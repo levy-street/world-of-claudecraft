@@ -683,6 +683,9 @@ const baseEnTable = {
   'log.ignivarLiftArrives': 'The forge-lift settles; its gate grinds open.',
   'error.ignivarRaidInCombat':
     'Your raid is still in combat. You may enter once the fighting stops.',
+  // The boss-fight exit seal (src/sim/instances/ignivar_exit.ts, emitted by
+  // leaveDungeon): no portal leads out of a room whose boss is engaged.
+  'error.ignivarExitSealedInCombat': 'The forge doors hold fast while the battle rages.',
   'aura.carrierFatigue': 'Carrier Fatigue',
   // The always-worn carried-flag buff; right-clicking it drops the flag on purpose.
   'aura.carriedFlag': 'Carrying the Flag',
@@ -755,6 +758,76 @@ const baseEnTable = {
   'aura.webSnare': 'Web Snare',
   'aura.feedingFrenzy': 'Feeding Frenzy',
   'aura.demoralized': 'Demoralized',
+  // --- Rift mob and boss mechanic names (src/sim/content/rift/mobs.ts).
+  // Every row here is a name the rift content authors and the sim splices into a
+  // player surface in ENGLISH: an `aura` event name (the buff/debuff bar and the
+  // gain/fade log, via auraDisplayNameForHud), the {mechanic} of the
+  // "{mob} unleashes {mechanic}!" bark (locBossMechanic), or a dealDamage source
+  // label (abilityDisplayNameFromSource). The whole rift kit shipped with no
+  // matcher row between them, so all 52 rendered raw English in the 20
+  // non-English locales; only the four names rift REUSES from older content
+  // (Thunderclap, Howling Gale, Seismic Stomp, Soulrot) resolved.
+  // `aura.rift*` = the name lands as an aura, `mechanic.rift*` = it only ever
+  // labels damage or a bark, matching the existing split above.
+  // tests/sim_i18n_rift_mechanics.test.ts derives the set from RIFT_MOBS rather
+  // than listing it, so a newly authored rift mechanic reds until it has a row
+  // here AND in AURA_NAME_KEY. lifeleech.name and the deathZone*.name pair are
+  // deliberately NOT here: see that test's exemption table for why.
+  // Trash affixes (on-hit auras and splash labels; src/sim/mob/mob_swing.ts).
+  'aura.riftRimebite': 'Rimebite',
+  'aura.riftRime': 'Rime',
+  'aura.riftCinders': 'Cinders',
+  'aura.riftSmoulder': 'Smoulder',
+  'aura.riftVenom': 'Venom',
+  'aura.riftWeb': 'Web',
+  'aura.riftSerration': 'Serration',
+  'mechanic.riftSweepingArc': 'Sweeping Arc',
+  'aura.riftManaBurn': 'Mana Burn',
+  'aura.riftVoidRot': 'Void Rot',
+  'aura.riftDread': 'Dread',
+  'mechanic.riftTailSweep': 'Tail Sweep',
+  'aura.riftCorrode': 'Corrode',
+  'aura.riftCrush': 'Crush',
+  'mechanic.riftPitsteelSweep': 'Pitsteel Sweep',
+  'aura.riftSearingBrand': 'Searing Brand',
+  'aura.riftPactRot': 'Pact Rot',
+  // Rift boss headline mechanics (the rank-gated runners in
+  // src/sim/mob/locomotion.ts plus the on-hit affixes above).
+  'mechanic.riftGlacialBurst': 'Glacial Burst',
+  'aura.riftGlacialCarapace': 'Glacial Carapace',
+  'mechanic.riftWhiteout': 'Whiteout',
+  'mechanic.riftPyroclasm': 'Pyroclasm',
+  'mechanic.riftCinderWave': 'Cinder Wave',
+  'aura.riftMagmaCrash': 'Magma Crash',
+  'aura.riftDeadlyVenom': 'Deadly Venom',
+  'aura.riftClingingSilk': 'Clinging Silk',
+  'mechanic.riftVenomSpray': 'Venom Spray',
+  'mechanic.riftVenomDeluge': 'Venom Deluge',
+  'aura.riftNecroticBlight': 'Necrotic Blight',
+  'mechanic.riftMarrowHarvest': 'Marrow Harvest',
+  'mechanic.riftBoneStorm': 'Bone Storm',
+  'aura.riftRisingFrenzy': 'Rising Frenzy',
+  'aura.riftWarlordsBellow': "Warlord's Bellow",
+  'mechanic.riftEarthbreaker': 'Earthbreaker',
+  'mechanic.riftArcaneDetonation': 'Arcane Detonation',
+  'aura.riftArcaneFrailty': 'Arcane Frailty',
+  'aura.riftManaShield': 'Mana Shield',
+  'aura.riftTemporalDrag': 'Temporal Drag',
+  'mechanic.riftArcaneVolley': 'Arcane Volley',
+  'mechanic.riftChainLightning': 'Chain Lightning',
+  'mechanic.riftThunderSlam': 'Thunder Slam',
+  'mechanic.riftThunderhead': 'Thunderhead',
+  'aura.riftGalecrash': 'Galecrash',
+  'aura.riftStaticField': 'Static Field',
+  'aura.riftTerrifyingScreech': 'Terrifying Screech',
+  'mechanic.riftRiptide': 'Riptide',
+  'aura.riftUndertow': 'Undertow',
+  'mechanic.riftPactFlame': 'Pact Flame',
+  'mechanic.riftBloodSigil': 'Blood Sigil',
+  'mechanic.riftRainOfBrimstone': 'Rain of Brimstone',
+  'aura.riftHoofOfRuin': 'Hoof of Ruin',
+  'mechanic.riftWingBuffet': 'Wing Buffet',
+  'mechanic.riftPitfireRing': 'Pitfire Ring',
   'aura.resurrectionSickness': "The Keeper's Toll",
   'aura.unstuckSickness': 'Unstuck Sickness',
   'aura.hotPursuit': 'Hot Pursuit',
@@ -1716,6 +1789,22 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Tu habilidad es demasiado baja para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes pagar ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque se ha completado.',
+    'error.townFocusRespecCancelled':
+      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
+    'error.ignivarRaidInCombat':
+      'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
+    'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
+    'error.liveRaidClaimUnsafe':
+      'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
+    'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
+    'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
+    'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
+    'error.vaultMaxUpgrades': 'Tu bóveda no se puede mejorar más.',
+    'error.vaultCannotAfford': 'No puedes permitirte esa mejora de la bóveda.',
+    'log.vaultUnlocked': 'Has desbloqueado la Bóveda de materiales.',
+    'log.vaultUpgraded': 'Has mejorado la Bóveda de materiales.',
+    'error.alreadyEating': 'Ya estás comiendo.',
+    'error.alreadyDrinking': 'Ya estás bebiendo.',
   },
   es_ES: {
     'log.passingStoneKneel':
@@ -2215,6 +2304,23 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Tu nivel de habilidad es demasiado bajo para aprender ese patrón.',
     'error.townFocusCannotAfford': 'No puedes costear ese reajuste de enfoque.',
     'log.townFocusRespecComplete': 'Tu reajuste de enfoque ha terminado.',
+
+    'error.townFocusRespecCancelled':
+      'No podías permitirte la reespecialización de enfoque pendiente, así que se canceló.',
+    'error.ignivarRaidInCombat':
+      'Tu banda sigue en combate. Podrás entrar cuando termine la lucha.',
+    'error.ignivarForgeGateSealed': 'La puerta de la forja está sellada para ti.',
+    'error.liveRaidClaimUnsafe':
+      'Esta reclamación de banda activa no se puede reemplazar de forma segura.',
+    'error.vaultOnlyMaterials': 'En la Bóveda de materiales solo se pueden almacenar materiales.',
+    'error.vaultLocked': 'No has desbloqueado la Bóveda de materiales.',
+    'error.vaultMaterialFull': 'Tu bóveda no puede almacenar más de ese material.',
+    'error.vaultMaxUpgrades': 'Tu bóveda no se puede mejorar más.',
+    'error.vaultCannotAfford': 'No puedes permitirte esa mejora de la bóveda.',
+    'log.vaultUnlocked': 'Has desbloqueado la Bóveda de materiales.',
+    'log.vaultUpgraded': 'Has mejorado la Bóveda de materiales.',
+    'error.alreadyEating': 'Ya estás comiendo.',
+    'error.alreadyDrinking': 'Ya estás bebiendo.',
   },
   fr_FR: {
     'log.passingStoneKneel':
@@ -2725,6 +2831,24 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Votre compétence est trop faible pour apprendre ce patron.',
     'error.townFocusCannotAfford': "Vous n'avez pas les moyens de cette respécialisation de focus.",
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est terminée.',
+
+    'error.townFocusRespecCancelled':
+      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat':
+      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
+    'error.liveRaidClaimUnsafe':
+      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials':
+      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
+    'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
+    'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
+    'error.vaultCannotAfford': 'Vous n’avez pas les moyens de payer cette amélioration du coffre.',
+    'log.vaultUnlocked': 'Vous déverrouillez le Coffre des matériaux.',
+    'log.vaultUpgraded': 'Vous améliorez le Coffre des matériaux.',
+    'error.alreadyEating': 'Vous êtes déjà en train de manger.',
+    'error.alreadyDrinking': 'Vous êtes déjà en train de boire.',
   },
   fr_CA: {
     'log.passingStoneKneel':
@@ -3236,6 +3360,24 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.townFocusCannotAfford':
       'Vous n’avez pas assez de moyens pour cette respécialisation de focus.',
     'log.townFocusRespecComplete': 'Votre respécialisation de focus est complétée.',
+
+    'error.townFocusRespecCancelled':
+      'Vous n’aviez pas les moyens de payer votre réattribution de spécialisation de focus en attente ; elle a donc été annulée.',
+    'error.ignivarRaidInCombat':
+      'Votre raid est toujours en combat. Vous pourrez entrer une fois le combat terminé.',
+    'error.ignivarForgeGateSealed': 'La porte de la forge vous est scellée.',
+    'error.liveRaidClaimUnsafe':
+      'Cette revendication de raid en direct ne peut pas être remplacée en toute sécurité.',
+    'error.vaultOnlyMaterials':
+      'Seuls les matériaux peuvent être stockés dans le Coffre des matériaux.',
+    'error.vaultLocked': 'Vous n’avez pas déverrouillé le Coffre des matériaux.',
+    'error.vaultMaterialFull': 'Votre coffre ne peut plus contenir de ce matériau.',
+    'error.vaultMaxUpgrades': 'Votre coffre ne peut pas être amélioré davantage.',
+    'error.vaultCannotAfford': 'Vous n’avez pas les moyens de payer cette amélioration du coffre.',
+    'log.vaultUnlocked': 'Vous déverrouillez le Coffre des matériaux.',
+    'log.vaultUpgraded': 'Vous améliorez le Coffre des matériaux.',
+    'error.alreadyEating': 'Vous êtes déjà en train de manger.',
+    'error.alreadyDrinking': 'Vous êtes déjà en train de boire.',
   },
   en_CA: {
     'log.seaFatigue': 'The open sea saps your strength. Swim back to shore!',
@@ -3944,6 +4086,23 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'La tua abilità è troppo bassa per imparare quello schema.',
     'error.townFocusCannotAfford': 'Non puoi permetterti quella rispecializzazione del focus.',
     'log.townFocusRespecComplete': 'La tua rispecializzazione del focus è completata.',
+
+    'error.townFocusRespecCancelled':
+      'Non potevi permetterti la riassegnazione della specializzazione di focus in sospeso, quindi è stata annullata.',
+    'error.ignivarRaidInCombat':
+      'La tua incursione è ancora in combattimento. Potrai entrare quando lo scontro sarà terminato.',
+    'error.ignivarForgeGateSealed': 'Il cancello della forgia ti è precluso.',
+    'error.liveRaidClaimUnsafe':
+      'Questa rivendicazione dell’incursione in corso non può essere sostituita in sicurezza.',
+    'error.vaultOnlyMaterials': 'Nel Deposito dei materiali si possono conservare solo materiali.',
+    'error.vaultLocked': 'Non hai sbloccato il Deposito dei materiali.',
+    'error.vaultMaterialFull': 'Il tuo deposito non può contenere altro di quel materiale.',
+    'error.vaultMaxUpgrades': 'Il tuo deposito non può essere ulteriormente potenziato.',
+    'error.vaultCannotAfford': 'Non puoi permetterti questo potenziamento del deposito.',
+    'log.vaultUnlocked': 'Hai sbloccato il Deposito dei materiali.',
+    'log.vaultUpgraded': 'Hai potenziato il Deposito dei materiali.',
+    'error.alreadyEating': 'Stai già mangiando.',
+    'error.alreadyDrinking': 'Stai già bevendo.',
   },
   de_DE: {
     'log.passingStoneKneel':
@@ -4449,6 +4608,23 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Deine Fertigkeit ist zu gering, um dieses Muster zu erlernen.',
     'error.townFocusCannotAfford': 'Du kannst dir diese Fokus-Neuverteilung nicht leisten.',
     'log.townFocusRespecComplete': 'Deine Fokus-Neuverteilung ist abgeschlossen.',
+
+    'error.townFocusRespecCancelled':
+      'Du konntest dir deine ausstehende Fokus-Neuspezialisierung nicht leisten, daher wurde sie abgebrochen.',
+    'error.ignivarRaidInCombat':
+      'Dein Schlachtzug befindet sich noch im Kampf. Du kannst eintreten, sobald der Kampf vorbei ist.',
+    'error.ignivarForgeGateSealed': 'Das Tor zur Schmiede ist für dich versiegelt.',
+    'error.liveRaidClaimUnsafe':
+      'Diese laufende Schlachtzugsbeanspruchung kann nicht sicher ersetzt werden.',
+    'error.vaultOnlyMaterials': 'Im Materiallager können nur Materialien gelagert werden.',
+    'error.vaultLocked': 'Du hast das Materiallager noch nicht freigeschaltet.',
+    'error.vaultMaterialFull': 'Dein Lager kann von diesem Material nichts mehr aufnehmen.',
+    'error.vaultMaxUpgrades': 'Dein Lager kann nicht weiter ausgebaut werden.',
+    'error.vaultCannotAfford': 'Du kannst dir diesen Ausbau des Lagers nicht leisten.',
+    'log.vaultUnlocked': 'Du hast das Materiallager freigeschaltet.',
+    'log.vaultUpgraded': 'Du hast das Materiallager ausgebaut.',
+    'error.alreadyEating': 'Du isst bereits.',
+    'error.alreadyDrinking': 'Du trinkst bereits.',
   },
   zh_CN: {
     'log.passingStoneKneel': '你的手合拢在往生石上，海滨这才放你离去。',
@@ -4929,6 +5105,20 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': '你的技能不足以学习该图样。',
     'error.townFocusCannotAfford': '你负担不起这次专注重置。',
     'log.townFocusRespecComplete': '你的专注重置已完成。',
+
+    'error.townFocusRespecCancelled': '你无法负担待处理的专精重置费用，因此操作已取消。',
+    'error.ignivarRaidInCombat': '你的团队仍在战斗中。战斗结束后才能进入。',
+    'error.ignivarForgeGateSealed': '熔炉大门拒绝向你开放。',
+    'error.liveRaidClaimUnsafe': '无法安全替换当前的实时团队归属。',
+    'error.vaultOnlyMaterials': '材料库只能存放材料。',
+    'error.vaultLocked': '你尚未解锁材料库。',
+    'error.vaultMaterialFull': '你的材料库已无法再存放更多该材料。',
+    'error.vaultMaxUpgrades': '你的材料库已无法继续升级。',
+    'error.vaultCannotAfford': '你负担不起这次材料库升级。',
+    'log.vaultUnlocked': '你解锁了材料库。',
+    'log.vaultUpgraded': '你升级了材料库。',
+    'error.alreadyEating': '你已经在进食了。',
+    'error.alreadyDrinking': '你已经在饮水了。',
   },
   zh_TW: {
     'log.passingStoneKneel': '你的手握住了往生石，海濱終於放你離去。',
@@ -5409,6 +5599,20 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': '你的技能不足以學習該圖樣。',
     'error.townFocusCannotAfford': '你負擔不起這次專注重置。',
     'log.townFocusRespecComplete': '你的專注重置已完成。',
+
+    'error.townFocusRespecCancelled': '你無法負擔待處理的專精重置費用，因此操作已取消。',
+    'error.ignivarRaidInCombat': '你的團隊仍在戰鬥中。戰鬥結束後才能進入。',
+    'error.ignivarForgeGateSealed': '熔爐大門拒絕向你開放。',
+    'error.liveRaidClaimUnsafe': '無法安全替換目前的即時團隊歸屬。',
+    'error.vaultOnlyMaterials': '材料庫只能存放材料。',
+    'error.vaultLocked': '你尚未解鎖材料庫。',
+    'error.vaultMaterialFull': '你的材料庫已無法再存放更多該材料。',
+    'error.vaultMaxUpgrades': '你的材料庫已無法繼續升級。',
+    'error.vaultCannotAfford': '你負擔不起這次材料庫升級。',
+    'log.vaultUnlocked': '你解鎖了材料庫。',
+    'log.vaultUpgraded': '你升級了材料庫。',
+    'error.alreadyEating': '你已經在進食了。',
+    'error.alreadyDrinking': '你已經在飲水了。',
   },
   ko_KR: {
     'log.passingStoneKneel': '안식의 돌을 손에 쥐자, 해안이 당신을 놓아줍니다.',
@@ -5901,6 +6105,21 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': '숙련도가 낮아 그 도안을 배울 수 없습니다.',
     'error.townFocusCannotAfford': '해당 집중 재설정 비용을 감당할 수 없습니다.',
     'log.townFocusRespecComplete': '집중 재설정이 완료되었습니다.',
+
+    'error.townFocusRespecCancelled': '대기 중인 특성 초기화 비용을 감당할 수 없어 취소되었습니다.',
+    'error.ignivarRaidInCombat':
+      '공격대가 아직 전투 중입니다. 전투가 끝난 뒤에 입장할 수 있습니다.',
+    'error.ignivarForgeGateSealed': '당신에게는 대장간 문이 봉인되어 있습니다.',
+    'error.liveRaidClaimUnsafe': '현재 진행 중인 공격대 점유를 안전하게 교체할 수 없습니다.',
+    'error.vaultOnlyMaterials': '재료 보관함에는 재료만 보관할 수 있습니다.',
+    'error.vaultLocked': '아직 재료 보관함을 잠금 해제하지 않았습니다.',
+    'error.vaultMaterialFull': '보관함에 해당 재료를 더 보관할 수 없습니다.',
+    'error.vaultMaxUpgrades': '보관함을 더 이상 업그레이드할 수 없습니다.',
+    'error.vaultCannotAfford': '보관함 업그레이드 비용을 감당할 수 없습니다.',
+    'log.vaultUnlocked': '재료 보관함을 잠금 해제했습니다.',
+    'log.vaultUpgraded': '재료 보관함을 업그레이드했습니다.',
+    'error.alreadyEating': '이미 식사 중입니다.',
+    'error.alreadyDrinking': '이미 음료를 마시는 중입니다.',
   },
   ja_JP: {
     'log.passingStoneKneel': 'たましいの石を握りしめると、渚がその手を解き放つ。',
@@ -6403,6 +6622,21 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': '技能が足りないため、その図案を習得できません。',
     'error.townFocusCannotAfford': 'そのフォーカス再設定を支払えません。',
     'log.townFocusRespecComplete': 'フォーカス再設定が完了しました。',
+
+    'error.townFocusRespecCancelled':
+      '保留中のフォーカス振り直し費用を支払えないため、キャンセルされました。',
+    'error.ignivarRaidInCombat': 'あなたのレイドはまだ戦闘中です。戦闘が終わるまで入場できません。',
+    'error.ignivarForgeGateSealed': 'あなたに対して鍛冶場の門は封印されています。',
+    'error.liveRaidClaimUnsafe': '現在進行中のレイドの権利を安全に置き換えられません。',
+    'error.vaultOnlyMaterials': '素材保管庫には素材のみ保管できます。',
+    'error.vaultLocked': '素材保管庫をまだアンロックしていません。',
+    'error.vaultMaterialFull': '保管庫にはその素材をこれ以上保管できません。',
+    'error.vaultMaxUpgrades': '保管庫はこれ以上アップグレードできません。',
+    'error.vaultCannotAfford': '保管庫のアップグレード費用が足りません。',
+    'log.vaultUnlocked': '素材保管庫をアンロックしました。',
+    'log.vaultUpgraded': '素材保管庫をアップグレードしました。',
+    'error.alreadyEating': 'すでに食事中です。',
+    'error.alreadyDrinking': 'すでに飲み物を飲んでいます。',
   },
   pt_BR: {
     'log.passingStoneKneel':
@@ -6898,6 +7132,23 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Sua habilidade é baixa demais para aprender esse molde.',
     'error.townFocusCannotAfford': 'Você não pode pagar essa redefinição de foco.',
     'log.townFocusRespecComplete': 'Sua redefinição de foco foi concluída.',
+
+    'error.townFocusRespecCancelled':
+      'Você não pôde pagar pela redefinição de foco pendente, então ela foi cancelada.',
+    'error.ignivarRaidInCombat':
+      'Seu raide ainda está em combate. Você poderá entrar quando a luta terminar.',
+    'error.ignivarForgeGateSealed': 'O portão da forja está selado para você.',
+    'error.liveRaidClaimUnsafe':
+      'Esta reivindicação de raide ao vivo não pode ser substituída com segurança.',
+    'error.vaultOnlyMaterials': 'Somente materiais podem ser armazenados no Cofre de Materiais.',
+    'error.vaultLocked': 'Você ainda não desbloqueou o Cofre de Materiais.',
+    'error.vaultMaterialFull': 'Seu cofre não pode armazenar mais desse material.',
+    'error.vaultMaxUpgrades': 'Seu cofre não pode ser aprimorado mais.',
+    'error.vaultCannotAfford': 'Você não pode pagar por esse aprimoramento do cofre.',
+    'log.vaultUnlocked': 'Você desbloqueou o Cofre de Materiais.',
+    'log.vaultUpgraded': 'Você aprimorou o Cofre de Materiais.',
+    'error.alreadyEating': 'Você já está comendo.',
+    'error.alreadyDrinking': 'Você já está bebendo.',
   },
   ru_RU: {
     'log.passingStoneKneel': 'Вы сжимаете в ладони Камень Ухода, и берег отпускает вас.',
@@ -7404,6 +7655,22 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.patternSkill': 'Ваш навык слишком низок, чтобы изучить эту схему.',
     'error.townFocusCannotAfford': 'Вам не хватает средств на эту смену фокуса.',
     'log.townFocusRespecComplete': 'Смена фокуса завершена.',
+
+    'error.townFocusRespecCancelled':
+      'Вы не смогли оплатить ожидающую смену специализации фокуса, поэтому она была отменена.',
+    'error.ignivarRaidInCombat':
+      'Ваш рейд всё ещё в бою. Вы сможете войти, когда сражение закончится.',
+    'error.ignivarForgeGateSealed': 'Вам закрыт доступ к воротам кузницы.',
+    'error.liveRaidClaimUnsafe': 'Эту активную заявку на рейд нельзя безопасно заменить.',
+    'error.vaultOnlyMaterials': 'В хранилище материалов можно хранить только материалы.',
+    'error.vaultLocked': 'Вы ещё не разблокировали хранилище материалов.',
+    'error.vaultMaterialFull': 'В вашем хранилище больше нет места для этого материала.',
+    'error.vaultMaxUpgrades': 'Ваше хранилище больше нельзя улучшить.',
+    'error.vaultCannotAfford': 'Вы не можете позволить себе это улучшение хранилища.',
+    'log.vaultUnlocked': 'Вы разблокировали хранилище материалов.',
+    'log.vaultUpgraded': 'Вы улучшили хранилище материалов.',
+    'error.alreadyEating': 'Вы уже едите.',
+    'error.alreadyDrinking': 'Вы уже пьёте.',
   },
   ...BASE_NEW,
   cs_CZ: {
@@ -7575,6 +7842,27 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'Toto dílo potřebuje jméno, aby se stalo legendou.',
     'error.legendaryNameShape': 'Toto jméno nelze do díla vepsat.',
     'error.legendaryDeed': 'Abyste z tohoto díla udělali legendu, potřebujete Listinu stvoření.',
+
+    'error.townFocusRespecCancelled':
+      'Nemáš dost prostředků na čekající změnu zaměření, takže byla zrušena.',
+    'error.ignivarRaidInCombat': 'Tvůj raid je stále v boji. Vstoupit můžeš, až boj skončí.',
+    'error.ignivarForgeGateSealed': 'Brána kovárny je pro tebe zapečetěná.',
+    'error.liveRaidClaimUnsafe': 'Tento nárok na probíhající raid nelze bezpečně nahradit.',
+    'error.bankStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v bance.',
+    'error.bagsStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v brašnách.',
+    'error.vaultOnlyMaterials': 'Do Trezoru materiálů lze ukládat pouze materiály.',
+    'error.vaultLocked': 'Trezor materiálů sis ještě neodemkl.',
+    'error.vaultMaterialFull': 'Do trezoru se už žádný další materiál nevejde.',
+    'error.vaultMaxUpgrades': 'Trezor už nelze dále vylepšit.',
+    'error.vaultCannotAfford': 'Na toto vylepšení trezoru nemáš dost prostředků.',
+    'error.guildBankStackIndivisible':
+      'Tento stoh nelze rozdělit tak, aby se vešel do volného místa v cechovní bance.',
+    'log.vaultUnlocked': 'Odemkl sis Trezor materiálů.',
+    'log.vaultUpgraded': 'Vylepšil sis Trezor materiálů.',
+    'error.alreadyEating': 'Už jíš.',
+    'error.alreadyDrinking': 'Už piješ.',
   },
   nl_NL: {
     'log.passingStoneKneel': 'Je sluit je hand om de Doorgangssteen, en het strand laat je gaan.',
@@ -7749,6 +8037,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryNameShape': 'Die naam kan niet in het werkstuk worden gegraveerd.',
     'error.legendaryDeed':
       'Je hebt een Scheppingsakte nodig om van dat werkstuk een legende te maken.',
+
+    'error.townFocusRespecCancelled':
+      'Je kon de geplande focus-herverdeling niet betalen, dus deze is geannuleerd.',
+    'error.ignivarRaidInCombat':
+      'Je raid is nog in gevecht. Je kunt binnenkomen zodra het gevecht voorbij is.',
+    'error.ignivarForgeGateSealed': 'De poort van de smidse is voor jou verzegeld.',
+    'error.liveRaidClaimUnsafe': 'Deze claim voor een live raid kan niet veilig worden vervangen.',
+    'error.bankStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je bank te passen.',
+    'error.bagsStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van je tassen te passen.',
+    'error.vaultOnlyMaterials': 'Alleen materialen kunnen in de Materialenkluis worden opgeslagen.',
+    'error.vaultLocked': 'Je hebt de Materialenkluis nog niet ontgrendeld.',
+    'error.vaultMaterialFull': 'Er past geen extra exemplaar van dat materiaal meer in je kluis.',
+    'error.vaultMaxUpgrades': 'Je kluis kan niet verder worden verbeterd.',
+    'error.vaultCannotAfford': 'Je kunt die kluisverbetering niet betalen.',
+    'error.guildBankStackIndivisible':
+      'Deze stapel kan niet worden gesplitst om in de resterende ruimte van de gildebank te passen.',
+    'log.vaultUnlocked': 'Je ontgrendelt de Materialenkluis.',
+    'log.vaultUpgraded': 'Je verbetert de Materialenkluis.',
+    'error.alreadyEating': 'Je bent al aan het eten.',
+    'error.alreadyDrinking': 'Je bent al aan het drinken.',
   },
   pl_PL: {
     'log.passingStoneKneel': 'Zaciskasz dłoń na Kamieniu Przejścia, a wybrzeże pozwala ci odejść.',
@@ -7922,6 +8232,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'To dzieło potrzebuje imienia, by stać się legendą.',
     'error.legendaryNameShape': 'Tego imienia nie można wyryć na dziele.',
     'error.legendaryDeed': 'Potrzebujesz Aktu stworzenia, by uczynić to dzieło legendą.',
+
+    'error.townFocusRespecCancelled':
+      'Nie było Cię stać na oczekującą zmianę specjalizacji skupienia, więc ją anulowano.',
+    'error.ignivarRaidInCombat':
+      'Twój rajd wciąż jest w walce. Możesz wejść, gdy walka się zakończy.',
+    'error.ignivarForgeGateSealed': 'Brama kuźni jest dla Ciebie zamknięta.',
+    'error.liveRaidClaimUnsafe': 'Tego aktywnego zgłoszenia rajdu nie można bezpiecznie zastąpić.',
+    'error.bankStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku.',
+    'error.bagsStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w torbach.',
+    'error.vaultOnlyMaterials': 'W Skarbcu Materiałów można przechowywać wyłącznie materiały.',
+    'error.vaultLocked': 'Nie odblokowano jeszcze Skarbca Materiałów.',
+    'error.vaultMaterialFull': 'W Skarbcu nie ma już miejsca na ten materiał.',
+    'error.vaultMaxUpgrades': 'Skarbca nie można już bardziej ulepszyć.',
+    'error.vaultCannotAfford': 'Nie stać Cię na to ulepszenie Skarbca.',
+    'error.guildBankStackIndivisible':
+      'Nie można podzielić tego stosu, aby zmieścić go w wolnym miejscu w banku gildii.',
+    'log.vaultUnlocked': 'Odblokowujesz Skarbiec Materiałów.',
+    'log.vaultUpgraded': 'Ulepszasz Skarbiec Materiałów.',
+    'error.alreadyEating': 'Już jesz.',
+    'error.alreadyDrinking': 'Już pijesz.',
   },
   id_ID: {
     'log.passingStoneKneel':
@@ -8095,6 +8427,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'Karya itu membutuhkan nama untuk menjadi legenda.',
     'error.legendaryNameShape': 'Nama itu tidak dapat diukir pada karya tersebut.',
     'error.legendaryDeed': 'Anda memerlukan Akta Penciptaan untuk menjadikan karya itu legenda.',
+
+    'error.townFocusRespecCancelled':
+      'Kamu tidak mampu membayar perubahan spesialisasi fokus yang tertunda, jadi perubahan itu dibatalkan.',
+    'error.ignivarRaidInCombat':
+      'Raid kamu masih dalam pertempuran. Kamu dapat masuk setelah pertarungan berhenti.',
+    'error.ignivarForgeGateSealed': 'Gerbang tempa itu tertutup bagimu.',
+    'error.liveRaidClaimUnsafe': 'Klaim raid aktif ini tidak dapat digantikan dengan aman.',
+    'error.bankStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bankmu.',
+    'error.bagsStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam tasmu.',
+    'error.vaultOnlyMaterials': 'Hanya material yang dapat disimpan di Vault Material.',
+    'error.vaultLocked': 'Kamu belum membuka Vault Material.',
+    'error.vaultMaterialFull': 'Vault-mu tidak dapat menampung material itu lagi.',
+    'error.vaultMaxUpgrades': 'Vault-mu tidak dapat ditingkatkan lagi.',
+    'error.vaultCannotAfford': 'Kamu tidak mampu membayar peningkatan vault itu.',
+    'error.guildBankStackIndivisible':
+      'Tumpukan itu tidak dapat dipecah agar muat di ruang yang tersisa dalam bank guild.',
+    'log.vaultUnlocked': 'Kamu membuka Vault Material.',
+    'log.vaultUpgraded': 'Kamu meningkatkan Vault Material.',
+    'error.alreadyEating': 'Kamu sedang makan.',
+    'error.alreadyDrinking': 'Kamu sedang minum.',
   },
   tr_TR: {
     'log.passingStoneKneel':
@@ -8267,6 +8621,25 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'O eserin efsane olabilmesi için bir isme ihtiyacı var.',
     'error.legendaryNameShape': 'O isim esere yazılamaz.',
     'error.legendaryDeed': 'O eseri efsaneye dönüştürmek için bir Yaratım Senedi gerekir.',
+
+    'error.townFocusRespecCancelled':
+      'Bekleyen odak uzmanlık değişikliğinin ücretini karşılayamadığın için iptal edildi.',
+    'error.ignivarRaidInCombat': 'Raid’in hâlâ savaşta. Savaş sona erince girebilirsin.',
+    'error.ignivarForgeGateSealed': 'Demirhane kapısı sana kapalı.',
+    'error.liveRaidClaimUnsafe': 'Bu canlı raid talebi güvenle değiştirilemez.',
+    'error.bankStackIndivisible': 'Bu yığın, bankanda kalan alana sığması için bölünemez.',
+    'error.bagsStackIndivisible': 'Bu yığın, çantalarında kalan alana sığması için bölünemez.',
+    'error.vaultOnlyMaterials': 'Malzeme Kasası’nda yalnızca malzemeler saklanabilir.',
+    'error.vaultLocked': 'Malzeme Kasası’nın kilidini henüz açmadın.',
+    'error.vaultMaterialFull': 'Kasanda bu malzemeden daha fazla yer yok.',
+    'error.vaultMaxUpgrades': 'Kasan daha fazla yükseltilemez.',
+    'error.vaultCannotAfford': 'Bu kasa yükseltmesinin ücretini karşılayamazsın.',
+    'error.guildBankStackIndivisible':
+      'Bu yığın, lonca bankasında kalan alana sığması için bölünemez.',
+    'log.vaultUnlocked': 'Malzeme Kasası’nın kilidini açtın.',
+    'log.vaultUpgraded': 'Malzeme Kasası’nı yükselttin.',
+    'error.alreadyEating': 'Zaten yemek yiyorsun.',
+    'error.alreadyDrinking': 'Zaten içiyorsun.',
   },
   sv_SE: {
     'log.passingStoneKneel': 'Du sluter handen om Övergångsstenen, och stranden släpper dig.',
@@ -8437,6 +8810,29 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'Det verket behöver ett namn för att bli en legend.',
     'error.legendaryNameShape': 'Det namnet kan inte ristas in i verket.',
     'error.legendaryDeed': 'Du behöver en Skapelseurkund för att göra det verket till en legend.',
+
+    'error.townFocusRespecCancelled':
+      'Du hade inte råd med den pågående ändringen av fokusinriktning, så den avbröts.',
+    'error.ignivarRaidInCombat':
+      'Ditt raid är fortfarande i strid. Du kan gå in när striden är över.',
+    'error.ignivarForgeGateSealed': 'Smidesporten är stängd för dig.',
+    'error.liveRaidClaimUnsafe':
+      'Det här aktiva raidanspråket kan inte ersättas på ett säkert sätt.',
+    'error.bankStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i banken.',
+    'error.bagsStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i dina väskor.',
+    'error.vaultOnlyMaterials': 'Endast material kan förvaras i materialförrådet.',
+    'error.vaultLocked': 'Du har inte låst upp materialförrådet.',
+    'error.vaultMaterialFull': 'Ditt förråd rymmer inte mer av det materialet.',
+    'error.vaultMaxUpgrades': 'Ditt förråd kan inte uppgraderas mer.',
+    'error.vaultCannotAfford': 'Du har inte råd med den uppgraderingen av förrådet.',
+    'error.guildBankStackIndivisible':
+      'Den högen kan inte delas för att få plats i det återstående utrymmet i guildbanken.',
+    'log.vaultUnlocked': 'Du låser upp materialförrådet.',
+    'log.vaultUpgraded': 'Du uppgraderar materialförrådet.',
+    'error.alreadyEating': 'Du äter redan.',
+    'error.alreadyDrinking': 'Du dricker redan.',
   },
   vi_VN: {
     'log.passingStoneKneel': 'Bạn siết chặt tay quanh Đá Từ Trần, và bờ biển để bạn ra đi.',
@@ -8606,6 +9002,29 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'Tác phẩm đó cần một cái tên để trở thành huyền thoại.',
     'error.legendaryNameShape': 'Cái tên đó không thể khắc lên tác phẩm.',
     'error.legendaryDeed': 'Bạn cần một Chứng thư Tạo tác để biến tác phẩm đó thành huyền thoại.',
+
+    'error.townFocusRespecCancelled':
+      'Bạn không đủ tiền để đặt lại chuyên môn đang chờ, nên thao tác đã bị hủy.',
+    'error.ignivarRaidInCombat':
+      'Đội raid của bạn vẫn đang giao chiến. Bạn có thể vào khi trận chiến kết thúc.',
+    'error.ignivarForgeGateSealed': 'Cổng lò rèn không mở cho bạn.',
+    'error.liveRaidClaimUnsafe':
+      'Không thể thay thế yêu cầu nhận phần thưởng raid đang diễn ra này một cách an toàn.',
+    'error.bankStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng.',
+    'error.bagsStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong túi.',
+    'error.vaultOnlyMaterials': 'Chỉ vật liệu mới có thể được cất trong Kho Vật liệu.',
+    'error.vaultLocked': 'Bạn chưa mở khóa Kho Vật liệu.',
+    'error.vaultMaterialFull': 'Kho của bạn không thể chứa thêm vật liệu đó.',
+    'error.vaultMaxUpgrades': 'Kho của bạn không thể nâng cấp thêm nữa.',
+    'error.vaultCannotAfford': 'Bạn không đủ tiền cho lần nâng cấp kho đó.',
+    'error.guildBankStackIndivisible':
+      'Không thể tách chồng vật phẩm đó để vừa với chỗ trống còn lại trong ngân hàng hội.',
+    'log.vaultUnlocked': 'Bạn đã mở khóa Kho Vật liệu.',
+    'log.vaultUpgraded': 'Bạn đã nâng cấp Kho Vật liệu.',
+    'error.alreadyEating': 'Bạn đang ăn.',
+    'error.alreadyDrinking': 'Bạn đang uống.',
   },
   da_DK: {
     'log.passingStoneKneel': 'Du lukker hånden om Hvilestenen, og kysten lader dig gå.',
@@ -8777,6 +9196,28 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'error.legendaryName': 'Det værk har brug for et navn for at blive en legende.',
     'error.legendaryNameShape': 'Det navn kan ikke indgraveres i værket.',
     'error.legendaryDeed': 'Du skal bruge et Skabelsesskøde for at gøre det værk til en legende.',
+
+    'error.townFocusRespecCancelled':
+      'Du havde ikke råd til at nulstille dit fokus, så det blev annulleret.',
+    'error.ignivarRaidInCombat': 'Dit raid er stadig i kamp. Du kan gå ind, når kampen er slut.',
+    'error.ignivarForgeGateSealed': 'Smedjens port er lukket for dig.',
+    'error.liveRaidClaimUnsafe':
+      'Dette krav på belønningen fra det igangværende raid kan ikke erstattes sikkert.',
+    'error.bankStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i din bank.',
+    'error.bagsStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i dine tasker.',
+    'error.vaultOnlyMaterials': 'Kun materialer kan opbevares i Materialelageret.',
+    'error.vaultLocked': 'Du har ikke låst Materialelageret op.',
+    'error.vaultMaterialFull': 'Dit lager kan ikke rumme mere af dette materiale.',
+    'error.vaultMaxUpgrades': 'Dit lager kan ikke opgraderes yderligere.',
+    'error.vaultCannotAfford': 'Du har ikke råd til den lageropgradering.',
+    'error.guildBankStackIndivisible':
+      'Stakken kan ikke opdeles, så den passer til den resterende plads i laugsbanken.',
+    'log.vaultUnlocked': 'Du låser Materialelageret op.',
+    'log.vaultUpgraded': 'Du opgraderer Materialelageret.',
+    'error.alreadyEating': 'Du spiser allerede.',
+    'error.alreadyDrinking': 'Du drikker allerede.',
   },
 };
 
@@ -9418,6 +9859,8 @@ const RAID_BOSS_DIALOGUE_DICT: Partial<
 const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, string>>>> =
   {
     es: {
+      'error.ignivarExitSealedInCombat':
+        'Las puertas de la forja permanecen cerradas mientras continúa la batalla.',
       'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
       'aura.ignivarMoltenArmor': 'Armadura Fundida',
       'aura.ignivarLastInferno': 'Último Infierno',
@@ -9450,6 +9893,8 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
     es_ES: {
+      'error.ignivarExitSealedInCombat':
+        'Las puertas de la forja permanecen cerradas mientras continúa la batalla.',
       'aura.ignivarBrandOfThePyre': 'Marca de la Pira',
       'aura.ignivarMoltenArmor': 'Armadura Fundida',
       'aura.ignivarLastInferno': 'Último Infierno',
@@ -9481,7 +9926,24 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'dialogue.ignivarDeath': 'Varkhul... el sello se ha roto.',
       'dialogue.varkhulDeath': 'Maestro... te he fallado.',
     },
+    fr_FR: {
+      'error.ignivarExitSealedInCombat':
+        'Les portes de la forge restent scellées tant que la bataille fait rage.',
+    },
+    fr_CA: {
+      'error.ignivarExitSealedInCombat':
+        'Les portes de la forge restent scellées tant que la bataille fait rage.',
+    },
+    it_IT: {
+      'error.ignivarExitSealedInCombat':
+        'Le porte della forgia restano sigillate finché infuria la battaglia.',
+    },
+    de_DE: {
+      'error.ignivarExitSealedInCombat':
+        'Die Tore der Schmiede bleiben verschlossen, solange die Schlacht tobt.',
+    },
     ja_JP: {
+      'error.ignivarExitSealedInCombat': '戦いが続く間、鍛冶場の扉は固く閉ざされている。',
       'lore.ignivarSentinelEcho':
         'メイリンの残り火の投影が弾ける。「最初の殻は炎を宿したが、その中に命はなかった。」',
       'lore.ignivarWardenEcho':
@@ -9500,6 +9962,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '焼入れの傷',
     },
     ko_KR: {
+      'error.ignivarExitSealedInCombat': '전투가 계속되는 동안 대장간 문은 굳게 닫혀 있습니다.',
       'lore.ignivarSentinelEcho':
         '메일린의 잔불 투영이 타닥거린다. "첫 번째 껍질들은 불꽃을 품었지만 그 안에는 생명이 없었다."',
       'lore.ignivarWardenEcho':
@@ -9518,6 +9981,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '담금질 상처',
     },
     ru_RU: {
+      'error.ignivarExitSealedInCombat': 'Пока идет бой, двери кузницы остаются наглухо закрыты.',
       'lore.ignivarSentinelEcho':
         'Угольная проекция Мэйлин потрескивает: «Первые оболочки удерживали пламя, но жизни в них не было».',
       'lore.ignivarWardenEcho':
@@ -9536,6 +10000,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': 'Закалённая рана',
     },
     zh_CN: {
+      'error.ignivarExitSealedInCombat': '战斗仍在进行时，锻炉大门紧闭不动。',
       'lore.ignivarSentinelEcho': '梅琳的余烬投影噼啪作响：“最初的躯壳容得下火焰，却没有生命。”',
       'lore.ignivarWardenEcho':
         '梅琳的余烬投影噼啪作响：“瓦尔库尔将最后之泉强行灌入金属，泉水成了它的血液。”',
@@ -9551,6 +10016,7 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'aura.varkhulTemperedWound': '淬火创伤',
     },
     zh_TW: {
+      'error.ignivarExitSealedInCombat': '戰鬥仍在進行時，鍛爐大門緊閉不動。',
       'lore.ignivarSentinelEcho': '梅琳的餘燼投影劈啪作響：「最初的軀殼容得下火焰，卻沒有生命。」',
       'lore.ignivarWardenEcho':
         '梅琳的餘燼投影劈啪作響：「瓦爾庫爾將最後之泉強行灌入金屬，泉水成了它的血液。」',
@@ -9564,6 +10030,37 @@ const IGNIVAR_DICT: Partial<Record<SupportedLanguage, Partial<Record<BaseSimMess
       'mechanic.varkhulRecalibrate': '重新校準',
       'mechanic.varkhulTemperingRay': '淬火射線',
       'aura.varkhulTemperedWound': '淬火創傷',
+    },
+    pt_BR: {
+      'error.ignivarExitSealedInCombat':
+        'As portas da forja permanecem seladas enquanto a batalha continua.',
+    },
+    cs_CZ: {
+      'error.ignivarExitSealedInCombat': 'Dveře kovárny zůstávají pevně zavřené, dokud zuří bitva.',
+    },
+    nl_NL: {
+      'error.ignivarExitSealedInCombat':
+        'De deuren van de smidse blijven gesloten zolang de strijd woedt.',
+    },
+    pl_PL: {
+      'error.ignivarExitSealedInCombat': 'Drzwi kuźni pozostają zamknięte, dopóki trwa walka.',
+    },
+    id_ID: {
+      'error.ignivarExitSealedInCombat':
+        'Pintu-pintu bengkel tempa tetap tertutup rapat selama pertempuran berlangsung.',
+    },
+    tr_TR: {
+      'error.ignivarExitSealedInCombat': 'Demirhane kapıları savaş sürdükçe sıkıca kapalı kalır.',
+    },
+    sv_SE: {
+      'error.ignivarExitSealedInCombat': 'Smedjans portar förblir stängda så länge striden pågår.',
+    },
+    vi_VN: {
+      'error.ignivarExitSealedInCombat':
+        'Cửa lò rèn vẫn đóng chặt chừng nào trận chiến còn tiếp diễn.',
+    },
+    da_DK: {
+      'error.ignivarExitSealedInCombat': 'Smedjens porte forbliver lukkede, så længe slaget raser.',
     },
   };
 
@@ -10018,6 +10515,65 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   'Unyielding Pact': 'aura.unyieldingPact',
   'Grimoire of Carnage': 'aura.grimoireOfCarnage',
   'Curse Mastery': 'aura.curseMastery',
+  // Rift mob and boss mechanic names (src/sim/content/rift/mobs.ts). Keep every
+  // English key here BYTE-IDENTICAL to the authored `name` in the content record:
+  // this map is keyed by the raw English the sim splices in, so one drifted
+  // character silently falls back to raw English with nothing red. The four rift
+  // names that reuse older content (Thunderclap, Howling Gale, Seismic Stomp,
+  // Soulrot) are already registered above and deliberately not repeated.
+  // Derivation and the exemptions live in tests/sim_i18n_rift_mechanics.test.ts.
+  Rimebite: 'aura.riftRimebite',
+  Rime: 'aura.riftRime',
+  Cinders: 'aura.riftCinders',
+  Smoulder: 'aura.riftSmoulder',
+  Venom: 'aura.riftVenom',
+  Web: 'aura.riftWeb',
+  Serration: 'aura.riftSerration',
+  'Sweeping Arc': 'mechanic.riftSweepingArc',
+  'Mana Burn': 'aura.riftManaBurn',
+  'Void Rot': 'aura.riftVoidRot',
+  Dread: 'aura.riftDread',
+  'Tail Sweep': 'mechanic.riftTailSweep',
+  Corrode: 'aura.riftCorrode',
+  Crush: 'aura.riftCrush',
+  'Pitsteel Sweep': 'mechanic.riftPitsteelSweep',
+  'Searing Brand': 'aura.riftSearingBrand',
+  'Pact Rot': 'aura.riftPactRot',
+  'Glacial Burst': 'mechanic.riftGlacialBurst',
+  'Glacial Carapace': 'aura.riftGlacialCarapace',
+  Whiteout: 'mechanic.riftWhiteout',
+  Pyroclasm: 'mechanic.riftPyroclasm',
+  'Cinder Wave': 'mechanic.riftCinderWave',
+  'Magma Crash': 'aura.riftMagmaCrash',
+  'Deadly Venom': 'aura.riftDeadlyVenom',
+  'Clinging Silk': 'aura.riftClingingSilk',
+  'Venom Spray': 'mechanic.riftVenomSpray',
+  'Venom Deluge': 'mechanic.riftVenomDeluge',
+  'Necrotic Blight': 'aura.riftNecroticBlight',
+  'Marrow Harvest': 'mechanic.riftMarrowHarvest',
+  'Bone Storm': 'mechanic.riftBoneStorm',
+  'Rising Frenzy': 'aura.riftRisingFrenzy',
+  "Warlord's Bellow": 'aura.riftWarlordsBellow',
+  Earthbreaker: 'mechanic.riftEarthbreaker',
+  'Arcane Detonation': 'mechanic.riftArcaneDetonation',
+  'Arcane Frailty': 'aura.riftArcaneFrailty',
+  'Mana Shield': 'aura.riftManaShield',
+  'Temporal Drag': 'aura.riftTemporalDrag',
+  'Arcane Volley': 'mechanic.riftArcaneVolley',
+  'Chain Lightning': 'mechanic.riftChainLightning',
+  'Thunder Slam': 'mechanic.riftThunderSlam',
+  Thunderhead: 'mechanic.riftThunderhead',
+  Galecrash: 'aura.riftGalecrash',
+  'Static Field': 'aura.riftStaticField',
+  'Terrifying Screech': 'aura.riftTerrifyingScreech',
+  Riptide: 'mechanic.riftRiptide',
+  Undertow: 'aura.riftUndertow',
+  'Pact Flame': 'mechanic.riftPactFlame',
+  'Blood Sigil': 'mechanic.riftBloodSigil',
+  'Rain of Brimstone': 'mechanic.riftRainOfBrimstone',
+  'Hoof of Ruin': 'aura.riftHoofOfRuin',
+  'Wing Buffet': 'mechanic.riftWingBuffet',
+  'Pitfire Ring': 'mechanic.riftPitfireRing',
 };
 
 const WARLOCK_ABILITY_AURA_IDS: Readonly<Record<string, string>> = {

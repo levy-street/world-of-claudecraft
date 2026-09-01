@@ -83,6 +83,11 @@
     --color-focus: #d79a2b;
     --color-devotion: #e7b943;
     --color-ascension: #fff1a3;
+    /* Extended Dawn (pal_r17_extended_dawn) grants 2 charges beyond the base 5;
+       those bonus charge pips (.paladin-ascension-charges span:nth-child(n+6))
+       glow this color instead of --color-ascension so the empowered bonus reads
+       at a glance, including in peripheral vision. */
+    --color-ascension-bonus: #c88ef5;
     --color-hostile: #ff6b5e;
     --color-friendly: #9fdc7f;
     --color-buff: #3a6ea8;

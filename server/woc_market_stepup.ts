@@ -4,17 +4,18 @@
 //
 // SCOPE OF THE GUARANTEE (be honest about it): this raises the bar and makes a
 // custody move loud and attributable (it demands a live wallet signature, not
-// the bearer alone), but it is NOT an absolute "a stolen bearer cannot move
-// custody" bar on its own, because relinking the account's wallet
-// (POST /api/wallet/link) needs only the INCOMING wallet's signature and is an
-// upsert. A bearer thief can relink to their own wallet FIRST, then sign every
-// challenge. The module's live re-read closes the issue-to-use window (a relink
-// between issuance and use refuses), but not a relink BEFORE issuance. Closing
-// that is a named security follow-up in the wallet-link flow (out of this
-// change's scope): require the OUTGOING wallet's signature to relink/unlink, or
-// a link-age cooldown before a freshly linked wallet may authorize custody, or
-// refuse relink while the account holds live escrowed listings. Tracked in
-// docs/woc-marketplace-hardening/state.md.
+// the bearer alone). On its own it was not an absolute "a stolen bearer cannot
+// move custody" bar, because relinking the account's wallet
+// (POST /api/wallet/link) needed only the INCOMING wallet's signature: a bearer
+// thief could relink to their own wallet FIRST, then sign every challenge. That
+// relink-first hole is now closed by the R11 wallet-link re-auth gate
+// (server/wallet_reauth.ts): CHANGING an existing link demands the CURRENT
+// wallet's co-signature or the account password plus its second factor, and
+// REMOVING it demands the password arm (a link challenge cannot be
+// action-scoped to a removal, so no signature arm is offered there), with a
+// wallet-changed email as the compensating alert. This module's live
+// re-read still closes the issue-to-use window (a relink between issuance and
+// use refuses). History: docs/woc-marketplace-hardening/state.md (R11).
 //
 // Protocol shape (the wallet_link_challenges rules, tightened):
 // - The server builds and stores the FULL signed message; the client can never

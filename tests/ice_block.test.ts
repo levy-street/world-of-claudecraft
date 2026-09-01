@@ -116,6 +116,27 @@ describe('Ice Block: immunity + cleanse + control', () => {
     }
   });
 
+  it('does not strip Stormsurge Ready just because it uses the debuff display surface', () => {
+    const { sim, p } = rigMage();
+    p.auras.push(debuff('test_dot', 'dot', 50));
+    p.auras.push({
+      id: 'shaman_stormsurge_ready',
+      name: 'Stormsurge Ready',
+      kind: 'internal_cd',
+      value: 1,
+      remaining: 6,
+      duration: 6,
+      sourceId: p.id,
+      school: 'nature',
+    });
+
+    sim.castAbility('ice_block');
+
+    expect(p.auras.some((a) => a.id === 'test_dot')).toBe(false);
+    expect(p.auras.some((a) => a.id === 'shaman_stormsurge_ready')).toBe(true);
+    expect(p.auras.some((a) => a.id === 'ice_block' && a.kind === 'stasis')).toBe(true);
+  });
+
   it('cannot cleanse encounter-owned mechanics but still cleanses ordinary debuffs', () => {
     const { sim, p } = rigMage();
     p.auras.push(unbreakableControl('scripted_stun', 'stun'));

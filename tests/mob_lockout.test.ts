@@ -107,6 +107,19 @@ describe('mob school lockout ("Wyrmward Sigil")', () => {
     const sim = makeSim('mage');
     sim.setPlayerLevel(10);
     const p = sim.player;
+    // A live, idle, non-threatening target: a real timed hostile cast always
+    // locks its castTargetId at cast start (castAbility), so a mid-cast fixture
+    // must set it too, or updateCasting's own dead/gone-target check (a plain
+    // timed cast now re-checks its locked target every tick, not just at
+    // completion) would cancel it for the wrong reason.
+    const target = createMob(999901, MOBS.forest_wolf, 10, {
+      x: p.pos.x,
+      y: p.pos.y,
+      z: p.pos.z + 6,
+    });
+    target.hostile = true;
+    target.aiState = 'idle';
+    (sim as any).addEntity(target);
     p.auras.push({
       id: 'lockout_x',
       name: 'Wyrmward Sigil',
@@ -119,12 +132,14 @@ describe('mob school lockout ("Wyrmward Sigil")', () => {
     });
     // A fireball mid-cast is the locked school → broken next tick.
     p.castingAbility = 'fireball';
+    p.castTargetId = target.id;
     p.castRemaining = 2;
     p.channeling = false;
     sim.tick();
     expect(p.castingAbility).toBeNull();
     // A frostbolt mid-cast is a different school → survives.
     p.castingAbility = 'frostbolt';
+    p.castTargetId = target.id;
     p.castRemaining = 2;
     p.channeling = false;
     sim.tick();

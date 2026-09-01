@@ -219,7 +219,7 @@ export const DELVE_ITEMS: Record<string, ItemDef> = {
     sellValue: 550,
     requiredClass: MAG,
   },
-  // --- epic (purple) prestige drops, bountiful-only 3% from the Drowned Reliquary Rite ---
+  // --- epic (purple) prestige drops, bountiful-only 12% from the Drowned Reliquary Rite ---
   blackwater_vanguard_chest: {
     id: 'blackwater_vanguard_chest',
     name: 'Blackwater Vanguard Chestguard',

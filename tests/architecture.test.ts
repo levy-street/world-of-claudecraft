@@ -537,6 +537,7 @@ const UI_PURE_CORES = [
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
+  'src/ui/window_position_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
   'src/ui/target_frame_pos.ts',
@@ -688,6 +689,7 @@ const RENDER_PURE_CORES = [
   'src/render/foliage_shader_core.ts',
   'src/render/foliage_shadow_core.ts',
   'src/render/frame_present.ts',
+  'src/render/self_motion_rift_lift.ts',
   'src/render/shadow_cadence_core.ts',
   'src/render/shadow_texel_snap_core.ts',
   'src/render/frost_ice_fields_core.ts',
@@ -711,6 +713,7 @@ const RENDER_PURE_CORES = [
   'src/render/fenbridge_town_visibility_core.ts',
   'src/render/occluder_fade_core.ts',
   'src/render/point_light_shader_core.ts',
+  'src/render/final_color_nan_guard_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
   'src/render/post_plan_core.ts',
@@ -745,6 +748,8 @@ const RENDER_PURE_CORES = [
   'src/render/rift_death_zone_core.ts',
   'src/render/scene_census_core.ts',
   'src/render/sea_mist_core.ts',
+  'src/render/self_prediction_core.ts',
+  'src/render/self_render_position_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
   'src/render/terrain_region_core.ts',
@@ -820,6 +825,7 @@ const BARE_NAMED = [
   'src/ui/woc_market_reason_text.ts',
   'src/render/foliage_lod.ts',
   'src/render/frame_present.ts',
+  'src/render/self_motion_rift_lift.ts',
   'src/game/presentation_gate.ts',
   'src/game/stale_chrome_focus.ts',
   'src/render/compile_gate.ts',
@@ -1891,6 +1897,7 @@ const EXPECTED_BARE_NAMED = [
   'src/render/prewarm_pass.ts',
   'src/render/prewarm_policy.ts',
   'src/render/prewarm_resume.ts',
+  'src/render/self_motion_rift_lift.ts',
   'src/ui/ability_tooltip_lines.ts',
   'src/ui/absorb_bar.ts',
   'src/ui/bag_filter.ts',
@@ -2389,6 +2396,7 @@ const UI_DOM_MODULES = [
   'src/ui/meters_frame.ts',
   'src/ui/minimap_gilded_ornament.ts',
   'src/ui/mobile_wallet_launcher.ts',
+  'src/ui/wallet_reauth_prompt.ts',
   'src/ui/wallet_verify_request.ts',
   'src/ui/mount_race_controls.ts',
   'src/ui/mount_race_strip.ts',
@@ -2454,8 +2462,13 @@ const UI_DOM_MODULES = [
   'src/ui/steam_wishlist.ts',
   'src/ui/store_decision_prompt.ts',
   'src/ui/store_stack_diag.ts',
+  'src/ui/swing_timer_bars.ts',
   'src/ui/talents_window.ts',
   'src/ui/target_auras_window.ts',
+  // target_swing_timer_bars.ts mirrors swing_timer_bars.ts's own reach: it
+  // resolves the #swingbar-target/#swingbar-tot elements via document.querySelector
+  // once in its constructor, the same DOM-owning shape as its sibling above.
+  'src/ui/target_swing_timer_bars.ts',
   'src/ui/theme.ts',
   'src/ui/touch_item_drag.ts',
   'src/ui/touch_tap.ts',
@@ -2475,6 +2488,7 @@ const UI_DOM_MODULES = [
   'src/ui/window_drag.ts',
   'src/ui/window_open_state.ts',
   'src/ui/window_resize.ts',
+  'src/ui/woc_market_link.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // The sweep's domain: every src/ui module the other two sweeps do NOT already

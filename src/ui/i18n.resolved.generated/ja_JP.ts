@@ -961,7 +961,8 @@ export const ja_JP: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "時",
-      "durationUnitDays": "日"
+      "durationUnitDays": "日",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "キャラクターモデルプレビュー"
@@ -1391,6 +1392,7 @@ export const ja_JP: EnTranslations = {
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "name_terrorspark_groundshaker": "地揺らしのドレッドスパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
       "desc_stalkglider_snail": "粘り強くゆっくり燃えるカタツムリ。移動速度を高める。",
@@ -1399,7 +1401,8 @@ export const ja_JP: EnTranslations = {
       "desc_stormfeather_griffin": "ルーンの爪で地を闊歩する気高き嵐のグリフォン。翼はたたまれている。",
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
-      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。"
+      "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
     "mountTraining": {
       "mountPrompt": "{key} キーを押して訓練用ヴァロースティードに騎乗する。",
@@ -1569,6 +1572,7 @@ export const ja_JP: EnTranslations = {
       "playerFrameScale": "プレイヤーフレームの大きさ",
       "targetFrameScale": "ターゲットフレームの大きさ",
       "aurasOnPlayerFrame": "バフをプレイヤーフレームに表示",
+      "alwaysShowAllBuffs": "すべてのバフを常に表示",
       "highContrastBackground": "高コントラスト背景",
       "startAttackOnAbility": "アビリティ使用時に自動攻撃",
       "stopAutoAttackOnTargetSwitch": "ターゲット切り替え時に自動攻撃を停止",
@@ -1578,6 +1582,8 @@ export const ja_JP: EnTranslations = {
       "stickyTarget": "地面クリックでターゲットを維持",
       "showItemLevel": "アイテムレベルを表示",
       "showReliquaryTracker": "聖遺物庫トラッカーを表示",
+      "confirmVendorSell": "売却前に確認する",
+      "confirmVendorSellNote": "オフにすると確認なしでワンクリックでアイテムを売却します。カバンのスロットがずれていると、誤ったアイテムを売却する可能性があります。",
       "itemLevelLine": "アイテムレベル {level}",
       "itemScoreLine": "スコア {score}",
       "showSecondaryActionBar": "セカンダリアクションバーを表示",
@@ -1586,6 +1592,7 @@ export const ja_JP: EnTranslations = {
       "hideUnusedActionSlots": "未使用のアクションスロットを非表示",
       "lockActionBars": "アクションバーをロック",
       "showTargetOfTarget": "ターゲットのターゲットを表示",
+      "showTargetSwingTimer": "ターゲットの攻撃タイマーを表示",
       "showPetFrame": "自分のペットを表示",
       "waterRipples": "水面の波紋（航跡）",
       "showAttackButton": "攻撃ボタンを表示",
@@ -2166,6 +2173,12 @@ export const ja_JP: EnTranslations = {
         "few": "残り {count} 秒",
         "many": "残り {count} 秒",
         "other": "残り {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "few": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "many": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です",
+        "other": "あと{count}個のバフが有効ですが、画質設定によりアイコンが非表示です"
       },
       "playtimeDays": {
         "one": "{count} 日",
@@ -2980,11 +2993,11 @@ export const ja_JP: EnTranslations = {
         "actionBar2": "アクションバー 2",
         "actionBar3": "アクションバー 3",
         "steamWishlist": "ウィッシュリストの通知",
-        "menu": "Menu",
+        "menu": "メニュー",
         "minimap": "ミニマップ",
         "stanceBar": "スタンスバー",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "経験値バー",
+        "chat": "チャット",
         "actionBarGroup": "アクションバー",
         "playerFrame": "プレイヤー",
         "targetFrame": "ターゲット",
@@ -3002,7 +3015,7 @@ export const ja_JP: EnTranslations = {
       "actionBar2Vertical": "アクションバー 2 を縦向きに",
       "actionBar3Vertical": "アクションバー 3 を縦向きに",
       "menuRailHorizontal": "メニューを横向きに",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "グリッドにスナップ",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "サイズをリセット",
       "resetFrameSizeFor": "{name}のサイズをリセット",
@@ -4038,7 +4051,9 @@ export const ja_JP: EnTranslations = {
       "disenchant": "魔力分解",
       "salvage": "解体",
       "applyEnchant": "エンチャントを付与",
-      "sunder": "断つ"
+      "sunder": "断つ",
+      "sell": "売却",
+      "sellAll": "すべて売却（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "{item}を魔力分解した。",
@@ -4596,6 +4611,10 @@ export const ja_JP: EnTranslations = {
       "loading": "取引所を読み込み中...",
       "loadFailed": "取引所に接続できませんでした。しばらくしてからもう一度お試しください。",
       "disabledRealm": "このレルムでは $WOC 取引所を利用できません。",
+      "browserOnlyConfirmTitle": "ブラウザで $WOC 取引所を開きますか？",
+      "browserOnlyConfirmBody": "$WOC 取引所は World of ClaudeCraft のブラウザ版でのみ利用できます。ブラウザで World of ClaudeCraft を開きます。そこでログインして取引所を開けます。ゲームはそのまま続行されます。",
+      "browserOnlyConfirmOpen": "ブラウザで開く",
+      "browserOnlyConfirmCancel": "キャンセル",
       "pausedBanner": "取引は一時停止中です。オークションのカウントダウンは続行されます。新しい出品、入札、オファー、支払いは取引再開まで待機になりますが、すでに送信された支払いはそのまま決済されます。",
       "walletLinkedDisconnected": "公開アドレスはリンク済みです。$WOC で支払う際は、そのウォレットアプリに再接続してください。",
       "walletLinkedConnected": "リンク済みのウォレットアプリに接続され、$WOC で支払う準備ができています。",
@@ -4917,7 +4936,13 @@ export const ja_JP: EnTranslations = {
       "upstream": "Epicから応答がありません。しばらくしてからもう一度お試しください。"
     },
     "wallet": {
-      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。"
+      "handoff_invalid": "ウォレット認証の有効期限が切れたか、確認できませんでした。もう一度お試しください。",
+      "reauth_required": "このウォレット変更を確認するには、アカウントのパスワードを入力してください。",
+      "reauth_two_factor": "このアカウントは二要素認証が有効です。確認のため認証コードを入力してください。",
+      "reauth_no_password": "まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+      "reauth_bad_signature": "ウォレットの署名を確認できませんでした。もう一度お試しください。",
+      "reauth_bad_password": "パスワードが正しくありません。",
+      "reauth_bad_two_factor": "そのコードは無効です。もう一度お試しください。"
     },
     "ota_updates": {
       "invalid_input": "入力が無効です。"
@@ -5376,6 +5401,7 @@ export const ja_JP: EnTranslations = {
       "ifPartySort": "パーティメンバーを並べる順序です。グループ順、ロール、名前から選べます。",
       "ifPartyShowAuras": "パーティフレームにバフとデバフを表示するかどうかです。同様のスイッチが、リソースバー、吸収、ペット、そして自分をパーティ一覧に含めるかどうかにも用意されています。",
       "ifAurasOnPlayerFrame": "自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。",
+      "ifAlwaysShowAllBuffs": "低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。",
       "ifTargetOfTarget": "ターゲットが誰を狙っているかを表示します。タンクがまだ抱えているかを確かめる、昔ながらの手立てです。",
       "ifPetFrame": "ペット用のフレームを表示します。",
       "ifChatFontScale": "チャットの文字サイズです。",
@@ -6583,6 +6609,9 @@ export const ja_JP: EnTranslations = {
       "effectFood": "食べると{seconds}秒かけて体力を{amount}回復する。",
       "effectWellFed": "食べ終えると満腹: {stat}+{value}({minutes}分)。",
       "effectWellFedAura": "食べ終えると{minutes}分間{aura}を得る。",
+      "effectFeast": "他の人が食べられる宴を並べる。1人1杯: 計{servings}杯、{minutes}分間持続。",
+      "effectFeastServing": "1杯につき{seconds}秒かけて体力を{amount}回復する。",
+      "effectFeastWellFed": "1杯を食べ終えると満腹: {stat}+{value}({minutes}分)。",
       "sourceTrainerFee": "訓練師、{fee}",
       "sourceTrainerFree": "訓練師、無料",
       "sourceKnown": "最初から習得済み",
@@ -6590,6 +6619,7 @@ export const ja_JP: EnTranslations = {
       "sourceVendor": "英雄補給係が販売",
       "sourceDropAndVendor": "見つけた図案から習得、または英雄補給係が販売",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "なし",
       "colRecipe": "レシピ",
       "colSkill": "スキル",
       "colSource": "入手先",
@@ -7917,6 +7947,13 @@ export const ja_JP: EnTranslations = {
     "unlink": "連携解除",
     "unlinkTitle": "このアカウントからウォレット認証を削除",
     "unlinkAria": "このアカウントからウォレット認証を削除",
+    "reauthTitle": "ウォレット変更の確認",
+    "reauthUnlinkTitle": "ウォレット削除の確認",
+    "reauthHelp": "セキュリティ保護のため、この変更を許可するにはアカウントのパスワードを入力してください。",
+    "reauthNoPassword": "このアカウントはパスワードなしでサインインしています。まずアカウント設定でパスワードを設定してから、もう一度お試しください。",
+    "reauthConfirm": "確認",
+    "reauthCancel": "キャンセル",
+    "reauthClose": "閉じる",
     "signOut": "接続解除",
     "signOutTitle": "このブラウザでウォレットアプリの接続を解除",
     "signOutAria": "このブラウザでウォレットアプリの接続を解除",
@@ -9621,6 +9658,8 @@ export const ja_JP: EnTranslations = {
       "soldJunkMany": "不要品{count}個を{money}で売却しました。",
       "keptBoundOne": "バインド品{count}個は売らずに残しました。",
       "keptBoundMany": "バインド品{count}個は売らずに残しました。",
+      "keptLockedOne": "ロック中の{count}個は売らずに残しました。",
+      "keptLockedMany": "ロック中の{count}個は売らずに残しました。",
       "friendOnline": "{name}がオンラインになりました。",
       "friendOffline": "{name}がオフラインになりました。"
     },
@@ -13479,6 +13518,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "ドレッドスパークの始動キー"
+      },
+      "reins_rickshaw_mount": {
+        "name": "縛りの手綱：骨縛りの人力車"
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"

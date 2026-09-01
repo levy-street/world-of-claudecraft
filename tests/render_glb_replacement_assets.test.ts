@@ -74,7 +74,7 @@ const armouryFinalPipelineEnabled =
     item.src?.endsWith('eastbrook_grand_armoury-final.glb'),
   ) ?? false;
 const ARMOURY_SHIPPING_BYTE_CEILING = 160 * 1024;
-const ARMOURY_SHIPPING_SHA256 = '52bb34d1ae961e6d52c5e543149d902b211be8f3a2f8be94ad21b5dfc84283cb';
+const ARMOURY_SHIPPING_SHA256 = 'd7c056c90862ef3684ac33008ff8b748cb04b784f1629fe6f7c4cc36f669401e';
 const MANIFEST_HASH_LENGTH = 12;
 
 function expectAssetExistsAndManifested(url: string): void {
@@ -511,10 +511,11 @@ describe('GLB-replacement asset preload sets resolve to real, manifested files',
   it('farm patch assets', () => {
     const urls = farmPatchesPreloadInternalsForTest.modelUrls;
     // The full committed set: bed + bin + shared sprout + 3 families x
-    // (stage2, stage3, stage4, withered), plus the Phase 12 harvest feast
-    // table. A new family or stage moves this count deliberately, in the
-    // same change that commits its GLB.
-    expect(urls.length).toBe(16);
+    // (stage2, stage3, stage4, withered), plus BOTH harvest feast tables (the
+    // Phase 12 party trestle table and the Phase 18 apex pedestal banquet the
+    // three role feasts wear). A new family, stage or table moves this count
+    // deliberately, in the same change that commits its GLB.
+    expect(urls.length).toBe(17);
     for (const url of urls) expectAssetExistsAndManifested(url);
   });
 

@@ -42,6 +42,7 @@ import type { InstanceSlot, PlayerMeta } from '../sim';
 import type { SimContext } from '../sim_context';
 import { arenaQueueLeave } from '../social/arena';
 import { resurrectOnInstanceReentry } from '../spirit';
+import { settleTeleportArrival } from '../teleport_arrival';
 import { dropThreat } from '../threat';
 import {
   dist2d,
@@ -65,6 +66,7 @@ import {
   ignivarRaidInCombat,
   resolveIgnivarEntryRoom,
 } from './ignivar_entry';
+import { ignivarExitRoom, ignivarExitSealed } from './ignivar_exit';
 import { tickIgnivarLavaHazard } from './ignivar_lava_hazard';
 import { emitFirstRaidBossRoomWelcome } from './raid_boss_room_welcome';
 
@@ -366,6 +368,7 @@ export function enterDungeon(
   // so a lone tester can zone into the raid. Dev-gated (never in production). The
   // raid LOCKOUT is deliberately NOT bypassed (use /dev raid reset for that).
   devBypass = false,
+  options: { ignivarBacktrack?: boolean } = {},
 ): boolean {
   const r = ctx.resolve(pid);
   // The Ignivar checkpoint redirect below may re-point the entry at a deeper
@@ -410,13 +413,20 @@ export function enterDungeon(
   // the rift bars only dead entrants): NO entrant from OUTSIDE the raid,
   // living or ghost, may zone in while any of the group's rooms still has a
   // living mob engaged (the anti-zerg lockout), and an allowed outside
-  // entrant through the overworld approach door lands in the deepest room
-  // the group already claims, not back at the approach. A member standing
+  // entrant through the keep door zones straight into the deepest room the
+  // group already claims once that checkpoint sits past the Halls; a group
+  // no deeper than the Halls boards the lift again. A member standing
   // inside one of the group's rooms is moving BETWEEN rooms and skips both
   // rules.
   if (isIgnivarRaidRoom(dungeonId) && !bypass) {
     const raidClaims = ignivarRaidClaimsForKey(ctx, key);
-    const insideOwnRaid = raidClaims.some((claim) => instanceClaimContains(claim, r.e.pos));
+    // A backward exit portal is already authenticated by leaveDungeon finding
+    // the player inside the later room. Mark it explicitly so checkpoint
+    // routing can never send that exit forward again if position or claim
+    // ownership changes around the teleport boundary.
+    const insideOwnRaid =
+      options.ignivarBacktrack === true ||
+      raidClaims.some((claim) => instanceClaimContains(claim, r.e.pos));
     if (!insideOwnRaid) {
       if (ignivarRaidInCombat(ctx, raidClaims)) {
         // Throttled like the rift denials: the walk-in trigger fires at 20 Hz.
@@ -454,10 +464,9 @@ export function enterDungeon(
   // previous room's claim always answers to that room's gate (a sealed
   // forge-lift car never leaks its rider into the Halls early). An OUTSIDE
   // entrant is admitted only where the room carries a real overworld
-  // walk-up door (today the Halls' Eastbrook testing door, whatever the
-  // room's chain position); when the walk-up reverts at launch
-  // (overworldDoor: false), the seal re-engages and the lift-gate flow
-  // governs first entry.
+  // walk-up door; every room past the lift is interior-only
+  // (overworldDoor: false), so the lift-gate flow governs first entry to
+  // the whole chain (the Eastbrook walk-up testing door is retired).
   if (
     previousIgnivarRoom &&
     !bypass &&
@@ -674,6 +683,7 @@ export function enterDungeon(
   p.pos = ctx.groundPos(origin.x + dungeon.entry.x, origin.z + dungeon.entry.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.facing = 0;
   p.prevFacing = 0;
   p.dungeonEntrySeq = (p.dungeonEntrySeq ?? 0) + 1;
@@ -681,16 +691,6 @@ export function enterDungeon(
   r.meta.moveInput.turnRight = false;
   p.targetId = null;
   p.autoAttack = false;
-  // Land settled: no carried-over jump arc or fall distance from the overworld
-  // side of the door (the same recipe as every other sim teleport, portals.ts
-  // included). Without this, a player who jumps into the door mid-air keeps
-  // its stale overworld fallStartY/onGround=false, and the next vertical pass
-  // computes a bogus drop against the unrelated instance floor height and
-  // deals fall damage that has nothing to do with any real fall.
-  p.vy = 0;
-  p.jumping = false;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
   inst.emptyFor = 0;
   // Session participation record for this run: awardHeroicMarks pays the mail
   // arm only to locked players who actually walked through the door.
@@ -816,21 +816,49 @@ export function leaveDungeon(ctx: SimContext, pid?: number): boolean {
       return false;
     }
   }
+  // The Ignivar raid exit rules (instances/ignivar_exit.ts): while the room's
+  // boss fight is live no portal leads out, and the rooms past the Halls
+  // route their exit portal BACK a floor (arena to approach, assembly to
+  // arena, crucible to assembly) instead of outside. Only the lift and the
+  // Halls set players down in the open world, beside the keep entrance.
+  if (isIgnivarRaidRoom(dungeon.id)) {
+    const inst = ctx.instances.find((i) => i.partyKey !== null && instanceClaimContains(i, p.pos));
+    if (inst && ignivarExitSealed(dungeon.id, inst.mobIds, ctx.entities)) {
+      // Throttled like the entry denial: the exit walk-in trigger fires at 20 Hz.
+      if (ctx.time >= (p.ignivarExitDeniedAt ?? -Infinity) + IGNIVAR_ENTRY_DENIED_NOTICE_SECONDS) {
+        p.ignivarExitDeniedAt = ctx.time;
+        ctx.error(r.meta.entityId, 'The forge doors hold fast while the battle rages.');
+      }
+      return false;
+    }
+    const previousRoomId = ignivarExitRoom(dungeon.id);
+    if (previousRoomId !== null) {
+      // Route through the real door: the group's claim for the previous room
+      // exists in normal play (the family frees together), the insideOwnRaid
+      // exemption skips the combat lockout, and claim-wins difficulty applies.
+      // A refusal leaves the player standing where they are, never outside.
+      if (
+        !enterDungeon(ctx, previousRoomId, r.meta.entityId, false, {
+          ignivarBacktrack: true,
+        })
+      )
+        return false;
+      // The left room's teardown, exactly leaveDungeon's: departing scrubs the
+      // leaver from its hate tables and sheds its encounter-owned auras.
+      if (inst) scrubInstanceThreat(ctx, inst, p.id);
+      if (dungeon.id === IGNIVAR_RAID_ARENA_ID) clearIgnivarEncounterAuras(p);
+      if (dungeon.id === IGNIVAR_SECOND_WING_ID) clearVarkhulEncounterAuras(p);
+      return true;
+    }
+  }
   const door = detachFromDungeon(ctx, p);
   if (!door) return false; // unreachable: dungeonAt already answered above
   p.pos = ctx.groundPos(door.x, door.z);
   p.prevPos = { ...p.pos };
   ctx.rebucket(p);
+  settleTeleportArrival(p);
   p.targetId = null;
   p.autoAttack = false;
-  // Land settled (see the matching comment in enterDungeon above): the exit
-  // side of the door needs the same reset, or leaving mid-air over an
-  // instance's interior geometry carries that fall state back out onto the
-  // overworld door and deals the same bogus fall damage in reverse.
-  p.vy = 0;
-  p.jumping = false;
-  p.onGround = true;
-  p.fallStartY = p.pos.y;
   ctx.emit({ type: 'log', text: dungeon.leaveText, color: '#b9f', pid: r.meta.entityId });
   return true;
 }
@@ -1340,6 +1368,20 @@ export function awardHeroicMarks(
 
   for (const meta of lockoutRecipients.values()) {
     const alreadyLocked = isRaidLocked(ctx, meta, heroicLockoutId(inst.dungeonId));
+    // THE GATE FIRST, then the pay. The mail arm below is the one DURABLE half
+    // of this payout that does not live on the character: a parcel persists in
+    // the realm's mail book, while the lockout that prices it persists only in
+    // the character's own save. Stamping first means no failure between the two
+    // can leave a participant holding marks with the gate that paid for them
+    // unset, which is a second payout from one kill. Behavior-identical: the
+    // payment reads `alreadyLocked`, captured above, and lockToHeroicClaim's
+    // own clearedBy test reads the same pre-stamp value, so only the ORDER of
+    // two independent writes moves. Whether the stamp reaches the DATABASE is a
+    // separate question, answered upstream: instanceLockoutMetas and the death
+    // hub's participation snapshot both drop a meta.leaving character, so a
+    // departing one is never mailed at all (tests/heroic_marks_mail.test.ts
+    // pins both halves, and the second-payout consequence).
+    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
     if (!alreadyLocked && credited) {
       let paid = false;
       if (presentIds.has(meta.entityId)) {
@@ -1359,7 +1401,6 @@ export function awardHeroicMarks(
         ctx.markDeedsDirty(meta.entityId);
       }
     }
-    lockToHeroicClaim(ctx, inst, meta, lockedUntil);
   }
 }
 

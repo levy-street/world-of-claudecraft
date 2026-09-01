@@ -375,7 +375,7 @@ describe('ignivar loot: the boss drop tables', () => {
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });
 
-  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, copper, and the legendary shield', () => {
+  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, and copper on Normal', () => {
     const loot = MOBS.varkhul_forgefather_of_the_last_flame.loot ?? [];
     expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
     const groups = groupsOf(loot);
@@ -385,22 +385,16 @@ describe('ignivar loot: the boss drop tables', () => {
       'varkhul_offset',
       'varkhul_rings',
     ]);
-    // The shield rides inside the feet-and-held group at the kingsbane 3
-    // percent precedent, paid for by its off-hand slot-mate the cinder.
-    // Forgebreaker is deliberately ABSENT: the maintainer pulled it from the
-    // table to route it through the crafting professions (2026-08-30); the
-    // orb sits back at its full 0.15 and the partition stays exactly 1.00.
+    // Neither legendary belongs to the normal table. Emberward is a
+    // heroic-only Varkhul drop, while Forgebreaker remains reserved for the
+    // crafting professions. The two held offhands keep their full 0.15
+    // slices and the partition stays exactly 1.00.
     const legendaryRows = loot.filter(
       (r) => 'itemId' in r && String(r.itemId).startsWith('varkhul_'),
     );
-    expect(legendaryRows.map((r) => ('itemId' in r ? r.itemId : ''))).toEqual([
-      'varkhul_emberward',
-    ]);
-    for (const row of legendaryRows) {
-      expect(row).toMatchObject({ chance: 0.03, rollGroup: 'varkhul_offset' });
-    }
+    expect(legendaryRows).toEqual([]);
     const offset = groups.get('varkhul_offset');
-    expect(offset?.ids.length).toBe(13); // 10 feet + both held offhands + the shield
+    expect(offset?.ids.length).toBe(12); // 10 feet + both held offhands
     expect(offset?.ids).toContain('orb_of_the_last_spring');
     expect(offset?.ids).toContain('cinder_of_the_first_design');
     for (const id of offset?.ids ?? []) {
@@ -427,7 +421,7 @@ describe('ignivar loot: the boss drop tables', () => {
     expect(tuning?.finalBossId).toBe('varkhul_forgefather_of_the_last_flame');
   });
 
-  it('Heroic appends pay the Robe sigil on both bosses and the shields on Varkhul', () => {
+  it('Heroic appends pay the Robe sigil on both bosses and Emberward in Varkhul shields', () => {
     const ignivar = HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame ?? [];
     const varkhul = HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? [];
     const ignivarGroups = groupsOf(ignivar);
@@ -445,7 +439,12 @@ describe('ignivar loot: the boss drop tables', () => {
     expect(varkhulGroups.get('varkhul_h_shields')?.ids).toEqual([
       'bulwark_of_the_inner_crucible',
       'ember_wardens_barrier',
+      'varkhul_emberward',
     ]);
+    expect(varkhul.find((entry) => entry.itemId === 'varkhul_emberward')).toMatchObject({
+      chance: 0.03,
+      rollGroup: 'varkhul_h_shields',
+    });
     for (const groups of [ignivarGroups, varkhulGroups])
       for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });

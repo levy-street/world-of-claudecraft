@@ -1862,6 +1862,9 @@ export interface MobTemplate {
   componentTags?: string[];
   boss?: boolean;
   rare?: boolean;
+  // Explicit tame opt-out for ordinary beasts whose encounter lifecycle must
+  // not be replaced by the hunter pet respawn lifecycle.
+  untameable?: boolean;
   // World boss: a server-wide elite that spawns on a fixed cadence (not from a
   // CAMP), announces itself when it rises, and drops PERSONAL loot to every player
   // who damaged it (gated to once per day per boss). The spawn schedule + location
@@ -4215,6 +4218,11 @@ export interface ZonePropsDef {
     /** ride the water surface instead of the seabed (moored ships/boats);
      * sunk this many yd below the waterline (the hull's draft) */
     float?: number;
+    /** A standable top (crate/rock family, see `colliders.ts`): this many yd
+     * above ground, a mover may land and stand on it instead of the piece
+     * colliding as a full-height wall. Requires `r` (or `hw`/`hd`) for the
+     * footprint; omit for ordinary full-height or walk-through decor. */
+    standableTop?: number;
   }[];
 }
 
@@ -5232,6 +5240,9 @@ export interface Entity extends ClientMirroredEntityFields {
   // `tid` (#2513).
   harvestClaimedBy: number | null;
   despawnTimer?: number;
+  // An unconditional lifetime countdown. Unlike despawnTimer, combat, retargeting,
+  // and evade transitions never clear this timer.
+  hardDespawnTimer?: number;
   // Summoned quest add (e.g. a Broodmother-egg hatchling): seconds it survives out
   // of combat before despawning. updateMob starts the despawnTimer countdown when
   // the add leashes home and cancels it while the add is back in combat.
@@ -5292,6 +5303,11 @@ export interface Entity extends ClientMirroredEntityFields {
   // shown to this player, so the 20 Hz walk-in door trigger does not spam the
   // toast (instances/ignivar_entry.ts).
   ignivarEntryDeniedAt?: number;
+  // Sim time of the last "the forge doors hold fast" Ignivar exit denial shown
+  // to this player while a boss fight seals the room, throttled the same way:
+  // the 20 Hz exit-portal walk-in trigger must not spam the toast
+  // (instances/ignivar_exit.ts).
+  ignivarExitDeniedAt?: number;
   // Sim time of the last lockpickOffer emitted to this player from a
   // rift_locked_chest click, so repeated F-key presses don't spam the UI.
   riftLockpickOfferAt?: number;
@@ -6457,8 +6473,8 @@ export type SimEvent = { pid?: number } & (
       // Healing lost to the missing-hp clamp (parse fidelity 7.1), omitted
       // when zero. Computed AFTER heal-absorb consumption, so absorbed and
       // overheal never double-count the same lost healing. Set at every
-      // clamped heal2 emit site; a tick whose heal fully overheals still
-      // emits nothing (those sites gate on healed > 0, unchanged).
+      // clamped heal2 emit site; a tick whose heal fully overheals without
+      // draining a heal-absorb shield still emits nothing.
       overheal?: number;
     }
   // visual-only cue for the renderer: spell projectiles, channel beams, dot
@@ -7385,13 +7401,6 @@ export type SimEvent = { pid?: number } & (
   // the client renders its own one-shot tier-up explainer. Carries no ids beyond
   // the recipient; the persisted one-shot flag guarantees it never re-fires.
   | { type: 'profTierTutorial'; pid: number }
-  // Spawn greeting (tutorial island): fired exactly once per character, on a
-  // genuinely fresh character's first swept tick (sim/tutorial/greeting.ts).
-  // Personal (pid = the newcomer) and text-free: the client renders the
-  // greeter dialog itself, choosing first-character vs refresher copy off
-  // `firstCharacter` (a server-recomputed account fact, never persisted).
-  // The persisted one-shot flag guarantees it never re-fires.
-  | { type: 'tutorialGreeting'; pid: number; firstCharacter: boolean }
   // Ferry bell homecoming (tutorial island): fired every time the island's
   // bell sets a player down in Eastbrook town (interactions/ferry_bell.ts).
   // Personal and text-free: the client decides ONCE per device (localStorage)

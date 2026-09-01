@@ -47,7 +47,11 @@ describe('material_taxonomy as the first-evaluated sim module', () => {
     // poor again), so both derive OUT like the other survivors.
     // 115 -> 116 at masterwrought Phase 11o: cogwheel_blank, the junk-kind
     // engineering on-ramp part, derives IN as a chassis and ocular reagent.
-    expect(MATERIAL_ITEM_IDS.size).toBe(116);
+    // 116 -> 117 at the release/v0.42.0 merge: lastflame_core, the
+    // Crucible of the Last Spring core reagent, derives IN through the
+    // recipe-pending list (CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS)
+    // while its consuming recipes are still staged.
+    expect(MATERIAL_ITEM_IDS.size).toBe(117);
     expect(MATERIAL_ITEM_IDS.has('iron_ore')).toBe(true);
     expect(MATERIAL_ITEM_IDS.has('arcanite_bar')).toBe(true);
     // The farming source specifically, because it is the newest and the one

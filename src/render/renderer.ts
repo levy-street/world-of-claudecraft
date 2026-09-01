@@ -98,9 +98,9 @@ import {
   stepCameraDirector,
 } from './camera_director_core';
 import {
-  cameraFovOffset,
   createCameraFeel,
   punchCameraFov,
+  resolveCameraFov,
   stepCameraFeel,
   stepLandingDetector,
 } from './camera_feel_core';
@@ -417,12 +417,13 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
+import { applyMountJumpAttitude } from './mount_jump_attitude';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountBobY, mountVisualSpec } from './mount_visuals';
+import { mountVisualSpec } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -607,6 +608,16 @@ import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
+import {
+  attachPullerIfRickshaw,
+  preloadPullerIfRickshaw,
+  type RickshawMountViewState,
+  releaseRickshawMountState,
+  rickshawMountBuildReady,
+  spinMountWheels,
+  updateRickshawPuller,
+  updateRollingMountLoop,
+} from './rickshaw_mount';
 import { collectRiftAmbientSources } from './rift_ambience';
 import { buildRiftRankBadge } from './rift_rank';
 import { syncRigMatrixFreeze, unfreezeRigMatrices } from './rig_visibility_freeze';
@@ -622,7 +633,12 @@ import {
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
 import { drapeRingLocalY } from './selection_ring';
-import { type SelfMotionFrame, SelfMotionPredictor, updateSelfRenderFallback } from './self_motion';
+import {
+  createSelfRenderPositionState,
+  noteSelfIdentity,
+  type SelfRenderPrediction,
+  updateSelfRenderPosition,
+} from './self_render_position_core';
 import { SelfSpiritPrewarmer } from './self_spirit_prewarm';
 import { SentenceVfx } from './sentence_vfx';
 import { sentenceImpactPlan } from './sentence_vfx_core';
@@ -939,9 +955,6 @@ const SPARKLE_BOOST = 1.5;
 // hideable crosses the eye-to-camera segment through the shared fade policy.
 // The requested chase-camera distance is never changed by scene geometry.
 const CAMERA_BASE_FOV = 60;
-// Decay rate of the one-time offset captured when the self-motion predictor
-// takes over from the lead-smoothing path (gone in ~0.3 s, no camera step).
-const SELF_MOTION_HANDOFF_RATE = 15;
 // lighting rig (high/ultra): IBL supplies ambient, sun carries the key.
 // The key keeps its golden color (full-strength white read as harsh midday
 // glare against the sunless realm skies); key up / fill down buys the
@@ -1034,11 +1047,7 @@ interface AoeRingSlot {
   elapsed: number; // seconds since spawn; >= AOE_RING_LIFETIME means free
 }
 
-function selfSnapshotAlpha(alpha: number, lead: number): number {
-  return Math.min(1.25, alpha + Math.max(0, lead));
-}
-
-export interface EntityView {
+export interface EntityView extends RickshawMountViewState {
   group: THREE.Group;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
@@ -1053,6 +1062,8 @@ export interface EntityView {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
+  /** Display-only jump attitude; see mount_jump_attitude. */
+  mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
   fireballTravelVisual: FireballTravelVisual | null; // Mage travel form, built lazily
   iceBlockVisual: IceBlockVisual | null; // Ice Block shell, built lazily on first stasis
@@ -1292,6 +1303,7 @@ export class Renderer {
   private readonly camBoom = createCameraBoom();
   private readonly camFeel = createCameraFeel();
   private readonly camDirector = createCameraDirector();
+  private baseFov = CAMERA_BASE_FOV; // setCameraFov's value; camera.fov is overwritten below each frame
   // Player-pose mirror from last frame: any change while a directive runs is
   // manual camera input (or the follow system), which cancels the directive.
   private readonly camMirror = {
@@ -1462,22 +1474,20 @@ export class Renderer {
     sitting: false,
   };
   private selfRenderPosition = new THREE.Vector3();
-  private selfRenderPositionReady = false;
-  // Online display-only self extrapolation (see src/render/self_motion.ts).
-  // Lazy: offline never passes a SelfMotionFrame, so it is never constructed.
-  private selfMotionPredictor: SelfMotionPredictor | null = null;
-  private selfMotionActive = false;
-  private selfMotionOffset = new THREE.Vector3();
+  // Display-pose state the pure core owns (predictor, handoff offset, ready /
+  // active / identity), writing straight into the Vector3 above. Online
+  // extrapolation itself lives in src/render/self_motion.ts, and its predictor
+  // is lazy: offline never passes a SelfMotionFrame, so it is never built.
+  private selfRender = createSelfRenderPositionState(this.selfRenderPosition);
 
   /** Perf-overlay telemetry: ms of latency the self-motion extrapolation is
    *  currently hiding, or null while the predictor is inactive. */
   get selfMotionLeadMs(): number | null {
-    return this.selfMotionActive && this.selfMotionPredictor
-      ? this.selfMotionPredictor.leadMs
+    return this.selfRender.active && this.selfRender.predictor
+      ? this.selfRender.predictor.leadMs
       : null;
   }
 
-  private lastSelfId: number | null = null;
   // Last yaw applied to the local player while the camera was driving its facing
   // (mouselook / mouse-camera). Null when the override is disengaged, so the next
   // engage re-seeds from the live interpolated facing instead of snapping. See
@@ -4205,7 +4215,7 @@ export class Renderer {
 
   /** Vertical camera field of view in degrees (55..100, default 60). */
   setCameraFov(deg: number): void {
-    this.camera.fov = Math.min(100, Math.max(55, deg));
+    this.camera.fov = this.baseFov = Math.min(100, Math.max(55, deg));
     this.camera.updateProjectionMatrix();
   }
 
@@ -7262,7 +7272,7 @@ export class Renderer {
           // position so the body snaps to the authoritative destination. A
           // short pulse sells the pop.
           if (ev.sourceId === this.sim.player.id) {
-            this.selfRenderPositionReady = false;
+            this.selfRender.ready = false;
           }
           this.pulseAt(ev.sourceId, ev.school, 1.2, 0.35);
           break;
@@ -8226,7 +8236,9 @@ export class Renderer {
       travelVisual: null,
       mountVisual: null,
       mountVisualKey: '',
+      mountPullerVisual: null,
       mountLift: 0,
+      mountJumpPitch: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
       iceBlockVisual: null,
@@ -9742,6 +9754,7 @@ export class Renderer {
       v.travelVisual?.dispose();
       v.mountVisual?.dispose();
       v.metamorphVisual?.dispose();
+      releaseRickshawMountState(v, true);
       v.fireballTravelVisual?.dispose();
     } else {
       if (!terminal && v.objectPoolKey && v.objectMesh instanceof THREE.Group) {
@@ -9767,6 +9780,10 @@ export class Renderer {
     if (disposeObjectResources)
       disposeUnsharedMeshResources(v.group, { geometries: true, materials: true });
     this.audioSink?.mountEngineReset(id);
+    // A mount loop is keyed by entity id and driven from the per-frame sync
+    // pass; once the view is gone nothing calls it again, so it would keep
+    // playing at the spot the entity vanished from. Stop it here.
+    this.audioSink?.stopMountLoop(id);
     this.views.delete(id);
   }
 
@@ -9874,7 +9891,7 @@ export class Renderer {
     dt: number,
     renderFacingOverride: number | null,
     selfAlphaLead = 0,
-    selfMotion: SelfMotionFrame | null = null,
+    selfMotion: SelfRenderPrediction | null = null,
     selfAuthoritativeDiscontinuity = false,
     // False while the window is hidden: everything below still runs (view
     // lifecycle, mixers, uTime, the viewport poll) so coming back costs no
@@ -9946,24 +9963,24 @@ export class Renderer {
     }
     const sim = this.sim;
     const p = sim.player;
-    if (this.lastSelfId !== p.id) {
-      this.lastSelfId = p.id;
-      this.selfRenderPositionReady = false;
+    if (noteSelfIdentity(this.selfRender, p.id)) {
       this.selfFacingOverride = null;
       this.selfFacingLastTarget = null;
-      // A still-decaying predictor-handoff offset belongs to the previous
-      // character; leaking it would displace the new one for a few frames.
-      this.selfMotionOffset.set(0, 0, 0);
     }
     const now = performance.now();
     this.viewCreateRetry.prune(now, sim.entities);
-    const selfPos = this.updateSelfRenderPosition(
+    updateSelfRenderPosition(
+      this.selfRender,
+      p,
+      sim.cfg.seed,
       alpha,
       dt,
       selfAlphaLead,
       selfMotion,
       selfAuthoritativeDiscontinuity,
+      sim.riftCollisionToken,
     );
+    const selfPos = this.selfRenderPosition;
     phaseStart = this.markRendererPhase(framePhaseMs, 'setup', phaseStart);
 
     // Dynamic worlds create nearby views lazily and drop views for leavers or
@@ -10663,13 +10680,15 @@ export class Renderer {
           v.mountVisual.dispose();
           v.mountVisual = null;
         }
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
-        if (mountAssetsReady(mountSpec.visualKey)) {
+        if (rickshawMountBuildReady(mountSpec.visualKey, mountAssetsReady(mountSpec.visualKey))) {
           const mountStarted = performance.now();
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
           v.mountVisualKey = mountSpec.visualKey;
+          attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
           // A newly summoned mount is exactly a brand-new rig's materials
           // linking for the first time; gate it like a gear swap instead of
           // freezing the frame the mount lands on (#2571).
@@ -10681,11 +10700,13 @@ export class Renderer {
           void preloadMountAssets(mountSpec.visualKey).catch((err) =>
             console.error('Failed to preload mount model:', err),
           );
+          preloadPullerIfRickshaw(mountSpec.visualKey);
         }
       } else if (!mountSpec && v.mountVisual) {
         v.group.remove(v.mountVisual.root);
         v.mountVisual.dispose();
         v.mountVisual = null;
+        releaseRickshawMountState(v, true);
         v.mountVisualKey = '';
       }
       if (v.mountVisual) v.mountVisual.root.visible = mountShown && !v.mountCompilePending;
@@ -10737,6 +10758,11 @@ export class Renderer {
       // model origin (the toad's is well back toward the tail).
       v.visual.root.position.y = v.mountLift;
       v.visual.root.position.z = v.mountLift > 0 && mountSpec ? mountSpec.seatFwd : 0;
+      // Dismounted: relax the tip, or the rider keeps the cart's last attitude.
+      if (!mountShown) {
+        v.mountJumpPitch = 0;
+        v.visual.root.rotation.x = 0;
+      }
       // distant rigs swap to the single-draw baked idle-pose mesh
       v.visual.setFar(v.isFar && active === v.visual && resolvedForm !== 'fireball');
       v.sheepVisual?.setFar(v.isFar && active === v.sheepVisual);
@@ -10770,7 +10796,7 @@ export class Renderer {
       // fallback path the plain interpolated sim motion is still sampled
       // instead (that path's smoothed selfPos stutters within a snapshot
       // interval). Offline, all of these are the same value.
-      const animFromDisplay = isSelf && this.selfMotionActive;
+      const animFromDisplay = isSelf && this.selfRender.active;
       const ax = isSelf && !animFromDisplay ? e.prevPos.x + (e.pos.x - e.prevPos.x) * alpha : x;
       const ay = isSelf && !animFromDisplay ? e.prevPos.y + (e.pos.y - e.prevPos.y) * alpha : y;
       const az = isSelf && !animFromDisplay ? e.prevPos.z + (e.pos.z - e.prevPos.z) * alpha : z;
@@ -10878,14 +10904,14 @@ export class Renderer {
       const airborne =
         !visuallyDead &&
         !swimming &&
-        (animFromDisplay && this.selfMotionPredictor && !inRift
-          ? !this.selfMotionPredictor.onGround
+        (animFromDisplay && this.selfRender.predictor && !inRift
+          ? !this.selfRender.predictor.onGround
           : !e.onGround || v.airborneHeurFrames >= 2);
       // Grounded presentation polish, both display-only (see the cores).
       // Vertical smoothing absorbs the step-up the solver performs inside a
       // single tick, so the body strides onto a kerb instead of teleporting up
-      // it while the soft camera boom trails behind. Applied for every body,
-      // and fed back into the self pose so the camera follows what is drawn.
+      // it. Applied for every body, and fed back into the self pose so the
+      // camera follows exactly what is drawn.
       const settled = !airborne && !swimming && !visuallyDead;
       // Display-derived fall speed: the wire carries no vy for remote bodies,
       // so the drawn trajectory is the only honest source of landing weight.
@@ -11104,6 +11130,17 @@ export class Renderer {
         // state (an ordinary mount, or the loop already stopped).
         sink.mountEngineReset(e.id);
       }
+      updateRollingMountLoop(
+        sink,
+        v,
+        e.id,
+        e.mountKey,
+        ax,
+        ay,
+        az,
+        logicallyMounted && !visuallyDead,
+        moving && !airborne,
+      );
       // Capture the flight's peak fall speed before the landing reset: the
       // water-entry splash below scales with how hard the body came down.
       const entryFallSpeed = v.fallSpeed;
@@ -11312,11 +11349,25 @@ export class Renderer {
         mst.swimming = st.swimming;
         if (runCharacterPresentation) {
           v.mountVisual.update(dt, mst, animate);
-          // the rider floats WITH the procedural bob (the hover cycle's idle
-          // float), not just the mount body
-          const bob = mountBobY(mountSpec, this.time, moving);
-          v.mountVisual.root.position.y = bob;
-          v.visual.root.position.y = v.mountLift + bob;
+          // RAW per-frame travel, not st.speed. loco.speed is exponentially
+          // smoothed for footstep cadence and additionally latches its last
+          // value while "stalled", so it keeps reporting motion for a beat
+          // after the player actually stops -- which the wheels rode as a
+          // visible coast. The displayed position delta is the ground truth
+          // the wheels should agree with anyway: if the cart did not move this
+          // frame, the wheels must not turn this frame.
+          spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
+          applyMountJumpAttitude(
+            v,
+            v.mountVisual.root,
+            v.visual.root,
+            mountSpec,
+            this.time,
+            moving,
+            airborne,
+            dt > 1e-4 ? dyRaw / dt : 0,
+            dt,
+          );
           // ambient mount particles: the snail paints its slime path while
           // gliding, the hover cycle streams aether exhaust off its tail
           if (mountSpec.fx === 'slime') {
@@ -11327,6 +11378,7 @@ export class Renderer {
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
+        updateRickshawPuller(v, dt, mst, animate, runCharacterPresentation);
       }
 
       const emoteId =
@@ -11370,6 +11422,14 @@ export class Renderer {
         if (e.mountKey !== v.lastMountKey) {
           v.lastMountKey = e.mountKey;
           if (runCharacterPresentation) this.vfx.mountSummonGlow(e.id);
+          // The mount's own call, on the same edge as the glow but only when a
+          // mount actually APPEARED: e.mountKey === '' is a dismount, which
+          // keeps the glow and gets no call. A live swap is a genuine
+          // appearance and does play the new mount's call. lastMountKey is
+          // seeded from the entity's current state at view creation, so a rider
+          // already mounted when they enter interest range (or at login) never
+          // reaches this edge and stays silent.
+          if (e.mountKey !== '') this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf);
           // A mountKey change (dismount, a live mount swap, or a fresh summon
           // reusing this entity id) must drop any engine mount's windup/loop
           // state; otherwise the old loop node stays connected forever once
@@ -12267,68 +12327,6 @@ export class Renderer {
     }
   }
 
-  private updateSelfRenderPosition(
-    alpha: number,
-    dt: number,
-    selfAlphaLead: number,
-    selfMotion: SelfMotionFrame | null = null,
-    authoritativeDiscontinuity = false,
-  ): THREE.Vector3 {
-    const p = this.sim.player;
-    // Online intent-driven extrapolation: when active it owns the position and
-    // the lead-smoothing path below becomes the fallback (both write the same
-    // selfRenderPosition, so enable/disable hands off without a pop, absorbed
-    // by the snap/smooth rules on the next frame).
-    if (selfMotion) {
-      if (!this.selfMotionPredictor) {
-        this.selfMotionPredictor = new SelfMotionPredictor(this.sim.cfg.seed);
-      }
-      const predicted = this.selfMotionPredictor.step(p, selfMotion, authoritativeDiscontinuity);
-      if (predicted) {
-        // Follow the predictor output exactly (it is already continuous;
-        // smoothing it again would re-add the display lag this exists to
-        // remove). The only discontinuity is the handoff frame from the
-        // lead-smoothing path below: capture that gap once as an offset and
-        // decay it, so the camera glides instead of stepping.
-        if (authoritativeDiscontinuity) {
-          this.selfMotionOffset.set(0, 0, 0);
-        } else if (this.selfRenderPositionReady && !this.selfMotionActive) {
-          this.selfMotionOffset.set(
-            this.selfRenderPosition.x - predicted.x,
-            this.selfRenderPosition.y - predicted.y,
-            this.selfRenderPosition.z - predicted.z,
-          );
-        }
-        this.selfMotionOffset.multiplyScalar(Math.exp(-SELF_MOTION_HANDOFF_RATE * Math.max(0, dt)));
-        this.selfRenderPosition.set(
-          predicted.x + this.selfMotionOffset.x,
-          predicted.y + this.selfMotionOffset.y,
-          predicted.z + this.selfMotionOffset.z,
-        );
-        this.selfRenderPositionReady = true;
-        this.selfMotionActive = true;
-        return this.selfRenderPosition;
-      }
-    }
-    this.selfMotionActive = false;
-    const playerAlpha = selfSnapshotAlpha(alpha, selfAlphaLead);
-    const px = p.prevPos.x + (p.pos.x - p.prevPos.x) * playerAlpha;
-    const py = p.prevPos.y + (p.pos.y - p.prevPos.y) * playerAlpha;
-    const pz = p.prevPos.z + (p.pos.z - p.prevPos.z) * playerAlpha;
-    updateSelfRenderFallback(
-      this.selfRenderPosition,
-      px,
-      py,
-      pz,
-      this.selfRenderPositionReady,
-      dt,
-      selfAlphaLead > 0,
-      authoritativeDiscontinuity,
-    );
-    this.selfRenderPositionReady = true;
-    return this.selfRenderPosition;
-  }
-
   // ---- Map-editor 3D seams (editor-only) --------------------------------
 
   /** The terrain chunk group, for the editor to raycast/rebuild. */
@@ -12648,8 +12646,7 @@ export class Renderer {
     // way the old terrain walls lifted it.
     groundY += gardenMazeCameraLift(cx, cz);
     this.camera.position.set(cx, Math.max(cy, groundY), cz);
-    // Base FOV plus the feel kicks; the latter are zero under reduced motion.
-    const fovTarget = Math.min(100, Math.max(50, CAMERA_BASE_FOV + cameraFovOffset(this.camFeel)));
+    const fovTarget = resolveCameraFov(this.baseFov, this.camFeel);
     if (Math.abs(this.camera.fov - fovTarget) > 0.01) {
       this.camera.fov = fovTarget;
       this.camera.updateProjectionMatrix();

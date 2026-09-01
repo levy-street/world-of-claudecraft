@@ -76,6 +76,7 @@ function renderBagsHarness(
     isPersonalBankTab: () => false,
     isGuildBankTab: () => false,
     isVaultBankTab: () => false,
+    confirmVendorSell: () => true,
     pendingPetFeed: () => false,
     closeVendor: noop,
     closeBank: noop,
@@ -448,7 +449,7 @@ describe('bags_window: touch peek + bank-cluster close', () => {
     // the document-level native-menu suppress set), and fails safe to inspect
     // when a mobile-touch browser reports no pointerType (Firefox Android).
     expect(painter).toMatch(
-      /row\.addEventListener\('contextmenu', \(ev\) => \{[\s\S]{0,700}?pointerType === 'touch'[\s\S]{0,200}?ev\.preventDefault\(\);\s*return;\s*\}\s*\/\/ At a vendor/,
+      /row\.addEventListener\('contextmenu', \(ev\) => \{[\s\S]{0,700}?pointerType === 'touch'[\s\S]{0,200}?ev\.preventDefault\(\);\s*return;\s*\}\s*if \(this\.deps\.vendorOpen\(\)\)/,
     );
     expect(painter).toContain(
       "(document.body.classList.contains('mobile-touch') && pointerType !== 'mouse')",
@@ -647,9 +648,11 @@ describe('bags_window: a vendor click confirms before selling anything but true 
       painter.indexOf('private sellBagItem('),
       painter.indexOf('private showSellConfirmPrompt('),
     );
-    expect(body).toContain(
-      'const instant = vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);',
-    );
+    // The confirmVendorSell setting (a player opt-out) folds into the same
+    // instant gate: off treats every item as instant, restoring the classic
+    // one-click sale.
+    expect(body).toContain('!this.deps.confirmVendorSell()');
+    expect(body).toContain('vendorSellIsInstant(item, slot.instance, slot.craftedRecipeId);');
     expect(body).toContain('!instant');
     expect(body).toContain('this.showSellConfirmPrompt(item, slot)');
     // Ctrl/meta and shift both still confirm a non-instant sale (the review-round
@@ -657,6 +660,10 @@ describe('bags_window: a vendor click confirms before selling anything but true 
     // prompt, never an unconfirmed instant sellItem call, for anything but junk.
     expect(body).toMatch(/if \(instant\)[\s\S]{0,40}sellItem\(slot\.itemId, count\)/);
     expect(body).toContain('this.showSellQuantityPrompt(slot.itemId, heldTotal);');
+    // The full-stack fix: a plain click on a non-instant STACK (count > 1) also
+    // routes through the bulk quantity prompt instead of confirming exactly one
+    // unit at a time (the "can't sell full stacks" regression).
+    expect(body).toContain('!instant && count > 1');
   });
 
   it('the confirm prompt re-resolves the live slot at submit and refuses on a mismatch', () => {

@@ -791,6 +791,8 @@ export function createMob(id: number, template: MobTemplate, level: number, pos:
   e.swingTimer = 0;
   // Telegraph the first War Stomp: delay it one full interval after engage.
   if (template.stomp) e.stompTimer = template.stomp.every;
+  // Telegraph the first pulse blast the same way: one full interval after engage.
+  if (template.aoePulse) e.pulseTimer = template.aoePulse.every;
   // Telegraph the first Banshee's Wail the same way: one full interval after engage.
   if (template.terrify) e.terrifyTimer = template.terrify.every;
   // Telegraph the first Howling Gale the same way: one full interval after engage.

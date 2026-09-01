@@ -8,6 +8,7 @@
 //     guess that could vendor a DIFFERENT copy of the same id).
 //   - focus after a confirmed sale lands on the close button, not a detached cell.
 import { describe, expect, it } from 'vitest';
+import { stackSizeOf } from '../src/sim/bags';
 import { ITEMS } from '../src/sim/data';
 import { itemCopyPin } from '../src/sim/item_copy_ref';
 import type { InvSlot } from '../src/sim/types';
@@ -28,6 +29,20 @@ const valuableId = Object.keys(ITEMS).find((id) => {
   const d = ITEMS[id];
   return d.kind === 'weapon' && d.quality !== 'poor' && !d.noVendorSell && !d.soulbound;
 }) as string;
+// A non-junk item that actually STACKS (quality above poor, no instance
+// payload possible on a plain fungible stack), for the "can't sell full
+// stacks" regression: unlike valuableId (a weapon, always count 1) this id
+// can carry a slot count above 1.
+const stackableValuableId = Object.keys(ITEMS).find((id) => {
+  const d = ITEMS[id];
+  return (
+    d.quality !== 'poor' &&
+    d.kind !== 'quest' &&
+    !d.noVendorSell &&
+    !d.soulbound &&
+    stackSizeOf(d) > 1
+  );
+}) as string;
 
 interface Harness {
   root: HTMLElement;
@@ -39,13 +54,29 @@ interface Harness {
   inventory: InvSlot[];
   /** Item ids the window asked to open the action menu for. */
   menuOpens: string[];
+  /** The same opens with their payload, so a case can run the row the player
+   *  would tap: the vendor row set's Sell IS the window's classic action, and
+   *  a defined sellCount is what distinguishes that row set from the default
+   *  one. */
+  menuCalls: MenuOpen[];
 }
 
-function harness(inventory: InvSlot[], opts?: { touch?: boolean; vendor?: boolean }): Harness {
+interface MenuOpen {
+  itemId: string;
+  sellCount?: number;
+  runDefault: () => void;
+  runSellAll?: () => void;
+}
+
+function harness(
+  inventory: InvSlot[],
+  opts?: { touch?: boolean; vendor?: boolean; confirmVendorSell?: boolean },
+): Harness {
   document.body.innerHTML = '<div id="prompt-stack"></div>';
   const calls: string[] = [];
   const errors: string[] = [];
   const menuOpens: string[] = [];
+  const menuCalls: MenuOpen[] = [];
   const sink =
     (name: string) =>
     (...a: unknown[]) =>
@@ -115,17 +146,29 @@ function harness(inventory: InvSlot[], opts?: { touch?: boolean; vendor?: boolea
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => opts?.touch === true,
+    confirmVendorSell: () => opts?.confirmVendorSell ?? true,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,
     dropOnActionRingSlot: noop,
-    openItemActionMenu: (_def, itemId) => {
+    openItemActionMenu: (
+      _def,
+      itemId,
+      _target,
+      _x,
+      _y,
+      runDefault,
+      _instance,
+      sellCount,
+      runSellAll,
+    ) => {
       menuOpens.push(itemId);
+      menuCalls.push({ itemId, sellCount, runDefault, runSellAll });
     },
   };
   const window_ = new BagsWindow(deps);
   window_.render();
-  return { root, calls, errors, window: window_, inventory, menuOpens };
+  return { root, calls, errors, window: window_, inventory, menuOpens, menuCalls };
 }
 
 function clickCellFor(root: HTMLElement, itemId: string, opts?: { ctrl?: boolean }): void {
@@ -141,9 +184,19 @@ function confirmPrompt(): HTMLElement | null {
   return document.querySelector('.sell-confirm-prompt');
 }
 
+function quantityPrompt(): HTMLElement | null {
+  return document.querySelector('.sell-quantity-prompt');
+}
+
 function clickPromptConfirmButton(): void {
   const btn = confirmPrompt()?.querySelector('button.btn');
   expect(btn, 'no confirm button in the open prompt').toBeTruthy();
+  (btn as HTMLElement).click();
+}
+
+function clickQuantityPromptConfirmButton(): void {
+  const btn = quantityPrompt()?.querySelector('button.btn');
+  expect(btn, 'no confirm button in the open quantity prompt').toBeTruthy();
   (btn as HTMLElement).click();
 }
 
@@ -392,13 +445,14 @@ describe('vendor plain click on an adopted 11l trophy confirms like any common i
     }
   });
 
-  it('the MOBILE sell route raises exactly ONE dialog, never a back-to-back pair', () => {
-    // The de-duplication this pins is structural rather than a new branch: a
-    // touch tap normally opens the item-action menu first (touch has no
-    // right-click), which on top of the sell confirm would be two dialogs for
-    // one sale. itemMenuAvailable's transactional-mode gate refuses the menu at
-    // a vendor, so the tap runs the classic action directly and the ONE dialog
-    // the player sees is the sell confirm, which names the copy.
+  it('the MOBILE sell route raises ONE surface at a time, never a back-to-back pair', () => {
+    // A touch tap has no right-click, so it opens the action menu instead of
+    // running the classic action. At a vendor itemMenuAvailable refuses the
+    // default row set (every special mode does), and the release's VENDOR row
+    // set answers instead (Sell, plus Sell all when more than one copy is
+    // held), which is touch's only route to Sell all. So the tap raises the
+    // MENU and no prompt beside it, and the menu's Sell row runs the window's
+    // own classic action, which is where the single sell confirm comes from.
     //
     // The pin is here rather than as a source read because the two halves sit
     // in different modules (the gate and the sell route) and only the flow
@@ -406,9 +460,14 @@ describe('vendor plain click on an adopted 11l trophy confirms like any common i
     const trophyId = adoptedTrophyIds(ITEMS)[0];
     const h = harness([{ itemId: trophyId, count: 1 }], { touch: true });
     clickCellFor(h.root, trophyId);
-    // No menu hop...
-    expect(h.menuOpens).toEqual([]);
-    // ...and exactly one modal, carrying the copy's own name.
+    // One surface: the vendor row set, with no dialog stacked behind it.
+    expect(h.menuOpens).toEqual([trophyId]);
+    expect(h.menuCalls.at(-1)?.sellCount).toBe(1);
+    expect(document.querySelectorAll('.prompt.panel')).toHaveLength(0);
+    expect(h.calls).toEqual([]);
+    // Tapping Sell runs that classic action, and it raises exactly ONE dialog,
+    // carrying the copy's own name.
+    h.menuCalls.at(-1)?.runDefault();
     expect(document.querySelectorAll('.prompt.panel')).toHaveLength(1);
     expect(confirmPrompt()?.textContent).toContain(ITEMS[trophyId].name);
     expect(h.calls).toEqual([]);
@@ -417,14 +476,98 @@ describe('vendor plain click on an adopted 11l trophy confirms like any common i
     expect(document.querySelectorAll('.prompt.panel')).toHaveLength(0);
   });
 
-  it('the same tap OUTSIDE a vendor DOES open the menu (the gate is what de-duplicates)', () => {
+  it('the same tap OUTSIDE a vendor opens the DEFAULT row set, never the vendor one', () => {
     // The control arm: without it the case above would pass on a window that
-    // never opens the action menu on touch at all, which would be a different
-    // bug and would make the de-duplication claim vacuous.
+    // opens the same menu on every touch tap, which would make the vendor
+    // route it pins vacuous. Outside a vendor itemMenuAvailable answers first,
+    // so the menu opens with NO vendor sell count, and still no prompt.
     const trophyId = adoptedTrophyIds(ITEMS)[0];
     const h = harness([{ itemId: trophyId, count: 1 }], { touch: true, vendor: false });
     clickCellFor(h.root, trophyId);
     expect(h.menuOpens).toEqual([trophyId]);
+    expect(h.menuCalls.at(-1)?.sellCount).toBe(undefined);
     expect(document.querySelectorAll('.prompt.panel')).toHaveLength(0);
+  });
+});
+
+describe('vendor plain click on a non-junk STACK opens the bulk quantity prompt, not a 1-unit confirm', () => {
+  // Regression: showSellConfirmPrompt never took a quantity, so a plain click
+  // on anything short of true junk sold exactly one unit per confirmation,
+  // and clearing an N-unit stack demanded N separate prompts. Mirrors what
+  // ctrl-click already did for the same case.
+  it('opens .sell-quantity-prompt, not .sell-confirm-prompt, and defaults to the FULL held count', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    expect(h.calls).toEqual([]);
+    expect(confirmPrompt()).toBeNull();
+    const prompt = quantityPrompt();
+    expect(prompt).not.toBeNull();
+    const input = prompt?.querySelector('input.prompt-number') as HTMLInputElement;
+    expect(input.value).toBe('5');
+    expect(input.max).toBe('5');
+  });
+
+  it('a single confirm click sells the whole stack in one action', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    clickQuantityPromptConfirmButton();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},5`]);
+    expect(quantityPrompt()).toBeNull();
+  });
+
+  it('the quantity is still editable down to sell fewer', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }]);
+    clickCellFor(h.root, stackableValuableId);
+    const input = quantityPrompt()?.querySelector('input.prompt-number') as HTMLInputElement;
+    input.value = '2';
+    clickQuantityPromptConfirmButton();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},2`]);
+  });
+
+  it('a single-count copy of the same item still opens the per-slot confirm prompt (unchanged)', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 1 }]);
+    clickCellFor(h.root, stackableValuableId);
+    expect(quantityPrompt()).toBeNull();
+    expect(confirmPrompt()).not.toBeNull();
+  });
+});
+
+describe('confirmVendorSell setting off: every vendor sale skips confirmation', () => {
+  // The instant sales below carry the ordinal-plus-count COPY anchor beside
+  // their slot index, the same payload the junk arm at the top of this file
+  // pins: the opt-out changes WHETHER a sale confirms, never how the sale
+  // addresses the copy it sells.
+  it('a plain click on a non-junk single item sells instantly, no prompt (matches junk)', () => {
+    const h = harness([{ itemId: valuableId, count: 1 }], { confirmVendorSell: false });
+    clickCellFor(h.root, valuableId);
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([
+      `sellItem:${valuableId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
+  });
+
+  it('a plain click on a non-junk stack sells one unit instantly, no prompt (classic one-click sale)', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }], { confirmVendorSell: false });
+    clickCellFor(h.root, stackableValuableId);
+    expect(quantityPrompt()).toBeNull();
+    expect(confirmPrompt()).toBeNull();
+    expect(h.calls).toEqual([
+      `sellItem:${stackableValuableId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
+  });
+
+  it('a ctrl-click on a non-junk stack still bulk-sells the whole stack instantly', () => {
+    const h = harness([{ itemId: stackableValuableId, count: 5 }], { confirmVendorSell: false });
+    clickCellFor(h.root, stackableValuableId, { ctrl: true });
+    expect(quantityPrompt()).toBeNull();
+    expect(h.calls).toEqual([`sellItem:${stackableValuableId},5`]);
+  });
+
+  it('true junk is unaffected either way', () => {
+    const h = harness([{ itemId: junkId, count: 1 }], { confirmVendorSell: false });
+    clickCellFor(h.root, junkId);
+    expect(h.calls).toEqual([
+      `sellItem:${junkId},{"slotIndex":0,"anchor":{"ordinal":0,"count":1}}`,
+    ]);
   });
 });

@@ -59,6 +59,7 @@ import {
 export { MAX_BODY_RADIUS } from './collider_cells';
 
 import { DAWNHOLD_WALL_LEDGES, dawnholdParapetSegments } from './dawnhold_layout';
+import { buildDecorPropColliders } from './decor_prop_colliders';
 import {
   decorationHasCollider,
   ROCK_RADIUS_PER_SCALE,
@@ -764,35 +765,10 @@ function staticWorldColliders(seed: number): Collider[] {
     }
   }
 
-  // Hand-placed GLB decor. r 0/absent entries are walk-through dressing and add
-  // no collider. An entry carrying hw AND hd collides as the model's real BOX,
-  // oriented by its own rot; everything else keeps the circle it always had.
-  // The box exists because these models are rectangles: a circle drawn round one
-  // stands off its flat walls (that is the invisible wall players walk into) and
-  // a circle drawn inside one cuts its corners off instead.
-  for (const d of PROPS.decorProps ?? []) {
-    const cameraTopY = topY(seed, d.x, d.z, d.h ?? 4);
-    if (d.hw !== undefined && d.hd !== undefined) {
-      out.push({
-        type: 'obb',
-        x: d.x,
-        z: d.z,
-        hw: d.hw,
-        hd: d.hd,
-        rot: d.rot ?? 0,
-        cameraTopY,
-      });
-      continue;
-    }
-    if (!d.r) continue;
-    out.push({
-      type: 'circle',
-      x: d.x,
-      z: d.z,
-      r: d.r,
-      cameraTopY: topY(seed, d.x, d.z, d.h ?? 4),
-    });
-  }
+  // Hand-placed GLB decor (src/sim/decor_prop_colliders.ts): a circle or box
+  // per PROPS.decorProps entry, walk-through when r/hw+hd are absent, standable
+  // on top when standableTop is set (see that module's header).
+  out.push(...buildDecorPropColliders(seed, PROPS.decorProps ?? []));
 
   // THE GREAT MAZE's hedges. One box per drawn piece, straight off the same
   // grid the renderer lays the hedge GLBs from, so the blocked ground IS the

@@ -39,16 +39,20 @@ describe('PgSocialDb case-insensitive guild creation', () => {
       .mockResolvedValueOnce({ rows: [] })
       .mockResolvedValueOnce({ rows: [{ id: 12 }] })
       .mockResolvedValueOnce({ rows: [], rowCount: 1 })
+      .mockResolvedValueOnce({ rows: [], rowCount: 0 }) // founder pledge clear
       .mockResolvedValueOnce({ rows: [] });
 
     await expect(db.createGuildWithLeader('Dawn Guard', 8)).resolves.toEqual({ guildId: 12 });
 
+    // The DELETE is the founder's standing-pledge clear, inside the same
+    // transaction as the seat (docs/prd/guild-pledge-board.md).
     expect(client.query.mock.calls.map(([sql]) => String(sql).trim().split(/\s+/)[0])).toEqual([
       'BEGIN',
       'SELECT',
       'SELECT',
       'INSERT',
       'INSERT',
+      'DELETE',
       'COMMIT',
     ]);
     expect(client.query.mock.calls[1]).toEqual([

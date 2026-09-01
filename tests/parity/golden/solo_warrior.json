@@ -16,8 +16,8 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 1004,
-      "state": "8d8e5b18",
+      "nextId": 1003,
+      "state": "2567625d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -63,7 +63,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -107,7 +107,7 @@
               "name": "Battle Stance",
               "remaining": 3600,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -121,7 +121,7 @@
           "fiveSecondRule": 99,
           "healPower": 5,
           "hp": 100,
-          "id": 999,
+          "id": 998,
           "kind": "player",
           "level": 1,
           "lootFfaTimer": "Infinity",
@@ -165,9 +165,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1005,
-      "state": "d108cf28",
-      "events": "aaee76ff",
+      "nextId": 1004,
+      "state": "3dd8e262",
+      "events": "eafbaa23",
       "rng": {
         "draws": 7,
         "digest": "4f9a2cfb"
@@ -176,8 +176,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1005,
-      "state": "c9accbf4",
+      "nextId": 1004,
+      "state": "09d7aed6",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -187,9 +187,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1005,
-      "state": "abd8831e",
-      "events": "c30e300d",
+      "nextId": 1004,
+      "state": "a2ed1a3e",
+      "events": "b6fdad13",
       "rng": {
         "draws": 174,
         "digest": "847684f0"
@@ -198,9 +198,9 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1005,
-      "state": "bf432ebc",
-      "events": "514b05d0",
+      "nextId": 1004,
+      "state": "7be7a355",
+      "events": "5dc32bb6",
       "rng": {
         "draws": 263,
         "digest": "d3f0124f"
@@ -269,7 +269,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -315,7 +315,7 @@
               "name": "Battle Stance",
               "remaining": 3596.4,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -329,7 +329,7 @@
           "fiveSecondRule": 102.6,
           "healPower": 5,
           "hp": 49995,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -364,7 +364,7 @@
             "str": 41
           },
           "swingTimer": 0.45,
-          "targetId": 1004,
+          "targetId": 1003,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -374,6 +374,7 @@
         },
         {
           "aiState": "dead",
+          "autoAttack": true,
           "comboUntil": -1,
           "corpseTimer": 60,
           "critChance": 0.05,
@@ -384,7 +385,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1004,
+          "id": 1003,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -404,7 +405,7 @@
           },
           "lootFfaTimer": 60,
           "lootRecipientIds": [
-            999
+            998
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -428,8 +429,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 999,
-          "targetId": 999,
+          "tappedById": 998,
+          "targetId": 998,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,
@@ -442,9 +443,9 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 1005,
-      "state": "bc02efce",
-      "events": "cc703ad5",
+      "nextId": 1004,
+      "state": "5caac807",
+      "events": "93f84c96",
       "rng": {
         "draws": 309,
         "digest": "f78161ea"
@@ -517,7 +518,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 999,
+          "entityId": 998,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -563,7 +564,7 @@
               "name": "Battle Stance",
               "remaining": 3596.2,
               "school": "physical",
-              "sourceId": 999
+              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -578,7 +579,7 @@
           "fiveSecondRule": 102.8,
           "healPower": 5,
           "hp": 49995,
-          "id": 999,
+          "id": 998,
           "inCombat": true,
           "kind": "player",
           "level": 10,
@@ -613,7 +614,7 @@
             "str": 41
           },
           "swingTimer": 0.25,
-          "targetId": 1004,
+          "targetId": 1003,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -623,6 +624,7 @@
         },
         {
           "aiState": "dead",
+          "autoAttack": true,
           "comboUntil": -1,
           "corpseTimer": 59.8,
           "critChance": 0.05,
@@ -633,7 +635,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1004,
+          "id": 1003,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -653,7 +655,7 @@
           },
           "lootFfaTimer": 59.8,
           "lootRecipientIds": [
-            999
+            998
           ],
           "lootable": true,
           "maxHp": 6000,
@@ -677,8 +679,8 @@
             "armor": 10
           },
           "swingTimer": 0.45,
-          "tappedById": 999,
-          "targetId": 999,
+          "tappedById": 998,
+          "targetId": 998,
           "templateId": "forest_wolf",
           "weapon": {
             "max": 6,

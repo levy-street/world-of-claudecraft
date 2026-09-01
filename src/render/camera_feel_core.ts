@@ -106,6 +106,17 @@ export function cameraFovOffset(s: CameraFeelState): number {
 }
 
 /**
+ * The camera's per-frame FOV target: the player's configured base FOV (the
+ * options-menu slider value) plus the feel kicks, clamped to the widest range
+ * either arm can reach. `baseFovDeg` MUST be the live setting, never a fixed
+ * constant, or every kick-driven frame silently snaps the camera back to
+ * whatever default the caller hard-coded.
+ */
+export function resolveCameraFov(baseFovDeg: number, s: CameraFeelState): number {
+  return Math.min(100, Math.max(50, baseFovDeg + cameraFovOffset(s)));
+}
+
+/**
  * Feed the display height each frame; returns a 0..1 landing thump when the
  * trajectory transitions from a fast fall to settled, else 0. Purely
  * display-derived so it works identically offline and online, and never fires

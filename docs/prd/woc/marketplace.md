@@ -298,7 +298,8 @@ bank gate on.
   desktop app, which is functionally a desktop browser we ship ourselves.
   Steam and Epic desktop builds and Capacitor iOS/Android stay fail-closed:
   tradeable-token functionality is against both stores' terms of service, so
-  those builds must never show any Exchange surface, even disabled or teased.
+  those builds must never attach the in-app Exchange UI, wallet code, or
+  trading flow.
   The desktop gate reads the shell's distribution stamp through the preload
   bridge (`wocExchangeSupported`) and fails closed when the stamp is absent,
   unknown, or unreadable, treating such a build as a store build. On the
@@ -307,7 +308,15 @@ bank gate on.
   the server pre-registers each issued challenge and payable quote, the
   desktop app opens the player's browser with a single-use code, and the
   browser wallet signs the server-stored bytes (never renderer-supplied
-  ones). Browser web keeps the in-page wallet flow unchanged.
+  ones). Browser web keeps the in-page wallet flow unchanged. A wrapped
+  non-native desktop shell denied by the gate may still reveal the same
+  `$WOC Exchange` launcher as a confirm-then-open browser hand-off
+  (`src/ui/woc_market_link.ts`), so the user lands in the supported browser
+  web flow rather than an in-shell trading surface. Capacitor iOS/Android
+  gets neither the real Exchange nor this hand-off launcher and stays fully
+  silent: steering a mobile-app-store build to an external real-money
+  marketplace is the anti-steering shape those stores restrict, and that
+  broader step has not had its own counsel review.
 - Listings, custody, and sales history are realm-scoped like the World Market;
   wallets, bonds, strikes, and suspensions are account-scoped.
 - The service is configurable by server: the existing server runs the

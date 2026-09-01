@@ -830,8 +830,16 @@ export const HEROIC_BOSS_LOOT: Record<string, LootEntry[]> = {
     { itemId: 'sigil_anvil_chest', chance: 0.34, rollGroup: 'varkhul_h_sigil_robe' },
     { itemId: 'sigil_ember_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
     { itemId: 'sigil_tempest_chest', chance: 0.33, rollGroup: 'varkhul_h_sigil_robe' },
-    { itemId: 'bulwark_of_the_inner_crucible', chance: 0.5, rollGroup: 'varkhul_h_shields' },
-    { itemId: 'ember_wardens_barrier', chance: 0.5, rollGroup: 'varkhul_h_shields' },
+    // Emberward shares the existing shield partition so its 3 percent chance
+    // adds no heroic RNG draw. The two epic outcomes split the remaining 97
+    // percent evenly, and the group still guarantees exactly one shield.
+    {
+      itemId: 'bulwark_of_the_inner_crucible',
+      chance: 0.485,
+      rollGroup: 'varkhul_h_shields',
+    },
+    { itemId: 'ember_wardens_barrier', chance: 0.485, rollGroup: 'varkhul_h_shields' },
+    { itemId: 'varkhul_emberward', chance: 0.03, rollGroup: 'varkhul_h_shields' },
     { itemId: 'heart_of_the_end_greatblade', chance: 0.34, rollGroup: 'varkhul_h_weapon' },
     { itemId: 'forgefire_spire', chance: 0.33, rollGroup: 'varkhul_h_weapon' },
     { itemId: 'staff_of_the_last_spring', chance: 0.33, rollGroup: 'varkhul_h_weapon' },

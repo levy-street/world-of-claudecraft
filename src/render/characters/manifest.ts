@@ -287,6 +287,35 @@ const skeletonClips = (attack: string[], flourish = 'Skeletons_Awaken_Standing')
   flourish,
 });
 
+// The Bonebound Rickshaw's puller ONLY (skel_rickshaw_puller). Not shared
+// with any other skeleton key on purpose.
+//
+// skeleton_minion.glb is one of the rigs corrupted by build_assets.mjs's
+// meshopt() step (it breaks this exact multi-primitive-skinned KayKit shape),
+// which the mount cannot ship around: its puller renders as a scattered pile of
+// bones. It is rebuilt by scripts/assets/rebuild_kaykit_skeletons_free.mjs from
+// the KayKit_Skeletons_1.1_FREE pack and shipped as a SEPARATE file
+// (skeleton_minion_free.glb) rather than overwriting the original, because the
+// FREE pack bundles only 2 of the 7 Rig_Medium animation sources: no combat
+// swing, no emotes. Overwriting the shared file would have handed that
+// regression to delve_skel_wraith, a real Reliquary delve mob that currently
+// has real attack clips and nothing to do with this mount. A cart puller never
+// swings at anything, so the reduced set costs the mount nothing.
+//
+// Fixing the other rigs on that shared file, and deciding whether losing their
+// attack swings is worth the geometry fix, is a separate change with its own
+// argument to make.
+const RICKSHAW_PULLER_CLIPS: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walking_A',
+  run: 'Running_A',
+  // Empty rather than naming a clip this GLB does not contain, which
+  // tests/character_clipmaps.test.ts correctly refuses to let through.
+  attack: [],
+  hit: ['Hit_A'],
+  death: 'Death_A',
+};
+
 const skeletonLargeClips = (attack: string[]): ClipMap => ({
   idle: 'Idle',
   walk: 'Walking_A',
@@ -984,11 +1013,14 @@ const ITEM_OFFHAND_MODELS: Readonly<Record<string, string>> = {
   bonewrought_bulwark: 'shield_square',
   duskforged_bulwark: 'shield_square', // crafted apex tower shield (masterwrought); bulwarks share shield_square
   pearlward_aegis: 'shield_round', // the first caster (int/spi) shield
-  // The phase 06 inscription tomes: the first held_offhand item models,
-  // procedural GLBs from scripts/assets/inscription_tomes (VAR_BOOK grips).
+  // The inscription tomes: the first held_offhand item models, procedural GLBs
+  // from scripts/assets/inscription_tomes (VAR_BOOK grips). The phase 09 apex
+  // grimoire joined the family at phase 18, and with it left the conscious
+  // no-model pin in tests/held_weapon_models.test.ts.
   silverleaf_primer: 'tome_silverleaf',
   goldleaf_folio: 'tome_goldleaf',
   sunpetal_grimoire: 'tome_sunpetal',
+  voidbound_grimoire: 'tome_voidbound',
   // Crucible raid shields (content/ignivar_loot.ts): tank wall + healer barrier.
   bulwark_of_the_inner_crucible: 'shield_square',
   ember_wardens_barrier: 'shield_round',
@@ -1983,6 +2015,34 @@ export const VISUALS: Record<string, VisualDef> = {
     // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
     // natural against the same 12.6 leaves it sliding over half its travel).
     runRef: 12.6,
+    lazyPreload: true,
+  },
+  // Developer-only Halloween cart (image-to-glb static prop, no clips of its
+  // own): height is the measured shipped bbox (npx gltf-transform inspect).
+  // The puller is a SEPARATE visual (skel_rickshaw_puller) composed at
+  // runtime by src/render/rickshaw_mount.ts, not baked into this GLB.
+  mount_rickshaw_mount: {
+    url: `${MOUNTS_DIR}/rickshaw_mount.glb`,
+    // MUST match the shipped GLB's measured bbox height exactly (npx
+    // gltf-transform inspect): prepareVisual's normScale = height /
+    // measuredHeight, so a stale value here silently RESCALES the whole
+    // model to compensate. A canopy-raise once landed with almost no visible
+    // effect in-game because this field was left stale through two geometry
+    // changes, quietly shrinking the whole mount to compensate; the canopy
+    // was later cut entirely (floating/unmounted, unconnected wheel spokes),
+    // dropping the real height back down. Re-measure after any geometry
+    // change to this GLB.
+    // Re-measured off the shipped GLB after this pass's geometry work (arched
+    // seat back, trimmed throne wings, harness collar, lantern rebuild): 2.8 was
+    // stale and was silently rescaling the whole cart.
+    height: 4.779,
+    // This GLB ships NO clips: the wheels are spun procedurally by
+    // rickshaw_mount.ts's spinMountWheels, because crossfading a spin clip out drags the wheel back
+    // toward its bind rotation and reads as backwards spin on every stop (full
+    // history in scripts/assets/rickshaw_mount/model.js, above WHEEL_NODES).
+    // MOUNT_RIGGED's names therefore resolve to nothing, which is already a
+    // no-op: visual.ts registers actions only for clips that exist.
+    clips: MOUNT_RIGGED,
     lazyPreload: true,
   },
 
@@ -2980,6 +3040,34 @@ export const VISUALS: Record<string, VisualDef> = {
     animUrls: [`${ENEMIES}/skeleton_minion_hit_variety_anims.glb`],
     height: 2.5,
     clips: skeletonClips(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    tint: 'entity',
+    tintStrength: 0.25,
+  },
+  // The Bonebound Rickshaw's puller ONLY: a separate key on its own rebuilt
+  // rig (see RICKSHAW_PULLER_CLIPS above for why it is a separate GLB from
+  // skeleton_minion.glb, which skel_minion above still uses unchanged, no
+  // regression to any of its own consumers).
+  //
+  // 2.166 is a DELIBERATE ART CHOICE, not a measurement, and it is the one
+  // value in this entry that is not free to change. `height` is a TARGET:
+  // prepareVisual poses a throwaway clone mid-idle, measures that, and
+  // derives normScale = height / posedHeight, so whatever goes here IS the
+  // puller's rendered size. The rest of this skeleton family stands at the
+  // 2.5 convention (skel_minion, skel_warrior), so this puller is
+  // deliberately about 13% shorter than the identical rig walking around as
+  // a mob: it reads as a hunched grunt harnessed to a cart rather than a
+  // soldier, and it keeps the crown clear of the cart's own canopy line.
+  //
+  // Changing it is a geometry change, not a number change. The shaft
+  // cross-brace (model.js SHAFT_TIP_Y/Z/SIDE_X) is positioned against this
+  // rig's measured handslot bones AT THIS SIZE, and RICKSHAW_PULLER_OFFSET_Z
+  // /_Y (src/render/rickshaw_mount.ts) were tuned live against it. Scaling
+  // to 2.5 moves the hand bones and breaks the grip alignment; re-tune all
+  // three together and retake the screenshots if you ever do.
+  skel_rickshaw_puller: {
+    url: `${ENEMIES}/skeleton_minion_free.glb`,
+    height: 2.166,
+    clips: RICKSHAW_PULLER_CLIPS,
     tint: 'entity',
     tintStrength: 0.25,
   },

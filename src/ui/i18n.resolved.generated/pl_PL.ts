@@ -796,33 +796,33 @@ export const pl_PL: EnTranslations = {
       "detach": "Usuń skórkę",
       "equipHint": "Wyposaż {type}, aby zastosować tę skórkę.",
       "charter": {
-        "eyebrow": "Strongbox",
-        "title": "Strongbox Charters",
-        "scope": "A charter expands the bank of this character only. The bursar sells the same slots for gold.",
-        "grant": "Adds {slots} bank slots",
-        "buy": "Purchase Charter",
-        "buyAria": "Purchase {item}",
-        "confirmTitle": "Confirm Charter Purchase",
-        "confirmBody": "Purchase {item} for {cost} Claudium?",
+        "eyebrow": "Szkatuła",
+        "title": "Statuty Szkatuły",
+        "scope": "Statut rozszerza bank wyłącznie tej postaci. Skarbnik sprzedaje te same miejsca za złoto.",
+        "grant": "Dodaje {slots} miejsc w banku",
+        "buy": "Kup statut",
+        "buyAria": "Kup {item}",
+        "confirmTitle": "Potwierdź zakup statutu",
+        "confirmBody": "Kupić {item} za {cost} Claudium?",
         "resultContext": "{item} ({sku}): {message}",
-        "granted": "The charter was applied. The bank of this character is larger now.",
-        "alreadyGranted": "This charter is already on this character. You were not charged again.",
-        "applyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
-        "grantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
-        "inProgress": "A purchase for this character is still being completed. Try again in a moment.",
-        "doesNotFit": "The bank of this character cannot fit the full grant of this charter.",
-        "notPurchasable": "This charter cannot be purchased right now.",
-        "noRoom": "The bank of this character has no room left for a charter.",
-        "noCharterFits": "No charter fits the room left in the bank of this character.",
-        "someHiddenByFit": "Charters too large for the room left in the bank of this character are not shown.",
-        "outage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
-        "outageStale": "Return to the Store and use the same Purchase Charter action again. You will not be charged twice. Reloading the game first can lose that protection.",
-        "failed": "The purchase could not be completed.",
+        "granted": "Statut został zastosowany. Bank tej postaci jest teraz większy.",
+        "alreadyGranted": "Ten statut jest już przypisany do tej postaci. Nie zostałeś ponownie obciążony opłatą.",
+        "applyDeferred": "Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.",
+        "grantUnresolved": "Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.",
+        "inProgress": "Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.",
+        "doesNotFit": "Bank tej postaci nie pomieści pełnej puli tego statutu.",
+        "notPurchasable": "Tego statutu nie można teraz kupić.",
+        "noRoom": "Bank tej postaci nie ma już miejsca na statut.",
+        "noCharterFits": "Żaden statut nie zmieści się w miejscu pozostałym w banku tej postaci.",
+        "someHiddenByFit": "Statuty zbyt duże dla miejsca pozostałego w banku tej postaci nie są pokazywane.",
+        "outage": "Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.",
+        "outageStale": "Wróć do sklepu i ponownie użyj tej samej opcji Kup statut. Nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.",
+        "failed": "Nie udało się zakończyć zakupu.",
         "names": {
-          "strongbox_charter_1": "Lesser Strongbox Charter",
-          "strongbox_charter_2": "Greater Strongbox Charter",
-          "strongbox_charter_3": "Grand Strongbox Charter",
-          "strongbox_charter_complete": "Complete Strongbox Charter"
+          "strongbox_charter_1": "Mniejszy Statut Szkatuły",
+          "strongbox_charter_2": "Większy Statut Szkatuły",
+          "strongbox_charter_3": "Wielki Statut Szkatuły",
+          "strongbox_charter_complete": "Pełny Statut Szkatuły"
         }
       }
     },
@@ -880,7 +880,7 @@ export const pl_PL: EnTranslations = {
       "reset": "Resetuj",
       "presets": {
         "classic": "Klasyczne złoto",
-        "fancyGold": "Fancy Gold (WIP)",
+        "fancyGold": "Wytworne złoto (w budowie)",
         "midnight": "Północ",
         "parchment": "Pergamin",
         "highContrast": "Wysoki kontrast"
@@ -961,7 +961,8 @@ export const pl_PL: EnTranslations = {
       "durationUnitSeconds": "s",
       "durationUnitMinutes": "m",
       "durationUnitHours": "h",
-      "durationUnitDays": "d"
+      "durationUnitDays": "d",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "Podgląd modelu postaci"
@@ -1357,11 +1358,11 @@ export const pl_PL: EnTranslations = {
       "reset": "Resetuj",
       "done": "Gotowe",
       "cancel": "Anuluj",
-      "showExtraBar": "Show Another Action Bar",
-      "hideExtraBar": "Hide an Action Bar",
-      "conflictTitle": "Key Already Bound",
-      "conflictBody": "{key} is already bound to {other}. Binding it to {action} will unbind {other}.",
-      "conflictAccept": "Rebind Anyway",
+      "showExtraBar": "Pokaż kolejny pasek akcji",
+      "hideExtraBar": "Ukryj pasek akcji",
+      "conflictTitle": "Klawisz już przypisany",
+      "conflictBody": "{key} jest już przypisany do {other}. Przypisanie go do {action} usunie przypisanie {other}.",
+      "conflictAccept": "Przypisz mimo to",
       "resetConfirmTitle": "Zresetować klawisze paska akcji?",
       "resetConfirmBody": "Pierwszy pasek wraca do domyślnych klawiszy. Drugi i trzeci tracą przypisania. Tego nie można cofnąć."
     },
@@ -1391,6 +1392,7 @@ export const pl_PL: EnTranslations = {
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_stalkglider_snail": "Krzepki, powoli, lecz niezmordowanie pełznący ślimak, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1399,7 +1401,8 @@ export const pl_PL: EnTranslations = {
       "desc_stormfeather_griffin": "Dostojny gryf burzy, który skrada się po ziemi na szponach okutych runami, ze złożonymi skrzydłami.",
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
-      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem."
+      "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
       "mountPrompt": "Naciśnij {key}, aby dosiąść treningowego Rumaka Męstwa.",
@@ -1569,6 +1572,7 @@ export const pl_PL: EnTranslations = {
       "playerFrameScale": "Skala ramki gracza",
       "targetFrameScale": "Skala ramki celu",
       "aurasOnPlayerFrame": "Wzmocnienia na ramce gracza",
+      "alwaysShowAllBuffs": "Zawsze pokazuj wszystkie wzmocnienia",
       "highContrastBackground": "Tło o wysokim kontraście",
       "startAttackOnAbility": "Automatyczny atak przy użyciu umiejętności",
       "stopAutoAttackOnTargetSwitch": "Zatrzymaj automatyczny atak przy zmianie celu",
@@ -1578,22 +1582,25 @@ export const pl_PL: EnTranslations = {
       "stickyTarget": "Zachowaj cel po kliknięciu w ziemię",
       "showItemLevel": "Pokaż poziom przedmiotu",
       "showReliquaryTracker": "Pokaż narzędzie do śledzenia relikwiarzy",
+      "confirmVendorSell": "Potwierdzaj przed sprzedażą",
+      "confirmVendorSellNote": "Wyłączenie tego sprawia, że przedmioty sprzedają się jednym kliknięciem bez potwierdzenia, więc przesunięty slot w torbie może sprzedać niewłaściwy przedmiot.",
       "itemLevelLine": "Poziom przedmiotu {level}",
       "itemScoreLine": "Ocena {score}",
       "showSecondaryActionBar": "Pokaż dodatkowy pasek akcji",
       "showThirdActionBar": "Pokaż trzeci pasek akcji",
-      "combineActionBars": "Combine Action Bars",
+      "combineActionBars": "Połącz paski akcji",
       "hideUnusedActionSlots": "Ukryj nieużywane pola akcji",
       "lockActionBars": "Zablokuj paski akcji",
       "showTargetOfTarget": "Pokaż cel celu",
+      "showTargetSwingTimer": "Pokaż licznik zamachu celu",
       "showPetFrame": "Pokaż swoje zwierzę",
       "waterRipples": "Zmarszczki na wodzie (kilwater)",
       "showAttackButton": "Pokaż Przycisk Ataku",
       "showDailyRewardsChest": "Pokaż skrzynię codziennych nagród",
       "mobileCameraJoystick": "Joystick aparatu",
       "mobileLeftHanded": "Układ leworęczny",
-      "touchPreciseAim": "Precise Ground Targeting",
-      "touchPreciseAimNote": "Aim before casting ground spells. Turn off to cast instantly at the suggested point.",
+      "touchPreciseAim": "Precyzyjne celowanie naziemne",
+      "touchPreciseAimNote": "Celuj przed rzuceniem zaklęć naziemnych. Wyłącz, aby rzucać natychmiast w sugerowany punkt.",
       "touchTapMenus": "Dotykowe menu",
       "touchTapMenusNote": "Otwieraj kontrolki akcji, materiałów zużywalnych i menu dotknięciem zamiast przeciągnięciem. Dotknij pozycji, aby jej użyć, dotknij kontrolki ponownie, aby wykonać jej zwykłe działanie, albo dotknij poza nią, aby zamknąć."
     },
@@ -1629,7 +1636,7 @@ export const pl_PL: EnTranslations = {
       "invertY": "Odwróć kamerę (Y)",
       "deadzone": "Martwa strefa gałki",
       "cameraSpeed": "Szybkość kamery",
-      "reticleSpeed": "Reticle Speed",
+      "reticleSpeed": "Prędkość celownika",
       "vibration": "Wibracje",
       "buttons": "Układ przycisków",
       "resetButtons": "Resetuj układ przycisków",
@@ -2010,7 +2017,7 @@ export const pl_PL: EnTranslations = {
       "fromYour": "Z twoich {value} pkt. cechy {stat}:",
       "names": {
         "spellPower": "Moc zaklęć",
-        "healPower": "Healing Power",
+        "healPower": "Moc leczenia",
         "critRating": "Ocena krytyczna",
         "hasteRating": "Ocena pośpiechu",
         "parry": "Parowanie",
@@ -2166,6 +2173,12 @@ export const pl_PL: EnTranslations = {
         "few": "pozostały {count} sekundy",
         "many": "pozostało {count} sekund",
         "other": "pozostało {count} sekund"
+      },
+      "buffsHidden": {
+        "one": "Aktywne jest jeszcze {count} wzmocnienie, ale ukryte w tym ustawieniu grafiki",
+        "few": "Aktywne są jeszcze {count} wzmocnienia, ale ukryte w tym ustawieniu grafiki",
+        "many": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki",
+        "other": "Aktywnych jest jeszcze {count} wzmocnień, ale ukryte w tym ustawieniu grafiki"
       },
       "playtimeDays": {
         "one": "{count} dzień",
@@ -2501,9 +2514,9 @@ export const pl_PL: EnTranslations = {
       "bagSocketAria": "{name}: {slots}",
       "socketEmpty": "Puste gniazdo na torbę",
       "unequipHint": "Kliknij, aby zdjąć tę torbę",
-      "poolGeneral": "General: {used} of {total}",
-      "poolMaterials": "Materials: {used} of {total}",
-      "capacityPoolsAria": "Bag slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}."
+      "poolGeneral": "Ogólne: {used} z {total}",
+      "poolMaterials": "Materiały: {used} z {total}",
+      "capacityPoolsAria": "Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}."
     },
     "raidConvert": {
       "toPartyDone": "Twój rajd został z powrotem przekształcony w drużynę.",
@@ -2517,179 +2530,179 @@ export const pl_PL: EnTranslations = {
       "mail": "Kolczuga"
     },
     "varkhulCallout": {
-      "leftPillarCharging": "The left forge pillar is charging. It will ignite in 3 sec!",
-      "rightPillarCharging": "The right forge pillar is charging. It will ignite in 3 sec!",
-      "bothPillarsCharging": "The forge pillars are charging. They will ignite in 3 sec!",
-      "artificerApproaches": "A Cinder Artificer is approaching the forge!",
-      "leftPillar": "The left forge pillar ignites!",
-      "rightPillar": "The right forge pillar ignites!",
-      "bothPillars": "The forge pillars ignite!",
-      "portalsOpening": "The forge portals are opening!",
-      "heat75": "The forge is at 75% heat!",
-      "heat90": "Forge Meltdown is imminent!",
-      "addsDefeated": "The forge legion is defeated: Varkhul is exposed!",
-      "worldfireBegins": "Worldfire ignites at the edge of the room. The crucible will be consumed in 42 sec!",
-      "worldfireClosing": "Worldfire closes in. Move toward the center!",
-      "worldfireConsumed": "The entire crucible is burning!"
+      "leftPillarCharging": "Lewy filar kuźni się ładuje. Zapłonie za 3 sek!",
+      "rightPillarCharging": "Prawy filar kuźni się ładuje. Zapłonie za 3 sek!",
+      "bothPillarsCharging": "Filary kuźni się ładują. Zapłoną za 3 sek!",
+      "artificerApproaches": "Inżynier Żaru zbliża się do kuźni!",
+      "leftPillar": "Lewy filar kuźni zapłonął!",
+      "rightPillar": "Prawy filar kuźni zapłonął!",
+      "bothPillars": "Filary kuźni zapłonęły!",
+      "portalsOpening": "Portale kuźni się otwierają!",
+      "heat75": "Kuźnia osiągnęła 75% żaru!",
+      "heat90": "Stopienie Kuźni jest bliskie!",
+      "addsDefeated": "Legion Kuźni pokonany: Varkhul jest odsłonięty!",
+      "worldfireBegins": "Pożoga Świata zapala się na krawędzi pomieszczenia. Tygiel zostanie pochłonięty za 42 sek!",
+      "worldfireClosing": "Pożoga Świata zaciska się. Przesuń się w stronę środka!",
+      "worldfireConsumed": "Cały tygiel płonie!"
     },
-    "varkhulWaveStatus": "Wave {wave}/{waves} | Enemies: {remaining}",
+    "varkhulWaveStatus": "Fala {wave}/{waves} | Wrogowie: {remaining}",
     "raidBossGuide": {
-      "title": "Boss Guide",
-      "button": "Boss Guide: {boss}",
+      "title": "Przewodnik po bossie",
+      "button": "Przewodnik po bossie: {boss}",
       "subtitle": "{boss} | {difficulty}",
-      "close": "Close boss guide",
-      "bossesLabel": "Raid bosses",
-      "difficultyLabel": "Difficulty",
-      "normal": "Normal",
-      "heroic": "Heroic",
-      "portraitAlt": "{boss} encounter portrait",
-      "overviewHeading": "Overview",
-      "abilitiesHeading": "Abilities",
-      "whatToDo": "What to do",
-      "whatToDoResponse": "What to do: {response}",
-      "rolesLabel": "Role responsibilities",
-      "flagsLabel": "Mechanic warnings",
+      "close": "Zamknij przewodnik po bossie",
+      "bossesLabel": "Bossowie rajdu",
+      "difficultyLabel": "Poziom trudności",
+      "normal": "Normalny",
+      "heroic": "Heroiczny",
+      "portraitAlt": "Portret starcia z {boss}",
+      "overviewHeading": "Przegląd",
+      "abilitiesHeading": "Umiejętności",
+      "whatToDo": "Co robić",
+      "whatToDoResponse": "Co robić: {response}",
+      "rolesLabel": "Zadania ról",
+      "flagsLabel": "Ostrzeżenia o mechanikach",
       "roleTank": "Tank",
-      "roleHealer": "Healer",
-      "roleDamage": "Damage",
-      "roleAll": "All roles",
-      "flagDeadly": "Deadly",
-      "flagInterruptible": "Interruptible",
-      "flagImportant": "Important",
-      "flagCleansable": "Cleansable",
-      "browseBoss": "View {boss}",
-      "chooseDifficulty": "View {difficulty} mechanics",
-      "expandAbility": "Expand {ability}",
-      "collapseAbility": "Collapse {ability}",
+      "roleHealer": "Uzdrowiciel",
+      "roleDamage": "Obrażenia",
+      "roleAll": "Wszystkie role",
+      "flagDeadly": "Śmiertelne",
+      "flagInterruptible": "Można przerwać",
+      "flagImportant": "Ważne",
+      "flagCleansable": "Można oczyścić",
+      "browseBoss": "Pokaż {boss}",
+      "chooseDifficulty": "Zobacz mechaniki: {difficulty}",
+      "expandAbility": "Rozwiń {ability}",
+      "collapseAbility": "Zwiń {ability}",
       "abilityControlLabel": "{action}. {details}",
       "tooltipMeta": "{phase} | {difficulty}",
       "ignivar": {
-        "overview": "Varkhul forged Ignivar as a herald, a living seal, and the key to the Inner Crucible. The encounter tests water-conduit control, precise movement, and fast priority damage.",
-        "phaseOpeningName": "The Herald Awakens",
-        "phaseOpeningSummary": "Control Brand of the Pyre with the water conduits while handling Ignivar's repeating frontal, skyfire, rotating rays, and expanding Forge Wave.",
-        "phaseApocalypseName": "Intermission: Apocalypse",
-        "phaseApocalypseSummary": "At {health} health, Ignivar calls an Ashcaller that attempts to end the encounter.",
-        "phaseJudgmentName": "Judgment of the Forge",
-        "phaseJudgmentSummary": "At {health} health, Ignivar ignites the arena and reveals one safe refuge among three shelters.",
-        "phaseJudgmentHeroicSummary": "At {health} health, Ignivar ignites the arena while active Brands continue to threaten nearby players inside the refuge.",
-        "phaseFinaleName": "Finale: Last Inferno",
-        "phaseFinaleSummary": "At {health} health, Ignivar begins a final burn phase with a hard deadline and faster repeating mechanics.",
-        "forgeStrikeName": "Forge Strike",
-        "forgeStrikeSummary": "Ignivar strikes his current tank and applies Molten Armor, increasing damage taken from Ignivar.",
-        "forgeStrikeResponse": "Tanks swap at {stacks} stacks. Healers prepare for the strike and the new tank's first melee swings.",
-        "brandName": "Brand of the Pyre",
-        "brandSummary": "Ignivar marks non-tank players with persistent fire damage. Branded players also burn nearby allies.",
-        "brandResponse": "Spread out. Aim Searing Torrent into a ready water conduit, then have each marked player cross the activated water alone to cleanse.",
-        "brandHeroicResponse": "Spread out. Open a conduit with Searing Torrent and cleanse one marked player at a time. Every cleanse triggers raid-wide Cleansing Backlash.",
-        "searingTorrentName": "Searing Torrent",
-        "searingTorrentSummary": "Ignivar tracks a player, then releases a wide frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
-        "searingTorrentHeroicSummary": "Ignivar tracks a player, then releases a nearly lethal frontal blast. A ready water conduit struck by the blast becomes active for a short time.",
-        "searingTorrentResponse": "Aim the warning through exactly one ready conduit. Everyone else leaves the frontal before the cast completes.",
-        "rainName": "Rain of Cinders",
-        "rainSummary": "Three fire sectors and marked meteor impacts punish players who remain inside their warnings.",
-        "rainHeroicSummary": "Three fire sectors and marked meteor impacts deal extreme damage to players who remain inside their warnings.",
-        "rainResponse": "Move into an unmarked gap and leave every meteor circle before impact.",
-        "raysName": "Revolving Inferno",
-        "raysSummary": "Rotating fire rays sweep around Ignivar and repeatedly damage players who touch them.",
-        "raysHeroicSummary": "Rotating fire rays sweep around Ignivar and inflict severe repeated damage on contact.",
-        "raysResponse": "Move with the open space between rays. Do not cut through a ray, even with a fast movement ability.",
-        "forgeWaveName": "Forge Wave",
-        "forgeWaveSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking back players it hits.",
-        "forgeWaveHeroicSummary": "An expanding wall of fire crosses the arena, leaving two opposite gaps and knocking hit players much farther.",
-        "forgeWaveResponse": "Find either gap during the windup, align with it, and avoid being knocked toward the arena edge.",
-        "apocalypseName": "Apocalypse",
-        "apocalypseSummary": "Ignivar summons an Ashcaller. If the add finishes Apocalypse, the raid is defeated immediately.",
-        "apocalypseResponse": "Switch all available damage to the Ignivar Ashcaller and defeat it before the cast completes.",
-        "judgmentName": "Judgment of the Forge",
-        "judgmentSummary": "Ignivar marks three shelters, identifies one safe refuge, and then repeatedly burns the rest of the arena.",
-        "judgmentHeroicSummary": "Ignivar marks one safe refuge while the arena burns. Brand of the Pyre remains active and still damages nearby allies.",
-        "judgmentResponse": "Identify the uniquely marked refuge during the warning and stack fully inside its boundary before the floor ignites.",
-        "chainsName": "Chains of the Forge",
-        "chainsSummary": "Ignivar links nearby pairs. Separating too far or crossing another pair's chain causes lethal damage.",
-        "chainsResponse": "Stay close to your linked partner, move together, and keep every other player from passing through your chain.",
-        "lastInfernoName": "Last Inferno",
-        "lastInfernoSummary": "Ignivar enrages and prepares a hard wipe while Rain of Cinders, Searing Torrent, and Revolving Inferno accelerate.",
-        "lastInfernoResponse": "Use remaining damage and healing cooldowns, keep executing the movement mechanics, and defeat Ignivar before the countdown ends.",
-        "brand": "Brand of the Pyre: spread out. Aim Searing Torrent into a ready water conduit, then cross the water alone to cleanse.",
-        "movement": "Movement: avoid Rain of Cinders cones and meteors, move with Revolving Inferno, and use Forge Wave's two gaps.",
-        "apocalypse": "Apocalypse: kill Ignivar Ashcaller before its cast completes.",
-        "judgment": "Judgment of the Forge: identify the unique refuge during the warning, then stack inside its marked boundary when the floor ignites.",
-        "finale": "Last Inferno: finish Ignivar before the hard wipe while faster meteors, frontals, and Revolving Inferno continue.",
-        "heroic": "Heroic: paired players stay close during Chains of the Forge, Brand remains active inside Judgment, and Forge Wave pushes farther."
+        "overview": "Varkhul wykuł Ignivara jako herolda, żywą pieczęć i klucz do Inner Crucible. To starcie sprawdza kontrolę nad kanałami wodnymi, precyzyjny ruch oraz szybkie, priorytetowe obrażenia.",
+        "phaseOpeningName": "Herold się budzi",
+        "phaseOpeningSummary": "Kontroluj Piętno Stosu za pomocą kanałów wodnych, radząc sobie jednocześnie z powtarzającym się atakiem frontalnym Ignivara, ogniem z nieba, wirującymi promieniami i rozszerzającą się Falą Kuźni.",
+        "phaseApocalypseName": "Przerwa: Apokalipsa",
+        "phaseApocalypseSummary": "Przy {health} zdrowia Ignivar przyzywa Wzywacza Popiołu, który próbuje zakończyć starcie.",
+        "phaseJudgmentName": "Sąd Kuźni",
+        "phaseJudgmentSummary": "Przy {health} zdrowia Ignivar podpala arenę i ujawnia jedno bezpieczne schronienie spośród trzech.",
+        "phaseJudgmentHeroicSummary": "Przy {health} zdrowia Ignivar podpala arenę, a aktywne Piętna wciąż zagrażają pobliskim graczom wewnątrz schronienia.",
+        "phaseFinaleName": "Finał: Ostatnie Piekło",
+        "phaseFinaleSummary": "Przy {health} zdrowia Ignivar rozpoczyna ostatnią fazę spalania z nieprzekraczalnym czasem i szybciej powtarzającymi się mechanikami.",
+        "forgeStrikeName": "Uderzenie Kuźni",
+        "forgeStrikeSummary": "Ignivar uderza obecnego tanka i nakłada Roztopioną Zbroję, zwiększającą obrażenia otrzymywane od Ignivara.",
+        "forgeStrikeResponse": "Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują się na uderzenie i pierwsze ciosy wręcz nowego tanka.",
+        "brandName": "Piętno Stosu",
+        "brandSummary": "Ignivar znaczy graczy spoza roli tanka trwałymi obrażeniami od ognia. Naznaczeni gracze parzą też pobliskich sojuszników.",
+        "brandResponse": "Rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem niech każdy oznaczony gracz przejdzie przez aktywowaną wodę sam, aby się oczyścić.",
+        "brandHeroicResponse": "Rozejdźcie się. Otwórz kanał Płonącym Nawałem i oczyszczaj oznaczonych graczy pojedynczo. Każde oczyszczenie wywołuje Odrzut Oczyszczenia obejmujący cały rajd.",
+        "searingTorrentName": "Płonący Nawał",
+        "searingTorrentSummary": "Ignivar namierza gracza, a potem uwalnia szeroki wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.",
+        "searingTorrentHeroicSummary": "Ignivar namierza gracza, a potem uwalnia niemal śmiertelny wybuch frontalny. Gotowy kanał wodny trafiony wybuchem staje się aktywny na krótki czas.",
+        "searingTorrentResponse": "Wyceluj ostrzeżenie dokładnie w jeden gotowy kanał. Wszyscy pozostali opuszczają strefę frontalną, zanim rzucanie się zakończy.",
+        "rainName": "Deszcz Popiołów",
+        "rainSummary": "Trzy ogniste sektory i oznaczone uderzenia meteorów karzą graczy, którzy pozostają w ich zasięgu ostrzeżenia.",
+        "rainHeroicSummary": "Trzy ogniste sektory i oznaczone uderzenia meteorów zadają ekstremalne obrażenia graczom, którzy pozostają w ich zasięgu ostrzeżenia.",
+        "rainResponse": "Przesuń się w nieoznaczoną lukę i opuść każdy krąg meteoru przed uderzeniem.",
+        "raysName": "Wirujące Piekło",
+        "raysSummary": "Wirujące ogniste promienie zataczają krąg wokół Ignivara i wielokrotnie zadają obrażenia graczom, którzy ich dotkną.",
+        "raysHeroicSummary": "Wirujące ogniste promienie zataczają krąg wokół Ignivara i zadają dotkliwe, powtarzające się obrażenia przy kontakcie.",
+        "raysResponse": "Poruszaj się razem z wolną przestrzenią między promieniami. Nie przecinaj promienia, nawet szybką zdolnością ruchu.",
+        "forgeWaveName": "Fala Kuźni",
+        "forgeWaveSummary": "Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy.",
+        "forgeWaveHeroicSummary": "Rozszerzająca się ściana ognia przemierza arenę, zostawiając dwie przeciwległe luki i odrzucając trafionych graczy znacznie dalej.",
+        "forgeWaveResponse": "Znajdź jedną z luk podczas zamachu, ustaw się w niej i unikaj odrzucenia w stronę krawędzi areny.",
+        "apocalypseName": "Apokalipsa",
+        "apocalypseSummary": "Ignivar przyzywa Wzywacza Popiołu. Jeśli ten posiłek dokończy Apokalipsę, drużyna rajdowa zostaje natychmiast pokonana.",
+        "apocalypseResponse": "Przekieruj wszystkie dostępne obrażenia na Wzywacza Popiołu Ignivara i pokonaj go, zanim dokończy rzucanie.",
+        "judgmentName": "Sąd Kuźni",
+        "judgmentSummary": "Ignivar oznacza trzy schronienia, wskazuje jedno bezpieczne, a potem wielokrotnie podpala resztę areny.",
+        "judgmentHeroicSummary": "Ignivar oznacza jedno bezpieczne schronienie, podczas gdy arena płonie. Piętno Stosu pozostaje aktywne i wciąż zadaje obrażenia pobliskim sojusznikom.",
+        "judgmentResponse": "Rozpoznaj unikalnie oznaczone schronienie podczas ostrzeżenia i zbierzcie się w pełni w jego granicach, zanim podłoga stanie w ogniu.",
+        "chainsName": "Łańcuchy Kuźni",
+        "chainsSummary": "Ignivar łączy pobliskie pary graczy. Zbytnie oddalenie się lub przecięcie łańcucha innej pary powoduje śmiertelne obrażenia.",
+        "chainsResponse": "Trzymaj się blisko powiązanego partnera, poruszajcie się razem i nie pozwalajcie innym graczom przechodzić przez wasz łańcuch.",
+        "lastInfernoName": "Ostatnie Piekło",
+        "lastInfernoSummary": "Ignivar wpada w szał i szykuje nieuniknioną klęskę całej drużyny, podczas gdy Deszcz Popiołów, Płonący Nawał i Wirujące Piekło przyspieszają.",
+        "lastInfernoResponse": "Użyj pozostałych zdolności obrażeń i leczenia, wciąż wykonuj mechaniki ruchu i pokonaj Ignivara, zanim odliczanie dobiegnie końca.",
+        "brand": "Piętno Stosu: rozejdźcie się. Wyceluj Płonący Nawał w gotowy kanał wodny, a potem przejdź przez wodę sam, aby się oczyścić.",
+        "movement": "Ruch: unikaj stożków Deszczu Popiołów i meteorów, poruszaj się zgodnie z Wirującym Piekłem i korzystaj z dwóch luk Fali Kuźni.",
+        "apocalypse": "Apokalipsa: pokonaj Wzywacza Popiołu Ignivara, zanim dokończy rzucanie.",
+        "judgment": "Sąd Kuźni: rozpoznaj unikalne schronienie podczas ostrzeżenia, a potem zbierzcie się w jego oznaczonych granicach, gdy podłoga stanie w ogniu.",
+        "finale": "Ostatnie Piekło: pokonaj Ignivara, zanim nastąpi nieunikniona klęska całej drużyny, podczas gdy szybsze meteory, ataki frontalne i Wirujące Piekło trwają nadal.",
+        "heroic": "Heroiczny: powiązani gracze trzymają się blisko podczas Łańcuchów Kuźni, Piętno pozostaje aktywne podczas Sądu, a Fala Kuźni odrzuca dalej."
       },
       "varkhul": {
-        "overview": "Varkhul imprisoned the dying Last Spring to forge living metal, then created Ignivar to guard the crime. His encounter combines personal positioning with raid-wide control of the grand forge.",
-        "phaseOpeningName": "The Forgefather",
-        "phaseOpeningSummary": "Varkhul cycles tank pressure, wide frontals, moving projectiles, group soaks, meteor waves, and attacks from the grand anvil.",
-        "phaseAssemblyName": "Intermission: The Master's Assembly",
-        "phaseAssemblySummary": "At {health} health, Varkhul becomes protected while his forge legion enters through portals and the pillar beams threaten a Forge Meltdown.",
-        "phaseFinaleName": "Finale: Masterpiece Unbound",
-        "phaseFinaleSummary": "At {health} health, Varkhul attacks faster, deals more damage, and pulses fire through the raid until the final deadline.",
-        "phaseFinaleHeroicSummary": "At {health} health, Varkhul abandons most earlier mechanics as Worldfire closes inward and consumes the crucible.",
-        "makersBrandName": "Maker's Brand",
-        "makersBrandSummary": "Varkhul strikes his current tank and applies a stacking effect that increases all damage taken from him.",
-        "makersBrandResponse": "Tanks swap at {stacks} stacks. Healers prepare the incoming tank before Varkhul changes targets.",
-        "frontalName": "Forgefather's Sweep",
-        "frontalSummary": "Varkhul releases a very wide frontal sweep that deals heavy fire damage to everyone in front of him.",
-        "frontalHeroicSummary": "Varkhul releases a very wide frontal sweep that deals nearly lethal fire damage to everyone in front of him.",
-        "frontalResponse": "Keep Varkhul facing away from the group and move behind him as soon as the warning appears.",
-        "orbsName": "Cinder Orbs",
-        "orbsSummary": "Marked non-tanks drop persistent cinder pools and release fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
-        "orbsHeroicSummary": "Marked non-tanks drop highly damaging persistent cinder pools and release dangerous fire orbs in every direction. Red-hot Metal also absorbs incoming healing.",
-        "orbsResponse": "Carry each mark to the room edge, separate the pools, then dodge the orbs as they cross the arena. Healers clear the absorb quickly.",
-        "pyreName": "Shared Pyre",
-        "pyreSummary": "A moving circle follows one player without Red-hot Metal. Its damage is divided among players inside, and every missing player deals {missingPenalty} maximum-health damage to the entire raid.",
-        "pyreHeroicSummary": "A moving circle follows one player without Red-hot Metal and splits a larger hit. Every missing player also deals {missingPenalty} maximum-health damage to the entire raid.",
-        "pyreResponse": "Stack at least {players} players inside the circle and move with its target until the cast resolves.",
-        "forgestormName": "Forgestorm",
-        "forgestormSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts across the arena.",
-        "forgestormHeroicSummary": "Varkhul calls down {waves} consecutive waves of marked meteor impacts that deal extreme damage.",
-        "forgestormResponse": "Watch each new set of ground warnings and move out before that wave lands. Do not return to a previous position without checking the next wave.",
-        "rayName": "Tempering Ray",
-        "raySummary": "A ray tracks a marked player for a long windup. The first other player between Varkhul and the target intercepts the hit and receives Tempered Wound.",
-        "rayResponse": "Assign a healthy player, usually the off-tank, to step into the line. Keep other players out and rotate interceptors while Tempered Wound is active.",
-        "anvilName": "Anvil's Decree",
-        "anvilSummary": "Varkhul walks to the grand forge and strikes it {strikes} times, dealing increasing raid-wide damage.",
-        "anvilHeroicSummary": "Varkhul strikes the grand forge {strikes} times for increasing raid damage while marked meteors fall on players.",
-        "anvilResponse": "Group for raid healing and use defensive cooldowns for the final strike.",
-        "anvilHeroicResponse": "Spread marked meteors away from the group while healers and defensive cooldowns cover all {strikes} strikes.",
-        "assemblyName": "The Master's Assembly",
-        "assemblySummary": "Varkhul becomes protected and starts a timed assembly. The raid must defeat every portal wave before the forge completes his masterpiece.",
-        "assemblyResponse": "Split attention between beam control and priority adds. Defeat the full forge legion before the assembly timer expires.",
-        "beamName": "Crucible Beam",
-        "beamSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, while blocked and inactive beams let heat fall.",
-        "beamHeroicSummary": "Active pillar beams heat the forge unless a player blocks them. Blockers take increasing damage from Crucible Exposure, and forge heat never decreases.",
-        "beamResponse": "Stand between each active pillar and the forge, then rotate blockers before exposure becomes dangerous. Reaching full heat causes a lethal Forge Meltdown.",
-        "legionName": "Forge Legion",
-        "legionSummary": "Crucible Wardens cast Crucible Quake to add forge heat, while Cinder Artificers use Repair Protocol to heal Varkhul.",
-        "legionResponse": "Interrupt Crucible Quake, stop Repair Protocol, and focus each dangerous caster before clearing the remaining adds.",
-        "masterpieceName": "Masterpiece Unbound",
-        "masterpieceSummary": "Varkhul attacks faster, deals more damage, and repeatedly burns the raid until the final wipe.",
-        "masterpieceHeroicSummary": "Varkhul attacks faster and deals more damage while Worldfire replaces most earlier mechanics for the final burn.",
-        "masterpieceResponse": "Commit remaining offensive and defensive cooldowns and defeat Varkhul before the final countdown ends.",
-        "worldfireName": "Worldfire",
-        "worldfireSummary": "On Heroic, fire advances from the arena edge toward the center in stages until the entire crucible burns.",
-        "worldfireResponse": "Move inward ahead of each advancing fire band, preserve the shrinking safe space, and finish Varkhul before the center ignites.",
-        "tanks": "Tanks: swap at two stacks of Maker's Brand and keep Varkhul in melee range.",
-        "orbs": "Cinder Orbs: marked players spread to the room edge. Their fire pools persist and the released orbs cross the room.",
-        "pyre": "Shared Pyre: only a player without Red-hot Metal is selected. Stack four players inside the moving circle in either difficulty. Each missing player deals 15% of maximum health to the entire raid.",
-        "forgestorm": "Forgestorm: watch the falling meteors and leave every marked impact before each of the three waves lands.",
-        "anvil": "Anvil's Decree: Varkhul moves to the grand forge and strikes it three times for raid damage. Heroic also drops marked meteors.",
-        "ray": "Tempering Ray: another player, usually a tank, intercepts the moving line before the long windup ends. The player hit receives Tempered Wound.",
-        "forge": "Forge pillars: block active beams before they reach the forge and rotate blockers as Crucible Exposure grows. A full heat meter causes Forge Meltdown.",
-        "assembly": "The Master's Assembly: block both forge beams, kill every portal wave, interrupt Crucible Quake, and stop Cinder Artificers from healing Varkhul.",
-        "worldfire": "Worldfire: on Heroic, the burning edge closes toward the center during the final phase. Defeat Varkhul before the whole crucible burns.",
-        "heroic": "Heroic: forge heat never cools, Anvil's Decree adds meteors, and the final phase removes most mechanics to focus on Worldfire."
+        "overview": "Varkhul uwięził umierający Last Spring, aby wykuć żywy metal, po czym stworzył Ignivara, by strzegł tej zbrodni. To starcie łączy indywidualne ustawianie się z kontrolą wielkiej kuźni obejmującą cały rajd.",
+        "phaseOpeningName": "Ojciec Kuźni",
+        "phaseOpeningSummary": "Varkhul naprzemiennie stosuje presję na tanka, szerokie ataki frontalne, poruszające się pociski, wspólne wchłanianie obrażeń w grupie, fale meteorów i ataki od strony wielkiego kowadła.",
+        "phaseAssemblyName": "Przerwa: Zgromadzenie Mistrza",
+        "phaseAssemblySummary": "Przy {health} zdrowia Varkhul staje się chroniony, gdy jego Legion Kuźni wkracza przez portale, a promienie filarów grożą Stopieniem Kuźni.",
+        "phaseFinaleName": "Finał: Arcydzieło Uwolnione",
+        "phaseFinaleSummary": "Przy {health} zdrowia Varkhul atakuje szybciej, zadaje więcej obrażeń i zsyła fale ognia na cały rajd aż do nieprzekraczalnego czasu.",
+        "phaseFinaleHeroicSummary": "Przy {health} zdrowia Varkhul porzuca większość wcześniejszych mechanik, gdy Pożoga Świata zaciska się do środka i pochłania tygiel.",
+        "makersBrandName": "Piętno Twórcy",
+        "makersBrandSummary": "Varkhul uderza obecnego tanka i nakłada narastający efekt zwiększający wszystkie obrażenia od niego otrzymywane.",
+        "makersBrandResponse": "Tankowie zmieniają się przy {stacks} ładunkach. Uzdrowiciele przygotowują nadchodzącego tanka, zanim Varkhul zmieni cel.",
+        "frontalName": "Zamach Ojca Kuźni",
+        "frontalSummary": "Varkhul uwalnia bardzo szeroki zamach frontalny, zadający ciężkie obrażenia od ognia wszystkim przed nim.",
+        "frontalHeroicSummary": "Varkhul uwalnia bardzo szeroki zamach frontalny, zadający niemal śmiertelne obrażenia od ognia wszystkim przed nim.",
+        "frontalResponse": "Trzymaj Varkhula odwróconego od grupy i przejdź za niego, jak tylko pojawi się ostrzeżenie.",
+        "orbsName": "Kule Żaru",
+        "orbsSummary": "Oznaczeni gracze spoza roli tanka zostawiają trwałe kałuże żaru i uwalniają ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.",
+        "orbsHeroicSummary": "Oznaczeni gracze spoza roli tanka zostawiają silnie obrażające, trwałe kałuże żaru i uwalniają niebezpieczne ogniste kule we wszystkich kierunkach. Rozżarzony Metal pochłania też otrzymywane leczenie.",
+        "orbsResponse": "Zanieś każde oznaczenie do krawędzi pomieszczenia, oddziel kałuże, a potem unikaj kul przemierzających arenę. Uzdrowiciele powinni szybko usunąć pochłanianie.",
+        "pyreName": "Wspólny Stos",
+        "pyreSummary": "Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu. Jego obrażenia dzielone są między graczy w środku, a każdy brakujący gracz zadaje {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.",
+        "pyreHeroicSummary": "Poruszający się krąg podąża za graczem bez Rozżarzonego Metalu i dzieli większe trafienie. Każdy brakujący gracz zadaje też {missingPenalty} obrażeń od maksymalnego zdrowia całemu rajdowi.",
+        "pyreResponse": "Zbierzcie co najmniej {players} graczy wewnątrz kręgu i poruszajcie się z jego celem, aż rzucanie się zakończy.",
+        "forgestormName": "Burza Kuźni",
+        "forgestormSummary": "Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów na całej arenie.",
+        "forgestormHeroicSummary": "Varkhul sprowadza {waves} kolejnych fal oznaczonych uderzeń meteorów, zadających ekstremalne obrażenia.",
+        "forgestormResponse": "Obserwuj każdy nowy zestaw ostrzeżeń na ziemi i odsuń się, zanim ta fala spadnie. Nie wracaj na poprzednią pozycję bez sprawdzenia kolejnej fali.",
+        "rayName": "Promień Hartowania",
+        "raySummary": "Promień namierza oznaczonego gracza podczas długiego zamachu. Pierwszy inny gracz stojący między Varkhulem a celem przechwytuje trafienie i otrzymuje Hartowaną Ranę.",
+        "rayResponse": "Wyznacz zdrowego gracza, zwykle off-tanka, aby wszedł w linię. Trzymaj pozostałych graczy z dala i zmieniajcie przechwytujących, dopóki Hartowana Rana jest aktywna.",
+        "anvilName": "Edykt Kowadła",
+        "anvilSummary": "Varkhul podchodzi do wielkiej kuźni i uderza w nią {strikes} razy, zadając coraz większe obrażenia całemu rajdowi.",
+        "anvilHeroicSummary": "Varkhul uderza w wielką kuźnię {strikes} razy, zadając coraz większe obrażenia całemu rajdowi, podczas gdy na graczy spadają oznaczone meteory.",
+        "anvilResponse": "Zgromadźcie się do leczenia rajdowego i użyjcie zdolności obronnych na ostatnie uderzenie.",
+        "anvilHeroicResponse": "Rozprowadźcie oznaczone meteory z dala od grupy, podczas gdy uzdrowiciele i zdolności obronne pokrywają wszystkie {strikes} uderzenia.",
+        "assemblyName": "Zgromadzenie Mistrza",
+        "assemblySummary": "Varkhul staje się chroniony i rozpoczyna zgromadzenie na czas. Rajd musi pokonać każdą falę z portali, zanim kuźnia ukończy jego arcydzieło.",
+        "assemblyResponse": "Podzielcie uwagę między kontrolę promieni a priorytetowe cele. Pokonajcie cały Legion Kuźni, zanim upłynie czas Zgromadzenia.",
+        "beamName": "Promień Tygla",
+        "beamSummary": "Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, natomiast zablokowane i nieaktywne promienie pozwalają żarowi opaść.",
+        "beamHeroicSummary": "Aktywne promienie filarów rozgrzewają kuźnię, chyba że zablokuje je gracz. Blokujący otrzymują coraz większe obrażenia od Ekspozycji Tygla, a żar kuźni nigdy nie spada.",
+        "beamResponse": "Stań między każdym aktywnym filarem a kuźnią, a potem zmieniajcie blokujących, zanim ekspozycja stanie się niebezpieczna. Osiągnięcie pełnego żaru powoduje śmiertelne Stopienie Kuźni.",
+        "legionName": "Legion Kuźni",
+        "legionSummary": "Strażnicy Tygla rzucają Wstrząs Tygla, zwiększając żar kuźni, a Inżynierowie Żaru używają Protokołu Naprawy, aby leczyć Varkhula.",
+        "legionResponse": "Przerywaj Wstrząs Tygla, zatrzymuj Protokół Naprawy i skupiaj się na każdym groźnym rzucającym, zanim oczyścisz pozostałe posiłki.",
+        "masterpieceName": "Arcydzieło Uwolnione",
+        "masterpieceSummary": "Varkhul atakuje szybciej, zadaje więcej obrażeń i wielokrotnie podpala rajd, aż do ostatecznej klęski.",
+        "masterpieceHeroicSummary": "Varkhul atakuje szybciej i zadaje więcej obrażeń, podczas gdy Pożoga Świata zastępuje większość wcześniejszych mechanik w ostatniej fazie spalania.",
+        "masterpieceResponse": "Użyjcie pozostałych zdolności ofensywnych i obronnych i pokonajcie Varkhula, zanim ostateczne odliczanie dobiegnie końca.",
+        "worldfireName": "Pożoga Świata",
+        "worldfireSummary": "W trybie heroicznym ogień etapami przesuwa się od krawędzi areny w stronę środka, aż spłonie cały tygiel.",
+        "worldfireResponse": "Przesuwaj się do środka przed każdym nadciągającym pasem ognia, zachowuj kurczącą się bezpieczną przestrzeń i dobij Varkhula, zanim zapłonie środek.",
+        "tanks": "Tankowie: zmieniajcie się przy dwóch ładunkach Piętna Twórcy i trzymajcie Varkhula w zasięgu wręcz.",
+        "orbs": "Kule Żaru: oznaczeni gracze rozchodzą się do krawędzi pomieszczenia. Ich ogniste kałuże utrzymują się, a uwolnione kule przemierzają pomieszczenie.",
+        "pyre": "Wspólny Stos: wybierany jest tylko gracz bez Rozżarzonego Metalu. Zbierzcie czterech graczy wewnątrz poruszającego się kręgu w obu poziomach trudności. Każdy brakujący gracz zadaje 15% maksymalnego zdrowia całemu rajdowi.",
+        "forgestorm": "Burza Kuźni: obserwuj spadające meteory i opuszczaj każde oznaczone miejsce uderzenia, zanim spadnie każda z trzech fal.",
+        "anvil": "Edykt Kowadła: Varkhul podchodzi do wielkiej kuźni i uderza w nią trzykrotnie, zadając obrażenia całemu rajdowi. W trybie heroicznym spadają też oznaczone meteory.",
+        "ray": "Promień Hartowania: inny gracz, zwykle tank, przechwytuje poruszającą się linię, zanim zakończy się długi zamach. Trafiony gracz otrzymuje Hartowaną Ranę.",
+        "forge": "Filary kuźni: blokujcie aktywne promienie, zanim dosięgną kuźni, i zmieniajcie blokujących, gdy rośnie Ekspozycja Tygla. Pełny wskaźnik żaru powoduje Stopienie Kuźni.",
+        "assembly": "Zgromadzenie Mistrza: blokujcie oba promienie kuźni, zabijajcie każdą falę z portali, przerywajcie Wstrząs Tygla i nie pozwólcie Inżynierom Żaru leczyć Varkhula.",
+        "worldfire": "Pożoga Świata: w trybie heroicznym płonąca krawędź zaciska się w stronę środka podczas ostatniej fazy. Pokonaj Varkhula, zanim spłonie cały tygiel.",
+        "heroic": "Heroiczny: żar kuźni nigdy nie opada, Edykt Kowadła dodaje meteory, a ostatnia faza usuwa większość mechanik, skupiając się na Pożodze Świata."
       }
     },
     "auraEffect": {
-      "sharedPyre": "Deals {total}% of each player's maximum health, divided by the number of players inside the circle ({perPlayer}% each with {players} players).",
-      "varkhulSharedPyre": "Deals {total}% of each player's maximum health, divided among players inside the circle ({perPlayer}% each with {players} players). Each missing player also deals {missingPenalty}% of maximum health to the entire raid, including players inside the circle.",
-      "makersBrand": "For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.",
-      "varkhulSentinelsGaze": "The Ember Sentinel pursues you. Keep it away from the raid until it is destroyed.",
-      "varkhulMoltenCore": "Carry this core to the forge. Molten Burden deals increasing damage every {interval} sec, from {min}% to {max}% of maximum health.",
-      "varkhulForgeLink": "Intercept an active pillar beam before it reaches the forge. Open beams add 6% heat per second. In Normal, blocked beams and inactive pillars cool the forge; in Heroic, heat never falls. At 100%, the forge suffers a lethal Meltdown.",
-      "varkhulCrucibleExposure": "Blocking a Crucible Beam deals increasing maximum-health damage every second. The stacks reset 10 seconds after leaving a beam in Normal and after 60 seconds in Heroic.",
+      "sharedPyre": "Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone przez liczbę graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach).",
+      "varkhulSharedPyre": "Zadaje {total}% maksymalnego zdrowia każdego gracza, podzielone między graczy wewnątrz kręgu ({perPlayer}% każdy przy {players} graczach). Każdy brakujący gracz zadaje też {missingPenalty}% maksymalnego zdrowia całemu rajdowi, w tym graczom wewnątrz kręgu.",
+      "makersBrand": "Przez {duration} sek. każdy ładunek zwiększa obrażenia otrzymywane od Varkhula o {pct}%. Nakłada się maksymalnie {max} razy. Tankowie powinni się zmieniać przy {swap} ładunkach.",
+      "varkhulSentinelsGaze": "Strażnik Żaru ściga cię. Trzymaj go z dala od rajdu, aż zostanie zniszczony.",
+      "varkhulMoltenCore": "Zanieś ten rdzeń do kuźni. Roztopiony Ciężar zadaje rosnące obrażenia co {interval} sek., od {min}% do {max}% maksymalnego zdrowia.",
+      "varkhulForgeLink": "Przechwyć aktywny promień filaru, zanim dotrze do kuźni. Otwarte promienie dodają 6% żaru na sekundę. W trybie normalnym zablokowane promienie i nieaktywne filary chłodzą kuźnię; w trybie heroicznym żar nigdy nie spada. Przy 100% kuźnia ulega śmiertelnemu Stopieniu.",
+      "varkhulCrucibleExposure": "Blokowanie Promienia Tygla zadaje co sekundę rosnące obrażenia od maksymalnego zdrowia. Ładunki znikają 10 sekund po opuszczeniu promienia w trybie normalnym i po 60 sekundach w trybie heroicznym.",
       "dot": "Zadaje {value} obrażeń od {school} co {interval} s",
       "hot": "Przywraca {value} zdrowia co {interval} s",
       "mendingCurrent": "Gromadzi {value} leczenia, uwalnianego z czasem lub zużywanego przez Kaskadowe Cerowanie",
@@ -2901,8 +2914,8 @@ export const pl_PL: EnTranslations = {
       "takeLootButton": "Weź łup",
       "takeLootTooltip": "Bierze monety i wypadłe przedmioty. Nie zużywa zebranych zasobów.",
       "unifiedPressHint": "Klawisz interakcji bierze łup i zbiera zasoby jednym naciśnięciem, korzystając z priorytetów miasta.",
-      "bindConfirmTitle": "Binds when picked up",
-      "bindConfirmBody": "This loot contains an item that will bind to you when taken. A bound item can only be traded to players who shared its drop, and only for a limited time."
+      "bindConfirmTitle": "Przywiązuje się po podniesieniu",
+      "bindConfirmBody": "Ten łup zawiera przedmiot, który przywiąże się do ciebie, gdy go zabierzesz. Przywiązany przedmiot można wymienić wyłącznie z graczami, z którymi wypadł, i tylko przez ograniczony czas."
     },
     "spellbook": {
       "addToBarAria": "Dodaj {name} do paska akcji",
@@ -2934,7 +2947,7 @@ export const pl_PL: EnTranslations = {
     },
     "partyFrames": {
       "section": "Ramki grupy i rajdu",
-      "optionsSection": "Party Frame Options",
+      "optionsSection": "Opcje ramek drużyny",
       "unlock": "Przenieś ramki grupy i rajdu",
       "lock": "Zablokuj ramki grupy i rajdu",
       "style": "Styl ramki",
@@ -2966,60 +2979,60 @@ export const pl_PL: EnTranslations = {
       "label": "Resetuj pozycje ramek"
     },
     "interfaceUnlock": {
-      "label": "Edit Frames",
-      "unlock": "Unlock interface",
-      "lock": "Lock interface",
-      "lockAll": "Lock Interface",
-      "barsNote": "Only the action bars you have turned on appear while editing. To place more bars, add them with the plus and minus buttons on the main action bar first.",
-      "frozenNote": "While editing, the interface and camera are frozen: buttons and frames are still pictures to arrange, and clicks will not reach the game world.",
-      "unlockFrame": "Unlock this frame",
-      "lockFrame": "Lock this frame",
-      "resizeFrame": "Resize this frame",
+      "label": "Edytuj ramki",
+      "unlock": "Odblokuj interfejs",
+      "lock": "Zablokuj interfejs",
+      "lockAll": "Zablokuj interfejs",
+      "barsNote": "Podczas edycji widoczne są tylko włączone paski akcji. Aby dodać więcej pasków, najpierw dodaj je przyciskami plus i minus na głównym pasku akcji.",
+      "frozenNote": "Podczas edycji interfejs i kamera są zablokowane: przyciski i ramki stają się nieruchomymi obrazami do rozmieszczenia, a kliknięcia nie docierają do świata gry.",
+      "unlockFrame": "Odblokuj tę ramkę",
+      "lockFrame": "Zablokuj tę ramkę",
+      "resizeFrame": "Zmień rozmiar tej ramki",
       "frameNames": {
-        "actionBar1": "Action Bar",
-        "actionBar2": "Action Bar 2",
-        "actionBar3": "Action Bar 3",
-        "steamWishlist": "Wishlist Reminder",
+        "actionBar1": "Pasek akcji",
+        "actionBar2": "Pasek akcji 2",
+        "actionBar3": "Pasek akcji 3",
+        "steamWishlist": "Przypomnienie o liście życzeń",
         "menu": "Menu",
-        "minimap": "Minimap",
-        "stanceBar": "Stance Bar",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
-        "actionBarGroup": "Action Bars",
-        "playerFrame": "Player",
-        "targetFrame": "Target",
-        "partyFrames": "Party",
-        "swingBar": "Auto Attack"
+        "minimap": "Minimapa",
+        "stanceBar": "Pasek postaw",
+        "xpBar": "Pasek doświadczenia",
+        "chat": "Czat",
+        "actionBarGroup": "Paski akcji",
+        "playerFrame": "Gracz",
+        "targetFrame": "Cel",
+        "partyFrames": "Drużyna",
+        "swingBar": "Automatyczny atak"
       },
-      "framesMenu": "Frames Settings",
-      "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",
-      "showHideFrames": "Show or Hide Frames",
-      "buffsLeftToRight": "Buffs left to right",
-      "debuffsLeftToRight": "Debuffs left to right",
-      "lockPlayerFrameToBar": "Lock Player Frame to Action Bar",
-      "actionBarsVertical": "Vertical Action Bars",
-      "actionBar1Vertical": "Vertical Action Bar",
-      "actionBar2Vertical": "Vertical Action Bar 2",
-      "actionBar3Vertical": "Vertical Action Bar 3",
-      "menuRailHorizontal": "Horizontal Menu",
-      "snapToGrid": "Snap to Grid",
+      "framesMenu": "Ustawienia ramek",
+      "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",
+      "showHideFrames": "Pokaż lub ukryj ramki",
+      "buffsLeftToRight": "Wzmocnienia od lewej do prawej",
+      "debuffsLeftToRight": "Osłabienia od lewej do prawej",
+      "lockPlayerFrameToBar": "Przypnij ramkę gracza do paska akcji",
+      "actionBarsVertical": "Pionowe paski akcji",
+      "actionBar1Vertical": "Pionowy pasek akcji",
+      "actionBar2Vertical": "Pionowy pasek akcji 2",
+      "actionBar3Vertical": "Pionowy pasek akcji 3",
+      "menuRailHorizontal": "Poziome menu",
+      "snapToGrid": "Przyciągaj do siatki",
       "previewMemberName": "{className} {number}",
-      "resetFrameSize": "Reset size",
-      "resetFrameSizeFor": "Reset size for {name}",
-      "previewSpell": "Example Spell"
+      "resetFrameSize": "Zresetuj rozmiar",
+      "resetFrameSizeFor": "Zresetuj rozmiar dla {name}",
+      "previewSpell": "Przykładowe zaklęcie"
     },
     "transfer": {
-      "frameLayout": "Frame Layout",
-      "allSettings": "All Settings",
-      "exportAction": "Export",
-      "importAction": "Import",
-      "copy": "Copy",
-      "copied": "Copied to clipboard.",
-      "copyFailed": "Copy failed. Select the code and copy it yourself.",
-      "applyReload": "Apply and Reload",
-      "pastePlaceholder": "Paste an exported code here.",
-      "invalid": "That is not a valid export code.",
-      "wrongKind": "That code is a different export type."
+      "frameLayout": "Układ ramek",
+      "allSettings": "Wszystkie ustawienia",
+      "exportAction": "Eksportuj",
+      "importAction": "Importuj",
+      "copy": "Kopiuj",
+      "copied": "Skopiowano do schowka.",
+      "copyFailed": "Kopiowanie nie powiodło się. Zaznacz kod i skopiuj go samodzielnie.",
+      "applyReload": "Zastosuj i przeładuj",
+      "pastePlaceholder": "Wklej tutaj wyeksportowany kod.",
+      "invalid": "To nie jest prawidłowy kod eksportu.",
+      "wrongKind": "Ten kod jest innego typu eksportu."
     },
     "itemTooltip": {
       "requiresLevel": "Wymaga poziomu {level}",
@@ -3028,7 +3041,7 @@ export const pl_PL: EnTranslations = {
       "riftSockets": "Klejnoty Szczeliny {used}/{total}",
       "statEnchanted": "+{value} {stat} (Zaklęty)",
       "enchantedFallback": "Zaklęty",
-      "partyTradeWindow": "You may trade this item to players who shared its drop for the next {time}. Equipping it ends the trade window.",
+      "partyTradeWindow": "Możesz wymienić ten przedmiot z graczami, z którymi wypadł, jeszcze przez {time}. Założenie go kończy okno wymiany.",
       "perfectedBadge": "Perfected",
       "perfectingRank": "Perfecting: rank {rank} of {ranks}"
     },
@@ -3244,9 +3257,9 @@ export const pl_PL: EnTranslations = {
       "linked": "Połączono z kontem Steam {id}",
       "benefits": "Połącz swoje konto Steam z poziomu aplikacji na komputer, aby zdobywane czyny znajdowały odbicie w osiągnięciach Steam.",
       "noTicket": "Steam nie wystawił biletu połączenia. Uruchom Steam i spróbuj ponownie.",
-      "wishlist": "Wishlist on Steam",
-      "wishlistAria": "Wishlist on Steam: open the World of ClaudeCraft store page",
-      "wishlistShort": "Wishlist"
+      "wishlist": "Dodaj do listy życzeń na Steam",
+      "wishlistAria": "Dodaj do listy życzeń na Steam: otwórz stronę World of ClaudeCraft w sklepie",
+      "wishlistShort": "Lista życzeń"
     },
     "epic": {
       "title": "Epic",
@@ -3332,26 +3345,26 @@ export const pl_PL: EnTranslations = {
       "buySlotsMaxed": "W pełni rozszerzony",
       "buyConfirm": "Kupić {count} dodatkowych miejsc w banku za {price}?",
       "buyConfirmAccept": "Kup",
-      "meterLabel": "{used} of {total} slots",
-      "meterPoolGeneral": "General: {used} of {total}",
-      "meterPoolMaterials": "Materials: {used} of {total}",
-      "meterPoolsAria": "Bank slots used: {used} of {total}. General items: {generalUsed} of {generalTotal}. Materials: {materialsUsed} of {materialsTotal}.",
-      "meterMaterialsNote": "Materials-only space from socketed satchels. Other items cannot use it.",
-      "priceDisclaimer": "Prices may change with the game economy.",
-      "rungItemName": "{count} bank slots",
-      "buySlotsDualAria": "Buy {count} slots for {price} or {cost} Claudium",
-      "buyConfirmDual": "Purchase {count} additional bank slots?",
-      "buyConfirmGold": "Purchase for {price}",
-      "buyConfirmClaudium": "Purchase for {cost} Claudium",
-      "rungGranted": "The bank slots were added. The bank of this character is larger now.",
-      "rungAlreadyGranted": "These slots are already on this character. You were not charged again.",
-      "rungApplyDeferred": "Payment complete. The slots apply automatically the next time this character logs in.",
-      "rungGrantUnresolved": "Payment complete, but the slots could not be applied yet. The purchase is recorded and support can finish it for you.",
-      "rungInProgress": "A purchase for this character is still being completed. Try again in a moment.",
-      "rungDoesNotFit": "The bank of this character cannot fit another expansion.",
-      "rungNotPurchasable": "These bank slots cannot be purchased right now.",
-      "rungFailed": "The purchase could not be completed.",
-      "rungOutage": "The purchase could not be confirmed. Try again with this button and you will not be charged twice. Reloading the game first can lose that protection.",
+      "meterLabel": "{used} z {total} miejsc",
+      "meterPoolGeneral": "Ogólne: {used} z {total}",
+      "meterPoolMaterials": "Materiały: {used} z {total}",
+      "meterPoolsAria": "Zajęte miejsca w banku: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.",
+      "meterMaterialsNote": "Miejsce wyłącznie na materiały z osadzonych toreb. Inne przedmioty nie mogą go używać.",
+      "priceDisclaimer": "Ceny mogą się zmieniać wraz z ekonomią gry.",
+      "rungItemName": "{count} miejsc w banku",
+      "buySlotsDualAria": "Kup {count} miejsc za {price} lub {cost} Claudium",
+      "buyConfirmDual": "Kupić {count} dodatkowych miejsc w banku?",
+      "buyConfirmGold": "Kup za {price}",
+      "buyConfirmClaudium": "Kup za {cost} Claudium",
+      "rungGranted": "Miejsca w banku zostały dodane. Bank tej postaci jest teraz większy.",
+      "rungAlreadyGranted": "Te miejsca są już przypisane do tej postaci. Nie zostałeś ponownie obciążony opłatą.",
+      "rungApplyDeferred": "Płatność zakończona. Miejsca zostaną zastosowane automatycznie przy następnym zalogowaniu tej postaci.",
+      "rungGrantUnresolved": "Płatność zakończona, ale miejsca nie mogły zostać jeszcze zastosowane. Zakup został zapisany, a wsparcie techniczne może dokończyć go za ciebie.",
+      "rungInProgress": "Zakup dla tej postaci wciąż jest finalizowany. Spróbuj ponownie za chwilę.",
+      "rungDoesNotFit": "Bank tej postaci nie pomieści kolejnego rozszerzenia.",
+      "rungNotPurchasable": "Tych miejsc w banku nie można teraz kupić.",
+      "rungFailed": "Nie udało się zakończyć zakupu.",
+      "rungOutage": "Nie udało się potwierdzić zakupu. Spróbuj ponownie za pomocą tego przycisku, a nie zostaniesz obciążony dwukrotnie. Ponowne wczytanie gry przed tym może utracić tę ochronę.",
       "withdrawHint": "Kliknij, aby wyjąć",
       "withdrawPartialHint": "Kliknij z Shiftem, aby wyjąć część",
       "depositHint": "Kliknij, aby zdeponować",
@@ -3364,9 +3377,9 @@ export const pl_PL: EnTranslations = {
       "withdrawQuantityTitle": "Wyjmij: {item}",
       "withdrawQuantityInput": "Liczba do wyjęcia",
       "withdrawQuantityConfirm": "Wyjmij",
-      "vaultRowWithdrawName": "Withdraw {item}",
-      "priceChanged": "The price changed before the purchase completed. Review the refreshed price and confirm again.",
-      "withdrawQuantityAction": "Quantity to withdraw: {item}",
+      "vaultRowWithdrawName": "Wyjmij {item}",
+      "priceChanged": "Cena zmieniła się, zanim zakup został zakończony. Sprawdź odświeżoną cenę i potwierdź ponownie.",
+      "withdrawQuantityAction": "Liczba do wyjęcia: {item}",
       "filterGroupAria": "Filtruj bank według kategorii",
       "sortAria": "Sortuj przedmioty w banku",
       "searchAria": "Szukaj przedmiotów w banku po nazwie",
@@ -3388,34 +3401,34 @@ export const pl_PL: EnTranslations = {
       "bonusReferralProgress": "{count}/{cap}",
       "bonusReferralExplainer": "Zaproś przyjaciela: gdy osiągnie 10. poziom, oboje zdobywacie po 2 miejsca, maksymalnie za 5 przyjaciół.",
       "bonusSectionAria": "Premiowe miejsca w banku i jak zdobyć ich więcej",
-      "socketRowAria": "Bank bag sockets",
-      "socketEmpty": "Empty bank bag socket",
-      "socketEmptyHint": "Click a bag in your bags to store it in the bank",
-      "socketLocked": "Locked bag socket",
-      "socketLockedLater": "Bag sockets unlock in order, cheapest first",
-      "socketUnlockAria": "Unlock a bank bag socket for {price}",
-      "socketUnlockHint": "Click to unlock this bag socket",
-      "socketUnlockConfirm": "Unlock a bank bag socket for {price}?",
-      "socketUnlockAccept": "Unlock",
-      "unsocketHint": "Click to return this bag to your bags",
-      "socketHint": "Click to socket this bag into your bank",
-      "vaultTab": "Vault",
-      "vaultCapacityNote": "Each material holds up to {cap}.",
-      "vaultEmpty": "Your vault is empty. Click a material in your bags to deposit it.",
-      "vaultRowAria": "{item}: {count} of {cap} stored",
-      "vaultLockedIntro": "Unlock the Materials Vault to stockpile crafting materials beside your bank. Every material gets its own room, up to {cap} apiece.",
-      "vaultUnlockButton": "Unlock the Materials Vault",
-      "vaultUnlockConfirm": "Unlock the Materials Vault for {price}?",
-      "vaultUpgrade": "Widen every ceiling to {cap}",
-      "vaultUpgradeConfirm": "Widen every material ceiling to {cap} for {price}?",
-      "vaultDepositAll": "Deposit all materials",
-      "vaultDepositAllTooltip": "Sends every material from your bags to your vault in one trip, filling each material up to its ceiling. Gear, tools, quest items, and consumables are never touched.",
-      "vaultDepositAllDone": "Materials deposited: {count}.",
-      "vaultDepositAllFull": "Materials deposited: {count}. Some ceilings are full.",
-      "vaultDepositAllNone": "Vault ceilings full: nothing deposited.",
-      "vaultWithdrawShort": "Only {fit} of {count} fit in your bags.",
-      "vaultDepositHint": "Click to deposit into your vault",
-      "vaultCannotDeposit": "Cannot go in the vault",
+      "socketRowAria": "Gniazda na torby banku",
+      "socketEmpty": "Puste gniazdo na torbę banku",
+      "socketEmptyHint": "Kliknij torbę w swoich torbach, aby umieścić ją w banku",
+      "socketLocked": "Zablokowane gniazdo na torbę",
+      "socketLockedLater": "Gniazda na torby odblokowują się po kolei, od najtańszego",
+      "socketUnlockAria": "Odblokuj gniazdo na torbę banku za {price}",
+      "socketUnlockHint": "Kliknij, aby odblokować to gniazdo na torbę",
+      "socketUnlockConfirm": "Odblokować gniazdo na torbę banku za {price}?",
+      "socketUnlockAccept": "Odblokuj",
+      "unsocketHint": "Kliknij, aby zwrócić tę torbę do swoich toreb",
+      "socketHint": "Kliknij, aby osadzić tę torbę w banku",
+      "vaultTab": "Skarbiec",
+      "vaultCapacityNote": "Każdy materiał mieści do {cap}.",
+      "vaultEmpty": "Twój skarbiec jest pusty. Kliknij materiał w swoich torbach, aby go zdeponować.",
+      "vaultRowAria": "{item}: przechowywane {count} z {cap}",
+      "vaultLockedIntro": "Odblokuj Skarbiec Materiałów, aby gromadzić materiały rzemieślnicze obok swojego banku. Każdy materiał ma swoje własne miejsce, aż do {cap} sztuk każdy.",
+      "vaultUnlockButton": "Odblokuj Skarbiec Materiałów",
+      "vaultUnlockConfirm": "Odblokować Skarbiec Materiałów za {price}?",
+      "vaultUpgrade": "Powiększ każdy limit do {cap}",
+      "vaultUpgradeConfirm": "Powiększyć każdy limit materiałów do {cap} za {price}?",
+      "vaultDepositAll": "Zdeponuj wszystkie materiały",
+      "vaultDepositAllTooltip": "Wysyła wszystkie materiały z twoich toreb do skarbca za jednym razem, wypełniając każdy materiał aż do jego limitu. Ekwipunek, narzędzia, przedmioty zadań i konsumpcyjne nigdy nie są ruszane.",
+      "vaultDepositAllDone": "Zdeponowane materiały: {count}.",
+      "vaultDepositAllFull": "Zdeponowane materiały: {count}. Niektóre limity są pełne.",
+      "vaultDepositAllNone": "Limity skarbca pełne: niczego nie zdeponowano.",
+      "vaultWithdrawShort": "Tylko {fit} z {count} zmieści się w twoich torbach.",
+      "vaultDepositHint": "Kliknij, aby zdeponować w skarbcu",
+      "vaultCannotDeposit": "Nie można umieścić w skarbcu",
       "tabsAria": "Zakładki banku",
       "personalTab": "Osobiste",
       "guildTab": "Gildia",
@@ -3926,8 +3939,8 @@ export const pl_PL: EnTranslations = {
       "reagentsNeeded": "Wymaga:",
       "reagentLine": "{name}: {have}/{required}",
       "reagentFineSub": "(zużywa {count} gatunku wybornego)",
-      "reagentVaultDraw": "(draws {count} from your vault)",
-      "vaultUnreachable": "The Materials Vault is out of reach here.",
+      "reagentVaultDraw": "(pobiera {count} ze skarbca)",
+      "vaultUnreachable": "Skarbiec Materiałów jest tu poza zasięgiem.",
       "craftFeeLine": "Opłata za wytworzenie: {fee} za sztukę",
       "empty": "Nie są jeszcze znane żadne przepisy.",
       "resultAria": "Craft {name}",
@@ -4038,7 +4051,9 @@ export const pl_PL: EnTranslations = {
       "disenchant": "Rozbroić",
       "salvage": "Odzyskaj",
       "applyEnchant": "Zastosuj zaklinanie",
-      "sunder": "Sunder"
+      "sunder": "Sunder",
+      "sell": "Sprzedaj",
+      "sellAll": "Sprzedaj wszystko ({count})"
     },
     "enchanting": {
       "disenchantedLine": "Rozbrajasz {item}.",
@@ -4596,11 +4611,15 @@ export const pl_PL: EnTranslations = {
       "loading": "Wczytywanie Giełdy...",
       "loadFailed": "Nie udało się połączyć z Giełdą. Spróbuj ponownie za chwilę.",
       "disabledRealm": "Giełda $WOC nie jest dostępna na tym świecie.",
+      "browserOnlyConfirmTitle": "Otworzyć Giełdę $WOC w przeglądarce?",
+      "browserOnlyConfirmBody": "Giełda $WOC działa tylko w przeglądarkowej wersji World of ClaudeCraft. Spowoduje to otwarcie World of ClaudeCraft w przeglądarce, gdzie możesz się zalogować i otworzyć Giełdę; gra będzie tu nadal działać.",
+      "browserOnlyConfirmOpen": "Otwórz w przeglądarce",
+      "browserOnlyConfirmCancel": "Anuluj",
       "pausedBanner": "Handel jest wstrzymany. Aukcje nadal odliczają czas; nowe wystawienia, oferty, propozycje i płatności czekają do wznowienia handlu, a płatność już wysłana zostanie mimo to rozliczona.",
-      "walletLinkedDisconnected": "Your public address is linked. Reconnect that wallet app when you want to pay with $WOC.",
-      "walletLinkedConnected": "Your linked wallet app is connected and ready for $WOC purchases.",
+      "walletLinkedDisconnected": "Twój publiczny adres jest powiązany. Połącz ponownie tę aplikację portfela, gdy będziesz chciał zapłacić w $WOC.",
+      "walletLinkedConnected": "Twoja powiązana aplikacja portfela jest połączona i gotowa do zakupów $WOC.",
       "walletUsdBalance": "{amount} USD",
-      "walletUsdUnknown": "Unknown",
+      "walletUsdUnknown": "Nieznane",
       "rateNote": "Kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.",
       "rateNotePaused": "Ostatni znany kurs: około {tokens} $WOC za 1,00 USD, stan na {time}.",
       "estimateNote": "Około {tokens} $WOC za {usd} po obecnym kursie.",
@@ -4855,8 +4874,8 @@ export const pl_PL: EnTranslations = {
       "online": "Postać jest obecnie online.",
       "rename_not_permitted": "Zmiana imienia tej postaci jest niedozwolona.",
       "delete_confirm": "Wpisz imię postaci, aby potwierdzić usunięcie.",
-      "storage_purchase_open": "A storage purchase must finish or be resolved before this character can be deleted.",
-      "delete_busy": "The realm is busy. Try deleting this character again in a moment.",
+      "storage_purchase_open": "Zakup miejsca musi się zakończyć lub zostać rozstrzygnięty, zanim będzie można usunąć tę postać.",
+      "delete_busy": "Kraina jest zajęta. Spróbuj ponownie usunąć tę postać za chwilę.",
       "already_in_world": "Postać jest już w świecie.",
       "taken_over": "Twoją postać przejęła inna sesja.",
       "rename_required": "Tę postać trzeba przemianować przed wejściem do świata.",
@@ -4917,7 +4936,13 @@ export const pl_PL: EnTranslations = {
       "upstream": "Epic nie odpowiedział. Spróbuj ponownie za chwilę."
     },
     "wallet": {
-      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie."
+      "handoff_invalid": "Autoryzacja portfela wygasła lub nie mogła zostać zweryfikowana. Spróbuj ponownie.",
+      "reauth_required": "Potwierdź tę zmianę portfela hasłem do konta.",
+      "reauth_two_factor": "Twoje konto ma włączone uwierzytelnianie dwuskładnikowe. Wpisz swój kod, aby potwierdzić.",
+      "reauth_no_password": "Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+      "reauth_bad_signature": "Nie udało się zweryfikować podpisu portfela. Spróbuj ponownie.",
+      "reauth_bad_password": "Twoje hasło jest nieprawidłowe.",
+      "reauth_bad_two_factor": "Ten kod jest nieprawidłowy, spróbuj ponownie."
     },
     "ota_updates": {
       "invalid_input": "Nieprawidłowe dane."
@@ -5376,6 +5401,7 @@ export const pl_PL: EnTranslations = {
       "ifPartySort": "Kolejność, w jakiej wyświetlani są członkowie drużyny: grupa, rola lub nazwa.",
       "ifPartyShowAuras": "Czy wzmocnienia i osłabienia pokazują się na ramkach drużyny. Odpowiadające im przełączniki obejmują paski zasobów, tarcze absorpcji, zwierzęta oraz to, czy pojawiasz się na własnej liście drużyny.",
       "ifAurasOnPlayerFrame": "Umieszcza twoje wzmocnienia i osłabienia na własnej ramce gracza, obok paska aur.",
+      "ifAlwaysShowAllBuffs": "Pokazuje wszystkie aktywne wzmocnienia nawet przy niskim poziomie grafiki, omijając zwykły limit ikon wzmocnień.",
       "ifTargetOfTarget": "Pokazuje, kogo atakuje twój cel, co jest klasycznym sposobem sprawdzenia, czy tank wciąż go trzyma.",
       "ifPetFrame": "Pokazuje ramkę dla twojego zwierzęcia.",
       "ifChatFontScale": "Rozmiar tekstu czatu.",
@@ -6583,6 +6609,9 @@ export const pl_PL: EnTranslations = {
       "effectFood": "Restores {amount} health over {seconds} sec when eaten.",
       "effectWellFed": "Well Fed when you finish eating: +{value} {stat} for {minutes} min.",
       "effectWellFedAura": "Grants {aura} for {minutes} min when you finish eating.",
+      "effectFeast": "Sets out a feast others eat from, one serving each: {servings} servings, lasting {minutes} min.",
+      "effectFeastServing": "Each serving restores {amount} health over {seconds} sec.",
+      "effectFeastWellFed": "Well Fed when a serving is finished: +{value} {stat} for {minutes} min.",
       "sourceTrainerFee": "Trener, {fee}",
       "sourceTrainerFree": "Trener, bezpłatnie",
       "sourceKnown": "Znany od początku",
@@ -6590,6 +6619,7 @@ export const pl_PL: EnTranslations = {
       "sourceVendor": "Sold by the Heroic Quartermaster",
       "sourceDropAndVendor": "From a found pattern, or the Heroic Quartermaster",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "never",
       "colRecipe": "Przepis",
       "colSkill": "Umiejętność",
       "colSource": "Źródło",
@@ -6935,7 +6965,7 @@ export const pl_PL: EnTranslations = {
       "bankBody": "W każdym głównym mieście działa oddział Złoconej Szkatuły, domu bankowego królestwa. Porozmawiaj z tamtejszym skarbnikiem, aby otworzyć swój skarbiec, prywatny schowek poza torbami, który twoja postać zachowuje na całe życie. Cokolwiek tam zostawisz, czeka bezpiecznie, niezależnie od tego, który oddział odwiedzisz następnym razem.",
       "bankHow": "Przy otwartym skarbcu kliknij przedmiot w torbach, aby go zdeponować, i kliknij go w skarbcu, aby zabrać z powrotem. Skarbiec przechowuje wyłącznie dobra, nigdy monety, a przedmioty zadań zostają przy tobie. Gdy torby zapełnią ci się w połowie drogi, jeden przycisk zgarnia do środka wszystkie materiały rzemieślnicze naraz.",
       "bankSlots": "Świeży skarbiec zaczyna skromnie i rośnie razem z tobą. Skarbnik sprzedaje kolejne miejsca za monety po coraz wyższych cenach, a granie online przynosi na dodatek premiowe miejsca, na przykład za zweryfikowany e-mail, połączone konta i przyjaciół, których przyprowadzisz do gry.",
-      "bankSockets": "Past the slot ladder, the bursar also sells up to four bag sockets, unlocked in order at ever-steeper prices. Seat a spare bag from your carrying set in one and its slots join your vault room: an everyday bag widens the whole store, while a reagent satchel adds room only crafting materials may take. Click a bag in your bags to seat it and click the socket to take it back. Taking one back never costs you a thing you stored: if the vault ends up fuller than its shrunken room, everything stays put and new deposits simply wait for space.",
+      "bankSockets": "Za drabinką miejsc skarbnik sprzedaje także do czterech gniazd na torby, odblokowywanych kolejno za coraz wyższą cenę. Umieść w jednym z nich zapasową torbę z zestawu noszonych toreb, a jej miejsca dołączą do twojego skarbca: zwykła torba powiększa cały magazyn, zaś sakwa na reagenty dodaje miejsce tylko na materiały rzemieślnicze. Kliknij torbę w swoich torbach, aby ją umieścić, a następnie kliknij gniazdo, by ją wyjąć. Wyjęcie torby nigdy nie zabiera żadnych przechowywanych przedmiotów: jeśli pojemność skarbca okaże się większa niż zmniejszona liczba miejsc, wszystko pozostaje na miejscu, a nowe depozyty po prostu czekają na wolne miejsce.",
       "buyingTitle": "Kupowanie i sprzedawanie",
       "buyingBody": "Porozmawiaj z kupcem i wybierz przeglądanie jego towarów, a sklep otworzy się z trzema zakładkami: Przeglądaj, Sprzedaj i Odkup. Przeglądaj mieści wszystko, co ma na składzie, twoje, jeśli cię na to stać. Sprzedaj wypisuje to z twoich toreb, za co zapłaci, a sprzedaż przedmiotu o własnej wylosowanej jakości wymaga najpierw potwierdzenia, więc cenny egzemplarz nigdy nie wymknie się przez pomyłkę. Jeśli rozstaniesz się z czymś, czego żałujesz, zakładka Odkup przechowuje twoje niedawne sprzedaże, byś mógł je odkupić za monety, które ci zapłacono.",
       "junkTitle": "Pozbywanie się rupieci",
@@ -7917,6 +7947,13 @@ export const pl_PL: EnTranslations = {
     "unlink": "Odepnij",
     "unlinkTitle": "Usuń weryfikację portfela z tego konta",
     "unlinkAria": "Usuń weryfikację portfela z tego konta",
+    "reauthTitle": "Potwierdź zmianę portfela",
+    "reauthUnlinkTitle": "Potwierdź usunięcie portfela",
+    "reauthHelp": "Dla Twojego bezpieczeństwa wpisz hasło do konta, aby zatwierdzić tę zmianę.",
+    "reauthNoPassword": "To konto loguje się bez hasła. Najpierw ustaw hasło w ustawieniach konta, a potem spróbuj ponownie.",
+    "reauthConfirm": "Potwierdź",
+    "reauthCancel": "Anuluj",
+    "reauthClose": "Zamknij",
     "signOut": "Rozłącz",
     "signOutTitle": "Rozłącz aplikację portfela w tej przeglądarce",
     "signOutAria": "Rozłącz aplikację portfela w tej przeglądarce",
@@ -7972,7 +8009,7 @@ export const pl_PL: EnTranslations = {
       "title": "Podłącz portfel Solana",
       "linkBody": "Wybierz rozszerzenie portfela w tej przeglądarce. Podpiszesz wiadomość weryfikacyjną, a następnie wrócisz do aplikacji desktopowej.",
       "paymentBody": "Wybierz portfel powiązany z twoim kontem i zatwierdź transakcję w tej przeglądarce.",
-      "stepUpBody": "Choose the wallet linked to your account and sign the $WOC Exchange authorization message. Signing is free and moves no funds.",
+      "stepUpBody": "Wybierz portfel powiązany z twoim kontem i podpisz wiadomość autoryzacyjną $WOC Exchange. Podpisanie jest bezpłatne i nie powoduje przesłania żadnych środków.",
       "extensionHelp": "Nie znaleziono zgodnego rozszerzenia portfela. Zainstaluj lub odblokuj Phantom, Solflare lub inny portfel Solana w przeglądarce, a następnie spróbuj ponownie.",
       "safety": "World of ClaudeCraft nigdy nie prosi o frazę odzyskiwania ani klucz prywatny.",
       "continueWith": "Kontynuuj z {wallet}",
@@ -8359,18 +8396,18 @@ export const pl_PL: EnTranslations = {
     "buyConfirmCancel": "Anulować"
   },
   "crucibleShop": {
-    "browse": "Redeem Sigils",
-    "browseAria": "Redeem Crucible sigils with {name}",
-    "empty": "No set pieces are redeemable for your class.",
-    "balance": "Your sigils: {list}",
+    "browse": "Wymień pieczęcie",
+    "browseAria": "Wymień pieczęcie Tygla za pomocą {name}",
+    "empty": "Elementy zestawu dla twojej klasy nie są dostępne do wymiany.",
+    "balance": "Twoje pieczęcie: {list}",
     "balanceEntry": "{name} x{count}",
-    "noSigils": "You hold no Crucible sigils.",
+    "noSigils": "Nie masz żadnych pieczęci Tygla.",
     "price": "1 {sigil}",
-    "buyAria": "Redeem {sigil} for {item}",
-    "buyConfirmTitle": "Confirm Redemption",
-    "buyConfirmBody": "Redeem your {sigil} for {item}? A consumed sigil cannot be refunded.",
-    "buyConfirmAccept": "Redeem",
-    "buyConfirmCancel": "Cancel"
+    "buyAria": "Wymień {sigil} na {item}",
+    "buyConfirmTitle": "Potwierdź wymianę",
+    "buyConfirmBody": "Wymienić {sigil} na {item}? Zużytej pieczęci nie można zwrócić.",
+    "buyConfirmAccept": "Wymień",
+    "buyConfirmCancel": "Anuluj"
   },
   "cardDuel": {
     "title": "Pojedynek Karciany",
@@ -9202,7 +9239,7 @@ export const pl_PL: EnTranslations = {
         "hostileEnemy": "Wrogi przeciwnik",
         "aggressiveEnemy": "Atakujący cię wróg",
         "bossEnemy": "Boss: {name}",
-        "bossAggressiveEnemy": "Boss attacking you: {name}",
+        "bossAggressiveEnemy": "Boss atakujący cię: {name}",
         "lootableEnemy": "Wróg do ograbienia",
         "corpse": "Twoje zwłoki",
         "deathZone": "Strefa zagrożenia",
@@ -9591,7 +9628,7 @@ export const pl_PL: EnTranslations = {
       "tradeExpired": "Prośba o wymianę wygasła.",
       "tradeFailed": "Wymiana nieudana: przedmioty lub pieniądze są już niedostępne.",
       "tradeBound": "Ten przedmiot jest przywiązany i nie można go wymienić.",
-      "tradeWindowIneligible": "That can only be traded to players who shared its drop.",
+      "tradeWindowIneligible": "Można to wymienić wyłącznie z graczami, z którymi ten przedmiot wypadł.",
       "marketListBound": "Ten przedmiot jest przywiązany i nie można go wystawić na sprzedaż."
     },
     "logs": {
@@ -9621,6 +9658,8 @@ export const pl_PL: EnTranslations = {
       "soldJunkMany": "Sprzedano {count} bezwartościowych przedmiotów za {money}.",
       "keptBoundOne": "Zachowano {count} zawiązaną kopię.",
       "keptBoundMany": "Zachowano {count} zawiązanych kopii.",
+      "keptLockedOne": "Kept {count} locked copy.",
+      "keptLockedMany": "Kept {count} locked copies.",
       "friendOnline": "{name} pojawił się w sieci.",
       "friendOffline": "{name} przeszedł w tryb offline."
     },
@@ -10273,7 +10312,7 @@ export const pl_PL: EnTranslations = {
       "passAria": "Pasuj na {item}",
       "everyonePassed": "Wszyscy spasowali na {item}.",
       "rolled": "{answered}/{total} rzuciło",
-      "bindsOnPickup": "Binds when picked up"
+      "bindsOnPickup": "Przywiązuje się po podniesieniu"
     }
   },
   "entities": {
@@ -13480,6 +13519,9 @@ export const pl_PL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Ignition Key: Dreadspark Groundshaker"
       },
+      "reins_rickshaw_mount": {
+        "name": "Spętane lejce: Spętana Kośćmi Riksza"
+      },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
       },
@@ -13526,25 +13568,25 @@ export const pl_PL: EnTranslations = {
         "name": "Bukiecik z ogrodu zamku Dawnhold"
       },
       "wayfarers_backpack": {
-        "name": "Wayfarer's Backpack"
+        "name": "Plecak Wędrowca"
       },
       "burlap_reagent_pouch": {
-        "name": "Burlap Reagent Pouch"
+        "name": "Jutowa Sakiewka na Reagenty"
       },
       "necromancers_reagent_satchel": {
-        "name": "Necromancer's Reagent Satchel"
+        "name": "Sakwa na Reagenty Nekromanty"
       },
       "duskweave_bag": {
-        "name": "Duskweave Bag"
+        "name": "Torba Zmierzchowej Tkaniny"
       },
       "resonant_weave_bag": {
-        "name": "Resonantweave Bag"
+        "name": "Torba Rezonującego Splotu"
       },
       "foragers_haversack": {
-        "name": "Forager's Haversack"
+        "name": "Torba Zbieracza"
       },
       "loombound_reagent_satchel": {
-        "name": "Loombound Reagent Satchel"
+        "name": "Przypięta do Krosna Sakwa na Reagenty"
       },
       "hammered_copper_band": {
         "name": "Hammered Copper Band"
@@ -14036,610 +14078,610 @@ export const pl_PL: EnTranslations = {
         "name": "Kamień Przejścia"
       },
       "lastflame_core": {
-        "name": "Core of the Last Flame"
+        "name": "Rdzeń Ostatniego Płomienia"
       },
       "slagbreaker_helmet": {
-        "name": "Slagbreaker Helm"
+        "name": "Hełm Łamacza Żużlu"
       },
       "slagbreaker_shoulder": {
-        "name": "Slagbreaker Pauldrons"
+        "name": "Naramienniki Łamacza Żużlu"
       },
       "slagbreaker_chest": {
-        "name": "Slagbreaker Hauberk"
+        "name": "Kolczuga Łamacza Żużlu"
       },
       "slagbreaker_gloves": {
-        "name": "Slagbreaker Gauntlets"
+        "name": "Rękawice Łamacza Żużlu"
       },
       "slagbreaker_legs": {
-        "name": "Slagbreaker Legguards"
+        "name": "Nogawice Łamacza Żużlu"
       },
       "emberfury_helmet": {
-        "name": "Emberfury Helm"
+        "name": "Hełm Furii Żaru"
       },
       "emberfury_shoulder": {
-        "name": "Emberfury Pauldrons"
+        "name": "Naramienniki Furii Żaru"
       },
       "emberfury_chest": {
-        "name": "Emberfury Hauberk"
+        "name": "Kolczuga Furii Żaru"
       },
       "emberfury_gloves": {
-        "name": "Emberfury Gauntlets"
+        "name": "Rękawice Furii Żaru"
       },
       "emberfury_legs": {
-        "name": "Emberfury Legguards"
+        "name": "Nagolenniki Furii Żaru"
       },
       "forgewall_helmet": {
-        "name": "Forgewall Helm"
+        "name": "Hełm Muru Kuźni"
       },
       "forgewall_shoulder": {
-        "name": "Forgewall Pauldrons"
+        "name": "Naramienniki Muru Kuźni"
       },
       "forgewall_chest": {
-        "name": "Forgewall Hauberk"
+        "name": "Kolczuga Muru Kuźni"
       },
       "forgewall_gloves": {
-        "name": "Forgewall Gauntlets"
+        "name": "Rękawice Muru Kuźni"
       },
       "forgewall_legs": {
-        "name": "Forgewall Legguards"
+        "name": "Nagolenniki Muru Kuźni"
       },
       "dawnforged_helmet": {
-        "name": "Dawnforged Helm"
+        "name": "Hełm Wykuty o Świcie"
       },
       "dawnforged_shoulder": {
-        "name": "Dawnforged Pauldrons"
+        "name": "Naramienniki Wykute o Świcie"
       },
       "dawnforged_chest": {
-        "name": "Dawnforged Hauberk"
+        "name": "Kolczuga Wykuta o Świcie"
       },
       "dawnforged_gloves": {
-        "name": "Dawnforged Gauntlets"
+        "name": "Rękawice Wykute o Świcie"
       },
       "dawnforged_legs": {
-        "name": "Dawnforged Legguards"
+        "name": "Nagolenniki Wykute o Świcie"
       },
       "oathpyre_helmet": {
-        "name": "Oathpyre Helm"
+        "name": "Hełm Ognia Przysięgi"
       },
       "oathpyre_shoulder": {
-        "name": "Oathpyre Pauldrons"
+        "name": "Naramienniki Ognia Przysięgi"
       },
       "oathpyre_chest": {
-        "name": "Oathpyre Hauberk"
+        "name": "Kolczuga Ognia Przysięgi"
       },
       "oathpyre_gloves": {
-        "name": "Oathpyre Gauntlets"
+        "name": "Rękawice Ognia Przysięgi"
       },
       "oathpyre_legs": {
-        "name": "Oathpyre Legguards"
+        "name": "Nagolenniki Ognia Przysięgi"
       },
       "zealfire_helmet": {
-        "name": "Zealfire Helm"
+        "name": "Hełm Płomienia Zapału"
       },
       "zealfire_shoulder": {
-        "name": "Zealfire Pauldrons"
+        "name": "Naramienniki Płomienia Zapału"
       },
       "zealfire_chest": {
-        "name": "Zealfire Hauberk"
+        "name": "Kolczuga Płomienia Zapału"
       },
       "zealfire_gloves": {
-        "name": "Zealfire Gauntlets"
+        "name": "Rękawice Płomienia Zapału"
       },
       "zealfire_legs": {
-        "name": "Zealfire Legguards"
+        "name": "Nagolenniki Płomienia Zapału"
       },
       "packlord_emberhide_helmet": {
-        "name": "Packlord's Cowl"
+        "name": "Kaptur Władcy Sfory"
       },
       "packlord_emberhide_shoulder": {
-        "name": "Packlord's Spaulders"
+        "name": "Naramienniki Władcy Sfory"
       },
       "packlord_emberhide_chest": {
-        "name": "Packlord's Tunic"
+        "name": "Tunika Władcy Sfory"
       },
       "packlord_emberhide_gloves": {
-        "name": "Packlord's Grips"
+        "name": "Chwytaki Władcy Sfory"
       },
       "packlord_emberhide_legs": {
-        "name": "Packlord's Breeches"
+        "name": "Bryczesy Władcy Sfory"
       },
       "coldsight_trackers_helmet": {
-        "name": "Coldsight Cowl"
+        "name": "Kaptur Tropiciela Zimnego Wzroku"
       },
       "coldsight_trackers_shoulder": {
-        "name": "Coldsight Spaulders"
+        "name": "Naramienniki Tropiciela Zimnego Wzroku"
       },
       "coldsight_trackers_chest": {
-        "name": "Coldsight Tunic"
+        "name": "Tunika Tropiciela Zimnego Wzroku"
       },
       "coldsight_trackers_gloves": {
-        "name": "Coldsight Grips"
+        "name": "Chwytaki Tropiciela Zimnego Wzroku"
       },
       "coldsight_trackers_legs": {
-        "name": "Coldsight Breeches"
+        "name": "Bryczesy Tropiciela Zimnego Wzroku"
       },
       "slagsnare_helmet": {
-        "name": "Slagsnare Cowl"
+        "name": "Kaptur Żużlowej Pułapki"
       },
       "slagsnare_shoulder": {
-        "name": "Slagsnare Spaulders"
+        "name": "Naramienniki Żużlowej Pułapki"
       },
       "slagsnare_chest": {
-        "name": "Slagsnare Tunic"
+        "name": "Tunika Żużlowej Pułapki"
       },
       "slagsnare_gloves": {
-        "name": "Slagsnare Grips"
+        "name": "Chwytaki Żużlowej Pułapki"
       },
       "slagsnare_legs": {
-        "name": "Slagsnare Breeches"
+        "name": "Bryczesy Żużlowej Pułapki"
       },
       "cinderfang_helmet": {
-        "name": "Cinderfang Cowl"
+        "name": "Kaptur Żużlowego Kła"
       },
       "cinderfang_shoulder": {
-        "name": "Cinderfang Spaulders"
+        "name": "Naramienniki Żużlowego Kła"
       },
       "cinderfang_chest": {
-        "name": "Cinderfang Tunic"
+        "name": "Tunika Żużlowego Kła"
       },
       "cinderfang_gloves": {
-        "name": "Cinderfang Grips"
+        "name": "Rękawice Żużlowego Kła"
       },
       "cinderfang_legs": {
-        "name": "Cinderfang Breeches"
+        "name": "Bryczesy Żużlowego Kła"
       },
       "smolderstrike_helmet": {
-        "name": "Smolderstrike Cowl"
+        "name": "Kaptur Żarowego Uderzenia"
       },
       "smolderstrike_shoulder": {
-        "name": "Smolderstrike Spaulders"
+        "name": "Naramienniki Żarowego Uderzenia"
       },
       "smolderstrike_chest": {
-        "name": "Smolderstrike Tunic"
+        "name": "Tunika Żarowego Uderzenia"
       },
       "smolderstrike_gloves": {
-        "name": "Smolderstrike Grips"
+        "name": "Chwytaki Żarowego Uderzenia"
       },
       "smolderstrike_legs": {
-        "name": "Smolderstrike Breeches"
+        "name": "Bryczesy Żarowego Uderzenia"
       },
       "ashveil_helmet": {
-        "name": "Ashveil Cowl"
+        "name": "Kaptur Popielnego Welonu"
       },
       "ashveil_shoulder": {
-        "name": "Ashveil Spaulders"
+        "name": "Naramienniki Popielnego Welonu"
       },
       "ashveil_chest": {
-        "name": "Ashveil Tunic"
+        "name": "Tunika Popielnego Welonu"
       },
       "ashveil_gloves": {
-        "name": "Ashveil Grips"
+        "name": "Rękawice Popielnego Welonu"
       },
       "ashveil_legs": {
-        "name": "Ashveil Breeches"
+        "name": "Bryczesy Popielnego Welonu"
       },
       "emberscreed_helmet": {
-        "name": "Creed of Embers Hood"
+        "name": "Kaptur Przysięgi Żaru"
       },
       "emberscreed_shoulder": {
-        "name": "Creed of Embers Mantle"
+        "name": "Mantyla Przysięgi Żaru"
       },
       "emberscreed_chest": {
-        "name": "Creed of Embers Robe"
+        "name": "Szata Przysięgi Żaru"
       },
       "emberscreed_gloves": {
-        "name": "Creed of Embers Handwraps"
+        "name": "Owijki Dłoni Przysięgi Żaru"
       },
       "emberscreed_legs": {
-        "name": "Creed of Embers Leggings"
+        "name": "Nogawice Przysięgi Żaru"
       },
       "benison_dawnweave_helmet": {
-        "name": "Dawnweave Hood"
+        "name": "Kaptur Tkaniny Świtu"
       },
       "benison_dawnweave_shoulder": {
-        "name": "Dawnweave Mantle"
+        "name": "Płaszcz Tkaniny Świtu"
       },
       "benison_dawnweave_chest": {
-        "name": "Dawnweave Robe"
+        "name": "Szata Tkaniny Świtu"
       },
       "benison_dawnweave_gloves": {
-        "name": "Dawnweave Handwraps"
+        "name": "Owijacze Dłoni Tkaniny Świtu"
       },
       "benison_dawnweave_legs": {
-        "name": "Dawnweave Leggings"
+        "name": "Nogawice Tkaniny Świtu"
       },
       "vesperash_helmet": {
-        "name": "Vesperash Hood"
+        "name": "Kaptur Wieczornego Popiołu"
       },
       "vesperash_shoulder": {
-        "name": "Vesperash Mantle"
+        "name": "Mantyla Wieczornego Popiołu"
       },
       "vesperash_chest": {
-        "name": "Vesperash Robe"
+        "name": "Szata Wieczornego Popiołu"
       },
       "vesperash_gloves": {
-        "name": "Vesperash Handwraps"
+        "name": "Owijacze Dłoni Wieczornego Popiołu"
       },
       "vesperash_legs": {
-        "name": "Vesperash Leggings"
+        "name": "Nogawice Wieczornego Popiołu"
       },
       "stormkindled_helmet": {
-        "name": "Stormkindled Helm"
+        "name": "Hełm Rozpalonej Burzy"
       },
       "stormkindled_shoulder": {
-        "name": "Stormkindled Pauldrons"
+        "name": "Naramienniki Rozpalonej Burzy"
       },
       "stormkindled_chest": {
-        "name": "Stormkindled Hauberk"
+        "name": "Kolczuga Rozpalonej Burzy"
       },
       "stormkindled_gloves": {
-        "name": "Stormkindled Gauntlets"
+        "name": "Rękawice Rozpalonej Burzy"
       },
       "stormkindled_legs": {
-        "name": "Stormkindled Legguards"
+        "name": "Nagolenniki Rozpalonej Burzy"
       },
       "warspirit_emberscale_helmet": {
-        "name": "Emberscale Helm"
+        "name": "Hełm Łuski Żaru"
       },
       "warspirit_emberscale_shoulder": {
-        "name": "Emberscale Pauldrons"
+        "name": "Naramienniki Łuski Żaru"
       },
       "warspirit_emberscale_chest": {
-        "name": "Emberscale Hauberk"
+        "name": "Kolczuga Łuski Żaru Ducha Wojny"
       },
       "warspirit_emberscale_gloves": {
-        "name": "Emberscale Gauntlets"
+        "name": "Rękawice Łuski Żaru Ducha Wojny"
       },
       "warspirit_emberscale_legs": {
-        "name": "Emberscale Legguards"
+        "name": "Nagolenniki Łuski Żaru"
       },
       "stonehearth_helmet": {
-        "name": "Stonehearth Helm"
+        "name": "Hełm Kamiennego Serca"
       },
       "stonehearth_shoulder": {
-        "name": "Stonehearth Pauldrons"
+        "name": "Naramienniki Kamiennego Serca"
       },
       "stonehearth_chest": {
-        "name": "Stonehearth Hauberk"
+        "name": "Kolczuga Kamiennego Serca"
       },
       "stonehearth_gloves": {
-        "name": "Stonehearth Gauntlets"
+        "name": "Rękawice Kamiennego Serca"
       },
       "stonehearth_legs": {
-        "name": "Stonehearth Legguards"
+        "name": "Nagolenniki Kamiennego Serca"
       },
       "springmender_helmet": {
-        "name": "Springmender Helm"
+        "name": "Hełm Uzdrowiciela Źródła"
       },
       "springmender_shoulder": {
-        "name": "Springmender Pauldrons"
+        "name": "Naramienniki Uzdrowiciela Źródła"
       },
       "springmender_chest": {
-        "name": "Springmender Hauberk"
+        "name": "Kolczuga Uzdrowiciela Źródła"
       },
       "springmender_gloves": {
-        "name": "Springmender Gauntlets"
+        "name": "Rękawice Uzdrowiciela Źródła"
       },
       "springmender_legs": {
-        "name": "Springmender Legguards"
+        "name": "Nagolenniki Uzdrowiciela Źródła"
       },
       "chronoweave_helmet": {
-        "name": "Aetherweave Hood"
+        "name": "Kaptur Eterowej Tkaniny"
       },
       "chronoweave_shoulder": {
-        "name": "Aetherweave Mantle"
+        "name": "Płaszcz Eterowej Tkaniny"
       },
       "chronoweave_chest": {
-        "name": "Aetherweave Robe"
+        "name": "Szata Eterowej Tkaniny"
       },
       "chronoweave_gloves": {
-        "name": "Aetherweave Handwraps"
+        "name": "Owijacze Dłoni Eterowej Tkaniny"
       },
       "chronoweave_legs": {
-        "name": "Aetherweave Leggings"
+        "name": "Nogawice Eterowej Tkaniny"
       },
       "pyroclast_helmet": {
-        "name": "Pyroclast Hood"
+        "name": "Kaptur Piroklastu"
       },
       "pyroclast_shoulder": {
-        "name": "Pyroclast Mantle"
+        "name": "Mantyla Piroklastu"
       },
       "pyroclast_chest": {
-        "name": "Pyroclast Robe"
+        "name": "Szata Piroklastu"
       },
       "pyroclast_gloves": {
-        "name": "Pyroclast Handwraps"
+        "name": "Owijacze Dłoni Piroklastu"
       },
       "pyroclast_legs": {
-        "name": "Pyroclast Leggings"
+        "name": "Nogawice Piroklastu"
       },
       "frostquench_helmet": {
-        "name": "Frostquench Hood"
+        "name": "Kaptur Mroźnego Ukojenia"
       },
       "frostquench_shoulder": {
-        "name": "Frostquench Mantle"
+        "name": "Mantyla Mroźnego Ukojenia"
       },
       "frostquench_chest": {
-        "name": "Frostquench Robe"
+        "name": "Szata Mroźnego Ukojenia"
       },
       "frostquench_gloves": {
-        "name": "Frostquench Handwraps"
+        "name": "Owijki Dłoni Mroźnego Ukojenia"
       },
       "frostquench_legs": {
-        "name": "Frostquench Leggings"
+        "name": "Nogawice Mroźnego Ukojenia"
       },
       "hexthread_helmet": {
-        "name": "Hexthread Hood"
+        "name": "Kaptur Tkaniny Klątwy"
       },
       "hexthread_shoulder": {
-        "name": "Hexthread Mantle"
+        "name": "Mantyla Tkaniny Klątwy"
       },
       "hexthread_chest": {
-        "name": "Hexthread Robe"
+        "name": "Szata Tkaniny Klątwy"
       },
       "hexthread_gloves": {
-        "name": "Hexthread Handwraps"
+        "name": "Owijacze Dłoni Tkaniny Klątwy"
       },
       "hexthread_legs": {
-        "name": "Hexthread Leggings"
+        "name": "Nogawice Tkaniny Klątwy"
       },
       "gravebrand_helmet": {
-        "name": "Gravebrand Hood"
+        "name": "Kaptur Grobowego Piętna"
       },
       "gravebrand_shoulder": {
-        "name": "Gravebrand Mantle"
+        "name": "Mantyla Grobowego Piętna"
       },
       "gravebrand_chest": {
-        "name": "Gravebrand Robe"
+        "name": "Szata Grobowego Piętna"
       },
       "gravebrand_gloves": {
-        "name": "Gravebrand Handwraps"
+        "name": "Owijacze Dłoni Grobowego Piętna"
       },
       "gravebrand_legs": {
-        "name": "Gravebrand Leggings"
+        "name": "Nogawice Grobowego Piętna"
       },
       "ruincaller_helmet": {
-        "name": "Ruincaller Hood"
+        "name": "Kaptur Przywoływacza Ruiny"
       },
       "ruincaller_shoulder": {
-        "name": "Ruincaller Mantle"
+        "name": "Mantyla Przywoływacza Ruiny"
       },
       "ruincaller_chest": {
-        "name": "Ruincaller Robe"
+        "name": "Szata Przywoływacza Ruiny"
       },
       "ruincaller_gloves": {
-        "name": "Ruincaller Handwraps"
+        "name": "Owijacze Dłoni Przywoływacza Ruiny"
       },
       "ruincaller_legs": {
-        "name": "Ruincaller Leggings"
+        "name": "Nogawice Przywoływacza Ruiny"
       },
       "moonscorch_helmet": {
-        "name": "Moonscorch Cowl"
+        "name": "Kaptur Księżycowego Żaru"
       },
       "moonscorch_shoulder": {
-        "name": "Moonscorch Spaulders"
+        "name": "Naramienniki Księżycowego Żaru"
       },
       "moonscorch_chest": {
-        "name": "Moonscorch Tunic"
+        "name": "Tunika Księżycowego Żaru"
       },
       "moonscorch_gloves": {
-        "name": "Moonscorch Grips"
+        "name": "Chwytaki Księżycowego Żaru"
       },
       "moonscorch_legs": {
-        "name": "Moonscorch Breeches"
+        "name": "Bryczesy Księżycowego Żaru"
       },
       "wildfang_emberhide_helmet": {
-        "name": "Wildfang Cowl"
+        "name": "Kaptur Dzikiego Kła"
       },
       "wildfang_emberhide_shoulder": {
-        "name": "Wildfang Spaulders"
+        "name": "Naramienniki Dzikiego Kła"
       },
       "wildfang_emberhide_chest": {
-        "name": "Wildfang Tunic"
+        "name": "Tunika Dzikiego Kła"
       },
       "wildfang_emberhide_gloves": {
-        "name": "Wildfang Grips"
+        "name": "Chwytaki Dzikiego Kła"
       },
       "wildfang_emberhide_legs": {
-        "name": "Wildfang Breeches"
+        "name": "Bryczesy Dzikiego Kła"
       },
       "cinderbark_helmet": {
-        "name": "Cinderbark Cowl"
+        "name": "Kaptur Żużlowej Kory"
       },
       "cinderbark_shoulder": {
-        "name": "Cinderbark Spaulders"
+        "name": "Naramienniki Żużlowej Kory"
       },
       "cinderbark_chest": {
-        "name": "Cinderbark Tunic"
+        "name": "Tunika Żużlowej Kory"
       },
       "cinderbark_gloves": {
-        "name": "Cinderbark Grips"
+        "name": "Rękawice Żużlowej Kory"
       },
       "cinderbark_legs": {
-        "name": "Cinderbark Breeches"
+        "name": "Bryczesy Żużlowej Kory"
       },
       "grovespring_helmet": {
-        "name": "Grovespring Cowl"
+        "name": "Kaptur Gajowego Źródła"
       },
       "grovespring_shoulder": {
-        "name": "Grovespring Spaulders"
+        "name": "Naramienniki Gajowego Źródła"
       },
       "grovespring_chest": {
-        "name": "Grovespring Tunic"
+        "name": "Tunika Gajowego Źródła"
       },
       "grovespring_gloves": {
-        "name": "Grovespring Grips"
+        "name": "Chwytaki Gajowego Źródła"
       },
       "grovespring_legs": {
-        "name": "Grovespring Breeches"
+        "name": "Bryczesy Gajowego Źródła"
       },
       "sigil_anvil_helmet": {
-        "name": "Helm Sigil of the Anvil"
+        "name": "Hełm Znaku Kowadła"
       },
       "sigil_ember_helmet": {
-        "name": "Helm Sigil of the Ember"
+        "name": "Hełm Znaku Żaru"
       },
       "sigil_tempest_helmet": {
-        "name": "Helm Sigil of the Tempest"
+        "name": "Hełm Znaku Nawałnicy"
       },
       "sigil_anvil_shoulder": {
-        "name": "Mantle Sigil of the Anvil"
+        "name": "Mantyla Znaku Kowadła"
       },
       "sigil_ember_shoulder": {
-        "name": "Mantle Sigil of the Ember"
+        "name": "Mantyla Znaku Żaru"
       },
       "sigil_tempest_shoulder": {
-        "name": "Mantle Sigil of the Tempest"
+        "name": "Mantyla Znaku Nawałnicy"
       },
       "sigil_anvil_chest": {
-        "name": "Robe Sigil of the Anvil"
+        "name": "Szata Znaku Kowadła"
       },
       "sigil_ember_chest": {
-        "name": "Robe Sigil of the Ember"
+        "name": "Szata Znaku Żaru"
       },
       "sigil_tempest_chest": {
-        "name": "Robe Sigil of the Tempest"
+        "name": "Szata Znaku Nawałnicy"
       },
       "sigil_anvil_gloves": {
-        "name": "Grip Sigil of the Anvil"
+        "name": "Chwytaki Znaku Kowadła"
       },
       "sigil_ember_gloves": {
-        "name": "Grip Sigil of the Ember"
+        "name": "Chwytaki Znaku Żaru"
       },
       "sigil_tempest_gloves": {
-        "name": "Grip Sigil of the Tempest"
+        "name": "Chwytaki Znaku Nawałnicy"
       },
       "sigil_anvil_legs": {
-        "name": "Legging Sigil of the Anvil"
+        "name": "Nogawice Znaku Kowadła"
       },
       "sigil_ember_legs": {
-        "name": "Legging Sigil of the Ember"
+        "name": "Nogawice Znaku Żaru"
       },
       "sigil_tempest_legs": {
-        "name": "Legging Sigil of the Tempest"
+        "name": "Nogawice Znaku Nawałnicy"
       },
       "cord_of_the_last_flame": {
-        "name": "Cord of the Last Flame"
+        "name": "Sznur Ostatniego Płomienia"
       },
       "cindersoaked_slippers": {
-        "name": "Cindersoaked Slippers"
+        "name": "Kapcie Przesiąknięte Sadzą"
       },
       "springbinder_sash": {
-        "name": "Springbinder Sash"
+        "name": "Szarfa Spętania Źródła"
       },
       "steps_of_quiet_water": {
-        "name": "Steps of Quiet Water"
+        "name": "Kroki Cichej Wody"
       },
       "cinderbark_cinch": {
-        "name": "Cinderbark Cinch"
+        "name": "Pas Żużlowej Kory"
       },
       "ashenbark_treads": {
-        "name": "Ashenbark Treads"
+        "name": "Trzewiki Popielnej Kory"
       },
       "slagstalker_belt": {
-        "name": "Slagstalker Belt"
+        "name": "Pas Łowcy Żużlu"
       },
       "ashrunner_boots": {
-        "name": "Ashrunner Boots"
+        "name": "Buty Popielnego Biegacza"
       },
       "moonscorch_waistwrap": {
-        "name": "Moonscorch Waistwrap"
+        "name": "Owijacz Talii Księżycowego Żaru"
       },
       "scorchgrove_striders": {
-        "name": "Scorchgrove Striders"
+        "name": "Kroczące Buty Żarowego Gaju"
       },
       "grovetender_belt": {
-        "name": "Grovetender Belt"
+        "name": "Pas Gajowego"
       },
       "dewfall_moccasins": {
-        "name": "Dewfall Moccasins"
+        "name": "Mokasyny Rosy"
       },
       "forgewall_girdle": {
-        "name": "Forgewall Girdle"
+        "name": "Pas Muru Kuźni"
       },
       "anvilstance_sabatons": {
-        "name": "Anvilstance Sabatons"
+        "name": "Sabatony Kowadłowej Postawy"
       },
       "warforged_waistguard": {
-        "name": "Warforged Waistguard"
+        "name": "Ochraniacz Pasa Wykuty na Wojnę"
       },
       "furnace_march_greaves": {
-        "name": "Furnace March Greaves"
+        "name": "Nagolenniki Pochodu Pieca"
       },
       "stormkindled_chain": {
-        "name": "Stormkindled Chain"
+        "name": "Łańcuch Rozpalonej Burzy"
       },
       "thundershock_treads": {
-        "name": "Thundershock Treads"
+        "name": "Kroczące Buty Gromowego Wstrząsu"
       },
       "tidebinder_links": {
-        "name": "Tidebinder Links"
+        "name": "Ogniwa Spętania Przypływu"
       },
       "springwarden_sabatons": {
-        "name": "Springwarden Sabatons"
+        "name": "Trzewiki Strażnika Źródła"
       },
       "pendant_of_the_first_tempering": {
-        "name": "Pendant of the First Tempering"
+        "name": "Wisior Pierwszego Hartowania"
       },
       "ignivars_ember_choker": {
-        "name": "Ignivar's Ember Choker"
+        "name": "Żarowy Naszyjnik Ignivara"
       },
       "locket_of_the_last_flame": {
-        "name": "Locket of the Last Flame"
+        "name": "Medalion Ostatniego Płomienia"
       },
       "heartspring_amulet": {
-        "name": "Heartspring Amulet"
+        "name": "Amulet Serca Źródła"
       },
       "seal_of_the_forgewall": {
-        "name": "Seal of the Forgewall"
+        "name": "Pieczęć Muru Kuźni"
       },
       "band_of_marked_strikes": {
-        "name": "Band of Marked Strikes"
+        "name": "Pierścień Naznaczonych Ciosów"
       },
       "circle_of_cinders": {
-        "name": "Circle of Cinders"
+        "name": "Krąg Żużli"
       },
       "loop_of_quiet_springs": {
-        "name": "Loop of Quiet Springs"
+        "name": "Pętla Cichych Źródeł"
       },
       "bulwark_of_the_inner_crucible": {
-        "name": "Bulwark of the Inner Crucible"
+        "name": "Bastion Wewnętrznego Tygla"
       },
       "ember_wardens_barrier": {
-        "name": "Ember Warden's Barrier"
+        "name": "Bariera Strażnika Żaru"
       },
       "orb_of_the_last_spring": {
-        "name": "Orb of the Last Spring"
+        "name": "Kula Ostatniego Źródła"
       },
       "cinder_of_the_first_design": {
-        "name": "Cinder of the First Design"
+        "name": "Żar Pierwszego Projektu"
       },
       "forgefathers_warhammer": {
-        "name": "Forgefather's Warhammer"
+        "name": "Młot Wojenny Ojca Kuźni"
       },
       "cinderfang_kris": {
-        "name": "Cinderfang Kris"
+        "name": "Kris Żużlowego Kła"
       },
       "slagrender_cleaver": {
-        "name": "Slagrender Cleaver"
+        "name": "Tasak Rozcinacza Żużlu"
       },
       "anvilguard_blade": {
-        "name": "Anvilguard Blade"
+        "name": "Ostrze Straży Kowadła"
       },
       "heart_of_the_end_greatblade": {
-        "name": "Heart of the End Greatblade"
+        "name": "Wielkie Ostrze Serca Końca"
       },
       "staff_of_the_last_spring": {
-        "name": "Staff of the Last Spring"
+        "name": "Kostur Ostatniego Źródła"
       },
       "forgefire_spire": {
-        "name": "Forgefire Spire"
+        "name": "Iglica Ognia Kuźni"
       },
       "springtouched_crozier": {
-        "name": "Springtouched Crozier"
+        "name": "Pastorał Dotknięty Źródłem"
       },
       "wand_of_quenched_sparks": {
-        "name": "Wand of Quenched Sparks"
+        "name": "Różdżka Wygaszonych Iskier"
       },
       "cogwheel_blank": {
         "name": "Cogwheel Blank"
@@ -15437,10 +15479,10 @@ export const pl_PL: EnTranslations = {
         "name": "Wodze Gromostępa, Wielkiego Indora"
       },
       "varkhul_forgebreaker": {
-        "name": "Forgebreaker, Engine of Varkhul"
+        "name": "Łamacz Kuźni, Machina Varkhula"
       },
       "varkhul_emberward": {
-        "name": "Emberward, Bulwark of Varkhul"
+        "name": "Strażnik Żaru, Bastion Varkhula"
       }
     },
     "mobs": {
@@ -15637,25 +15679,25 @@ export const pl_PL: EnTranslations = {
         "name": "Nythraxis, Plaga Ciernistego Szczytu"
       },
       "ignivar_herald_of_the_last_flame": {
-        "name": "Ignivar, Herald of the Last Flame"
+        "name": "Ignivar, Herold Ostatniego Płomienia"
       },
       "ignivar_heart_of_the_end": {
-        "name": "Ignivar Ashcaller"
+        "name": "Ignivar, Przywoływacz Popiołu"
       },
       "ignivar_ember_sentinel": {
-        "name": "Ember Sentinel"
+        "name": "Żarowy Wartownik"
       },
       "ignivar_crucible_warden": {
-        "name": "Crucible Warden"
+        "name": "Strażnik Tygla"
       },
       "ignivar_cinder_artificer": {
-        "name": "Cinder Artificer"
+        "name": "Żarowy Inżynier"
       },
       "varkhul_forgefather_of_the_last_flame": {
-        "name": "Varkhul, Forgefather of the Last Flame"
+        "name": "Varkhul, Ojciec Kuźni Ostatniego Płomienia"
       },
       "derelict_mech": {
-        "name": "Derelict Mech"
+        "name": "Opuszczony Mech"
       },
       "reliquary_ledger_wraith": {
         "name": "Widmo Ksiąg"
@@ -16318,19 +16360,19 @@ export const pl_PL: EnTranslations = {
         "greeting": "Od dziedzińca kaplicy w Dolinie aż po dach świata... ślad, którym podążaliśmy, kończy się tutaj. Czuję, że góra nasłuchuje."
       },
       "archivist_maelin_emberward": {
-        "name": "Archivist Maelin Emberward",
-        "title": "Crucible Archivist",
-        "greeting": "Every hammer mark in this place is a sentence. Help me read what Varkhul tried to hide."
+        "name": "Archiwistka Maelin Żarowa Straż",
+        "title": "Archiwistka Tygla",
+        "greeting": "Każdy ślad młota w tym miejscu jest zdaniem. Pomóż mi odczytać to, co Varkhul próbował ukryć."
       },
       "archivist_maelin_ember_projection": {
-        "name": "Maelin's Ember Projection",
-        "title": "Ember Projection",
-        "greeting": "The embers carry Maelin's voice forward through the forge."
+        "name": "Żarowa Projekcja Maelin",
+        "title": "Żarowa Projekcja",
+        "greeting": "Żar niesie głos Maelin przez kuźnię."
       },
       "crucible_quartermaster": {
-        "name": "Quartermaster Bronn Emberward",
-        "title": "Crucible Quartermaster",
-        "greeting": "The forge marks its own. Bring me a sigil from the Crucible and I will fit you for war."
+        "name": "Kwatermistrz Bronn Żarowa Straż",
+        "title": "Kwatermistrz Tygla",
+        "greeting": "Kuźnia rozpoznaje swoich. Przynieś mi pieczęć z Tygla, a wyposażą cię do wojny."
       },
       "brother_halven": {
         "name": "Brat Halven",
@@ -17514,35 +17556,35 @@ export const pl_PL: EnTranslations = {
         }
       },
       "q_ignivar_echoes_in_iron": {
-        "title": "Echoes in Iron",
-        "text": "These automata are not soldiers. They are drafts. Break each assembly line and listen when the final shell falls. The forge remembers what Varkhul tried to erase.",
-        "completion": "The echoes agree. Varkhul bound water from the dying Last Spring into living metal. These automatons were failed temperings. Only Ignivar endured.",
+        "title": "Echa w żelazie",
+        "text": "Te automaty nie są żołnierzami. To szkice. Rozbij każdą linię montażową i słuchaj, gdy upadnie ostatnia skorupa. Kuźnia pamięta, co Varkhul próbował wymazać.",
+        "completion": "Echa potwierdzają. Varkhul związał wodę z umierającego Ostatniego Źródła w żywy metal. Te automaty były nieudanymi próbami hartowania. Przetrwał tylko Ignivar.",
         "objectives": {
           "0": {
-            "label": "Ember Sentinels destroyed"
+            "label": "Pokonane Żarowe Wartowniki"
           },
           "1": {
-            "label": "Crucible Wardens destroyed"
+            "label": "Pokonani Strażnicy Tygla"
           }
         }
       },
       "q_ignivar_heralds_heart": {
-        "title": "The Herald's Heart",
-        "text": "The survivor named in every echo is Ignivar. Varkhul called him herald, seal, and key. Defeat him. If the records are true, his death will reveal what he was forged to guard.",
-        "completion": "Ignivar was never merely a guardian. His heart was the key, and its final plates opened the sealed crucible below.",
+        "title": "Serce Herolda",
+        "text": "Ocalały, którego imię powtarza się w każdym echu, to Ignivar. Varkhul nazywał go heroldem, pieczęcią i kluczem. Pokonaj go. Jeśli zapisy mówią prawdę, jego śmierć ujawni, czego miał strzec jako wykuty strażnik.",
+        "completion": "Ignivar nigdy nie był zwykłym strażnikiem. Jego serce było kluczem, a jego ostatnie płyty otworzyły zapieczętowany Tygiel poniżej.",
         "objectives": {
           "0": {
-            "label": "Ignivar defeated"
+            "label": "Pokonany Ignivar"
           }
         }
       },
       "q_ignivar_the_forgefather": {
-        "title": "The Forgefather",
-        "text": "The path below leads to Varkhul, Forgefather of the Last Flame. He imprisoned the Last Spring to make metal live, then forged Ignivar to keep the crime sealed. Enter the Inner Crucible and end his work.",
-        "completion": "The forge is silent at last. The spring may never recover, but Varkhul will shape no more lives into chains.",
+        "title": "Ojciec Kuźni",
+        "text": "Ścieżka poniżej prowadzi do Varkhula, Ojca Kuźni Ostatniego Płomienia. Uwięził Ostatnie Źródło, by tchnąć życie w metal, a potem wykuł Ignivara, aby utrzymać zbrodnię w tajemnicy. Wejdź do Wewnętrznego Tygla i zakończ jego dzieło.",
+        "completion": "Kuźnia wreszcie ucichła. Ostatnie Źródło może nigdy nie odzyskać sił, lecz Varkhul nie ukształtuje już żadnego życia w kajdany.",
         "objectives": {
           "0": {
-            "label": "Varkhul defeated"
+            "label": "Pokonany Varkhul"
           }
         }
       },
@@ -19444,29 +19486,29 @@ export const pl_PL: EnTranslations = {
         "leaveText": "Wracasz w zimne powietrze Ciernistego Szczytu."
       },
       "ignivar_forge_lift": {
-        "name": "The Forge-Lift",
-        "enterText": "The forge-lift shudders and sinks; hammerfall rises to meet you.",
-        "leaveText": "The lift hauls you back into the open air of the keep."
+        "name": "Winda kuźni",
+        "enterText": "Winda kuźnicza drży i opada; odgłosy młotów wznoszą się ku tobie.",
+        "leaveText": "Winda wynosi cię z powrotem na otwarte powietrze twierdzy."
       },
       "ignivar_forge_approach": {
-        "name": "Halls of the First Tempering",
-        "enterText": "Hammerfall echoes through the Halls of the First Tempering.",
-        "leaveText": "You step away from the first forge and breathe freely again."
+        "name": "Sale Pierwszego Hartowania",
+        "enterText": "Odgłosy młotów rozbrzmiewają w Salach Pierwszego Hartowania.",
+        "leaveText": "Odchodzisz od pierwszej kuźni i znów swobodnie oddychasz."
       },
       "ignivar_raid_arena": {
-        "name": "Crucible of the Last Spring",
-        "enterText": "Heat shimmers above the sealed waters of the Crucible.",
-        "leaveText": "You step away from the Crucible and breathe freely again."
+        "name": "Tygiel Ostatniego Źródła",
+        "enterText": "Nad zamkniętymi wodami Tygla migocze żar.",
+        "leaveText": "Odchodzisz od Tygla i znów swobodnie oddychasz."
       },
       "ignivar_molten_assembly": {
-        "name": "Molten Assembly",
-        "enterText": "The opened gate leads into a molten assembly hall.",
-        "leaveText": "You leave the assembly line and return to the Crucible."
+        "name": "Płynny montaż",
+        "enterText": "Otwarta brama prowadzi do płynnej hali montażowej.",
+        "leaveText": "Opuszczasz linię montażową i wracasz do Tygla."
       },
       "ignivar_inner_crucible": {
-        "name": "The Inner Crucible",
-        "enterText": "The opened gate leads deeper into the Crucible.",
-        "leaveText": "You leave the silent depths of the Crucible."
+        "name": "Wewnętrzny Tygiel",
+        "enterText": "Otwarta brama prowadzi głębiej do Tygla.",
+        "leaveText": "Opuszczasz milczące głębiny Tygla."
       },
       "wildheart_basin": {
         "name": "Kotlina Dzikiego Serca",
@@ -19705,182 +19747,182 @@ export const pl_PL: EnTranslations = {
     },
     "itemSets": {
       "ashveil": {
-        "name": "Ashveil Garb",
-        "bonus2": "Lurker's Strike hits 25 percent harder.",
-        "bonus4": "Your Veiled Edge strike hits for triple, up from double."
+        "name": "Szaty Popiołowej Zasłony",
+        "bonus2": "Cios Czającego się zadaje o 25 procent większe obrażenia.",
+        "bonus4": "Cios Ukrytego Ostrza zadaje potrójne obrażenia zamiast podwójnych."
       },
       "benison_dawnweave": {
-        "name": "Benison Dawnweave",
-        "bonus2": "Seraphic Vigil's rescue heals for 270, up from 180. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When Seraphic Vigil triggers, its ally is also mended for 15 percent of their maximum health over 10 sec."
+        "name": "Błogosławiona Tkanina Świtu",
+        "bonus2": "Ratunek Seraficznej Warty leczy za 270 zamiast 180. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Po aktywowaniu Seraficznej Warty jej sojusznik zostaje uleczony o 15 procent maksymalnego zdrowia w ciągu 10 sek."
       },
       "boundstone_vanguard": {
         "name": "Straż przednia spętanego kamienia",
         "bonus3": "Zwiększa szybkość ataku i rzucania zaklęć o 15%."
       },
       "chronoweave": {
-        "name": "Aetherweave Vestments",
-        "bonus2": "Temporal Echo converts 50 percent of your single-target Arcane damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Temporal Cascade's cooldown is reduced by 5 sec."
+        "name": "Szaty Eterowej Tkaniny",
+        "bonus2": "Echo Czasu zamienia 50 procent twoich obrażeń tajemnych przeciw jednemu celowi w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Czas odnowienia Czasowej Kaskady skraca się o 5 sek."
       },
       "cinderbark": {
-        "name": "Cinderbark Ward",
-        "bonus2": "Sweeping Claws has a 30 percent chance to bank an additional Old Blood.",
-        "bonus4": "Marrowbreak hits 30 percent harder, and its emergency guard no longer replaces the strike."
+        "name": "Osłona Żarokory",
+        "bonus2": "Zamiatające Szpony mają 30 procent szans na zgromadzenie dodatkowej Starej Krwi.",
+        "bonus4": "Łamanie Szpiku zadaje o 30 procent większe obrażenia, a jego awaryjna osłona nie zastępuje już ciosu."
       },
       "cinderfang": {
-        "name": "Cinderfang Shroud",
-        "bonus2": "Venom Ritual's energy refund rises to 20 per builder.",
-        "bonus4": "Venom Dart's cooldown is reduced to 4 sec."
+        "name": "Całun Żarokła",
+        "bonus2": "Zwrot energii Rytuału Jadu wzrasta do 20 za każdy generator.",
+        "bonus4": "Czas odnowienia Strzałki Jadu skraca się do 4 sek."
       },
       "coldsight_trackers": {
-        "name": "Coldsight Trackers",
-        "bonus2": "Measured Shot restores 5 additional Focus.",
-        "bonus4": "Long Draw critical strikes extend Cold Focus by 2 sec, up to 6 sec per activation."
+        "name": "Tropiciele Zimnego Wzroku",
+        "bonus2": "Mierzony Strzał przywraca dodatkowe 5 skupienia.",
+        "bonus4": "Trafienia krytyczne Długiego Naciągnięcia wydłużają Zimne Skupienie o 2 sek., maksymalnie o 6 sek. na aktywację."
       },
       "crownforged": {
         "name": "Regalia Bonewrought",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus4": "Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 8 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy."
       },
       "dawnforged": {
-        "name": "Dawnforged Vestments",
-        "bonus2": "Beacon of Light copies 55 percent of your direct heals. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Radiant Resonance's empowered Dawn's Embrace is instant."
+        "name": "Szaty Wykute o Świcie",
+        "bonus2": "Latarnia Światła kopiuje 55 procent twoich bezpośrednich uzdrowień. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Wzmocniony przez Promienny Rezonans Uścisk Świtu jest natychmiastowy."
       },
       "deathlord": {
         "name": "Rynsztunek bojowy Barrowlorda",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus4": "Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Grobowej Potęgi, zwiększającej moc ataku o 60 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes splinter the target with Bonesplinter, bleeding it for 5 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozłupują cel Kościaną Drzazgą, zadając 5 obrażeń od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy."
       },
       "emberfury": {
-        "name": "Emberfury Harness",
-        "bonus2": "Your Enrage lasts 6 sec instead of 4.",
-        "bonus4": "Bloodletting always Enrages you, and its healing rises to 8 percent of your maximum health."
+        "name": "Rynsztunek Żaru Furii",
+        "bonus2": "Rozjuszenie trwa 6 sek. zamiast 4.",
+        "bonus4": "Upuszczanie Krwi zawsze cię rozjusza, a jego leczenie wzrasta do 8 procent twojego maksymalnego zdrowia."
       },
       "emberscreed": {
-        "name": "Creed of Embers Vestments",
-        "bonus2": "Your Doctrine link converts 10 percent more of your Holy damage into healing. Damage taken no longer delays your spellcasting.",
-        "bonus4": "When your Psalm of Warding is fully consumed, your next Scouring Hymn within 10 sec is instant. Cannot occur more than once every 15 sec."
+        "name": "Szaty Credo Żaru",
+        "bonus2": "Więź Doktryny zamienia o 10 procent więcej twoich obrażeń świętych w leczenie. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Gdy Psalm Ochrony zostanie w pełni zużyty, twój następny Hymn Oczyszczenia w ciągu 10 sek. jest natychmiastowy. Efekt może wystąpić nie częściej niż raz na 15 sek."
       },
       "forgewall": {
-        "name": "Forgewall Aegis",
-        "bonus2": "Iron Resolve converts rage at 5 absorb per point instead of 4.",
-        "bonus4": "Casting Shieldcrack reduces Iron Resolve's remaining cooldown by 2 sec."
+        "name": "Egida Kuźnomuru",
+        "bonus2": "Żelazna Determinacja zamienia furię w 5 punktów absorpcji za punkt zamiast 4.",
+        "bonus4": "Rzucenie Pęknięcia Tarczy skraca pozostały czas odnowienia Żelaznej Determinacji o 2 sek."
       },
       "frostquench": {
-        "name": "Frostquench Weave",
-        "bonus2": "Rimelance critical strikes bank a second Icicle, up to the maximum of 5. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Winterlash plants 3 Winter's Chill charges, up from 2."
+        "name": "Splot Mroźnego Ukojenia",
+        "bonus2": "Krytyczne trafienia Loduńca zachowują drugi Sopel, maksymalnie do 5. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Zimowy Bicz nakłada 3 ładunki Zimowego Chłodu zamiast 2."
       },
       "gravebrand": {
-        "name": "Gravebrand Regalia",
-        "bonus2": "Reaping Command's cooldown is reduced by 2 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Reaping Command's unison strikes deal 25 percent more damage."
+        "name": "Regalia Grobowego Znaku",
+        "bonus2": "Czas odnowienia Rozkazu Żniw skraca się o 2 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Zjednoczone trafienia Rozkazu Żniw zadają o 25 procent większe obrażenia."
       },
       "greyjaw_stalker": {
         "name": "Rynsztunek tropiciela Szaroszczękiego",
         "bonus3": "Zwiększa szybkość ataku i rzucania zaklęć o 15%."
       },
       "grovespring": {
-        "name": "Grovespring Raiment",
-        "bonus2": "Fleetmend consumes your own Wildbloom or Second Bloom first and heals 25 percent more. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Overbloom harvests 75 percent of your remaining effects and banks 1 Verdance afterward."
+        "name": "Strój Gajowego Źródła",
+        "bonus2": "Szybkie Uzdrowienie najpierw zużywa twój własny Dzikokwiat lub Drugi Rozkwit i leczy o 25 procent więcej. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Nadrozkwit zbiera 75 procent twoich pozostałych efektów, a następnie zachowuje 1 punkt Zieloności."
       },
       "hexthread": {
-        "name": "Hexthread Shroud",
-        "bonus2": "Needle of Fate grants 2 additional Condemnation. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Passing Sentence refunds 10 Condemnation."
+        "name": "Całun Klątwy",
+        "bonus2": "Igła Losu zapewnia 2 dodatkowe punkty Potępienia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Wykonanie Wyroku zwraca 10 punktów Potępienia."
       },
       "moonscorch": {
-        "name": "Moonscorch Raiment",
-        "bonus2": "Moonseed may extend Lunar Tempest twice per application, to a maximum of 12 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Moonsurge and Sunwake strike 25 percent harder."
+        "name": "Strój Księżycowego Żaru",
+        "bonus2": "Księżycowe Nasienie może dwukrotnie wydłużyć Księżycową Nawałnicę przy jednym nałożeniu, maksymalnie do 12 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Księżycowy Przypływ i Słoneczne Przebudzenie uderzają o 25 procent mocniej."
       },
       "necromancers": {
         "name": "Szaty Mournweave",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Jasności Umysłu, dzięki czemu następne zaklęcie jest darmowe.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Duszny Żar, zwiększając moc zaklęć o 25 na 10 sek."
       },
       "nighttalon": {
         "name": "Skóra Direfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus4": "Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 6 obrażeń od krwawienia co 2 s przez 12 s. Kumuluje się do 3 razy.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy."
       },
       "oathpyre": {
-        "name": "Oathpyre Bastion",
-        "bonus2": "Vowkeeper Strike's chance to arm Solar Reprisal rises to 30 percent, and blocking an attack arms it 40 percent of the time.",
-        "bonus4": "Consuming Solar Reprisal shields you for 6 percent of your maximum health for 10 sec."
+        "name": "Bastion Ognia Przysięgi",
+        "bonus2": "Szansa, że Cios Strażnika Przysięgi uzbroi Słoneczny Odwet, wzrasta do 30 procent, a blokowanie ataku uzbraja go w 40 procent przypadków.",
+        "bonus4": "Zużycie Słonecznego Odwetu osłania cię na 6 procent maksymalnego zdrowia przez 10 sek."
       },
       "packlord_emberhide": {
-        "name": "Packlord's Emberhide",
-        "bonus2": "Pack Command's cooldown is reduced to 3 sec.",
-        "bonus4": "Pack Command's chance to reset Stampede's cooldown rises to 30 percent."
+        "name": "Żaroskóra Władcy Sfory",
+        "bonus2": "Czas odnowienia Rozkazu Sfory zostaje skrócony do 3 sek.",
+        "bonus4": "Szansa, że Rozkaz Sfory zresetuje czas odnowienia Stampede, wzrasta do 30 procent."
       },
       "pyroclast": {
-        "name": "Pyroclast Regalia",
-        "bonus2": "Scald always critically strikes targets at or below 35 percent health. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Your Fire spells' critical strikes outside Phoenix Trance reduce its remaining cooldown by 1.5 sec."
+        "name": "Regalia Piroklastu",
+        "bonus2": "Oparzenie zawsze zadaje trafienie krytyczne celom mającym najwyżej 35 procent zdrowia. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Krytyczne trafienia twoimi zaklęciami ognia poza Trancem Feniksa skracają jego pozostały czas odnowienia o 1,5 sek."
       },
       "ruincaller": {
-        "name": "Ruincaller Vestments",
-        "bonus2": "Conflagrate holds 3 charges. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Ruinbolt strikes 20 percent harder."
+        "name": "Szaty Przywoływacza Ruiny",
+        "bonus2": "Spustoszenie ma 3 ładunki. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Pocisk Zagłady uderza o 20 procent mocniej."
       },
       "slagbreaker": {
-        "name": "Slagbreaker Battlegear",
-        "bonus2": "Redhand empowers your next Maiming Strike by 30 percent per stack instead of 20.",
-        "bonus4": "Every second cast of Redhand reduces Breachmaker's remaining cooldown by 3 sec."
+        "name": "Rynsztunek Łamacza Żużlu",
+        "bonus2": "Czerwony Znak wzmacnia następne Miażdżące Uderzenie o 30 procent za każdy ładunek zamiast 20.",
+        "bonus4": "Co drugie użycie Czerwonego Znaku skraca pozostały czas odnowienia Przełamującego o 3 sek."
       },
       "slagsnare": {
-        "name": "Slagsnare Trappings",
-        "bonus2": "Gutting Strike generates 20 Focus.",
-        "bonus4": "Woundrend that consumes 3 Hunting Momentum preserves them. Cannot occur more than once every 8 sec."
+        "name": "Oprawa Żużlowej Pułapki",
+        "bonus2": "Rozpruwające Uderzenie generuje 20 punktów Skupienia.",
+        "bonus4": "Rozcięcie Ran, które zużywa 3 ładunki Łowieckiego Pędu, zachowuje je. Nie może się to zdarzyć częściej niż raz na 8 sek."
       },
       "smolderstrike": {
-        "name": "Smolderstrike Leathers",
-        "bonus2": "Haymaker hits 20 percent harder.",
-        "bonus4": "Lights Out refunds 6 sec of Mirrored Blades' remaining cooldown."
+        "name": "Skóry Żarowego Uderzenia",
+        "bonus2": "Cios Młota uderza o 20 procent mocniej.",
+        "bonus4": "Koniec Zabawy zwraca 6 sek. pozostałego czasu odnowienia Lustrzanych Ostrzy."
       },
       "soulflame": {
         "name": "Regalia Wraithfire",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek."
       },
       "springmender": {
-        "name": "Springmender Scale",
-        "bonus2": "Tidecall's cooldown is reduced by 4 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Cascading Mend reaches a fourth ally and harvests Mending Currents at 150 percent."
+        "name": "Łuska Wiosennego Uzdrowiciela",
+        "bonus2": "Czas odnowienia Wezwania Przypływu zostaje skrócony o 4 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Kaskadowe Uzdrowienie dosięga czwartego sojusznika i zbiera Prądy Uzdrowienia w wysokości 150 procent."
       },
       "stonehearth": {
-        "name": "Stonehearth Bastion",
-        "bonus2": "While Stonebound, Stormcast Mending Waters costs no mana and heals 25 percent more.",
-        "bonus4": "While Stonebound, completing a cadence heals you for 3 percent of your maximum health."
+        "name": "Bastion Kamiennego Serca",
+        "bonus2": "Podczas Kamiennego Związania Kamienne Uzdrowienie Wód Burzy nie kosztuje many i leczy o 25 procent więcej.",
+        "bonus4": "Podczas Kamiennego Związania ukończenie kadencji leczy cię za 3 procent maksymalnego zdrowia."
       },
       "stormcallers": {
         "name": "Szaty Galecall",
         "bonus2": "Zwiększa moc zaklęć o 20. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć (100% odporności na opóźnienie rzucania).",
         "bonus4": "Twoje zaklęcia mają 10% szansy na udzielenie Płomienia Duszy, zwiększającego moc zaklęć o 40 na 10 s.",
-        "bonus6": "Increases attack and casting speed by 4%. Your spells have a 10% chance to grant Soulblaze, increasing spell power by 25 for 10 sec."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4%. Twoje zaklęcia mają 10% szansy zapewnić Płomień Duszy, zwiększając moc zaklęć o 25 na 10 sek."
       },
       "stormkindled": {
-        "name": "Stormkindled Regalia",
-        "bonus2": "Unleash Weapon on Pyrebrand grants 3 Thunder. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Earthen Jolt's bonus per Thunder rises to 30 percent."
+        "name": "Regalia Rozpalonej Burzy",
+        "bonus2": "Uwolnienie Broni na Żarze Stosu zapewnia 3 ładunki Gromu. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Premia Wstrząsu Ziemi za każdy ładunek Gromu wzrasta do 30 procent."
       },
       "vale_arcanist": {
         "name": "Szaty Arkanisty z Doliny",
         "bonus3": "Zwiększa szybkość ataku i rzucania zaklęć o 15%."
       },
       "vesperash": {
-        "name": "Vesperash Shroud",
-        "bonus2": "Call Tithefiend's cooldown is reduced by 6 sec. Damage taken no longer delays your spellcasting.",
-        "bonus4": "Calling your Tithefiend resets Mindfracture's cooldown, and the fiend returns twice as much mana per hit."
+        "name": "Całun Wieczornego Popiołu",
+        "bonus2": "Czas odnowienia Przyzwania Żniwiarza Dziesięciny zostaje skrócony o 6 sek. Otrzymywane obrażenia nie opóźniają już rzucania zaklęć.",
+        "bonus4": "Przyzwanie Żniwiarza Dziesięciny resetuje czas odnowienia Rozłamania Umysłu, a żniwiarz zwraca dwa razy więcej many za każde trafienie."
       },
       "warfare_ashstalker": {
         "name": "Zestaw Ashstalker",
@@ -19913,25 +19955,25 @@ export const pl_PL: EnTranslations = {
         "bonus7": "Zwiększa Atak i Obronę wojenną o 80. Twoje zaklęcia mają 15% szansy dać Cierniową Straż, która zwiększa unik o 15% na 6 s."
       },
       "warspirit_emberscale": {
-        "name": "Warspirit Emberscale",
-        "bonus2": "Ancestral Strike advances your cadence 3 steps.",
-        "bonus4": "Ancestral Strike hits 30 percent harder."
+        "name": "Łuska Żaru Ducha Wojny",
+        "bonus2": "Uderzenie Przodków przesuwa twoją kadencję o 3 kroki.",
+        "bonus4": "Uderzenie Przodków uderza o 30 procent mocniej."
       },
       "wildfang_emberhide": {
-        "name": "Wildfang Emberhide",
-        "bonus2": "Redharvest restores 45 energy, up from 30.",
-        "bonus4": "Redharvest plants a fresh Flense on the target."
+        "name": "Żaroskóra Dzikiego Kła",
+        "bonus2": "Krwawy Zbiór przywraca 45 energii zamiast 30.",
+        "bonus4": "Krwawy Zbiór nakłada na cel świeże Rozdarcie."
       },
       "wyrmshadow": {
         "name": "Szaty Nightfang",
         "bonus2": "Zwiększa siłę ataku o 40.",
         "bonus4": "Twoje krytyczne trafienia bronią mają 50% szansy na udzielenie Pędu Kłów, zwiększającego szybkość ataku o 25% na 8 s.",
-        "bonus6": "Increases attack and casting speed by 4% and Hit by 3%. Your weapon critical strikes tear a Ragged Gash, bleeding the target for 4 damage every 2 sec for 12 sec. Stacks up to 3 times."
+        "bonus6": "Zwiększa szybkość ataku i rzucania zaklęć o 4% oraz trafienie o 3%. Twoje krytyczne trafienia bronią rozrywają cel Poszarpaną Raną, zadając 4 obrażenia od krwawienia co 2 sek. przez 12 sek. Kumuluje się do 3 razy."
       },
       "zealfire": {
-        "name": "Zealfire Warplate",
-        "bonus2": "Final Edict and Dawnfall cut each other's remaining cooldown by 3 sec instead of 2.",
-        "bonus4": "Hammer of Wrath cast under Dawn's Wrath strikes 40 percent harder, up from 20."
+        "name": "Płyta Bojowa Płomienia Zapału",
+        "bonus2": "Dekret Ostateczny i Świt Zagłady skracają wzajemnie pozostały czas odnowienia o 3 sek. zamiast o 2.",
+        "bonus4": "Rzut Młotem Gniewu podczas Gniewu Świtu zadaje o 40 procent większe obrażenia zamiast o 20."
       }
     }
   },

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { resetIgnivarEncounter } from '../src/sim/encounters/ignivar';
 import { IGNIVAR_DIALOGUE } from '../src/sim/encounters/ignivar_dialogue';
-import { IGNIVAR_RAID_ARENA_ID, IGNIVAR_SECOND_WING_ID } from '../src/sim/ignivar_raid_ids';
+import {
+  IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+} from '../src/sim/ignivar_raid_ids';
 import { enterDungeon, leaveDungeon, updateInstances } from '../src/sim/instances/dungeons';
 import { raidBossRoomWelcomeFor } from '../src/sim/instances/raid_boss_room_welcome';
 import { Sim } from '../src/sim/sim';
@@ -41,6 +45,9 @@ describe('Ignivar room welcome', () => {
     const laterId = sim.addPlayer('mage', 'Laterember');
     sim.partyInvite(laterId, leaderId);
     sim.partyAccept(laterId);
+    // Claim the Halls first: the arena's exit portal routes back to them (the
+    // floor-chain exit rule), so the wipe walk-out below needs the claim live.
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, leaderId, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, leaderId, true)).toBe(true);
 
     const claim = sim.instances.find(
@@ -112,6 +119,8 @@ describe('Ignivar room welcome', () => {
       devCommands: true,
     });
     const pid = sim.addPlayer('warrior', 'Freshclaim', { characterId: 4274 });
+    // The Halls claim keeps the arena's floor-chain exit routable below.
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, pid, true)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, pid, true)).toBe(true);
     const claim = sim.instances.find(
       (instance) => instance.dungeonId === IGNIVAR_RAID_ARENA_ID && instance.partyKey !== null,
@@ -119,6 +128,8 @@ describe('Ignivar room welcome', () => {
     if (!claim) throw new Error('Missing claimed Ignivar boss room');
     expect(welcomeEvents(sim.drainEvents(), IGNIVAR_DIALOGUE.roomEntry)).toHaveLength(1);
 
+    // Two hops out: arena to the Halls (the floor-chain exit), then outside.
+    expect(leaveDungeon(sim.ctx, pid)).toBe(true);
     expect(leaveDungeon(sim.ctx, pid)).toBe(true);
     claim.emptyFor = INSTANCE_EMPTY_TIMEOUT - 1;
     updateInstances(sim.ctx);

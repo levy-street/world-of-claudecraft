@@ -5,10 +5,11 @@
 // deeds_sites_pin harness idiom.
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
-import { DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, DUNGEONS, instanceOrigin, MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
@@ -256,8 +257,10 @@ function bossIn(sim: Sim, claim: InstanceSlot, templateId: string): Entity {
   return boss;
 }
 
-// Walk the real doors: the overworld approach first, then the requested deeper
-// rooms via the dev arm (the raid LOCKOUT itself is never dev-bypassed).
+// Walk the real doors: the overworld keep door onto the lift first, then the
+// Halls and the requested deeper rooms via the dev arm, which stands in for
+// the lift-gate ride and the interior gates (the raid LOCKOUT itself is never
+// dev-bypassed).
 function claimRooms(
   sim: Sim,
   lead: PlayerMeta,
@@ -265,14 +268,26 @@ function claimRooms(
   deeperRooms: string[],
 ): void {
   if (difficulty === 'heroic') sim.setDungeonDifficulty('heroic', lead.entityId);
-  if (!enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, lead.entityId)) {
-    throw new Error('approach entry failed');
+  if (!enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, lead.entityId)) {
+    throw new Error('lift entry failed');
   }
-  for (const roomId of deeperRooms) {
+  for (const roomId of [IGNIVAR_FORGE_APPROACH_ID, ...deeperRooms]) {
     if (!enterDungeon(sim.ctx, roomId, lead.entityId, true)) {
       throw new Error(`${roomId} entry failed`);
     }
   }
+}
+
+// Step a player back into the open world. The deeper rooms route their exit
+// portal BACK a floor (tests/ignivar_exit_routing.test.ts owns those pins),
+// so walking out is a bounded chain of leaveDungeon hops.
+function stepOutside(sim: Sim, pid: number): void {
+  const e = sim.entities.get(pid);
+  if (!e) throw new Error(`missing player ${pid}`);
+  for (let hop = 0; hop < 6 && e.pos.x > DUNGEON_X_THRESHOLD; hop += 1) {
+    if (!leaveDungeon(sim.ctx, pid)) throw new Error('raid exit chain refused a claimed floor');
+  }
+  if (e.pos.x > DUNGEON_X_THRESHOLD) throw new Error('raid exit chain never reached the keep');
 }
 
 function killBoss(sim: Sim, killer: PlayerMeta, boss: Entity): void {
@@ -299,7 +314,7 @@ describe('the cleared-claim door: participants return to their exact live weekly
     // Offline members carry no characterId: the durable return key falls back
     // to the entity form, and the door reads exactly this set.
     expect(inst.raidReturnKeys.has(`entity:${lead.entityId}`)).toBe(true);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     sim.drainEvents();
 
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, lead.entityId)).toBe(true);
@@ -324,7 +339,7 @@ describe('the cleared-claim door: participants return to their exact live weekly
     expect(lead.raidLockouts.has(heroicLockoutId(IGNIVAR_RAID_ARENA_ID))).toBe(true);
     expect(inst.clearedBy.has(lead.entityId)).toBe(true);
     expect(inst.raidReturnKeys.has(`entity:${lead.entityId}`)).toBe(true);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     sim.drainEvents();
 
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, lead.entityId)).toBe(true);
@@ -352,7 +367,7 @@ describe('the cleared-claim door: participants return to their exact live weekly
     killBoss(sim, lead, varkhul);
     expect(lead.raidLockouts.has(heroicLockoutId(IGNIVAR_SECOND_WING_ID))).toBe(true);
     expect(inst.clearedBy.has(lead.entityId)).toBe(true);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     sim.drainEvents();
 
     // The approach door's checkpoint redirect resolves to the deepest claimed
@@ -437,7 +452,7 @@ describe('the cleared-claim door: participants return to their exact live weekly
     const inst = liveClaim(sim, IGNIVAR_RAID_ARENA_ID);
     killBoss(sim, lead, bossIn(sim, inst, IGNIVAR_BOSS_ID));
     expect(inst.clearedBy.has(lead.entityId)).toBe(true);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     // The reaper frees the empty cleared claim once the extended grace lapses.
     for (let second = 0; second <= INSTANCE_CLEARED_EMPTY_TIMEOUT; second += 1) {
       updateInstances(sim.ctx);
@@ -455,6 +470,7 @@ describe('the cleared-claim door: participants return to their exact live weekly
 // A real claimed run through the real door: enter, find the claim and its own
 // final boss, kill it via the real stamping path, then exercise re-entry.
 function clearedClaimRun(sim: Sim, lead: PlayerMeta): { inst: InstanceSlot; boss: Entity } {
+  expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, lead.entityId, true)).toBe(true);
   expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
   const key = instanceKeyFor(sim.ctx, lead.entityId);
   const inst = sim.ctx.instances.find(
@@ -502,6 +518,7 @@ const HEROIC_ARENA_LOCKED_ERROR = 'You are locked to Heroic Crucible of the Last
 // the normal-difficulty tests above never touch.
 function heroicClearedClaimRun(sim: Sim, lead: PlayerMeta, participant: PlayerMeta): InstanceSlot {
   sim.setDungeonDifficulty('heroic', lead.entityId);
+  expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, participant.entityId, true)).toBe(true);
   expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', participant.entityId, true)).toBe(true);
   const inst = arenaClaimsFor(sim, participant.entityId)[0];
   expect(inst.difficulty).toBe('heroic');
@@ -522,7 +539,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     const sim = makeSim();
     const lead = raidLeader(sim);
     const { inst } = clearedClaimRun(sim, lead);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(true);
     // Back into the SAME claim: no parallel run was minted for a second loot pass.
     expect(arenaClaimsFor(sim, lead.entityId)).toEqual([inst]);
@@ -534,7 +551,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     const { inst } = clearedClaimRun(sim, lead);
     const e = entityOf(sim, lead);
     const corpsePos = { ...e.pos };
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     e.dead = true;
     e.ghost = true;
     e.corpsePos = corpsePos;
@@ -551,6 +568,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     sim.partyInvite(memPid, lead.entityId);
     sim.partyAccept(memPid);
     const mem = sim.players.get(memPid)!;
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, memPid, true)).toBe(true);
     expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', memPid, true)).toBe(true);
     const inst = arenaClaimsFor(sim, memPid)[0];
     const finalBossId = HEROIC_DUNGEON_TUNING.ignivar_raid_arena.finalBossId;
@@ -561,7 +579,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     boss.dead = true;
     sim.ctx.awardHeroicMarks(boss, [mem]);
     expect(inst.raidReturnKeys.has('character:777')).toBe(true);
-    expect(leaveDungeon(sim.ctx, memPid)).toBe(true);
+    stepOutside(sim, memPid);
     // Relog: the old session's entity id is gone, the character id survives,
     // and the durable lockout rides back in the way hydration restores it.
     sim.removePlayer(memPid);
@@ -577,7 +595,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     const sim = makeSim();
     const lead = raidLeader(sim);
     const { boss } = clearedClaimRun(sim, lead);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     boss.dead = false;
     const errors = captureErrors(sim);
     expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', lead.entityId, true)).toBe(false);
@@ -610,7 +628,7 @@ describe('the cleared-run door exception on the weekly rooms', () => {
     const inst = heroicClearedClaimRun(sim, lead, mem);
     expect(inst.raidReturnKeys.has('character:777')).toBe(true);
     expect(inst.raidReturnKeys.has(`entity:${mem.entityId}`)).toBe(false);
-    expect(leaveDungeon(sim.ctx, memPid)).toBe(true);
+    stepOutside(sim, memPid);
     // Relog: the old session's entity id is gone, the character id survives,
     // and the durable heroic lockout rides back in the way hydration restores it.
     sim.removePlayer(memPid);
@@ -681,7 +699,7 @@ describe('the family reaper honors a cleared sibling claim', () => {
     )!;
     expect(approach).toBeDefined();
     const { inst } = clearedClaimRun(sim, lead);
-    expect(leaveDungeon(sim.ctx, lead.entityId)).toBe(true);
+    stepOutside(sim, lead.entityId);
     // Past the SHORT 300-second timeout, the bossless approach used to free
     // the whole family, cleared arena and boss corpse included; the cleared
     // grace now extends to every sibling. Each reaper pass counts one empty

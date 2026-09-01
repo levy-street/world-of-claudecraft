@@ -48,7 +48,6 @@ import type { SimContext } from '../sim_context';
 import { abilityScalingPower, channelTickBonus } from '../spell_scaling';
 import { resolveTalentHitMult } from '../talent_hit_mult';
 import { hasEscapeStealth } from '../threat';
-import { creditAbilityDrill } from '../tutorial/ability_drill';
 import type { AbilityDef, AbilityEffect, Aura, Entity, Vec3 } from '../types';
 import {
   angleTo,
@@ -209,7 +208,7 @@ import {
   spellDamageMultFromAuras,
   spellHasteMult,
 } from './spell_combat';
-import { isSpellResisted } from './spell_resist';
+import { resolveHostileSpellResist } from './spell_resist';
 import { onCastCompleted } from './talent_procs';
 import { emitRainOfFireStop } from './warlock_meteor_events';
 import {
@@ -453,6 +452,32 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       return;
     }
   }
+  // The offensive twin of the mass-rez/combat-res gates above: a hostile (or
+  // any-type) TIMED (non-channel) cast whose locked target dies mid-cast, from
+  // ANY source (another player's finishing blow, a DoT tick, an AoE), cancels
+  // now instead of running the rest of a multi-second cast into a certain
+  // finish-side "You have no target." refusal at applyAbility. Channels are
+  // exempt: applyChannelTick already re-checks the same locked target on every
+  // pulse (a coarser but pre-existing cadence), and folding them in here would
+  // pre-empt that path's own completion-time side effects (e.g. Affliction's
+  // Consume completion Doom) and turn its silent cancel into a player-visible
+  // error. A friendly cast is exempt too: its target resolution already falls
+  // back to the caster on a dead ally (see resolveFriendlyTarget), unaffected
+  // by this gate. Placed after silence/lockout so those keep priority (their
+  // silent cancel) on the rare tick where both conditions are true at once.
+  if (
+    !p.channeling &&
+    activeCast?.def.requiresTarget &&
+    !activeCast.def.targetsDead &&
+    activeCast.def.targetType !== 'friendly'
+  ) {
+    const liveTarget = p.castTargetId !== null ? (ctx.entities.get(p.castTargetId) ?? null) : null;
+    if (!liveTarget || liveTarget.dead) {
+      cancelCast(ctx, p);
+      ctx.error(p.id, 'You have no target.', liveTarget?.dead ? 'target_dead' : undefined);
+      return;
+    }
+  }
   // Fishing bite minigame: the hidden seeded bite and the
   // server-authoritative reel deadline, resolved in sim ticks (the lockpick
   // stepDeadlineTick precedent; the client never reports a timeout). The
@@ -535,13 +560,11 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
       // end advance separately, so floating-point drift can leave the final
       // tick a hair short exactly when they coincide, silently dropping the
       // last missile (the Arcane Missiles 5-barrage bug). A tick still
-      // meaningfully in the future was not lost to drift: pushbackCast's
-      // channel-fraction branch shortens castRemaining without rescheduling
-      // channelTickTimer, so a big enough pushback can end the channel before
-      // a later tick's timer ever comes due. Classic-era pushback trims the
-      // trailing tick count along with the time, so that tick is dropped too,
-      // never forced out as a same-instant completion burst. Inert for
-      // duration-based channels, whose channelTicksLeft is 0.
+      // meaningfully in the future was not lost to drift: a pushback-shortened
+      // channel already gave up the boundaries it no longer reaches (see
+      // pushbackCast), and anything still orphaned here is dropped rather than
+      // forced out as a same-instant completion burst. Inert for duration-based
+      // channels, whose channelTicksLeft is 0.
       while (p.channelTicksLeft > 0 && p.channelTickTimer <= CAST_COMPLETE_EPS) {
         p.channelTicksLeft -= 1;
         p.channelTickTimer += p.channelTickEvery;
@@ -781,6 +804,14 @@ export function pushbackCast(p: Entity): void {
       0,
       p.castRemaining - p.castTotal * CHANNEL_PUSHBACK_FRACTION * factor,
     );
+    // The shortened channel keeps only the ticks whose boundaries still fit: the
+    // next lands in channelTickTimer, the rest one channelTickEvery apart.
+    if (p.channelTicksLeft > 0 && p.channelTickEvery > 0) {
+      const roomAfterNextTick = p.castRemaining - p.channelTickTimer + CAST_COMPLETE_EPS;
+      const stillFit =
+        roomAfterNextTick < 0 ? 0 : Math.floor(roomAfterNextTick / p.channelTickEvery) + 1;
+      p.channelTicksLeft = Math.min(p.channelTicksLeft, stillFit);
+    }
   } else {
     p.castRemaining += CAST_PUSHBACK_SEC * factor;
     p.castTotal += CAST_PUSHBACK_SEC * factor;
@@ -2788,23 +2819,7 @@ function applyAbility(
               ),
           });
         }
-        if (isSpell && !isTaunt && isSpellResisted(ctx.rng, src.level, tgt.level, src.hitBonus)) {
-          ctx.emit({
-            type: 'damage',
-            sourceId: src.id,
-            targetId: tgt.id,
-            amount: 0,
-            crit: false,
-            school: ability.school,
-            ability: ability.name,
-            kind: 'resist',
-          });
-          // A resisted bolt never reaches runEffects, but the player still
-          // pressed the button the island asked for, so the drill credits
-          // here too. Without this the lesson stalls on an unlucky roll and
-          // the coach keeps asking for a press that already happened.
-          creditAbilityDrill(ctx, src, tgt, ability.id);
-          ctx.enterCombat(src, tgt);
+        if (isSpell && !isTaunt && resolveHostileSpellResist(ctx, src, tgt, ability)) {
           restoreStormcastReservation(ctx, src, stormcastReservation);
           return;
         }
@@ -2857,8 +2872,21 @@ function applyAbility(
       ability: ability.id,
     });
   }
-  ctx.runEffects(p, meta, target, res);
-  completeStormcastReservation(ctx, p, stormcastReservation);
+  // An instant hostile spell (`projectile: false`) rolls the SAME resist a bolt
+  // rolls on impact; only the delivery differs. Taunts are exempt here for the
+  // reason they are exempt there: a resisted taunt silently breaks tanking.
+  const instantResisted =
+    target !== null &&
+    ability.school !== 'physical' &&
+    ctx.isHostileTo(p, target) &&
+    !res.effects.some((eff) => eff.type === 'taunt') &&
+    resolveHostileSpellResist(ctx, p, target, ability);
+  if (instantResisted) {
+    restoreStormcastReservation(ctx, p, stormcastReservation);
+  } else {
+    ctx.runEffects(p, meta, target, res);
+    completeStormcastReservation(ctx, p, stormcastReservation);
+  }
   // 'spellCast' means SPELLS: physical specials (a cat/bear weapon strike from a
   // cloth-capable druid) and toggle-offs fall through here and must not roll.
   if (p.kind === 'player' && ability.school !== 'physical' && !togglingOff)

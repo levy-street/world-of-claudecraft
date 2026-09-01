@@ -168,18 +168,17 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands.
-    // 362 at the release/v0.41.0 merge (2026-08-30): the shared base read 313,
-    // masterwrought added 6 (Phase 11i's apex fishing rod on the specimen page
-    // plus its other catalogued slots, the same slots the character pair in
-    // tests/reliquary_content.test.ts carries) and the release added 43 (the
-    // 40 Crucible raid relics, the raid's flawless title, and the rest of its
-    // own 313 -> 356 arm; Forgebreaker left the pages for its crafting chain).
-    // The id sets are disjoint, so the merged catalog carries both sides'
-    // slots: 313 + 6 + 43. Phase 18 then added the gather_event:golden_harvest
-    // field note to RELIQUARY_PROFESSION_MARKS, one more character-scoped mark
-    // slot, so 362 + 1 = 363; the character pair in
-    // tests/reliquary_content.test.ts moved by the same one.
-    expect(catalogTotal).toBe(363);
+    // 364 at the release/v0.42.0 merge (2026-08-31), re-derived from the merged
+    // catalog rather than picked from a side. The shared base reads 356 (311
+    // plus the 40 Crucible raid relics and the raid's flawless title;
+    // Forgebreaker left the pages for its crafting chain). Masterwrought adds 7
+    // on top of it: the two per-craft masterwork marks (jewelcrafting,
+    // inscription), the three grandmaster/farming title slots, Phase 11i's apex
+    // fishing rod, and Phase 18's gather_event:golden_harvest field note, the
+    // same slots the character pair in tests/reliquary_content.test.ts carries.
+    // The release adds 1, the Bonebound Rickshaw's horizons_mounts slot. The id
+    // sets are disjoint, so the merged catalog carries both sides: 356 + 7 + 1.
+    expect(catalogTotal).toBe(364);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

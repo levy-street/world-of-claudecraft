@@ -83,6 +83,7 @@ function harness(
     clearActionDropTargets: noop,
     dragState: new ItemDragState(),
     isTouchHud: () => false,
+    confirmVendorSell: () => true,
     markEquipDropTargets: noop,
     dropOnEquipSlot: noop,
     dropOnActionSlot: noop,

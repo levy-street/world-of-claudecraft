@@ -288,6 +288,7 @@ describe('tier player-frame nudges are landscape-gated (hud.mobile.css)', () => 
       'body.mobile-touch.hud-mobile-tablet.mobile-left-handed #player-frame,\n' +
         '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #castbar,\n' +
         '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar,\n' +
+        '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #swingbar-offhand,\n' +
         '    body.mobile-touch.hud-mobile-tablet.mobile-left-handed #pet-frame {\n' +
         '      left: calc(50% + 10px);\n' +
         '    }',

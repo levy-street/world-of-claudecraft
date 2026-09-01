@@ -225,6 +225,7 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
 const CLIPLESS_RIGS = new Set([
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
+  'mount_rickshaw_mount',
   'mob_glimmerwisp',
   'mob_duskwisp',
   'mob_spider_egg_sac',

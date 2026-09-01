@@ -3,6 +3,7 @@
 // craft ring. A pure sim leaf; no DOM.
 
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS, FARM_MATERIAL_ITEM_IDS } from '../src/sim/content/farm_crops';
 import { CRAFT_RING } from '../src/sim/content/professions';
@@ -273,14 +274,21 @@ describe('craftIdsForMaterialItem', () => {
     }
   });
 
-  it('every honest material has at least one craft consumer (no orphan reagents)', () => {
+  it('every non-pending material has at least one craft consumer', () => {
     // The material taxonomy only admits junk-kind members of the source-or-
-    // reagent union; if a material has zero craft consumers the Used-by line
-    // cannot fire and the bag stack is unexplained. Pin completeness here.
-    // Farming's family is command-consumed (see the exemption banner above),
-    // so its stacks are explained by a different mechanism, not unexplained.
+    // reagent union, plus an explicit recipe-pending list. If any other
+    // material has zero craft consumers, the Used-by line cannot fire and the
+    // bag stack is unexplained. Pin completeness here.
+    // Two skips, each for its own reason. Farming's family is
+    // command-consumed (see the exemption banner above), so its stacks are
+    // explained by a different mechanism, not unexplained. A recipe-pending
+    // material is staged AHEAD of its recipes, so it has no consumer yet at
+    // all; the pending arm below pins exactly that, and the id leaves the
+    // pending list the moment a live recipe names it.
+    const pending = new Set<string>(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS);
     let exempted = 0;
     for (const itemId of MATERIAL_ITEM_IDS) {
+      if (pending.has(itemId)) continue;
       if (COMMAND_CONSUMED_FARM_MATERIALS.has(itemId)) {
         exempted++;
         continue;
@@ -294,7 +302,7 @@ describe('craftIdsForMaterialItem', () => {
     // family is in the material set), and it did not swallow the census (the
     // non-exempt majority was genuinely walked).
     expect(exempted).toBe(COMMAND_CONSUMED_FARM_MATERIALS.size);
-    expect(MATERIAL_ITEM_IDS.size - exempted).toBeGreaterThan(40);
+    expect(MATERIAL_ITEM_IDS.size - exempted - pending.size).toBeGreaterThan(40);
   });
 
   it('the farming exemption names only real materials, all from the one content source', () => {
@@ -308,6 +316,14 @@ describe('craftIdsForMaterialItem', () => {
     expect(COMMAND_CONSUMED_FARM_MATERIALS.size).toBeGreaterThan(0);
     for (const itemId of COMMAND_CONSUMED_FARM_MATERIALS) {
       expect(MATERIAL_ITEM_IDS.has(itemId), `${itemId} is no longer a material`).toBe(true);
+    }
+  });
+
+  it('recipe-pending materials have no consumer yet and remain explicitly classified', () => {
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const itemId of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(itemId), itemId).toBe(true);
+      expect(craftIdsForMaterialItem(itemId), itemId).toEqual([]);
     }
   });
 

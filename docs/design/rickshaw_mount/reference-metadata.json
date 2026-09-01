@@ -1,0 +1,64 @@
+{
+  "assetId": "rickshaw-mount",
+  "sourceKind": "user-supplied real-world reference photographs (three, not AI-generated)",
+  "sourceRedistributed": false,
+  "confirmationDate": "2026-08-07",
+  "scopeNote": "This is the v1 open-frame-cart shape's reference set only. It predates and is separate from the v2 throne-cart rebuild's own reference (a later AI-generated concept sheet, see object-sculpt-spec.json's authoringNote/sourceImage). Only a few v1 measurements (RICKSHAW_SCALE, the wheel hub/spoke fix, the shaft cross-brace position) carry forward into v2 unchanged; the throne, cushion, lantern, and banner design in v2 comes from the concept sheet, not these photographs.",
+  "permissionContext": "The user supplied three real photographs of hand-pulled rickshaws in conversation and asked for a new game mount inspired by their shape, to be built as a Halloween/skeleton-puller theme.",
+  "shippingPolicy": "None of the three source images or derived crops are committed or shipped. Only silhouette, proportion, and construction-logic observations are carried into the v1 sculpt spec and factory code.",
+  "sources": [
+    {
+      "id": "extended-canopy",
+      "description": "Color photo, classic Kolkata-style hand-pulled rickshaw, canopy raised, parked against a barred window and wall covered in unrelated tutoring-service posters.",
+      "sha256": "a6228383077bf9bb80e6e6c5cc314742e4ba9d61f743f66d9e8a1d60fa58efdc",
+      "role": "primary shape + canopy-raised reference"
+    },
+    {
+      "id": "collapsed-frame",
+      "description": "Black-and-white photo, same rickshaw style, canopy fully collapsed, no cover fabric visible at all: shows the bare rib/frame structure and rear cross-bracing with nothing occluding it.",
+      "sha256": "bd7ec26ee7a49011e41db4d1c51e3e952e805da25fc4ff7c75d0ee7dd7073266",
+      "role": "frame/rib construction + canopy-collapsed reference"
+    },
+    {
+      "id": "modern-repro",
+      "description": "Color photo, modern manufactured reproduction rickshaw (commercial product photo, carries a visible manufacturer watermark/logo in-frame), canopy raised, cleaner tubular-steel construction and a distinct rear profile with flared mudguard-style wheel arches.",
+      "sha256": "a334fb77078f2895865691b0a9c2a359524f7c6623138e2630a5fdb0a88e6a30",
+      "role": "secondary construction reference (rear three-quarter, canopy support geometry)"
+    }
+  ],
+  "designBoundary": {
+    "kept": [
+      "two-wheel hand-pulled cart silhouette: large wire-spoke wheels flanking a low bench seat",
+      "sloped footboard/step at the front of the seat, ahead of the wheels",
+      "two long, roughly parallel forward-reaching shafts (the puller's handles), meeting the cart body near the wheel axle line",
+      "wheel hub and spoke rhythm (evenly spaced thin spokes, a visibly thicker rim)"
+    ],
+    "excluded": [
+      "the modern-repro photo's manufacturer watermark/logo and any brand identity",
+      "the extended-canopy photo's background: barred window, wall, and unrelated posters",
+      "any real-world manufacturer name, decal, or plate",
+      "the specific upholstery colors (dark green bench, black lacquer body) as a literal palette to copy exactly",
+      "exact heraldry or paint scheme from either photographed unit",
+      "the folding canopy both photographed units show: cut from v1 for real crown-clearance and unsupported-spoke problems and never shipped in any pass, including v2 (see object-sculpt-spec.json's omitOrSimplify)"
+    ],
+    "originalTreatment": [
+      "the integrated skeleton-torso puller: arms/hands pinned to the shaft handles, composed as a separate runtime actor rather than baked into this mesh, no photo shows this, fully invented",
+      "a Halloween-appropriate material palette: weathered bone, aged dark iron, rather than the photographed gloss-black lacquer and clean upholstery",
+      "project-authored rear and underside geometry (none of the three photos show a clean rear three-quarter; the modern-repro photo's rear view informs proportions only, not exact form)"
+    ]
+  },
+  "admittedViews": {
+    "front-three-quarter": {
+      "description": "Front-left three-quarter view of the classic rickshaw, canopy raised, showing wheel spoke rhythm, footboard slope, shaft angle, and canopy rib fan.",
+      "source": "extended-canopy"
+    },
+    "frame-detail": {
+      "description": "Side-on view of the bare frame with canopy collapsed: rear cross-bracing, seat-back structure, and how the canopy ribs fold down when not in use.",
+      "source": "collapsed-frame"
+    },
+    "rear-three-quarter": {
+      "description": "Rear-left three-quarter view of the modern reproduction, canopy raised: informs the rear seat-back curve, canopy support strut angle, and wheel arch relationship not visible in the other two references.",
+      "source": "modern-repro"
+    }
+  }
+}

@@ -772,7 +772,7 @@ export interface SimContextCallbacks {
   isStunned(e: Entity): boolean;
   isRooted(e: Entity): boolean;
   moveSpeedMult(e: Entity): number;
-  swingIntervalMult(e: Entity): number;
+  swingIntervalMult(e: Entity, channel?: 'melee' | 'ranged'): number;
   mobCanSwim(template: { family?: string; canSwim?: boolean } | undefined): boolean;
   resolveMovePoint(nx: number, nz: number, r: number, e: Entity): { x: number; z: number };
   // Exact swept player movement resolver, exposed for the local unstuck search.

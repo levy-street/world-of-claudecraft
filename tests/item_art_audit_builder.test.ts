@@ -877,8 +877,14 @@ describe('item-art audit builder', () => {
     // records the release's catalog carries (108697 bytes; measured by the
     // merged build: 613422 with the five promotions in); the promotion
     // arithmetic on top of it is unchanged.
+    // v0.42.0 sync: the base moves 613412 to 613948, the one reins_rickshaw_mount
+    // record the release's catalog carries plus the mount group's count digit
+    // (9 to 10). That 536-byte delta is the release arm's own measurement
+    // (567150 to 567686 for the same single addition) and transfers exactly,
+    // because the record serializes identically on either arm and no other
+    // field changes width; the promotion arithmetic on top of it is unchanged.
     expect(verified.catalogBytes).toBe(
-      613412 + promoted.length * ('common'.length - 'poor'.length),
+      613948 + promoted.length * ('common'.length - 'poor'.length),
     );
     // Re-minted a third time at the 11l QA, which excluded the cracked fetish
     // and the bogiron nugget under the tusk standard and put both defs back
@@ -904,11 +910,28 @@ describe('item-art audit builder', () => {
       // and sha, and the shipping catalog sha are all the merged build's own
       // measurement; the release's 22 groups over 27 pages fold into this
       // branch's 25 groups.
-      catalogSha256: 'e0c30df50810b7cc28eb4f13d0c9f2510ff205eebec6c549245f7ebfe1593fdb',
-      catalogBytes: 613422,
+      // v0.42.0 sync: 1041 / 1056 on the release's own arm (its one post-base
+      // id, the Bonebound Rickshaw reins painted icon), 1125 / 1140 merged.
+      // The release did not touch scripts/lib/item_art_audit.mjs, so the lib
+      // self-hash below is still this branch's; the catalog grows by exactly
+      // the one reins record plus the mount group's count digit (536 bytes on
+      // the release's own arm, 567150 to 567686), and the shipping catalog sha
+      // is re-measured over the merged 1125-file set.
+      // RE-MINTED at the v0.42.0 sync on 2026-08-31, once
+      // public/ui/items/mapping.json was hand-merged to its 1125-owner union
+      // (ours plus the release's single appended reins_rickshaw_mount owner, a
+      // bijection with the 1125 committed .webp files). Parent values for the
+      // record: ours e0c30df5 over 1124 files, the release de2dae43 over 1041.
+      // The sha below is the printed catalogSha256 from `node
+      // scripts/item_art_audit.mjs --refresh-verdict` over the merged tree, the
+      // same run this case's own build reproduces, and it is pinned identically
+      // in verdict.evidence.catalog in tests/item_art_consistency.test.ts. No
+      // capture or asset was retaken.
+      catalogSha256: 'b5601f861fe189d39e2edc292df65587f9f0a5a7310ba87e8520935612de58fa',
+      catalogBytes: 613958,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1124,
-      liveItemCount: 1139,
+      catalogCount: 1125,
+      liveItemCount: 1140,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -917,9 +940,10 @@ describe('item-art audit builder', () => {
       sheetCount: 240,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 30])),
       sheetSetSha256: null,
-      // Measured by the merged build at the v0.41.0 Crucible sync (the
-      // 1124-id shipping set, both arms' art in).
-      shippingCatalogSha256: '6f7ec6e61f2cd3343a7c352b69d3b04cfa0a27026fa1e3c5248bab1ef194dadd',
+      // Measured over the merged tree at the v0.42.0 sync: the 1125-id
+      // shipping set, both arms' art in (the release's one reins icon on top
+      // of the v0.41.0 Crucible sync's 1124).
+      shippingCatalogSha256: '941770df7a583cfa875c10568596ecf25ae0c0bdde2ae67da7de16907c9a395f',
       machineChecksPassed: true,
       verdict: null,
     });

@@ -969,9 +969,19 @@ export function resetAdminOversightRateLimits(): void {
 // dashboard tab polls at most:
 //   overview        every LIVE_REFRESH_MS = 5 s      -> 12 / min
 //   activity        every ACTIVITY_REFRESH_MS = 60 s ->  1 / min
+//   online history  every ACTIVITY_REFRESH_MS = 60 s ->  1 / min
 //   market metrics  every AUTO_REFRESH_MS = 30 s     ->  2 / min
 //   (src/admin/state/poll.ts, src/admin/pages/MarketMetrics.svelte)
-// so ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE is 15. The ACCOUNT arm meters one
+// so ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE is 16. ONLINE HISTORY is the
+// fourth term and it is easy to miss: Overview's refreshActivity fetches
+// /admin/api/online-history in the SAME Promise.all as /admin/api/activity
+// (src/admin/pages/Overview.svelte), so it rides the activity cadence rather
+// than a poll constant of its own. It was omitted when the bucket was first
+// sized, which left the documented 8-tab account headroom at 8 x 16 = 128
+// against a 120 ceiling: 429s at exactly the headroom the comment promises,
+// and a 429 here collapses the Overview live cards to "load failed". Note a
+// range-button click costs 2 more, because selectOnlineHistoryRange re-runs
+// refreshActivity. The ACCOUNT arm meters one
 // operator's own tabs: 8 tabs of headroom (nobody runs eight dashboards, and a
 // looping tab still trips it) = 120 / min. The IP arm meters a whole office
 // behind one NAT: 40 tab-equivalents (say, a dozen operators with three tabs
@@ -979,7 +989,7 @@ export function resetAdminOversightRateLimits(): void {
 // the relation is pinned in tests/admin_rate_limit_buckets.test.ts against
 // the SPA's own poll constants.
 // ---------------------------------------------------------------------------
-export const ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE = 12 + 1 + 2;
+export const ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE = 12 + 1 + 1 + 2;
 export const ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET = 8;
 export const ADMIN_ANALYTICS_IP_TAB_BUDGET = 40;
 /** The per-OPERATOR (account arm) budget: one operator's own open tabs. */
@@ -1054,9 +1064,10 @@ function isThrottled(times: number[], windowStart: number): boolean {
  * stale failures but records NONE (only recordAuthFailure does). It DOES emit the
  * auth_failures_total{kind="throttled"} observability signal when the outcome is a
  * lockout rejection (allowed false), so /metrics can count throttled attempts.
- * That count is exact only under an assumption every current caller honors: the
- * three callers (server/auth_routes.ts, server/discord.ts, server/main.ts) all
- * gate on the result and reject the request when allowed is false, so one
+ * That count is exact only under an assumption every caller honors (today:
+ * server/auth_routes.ts, server/discord.ts, server/main.ts, server/apple_auth.ts,
+ * and the wallet re-auth pre-check in server/wallet.ts): every caller gates on
+ * the result and rejects the request when allowed is false, so one
  * lockout-outcome check equals one rejected attempt. A future caller that only
  * inspects the status without rejecting must split this predicate instead of
  * reusing it, or the metric would over-count. allowed is false once the account

@@ -45,11 +45,26 @@
 // Pure and Node-testable (no Three, no DOM): plain {x,y,z} in and out, like
 // facing_smooth.ts / locomotion.ts. tests/self_motion.test.ts drives it
 // against a real lagging Sim.
+//
+// Rifts (issue #3479): predicted like the overworld and regular dungeons. The
+// raised-tier lift is stripped/reapplied around each kernel step
+// (self_motion_rift_lift.ts, mirroring Sim.updatePlayerMovement's
+// riftPlayerLift pair in src/sim/rift/runs.ts) and walls resolve through a
+// real riftCollisionToken (src/net/CLAUDE.md has the full wiring). Two rift
+// mechanics stay outside local prediction, deliberately: the ice slide is
+// server-driven and unmirrored (self.riftSliding suspends prediction the same
+// way a ledge climb does, below), and a closed switch-gated portcullis is a
+// runtime clamp rather than a static collider, so it is left leash-bounded
+// instead of locally resolved. Delves remain excluded (a separate, tracked
+// gap: their door/prop state is not mirrored client-side).
 
 import { moverHeight, resolveMovement } from '../sim/colliders';
 import { hasValkyrsCallingFlightAura } from '../sim/combat/paladin_valkyrs_calling_state';
+import { isRiftPos } from '../sim/data';
 import { moveSpeedMult, type PlayerMotionDeps, stepPlayerMotion } from '../sim/player_motion';
 import { DT, type Entity, type MoveInput, RUN_SPEED, type SimEvent } from '../sim/types';
+import type { RiftFloorView } from '../world_api/dungeons';
+import { resolvedRiftFloorPlan, riftLiftFor } from './self_motion_rift_lift';
 
 // Latency cap on the extrapolation window: at least one snapshot-ish interval
 // so low-ping links still get the start-of-motion snap, and a hard ceiling so
@@ -122,6 +137,11 @@ export interface SelfMotionFrame {
   snapAgeMs: number;
   /** The mirror's adaptive inter-snapshot interval in ms (ClientWorld.snapInterval). */
   snapIntervalMs: number;
+  /** The active rift floor descriptor (IWorld.riftFloor), or null outside a rift.
+   *  Lets the kernel strip/reapply the raised-tier lift the same way the server
+   *  does (self_motion_rift_lift.ts), so a platform or ramp never reads as
+   *  airborne or fights the servo. */
+  riftFloor: RiftFloorView | null;
 }
 
 export interface Vec3Like {
@@ -131,6 +151,18 @@ export interface Vec3Like {
 }
 
 const clamp = (n: number, min: number, max: number): number => Math.max(min, Math.min(max, n));
+
+/**
+ * Whether display-only self prediction is allowed to run for the local player
+ * at `posX`. Prediction inside a rift needs the floor descriptor (lift +
+ * wall data); a resumed ClientWorld starts with `riftFloor` null since
+ * enter/descend/exit are the only ordinary riftState emit sites and a resume
+ * replays none of them. `server/game.ts` `resumeSession` re-sends riftState
+ * on resume, so this stays defense in depth for whatever window precedes it.
+ */
+export function selfMotionAllowedAt(posX: number, riftFloor: RiftFloorView | null): boolean {
+  return !isRiftPos(posX) || riftFloor !== null;
+}
 
 export function hasAuthoritativeSelfPositionDiscontinuity(
   events: readonly SimEvent[],
@@ -234,15 +266,31 @@ export class SelfMotionPredictor {
   };
   private readonly out: Vec3Like = { x: 0, y: 0, z: 0 };
 
-  constructor(seed: number) {
+  constructor(seed: number, riftCollisionToken = 0) {
     // The client dep shape: pure static collision (delves are gated off by the
     // enabled flag), aura-only speed (the Fiesta augment is not mirrored; the
     // leash absorbs that bounded divergence), and no-op live-Sim callbacks.
+    // riftCollisionToken is IWorld.riftCollisionToken (a fixed per-world value,
+    // same as the live Sim closes over its own this.riftCollisionToken): the
+    // online client registers the current rift floor's colliders under it
+    // (src/net/online.ts applyRiftStateEvent), so a rift wall resolves here the
+    // same way it does for the server and for the offline Sim.
     this.deps = {
       seed,
       moveSpeedMult: (e) => moveSpeedMult(e, 0),
       resolveMove: (fromX, fromZ, nx, nz, r, e, ignoreFences) =>
-        resolveMovement(seed, fromX, fromZ, nx, nz, r, ignoreFences, undefined, moverHeight(e)),
+        resolveMovement(
+          seed,
+          fromX,
+          fromZ,
+          nx,
+          nz,
+          r,
+          ignoreFences,
+          undefined,
+          moverHeight(e),
+          riftCollisionToken,
+        ),
       resolvedAbility: () => null,
       cancelCast: () => {},
       standUp: () => {},
@@ -312,7 +360,11 @@ export class SelfMotionPredictor {
     // Valkyr's Calling is server-driven movement. Let authoritative snapshot
     // interpolation render the full ascent and approach instead of predicting
     // ordinary grounded input over it.
-    if (!frame.enabled || hasValkyrsCallingFlightAura(self)) {
+    // The rift ice slide is also server-driven (a scripted glide, not ordinary
+    // input): only the boolean rides the wire, never a direction to mirror, so
+    // predicting it would invent a heading. Suspend like a ledge climb; the
+    // slide's own authoritative interpolation carries the display instead.
+    if (!frame.enabled || hasValkyrsCallingFlightAura(self) || self.riftSliding) {
       this.reset();
       return null;
     }
@@ -326,6 +378,12 @@ export class SelfMotionPredictor {
     const ax = self.prevPos.x + (self.pos.x - self.prevPos.x) * alpha;
     const ay = self.prevPos.y + (self.pos.y - self.prevPos.y) * alpha;
     const az = self.prevPos.z + (self.pos.z - self.prevPos.z) * alpha;
+    // Resolved once and reused for every lift lookup this frame (self_motion_rift_lift.ts);
+    // 0 outside a rift for every position, so non-rift prediction is unaffected below.
+    const riftPlan = resolvedRiftFloorPlan(frame.riftFloor);
+    const riftOrigin = frame.riftFloor?.origin;
+    const liftAt = (x: number, z: number): number =>
+      riftOrigin ? riftLiftFor(riftPlan, riftOrigin, x, z) : 0;
 
     // Re-adopt the authoritative pose outright on identity/life-state flips and
     // teleports; otherwise keep the persistent scratch actor.
@@ -398,6 +456,26 @@ export class SelfMotionPredictor {
     actor.mountCastRemaining = self.mountCastRemaining;
     actor.mountCastKey = self.mountCastKey;
 
+    // Verticality: strip the raised-tier lift from the WORKING actor before
+    // any of this frame's position math runs, exactly like
+    // Sim.updatePlayerMovement strips it before the kernel (its
+    // riftPlayerLift; src/sim/rift/runs.ts). Both pos and prevPos are
+    // stripped by their OWN current x/z, since they can already sit at
+    // different points along a ramp. Zero outside a rift, so non-rift
+    // prediction is unaffected. Unlike the server, this frame does more than
+    // one kernel step's worth of position math after the strip (the DT loop,
+    // then the divergence servo, then the horizontal leash can all move x/z
+    // further), so the reapply below waits until ALL of it is done and reads
+    // the FINAL x/z, rather than re-deriving the lift once per kernel step
+    // the way an early version of this fix did: that left the servo blend
+    // and the leash clamp free to shift x/z out from under an already-baked
+    // Y on a ramp, since neither recomputed the lift for where they moved
+    // the body to. Working in flat-baseline space end to end removes the
+    // possibility rather than chasing each mutation site for it: a
+    // position-independent Y cannot desync from a position that moves.
+    actor.pos.y -= liftAt(actor.pos.x, actor.pos.z);
+    actor.prevPos.y -= liftAt(actor.prevPos.x, actor.prevPos.z);
+
     // Fixed-step advance with the held intent. Turn flags are stripped: the
     // heading is assigned from the one display source each step, and letting
     // the kernel integrate tl/tr on top would double the turn.
@@ -433,6 +511,9 @@ export class SelfMotionPredictor {
       actor.prevPos.y = actor.pos.y;
       actor.prevPos.z = actor.pos.z;
       actor.facing = frame.displayFacing;
+      // actor.pos.y is flat-baseline here (stripped above): the kernel's
+      // gravity/onGround pass integrates against the true flat rift floor,
+      // same as outside a rift, and needs no rift-specific handling at all.
       stepPlayerMotion(this.deps, actor, inp);
       this.acc -= DT;
     }
@@ -509,7 +590,13 @@ export class SelfMotionPredictor {
       const rate = Math.min(SELF_MOTION_BLEND_RATE, 500 / measureMs);
       const k = 1 - Math.exp(-rate * Math.min(dt, 1 / 30));
       const errX = ax - past.x;
-      const errY = ay - past.y;
+      // Both sides flattened to match the WORKING actor's flat-baseline Y at
+      // this point in the frame (stripped above, not yet reapplied): the
+      // anchor and the history sample are otherwise each correctly lifted
+      // for their OWN (different) x/z, and comparing them lifted here would
+      // just be comparing the lift difference between two positions, not the
+      // divergence this correction exists to measure.
+      const errY = ay - liftAt(ax, az) - (past.y - liftAt(past.x, past.z));
       const errZ = az - past.z;
       const errLen = Math.hypot(errX, errY, errZ);
       const scale =
@@ -569,6 +656,15 @@ export class SelfMotionPredictor {
       actor.pos.x = ax + (ex * budget) / elen;
       actor.pos.z = az + (ez * budget) / elen;
     }
+
+    // Reapply the lift now that every mutation of x/z for this frame is
+    // done (the DT loop, the divergence servo, the leash clamp): each of
+    // pos and prevPos by its OWN final x/z, converting the working actor
+    // back to the same visual/lifted space `self`'s own pos/prevPos are in,
+    // which is what `this.actor` must stay in between calls (the entry
+    // snap-reset check above compares it against the lifted anchor).
+    actor.pos.y += liftAt(actor.pos.x, actor.pos.z);
+    actor.prevPos.y += liftAt(actor.prevPos.x, actor.prevPos.z);
 
     this.out.x = actor.prevPos.x + (actor.pos.x - actor.prevPos.x) * frac;
     this.out.y = actor.prevPos.y + (actor.pos.y - actor.prevPos.y) * frac;

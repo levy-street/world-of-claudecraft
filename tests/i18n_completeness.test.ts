@@ -224,31 +224,64 @@ describe('i18n whole-catalog completeness', () => {
   });
 
   it('keeps every localized marker accessibility meaning pinned per locale', () => {
-    // Re-derived 2026-08-30 at the merge of release/v0.41.0 (tip 3e801dc925) into
-    // feature/masterwrought: both parents added marker keys, so the merged rows
-    // digest to a value matching neither parent (recomputed the test's own way
-    // over the regenerated resolved tables, 101 rows per locale).
+    // Two merges wrote this table. This branch re-derived every row on 2026-08-30
+    // at the merge of release/v0.41.0 (tip 3e801dc925), where both parents had
+    // added marker keys and the merged digest matched neither parent; the release
+    // side then re-derived thirteen of the rows at v0.42.0, where it filled the
+    // two boss marker labels (mapMarkerLabels.bossEnemy and .bossAggressiveEnemy)
+    // in the Latin overlays. Both facts hold in the merged tree: the row SET is
+    // this branch's (the extra hud.core.mapMarkerLabels.farmPatch row the release
+    // never had), and thirteen of the row VALUES are the release's new fills, so
+    // those thirteen digests belong to neither parent.
+    // RE-DERIVED over the merged tree on 2026-08-31, at the v0.42.0 sync (ours
+    // 2ab5c2f7d0, theirs 22e909839f, base e6b8edb375). Every row below was read
+    // out of this assertion's own derivation, run over freshly regenerated
+    // resolved tables (`node scripts/i18n_build.mjs`, confirmed idempotent: a
+    // second run left every emitted slice byte-identical), never hand-computed
+    // and never copied from a parent.
+    //
+    // WHICH rows moved, and why, derived rather than assumed. The release filled
+    // the two boss marker labels (mapMarkerLabels.bossEnemy and
+    // .bossAggressiveEnemy) in TWELVE overlays under src/ui/i18n.locales/: de_DE,
+    // fr_FR, it_IT, pt_BR, cs_CZ, nl_NL, pl_PL, id_ID, tr_TR, sv_SE, vi_VN,
+    // da_DK. fr_CA adds a thirteenth moved digest without an overlay edit of its
+    // own: it resolves through fr_FR, so its rows follow that fill. The other
+    // seven (es, es_ES, zh_CN, zh_TW, ko_KR, ja_JP, ru_RU) got no boss fill from
+    // either parent, so they still read this branch's v0.41.0 values, and their
+    // digests below are unchanged from that re-derivation.
+    // This branch contributed no marker-row edit at this merge, so the thirteen
+    // moved digests are the release's fill measured through THIS branch's row
+    // set: they match neither parent's literal.
+    //
+    // Digests stay PINNED literals, not computed at test time: the whole point of
+    // the row is to red on an unintended change to a marker's accessibility
+    // meaning, and a digest recomputed from the same table it is compared against
+    // would assert nothing. Re-derivation recipe, unchanged: regenerate the
+    // resolved tables (`npm run i18n:gen`), run this file, and re-pin each locale
+    // from the reported digest, which is sha256 over JSON.stringify of the
+    // hud.core.mapMarker rows in table order, exactly as the assertion below
+    // computes them.
     const expected = {
       es: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
       es_ES: '71280fba077d6d0e9fdb251edd2a9c90b22e76e6d72b7f072759529e5cbc7de3',
-      fr_FR: '78c4622c008dacdd7999a63663f9db6dd0129909d1c1aec7fe3b3c8cf8f23c66',
-      fr_CA: '78c4622c008dacdd7999a63663f9db6dd0129909d1c1aec7fe3b3c8cf8f23c66',
-      it_IT: 'd4871933ecda60f31eef89695499c14143b814a830bb27cb9bb2ef81e99db965',
-      de_DE: '561b0bdde46111288a41393d99a0f86e34541262d6687ddefefb1b8195923ca2',
+      fr_FR: '7011bb7f227cdec0e53df1c6f22b0e4067f6a4bbf904e16c11ec24baadb85a97',
+      fr_CA: '7011bb7f227cdec0e53df1c6f22b0e4067f6a4bbf904e16c11ec24baadb85a97',
+      it_IT: '1417bf6d753bfff5a8b221602981143fce47be9b8fbdd666386b17e654796863',
+      de_DE: '060fc7fd120253737179daf3258a622caf665200028ad509103588cf79fba6e5',
       zh_CN: '88655d9dcd570ef3031925e758bd28f9480d378e6e074b7c30bc4e1e4fad73bc',
       zh_TW: 'd013561d91c7bd77ee5f7c309bd39e147e4e67a45b4982faf4f9975396ba0865',
       ko_KR: 'd35b9d6cb07a9394455c31e2cf465c74888e2bf86463098d6ce09fbe64d63bb6',
       ja_JP: 'aaad77f83c6acd5bd443c654cf4930f565e31deca0f1e0f8eba460c9686fe065',
-      pt_BR: 'ef3e911c94e6b22e12893f1bd53af45e73100770e64ec288755c88fa7cffd77f',
+      pt_BR: '3f8e5a1774351140940464f317eecb089fe2bef0e4154661dda232a91f18e7ca',
       ru_RU: '869bb35098d22e182aa7c693786f69148769fc6c93228a2b959a9b2b719d6794',
-      cs_CZ: '50b349eecfa38cec90036bda3dd01c816db8832fce3fe05da1a791734361cc57',
-      nl_NL: '67004a2f3890e86ebeb2be6dc0a37b1e9eb29466d40ed4108d5f31a411b8e7ad',
-      pl_PL: '8d48b62fb85ebf10a900c4e559618a3e08be1aee66799f85154a2a93d2376c74',
-      id_ID: '2e0bb93cfd572e37a63179c6981e96ffd5dd7794e441c4ac46592fa2d155bf80',
-      tr_TR: '26cc32a76bced8f7d1e2d383f9bf61338643f6b87b72876df29244fee75b4200',
-      sv_SE: 'e3bfd8e3b602a798dce2a476487b3a7c5d0fd200e7688a2d1de8d4b93ac283a8',
-      vi_VN: 'ea499bad62046a4d95d2e63de0f695507595bc733c615c4b90b47bacdc61db0c',
-      da_DK: 'fd9baf6493eafbc7e7ce3b60c900ad33d561797cbeda584fb2454aafd7cf7092',
+      cs_CZ: '17fd408e52c09a8d06a9f90635afdcd8de2f935622a0582125c89ea810188dcd',
+      nl_NL: 'a911f15718c1bf47701e1e01e6b5467b37bbab274359dbcd42ddd85114a19dfa',
+      pl_PL: '76217062945651b618324148f8d891e7a84d9ec030efaf02b2b4ac4537ad756a',
+      id_ID: '3ea89d7c84cf648f0f2e3076388f635cbccfdb32195b7452fb32386c59010d43',
+      tr_TR: '41b00dec2daf97f66c97550735027f0ed98d9fda39cc36a6fd7fde5ac4dee98f',
+      sv_SE: '883f417a069dce0068b7c733f0bfd7b3e34d405e4c6440dcc9d6a6f324f194e6',
+      vi_VN: 'a6292828742e853efcb1fd7c2ac17f558991316ac90916ebfd162ed11db4fcce',
+      da_DK: '9e0db1b8079913f713ba0322593e405b33d002d8044e292ca423f0eea0da7ffa',
     } as const satisfies Partial<Record<SupportedLanguage, string>>;
 
     for (const [lang, digest] of Object.entries(expected) as Array<
@@ -257,7 +290,11 @@ describe('i18n whole-catalog completeness', () => {
       const markerRows = Object.entries(flatten(TABLES[lang])).filter(([key]) =>
         key.startsWith('hud.core.mapMarker'),
       );
-      // 98 at the shared base + this branch's marker key + the release's two.
+      // 100 at this merge's shared base (which already carries the release's two)
+      // plus this branch's own mapMarkerLabels.farmPatch row. The release side
+      // added no marker key at v0.42.0, only VALUES for two it already had, so
+      // the count did not move; re-measured at 101 for all twenty locales over
+      // the merged tree on 2026-08-31.
       expect(markerRows).toHaveLength(101);
       expect(createHash('sha256').update(JSON.stringify(markerRows)).digest('hex'), lang).toBe(
         digest,
@@ -428,6 +465,7 @@ describe('i18n CLDR pluralization', () => {
 
   it('declares the expected plural bases with all four CLDR categories in en', () => {
     expect(bases.sort()).toEqual([
+      'buffsHidden',
       'characterCount',
       // The commission board's crafter's-record counts (Masterwrought phase
       // 14, the quality signal).

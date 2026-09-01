@@ -6,9 +6,12 @@
 // bind-on-trade windfall is not resellable or mail-launderable). trade.ts
 // keeps its own per-copy lock, isTradeLocked (boundTo only), so an armed
 // copy may still trade in person, where the stamp lands on the recipient.
-// trade.ts also carries a def-level exclusion of its own (RIFT_GEAR_ITEMS);
-// the pipes cover that family through each pipe's def-level rules instead
-// (every rift gear def carries noMarketList).
+// trade.ts also carries a def-level exclusion of its own (RIFT_GEAR_ITEMS,
+// the three riftbound_band_of_* personal rings); the pipes cover that same
+// family through each pipe's def-level rules instead (every RIFT_GEAR_ITEM_IDS
+// def carries noMarketList). Rift forge currency (rift_essence, rift_gem_*)
+// is a SEPARATE family: not in RIFT_GEAR_ITEM_IDS and not noMarketList, so it
+// stays tradeable through every pipe (see content/rift/items.ts).
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no rng, no clock
 // (enforced by tests/architecture.test.ts). Pure bookkeeping, zero draws.

@@ -357,6 +357,8 @@ export const vi_VN: Record<string, string> = {
   'usage.metric.walletChallengeRateLimited': 'Yêu cầu thử thách ví bị giới hạn',
   'usage.metric.walletLinkRequest': 'Yêu cầu liên kết ví',
   'usage.metric.walletLinkFailure': 'Lần liên kết ví thất bại',
+  'usage.metric.walletUnlinkFailure': 'Lần gỡ liên kết ví bị từ chối',
+  'usage.metric.walletUnlinkSuccess': 'Lần gỡ liên kết ví hoàn tất',
   'usage.metric.walletLinkRateLimited': 'Yêu cầu liên kết ví bị giới hạn',
   'usage.metric.cardPublishRequest': 'Yêu cầu đăng thẻ người chơi',
   'usage.metric.cardPublishRejected': 'Lần đăng thẻ người chơi bị từ chối',
@@ -1173,4 +1175,7 @@ export const vi_VN: Record<string, string> = {
   'wealth.purse': 'Về nhân vật:',
   'wealth.total': 'Tổng cộng:',
   'wealth.updatedAt': 'đã cập nhật {when}',
+  'usage.metric.walletHandoffAuthorizationEvicted':
+    'Lần bàn giao ví từ ứng dụng máy tính bị loại bỏ',
+  'usage.metric.walletHandoffCreateRejected': 'Lần bàn giao ví từ ứng dụng máy tính bị từ chối',
 };

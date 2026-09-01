@@ -107,6 +107,32 @@ describe('loot_roll: rollLoot producer (drop-rate determinism)', () => {
     expect(rate).toBeLessThan(0.08);
   });
 
+  it('awards Emberward only when Varkhul belongs to a heroic instance', () => {
+    const rollVarkhul = (heroic: boolean): string[] => {
+      const sim = makeSim(123);
+      const pid = sim.addPlayer('warrior', 'Looter');
+      const meta = playerMeta(sim, pid);
+      const template = MOBS.varkhul_forgefather_of_the_last_flame;
+      const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+      if (heroic) {
+        sim.ctx.instances.push({
+          id: -1,
+          dungeonId: 'ignivar_inner_crucible',
+          difficulty: 'heroic',
+          partyKey: 'test-party',
+          mobIds: [mob.id],
+        } as unknown as (typeof sim.ctx.instances)[number]);
+      }
+      const nextSpy = vi.spyOn(sim.ctx.rng, 'next').mockReturnValue(0.99);
+      rollLoot(sim.ctx, mob, meta);
+      nextSpy.mockRestore();
+      return (mob.loot?.items ?? []).map((slot) => slot.itemId);
+    };
+
+    expect(rollVarkhul(false)).not.toContain('varkhul_emberward');
+    expect(rollVarkhul(true)).toContain('varkhul_emberward');
+  });
+
   // Reproduces the raid-loot duplicate bug: Nythraxis has 4 independent rollGroups
   // (2 helm slots, 2 shoulder slots) and several items (e.g. soulflame_mantle,
   // crownforged_dreadhelm, nighttalon_crown/shoulderguards) appear in every one of

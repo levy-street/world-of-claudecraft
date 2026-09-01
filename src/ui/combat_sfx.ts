@@ -548,6 +548,45 @@ export function mobVoiceCue(
   return hasCue(specific) ? specific : MOB_VOICE_CUES[family][action];
 }
 
+export type PlayerVoiceAction = 'hurt' | 'death';
+
+/** Resolves a player's pain/death vocalization against their authored gender.
+ *
+ *  Same shape as mobVoiceCue above, and for the same reason: the female takes
+ *  are a SUPERSET layered over the shipped male ones, so the specific key is
+ *  tried first and the base key is the fallback. `hasCue` is injected rather
+ *  than read from the manifest here so this stays host-agnostic and directly
+ *  testable, exactly as the mob resolver does.
+ *
+ *  Only an explicit `gender: 'female'` diverts. A male look, an absent look
+ *  (every character authored before the modular creator shipped in v0.35.0),
+ *  and an unreadable one all keep the base cue, so no existing character's
+ *  voice changes unless its owner deliberately made a female character.
+ *
+ *  Gender is read off the entity's `modularAppearance` (the `app` identity
+ *  wire field), which is deliberately opaque `Record<string, unknown>` in the
+ *  sim, hence the narrow here rather than a typed field access. */
+export function playerVoiceCue(
+  appearance: Record<string, unknown> | null | undefined,
+  action: 'hurt',
+  hasCue?: (key: string) => boolean,
+): 'player_hurt' | 'player_hurt_female';
+export function playerVoiceCue(
+  appearance: Record<string, unknown> | null | undefined,
+  action: 'death',
+  hasCue?: (key: string) => boolean,
+): 'player_death' | 'player_death_female';
+export function playerVoiceCue(
+  appearance: Record<string, unknown> | null | undefined,
+  action: PlayerVoiceAction,
+  hasCue: (key: string) => boolean = NO_CUE,
+): 'player_hurt' | 'player_hurt_female' | 'player_death' | 'player_death_female' {
+  const base = action === 'hurt' ? 'player_hurt' : 'player_death';
+  if (appearance?.gender !== 'female') return base;
+  const female = `${base}_female` as 'player_hurt_female' | 'player_death_female';
+  return hasCue(female) ? female : base;
+}
+
 /** Resolves the cue for `action`, but falls back to the `attack` cue when the
  *  resolved cue is not yet buffered. `attack` plays on every ordinary hit, so
  *  it is always warm; a rare action (e.g. `hurt`, triggered only on a crit)

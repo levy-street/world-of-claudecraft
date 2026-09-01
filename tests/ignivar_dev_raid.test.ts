@@ -11,7 +11,12 @@ import {
   IGNIVAR_FORGE_CHAINS_BREAK_DISTANCE,
   IGNIVAR_FORGE_CHAINS_STRAIN_SECONDS,
 } from '../src/sim/ignivar_forge_chains';
-import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from '../src/sim/ignivar_raid_ids';
+import {
+  IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_LIFT_ROOM_ID,
+  IGNIVAR_RAID_ARENA_ID,
+} from '../src/sim/ignivar_raid_ids';
+import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { MAX_AGGRO_RADIUS } from '../src/sim/mob/aggro_ranges';
 import { Sim } from '../src/sim/sim';
 import { DT, dist2d, IGNIVAR_BOSS_ID } from '../src/sim/types';
@@ -29,6 +34,27 @@ function ignivarBots(sim: Sim) {
 }
 
 describe('/dev ignivarraid', () => {
+  it('keeps the earlier floor claims attached when the practice raid forms in the arena', () => {
+    const sim = devSim();
+    for (const roomId of [IGNIVAR_LIFT_ROOM_ID, IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID]) {
+      expect(enterDungeon(sim.ctx, roomId, sim.player.id, true), roomId).toBe(true);
+    }
+
+    sim.chat('/dev ignivarraid');
+
+    const partyKey = sim.ctx.instanceKeyFor(sim.player.id);
+    for (const roomId of [IGNIVAR_LIFT_ROOM_ID, IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID]) {
+      expect(
+        sim.instances.find((claim) => claim.dungeonId === roomId && claim.partyKey === partyKey),
+        `${roomId} stays in the practice raid family`,
+      ).toBeDefined();
+    }
+    expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+    expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)).toBeNull();
+  });
+
   it('replaces a live Normal dev claim when entering the same arena on Heroic', () => {
     const sim = devSim();
     sim.chat('/dev dungeon ignivar_raid_arena normal');

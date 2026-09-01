@@ -132,19 +132,36 @@ describe('classifyDiff', () => {
     expect(plan.generic).toHaveLength(0);
   });
 
-  it('maps an options_view change to the unlock, graphics dial AND interface tab targets, in order', () => {
-    // All three targets key on 'ui/options_view'; the interface-unlock entry
-    // precedes the graphics-options one in the registry, so the unlock row is
-    // the lead capture. An ordering or selector regression here silently
-    // drops or duplicates the options-panel evidence.
+  it('maps an options_view change to the unlock, graphics dial, interface tab, and confirm-vendor-sell targets, in order', () => {
+    // All four targets key on 'ui/options_view'; registry order is the
+    // capture order: interface-unlock leads, then the graphics dial, then
+    // interface tabs, then the confirm-vendor-sell toggle row (the last one
+    // added). An ordering or selector regression here silently drops or
+    // duplicates the options-panel evidence.
     const plan = classifyDiff(['src/ui/options_view.ts']);
     expect(plan.isVisual).toBe(true);
     expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
       'interface-unlock-option',
       'graphics-options-shadow-dial',
       'interface-options-tabs',
+      'interface-options-confirm-vendor-sell',
     ]);
     expect(plan.generic).toHaveLength(0);
+  });
+
+  it('maps controller option changes to remapped desktop and mobile evidence', () => {
+    const plan = classifyDiff(['src/game/gamepad_bindings.ts']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toEqual([
+      'controller-options-button-layout',
+    ]);
+    expect(plan.specific[0].variants.map((v: { key: string }) => v.key)).toEqual([
+      'desktop',
+      'mobile',
+    ]);
+    const captureSource = plan.specific[0].capture.toString();
+    expect(captureSource).toContain('[aria-label="Cross"]');
+    expect(captureSource).toContain('buttons[1]?.click()');
+    expect(captureSource).toContain('#tutorial-greeting');
   });
 
   it('maps the player tooltip view to its focused hover target', () => {
@@ -356,9 +373,10 @@ describe('classifyDiff', () => {
     expect(plan.generic).toEqual(['hud-desktop']);
   });
 
-  it('adds the mobile HUD when the visual change touches the mobile surface', () => {
+  it('maps the mobile HUD stylesheet to the cross-hotbar target it can visually change', () => {
     const plan = classifyDiff(['src/styles/hud.mobile.css']);
-    expect(plan.generic).toEqual(['hud-desktop', 'hud-mobile']);
+    expect(plan.specific.map((t: { key: string }) => t.key)).toContain('cross-hotbar');
+    expect(plan.generic).toHaveLength(0);
   });
 
   it('keeps the desktop HUD fallback for the shared component stylesheet', () => {

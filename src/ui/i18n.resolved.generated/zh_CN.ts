@@ -804,7 +804,7 @@ export const zh_CN: EnTranslations = {
         "buyAria": "购买{item}",
         "confirmTitle": "确认购买特许状",
         "confirmBody": "花费 {cost} Claudium 购买{item}？",
-        "resultContext": "{item} ({sku}): {message}",
+        "resultContext": "{item}（{sku}）：{message}",
         "granted": "特许状已生效。当前角色的银行已经变大。",
         "alreadyGranted": "当前角色已拥有该特许状，不会重复扣费。",
         "applyDeferred": "付款完成。该角色下次登录时会自动获得这些格子。",
@@ -961,7 +961,8 @@ export const zh_CN: EnTranslations = {
       "durationUnitSeconds": "秒",
       "durationUnitMinutes": "分",
       "durationUnitHours": "时",
-      "durationUnitDays": "天"
+      "durationUnitDays": "天",
+      "buffOverflowLabel": "+{n}"
     },
     "character": {
       "modelPreview": "角色模型预览"
@@ -1391,6 +1392,7 @@ export const zh_CN: EnTranslations = {
       "name_thunderstrut_gobbler": "雷霆阔步大火鸡",
       "name_terrorspark_groundshaker": "骇雷撼地者",
       "name_drakemaw_raptor": "龙喉迅猛龙",
+      "name_rickshaw_mount": "白骨人力车",
       "desc_valorsteed": "一匹坚韧稳健的骏马，可提升旅行速度。",
       "desc_grag_bear": "一头坚韧稳健的巨熊，可提升旅行速度。",
       "desc_stalkglider_snail": "一只坚毅耐久的蜗牛，可提升旅行速度。",
@@ -1399,7 +1401,8 @@ export const zh_CN: EnTranslations = {
       "desc_stormfeather_griffin": "一头威严的风暴狮鹫，收拢双翼，以符文利爪行走于大地。",
       "desc_thunderstrut_gobbler": "一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。",
       "desc_terrorspark_groundshaker": "一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。",
-      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。"
+      "desc_drakemaw_raptor": "来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。",
+      "desc_rickshaw_mount": "一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。"
     },
     "mountTraining": {
       "mountPrompt": "按 {key} 键骑上训练用英勇战马。",
@@ -1569,6 +1572,7 @@ export const zh_CN: EnTranslations = {
       "playerFrameScale": "玩家框缩放",
       "targetFrameScale": "目标框缩放",
       "aurasOnPlayerFrame": "增益显示在玩家框",
+      "alwaysShowAllBuffs": "始终显示所有增益",
       "highContrastBackground": "高对比度背景",
       "startAttackOnAbility": "使用技能时自动攻击",
       "stopAutoAttackOnTargetSwitch": "切换目标时停止自动攻击",
@@ -1578,6 +1582,8 @@ export const zh_CN: EnTranslations = {
       "stickyTarget": "点击地面时保留目标",
       "showItemLevel": "显示物品等级",
       "showReliquaryTracker": "显示圣物库追踪器",
+      "confirmVendorSell": "出售前确认",
+      "confirmVendorSellNote": "关闭后，出售物品只需单击即可完成，不再确认；如果背包格位发生变化，可能会卖错物品。",
       "itemLevelLine": "物品等级 {level}",
       "itemScoreLine": "评分 {score}",
       "showSecondaryActionBar": "显示副动作条",
@@ -1586,6 +1592,7 @@ export const zh_CN: EnTranslations = {
       "hideUnusedActionSlots": "隐藏未使用的动作栏位",
       "lockActionBars": "锁定动作条",
       "showTargetOfTarget": "显示目标的目标",
+      "showTargetSwingTimer": "显示目标的挥击计时器",
       "showPetFrame": "显示你的宠物",
       "waterRipples": "水面涟漪（尾波）",
       "showAttackButton": "显示攻击按钮",
@@ -2166,6 +2173,12 @@ export const zh_CN: EnTranslations = {
         "few": "剩余 {count} 秒",
         "many": "剩余 {count} 秒",
         "other": "剩余 {count} 秒"
+      },
+      "buffsHidden": {
+        "one": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "few": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "many": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标",
+        "other": "还有 {count} 个增益效果仍然生效，只是因画质设置未显示图标"
       },
       "playtimeDays": {
         "one": "{count} 天",
@@ -2980,11 +2993,11 @@ export const zh_CN: EnTranslations = {
         "actionBar2": "动作条 2",
         "actionBar3": "动作条 3",
         "steamWishlist": "愿望单提醒",
-        "menu": "Menu",
+        "menu": "菜单",
         "minimap": "小地图",
         "stanceBar": "姿态栏",
-        "xpBar": "XP Bar",
-        "chat": "Chat",
+        "xpBar": "经验条",
+        "chat": "聊天",
         "actionBarGroup": "动作条组",
         "playerFrame": "玩家",
         "targetFrame": "目标",
@@ -3002,7 +3015,7 @@ export const zh_CN: EnTranslations = {
       "actionBar2Vertical": "动作条 2 纵向",
       "actionBar3Vertical": "动作条 3 纵向",
       "menuRailHorizontal": "菜单横向排列",
-      "snapToGrid": "Snap to Grid",
+      "snapToGrid": "对齐网格",
       "previewMemberName": "{className} {number}",
       "resetFrameSize": "重置尺寸",
       "resetFrameSizeFor": "重置{name}的尺寸",
@@ -4038,7 +4051,9 @@ export const zh_CN: EnTranslations = {
       "disenchant": "分解",
       "salvage": "拆解",
       "applyEnchant": "施加附魔",
-      "sunder": "裂断"
+      "sunder": "裂断",
+      "sell": "出售",
+      "sellAll": "全部出售（{count}）"
     },
     "enchanting": {
       "disenchantedLine": "你分解了{item}。",
@@ -4596,6 +4611,10 @@ export const zh_CN: EnTranslations = {
       "loading": "正在加载交易所...",
       "loadFailed": "无法连接交易所，请稍后再试。",
       "disabledRealm": "本服务器未开放 $WOC 交易所。",
+      "browserOnlyConfirmTitle": "在浏览器中打开 $WOC 交易所？",
+      "browserOnlyConfirmBody": "$WOC 交易所仅在 World of ClaudeCraft 的浏览器版本中提供。即将在浏览器中打开 World of ClaudeCraft，你可以在那里登录并打开交易所，游戏会继续在这里运行。",
+      "browserOnlyConfirmOpen": "在浏览器中打开",
+      "browserOnlyConfirmCancel": "取消",
       "pausedBanner": "交易已暂停。拍卖倒计时照常进行；新的挂单、出价、报价和付款需等交易恢复后再进行，已发出的付款仍会照常结算。",
       "walletLinkedDisconnected": "您的公开地址已关联。需要使用 $WOC 付款时，请重新连接该钱包应用。",
       "walletLinkedConnected": "已关联的钱包应用已连接，可用于 $WOC 付款。",
@@ -4917,7 +4936,13 @@ export const zh_CN: EnTranslations = {
       "upstream": "Epic 未响应。请稍后重试。"
     },
     "wallet": {
-      "handoff_invalid": "钱包授权已过期或无法验证。请重试。"
+      "handoff_invalid": "钱包授权已过期或无法验证。请重试。",
+      "reauth_required": "请输入账号密码以确认此钱包变更。",
+      "reauth_two_factor": "你的账号已启用两步验证。请输入验证码以确认。",
+      "reauth_no_password": "请先在账号设置中设置密码，然后重试。",
+      "reauth_bad_signature": "钱包签名验证失败。请重试。",
+      "reauth_bad_password": "密码不正确。",
+      "reauth_bad_two_factor": "验证码无效，请重试。"
     },
     "ota_updates": {
       "invalid_input": "输入无效。"
@@ -5376,6 +5401,7 @@ export const zh_CN: EnTranslations = {
       "ifPartySort": "队伍成员的排列顺序：入队顺序、职责或名字。",
       "ifPartyShowAuras": "队伍框体上是否显示增益和减益。相应的开关还涵盖资源条、吸收盾、宠物，以及你自己是否出现在队伍列表里。",
       "ifAurasOnPlayerFrame": "除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。",
+      "ifAlwaysShowAllBuffs": "即使在低画质预设下也显示所有生效中的增益，绕过该档位平时的增益图标上限。",
       "ifTargetOfTarget": "显示你的目标正在攻击谁，这是判断坦克有没有拉住的经典办法。",
       "ifPetFrame": "为你的宠物显示一个框体。",
       "ifChatFontScale": "聊天文字的大小。",
@@ -6583,6 +6609,9 @@ export const zh_CN: EnTranslations = {
       "effectFood": "食用后在{seconds}秒内恢复{amount}点生命值。",
       "effectWellFed": "吃完后进入精神饱满状态：{stat}+{value}，持续{minutes}分钟。",
       "effectWellFedAura": "吃完后获得{aura}，持续{minutes}分钟。",
+      "effectFeast": "摆出宴席供他人取用，每人一份：共{servings}份，持续{minutes}分钟。",
+      "effectFeastServing": "每一份在{seconds}秒内恢复{amount}点生命值。",
+      "effectFeastWellFed": "吃完一份后进入精神饱满状态：{stat}+{value}，持续{minutes}分钟。",
       "sourceTrainerFee": "训练师，{fee}",
       "sourceTrainerFree": "训练师，免费",
       "sourceKnown": "初始即会",
@@ -6590,6 +6619,7 @@ export const zh_CN: EnTranslations = {
       "sourceVendor": "由英雄军需官出售",
       "sourceDropAndVendor": "习自寻获的图样，或由英雄军需官出售",
       "gainFmt": "{reduced} / {minimal} / {zero}",
+      "gainNever": "无",
       "colRecipe": "配方",
       "colSkill": "技能",
       "colSource": "来源",
@@ -7917,6 +7947,13 @@ export const zh_CN: EnTranslations = {
     "unlink": "解除绑定",
     "unlinkTitle": "从此账号移除钱包验证",
     "unlinkAria": "从此账号移除钱包验证",
+    "reauthTitle": "确认钱包变更",
+    "reauthUnlinkTitle": "确认移除钱包",
+    "reauthHelp": "为了你的账号安全，请输入账号密码以授权此变更。",
+    "reauthNoPassword": "此账号未设置密码登录。请先在账号设置中设置密码，然后重试。",
+    "reauthConfirm": "确认",
+    "reauthCancel": "取消",
+    "reauthClose": "关闭",
     "signOut": "断开连接",
     "signOutTitle": "在此浏览器中断开钱包应用",
     "signOutAria": "在此浏览器中断开钱包应用",
@@ -9621,6 +9658,8 @@ export const zh_CN: EnTranslations = {
       "soldJunkMany": "你以 {money} 卖出 {count} 件杂物。",
       "keptBoundOne": "已保留 {count} 件绑定物品。",
       "keptBoundMany": "已保留 {count} 件绑定物品。",
+      "keptLockedOne": "已保留 {count} 件锁定物品。",
+      "keptLockedMany": "已保留 {count} 件锁定物品。",
       "friendOnline": "{name} 上线了。",
       "friendOffline": "{name} 下线了。"
     },
@@ -13479,6 +13518,9 @@ export const zh_CN: EnTranslations = {
       },
       "reins_terrorspark_groundshaker": {
         "name": "骇雷撼地者点火钥匙"
+      },
+      "reins_rickshaw_mount": {
+        "name": "白骨人力车缚绳"
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"

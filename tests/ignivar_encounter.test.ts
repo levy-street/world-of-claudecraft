@@ -97,7 +97,7 @@ import {
   IGNIVAR_METEOR_REVEAL_DELAY_SECONDS,
   IGNIVAR_METEOR_TELEGRAPH_SECONDS,
 } from '../src/sim/ignivar_meteors';
-import { enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
+import { detachFromDungeon, enterDungeon, leaveDungeon } from '../src/sim/instances/dungeons';
 import { Rng } from '../src/sim/rng';
 import { type ResolvedAbility, Sim } from '../src/sim/sim';
 import { revivePlayerAt } from '../src/sim/spirit';
@@ -187,6 +187,18 @@ function applyIgnivarBrand(player: Entity, boss: Entity): void {
     school: 'fire',
     encounterOwned: true,
   });
+}
+
+// A mid-fight departure from the arena: the exit portal is sealed while
+// Ignivar is engaged (the raid boss-fight seal, tests/ignivar_exit_routing),
+// so a partner leaves through the displacement path (the battleground
+// queue-pop shape): detach from the claim, then set them down at the
+// reported outside door.
+function displaceOutOfArena(sim: Sim, partner: Entity): void {
+  const door = detachFromDungeon(sim.ctx, partner);
+  if (!door) throw new Error('partner was not inside the arena');
+  partner.pos = { x: door.x, y: partner.pos.y, z: door.z };
+  partner.prevPos = { ...partner.pos };
 }
 
 function prepareConduitCleanse(sim: Sim, boss: Entity, conduit: Entity): void {
@@ -668,7 +680,7 @@ describe('Ignivar encounter', () => {
     const firstHp = first.hp;
     const secondHp = second.hp;
 
-    leaveDungeon(sim.ctx, first.id);
+    displaceOutOfArena(sim, first);
     updateIgnivarEncounter(sim.ctx, boss);
 
     expect(boss.ignivar.forgeChainsPlayerIds).toBeNull();
@@ -688,7 +700,7 @@ describe('Ignivar encounter', () => {
     const firstHp = first.hp;
     const secondHp = second.hp;
 
-    leaveDungeon(sim.ctx, second.id);
+    displaceOutOfArena(sim, second);
     updateIgnivarEncounter(sim.ctx, boss);
 
     expect(boss.ignivar.forgeChainsPlayerIds).toBeNull();
@@ -2935,6 +2947,12 @@ describe('Ignivar encounter', () => {
       encounterOwned: true,
     });
 
+    // The exit portal is sealed while Ignivar is engaged, so the fight lulls
+    // first; the Halls claim gives the arena's floor-chain exit a live room to
+    // route to, and stepping back into the arena takes its real portal out.
+    boss.inCombat = false;
+    expect(enterDungeon(sim.ctx, 'ignivar_forge_approach', sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, 'ignivar_raid_arena', sim.player.id, true)).toBe(true);
     expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
 
     expect(sim.player.auras.some((aura) => aura.id === IGNIVAR_BRAND_AURA_ID)).toBe(false);

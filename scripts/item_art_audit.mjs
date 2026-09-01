@@ -117,7 +117,13 @@ const build = await buildItemArtAudit({
     // Crucible pieces, and the Core of the Last Flame reagent), so its 204
     // post-base ids join the 920 (836 shared base plus this branch's 84 plus
     // the release's 204), again measured as the committed .webp count.
-    catalogCount: 1124,
+    // 1125 at the v0.42.0 sync: the release's own arm went 1040 to 1041 with
+    // one more painted piece, the Bonebound Rickshaw reins
+    // (reins_rickshaw_mount, the OSSBrain v0.41 batch's own icon carried
+    // through the release's base merge alongside the Crucible waves), so that
+    // one id joins the 1124; re-counted on the merged tree as 1125 committed
+    // .webp files under public/ui/items.
+    catalogCount: 1125,
     // The ART-SUBJECT count: live defs minus the declared procedural-art
     // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
     // 922 was the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
@@ -134,7 +140,11 @@ const build = await buildItemArtAudit({
     // so its 204 post-base art-shipping defs join the 935; the release's
     // content-side ledger (IGNIVAR_ART_PENDING_ITEM_IDS) is empty, so the
     // debt term below is this branch's 81 alone.
-    liveItemCount: 1139,
+    // 1140 at the v0.42.0 sync: the release's arm went 1055 to 1056, the one
+    // Bonebound Rickshaw reins definition, which ships its own art, so it
+    // joins this term too; the debt term below is still this branch's 81
+    // (IGNIVAR_ART_PENDING_ITEM_IDS is still empty on the release arm).
+    liveItemCount: 1140,
     // The other half of the art-subject split: the declared procedural-art
     // debt, pinned as its own literal so the audit reds on new debt even
     // when it runs standalone (the vitest exact-set pin in
@@ -178,6 +188,9 @@ const build = await buildItemArtAudit({
     // at the v0.41.0 Crucible sync the merged census keeps the 25 groups and
     // the release's 204 ids split one more page, 30, measured by the merged
     // build.
+    // Both hold at the v0.42.0 sync: the release's one id lands in the
+    // existing 'mount' group (9 to 10), far inside that group's single 80-id
+    // page, so neither the page count nor the group count moves.
     sheetPageCount: 30,
     groupCount: 25,
   },

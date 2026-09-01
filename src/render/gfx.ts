@@ -9,6 +9,12 @@ import { safeStartupGraphicsPreset } from '../game/startup_graphics_safety';
 import { EFFECTS_QUALITY_LOW_CUTOFF } from '../game/ui_effects_profile';
 import { attachBiomeHaze } from './biome_haze_field';
 import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
+// Side-effect import only: installs the final-color NaN guard (see the
+// point-light pruning comment in initGfxTier below for why this is a bare
+// import here, not a direct invocation). This import is also what
+// gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
+// the guard, transitively: they reach it via gfx.ts, never call it directly.
+import './final_color_nan_guard';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import {
@@ -1894,11 +1900,21 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
   // Install before any scene material compiles. The fixed point-light budget
   // keeps program counts stable with zero-intensity slots; the shader guard
   // makes those stable slots cheap without changing their permutation.
+  //
+  // The final-color NaN guard (final_color_nan_guard.ts) is NOT installed
+  // here: unlike this pruning, it needs to run before renderers this repo
+  // builds outside initGfxTier too (characters/preview.ts,
+  // characters/portrait.ts, armory_preview.ts), so it installs itself at
+  // module scope instead, as an import side effect. It is not moved here
+  // because a per-site call was tried first and provably missed two of
+  // those three; see final_color_nan_guard.ts for the reasoning. The two
+  // guards use different seams on purpose, not by oversight.
   installPbrPointLightShaderPruning();
   const gpuRenderer = rendererName(webgl);
   const softwareRendering = isSoftwareRendererName(gpuRenderer);
   const hints = { ...runtimeHints(), gpuRenderer };
-  return activateGfxProfile(profileFromHints(hints, softwareRendering, 0)).settings.tier;
+  const activated = activateGfxProfile(profileFromHints(hints, softwareRendering, 0));
+  return activated.settings.tier;
 }
 
 export const gfxInternalsForTest = {

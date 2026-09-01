@@ -234,9 +234,9 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
     // with their fixed class wand; the shot then fires at that resolved profile.
     const shot = rangedShotProfile(ranged, p.weapon);
     rangedSwing(ctx, p, t, { ...ranged, min: shot.min, max: shot.max, speed: shot.speed });
-    // The weapon's speed sets the cadence; ranged haste (item-set bonus) then
-    // shortens the auto-shot interval.
-    p.swingTimer = (shot.speed * ctx.swingIntervalMult(p)) / (1 + p.rangedHaste);
+    // The weapon's speed sets the cadence; the ranged channel of the one
+    // additive haste bucket then shortens the auto-shot interval.
+    p.swingTimer = shot.speed * ctx.swingIntervalMult(p, 'ranged');
     return;
   }
   if (d > effectivePlayerAttackRange(t, MELEE_RANGE)) return;

@@ -95,14 +95,16 @@ describe('NPC voice line coverage', () => {
 
 describe('yell clip keys', () => {
   // Escort barks and encounter yells are looked up at runtime from the LIVE chat text
-  // by yellVoiceKey in src/ui/hud.ts. If that derivation and the generator's yellKey
-  // ever drift, every yell goes silent with no other symptom, so pin them together.
-  const hudSrc = readFileSync(join(repoRoot, 'src/ui/hud.ts'), 'utf8');
+  // by yellVoiceKey in src/ui/hud_voice_cues.ts (extracted out of src/ui/hud.ts with
+  // the HUD's other voice-clip key resolvers). If that derivation and the generator's
+  // yellKey ever drift, every yell goes silent with no other symptom, so pin them
+  // together.
+  const voiceCuesSrc = readFileSync(join(repoRoot, 'src/ui/hud_voice_cues.ts'), 'utf8');
 
-  it('keeps src/ui/hud.ts yellVoiceKey byte-identical in shape to the generator', () => {
-    const body = hudSrc.slice(
-      hudSrc.indexOf('function yellVoiceKey'),
-      hudSrc.indexOf('}', hudSrc.indexOf('function yellVoiceKey')),
+  it('keeps yellVoiceKey byte-identical in shape to the generator', () => {
+    const body = voiceCuesSrc.slice(
+      voiceCuesSrc.indexOf('function yellVoiceKey'),
+      voiceCuesSrc.indexOf('}', voiceCuesSrc.indexOf('function yellVoiceKey')),
     );
     expect(body).toContain('.toLowerCase()');
     expect(body).toContain("replace(/[^a-z0-9]+/g, '_')");
@@ -112,8 +114,8 @@ describe('yell clip keys', () => {
   });
 
   it('slugs real content barks the way the runtime will', () => {
-    // Reference implementation copied from hud.ts yellVoiceKey; if this ever needs a
-    // change, the generator and hud must change with it.
+    // Reference implementation copied from hud_voice_cues.ts yellVoiceKey; if this
+    // ever needs a change, the generator and the resolver must change with it.
     const reference = (text: string) =>
       `yell__${text
         .toLowerCase()

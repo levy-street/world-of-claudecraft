@@ -1,19 +1,22 @@
-// Ignivar raid entry rules (the Rift door rules applied to the four-room raid):
+// Ignivar raid entry rules (the Rift door rules applied to the five-room raid):
 // an entrant from OUTSIDE the raid is barred while any of the group's raid rooms
 // still has a living mob engaged (the anti-zerg combat lockout), and an allowed
-// outside entrant through the Eastbrook door lands in the deepest room the group
-// has already claimed (the checkpoint redirect), not back at the approach.
-// Members moving BETWEEN rooms inside the raid are exempt from both rules.
+// outside entrant through the keep door (the lift's walk-up) zones straight into
+// the deepest room the group claims once that checkpoint sits past the Halls;
+// a group no deeper than the Halls boards the lift again (the checkpoint
+// redirect). Members moving BETWEEN rooms inside the raid are exempt from both
+// rules.
 import { describe, expect, it } from 'vitest';
 import { DUNGEON_X_THRESHOLD, DUNGEONS } from '../src/sim/data';
 import {
   IGNIVAR_FORGE_APPROACH_ID,
+  IGNIVAR_LIFT_ROOM_ID,
   IGNIVAR_MOLTEN_ASSEMBLY_ID,
   IGNIVAR_RAID_ARENA_ID,
   IGNIVAR_SECOND_WING_ID,
   IGNIVAR_TRASH_AUTOMATON_IDS,
 } from '../src/sim/ignivar_raid_ids';
-import { enterDungeon, instanceOriginOf, leaveDungeon } from '../src/sim/instances/dungeons';
+import { enterDungeon, instanceOriginOf } from '../src/sim/instances/dungeons';
 import {
   furthestIgnivarRaidRoom,
   ignivarRaidInCombat,
@@ -26,7 +29,8 @@ import type { Entity } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { localizeSimText } from '../src/ui/sim_i18n';
 
-const DOOR_POS = { x: -24, z: -114 };
+// The keep tower door on Forgefather's Isle: the raid's one overworld entrance.
+const DOOR_POS = { x: 503.05, z: 2243.7 };
 const COMBAT_DENIAL = 'Your raid is still in combat. You may enter once the fighting stops.';
 
 function placeAt(sim: Sim, pid: number, x: number, z: number): void {
@@ -75,6 +79,16 @@ function entryPosOf(sim: Sim, dungeonId: string): { x: number; z: number } {
   return { x: origin.x + entry.x, z: origin.z + entry.z };
 }
 
+// Walk the chain to `deepestRoom` via the dev arm (each room mints its family
+// claim), then step back outside beside the keep so the next walk-in exercises
+// the real overworld door rules.
+function claimChainAndStepOutside(sim: Sim, pid: number, rooms: readonly string[]): void {
+  for (const roomId of rooms) {
+    if (!enterDungeon(sim.ctx, roomId, pid, true)) throw new Error(`${roomId} entry failed`);
+  }
+  placeAt(sim, pid, DOOR_POS.x, DOOR_POS.z - 6);
+}
+
 describe('ignivar raid entry: pure helpers', () => {
   const fakeClaim = (dungeonId: string): InstanceSlot => ({ dungeonId }) as InstanceSlot;
 
@@ -92,11 +106,23 @@ describe('ignivar raid entry: pure helpers', () => {
     ).toBe(IGNIVAR_MOLTEN_ASSEMBLY_ID);
   });
 
-  it('redirects only the overworld approach entry, never an interior gate', () => {
-    const claims = [fakeClaim(IGNIVAR_FORGE_APPROACH_ID), fakeClaim(IGNIVAR_RAID_ARENA_ID)];
-    expect(resolveIgnivarEntryRoom(IGNIVAR_FORGE_APPROACH_ID, claims)).toBe(IGNIVAR_RAID_ARENA_ID);
-    expect(resolveIgnivarEntryRoom(IGNIVAR_RAID_ARENA_ID, claims)).toBe(IGNIVAR_RAID_ARENA_ID);
+  it('redirects the two front-door requests past the Halls, never an interior gate', () => {
+    const deepClaims = [fakeClaim(IGNIVAR_FORGE_APPROACH_ID), fakeClaim(IGNIVAR_RAID_ARENA_ID)];
+    expect(resolveIgnivarEntryRoom(IGNIVAR_LIFT_ROOM_ID, deepClaims)).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(resolveIgnivarEntryRoom(IGNIVAR_FORGE_APPROACH_ID, deepClaims)).toBe(
+      IGNIVAR_RAID_ARENA_ID,
+    );
+    expect(resolveIgnivarEntryRoom(IGNIVAR_RAID_ARENA_ID, deepClaims)).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(resolveIgnivarEntryRoom(IGNIVAR_LIFT_ROOM_ID, [])).toBe(IGNIVAR_LIFT_ROOM_ID);
     expect(resolveIgnivarEntryRoom(IGNIVAR_FORGE_APPROACH_ID, [])).toBe(IGNIVAR_FORGE_APPROACH_ID);
+  });
+
+  it('a group no deeper than the Halls boards the lift again', () => {
+    const shallowClaims = [fakeClaim(IGNIVAR_LIFT_ROOM_ID), fakeClaim(IGNIVAR_FORGE_APPROACH_ID)];
+    expect(resolveIgnivarEntryRoom(IGNIVAR_LIFT_ROOM_ID, shallowClaims)).toBe(IGNIVAR_LIFT_ROOM_ID);
+    expect(resolveIgnivarEntryRoom(IGNIVAR_LIFT_ROOM_ID, [fakeClaim(IGNIVAR_LIFT_ROOM_ID)])).toBe(
+      IGNIVAR_LIFT_ROOM_ID,
+    );
   });
 
   it('counts only living engaged mobs toward the lockout', () => {
@@ -116,18 +142,20 @@ describe('ignivar raid entry: pure helpers', () => {
 });
 
 describe('ignivar raid entry: checkpoint redirect', () => {
-  it('walks a returning member through the Eastbrook door into the deepest claimed room', () => {
+  it('walks a returning member through the keep door into the deepest claimed room', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Checkpoint Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
-    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id, true)).toBe(true);
-    expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
+    claimChainAndStepOutside(sim, sim.player.id, [
+      IGNIVAR_LIFT_ROOM_ID,
+      IGNIVAR_FORGE_APPROACH_ID,
+      IGNIVAR_RAID_ARENA_ID,
+    ]);
     const claimsBefore = sim.instances.filter((inst) => inst.partyKey !== null).length;
     placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
     sim.tick();
     const arenaEntry = entryPosOf(sim, IGNIVAR_RAID_ARENA_ID);
-    expect(sim.player.pos.x, 'landed at the arena entry, not the approach').toBeCloseTo(
+    expect(sim.player.pos.x, 'landed at the arena entry, not the lift').toBeCloseTo(
       arenaEntry.x,
       0,
     );
@@ -142,15 +170,13 @@ describe('ignivar raid entry: checkpoint redirect', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Crucible Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
-    for (const roomId of [
+    claimChainAndStepOutside(sim, sim.player.id, [
+      IGNIVAR_LIFT_ROOM_ID,
+      IGNIVAR_FORGE_APPROACH_ID,
       IGNIVAR_RAID_ARENA_ID,
       IGNIVAR_MOLTEN_ASSEMBLY_ID,
       IGNIVAR_SECOND_WING_ID,
-    ]) {
-      expect(enterDungeon(sim.ctx, roomId, sim.player.id, true), roomId).toBe(true);
-    }
-    expect(leaveDungeon(sim.ctx, sim.player.id)).toBe(true);
+    ]);
     placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
     sim.tick();
     const crucibleEntry = entryPosOf(sim, IGNIVAR_SECOND_WING_ID);
@@ -158,11 +184,80 @@ describe('ignivar raid entry: checkpoint redirect', () => {
     expect(sim.player.pos.z).toBeCloseTo(crucibleEntry.z, 0);
   });
 
+  it('an explicit backward portal never applies the outside checkpoint redirect', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    claimChainAndStepOutside(sim, sim.player.id, [
+      IGNIVAR_LIFT_ROOM_ID,
+      IGNIVAR_FORGE_APPROACH_ID,
+      IGNIVAR_RAID_ARENA_ID,
+    ]);
+
+    expect(
+      enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, false, {
+        ignivarBacktrack: true,
+      }),
+    ).toBe(true);
+    expect(sim.instanceInfoAt(sim.player.pos)?.dungeonId).toBe(IGNIVAR_FORGE_APPROACH_ID);
+  });
+
+  it('redirects the keep door to a claimed floor 3 checkpoint', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    const ally = sim.addPlayer('paladin', 'Assembly Ally');
+    formTestRaid(sim, [sim.player.id, ally]);
+    claimChainAndStepOutside(sim, sim.player.id, [
+      IGNIVAR_LIFT_ROOM_ID,
+      IGNIVAR_FORGE_APPROACH_ID,
+      IGNIVAR_RAID_ARENA_ID,
+      IGNIVAR_MOLTEN_ASSEMBLY_ID,
+    ]);
+    placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
+    sim.tick();
+    const assemblyEntry = entryPosOf(sim, IGNIVAR_MOLTEN_ASSEMBLY_ID);
+    expect(sim.player.pos.x).toBeCloseTo(assemblyEntry.x, 0);
+    expect(sim.player.pos.z).toBeCloseTo(assemblyEntry.z, 0);
+  });
+
+  it('boards the lift again when the group is no deeper than the Halls', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    const ally = sim.addPlayer('paladin', 'Lift-again Ally');
+    formTestRaid(sim, [sim.player.id, ally]);
+    claimChainAndStepOutside(sim, sim.player.id, [IGNIVAR_LIFT_ROOM_ID, IGNIVAR_FORGE_APPROACH_ID]);
+    placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
+    sim.tick();
+    expect(
+      sim.instanceInfoAt(sim.player.pos)?.dungeonId,
+      'floor 1 progress means taking the elevator again',
+    ).toBe(IGNIVAR_LIFT_ROOM_ID);
+  });
+
+  it('redirects a returning ghost from the keep door to the claimed boss floor', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
+    const ally = sim.addPlayer('paladin', 'Boss-floor Ghost');
+    formTestRaid(sim, [sim.player.id, ally]);
+    claimChainAndStepOutside(sim, sim.player.id, [
+      IGNIVAR_LIFT_ROOM_ID,
+      IGNIVAR_FORGE_APPROACH_ID,
+      IGNIVAR_RAID_ARENA_ID,
+    ]);
+    expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, ally, true)).toBe(true);
+    const allyEntity = sim.entities.get(ally);
+    if (!allyEntity) throw new Error('missing ally');
+    makeGhost(allyEntity);
+    allyEntity.corpsePos = { ...allyEntity.pos };
+    allyEntity.corpseInstanceId = claimOf(sim, IGNIVAR_RAID_ARENA_ID).exitId;
+    placeAt(sim, ally, DOOR_POS.x, DOOR_POS.z - 1);
+
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally)).toBe(true);
+    expect(sim.instanceInfoAt(allyEntity.pos)?.dungeonId).toBe(IGNIVAR_RAID_ARENA_ID);
+    expect(allyEntity.dead, 'the checkpoint re-entry completes the corpse run').toBe(false);
+  });
+
   it('keeps unclaimed deeper rooms sealed: the own-claim exemption never invents entry', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Sealed Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     // A member inside the approach with the herald gate still closed: sealed.
     sim.drainEvents();
     expect(enterDungeon(sim.ctx, IGNIVAR_RAID_ARENA_ID, sim.player.id)).toBe(false);
@@ -177,14 +272,23 @@ describe('ignivar raid entry: checkpoint redirect', () => {
     ).toBeUndefined();
   });
 
-  it('a group with no deeper claim still enters at the approach', () => {
+  it('the interior-only Halls refuse a first entry from outside', () => {
+    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const ally = sim.addPlayer('paladin', 'Refused Ally');
+    formTestRaid(sim, [sim.player.id, ally]);
+    sim.drainEvents();
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(false);
+    expect(JSON.stringify(sim.drainEvents())).toContain('The forge gate is sealed to you.');
+  });
+
+  it('a group with no claim at all boards the lift at the keep door', () => {
     const sim = new Sim({ seed: 42, playerClass: 'warrior' });
     const ally = sim.addPlayer('paladin', 'Fresh Ally');
     formTestRaid(sim, [sim.player.id, ally]);
     placeAt(sim, sim.player.id, DOOR_POS.x, DOOR_POS.z - 1);
     sim.tick();
     expect(sim.player.pos.x).toBeGreaterThan(DUNGEON_X_THRESHOLD);
-    expect(claimOf(sim, IGNIVAR_FORGE_APPROACH_ID)).toBeDefined();
+    expect(claimOf(sim, IGNIVAR_LIFT_ROOM_ID)).toBeDefined();
     expect(
       sim.instances.find(
         (inst) => inst.dungeonId === IGNIVAR_RAID_ARENA_ID && inst.partyKey !== null,
@@ -196,45 +300,48 @@ describe('ignivar raid entry: checkpoint redirect', () => {
 
 describe('ignivar raid entry: combat lockout', () => {
   it('bars an outside member while a raid room fights, and admits them once it settles', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Locked Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     const mob = livingMobIn(sim, claimOf(sim, IGNIVAR_FORGE_APPROACH_ID));
     mob.inCombat = true;
     sim.drainEvents();
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally)).toBe(false);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally)).toBe(false);
     expect(JSON.stringify(sim.drainEvents()), 'the denial explains itself').toContain(
       COMBAT_DENIAL,
     );
     const allyEntity = sim.entities.get(ally);
     expect(allyEntity && allyEntity.pos.x < DUNGEON_X_THRESHOLD, 'ally stays outside').toBe(true);
     mob.inCombat = false;
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally)).toBe(true);
   });
 
   it("ignores another raid's fights: the lockout is scoped to your own group", () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const allyA = sim.addPlayer('paladin', 'Raid A Member');
     formTestRaid(sim, [sim.player.id, allyA]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     const mobA = livingMobIn(sim, claimOf(sim, IGNIVAR_FORGE_APPROACH_ID));
     mobA.inCombat = true;
     const b1 = sim.addPlayer('mage', 'Raid B One');
     const b2 = sim.addPlayer('priest', 'Raid B Two');
     formTestRaid(sim, [b1, b2]);
     expect(
-      enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, b1),
+      enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, b1),
       "raid A's combat never bars raid B",
     ).toBe(true);
   });
 
   it('bars a ghost during combat and corpse-runs them back in once it settles', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Ghost Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally, true)).toBe(true);
     const allyEntity = sim.entities.get(ally);
     if (!allyEntity) throw new Error('missing ally');
     makeGhost(allyEntity);
@@ -246,11 +353,13 @@ describe('ignivar raid entry: combat lockout', () => {
     const mob = livingMobIn(sim, claimOf(sim, IGNIVAR_FORGE_APPROACH_ID));
     mob.inCombat = true;
     sim.drainEvents();
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally), 'combat bars the ghost').toBe(
-      false,
-    );
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally), 'combat bars the ghost').toBe(false);
     expect(JSON.stringify(sim.drainEvents())).toContain(COMBAT_DENIAL);
     mob.inCombat = false;
+    // The fight settled: the ghost walks the keep door; with only floor 1
+    // claimed the redirect boards the lift, and re-entering the approach
+    // through its claim is the corpse run that resurrects them.
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, ally)).toBe(true);
     expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, ally)).toBe(true);
     expect(allyEntity.dead, 'instance re-entry is the corpse run: the ghost resurrects').toBe(
       false,
@@ -258,10 +367,11 @@ describe('ignivar raid entry: combat lockout', () => {
   });
 
   it('never blocks movement between rooms for a member already inside the raid', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Inside Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     const approachClaim = claimOf(sim, IGNIVAR_FORGE_APPROACH_ID);
     // Clear the approach guardians so the progression pass opens the herald
     // gate to the arena (the real gate-open path, no dev bypass).
@@ -284,10 +394,11 @@ describe('ignivar raid entry: combat lockout', () => {
   });
 
   it('throttles the walk-in denial to one notice per window', () => {
-    const sim = new Sim({ seed: 42, playerClass: 'warrior' });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', devCommands: true });
     const ally = sim.addPlayer('paladin', 'Patient Ally');
     formTestRaid(sim, [sim.player.id, ally]);
-    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_LIFT_ROOM_ID, sim.player.id, true)).toBe(true);
+    expect(enterDungeon(sim.ctx, IGNIVAR_FORGE_APPROACH_ID, sim.player.id, true)).toBe(true);
     const mob = livingMobIn(sim, claimOf(sim, IGNIVAR_FORGE_APPROACH_ID));
     placeAt(sim, ally, DOOR_POS.x, DOOR_POS.z - 1);
     sim.drainEvents();

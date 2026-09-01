@@ -336,6 +336,7 @@ describe("Paladin Retribution: Valkyr's Calling", () => {
       frameDt: 1 / 60,
       snapAgeMs: 0,
       snapIntervalMs: 50,
+      riftFloor: null,
     };
 
     expect(predictor.step(sim.player, frame)).not.toBeNull();
