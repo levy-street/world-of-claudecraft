@@ -410,7 +410,7 @@ closed-by-X.
    PENDING_ART allowlist sign-off; (w) the structural affinity exemption
    (standing since Phase 4, now 27 materials); (al) the art-suite guard
    extensions plus the sharpened bundle-hash renderer/content split; (ap)
-   the farmNowMs facet member; (bb) the linkdead notice loss; (be) the
+   the farmNowMs facet member; (be) the
    simplified-mode gathering rows; (bg) the intro grant fence, its
    trade-pipe leak, and the garden_hoe reagent knock-on; (bh) the
    NPCs-are-terrain calm-pad rule; (bs) the dormant-deed waiver plus the
@@ -533,7 +533,7 @@ closed-by-X.
 | (w) structural affinity exemption, 27 materials (standing since Phase 4) | P4 / P5 | maintainer | open ruling-owed |
 | (al) art-suite guard extensions plus the bundle-hash renderer/content split | P6 / P6 QA | maintainer | PARTLY CLOSED 2026-09-01 by Phase 19 ruling qr-19-art-suite-guard-extensions: the guard-extensions half is RATIFIED as shipped. The ART-SUBJECT rule and the bookkeepingOnly receipt-free refresh stand exactly as written, each policed in both directions and each self-clearing when the art wave lands; refusing them is blocked behind that same parked art wave and by the seventeenth-absorb rule (never a raised release literal, never a gutted arm), and the release has since adopted the same mechanism on its own content side (IGNIVAR_ART_PENDING_ITEM_IDS). Ratification BINDS the standing obligations: both CLIs re-run after every absorb and every sim-content phase, manifest and verdict conflicts resolved by re-running on the merged tree, the same ART-SUBJECT split for any future release seal, and the three literals (catalogCount 1125, liveItemCount 1140, pendingArtCount 81) re-minted at every content move. The row's other half, the bundle-hash renderer/content split, is answered under qr-19-portrait-bundle-hash-split (D029) and folds into this cell in the same edit. |
 | (ap) farmNowMs facet member (re-argued KEEP at P7 QA) | P7 | maintainer | CLOSED 2026-09-01 by Phase 19 ruling qr-19-farmnowms-facet-member: KEEP ratified as shipped, together with the two acceptances the Phase 7 QA recorded under it (online, a fast client wall clock can paint the stage4 looks-ready mesh before the authority flips status, and the harvest then refuses not_ready; withered surfaces online only when the heavy-gated fplot re-diffs). Nothing moves: no code, no pin, no golden, and the member stays an untagged read with no wire field. Unwinding it would force either a Date.now read the CLOCK-BASE CONTRACT forbids on the offline and headless hosts or an unscoped nowMs seam, and capping the fraction path at stage3 stays rejected because it would put a host-dependent branch into a pure render core and lag the ready mesh for every online player. |
-| (bb) linkdead transient-notice loss acceptance | P8 | maintainer | open ruling-owed |
+| (bb) linkdead transient-notice loss acceptance | P8 | maintainer | RATIFIED 2026-09-01 by qr-19-linkdead-notice-loss (Phase 19, under qr-19-best-for-project): the transient ripe-notice loss during the linkdead grace window is ACCEPTED as recommended. Every durable surface shows the truth on resume (journal, map pins, fplot status), and every honest fix needs a connectivity concept the deterministic sim deliberately lacks (new sim state persisted and replayed on resume across all three hosts, re-seating every farming parity golden, a per-player delivery record on a 20 Hz tick the server hot-path rule bars). The smaller sibling (a disconnect inside the one tick between addPlayer and its event drain) rides the same ruling. |
 | (be) simplified-mode gathering rows (a Professions 2.0 surface change) | P8 QA | maintainer | CLOSED 2026-09-01 by qr-19-simplified-gathering-rows: the shipped worked-rows shape is RATIFIED as written, no code change. Skill-0 rows stay hidden so a fresh character's window is unchanged and both modes paint through the one gatheringSectionHtml builder; narrowing to the Farming row or reverting to CTA-only would take back the only journal entry a pre-attunement touch farmer has, the (az) reachability defect this deviation closed. |
 | (bg) intro grant fence, trade-pipe leak, garden_hoe reagent knock-on | P9 | maintainer | CLOSED 2026-09-01 by ruling qr-19-intro-grant-fence-trade-pipe (Phase 19, under qr-19-best-for-project): the leak is ACCEPTED AND RECORDED and the face-to-face trade guard is NOT extended. Barred rather than deferred: CLAUDE.md's default task workflow says 'Preserve existing behavior unless the goal explicitly requires changing it' and 'Avoid unrelated refactors. Keep the diff scoped to the task', and src/sim/social/trade.ts fences every requiredItems item in the game, so the change would land general trade behavior this packet's goal never required. On the merits too: the ledger sizes the leak at 4 copper per cycle and calls it a balance leak, not a security hole, while extending the guard would cut the last cooperative route for the garden_hoe crafting reagent and make the bronze-hoe path worse. Full ruling line on the (bg) block. |
 | (bh) NPCs-are-terrain pad rule (Highwatch eyeballed, no re-seat) | P9 | maintainer | open ruling-owed |
@@ -3542,6 +3542,13 @@ question does not arise (farming has no station).
   connectivity concept the sim deliberately lacks. Same class, smaller: a
   disconnect inside the one tick between addPlayer and its event drain
   loses the login notice the same way.
+  RULED (qr-19-linkdead-notice-loss, 2026-09-01, under qr-19-best-for-project):
+  the transient ripe-notice loss is ACCEPTED. Every durable surface shows the
+  truth on resume, and every honest fix needs a connectivity concept the
+  deterministic sim deliberately lacks (new sim state persisted and replayed on
+  resume across all three hosts, re-seating every farming parity golden, a
+  per-player delivery record on a 20 Hz tick the server hot-path rule bars),
+  a price far above a lost transient toast. The smaller sibling rides it.
   (bc) The 1 Hz sweep is deliberately UNSHARDED on the crowded % 20 === 0
   residue (the hot-path review's convoy finding): sharding by entity id
   would move which tick each notice emits on and fork every parity golden;
