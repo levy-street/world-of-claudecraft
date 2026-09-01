@@ -2316,8 +2316,8 @@ export class Hud {
     });
     this.questTracker = new QuestTrackerController({
       writers: this.writerFacet,
-      // #qt-body, never #quest-tracker: the outer element is a movable frame
-      // and a root innerHTML swap would wipe the mover's chrome.
+      // #qt-body, never #quest-tracker: a root innerHTML swap would wipe the
+      // movable frame's chrome.
       element: $('#qt-body'),
       document,
       world: () => this.sim,
@@ -3953,10 +3953,8 @@ export class Hud {
       });
       // The optional bars' menu row toggles the bar's ENABLED setting (the
       // same state the on-bar plus/minus drives), listed in BOTH shapes
-      // (owner request): split it shows/enables the standalone row, combined
-      // it grows or shrinks the combined block exactly like its plus/minus.
-      // The Reliquary tracker's row drives its existing master switch the
-      // same way, so this checkbox and the Interface option stay one state.
+      // (owner request); the Reliquary tracker's row drives its existing
+      // master switch the same way, so checkbox and option stay one state.
       const optionalBarKey =
         spec.id === 'actionBar2'
           ? ('showSecondaryActionBar' as const)
@@ -4037,7 +4035,7 @@ export class Hud {
     if (id === 'actionBar3') {
       return !this.combineActionBars && document.body.classList.contains('show-actionbar3');
     }
-    if (id === 'petFrame') return isPetClass(this.sim.cfg.playerClass);
+    if (id === 'petFrame' || id === 'petBar') return isPetClass(this.sim.cfg.playerClass);
     // The stance-style choice bar exists only for the two classes that get one
     // (warrior stances, paladin auras), mirroring renderStanceBar's own gate.
     if (id === 'stanceBar') {
@@ -4046,8 +4044,8 @@ export class Hud {
     }
     // The class resource bars follow the pet-frame rule (only the class that
     // can ever show one gets a placeholder); the Reliquary tracker follows
-    // the optional-bar rule (switched off stays hidden even while editing;
-    // its menu row stays listed through the rowOverride above).
+    // the optional-bar rule (switched off stays hidden; its menu row stays
+    // listed through the rowOverride above).
     if (id === 'paladinDevotion') return this.sim.cfg.playerClass === 'paladin';
     if (id === 'doomMeter') return this.sim.cfg.playerClass === 'warlock';
     if (id === 'reliquaryTracker') {
@@ -4077,16 +4075,12 @@ export class Hud {
   // which covers the three unit frames as well as the action bars, cast bar,
   // menu, minimap, pet frame, trackers and class resource bars.
   resetUnitFrames(): void {
-    // The one button that answers "put the interface back the way the base
-    // game ships": lock everything, forget every saved frame box (every
-    // registered mover, the trackers and class resource bars included), and
-    // re-dock the panels that keep their own geometry (chat, meter panels,
-    // target auras). Combining the action bars is a layout mode of
-    // this same feature, so it splits back apart too, routed through the
-    // settings seam so the checkbox, persistence and body class stay in sync.
-    // Settings that merely SHOW or HIDE content (the optional bars, the pet
-    // frame, buffs on the player frame) keep the player's choice: they have
-    // their own checkboxes and are not frame layout.
+    // "Put the interface back the way the base game ships": lock everything,
+    // forget every saved frame box (every registered mover, trackers and
+    // class resource bars included), and re-dock the panels with their own
+    // geometry (chat, meters, target auras). Combined action bars split back
+    // apart through the settings seam; settings that merely SHOW or HIDE
+    // content (optional bars, the pet frame) keep the player's choice.
     this.interfaceUnlock.resetAll();
     this.chatGeometry.reset();
     this.meters.resetFrames();
@@ -8329,17 +8323,20 @@ export class Hud {
   // `pet` is resolved ONCE per frame by update() and passed in, shared with the pet
   // frame above it: both surfaces need the same entity, and each resolving its own
   // would walk the interest-scoped roster twice per frame.
+  // The pet bar is a movable frame ('petBar'), so its rebuild wipes only its
+  // OWN group children: an innerHTML clear would destroy the mover's chrome.
+  private clearPetBarGroups(bar: HTMLElement): void {
+    for (const group of bar.querySelectorAll('.petbar-group')) group.remove();
+  }
+
   private renderPetBar(pet: Entity | null): void {
     const bar = $('#petbar') as HTMLElement;
     // Keep commandable Necromancy secondaries visible after Graveguard is gone.
     const primaryPetShown = !!pet && !pet.dead;
     if (!primaryPetShown) pet = livingSecondaryPet(this.sim.entities.values(), this.sim.playerId);
-    // Value-diffed body-class flag the mobile top-band layout reads (see field doc):
-    // toggled only on a real transition so the per-frame path stays write-free.
-    // Deliberately toggled on EVERY host, not just touch: only body.mobile-touch
-    // CSS consumes it, and an always-true flag survives a desktop-to-touch flip
-    // mid-session where a mobile-gated toggle would leave it stale until the
-    // pet's presence next changed.
+    // Value-diffed body-class flag (see field doc): toggled only on a real
+    // transition so the per-frame path stays write-free, and on EVERY host so
+    // a desktop-to-touch flip never sees it stale.
     const petPresent = !!pet && !pet.dead;
     if (petPresent !== this.lastPetPresent) {
       this.lastPetPresent = petPresent;
@@ -8348,7 +8345,7 @@ export class Hud {
     if (!pet || pet.dead) {
       bar.style.display = 'none';
       if (this.lastPetBarSig !== '') {
-        bar.innerHTML = '';
+        this.clearPetBarGroups(bar);
         this.lastPetBarSig = '';
       }
       return;
@@ -8387,7 +8384,7 @@ export class Hud {
     // check, so this rebuild never steals focus from another open window that
     // happens to reuse the same data-focus-key value.
     const focusedPetActionKey = captureFocusKey(bar);
-    bar.innerHTML = '';
+    this.clearPetBarGroups(bar);
     const commands = document.createElement('div');
     commands.className = 'petbar-group';
     const stances = document.createElement('div');

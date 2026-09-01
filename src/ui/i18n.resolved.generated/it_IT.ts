@@ -2977,7 +2977,8 @@ export const it_IT: EnTranslations = {
         "swingBar": "Attacco automatico",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",

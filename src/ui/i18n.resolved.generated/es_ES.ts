@@ -2977,7 +2977,8 @@ export const es_ES: EnTranslations = {
         "swingBar": "Ataque automático",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Ajustes de marcos",
       "framesMenuTitle": "Muestra u oculta marcos individuales. Un marco sin marcar permanece oculto hasta que vuelvas a marcarlo o restablezcas los valores predeterminados.",

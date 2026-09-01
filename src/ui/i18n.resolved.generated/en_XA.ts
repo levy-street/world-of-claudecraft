@@ -2977,7 +2977,8 @@ export const en_XA: EnTranslations = {
         "swingBar": "[Áúţó Áţţáçķ]",
         "questTracker": "[Ɋúéšţ Ţŕáçķéŕ]",
         "reliquaryTracker": "[Ŕéļíɋúáŕý Ţŕáçķéŕ]",
-        "doomMeter": "[Áƒƒļíçţíóñ Ɓáŕ]"
+        "doomMeter": "[Áƒƒļíçţíóñ Ɓáŕ]",
+        "petBar": "[Þéţ Ɓáŕ]"
       },
       "framesMenu": "[Ƒŕáɱéš Šéţţíñĝš]",
       "framesMenuTitle": "[Šĥóŵ óŕ ĥíðé íñðíʋíðúáļ ƒŕáɱéš. Áñ úñţíçķéð ƒŕáɱé šţáýš ĥíððéñ úñţíļ ýóú ţíçķ íţ áĝáíñ óŕ ŕéšéţ ţó ðéƒáúļţš.]",

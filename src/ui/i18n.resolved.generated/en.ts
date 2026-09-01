@@ -2977,7 +2977,8 @@ export const en: EnTranslations = {
         "swingBar": "Auto Attack",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",

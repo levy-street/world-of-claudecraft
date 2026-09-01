@@ -2977,7 +2977,8 @@ export const da_DK: EnTranslations = {
         "swingBar": "Autoangreb",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",

@@ -9496,6 +9496,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.interfaceUnlock.frameNames.menu'
   | 'hudChrome.interfaceUnlock.frameNames.minimap'
   | 'hudChrome.interfaceUnlock.frameNames.partyFrames'
+  | 'hudChrome.interfaceUnlock.frameNames.petBar'
   | 'hudChrome.interfaceUnlock.frameNames.playerFrame'
   | 'hudChrome.interfaceUnlock.frameNames.questTracker'
   | 'hudChrome.interfaceUnlock.frameNames.reliquaryTracker'

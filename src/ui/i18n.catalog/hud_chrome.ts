@@ -3959,6 +3959,8 @@ export const hudChromeStrings = {
       questTracker: 'Quest Tracker',
       reliquaryTracker: 'Reliquary Tracker',
       doomMeter: 'Affliction Bar',
+      // The pet ACTION bar (#petbar); the pet unit frame reuses its aria key.
+      petBar: 'Pet Bar',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

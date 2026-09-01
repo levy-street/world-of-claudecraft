@@ -139,6 +139,19 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 180, h: 54 },
     detachToUiRoot: true,
   },
+  // The pet ACTION bar, the command half of #pet-cluster. Its own row rather
+  // than a cluster-wide frame so the two halves place independently (the
+  // shipped mobile layout splits them the same way) and the pet frame's saved
+  // spots stay valid. renderPetBar wipes only its .petbar-group children, so
+  // the mover chrome minted beside them survives every rebuild.
+  {
+    id: 'petBar',
+    elementId: 'petbar',
+    storageKey: 'woc_hud_frame_petbar',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.petBar',
+    fallbackSize: { w: 300, h: 44 },
+    detachToUiRoot: true,
+  },
   // The stance-style choice bar (warrior stances, paladin auras) sits inside
   // the transformed #actionbar-stack like the action bars, so it detaches too.
   {

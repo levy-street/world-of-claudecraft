@@ -20,6 +20,9 @@ import { iconDataUrl } from './icons';
  *  and name), so these only need to LOOK like a plausible row. */
 const PREVIEW_BUFFS = ['battle_shout', 'arcane_intellect', 'renew', 'blessing_of_might'];
 const PREVIEW_DEBUFFS = ['rend', 'curse_of_agony', 'frostbite'];
+/** Sample pet commands for the force-shown pet ACTION bar (no pet out means
+ *  its real buttons are wiped, so the placeholder shows a plausible row). */
+const PREVIEW_PET_ACTIONS = ['pet_attack', 'pet_mend', 'pet_defensive'];
 const PREVIEW_ICON_SIZE = 24;
 /** Sample fill fractions: mid-cast and mid-swing read as live bars. */
 const PREVIEW_CAST_FRAC = 0.62;
@@ -52,6 +55,7 @@ export class InterfaceUnlockPreview {
     // shows the real frame chrome (portrait ring, bars), and a second set of
     // sample bars over it read as clutter (owner feedback).
     this.mount('pet-frame', this.unitSample(t('hudChrome.unitFrame.petLabel')));
+    this.mount('petbar', this.auraRow(PREVIEW_PET_ACTIONS, 'ability'));
     this.mount(
       'castbar',
       this.barSample(PREVIEW_CAST_FRAC, t('hudChrome.interfaceUnlock.previewSpell'), 'cast'),
@@ -74,12 +78,12 @@ export class InterfaceUnlockPreview {
     return el;
   }
 
-  private auraRow(ids: readonly string[]): HTMLElement {
+  private auraRow(ids: readonly string[], kind: 'aura' | 'ability' = 'aura'): HTMLElement {
     const row = this.shell('tf-preview-auras');
     for (const id of ids) {
       const icon = this.doc.createElement('img');
       icon.className = 'tf-preview-icon';
-      icon.src = iconDataUrl('aura', id, PREVIEW_ICON_SIZE);
+      icon.src = iconDataUrl(kind, id, PREVIEW_ICON_SIZE);
       icon.alt = '';
       row.appendChild(icon);
     }

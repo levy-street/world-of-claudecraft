@@ -2977,7 +2977,8 @@ export const sv_SE: EnTranslations = {
         "swingBar": "Autoattack",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",

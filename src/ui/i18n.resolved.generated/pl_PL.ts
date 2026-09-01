@@ -2977,7 +2977,8 @@ export const pl_PL: EnTranslations = {
         "swingBar": "Automatyczny atak",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Ustawienia ramek",
       "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",

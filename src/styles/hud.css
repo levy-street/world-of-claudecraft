@@ -1251,8 +1251,12 @@
     margin: 0 auto;
     padding-left: var(--unit-frame-content-inset);
   }
+  /* relative, not static: the docked bar stays an ordinary flex item but is
+     a containing block for its movable-frame chrome (corner button, grip,
+     name chip; the frame is HUD_FRAME_SPECS row 'petBar'). A static bar hung
+     that chrome off #actionbar-stack instead. */
   #pet-cluster > #petbar {
-    position: static;
+    position: relative;
     margin-bottom: 4px;
   }
   /* The health half of the cluster. Hidden until the player actually has a pet; the
@@ -1490,6 +1494,7 @@
   #side-buttons.tf-unlocked,
   #minimap-wrap.tf-unlocked,
   #pet-frame.tf-unlocked,
+  #petbar.tf-unlocked,
   #stancebar.tf-unlocked,
   #xpbar.tf-unlocked,
   #buff-bar.tf-unlocked,
@@ -1534,6 +1539,7 @@
   #actionbar2.hud-frame-detached,
   #actionbar3.hud-frame-detached,
   #pet-frame.hud-frame-detached,
+  #petbar.hud-frame-detached,
   #stancebar.hud-frame-detached,
   #xpbar.hud-frame-detached,
   #buff-bar.hud-frame-detached,
@@ -1558,6 +1564,7 @@
   #side-buttons .tf-move-btn,
   #minimap-wrap .tf-move-btn,
   #pet-frame .tf-move-btn,
+  #petbar .tf-move-btn,
   #stancebar .tf-move-btn,
   #xpbar .tf-move-btn,
   #buff-bar .tf-move-btn,
@@ -1593,6 +1600,7 @@
   #quest-tracker .tf-move-btn:focus-visible,
   #reliquary-tracker .tf-move-btn:focus-visible,
   #paladin-devotion-frame .tf-move-btn:focus-visible,
+  #petbar .tf-move-btn:focus-visible,
   #chatlog-wrap .chat-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -1726,6 +1734,7 @@
      points at the plus/minus buttons for turning more on. */
   body.interface-unlocked #target-frame.tf-unlocked,
   body.interface-unlocked #pet-frame.tf-unlocked,
+  body.interface-unlocked #petbar.tf-unlocked,
   body.interface-unlocked #stancebar.tf-unlocked,
   body.interface-unlocked #paladin-devotion-frame.tf-unlocked,
   body.interface-unlocked .warlock-doom-frame.tf-unlocked {
@@ -1761,6 +1770,12 @@
   body.interface-unlocked #stancebar.tf-unlocked {
     min-width: 160px;
     min-height: 30px;
+  }
+  /* The pet ACTION bar's placeholder: with no pet out its button groups are
+     wiped, so the graspable minimum matches a two-group bar's footprint. */
+  body.interface-unlocked #petbar.tf-unlocked {
+    min-width: 200px;
+    min-height: 44px;
   }
   /* The arrange-mode name chip: which frame is which, sitting just ABOVE the
      frame so it never covers the frame's own contents. A frame parked against

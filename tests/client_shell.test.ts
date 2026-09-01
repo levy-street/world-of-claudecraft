@@ -3438,9 +3438,12 @@ describe('pet cluster layout', () => {
 
   it('lays the cluster out as one row and un-anchors the pet bar from the stack edge', () => {
     expect(hudCssSrc).toMatch(/#pet-cluster \{[^}]*display: flex/);
-    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so the
-    // desktop cluster has to override it or the two halves overlap.
-    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: static/);
+    // The bar keeps its own absolute top:-52px seat for the mobile sheet, so
+    // the desktop cluster has to override it or the two halves overlap.
+    // RELATIVE, not static: the docked bar is a containing block for its
+    // movable-frame chrome (HUD_FRAME_SPECS row 'petBar') while staying an
+    // ordinary flex item of the cluster row.
+    expect(hudCssSrc).toMatch(/#pet-cluster > #petbar \{[^}]*position: relative/);
   });
 
   it('shares one content inset with the player frame so the row lines up with it', () => {

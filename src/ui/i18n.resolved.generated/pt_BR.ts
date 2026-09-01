@@ -2977,7 +2977,8 @@ export const pt_BR: EnTranslations = {
         "swingBar": "Ataque Automático",
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
-        "doomMeter": "Affliction Bar"
+        "doomMeter": "Affliction Bar",
+        "petBar": "Pet Bar"
       },
       "framesMenu": "Configurações de Quadros",
       "framesMenuTitle": "Mostre ou oculte quadros individuais. Um quadro desmarcado permanece oculto até que você o marque novamente ou redefina para o padrão.",
