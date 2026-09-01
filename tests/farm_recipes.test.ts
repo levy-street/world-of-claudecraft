@@ -625,6 +625,21 @@ describe('FARM_RECIPES: the farm-economy hook set', () => {
     expect(dishes.map((d) => d.id)).toContain('recipe_eastbrook_glazed_carrots');
   });
 
+  it('the ratified hoe-reagent-ONLY set is exactly three (qr-19-fine-twin-dish-consumers)', () => {
+    // RULED 2026-09-01: hoe-reagent-only is ratified as shipped design FOR A
+    // SET OF THREE, and that count is the half the ledger row got wrong (it
+    // said two, omitting fine_vale_wheat). Its OWN case on purpose: derived in
+    // the sibling arm below it would only ever fail after an earlier assertion
+    // there had already failed, which is not a pin. Here a fourth twin going
+    // hoe-only, or the wheat gaining a dish consumer, reds this directly
+    // instead of leaving the ratified count quietly false.
+    const dishReagentIds = new Set(dishes.flatMap((d) => d.reagents.map((r) => r.itemId)));
+    expect(
+      HOE_REAGENT_TWINS.filter((twin) => !dishReagentIds.has(twin)),
+      'the ratified hoe-reagent-ONLY set, three members',
+    ).toEqual(['fine_highland_barley', 'fine_marsh_rice', 'fine_vale_wheat']);
+  });
+
   it('every fine twin has a consumer, by a dish or by the hoe ladder', () => {
     const dishReagents = new Set(dishes.flatMap((d) => d.reagents.map((r) => r.itemId)));
     for (const twin of FINE_TWINS_CLOSED_HERE) {

@@ -22,6 +22,7 @@ import { describe, expect, it } from 'vitest';
 import { ALL_RECIPES } from '../src/sim/content/recipes';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
+import { expectDefined } from './helpers/defined';
 
 /** Everything a shipped recipe produces, trophy rows included: the header's own
  *  "uncrafted" predicate (recipeForResultItem) read over the merged table. */
@@ -222,5 +223,40 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
       'uncrafted neck/ring inside the rung ceiling band, the amended one-row set',
     ).toEqual(['mother_of_pearl']);
     expect(ITEMS.mother_of_pearl.sellValue, 'the in-band row value').toBe(50);
+  });
+
+  it('the in-band row is dominated by the trainer rings, the amendment load-bearing half', () => {
+    // The census counts alone do NOT justify keeping the two output
+    // exclusions: what justifies them is that the one in-band row is a
+    // tutorial keepsake dominated by jewelcrafting's OWN rung-0 output. That
+    // was prose only until this arm, in the one file whose stated purpose is
+    // that a paragraph of prose is not quietly false. Derived, not pasted: a
+    // re-stat or re-price of either trainer ring, or of the keepsake, reds.
+    const keepsake = expectDefined(ITEMS.mother_of_pearl);
+    const signet = expectDefined(ITEMS.riveted_iron_signet);
+    const loop = expectDefined(ITEMS.etched_iron_loop);
+    const points = (d: { stats?: Record<string, number> }): number =>
+      Object.values(d.stats ?? {}).reduce((a, b) => a + b, 0);
+    // The keepsake spreads five points one per stat; each trainer ring pays
+    // four points but concentrates three of them in ONE primary, which is what
+    // "dominated" means here and why the spread loses despite the higher total.
+    expect(points(keepsake), 'keepsake total points').toBe(5);
+    expect(Math.max(...Object.values(keepsake.stats ?? {})), 'keepsake best stat').toBe(1);
+    for (const [ring, primary] of [
+      [signet, 'str'],
+      [loop, 'int'],
+    ] as const) {
+      expect(points(ring), `${ring.id} total points`).toBe(4);
+      expect(ring.stats?.[primary], `${ring.id} focused primary`).toBe(3);
+      expect(ring.sellValue, `${ring.id} sell value`).toBe(46);
+      expect(
+        ring.stats?.[primary] ?? 0,
+        `${ring.id} concentrates more in one stat than the keepsake carries in any`,
+      ).toBeGreaterThan(Math.max(...Object.values(keepsake.stats ?? {})));
+    }
+    // And the keepsake really is the in-band row this argument is about, so the
+    // arm cannot pass while pointing at some other item.
+    expect(keepsake.sellValue, 'keepsake price sits in the band').toBeGreaterThan(25);
+    expect(keepsake.sellValue, 'keepsake price sits in the band').toBeLessThanOrEqual(460);
   });
 });

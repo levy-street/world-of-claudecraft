@@ -14,10 +14,11 @@
 // so the armor step passes ~44.2% and the stance cut leaves ~39.8%.
 // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
 // PINNED constant, not a live measurement of the catalog. The committed
-// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
-// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
-// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
-// On the 4085 kit those two figures read about 35.7% and about 32.1%.
+// max-armour kit pins at 4085, in THIS file's own re-pin arm below (search
+// 'the live max-armor kit'), and whether 2861 was ever the raw kit armour or a
+// prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides
+// the packet's R5 re-measure. On the 4085 kit those two figures read about 35.7%
+// and about 32.1%, derived in the arm named REF_ARMOR provenance below.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -346,5 +347,33 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     // each slot on armour carries less stamina than the pre-raid kit it
     // displaces. Same re-pin, same date, same named cause.
     expect(a.maxHp, 'and its pool').toBe(1582);
+  });
+
+  it('REF_ARMOR provenance: the 2861-vs-4085 readings the comments quote are derived', () => {
+    // RULED (qr-19-ref-armor-calibration-constant, 2026-09-01): the constant
+    // stays pinned at 2861 and the widened gap is recorded as the model's
+    // stated conservatism. That ruling put four derived percentages into
+    // comments across this suite, its three siblings, dungeon_difficulty.ts
+    // and rift/ranks.ts, and NOTHING asserted them, so a move in the armour
+    // curve or the level-22 attacker pin would rot every one of them silently.
+    // This arm is the derivation those comments quote; it pins no new policy.
+    const passes = (armor: number, level: number): number => 1 - armorReduction(armor, level);
+    // The armour step at the level-22 heroic pin, both kits.
+    expect(passes(REF_ARMOR, 22) * 100, 'armour pass at 2861').toBeCloseTo(44.24, 1);
+    expect(passes(4085, 22) * 100, 'armour pass at 4085').toBeCloseTo(35.72, 1);
+    // Defensive Stance takes 10 percent off on top, which is where the ~39.8
+    // the comments quote comes from, and what it would read on the live kit.
+    expect(passes(REF_ARMOR, 22) * 0.9 * 100, 'with Defensive Stance at 2861').toBeCloseTo(39.8, 1);
+    expect(passes(4085, 22) * 0.9 * 100, 'with Defensive Stance at 4085').toBeCloseTo(32.1, 1);
+    // The S-rank level-23 pair the rift suite's comment quotes.
+    expect(passes(4085, 23) * 100, 'armour pass at 4085, level 23').toBeCloseTo(36.57, 1);
+    expect(passes(4085, 23) * 0.9 * 100, 'with stance at 4085, level 23').toBeCloseTo(32.9, 1);
+    // And the headline the ruling rests on: post-armour melee falls about 19
+    // percent on the live kit, so holding a floor would want about 24 percent
+    // more mob melee. This is the number that makes a re-base a difficulty
+    // change rather than a calibration tidy.
+    const ratio = passes(4085, 22) / passes(REF_ARMOR, 22);
+    expect((1 - ratio) * 100, 'post-armour melee falls').toBeCloseTo(19.3, 1);
+    expect((1 / ratio - 1) * 100, 'and holding the floor would need').toBeCloseTo(23.9, 1);
   });
 });

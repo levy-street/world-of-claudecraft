@@ -3980,7 +3980,11 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // and well-formed but with no tier 3/4 seed faucet. NO LONGER DORMANT: GATE 1
   // (Phase 11e) stocked all eight upper seeds at farmer_hollis and
   // farmer_verbena, so both rows are completable today. VALUES ARE PROPOSED AND
-  // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike.
+  // FLAGGED FOR THE MAINTAINER, reagent counts and rungs alike. STILL OPEN
+  // DELIBERATELY (noted 2026-09-01): qr-19-dish-curve-point-assignments ratified
+  // the EIGHT PLAIN dishes and retired their two proposal banners, and this pair
+  // is the BUFF-dish tier 3/4 row, which is 11c-D-2 surface and outside that
+  // ruling's scope. It is not an instance the ruling missed.
   //
   // The tier-1 row keeps the POTTAGE PRECEDENT: brook_carrot is the D9
   // vegetable, the one produce row that is vendor-stocked AND priced, so a

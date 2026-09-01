@@ -32,7 +32,7 @@ import {
   MONSTER_MATERIAL_TIERS,
   monsterMaterialTierFor,
 } from '../src/sim/content/professions';
-import { BUILTIN_WORLD, ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
+import { BUILTIN_WORLD, CAMPS, ITEMS, MOBS, setActiveWorldContent } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import {
   forfeitsEveryMappedYield,
@@ -957,6 +957,61 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
       const tags = (mob.componentTags ?? []).filter((tag) => specimenless.has(tag));
       expect(tags.length, `${mob.id} tags ${tags.join('+')}`).toBeLessThanOrEqual(1);
     }
+  });
+
+  it('the two refused spread candidates never gained the tag they were refused', () => {
+    // The ruling above ratifies the pre-gate on the stated warrant that each
+    // REFUSAL already has a working replacement, so the refusal itself must be
+    // measured rather than only described. Each candidate ALREADY carries one
+    // specimen-less family, which is exactly why it was refused: adding the
+    // second would put two on one corpse and breach the premise the arm above
+    // guards. dune_troll was refused for tusk (it carries fang) and
+    // frostmane_yeti for horn. Relaxing the pre-gate and admitting either reds
+    // here, so the comment above cannot quietly become false while green.
+    const specimenless = new Set(
+      Object.keys(HARVEST_COMPONENT_ITEMS).filter((tag) => !(tag in HARVEST_COMPONENT_SPECIMENS)),
+    );
+    for (const [refused, refusedTag] of [
+      ['dune_troll', 'tusk'],
+      ['frostmane_yeti', 'horn'],
+    ] as const) {
+      const mob = MOBS[refused];
+      expect(mob, `${refused} must still exist to be a meaningful refusal`).toBeDefined();
+      const tags = mob?.componentTags ?? [];
+      expect(tags, `${refused} must not have gained ${refusedTag}`).not.toContain(refusedTag);
+      // Non-vacuity: the refusal only means anything while the candidate still
+      // carries a specimen-less family of its own, which is what made the
+      // second one unaffordable. If this ever empties, the refusal is moot and
+      // the ledger's stated reason needs re-deriving rather than re-asserting.
+      const carried = tags.filter((tag) => specimenless.has(tag));
+      expect(
+        carried.length,
+        `${refused} still carries one specimen-less family (${carried.join('+')})`,
+      ).toBe(1);
+      expect(specimenless.has(refusedTag), `${refusedTag} is specimen-less`).toBe(true);
+    }
+  });
+
+  it('the substitutes the refusals lean on are live: tusk on the Horror, horn on six', () => {
+    // The other half of the same warrant, and the half the ledger states as
+    // fact. Derived from the live tables, never a hand list: if the Sundered
+    // Horror loses tusk, or the horn floor drops below six camped carriers,
+    // the ratification's stated ground is gone and this reds.
+    expect(MOBS.sundered_horror?.componentTags ?? [], 'the tusk substitute').toContain('tusk');
+    const campedMobIds = new Set(CAMPS.map((c) => c.mobId));
+    const hornCarriers = Object.values(MOBS)
+      .filter((m) => (m.componentTags ?? []).includes('horn'))
+      .map((m) => m.id);
+    const reachableHorn = hornCarriers.filter((id) => campedMobIds.has(id)).sort();
+    expect(reachableHorn.length, `horn carriers with a camp row: ${reachableHorn.join(', ')}`).toBe(
+      6,
+    );
+    // Non-vacuity: there is a seventh TAGGED template that is deliberately
+    // campless, so the filter above is doing real work rather than passing
+    // because every tagged mob happens to be camped.
+    expect(hornCarriers.length, 'horn-tagged templates, camped or not').toBeGreaterThan(
+      reachableHorn.length,
+    );
   });
 
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {

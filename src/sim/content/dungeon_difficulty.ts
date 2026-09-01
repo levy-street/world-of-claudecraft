@@ -86,6 +86,7 @@ export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPe
 // whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
 // UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
 // The ~39.8% above reads about 32.1% on the 4085 kit.
+//
 // NORMAL-difficulty retunes. Normal spawns default to the raw base templates;
 // a dungeon appears here only when its normal mode needs its own calibration.
 // Unlike the heroic table this one is PER MOB, because the floor-style targets
@@ -411,7 +412,11 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
   },
   // The 10-player raid arena. The boss floors at 1200 post-mitigation on the
   // reference warrior (roughly 43% of his hp per 2.6s swing; a raid brings
-  // two or three healers) via the dungeon-wide multiplier; the encounter-
+  // two or three healers). Measured on the PINNED 2861, like every
+  // post-mitigation figure in this file: on the live 4085 kit the same raw
+  // swing lands about 969, roughly 35% of pool (see the provenance block at
+  // the head of the heroic tuning model).
+  // The floor is applied via the dungeon-wide multiplier; the encounter-
   // script add waves are held to the five-man 500 line through the per-mob
   // map, because their base weapon damage spans a 2x spread (the priest add
   // swings less than half as hard as a Royal Guard). The percentage

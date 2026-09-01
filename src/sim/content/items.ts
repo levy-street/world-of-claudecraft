@@ -1227,8 +1227,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // RULED (qr-19-fine-twin-dish-consumers, 2026-09-01, under
   // qr-19-best-for-project): hoe-reagent-only is ratified as shipped design,
   // and the hoe-only set is THREE, not two: fine_vale_wheat rides
-  // recipe_bronze_hoe the same way. Only fine_evergarden_greens is
-  // double-booked. No dish is owed here.
+  // recipe_bronze_hoe the same way. Scoped precisely, because the unscoped form
+  // is false: of the FOUR hoe-ladder fine twins, only fine_evergarden_greens has
+  // a consumer outside the hoe ladder, and it has THREE reagent sites in all
+  // (recipe_laden_hearth, recipe_evergarden_hoe, recipe_evergarden_harvest_platter).
+  // Outside the hoe ladder other fines are multi-owner too, fine_gilded_sunmelon
+  // among them, so re-derive from the recipe table rather than from this list.
+  // No dish is owed here.
   fine_marsh_rice: {
     id: 'fine_marsh_rice',
     name: 'Fine Marsh Rice',
@@ -1308,7 +1313,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // RULED (qr-19-fine-twin-dish-consumers, 2026-09-01, under
   // qr-19-best-for-project): hoe-reagent-only is ratified as shipped design,
   // and the hoe-only set is THREE, not two: fine_vale_wheat rides
-  // recipe_bronze_hoe the same way. No dish is owed here.
+  // recipe_bronze_hoe the same way. Scoped as at the marsh rice above: of the
+  // FOUR hoe-ladder fine twins only fine_evergarden_greens has a consumer
+  // outside the ladder. No dish is owed here.
   fine_highland_barley: {
     id: 'fine_highland_barley',
     name: 'Fine Highland Barley',

@@ -18673,9 +18673,13 @@ spawn roll moves.
 
 WHAT IS NOT BLOCKED, recorded so the next session does not re-derive it. The
 drop CHANCES need no maintainer input: the shipped ordinary-mob gray-junk rate
-is 0.35, with 0.5 on a tougher variant and 1 on a named or elite, read off the
-two zone-3 gray junk drops (ogre_toe_ring and frayed_prayer_beads, each
-carried at all three rates in src/sim/content/zone3.ts). The deed arm at
+is 0.35, read off the two zone-3 gray junk drops (ogre_toe_ring and
+frayed_prayer_beads, each carried at three rates in src/sim/content/zone3.ts).
+CORRECTED at review, because the first wording did not discriminate: the ladder
+is 0.35 on an ORDINARY mob, 0.5 on an ELITE or rare-elite variant, and 1 only on
+the NAMED QUEST CAPSTONE. Both 0.5 carriers (ogre_crusher, corrupted_priest_malric)
+are elite and one of them is named, so "1 on a named or elite" would send a later
+session to 1 where the shipped precedent is 0.5. The deed arm at
 tests/deeds_content.test.ts is toBeLessThanOrEqual, so it stays green at 14
 and D009's affordance gap closes at 14; the two EXACT-SET arms (the thirteen
 survivors, and the unreachable Brightwood pack) are what move.
