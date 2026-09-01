@@ -1911,6 +1911,31 @@ daily gate anywhere in professions is out of ruling and STOPS.
      instance-class page, not a def page), or is the Book of Deeds credit
      (prog_legendmaker) the complete cosmetic record? Owner: maintainer; until ruled,
      no phase may author an instance-keyed reliquary page.
+     RULED (qr-19-named-legendary-instance-reliquary-page, 2026-09-01, under
+     qr-19-best-for-project): NO Reliquary rung for the promoted copy, now or later,
+     and ruling 135 CLOSES here. The Book of Deeds credit is the complete cosmetic
+     record, and it is TWO credits rather than the one this row names:
+     col_first_legendary (renown 0, on the quality:legendary visit mark) and
+     prog_legendmaker (renown 50, on the legendariesForged stat), both in
+     src/sim/content/deeds.ts, both stamped by promotePerfectedCopy and both proven to
+     land on the SAME TICK as the promotion by tests/orange_promotion.test.ts. THE
+     GROUND IS THE DEF-KEYED MODEL, NEVER A CONQUERABILITY CLAIM:
+     docs/design/reliquary.md rule 3 bounds membership by construction to authored
+     catalog ids, rule 5 fills item-globally by item id, and serializeReliquaryState
+     persists def keys and allowlisted mark ids only, so a rung keyed on one named
+     copy sits outside the shipped model rather than merely unbuilt, and would amend
+     both rules to exist. The conquerability wording is refused on purpose: the 11j QA
+     already found a Reliquary decline right for the wrong reason on exactly that
+     ground (the shelf catalogues three crafted rods, so the claim was false on its
+     face), and this packet does not repeat the error. The bounded instance-CLASS MARK
+     shape is DECLINED too, not deferred: it would seat a mark whose entire content is
+     that a promotion happened, which both deed credits already say, and it would
+     carry the whole mark chain (the RELIQUARY_PROFESSION_MARKS seat, a
+     noteReliquaryMark call, RELIQUARY_MARK_ENGLISH, RELIQUARY_MARK_GUIDE_NAMES plus a
+     wiki regen, an i18n leaf and both cell resolvers) for no information a player
+     does not already hold. The refusal is written into the Locked decisions block of
+     docs/design/reliquary.md in the same commit, so a future page author reads it
+     where they look. Zero code, zero pins.
 
 ## Locked design decisions
 

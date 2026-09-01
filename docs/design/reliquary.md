@@ -505,6 +505,21 @@ evaluated over the ownership options.
   print "first found on clear 12": that is the same fabricated-provenance class
   the zero case refuses. Both the tooltip and the aria line drop together when
   the stamp is absent.
+- **A player-named legendary INSTANCE takes no page and no rung.** The
+  promotion that raises a Perfected copy stamps `rolled.quality: 'legendary'`
+  and a player-chosen name on ONE copy and mints no item def, while Reliquary
+  state is def-keyed and mark-keyed by construction (rules 3 and 5, and
+  `serializeReliquaryState`), so a rung keyed on the named copy sits outside
+  the model rather than merely unbuilt. The Book of Deeds carries the whole
+  cosmetic record with two credits, `col_first_legendary` and
+  `prog_legendmaker`. A bounded instance-CLASS mark is declined on the same
+  ruling: it would say only that a promotion happened, which both deeds already
+  say. Note the ground, which is the def-keyed model and NOT a conquerability
+  claim: an earlier decline of a crafted item rested on conquerability and was
+  right for the wrong reason, since this shelf does catalogue crafted uniques.
+  Masterwrought ruling `qr-19-named-legendary-instance-reliquary-page`
+  (2026-09-01); the packet record is `docs/prd/masterwrought/farming/state.md`,
+  ruling 135.
 
 ## Migration hazards (one-way contracts)
 
