@@ -7,10 +7,13 @@
 // RULED (qr-19-tooltip-line-doctrine, 2026-09-01, under
 // qr-19-best-for-project): the header's old "prefer this over new innerHTML
 // builders" line is RETIRED as a stated preference, deliberately rather than
-// dropped. It lost on the merits: this module has ONE importer while the
-// HTML-string line family (tooltip_line_core.ts) has four modules and 27 call
-// sites, and a preference the tree has contradicted that thoroughly is worse
-// than no preference. NOTHING ABOUT SAFETY CHANGES. The string path is not the
+// dropped. It lost on the merits: this module has a single importer while the
+// HTML-string line family (tooltip_line_core.ts) carries the great majority of
+// the tooltip-line call sites, and a preference the tree has contradicted that
+// thoroughly is worse than no preference. (Counts deliberately not written
+// here: nothing pins them and the repo's anchor rule is against numbers that
+// rot; tests/tooltip_line_core.test.ts holds the importer set that does.)
+// NOTHING ABOUT SAFETY CHANGES. The string path is not the
 // unsafe one, every line's text goes through esc(), and src/ui/CLAUDE.md's
 // standing rule against writing raw player or server text as markup is
 // untouched. Pick between the two mechanisms by RETURN TYPE: this one returns

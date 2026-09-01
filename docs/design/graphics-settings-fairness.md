@@ -84,17 +84,25 @@ COSMETIC (may be tiered down on lower presets):
 - Ambient plant motion in the world: the foliage wind sway on canopies, bushes and grass
   cards, and the farm crops' idle lean (`src/render/farm_patches.ts`). This is the class
   boundary for the reduced-motion clause directly above, which is about a CHARACTER-borne
-  identity effect and does not generalize to the scenery. Plant motion carries no player
-  state, so it is never gated on `prefers-reduced-motion` and never has been: the foliage
-  sway reads only the STATIC `GFX.windSway` preset knob against the shared `uTime` clock the
-  renderer advances every frame, and the crop lean is a per-plot phase advanced by `dt` and
-  composed onto the bed's seat quaternion, so a crop always stands normal to the ground it
-  grows in. The two share the class, not the clock. What IS gated stays gated: an ability
-  marker drawn in the world is not ambient scenery, and `src/render/umbral_anchor_marker.ts`
-  freezes its `uTime` to zero under the setting. Gating the crops alone would make farm beds
-  the one plant in the game that stops, which is a fidelity break rather than an
-  accessibility win. The classification is a recorded maintainer read in the masterwrought
-  Phase 19 ledger, ruling `qr-19-idle-sway-reducedmotion`.
+  identity effect and does not generalize to the scenery. The exempt class is the CONTINUOUS
+  AMBIENT motion itself, the wind sway and the idle lean, and it is narrow in both
+  directions. Neither is gated on `prefers-reduced-motion` and neither ever has been: the
+  foliage sway reads only the STATIC `GFX.windSway` preset knob against the shared `uTime`
+  clock the renderer advances every frame, and the crop lean is a per-plot phase advanced by
+  `dt` and composed onto the bed's seat quaternion, so a crop always stands normal to the
+  ground it grows in. The two share the class, not the clock. Note the binding time before
+  reusing the knob: `windSway` is read inside `onBeforeCompile` and injected into the vertex
+  shader SOURCE, so making it tier- or preference-varying is a program-key change owing a
+  prewarm story, never a live uniform flip. What is NOT exempt, and the two nearest examples
+  are both inside the same subsystems: a camera-driven TRANSITION is a fade, not ambient
+  motion, so `src/render/tree_hide_fade.ts`'s occluder ghost ramp honors the setting
+  (`updateTreeHides` threads it in from `foliage.ts`); and an ability marker drawn in the
+  world is not scenery, so `src/render/umbral_anchor_marker.ts` freezes its uTime to zero,
+  which it can do precisely because it owns a PRIVATE `uTime` uniform rather than the shared
+  clock. Gating the crops alone would make farm beds the one plant in the game that stops,
+  which is a fidelity break rather than an accessibility win. The classification is a
+  recorded maintainer read in the masterwrought Phase 19 ledger, ruling
+  `qr-19-idle-sway-reducedmotion`.
 - Deed Heraldry's decorative bloom (the Book of Deeds rewards worn in-world and on social
   surfaces). Heraldry is IDENTITY: it encodes no health, range, rank, or threat, so its
   forged seal, motif, material, and structural edge may never be hidden. The world seal and

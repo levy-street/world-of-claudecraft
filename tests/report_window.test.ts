@@ -191,12 +191,15 @@ describe('report window: submit routing', () => {
   });
 });
 
-// The carve-out this window carried until Phase 19B: it was the one
-// .window.panel on closeManagedWindow's `default:` arm with no focus trap at
-// all, recorded in tests/managed_window_close_registry.test.ts as "needs no
-// teardown" (qr-19-report-window-focus-trap-carveout closed it). Every close
-// path must now arm and release the shared bridge, so a keyboard player is
-// returned to their opener (WCAG 2.2 AA) whichever way the window goes away.
+// The carve-out this window carried until Phase 19B: it sat on
+// closeManagedWindow's `default:` arm with no focus trap, recorded in
+// tests/managed_window_close_registry.test.ts as "needs no teardown"
+// (qr-19-report-window-focus-trap-carveout closed it). It was the one such
+// panel that TAKES INPUT AND SUBMITS, which is what made the missing
+// return-to-opener bite; #map-window is still on that arm and still trapless,
+// deliberately, as its surviving registry row says. Every close path must now
+// arm and release the shared bridge, so a keyboard player is returned to their
+// opener (WCAG 2.2 AA) whichever way the window goes away.
 describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout)', () => {
   const open = (hooks: Hooks): void => {
     openReportWindow(

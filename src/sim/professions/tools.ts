@@ -462,11 +462,13 @@ export function resolveSlotToolEffect(
   // farming's one apply site (professions/farming.ts harvestCrop) `confirmed`
   // is hard false, so a farming slot minted in prompt mode could never fire
   // or spend and the charm would be consumed into a permanently dead slot.
-  // Whether harvest_crop grows a confirm channel is the Phase 7/8 farming UI
-  // work's decision (the windows/timers surface owns the interaction); lift
-  // this refusal in the same change that lands the channel, together with
-  // its LOAD-side twin in normalizeToolEffectSlots below (masterwrought
-  // Phase 18): no legal mint can write a farming prompt row, so a persisted
+  // RULED PERMANENT (qr-19-harvest-confirm-channel, 2026-09-01): the refusal
+  // is the design, not a stopgap waiting on the Phase 7/8 farming UI work.
+  // Whether harvest_crop ever grows a confirm channel is a fresh sub-feature
+  // decision, and whoever takes it lifts this refusal in the same change,
+  // together with the predicate above and its LOAD-side twin in
+  // normalizeToolEffectSlots below (masterwrought Phase 18), THREE sites, not
+  // two: no legal mint can write a farming prompt row, so a persisted
   // one is a hand-edited or rogue-writer row and drops at load like any
   // policy-refused pair, instead of loading as a permanently dead slot.
   if (promptSlotRefused(professionId) && confirmMode === 'prompt') {
