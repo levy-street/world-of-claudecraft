@@ -25,9 +25,43 @@ export interface ReportWindowDeps {
   ): HTMLElement;
   log(text: string, color?: string): void;
   localizeReportError(err: unknown): string;
+  /** The shared window-focus bridge (window_focus.ts makeWindowFocus), typed
+   *  structurally so this module still imports no coordinator: captureFocus
+   *  records the opener and arms the Tab trap on the root, restoreFocus
+   *  releases it and hands focus back. */
+  captureFocus(): HTMLElement | null;
+  restoreFocus(target: HTMLElement | null): void;
 }
 
 const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.querySelector(sel) as T;
+
+/** What close() needs from the open that armed the trap. Module-level because
+ *  this module is a pair of free functions rather than a class (the Phase 9b
+ *  extraction's shape) and the panel it drives is a single persistent node. */
+let openState: { deps: ReportWindowDeps; opener: HTMLElement | null } | null = null;
+
+/** Bumped on EVERY open and EVERY close, so an in-flight submit can tell
+ *  whether the window it started against is still the one on screen. The
+ *  panel persists across opens (it is markup, not minted), so before this the
+ *  submit closure's late arms wrote into whatever window was open when they
+ *  landed: a stale resolve hid a REOPENED window, and a stale reject painted
+ *  its error line, because that arm re-queries #report-error live. */
+let openEpoch = 0;
+
+/**
+ * The one close path: the two [data-close] buttons, the submit success, and
+ * Hud.closeManagedWindow (Esc, the gamepad, a replacing modal) all route here,
+ * so the trap is released and focus returns to the opener on every one of them
+ * (WCAG 2.2 AA). Safe to call when the window is already closed: the hide is
+ * idempotent and the focus return is skipped when no open armed it.
+ */
+export function closeReportWindow(): void {
+  const state = openState;
+  openState = null;
+  openEpoch++;
+  $('#report-window').style.display = 'none';
+  state?.deps.restoreFocus(state.opener);
+}
 
 export function openReportWindow(
   deps: ReportWindowDeps,
@@ -49,6 +83,12 @@ export function openReportWindow(
       <button class="btn" type="button" data-close>${esc(t('hud.report.cancel'))}</button>
     </div>`;
   el.style.display = 'block'; // centred by the shared .window rule
+  // AFTER the display flip and after closeOtherWindows, matching the family:
+  // an earlier capture would record whatever the window we just closed handed
+  // focus back to rather than this window's own opener.
+  openEpoch++;
+  openState = { deps, opener: deps.captureFocus() };
+  const epoch = openEpoch;
   const reasonDD = deps.buildDropdown(
     [
       { value: 'harassment', label: t('hud.report.reasons.harassment') },
@@ -72,7 +112,7 @@ export function openReportWindow(
   el.querySelector('#report-reason-slot')?.replaceWith(reasonDD);
   el.querySelectorAll('[data-close]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      el.style.display = 'none';
+      closeReportWindow();
     });
   });
   const submit = $('#report-submit') as HTMLButtonElement;
@@ -92,13 +132,21 @@ export function openReportWindow(
     }
     request
       .then(() => {
-        el.style.display = 'none';
+        // The log line is the honest outcome of a submit that really did
+        // succeed, so it fires whatever is on screen now; only the DOM touch
+        // below is epoch-guarded.
         // The gold token, not a hex: painters never hard-code a color in TS
         // (src/styles/CLAUDE.md); the log sink writes style.color, so the
         // var() resolves against the live theme like the talents signature.
         deps.log(t('hud.report.submitted', { name }), 'var(--gold)');
+        if (epoch !== openEpoch) return;
+        closeReportWindow();
       })
       .catch((err: unknown) => {
+        // The error belongs to THIS submit. #report-error is re-queried live,
+        // so without the epoch a reject landing after a close and reopen would
+        // paint the previous report's failure into the new window.
+        if (epoch !== openEpoch) return;
         submit.disabled = false;
         $('#report-error').textContent = deps.localizeReportError(err);
       });

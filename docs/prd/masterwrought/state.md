@@ -6854,6 +6854,33 @@ baseline back to exactly the 1 known 11C-owned red.
   farm_event_feedback.ts's five raw hex log colors beside the tokenized
   report_window call (tokenization backlog), .hj-row's rgba inset-card
   literal (backlog), the report_window focus-trap carve-out (already
+  RULED (qr-19-report-window-focus-trap-carveout, 2026-09-01, under
+  qr-19-best-for-project): CLOSED, not carried. report_window gains
+  capture/restore through the shared makeWindowFocus bridge plus an
+  exported close(), so the two [data-close] handlers, the submit success
+  and Hud.closeManagedWindow all route through one path; hud.ts gains a
+  case 'report-window' arm carrying the tooltip hide the default arm used
+  to give it, so the managed close stays a strict superset of what it
+  replaces; and the NO_MANAGED_TEARDOWN row is deleted, leaving map-window
+  the only one. An a11y exception costs more to carry than one small diff
+  costs to spend, and the exception's own registry row was the last thing
+  keeping it readable as deliberate. THE ROW'S PARENTHETICAL RESIDUE IS
+  SETTLED IN THE SAME CHANGE, and it was sharper than the row recorded:
+  the in-flight submit closure captured the PERSISTENT panel, so a stale
+  resolve could hide a REOPENED window and, worse, a stale reject could
+  paint the previous report's failure into it, because that arm re-queries
+  #report-error live. A per-open epoch now guards both arms, with the
+  success log line deliberately left outside it, since a submit that
+  really succeeded is honest to report whatever is on screen. CEILING
+  NOTE, stated rather than glossed: the coordinator grows by five lines,
+  18708 to 18713 against the pinned 18728, which is the smallest delta
+  that lands the arm; the alternative extraction was refused because the
+  only candidate (localizeReportError) is read out of hud.ts by a source
+  pin in tests/localization_fixes.test.ts, so paying for four lines would
+  have dragged an i18n guard re-point into a focus-trap unit. The pin
+  row's own comment still reads "Exact merged count, zero slack", which
+  qr-19-monolith-ceiling-repin already falsified and did not sweep; that
+  is carried, not fixed here.
   pinned in tests/managed_window_close_registry.test.ts; cheap to close at
   a maintainer's option), targetCastDisplayLabel returning raw ids for
   non-farming system casts (in-module documented scoped gap; the one-line

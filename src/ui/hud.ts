@@ -780,7 +780,7 @@ import {
   reliquaryRelicPageIndex,
 } from './reliquary_view';
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
-import { openReportWindow } from './report_window';
+import { closeReportWindow, openReportWindow } from './report_window';
 import { restView } from './rest_indicator';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
@@ -3535,6 +3535,10 @@ export class Hud {
         break;
       case 'inspect-window':
         this.inspectWindow.close();
+        break;
+      case 'report-window':
+        closeReportWindow();
+        this.hideTooltip();
         break;
       case 'trade-window':
         this.sim.tradeCancel();
@@ -18305,6 +18309,7 @@ export class Hud {
           this.buildDropdown(options, current, onChange, placeholder, a11y),
         log: (text, color) => this.log(text, color),
         localizeReportError: (err) => this.localizeReportError(err),
+        ...this.windowFocus('#report-window'),
       },
       target,
     );
