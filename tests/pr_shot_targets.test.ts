@@ -338,6 +338,7 @@ describe('classifyDiff', () => {
       'src/ui/hud/action_bar/ability_requirement_keys.ts',
       'src/sim/incapacitate_dr.ts',
       'src/sim/combat/stealth_focus.ts',
+      'src/sim/combat/auto_attack.ts',
     ]) {
       const plan = classifyDiff([file]);
       expect(
@@ -352,6 +353,7 @@ describe('classifyDiff', () => {
       'melting-acid',
       'nightshade-coating',
       'sap',
+      'eye-jab',
       'shadeslip',
       'shadeslip-mobile',
     ]);
