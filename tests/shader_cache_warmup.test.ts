@@ -26,6 +26,8 @@ import {
   type WarmupContext,
   type WarmupGl,
 } from '../src/game/shader_cache_warmup';
+import { releaseTrackedWebGLContexts } from '../src/render/context_release';
+import { setShaderWarmStoredSettingSource } from '../src/render/shader_warm_client';
 import {
   createShaderCorpusRecord,
   type ShaderCorpusRecord,
@@ -226,6 +228,24 @@ describe('the corpus round trip', () => {
       await decodeCorpus({ gzip: false, bytes: new TextEncoder().encode(JSON.stringify(foreign)) }),
     ).toBeNull();
   });
+
+  it('refuses a stored value past the byte ceiling before and during inflation', async () => {
+    // The store is same-origin writable: a value too large as stored, and one
+    // that inflates past the ceiling, must each read as no corpus without
+    // being materialized. (A record whose GLSL alone sums past the ceiling is
+    // the validator's arm, pinned in tests/shader_warmup_core.test.ts.)
+    const record = corpusRecord([program(1), program(2)]);
+    const stored = await encodeCorpus(record);
+    const raw = new TextEncoder().encode(JSON.stringify(record));
+    // One ceiling for both forms: the inflated bytes are what the page holds.
+    expect(await decodeCorpus(stored, raw.byteLength)).toEqual(record);
+    expect(await decodeCorpus(stored, stored.bytes.byteLength - 1)).toBeNull();
+    // Compressed under the cap, inflated over it.
+    expect(stored.bytes.byteLength).toBeLessThan(raw.byteLength);
+    expect(await decodeCorpus(stored, raw.byteLength - 1)).toBeNull();
+    expect(await decodeCorpus({ gzip: false, bytes: raw }, raw.byteLength)).toEqual(record);
+    expect(await decodeCorpus({ gzip: false, bytes: raw }, raw.byteLength - 1)).toBeNull();
+  });
 });
 
 describe('startShaderWarmup', () => {
@@ -242,6 +262,8 @@ describe('startShaderWarmup', () => {
   const run = async (options: {
     record?: ShaderCorpusRecord | null;
     search?: string;
+    stored?: string | null;
+    platform?: 'ios' | 'android' | 'other';
     tier?: string;
     parallelCompile?: boolean;
     missingExtensions?: string[];
@@ -265,6 +287,8 @@ describe('startShaderWarmup', () => {
     };
     startShaderWarmup({
       search: options.search ?? '',
+      stored: options.stored ?? null,
+      platform: options.platform ?? 'other',
       store,
       buildId: BUILD,
       tier: options.tier ?? TIER,
@@ -427,6 +451,136 @@ describe('startShaderWarmup', () => {
     expect(ctx.storeGets()).toBe(0);
   });
 
+  it('is off under the worker grammar too: ?shaderwarm=off silences both arms', async () => {
+    const ctx = await run({ record: corpusRecord([program(1)]), search: '?shaderwarm=off' });
+    expect(shaderWarmupStats().skipped).toBe('disabled');
+    expect(ctx.contexts()).toBe(0);
+    expect(ctx.storeGets()).toBe(0);
+  });
+
+  it('honours the stored Off of the Shader Warm-up option, storage unread', async () => {
+    const ctx = await run({ record: corpusRecord([program(1)]), stored: 'off' });
+    expect(shaderWarmupStats().skipped).toBe('disabled');
+    expect(ctx.contexts()).toBe(0);
+    expect(ctx.storeGets()).toBe(0);
+  });
+
+  it('warms under the stored Auto and On alike, and under a pin over a stored Off', async () => {
+    for (const stored of ['auto', 'all']) {
+      shaderWarmupInternalsForTest.reset();
+      const ctx = await run({ record: corpusRecord([program(1)]), stored });
+      ctx.runFrames(1);
+      expect(shaderWarmupStats().skipped).toBeNull();
+      expect(ctx.gl.linked).toEqual([program(1)]);
+    }
+    shaderWarmupInternalsForTest.reset();
+    const pinned = await run({
+      record: corpusRecord([program(1)]),
+      stored: 'off',
+      search: '?shaderwarm=all',
+    });
+    pinned.runFrames(1);
+    expect(shaderWarmupStats().skipped).toBeNull();
+    expect(pinned.gl.linked).toEqual([program(1)]);
+  });
+
+  it('reads the registered option and the page navigator when the host passes none', async () => {
+    // src/main.ts calls startShaderWarmup() bare: the stored Off and the iOS
+    // refusal must reach this arm through the registered source and the
+    // navigator, not only through the test seams.
+    const bare = async (record: ShaderCorpusRecord) => {
+      const gl = fakeGl();
+      let contexts = 0;
+      const values = new Map<string, unknown>();
+      values.set(shaderWarmupInternalsForTest.corpusKey, await encodeCorpus(record));
+      let storeGets = 0;
+      const store = {
+        get: (key: string) => {
+          storeGets += 1;
+          return Promise.resolve(values.get(key));
+        },
+        set: () => Promise.resolve(),
+      };
+      startShaderWarmup({
+        search: '',
+        store,
+        buildId: BUILD,
+        tier: TIER,
+        createContext: () => {
+          contexts += 1;
+          return { gl, dispose: () => {} };
+        },
+        scheduleFrame: () => 0,
+      });
+      await waitFor(() => shaderWarmupStats().skipped !== null || contexts > 0);
+      return { contexts: () => contexts, storeGets: () => storeGets };
+    };
+    try {
+      setShaderWarmStoredSettingSource(() => 'off');
+      const off = await bare(corpusRecord([program(1)]));
+      expect(shaderWarmupStats().skipped).toBe('disabled');
+      expect(off.storeGets()).toBe(0);
+      expect(off.contexts()).toBe(0);
+
+      shaderWarmupInternalsForTest.reset();
+      setShaderWarmStoredSettingSource(() => 'all');
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 (iPhone)',
+        platform: 'iPhone',
+        maxTouchPoints: 5,
+      });
+      const ios = await bare(corpusRecord([program(1)]));
+      expect(shaderWarmupStats().skipped).toBe('ios-webkit');
+      expect(ios.storeGets()).toBe(0);
+      expect(ios.contexts()).toBe(0);
+
+      shaderWarmupInternalsForTest.reset();
+      vi.stubGlobal('navigator', {
+        userAgent: 'Mozilla/5.0 (X11; Linux)',
+        platform: 'Linux',
+        maxTouchPoints: 0,
+      });
+      const desktop = await bare(corpusRecord([program(1)]));
+      expect(shaderWarmupStats().skipped).toBeNull();
+      expect(desktop.contexts()).toBe(1);
+    } finally {
+      setShaderWarmStoredSettingSource(() => null);
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it('is released with the page: the hidden context rides the teardown release list', async () => {
+    const ctx = await run({ record: corpusRecord([program(1), program(2)]) });
+    ctx.runFrames(1);
+    expect(ctx.gl.lost).toBe(false);
+    releaseTrackedWebGLContexts();
+    expect(ctx.gl.lost).toBe(true);
+    expect(shaderWarmupStats().released).toBe(true);
+    // Released once: a second sweep finds nothing of it.
+    releaseTrackedWebGLContexts();
+    expect(ctx.disposed()).toBe(1);
+  });
+
+  it('never mints the hidden context on iOS, whatever the setting or the pin', async () => {
+    // The same refusal as the worker's (shaderWarmModeFor): a second WebGL2
+    // context beside the world's is a per-process ceiling risk on phone-class
+    // WebKit, so nothing is read and nothing is created.
+    const ctx = await run({
+      record: corpusRecord([program(1)]),
+      platform: 'ios',
+      stored: 'all',
+      search: '?shaderwarm=all',
+    });
+    expect(shaderWarmupStats().skipped).toBe('ios-webkit');
+    expect(ctx.contexts()).toBe(0);
+    expect(ctx.storeGets()).toBe(0);
+    shaderWarmupInternalsForTest.reset();
+    const android = await run({ record: corpusRecord([program(1)]), platform: 'android' });
+    android.runFrames(1);
+    expect(shaderWarmupStats().skipped).toBeNull();
+    expect(android.gl.linked).toEqual([program(1)]);
+  });
+
   it('stops paying out the moment the player enters the world', async () => {
     const ctx = await run({ record: corpusRecord([program(1), program(2), program(3)]) });
     ctx.runFrames(1);
@@ -566,13 +720,28 @@ describe('the src/main.ts wiring', () => {
     expect(mainSource).toContain("from './game/shader_cache_warmup'");
   });
 
+  it('registers the stored option source before the warm-up can start', () => {
+    // The corpus reads the option through the registered source at start;
+    // registered later, a stored Off would read as no option, which is ON.
+    const registered = mainSource.indexOf('registerShaderWarmSetting(');
+    const start = mainSource.indexOf('startShaderWarmup();');
+    expect(registered).toBeGreaterThan(0);
+    expect(registered).toBeLessThan(start);
+  });
+
   it('starts the warm-up on the character-select screen', () => {
     expect(mainSource).toContain("if (el === '#charselect-panel') {\n    startShaderWarmup();");
   });
 
-  it('stops it as the first thing world entry does', () => {
+  it('stops it as the first thing EVERY world entry does, online and offline', () => {
+    // Both entries build the renderer through startGame; a corpus still
+    // paying out one program per frame there would share the main thread
+    // with the world build, which is the one thing this arm must never do.
     expect(mainSource).toMatch(
       /async function enterWorld\([^)]*\): Promise<void> \{\n {2}stopShaderWarmup\(\);/,
+    );
+    expect(mainSource).toMatch(
+      /async function startOffline\([^)]*\): Promise<void> \{\n {2}stopShaderWarmup\(\);/,
     );
   });
 
@@ -586,9 +755,10 @@ describe('the src/main.ts wiring', () => {
     expect(start).toBeGreaterThan(0);
     expect(stop).toBeGreaterThan(0);
     expect(reveal).toBeGreaterThan(0);
-    // One call each: the wiring is three points, not a pattern sprayed around.
+    // One start, one stop per world entry, one finish: the wiring is a fixed
+    // set of points, not a pattern sprayed around.
     expect(mainSource.split('startShaderWarmup();')).toHaveLength(2);
-    expect(mainSource.split('stopShaderWarmup();')).toHaveLength(2);
+    expect(mainSource.split('stopShaderWarmup();')).toHaveLength(3);
     expect(mainSource.split('finishShaderWarmup(renderer.webgl);')).toHaveLength(2);
   });
 });

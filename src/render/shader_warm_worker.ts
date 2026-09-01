@@ -283,6 +283,10 @@ scope.onmessage = (event: MessageEvent<ShaderWarmClientMessage>) => {
         post({ kind: 'failed', id, reason: 'cancelled' });
       }
       break;
+    case 'reprioritize':
+      if (!scheduler) break;
+      for (const update of message.updates) scheduler.reprioritize(update.id, update.priority);
+      break;
     case 'pause':
       scheduler?.pause();
       break;

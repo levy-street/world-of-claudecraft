@@ -26,7 +26,9 @@ import { desktopDisplayModeSupported } from '../game/desktop_display_mode_sync';
 import {
   desktopGpuBackendActive,
   desktopGpuBackendSupported,
+  desktopGpuBackendWriteFailed,
   onDesktopGpuBackendActiveChange,
+  onDesktopGpuBackendWriteFailed,
 } from '../game/desktop_gpu_backend_sync';
 import { desktopGpuPrefSupported } from '../game/desktop_gpu_pref_sync';
 import {
@@ -71,6 +73,7 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
 } from '../game/settings';
+import { mobilePlatformFromNavigator } from '../render/gfx';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
@@ -448,6 +451,9 @@ export class OptionsWindow {
   // launch seconds after boot, so a panel opened before that verdict painted
   // the backend row without its reading and never refreshed.
   private gpuBackendWatch: (() => void) | null = null;
+  // Its twin for the other thing the backend row can say: the shell refused the
+  // write, which arrives one round trip after the click that caused it.
+  private gpuBackendWriteWatch: (() => void) | null = null;
 
   constructor(private readonly deps: OptionsWindowDeps) {}
 
@@ -604,9 +610,16 @@ export class OptionsWindow {
     if (!wanted) {
       this.gpuBackendWatch?.();
       this.gpuBackendWatch = null;
+      this.gpuBackendWriteWatch?.();
+      this.gpuBackendWriteWatch = null;
       return;
     }
     this.gpuBackendWatch = onDesktopGpuBackendActiveChange(() => this.render());
+    // The refused write repaints the same panel: the buttons snap back to the
+    // value the shell actually holds, the row says so, and the restart strip
+    // (which reads that same local value) withdraws the offer it should never
+    // have made.
+    this.gpuBackendWriteWatch = onDesktopGpuBackendWriteFailed(() => this.render());
   }
 
   // Return to the Game Menu root without closing the window. The title-bar back
@@ -942,6 +955,11 @@ export class OptionsWindow {
     if (c.statusKey) {
       const status = document.createElement('div');
       status.className = 'set-note set-note-inline';
+      // A verdict that lands seconds after the panel was built, so it is a live
+      // region either way: assertive for the reading that says the choice did
+      // not take, polite for the one that just reports what is running.
+      status.setAttribute('role', c.statusAlert ? 'alert' : 'status');
+      if (!c.statusAlert) status.setAttribute('aria-live', 'polite');
       const values: Record<string, string> = {};
       for (const [name_, key_] of Object.entries(c.statusValueKeys ?? {})) values[name_] = t(key_);
       status.textContent = c.statusValueKeys ? t(c.statusKey, values) : t(c.statusKey);
@@ -1325,6 +1343,14 @@ export class OptionsWindow {
               // methods AND the shell's platform answer, folded into one flag.
               desktopGpuBackend: desktopGpuBackendSupported(desktopBridge()),
               desktopGpuBackendActive: desktopGpuBackendActive(),
+              // The shell refused the last write: the row says what the next
+              // start will really use, over the rung this one is on.
+              desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
+              // The shader warm-up worker is forced off on iOS whatever the
+              // setting (shader_warm_client_core.ts), so that host gets no row.
+              shaderWarmChoice:
+                mobilePlatformFromNavigator(typeof navigator === 'undefined' ? null : navigator) !==
+                'ios',
             },
           )
         : [];

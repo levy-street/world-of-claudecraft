@@ -1556,6 +1556,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Авто выбирает лучший вариант за вас. Vulkan быстрее и рекомендуется большинству игроков. OpenGL медленнее, но может помочь, если Vulkan работает неправильно. Вступает в силу при следующем запуске игры.',
   'hudChrome.options.gpuBackendActiveAutoCapped':
     'Сейчас используется {backend}. На этой видеокарте режим Авто пока не пробует Vulkan; чтобы попробовать, выберите Vulkan.',
+  'hudChrome.options.gpuBackendSaveFailed':
+    'Не удалось сохранить выбор. При следующем запуске будет использоваться {backend}.',
   'hudChrome.options.restartPending': 'Некоторые изменения вступят в силу после перезапуска.',
   'hudChrome.options.restartGame': 'Перезапустить игру',
   'hudChrome.options.restartInProgress': 'Перезапуск игры...',

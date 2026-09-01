@@ -2640,7 +2640,6 @@ async function startGame(
       hud.renderCharIfOpen();
       return;
     }
-    // The shell-mirrored settings (src/game/desktop_shell_settings.ts).
     if (applyDesktopShellSetting(key, value, settings, desktopBridge())) return;
     if (key === 'showDevBadges') {
       renderer.showDevBadges = settings.set('showDevBadges', !!value);
@@ -5302,6 +5301,7 @@ async function startOffline(
   world?: WorldContent,
   seedOverride?: number,
 ): Promise<void> {
+  stopShaderWarmup();
   if (!(await prepareWorldEntry())) return;
   resetLoadProfile();
   loadPhaseStart('entry');

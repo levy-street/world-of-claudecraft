@@ -5730,9 +5730,7 @@ export class Renderer {
       },
     );
     const castVfxUnits = (): PrewarmResumeUnit[] =>
-      castVfxProgramUnits(this.scene, abilityMaterialSlot.group, (root) =>
-        this.compilePrewarmColorPrograms(root, false),
-      );
+      castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);
     let mountPrewarmGroup: THREE.Group | null = null;
     const mountPrewarmPlannedKeys = mountPrewarmKeys(this.sim.ownedMounts());
     const mountPrewarmPendingKeys = new Set(mountPrewarmPlannedKeys);

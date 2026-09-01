@@ -136,6 +136,11 @@ export interface ChoiceControl {
    *  cell. Placeholders are KEYS the painter resolves, like NoteControl's. */
   statusKey?: TranslationKey;
   statusValueKeys?: Record<string, TranslationKey>;
+  /** Render that line as an ASSERTIVE live region (role="alert") rather than a
+   *  polite one: the reading is a verdict a player has to act on (their choice
+   *  did not take), and it arrives long after the panel was built, so assistive
+   *  technology has to be told rather than left to notice. */
+  statusAlert?: boolean;
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -232,6 +237,17 @@ export interface OptionsEnv {
     /** Auto held at OpenGL by the shell's GPU policy (an excluded card). */
     autoCapped?: boolean;
   } | null;
+  /** desktopGpuBackendWriteFailed(): the shell refused the last write of the
+   *  backend choice, so its STORED value is still the old one and the next
+   *  launch keeps it. Outranks the reading above: a player must not leave the
+   *  panel believing a pick took when the shell never stored it. */
+  desktopGpuBackendWriteFailed?: boolean;
+  /** Whether the shader warm-up worker is a real choice on this host. False on
+   *  iOS, where shaderWarmModeFor() forces the worker off whatever the setting
+   *  (a second WebGL2 context is a per-process memory ceiling risk on
+   *  phone-class WebKit), so the row and its note would both be lies. Absent
+   *  means yes, which is what every non-iOS caller wants. */
+  shaderWarmChoice?: boolean;
   /** desktopDisplayModeSupported(): the shell owns the window, so the Display
    *  card shows a windowed/borderless picker INSTEAD of the browser Fullscreen
    *  toggle (asking the browser for fullscreen inside an already-fullscreen
@@ -337,6 +353,21 @@ const gpuBackendOptions: ChoiceOption[] = [
   { value: 1, labelKey: 'hudChrome.options.gpuBackendVulkan' },
   { value: 2, labelKey: 'hudChrome.options.gpuBackendOpenGL' },
 ];
+
+// What the player calls the choice the shell has STORED, for the sentence that
+// says a write did not take, keyed by the same stored numbers. Auto keeps the
+// picker's own label (it is a stored choice, not a rung); the two backends
+// borrow the active-reading names, so the sentence says "OpenGL" rather than
+// the picker's "OpenGL (slow)".
+const gpuBackendStoredNameKeys: Record<number, TranslationKey> = {
+  0: 'hudChrome.options.gpuBackendAuto',
+  1: 'hudChrome.options.gpuBackendActiveNameVulkan',
+  2: 'hudChrome.options.gpuBackendActiveNameOpenGL',
+};
+
+function gpuBackendStoredNameKey(value: number): TranslationKey {
+  return gpuBackendStoredNameKeys[value] ?? 'hudChrome.options.gpuBackendAuto';
+}
 
 // The desktop shell's window modes, in the order a player reads them: the
 // smaller window first, the default (borderless fullscreen) second, matching
@@ -574,9 +605,16 @@ export function buildGraphicsSections(
       { value: 3, labelKey: 'hudChrome.options.browserEffectsMinimal' },
     ]),
     note('hudChrome.options.browserEffectsNote'),
-    choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
-    note('hudChrome.options.shaderWarmNote'),
   ];
+  // iOS forces the worker off whatever the setting says, so the row would be a
+  // control that changes nothing under a note promising On is forced
+  // everywhere. Absent means yes: every other host keeps the pair byte for byte.
+  if (env.shaderWarmChoice !== false) {
+    system.push(
+      choice(s, 'shaderWarm', 'hudChrome.options.shaderWarm', shaderWarmOptions),
+      note('hudChrome.options.shaderWarmNote'),
+    );
+  }
   // The Linux graphics backend (the Vulkan trial) sits right under the shader
   // warm-up worker it feeds, where a player looking for it expects it. Behind
   // its own bridge capability AND the shell's platform answer; its note carries
@@ -598,7 +636,15 @@ export function buildGraphicsSections(
       gpuBackendOptions,
       true,
     );
-    if (active) {
+    if (env.desktopGpuBackendWriteFailed) {
+      // A refused write outranks the rung this launch is on: the player's pick
+      // never reached the store, so what the row owes them is what the NEXT
+      // start will do, named off the value the shell actually holds (the apply
+      // arm has already put the local setting back on it).
+      backendRow.statusKey = 'hudChrome.options.gpuBackendSaveFailed';
+      backendRow.statusValueKeys = { backend: gpuBackendStoredNameKey(backendRow.current) };
+      backendRow.statusAlert = true;
+    } else if (active) {
       // A choice that fell short wins over a capped Auto: the two cannot both
       // hold (a cap only ever applies to Auto), and the order is a pin.
       backendRow.statusKey = active.requestedUnavailable
@@ -607,6 +653,9 @@ export function buildGraphicsSections(
           ? 'hudChrome.options.gpuBackendActiveAutoCapped'
           : 'hudChrome.options.gpuBackendActive';
       backendRow.statusValueKeys = { backend: gpuBackendActiveNameKey(active.active) };
+      // Only the verdict that says the choice did not take is an alert; the
+      // plain reading and the policy cap are information, not a failure.
+      if (active.requestedUnavailable) backendRow.statusAlert = true;
     }
     system.push(backendRow, note('hudChrome.options.gpuBackendNote'));
   }

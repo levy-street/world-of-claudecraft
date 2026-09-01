@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { collectAbilityVfxCompileTargets } from '../src/render/ability_vfx';
 import { castVfxProgramUnits } from '../src/render/cast_vfx_prewarm';
+import type { CompileArmHost } from '../src/render/compile_arms';
 import { createCorpseBeacon } from '../src/render/corpse_beacon';
 import {
   bubbleBeamMaterialOptions,
@@ -25,6 +26,12 @@ function programShape(material: THREE.MeshBasicMaterial) {
     toneMapped: material.toneMapped,
   };
 }
+
+/** A renderer whose materials carry no program yet: the unit's mark after its
+ *  compile then has nothing to record, which is what these cases want. */
+const unprovedPrograms = { properties: { get: () => ({}) } };
+/** Never reached: every case below injects its own compile. */
+const noArms = {} as CompileArmHost;
 
 describe('the generic basic stand-ins', () => {
   it('carry the bubble beam and corpse beacon program shapes, hidden, one mesh each', () => {
@@ -61,7 +68,7 @@ describe('the generic basic stand-ins', () => {
     const targets = collectAbilityVfxCompileTargets(scene);
     expect(targets).toHaveLength(2);
     const compiled: string[] = [];
-    const units = castVfxProgramUnits(scene, null, async (root) => {
+    const units = castVfxProgramUnits(scene, null, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
     });
     expect(units.map((unit) => unit.id)).toEqual(targets.map((target) => `program:${target.id}`));
@@ -76,7 +83,7 @@ describe('the generic basic stand-ins', () => {
     const standIns = new THREE.Group();
     standIns.name = 'ability-material-prewarm';
     const compiled: string[] = [];
-    const units = castVfxProgramUnits(scene, standIns, async (root) => {
+    const units = castVfxProgramUnits(scene, standIns, noArms, unprovedPrograms, async (root) => {
       compiled.push(root.name);
     });
     expect(units.map((unit) => unit.id)).toEqual(['ability-materials:compile']);

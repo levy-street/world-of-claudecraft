@@ -14,12 +14,16 @@
 // program-cache key carries the explicit attribute bindings: a corpus that
 // forgets it warms keys the game never asks for (measured, see the module).
 import { describe, expect, it } from 'vitest';
+import { RENDERER_CONTEXT_EXTENSIONS } from '../src/render/renderer_extensions';
 import {
   createShaderCorpusRecord,
   createWarmupPlan,
   isShaderCorpusRecord,
   nextWarmupIndex,
   readWarmupQuery,
+  SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT,
+  SHADER_CORPUS_EXTENSION_LIMIT,
+  SHADER_CORPUS_MAX_BYTES,
   SHADER_CORPUS_PROGRAM_LIMIT,
   SHADER_CORPUS_VERSION,
   type ShaderCorpusIdentityInputs,
@@ -29,6 +33,7 @@ import {
   warmupApplies,
   warmupExtensionsMatch,
   warmupProgress,
+  warmupRefusedOnPlatform,
 } from '../src/render/shader_warmup_core';
 
 const IDENTITY: ShaderCorpusIdentityInputs = {
@@ -90,6 +95,26 @@ describe('shaderCorpusIdentity', () => {
 });
 
 describe('selectCorpusPrograms', () => {
+  it('stops at the byte ceiling, keeping the programs seen first', () => {
+    // Recorded past the ceiling, the next boot would refuse the whole record.
+    const chars = pair(1).vertex.length + pair(1).fragment.length;
+    expect(selectCorpusPrograms([pair(1), pair(2), pair(3)], 1024, chars * 2)).toEqual([
+      pair(1),
+      pair(2),
+    ]);
+    expect(selectCorpusPrograms([pair(1), pair(2)], 1024, chars - 1)).toEqual([]);
+    expect(
+      createShaderCorpusRecord({
+        identity: 'id',
+        extensions: [],
+        savedAt: 1,
+        contextAttributes: null,
+        sources: [pair(1), pair(2), pair(3)],
+        maxChars: chars * 2,
+      }).programs,
+    ).toEqual([pair(1), pair(2)]);
+  });
+
   it('drops identical vertex+fragment pairs and keeps first-seen order', () => {
     const selected = selectCorpusPrograms([pair(1), pair(2), pair(1), pair(3), pair(2)]);
     expect(selected).toEqual([pair(1), pair(2), pair(3)]);
@@ -200,6 +225,65 @@ describe('isShaderCorpusRecord', () => {
       }),
     ).toBe(false);
   });
+
+  it('bounds what a stored record may ask the next entry to hold or link', () => {
+    // The store is same-origin writable, so the record is read under the
+    // caps the recorder writes under: a program count past the corpus limit,
+    // more GLSL than the byte ceiling, an extension list or an attribute name
+    // no sweep produces. Each one alone reads as no corpus.
+    const three = [pair(1), pair(2), pair(3)];
+    expect(isShaderCorpusRecord({ ...record, programs: three }, { programs: 3 })).toBe(true);
+    expect(isShaderCorpusRecord({ ...record, programs: three }, { programs: 2 })).toBe(false);
+    const chars = pair(1).vertex.length + pair(1).fragment.length;
+    expect(isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: chars })).toBe(true);
+    expect(isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: chars - 1 })).toBe(
+      false,
+    );
+    expect(isShaderCorpusRecord({ ...record, programs: three }, { bytes: chars * 2 })).toBe(false);
+    const manyExtensions = Array.from(
+      { length: SHADER_CORPUS_EXTENSION_LIMIT + 1 },
+      (_, i) => `EXT_${i}`,
+    );
+    expect(isShaderCorpusRecord({ ...record, extensions: manyExtensions })).toBe(false);
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        programs: [
+          {
+            ...pair(1),
+            index0Attribute: 'a'.repeat(SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT + 1),
+          },
+        ],
+      }),
+    ).toBe(false);
+    // The shipped ceilings, as literals (a lowered one would refuse every real
+    // record at boot while this suite stayed green), anchored on the sweep the
+    // world context actually enables and on the measured set (about 35 MB of
+    // GLSL for 390 programs).
+    expect(SHADER_CORPUS_MAX_BYTES).toBe(64 * 1024 * 1024);
+    expect(SHADER_CORPUS_EXTENSION_LIMIT).toBe(64);
+    expect(SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT).toBe(256);
+    expect(RENDERER_CONTEXT_EXTENSIONS.length).toBeLessThanOrEqual(SHADER_CORPUS_EXTENSION_LIMIT);
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        extensions: [...RENDERER_CONTEXT_EXTENSIONS],
+        programs: [{ ...pair(1), index0Attribute: 'position' }],
+      }),
+    ).toBe(true);
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        programs: Array.from({ length: SHADER_CORPUS_PROGRAM_LIMIT }, (_, i) => pair(i)),
+      }),
+    ).toBe(true);
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        programs: Array.from({ length: SHADER_CORPUS_PROGRAM_LIMIT + 1 }, (_, i) => pair(i)),
+      }),
+    ).toBe(false);
+  });
 });
 
 describe('warmupExtensionsMatch', () => {
@@ -223,6 +307,7 @@ describe('warmupExtensionsMatch', () => {
 describe('warmupApplies', () => {
   const ready = {
     enabled: true,
+    iosWebKit: false,
     parallelCompile: true,
     hasCorpus: true,
     extensionsMatch: true,
@@ -237,6 +322,10 @@ describe('warmupApplies', () => {
     expect(warmupApplies({ ...ready, enabled: false })).toEqual({
       applies: false,
       reason: 'disabled',
+    });
+    expect(warmupApplies({ ...ready, iosWebKit: true })).toEqual({
+      applies: false,
+      reason: 'ios-webkit',
     });
     expect(warmupApplies({ ...ready, hasCorpus: false })).toEqual({
       applies: false,
@@ -260,12 +349,19 @@ describe('warmupApplies', () => {
     expect(
       warmupApplies({
         enabled: false,
+        iosWebKit: true,
         parallelCompile: false,
         hasCorpus: false,
         extensionsMatch: false,
         identityMatches: false,
       }).reason,
     ).toBe('disabled');
+  });
+
+  it('names the platform ahead of every corpus reason: iOS reads no corpus at all', () => {
+    expect(warmupApplies({ ...ready, iosWebKit: true, hasCorpus: false }).reason).toBe(
+      'ios-webkit',
+    );
   });
 
   it('names the extension set ahead of the identity that folds it in', () => {
@@ -279,23 +375,55 @@ describe('warmupApplies', () => {
 });
 
 describe('readWarmupQuery', () => {
-  it('is on by default', () => {
+  it('is on by default, with or without a stored option', () => {
     expect(readWarmupQuery('')).toEqual({ enabled: true, forced: false });
     expect(readWarmupQuery('?perf&gfx=ultra')).toEqual({ enabled: true, forced: false });
+    expect(readWarmupQuery('', null)).toEqual({ enabled: true, forced: false });
+    expect(readWarmupQuery('', 'bogus')).toEqual({ enabled: true, forced: false });
   });
 
-  it('reads both arms of the override', () => {
+  it('reads the worker grammar on the pin: off and 0 silence, the rest force', () => {
     expect(readWarmupQuery('?shaderwarm=0')).toEqual({ enabled: false, forced: true });
+    expect(readWarmupQuery('?shaderwarm=off')).toEqual({ enabled: false, forced: true });
     expect(readWarmupQuery('?perf&shaderwarm=0&gfx=low')).toEqual({ enabled: false, forced: true });
     expect(readWarmupQuery('?shaderwarm=1')).toEqual({ enabled: true, forced: true });
+    expect(readWarmupQuery('?shaderwarm=all')).toEqual({ enabled: true, forced: true });
+    expect(readWarmupQuery('?shaderwarm=reveal')).toEqual({ enabled: true, forced: true });
+    expect(readWarmupQuery('?shaderwarm=auto')).toEqual({ enabled: true, forced: true });
   });
 
-  it('ignores a value it does not know', () => {
+  it('honours the stored Off, and only Off: auto and On both keep the corpus', () => {
+    // Auto's backend rule is the worker's (a second context linking during
+    // play); this arm links before the world exists and was measured on the
+    // OpenGL desktops where auto turns the worker off.
+    expect(readWarmupQuery('', 'off')).toEqual({ enabled: false, forced: false });
+    expect(readWarmupQuery('?perf', 'off')).toEqual({ enabled: false, forced: false });
+    expect(readWarmupQuery('', 'auto')).toEqual({ enabled: true, forced: false });
+    expect(readWarmupQuery('', 'all')).toEqual({ enabled: true, forced: false });
+  });
+
+  it('lets the pin win over the stored option both ways', () => {
+    expect(readWarmupQuery('?shaderwarm=all', 'off')).toEqual({ enabled: true, forced: true });
+    expect(readWarmupQuery('?shaderwarm=1', 'off')).toEqual({ enabled: true, forced: true });
+    expect(readWarmupQuery('?shaderwarm=off', 'all')).toEqual({ enabled: false, forced: true });
+    expect(readWarmupQuery('?shaderwarm=0', 'auto')).toEqual({ enabled: false, forced: true });
+  });
+
+  it('ignores a value it does not know and falls back to the stored option', () => {
     expect(readWarmupQuery('?shaderwarm=maybe')).toEqual({ enabled: true, forced: false });
+    expect(readWarmupQuery('?shaderwarm=maybe', 'off')).toEqual({ enabled: false, forced: false });
   });
 
   it('does not match a different flag that ends the same way', () => {
     expect(readWarmupQuery('?noshaderwarm=0')).toEqual({ enabled: true, forced: false });
+  });
+});
+
+describe('warmupRefusedOnPlatform', () => {
+  it('refuses iOS alone: the same platform class the worker refuses', () => {
+    expect(warmupRefusedOnPlatform('ios')).toBe(true);
+    expect(warmupRefusedOnPlatform('android')).toBe(false);
+    expect(warmupRefusedOnPlatform('other')).toBe(false);
   });
 });
 

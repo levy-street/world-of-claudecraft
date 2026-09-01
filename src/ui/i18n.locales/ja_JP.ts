@@ -1537,6 +1537,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '自動はあなたに最適な選択肢を選びます。Vulkanのほうが高速で、ほとんどのプレイヤーにおすすめです。OpenGLは低速ですが、Vulkanが正しく動作しない場合に役立つことがあります。次回のゲーム起動時に反映されます。',
   'hudChrome.options.gpuBackendActiveAutoCapped':
     '現在 {backend} を使用中です。このグラフィックカードでは自動はまだVulkanを試しません。試すにはVulkanを選んでください。',
+  'hudChrome.options.gpuBackendSaveFailed':
+    'この選択を保存できませんでした。次回の起動でも {backend} が使用されます。',
   'hudChrome.options.restartPending': '一部の変更は再起動後に反映されます。',
   'hudChrome.options.restartGame': 'ゲームを再起動',
   'hudChrome.options.restartInProgress': 'ゲームを再起動しています...',

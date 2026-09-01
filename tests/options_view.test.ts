@@ -381,6 +381,12 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
       backend: 'hudChrome.options.gpuBackendActiveNameOpenGL',
     });
 
+    // Only the verdict that says the choice did not take is an alert: the row
+    // is a live region either way, but a plain reading is information, not a
+    // failure a player has to act on.
+    expect(fallen?.control === 'choice' && fallen.statusAlert).toBe(true);
+    expect(row?.control === 'choice' && row.statusAlert).toBeUndefined();
+
     // Auto held at OpenGL by the shell's GPU policy: its own sentence (why the
     // player is not on Vulkan, and that it is theirs to pick), the OpenGL name.
     const capped = backendRow({ active: 'opengl', requestedUnavailable: false, autoCapped: true });
@@ -408,6 +414,83 @@ describe('options_view: graphics dispatch matrix (cluster 3)', () => {
           ?.controls ?? [],
       );
       expect(quietKeys).toContain('note:hudChrome.options.gpuBackendNote');
+    }
+  });
+
+  it('says the write did not save, over the rung this launch is on', () => {
+    // The shell refused the write, so the STORED choice never moved and the
+    // next start keeps it. A row that went on reporting the running rung would
+    // let a player leave believing their pick took.
+    const system = (env: OptionsEnv, gpuBackend: number) =>
+      buildGraphicsSections(makeSource({ graphicsPreset: 4, gpuBackend }), env).find(
+        (section) => section.titleKey === 'hudChrome.options.gfxSectionSystem',
+      );
+    const backendRow = (env: OptionsEnv, gpuBackend: number) =>
+      find(system(env, gpuBackend)?.controls ?? [], 'gpuBackend');
+
+    const failedEnv: OptionsEnv = {
+      ...WEB_ENV,
+      desktopGpuBackend: true,
+      desktopGpuBackendWriteFailed: true,
+      // The launch is running Vulkan and says so; the refusal outranks it.
+      desktopGpuBackendActive: { active: 'vulkan-parallel-compile', requestedUnavailable: false },
+    };
+    const failed = backendRow(failedEnv, 2);
+    expect(failed?.control === 'choice' && failed.statusKey).toBe(
+      'hudChrome.options.gpuBackendSaveFailed',
+    );
+    // The name is the STORED choice's (the apply arm has already put the local
+    // value back on it), and the active-reading name, never the picker's
+    // "OpenGL (slow)".
+    expect(failed?.control === 'choice' && failed.statusValueKeys).toEqual({
+      backend: 'hudChrome.options.gpuBackendActiveNameOpenGL',
+    });
+    // A verdict a player must act on: an assertive live region, not a polite one.
+    expect(failed?.control === 'choice' && failed.statusAlert).toBe(true);
+
+    const vulkanStored = backendRow(failedEnv, 1);
+    expect(vulkanStored?.control === 'choice' && vulkanStored.statusValueKeys).toEqual({
+      backend: 'hudChrome.options.gpuBackendActiveNameVulkan',
+    });
+    // Auto is a stored choice too, and keeps the picker's own Auto label.
+    const autoStored = backendRow(failedEnv, 0);
+    expect(autoStored?.control === 'choice' && autoStored.statusValueKeys).toEqual({
+      backend: 'hudChrome.options.gpuBackendAuto',
+    });
+
+    // Flag down: the active reading again, unchanged.
+    const settled = backendRow({ ...failedEnv, desktopGpuBackendWriteFailed: false }, 2);
+    expect(settled?.control === 'choice' && settled.statusKey).toBe(
+      'hudChrome.options.gpuBackendActive',
+    );
+    expect(settled?.control === 'choice' && settled.statusAlert).toBeUndefined();
+  });
+
+  it('drops the shader warm-up worker row and its note where the worker is forced off', () => {
+    // iOS resolves the worker to off whatever the setting says
+    // (shaderWarmModeFor), so the row would change nothing under a note
+    // promising On is forced everywhere.
+    const system = (env: OptionsEnv) =>
+      buildGraphicsSections(makeSource({ graphicsPreset: 4 }), env).find(
+        (section) => section.titleKey === 'hudChrome.options.gfxSectionSystem',
+      );
+    const withoutChoice = keysOf(system({ ...WEB_ENV, shaderWarmChoice: false })?.controls ?? []);
+    expect(withoutChoice.length).toBeGreaterThan(0);
+    expect(withoutChoice).not.toContain('shaderWarm');
+    expect(withoutChoice).not.toContain('note:hudChrome.options.shaderWarmNote');
+    // The card keeps everything else it had, in order (the pair leaves together).
+    expect(withoutChoice).toEqual(
+      keysOf(system(WEB_ENV)?.controls ?? []).filter(
+        (key) => key !== 'shaderWarm' && key !== 'note:hudChrome.options.shaderWarmNote',
+      ),
+    );
+    // Absent means yes, and so does true: every non-iOS caller keeps the pair.
+    for (const env of [WEB_ENV, { ...WEB_ENV, shaderWarmChoice: true }]) {
+      const keys = keysOf(system(env)?.controls ?? []);
+      expect(keys.slice(keys.indexOf('shaderWarm'), keys.indexOf('shaderWarm') + 2)).toEqual([
+        'shaderWarm',
+        'note:hudChrome.options.shaderWarmNote',
+      ]);
     }
   });
 

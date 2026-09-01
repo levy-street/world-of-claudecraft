@@ -1895,6 +1895,11 @@ export const hudChromeStrings = {
     // the player is told why they are not on Vulkan, and that it is theirs to pick.
     gpuBackendActiveAutoCapped:
       'Currently using {backend}. Auto does not try Vulkan on this graphics card yet; pick Vulkan to try it.',
+    // The shell refused the write (its own prefs write failed, or it rejected
+    // the value): the stored choice never moved, so the sentence says what the
+    // NEXT start will use rather than what was just clicked. Wordy value, M16:
+    // the five non-Latin fills land in this same change.
+    gpuBackendSaveFailed: 'The choice could not be saved. The next start keeps {backend}.',
     // What the player calls each backend in that line. Kept apart from the
     // picker labels on purpose: the OpenGL button reads "OpenGL (slow)", and
     // "Currently using OpenGL (slow) (unable to enable Vulkan)" would not do.

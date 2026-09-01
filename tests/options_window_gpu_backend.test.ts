@@ -17,6 +17,7 @@ vi.mock('../src/ui/app_version', () => ({
 
 import {
   initDesktopGpuBackendActive,
+  latchDesktopGpuBackendWriteFailed,
   resetDesktopGpuBackendActiveForTest,
 } from '../src/game/desktop_gpu_backend_sync';
 import { normalizeGraphicsSettingsSnapshot } from '../src/game/graphics_rebuild_core';
@@ -82,8 +83,13 @@ function openGraphicsPanel(root: HTMLElement): OptionsWindow {
  *  the row that owns the backend choice, so a second status line elsewhere
  *  in the panel cannot satisfy this by accident. */
 function backendReading(root: HTMLElement): string | null {
+  return backendStatus(root)?.textContent ?? null;
+}
+
+/** The element carrying that reading, for what it tells assistive technology. */
+function backendStatus(root: HTMLElement): HTMLElement | null {
   const choice = root.querySelector('[data-focus-key^="gpuBackend:"]');
-  return choice?.closest('.set-row')?.querySelector('.set-note-inline')?.textContent ?? null;
+  return choice?.closest('.set-row')?.querySelector<HTMLElement>('.set-note-inline') ?? null;
 }
 
 const VULKAN_READING = t('hudChrome.options.gpuBackendActive', {
@@ -91,6 +97,10 @@ const VULKAN_READING = t('hudChrome.options.gpuBackendActive', {
 });
 const OPENGL_FELL_SHORT = t('hudChrome.options.gpuBackendActiveUnavailable', {
   backend: t('hudChrome.options.gpuBackendActiveNameOpenGL'),
+});
+
+const SAVE_FAILED = t('hudChrome.options.gpuBackendSaveFailed', {
+  backend: t('hudChrome.options.gpuBackendAuto'),
 });
 
 let root: HTMLElement;
@@ -133,6 +143,58 @@ describe('OptionsWindow graphics backend reading', () => {
     // panel stayed open).
     shell.send({ setting: 'vulkan', active: 'opengl', requestedUnavailable: true });
     expect(backendReading(root)).toBe(OPENGL_FELL_SHORT);
+    off();
+  });
+
+  it('announces the reading, assertively for the verdict that says the choice did not take', () => {
+    // The verdict lands seconds after the panel was built, so the line has to
+    // tell assistive technology rather than wait to be found.
+    const shell = installShell();
+    const off = initDesktopGpuBackendActive(desktopBridge());
+    openGraphicsPanel(root);
+
+    shell.send({
+      setting: 'vulkan',
+      active: 'vulkan-parallel-compile',
+      requestedUnavailable: false,
+    });
+    expect(backendStatus(root)?.getAttribute('role')).toBe('status');
+    expect(backendStatus(root)?.getAttribute('aria-live')).toBe('polite');
+
+    shell.send({ setting: 'vulkan', active: 'opengl', requestedUnavailable: true });
+    expect(backendReading(root)).toBe(OPENGL_FELL_SHORT);
+    expect(backendStatus(root)?.getAttribute('role')).toBe('alert');
+    off();
+  });
+
+  it('repaints when the shell refuses the write, so the row stops promising the pick', () => {
+    // The apply arm has already put the local value back on the shell's stored
+    // one by the time it latches this; the panel has to hear about it, or the
+    // buttons and the restart offer keep standing on a choice that never saved.
+    const shell = installShell();
+    const off = initDesktopGpuBackendActive(desktopBridge());
+    openGraphicsPanel(root);
+    shell.send({
+      setting: 'vulkan',
+      active: 'vulkan-parallel-compile',
+      requestedUnavailable: false,
+    });
+    expect(backendReading(root)).toBe(VULKAN_READING);
+
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(backendReading(root)).toBe(SAVE_FAILED);
+    expect(backendStatus(root)?.getAttribute('role')).toBe('alert');
+
+    // A later write the shell keeps clears it, and the running rung is the
+    // reading again.
+    latchDesktopGpuBackendWriteFailed(false);
+    expect(backendReading(root)).toBe(VULKAN_READING);
+
+    // And the panel stops listening with the other watch when it leaves the
+    // screen: no rebuild of hidden DOM off a refusal nobody is looking at.
+    root.querySelector<HTMLButtonElement>('[data-back]')?.click();
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(root.querySelector('.opt-list')).not.toBeNull();
     off();
   });
 

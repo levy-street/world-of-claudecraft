@@ -663,9 +663,26 @@ GPU work signs. Each rule names its seam and its guard.
   link is already as cheap as a hit and the first draw is free while the worker's own
   links cost three to six times more (measured 2026-08-30 on an RTX 3060, an RTX 3090
   and an Intel iGPU); iOS is `off` whatever the setting (a second context is a
-  per-process ceiling risk there); `?shaderwarm=off|reveal|all` overrides, and
+  per-process ceiling risk there); `?shaderwarm=auto|off|reveal|all` overrides
+  (`0` and `1` are aliases of `off` and `all`, one grammar for both arms below), and
   `?shaderwarmready=<ms>` lengthens the worker's ready deadline for a probe on a
   backend whose GPU process is busy at boot (Windows OpenGL).
+  THE CHARACTER-SELECT CORPUS (`src/game/shader_cache_warmup.ts`, decisions in
+  `shader_warmup_core.ts`) is the other arm of the same cache, and the ONE producer
+  that is not a client of the scheduler, by construction rather than by exemption:
+  it replays the previous session's recorded program set on a hidden context while
+  the character-select screen is idle, before any `Renderer` (and so any
+  `background_gpu_queue`) exists, one program per animation frame, and every world
+  entry stops it as its first statement (`enterWorld` and `startOffline`, pinned by
+  the wiring block of `tests/shader_cache_warmup.test.ts`), so no live frame ever
+  shares the main thread with a submission; what the GPU process still resolves
+  after the click is the entry's own program set landing in the shared cache. It
+  reads the same stored option and the same pin as the worker (`readWarmupQuery`):
+  Off silences it, `auto` and On keep it (the backend rule is the worker's: a
+  second context linking DURING play; this arm was measured on the OpenGL desktops
+  where `auto` turns the worker off), iOS never mints its context, and a stored
+  record is bounded before, during and after inflation
+  (`SHADER_CORPUS_MAX_BYTES`, `SHADER_CORPUS_PROGRAM_LIMIT`).
   The worker is a client of the EXISTING gates: `shader_warm_gate.ts` assembles a
   root's program sources through the three patch's dry-compile hook
   (`program_sources.ts`; the hook calls each live material's `onBeforeCompile`
@@ -699,9 +716,14 @@ GPU work signs. Each rule names its seam and its guard.
   `perfStats().shaderWarmAudit` are the readout, local only (nothing of it rides the
   perf beacon). The cast-VFX gate (`cast_vfx_readiness_core.ts`,
   `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
-  draws no cast until every cast program is linked, with the terrain-draped area
-  ring as the one exception (an actionable telegraph on a pool that is not a cast
-  program).
+  draws no cast until every cast program is linked (linked means the settle
+  record of `linked_program_readiness.ts`, which each cast unit writes once its
+  compile settled; never the presence of `currentProgram`, assigned before the
+  link resolves, and never a driver query from a live frame), and the reads a
+  player ACTS on never wait behind it: the
+  terrain-draped area ring and a mob's windup clip on the cast path, and on the
+  per-frame path the hard-CC band (stun, fear, root), re-held right after the
+  sleep that releases the held entity's cosmetic pools (`tests/ability_vfx_cast_gate.test.ts`).
 - **Verify, do not assert.** `?perf`, then `__game.renderer.perfStats().gpuPrep`: the
   budget snapshot, the event ring (`live-program`, `gate-timeout`, `reveal-watchdog`,
   `reveal-soft-deadline`, `submit-stop`, `attach-watchdog`, `touch-unproven` (programs a

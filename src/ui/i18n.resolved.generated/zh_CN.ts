@@ -1571,6 +1571,7 @@ export const zh_CN: EnTranslations = {
       "gpuBackendActive": "当前使用 {backend}。",
       "gpuBackendActiveUnavailable": "当前使用 {backend}（无法启用 Vulkan）。",
       "gpuBackendActiveAutoCapped": "当前使用 {backend}。自动模式暂不会在此显卡上尝试 Vulkan；如需尝试，请选择 Vulkan。",
+      "gpuBackendSaveFailed": "无法保存该选择。下次启动仍将使用 {backend}。",
       "gpuBackendActiveNameVulkan": "Vulkan",
       "gpuBackendActiveNameOpenGL": "OpenGL",
       "restartPending": "部分更改将在重启后生效。",

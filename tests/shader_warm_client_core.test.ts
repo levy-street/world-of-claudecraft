@@ -11,6 +11,7 @@ import {
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
+  readShaderWarmQuery,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
@@ -127,6 +128,14 @@ describe('readShaderWarmSetting', () => {
     expect(readShaderWarmSetting('?perf&shaderwarm=all')).toBe('all');
     expect(readShaderWarmSetting('?shaderwarm=off&perf')).toBe('off');
     expect(readShaderWarmSetting('?shaderwarm=%6fff')).toBe('off');
+    // The corpus arm's original spellings, one grammar for both readers.
+    expect(readShaderWarmSetting('?shaderwarm=0', 'all')).toBe('off');
+    expect(readShaderWarmSetting('?shaderwarm=1', 'off')).toBe('all');
+    expect(readShaderWarmQuery('?shaderwarm=0')).toBe('off');
+    expect(readShaderWarmQuery('?shaderwarm=1')).toBe('all');
+    expect(readShaderWarmQuery('?shaderwarm=reveal')).toBe('reveal');
+    expect(readShaderWarmQuery('?shaderwarm=maybe')).toBeNull();
+    expect(readShaderWarmQuery('?perf')).toBeNull();
   });
 
   it('takes the stored graphics option when the query names nothing, else OFF', () => {
@@ -210,6 +219,33 @@ describe('createShaderWarmRequests', () => {
     requests.settle(1, 'warmed');
     expect(await both).toEqual([['warmed'], ['warmed']]);
     expect(requests.stats()).toMatchObject({ asked: 2, sent: 1, deduped: 1, warmed: 1, failed: 0 });
+  });
+
+  it('raises a pending program to the higher priority a later asker names', () => {
+    // A catalog asked first at its own priority; the live view that names the
+    // same text next must not wait behind the catalog's place in the worker's
+    // queue, so the dedupe hands the host the promotion to post.
+    const requests = createShaderWarmRequests();
+    const catalog = requests.request([source('void main() {}')], 20);
+    expect(catalog.toPromote).toEqual([]);
+    const live = requests.request([source('void main() {}')], 60);
+    expect(live.toSend).toEqual([]);
+    expect(live.toPromote).toEqual([{ id: 1, priority: 60 }]);
+    // Equal or lower asks change nothing; a second higher one moves it again.
+    expect(requests.request([source('void main() {}')], 60).toPromote).toEqual([]);
+    expect(requests.request([source('void main() {}')], 10).toPromote).toEqual([]);
+    expect(requests.request([source('void main() {}')], 80).toPromote).toEqual([
+      { id: 1, priority: 80 },
+    ]);
+    expect(requests.stats()).toMatchObject({ asked: 5, sent: 1, deduped: 4, promoted: 2 });
+  });
+
+  it('promotes nothing that already settled: a warm program needs no place in line', () => {
+    const requests = createShaderWarmRequests();
+    requests.request([source('void main() {}')], 20);
+    requests.settle(1, 'warmed');
+    expect(requests.request([source('void main() {}')], 90).toPromote).toEqual([]);
+    expect(requests.stats().promoted).toBe(0);
   });
 
   it('counts the location-0 bind as part of the program identity', () => {

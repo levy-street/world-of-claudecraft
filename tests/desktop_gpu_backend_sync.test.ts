@@ -6,11 +6,14 @@ import { afterEach, describe, expect, it } from 'vitest';
 import {
   desktopGpuBackendActive,
   desktopGpuBackendSupported,
+  desktopGpuBackendWriteFailed,
   GPU_BACKEND_SETTING_VALUES,
   gpuBackendSettingFromValue,
   gpuBackendValueFromSetting,
   initDesktopGpuBackendActive,
+  latchDesktopGpuBackendWriteFailed,
   onDesktopGpuBackendActiveChange,
+  onDesktopGpuBackendWriteFailed,
   pushDesktopGpuBackend,
   resetDesktopGpuBackendActiveForTest,
   syncDesktopGpuBackendSetting,
@@ -113,40 +116,113 @@ describe('syncDesktopGpuBackendSetting', () => {
   });
 });
 
+/** A shell whose setter answers exactly what the case is about. */
+function bridgeWriting(write: () => unknown): DesktopBridge {
+  return {
+    getGpuBackend: () => Promise.resolve(),
+    setGpuBackend: write,
+  } as unknown as DesktopBridge;
+}
+
 describe('pushDesktopGpuBackend', () => {
   it('sends the setting name the stored number means', async () => {
     const { bridge, written } = bridgeAnswering({ setting: 'auto' });
-    pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.vulkan);
-    pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.opengl);
-    pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.auto);
-    await Promise.resolve();
+    await pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.vulkan);
+    await pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.opengl);
+    await pushDesktopGpuBackend(bridge, GPU_BACKEND_SETTING_VALUES.auto);
     expect(written).toEqual(['vulkan', 'opengl', 'auto']);
   });
 
-  it('swallows a missing setter, a throwing channel and a rejected write', async () => {
-    expect(() => pushDesktopGpuBackend(null, 1)).not.toThrow();
-    expect(() => pushDesktopGpuBackend({} as DesktopBridge, 1)).not.toThrow();
-    expect(() =>
+  it('answers what the shell did with it, and never throws doing so', async () => {
+    // Null is "nothing to confirm" (no setter at all), which is NOT a refusal:
+    // the caller has no local value to put back and nothing to tell a player.
+    await expect(pushDesktopGpuBackend(null, 1)).resolves.toBeNull();
+    await expect(pushDesktopGpuBackend({} as DesktopBridge, 1)).resolves.toBeNull();
+    await expect(
+      pushDesktopGpuBackend(bridgeAnswering({ setting: 'auto' }).bridge, 1),
+    ).resolves.toBe(true);
+    // The shell answers false when its own prefs write failed, when the sender
+    // is untrusted, or when the value is not one it knows: a refusal, not a
+    // channel fault, and the one the row exists for.
+    await expect(
       pushDesktopGpuBackend(
-        {
-          getGpuBackend: () => Promise.resolve(),
-          setGpuBackend: () => {
-            throw new Error('channel closed');
-          },
-        } as unknown as DesktopBridge,
+        bridgeWriting(() => Promise.resolve(false)),
         1,
       ),
-    ).not.toThrow();
-    expect(() =>
+    ).resolves.toBe(false);
+    await expect(
       pushDesktopGpuBackend(
-        {
-          getGpuBackend: () => Promise.resolve(),
-          setGpuBackend: () => Promise.reject(new Error('no')),
-        } as unknown as DesktopBridge,
+        bridgeWriting(() => {
+          throw new Error('channel closed');
+        }),
         1,
       ),
-    ).not.toThrow();
-    await new Promise((r) => setTimeout(r, 0));
+    ).resolves.toBe(false);
+    await expect(
+      pushDesktopGpuBackend(
+        bridgeWriting(() => Promise.reject(new Error('no'))),
+        1,
+      ),
+    ).resolves.toBe(false);
+  });
+});
+
+describe('the refused-write latch and its subscribers', () => {
+  it('carries the refusal, clears on a later write the shell keeps, and wakes once per move', async () => {
+    let wakes = 0;
+    const unsubscribe = onDesktopGpuBackendWriteFailed(() => {
+      wakes += 1;
+    });
+    expect(desktopGpuBackendWriteFailed()).toBe(false);
+
+    // The apply arm latches the refusal itself, once it has put the local
+    // setting back on the shell's stored value.
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(desktopGpuBackendWriteFailed()).toBe(true);
+    expect(wakes).toBe(1);
+    // A second refusal says nothing new; a rebuild per push would throw away
+    // the control the player is standing on.
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(wakes).toBe(1);
+
+    // A push the shell refuses leaves the flag to the caller (which reverts
+    // first), so it neither clears the line nor repaints behind the revert.
+    await expect(
+      pushDesktopGpuBackend(
+        bridgeWriting(() => Promise.resolve(false)),
+        1,
+      ),
+    ).resolves.toBe(false);
+    expect(desktopGpuBackendWriteFailed()).toBe(true);
+    expect(wakes).toBe(1);
+
+    // A write that does persist takes the sentence off the row.
+    await expect(
+      pushDesktopGpuBackend(bridgeAnswering({ setting: 'auto' }).bridge, 1),
+    ).resolves.toBe(true);
+    expect(desktopGpuBackendWriteFailed()).toBe(false);
+    expect(wakes).toBe(2);
+    // And a second success is silent for the same reason.
+    await pushDesktopGpuBackend(bridgeAnswering({ setting: 'auto' }).bridge, 1);
+    expect(wakes).toBe(2);
+
+    unsubscribe();
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(desktopGpuBackendWriteFailed()).toBe(true);
+    expect(wakes).toBe(2);
+  });
+
+  it('is forgotten by the test reset, subscribers and all', () => {
+    let wakes = 0;
+    onDesktopGpuBackendWriteFailed(() => {
+      wakes += 1;
+    });
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(wakes).toBe(1);
+    resetDesktopGpuBackendActiveForTest();
+    expect(desktopGpuBackendWriteFailed()).toBe(false);
+    latchDesktopGpuBackendWriteFailed(true);
+    expect(wakes).toBe(1);
   });
 });
 

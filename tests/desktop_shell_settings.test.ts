@@ -2,14 +2,22 @@
 // (src/game/desktop_shell_settings.ts): every reflection fires at boot, and
 // the apply arm routes exactly the shell-mirrored keys to their push.
 
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
+import {
+  desktopGpuBackendWriteFailed,
+  resetDesktopGpuBackendActiveForTest,
+} from '../src/game/desktop_gpu_backend_sync';
 import {
   applyDesktopShellSetting,
   syncDesktopShellSettings,
 } from '../src/game/desktop_shell_settings';
 import type { DesktopBridge } from '../src/runtime';
 
-function bridgeRecorder() {
+afterEach(() => {
+  resetDesktopGpuBackendActiveForTest();
+});
+
+function bridgeRecorder(gpuBackendWriteAnswer = true) {
   const calls: string[] = [];
   const bridge = {
     hasGpuBackendChoice: true,
@@ -27,7 +35,7 @@ function bridgeRecorder() {
     },
     setGpuBackend: (value: string) => {
       calls.push(`set:gpuBackend=${value}`);
-      return Promise.resolve(true);
+      return Promise.resolve(gpuBackendWriteAnswer);
     },
     getDisplayMode: () => {
       calls.push('get:displayMode');
@@ -105,6 +113,38 @@ describe('applyDesktopShellSetting', () => {
     await Promise.resolve();
     expect(writes).toEqual([['gpuBackend', 2]]);
     expect(calls).toEqual(['set:gpuBackend=opengl']);
+  });
+
+  it('leaves the local backend value alone once the shell has kept the write', async () => {
+    const { bridge, calls } = bridgeRecorder();
+    const { settings, writes } = settingsRecorder();
+    applyDesktopShellSetting('gpuBackend', 2, settings, bridge);
+    await new Promise((r) => setTimeout(r, 0));
+    // No second read: the shell holds what the player picked, so re-reading it
+    // would only be a chance to overwrite a newer choice with an older answer.
+    expect(calls).toEqual(['set:gpuBackend=opengl']);
+    expect(writes).toEqual([['gpuBackend', 2]]);
+    expect(desktopGpuBackendWriteFailed()).toBe(false);
+  });
+
+  it("puts the local backend value back on the shell's own when the write is refused", async () => {
+    // The restart the options window offers reads the LOCAL value against the
+    // shell's launch snapshot, so a refused write that left the pick standing
+    // would offer a restart into a backend the shell never stored.
+    const { bridge, calls } = bridgeRecorder(false);
+    const { settings, writes } = settingsRecorder();
+    expect(applyDesktopShellSetting('gpuBackend', 2, settings, bridge)).toBe(true);
+    await new Promise((r) => setTimeout(r, 0));
+    // Local first (the row answers the click), then the push, then the shell's
+    // own stored value read back and written straight into the local store.
+    expect(calls).toEqual(['set:gpuBackend=opengl', 'get:gpuBackend']);
+    expect(writes).toEqual([
+      ['gpuBackend', 2],
+      ['gpuBackend', 1],
+    ]);
+    // And only now does the row learn to say so, with the buttons already back
+    // on the value the sentence names.
+    expect(desktopGpuBackendWriteFailed()).toBe(true);
   });
 
   it('routes the presence toggle with the same polarity on both sides', async () => {

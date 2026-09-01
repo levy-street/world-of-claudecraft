@@ -4,10 +4,16 @@
 // never links a program cold on a live frame; the cast bars and nameplates
 // the player acts on are untouched, only the cosmetic read is skipped.
 // The per-frame path is wider than the cast draws alone (a held entity is
-// slept, so its CC band, ground aura, shell, orbit and glow sleep with it), and
-// what carries the actionable reads through the window is elsewhere: the rig's
-// windup clip, the terrain-draped area ring, the cast bar, the nameplate and
-// the HUD debuffs, with the deadline below bounding the whole window.
+// slept, so its ground aura, shell, orbit and glow sleep with it), with ONE
+// read that survives the closed gate: the hard-CC band, re-held right after
+// the sleep that deleted it, because a stun, fear or root is information the
+// player acts on and only a frustum-culled rig may drop it. The other
+// actionable reads are elsewhere: the rig's windup clip, the terrain-draped
+// area ring, the cast bar, the nameplate and the HUD debuffs, with the
+// deadline below bounding the whole window. The band's overlay program is one
+// of the gated set, so drawing it through the closed gate may link that one
+// program cold once (the trade the area ring makes too); its unit then settles
+// as a hit and records it like the rest.
 //
 // Why a gate rather than an earlier link: the boot manifest's entry for these
 // programs runs after its 3 s budget on the OpenGL desktops (measured
@@ -38,6 +44,9 @@ export interface CastVfxReadinessDeps<M> {
   /** The lazy stand-ins were staged at least once: until then their set is
    *  unknown, so nothing is admitted. */
   staged: () => boolean;
+  /** Whether a settle has PROVED this material's program linked (the host
+   *  reads the settle record, never the driver: a per-frame consult must not
+   *  issue a GPU-process round trip). */
   linked: (material: M) => boolean;
 }
 
@@ -71,6 +80,9 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   // From the first consult, not from the staging: the failure this bounds
   // includes the one where the stand-ins are never staged at all.
   let firstConsultAt: number | null = null;
+  // Per material, the same latch: one that answered linked is never asked
+  // again, so the walk shrinks to the materials still pending.
+  const linkedMaterials = new Set<M>();
   const check = (): boolean => {
     if (ready) return true;
     const now = deps.now();
@@ -86,7 +98,11 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
     }
     if (materials === null) materials = deps.materials();
     let unlinked = 0;
-    for (const material of materials) if (!deps.linked(material)) unlinked++;
+    for (const material of materials) {
+      if (linkedMaterials.has(material)) continue;
+      if (deps.linked(material)) linkedMaterials.add(material);
+      else unlinked++;
+    }
     pending = unlinked;
     ready = unlinked === 0;
     return ready;

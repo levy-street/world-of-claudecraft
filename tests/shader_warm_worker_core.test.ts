@@ -218,6 +218,26 @@ describe('warm scheduler order', () => {
     expect(scheduler.takeNext()?.id).toBe(1);
   });
 
+  it('moves a pending request to where a fresh arrival at the new priority would land', () => {
+    // The client's dedupe promotes a catalog's program when a reveal names it:
+    // it goes ahead of everything below the new priority and behind what is
+    // already pending at or above it, and an in-flight or unknown id is left.
+    const { scheduler } = rig();
+    scheduler.enqueue({ id: 1, priority: 10 });
+    scheduler.enqueue({ id: 2, priority: 10 });
+    scheduler.enqueue({ id: 3, priority: 10 });
+    scheduler.enqueue({ id: 4, priority: 40 });
+    expect(scheduler.reprioritize(3, 40)).toBe(true);
+    expect(scheduler.reprioritize(99, 40)).toBe(false);
+    expect(scheduler.pendingCount()).toBe(4);
+    expect(scheduler.takeNext()?.id).toBe(4);
+    expect(scheduler.reprioritize(4, 80)).toBe(false);
+    scheduler.markSettled(4);
+    expect(scheduler.takeNext()?.id).toBe(3);
+    scheduler.markSettled(3);
+    expect(scheduler.takeNext()?.id).toBe(1);
+  });
+
   it('ignores an id it is already carrying, pending or in flight', () => {
     const { scheduler } = rig();
     scheduler.enqueue({ id: 7, priority: 10 });

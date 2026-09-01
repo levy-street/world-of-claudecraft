@@ -41,6 +41,14 @@ export interface ShaderWarmCancelMessage {
   ids: number[];
 }
 
+/** A program already asked for is wanted sooner (a live view or a reveal
+ *  named the same text a catalog queued first): the worker moves it ahead of
+ *  everything below the new priority, in place if it is already linking. */
+export interface ShaderWarmReprioritizeMessage {
+  kind: 'reprioritize';
+  updates: Array<{ id: number; priority: number }>;
+}
+
 /** No teardown message: the client retires a worker by terminating it, which
  *  takes the whole scope (its context and its OffscreenCanvas) with it, and a
  *  message posted right before that terminate is not guaranteed to run. */
@@ -52,6 +60,7 @@ export type ShaderWarmClientMessage =
   | ShaderWarmInitMessage
   | ShaderWarmRequestMessage
   | ShaderWarmCancelMessage
+  | ShaderWarmReprioritizeMessage
   | ShaderWarmPauseMessage;
 
 /** Why the worker could not take the game context's contract. A context

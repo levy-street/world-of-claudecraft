@@ -42,20 +42,31 @@ export function desktopGpuBackendSupported(bridge: DesktopBridge | null | undefi
   );
 }
 
-/** Push a player's choice to the shell store. Fire and forget: the shell
- *  applies it at the next launch, and a missing setter, a dead channel or a
- *  rejected write leave the options window undisturbed. */
-export function pushDesktopGpuBackend(
+/** Push a player's choice to the shell store and answer whether it stuck.
+ *  Never throws. Null when the shell has no setter (nothing to confirm, and
+ *  nothing to say about it); false on a rejected write, a dead channel, or the
+ *  shell answering false, which it does when its own prefs write failed, when
+ *  the sender is untrusted, or when the value is not one it knows. A write the
+ *  shell persisted clears the failure latch below (the apply arm latches the
+ *  refusal itself, see latchDesktopGpuBackendWriteFailed), so a retry that
+ *  works takes the sentence off the row. */
+export async function pushDesktopGpuBackend(
   bridge: DesktopBridge | null | undefined,
   value: number,
-): void {
+): Promise<boolean | null> {
   const write = bridge?.setGpuBackend;
-  if (typeof write !== 'function') return;
+  if (typeof write !== 'function') return null;
+  let answer: unknown;
   try {
-    void Promise.resolve(write.call(bridge, gpuBackendSettingFromValue(value))).catch(() => {});
+    answer = await write.call(bridge, gpuBackendSettingFromValue(value));
   } catch {
-    /* the shell's channel is gone; the stored setting is still the player's */
+    // The shell's channel is gone, or it threw on the way in: the stored
+    // setting is whatever it was, which is exactly what the row must say.
+    return false;
   }
+  if (answer === false) return false;
+  latchDesktopGpuBackendWriteFailed(false);
+  return true;
 }
 
 /** Reflect the shell's stored choice into the local setting at boot, writing
@@ -168,8 +179,43 @@ export function desktopGpuBackendActive(): DesktopGpuBackendActive | null {
   return activeState;
 }
 
-/** Tests only: forget the latched reading and its subscribers between cases. */
+/** Whether the shell refused the last backend write it was given, which means
+ *  the STORED choice is still the old one and the next launch will use it. */
+let writeFailed = false;
+
+const writeFailedListeners = new Set<() => void>();
+
+/** Subscribe to a CHANGE of that signal, the same no-payload shape as
+ *  onDesktopGpuBackendActiveChange above: the answer comes back through
+ *  desktopGpuBackendWriteFailed(), so there is one reading, not two. Returns
+ *  the unsubscribe. */
+export function onDesktopGpuBackendWriteFailed(listener: () => void): () => void {
+  writeFailedListeners.add(listener);
+  return () => writeFailedListeners.delete(listener);
+}
+
+/** Latch the refusal and wake the subscribers on a transition (silent on a
+ *  repeat, like the reading above). The push above clears it itself, but the
+ *  apply arm latches a FAILURE, and only after it has put the local setting
+ *  back on the shell's stored value: the row's sentence names that stored
+ *  value, so waking before the revert would paint one pass naming the very
+ *  choice that did not take. */
+export function latchDesktopGpuBackendWriteFailed(failed: boolean): void {
+  if (writeFailed === failed) return;
+  writeFailed = failed;
+  for (const listener of writeFailedListeners) listener();
+}
+
+/** True while the shell's stored choice is NOT what the player last picked. */
+export function desktopGpuBackendWriteFailed(): boolean {
+  return writeFailed;
+}
+
+/** Tests only: forget the latched reading, the refusal, and their subscribers
+ *  between cases. */
 export function resetDesktopGpuBackendActiveForTest(): void {
   activeState = null;
   activeListeners.clear();
+  writeFailed = false;
+  writeFailedListeners.clear();
 }

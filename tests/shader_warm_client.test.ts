@@ -16,9 +16,11 @@ import {
   noteShaderWarmHold,
   resetShaderWarmForTest,
   SHADER_WARM_READY_DEADLINE_MS,
+  setShaderWarmStoredSettingSource,
   shaderWarmAvailable,
   shaderWarmDecide,
   shaderWarmSnapshot,
+  storedShaderWarmSetting,
   warmShaderPrograms,
 } from '../src/render/shader_warm_client';
 import {
@@ -1065,5 +1067,53 @@ describe('a hold that gives up on its request', () => {
     ready();
     expect(worker().ofKind('warm')).toHaveLength(0);
     expect(worker().ofKind('cancel')).toHaveLength(0);
+  });
+});
+
+describe('the registered stored-option source', () => {
+  it('hands the corpus arm what the settings module registered, null by default', () => {
+    expect(storedShaderWarmSetting()).toBeNull();
+    setShaderWarmStoredSettingSource(() => 'off');
+    expect(storedShaderWarmSetting()).toBe('off');
+    setShaderWarmStoredSettingSource(() => null);
+    expect(storedShaderWarmSetting()).toBeNull();
+  });
+});
+
+describe('priority promotion', () => {
+  it('posts a reprioritize for a pending program a higher-priority hold names again', () => {
+    // A catalog held first at the prewarm priority; the live view naming the
+    // same text must reach the worker's queue at ITS priority, not wait
+    // behind the catalog until the hold cap.
+    expect(GPU_WORK_PRIORITY.LIVE_VIEW).toBeGreaterThan(GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    const { ready, worker } = start({ search: '?shaderwarm=all' });
+    ready();
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.LIVE_VIEW);
+    const w = worker();
+    expect(w.ofKind('warm')).toHaveLength(1);
+    expect(w.ofKind('reprioritize')).toEqual([
+      { kind: 'reprioritize', updates: [{ id: 1, priority: GPU_WORK_PRIORITY.LIVE_VIEW }] },
+    ]);
+    // The same or a lower priority posts nothing more.
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.LIVE_VIEW);
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    expect(w.ofKind('reprioritize')).toHaveLength(1);
+    expect(shaderWarmSnapshot().promoted).toBe(1);
+  });
+
+  it('carries the promotion on the copy still queued for a worker that is not ready', () => {
+    const { ready, worker } = start({ search: '?shaderwarm=all' });
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    holdShaderPrograms([SOURCE], GPU_WORK_PRIORITY.LIVE_VIEW);
+    const w = worker();
+    expect(w.ofKind('reprioritize')).toEqual([]);
+    ready();
+    const flushed = w.ofKind('warm');
+    expect(flushed).toHaveLength(1);
+    expect((flushed[0].sources as Array<{ priority: number }>)[0].priority).toBe(
+      GPU_WORK_PRIORITY.LIVE_VIEW,
+    );
+    expect(w.ofKind('reprioritize')).toEqual([]);
   });
 });

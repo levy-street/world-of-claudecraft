@@ -1533,6 +1533,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '자동은 가장 알맞은 옵션을 대신 선택합니다. Vulkan이 더 빠르며 대부분의 플레이어에게 권장됩니다. OpenGL은 더 느리지만 Vulkan이 제대로 작동하지 않을 때 도움이 될 수 있습니다. 다음에 게임을 시작할 때 적용됩니다.',
   'hudChrome.options.gpuBackendActiveAutoCapped':
     '현재 {backend}을(를) 사용 중입니다. 이 그래픽 카드에서는 자동이 아직 Vulkan을 시도하지 않습니다. 시도하려면 Vulkan을 선택하세요.',
+  'hudChrome.options.gpuBackendSaveFailed':
+    '선택을 저장하지 못했습니다. 다음 실행에서도 {backend}을(를) 사용합니다.',
   'hudChrome.options.restartPending': '일부 변경 사항은 재시작 후에 적용됩니다.',
   'hudChrome.options.restartGame': '게임 재시작',
   'hudChrome.options.restartInProgress': '게임을 재시작하는 중...',

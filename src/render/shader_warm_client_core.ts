@@ -110,10 +110,22 @@ export type ShaderWarmSetting = 'auto' | ShaderWarmMode;
 
 export const SHADER_WARM_SETTINGS: readonly ShaderWarmSetting[] = ['auto', 'off', 'reveal', 'all'];
 
-function asShaderWarmSetting(value: string | null | undefined): ShaderWarmSetting | null {
-  return value === 'auto' || value === 'off' || value === 'reveal' || value === 'all'
-    ? value
-    : null;
+/** The one grammar every `?shaderwarm=` reader shares (the worker here, the
+ *  character-select corpus in shader_warmup_core.ts): the four settings by
+ *  name, plus `0` and `1` as the corpus's original off and on, so one pin
+ *  reads the same on both arms and a probe cannot leave one of them running. */
+export function asShaderWarmSetting(value: string | null | undefined): ShaderWarmSetting | null {
+  if (value === 'auto' || value === 'off' || value === 'reveal' || value === 'all') return value;
+  if (value === '0') return 'off';
+  if (value === '1') return 'all';
+  return null;
+}
+
+/** The query arm alone: the pinned setting, or null when the flag is absent
+ *  or names nothing known. */
+export function readShaderWarmQuery(search: string): ShaderWarmSetting | null {
+  const match = /[?&]shaderwarm=([^&]*)/.exec(search);
+  return match ? asShaderWarmSetting(decodeURIComponent(match[1] ?? '')) : null;
 }
 
 /** `?shaderwarmready=<ms>` pins how long a spawned worker has to answer ready,
@@ -136,9 +148,7 @@ export function readShaderWarmSetting(
   search: string,
   stored: string | null | undefined = null,
 ): ShaderWarmSetting {
-  const match = /[?&]shaderwarm=([^&]*)/.exec(search);
-  const query = match ? asShaderWarmSetting(decodeURIComponent(match[1] ?? '')) : null;
-  return query ?? asShaderWarmSetting(stored) ?? 'off';
+  return readShaderWarmQuery(search) ?? asShaderWarmSetting(stored) ?? 'off';
 }
 
 /** The platform class the mode resolver refuses on: phone-class WebKit,
@@ -199,6 +209,9 @@ export interface ShaderWarmRequestStats {
   cancelled: number;
   /** Requests answered from an earlier warm (the same text asked again). */
   deduped: number;
+  /** Deduped requests that raised the pending program's priority (a live
+   *  view or a reveal naming what a catalog queued first). */
+  promoted: number;
   /** Gates that held their link for the worker. */
   held: number;
   /** Of the held gates, those whose every program was warm when the hold
@@ -218,11 +231,19 @@ export interface ShaderWarmRequestStats {
 
 export interface ShaderWarmRequests {
   /** Ask for a set of programs. The returned ids are the worker's; already
-   *  warm ones are not re-sent and are not in `toSend`. */
+   *  warm ones are not re-sent and are not in `toSend`. A pending one asked
+   *  again at a HIGHER priority is in `toPromote`: the worker keeps its own
+   *  order by priority, so a dedupe that kept the first, lower priority left a
+   *  reveal's program behind the catalog that queued it first, until the hold
+   *  cap. A lower or equal priority changes nothing. */
   request(
     sources: readonly ShaderWarmRequestSource[],
     priority: number,
-  ): { ids: number[]; toSend: ShaderWarmSource[] };
+  ): {
+    ids: number[];
+    toSend: ShaderWarmSource[];
+    toPromote: Array<{ id: number; priority: number }>;
+  };
   /** Resolves with the outcomes of `ids`, in order, once every one settled. */
   whenSettled(ids: readonly number[]): Promise<ShaderWarmOutcome[]>;
   /** True when the id was pending and is settled now. `cancelled` says a
@@ -257,6 +278,7 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
     failed: 0,
     cancelled: 0,
     deduped: 0,
+    promoted: 0,
     held: 0,
     heldWarm: 0,
     heldTimedOut: 0,
@@ -278,6 +300,7 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
     request(sources, priority) {
       const ids: number[] = [];
       const toSend: ShaderWarmSource[] = [];
+      const toPromote: Array<{ id: number; priority: number }> = [];
       for (const source of sources) {
         stats.asked++;
         const hash = `${programSourceHash(source.vertex, source.fragment)}|${source.index0Attribute}`;
@@ -285,6 +308,11 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
         if (entry) {
           stats.deduped++;
           entry.interest++;
+          if (entry.outcome === null && priority > entry.priority) {
+            entry.priority = priority;
+            stats.promoted++;
+            toPromote.push({ id: entry.id, priority });
+          }
         } else {
           entry = { id: nextId++, hash, outcome: null, waiters: [], priority, interest: 1 };
           byHash.set(hash, entry);
@@ -301,7 +329,7 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
         }
         ids.push(entry.id);
       }
-      return { ids, toSend };
+      return { ids, toSend, toPromote };
     },
     whenSettled(ids) {
       return Promise.all(

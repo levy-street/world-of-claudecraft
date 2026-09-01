@@ -169,7 +169,7 @@ describe('the renderer wires the units into the prewarm resume lane', () => {
       'resumeProgramUnits: () => [...abilityMaterialSlot.resumeUnits(), ...castVfxUnits()],',
     );
     expect(renderer).toContain(
-      'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, (root) =>\n        this.compilePrewarmColorPrograms(root, false),',
+      'castVfxProgramUnits(this.scene, abilityMaterialSlot.group, this.compileArms, this.webgl);',
     );
     // run() links the same set behind the curtain; the spawn binds textures only.
     expect(entry).toContain('await Promise.all(castVfxUnits().map((unit) => unit.run()));');

@@ -1494,6 +1494,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '自動會為你選擇最合適的選項。Vulkan 較快，建議大多數玩家使用。OpenGL 較慢，但在 Vulkan 無法正常運作時可能會有幫助。下次啟動遊戲時生效。',
   'hudChrome.options.gpuBackendActiveAutoCapped':
     '目前使用 {backend}。自動模式暫時不會在此顯示卡上嘗試 Vulkan；如要嘗試，請選擇 Vulkan。',
+  'hudChrome.options.gpuBackendSaveFailed':
+    '無法儲存此選擇。下次啟動仍會使用 {backend}。',
   'hudChrome.options.restartPending': '部分變更將在重新啟動後生效。',
   'hudChrome.options.restartGame': '重新啟動遊戲',
   'hudChrome.options.restartInProgress': '正在重新啟動遊戲...',

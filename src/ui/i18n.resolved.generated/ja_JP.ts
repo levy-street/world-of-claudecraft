@@ -1571,6 +1571,7 @@ export const ja_JP: EnTranslations = {
       "gpuBackendActive": "現在は {backend} を使用しています。",
       "gpuBackendActiveUnavailable": "現在は {backend} を使用しています（Vulkan を有効にできませんでした）。",
       "gpuBackendActiveAutoCapped": "現在 {backend} を使用中です。このグラフィックカードでは自動はまだVulkanを試しません。試すにはVulkanを選んでください。",
+      "gpuBackendSaveFailed": "この選択を保存できませんでした。次回の起動でも {backend} が使用されます。",
       "gpuBackendActiveNameVulkan": "Vulkan",
       "gpuBackendActiveNameOpenGL": "OpenGL",
       "restartPending": "一部の変更は再起動後に反映されます。",

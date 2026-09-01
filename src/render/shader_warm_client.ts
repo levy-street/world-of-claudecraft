@@ -203,6 +203,12 @@ export function setShaderWarmStoredSettingSource(source: () => string | null): v
   storedSettingSource = source;
 }
 
+/** The stored option as registered, for the character-select corpus
+ *  (src/game/shader_cache_warmup.ts), which honours the same Off. */
+export function storedShaderWarmSetting(): string | null {
+  return storedSettingSource();
+}
+
 /** Read once, so a probe can pin an arm; the defaults are the page's. `auto`
  *  stays OFF until the first policy call brings a context whose backend
  *  decides it. */
@@ -420,7 +426,7 @@ export function holdShaderPrograms(
   sources: readonly ShaderWarmRequestSource[],
   priority: number,
 ): ShaderWarmHold {
-  const { ids, toSend } = state.requests.request(sources, priority);
+  const { ids, toSend, toPromote } = state.requests.request(sources, priority);
   if (toSend.length > 0) {
     if (state.workerState === 'ready' && state.worker) {
       state.worker.postMessage({ kind: 'warm', sources: toSend });
@@ -429,6 +435,17 @@ export function holdShaderPrograms(
       state.queuedUntilReady.push(...toSend);
     } else {
       for (const source of toSend) state.requests.settle(source.id, 'failed');
+    }
+  }
+  if (toPromote.length > 0) {
+    if (state.workerState === 'ready' && state.worker) {
+      state.worker.postMessage({ kind: 'reprioritize', updates: toPromote });
+    } else if (state.workerState === 'starting') {
+      // Not sent yet: the queued copy carries the priority the flush posts.
+      for (const update of toPromote) {
+        const queued = state.queuedUntilReady.find((source) => source.id === update.id);
+        if (queued) queued.priority = update.priority;
+      }
     }
   }
   const requests = state.requests;

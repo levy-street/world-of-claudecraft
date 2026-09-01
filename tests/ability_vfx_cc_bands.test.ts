@@ -12,7 +12,9 @@
 // are the frame-stamp sweep (aura faded or entity out of the renderer's sync
 // range), sleepEntity via syncEntity(e, false) (a frustum-culled,
 // non-actionable rig), the dead gate, and the ranked cap; no quality tier,
-// budget tier, or governor state reaches it.
+// budget tier, or governor state reaches it, and neither does the cast
+// readiness gate (its sleep keeps the band: the keep arm below, the painter
+// side in tests/ability_vfx_cast_gate.test.ts).
 import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AbilityVfxFx } from '../src/render/ability_vfx/fx';
@@ -509,7 +511,8 @@ describe('painter feeds the tell from the sim state, not the spec table', () => 
 
     painter.syncEntity(ent([{ id: 'storm_bolt_stun', kind: 'stun', remaining: 3 }]), false);
 
-    expect(fx.sleepEntity).toHaveBeenCalledWith(7);
+    // The full sleep (no band kept): the keep arm is the cast gate's alone.
+    expect(fx.sleepEntity).toHaveBeenCalledWith(7, false);
     expect(fx.holdCcBand).not.toHaveBeenCalled();
   });
 });
@@ -647,6 +650,25 @@ describe('fx engine draws and sweeps the held band', () => {
     expect(drawn).toBe(MAX_CC_BANDS);
     // Every held entry survives the cap; only the draw is bounded.
     expect(probe.ccBands.size).toBe(total);
+  });
+
+  it('keeps a held band through a sleep asked to keep it, and drops it otherwise', () => {
+    // The cast gate's per-frame path: the sleep releases the cosmetic pools
+    // and the hold that follows refreshes the same entry, so the band draws
+    // on and no entry is re-minted per frame.
+    const { fx, probe } = makeFx();
+    fx.holdCcBand(7, 'stun', 3);
+    const entry = probe.ccBands.get(7);
+    fx.sleepEntity(7, true);
+    fx.holdCcBand(7, 'stun', 3);
+    expect(probe.ccBands.get(7)).toBe(entry);
+    fx.update(0.05);
+    expect(fx.heldCcBand(7)).toBe(true);
+    // A culled rig's sleep is the full one.
+    fx.sleepEntity(7);
+    fx.update(0.05);
+    expect(fx.heldCcBand(7)).toBe(false);
+    expect(probe.ccBands.has(7)).toBe(false);
   });
 
   it('gives the scarce slots to the most severe control, not the nearest', () => {

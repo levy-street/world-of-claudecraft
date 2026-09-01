@@ -9877,6 +9877,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.gpuBackendAuto'
   | 'hudChrome.options.gpuBackendNote'
   | 'hudChrome.options.gpuBackendOpenGL'
+  | 'hudChrome.options.gpuBackendSaveFailed'
   | 'hudChrome.options.gpuBackendVulkan'
   | 'hudChrome.options.graphicsApplied'
   | 'hudChrome.options.graphicsApply'

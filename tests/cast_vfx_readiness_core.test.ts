@@ -93,6 +93,32 @@ describe('createCastVfxReadiness', () => {
     expect(reads).toHaveBeenCalledTimes(1);
   });
 
+  it('never asks about a material that already answered linked', () => {
+    // `linked` is a driver query on the host (three's isReady polls
+    // COMPLETION_STATUS while a link is pending), and a linked program stays
+    // linked: the walk shrinks to what is still pending.
+    const materials: Mat[] = [
+      { id: 'ring', linked: true },
+      { id: 'decal', linked: false },
+    ];
+    const asked: string[] = [];
+    const readiness = createCastVfxReadiness<Mat>({
+      now: () => 0,
+      deadlineMs: DEADLINE_MS,
+      materials: () => materials,
+      staged: () => true,
+      linked: (material) => {
+        asked.push(material.id);
+        return material.linked;
+      },
+    });
+    expect(readiness.ready()).toBe(false);
+    expect(readiness.ready()).toBe(false);
+    expect(asked.filter((id) => id === 'ring')).toHaveLength(1);
+    expect(asked.filter((id) => id === 'decal')).toHaveLength(2);
+    expect(readiness.snapshot().pending).toBe(1);
+  });
+
   it('is ready with nothing to link once staged', () => {
     const { readiness } = harness([]);
     expect(readiness.admit()).toBe(true);

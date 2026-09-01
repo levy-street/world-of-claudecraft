@@ -4,26 +4,43 @@
 // The exceptions are the reads a player ACTS on, which the gate must never
 // hold: the terrain-draped area ring, point-anchored and entity-anchored alike
 // (the blast area the player steps out of, whose pool is not a cast program),
-// and a mob's windup clip (a rig animation, no program at all).
+// a mob's windup clip (a rig animation, no program at all), and the victim's
+// hard-CC band, which is re-held right after the per-frame sleep the closed
+// gate takes (only a frustum-culled rig, and a corpse, drop it).
 
 import { describe, expect, it, vi } from 'vitest';
 import type { AbilityVfxFx } from '../src/render/ability_vfx/fx';
-import { AbilityVfx } from '../src/render/ability_vfx/painter';
+import { AbilityVfx, type AbilityVfxEntityState } from '../src/render/ability_vfx/painter';
 
-/** An engine that records every method the painter reaches for. */
-function recordingFx(): { fx: AbilityVfxFx; touched: Set<string> } {
+/** An engine that records every method the painter reaches for, in order. */
+function recordingFx(): {
+  fx: AbilityVfxFx;
+  touched: Set<string>;
+  calls: { name: string; args: unknown[] }[];
+} {
   const touched = new Set<string>();
+  const calls: { name: string; args: unknown[] }[] = [];
+  const stubs = new Map<string, (...args: unknown[]) => number>();
   const fx = new Proxy({} as Record<string, unknown>, {
     get: (_target, key) => {
-      touched.add(String(key));
-      return vi.fn(() => 0);
+      const name = String(key);
+      touched.add(name);
+      let stub = stubs.get(name);
+      if (!stub) {
+        stub = vi.fn((...args: unknown[]) => {
+          calls.push({ name, args });
+          return 0;
+        });
+        stubs.set(name, stub);
+      }
+      return stub;
     },
   }) as unknown as AbilityVfxFx;
-  return { fx, touched };
+  return { fx, touched, calls };
 }
 
 function painterWith(admit: () => boolean, ready: () => boolean = admit) {
-  const { fx, touched } = recordingFx();
+  const { fx, touched, calls } = recordingFx();
   const vfx = {
     projectile: vi.fn(),
     lightningProjectile: vi.fn(),
@@ -51,7 +68,8 @@ function painterWith(admit: () => boolean, ready: () => boolean = admit) {
   );
   // The constructor's delegate wiring is the one touch a closed gate allows.
   touched.clear();
-  return { painter, touched, vfx, spawnAoeRing, triggerAttack };
+  calls.length = 0;
+  return { painter, touched, calls, vfx, spawnAoeRing, triggerAttack };
 }
 
 const frostbolt = {
@@ -171,6 +189,8 @@ describe('the cast gate', () => {
 
   it('keeps the per-entity held state in sync without drawing while closed', () => {
     // The per-frame consult is the uncounted read: a counted refusal is a cast.
+    // This entity wears no hard-CC aura, so the band exception below never
+    // applies to it and the closed gate really does draw nothing.
     const admit = vi.fn(() => false);
     const { painter, touched } = painterWith(admit, () => false);
     painter.syncEntity({
@@ -184,5 +204,60 @@ describe('the cast gate', () => {
     // none of the engine's spawn methods.
     for (const key of touched) expect(key).not.toMatch(/spawn|flash|hold|windup|orbit/i);
     expect(admit).not.toHaveBeenCalled();
+  });
+});
+
+describe('the hard-CC band under a closed gate', () => {
+  // The band is what says a victim is stunned, feared or rooted: actionable
+  // information, which docs/design/graphics-settings-fairness.md keeps at every
+  // tier. The closed gate sleeps the entity (that is how it releases the
+  // cosmetic pools, and sleepEntity deletes the band), so the band has to be
+  // re-held right after, on the entity that is still on screen.
+  const stunned = (over: Partial<AbilityVfxEntityState> = {}): AbilityVfxEntityState => ({
+    id: 7,
+    castingAbility: null,
+    castRemaining: 0,
+    castTotal: 0,
+    auras: [{ id: 'war_stomp_stun', kind: 'stun', remaining: 2.5 }],
+    ...over,
+  });
+
+  it('holds the worn band while closed, and reaches nothing else', () => {
+    const { painter, touched, calls } = painterWith(() => false);
+    painter.syncEntity(stunned());
+    expect(touched).toEqual(new Set(['sleepEntity', 'holdCcBand']));
+    expect(calls.map((c) => c.name)).toEqual(['sleepEntity', 'holdCcBand']);
+    // The sleep is asked to KEEP the band (no entry re-minted per frame), and
+    // the hold that follows refreshes it in place.
+    expect(calls[0].args).toEqual([7, true]);
+    expect(calls[1].args).toEqual([7, 'stun', 2.5]);
+  });
+
+  it('drops the band for a frustum-culled rig, gate open or closed', () => {
+    // The pre-existing skip: a rig the renderer culled shows nothing at all,
+    // so there is no read to keep, and the sleep is a full one.
+    for (const gate of [false, true]) {
+      const { painter, touched, calls } = painterWith(() => gate);
+      painter.syncEntity(stunned(), false);
+      expect(calls.map((c) => c.name)).toEqual(['sleepEntity']);
+      expect(calls[0].args).toEqual([7, false]);
+      expect(touched.has('holdCcBand')).toBe(false);
+    }
+  });
+
+  it('drops the band for a dead body under a closed gate', () => {
+    // A corpse must not wear a frozen band; deadness is the renderer's own
+    // isVisuallyDead rule, exactly as on the drawing path.
+    const { painter, touched } = painterWith(() => false);
+    painter.syncEntity(stunned({ dead: true, hp: 0 }));
+    expect(touched.has('holdCcBand')).toBe(false);
+  });
+
+  it('holds the same band once the gate opens', () => {
+    const { painter, calls } = painterWith(() => true);
+    painter.syncEntity(stunned());
+    const held = calls.filter((c) => c.name === 'holdCcBand');
+    expect(held).toHaveLength(1);
+    expect(held[0].args).toEqual([7, 'stun', 2.5]);
   });
 });

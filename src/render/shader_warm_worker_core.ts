@@ -193,6 +193,10 @@ export interface WarmScheduler {
    *  to its settle (a driver link is not cancellable). Returns the ids that
    *  were still pending. */
   cancel(ids: readonly number[]): number[];
+  /** Move a pending request to where the new priority puts it (behind every
+   *  pending request of the same or higher priority, as a fresh arrival
+   *  would land). A request in flight or unknown is left alone; false then. */
+  reprioritize(id: number, priority: number): boolean;
   pause(): void;
   resume(): void;
   paused(): boolean;
@@ -252,6 +256,14 @@ export function createWarmScheduler(
         cancelled++;
       }
       return dropped;
+    },
+    reprioritize(id, priority) {
+      const at = pending.findIndex((item) => item.id === id);
+      if (at < 0) return false;
+      const [request] = pending.splice(at, 1);
+      if (!request) return false;
+      insert({ ...request, priority });
+      return true;
     },
     pause() {
       paused = true;

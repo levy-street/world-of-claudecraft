@@ -1193,7 +1193,7 @@ export class AbilityVfx {
   // Allocation-free per call.
   syncEntity(e: AbilityVfxEntityState, renderEffects = true): void {
     // The held state below is kept either way; only the draws wait.
-    if (renderEffects && !this.ready()) renderEffects = false;
+    const gateHeld = renderEffects && !this.ready();
     const fx = this.deps.fx;
     let held = this.heldSemantic.get(e.id);
     if (!held) {
@@ -1208,8 +1208,15 @@ export class AbilityVfx {
     }
     const castingWasHeld = e.castingAbility !== null && held.castingAbility === e.castingAbility;
     const queuedWasHeld = e.queuedOnSwing != null && held.queuedOnSwing === e.queuedOnSwing;
-    if (!renderEffects) {
-      fx.sleepEntity(e.id);
+    if (gateHeld || !renderEffects) {
+      // A culled rig is off screen and drops everything with it (the
+      // pre-existing skip). A gate-held one is on screen and only its COSMETIC
+      // reads wait, so the sleep keeps its hard-CC band and the hold below
+      // refreshes it in place: a stun, fear or root is information the player
+      // acts on, and drawing it may link the overlay program cold once, which
+      // is the same trade the area ring already makes.
+      fx.sleepEntity(e.id, gateHeld);
+      if (gateHeld) this.holdWornCcBand(e, fx);
       this.latchHeldState(held, e);
       return;
     }
@@ -1410,25 +1417,7 @@ export class AbilityVfx {
       }
       bands++;
     }
-    // The hard-CC tell: a worn stun, fear, or root aura wears its band for the
-    // aura's whole life. Matched by what the SIM says the victim is suffering
-    // (aura kind, plus the sim's own fear rule for the fear family), never the
-    // spec table, so every source reads (mob stomps, ensnare affixes and traps
-    // included) and it works online for any victim in interest range, exactly
-    // like the bands above. Actionable information: it rides outside the cast
-    // budget, every quality tier keeps it, and the fx engine sweeps it the
-    // frame the aura fades. One band per victim, the most severe the victim
-    // wears, which is also what keeps a stunned target (always isRooted() in
-    // the sim) from wearing two. A dead body sheds it (an unbreakable stun can
-    // survive death by design, e.g. the Nythraxis transition ghosts; a corpse
-    // must not wear a frozen band). Deadness is the renderer's own
-    // isVisuallyDead rule, not a bare `dead` flag: a mob at 0 hp whose flag
-    // has not landed yet would otherwise keep the band for that window.
-    // CC_BAND_SPECS in the core owns each band's look and why.
-    if (!isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) {
-      const band = wornCcBand(e.auras);
-      if (band) fx.holdCcBand(e.id, band.type, band.remaining);
-    }
+    this.holdWornCcBand(e, fx);
     // On-next-swing queue (heroic-strike style): while the sim's queuedOnSwing
     // flag is armed, the queued ability's authored orbit rides the caster as
     // the empowerment tell - Reaver Strike's hot amber weaponGlow ember that
@@ -1484,6 +1473,28 @@ export class AbilityVfx {
         if (nowSec - ch.lastAt > ch.every * 1.9 + 0.25) this.beamChannels.delete(id);
       }
     }
+  }
+
+  // The hard-CC tell: a worn stun, fear, or root aura wears its band for the
+  // aura's whole life. Matched by what the SIM says the victim is suffering
+  // (aura kind, plus the sim's own fear rule for the fear family), never the
+  // spec table, so every source reads (mob stomps, ensnare affixes and traps
+  // included) and it works online for any victim in interest range, exactly
+  // like the orbit bands. Actionable information: it rides outside the cast
+  // budget, every quality tier keeps it, the closed cast gate keeps it too
+  // (only a culled rig drops it), and the fx engine sweeps it the frame the
+  // aura fades. One band per victim, the most severe the victim wears, which
+  // is also what keeps a stunned target (always isRooted() in the sim) from
+  // wearing two. A dead body sheds it (an unbreakable stun can survive death
+  // by design, e.g. the Nythraxis transition ghosts; a corpse must not wear a
+  // frozen band). Deadness is the renderer's own isVisuallyDead rule, not a
+  // bare `dead` flag: a mob at 0 hp whose flag has not landed yet would
+  // otherwise keep the band for that window. CC_BAND_SPECS in the core owns
+  // each band's look and why.
+  private holdWornCcBand(e: AbilityVfxEntityState, fx: AbilityVfxFx): void {
+    if (isVisuallyDead({ dead: e.dead === true, hp: e.hp ?? 1 })) return;
+    const band = wornCcBand(e.auras);
+    if (band) fx.holdCcBand(e.id, band.type, band.remaining);
   }
 
   private latchHeldState(held: AbilityVfxHeldSemanticState, e: AbilityVfxEntityState): void {

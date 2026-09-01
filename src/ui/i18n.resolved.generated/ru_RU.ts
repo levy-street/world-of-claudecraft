@@ -1571,6 +1571,7 @@ export const ru_RU: EnTranslations = {
       "gpuBackendActive": "Сейчас используется {backend}.",
       "gpuBackendActiveUnavailable": "Сейчас используется {backend} (не удалось включить Vulkan).",
       "gpuBackendActiveAutoCapped": "Сейчас используется {backend}. На этой видеокарте режим Авто пока не пробует Vulkan; чтобы попробовать, выберите Vulkan.",
+      "gpuBackendSaveFailed": "Не удалось сохранить выбор. При следующем запуске будет использоваться {backend}.",
       "gpuBackendActiveNameVulkan": "Vulkan",
       "gpuBackendActiveNameOpenGL": "OpenGL",
       "restartPending": "Некоторые изменения вступят в силу после перезапуска.",

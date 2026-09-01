@@ -869,3 +869,7 @@ export function impostorPrewarmMeshes(): THREE.Object3D[] {
   }
   return out;
 }
+
+/** Test seam: the per-category sprite material builder, which is otherwise
+ *  reachable only through a live session and a baked atlas. */
+export const foliageImpostorInternalsForTest = { impostorMaterial };

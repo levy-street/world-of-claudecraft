@@ -22,12 +22,32 @@ let canvases: CanvasStub[] = [];
  *  that model a driver dropping the context without dispatching the event. */
 let contextIsLost = false;
 
+/** The vertex texts the stub context was asked to link, in submission order. */
+let submitted: string[] = [];
+
 function glStub() {
   return {
     RENDERER: 0x1f01,
+    VERTEX_SHADER: 1,
+    FRAGMENT_SHADER: 2,
+    LINK_STATUS: 3,
     getExtension: (name: string) => (GRANTED.includes(name) ? { name } : null),
     getParameter: () => 'Stub Adapter',
     isContextLost: () => contextIsLost,
+    createShader: (type: number) => ({ type, source: '' }),
+    shaderSource: (shader: { type: number; source: string }, source: string) => {
+      shader.source = source;
+      if (shader.type === 1) submitted.push(source);
+    },
+    compileShader: () => {},
+    createProgram: () => ({}),
+    attachShader: () => {},
+    bindAttribLocation: () => {},
+    linkProgram: () => {},
+    // Never completes: the cases here read the submission order only.
+    getProgramParameter: () => false,
+    deleteShader: () => {},
+    deleteProgram: () => {},
   };
 }
 
@@ -73,10 +93,10 @@ function init(send: (message: unknown) => void): void {
 }
 
 /** One request, which is all it takes to make the worker schedule a tick. */
-function warmOne(id: number) {
+function warmOne(id: number, priority = 0) {
   return {
     kind: 'warm',
-    sources: [{ id, vertex: 'v', fragment: 'f', index0Attribute: 'p', priority: 0 }],
+    sources: [{ id, vertex: `v${id}`, fragment: 'f', index0Attribute: 'p', priority }],
   };
 }
 
@@ -87,6 +107,7 @@ const TICK_WINDOW_MS = 50;
 beforeEach(() => {
   posted.length = 0;
   canvases = [];
+  submitted = [];
   contextIsLost = false;
   // The worker's state is module-scoped and its handler installs at import.
   vi.resetModules();
@@ -173,6 +194,24 @@ describe('the shader warm worker scope', () => {
     send(warmOne(7));
     vi.advanceTimersByTime(TICK_WINDOW_MS);
     expect(posted).toEqual([{ kind: 'failed', id: 7, reason: 'context-lost' }, { kind: 'lost' }]);
+  });
+
+  it('submits a reprioritized request ahead of what was queued before it', async () => {
+    // The client promotes a catalog's program when a reveal names the same
+    // text; the worker re-seats it by the new priority before its next tick.
+    // A window of one makes the order observable one submission at a time.
+    vi.useFakeTimers();
+    const send = await loadWorker();
+    send({ kind: 'init', contextAttributes: null, extensions: GRANTED, maxWindow: 1, retain: 0 });
+    send(warmOne(1));
+    send(warmOne(2));
+    send(warmOne(3));
+    send({ kind: 'reprioritize', updates: [{ id: 3, priority: 50 }] });
+    vi.advanceTimersByTime(TICK_WINDOW_MS);
+    expect(submitted).toEqual(['v3']);
+    // Unknown ids are ignored, and the message never fails anything.
+    send({ kind: 'reprioritize', updates: [{ id: 99, priority: 50 }] });
+    expect(posted.filter((message) => message.kind === 'failed')).toEqual([]);
   });
 
   it('adds nothing when the canvas announces the loss the poll already reported', async () => {

@@ -27,15 +27,31 @@
 // The graphics tier read here is the LIVE `GFX.tier` at record time and the
 // import-time guess at warm-up time; when the two disagree the identity simply
 // does not match and the warm-up skips, which is the fail-safe direction.
+//
+// Off is Off: the stored Shader Warm-up option and the `?shaderwarm=` pin are
+// read through the worker's own grammar (../render/shader_warmup_core
+// readWarmupQuery), and iOS never mints the hidden context, for the reason the
+// worker refuses it there (a second WebGL2 context beside the world's on a
+// phone-class WebKit). This arm is NOT a client of the renderer's preparation
+// scheduler, and cannot be: it runs on the character-select screen, before any
+// renderer or background_gpu_queue exists, and every world entry stops it as
+// its first statement (enterWorld and startOffline), so no live frame ever
+// shares the main thread with a submission. What the GPU process still holds
+// in flight at the click is the entry's own program set resolving into the
+// shared cache, which is the measured gain.
 
-import { GFX } from '../render/gfx';
+import { trackWebGLContext } from '../render/context_release';
+import { GFX, mobilePlatformFromNavigator } from '../render/gfx';
 import { enableRendererExtensions } from '../render/renderer_extensions';
+import { storedShaderWarmSetting } from '../render/shader_warm_client';
+import type { ShaderWarmPlatform } from '../render/shader_warm_client_core';
 import {
   createShaderCorpusRecord,
   createWarmupPlan,
   isShaderCorpusRecord,
   nextWarmupIndex,
   readWarmupQuery,
+  SHADER_CORPUS_MAX_BYTES,
   type ShaderCorpusRecord,
   type ShaderProgramSources,
   shaderCorpusIdentity,
@@ -44,6 +60,7 @@ import {
   type WarmupSkipReason,
   warmupApplies,
   warmupExtensionsMatch,
+  warmupRefusedOnPlatform,
 } from '../render/shader_warmup_core';
 import {
   pollWarmProgram,
@@ -120,6 +137,8 @@ export interface ShaderWarmupStats {
 interface WarmupSession {
   plan: WarmupPlan | null;
   context: WarmupContext | null;
+  /** Forgets the hidden context at the page-teardown release list. */
+  untrackContext: () => void;
   programs: WebGLProgram[];
   /** Submitted programs whose link has not been observed complete yet. */
   pending: WarmProgramHandle[];
@@ -142,6 +161,7 @@ function freshSession(recorded: number | null): WarmupSession {
   return {
     plan: null,
     context: null,
+    untrackContext: () => {},
     programs: [],
     pending: [],
     resolved: 0,
@@ -244,9 +264,27 @@ async function gzip(bytes: Uint8Array): Promise<Uint8Array> {
   return new Uint8Array(await new Response(compressed).arrayBuffer());
 }
 
-async function gunzip(bytes: Uint8Array): Promise<Uint8Array> {
-  const plain = bytesStream(bytes).pipeThrough(new DecompressionStream('gzip'));
-  return new Uint8Array(await new Response(plain).arrayBuffer());
+/** Inflate under a ceiling: a counting stage errors the stream the moment the
+ *  inflated bytes pass `maxBytes`, so a stored value that inflates without
+ *  bound never materializes, and the bytes under it are assembled once by the
+ *  platform (no chunk list beside the result). Null past the ceiling. */
+async function gunzip(bytes: Uint8Array, maxBytes: number): Promise<Uint8Array | null> {
+  let total = 0;
+  const bounded = new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      total += chunk.byteLength;
+      if (total > maxBytes) controller.error(new Error('corpus past the byte ceiling'));
+      else controller.enqueue(chunk);
+    },
+  });
+  try {
+    const plain = bytesStream(bytes)
+      .pipeThrough(new DecompressionStream('gzip'))
+      .pipeThrough(bounded);
+    return new Uint8Array(await new Response(plain).arrayBuffer());
+  } catch {
+    return null;
+  }
 }
 
 /** Gzip when the platform has `CompressionStream`, raw with the flag down
@@ -257,20 +295,27 @@ export async function encodeCorpus(record: ShaderCorpusRecord): Promise<StoredCo
   return { gzip: true, bytes: await gzip(bytes) };
 }
 
-export async function decodeCorpus(stored: unknown): Promise<ShaderCorpusRecord | null> {
+/** The stored value is untrusted (same origin can write the store): bounded
+ *  before inflation, during it, and again on the parsed record's program
+ *  count and source size, so nothing past `maxBytes` is ever held. */
+export async function decodeCorpus(
+  stored: unknown,
+  maxBytes: number = SHADER_CORPUS_MAX_BYTES,
+): Promise<ShaderCorpusRecord | null> {
   if (typeof stored !== 'object' || stored === null) return null;
   const entry = stored as Partial<StoredCorpus>;
   if (!(entry.bytes instanceof Uint8Array)) return null;
+  if (entry.bytes.byteLength > maxBytes) return null;
   try {
     const plain =
       entry.gzip === true
         ? typeof DecompressionStream === 'undefined'
           ? null
-          : await gunzip(entry.bytes)
+          : await gunzip(entry.bytes, maxBytes)
         : entry.bytes;
     if (!plain) return null;
     const parsed: unknown = JSON.parse(new TextDecoder().decode(plain));
-    return isShaderCorpusRecord(parsed) ? parsed : null;
+    return isShaderCorpusRecord(parsed, { bytes: maxBytes }) ? parsed : null;
   } catch {
     return null;
   }
@@ -315,6 +360,10 @@ function currentSearch(): string {
   return location?.search ?? '';
 }
 
+function currentPlatform(): ShaderWarmPlatform {
+  return mobilePlatformFromNavigator(typeof navigator === 'undefined' ? null : navigator);
+}
+
 function appBuildId(): string {
   return typeof __APP_BUILD_ID__ !== 'undefined' ? __APP_BUILD_ID__ : 'dev';
 }
@@ -346,6 +395,9 @@ function defaultScheduleIdle(callback: () => void, delayMs: number): void {
 
 export interface StartShaderWarmupOptions {
   search?: string;
+  /** The stored Shader Warm-up option; the registered source otherwise. */
+  stored?: string | null;
+  platform?: ShaderWarmPlatform;
   store?: KeyValueStore;
   buildId?: string;
   tier?: string;
@@ -385,14 +437,20 @@ function resolveCompletedLinks(gl: WarmupGl): void {
 }
 
 async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
-  const query = readWarmupQuery(options.search ?? currentSearch());
+  const query = readWarmupQuery(
+    options.search ?? currentSearch(),
+    options.stored !== undefined ? options.stored : storedShaderWarmSetting(),
+  );
+  const refused = warmupRefusedOnPlatform(options.platform ?? currentPlatform());
+  // Off and a refused platform read no storage and mint no context.
+  const admitted = query.enabled && !refused;
   const store = options.store ?? createIndexedDbStore();
-  const record = query.enabled ? await decodeCorpus(await store.get(CORPUS_KEY)) : null;
+  const record = admitted ? await decodeCorpus(await store.get(CORPUS_KEY)) : null;
   // The player can have clicked through to the world while the corpus loaded.
   if (session.stopped) return;
   const hasCorpus = record !== null && record.programs.length > 0;
   const context =
-    query.enabled && hasCorpus
+    admitted && hasCorpus
       ? (options.createContext ?? createWarmupContext)(record?.contextAttributes ?? null)
       : null;
   const sweep = context ? enableRendererExtensions(context.gl) : null;
@@ -407,6 +465,7 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
       : '';
   const decision = warmupApplies({
     enabled: query.enabled,
+    iosWebKit: refused,
     parallelCompile: sweep?.parallelCompile ?? false,
     hasCorpus,
     extensionsMatch:
@@ -424,6 +483,13 @@ async function runWarmup(options: StartShaderWarmupOptions): Promise<void> {
   const plan = createWarmupPlan(record.programs.length);
   session.plan = plan;
   session.context = context;
+  // A second live context is capped per GPU process with the world's: the
+  // page-teardown release (context_release.ts) loses it with the rest, so an
+  // entry that never reaches its reveal cannot keep it for the page's life.
+  session.untrackContext = trackWebGLContext({
+    forceContextLoss: releaseShaderWarmup,
+    dispose: releaseShaderWarmup,
+  });
   session.cancelFrame = options.cancelFrame ?? defaultCancelFrame;
   session.corpusPrograms = record.programs.length;
   session.startedAt = now();
@@ -498,6 +564,8 @@ export function releaseShaderWarmup(): void {
     for (const shader of session.shaders) context.gl.deleteShader(shader);
     context.dispose();
   }
+  session.untrackContext();
+  session.untrackContext = () => {};
   session.programs = [];
   session.shaders = [];
   session.context = null;

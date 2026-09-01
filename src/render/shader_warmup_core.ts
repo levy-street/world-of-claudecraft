@@ -45,13 +45,39 @@
 // block that is a 7 s freeze of the character-select screen, so the plan hands
 // out ONE index per call and the host spends one per animation frame.
 
+import {
+  asShaderWarmSetting,
+  readShaderWarmQuery,
+  type ShaderWarmPlatform,
+} from './shader_warm_client_core';
+
 /** Bumped when the record shape changes; an older record is ignored. */
 export const SHADER_CORPUS_VERSION = 2;
 
 /** A full ultra-tier set is about 390 programs; the cap bounds a pathological
  *  session (a long play session that keeps minting variants) rather than the
- *  normal one. */
+ *  normal one. Enforced on the way OUT (the record) and on the way IN (a
+ *  stored value is untrusted, see isShaderCorpusRecord). */
 export const SHADER_CORPUS_PROGRAM_LIMIT = 1024;
+
+/** The most GLSL a corpus may carry, in bytes, applied on the way OUT (the
+ *  recorder stops adding programs at it) and on the way IN (the stored bytes,
+ *  the inflating stream, and the parsed record's summed source length are
+ *  each refused past it). A full ultra set reads about 35 MB of text for 390
+ *  programs; the character-select screen holds the inflated bytes, their
+ *  decoded string and the parsed record at once while it decides, so the
+ *  ceiling sits near the measured set rather than at what the program cap
+ *  alone would admit. The sources three emits are ASCII, so the parsed
+ *  record's character count is its byte count; a non-ASCII write is bounded
+ *  by the two byte arms before it. */
+export const SHADER_CORPUS_MAX_BYTES = 64 * 1024 * 1024;
+
+/** The context extension sweep enables one pinned list (renderer_extensions.ts),
+ *  a dozen names; a record naming more than this is not one of ours. */
+export const SHADER_CORPUS_EXTENSION_LIMIT = 64;
+
+/** An attribute name at location 0: `position` in practice. */
+export const SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT = 256;
 
 export interface ShaderProgramSources {
   vertex: string;
@@ -92,6 +118,7 @@ export interface ShaderCorpusRecord {
 
 export type WarmupSkipReason =
   | 'disabled'
+  | 'ios-webkit'
   | 'no-corpus'
   | 'extension-mismatch'
   | 'identity-mismatch'
@@ -99,6 +126,10 @@ export type WarmupSkipReason =
 
 export interface WarmupAppliesInputs {
   enabled: boolean;
+  /** Phone-class WebKit, where the worker is refused for the same reason
+   *  (shaderWarmModeFor): a second WebGL2 context beside the world's is a
+   *  per-process memory ceiling risk there, whatever the setting says. */
+  iosWebKit: boolean;
   parallelCompile: boolean;
   hasCorpus: boolean;
   /** The warm-up context enabled exactly the recorded set, in that order. */
@@ -149,13 +180,20 @@ export function shaderCorpusIdentity(inputs: ShaderCorpusIdentityInputs): string
 export function selectCorpusPrograms(
   sources: readonly ShaderProgramSources[],
   limit: number = SHADER_CORPUS_PROGRAM_LIMIT,
+  maxChars: number = SHADER_CORPUS_MAX_BYTES,
 ): ShaderProgramSources[] {
   const seen = new Set<string>();
   const kept: ShaderProgramSources[] = [];
+  let chars = 0;
   for (const source of sources) {
     if (kept.length >= limit) break;
     const key = `${source.vertex}\u0000${source.fragment}\u0000${source.index0Attribute}`;
     if (seen.has(key)) continue;
+    // Past the byte ceiling the next boot would refuse the whole record, so
+    // the recorder keeps what fits (first seen, the programs of the first
+    // minutes) and drops the rest.
+    chars += source.vertex.length + source.fragment.length;
+    if (chars > maxChars) break;
     seen.add(key);
     kept.push({
       vertex: source.vertex,
@@ -173,6 +211,7 @@ export interface CreateShaderCorpusRecordInputs {
   contextAttributes: Record<string, unknown> | null;
   sources: readonly ShaderProgramSources[];
   limit?: number;
+  maxChars?: number;
 }
 
 export function createShaderCorpusRecord(
@@ -184,26 +223,42 @@ export function createShaderCorpusRecord(
     extensions: [...inputs.extensions],
     savedAt: inputs.savedAt,
     contextAttributes: inputs.contextAttributes,
-    programs: selectCorpusPrograms(inputs.sources, inputs.limit ?? SHADER_CORPUS_PROGRAM_LIMIT),
+    programs: selectCorpusPrograms(
+      inputs.sources,
+      inputs.limit ?? SHADER_CORPUS_PROGRAM_LIMIT,
+      inputs.maxChars ?? SHADER_CORPUS_MAX_BYTES,
+    ),
   };
 }
 
 /** Whatever comes back from storage is untrusted: an older version, a partial
- *  write or a foreign value must read as "no corpus", never throw at the host. */
-export function isShaderCorpusRecord(value: unknown): value is ShaderCorpusRecord {
+ *  write, a foreign value or one past the size bounds must read as "no
+ *  corpus", never throw at the host and never hand it an unbounded plan. */
+export function isShaderCorpusRecord(
+  value: unknown,
+  limits: { programs?: number; bytes?: number } = {},
+): value is ShaderCorpusRecord {
+  const programLimit = limits.programs ?? SHADER_CORPUS_PROGRAM_LIMIT;
+  const byteLimit = limits.bytes ?? SHADER_CORPUS_MAX_BYTES;
   if (typeof value !== 'object' || value === null) return false;
   const record = value as Partial<ShaderCorpusRecord>;
   if (record.version !== SHADER_CORPUS_VERSION) return false;
   if (typeof record.identity !== 'string' || record.identity.length === 0) return false;
   if (!Array.isArray(record.extensions)) return false;
+  if (record.extensions.length > SHADER_CORPUS_EXTENSION_LIMIT) return false;
   for (const name of record.extensions) if (typeof name !== 'string') return false;
   if (typeof record.savedAt !== 'number' || !Number.isFinite(record.savedAt)) return false;
   if (!Array.isArray(record.programs)) return false;
+  if (record.programs.length > programLimit) return false;
+  let chars = 0;
   for (const program of record.programs) {
     if (typeof program !== 'object' || program === null) return false;
     const pair = program as Partial<ShaderProgramSources>;
     if (typeof pair.vertex !== 'string' || typeof pair.fragment !== 'string') return false;
     if (typeof pair.index0Attribute !== 'string') return false;
+    if (pair.index0Attribute.length > SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT) return false;
+    chars += pair.vertex.length + pair.fragment.length;
+    if (chars > byteLimit) return false;
   }
   return true;
 }
@@ -224,6 +279,7 @@ export function warmupExtensionsMatch(
 /** The one gate the host consults before it spends a single frame. */
 export function warmupApplies(inputs: WarmupAppliesInputs): WarmupAppliesDecision {
   if (!inputs.enabled) return { applies: false, reason: 'disabled' };
+  if (inputs.iosWebKit) return { applies: false, reason: 'ios-webkit' };
   if (!inputs.hasCorpus) return { applies: false, reason: 'no-corpus' };
   // Ahead of the identity, which folds the same list into one string: the
   // extension set is the one input the warm-up context can fail to reproduce
@@ -236,16 +292,29 @@ export function warmupApplies(inputs: WarmupAppliesInputs): WarmupAppliesDecisio
   return { applies: true, reason: null };
 }
 
-/** `?shaderwarm=0` disables, `?shaderwarm=1` forces; the default is ON. The
- *  flag reads both ways so a probe can pin an arm whichever way the default
- *  later moves. */
-export function readWarmupQuery(search: string): WarmupQuerySetting {
-  const match = /[?&]shaderwarm=([^&]*)/.exec(search);
-  if (!match) return { enabled: true, forced: false };
-  const value = decodeURIComponent(match[1] ?? '');
-  if (value === '0') return { enabled: false, forced: true };
-  if (value === '1') return { enabled: true, forced: true };
-  return { enabled: true, forced: false };
+/** Whether the corpus warms, from the same two inputs the worker reads
+ *  (shader_warm_client_core.ts): the `?shaderwarm=` pin first (one grammar for
+ *  both arms, so `off` and `0` silence both and `all`, `reveal`, `auto` and
+ *  `1` force this one), then the stored Shader Warm-up option, where only an
+ *  explicit Off counts. `auto` keeps the corpus ON whatever the backend: the
+ *  worker's backend rule (off on OpenGL, where it relocates the stall) is
+ *  about a second context linking DURING play, while this arm links before
+ *  the world exists and was measured on exactly those OpenGL desktops. No
+ *  stored option at all (a test, another entry) is ON, the arm's original
+ *  default. */
+export function readWarmupQuery(
+  search: string,
+  stored: string | null | undefined = null,
+): WarmupQuerySetting {
+  const query = readShaderWarmQuery(search);
+  if (query !== null) return { enabled: query !== 'off', forced: true };
+  return { enabled: asShaderWarmSetting(stored) !== 'off', forced: false };
+}
+
+/** The platform refusal, shared with the worker's resolver in name and
+ *  reason: iOS never mints the hidden context. */
+export function warmupRefusedOnPlatform(platform: ShaderWarmPlatform): boolean {
+  return platform === 'ios';
 }
 
 export function createWarmupPlan(count: number): WarmupPlan {

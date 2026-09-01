@@ -12,6 +12,7 @@ import {
 import {
   type DesktopGpuBackendSettings,
   initDesktopGpuBackendActive,
+  latchDesktopGpuBackendWriteFailed,
   pushDesktopGpuBackend,
   syncDesktopGpuBackendSetting,
 } from './desktop_gpu_backend_sync';
@@ -70,7 +71,18 @@ export function applyDesktopShellSetting(
     return true;
   }
   if (key === 'gpuBackend') {
-    pushDesktopGpuBackend(bridge, settings.set('gpuBackend', Number(value)));
+    // Fire and forget from the caller's side, but not from the shell's: a
+    // refused write leaves the stored choice on the old backend, and the
+    // restart the options window offers off the LOCAL value would relaunch
+    // into it. So the local value goes back on whatever the shell actually
+    // holds, read through the boot reflection (which writes settings.set
+    // directly, never through this change path, which would push the shell's
+    // own value back at it), and only then does the row learn to say so.
+    void settleDesktopGpuBackendWrite(
+      bridge,
+      settings.set('gpuBackend', Number(value)),
+      settings,
+    ).catch(() => {});
     return true;
   }
   if (key === 'discordPresence') {
@@ -79,4 +91,14 @@ export function applyDesktopShellSetting(
     return true;
   }
   return false;
+}
+
+async function settleDesktopGpuBackendWrite(
+  bridge: DesktopBridge | null | undefined,
+  value: number,
+  settings: DesktopApplySettings,
+): Promise<void> {
+  if ((await pushDesktopGpuBackend(bridge, value)) !== false) return;
+  await syncDesktopGpuBackendSetting(bridge, () => settings);
+  latchDesktopGpuBackendWriteFailed(true);
 }

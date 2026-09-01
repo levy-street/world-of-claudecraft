@@ -1571,6 +1571,7 @@ export const en_XA: EnTranslations = {
       "gpuBackendActive": "[Çúŕŕéñţļý úšíñĝ {backend}.]",
       "gpuBackendActiveUnavailable": "[Çúŕŕéñţļý úšíñĝ {backend} (úñáƀļé ţó éñáƀļé Ʋúļķáñ).]",
       "gpuBackendActiveAutoCapped": "[Çúŕŕéñţļý úšíñĝ {backend}. Áúţó ðóéš ñóţ ţŕý Ʋúļķáñ óñ ţĥíš ĝŕáþĥíçš çáŕð ýéţ; þíçķ Ʋúļķáñ ţó ţŕý íţ.]",
+      "gpuBackendSaveFailed": "[Ţĥé çĥóíçé çóúļð ñóţ ƀé šáʋéð. Ţĥé ñéẋţ šţáŕţ ķééþš {backend}.]",
       "gpuBackendActiveNameVulkan": "[Ʋúļķáñ]",
       "gpuBackendActiveNameOpenGL": "[ÓþéñĜĻ]",
       "restartPending": "[Šóɱé çĥáñĝéš ţáķé éƒƒéçţ áƒţéŕ á ŕéšţáŕţ.]",

@@ -1571,6 +1571,7 @@ export const ko_KR: EnTranslations = {
       "gpuBackendActive": "현재 {backend}을(를) 사용 중입니다.",
       "gpuBackendActiveUnavailable": "현재 {backend}을(를) 사용 중입니다(Vulkan을 활성화할 수 없음).",
       "gpuBackendActiveAutoCapped": "현재 {backend}을(를) 사용 중입니다. 이 그래픽 카드에서는 자동이 아직 Vulkan을 시도하지 않습니다. 시도하려면 Vulkan을 선택하세요.",
+      "gpuBackendSaveFailed": "선택을 저장하지 못했습니다. 다음 실행에서도 {backend}을(를) 사용합니다.",
       "gpuBackendActiveNameVulkan": "Vulkan",
       "gpuBackendActiveNameOpenGL": "OpenGL",
       "restartPending": "일부 변경 사항은 재시작 후에 적용됩니다.",
