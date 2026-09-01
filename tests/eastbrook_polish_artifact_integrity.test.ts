@@ -1042,10 +1042,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // beside the release's forge-lift room and Drakelands entrance render
 // integrations, so the composite matches neither parent). No capture was
 // retaken.
+// Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
+// moved with the shipped renderer tree. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '5378948b06f7a354d5796d18be3ed547506d243666984a68f7c2b4d3608e4e35';
+  'cd7b8e9afa6ad54248d9c6eae4e194b41395fe844cbaded4f6e0473b11986f99';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f7846522395ef9b736bb5a16908268aa13d278cb12d5dac0809e5ee0faa12b5a';
+  'e6134af376ab536c12e618c4ba19c758ba3c6259290ba3b7ef9934880567de3e';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2203,10 +2205,12 @@ describe('Eastbrook polish performance and contact evidence', () => {
     // Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
     // branch: same order, the composite first, then this seal. No capture was
     // retaken.
+    // Re-minted for the v0.42.0 release batch renderer merge: same order, the
+    // composite first, then this seal. No capture was retaken.
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-    ).toBe('296a93977b2197e167ab3828cf3062f514ac507b3f879a3377a975ebd9baefd2');
+    ).toBe('62976c8169fe5e452c702bb798ba8201c6cfbd5812961789ef69f648dc0e772f');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -356,8 +356,10 @@ interface AttributionTargetFixture {
 // beside the release's forge-lift room and Drakelands entrance render
 // integrations, so the composite matches neither parent). No capture was
 // retaken.
+// Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
+// moved with the shipped renderer tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f7846522395ef9b736bb5a16908268aa13d278cb12d5dac0809e5ee0faa12b5a';
+  'e6134af376ab536c12e618c4ba19c758ba3c6259290ba3b7ef9934880567de3e';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
