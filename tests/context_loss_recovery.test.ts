@@ -354,28 +354,57 @@ describe('attachContextRecoveryHandlers', () => {
     expect(fake.pendingCount()).toBe(1);
   });
 
-  it('arms on a persisted pageshow even if webglcontextlost never reached this handler', () => {
+  it('observes and arms a loss on persisted pageshow if webglcontextlost never reached this handler', () => {
     // The freeze can outlast the loss itself: nothing guarantees this
     // listener sees `webglcontextlost` before or during a bfcache freeze, so
     // the resume path must be able to discover a still-lost context on its
     // own rather than only ever re-arming an already-armed watchdog.
     const canvas = canvasFixture(); // isContextLost() reports lost by default
+    const onLost = vi.fn();
     const onStuck = vi.fn();
     const fake = fakeScheduler();
     const pageTeardown = new EventTarget();
     attachContextRecoveryHandlers(
       canvas,
-      { onLost: vi.fn(), onRestored: vi.fn(), onStuck },
+      { onLost, onRestored: vi.fn(), onStuck },
       { escalateMs: 5000, scheduler: fake.scheduler, pageTeardown },
     );
 
     expect(fake.pendingCount()).toBe(0); // nothing armed yet, no loss event has fired
+    expect(onLost).not.toHaveBeenCalled();
 
     const resume = new Event('pageshow');
     Object.assign(resume, { persisted: true });
     pageTeardown.dispatchEvent(resume);
 
+    expect(onLost).toHaveBeenCalledTimes(1);
     expect(fake.pendingCount()).toBe(1);
+    fake.fire(1);
+    expect(onStuck).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not duplicate onLost on persisted pageshow when the loss was already observed', () => {
+    const canvas = canvasFixture(); // isContextLost() reports lost by default
+    const onLost = vi.fn();
+    const onStuck = vi.fn();
+    const fake = fakeScheduler();
+    const pageTeardown = new EventTarget();
+    attachContextRecoveryHandlers(
+      canvas,
+      { onLost, onRestored: vi.fn(), onStuck },
+      { escalateMs: 5000, scheduler: fake.scheduler, pageTeardown },
+    );
+
+    canvas.dispatchEvent(new Event('webglcontextlost', { cancelable: true }));
+    expect(onLost).toHaveBeenCalledTimes(1);
+    expect(fake.pendingCount()).toBe(1);
+
+    const resume = new Event('pageshow');
+    Object.assign(resume, { persisted: true });
+    pageTeardown.dispatchEvent(resume);
+
+    expect(onLost).toHaveBeenCalledTimes(1);
+    expect(fake.scheduler.setTimeout).toHaveBeenCalledTimes(1);
     fake.fire(1);
     expect(onStuck).toHaveBeenCalledTimes(1);
   });
