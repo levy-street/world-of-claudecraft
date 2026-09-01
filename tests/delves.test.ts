@@ -3821,24 +3821,36 @@ describe('The Drowned Litany (Phase 7 Drowned Reliquary Rite)', () => {
     // earlier draw shifts run.seed): only claimDelveRun's own p values are
     // under test here. The roll is delve-agnostic (keyed on tierId only), so
     // this pins the one shared formula regardless of which delve calls it.
-    const runSeedFor = (seed: number, tier: 'normal' | 'heroic') => {
+    const runFor = (seed: number, tier: 'normal' | 'heroic') => {
       const s = makeSim('warrior', seed);
       enterLitany(s, tier);
-      return s.delveRunForPlayer(s.playerId)!.seed;
+      return s.delveRunForPlayer(s.playerId)!;
     };
     const rolls = (runSeed: number, p: number) => new Rng((runSeed ^ 0x600dc0ff) >>> 0).chance(p);
 
     // Both top-level seeds were found by brute-force search: each produces a
     // run.seed that MISSES under the retired 5%/2% odds and HITS under the
     // live 20%/8% ones (the chase epics were landing near 1-in-700 per
-    // heroic clear before this bump, see drowned_litany_loot.ts).
-    const heroicSeed = runSeedFor(1, 'heroic');
-    expect(rolls(heroicSeed, 0.05)).toBe(false);
-    expect(rolls(heroicSeed, 0.2)).toBe(true);
+    // heroic clear before this bump, see drowned_litany_loot.ts). Also
+    // assert the LIVE run.bountiful directly, not just the re-derived
+    // formula: a regression of runs.ts's live constant back to the retired
+    // 5%/2% would leave the re-derivation above untouched (it hardcodes both
+    // odds itself) but must flip these to false.
+    const heroicRun = runFor(1, 'heroic');
+    expect(rolls(heroicRun.seed, 0.05)).toBe(false);
+    expect(rolls(heroicRun.seed, 0.2)).toBe(true);
+    expect(heroicRun.bountiful).toBe(true);
 
-    const normalSeed = runSeedFor(53, 'normal');
-    expect(rolls(normalSeed, 0.02)).toBe(false);
-    expect(rolls(normalSeed, 0.08)).toBe(true);
+    const normalRun = runFor(53, 'normal');
+    expect(rolls(normalRun.seed, 0.02)).toBe(false);
+    expect(rolls(normalRun.seed, 0.08)).toBe(true);
+    expect(normalRun.bountiful).toBe(true);
+
+    // Negative controls (also brute-force found): seeds whose run.seed MISSES
+    // even at the raised rate, so this test cannot be satisfied by a mutant
+    // that hardcodes run.bountiful = true regardless of the roll.
+    expect(runFor(2, 'heroic').bountiful).toBe(false);
+    expect(runFor(1, 'normal').bountiful).toBe(false);
   });
 
   it('rejects a rite difficulty commit from a player away from the reliquary', () => {
