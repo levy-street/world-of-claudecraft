@@ -9,6 +9,7 @@ import { expectDefined } from './helpers/defined';
 
 const BOUND_GUARDIAN = 'q_nythraxis_bound_guardian';
 const KEYSTONE = 'crypt_keystone';
+const REWARD = 'kings_signet';
 const HIGHWATCH_ALDRIC = 'brother_aldric_highwatch';
 
 function quest(extra: Partial<QuestDef>): QuestDef {
@@ -133,32 +134,37 @@ describe('Sim.acceptQuest quest-item fallback', () => {
   });
 
   it('the turn-in reward DOES gate on a full bag, the other half of the asymmetry', () => {
-    // The asymmetry is the design, per the same ruling and the capacity
-    // doctrine header in src/sim/bags.ts: the grant bypasses, the REWARD does
-    // not. Pinning only the bypass would let the reward silently start
-    // bypassing too and nothing would notice.
+    // The asymmetry is the design, per qr-19-qprofintro-overflow-grant and the
+    // capacity doctrine header in src/sim/bags.ts: the fallback grant bypasses
+    // capacity, the REWARD does not. This arm drives the REAL turnInQuest, not
+    // a re-implementation of its gate: an earlier draft called countFit
+    // directly and could not have failed if the gate were deleted outright,
+    // which is no pin at all. The Bound Guardian pays kings_signet and has no
+    // collect objective, so the scratch copy frees nothing and a full bag must
+    // genuinely refuse.
     const { sim, pid } = makeAttunedPlayerAtGiver();
     const meta = sim.players.get(pid)!;
+    sim.acceptQuest(BOUND_GUARDIAN, pid);
+    const qp = meta.questLog.get(BOUND_GUARDIAN);
+    expect(qp, 'the quest is on the log to turn in').toBeDefined();
+    // Force the objectives complete rather than playing them out: this arm is
+    // about the capacity gate, not about the encounter.
+    if (qp) qp.state = 'ready';
+
     const capacity = bagCapacity(meta.bags);
     const need = capacity - meta.inventory.length;
+    expect(need, 'room to fill after the accept').toBeGreaterThan(0);
     const filler = Object.values(ITEMS)
-      .filter((d) => d.kind === 'junk' && d.id !== KEYSTONE)
+      .filter((d) => d.kind === 'junk' && d.id !== KEYSTONE && d.id !== REWARD)
       .slice(0, need);
+    expect(filler.length, 'enough distinct junk ids to fill the bags').toBe(need);
     for (const def of filler) sim.addItem(def.id, 1, pid);
-    // The accept itself is the bypass path and is expected to overflow.
-    sim.acceptQuest(BOUND_GUARDIAN, pid);
-    expect(meta.inventory.length, 'the accept overflowed, as the bypass allows').toBeGreaterThan(
-      capacity,
-    );
-    // countFit is what the reward path consults. Ask it for an id the player
-    // does NOT already hold, so no existing stack can absorb it: the keystone
-    // itself would top up the stack the accept just granted and read as room
-    // that does not exist for a fresh item.
-    const unheld = Object.values(ITEMS).find(
-      (d) => d.kind === 'junk' && !meta.inventory.some((s) => s.itemId === d.id),
-    );
-    const rewardId = expectDefined(unheld).id;
-    const rewardable = countFit(meta.inventory, bagPools(meta.bags), rewardId, 1);
-    expect(rewardable, 'the reward path finds no room on this same bag').toBe(0);
+    expect(meta.inventory.length, 'bags are full before the turn-in').toBe(capacity);
+
+    sim.turnInQuest(BOUND_GUARDIAN, pid);
+
+    // The gate refused: the quest is NOT completed and the reward was not paid.
+    expect(meta.questLog.get(BOUND_GUARDIAN)?.state, 'the turn-in is refused').toBe('ready');
+    expect(sim.countItem(REWARD, pid), 'and no reward landed').toBe(0);
   });
 });

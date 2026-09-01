@@ -959,15 +959,21 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     }
   });
 
-  it('the two refused spread candidates never gained the tag they were refused', () => {
+  it('tusk and horn stay specimen-less, which is what made the two refusals bind', () => {
     // The ruling above ratifies the pre-gate on the stated warrant that each
     // REFUSAL already has a working replacement, so the refusal itself must be
     // measured rather than only described. Each candidate ALREADY carries one
     // specimen-less family, which is exactly why it was refused: adding the
     // second would put two on one corpse and breach the premise the arm above
     // guards. dune_troll was refused for tusk (it carries fang) and
-    // frostmane_yeti for horn. Relaxing the pre-gate and admitting either reds
-    // here, so the comment above cannot quietly become false while green.
+    // frostmane_yeti for horn.
+    //
+    // SCOPE, honestly: the not-toContain arms below are SUBSUMED by the global
+    // arm above, which already forbids a second specimen-less tag on any mob.
+    // They are kept for the named failure message only. The assertion that
+    // earns this case its own place is the LAST one: if tusk or horn ever
+    // gains a specimen row, the global arm goes green by SHRINKING while the
+    // ratified refusals silently stop meaning anything, and only this reds.
     const specimenless = new Set(
       Object.keys(HARVEST_COMPONENT_ITEMS).filter((tag) => !(tag in HARVEST_COMPONENT_SPECIMENS)),
     );
@@ -1002,16 +1008,19 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     const hornCarriers = Object.values(MOBS)
       .filter((m) => (m.componentTags ?? []).includes('horn'))
       .map((m) => m.id);
-    const reachableHorn = hornCarriers.filter((id) => campedMobIds.has(id)).sort();
-    expect(reachableHorn.length, `horn carriers with a camp row: ${reachableHorn.join(', ')}`).toBe(
+    // OPEN-WORLD carriers, meaning those with a CAMPS row. NOT "reachable":
+    // the seventh tagged template is a Wildheart DUNGEON mob, reached through
+    // an instance, which structurally cannot carry a camp row at all. The
+    // ledger's six is the open-world farm route, which is what the
+    // ratification actually leans on.
+    const openWorldHorn = hornCarriers.filter((id) => campedMobIds.has(id)).sort();
+    expect(openWorldHorn.length, `horn carriers with a camp row: ${openWorldHorn.join(', ')}`).toBe(
       6,
     );
-    // Non-vacuity: there is a seventh TAGGED template that is deliberately
-    // campless, so the filter above is doing real work rather than passing
-    // because every tagged mob happens to be camped.
-    expect(hornCarriers.length, 'horn-tagged templates, camped or not').toBeGreaterThan(
-      reachableHorn.length,
-    );
+    // Non-vacuity, on the honest ground: the tag set is strictly larger than
+    // the camped set, so the filter is doing real work. The reason is that one
+    // tagged template is instanced content, not a spread decision.
+    expect(hornCarriers.length, 'horn-tagged templates, camped or not').toBe(7);
   });
 
   it('the filed crossing case: zero free slots + a partial plain stack tops up, never overflows', () => {

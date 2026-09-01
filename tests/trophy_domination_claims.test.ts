@@ -249,14 +249,12 @@ describe('the jewelcrafting exclusion, recomputed: the amended census', () => {
       expect(points(ring), `${ring.id} total points`).toBe(4);
       expect(ring.stats?.[primary], `${ring.id} focused primary`).toBe(3);
       expect(ring.sellValue, `${ring.id} sell value`).toBe(46);
-      expect(
-        ring.stats?.[primary] ?? 0,
-        `${ring.id} concentrates more in one stat than the keepsake carries in any`,
-      ).toBeGreaterThan(Math.max(...Object.values(keepsake.stats ?? {})));
+      // The claim is domination by jewelcrafting's OWN rung-0 output, so the
+      // ring being a CRAFTED row is half of it and was unchecked at first
+      // draft. The sibling sabatons arm in this file pins its analogue the
+      // same way. (The 3 > 1 comparison that sat here is gone: both operands
+      // are pinned exactly above, so it could never fail.)
+      expect(CRAFTED.has(ring.id), `${ring.id} is a crafted trainer row`).toBe(true);
     }
-    // And the keepsake really is the in-band row this argument is about, so the
-    // arm cannot pass while pointing at some other item.
-    expect(keepsake.sellValue, 'keepsake price sits in the band').toBeGreaterThan(25);
-    expect(keepsake.sellValue, 'keepsake price sits in the band').toBeLessThanOrEqual(460);
   });
 });

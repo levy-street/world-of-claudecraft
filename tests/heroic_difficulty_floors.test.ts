@@ -349,30 +349,45 @@ describe('the reference warrior is a CALIBRATION CONSTANT, and the catalog must 
     expect(a.maxHp, 'and its pool').toBe(1582);
   });
 
-  it('REF_ARMOR provenance: the 2861-vs-4085 readings the comments quote are derived', () => {
+  it('REF_ARMOR provenance: the readings the comments quote are derived, not hand-carried', () => {
     // RULED (qr-19-ref-armor-calibration-constant, 2026-09-01): the constant
     // stays pinned at 2861 and the widened gap is recorded as the model's
-    // stated conservatism. That ruling put four derived percentages into
-    // comments across this suite, its three siblings, dungeon_difficulty.ts
-    // and rift/ranks.ts, and NOTHING asserted them, so a move in the armour
-    // curve or the level-22 attacker pin would rot every one of them silently.
-    // This arm is the derivation those comments quote; it pins no new policy.
+    // stated conservatism. That ruling put derived percentages into comments
+    // across this suite, its three siblings, dungeon_difficulty.ts and
+    // rift/ranks.ts, and NOTHING asserted them.
+    //
+    // The LIVE kit armour is derived here, never hand-carried: an earlier
+    // draft of this arm hardcoded 4085 five times, which would have kept
+    // computing on a stale number after the next catalog move while every
+    // comment it defends went false. That is the exact failure this arm
+    // exists to prevent, so it reads the same picker the sibling arm uses.
+    const liveKitArmor = characterDerivedStats('warrior', 20, maxArmorKit(true)).stats.armor;
     const passes = (armor: number, level: number): number => 1 - armorReduction(armor, level);
+    // Defensive Stance takes 10 percent off on top. MIRRORED, not read: the
+    // factor is a bare literal in src/sim/combat/damage.ts with no exported
+    // constant, so if stance mitigation ever moves, this line and the fifteen
+    // comments move together and neither is the other's guard.
+    const STANCE = 0.9;
+
+    // The constant is NOT a live catalog read, which is the whole ruling.
+    expect(REF_ARMOR, 'the pinned calibration constant').toBe(2861);
+    expect(liveKitArmor, 'and the live kit it no longer describes').toBeGreaterThan(REF_ARMOR);
+
     // The armour step at the level-22 heroic pin, both kits.
-    expect(passes(REF_ARMOR, 22) * 100, 'armour pass at 2861').toBeCloseTo(44.24, 1);
-    expect(passes(4085, 22) * 100, 'armour pass at 4085').toBeCloseTo(35.72, 1);
-    // Defensive Stance takes 10 percent off on top, which is where the ~39.8
-    // the comments quote comes from, and what it would read on the live kit.
-    expect(passes(REF_ARMOR, 22) * 0.9 * 100, 'with Defensive Stance at 2861').toBeCloseTo(39.8, 1);
-    expect(passes(4085, 22) * 0.9 * 100, 'with Defensive Stance at 4085').toBeCloseTo(32.1, 1);
+    expect(passes(REF_ARMOR, 22) * 100, 'armour pass at the constant').toBeCloseTo(44.24, 1);
+    expect(passes(liveKitArmor, 22) * 100, 'armour pass on the live kit').toBeCloseTo(35.72, 1);
+    // Which is where the ~39.8 the comments quote comes from, and what it
+    // would read on the live kit.
+    expect(passes(REF_ARMOR, 22) * STANCE * 100, 'with stance, the constant').toBeCloseTo(39.8, 1);
+    expect(passes(liveKitArmor, 22) * STANCE * 100, 'with stance, live kit').toBeCloseTo(32.1, 1);
     // The S-rank level-23 pair the rift suite's comment quotes.
-    expect(passes(4085, 23) * 100, 'armour pass at 4085, level 23').toBeCloseTo(36.57, 1);
-    expect(passes(4085, 23) * 0.9 * 100, 'with stance at 4085, level 23').toBeCloseTo(32.9, 1);
+    expect(passes(liveKitArmor, 23) * 100, 'live kit at level 23').toBeCloseTo(36.57, 1);
+    expect(passes(liveKitArmor, 23) * STANCE * 100, 'with stance at level 23').toBeCloseTo(32.9, 1);
     // And the headline the ruling rests on: post-armour melee falls about 19
     // percent on the live kit, so holding a floor would want about 24 percent
-    // more mob melee. This is the number that makes a re-base a difficulty
-    // change rather than a calibration tidy.
-    const ratio = passes(4085, 22) / passes(REF_ARMOR, 22);
+    // more mob melee. This is what makes a re-base a difficulty change rather
+    // than a calibration tidy.
+    const ratio = passes(liveKitArmor, 22) / passes(REF_ARMOR, 22);
     expect((1 - ratio) * 100, 'post-armour melee falls').toBeCloseTo(19.3, 1);
     expect((1 / ratio - 1) * 100, 'and holding the floor would need').toBeCloseTo(23.9, 1);
   });
