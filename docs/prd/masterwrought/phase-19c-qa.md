@@ -1,6 +1,16 @@
 # Phase 19C QA (server, persistence and stability: the third execution wave of the rulings gate)
 
-VERDICT: _recorded at the close of this document, after the pg-armed gate._
+VERDICT: **PASS-WITH-FINDINGS.** Seven units, one commit each, zero escalations,
+the pg-armed gate green at 9da50e6a96 (all 12 steps, full-suite fallback). The
+findings are the wave's real content and none reopened a ruling: D145's lock
+shipped unconditional and FOR UPDATE past green per-unit suites (caught by a broad
+sweep and four convergent reviewers, then scoped and weakened to FOR NO KEY
+UPDATE), and the pg-armed gate then caught what the per-unit suites could not, the
+escrow occupancy breach from D145's fourth save path, forcing the "four live save
+paths" premise correction and a carried race. Every write-ordering claim carries a
+real-Postgres proof red without the fix; every new pin is mutation-proved. Three
+items are CARRIED for the maintainer (B1's heartbeat qualifier, D122's warn digits,
+D145's excluded fourth path). LOCAL ONLY: no push, no PR, no teardown.
 
 Scope: the seven units of `phase-19c-server.md` (D023 D064 D122 D136 D145 D147
 D162), their fresh domain reviews, the reviewer fix round, and the fresh read of
@@ -174,7 +184,47 @@ Postgres row-lock matrix and the live pg arm, the metric help strings matching
 
 ## Validation
 
-_Filled at the close, below the verdict._
+All green on the committed tree at 9da50e6a96 (the escrow-exclusion fix folded
+into the D145 record):
+
+- **tsc** (`npx tsc --noEmit`): EXIT 0.
+- **Guard suites**: `tests/architecture.test.ts` (sim purity, determinism),
+  `tests/monolith_budget.test.ts` (server/db.ts held at its 5123 ceiling,
+  server/game.ts at 10347), `tests/world_api_parity.test.ts` (IWorld untouched):
+  pass.
+- **Symbol census** (`node scripts/merge_audit/symbol_census.mjs`): RESULT PASS.
+  The Phase 18/19 metric and fence exports carry their merge-deletion-list rows;
+  the escrow-exclusion fix added no exports (it reverted one call site and moved
+  prose).
+- **biome** on the changed files: no errors, no format diffs (the whole-repo
+  warning count is the standing debt the gate does not gate on).
+- **The write-ordering pg proofs** ran armed against the real dev Postgres, each
+  red without the fix and green with it: D136's expired-lease refusal, D145's
+  displacement race and no-takeover control, D147's observer-to-DB and
+  ensureSchema-boot arms. Every new pin was mutation-proved fail-alone, including
+  the D145 onClient EXCLUSION arm (re-routing onClient through the fenced executor
+  reds it) and the suite-duration ledger row (both directions).
+- **The pg-armed gate** (`node scripts/gate_select.mjs`, TEST_DATABASE_URL armed
+  at the dev Postgres): PASS, all 12 steps green. mode=full (the release sync's
+  broad changes force the full-suite fallback, the safe direction). vitest full
+  suite: 3668 passed / 1 skipped (3669 files); 54480 passed / 11 expected-fail /
+  28 skipped (54519 cases). Browser suite 332/332, all builds green.
+- **Drift**: +16 net runtime cases against the 19B-close baseline (54519 vs
+  54503), fully attributed: +15 from new/removed `it`/`test` declarations
+  (character_blob_size +4, the character-save pg suite +3, the sold-volume pg
+  suite +2, clean_metadata_text +3, character_save_statement +1, game_metrics +1,
+  the sold-volume unit +1; character_lease net 0), plus +1 from the WIRED_SEAMS
+  `it.each` growing from four seams to five. The pre-count estimate had run to +22;
+  the gap was in-place arm edits counted as new, corrected against the measurement.
+- **The first pg-armed gate run red-flagged two things the per-unit suites missed**
+  and both were fixed before this green run: the escrow occupancy breach (the D145
+  fourth-path ripple, `woc_market_directed_sql` + `guild_create_db.pg`), fixed by
+  excluding saveCharacterStateOnClient and carrying its race; and a monolith
+  overrun from the fix's own comment (db.ts 5133 > 5123), fixed net-zero by moving
+  the rationale to the runFencedCharacterUpdate JSDoc. A characterization false-red
+  in that run was a gate-harness artifact (a populated DATABASE_URL defeating the
+  suite's `||=` cold-cache degrade), not a code defect; corrected in the runner and
+  re-proven green (46/46).
 
 ## CARRIED for the maintainer, not taken unilaterally
 
