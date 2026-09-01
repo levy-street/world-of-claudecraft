@@ -7,6 +7,11 @@ records what the reviews found, and takes the verdict before 19B opens.
 
 **PASS-WITH-ONE-ESCALATION**, and the qualifier is the finding, not a caveat on it.
 
+Recorded honestly: this verdict was first written as a clean PASS while the fresh
+read over the fix round was still outstanding. That read came back with a VACUOUS
+pin and two weak ones, all of them mine, so the verdict below stands only on the
+repaired tree at `c8171095fc` and not on the tree the first draft described.
+
 Seventeen of eighteen units executed. One, D009+D170, is NOT executed and is
 recorded as an escalation with its own ledger entry, because two of its premises
 are falsified against the tree. Ten review findings, all applied. Zero blocking,
@@ -80,6 +85,35 @@ Four domain reviewers, dispatched fresh, never the implementer. Zero blocking.
 Ten findings, all applied in `133f19560f`, then re-read by a fresh reader because
 fixes are unreviewed code.
 
+### The fresh read found the fix round itself defective, and that is recorded, not smoothed over
+
+The first fresh reader died on an API error; the relaunched one returned findings
+that **invalidated the verdict as first written**. Of the six arms the fix round
+added, one was VACUOUS and two were weaker than claimed:
+
+- The turn-in gate arm called `countFit` directly instead of driving
+  `turnInQuest`, so **deleting the shipped gate outright would not have failed
+  it**, and its last assertion was arithmetically forced by the line above it.
+  Rewritten to drive the real path, and proved by deleting the gate at source.
+- The REF_ARMOR arm hardcoded `4085` five times, which is exactly the staleness
+  it existed to prevent: the next catalog move re-pins the sibling arm and leaves
+  this one computing on a dead number while the comments it defends go false. It
+  now derives the kit from the same picker the sibling uses.
+- The domination arm compared two values pinned exactly above it, so it could
+  only ever assert `3 > 1`, and it never checked the rings were trainer rows,
+  which is half the claim.
+
+Two comment defects went with them: the refusal arm's title described assertions
+subsumed by its sibling rather than the one that earns it a case, and the horn
+control's stated reason was false (the seventh carrier is a dungeon mob that
+structurally cannot hold a camp row, not a campless spread decision).
+
+All repaired in `c8171095fc`, each re-proved by mutation. **The lesson is the
+finding: I wrote six pins to close an unmeasured-claim gap and three of them
+reproduced the same class of defect they were closing.** A pin authored by the
+person who wrote the claim it defends needs an independent read before it counts,
+which is what exit criterion 3 is for and why it is not a formality.
+
 **Five were claims a ruling relied on that nothing measured** (the
 guard-comment-is-an-unmeasured-claim trap): the harvest-spread refusals and their
 substitutes, the jewelcrafting domination argument (the load-bearing half of that
@@ -92,14 +126,19 @@ mutation-proved, each mutant reverted with the tree grepped clean.
 created: `practice_dummies.ts` asserts the dummy is not a competing definition of
 the reference tank, which is exactly what D143 ratified it into being.
 
-## Two lessons worth carrying to 19B
+## Three lessons worth carrying to 19B
 
 1. **A green suite did not catch an incomplete commit.** The D143 script crashed
    partway; eight of fifteen sites landed while the message claimed all fifteen.
    Every suite passed on the incomplete diff, because the change is comment-only.
    What caught it was reading `git status` against intent. On a comment-only
    wave, tests are not the safety net; the diff review is.
-2. **The wave's own instructions were wrong in sixteen places**, including all
+2. **A pin its own author wrote is not evidence until someone else reads it.**
+   Six arms were added to close an unmeasured-claim gap; three reproduced the
+   same defect class, one of them unfailable. Exit criterion 3 is what caught it,
+   which is the argument for never treating that criterion as a formality, and
+   for never recording a verdict while it is still outstanding.
+3. **The wave's own instructions were wrong in sixteen places**, including all
    six handoff-row anchors, which were transcribed without their table pipes and
    matched nothing. A verbatim executor would have silently no-opped every status
    flip and reported success. Verifying anchors BEFORE editing, rather than
@@ -112,8 +151,8 @@ the reference tank, which is exactly what D143 ratified it into being.
 |---|---|---|
 | 1 | Every unit executed, or escalated with a dated reason | MET (17 executed, 1 escalated with its record) |
 | 2 | Domain reviewers dispatched FRESH, all findings applied | MET (4 reviewers, 10 findings, all applied) |
-| 3 | The fix round re-read by a fresh reader | MET |
-| 4 | Every new pin mutated and watched go red | MET (6 pins, each proved, each mutant reverted) |
+| 3 | The fix round re-read by a fresh reader | MET, and it FOUND REAL DEFECTS (see above); repairs in c8171095fc |
+| 4 | Every new pin mutated and watched go red | MET only after the repair: three of the six first-draft pins did NOT bite, one could not fail at all |
 | 5 | tsc clean, guards green, census PASS, `ci:changed` after the last commit | MET |
 | 6 | `gate_select.mjs` on the committed tree, judged by exit code | MET, EXIT 0 |
 | 7 | This document written and its verdict recorded before 19B opens | MET |
