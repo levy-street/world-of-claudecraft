@@ -39,7 +39,7 @@ import {
   SUPPORT_OVERLAP,
   supportHeightAt,
 } from '../colliders';
-import { rideSteepnessAt, shoreStepOut, stepWaterLevel } from '../ride_height';
+import { rideSteepnessAt, shoreStepOut, stepWaterLevel, walkedSteepnessAt } from '../ride_height';
 import { groundHeight, terrainDownhill } from '../world';
 import { overlapCollider, SKIN_WIDTH, sweepCollider } from './sweep';
 
@@ -338,6 +338,14 @@ export function moveCharacter(
       if (!blocksAt(c, px, pz, feetY, params)) continue;
       physicsStats.sweeps++;
       if (!sweepCollider(c, px, pz, remX, remZ, params.radius, hit)) continue;
+      // A zero-advance contact whose face the motion SEPARATES from is a
+      // graze, not an obstruction: a body resting against a deck plate's
+      // side while walking directly away used to take this as the nearest
+      // hit, fail the step-up (no floor lies away from the plate), and
+      // then discard its whole motion in the slide tail, freezing in place
+      // (the Last Keep mid-landing descent). Leaving a touched face is
+      // always free; real obstacles further along stay in the running.
+      if (hit.t <= 1e-6 && remX * hit.nx + remZ * hit.nz >= 0) continue;
       if (hit.t < bestT) {
         bestT = hit.t;
         bestIndex = i;
@@ -454,7 +462,7 @@ export function moveCharacter(
     const rise = groundEnd - groundStart;
     const unwalkable =
       (rise / run > params.maxSlope ||
-        (rawEnd >= wls && rideSteepnessAt(px, pz, params.seed) > params.maxSlope)) &&
+        (rawEnd >= wls && walkedSteepnessAt(px, pz, params.seed) > params.maxSlope)) &&
       !shoreStepOut(x, z, px, pz, params.seed, params.maxSlope);
     // NOTE: step-up deliberately does NOT apply to the heightfield. A per-tick
     // step allowance on terrain is a cliff-climbing ladder: at 20 Hz a body
@@ -499,7 +507,7 @@ export function moveCharacter(
           // step's own slope AND the gradient of the ground it lands on.
           const contourOk =
             (contourRise <= 0 || contourRise / contourRun <= params.maxSlope) &&
-            (contourRaw < contourWls || rideSteepnessAt(cx, cz, params.seed) <= params.maxSlope);
+            (contourRaw < contourWls || walkedSteepnessAt(cx, cz, params.seed) <= params.maxSlope);
           if (contourOk && isClear(cx, cz, feetY, params)) {
             px = cx;
             pz = cz;

@@ -9,7 +9,13 @@
 // applies this clamp for swimming path queries; this module gives the movement
 // kernel (player_motion.ts) the same view. `src/sim`-pure; draws no rng.
 
-import { groundHeight, STEEPNESS_SAMPLE, terrainSteepnessAt, waterLevelAt } from './world';
+import {
+  groundHeight,
+  STEEPNESS_SAMPLE,
+  terrainHeight,
+  terrainSteepnessAt,
+  waterLevelAt,
+} from './world';
 
 // Clamp an already-sampled ground height to the local waterline.
 export function rideHeight(x: number, z: number, h: number, seed: number): number {
@@ -51,6 +57,23 @@ export function isSubmergedAt(x: number, z: number, seed: number): boolean {
 // true waterline-to-bank rise.
 export function rideSteepnessAt(x: number, z: number, seed: number): number {
   if (!isSubmergedAt(x, z, seed)) return terrainSteepnessAt(x, z, seed);
+  const e = STEEPNESS_SAMPLE;
+  const hx = (rideHeightAt(x + e, z, seed) - rideHeightAt(x - e, z, seed)) / (2 * e);
+  const hz = (rideHeightAt(x, z + e, seed) - rideHeightAt(x, z - e, seed)) / (2 * e);
+  return Math.hypot(hx, hz);
+}
+
+// Steepness of the surface a walker actually WALKS. Everywhere the walked
+// ground IS the raw terrain this is exactly `rideSteepnessAt` (the memoized
+// dry-land gates stay bit-identical), but where a walk-lift band raises
+// groundHeight above the terrain (a stair flight over carved court ground),
+// the raw memo describes a surface buried yards below the feet: its steep
+// read there walled descents whose real walking surface is a gentle ramp
+// (the Last Keep stair flights over the court stamps' rims). On a lift, the
+// gradient of the ridden ground itself is measured instead, exactly.
+export function walkedSteepnessAt(x: number, z: number, seed: number): number {
+  if (groundHeight(x, z, seed) <= terrainHeight(x, z, seed) + 1e-6)
+    return rideSteepnessAt(x, z, seed);
   const e = STEEPNESS_SAMPLE;
   const hx = (rideHeightAt(x + e, z, seed) - rideHeightAt(x - e, z, seed)) / (2 * e);
   const hz = (rideHeightAt(x, z + e, seed) - rideHeightAt(x, z - e, seed)) / (2 * e);

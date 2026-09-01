@@ -32,7 +32,13 @@ import {
   moveCharacter,
 } from './physics';
 import { PLATFORM_CARRY_CLEARANCE } from './physics/character';
-import { isSubmergedAt, rideSteepnessAt, shoreStepOut, stepWaterLevel } from './ride_height';
+import {
+  isSubmergedAt,
+  rideHeight,
+  rideSteepnessAt,
+  shoreStepOut,
+  stepWaterLevel,
+} from './ride_height';
 import { GHOST_RUN_MULT } from './spirit';
 import {
   DT,
@@ -46,6 +52,7 @@ import {
 import {
   groundHeight,
   terrainDownhill,
+  terrainHeight,
   terrainSteepnessAt,
   terrainWallStandoff,
   waterLevelAt,
@@ -332,16 +339,28 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
   // EXACT position (terrainDownhill): genuinely steep ground still strips
   // control and slides, but a flat shoulder the cell memo over-reads keeps
   // control, and the wall/contour gate below still refuses the climb.
-  // A body CARRIED BY A STANDABLE PLATFORM (feet well above the raw ground:
-  // a fortress floor plate, a stair tread, a pier deck) is not walking the
-  // ground the memo read at all, so the strip never fires for the terrain
-  // buried under its deck: stripping there froze players on the Forgefather
-  // plates whose under-floor ground the stamps had carved steep, with no
-  // slide to escape by because the platform holds the body in place.
+  // A body CARRIED ABOVE THE RAW GROUND (feet well over the terrain the memo
+  // read: a fortress floor plate, a stair tread, a pier deck, or a walk-lift
+  // stair band) is not walking the ground the memo read at all, so the strip
+  // never fires for terrain buried beneath it: stripping there froze players
+  // on the Forgefather plates whose under-floor ground the stamps had carved
+  // steep, and later froze the Last Keep stair DESCENTS, where a band-carried
+  // walker's feet equal lift-inclusive groundHeight exactly, so comparing
+  // against that surface never exempted them even though the memo's steep
+  // read came from the raw rim carved yards below the flight. The reference
+  // surface is therefore the RAW ridden height, the same surface the dry-land
+  // steepness memo and the downhill sampler describe; without lifts it equals
+  // groundHeight, so plain ground walking is untouched.
+  const rawRide = rideHeight(
+    p.pos.x,
+    p.pos.z,
+    terrainHeight(p.pos.x, p.pos.z, deps.seed),
+    deps.seed,
+  );
   const steepFlagged =
     p.onGround &&
     !swimming &&
-    p.pos.y <= swimGround + PLATFORM_CARRY_CLEARANCE &&
+    p.pos.y <= rawRide + PLATFORM_CARRY_CLEARANCE &&
     rideSteepnessAt(p.pos.x, p.pos.z, deps.seed) > MAX_CLIMB_SLOPE;
   const steepSlide = steepFlagged ? terrainDownhill(p.pos.x, p.pos.z, deps.seed) : null;
   const steepGround = steepSlide !== null;
@@ -526,7 +545,14 @@ function stepInstancedRegion(
       // footprint edge into the open sea)
       const wls = stepWaterLevel(p.pos.x, p.pos.z, nx, nz, deps.seed);
       const g1 = groundHeight(nx, nz, deps.seed);
-      const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls);
+      // The climb is measured from where the FEET are, not from the ground
+      // buried beneath them: a grounded body on plain terrain has pos.y equal
+      // to groundHeight (the vertical pass settled it there), so this changes
+      // nothing on open ground, while a body standing ON a platform (a
+      // fortress deck, a crate) steps onto an adjacent walk-lift band or
+      // ledge at its own level instead of being refused for a rise its feet
+      // never make (the Last Keep mid-landing to stair-band hand-off).
+      const r0 = Math.max(groundHeight(p.pos.x, p.pos.z, deps.seed), wls, p.pos.y);
       const r1 = Math.max(g1, wls);
       const run = Math.hypot(nx - p.pos.x, nz - p.pos.z);
       if (

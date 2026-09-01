@@ -272,7 +272,7 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fence', x: 477.1, y: 2, z: 2144.75, ry: 270 * DEG, scale: 6 },
   { key: 'tower_pillar', x: 493.7, y: 2, z: 2142.4, ry: 315 * DEG, scale: 4 },
   { key: 'tower_pillar', x: 478.45, y: 2, z: 2142.4, ry: 345 * DEG, scale: 4 },
-  { key: 'staircase', x: 474.7, y: -1.25, z: 2144.65, ry: 90 * DEG, scale: 7 },
+  { key: 'staircase', x: 474.7, y: -1, z: 2144.65, ry: 90 * DEG, scale: 7 },
   { key: 'fortress_wall', x: 493.9, y: 2, z: 2149.25, ry: 90 * DEG, scale: 5 },
   { key: 'bridge_floor', x: 490.95, y: 2, z: 2151.4, ry: 270 * DEG, scale: 9 },
   { key: 'bridge_floor', x: 485.7, y: 2, z: 2151.4, ry: 270 * DEG, scale: 9 },
@@ -352,8 +352,8 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'fortress_wall', x: 426.45, y: 3, z: 2171.7, ry: 270 * DEG, scale: 8 },
   { key: 'fortress_wall', x: 426.45, y: 3, z: 2164.2, ry: 270 * DEG, scale: 8 },
   { key: 'fortress_wall', x: 426.45, y: 10, z: 2157.7, ry: 270 * DEG, scale: 6 },
-  { key: 'tower_pillar', x: 426.3, y: 1.9, z: 2162.6, ry: 45 * DEG, scale: 9 },
-  { key: 'tower_pillar', x: 426.3, y: 1.9, z: 2146.35, ry: 45 * DEG, scale: 9 },
+  { key: 'tower_pillar', x: 426.3, y: 1.9, z: 2162.6, ry: 75 * DEG, scale: 9 },
+  { key: 'tower_pillar', x: 426.3, y: 1.9, z: 2146.35, ry: 105 * DEG, scale: 9 },
   { key: 'fortress_wall', x: 426.45, y: 10, z: 2150.7, ry: 270 * DEG, scale: 6 },
   { key: 'gate_gear', x: 426.5, y: 10, z: 2153.8, ry: 270 * DEG, scale: 5 },
   { key: 'fortress_wall', x: 426.95, y: 10, z: 2154.45, ry: 90 * DEG, scale: 6 },
@@ -528,6 +528,34 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'cannon', x: 492.7, y: 9.25, z: 2180.6, ry: 45 * DEG, scale: 3 },
   { key: 'tower_pillar', x: 437.6, y: 0.3, z: 2183.9, ry: 180 * DEG, scale: 8 },
   { key: 'tower_pillar', x: 434.6, y: 0.3, z: 2183.9, ry: 180 * DEG, scale: 9 },
+  // ---------------------------------------------------------------------
+  // The fifth placer pass (2026-09-01): the west approach plaza outside the
+  // triple gate with its dune stair and stables, three dragon-head drinking
+  // fountains (yard gate, south wall, strand mouth), the gate pillar
+  // finials, and a guardhouse on the volcano fortress east terrace. One
+  // exact-duplicate approach paver from the export is baked once. The two
+  // gate drum pillars re-aim (rot 75 and 105) and the outer yard stair
+  // re-seats a quarter up.
+  // ---------------------------------------------------------------------
+  { key: 'stone_floor', x: 423.45, y: 1.9, z: 2151.25, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 423.45, y: 1.9, z: 2158.75, ry: 0, scale: 8 },
+  { key: 'staircase', x: 423.4, y: -2.1, z: 2154.9, ry: 180 * DEG, scale: 9 },
+  { key: 'stone_floor', x: 423.45, y: 1.9, z: 2166.25, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 423.45, y: 1.9, z: 2173.75, ry: 0, scale: 8 },
+  { key: 'stone_floor', x: 423.45, y: 1.9, z: 2181.25, ry: 0, scale: 8 },
+  { key: 'stables', x: 423.3, y: 1.8, z: 2176.35, ry: 270 * DEG, scale: 8 },
+  { key: 'horse_head', x: 420.5, y: 4.95, z: 2176.3, ry: 270 * DEG, scale: 2 },
+  { key: 'dragon_head', x: 435.35, y: 4, z: 2142.9, ry: 90 * DEG, scale: 6 },
+  { key: 'fountain_base', x: 435.35, y: 2, z: 2142.4, ry: 180 * DEG, scale: 9 },
+  { key: 'dragon_head', x: 476.15, y: 3.75, z: 2134.2, ry: 90 * DEG, scale: 6 },
+  { key: 'fountain_base', x: 476.15, y: 2, z: 2133.7, ry: 180 * DEG, scale: 9 },
+  { key: 'tower_pillar', x: 426.3, y: 10.4, z: 2146.35, ry: 105 * DEG, scale: 6 },
+  { key: 'tower_pillar', x: 426.3, y: 10.4, z: 2162.35, ry: 75 * DEG, scale: 6 },
+  { key: 'dragon_head', x: 454.55, y: 3.75, z: 2185.3, ry: 270 * DEG, scale: 6 },
+  { key: 'fountain_base', x: 454.8, y: 2, z: 2185.8, ry: 0, scale: 9 },
+  { key: 'building_base', x: 517.55, y: 6.1, z: 2214.25, ry: 90 * DEG, scale: 9 },
+  { key: 'tower_pillar', x: 516.15, y: 2.6, z: 2209.2, ry: 225 * DEG, scale: 5 },
+  { key: 'tower_pillar', x: 522.15, y: 2.1, z: 2217.2, ry: 225 * DEG, scale: 5 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as
@@ -638,6 +666,57 @@ export function forgefatherStreetlampSites(): PlacedStreetlamp[] {
   }));
 }
 
+/** Every standable deck plate's FULL (uncropped) footprint rect and top,
+ *  derived once from the table: the support query below reads these. */
+const FORTRESS_PLATE_RECTS: readonly {
+  x0: number;
+  x1: number;
+  z0: number;
+  z1: number;
+  top: number;
+}[] = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => FORTRESS_STANDABLE_KEYS.has(p.key)).map((p) => {
+  const native = IGNIVAR_PROP_NATIVE[p.key];
+  const cos = Math.abs(Math.cos(p.ry));
+  const halfX = ((cos * native.len + (1 - cos) * native.dep) * p.scale) / 2;
+  const halfZ = (((1 - cos) * native.len + cos * native.dep) * p.scale) / 2;
+  return {
+    x0: p.x - halfX,
+    x1: p.x + halfX,
+    z0: p.z - halfZ,
+    z1: p.z + halfZ,
+    top: p.y + native.hei * p.scale,
+  };
+});
+
+/** The highest deck-plate top under a placement's collider footprint, or
+ *  -Infinity when no plate intersects it. This is the piece's floor when it
+ *  stands on a deck instead of the dirt (the fence-on-a-bridge rule); the
+ *  footprint is the ROTATED collider's axis-aligned bounds so a rail whose
+ *  center hangs just past a plate edge still finds the plate it rests on. */
+export function fortressDeckTopUnder(placement: IgnivarPropPlacement): number {
+  const native = IGNIVAR_PROP_NATIVE[placement.key];
+  const footprint = IGNIVAR_PROP_COLLIDER_FOOTPRINT[placement.key] ?? 1;
+  const hw = (native.len * placement.scale * footprint) / 2;
+  const hd = (native.dep * placement.scale * footprint) / 2;
+  const c = Math.abs(Math.cos(placement.ry));
+  const s = Math.abs(Math.sin(placement.ry));
+  const halfX = hw * c + hd * s;
+  const halfZ = hw * s + hd * c;
+  let best = -Infinity;
+  for (const rect of FORTRESS_PLATE_RECTS) {
+    if (
+      placement.x + halfX <= rect.x0 ||
+      placement.x - halfX >= rect.x1 ||
+      placement.z + halfZ <= rect.z0 ||
+      placement.z - halfZ >= rect.z1
+    )
+      continue;
+    // only a plate at or below the piece's seat can be its floor
+    if (rect.top <= placement.y + 0.75 && rect.top > best) best = rect.top;
+  }
+  return best;
+}
+
 /** Colliders for the baked pass, in world space: standable platform OBBs
  *  for the deck pieces and the staircase treads, full-height blocker OBBs
  *  for every ground-standing solid (the ignivarPropColliders derivation,
@@ -682,12 +761,21 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
       continue;
     }
     if (IGNIVAR_NON_COLLIDING_PROPS.has(placement.key)) continue;
-    const ground = terrainHeight(placement.x, placement.z, seed);
+    // A solid's floor is the higher of the terrain and any deck plate under
+    // its footprint: a fence or parapet STANDING ON an elevated deck (the
+    // balcony rails, the court fences) is grounded furniture there, not an
+    // aerial stack member, so it blocks the walk along its deck. A piece
+    // seated on a deck ABOVE the terrain lane carries its base as passUnderY,
+    // so the walkers passing beneath the deck pass beneath its furniture too.
+    // Pieces grounded on the terrain itself classify exactly as before.
+    const terrain = terrainHeight(placement.x, placement.z, seed);
+    const ground = Math.max(terrain, fortressDeckTopUnder(placement));
     if (placement.y > ground + GROUND_STAND_TOLERANCE) continue;
     // Fully interred pieces (the summit foundation shaft) never collide: a
     // full-height OBB has no top, so a buried mass would otherwise blanket
     // the walkable ground above it.
     if (placement.y + native.hei * placement.scale < ground + 0.5) continue;
+    const deckSeated = placement.y > terrain + GROUND_STAND_TOLERANCE;
     // Every solid carries its real top as a movement top (the parkour
     // pass-over lane): a wall or tower stays a wall to anyone below it,
     // while a bridge support whose cap pokes just past the deck it holds
@@ -701,6 +789,7 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
         r: ((native.len + native.dep) * placement.scale * footprint) / 4,
         moveTopY: top,
         cameraTopY: top,
+        ...(deckSeated ? { passUnderY: placement.y } : {}),
       });
       continue;
     }
@@ -713,6 +802,7 @@ export function forgefatherFortressColliders(seed: number): Collider[] {
       rot: placement.ry,
       moveTopY: top,
       cameraTopY: top,
+      ...(deckSeated ? { passUnderY: placement.y } : {}),
     });
   }
   return colliders;

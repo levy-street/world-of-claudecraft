@@ -207,6 +207,16 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   // the west plaza stair (the fourth pass): the paved plaza plates (2.3) up
   // to the west gate bridge decks (3.4) inside the triple-gate mouth
   { axis: 'z', b0: 439.07, b1: 444.83, a0: 2160.15, a1: 2155.35, h0: 2.3, h1: 3.4 },
+  // the training yard stair (the fifth pass): the yard bridge decks (3.26)
+  // up between the drum posts to the keep court decks (5.76), the closing
+  // link tapering to the court's stamped raw ground
+  { axis: 'z', b0: 479.34, b1: 485.86, a0: 2149, a1: 2156, h0: 3.26, h1: 5.76 },
+  { link: true, axis: 'z', b0: 479.34, b1: 485.86, a0: 2156, a1: 2157.4, h0: 5.76, h1: 5.1 },
+  // the west approach stair (the fifth pass): the dune hollow outside the
+  // triple gate up onto the approach plaza pavers (2.54); the level run
+  // hands off to the gate bridge decks with one stride at the gate line
+  { axis: 'x', b0: 2150.68, b1: 2159.12, a0: 418.9, a1: 423.4, h0: 1.77, h1: 2.54 },
+  { axis: 'x', b0: 2150.68, b1: 2159.12, a0: 423.4, a1: 427.45, h0: 2.54, h1: 2.54 },
 ];
 
 /** No wild scatter on the fortress's graded grounds (the Last Keep rule):
