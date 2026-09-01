@@ -187,6 +187,7 @@ import {
   parseDesktopWalletHandoffStatus,
 } from './desktop_wallet_handoff';
 import { dungeonEntrySnapshotFacing } from './dungeon_entry_facing';
+import { reanchorDecision } from './entity_reanchor';
 import {
   decodeConsecrations,
   decodeFrostRings,
@@ -1206,11 +1207,6 @@ function copyPos(
   dst.y = src.y;
   dst.z = src.z;
 }
-
-// A single position update never moves an entity more than a few yards by
-// walking; anything past this is a teleport (arena pit, dungeon portal,
-// graveyard release). Those are snapped, not interpolated — see applyWire.
-const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 
 // Despawn grace (anti-flicker, entity-map churn). The server keeps known
 // entities in interest out to a drop radius (100yd players / 130yd npcs) that is
@@ -3081,15 +3077,13 @@ export class ClientWorld extends ReconWireState implements IWorld {
             )
           : contAlpha;
       const entFacingAlpha = Math.min(1, entAlpha);
-      // Distant entities interpolate on measured cadence. Ignore idle gaps,
-      // which would smear their next movement into slow motion.
-      if (prevUpdatedAt !== undefined) {
-        const gap = now - prevUpdatedAt;
-        if (gap > 5 && gap < 450) {
-          e.netInterval = prevInterval === undefined ? gap : prevInterval * 0.7 + gap * 0.3;
-        }
-      }
-      e.netUpdatedAt = now;
+      // Snap-vs-glide and per-entity update-clock learning both live in
+      // entity_reanchor.ts (reanchorDecision): a distance/gap combination no
+      // real movement could explain still snaps (a teleport: arena pit,
+      // dungeon portal, graveyard release); everything else glides on the
+      // entity's own measured cadence, now gap-aware so a legitimately fast
+      // mover crossing the old flat distance during a network stall is not
+      // mistaken for a teleport.
       const teleDx = w.x - e.pos.x,
         teleDz = w.z - e.pos.z;
       if (selfDelta) {
@@ -3112,7 +3106,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
       }
       const wasDead = e.dead;
       const nowDead = !!w.dead;
-      if ((wasDead && !nowDead) || teleDx * teleDx + teleDz * teleDz > TELEPORT_SNAP_DIST_SQ) {
+      const { snap, netInterval: learnedInterval } = reanchorDecision({
+        gapMs: prevUpdatedAt !== undefined ? now - prevUpdatedAt : undefined,
+        deltaSq: teleDx * teleDx + teleDz * teleDz,
+        prevInterval,
+        reviveEdge: wasDead && !nowDead,
+      });
+      if (learnedInterval !== undefined) e.netInterval = learnedInterval;
+      e.netUpdatedAt = now;
+      if (snap) {
         e.prevPos = { x: w.x, y: w.y, z: w.z };
         e.prevFacing = w.f;
       } else {
