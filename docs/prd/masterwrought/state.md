@@ -24584,3 +24584,44 @@ BEFORE running the gate, or the gate is measuring a library the tree does not
 describe. It is the dependency twin of the phase-close regeneration rule, and it
 fails in the same quiet direction: a green-looking tree whose artifacts are
 stale, or in this case a red whose cause looks like source and is not.
+
+### PHASE 18 QA VALIDATION (the freeze, at tip 30f20ed403)
+
+- **node scripts/gate_select.mjs on the COMMITTED tree: PASS, all 12 steps green,
+  EXIT 0**, pg armed via TEST_DATABASE_URL and DATABASE_URL never exported. The
+  planner fell back to the full suite, correctly: the change set is a whole
+  release span. Full-suite reading under the gate: 3667 passed / 1 skipped
+  (3668 files), 54435 passed / 11 expected fail / 28 skipped (54474).
+  It took three attempts to get there and each red was real, which is the
+  point of running it: the first found 6 red files, the second failed at the
+  i18n freshness step (an overlay edit with no regeneration behind it, caught
+  BEFORE any test ran), the third passed.
+- **The frozen bounded stamp: EXIT 0, FIRST TRY**, npm test -- --maxWorkers=8,
+  database vars UNSET, porcelain clean on both sides, zero vitest processes
+  before launch, one-minute load 6.99 on a box whose own idle noise is about 5.
+  **3637 passed / 31 skipped (3668 files), 53986 passed / 11 expected fail /
+  477 skipped (54474), 700.17 s.**
+- **DRIFT, predicted before the run and attributed one to one.** Against the
+  Phase 17 stamp at 1c265abfa6 (3342/29 files = 3371; 50414/2/453 = 50869):
+  files **+297**, which is exactly what was predicted, from 298 test files added
+  and 1 removed. The removal is tests/ignivar_eastbrook_entrance.test.ts, which
+  the release retired with the walk-up entrance when it moved to floor routing.
+  Of the 298 additions, **228 come from the release side** and **70 are
+  packet-authored** (the sweep's own suites plus this QA round's, which is why
+  the count is higher than the scaffold's stale 3592/53309 estimate).
+  Tests +3605. Expected fails **2 to 11, exactly +9**: the nine R5 escalation
+  pins the eighth sync recorded, unchanged and never re-tuned. Skips +24, and
+  the stamp's 477 against the gate's 28 is the pg arm, not a regression: the
+  stamp deliberately runs with the database vars unset, so every pg suite skips
+  where the gate ran it.
+- **Symbol census at the final tip: RESULT PASS, EXIT 0**, zero MISSING and zero
+  unexplained extras in every class.
+- **Isolation typecheck at the final tip: EXIT 0, zero errors**, in a CLEAN
+  worktree at HEAD with node_modules symlinked. This is the check the sweep's
+  own close-out promoted from a nicety to a hard prerequisite after it caught a
+  commit that shipped a consumer without its module; it passes here.
+- **npm run ci:changed after the last commit: EXIT 0** (warnings only, which the
+  repo does not gate on).
+- One environment trap paid for on the way, recorded above: a sync that changes
+  a PATCHED dependency's patch needs pnpm install BEFORE the gate, or a suite
+  reads a library the tree no longer describes.
