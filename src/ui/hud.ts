@@ -643,6 +643,7 @@ import { MobileMoreDialogController } from './mobile_more_dialog';
 import { MOUNT_DESC_KEYS, mountSpecLines } from './mount_labels';
 import { MountRaceControls } from './mount_race_controls';
 import { MountRaceStrip } from './mount_race_strip';
+import { mouseoverCastTarget } from './mouseover_cast_core';
 import { type FrameDimension, MovableFrame } from './movable_frame';
 import { NoticeboardPopup } from './noticeboard_popup';
 import { NPC_WINDOW_CLOSE_RANGE } from './npc_service_range';
@@ -790,8 +791,9 @@ import { toolEffectNameKey } from './tool_effect_name';
 import { toolEffectTooltipLines } from './tool_effect_tooltip';
 import { createTooltipLine } from './tooltip_line';
 import { SharedTooltipOwner } from './tooltip_owner';
+import { installTargetOfTargetControls } from './totarget_frame_controller';
 import { TOOLTIP_PEEK_MS, TouchPeekGuard } from './touch_peek';
-import { bindTouchDoubleTap, bindTouchTap, CLICK_SUPPRESS_MS, TAP_SLOP_PX } from './touch_tap';
+import { bindMobileFrameLongPress, bindTouchDoubleTap, bindTouchTap } from './touch_tap';
 import { buildTownFocusView, stepTownFocus, townFocusRenderSig } from './town_focus_view';
 import { renderTownFocusWindow } from './town_focus_window';
 import { installTrackerStackAnchor } from './tracker_stack_anchor';
@@ -962,7 +964,6 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string): T => document.quer
 // painter's repaint gate never fires for it; the constant just pins the key so the
 // gate stays a no-op (target/party pass a per-unit key).
 const PLAYER_PORTRAIT_KEY = 'player';
-const MOBILE_CONTEXT_LONG_PRESS_MS = 650;
 // The modal one-shots that stay above every banded window AND the mobile
 // window backdrop (z 85): the confirm/input prompt plus the confirm-dialog
 // family's once-ever explainers (the scoped-popup 96 rule).
@@ -2099,6 +2100,9 @@ export class Hud {
   private lastTargetFrameId: number | null = null;
   // Target-of-target frame throttle + identity tracking, the non-self cadence twins
   // of the target frame's fields above (see the showTargetOfTarget paint block).
+  // lastTotFrameId doubles as the frame's live SUBJECT for its click / menu /
+  // mouseover routes: a tot swap bypasses the throttle, so it is always whoever
+  // the frame is showing, and null the moment the frame paints hidden.
   private lastTotFramePaintAt = 0;
   private lastTotFrameId: number | null = null;
   // Title resolve elision for the target frame (the lastIcon pattern): the
@@ -2765,6 +2769,7 @@ export class Hud {
     });
     this.updateClock();
     // classic MMOs: the player interaction menu opens from the target portrait
+    const isMobile = () => this.isMobileLayout();
     $('#target-frame').addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
       this.openTargetFrameMenuAt((ev as MouseEvent).clientX, (ev as MouseEvent).clientY);
@@ -2778,7 +2783,9 @@ export class Hud {
       const pe = ev as PointerEvent;
       this.openTargetFrameMenuAt(pe.clientX, pe.clientY);
     });
-    this.bindMobileFrameLongPress($('#target-frame'), (x, y) => this.openTargetFrameMenuAt(x, y));
+    bindMobileFrameLongPress($('#target-frame'), isMobile, (x, y) =>
+      this.openTargetFrameMenuAt(x, y),
+    );
     const playerFrame = $('#player-frame');
     playerFrame.addEventListener('contextmenu', (ev) => {
       ev.preventDefault();
@@ -2792,7 +2799,7 @@ export class Hud {
       this.openSelfContextMenu(rect.left, rect.bottom, playerFrame);
       $('#ctx-menu').querySelector<HTMLElement>('.ctx-item')?.focus();
     });
-    this.bindMobileFrameLongPress(playerFrame, (x, y) => this.openSelfContextMenu(x, y), {
+    bindMobileFrameLongPress(playerFrame, isMobile, (x, y) => this.openSelfContextMenu(x, y), {
       ignoreSelector: 'button, #buff-bar, #debuff-bar',
     });
     $('#mm-char').addEventListener('click', () => this.toggleChar());
@@ -3875,6 +3882,20 @@ export class Hud {
         ),
       },
     });
+    // The target-of-target mini frame acts on its own unit like every other unit
+    // frame (select, unit menu, mouseover cast); the wiring lives in its own
+    // module. Its POSITION comes from the interface editor below, not a corner
+    // button of its own, which is why it takes no MovableFrame here.
+    installTargetOfTargetControls(this.totFrameEl, {
+      subjectId: () => this.lastTotFrameId,
+      onTarget: (id) => this.sim.targetEntity(id),
+      onMenu: (id, x, y) => this.openTargetFrameMenuAt(x, y, id),
+      onHover: (resolve) => {
+        this.hoveredCastUnit = resolve;
+      },
+      isInterfaceUnlocked: () => this.interfaceUnlock.isUnlocked,
+      isMobileLayout,
+    });
     this.initInterfaceUnlock(isMobileLayout);
   }
 
@@ -4847,10 +4868,12 @@ export class Hud {
   // a pure USER toggle (party HP is actionable info), never influenced by
   // data-fx-level, reduce-motion, or the FPS governor.
   private partyCollapsed = loadPartyCollapsed();
-  // The party member the cursor is over (Clique-style mouseover casts): set by
-  // the party rows' mouseenter/mouseleave, read by castSlot to redirect friendly
-  // abilities to the hovered member. null whenever no frame is hovered.
-  private hoveredPartyPid: number | null = null;
+  // The unit the cursor is over (Clique-style mouseover casts): set by the party
+  // rows' and the target-of-target frame's mouseenter/mouseleave, read by
+  // castSlot to redirect friendly abilities onto it. A RESOLVER rather than an
+  // id, because the target-of-target frame's unit changes under a still cursor.
+  // null whenever no frame is hovered.
+  private hoveredCastUnit: (() => number | null) | null = null;
   // The party frames are N further instances of the unit_frame family, one per
   // member, behind a keyed node pool that replaces the old per-rebuild innerHTML wipe
   // + click/contextmenu re-attach. The pool owns #party-frames; updatePartyFrames
@@ -4866,7 +4889,7 @@ export class Hud {
       // Clique-style mouseover casts: castSlot redirects friendly abilities to
       // the hovered member while the cursor is over a party frame.
       onHover: (pid) => {
-        this.hoveredPartyPid = pid;
+        this.hoveredCastUnit = pid === null ? null : () => pid;
       },
       // A party member's pet is an ordinary targetable entity, so selecting it is
       // the same call the row itself makes, just with the pet's id.
@@ -6151,65 +6174,6 @@ export class Hud {
     });
   }
 
-  private bindMobileFrameLongPress(
-    el: HTMLElement,
-    onLongPress: (x: number, y: number) => void,
-    opts: { ignoreSelector?: string } = {},
-  ): void {
-    let timer: number | undefined;
-    let downId: number | null = null;
-    let downX = 0;
-    let downY = 0;
-    let suppressUntil = 0;
-    const clear = () => {
-      if (timer !== undefined) window.clearTimeout(timer);
-      timer = undefined;
-      downId = null;
-    };
-    el.addEventListener('pointerdown', (ev) => {
-      if (ev.pointerType !== 'touch' || !this.isMobileLayout()) return;
-      const target = ev.target as HTMLElement | null;
-      if (opts.ignoreSelector && target?.closest(opts.ignoreSelector)) return;
-      clear();
-      downId = ev.pointerId;
-      downX = ev.clientX;
-      downY = ev.clientY;
-      timer = window.setTimeout(() => {
-        timer = undefined;
-        suppressUntil = Date.now() + CLICK_SUPPRESS_MS;
-        onLongPress(downX, downY);
-      }, MOBILE_CONTEXT_LONG_PRESS_MS);
-    });
-    el.addEventListener('pointermove', (ev) => {
-      if (ev.pointerType !== 'touch' || ev.pointerId !== downId) return;
-      if (Math.hypot(ev.clientX - downX, ev.clientY - downY) > TAP_SLOP_PX) clear();
-    });
-    el.addEventListener('pointerup', (ev) => {
-      if (ev.pointerId === downId) clear();
-    });
-    el.addEventListener('pointercancel', (ev) => {
-      if (ev.pointerId === downId) clear();
-    });
-    el.addEventListener(
-      'click',
-      (ev) => {
-        if (Date.now() > suppressUntil) return;
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-      },
-      true,
-    );
-    el.addEventListener(
-      'contextmenu',
-      (ev) => {
-        if (!this.isMobileLayout() || Date.now() > suppressUntil) return;
-        ev.preventDefault();
-        ev.stopImmediatePropagation();
-      },
-      true,
-    );
-  }
-
   hideTooltip(): void {
     this.tooltipEl.style.display = 'none';
     this.tooltipEl.classList.remove('mob-tooltip');
@@ -7489,21 +7453,16 @@ export class Hud {
           this.castPositionAbility(action.id, resolved, barSlot);
         } else {
           // Clique-style mouseover cast: a friendly (heal/buff) ability pressed
-          // while hovering a party frame lands on the hovered member instead of
-          // the current target; the sim validates and falls back if it went stale.
-          // Gated on the Interface option (mouseoverCast, on by default).
-          const def = resolved.def;
-          if (
-            this.hoveredPartyPid !== null &&
-            (this.optionsHooks?.settings.get('mouseoverCast') ?? true) &&
-            def.requiresTarget &&
-            def.targetType === 'friendly' &&
-            this.sim.entities.has(this.hoveredPartyPid)
-          ) {
-            this.sim.castAbilityOn(action.id, this.hoveredPartyPid);
-          } else {
-            this.sim.castAbility(action.id);
-          }
+          // while hovering a unit frame lands on that unit instead of the current
+          // target; the sim validates and falls back if it went stale. The rule
+          // (and the mouseoverCast option gate) is mouseover_cast_core.ts.
+          const hovered = mouseoverCastTarget(this.hoveredCastUnit?.() ?? null, {
+            enabled: this.optionsHooks?.settings.get('mouseoverCast') ?? true,
+            ability: resolved.def,
+            exists: (id) => this.sim.entities.has(id),
+          });
+          if (hovered !== null) this.sim.castAbilityOn(action.id, hovered);
+          else this.sim.castAbility(action.id);
           // Optional QoL: also engage auto-attack when the ability is an offensive
           // attack, so white swings start without a separate Attack press. Gated on
           // the player setting; abilityStartsAutoAttack skips heals/buffs and CC the
@@ -17810,8 +17769,9 @@ export class Hud {
   // you) gets the social/party menu; your own pet gets the pet menu; a live wild
   // hostile mob (in a party) gets the raid-marker menu, mirroring Sim.setMarker's
   // markable criteria so the menu never appears where it would be a no-op.
-  private openTargetFrameMenuAt(x: number, y: number): void {
-    const tid = this.sim.player.targetId;
+  // `tid` defaults to the current target (the target frame's own right-click);
+  // the target-of-target frame passes ITS unit through the same menu builder.
+  private openTargetFrameMenuAt(x: number, y: number, tid = this.sim.player.targetId): void {
     const t = tid !== null ? this.sim.entities.get(tid) : null;
     if (t && t.kind === 'player' && t.id !== this.sim.playerId) {
       this.openContextMenu(t.id, t.name, x, y);

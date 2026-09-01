@@ -1376,6 +1376,40 @@
   #totarget-frame .level-chip {
     display: none;
   }
+  /* Moved by the interface editor: makeUiRootDetacher re-homes the mini onto #ui,
+     so every `#target-frame > #totarget-frame` rule above stops matching and the
+     frame positions off its own saved left/top instead (the shared
+     .hud-frame-detached block below owns position/margin/z-index). Three things
+     the anchored rules used to supply are restated here.
+     (1) The mini zoom moves onto the CHILDREN, never the frame itself, exactly
+         as the player and target frames do it: zoom on a positioned frame also
+         multiplies its used left/top and breaks the MovableFrame drag math.
+     (2) The portrait-left order, stated again from scratch. NOT a specificity
+         win over the LATER #target-frame .portrait-wrap / .uf-bars mirror rules:
+         the re-home leaves those descendant selectors no ancestor to match, so
+         they and the docked rule above drop out TOGETHER and nothing is left to
+         contest. The class is what selects the detached state, not what outranks
+         anything (it does also cover the degenerate case where the class is set
+         but the re-home found no #ui to move into).
+     (3) --uf-bar-height, which the mini inherited from #target-frame and no
+         longer does, so its bar keeps tracking the Target Frame Height setting. */
+  #totarget-frame.hud-frame-detached {
+    --uf-bar-height: var(--target-frame-height, 15px);
+  }
+  #totarget-frame.hud-frame-detached > :not(.tf-move-btn) {
+    zoom: calc(0.74 * var(--target-frame-scale, 1));
+  }
+  #totarget-frame.hud-frame-detached .portrait-wrap {
+    order: 1;
+  }
+  #totarget-frame.hud-frame-detached .uf-bars {
+    order: 2;
+    width: 132px;
+    margin-left: -16px;
+    margin-right: 0;
+    border-radius: 11px 6px 6px 11px;
+    padding: 4px 8px 4px 22px;
+  }
   /* Movable unit frames: the small corner toggle (built by MovableFrame in
      movable_frame.ts) that unlocks
      the frame for dragging and locks it back. Sits just outside the top-right
@@ -1524,6 +1558,7 @@
   #actionbar2.hud-frame-detached,
   #actionbar3.hud-frame-detached,
   #pet-frame.hud-frame-detached,
+  #totarget-frame.hud-frame-detached,
   #stancebar.hud-frame-detached,
   #xpbar.hud-frame-detached,
   #buff-bar.hud-frame-detached,
@@ -1700,6 +1735,7 @@
      player has switched OFF stays hidden while editing, and the options note
      points at the plus/minus buttons for turning more on. */
   body.interface-unlocked #target-frame.tf-unlocked,
+  body.interface-unlocked #totarget-frame.tf-unlocked,
   body.interface-unlocked #pet-frame.tf-unlocked,
   body.interface-unlocked #stancebar.tf-unlocked {
     display: flex !important;
@@ -1774,8 +1810,17 @@
      themselves with their own id-specific rules (the daily rewards chest's
      pointer-events, the target debuff strip) and each would otherwise stay
      clickable inside an "inert" frame. The frame's own chrome, the move button
-     and the resize grip, is carved back out. */
-  body.interface-unlocked .tf-unlocked :not(.tf-move-btn):not(.mf-resize-grip) {
+     and the resize grip, is carved back out.
+     So is #totarget-frame, the one governed frame that is itself a DESCENDANT of
+     another one: the mini lives inside #target-frame until it is moved, so this
+     rule reached it and made it pointer-inert, leaving it the only arrangeable
+     frame a player could never actually grab (its name chip appeared, its drag
+     never started, and the press fell through to the world). Only the mini
+     ITSELF is carved out; its own contents still match through it, so a grab
+     anywhere on it starts the mini's drag rather than pressing its portrait. */
+  body.interface-unlocked
+    .tf-unlocked
+    :not(.tf-move-btn):not(.mf-resize-grip):not(#totarget-frame) {
     pointer-events: none !important;
   }
   /* While unlocked each aura row keeps a graspable minimum box (the dashed

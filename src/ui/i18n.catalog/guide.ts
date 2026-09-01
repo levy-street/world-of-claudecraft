@@ -586,7 +586,7 @@ export const guideStrings = {
     ifWalkByAutoloot: 'Scoops the loot from your own kills as you walk past them. Off by default.',
     ifGroundReticle: 'Shows the ground circle while you are aiming a placed spell.',
     ifMouseoverCast:
-      'Lets a heal or a friendly spell land on the party frame you are hovering, without changing your target.',
+      'Lets a heal or a friendly spell land on the unit frame you are hovering, a party or raid row or the target-of-target frame, without changing your target.',
     ifStickyTarget:
       'Keeps your current target when you click on empty ground, instead of clearing it.',
     ifFctScale: 'The size of the damage and healing numbers that float off your target.',

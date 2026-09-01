@@ -141,6 +141,20 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
   },
   // The stance-style choice bar (warrior stances, paladin auras) sits inside
   // the transformed #actionbar-stack like the action bars, so it detaches too.
+  // The target-of-target mini frame. Unlike the three unit frames above it has
+  // no corner button of its own, so the global toggle is its ONLY route to a
+  // spot of its own; until it had one, the mini could only ride wherever the
+  // target frame was dragged. It lives inside #target-frame (which is also its
+  // containing block), so it re-homes onto #ui while positioned exactly like the
+  // frames under a transformed ancestor do.
+  {
+    id: 'targetOfTarget',
+    elementId: 'totarget-frame',
+    storageKey: 'woc_hud_frame_totarget',
+    labelKey: 'hudChrome.unitFrame.targetOfTargetLabel',
+    fallbackSize: { w: 150, h: 54 },
+    detachToUiRoot: true,
+  },
   {
     id: 'stanceBar',
     elementId: 'stancebar',

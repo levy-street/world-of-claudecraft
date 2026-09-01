@@ -273,7 +273,15 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // LOWERED 18905 -> 18865 by the target-of-target frame work: giving the mini
+    // frame the unit-frame routes needed the touch long-press binder from a THIRD
+    // frame, so bindMobileFrameLongPress (timer, slop cancel and both
+    // capture-phase suppressors) moved beside its siblings in touch_tap.ts, and
+    // the mouseover-cast redirect rule moved to the pure mouseover_cast_core.ts.
+    // Hud kept the two call sites and one deps literal, so the extractions more
+    // than paid for the new wiring. The ratchet's own rule: an extraction lowers
+    // the ceiling in the same change. Exact count, zero slack.
+    ceiling: 18865,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

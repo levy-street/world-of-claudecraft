@@ -1285,3 +1285,71 @@ describe('MovableFrame dimensions resize', () => {
     });
   });
 });
+
+// A governed frame that ACCEPTS a drag must not let the pointerdown reach an
+// ancestor frame's mover. Governed frames are siblings on #ui with one
+// exception, the target-of-target mini inside #target-frame: without this,
+// grabbing the mini armed both movers and dragged the target frame along with
+// it (caught while re-shooting the PR screenshots, hence the pins).
+describe('MovableFrame nested inside another movable frame', () => {
+  it('stops the pointerdown once it takes the gesture', () => {
+    const { frame, btn } = makeFrame();
+    btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let stopped = 0;
+    frame.dispatch(
+      'pointerdown',
+      pointer({
+        clientX: 100,
+        clientY: 520,
+        stopPropagation() {
+          stopped++;
+        },
+      }),
+    );
+    expect(stopped).toBe(1);
+  });
+
+  it('leaves the pointerdown alone when it REFUSES the gesture', () => {
+    // A locked frame, the mobile layout and a press on the frame's own button
+    // all bail before the frame owns anything, so an ancestor (or the world
+    // underneath) must still see the event.
+    const locked = makeFrame();
+    let lockedStops = 0;
+    locked.frame.dispatch(
+      'pointerdown',
+      pointer({
+        stopPropagation() {
+          lockedStops++;
+        },
+      }),
+    );
+    expect(lockedStops).toBe(0);
+
+    const mobile = makeFrame({ mobile: true });
+    mobile.btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let mobileStops = 0;
+    mobile.frame.dispatch(
+      'pointerdown',
+      pointer({
+        stopPropagation() {
+          mobileStops++;
+        },
+      }),
+    );
+    expect(mobileStops).toBe(0);
+
+    const secondary = makeFrame();
+    secondary.btn.dispatch('click', { preventDefault() {}, stopPropagation() {} });
+    let secondaryStops = 0;
+    secondary.frame.dispatch(
+      'pointerdown',
+      pointer({
+        button: 2,
+        stopPropagation() {
+          secondaryStops++;
+        },
+      }),
+    );
+    expect(secondaryStops).toBe(0);
+  });
+});

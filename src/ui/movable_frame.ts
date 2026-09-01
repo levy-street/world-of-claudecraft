@@ -636,6 +636,13 @@ export class MovableFrame {
     // behaviour; only the frame body area initiates a drag.
     if (!target || target.closest('button')) return;
     ev.preventDefault();
+    // This frame has taken the gesture, so no ANCESTOR frame may also take it.
+    // Governed frames are siblings on #ui with one exception, the
+    // target-of-target mini, which lives inside #target-frame until it is moved:
+    // without this, grabbing the mini armed both movers and dragged the target
+    // frame along with it. A frame with no movable ancestor loses nothing (the
+    // pointermove / pointerup half rides `document`, which this cannot reach).
+    ev.stopPropagation();
     this.ensurePos();
     // Apply the position NOW (converting a CSS-default spot to explicit px and
     // firing any detach side effect) so the grab offsets below are measured
