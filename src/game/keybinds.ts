@@ -410,6 +410,20 @@ export const BIND_CATEGORIES = [...new Set(BIND_ACTIONS.map((a) => a.category))]
 // first rebind. The legacy blob is read-only here and never overwritten.
 const KEY_PREFIX = 'woc_keybinds';
 const SLOTS_PER_ACTION = 2; // primary + secondary
+// Marks a stored profile as already having run repairStoredBindings() at least
+// once, so the signature match in keybinds_repair.ts is genuinely one-time
+// rather than re-evaluated on every load. Without this, a deliberate rebind
+// that happens to reproduce an old corruption signature (e.g. slot10/11 -> Q/E,
+// which evicts strafeLeft/strafeRight to null via the ordinary uniqueness sweep
+// in bind(), byte-identical to the reverted Q/E strafe overhaul's leftover
+// shape) gets silently reverted on every relogin instead of just once. Not a
+// valid BIND_ACTIONS id, so it is never touched by the id-keyed load/save loops.
+// IMPORTANT for a future repair signature (a "Signature C"): once this marker is
+// set, repairStoredBindings() never runs again for that profile, so a signature
+// added later will never fire for anyone who saved since this shipped. Adding one
+// means deciding (and documenting here) whether existing marked profiles need to
+// see it too, e.g. by moving this to a version number bumped for that signature.
+const REPAIR_MARKER = '__repaired';
 
 export function actionKind(id: string): BindKind | null {
   return ACTION_BY_ID.get(id)?.kind ?? null;
@@ -607,8 +621,13 @@ export class Keybinds {
     // changes (Q/E strafe overhaul; targetFriendly/meters KeyH collision). It
     // deletes only the exact corrupted keys so they re-seed to current defaults
     // below, and leaves every other stored value (including deliberate remaps)
-    // untouched. See keybinds_repair.ts.
-    repairStoredBindings(obj);
+    // untouched. See keybinds_repair.ts. Gated on REPAIR_MARKER so it truly runs
+    // once per profile: without the gate, a deliberate remap that later
+    // reproduces the same corrupted shape (see REPAIR_MARKER's own comment)
+    // would keep getting reverted on every load.
+    if (obj[REPAIR_MARKER] !== true) {
+      repairStoredBindings(obj);
+    }
     // Apply stored codes over the defaults, but only for known actions and
     // never letting one code land on two actions (first writer keeps it).
     // Actions absent from the stored blob (e.g. ones added in a later release
@@ -649,8 +668,9 @@ export class Keybinds {
   }
 
   private save(): void {
-    const obj: Record<string, (string | null)[]> = {};
+    const obj: Record<string, (string | null)[] | boolean> = {};
     for (const [id, codes] of this.map) obj[id] = codes;
+    obj[REPAIR_MARKER] = true;
     try {
       localStorage.setItem(this.storeKey, JSON.stringify(obj));
     } catch {
