@@ -253,6 +253,9 @@ describe('simEventVerdict: the declared-but-unseen pin and the resolver backstop
       'guildRenamed',
       'motdResult',
       'reliquaryIlluminationBroadcast',
+      // Emitted, but through a builder the extractor cannot follow since the
+      // v0.42.0 merge took the release's refactor (see the script's note).
+      'riftState',
     ]);
   });
 });

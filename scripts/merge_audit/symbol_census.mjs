@@ -127,16 +127,7 @@ export const SIM_EVENT_DISCRIMINANT = 'type';
  * three celebration emits it fronts resolve here instead of riding the
  * union-only pin below.
  */
-export const SIM_EVENT_FANOUT_HELPERS = new Set([
-  'emitToZonePlayers',
-  'announceZoneCelebration',
-  // release/v0.42.0 (the tenth sync): the release moved the riftState emit one
-  // indirection past its literal, ctx.emit(buildRiftStateEvent(...)), so the
-  // extractor saw an emitted kind with no readable type. The builder is named here
-  // rather than pinning riftState as union-only, because riftState IS emitted and a
-  // union-only pin would have recorded the opposite (src/sim/rift/runs.ts).
-  'buildRiftStateEvent',
-]);
+export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers', 'announceZoneCelebration']);
 
 /**
  * SimEvent types the union DECLARES that the emits extractor does not see, pinned
@@ -179,6 +170,17 @@ export const SIM_EVENT_UNION_ONLY = Object.freeze([
   'guildRenamed',
   'motdResult',
   'reliquaryIlluminationBroadcast',
+  // release/v0.42.0 (the tenth sync). riftState IS emitted, every tick a player is
+  // in a rift; the extractor simply cannot see it any more. Our side emitted the
+  // literal directly (ctx.emit({ type: 'riftState', ... })); the release refactored
+  // that into ctx.emit(buildRiftStateEvent(ctx, pid, inst, active)) and the merge
+  // took the release's shape, which moves the literal into the builder's BODY. That
+  // is one indirection further than the fanout-helper mechanism reaches: it scans a
+  // named helper's CALL SITE arguments, where this call carries no object literal at
+  // all. Naming the builder as a fanout helper was tried and does nothing, so the
+  // honest record is here, with a matching simevent emit deletion-list row.
+  // The live behavior is pinned by the rift suites, not by the census.
+  'riftState',
 ]);
 
 /**
