@@ -8,8 +8,15 @@ function makeWorld() {
   return new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
 }
 
+function entityFor(sim: Sim, pid: number) {
+  const entity = sim.entities.get(pid);
+  expect(entity).toBeDefined();
+  if (!entity) throw new Error(`missing entity ${pid}`);
+  return entity;
+}
+
 function teleport(sim: Sim, pid: number, x: number, z: number) {
-  const e = sim.entities.get(pid)!;
+  const e = entityFor(sim, pid);
   e.pos.x = x;
   e.pos.z = z;
   e.pos.y = groundHeight(x, z, sim.cfg.seed);
@@ -18,6 +25,13 @@ function teleport(sim: Sim, pid: number, x: number, z: number) {
 
 function errorText(events: SimEvent[]): string | undefined {
   return events.find((e): e is Extract<SimEvent, { type: 'error' }> => e.type === 'error')?.text;
+}
+
+function expectErrorText(events: SimEvent[]): string {
+  const text = errorText(events);
+  expect(text).toBeDefined();
+  if (!text) throw new Error('missing error text');
+  return text;
 }
 
 describe('/zones command', () => {
@@ -37,7 +51,7 @@ describe('/zones command', () => {
     const a = sim.addPlayer('warrior', 'Aleph');
     sim.tick();
     sim.chat('/zones', a);
-    const text = errorText(sim.tick())!;
+    const text = expectErrorText(sim.tick());
     for (const z of ZONES) {
       expect(text).toContain(z.name);
       expect(text).toContain(`${z.levelRange[0]}-${z.levelRange[1]}`);
@@ -57,9 +71,10 @@ describe('/zones command', () => {
     const last = ordered[ordered.length - 1];
     teleport(sim, a, last.hub.x, last.hub.z); // inside the zone's own rect (columns!)
     sim.tick();
-    expect(zoneAt(sim.entities.get(a)!.pos.x, sim.entities.get(a)!.pos.z).name).toBe(last.name);
+    const player = entityFor(sim, a);
+    expect(zoneAt(player.pos.x, player.pos.z).name).toBe(last.name);
     sim.chat('/zones', a);
-    const text = errorText(sim.tick())!;
+    const text = expectErrorText(sim.tick());
     // The current-zone marker sits on the last zone's line, not the first.
     const here = text.indexOf('here');
     expect(here).toBeGreaterThan(text.indexOf(ordered[0].name));
@@ -72,7 +87,7 @@ describe('/zones command', () => {
     sim.tick();
     for (const cmd of ['/zonelist', '/worldmap']) {
       sim.chat(cmd, a);
-      const text = errorText(sim.tick())!;
+      const text = expectErrorText(sim.tick());
       expect(text).toContain(ZONES[0].name);
     }
   });
