@@ -1461,21 +1461,25 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     }
   });
 
-  it('denies same_enchant on the identical enchant id: no reagents spent, no throttle stamped', () => {
+  it('allows re-applying the identical enchant id (QoL): reagents spent, stats net unchanged, skill still gained', () => {
     const sim = makeSim();
     const pid = sim.playerId;
     sim.ctx.addItemInstance(SWORD, { enchant: MIGHT, rolled: { stats: { str: 2 } } }, pid);
     sim.addItem('arcane_dust', 5, pid);
     const meta = sim.ctx.resolve(pid)!.meta;
-    const stampsBefore = meta.craftThrottle.count;
+    const skillBefore = meta.craftSkills.enchanting;
     const result = resolveApplyEnchant(sim.ctx, pid, SWORD, MIGHT, undefined, true);
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('same_enchant');
-    // Pure deny: nothing consumed, nothing stamped, payload untouched.
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
-    expect(meta.craftThrottle.count).toBe(stampsBefore);
+    expect(result.ok).toBe(true);
+    // Reagents are spent even though the enchant does not actually change.
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    // Old bonus subtracted, the SAME bonus re-added: net byte-identical stats
+    // and marker, so this is purely a reagent-for-skill trade, not a re-roll.
     const slot = meta.inventory.find((s) => s.itemId === SWORD);
+    expect(slot?.instance?.enchant).toBe(MIGHT);
     expect(slot?.instance?.rolled?.stats).toEqual({ str: 2 });
+    // The whole point: a controlled way to burn materials and train
+    // Enchanting on a piece the player intends to keep.
+    expect(meta.craftSkills.enchanting).toBeGreaterThan(skillBefore);
   });
 
   it('replaces a LEGACY pre-marker copy wholesale: rolled.stats becomes exactly the new bonus', () => {
@@ -1657,16 +1661,18 @@ describe('replacing an enchant behind explicit confirmation (#2415)', () => {
     expect(sim.countItem(WORN_SWORD, pid)).toBe(0);
   });
 
-  it('denies same_enchant on the WORN arm too, with nothing consumed', () => {
+  it('allows re-applying the identical enchant id on the WORN arm too: reagents spent, stats unchanged', () => {
     const { sim, pid, meta } = wearing('mainhand', WORN_SWORD, {
       dust: 5,
       instance: { enchant: WORN_ENCHANT, rolled: { stats: { str: 2 } } },
     });
+    const skillBefore = meta.craftSkills.enchanting;
     const result = resolveApplyEnchant(sim.ctx, pid, WORN_SWORD, WORN_ENCHANT, 'mainhand', true);
-    expect(result.ok).toBe(false);
-    expect(result.reason).toBe('same_enchant');
+    expect(result.ok).toBe(true);
     expect(meta.equipmentInstance.mainhand?.enchant).toBe(WORN_ENCHANT);
-    expect(sim.countItem('arcane_dust', pid)).toBe(5);
+    expect(meta.equipmentInstance.mainhand?.rolled?.stats).toEqual({ str: 2 });
+    expect(sim.countItem('arcane_dust', pid)).toBe(0);
+    expect(meta.craftSkills.enchanting).toBeGreaterThan(skillBefore);
   });
 
   it('refuses a WORN marker id that no longer resolves (corrupt save): already_enchanted, untouched', () => {

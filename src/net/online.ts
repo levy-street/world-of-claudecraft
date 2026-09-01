@@ -4352,7 +4352,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
   // `confirm` (#2415) rides ONLY when confirmReplace is exactly true (the
   // craftItem `commission` idiom), so every non-replace apply stays
   // byte-identical to the pre-feature form; the sim re-validates the target
-  // and denies already_enchanted/same_enchant itself, never the client.
+  // and denies already_enchanted itself, never the client.
   applyEnchant(
     itemId: string,
     enchantId: string,

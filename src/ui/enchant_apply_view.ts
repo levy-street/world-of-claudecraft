@@ -317,8 +317,11 @@ export interface EnchantReplaceTargetInfo {
   /** The raw stats being destroyed on a LEGACY victim (its whole rolled.stats
    *  map, which on a pre-marker copy IS the old enchant). */
   stats?: Record<string, number>;
-  /** The picked enchant is already on the victim: the row paints DISABLED (a
-   *  confirm whose accept the sim denies same_enchant is never offered). */
+  /** The picked enchant is already on the victim: the sim now ALLOWS this as
+   *  an ordinary confirmed replace (it costs reagents and grants Enchanting
+   *  skill, netting to the same stats), so the row stays enabled; the thin
+   *  consumer uses this only to swap the destructive "replaces X" tag for the
+   *  informational "Already applied" one, since nothing is actually lost. */
   sameEnchant: boolean;
   /** What the swap does NOT destroy (#2421), in preservedReplaceTraits order.
    *  ABSENT, never an empty array, when the victim carries none of them: the

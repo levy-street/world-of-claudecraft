@@ -432,18 +432,25 @@ describe('BagItemActionMenu target step: worn rows', () => {
     expect(h.applied).toEqual([{ itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: 'offhand' }]);
   });
 
-  it('paints a worn copy already carrying the PICKED enchant as a disabled same-enchant row', () => {
+  it('paints a worn copy already carrying the PICKED enchant as an enabled same-enchant row (QoL re-apply)', () => {
     const h = harness(768, {
       inventory: [{ itemId: DUST, count: 99 }],
       equipment: { mainhand: SWORD },
       equippedInstances: { mainhand: { enchant: WEAPON_ENCHANT } },
     });
     h.openTargets(WEAPON_ENCHANT);
-    // #2415: no longer hidden, but not selectable either: a confirm whose
-    // accept the sim denies same_enchant is never offered.
+    // The sim now allows this (a normal replace that nets to the same
+    // stats), so the row stays clickable and tagged informationally rather
+    // than being inert.
     const rows = h.rows();
-    expect(rows.map((row) => row.act)).toEqual([null]);
+    expect(rows.map((row) => row.act)).toEqual(['worn:mainhand']);
     expect(rows[0].text).toContain('Already applied');
+    h.click('worn:mainhand');
+    expect(h.confirms).toHaveLength(1);
+    h.confirms[0].onOk();
+    expect(h.applied).toEqual([
+      { itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: 'mainhand', confirmReplace: true },
+    ]);
   });
 });
 
@@ -619,7 +626,7 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     expect(h.confirms[0].body.split('\n')[0]).toContain('+5 Strength');
   });
 
-  it('a BAGGED copy already carrying the picked enchant paints disabled, exactly like the worn arm', () => {
+  it('a BAGGED copy already carrying the picked enchant paints enabled, exactly like the worn arm (QoL re-apply)', () => {
     const h = harness(768, {
       inventory: [
         { itemId: DUST, count: 99 },
@@ -632,11 +639,17 @@ describe('BagItemActionMenu target step: replace rows (#2415)', () => {
     });
     h.openTargets(WEAPON_ENCHANT);
     const rows = h.rows();
-    // No data-act: the row is inert to mouse and keyboard, so a confirm whose
-    // accept the sim denies same_enchant (burning nothing but the round trip)
-    // is never offered from the bagged family either.
-    expect(rows.map((row) => row.act)).toEqual([null]);
+    // Clickable: the sim allows burning reagents to re-apply the identical
+    // enchant (a normal replace netting to the same stats), so the confirm
+    // is offered from the bagged family too, same as the worn arm.
+    expect(rows.map((row) => row.act)).toEqual([`replace:${SWORD}`]);
     expect(rows[0].text).toContain('Already applied');
+    h.click(`replace:${SWORD}`);
+    expect(h.confirms).toHaveLength(1);
+    h.confirms[0].onOk();
+    expect(h.applied).toEqual([
+      { itemId: SWORD, enchantId: WEAPON_ENCHANT, slot: undefined, confirmReplace: true },
+    ]);
   });
 
   it('a legacy victim with EMPTY or all-zero stats falls back to the plain Enchanted label', () => {
@@ -721,7 +734,7 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     ]);
   });
 
-  it('does NOT flag the already-applied tag: an inert row destroys nothing', () => {
+  it('does NOT flag the already-applied tag: re-applying destroys nothing (stats net unchanged)', () => {
     const h = harness(768, {
       inventory: [
         { itemId: DUST, count: 99 },
@@ -734,7 +747,9 @@ describe('BagItemActionMenu target step: destructive-path communication (#2421)'
     });
     h.openTargets(WEAPON_ENCHANT);
     const [row] = h.rows();
-    expect(row.act).toBeNull();
+    // Clickable (the sim allows this QoL re-apply), but the tag stays plain:
+    // nothing is actually destroyed, so it never takes the danger modifier.
+    expect(row.act).toBe(`replace:${SWORD}`);
     expect(row.metas.map((meta) => meta.text)).toEqual(['Already applied']);
     expect(row.metas[0].classes).toEqual([CTX_ITEM_META_CLASS]);
   });
@@ -1051,8 +1066,9 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     expect(h.applied).toEqual([{ itemId: ringId, enchantId: RING_ENCHANT, slot: 'ring2' }]);
   });
 
-  it('numbers both fingers on the inert same-enchant pair too', () => {
-    // Disabled, but still on screen and still read before anything is clicked.
+  it('numbers both fingers on the clickable same-enchant pair too', () => {
+    // Enabled (the sim allows re-applying an identical enchant), but still
+    // needs its own ordinal so a click always hits the finger it names.
     const ringId = (Object.values(ITEMS).find((def) => def.slot === 'ring') as ItemDef).id;
     const h = harness(768, {
       inventory: [{ itemId: DUST, count: 99 }],
@@ -1064,7 +1080,7 @@ describe('BagItemActionMenu target step: unique accessible names (#2466)', () =>
     });
     h.openTargets(RING_ENCHANT);
     const rows = h.rows();
-    expect(rows.map((row) => row.act)).toEqual([null, null]);
+    expect(rows.map((row) => row.act)).toEqual(['worn:ring1', 'worn:ring2']);
     expect(rows[0].metas.map((meta) => meta.text)).toEqual([
       wornIndexed('ring1', 1),
       'Already applied',
