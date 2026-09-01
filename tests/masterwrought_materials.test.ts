@@ -840,9 +840,10 @@ describe('sundered essence: the extraction', () => {
     // lock arm (the disenchant precedent from the release's own first-pass
     // scope), so a deliberately targeted locked raid epic still breaks. This
     // classification was taken at the v0.38.0 sync merge (fa51741408) and is
-    // recorded in the state.md ledger for maintainer ratification: if sunder
-    // ever gains a lock deny, flip this pin and the locked-copy menu pin in
-    // tests/bag_item_context_menu.test.ts together, they are one surface.
+    // RULED as shipped by qr-19-sunder-lock-exemption-ratification
+    // (2026-09-01, state.md): if sunder ever gains a lock deny, flip this pin
+    // and the locked-copy menu pin in tests/bag_item_context_menu.test.ts
+    // together, they are one surface.
     const sim = makeSunderSim();
     const { pid, meta } = playerOf(sim);
     sim.addItem(RAID_EPIC, 1, pid);

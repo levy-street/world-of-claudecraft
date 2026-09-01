@@ -93,7 +93,8 @@ describe('bag_item_context_menu: action eligibility', () => {
     // precedent and stays offered on a locked copy, matching the sim, whose
     // sunderAdmitted has no lock arm (pinned end to end in
     // tests/masterwrought_materials.test.ts). Classification taken at the
-    // v0.38.0 sync merge (fa51741408), recorded for maintainer ratification;
+    // v0.38.0 sync merge (fa51741408) and RULED as shipped by
+    // qr-19-sunder-lock-exemption-ratification (2026-09-01, state.md);
     // if the sim ever gains a lock deny for sunder, flip both pins together.
     const raidEpic = { ...def('armor', 'epic'), id: 'crownforged_dreadhelm' } as ItemDef;
     const locked = { locked: true } as ItemInstancePayload;
