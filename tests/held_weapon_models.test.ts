@@ -225,7 +225,11 @@ describe('held weapon models', () => {
       'cinder_of_the_first_design',
       // copperlens_ocular: masterwrought Phase 11o's on-ramp gadget parks
       // with its register sibling gyrelens_array below (the same lens-array
-      // class of gap; no shared model exists) until the art wave.
+      // class of gap; no shared model exists) until the art wave. RULED
+      // (qr-19-held-offhand-model-park, 2026-09-01, under
+      // qr-19-best-for-project): the park is RATIFIED for both lenses, so
+      // this is a ruled park rather than an open question, and the art wave
+      // that closes it is the maintainer's, not this phase's.
       'copperlens_ocular',
       'cragmaw_huntquiver',
       'direfang_quiver',
@@ -233,7 +237,11 @@ describe('held weapon models', () => {
       // class of gap). Its phase 09 register sibling voidbound_grimoire LEFT
       // this pin at phase 18: it was the half of the park with an existing
       // pattern to follow, so it got its own procedural tome GLB
-      // (tome_voidbound) instead of an entry here.
+      // (tome_voidbound) instead of an entry here. RULED
+      // (qr-19-held-offhand-model-park, 2026-09-01, under
+      // qr-19-best-for-project): the lens half KEEPS the park, precisely
+      // because a lens array has no pattern to reuse and the gap is
+      // cosmetic only. Commissioning is the maintainer's art wave.
       'gravewyrm_bone_quiver',
       'gyrelens_array',
       'heroic_direfang_quiver',
