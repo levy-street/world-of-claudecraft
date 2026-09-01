@@ -26180,3 +26180,150 @@ painter's arguments and passed the mutant that moved the call there.
   row's comment still reading "Exact merged count, zero slack" while eleven
   lines remain under the 18728 pin; and root `src/CLAUDE.md`'s
   dependency-direction section versus the live `ui -> sim/content` imports.
+
+## Phase 19C ledger (2026-09-01, the server wave of the rulings gate)
+
+STATUS: **COMPLETE, 7 of 7 units executed, ZERO escalations.** One commit per
+unit, every ruling written where its open record actually stands rather than in
+the decision table, following the qr-19 pattern. Then a reviewer fix round, a
+fresh read of that round, and their fixes.
+
+### What moved, stated as narrowly as it is true
+Three units are docs-only: D023 ratifies the linkdead ripe-notice loss
+(qr-19-linkdead-notice-loss), D064 rules the encounterOwned aura marker
+server-internal (qr-19-encounter-owned-aura-wire, one comment at
+src/sim/types.ts), D162 ratifies the shipped combined epoch 26 plus a
+docs/ota-updates.md deploy-order exemplar (qr-19-epoch-bump-at-golive; no code,
+every pin already read 26). Four land executable code:
+- **D122** (qr-19-character-blob-warn-threshold) re-mints CHARACTER_BLOB_WARN_BYTES
+  131,072 -> 163,840 (160 KiB): a WARN threshold that never blocks a write, the
+  smallest 32-KiB step above the QA-frozen measured legal worst case (151,584)
+  and one step below the 262,144 guild-bank scale. The value is a STATED
+  DERIVATION the maintainer may retune, not a maintainer-named number; the p99
+  gauge is named the real fleet-creep watch. The professions_blob_growth
+  whole-character arm flips from greater-than to less-than the threshold (its
+  designed re-mint contract).
+- **D136** (qr-19-nonce-fence-expiry-term) adds `AND expires_at > now()` to the
+  live nonce save fence, binding all four live paths through the shared
+  liveSaveFence shape and reusing the shipped takeover kick reason (no new i18n).
+  B1 (qualifying heartbeatCharacterLeases) is CARRIED to the maintainer, not
+  taken: it risks permanent-unsaveable sessions, so the heartbeat stays
+  unqualified and the term narrows the window rather than closing it.
+- **D145** (qr-19-live-nonce-fence-write-loss) takes the characters row lock
+  before the fenced UPDATE on the four live save paths, the live twin of the
+  offline fix the Phase 18 QA red-proved. The lock is FOR NO KEY UPDATE (the
+  review round's change from FOR UPDATE, below) and scoped to FENCED saves. The
+  monolith cost was paid by moving the lock helper and liveSaveFence beside the
+  statement builder; server/db.ts is unchanged at its 5123 ceiling.
+- **D147** (qr-19-sold-volume-four-seam-wiring) wires the four dark market
+  sold-volume seams together (ensureSchema DDL, the nightly retention table, both
+  boot configure calls, buyWithSoldVolume at the market_buy dispatch), flips the
+  guard from four absence arms to presence at the wiring SITES, and turns on the
+  admin dashboard's volume half. buyWithSoldVolume drops to one pre-buy read.
+  Monolith paid by extraction (cleanMetadataText to its own module; the one-use
+  delay helper inlined): db.ts stays 5123, game.ts LOWERED 10350 -> 10347. New
+  exports carry census rows in merge-deletion-list.md.
+
+### The wave's own instructions were wrong in eleven places
+The phase document was verified against the tree before any byte moved, and every
+correction is amended IN PLACE and dated (the AMENDED IN PLACE 2026-09-01 blocks
+in phase-19c-server.md). **11 corrections**, the same defect families 19A and 19B
+hit:
+- **Three handoff/gate-row anchors were transcribed with their markdown pipes
+  flattened to spaces**, so grep -cF returned 0 (D023's (bb) row, D147's gate
+  row, D162's epoch row). 19A's and 19B's exact defect, arriving a third time.
+- **Three stale line addresses** (D023's handoff row 475 -> 536, D023's
+  reads-owed enum 412 -> 413, D136's anchor 20780 -> 21410).
+- **A line-wrapped enum quote** (D023's reads-owed clause greps 0 because the
+  file hard-wraps it).
+- **An arithmetically wrong derivation** (D122's "163,840 ... the next
+  power-of-two step" is not a power of two; adopted as 160 KiB, the 32-KiB step,
+  under a corrected stated derivation).
+- **A stale measured band** (D122 cited 151,525 / 151,145..151,526; the live
+  QA-frozen figure is 151,584 / 151,204..151,584).
+- **A falsified monolith premise** (D147's "none of these files carries a
+  [monolith] row" is false: server/db.ts at 5123 and server/game.ts at 10350 are
+  both on the ratchet at zero slack, so the wiring had to be paid by extraction).
+- **An incomplete D145 file list** (it named save_offline_character_state.test.ts
+  but omitted tests/character_lease.test.ts, tests/guild_bank_db.test.ts and
+  tests/server/bank_ledger_save_effects_db.test.ts, the save-path statement tests
+  the added row lock breaks). This one was not caught by the per-unit affected
+  suites; a broad post-commit sweep found three red tests and they were fixed.
+
+### The real pins, and their proofs
+Every new pin was mutated and watched fail ALONE, the mutant reverted from a disk
+copy (never `git checkout --`), the tree grepped clean of probes afterward.
+- **D122**: the blob-warn literal (163,840), the inclusive boundary probes
+  (163,839/163,840/163,841), and the professions_blob_growth arm flipped to
+  toBeLessThan the threshold (independently bounded, so a revert reds).
+- **D136**: a POSITIVE `AND expires_at > now()` assertion on the nonce arm (the
+  existing toContain were a trap that stayed green over an appended term) plus a
+  real-Postgres expired-own-lease refusal arm, RED without the term.
+- **D145**: unit lock-order pins on ALL FOUR live save paths (lockIdx <
+  updateIdx), a no-nonce-skips-the-lock pin (the conditional), the literal lock
+  SQL (FOR NO KEY UPDATE, realm-scoped), and a real-Postgres displacement-race
+  arm plus its no-takeover control, RED without the lock (proven on both the
+  FOR UPDATE and the shipped FOR NO KEY UPDATE forms).
+- **D147**: the UNWIRED_SEAMS guard flipped to WIRED_SEAMS asserting the wiring
+  SITE, not the bare token (so a dispatch reverting to sim.marketBuy with the
+  import kept still reds, mutation-proved), a fifth seam for
+  configureAdminMarketSoldVolume, a real-Sim buyWithSoldVolume arm for the
+  length-drop coupling, and real-Postgres observer-end-to-end and
+  ensureSchema-boot arms, plus two new /metrics series pinned.
+
+### Reviews
+Six distinct domain reviewers were dispatched FRESH, never the implementer:
+privacy-security-review, migration-safety, database-performance-reviewer,
+server-hot-path-reviewer, cross-platform-sync, and test-coverage-auditor. NO
+blocking findings; every should-fix and nit was applied. The CONVERGENT finding,
+raised independently by four of them, is the wave's real story below.
+
+### The self-inflicted defects, recorded because the guards were green through them
+1. **D145's row lock shipped UNCONDITIONAL and FOR UPDATE, and the per-unit
+   affected suites were green.** Two consequences the phase document's own file
+   list did not cover: (a) an unconditional lock added a round trip to every
+   save, breaking the "four database round trips" budget for an ordinary
+   (unfenced) save and the guild-bank lock-order assertion and the character-lease
+   "no separate SELECT" assertion, in three test files D145 never named; a broad
+   post-commit sweep caught them, and the lock was scoped to fenced saves. (b)
+   FOR UPDATE was too strong: it conflicts with the FOR KEY SHARE every FK-child
+   insert of the character takes (chat_logs, character_deeds, play_sessions),
+   opening a contention and deadlock edge on the ~33-saves-a-second path, and it
+   bought nothing for the takeover case (an ON CONFLICT DO UPDATE that re-checks
+   no FK and takes no parent lock). Four reviewers converged on it; the live lock
+   is now FOR NO KEY UPDATE, which the offline arm's own note confirms fixes the
+   race (the fix is the statement ORDERING, not the lock strength), and which
+   restores the character-delete verify probe's FOR KEY SHARE premise.
+2. **The wiring exposed observability and shutdown gaps in the Phase-18-built
+   store.** The sold-volume FIFO's drop counter had no /metrics caller and no
+   shutdown drain; the review round wired both. The shutdown drain was then
+   BOUNDED at the fresh read's finding, so a wedged database cannot hold it past
+   the lease sweep.
+
+### The fresh read (criterion 3), and what it found
+A FRESH reader over the fix round found NO blocking issues, six should-fix and
+five nits, all applied (commit fa9499ec88): three planning-doc claims still said
+FOR UPDATE (corrected here, in phase-19c-server.md and merge-deletion-list.md);
+the none-fence-skips-the-lock behavior was unpinned (pinned, mutation-proved);
+the shutdown drain was unbounded (bounded); the B1 comment described the flush
+ordering wrong (the flush launches saves first, but the single-statement
+heartbeat wins by round-trip count); runFencedCharacterUpdate's JSDoc offered the
+unleased shape under the weaker mode (scoped to nonce-only); and four stale
+comments were refreshed. Its C/D/E verification confirmed the FOR NO KEY UPDATE
+reasoning true against the Postgres lock matrix and the live pg arm.
+
+### Validation
+_Recorded at the phase close after the pg-armed gate; see phase-19c-qa.md._
+
+### CARRIED for the maintainer, not taken unilaterally
+- **B1: qualifying heartbeatCharacterLeases.** Unqualified (the shipped state), a
+  recovered process re-arms a lapsed lease and the D136 term only narrows the
+  window; qualified, one stall past the 90 s TTL makes every session that process
+  holds permanently unsaveable. A blast the row reserves for the maintainer; the
+  heartbeat stays unqualified pending that call.
+
+### JUDGED, and not re-raised
+- The seven units, their rulings, and every reviewer and fresh-read finding are
+  SETTLED. This ledger records them; it does not reopen them.
+- The FOUR items 19B carried for the maintainer remain the maintainer's and are
+  NOT taken here (they are UI-domain, out of 19C's scope).
