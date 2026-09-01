@@ -161,11 +161,13 @@ function readPanelIds(html: string): string[] {
 // including the ones deliberately excused below.
 // BOTH were RE-MEASURED against the live tree at the Masterwrought Phase 19B close, and BOTH
 // had drifted SEVEN under, which is exactly the room a departing case or a departing panel
-// needs to leave unnoticed. Cases: 41 at the tip before this wave, 48 with D111's report
-// window arm. Markup ids: 45 in each shell and 45 in the union, against a floor still reading
-// 38. The markup half was caught only because a coverage audit re-ran readPanelIds itself
-// rather than trusting the constant, which is the lesson: re-measure a floor when you touch
-// its sibling, or you repair one and leave the identical hole open two lines away.
+// needs to leave unnoticed. Cases: the CONSTANT read 40 while the live switch already carried
+// 47, and 48 once D111 added the report window's arm. Markup ids: the constant read 38 while
+// each shell, and the union, carried 45. (The constant-versus-live distinction is the whole
+// point and an earlier draft of this comment lost it, writing a stale-constant figure as if it
+// were the measured tip.) The markup half was caught only because a coverage audit re-ran readPanelIds
+// itself rather than trusting the constant, which is the lesson: re-measure a floor when you
+// touch its sibling, or you repair one and leave the identical hole open two lines away.
 const CASE_COUNT = 48;
 const MARKUP_COUNT = 45;
 

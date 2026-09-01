@@ -273,10 +273,16 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
     expect(hud).toContain(
       "private readonly reportWindowFocus = this.windowFocus('#report-window');",
     );
+    // ONCE is half the title, so it is asserted rather than implied: exactly one
+    // bridge is minted for this root anywhere in the coordinator.
+    expect(hud.split("this.windowFocus('#report-window')").length - 1).toBe(1);
     expect(hud).toContain('...this.reportWindowFocus,');
     // A per-open bridge defeats makeWindowFocus's own defensive release, so
     // the field form is the contract, not a style choice.
+    // Both spellings: a later edit reaching for double quotes must not slip
+    // past a pin written only for the single-quoted form.
     expect(hud).not.toContain("...this.windowFocus('#report-window')");
+    expect(hud).not.toContain('...this.windowFocus("#report-window")');
   });
 
   it('marks the root a dialog named by its own title (the trap contract other half)', () => {
@@ -392,7 +398,7 @@ describe('report window: the REAL focus bridge across a re-open', () => {
     ...bridge,
   });
 
-  it('a re-open never parks focus on the FIRST window s opener', async () => {
+  it('a re-open never parks focus on the opener the FIRST window recorded', async () => {
     const first = document.createElement('button');
     document.body.appendChild(first);
     first.focus();
@@ -410,16 +416,30 @@ describe('report window: the REAL focus bridge across a re-open', () => {
     // Flush anything FocusManager.restore may have scheduled. If the re-open
     // routed through close(), this is where focus would snap back to `first`.
     await new Promise((resolve) => setTimeout(resolve, 0));
-    expect(document.activeElement).not.toBe(first);
+    // POSITIVE, not merely not-`first`: a bare not-`first` also passes in an
+    // environment where the bridge captures nothing and no restore ever fires,
+    // which would leave this arm inert instead of red. Focus must still be
+    // exactly where the second open left it.
+    expect(document.activeElement).toBe(second);
     expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Bram');
   });
 
-  it('a real CLOSE does return focus to the opener, so the arm above is not vacuous', async () => {
+  it('a real CLOSE MOVES focus back to the opener, so the arm above is not vacuous', async () => {
     const opener1 = document.createElement('button');
     document.body.appendChild(opener1);
     opener1.focus();
     const bridge = makeWindowFocus(new FocusManager(), () => el);
     openReportWindow(realDeps(bridge), { pid: 7, name: 'Rega' });
+    // Focus MUST be driven off the opener first. Opening does not move it:
+    // FocusManager.open only pushes the trap state (focusFirst is an opt-in
+    // this window never takes) and report_window.ts calls .focus() nowhere, so
+    // an assert-activeElement-is-opener1 written straight after the open reads
+    // the same value whether close() restores anything or does nothing at all.
+    // That is precisely the vacuity this arm exists to rule out, and its first
+    // draft had it.
+    const inside = el.querySelector<HTMLElement>('#report-submit');
+    inside?.focus();
+    expect(document.activeElement).toBe(inside);
     closeReportWindow();
     await vi.waitFor(() => expect(document.activeElement).toBe(opener1));
   });

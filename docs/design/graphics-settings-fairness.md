@@ -91,9 +91,22 @@ COSMETIC (may be tiered down on lower presets):
   clock the renderer advances every frame, and the crop lean is a per-plot phase advanced by
   `dt` and composed onto the bed's seat quaternion, so a crop always stands normal to the
   ground it grows in. The two share the class, not the clock. Note the binding time before
-  reusing the knob: `windSway` is read inside `onBeforeCompile` and injected into the vertex
-  shader SOURCE, so making it tier- or preference-varying is a program-key change owing a
-  prewarm story, never a live uniform flip. What is NOT exempt, and the two nearest examples
+  reusing the knob, and note that it is NOT one story across the three wind paths: on the
+  grass cards `GFX.windSway` is read inside `onBeforeCompile` and selects vertex shader
+  SOURCE (`foliage.ts` `applyGrassShader`), while the cache key beside it
+  (`grassCardProgramCacheKey`, `grass_cap_collapse_core.ts`) does not mention the knob, so a
+  varying grass sway is a program-key change owing a prewarm story. On the impostor sprites
+  (`foliage_impostor.ts`) and on the canopies and bushes (`foliage.ts` `addWind`, wherever it
+  installs its hook at all, which today is every leaf material) the injected source is
+  identical either way and the knob only sets the VALUE of `uWindStrength` or `uImpWind`;
+  `addWind` also has an arm that installs NO hook, so on that arm the knob is a program change
+  too. Even on the uniform arms it is not a live flip, which is the half a first draft of this
+  paragraph got wrong in both directions: nothing retains those uniform objects, both are
+  minted inside the compile hook at material-creation time, so a tier- or preference-varying
+  sway means new plumbing or rebuilt materials on every path, never a uniform write. One more
+  reader is easy to miss and is pinned: the renderer reports `windSway` in its quality bucket
+  (`renderer.ts`), which `tests/perf_reporter.test.ts` asserts on. Price the arm you are
+  actually taking. What is NOT exempt, and the two nearest examples
   are both inside the same subsystems: a camera-driven TRANSITION is a fade, not ambient
   motion, so `src/render/tree_hide_fade.ts`'s occluder ghost ramp honors the setting
   (`updateTreeHides` threads it in from `foliage.ts`); and an ability marker drawn in the

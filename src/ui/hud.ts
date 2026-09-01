@@ -15703,7 +15703,7 @@ export class Hud {
   // not one of the two documented opt-outs (#bags and #bank-window, which pair
   // with a second window and must stay Tab-passable), so it had no Tab trap and
   // no return-to-opener. It was not the last out (vendor, trade and map still
-  // are; crafting joined at #2525, report at qr-19-report-window-focus-trap-carveout);
+  // are; crafting joined at #2876, report at qr-19-report-window-focus-trap-carveout);
   // it is the one that became REACHABLE, because
   // #2500 stopped the panel rebuilding itself twice a second and focus started
   // surviving long enough for the missing hand-back to matter.

@@ -391,7 +391,16 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // the ruling leans on.
     const hud = read('src/ui/hud.ts');
     expect(hud).toContain("return this.alwaysShowAllBuffs ? 'ultra' : this.fxTier();");
-    expect(hud).toContain('this.buffBarFxTier()');
+    // The BUFF BAR's tier argument specifically, not merely that the name occurs:
+    // a bare occurrence pin stays green if this call site is rewired to fxTier()
+    // while some other reference survives, which is exactly the link the ruling
+    // leans on. `buffBarPainter` is the one instance the overflow badge rides.
+    // SLICED, not windowed: a fixed-width regex window reached past this
+    // declaration into the sibling debuffBarPainter's arguments and passed on
+    // the mutant that moved the call there (proven, then fixed).
+    const buffBarDecl = hud.slice(hud.indexOf('buffBarPainter = new AurasPainter('));
+    const buffBarArgs = buffBarDecl.slice(0, buffBarDecl.indexOf('\n  );'));
+    expect(buffBarArgs).toContain('() => this.buffBarFxTier()');
     const slots: AuraSlotState[] = Array.from({ length: 20 }, (_, i) => auraSlot({ key: `b${i}` }));
     const shed: boolean[] = [];
     expect(selectShedSlots(slots, slots.length, auraVisibleCap('ultra'), shed)).toBe(0);

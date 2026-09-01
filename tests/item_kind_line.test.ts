@@ -53,8 +53,12 @@ describe('the tooltip kind line for material grades', () => {
     expect(baseMaterialFor('fine_iron_ore')).toBe('iron_ore');
     const fine = tooltipHtml('fine_iron_ore');
     expect(fine).toContain('Fine Material');
-    // qualityKind is "{quality} {kind}"; reject bare Junk word after Fine Material.
-    expect(fine).not.toMatch(/(?<!Fine )\bJunk\b/);
+    // The plain refusal, matching the farm-twin arm below: itemKindLabel can
+    // return 'Fine Material' or 'Material' or the kind label, never a "Fine
+    // Junk", so the lookbehind this arm used to carry only weakened it. (Kept
+    // in step deliberately: the registry suite's lesson this same wave was a
+    // floor repaired in one place and left open two lines away.)
+    expect(fine).not.toMatch(/\bJunk\b/);
     const base = tooltipHtml('iron_ore');
     expect(base).toContain('Material');
     expect(base).not.toContain('Fine Material');
