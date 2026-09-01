@@ -666,6 +666,9 @@ export interface Aura {
   unbreakableControl?: true;
   // Encounter-authored mechanic that ordinary dispels and broad self-cleanses
   // cannot remove. Death, natural expiry, and the encounter script still clear it.
+  // Server-internal by qr-19-encounter-owned-aura-wire (Phase 19): no aura snapshot
+  // carries it on the wire until an encounter applies one to a PLAYER, the trigger
+  // that would earn the encode/decode pair and the parity re-record.
   encounterOwned?: true;
   // An aura no PLAYER counter may shed: dispel, cleanse, spellsteal, and any
   // player purge that ever ships all skip it, and it is never right-click

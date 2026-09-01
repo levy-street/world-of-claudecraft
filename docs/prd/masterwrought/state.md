@@ -22936,7 +22936,10 @@ explicit gear allowlist, pinned) with the Crucible GEAR tier's essence
 question carried as row 16; and the release's new encounterOwned aura marker
 never rides the wire (a client cannot see the removability refusal it
 implies), recorded as a maintainer read, a one-byte design call if an
-encounter ever applies one to players. The open decisions are rows 12 to 16
+encounter ever applies one to players.
+RULED (qr-19-encounter-owned-aura-wire, 2026-09-01): kept server-internal; the
+full ruling record is in the Phase 18 STEP 0 RECORDED-NOT-ACTED list of this file.
+The open decisions are rows 12 to 16
 of the Phase 19 decision table (phase-19-rulings-gate.md): re-measure R5 on
 the merged world (which also decides whether the Ignivar raid joins the
 protected-asset set beside heroic Nythraxis and S-rift) or ratify the record
@@ -24128,6 +24131,13 @@ prospectively contradicts the crafted-ceiling premises (folded into row 13);
 R5's protected-asset set does not name the new raid (folded into row 12's
 re-measure option); the release's encounterOwned aura marker never rides the
 wire (a one-byte design call if an encounter ever applies one to players);
+RULED (qr-19-encounter-owned-aura-wire, 2026-09-01, under qr-19-best-for-project):
+keep the marker server-internal. No encounter applies it to a player today, so
+the byte buys nothing; the trigger is the first encounter that applies one to a
+player, at which point the aura snapshot encode/decode pair (server, src/net) and
+the parity goldens follow. Verified live this session: encounterOwned appears only
+under src/sim and tests (types.ts:669, aura_classify.ts, the three encounter
+modules, ignivar_forge_chains.ts), zero hits in server/, src/net/ or src/world_api/.
 frozenOrbFx and necromancyArmyPortalFx carry no explicit renderer-teardown
 dispose (release-side tidy, not owed by the merge); the overlap parity suites
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as release-fx-teardown-dispose.
