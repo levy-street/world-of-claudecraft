@@ -18627,7 +18627,80 @@ ruling is taken and none is needed.
 The thirteen carried in are unchanged and none was needed (col_junk_drawer
 still three of margin: the live poor set is sixteen, thirteen reachable;
 the zone-1 no-poor-drop row now spans both starter zones since the island's
-items are all quest-kind, recorded by the audit). Maintainer reads this
+items are all quest-kind, recorded by the audit).
+ESCALATED (D009 + D170, 2026-09-01, Phase 19A execution, under
+qr-19-best-for-project): NOT EXECUTED, and deliberately so. The merged unit's
+DIRECTION is confirmed against the tree and is the right one: the three
+Brightwood Glade wildlife ids (amber_hide, soft_down, stag_antler) exist in
+src/sim/content/items.ts, are quality poor, already ship committed WebP, are
+already in ITEM_IMAGE_IDS, already carry a shipped_item_ids golden row each,
+are already named in every locale, and are pinned as routeless at
+tests/deeds_content.test.ts. Sourcing them really is cheaper and safer than
+minting a fourth id, and it really does avoid the rule-9 retro-edit of a
+shipped trigger, the 18 deed locale overlays and the frozen catalog digest.
+What FAILS is the unit's obligation list and its stated outcome, on two
+findings measured here rather than argued.
+
+FINDING 1, the not-owed list is wrong about parity goldens. The unit states
+"no parity golden". src/sim/loot/loot_roll.ts draws one ctx.rng.chance per
+plain loot entry, and tests/parity pins the rng draw-order fingerprint and the
+per-frame draw count, so ANY new loot row on a mob a recorded scenario kills
+forks the stream from that draw onward. Measured against tests/parity/golden:
+25 golden files name forest_wolf and 2 name wild_boar. The honest price
+therefore includes a separate reviewed UPDATE_PARITY=1 re-record commit, which
+the unit does not carry.
+
+FINDING 2, the 13-to-16 outcome is not deliverable on existing templates. The
+zone-1 roster is wolf, rare wolf, boar, spider, murloc, burrower, three
+humanoid families, undead and demons; the Proving Shore's only killable mobs
+are the training effigy, the shore scuttler and the summon-only Mister Crabs.
+There is no antlered and no feathered creature in either starter zone.
+amber_hide sources plausibly onto forest_wolf or wild_boar (both already carry
+the 'hide' componentTag). stag_antler ("Branching Antler") and soft_down
+("Soft Down Tuft") have NO flavour-true carrier, so the honest reach on
+existing templates is 13 to 14, not 13 to 16. Reaching 16 needs the
+NEW-CARRIER shape the unit prices as not owed, which brings a
+src/ui/world_entity_i18n.ts row, a parked mob portrait, architecture-reviewer,
+and a CAMPS row that must be tail-appended or every later camp's deterministic
+spawn roll moves.
+
+WHAT IS NOT BLOCKED, recorded so the next session does not re-derive it. The
+drop CHANCES need no maintainer input: the shipped ordinary-mob gray-junk rate
+is 0.35, with 0.5 on a tougher variant and 1 on a named or elite, read off the
+two zone-3 gray junk drops (ogre_toe_ring and frayed_prayer_beads, each
+carried at all three rates in src/sim/content/zone3.ts). The deed arm at
+tests/deeds_content.test.ts is toBeLessThanOrEqual, so it stays green at 14
+and D009's affordance gap closes at 14; the two EXACT-SET arms (the thirteen
+survivors, and the unreachable Brightwood pack) are what move.
+
+THE THREE PRICED SHAPES, for the maintainer to pick from:
+(a) shore_scuttler alone. Zero parity goldens move (0 of 83 name it), closes
+    D009's Proving Shore half outright, needs no new mob. Does NOT close the
+    zone-1 half.
+(b) amber_hide onto forest_wolf or wild_boar, plus (a). Closes both halves of
+    D009 and takes the margin from three to four, but moves up to 27 parity
+    goldens and so owes the UPDATE_PARITY re-record commit.
+(c) A new wildlife carrier (a stag, a bird) for the antler and the down. The
+    only shape that reaches 16, and the only one that is genuinely new
+    content: a mob template, a tail-appended camp row, a world_entity_i18n
+    name, a parked portrait, and architecture-reviewer on the diff.
+
+WHAT THE MAINTAINER OWES: the carrier assignment, which is a content design
+call with no shipped answer, and whether reaching sixteen is wanted at all
+given that fourteen already closes the affordance gap and lifts the margin.
+Under the packet's stopping rule a value that cannot be derived from a shipped
+anchor goes back rather than being invented, so this unit stops here rather
+than executing half of itself and recording the other half as done. Both
+handoff rows stay OPEN and are not flipped.
+
+TWO MIS-ADDRESSED CITATIONS in the unit, corrected here rather than rewritten:
+its claim that the farming handoff row "prices only a new item id plus
+committed WebP art" matches nothing in farming/state.md (the wrong price is
+real, but it lives in the D009 DECISION row in the table, not on the handoff
+row), and its two halves contradict each other on wiki regen (the D170 half is
+right: the generated bundle publishes no mob drop source, so no regen is
+owed).
+Maintainer reads this
 phase records, not numbered: es and pt_BR render fang and tusk with one
 word in the two reworded guide lists (pre-existing); Farmer Hollis borrows
 Huntsman Deral's voice since Bram's entry left with the Sowfield (a role
