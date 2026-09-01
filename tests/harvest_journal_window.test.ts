@@ -498,6 +498,45 @@ describe('harvest journal window: open, close, and focus', () => {
     expect(document.activeElement).toBe(outside);
     outside.remove();
   });
+
+  it('a focus key that is not a legal CSS selector cannot break the repaint', () => {
+    // The key a repaint reads back is whatever the focused control carried,
+    // and `data-focus-key` is ONE FLAT namespace shared by every window, so
+    // this window's read has to survive any member of it (the plant sheet's
+    // keys are already `seed:<cropId>`, content ids spliced verbatim). A key
+    // holding a double quote closes an attribute selector's own string early,
+    // so the interpolating spelling this window used to run,
+    // `root.querySelector('[data-focus-key="' + key + '"]')`, raises a
+    // SyntaxError from inside paint(). Two consequences, both asserted below:
+    // the repaint dies half-done, and the throw lands ABOVE the
+    // paintedSignature latch at the end of paint(), so the tick never records
+    // what it painted and repaints (and throws) again on every 1 Hz beat for
+    // as long as the journal is open.
+    const win = makeWindow();
+    win.open();
+    const content = root.querySelector<HTMLElement>('.hj-content');
+    expect(content).not.toBeNull();
+    const keyed = document.createElement('button');
+    keyed.type = 'button';
+    keyed.dataset.focusKey = 'bed:eastbrook "1"';
+    content?.appendChild(keyed);
+    keyed.focus();
+    expect(document.activeElement).toBe(keyed);
+
+    world.nowMs = 11 * MINUTE;
+    world.plots = [plot({ status: 'ready' })];
+    expect(() => vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS)).not.toThrow();
+    // The repaint really ran (this is the ready arm now), so the case is not
+    // passing by never reaching the restore.
+    expect(root.querySelector('.hj-time')?.textContent).toBe('Ready to harvest');
+    // The key resolves to nothing in the rebuilt tree, so the ladder degrades
+    // to its Close rung rather than stranding the player on <body> with the
+    // dialog still up.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+    // And the signature latched, so the next beat is a quiet one rather than
+    // the start of a once-a-second throw.
+    expect(() => vi.advanceTimersByTime(HARVEST_JOURNAL_TICK_MS)).not.toThrow();
+  });
 });
 
 describe('harvest journal window: the ClientWorld mirror shape', () => {

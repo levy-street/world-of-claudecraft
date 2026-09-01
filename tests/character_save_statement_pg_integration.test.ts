@@ -22,6 +22,7 @@ import type { Pool as PgPool } from 'pg';
 import { Pool } from 'pg';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  applyOfflineCharacterSaveBounds,
   OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
   OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
 } from '../server/offline_character_save_db';
@@ -112,6 +113,31 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       [characterId],
     );
     return res.rows[0]?.marker ?? undefined;
+  }
+
+  /**
+   * Block until some OTHER backend in the verify database is parked on a
+   * heavyweight lock. The mid-wait race below has to fit inside the fenced
+   * write's own 2s lock bound, so a fixed sleep is the wrong tool in both
+   * directions: too short and the contender has not reached its wait yet (the
+   * test races nothing and passes vacuously, the exact failure family this
+   * phase is cleaning up), too long and the bound fires before the race is
+   * set up. Polling pg_stat_activity waits for the real state instead.
+   */
+  async function waitForRowLockWaiter(deadlineMs = 1_200): Promise<void> {
+    const until = Date.now() + deadlineMs;
+    for (;;) {
+      const res = await pool.query(
+        `SELECT count(*)::int AS n FROM pg_stat_activity
+          WHERE datname = current_database()
+            AND state = 'active'
+            AND wait_event_type = 'Lock'
+            AND pid <> pg_backend_pid()`,
+      );
+      if (Number(res.rows[0].n) > 0) return;
+      if (Date.now() > until) throw new Error('no backend ever parked on the row lock');
+      await new Promise((resolve) => setTimeout(resolve, 20));
+    }
   }
 
   beforeAll(async () => {
@@ -253,6 +279,165 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       expect(await db.saveOfflineCharacterState(id, 7, STATE('cross-realm'))).toBe(false);
       expect(await markerOf(id)).toBeUndefined();
     });
+
+    it('REFUSES a lease that commits WHILE the write is parked on a contended row', async () => {
+      // THE PHASE 18 QA DATABASE REVIEW'S REPRODUCED WRITE LOSS. The unleased
+      // fence's NOT EXISTS is UNCORRELATED with the row it gates (its only
+      // reference is $1, never an outer column), so PostgreSQL hoists it into
+      // an InitPlan and gates the whole statement on a One-Time Filter: a
+      // verdict decided BEFORE the characters row lock is taken. After a lock
+      // wait, EvalPlanQual re-checks only the target row's OWN columns and
+      // never re-runs an InitPlan, so a lease committed during that wait was
+      // invisible and the write LANDED over a now-live session. The session
+      // was handed the pre-write blob at its handshake (server/ws_auth.ts), so
+      // its next autosave clobbered the write while the caller had already
+      // been told { ok: true } and had already committed an audit row for a
+      // strip that would not survive. The fix takes the characters row lock
+      // FIRST, so the lease check is evaluated with the lock already held.
+      const id = await makeCharacter();
+      const holder = await pool.connect();
+      let raced: unknown;
+      // Exactly the lock a live session's own save holds: an UPDATE of
+      // non-key columns takes FOR NO KEY UPDATE, which deliberately does NOT
+      // conflict with the FOR KEY SHARE a character_leases INSERT takes on its
+      // FK parent. That non-conflict is what lets a login land mid-wait in
+      // production, and it is what lets this test land one.
+      await holder.query('BEGIN');
+      await holder.query('SELECT 1 FROM characters WHERE id = $1 FOR NO KEY UPDATE', [id]);
+      // No lease stands yet, so the write starts admissible and parks on the row.
+      const write = db
+        .saveOfflineCharacterState(id, 7, STATE('raced-by-a-login'))
+        .catch((err: unknown) => {
+          raced = err;
+          return null;
+        });
+      try {
+        await waitForRowLockWaiter();
+        // The login lands mid-wait and COMMITS its lease.
+        await grantLease(id, 'login-during-the-wait', 3600);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+
+      // Not a lock timeout, not a throw: an honest fence refusal.
+      expect(raced).toBeUndefined();
+      expect(await write).toBe(false);
+      expect(await markerOf(id)).toBeUndefined();
+    }, 30_000);
+
+    it('still LANDS after waiting out a contender when no lease ever appears', async () => {
+      // The other half of the pin above: taking the row lock first must not
+      // turn every contended write into a refusal. Same contention, same wait,
+      // no login, so the write is admitted the moment the holder lets go.
+      const id = await makeCharacter();
+      const holder = await pool.connect();
+      let raced: unknown;
+      await holder.query('BEGIN');
+      await holder.query('SELECT 1 FROM characters WHERE id = $1 FOR NO KEY UPDATE', [id]);
+      const write = db
+        .saveOfflineCharacterState(id, 7, STATE('waited-then-landed'))
+        .catch((err: unknown) => {
+          raced = err;
+          return null;
+        });
+      try {
+        await waitForRowLockWaiter();
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+
+      expect(raced).toBeUndefined();
+      expect(await write).toBe(true);
+      expect(await markerOf(id)).toBe('waited-then-landed');
+    }, 30_000);
+
+    it('holds FOR UPDATE, the one mode that shuts a lease acquire out mid-write', async () => {
+      // The second half of the lock-first fix, and the reason the pre-write
+      // lock is FOR UPDATE rather than the FOR NO KEY UPDATE the write itself
+      // takes. A character_leases INSERT takes FOR KEY SHARE on its FK parent
+      // row; FOR NO KEY UPDATE does not conflict with that (which is exactly
+      // how the write loss above got its lease in mid-wait), while FOR UPDATE
+      // does. So while the fenced write holds its lock, no fresh lease can
+      // commit at all. Both arms run here, because only the control proves the
+      // stronger mode is doing the work.
+      const id = await makeCharacter();
+      const acquire = async (mode: string): Promise<string | undefined> => {
+        const holder = await pool.connect();
+        const login = await pool.connect();
+        try {
+          await holder.query('BEGIN');
+          await holder.query(`SELECT 1 FROM characters WHERE id = $1 ${mode}`, [id]);
+          await login.query('BEGIN');
+          // A short bound: this asks whether the acquire is BLOCKED, not how
+          // patiently it waits.
+          await login.query('SET LOCAL lock_timeout = 400');
+          try {
+            await login.query(
+              `INSERT INTO character_leases (character_id, realm, holder, nonce, expires_at)
+                 VALUES ($1, $2, $3, $4, now() + make_interval(secs => 3600))
+               ON CONFLICT (character_id) DO NOTHING`,
+              [id, realm, db.PROCESS_LEASE_HOLDER, `probe-${mode}`],
+            );
+            return undefined;
+          } catch (err) {
+            return (err as { code?: string }).code;
+          }
+        } finally {
+          await login.query('ROLLBACK').catch(() => {});
+          await holder.query('ROLLBACK').catch(() => {});
+          login.release();
+          holder.release();
+        }
+      };
+
+      // The control: the lock the UPDATE alone would take lets the login in.
+      expect(await acquire('FOR NO KEY UPDATE')).toBeUndefined();
+      // The production lock does not. That the shipped statement really asks
+      // for this mode is pinned beside the bound sequence, in
+      // tests/server/save_offline_character_state.test.ts.
+      expect(await acquire('FOR UPDATE')).toBe('55P03');
+    }, 30_000);
+
+    it('bounds a lock ACQUISITION, never the statement (the corrected residual)', async () => {
+      // The Phase 18 record said the lock bound capped the fenced write's
+      // whole exposure window at two seconds. It does not: lock_timeout
+      // applies per lock acquisition, so it never stops a statement that is
+      // RUNNING rather than waiting, and a statement that re-acquires as its
+      // tuple's holder changes gets a fresh allowance each time (the review
+      // measured 2,909 ms of real wait under this same 2s bound). The bound on
+      // the whole write is the STATEMENT bound. Driven through the production
+      // bound applier so the figures under test are the shipped ones.
+      const overLockBoundSec = (OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS + 500) / 1000;
+      const startedAt = Date.now();
+      await db.runWithStatementTimeout(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS, async (q) => {
+        await applyOfflineCharacterSaveBounds(q);
+        await q(`SELECT pg_sleep(${overLockBoundSec})`);
+      });
+      // It ran well past the lock bound and was not cancelled.
+      expect(Date.now() - startedAt).toBeGreaterThanOrEqual(OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS);
+
+      // The statement bound is what actually stops it, with 57014, not 55P03.
+      let code: string | undefined;
+      const cancelledAt = Date.now();
+      await expect(
+        db
+          .runWithStatementTimeout(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS, async (q) => {
+            await applyOfflineCharacterSaveBounds(q);
+            await q('SELECT pg_sleep(30)');
+          })
+          .catch((err: unknown) => {
+            code = (err as { code?: string }).code;
+            throw err;
+          }),
+      ).rejects.toThrow();
+      const waited = Date.now() - cancelledAt;
+      expect(code).toBe('57014');
+      expect(waited).toBeGreaterThanOrEqual(
+        OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS - LOCK_WAIT_SLACK_MS,
+      );
+    }, 30_000);
   });
 
   describe('the OFFLINE writers behind the unleased fence (the Phase 18 unfenced-offline-writers item)', () => {

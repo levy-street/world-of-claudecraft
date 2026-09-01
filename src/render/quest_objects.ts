@@ -636,10 +636,12 @@ function prepareItem(itemId: string): THREE.Group | null {
   return root;
 }
 
-/** The farm_feast contract bounds (scripts/assets/farm_props/model.js), which
- *  size the no-item pick proxy below. Exported ONLY for the drift pin in
- *  tests/farm_props_asset.test.ts: an authored prop resize must move this
- *  pair or the click box silently desyncs from the visible table. */
+/** The feast contract bounds (scripts/assets/farm_props/model.js), which size
+ *  the no-item pick proxy below. BOTH feast GLBs, the party trestle table and
+ *  the apex pedestal banquet, are authored to this one envelope precisely so
+ *  the single proxy fits either table. Exported ONLY for the drift pin in
+ *  tests/farm_props_asset.test.ts: an authored prop resize on EITHER must move
+ *  this pair or the click box silently desyncs from the visible table. */
 export const NO_ITEM_PICK_HEIGHT = 0.9;
 export const NO_ITEM_PICK_FOOTPRINT = 1.6;
 
@@ -675,10 +677,13 @@ export function buildGroundQuestObject(
   // admits: the party feast's 'farm_feast' plus the three apex role feasts
   // masterwrought Phase 11k added. Never key on the bare string here or
   // anywhere; the family is derived from the catalog. Its world prop is drawn by
-  // farm_patches.ts, so this generic view must not stack a supply-crate body
-  // on top of it. What the view still owes the renderer is a raycastable
-  // click body and an honest anchor height, so the proxy is an INVISIBLE box
-  // at the feast contract's bounds (the character clickProxy precedent:
+  // farm_patches.ts, which since Phase 18 picks BETWEEN TWO TABLES off that
+  // same templateId (the party trestle table and the apex pedestal banquet;
+  // farmFeastModelUrl in farm_patches_core.ts), so this generic view must not
+  // stack a supply-crate body on top of either. What the view still owes the
+  // renderer is a raycastable click body and an honest anchor height, so the
+  // proxy is an INVISIBLE box at the feast contract's bounds, the ONE envelope
+  // both tables are authored to (the character clickProxy precedent:
   // three's raycaster ignores `visible`). Fresh geometry per view on purpose
   // (removeView's non-pooled path disposes it); the material is the shared
   // dispose-exempt NO_ITEM_PICK_MATERIAL above, so the teardown that frees the

@@ -21,6 +21,7 @@ vi.mock('pg', () => ({
 
 import { DB_HEAVY_STATEMENT_TIMEOUT_MS, saveOfflineCharacterState } from '../../server/db';
 import {
+  applyOfflineCharacterSaveBounds,
   OFFLINE_CHARACTER_SAVE_IDLE_TX_TIMEOUT_MS,
   OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
   OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
@@ -103,9 +104,12 @@ describe('saveOfflineCharacterState: fenced on the absence of a live lease', () 
     expect(statements[1]).toBe('SET LOCAL statement_timeout = 5000');
     expect(statements[2]).toBe('SET LOCAL lock_timeout = 2000');
     expect(statements[3]).toBe('SET LOCAL idle_in_transaction_session_timeout = 10000');
+    // The row lock comes BEFORE the fenced write, and in the stronger mode
+    // (the Phase 18 QA fix round; see below).
+    expect(statements[4]).toBe('SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE');
     // Every bound is set BEFORE the write it bounds.
     const update = statements.findIndex((text) => text.includes('UPDATE characters'));
-    expect(update).toBe(4);
+    expect(update).toBe(5);
     expect(statements).toContain('COMMIT');
     // The constants, and their relations: the statement bound must exceed the
     // lock bound (or a contended wait could never report itself as a lock
@@ -117,6 +121,77 @@ describe('saveOfflineCharacterState: fenced on the absence of a live lease', () 
       OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS,
     );
     expect(OFFLINE_CHARACTER_SAVE_STATEMENT_TIMEOUT_MS).toBeLessThan(DB_HEAVY_STATEMENT_TIMEOUT_MS);
+  });
+
+  it('takes the characters row lock BEFORE the fence, in FOR UPDATE (the write-loss fix)', async () => {
+    // The Phase 18 QA database review's reproduced WRITE LOSS. The unleased
+    // fence's NOT EXISTS is uncorrelated with the row it gates, so PostgreSQL
+    // hoists it into an InitPlan and gates the UPDATE on a One-Time Filter
+    // decided BEFORE the row lock is taken; EvalPlanQual re-checks only the
+    // target row's own columns after a lock wait and never re-runs an
+    // InitPlan, so a lease committed during that wait was unseen and the write
+    // landed over a now-live session whose next autosave then clobbered it.
+    // The real-Postgres proof of the loss and of its closure rides
+    // tests/character_save_statement_pg_integration.test.ts; what is pinned
+    // HERE is the shipped statement itself, because the mode is the half no
+    // behavioural test can pin from the outside: the loss repro passes under
+    // FOR NO KEY UPDATE too (measured), and only FOR UPDATE conflicts with the
+    // FOR KEY SHARE a character_leases INSERT takes on its FK parent, which is
+    // what additionally shuts a fresh lease out for the write's lifetime.
+    const client = transactionClient(1);
+    dbMock.connect.mockResolvedValue(client as never);
+
+    await saveOfflineCharacterState(41, 12, realCharacterState());
+
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    const lock = statements.findIndex((text) => text.includes('FOR UPDATE'));
+    const update = statements.findIndex((text) => text.includes('UPDATE characters'));
+    expect(lock).toBeGreaterThan(-1);
+    expect(lock).toBeLessThan(update);
+    // The weaker mode the UPDATE alone would take is NOT what is asked for.
+    expect(statements[lock]).not.toContain('FOR NO KEY UPDATE');
+    // Realm-pinned like the write it precedes, so a cross-realm id locks nothing.
+    expect(statements[lock]).toBe(
+      'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE',
+    );
+    const lockValues = client.query.mock.calls[lock][1] as unknown[];
+    expect(lockValues[0]).toBe(41);
+    const updateValues = client.query.mock.calls[update][1] as unknown[];
+    // The lock and the fence address the SAME row on the SAME realm; a lock on
+    // a different predicate would order the statements and protect nothing.
+    expect(lockValues[1]).toBe(updateValues[3]);
+  });
+
+  it('refuses to interpolate a bound that is not a non-negative safe integer', async () => {
+    // The Phase 18 QA nit. SET LOCAL takes no bind parameter, so both bounds
+    // are interpolated into statement TEXT; db.ts runWithStatementTimeout
+    // validates its own interpolated allowance for precisely that reason and
+    // calls the check the injection guard, and this writer's two SET LOCALs
+    // had no equivalent. Today's values are module constants no caller can
+    // reach, which is exactly why the guard needs its own exercise: without
+    // one it is a comment, and the day a bound becomes configurable nothing
+    // says so. Every rejected shape is driven, since Number.isInteger alone
+    // would admit 1e21 (the sibling lesson from the bag-index ceiling).
+    const query = vi.fn().mockResolvedValue({ rows: [], rowCount: 0 } as never);
+    for (const bad of [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, 1e21]) {
+      await expect(applyOfflineCharacterSaveBounds(query, bad)).rejects.toThrow(
+        /lock_timeout must be a non-negative safe integer/,
+      );
+      await expect(
+        applyOfflineCharacterSaveBounds(query, OFFLINE_CHARACTER_SAVE_LOCK_TIMEOUT_MS, bad),
+      ).rejects.toThrow(/idle_in_transaction_session_timeout must be a non-negative safe integer/);
+    }
+    // It refuses BEFORE issuing anything: a rejected bound must never leave a
+    // half-bounded transaction behind.
+    expect(query).not.toHaveBeenCalled();
+
+    // And the shipped defaults pass the same guard, so the production path is
+    // the one being validated rather than a test-only shape.
+    await applyOfflineCharacterSaveBounds(query);
+    expect(query.mock.calls.map((call) => String(call[0]))).toEqual([
+      'SET LOCAL lock_timeout = 2000',
+      'SET LOCAL idle_in_transaction_session_timeout = 10000',
+    ]);
   });
 
   it('touches nothing and reports false while a live lease exists (rowCount 0)', async () => {

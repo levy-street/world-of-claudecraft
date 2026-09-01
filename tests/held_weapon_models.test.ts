@@ -208,8 +208,8 @@ describe('held weapon models', () => {
   // than the orbs: the hunter's ranger.glb already carries a built-in quiver
   // mesh, so an unmapped quiver reads correctly on the body instead of
   // showing nothing. The three inscription tomes LEFT this pin at the phase
-  // 06 QA: they map to the procedural tome GLBs
-  // (scripts/assets/inscription_tomes, pinned by
+  // 06 QA, and voidbound_grimoire followed them out at phase 18: all four map
+  // to the procedural tome GLBs (scripts/assets/inscription_tomes, pinned by
   // tests/inscription_tome_assets.test.ts).
   // Pinning the exact set makes the exception conscious: a future held_offhand
   // item must either map to a model or extend this pin.
@@ -230,10 +230,10 @@ describe('held weapon models', () => {
       'cragmaw_huntquiver',
       'direfang_quiver',
       // gyrelens_array: the shared art set has no lens-array model (the orb
-      // class of gap); voidbound_grimoire COULD map to a procedural tome GLB
-      // like the phase 06 inscription trio and is recorded as a phase 14
-      // beauty-pass follow-up in the phase 09 ledger, deliberately not
-      // mapped here so the pin stays a conscious exception.
+      // class of gap). Its phase 09 register sibling voidbound_grimoire LEFT
+      // this pin at phase 18: it was the half of the park with an existing
+      // pattern to follow, so it got its own procedural tome GLB
+      // (tome_voidbound) instead of an entry here.
       'gravewyrm_bone_quiver',
       'gyrelens_array',
       'heroic_direfang_quiver',
@@ -242,9 +242,11 @@ describe('held weapon models', () => {
       'moggers_hide_quiver',
       'orb_of_the_last_spring',
       'valefire_lantern',
-      'voidbound_grimoire',
       'wraithfire_orb',
     ]);
+    // The retirement itself, stated as its own assertion so a re-add cannot
+    // pass by quietly restoring the row above.
+    expect(unmapped).not.toContain('voidbound_grimoire');
   });
 
   it('every inscription tome resolves its own held model GLB on disk', () => {
@@ -252,6 +254,7 @@ describe('held weapon models', () => {
       silverleaf_primer: 'models/weapons/tome_silverleaf.glb',
       goldleaf_folio: 'models/weapons/tome_goldleaf.glb',
       sunpetal_grimoire: 'models/weapons/tome_sunpetal.glb',
+      voidbound_grimoire: 'models/weapons/tome_voidbound.glb',
     };
     for (const [itemId, url] of Object.entries(expected)) {
       expect(itemOffhandModelUrl(itemId), itemId).toBe(url);
@@ -263,7 +266,7 @@ describe('held weapon models', () => {
     // Without an accessory row a model still renders but sits at the raw bone
     // transform (no lift, no flip, no clamp), which no behavior suite can
     // see: pin the table rows plus both grip tables the family resolves to.
-    for (const key of ['tome_silverleaf', 'tome_goldleaf', 'tome_sunpetal']) {
+    for (const key of ['tome_silverleaf', 'tome_goldleaf', 'tome_sunpetal', 'tome_voidbound']) {
       expect(KAYKIT_WEAPON_ACCESSORY[key], key).toBe('VAR_BOOK');
     }
     expect(VARIANT_GRIPS.VAR_BOOK).toBeDefined();

@@ -420,4 +420,43 @@ describe('farm_event_feedback: the ready notice', () => {
       expect(fns).not.toContain('showSelfNote');
     }
   });
+
+  it('a NON-FINITE count says nothing, the malformed-zero rule extended', () => {
+    // The arm above already refuses a malformed ZERO from a stale or foreign
+    // server. A non-finite count is the same frame class and the worse
+    // outcome: `Infinity > 0` is true, so the count reached formatNumber and
+    // the player was banner-announced "Infinity crops are ready" (the Intl
+    // rendering of it) with the cue fired, over beds that do not exist.
+    // Digits are asserted absent from the whole surface set rather than the
+    // rendered glyph being named, because Intl spells the infinity symbol
+    // per locale and the claim is that no sentence was minted at all.
+    for (const ready of [Number.POSITIVE_INFINITY, Number.NaN] as const) {
+      expect(drive({ type: 'farmReady', pid: 1, ready }), String(ready)).toHaveLength(0);
+    }
+    expect(
+      drive({ type: 'farmReady', pid: 1, ready: 1, withered: Number.POSITIVE_INFINITY }).map(
+        (c) => c.fn,
+      ),
+      'the withered half took the same guard',
+    ).toEqual(['showBanner', 'log']);
+    expect(audioMock.farmReady).toHaveBeenCalledTimes(1); // the last drive only
+  });
+
+  it('a non-finite half never suppresses the honest one beside it', () => {
+    // Per HALF, not per event: a frame whose ready count is malformed still
+    // owes the player the withered sentence it also carries, so the guard can
+    // never be a whole-event bail.
+    const calls = drive({
+      type: 'farmReady',
+      pid: 1,
+      ready: Number.POSITIVE_INFINITY,
+      withered: 2,
+    });
+    expect(calls.map((c) => c.fn)).toEqual(['showBanner', 'log']);
+    expect(calls[1].color).toBe('#a8a8a8');
+    expect(calls[1].text).toContain('2');
+    // The SAME sentence a withered-only notice leads with, cross-checked
+    // against that path rather than a copy literal.
+    expect(calls[0].text).toBe(drive({ type: 'farmReady', pid: 1, ready: 0, withered: 2 })[0].text);
+  });
 });

@@ -87,6 +87,22 @@ describe('formatTickPerfLine', () => {
     expect(line).toContain(' serializeMs=1.23 ');
   });
 
+  it('skips a phase the profiler never registered instead of throwing', () => {
+    // The two sibling formatters below guard with `phases[n] &&`; this one
+    // dereferenced p[n] unguarded, so a single unregistered outer phase turned
+    // the whole heartbeat into a TypeError inside the tick body's guarded arm
+    // (that guard swallows it, so the operator loses the line and never learns
+    // why). A phase with no stats is omitted instead, which the token-by-name
+    // parser and its shorter historical samples already tolerate.
+    const { social: _social, ...withoutSocial } = PHASES;
+    const line = formatTickPerfLine({ ...INPUTS, phases: withoutSocial });
+    expect(line).toContain('| p95/max total=2.82/7.27 tick=1.19/2.74');
+    expect(line).toContain(' events=0.02/0.66 |');
+    expect(line).not.toContain('social=');
+    // The degenerate end of the same guard: no registered phase at all.
+    expect(() => formatTickPerfLine({ ...INPUTS, phases: {} })).not.toThrow();
+  });
+
   it('carries the blob p99 as a bare byte count (0 before any save)', () => {
     expect(formatTickPerfLine({ ...INPUTS, blobP99Bytes: 0 }).endsWith(' blobP99=0')).toBe(true);
     expect(/\bblobP99=(\d+)$/.exec(formatTickPerfLine(INPUTS))?.[1]).toBe('18944');

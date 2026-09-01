@@ -28,7 +28,6 @@ import {
   listCharacters,
   listModerationActions,
   listSharedIps,
-  onlineHistory,
   type SessionDayPoint,
 } from './admin_db';
 import {
@@ -54,6 +53,7 @@ import {
 import { parseAdminGuildSort } from './admin_guilds_sort';
 import { cleanIpAssociationLookup } from './admin_ip_association';
 import { readAdminMarketMetrics } from './admin_market_metrics';
+import { readOnlineHistoryCached } from './admin_online_history_cache';
 import { readOverviewCounts } from './admin_overview_cache';
 import {
   type AdminPermission,
@@ -1632,7 +1632,10 @@ export async function handleAdminApi(
       return ok(res, game.detectionCalibration());
     }
     if (path === '/admin/api/online-history') {
-      return ok(res, await onlineHistory(url.searchParams.get('range') ?? '30d'));
+      if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
+        return fail(res, 429, ADMIN_TOO_MANY_REQUESTS);
+      }
+      return ok(res, await readOnlineHistoryCached(url.searchParams.get('range') ?? '30d'));
     }
     if (path === '/admin/api/activity') {
       if (!adminAnalyticsReadRateLimited(req, accountId).allowed) {
@@ -2126,7 +2129,10 @@ function makeRealAdminDb() {
     recordAdminGuildBankPurge,
     listModerationActions,
     listSharedIps,
-    onlineHistory,
+    // Cache-backed (the range-keyed online-history memo; both dispatch arms read
+    // it): a setAdminDbForTests override still replaces this member outright,
+    // which bypasses the cache and keeps existing fakes exact.
+    onlineHistory: readOnlineHistoryCached,
     // Cache-backed (the shared admin overview memo; both dispatch arms read it):
     // a setAdminDbForTests override still replaces this member outright, which
     // bypasses the cache and keeps existing fakes exact.
@@ -2523,8 +2529,15 @@ async function detectionCalibrationHandler(ctx: Ctx): Promise<void> {
   ok(ctx.res, useAdminRuntime().detectionCalibration());
 }
 
-/** GET /admin/api/online-history: bucketed online + site-user history. */
+/** GET /admin/api/online-history: bucketed online + site-user history.
+ *  Metered on the analytics read bucket like its overview/activity/metrics
+ *  siblings (it is fetched from the SAME Promise.all as activity, so leaving it
+ *  off the meter left one uncapped door into the family's heaviest aggregate),
+ *  and served from the range-keyed memo bound into the bundle below. */
 async function onlineHistoryHandler(ctx: Ctx): Promise<void> {
+  if (!adminDb().adminAnalyticsReadRateLimited(ctx.req, ctxAccountId(ctx)).allowed) {
+    return fail(ctx.res, 429, ADMIN_TOO_MANY_REQUESTS);
+  }
   ok(ctx.res, await adminDb().onlineHistory(ctx.url.searchParams.get('range') ?? '30d'));
 }
 

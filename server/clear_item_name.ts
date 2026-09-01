@@ -28,14 +28,23 @@
 // deletes ONLY the name: the promotion itself (rolled.quality, the R5 stats,
 // signer, bind state) stands untouched.
 //
-// OFFLINE characters only, the offline admin/boost writer doctrine
+// OFFLINE characters only BY DEFAULT, the offline admin/boost writer doctrine
 // (server/characters.ts renameHandler: an online character's live session
 // would clobber the stripped blob on its next autosave, so the endpoint
 // refuses while online and the operator disconnects first via the existing
-// moderation surface). The LIVE-session arm would need a sim-side action on
-// the R35 tool-effect GM-restore precedent (named there, deliberately not
-// spelled here: its importer guard scans source TEXT for the identifier);
-// kick-then-clear is the recorded operator flow instead. The world-state books
+// moderation surface). The LIVE-session arm is the `clearLiveItemName` deps-bag
+// member below: a sim-side action on the R35 tool-effect GM-restore precedent
+// (named there, deliberately not spelled here: its importer guard scans source
+// TEXT for the identifier), reached from the server ADMIN runtime alone, with
+// no wire command and no IWorld member. The member is OPTIONAL and NOTHING
+// BINDS IT IN THE TREE TODAY: the sim half is unlanded, so an online character
+// is refused exactly as before and kick-then-clear stays the recorded operator
+// flow. What is landed is the shape the sim half plugs into, so the online arm
+// arrives without re-opening this decision core: the audit row is written
+// BEFORE the live strip (the same no-effect-unaudited ordering the offline arm
+// keeps), and a session that leaves between the online check and the strip is
+// an explicit retry rather than a silent fall-through to the offline writer
+// under an audit row that already named a live strip. The world-state books
 // (market listings, mail parcels) and foreign characters are deliberately
 // unswept: the soulbound argument above proves a named copy can never sit in
 // them, so the omission is completeness, not the rename sweep's scoping limit
@@ -245,6 +254,21 @@ export function stripLegendaryNames(state: CharacterState, target: ClearItemName
  *  (the moderation_service deps-bag shape; admin.ts binds the real ones). */
 export interface ClearItemNameDeps {
   characterOnline(characterId: number): boolean;
+  /** The LIVE-session strip (the module header's live arm). Clears the name on
+   *  the entity the sim is holding, in the sim, and makes the result durable
+   *  before it resolves; the endpoint never touches the persisted blob on this
+   *  path, because the live session owns it. Resolves 'offline' when the
+   *  session left between the online check and the strip, so the endpoint can
+   *  say retry instead of landing an offline write the audit row did not
+   *  describe.
+   *
+   *  OPTIONAL and UNBOUND today: the sim-side action is not in the tree, so
+   *  admin.ts injects nothing and runClearItemName keeps refusing an online
+   *  character. Every other member is required. */
+  clearLiveItemName?(
+    characterId: number,
+    target: ClearItemNameTarget,
+  ): Promise<'offline' | { cleared: number }>;
   loadCharacter(
     characterId: number,
   ): Promise<{ level: number; state: CharacterState | null } | null>;
@@ -270,8 +294,12 @@ export type ClearItemNameOutcome = { ok: true; cleared: number } | { ok: false; 
 /**
  * The whole endpoint decision, shared-body style so the route handler stays a
  * thin binder. Order mirrors the R35 restore contract: validate (no audit row
- * for an impossible request), require the character OFFLINE here (the module
- * header's live-session rationale), write the audit row, then load-strip,
+ * for an impossible request), then split on whether the character is ONLINE
+ * here. Online routes to the live arm when one is bound (audit, then the
+ * sim-side strip, then done: the persisted blob is never touched, the live
+ * session owns it) and otherwise refuses with the disconnect-first line, the
+ * module header's live-session rationale. Offline keeps the original path:
+ * write the audit row, then load-strip,
  * re-check OFFLINE once more immediately before the save (the login-race
  * close), then save, so a strip can never exist unaudited; a post-audit
  * refusal (deleted character, nothing matched, the character logging in
@@ -291,7 +319,34 @@ export async function runClearItemName(
   if (bodyError) return { ok: false, error: bodyError };
   const target = clearItemNameTarget(input.body);
   if (deps.characterOnline(input.characterId)) {
-    return { ok: false, error: 'character is online on this realm; disconnect them first' };
+    // No live arm bound (the module header: the sim half is unlanded), so the
+    // offline doctrine stands and the operator disconnects first.
+    const clearLive = deps.clearLiveItemName;
+    if (!clearLive) {
+      return { ok: false, error: 'character is online on this realm; disconnect them first' };
+    }
+    // Audit BEFORE the effect, exactly as the offline arm does: a strip can
+    // never exist unaudited, and the row's "requested" prose already carries
+    // that an attempt may not have landed.
+    await deps.recordAudit({
+      characterId: input.characterId,
+      adminAccountId: input.adminAccountId,
+      detail: describeClearItemNameTarget(target),
+      reason: input.body.reason,
+    });
+    const live = await clearLive(input.characterId, target);
+    if (live === 'offline') {
+      // The session left between the check and the strip. Deliberately NOT a
+      // fall-through to the offline writer: that would land a second effect
+      // under one audit row, and the operator's retry re-decides the arm
+      // honestly (the R35 restore family's self-detecting shape).
+      return {
+        ok: false,
+        error: 'character went offline before the strip landed; retry',
+      };
+    }
+    if (live.cleared === 0) return { ok: false, error: 'no named copy matched that target' };
+    return { ok: true, cleared: live.cleared };
   }
   await deps.recordAudit({
     characterId: input.characterId,

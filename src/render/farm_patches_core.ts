@@ -18,6 +18,7 @@
 // is why this is not a single import from the facet). The view types come
 // through the facet, which is the seam render code reads plots on.
 import { farmGrowthStage } from '../sim/professions/farm_projection';
+import { FARM_FEAST_TEMPLATE_ID, feastTemplateIds } from '../sim/professions/feast';
 import type { FarmPatchDef, FarmPlotStatus, FarmPlotView } from '../world_api/farming';
 
 /**
@@ -239,12 +240,45 @@ export function farmPlotKeyMatches(
   );
 }
 
-// The 16 authored GLBs, all under public/models/props/.
+// The 17 authored GLBs, all under public/models/props/.
 export const FARM_BED_MODEL_URL = '/models/props/farm_bed.glb';
 export const FARM_SPROUT_MODEL_URL = '/models/props/farm_sprout.glb';
 export const FARM_COMPOST_BIN_MODEL_URL = '/models/props/farm_compost_bin.glb';
-/** The placed harvest feast table (Phase 12, the shared feast). */
+/** The placed PARTY harvest feast table (Phase 12, the tier-4 shared feast):
+ *  the trestle table with its laden spread. */
 export const FARM_FEAST_MODEL_URL = '/models/props/farm_feast.glb';
+/** The placed APEX feast table (Phase 11k's three role feasts): a pedestal
+ *  banquet under a tiered cauldron, so the capstone rung reads as its own
+ *  thing across a field. Same authored envelope as the party table, because
+ *  both wear the one pick proxy in quest_objects.ts. */
+export const FARM_APEX_FEAST_MODEL_URL = '/models/props/farm_feast_apex.glb';
+
+/** The apex half of the placeable feast family, DERIVED rather than listed:
+ *  a feast templateId is apex when it is not the party feast's. Authoring a
+ *  fourth apex feast def therefore joins this set with no edit here, which is
+ *  the rule the feast module states (never key on a bare template string). */
+const APEX_FEAST_TEMPLATE_IDS: ReadonlySet<string> = new Set(
+  feastTemplateIds().filter((templateId) => templateId !== FARM_FEAST_TEMPLATE_ID),
+);
+
+/**
+ * Which table a placed feast entity shows. Pure over the templateId the entity
+ * carries, so the decision is testable without a renderer and the painter in
+ * farm_patches.ts stays a consumer. Anything that is not a known apex feast
+ * (including a null templateId off the wire) falls back to the party table,
+ * the pre-Phase-18 behaviour.
+ */
+export function farmFeastModelUrl(templateId: string | null | undefined): string {
+  return typeof templateId === 'string' && APEX_FEAST_TEMPLATE_IDS.has(templateId)
+    ? FARM_APEX_FEAST_MODEL_URL
+    : FARM_FEAST_MODEL_URL;
+}
+
+/** Both feast tables, for the preload sweep and the program anchors: every
+ *  feast GLB a live frame can draw, in a stable order. */
+export function farmFeastModelUrls(): string[] {
+  return [FARM_FEAST_MODEL_URL, FARM_APEX_FEAST_MODEL_URL];
+}
 
 /** The node in farm_bed.glb the stage meshes mount at. */
 export const FARM_SOIL_SOCKET_NAME = 'Socket_Soil';
@@ -269,7 +303,7 @@ export function farmModelUrls(): string[] {
     FARM_BED_MODEL_URL,
     FARM_SPROUT_MODEL_URL,
     FARM_COMPOST_BIN_MODEL_URL,
-    FARM_FEAST_MODEL_URL,
+    ...farmFeastModelUrls(),
   ];
   for (const family of families) {
     for (const stage of stages) urls.push(farmStageModelUrl(family, stage));

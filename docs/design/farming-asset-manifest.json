@@ -6,7 +6,7 @@
     "src/render/farm_patches.ts (adapter constants)",
     "src/render/farm_patches_core.ts (render identity tables)"
   ],
-  "assetCount": 16,
+  "assetCount": 17,
   "journeyEvidence": "docs/screenshots/farming-phase-13 holds the Phase 13 full-journey capture set (desktop 1600x900 and landscape mobile 844x390, LOW preset)",
   "heightNote": "authoredHeightYd is the exporter fit target (the shipped GLB bounds); drawHeightYd is the height the adapter renormalizes the whole model to at draw time. The three crop families share one drawHeightYd per stage even though their authored heights differ, which is what keeps a stage silhouette readable across families.",
   "assets": [
@@ -325,6 +325,25 @@
       "sockets": {},
       "mountsOn": null,
       "replacementIntent": "A sourced farm_feast.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmFeast at identity; shipped bounds exactly 1.6 x 0.9 x 1.6 yd (min [-0.8, 0, -0.8], max [0.8, 0.9, 0.8]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Height is renormalized to 0.9 yd at draw time, so the authored 0.9 yd height is a fit target, not the on-screen size; footprint and pivot are the binding halves of the contract."
+    },
+    {
+      "id": "farm_feast_apex",
+      "out": "models/props/farm_feast_apex.glb",
+      "rootNode": "FarmFeastApex",
+      "family": "utility",
+      "stage": "utility",
+      "footprintYd": [1.6, 1.6],
+      "pivot": "floor-center",
+      "authoredHeightYd": 0.9,
+      "drawHeightYd": 0.9,
+      "meshes": ["FarmBody"],
+      "materials": ["farm_body"],
+      "tintChannels": {
+        "farm_body": "left untinted at draw time; the feast ships its authored colors"
+      },
+      "sockets": {},
+      "mountsOn": null,
+      "replacementIntent": "A sourced farm_feast_apex.glb drops in with zero code changes when it keeps: one scene whose only child is the root node FarmFeastApex at identity; shipped bounds exactly 1.6 x 0.9 x 1.6 yd (min [-0.8, 0, -0.8], max [0.8, 0.9, 0.8]), the floor-center pivot seated on Y=0 and centered on X/Z; the exact mesh set [FarmBody] and material set [farm_body], vertex colored only (COLOR_0 + NORMAL + POSITION, one TRIANGLES primitive per mesh). Its envelope is DELIBERATELY identical to farm_feast: the two placed feast tables share the one invisible pick proxy in src/render/quest_objects.ts, so resizing this asset alone would desync the click box from the apex tables."
     }
   ],
   "replacementContract": {

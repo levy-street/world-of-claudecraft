@@ -23,7 +23,7 @@ import type { IWorld } from '../../../world_api';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
-import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, t } from '../../i18n';
 import { rovingTarget } from '../../roving_index';
 import { svgIcon } from '../../ui_icons';
@@ -220,8 +220,18 @@ export class PlantSheetWindow {
       `<div class="ps-body">${this.bodyHtml(view)}</div>`;
     this.wire(root);
     if (focusKey !== null) {
+      // findFocusKey, never a selector the key is spliced into. This sheet's
+      // own keys carry a CONTENT id (`seed:<cropId>`, `knob:<knobId>`) and
+      // the captured key can be any member of the flat namespace, so a value
+      // holding a quote or a CSS metacharacter makes querySelector THROW,
+      // and it throws out of paint() into whatever drove the repaint: an
+      // arrow-key seed pick loses focus to <body> mid-radiogroup, and an
+      // open() never reaches the `[data-close]` focus below it, leaving the
+      // dialog up with focus outside its own Tab trap. The helper discovers
+      // the namespace with a literal selector and matches the identity on
+      // the dataset value, the vault_window / bank_window idiom.
       restoreFirstEnabled([
-        root.querySelector<HTMLElement>(`[data-focus-key="${focusKey}"]`),
+        findFocusKey(root, focusKey),
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }

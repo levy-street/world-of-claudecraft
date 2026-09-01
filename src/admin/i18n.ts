@@ -286,6 +286,11 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
     'error.clearItemNameCameOnline',
   'character holds a live session lease; kick them (or wait out the lease) and retry':
     'error.clearItemNameLeased',
+  // The LIVE arm's own race (Masterwrought phase 18 QA): the session left between
+  // the online check and the in-memory strip. It reads the opposite way round from
+  // clearItemNameCameOnline above, which is the offline arm losing its race to a
+  // session arriving, so the two cannot share a key.
+  'character went offline before the strip landed; retry': 'error.clearItemNameWentOffline',
   // Named-constant, multi-line, and `err.message ?? literal` fallback prose the
   // widened phase 15 scan guard surfaced (it now flattens the source, resolves
   // single-identifier arguments through server/admin.ts's own constants, and

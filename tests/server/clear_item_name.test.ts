@@ -332,6 +332,112 @@ describe('runClearItemName (the endpoint body over injected deps)', () => {
     expect(saveCharacterState).not.toHaveBeenCalled();
   });
 
+  it('routes an ONLINE character to the live arm when one is bound, auditing first', async () => {
+    // The bucket-A live-session strip (the Phase 18 QA fix round). Nothing in
+    // the tree binds clearLiveItemName yet (the sim-side action is unlanded),
+    // so this drives the seam the sim half plugs into: with the member
+    // present, an online character is stripped IN THE SIM instead of refused,
+    // the persisted blob is never touched (a live session owns it and would
+    // clobber any write on its next autosave), and the audit row still
+    // precedes the effect.
+    const clearLiveItemName = vi.fn(async () => ({ cleared: 2 }));
+    const { deps, recordAudit, saveCharacterState } = makeDeps({
+      characterOnline: () => true,
+      clearLiveItemName,
+    });
+    const loadCharacter = deps.loadCharacter as ReturnType<typeof vi.fn>;
+
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+
+    expect(outcome).toEqual({ ok: true, cleared: 2 });
+    expect(clearLiveItemName).toHaveBeenCalledWith(5, { kind: 'all' });
+    expect(recordAudit).toHaveBeenCalledWith({
+      characterId: 5,
+      adminAccountId: 7,
+      detail: 'all copies',
+      reason: 'slur',
+    });
+    // Audit before effect, the same no-effect-unaudited ordering as offline.
+    expect(recordAudit.mock.invocationCallOrder[0]).toBeLessThan(
+      clearLiveItemName.mock.invocationCallOrder[0],
+    );
+    // The offline machinery stays entirely out of it: no blob read, no fenced
+    // write. A write here is the write loss the whole offline doctrine exists
+    // to prevent.
+    expect(loadCharacter).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('keeps refusing an ONLINE character while NO live arm is bound', async () => {
+    // The tree's shipped behaviour, pinned so landing the seam cannot quietly
+    // change it: the deps member is optional, admin.ts injects nothing, and
+    // the refusal is byte-identical to the pre-seam line.
+    const { deps, recordAudit, saveCharacterState } = makeDeps({
+      characterOnline: () => true,
+    });
+    expect(deps.clearLiveItemName).toBeUndefined();
+
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+
+    expect(outcome).toEqual({
+      ok: false,
+      error: 'character is online on this realm; disconnect them first',
+    });
+    expect(recordAudit).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('reports the live arm finding nothing, and never falls back to the blob', async () => {
+    const clearLiveItemName = vi.fn(async () => ({ cleared: 0 }));
+    const { deps, saveCharacterState } = makeDeps({
+      characterOnline: () => true,
+      clearLiveItemName,
+    });
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { slot: 'neck', reason: 'slur' },
+    });
+    expect(outcome).toEqual({ ok: false, error: 'no named copy matched that target' });
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
+  it('asks the operator to retry when the session leaves mid-strip, writing nothing', async () => {
+    // The live arm's own race: the session left between the online check and
+    // the sim action. Deliberately NOT a fall-through to the offline writer,
+    // which would land a second effect under the one audit row already
+    // written; the retry re-decides the arm honestly.
+    const clearLiveItemName = vi.fn(async () => 'offline' as const);
+    const { deps, recordAudit, saveCharacterState } = makeDeps({
+      characterOnline: () => true,
+      clearLiveItemName,
+    });
+    const loadCharacter = deps.loadCharacter as ReturnType<typeof vi.fn>;
+
+    const outcome = await runClearItemName(deps, {
+      characterId: 5,
+      adminAccountId: 7,
+      body: { all: true, reason: 'slur' },
+    });
+
+    expect(outcome).toEqual({
+      ok: false,
+      error: 'character went offline before the strip landed; retry',
+    });
+    // The attempt is on the record, and nothing else happened.
+    expect(recordAudit).toHaveBeenCalledTimes(1);
+    expect(loadCharacter).not.toHaveBeenCalled();
+    expect(saveCharacterState).not.toHaveBeenCalled();
+  });
+
   it('re-checks online IMMEDIATELY before the save and refuses without writing (the login race)', async () => {
     // The online check flips between the pre-check (false, so the strip
     // proceeds) and the pre-save re-check (true: the character logged in

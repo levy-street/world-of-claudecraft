@@ -17,6 +17,8 @@
 // Driven through the real Sim, one arm per deny reason, so a new deny arm that
 // forgets its bedId reds here rather than in a HUD test that cannot see it.
 
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   FARM_COMPOST_ITEM_ID,
@@ -31,6 +33,7 @@ import { canPlantCrop } from '../src/sim/professions/farming';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
+import { stripComments } from './helpers/strip_comments';
 
 const BED = 'bed_eastbrook_1';
 const CROP_ID = 'vale_wheat';
@@ -225,22 +228,168 @@ describe('every plantCrop deny arm carries the bed it was asked about', () => {
   it('covers every plant deny reason the module can emit', () => {
     // Vacuity floor: the arm table must keep pace with plantCrop's ladder, or
     // a new deny arm could land bedId-free with every arm above still green.
-    const covered = new Set(ARMS.map(([reason]) => reason));
-    for (const reason of [
-      'bad_bed',
-      'range',
-      'bed_taken',
-      'bad_crop',
-      'skill',
-      'no_seed',
-      'no_compost',
-      'no_fee_produce',
-      'no_tonic',
-      'tool',
-      'locked',
-    ]) {
-      expect(covered, reason).toContain(reason);
+    //
+    // Derived from the SOURCE, never from a second list beside this one: the
+    // hardcoded 11-element array this replaces compared a list against a list,
+    // so a new gate reusing an existing reason (a second 'locked' arm that
+    // forgot its bedId, say) added nothing to either side and reddened
+    // nothing. plantDenyReasonsIn below is exercised against synthetic source
+    // in its own arm, so the extractor cannot go blind unnoticed.
+    const covered = [...new Set(ARMS.map(([reason]) => reason))].sort();
+    expect(covered).toEqual([...plantDenyReasonsIn(farmingSource())].sort());
+  });
+
+  it('every farmDenied emit in the ladder carries bedId, in the source itself', () => {
+    // The correlation contract read straight off plantCrop, and the arm that
+    // closes the hole the reason-set floor structurally cannot: a NEW gate
+    // reusing an EXISTING reason word (a second 'locked' arm, say) changes
+    // neither list, so only this one can see it go out bedId-free.
+    const emits = plantDenyEmitsIn(farmingSource());
+    expect(emits.length, 'plantCrop should still have a deny ladder to check').toBeGreaterThan(9);
+    for (const emit of emits) {
+      expect(emit, 'a plantCrop farmDenied emit without bedId').toContain('bedId');
+      expect(emit, 'a plantCrop farmDenied emit without cropId').toContain('cropId');
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The vacuity floor's own input: plantCrop's deny ladder, read from the module.
+// ---------------------------------------------------------------------------
+
+const FARMING_SRC = resolve(process.cwd(), 'src/sim/professions/farming.ts');
+const PLANT_CROP_OPENER = 'export function plantCrop(';
+
+function farmingSource(): string {
+  return readFileSync(FARMING_SRC, 'utf8');
+}
+
+/** plantCrop's body alone, comment-stripped. A free function, so its body ends
+ *  at the first column-0 close after the opener; both anchors throw rather
+ *  than slicing an empty (vacuously passing) span. */
+function plantCropBody(source: string): string {
+  const stripped = stripComments(source);
+  const start = stripped.indexOf(PLANT_CROP_OPENER);
+  if (start === -1) throw new Error(`plantCrop opener not found: ${PLANT_CROP_OPENER}`);
+  const end = stripped.indexOf('\n}', start);
+  if (end === -1) throw new Error('plantCrop has no column-0 close');
+  return stripped.slice(start, end);
+}
+
+/**
+ * Every farmDenied reason plantCrop can emit, read off its two emit shapes:
+ * an inline `reason: 'x'` property, and a `const reason = cond ? 'x' : 'y'`
+ * assignment the emit then shorthands. Comments are stripped first, so a
+ * reason NAMED in prose can never stand in for one the code emits.
+ *
+ * The shape check below is what keeps this honest: every farmDenied emit in
+ * the body must be accounted for by one of those two forms, so a third emit
+ * shape (a helper call, a reason held in a differently named variable) fails
+ * loudly here instead of quietly shrinking the derived set.
+ */
+function plantDenyReasonsIn(source: string): Set<string> {
+  const body = plantCropBody(source);
+  const reasons = new Set<string>();
+  let inline = 0;
+  for (const m of body.matchAll(/reason:\s*'([a-z_]+)'/g)) {
+    reasons.add(m[1]);
+    inline++;
+  }
+  let assigned = 0;
+  for (const m of body.matchAll(/\breason\s*=[^;]*;/g)) {
+    for (const lit of m[0].matchAll(/'([a-z_]+)'/g)) reasons.add(lit[1]);
+    assigned++;
+  }
+  const emits = [...body.matchAll(/type:\s*'farmDenied'/g)].length;
+  if (emits !== inline + assigned) {
+    throw new Error(
+      `plantCrop has ${emits} farmDenied emits but ${inline} inline reasons and ` +
+        `${assigned} reason assignments: teach this extractor the new emit shape`,
+    );
+  }
+  return reasons;
+}
+
+/** Each farmDenied emit statement in plantCrop's body, comment-stripped. The
+ *  emits are single object literals with no nested brace of their own, so the
+ *  first `})` closes each one. */
+function plantDenyEmitsIn(source: string): string[] {
+  return [...plantCropBody(source).matchAll(/ctx\.emit\(\{[\s\S]*?\}\);/g)]
+    .map((m) => m[0])
+    .filter((emit) => emit.includes("'farmDenied'"));
+}
+
+describe('the deny-reason extractor behind that floor', () => {
+  it('reads both live emit shapes out of the real module', () => {
+    const found = plantDenyReasonsIn(farmingSource());
+    // Both shapes are genuinely present today: an inline literal arm and a
+    // ternary-assigned one. If either class ever disappears the floor above
+    // is still correct, but this says so out loud.
+    expect(found.has('bad_bed')).toBe(true);
+    expect(found.has('locked')).toBe(true);
+    expect(found.size).toBeGreaterThan(5);
+  });
+
+  it('picks up a NEW deny arm that reuses an existing reason word', () => {
+    // The exact hole the hardcoded list could not see. Injected into the REAL
+    // source text (never the file), so the extractor is proven against the
+    // shape it actually has to read.
+    const injected = farmingSource().replace(
+      '  const bed = farmBedById(bedId);',
+      "  if (bedId === 'scratch_only') {\n" +
+        "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'scratch_only', cropId });\n" +
+        '    return;\n' +
+        '  }\n' +
+        '  const bed = farmBedById(bedId);',
+    );
+    expect(injected).not.toBe(farmingSource());
+    expect(plantDenyReasonsIn(injected).has('scratch_only')).toBe(true);
+  });
+
+  it('refuses to guess when an emit stops matching either known shape', () => {
+    // A reason routed through anything else (a helper, a differently named
+    // variable) must fail loudly rather than shrink the set in silence.
+    const injected = farmingSource().replace(
+      '  const bed = farmBedById(bedId);',
+      "  if (bedId === 'scratch_only') {\n" +
+        '    const why = pickReason();\n' +
+        "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: why, cropId });\n" +
+        '    return;\n' +
+        '  }\n' +
+        '  const bed = farmBedById(bedId);',
+    );
+    expect(() => plantDenyReasonsIn(injected)).toThrow(/teach this extractor/);
+  });
+
+  it('the bedId floor bites on an id-free arm that reuses an existing reason', () => {
+    // The proof that the source-read floor is decisive where the two-list one
+    // was blind: this arm adds NO new reason word, so the reason-set floor
+    // sees nothing at all. Injected into the REAL source text, never the file.
+    const injected = farmingSource().replace(
+      '  const bed = farmBedById(bedId);',
+      "  if (bedId === 'scratch_only') {\n" +
+        "    ctx.emit({ type: 'farmDenied', pid: meta.entityId, reason: 'locked' });\n" +
+        '    return;\n' +
+        '  }\n' +
+        '  const bed = farmBedById(bedId);',
+    );
+    expect(injected).not.toBe(farmingSource());
+    // Unchanged reason set: the old floor's whole input.
+    expect([...plantDenyReasonsIn(injected)].sort()).toEqual(
+      [...plantDenyReasonsIn(farmingSource())].sort(),
+    );
+    // The bedId floor sees it.
+    const idFree = plantDenyEmitsIn(injected).filter((emit) => !emit.includes('bedId'));
+    expect(idFree).toHaveLength(1);
+  });
+
+  it('never reads a reason out of a COMMENT', () => {
+    const injected = farmingSource().replace(
+      '  const bed = farmBedById(bedId);',
+      "  // a future arm will emit reason: 'commented_only' here\n" +
+        '  const bed = farmBedById(bedId);',
+    );
+    expect(plantDenyReasonsIn(injected).has('commented_only')).toBe(false);
   });
 });
 

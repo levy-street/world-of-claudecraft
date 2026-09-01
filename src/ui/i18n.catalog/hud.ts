@@ -568,6 +568,13 @@ const hudStringsEn = {
       soldJunkMany: 'Sold {count} junk items for {money}.',
       keptBoundOne: 'Kept {count} bound copy.',
       keptBoundMany: 'Kept {count} bound copies.',
+      // The LOCKED twin: a partial vendor sale spares bound copies AND
+      // player-locked ones, and calling a locked copy bound named a reason the
+      // player cannot act on. Separate keys rather than one parameterized line,
+      // because the two states are unrelated and a locale may well word them
+      // differently (Masterwrought phase 18 QA).
+      keptLockedOne: 'Kept {count} locked copy.',
+      keptLockedMany: 'Kept {count} locked copies.',
       friendOnline: '{name} has come online.',
       friendOffline: '{name} has gone offline.',
     },

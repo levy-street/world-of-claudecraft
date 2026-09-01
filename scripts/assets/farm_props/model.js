@@ -1,6 +1,7 @@
 // Deterministic procedural factory for the farming prop set: one garden bed, one
 // shared sprout, three crop families across three growth stages plus a withered
-// husk, a compost bin, and the placed harvest feast table. Every asset is vertex
+// husk, a compost bin, and the two placed harvest feast tables (the party
+// trestle table and the apex pedestal banquet). Every asset is vertex
 // colored and texture free; the renderer supplies the biome tint on the bed and
 // the per-crop identity tint on the crop_accent material, so the meshes ship in
 // a neutral palette.
@@ -204,6 +205,30 @@ export const FARM_PROP_CONTRACTS = deepFreeze({
     id: 'farm_feast',
     out: 'models/props/farm_feast.glb',
     rootNode: 'FarmFeast',
+    family: 'utility',
+    stage: 'utility',
+    footprintYd: [1.6, 1.6],
+    pivot: 'floor-center',
+    heightYd: 0.9,
+    meshes: [FARM_BODY_MESH_NODE],
+    materials: [FARM_BODY_MATERIAL],
+    sockets: {},
+    mountsOn: null,
+    tintChannels: {
+      farm_body: 'left untinted at draw time; the feast ships its authored colors',
+    },
+  },
+  // The placed APEX feast (Phase 11k's three role tables: stonepot, warspice,
+  // sageleaf). A pedestal banquet table under a tiered centerpiece, so the
+  // capstone rung is legible from across the field instead of wearing the
+  // party table's model. Deliberately the SAME footprint and height as
+  // farm_feast: both share the one invisible click proxy in
+  // src/render/quest_objects.ts, so a different envelope here would desync the
+  // pick box from half the placed tables.
+  farm_feast_apex: {
+    id: 'farm_feast_apex',
+    out: 'models/props/farm_feast_apex.glb',
+    rootNode: 'FarmFeastApex',
     family: 'utility',
     stage: 'utility',
     footprintYd: [1.6, 1.6],
@@ -765,6 +790,115 @@ function buildFeastTable(context) {
   addBox(body, [0.07, 0.09, 0.07], [-0.5, topY + 0.045, 0.42], PALETTE.roastDeep, [0, 0.5, 0]);
 }
 
+// The APEX harvest feast: a pedestal banquet table (two hex tops crossed into a
+// twelve-sided round, so the silhouette reads round from every approach and the
+// authored footprint is square without fitToContract having to stretch it),
+// three cloth swags over the edge, and a raised second tier carrying the grand
+// cauldron. Authored to the same 1.6 x 0.9 x 1.6 contract as the party table,
+// which is why the tier is short and the pedestal carries the height.
+//
+// Reuses the party feast's palette rather than coining swatches: the shipped
+// farm_body COLOR_0 band is pinned (tests/farm_props_asset.test.ts), and these
+// values are the ones already proven under that ceiling.
+function buildApexFeastTable(context) {
+  const { body, random } = context;
+  const topY = 0.64;
+  const topThickness = 0.06;
+
+  // Pedestal: a splayed foot, a stout column, and the crossed hex top.
+  addDisc(body, 0.34, 0.08, [0, 0.04, 0], PALETTE.plankDark);
+  addDisc(body, 0.14, 0.5, [0, 0.33, 0], jitterColor(random, PALETTE.plankLight, 0.1));
+  for (const yaw of [0, Math.PI / 6]) {
+    addDisc(
+      body,
+      0.8,
+      topThickness,
+      [0, topY - topThickness / 2, 0],
+      jitterColor(random, PALETTE.plank, 0.12),
+      [0, yaw, 0],
+    );
+  }
+  // Cloth swags hung over the rim, the banquet read.
+  for (let swag = 0; swag < 3; swag++) {
+    const yaw = (swag / 3) * Math.PI * 2 + 0.4;
+    addBox(
+      body,
+      [0.42, 0.15, 0.02],
+      [Math.sin(yaw) * 0.72, topY - 0.09, Math.cos(yaw) * 0.72],
+      swag % 2 === 0 ? PALETTE.cloth : PALETTE.clothDeep,
+      [0, yaw, 0],
+    );
+  }
+
+  // The raised tier: three posts under a small round shelf.
+  for (let post = 0; post < 3; post++) {
+    const yaw = (post / 3) * Math.PI * 2;
+    addBox(
+      body,
+      [0.05, 0.13, 0.05],
+      [Math.sin(yaw) * 0.23, topY + 0.065, Math.cos(yaw) * 0.23],
+      PALETTE.plankDark,
+      [0, yaw, 0],
+    );
+  }
+  const shelfY = topY + 0.13;
+  addDisc(body, 0.33, 0.045, [0, shelfY + 0.0225, 0], PALETTE.plankLight);
+  // The grand cauldron: a deep pot under a broad rim, the capstone centerpiece.
+  addDisc(body, 0.19, 0.075, [0, shelfY + 0.0825, 0], PALETTE.roastDeep);
+  addDisc(body, 0.205, 0.025, [0, shelfY + 0.1325, 0], PALETTE.plankDark);
+
+  // Three laden platters set around the lower table.
+  for (let platter = 0; platter < 3; platter++) {
+    const yaw = (platter / 3) * Math.PI * 2 + 0.9;
+    const x = Math.sin(yaw) * 0.5;
+    const z = Math.cos(yaw) * 0.5;
+    addDisc(body, 0.15, 0.025, [x, topY + 0.013, z], PALETTE.plankLight);
+    addBlob(
+      body,
+      [0.11, 0.075, 0.11],
+      [x, topY + 0.026 + 0.07, z],
+      jitterColor(random, PALETTE.roast, 0.12),
+      [0, random() * Math.PI, 0],
+    );
+  }
+  // Three bread boards between them, each with one loaf.
+  for (let board = 0; board < 3; board++) {
+    const yaw = (board / 3) * Math.PI * 2 + 2.0;
+    const x = Math.sin(yaw) * 0.52;
+    const z = Math.cos(yaw) * 0.52;
+    addDisc(body, 0.12, 0.022, [x, topY + 0.011, z], PALETTE.plankDark);
+    addBlob(
+      body,
+      [0.09, 0.05, 0.055],
+      [x, topY + 0.022 + 0.045, z],
+      board % 2 === 0 ? PALETTE.bread : PALETTE.breadLight,
+      [0, yaw + 0.5, 0],
+    );
+  }
+  // A ring of mugs at the rim, one per seat.
+  for (let mug = 0; mug < 6; mug++) {
+    const yaw = (mug / 6) * Math.PI * 2 + 0.25;
+    addBox(
+      body,
+      [0.07, 0.09, 0.07],
+      [Math.sin(yaw) * 0.66, topY + 0.045, Math.cos(yaw) * 0.66],
+      mug % 2 === 0 ? PALETTE.plankDark : PALETTE.roastDeep,
+      [0, yaw, 0],
+    );
+  }
+  // Loose fruit scattered over the spread, kept clear of the tier posts.
+  for (const [x, z] of scatterPositions(random, 5, 0.6, 0.6)) {
+    if (Math.hypot(x, z) < 0.34) continue;
+    addBlob(
+      body,
+      [0.045, 0.04, 0.045],
+      [x, topY + 0.04, z],
+      jitterColor(random, PALETTE.fruit, 0.12),
+      [0, random() * Math.PI, 0],
+    );
+  }
+}
+
 const BUILDERS = Object.freeze({
   farm_bed: buildBed,
   farm_sprout: buildSprout,
@@ -942,6 +1076,7 @@ const BUILDERS = Object.freeze({
     }),
   farm_compost_bin: buildCompostBin,
   farm_feast: buildFeastTable,
+  farm_feast_apex: buildApexFeastTable,
 });
 
 function mergeBucket(bucket, label) {

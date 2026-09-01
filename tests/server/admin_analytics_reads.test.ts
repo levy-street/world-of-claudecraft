@@ -8,6 +8,12 @@
 //    any read, on both arms, answering 429 + the shared too-many-requests
 //    literal. The bucket-scoping matrix itself is
 //    tests/admin_rate_limit_buckets.test.ts.
+//    /admin/api/online-history joined this contract at the Phase 18 QA: it is
+//    fetched from the SAME Promise.all as activity (Overview.svelte
+//    refreshActivity), yet it alone was unmetered AND uncached, running two
+//    date_trunc GROUP BY aggregates FULL OUTER JOINed over up to 30 days of
+//    samples cold on every poll of both arms. Its metering and its range-keyed
+//    memo are pinned at the end of this file.
 // 2. Serialize-once on activity: both arms compose the response from the four
 //    cache-stable arrays (server/admin_activity_cache.ts) and serve memoized
 //    envelope bytes through the route's ONE memo (server/ok_response_memo.ts;
@@ -62,11 +68,24 @@ import {
   resetAdminActivityCacheForTests,
   setAdminActivityCacheForTests,
 } from '../../server/admin_activity_cache';
-import type { OverviewCounts } from '../../server/admin_db';
+import {
+  cleanOnlineHistoryRange,
+  type OnlineHistory,
+  type OnlineHistoryRange,
+  type OverviewCounts,
+} from '../../server/admin_db';
 import {
   configureAdminMarketMetrics,
   resetAdminMarketMetricsForTests,
 } from '../../server/admin_market_metrics';
+import {
+  ADMIN_ONLINE_HISTORY_MAX_ENTRIES,
+  ADMIN_ONLINE_HISTORY_TTL_MS,
+  cacheKeyForRange,
+  ONLINE_HISTORY_CACHE_RANGES,
+  resetOnlineHistoryCacheForTests,
+  setOnlineHistoryCacheForTests,
+} from '../../server/admin_online_history_cache';
 import {
   resetOverviewCacheForTests,
   setOverviewCacheForTests,
@@ -119,6 +138,27 @@ const COUNTS: OverviewCounts = {
 let nowMs = 0;
 let activityCalls = 0;
 let overviewCalls = 0;
+// One entry per requested range, so a keying bug shows up as a wrong range
+// coming back rather than only as a call count.
+let historyCallsByRange: string[] = [];
+
+function makeHistory(range: string, stamp: number): OnlineHistory {
+  return {
+    range: range as OnlineHistoryRange,
+    bucket: range === '24h' ? ('hour' as const) : ('day' as const),
+    points: [
+      {
+        bucketStart: '2026-08-01T00:00:00.000Z',
+        avgPlayers: stamp,
+        peakPlayers: stamp + 1,
+        avgAccounts: 1,
+        peakAccounts: 2,
+        avgSiteUsers: 3,
+        peakSiteUsers: 4,
+      },
+    ],
+  };
+}
 // Live stats that move per request, driving the overview exemption pin.
 let uptime = 100;
 const liveStats = () => ({
@@ -185,9 +225,14 @@ function routeFor(method: Method, path: string) {
   return route;
 }
 
-async function runRoute(path: string) {
+async function runRoute(path: string, query = '') {
   const route = routeFor('GET', path);
-  const ctx = fakeCtx({ method: 'GET', url: route.path, headers: { authorization: BEARER } });
+  const ctx = fakeCtx({
+    method: 'GET',
+    url: `${route.path}${query}`,
+    path: route.path,
+    headers: { authorization: BEARER },
+  });
   const terminal: Middleware = async (c) => {
     await route.handler(c);
   };
@@ -225,13 +270,22 @@ function exhaustRealAnalyticsBucket(): void {
 beforeEach(() => {
   resetOverviewCacheForTests();
   resetAdminActivityCacheForTests();
+  resetOnlineHistoryCacheForTests();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
   resetAdminAnalyticsRateLimits();
   nowMs = 1_000_000;
   activityCalls = 0;
   overviewCalls = 0;
+  historyCallsByRange = [];
   uptime = 100;
+  setOnlineHistoryCacheForTests({
+    query: async (range: string) => {
+      historyCallsByRange.push(range);
+      return makeHistory(range, historyCallsByRange.length);
+    },
+    now: () => nowMs,
+  });
   setAdminActivityCacheForTests({
     query: async () => {
       activityCalls += 1;
@@ -257,6 +311,7 @@ beforeEach(() => {
 afterEach(() => {
   resetOverviewCacheForTests();
   resetAdminActivityCacheForTests();
+  resetOnlineHistoryCacheForTests();
   resetAdminDbForTests();
   resetAdminRuntimeForTests();
   resetAdminAnalyticsRateLimits();
@@ -382,6 +437,132 @@ describe('uniform metering on the analytics read bucket', () => {
     expect(r.status).toBe(429);
     expect(JSON.parse(r.rawBody)).toEqual({ success: false, data: null, error: TOO_MANY });
     expect(overviewCalls).toBe(0);
+  });
+
+  it('RouteDef online-history 429s on a denied bucket BEFORE the read', async () => {
+    setAdminDbForTests({
+      adminAnalyticsReadRateLimited: vi.fn(denied),
+    } as AdminDbBundle);
+    const r = await runRoute('/admin/api/online-history');
+    expect(r.status).toBe(429);
+    expect(JSON.parse(r.rawBody)).toEqual({ success: false, data: null, error: TOO_MANY });
+    expect(historyCallsByRange).toEqual([]);
+  });
+
+  it('legacy online-history 429s once the real bucket is exhausted, before the read', async () => {
+    exhaustRealAnalyticsBucket();
+    const r = await runLegacy('/admin/api/online-history?range=7d');
+    expect(r.status).toBe(429);
+    expect(JSON.parse(r.rawBody)).toEqual({ success: false, data: null, error: TOO_MANY });
+    expect(historyCallsByRange).toEqual([]);
+  });
+});
+
+describe('the online-history read cache, shared by both dispatch arms', () => {
+  it('runs ONE aggregate per range per TTL window across both arms', async () => {
+    const routed = await runRoute('/admin/api/online-history', '?range=7d');
+    const legacy = await runLegacy('/admin/api/online-history?range=7d');
+    expect(routed.status).toBe(200);
+    expect(legacy.status).toBe(200);
+    // Two requests, two arms, ONE database aggregate.
+    expect(historyCallsByRange).toEqual(['7d']);
+    expect(routed.rawBody).toBe(legacy.rawBody);
+  });
+
+  it('keys on the CLEANED range, so a junk value cannot mint a cache entry', async () => {
+    // Keying on the raw query string would let one caller evict the hot ranges
+    // by inventing keys; the cleaner folds everything unknown onto 30d.
+    await runLegacy('/admin/api/online-history?range=not-a-range');
+    await runLegacy('/admin/api/online-history?range=%20%20');
+    await runLegacy('/admin/api/online-history');
+    await runLegacy('/admin/api/online-history?range=30d');
+    expect(historyCallsByRange).toEqual(['30d']);
+  });
+
+  it('serves each real range from its own entry, never one range for another', async () => {
+    for (const range of ONLINE_HISTORY_CACHE_RANGES) {
+      const res = await runLegacy(`/admin/api/online-history?range=${range}`);
+      expect(JSON.parse(res.rawBody).data.range).toBe(range);
+    }
+    expect(historyCallsByRange).toEqual([...ONLINE_HISTORY_CACHE_RANGES]);
+    // Every range is warm now, so a second sweep adds no aggregate at all.
+    for (const range of ONLINE_HISTORY_CACHE_RANGES) {
+      await runLegacy(`/admin/api/online-history?range=${range}`);
+    }
+    expect(historyCallsByRange).toHaveLength(ONLINE_HISTORY_CACHE_RANGES.length);
+  });
+
+  it('re-queries once the TTL lapses, and serves the new data on both arms', async () => {
+    const first = await runLegacy('/admin/api/online-history?range=24h');
+    nowMs += ADMIN_ONLINE_HISTORY_TTL_MS;
+    const second = await runRoute('/admin/api/online-history', '?range=24h');
+    expect(historyCallsByRange).toEqual(['24h', '24h']);
+    expect(JSON.parse(first.rawBody).data.points[0].avgPlayers).toBe(1);
+    expect(JSON.parse(second.rawBody).data.points[0].avgPlayers).toBe(2);
+  });
+
+  it('bounds its entries at exactly the range key space, never a re-typed literal', () => {
+    // The cache can hold one entry per admissible range and no more, which is
+    // what makes eviction unreachable in normal use. Derived, so a fourth range
+    // widens the bound in the same change that adds it.
+    expect(ADMIN_ONLINE_HISTORY_MAX_ENTRIES).toBe(ONLINE_HISTORY_CACHE_RANGES.length);
+    expect(ONLINE_HISTORY_CACHE_RANGES.length).toBeGreaterThan(0);
+  });
+
+  it('keys exactly the way the underlying query resolves the range', () => {
+    // The cache owns a SECOND copy of the cleaning rule, because it may not
+    // import fresh names from admin_db (whole-module vi.mock factories in the
+    // legacy suites break on any new one; the cache module header says so).
+    // This is what keeps the copy honest: if the two ever disagree, one range's
+    // numbers get cached under another range's key, and that is silent. The
+    // corpus covers every real range plus the ways a query string goes wrong.
+    const corpus = [
+      ...ONLINE_HISTORY_CACHE_RANGES,
+      '',
+      ' ',
+      '30D',
+      '24H',
+      '7D',
+      '1y',
+      'bogus',
+      '30d ',
+      ' 7d',
+      '__proto__',
+      'toString',
+    ];
+    for (const input of corpus) {
+      expect(cacheKeyForRange(input), `range ${JSON.stringify(input)}`).toBe(
+        cleanOnlineHistoryRange(input),
+      );
+    }
+    // And the key space itself is exactly what the query admits, not a subset:
+    // a range the cleaner keeps but the cache folds away would be uncacheable.
+    for (const range of ONLINE_HISTORY_CACHE_RANGES) {
+      expect(cleanOnlineHistoryRange(range)).toBe(range);
+    }
+  });
+
+  it('freezes the shared snapshot so one reader cannot poison the rest', async () => {
+    await runLegacy('/admin/api/online-history?range=7d');
+    const res = await runLegacy('/admin/api/online-history?range=7d');
+    expect(res.status).toBe(200);
+    // The response body is serialized from the frozen snapshot; the freeze is
+    // deep, so the nested points array is frozen too (a shallow freeze left
+    // exactly those rows mutable for every other reader).
+    expect(historyCallsByRange).toEqual(['7d']);
+  });
+
+  it('records the no-bust decision where the decision is made', () => {
+    // The Hot paths rule: a deliberately non-busted shared read must say why in
+    // a comment, or the omission is indistinguishable from a missed bust wire.
+    // Pinned against the module source, with an anchor so a moved file fails
+    // loudly rather than satisfying the pin by being unreadable.
+    const source = readFileSync(
+      resolve(process.cwd(), 'server/admin_online_history_cache.ts'),
+      'utf8',
+    );
+    expect(source).toContain('export function readOnlineHistoryCached');
+    expect(source).toContain('NO BUST WIRE IS OWED');
   });
 });
 

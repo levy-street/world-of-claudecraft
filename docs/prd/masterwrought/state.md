@@ -17899,6 +17899,52 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as homespun-cloth-abu
   rate, and its abundance is relative to silk's scarcity, which the spread
   closes from the other side. If cloth still reads as over-abundant after
   the spread, that is a later measurement.
+ACTIONED (qr-18-REOPEN, 2026-08-31, homespun-cloth-abundance): the "later
+measurement" this record defers HAS BEEN RUN, on the working tree of the
+release/v0.42.0 sync, and it CONFIRMS every recorded figure rather than
+contradicting one. METHOD, the 11m STEP 1 method re-run unchanged so it can
+be re-run again: over MOBS, CAMPS, ZONES, zoneAt, DUNGEON_X_THRESHOLD and
+HARVEST_COMPONENT_ITEMS, a template is REACHABLE when at least one of its
+camp rows sits off the instance plane (center.x <= DUNGEON_X_THRESHOLD) and
+its centre resolves to a ZONES entry; zones are the distinct reachable zone
+names, bands are floor((minLevel - 1) / 5), density is the sum of camp
+counts over the reachable rows. THE JUDGEMENT this line makes, stated
+because "reachable" does not settle it: a count-1 boss row, an elite camp
+and the spider clutch all count as ordinary spawns, which is the mechanical
+reading and is exactly the blind spot the post-spread density paragraph
+already names.
+CLOTH TODAY: 7 templates, 7 reachable, 4 zones, bands 0,1,2,3, density 58,
+every figure unmoved. Its members and their reachable spawns:
+vale_bandit (Eastbrook Vale, 11), gravecaller_cultist (Mirefen Marsh, 13),
+gravecaller_summoner (Mirefen Marsh, 4), wyrmcult_zealot (Thornpeak
+Heights, 16), wyrmcult_necromancer (Thornpeak Heights, 5),
+threnos_first_voice (Thornpeak Heights, 1, a count-1 row), hedge_knight
+(The Evergarden, 8).
+SILK AFTER THE SPREAD, the comparison the record asks for: 6 templates, 6
+reachable, 4 zones, bands 0,1,3, density 44, which also reproduces exactly.
+THE RELATIVE READING: cloth over silk stood at 7:3 templates, 4:3 zones and
+58:17 density (3.4x) before the spread; it stands at 7:6, 4:4 and 58:44
+(1.3x) now. Inside Mirefen Marsh, the zone the player report actually
+names, silk now OUT-SPAWNS cloth 27 to 17 (mire_widow 13, spider_egg 13,
+mirefen_broodmother 1, against the two gravecaller rows). So the spread
+closed the gap from silk's side as this record predicted it would, and
+cloth needs no content change: NOT ACTIONED as an edit, ACTIONED as the
+measurement it deferred.
+FLAGGED, not decided here: whether the count-1 and clutch members should be
+discounted from density. They should not be by the metric as written, but
+under a discount silk's 44 falls to 30 (the clutch 13, the boss 1) against
+cloth's 57, putting the ratio back at 1.9x. Which reading the abundance
+question is judged on is a metric policy the maintainer owns; the
+measurement above is the same either way.
+TO RE-RUN: bundle a script importing those six symbols with esbuild and
+print the per-tag census. The whole 2026-08-31 read: 242 templates (235 at
+the 11m read; the seven added since carry no component tag), 54 tagged, 15
+zones, 218 camps, 122 templates with a reachable camp, and EVERY family
+reproduces its recorded post-spread row (hide 28 reachable / 12 zones /
+202, fang 12 / 7 / 64, meat 16 / 10 / 116, cloth 7 / 4 / 58, claw 8 / 5 /
+61, silk 6 / 4 / 44, tusk 6 / 5 / 50, venomSac 6 / 6 / 43, horn 6 / 5 / 28,
+gills 6 / 6 / 59), so the release syncs since the spread moved no harvest
+geography at all.
 - "Disenchanting yields far more Greater material than anything
   consumes": measured over BOTH reagent files: the Greater rung (shard) has
   12 consumers and 21 units against essence's 40 and 84, and its supply is
@@ -22200,6 +22246,16 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-scre
    position) plus 5 inherited release debt (exp_the_last_keep,
    exp_dawnhold_castle, soc_strongbox_outfitter, soc_four_bags_deep,
    prog_ready_for_an_adventure), which are NOT packet obligations;
+CORRECTED (2026-08-31, the Phase 18 QA fix round): 15 was TRUE at Phase 16
+and is stale today. Re-derived from src/ui/icons.ts on the merged tree,
+DEED_ART_PENDING holds 20 rows: the release/v0.41.0 merge appended the five
+Crucible raid deeds (dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul,
+dgn_varkhul_heroic, dgn_varkhul_flawless) behind the 15, all five 'dungeon'
+and riding the deed_cat_dungeon crest. They are release-owned debt parked
+correctly by the same rule, NOT packet obligations, so the 10-plus-5
+partition above stands as the packet's own accounting; the total is what
+moved. Phase 19 row D010 is corrected with it, because that row is what
+sizes the maintainer's art wave.
    prog_farming_100 ships committed art under the title-shelf rule, and
    the commissioned crest brief stands. The compost rationale sweep was
    discharged at the 11e QA (recorded, both doc homes annotated). The
@@ -22426,7 +22482,10 @@ database-performance-reviewer was NOT dispatched, by measurement rather
 than assumption. Premise 2 re-derived from the tree: the 165 = 84 + 81 +
 0 partition reproduces exactly (84 art-landed with one mapping.json owner
 each, 81 parked ownerless with distinct recipes, the allowlist entirely
-packet-owned, DEED_ART_PENDING at 15). Premise 4 verified against the
+packet-owned, DEED_ART_PENDING at 15, which was the TRUE count when this
+premise was re-derived; the live set has held 20 since the
+release/v0.41.0 merge, see the CORRECTED annotation at the art
+reconciliation above and Phase 19 row D010). Premise 4 verified against the
 manifest: 13 keepers, regalia and enchant picker in both form factors,
 guide legs desktop-only by design, the admin capture skip recorded.
 
@@ -23035,14 +23094,40 @@ from the workflow journals; the bucket lists below are its human form).
 
 ### THE BUCKET-A LIST (done or carried per item)
 
-Written at STEP 4 close, one row per item: id, unit commit, status.
+THE ROWS WERE NOT WRITTEN. The phase closed with this section holding only
+its own promise, "one row per item: id, unit commit, status", and no table
+under it. That is this phase's central structural defect: the bucket-A
+list, the very thing STEP 1 spent ninety-one cluster verifiers deriving,
+finished the phase with no per-item disposition on the record. Nothing in
+the phase's own text says why, so no reason is invented here.
+
+The rows below were therefore NOT recovered from a table that never
+existed. The QA twin rebuilt them from evidence, item by item, against the
+unit records above, the unit commits, and the live tree, and the integrator
+pastes that rebuilt table at the marker below. This paragraph deliberately
+quotes no verdict counts: those belong to the twin's audit, which owns
+them, not to the placeholder it replaces.
+
+<!-- INSERTION POINT (Phase 18 QA fix round, 2026-08-31): the QA twin's
+     rebuilt bucket-A table goes here, one row per item (id, unit commit,
+     status), with its verdict counts. Nothing else belongs between this
+     marker and the bucket-B heading below. -->
 
 ### THE BUCKET-B LIST is the Phase 19 table DRAFT (STEP 4)
 
 Every bucket-B item is a row below (question, where it stands, priced options,
 a recommendation, and the seeded row it expands or "new"). Six expand seeded
 row 3 (the thirteen standing items), twenty-four expand row 4 (the farming
-handoff rows), one each expand rows 8 and 10, eighty-eight are new. The QA
+handoff rows), one each expand rows 8 and 10, and ONE HUNDRED are new: 132
+rows in all. CORRECTED 2026-08-31 (the sentence said eighty-eight new, a
+120-row table): re-counted from the seed column of the table below, row by
+row, 6 + 24 + 1 + 1 + 100 = 132. The count moved because the table grew
+after the sentence was written: D121 to D132 were all tabled later, all as
+"new", by the phase's own review rounds. The ledger names two of their
+origins itself (D121 from the net-wire hot-path review of 8cc3248db6, and
+D122, the character-blob warn threshold, from the blob-size comment repair
+aa184248da); the other ten carry no in-prose provenance line, only their
+own rows. Nothing was renumbered, so the row ids are stable. The QA
 twin finalizes this draft into phase-19-rulings-gate.md. Drafted by a
 twelve-lane workflow reading each item's authority record; recommendations are
 recommendations, never rulings (no decision is guessed in this phase).
@@ -23058,7 +23143,7 @@ recommendations, never rulings (no decision is guessed in this phase).
 | D007 | tier6-tool-rung | Should a tier-6 land-tool rung exist at all; if yes, its WIELD_REQUIREMENT_BY_TIER row must be authored first because the wield resolver fails open for unknown tiers, and its interaction with the Decision-A contradiction must be settled. | state.md, the rejection-list block 'THE REJECTION LIST, AS RECORDED DESIGN' (lines 12299-12301 as read): 'A tier-6 tool rung for anyone ... resolver fails OPEN, so it would ship ungated; recorded in brainstorm.md as future-tier intent instead.' Code confirms: src/sim/professions/wield_gate.ts, WIELD_REQUIREMENT_BY_TIER covers tiers 1-5 and wieldRequirementForTier returns 0 for a missing tier by documented design. | Keep the rejection standing (future-tier intent stays in brainstorm.md) [no-op]; Author the tier-6 rung now [a TIER6 proficiency constant plus the WIELD_REQUIREMENT_BY_TIER row FIRST, then tool item + recipe content, deeds/reliquary/wiki/art same-change obligations, sim tests, and a settlement of the Decision-A apex-hoe-channel contradiction it collides with (seeded row 3's item)]; Independent hardening: make the resolver fail closed on unknown tiers [changes the documented fail-open-toward-pre-R22 behavior in wield_gate.ts; sim test plus both-hosts parity check; bricks any future unregistered tool until its row lands] | Keep the rejection standing: the ledger records it as deliberate future-tier intent, the fail-open comment is documented design not a bug, and authoring a new tier mid-packet would reopen the Decision-A contradiction the seeded table already prices separately. | new (interacts with row 3's apex-hoe / Decision-A item but is a distinct decision the seed does not carry) |
 | D008 | tool-gate-obtainability-ruling | Must obtainability rulings (11h-GATE-B and its 11i/11j/11k heirs) derive through wieldRequirementForTier beside farmCropSkillThreshold, i.e. name the wield rung in the ruling basis, or does the profession threshold alone suffice? | state.md, the 11h-to-11i handoff block, open item 6 (line 14751 as read): 'THE TOOL GATE IS REAL AND UNRULED (open item 6). If 11i writes player-facing copy about what a catch or a crop asks of a player, it consults wieldRequirementForTier as well as the profession threshold.' No later RULED line exists. | Rule the basis must name the wield rung [amend the 11h-GATE-B basis text and the heir records in state.md (doc edits); one audit pass that player-facing obtainability copy already consults wieldRequirementForTier, code changes only if that audit finds a wrong line]; Rule the profession threshold alone suffices [no-op beyond a dated RULED line; the derivation stays incomplete on the record and future heirs inherit it] | Rule the basis names the wield rung: the handoff already obliges 11i's player-facing copy to consult wieldRequirementForTier, so the ruling basis should match what the copy rule demands rather than leaving the derivation and the copy on different authorities. | new (not among the thirteen standing items seeded in row 3) |
 | D009 | zone1-no-poor-drop | Author a starter-zone poor (gray) mob drop back onto the zone-1 and starter-island kill tables so the guide's Sell Junk loop works before zone 2, or accept the gap on the record. | state.md, 'THE MAINTAINER'S ITEMS, THIRTEEN NOW' block (lines 16944-16948 as read): zone 1's only three grays were promoted (bandana, tallow, scale), 'a starter-zone character has nothing for the Sell Junk button the guide teaches until zone 2; the candidates are a poor drop authored back onto a zone-1 table or the gap accepted on the record'; later records widen it to both starter zones (the island's items are all quest-kind). | Author one new gray item onto the zone-1 and starter-island kill tables [a new item id in src/sim/content plus committed WebP art, loot-table rows, wiki regen, the item-art audit, census row; no deed/reliquary (poor junk is not conquerable content)]; Accept the gap on the record [no-op dated RULED line; the taught Sell Junk loop stays dead until zone 2]; Reword the guide to teach Sell Junk at zone 2 [guide prose key edits plus the reworded-key stale-fill exposure the M16 gate cannot see (the toolsNoteThreeRods precedent)] | Author the gray drop: the guide teaches the loop in the starter zone, so accepting the gap leaves a taught-loop contradiction, and one junk item is cheaper and safer than a guide reword that re-triggers the invisible stale-fill trap. | row 3 (it is the thirteenth standing item, named verbatim in the seed: 'zone 1 carries no poor mob drop') |
-| D010 | art-batch-ledger | Schedule the maintainer art pass on his master SHA over the parked art batch: the merged ITEM_ART_PENDING 81 ids, DEED_ART_PENDING 15 rows, and the judgment sub-items (cross-family icon reads, 32px legibility eyeballs, the map-pin color unification)? | farming/state.md, the ART BATCH HANDOFF row (lines 439-451 read): the deliverable is the ledger, committed art demands the maintainer's master SHA per the profession_icons E2 rule; state.md, Phase 16 ledger art reconciliation (lines 22180-22199 read): the merged ITEM_ART_PENDING holds exactly the packet's 81 parked ids, DEED_ART_PENDING 15 rows, art wave runs on master after the packet. | Schedule the art wave post-merge on master [no-op for the packet (the parked allowlists are the deliverable); the maintainer runs the asset-pipeline batch on his SHA and drains ITEM_ART_PENDING/DEED_ART_PENDING then]; Author art in the packet branch now [violates the recorded profession_icons E2 rule (committed art demands the maintainer's master SHA), forks provenance, and re-litigates a settled doctrine paragraph in the Phase 16 ledger] | Schedule post-merge: the ledger is explicit twice over that the batch parks by rule, so the only ruling needed is the maintainer acknowledging the wave (and its judgment sub-items) as his queue item, dated. | row 4 (expands the farming handoff table's ART BATCH HANDOFF handed-to-maintainer row) |
+| D010 | art-batch-ledger | Schedule the maintainer art pass on his master SHA over the parked art batch: the merged ITEM_ART_PENDING 81 ids, DEED_ART_PENDING 20 rows (CORRECTED 2026-08-31 from 15; 15 was the true Phase 16 count and the live set has held 20 since the release/v0.41.0 merge, re-derived from src/ui/icons.ts), and the judgment sub-items (cross-family icon reads, 32px legibility eyeballs, the map-pin color unification)? | farming/state.md, the ART BATCH HANDOFF row (lines 439-451 read): the deliverable is the ledger, committed art demands the maintainer's master SHA per the profession_icons E2 rule; state.md, Phase 16 ledger art reconciliation (lines 22180-22199 read): the merged ITEM_ART_PENDING holds exactly the packet's 81 parked ids, DEED_ART_PENDING 15 rows AS READ AT PHASE 16, art wave runs on master after the packet. CORRECTED 2026-08-31 by re-deriving the set from src/ui/icons.ts: it holds 20 rows, the five extra being the Crucible raid deeds dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul, dgn_varkhul_heroic and dgn_varkhul_flawless, which the release/v0.41.0 merge appended BEHIND the 15. They are release-owned debt, correctly parked and not packet obligations, but they are five more paintings in the same wave, and this row is what sizes that wave for the maintainer, so an under-count here is the thing worth fixing. | Schedule the art wave post-merge on master [no-op for the packet (the parked allowlists are the deliverable); the maintainer runs the asset-pipeline batch on his SHA and drains ITEM_ART_PENDING/DEED_ART_PENDING then]; Author art in the packet branch now [violates the recorded profession_icons E2 rule (committed art demands the maintainer's master SHA), forks provenance, and re-litigates a settled doctrine paragraph in the Phase 16 ledger] | Schedule post-merge: the ledger is explicit twice over that the batch parks by rule, so the only ruling needed is the maintainer acknowledging the wave (and its judgment sub-items) as his queue item, dated. | row 4 (expands the farming handoff table's ART BATCH HANDOFF handed-to-maintainer row) |
 | D011 | crop-display-name-lore-pass | The maintainer lore pass over the eight crop display names: rename any (ids locked by D11, only display names may move) or ratify the shipped names. | farming/state.md, handoff table row 'Crop display names lore pass (D11 ids locked) / packet / maintainer / open ruling-owed' (line 488; echoed at 427-428 and the D11 block); no closure row. | Ratify the shipped names [no-op (flip the handoff row closed with the ruling id)]; Rename some or all display names in-session [display-name edits in the crop item defs, English catalog updates, non-Latin fills for any wordy new name (M16), wiki regen (guide freshness gate), no id or save impact]; Defer past the PR [no-op now; the row stays open carrying the ruling id and reason] | Take the ruling in-session: it is display-name-only under locked ids so either answer is cheap, and if the maintainer has no lore preference, ratify the shipped names to close the row rather than defer. | row 4 (the 'name lore passes' tuning read; the hoe-names row at line 489 is its sibling) |
 | D012 | crop-durations-gain-survival | Value read over the core farming pacing constants: crop durations (with the 5-minute sibling-gap advisory), the gain schedule, the survival endpoints, and the pick floor/cap; ratify the shipped values or name new ones. | farming/state.md, handoff table row (line 487): 'Crop durations (5-minute sibling gap advisory), gain schedule, survival endpoints, pick floor/cap / P3 / P5 / maintainer / open ruling-owed'; neighboring rows that closed say so explicitly, this one does not. | Ratify the shipped constants [no-op (flip the handoff row closed)]; Re-tune any constant to a maintainer-named value [farming content constant edits, farming test pins re-derived, parity goldens regenerated if timing is sampled (UPDATE_PARITY, its own reviewed commit), wiki regen; bounded by the 11e-D-A frozen band boundaries] | Ratify the shipped values: they survived the whole packet's QA and there is no play-signal arguing for movement, and a pure value read with no data leans status quo; any re-tune must come as the maintainer's own numbers, never guessed. | row 4 ('crop durations' is named in the row 4 tuning-reads list) |
 | D013 | farm-biome-palette-trim | Wire FarmBiomePalette.trim to a draw-time consumer in the planned higher-tier trim pass, or drop the authored-but-unconsumed channel? | farming/state.md handoff table (line 525 as read): 'wire trim in the higher-tier pass or drop the channel / P13 integration / maintainer / art batch / open, handed-to-maintainer'. Code confirms trim still authored-unconsumed: src/render/farm_patches_core.ts:112-120 ('unconsumed at draw time today'). | Keep the channel, wire it in the art-batch higher-tier pass [Defer with the art batch (a ruled deferral, row status flipped); the eventual pass adds a setColorAt consumer in src/render/farm_patches.ts plus a render-performance review]; Wire it now [The same consumer work this session: farm_patches.ts tint application, palette test extension, render-performance reviewer, plus art judgment the batch owns]; Drop the channel [Delete trim from FarmBiomePalette and all FARM_BIOME_PALETTES rows plus the exhaustiveness test, then re-author the per-biome values if the pass ever comes] | Option 1: the row is already handed to the maintainer/art batch, the authored per-biome values are exactly what the higher-tier pass needs, and deleting data a planned pass consumes just to tidy a field is negative work. | row 4 (a handed-to-maintainer farming handoff-table row, expanded one-row-each by row 4) |
@@ -23211,7 +23296,13 @@ record; the QA twin re-sweeps and diffs.
   daily-gate-ladder-corner, jack-worse-headstart-dead-term,
   test-lane-no-change-needed-list, double-deny-head-run,
   resolve-legendary-promotion-gate, apex-recipe-linear-find,
-  mst-party-walk-closure. Parity 383 green, no draw moved.
+  mst-party-walk-closure. No draw moved. CORRECTED by the Phase 18 QA: the
+  figure this line carried, "Parity 383 green", matches no suite at the phase
+  tip and the parity reviewer could not reproduce it from any of the four
+  candidates. The real readings are tests/world_api_parity.test.ts 372 passed
+  (over an IWORLD_MEMBERS pin of 354), tests/parity/ 262 passed and 1 skipped
+  over 81 golden files. The pin file is comment-only different since f746dbecd4,
+  so no parity count moved inside this range: 383 was wrong when written.
 - U-TESTS-1 e79042a8d4 (17 items, tests only) + coverage-audit round
   d84ce6e2b9 (0 blocking, 2 should-fix, 3 nits, ALL applied; the audit's own
   1e-7 claim corrected to 1e-6 by the writer) + fresh-read round 152756753c
@@ -23999,17 +24090,72 @@ carry that argument in its record.
   next login (the server feeds its own realm calendar, so online play is
   unaffected; the persisted gate date re-rolls on login). A wart the guard
   trades for closing the backwards-read double payout; recorded, not tuned.
-- The unleased save fence evaluates its lease check as an InitPlan BEFORE the
+- CLOSED, and the record it replaces was wrong twice. This bullet used to read:
+  "The unleased save fence evaluates its lease check as an InitPlan BEFORE the
   characters row lock is taken, so a lease acquired while the fence UPDATE waits
   on a contended row is unseen for that wait; the Phase 18 lock_timeout bounds
   the window to two seconds (the database review's measurement). A residual
-  concurrency shape, not a scaling defect; recorded.
+  concurrency shape, not a scaling defect; recorded."
+  The Phase 18 QA found both halves false. It is not a residual shape: the write
+  LANDS over a now-live session, and runClearItemName still answers ok with an
+  audit row recording a strip that the session's next autosave clobbers, so the
+  operator-facing outcome and the audit trail both assert something untrue
+  (reproduced twice against real Postgres). And two seconds was never the bound:
+  lock_timeout bounds each individual lock ACQUISITION, not the statement, so a
+  write parked behind two sequential contenders re-arms the timer and still
+  commits. Measured: the fenced write landed after 2,909 ms with the lease
+  committed at 2,215 ms. The real bound is the 5,000 ms statement allowance.
+  FIXED in the Phase 18 QA fix round: the offline save now takes the characters
+  row lock in its own statement first, so the fence is evaluated with the lock
+  held, red-proven by a pg arm that fails when the lock statement is removed.
+  Note the FK-parent-lock exclusion engages only on a fresh INSERT, because
+  production acquires a lease with ON CONFLICT DO UPDATE (server/db.ts:4776);
+  releaseCharacterLease DELETEs on a clean leave, so both arms are common.
+  The LIVE arm (the nonce fence, the 30 s autosave path) carries the identical
+  shape and was deliberately NOT changed here: the fix costs one extra statement
+  per save at about 33 saves a second, which is a maintainer call, tabled as
+  Phase 19 row D145 with the reproduction and the price.
 - The pg integration suites pin FIXED verify-database names by house
   convention (two concurrent runs of ONE suite drop each other's database);
   Phase 18 suffixes the character-save suite's name per worker/pid because the
   phase lengthened its window, and records the convention divergence: a
   repo-wide sweep of the other pg suites is out of this packet's scope.
-- (more appended at STEP 4)
+- The zone-celebration broadcast calls emitToZonePlayers, which scans every
+  player with a zoneAt call per celebration: O(all players), unmeasured, and
+  identical under both arms of the refusal the hot-path review priced. The
+  fix round landed the per-pid fragment index for the selection pass that
+  review found dominant; this scan was left standing. Recorded from the
+  net-wire unit's hot-path review of 8cc3248db6 above, where it is written
+  as a RECORDED read.
+- CHARACTER_BLOB_WARN_BYTES (131,072) sits BELOW the legitimate worst case,
+  not the roughly 3.2x above it the standing comment argued. The blob-size
+  comment repair (aa184248da above) inverted the recorded relation by
+  measurement, repaired the comment, and moved NO value, because the
+  threshold itself is a value decision: it is Phase 19 row D122. Read this
+  with one caveat the ledger carries in two places: the comment-repair
+  record quotes a maximal legal blob of 151,525 bytes while D122's row
+  quotes 151,495 with its measured band (151,115 to 151,496) and its drift
+  term. The two disagree by 30 bytes, so the ruling should re-measure rather
+  than pick a number off either line.
+- The shard-weight unmeasured set is 204 files, and about 184 of them
+  arrived with release syncs AFTER the 2026-08-23 harvest, so they were
+  already unattributed before this packet started. The phase-close local
+  carry repairs the table's shape but cannot attribute them properly: the CI
+  harvest that would needs a PUSHED branch, which this packet deliberately
+  does not have. Recorded so the 0.9434 coverage reading is not read back as
+  debt this packet created.
+- The two new HUD rail tiles ship DELIBERATELY GLYPH-ONLY until the
+  maintainer's art wave, the ip-16-ICON class: no painted chrome art can be
+  authored in this environment, and the upgrade path is a magenta-keyed
+  raster through npm run assets:chrome plus a CHROME_ART_IDS row, stated at
+  the glyphs themselves. Recorded beside the castle deed paintings in
+  CARRIED above, because both size the same wave.
+- A .ts source written with RAW control bytes is classified BINARY by git.
+  The collision guard's two 0x00 key separators were the right CHOICE (NUL
+  is the one character that cannot occur in TypeScript source) written the
+  wrong WAY, and git rendered the whole guard as Bin, so every review of it
+  was blind. Write the escape, never the byte. Recorded from the close-out
+  section above as a portable rule that outlives the one guard.
 
 ### VALIDATION
 

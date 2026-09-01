@@ -53,13 +53,23 @@ describe('createAutoRefresh', () => {
     expect(createAutoRefresh({ storageKey: KEY, intervalMs: 1000, load }).start()).toBeTypeOf(
       'function',
     );
-    const getItem = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+    // The INSTANCE, not Storage.prototype: the live localStorage here does not
+    // read through the prototype method, so a prototype spy never fires and
+    // this half of the case ran on the ordinary empty-store path instead (the
+    // shared _setup clears storage before every test). Measured: with the
+    // prototype spy in place, deleting the try/catch from
+    // src/admin/auto_refresh_preference.ts left all 11 cases in this file
+    // green, while the sibling unit test caught it at once.
+    const getItem = vi.spyOn(globalThis.localStorage, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
     });
     try {
       const blocked = createAutoRefresh({ storageKey: KEY, intervalMs: 1000, load });
       blocked.start();
       await vi.advanceTimersByTimeAsync(0);
+      // The throwing read really ran, so the assertion below is about the
+      // catch arm and not about an untouched store answering null.
+      expect(getItem, 'the blocked-storage read never happened').toHaveBeenCalledWith(KEY);
       expect(blocked.enabled).toBe(true);
     } finally {
       getItem.mockRestore();

@@ -55,6 +55,25 @@ export interface FarmFeedbackHost {
   showBanner(text: string): void;
 }
 
+/** One half of a ready notice's bed count, normalized before anything is said
+ *  about it: only a FINITE positive number is a count worth a sentence.
+ *
+ *  The positive test was always there (the emitter omits a zero, and a
+ *  malformed zero from a stale or foreign server must print nothing rather
+ *  than "0 crops"); what it could not catch is a non-finite count, because
+ *  `Infinity > 0` is true and formatNumber renders it as the locale's infinity
+ *  symbol, so such a frame reached the banner, the log and the cue with a
+ *  sentence about beds that do not exist. That is the same wrong-and-loud
+ *  outcome the zero guard exists to prevent, so it takes the same answer:
+ *  treat it as nothing to announce.
+ *  NaN already fell through both comparisons; it is normalized here too so the
+ *  refusal is spelled rather than inherited from an accident of `>`. Applied
+ *  per HALF, never per event, so a frame with one malformed count still tells
+ *  the player about the other. */
+function farmNoticeCount(raw: number | undefined): number {
+  return typeof raw === 'number' && Number.isFinite(raw) && raw > 0 ? raw : 0;
+}
+
 export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
   switch (ev.type) {
     case 'farmPlanted': {
@@ -245,11 +264,12 @@ export function handleFarmEvent(ev: FarmEvent, host: FarmFeedbackHost): void {
       // mixed notice reports both outcomes honestly instead of rounding a
       // failed crop into "ready", and a malformed zero from a stale or
       // foreign server prints nothing rather than "0 crops".
-      const witheredCount = ev.withered ?? 0;
+      const readyCount = farmNoticeCount(ev.ready);
+      const witheredCount = farmNoticeCount(ev.withered);
       const readyText =
-        ev.ready > 0
-          ? t(ev.ready > 1 ? 'hudChrome.farming.readyLineQty' : 'hudChrome.farming.readyLine', {
-              count: formatNumber(ev.ready, { maximumFractionDigits: 0 }),
+        readyCount > 0
+          ? t(readyCount > 1 ? 'hudChrome.farming.readyLineQty' : 'hudChrome.farming.readyLine', {
+              count: formatNumber(readyCount, { maximumFractionDigits: 0 }),
             })
           : null;
       const witheredText =

@@ -87,18 +87,20 @@ if (process.argv[2] === '--carry-local') {
   }
   console.log(`[carry-local] reason recorded on each row: "${reason}"`);
   console.log(`[carry-local] wrote ${tableRows(out).length} rows to ${target}`);
-  process.exit(0);
-}
-
-if (process.argv[2] === '--carry-local-missing') {
+  // process.exitCode, not process.exit: the gate convention. An immediate
+  // process.exit can truncate the audit lines above on a piped stdout.
+  process.exitCode = 0;
+} else if (process.argv[2] === '--carry-local-missing') {
   // The phase-close step. Enumerates every walked test file the table does not
   // measure, runs each `runs` times, and reads each duration from the SAME
   // reporter line the CI harvest parses (lib/ci_shard_weight_parse.mjs), so a
   // locally carried weight and a harvested one mean the same thing. Then it
   // hands the medians to the ordinary --carry-local path, contract check and
   // all. Enumerated, never hand-listed: a file a late unit added cannot be
-  // missed, and re-running after more suites land is idempotent for the files
-  // already carried (it re-measures and replaces their attribution).
+  // missed. Re-running after more suites land measures only what is still
+  // unmeasured: missingWeightFiles filters on `typeof weights[f] !== 'number'`,
+  // so a row already carried (or harvested) is SKIPPED, not re-measured and not
+  // re-attributed. Re-measuring a carried row is --carry-local's job.
   let reason;
   try {
     ({ reason } = parseCarryLocalCli(
@@ -119,141 +121,171 @@ if (process.argv[2] === '--carry-local-missing') {
   const missing = missingWeightFiles(walkShardTestFiles(ROOT), MEASURED_WEIGHTS);
   if (missing.length === 0) {
     console.log('[carry-missing] every walked test file already has a weight; nothing to do');
-    process.exit(0);
-  }
-  console.log(`[carry-missing] ${missing.length} unmeasured files, ${runsPer} runs each`);
-  const tokens = [];
-  for (const file of missing) {
-    const runs = [];
-    for (let i = 0; i < runsPer; i++) {
-      // --reporter=default explicitly: vitest's summary-only output prints no
-      // per-file line for a passing run, and the per-file line IS the
-      // measurement (the same one parseWeightLines reads out of a CI log).
-      const out = spawnSync('npx', ['vitest', 'run', file, '--reporter=default'], {
-        cwd: ROOT,
-        encoding: 'utf8',
-        maxBuffer: 64 * 1024 * 1024,
-      });
-      const parsed = parseWeightLines(`${out.stdout ?? ''}\n${out.stderr ?? ''}`);
-      const ms = parsed[file];
-      if (!Number.isInteger(ms) || ms <= 0) {
-        console.error(
-          `[carry-missing] ${file}: run ${i + 1} printed no parsable duration; measure it by ` +
-            'hand and carry it with --carry-local rather than guessing a weight',
-        );
-        process.exit(1);
+    process.exitCode = 0;
+  } else {
+    console.log(`[carry-missing] ${missing.length} unmeasured files, ${runsPer} runs each`);
+    const tokens = [];
+    for (const file of missing) {
+      const runs = [];
+      for (let i = 0; i < runsPer; i++) {
+        // --reporter=default explicitly: vitest's summary-only output prints no
+        // per-file line for a passing run, and the per-file line IS the
+        // measurement (the same one parseWeightLines reads out of a CI log).
+        const out = spawnSync('npx', ['vitest', 'run', file, '--reporter=default'], {
+          cwd: ROOT,
+          encoding: 'utf8',
+          maxBuffer: 64 * 1024 * 1024,
+        });
+        // The run's STATUS first, before the parser gets blamed for it. Vitest
+        // prints a failed file as `tests/x.test.ts (1 test | 1 failed)`, a shape
+        // the RAN regex does not match, so a RED suite used to fall through to
+        // the no-duration refusal below and walk the operator into hand-carrying
+        // a weight for a test file that is broken (Phase 18 QA, gate-census
+        // item 4). A file with no green run has no weight to carry at all.
+        if (out.error || out.status !== 0) {
+          const how = out.error
+            ? `could not be started (${out.error.message})`
+            : out.status === null
+              ? `was killed by signal ${out.signal}`
+              : `FAILED with exit code ${out.status}`;
+          console.error(
+            `[carry-missing] ${file}: run ${i + 1} ${how}. A red or unrunnable suite has no ` +
+              'weight to carry: fix the file, then re-run. Do NOT hand-carry a weight for it.',
+          );
+          process.exit(1);
+        }
+        const parsed = parseWeightLines(`${out.stdout ?? ''}\n${out.stderr ?? ''}`);
+        const ms = parsed[file];
+        if (!Number.isInteger(ms) || ms <= 0) {
+          console.error(
+            `[carry-missing] ${file}: run ${i + 1} exited 0 but printed no parsable duration; ` +
+              'measure it by hand and carry it with --carry-local rather than guessing a weight',
+          );
+          process.exit(1);
+        }
+        runs.push(ms);
       }
-      runs.push(ms);
+      console.log(`[carry-missing] ${file}: ${runs.join(', ')}`);
+      tokens.push(`${file}=${runs.join(',')}`);
     }
-    console.log(`[carry-missing] ${file}: ${runs.join(', ')}`);
-    tokens.push(`${file}=${runs.join(',')}`);
+    const table = JSON.parse(readFileSync(target, 'utf8'));
+    const out = applyLocalCarry(table, parseCarryLocalArgs(tokens), {
+      measured: today(),
+      reason,
+    });
+    const defects = carriedDefects(out, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true });
+    if (defects.length > 0) {
+      console.error('[carry-missing] refusing to write; the result fails its own contract:');
+      for (const d of defects) console.error(`  ${d}`);
+      process.exit(1);
+    }
+    writeFileSync(target, serializeWeightTable(out));
+    console.log(`[carry-missing] reason recorded on each row: "${reason}"`);
+    console.log(`[carry-missing] carried ${tokens.length} rows; ${tableRows(out).length} total`);
+    // process.exitCode, not process.exit (see --carry-local above).
+    process.exitCode = 0;
   }
-  const table = JSON.parse(readFileSync(target, 'utf8'));
-  const out = applyLocalCarry(table, parseCarryLocalArgs(tokens), {
-    measured: today(),
-    reason,
-  });
-  const defects = carriedDefects(out, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true });
-  if (defects.length > 0) {
-    console.error('[carry-missing] refusing to write; the result fails its own contract:');
-    for (const d of defects) console.error(`  ${d}`);
+} else {
+  const runId = process.argv[2];
+  if (!runId || !/^\d+$/.test(runId)) {
+    console.error('usage: node scripts/ci_shard_weights_harvest.mjs <run-id>');
+    console.error('       node scripts/ci_shard_weights_harvest.mjs --carry-local <path>=<ms>,...');
+    console.error(
+      '       node scripts/ci_shard_weights_harvest.mjs --carry-local-missing [--runs N]',
+    );
     process.exit(1);
+  }
+
+  // Constructed, not a literal: biome's noControlCharactersInRegex forbids a
+  // raw ESC byte in a regex literal (recorded trap from the merged-leg round).
+  const jobsJson = execFileSync(
+    'gh',
+    [
+      'run',
+      'view',
+      runId,
+      '--json',
+      'jobs',
+      '-q',
+      '[.jobs[] | {id: .databaseId, name, conclusion}]',
+    ],
+    { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
+  );
+  const jobs = JSON.parse(jobsJson).filter(
+    (j) => /PR tests \(\d+\)|PR long sims|PR gate/.test(j.name) && j.conclusion === 'success',
+  );
+  if (jobs.length < 10) {
+    console.error(
+      `only ${jobs.length} green test jobs on run ${runId}; need the 8 shards + 2 lanes`,
+    );
+    process.exit(1);
+  }
+
+  /** @type {Record<string, number>} */
+  const weights = {};
+  for (const job of jobs) {
+    const log = execFileSync('gh', ['run', 'view', runId, '--log', '--job', String(job.id)], {
+      encoding: 'utf8',
+      maxBuffer: 256 * 1024 * 1024,
+    });
+    // A selective-mode log would harvest only the selected slice; the mode
+    // line the shard entry prints is the proof this run measured everything.
+    if (/changes-job decision: mode=/.test(log) && !/changes-job decision: mode=full/.test(log)) {
+      console.error(`[harvest] ${job.name} did not run mode=full; use a full-mode run`);
+      process.exit(1);
+    }
+    const before = Object.keys(weights).length;
+    parseWeightLines(log, weights);
+    console.log(`[harvest] ${job.name}: +${Object.keys(weights).length - before} files`);
+  }
+
+  const sorted = Object.fromEntries(Object.entries(weights).sort(([a], [b]) => (a < b ? -1 : 1)));
+  const out = {
+    __provenance: {
+      run: runId,
+      harvested: today(),
+      files: Object.keys(sorted).length,
+      // A wholesale harvest MEASURED every row it wrote, so it declares the
+      // attribution rather than leaving the map absent for the next union to
+      // infer: harvestedFiles equals the row count and nothing is carried.
+      harvestedFiles: Object.keys(sorted).length,
+      carried: {},
+    },
+    ...sorted,
+  };
+  // A wholesale re-harvest replaces any locally measured rows a release sync
+  // merged in. The checked-in provenance uses sibling mergedLocal/mergedFiles;
+  // accept the older nested localMerge shape too so either table warns.
+  try {
+    const provenance = JSON.parse(readFileSync(target, 'utf8')).__provenance;
+    const measured = provenance?.mergedLocal ?? provenance?.localMerge?.measured;
+    const files = provenance?.mergedFiles ?? provenance?.localMerge?.files;
+    if (typeof measured === 'string' && measured && Number.isInteger(files) && files > 0) {
+      console.log(
+        `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
+      );
+    } else if (
+      provenance &&
+      typeof provenance === 'object' &&
+      // The keys THIS script writes (including the Phase 18 attribution pair);
+      // anything else is a shape the advisory above could not read.
+      Object.keys(provenance).some(
+        (k) => !['run', 'harvested', 'files', 'harvestedFiles', 'carried'].includes(k),
+      )
+    ) {
+      // The provenance carries keys beyond this script's own plain-harvest
+      // output, but neither known local-merge shape parsed: a THIRD shape the
+      // advisory above cannot see. Say so instead of silently overwriting
+      // whatever locally measured rows that shape recorded.
+      console.warn(
+        `[harvest] unrecognized __provenance shape (keys: ${Object.keys(provenance).join(', ')}); ` +
+          'the prior table may carry locally measured rows this rewrite DISCARDS. Inspect the ' +
+          'old provenance before trusting the new table.',
+      );
+    }
+  } catch {
+    // No prior table (or unreadable): nothing to report.
   }
   writeFileSync(target, serializeWeightTable(out));
-  console.log(`[carry-missing] reason recorded on each row: "${reason}"`);
-  console.log(`[carry-missing] carried ${tokens.length} rows; ${tableRows(out).length} total`);
-  process.exit(0);
+  console.log(`[harvest] wrote ${Object.keys(sorted).length} weights to ${target}`);
 }
-
-const runId = process.argv[2];
-if (!runId || !/^\d+$/.test(runId)) {
-  console.error('usage: node scripts/ci_shard_weights_harvest.mjs <run-id>');
-  console.error('       node scripts/ci_shard_weights_harvest.mjs --carry-local <path>=<ms>,...');
-  console.error(
-    '       node scripts/ci_shard_weights_harvest.mjs --carry-local-missing [--runs N]',
-  );
-  process.exit(1);
-}
-
-// Constructed, not a literal: biome's noControlCharactersInRegex forbids a
-// raw ESC byte in a regex literal (recorded trap from the merged-leg round).
-const jobsJson = execFileSync(
-  'gh',
-  ['run', 'view', runId, '--json', 'jobs', '-q', '[.jobs[] | {id: .databaseId, name, conclusion}]'],
-  { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 },
-);
-const jobs = JSON.parse(jobsJson).filter(
-  (j) => /PR tests \(\d+\)|PR long sims|PR gate/.test(j.name) && j.conclusion === 'success',
-);
-if (jobs.length < 10) {
-  console.error(`only ${jobs.length} green test jobs on run ${runId}; need the 8 shards + 2 lanes`);
-  process.exit(1);
-}
-
-/** @type {Record<string, number>} */
-const weights = {};
-for (const job of jobs) {
-  const log = execFileSync('gh', ['run', 'view', runId, '--log', '--job', String(job.id)], {
-    encoding: 'utf8',
-    maxBuffer: 256 * 1024 * 1024,
-  });
-  // A selective-mode log would harvest only the selected slice; the mode
-  // line the shard entry prints is the proof this run measured everything.
-  if (/changes-job decision: mode=/.test(log) && !/changes-job decision: mode=full/.test(log)) {
-    console.error(`[harvest] ${job.name} did not run mode=full; use a full-mode run`);
-    process.exit(1);
-  }
-  const before = Object.keys(weights).length;
-  parseWeightLines(log, weights);
-  console.log(`[harvest] ${job.name}: +${Object.keys(weights).length - before} files`);
-}
-
-const sorted = Object.fromEntries(Object.entries(weights).sort(([a], [b]) => (a < b ? -1 : 1)));
-const out = {
-  __provenance: {
-    run: runId,
-    harvested: today(),
-    files: Object.keys(sorted).length,
-    // A wholesale harvest MEASURED every row it wrote, so it declares the
-    // attribution rather than leaving the map absent for the next union to
-    // infer: harvestedFiles equals the row count and nothing is carried.
-    harvestedFiles: Object.keys(sorted).length,
-    carried: {},
-  },
-  ...sorted,
-};
-// A wholesale re-harvest replaces any locally measured rows a release sync
-// merged in. The checked-in provenance uses sibling mergedLocal/mergedFiles;
-// accept the older nested localMerge shape too so either table warns.
-try {
-  const provenance = JSON.parse(readFileSync(target, 'utf8')).__provenance;
-  const measured = provenance?.mergedLocal ?? provenance?.localMerge?.measured;
-  const files = provenance?.mergedFiles ?? provenance?.localMerge?.files;
-  if (typeof measured === 'string' && measured && Number.isInteger(files) && files > 0) {
-    console.log(
-      `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
-    );
-  } else if (
-    provenance &&
-    typeof provenance === 'object' &&
-    // The keys THIS script writes (including the Phase 18 attribution pair);
-    // anything else is a shape the advisory above could not read.
-    Object.keys(provenance).some(
-      (k) => !['run', 'harvested', 'files', 'harvestedFiles', 'carried'].includes(k),
-    )
-  ) {
-    // The provenance carries keys beyond this script's own plain-harvest
-    // output, but neither known local-merge shape parsed: a THIRD shape the
-    // advisory above cannot see. Say so instead of silently overwriting
-    // whatever locally measured rows that shape recorded.
-    console.warn(
-      `[harvest] unrecognized __provenance shape (keys: ${Object.keys(provenance).join(', ')}); ` +
-        'the prior table may carry locally measured rows this rewrite DISCARDS. Inspect the ' +
-        'old provenance before trusting the new table.',
-    );
-  }
-} catch {
-  // No prior table (or unreadable): nothing to report.
-}
-writeFileSync(target, serializeWeightTable(out));
-console.log(`[harvest] wrote ${Object.keys(sorted).length} weights to ${target}`);

@@ -4071,7 +4071,7 @@ const mergeExtraEn = {
     drowned_temple: {
       name: 'The Drowned Temple',
       enterText:
-        'You step through the moongate — the air turns to cold water and pale light, and the singing closes over your head.',
+        'You step through the moongate: the air turns to cold water and pale light, and the singing closes over your head.',
       leaveText: 'You surface through the moongate into the mountain night.',
     },
   },

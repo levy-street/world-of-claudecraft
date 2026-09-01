@@ -226,7 +226,12 @@ describe('saveCharacterState: the size signal never gates the write', () => {
 // case: a signal wired into two of the three would still pass a test that only
 // proved "some path warns".
 const MARKET = { listings: [], collections: {} } as unknown as MarketSave;
-const MAIL = { mail: [], nextMailId: 1 } as unknown as MailSave;
+// The release's incremental mail write (#3561) narrowed the saver's fifth
+// parameter from a whole MailSave to only the recipient mailboxes dirtied since
+// the last save. Empty is the right fixture here: this suite is about the blob
+// SIZE signal on the character half, and an empty partition list issues no mail
+// SQL at all, so nothing else can be what warns.
+const MAIL: readonly { recipientKey: string; letters: MailSave['mail'] }[] = [];
 
 describe('every character write path inherits the signal (the shared chokepoint)', () => {
   let warnSpy: ReturnType<typeof vi.spyOn>;

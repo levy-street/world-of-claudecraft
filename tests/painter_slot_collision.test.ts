@@ -159,6 +159,12 @@ function auraSlot(over: Partial<AuraSlotState> & { key: string }): AuraSlotState
     effectHtml: '',
     toggle: false,
     alwaysRender: false,
+    // The release's low-tier buff-cap shed priority added shortDuration as a
+    // required member. FALSE is the neutral default for this suite (it is about
+    // slot-pool collisions, not shedding), and defaulting it here rather than
+    // leaving it optional keeps the fixture honest about the full shape: a new
+    // required member must be answered, not spread past.
+    shortDuration: false,
     ...over,
   };
 }

@@ -51,6 +51,13 @@ export interface MarketSaleLog {
 export const MARKET_SALE_LOG_MAX = 50;
 /** Names are already server-bounded; this only fences a hand-edited save blob. */
 const MAX_BUYER_NAME_LEN = 32;
+/** The same fence for the sold copy's CHOSEN name. Mirrors the mint-side load
+ *  ceiling (item_instance_load.ts MAX_LEGENDARY_NAME_LOAD_LENGTH), which a
+ *  legal payload can never exceed; kept as a local literal rather than an
+ *  import so this leaf stays free of the content tree that ceiling's module
+ *  pulls in, and pinned equal to it by tests/market_sale_log.test.ts so the
+ *  two can never drift. */
+export const MAX_SALE_ITEM_NAME_LEN = 48;
 
 export function emptySaleLog(): MarketSaleLog {
   return { entries: [], omitted: 0 };
@@ -66,7 +73,15 @@ export function cloneSaleLog(log: MarketSaleLog): MarketSaleLog {
 }
 
 export function recordSale(log: MarketSaleLog, sale: MarketSaleRecord): void {
-  log.entries.push({ ...sale, buyerName: sale.buyerName.slice(0, MAX_BUYER_NAME_LEN) });
+  const row: MarketSaleRecord = {
+    ...sale,
+    buyerName: sale.buyerName.slice(0, MAX_BUYER_NAME_LEN),
+  };
+  // Bounded on the way in as well as on the way out, the buyerName idiom: the
+  // live stamp comes from a validated payload today, so this only keeps the
+  // in-memory row and the reloaded row identical for every input.
+  if (row.itemName !== undefined) row.itemName = row.itemName.slice(0, MAX_SALE_ITEM_NAME_LEN);
+  log.entries.push(row);
   trimSaleLog(log);
 }
 
@@ -105,14 +120,23 @@ export function sanitizeSaleLog(raw: unknown): MarketSaleLog {
     if (!e || typeof e !== 'object') continue;
     const row = e as Partial<MarketSaleRecord>;
     if (typeof row.itemId !== 'string' || row.itemId === '') continue;
-    log.entries.push({
+    const loaded: MarketSaleRecord = {
       itemId: row.itemId,
       count: Math.max(1, nonNegativeInt(row.count)),
       price: nonNegativeInt(row.price),
       proceeds: nonNegativeInt(row.proceeds),
       buyerName:
         typeof row.buyerName === 'string' ? row.buyerName.slice(0, MAX_BUYER_NAME_LEN) : '',
-    });
+    };
+    // The sold copy's chosen name survives the save, which is the whole reason
+    // the field exists (its docblock above): a row rebuilt without it renders
+    // as the bare def after a logout, exactly the two-identical-rows case the
+    // stamp was added to prevent. Bounded like buyerName, and set only when a
+    // usable string is there, so a plain copy's blob stays key-free.
+    if (typeof row.itemName === 'string' && row.itemName !== '') {
+      loaded.itemName = row.itemName.slice(0, MAX_SALE_ITEM_NAME_LEN);
+    }
+    log.entries.push(loaded);
   }
   // A hand-edited blob can carry more rows than the cap; trimming here keeps the
   // live invariant (entries <= cap) true no matter what was on disk.

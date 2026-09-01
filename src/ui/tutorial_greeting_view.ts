@@ -1,10 +1,19 @@
-// Pure, host-agnostic model for the spawn greeting dialog (tutorial island):
-// the one-time choice fired by the `tutorialGreeting` SimEvent when a fresh
-// character first stands in the world. The sim guarantees once-ever (a
-// persisted one-shot flag, sim/tutorial/greeting.ts), so this model owns one
-// decision only: which body copy the greeter speaks, first-character welcome
-// vs returning-player refresher, off the event's server-recomputed account
-// fact. The two buttons (take the tutorial / skip it) are static.
+// Pure, host-agnostic models for the tutorial island's greeter copy: the
+// retired take-or-skip greeting dialog, and the single-button notes that
+// outlived it.
+//
+// buildTutorialGreetingModel owns one decision only: which body copy the
+// greeter speaks, first-character welcome vs returning-player refresher, off a
+// server-recomputed account fact. The two buttons (take the tutorial / skip
+// it) are static. It and buildTutorialDeclineNote have NO caller left in
+// src/: the compulsory tutorial replaced the opt-in offer
+// (sim/tutorial/greeting.ts), and the Phase 18 dead-union sweep took the
+// never-emitted `tutorialGreeting` SimEvent arm and the Hud opener with it.
+// They are kept pending a maintainer ruling, because the five dialog-only
+// hudChrome.tutorialGreeting.* keys they name still carry reviewed rows in 18
+// locale overlays. buildFerryBellHomeNote and buildFerryIslandArrivalNote are
+// the LIVE half: hud.ts paints them from the ferryBellHome and
+// ferryIslandArrival event arms.
 //
 // The pure-core half of the pure-core + thin-consumer split (root CLAUDE.md;
 // reference profession_tutorial_view.ts): DOM-free, emitting stable

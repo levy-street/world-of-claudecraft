@@ -13,10 +13,12 @@
 //
 // So each writer counts its own refusals beside the line it already writes.
 // The counter is process-local and monotonic since boot (a total, never a
-// gauge), matching how the metrics endpoint publishes its other counters;
-// server/http/game_metrics.ts carries the intended
-// woc_offline_fence_refusals_total series and is owned elsewhere, so this
-// module deliberately stops at the read function.
+// gauge), matching how the metrics endpoint publishes its other counters.
+// server/http/game_metrics.ts publishes them as woc_offline_fence_refusals_total,
+// one series per family, reading offlineFenceRefusals() at scrape time and
+// replaying the absolute totals (the same shape the bank-ledger and
+// backend-cancel lifetime counters use). The TRUTH stays here: the exporter
+// holds no state of its own, so a scrape can never disagree with the writers.
 //
 // WHAT IS COUNTED is the FENCE's refusal, the 0-row answer, and nothing else.
 // A thrown save (a dead pool, a statement timeout) is a different failure with

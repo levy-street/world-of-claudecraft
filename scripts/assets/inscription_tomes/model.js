@@ -1,9 +1,11 @@
-// Deterministic procedural factory for the three Masterwrought phase 06
-// inscription tomes (silverleaf_primer / goldleaf_folio / sunpetal_grimoire),
-// the first held_offhand item models. Authored from the committed item-icon
-// SVG sources (docs/achievements/masterwrought-phase06-art/<id>.svg), which
-// are this repo's own art: reference rights and provenance are already
-// recorded in public/ui/items/mapping.json and CREDITS.md.
+// Deterministic procedural factory for the Masterwrought inscription tomes
+// (silverleaf_primer / goldleaf_folio / sunpetal_grimoire from phase 06, plus
+// the phase 09 apex voidbound_grimoire), the first held_offhand item models.
+// Authored from the committed item-icon SVG sources, which are this repo's own
+// art: reference rights and provenance are already recorded in
+// public/ui/items/mapping.json and CREDITS.md. Each variant names its own
+// reference path (`reference`), because the apex tome's icon was authored in
+// the later phase 09 art batch.
 //
 // Held-item coordinate frame (the VAR_* variant-pack convention, NOT the
 // floor-seated prop convention): the mesh ORIGIN is the grip. The fist wraps
@@ -35,6 +37,7 @@ export const INSCRIPTION_TOME_VARIANTS = Object.freeze({
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     outputName: 'tome_silverleaf.glb',
+    reference: 'docs/achievements/masterwrought-phase06-art/silverleaf_primer.svg',
     // Sheenleaf Primer: uncommon leathern primer. Green leather, cream pages,
     // a silvered sheenleaf laid on the cover, one plain strap.
     width: 0.3,
@@ -61,6 +64,7 @@ export const INSCRIPTION_TOME_VARIANTS = Object.freeze({
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     outputName: 'tome_goldleaf.glb',
+    reference: 'docs/achievements/masterwrought-phase06-art/goldleaf_folio.svg',
     // Goldleaf Folio: uncommon gilt folio. Brown leather, gilt frame and
     // corner caps, a gilt diamond, a hanging gilt bookmark ribbon.
     width: 0.315,
@@ -87,6 +91,7 @@ export const INSCRIPTION_TOME_VARIANTS = Object.freeze({
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     outputName: 'tome_sunpetal.glb',
+    reference: 'docs/achievements/masterwrought-phase06-art/sunpetal_grimoire.svg',
     // Sunpetal Grimoire: the rare rung. Deep blue leather, steel fittings,
     // a radiant gold sun boss with an amber core, an amber bookmark ribbon.
     width: 0.335,
@@ -107,6 +112,35 @@ export const INSCRIPTION_TOME_VARIANTS = Object.freeze({
     corners: true,
     ribbon: 0xf2b64a,
     emblem: 'sun',
+  }),
+  tome_voidbound: Object.freeze({
+    id: 'masterwrought-tome-voidbound',
+    itemId: 'voidbound_grimoire',
+    rootName: 'InscriptionTomeVoidbound',
+    outputName: 'tome_voidbound.glb',
+    reference: 'docs/achievements/masterwrought-phase09-art/voidbound_grimoire.svg',
+    // Voidbound Grimoire: the phase 09 apex rung, the largest of the family.
+    // Near-black violet leather, aged parchment, void-metal corner caps and a
+    // fore-edge clasp, and a rune ring closing on an event-horizon core. No
+    // bookmark ribbon: the icon shows the clasp holding it shut instead.
+    width: 0.35,
+    height: 0.48,
+    thickness: 0.13,
+    palette: Object.freeze({
+      cover: 0x2e2a3c,
+      coverDeep: 0x100d18,
+      coverLight: 0x453f5c,
+      pages: 0xcdbfa4,
+      pagesDeep: 0xa08e70,
+      strap: 0x1b1826,
+      accent: 0x9c5cf0,
+      accentLight: 0xc9b2f8,
+      metal: 0x4c4370,
+      metalLight: 0x8f86b8,
+    }),
+    corners: true,
+    ribbon: null,
+    emblem: 'void',
   }),
 });
 
@@ -226,6 +260,77 @@ function addLeaf(buckets, variant, centerY, emblemZ) {
     [-0.012, centerY - 0.085, emblemZ + 0.006],
     palette.metal,
     [0, 0, 0.35],
+  );
+}
+
+// The void sigil the apex tome wears: a segmented rune ring, six orbiting
+// tick marks, three inward-spiralling arms, and an event-horizon core with a
+// single bright highlight. Built from the same box/disc/octahedron vocabulary
+// as the leaf and the sun boss, so the family stays one merge of two buckets.
+function addVoidSigil(buckets, variant, centerY, emblemZ) {
+  const { palette } = variant;
+  const ringRadius = 0.078;
+  for (let segment = 0; segment < 12; segment++) {
+    const angle = (segment / 12) * Math.PI * 2;
+    addBox(
+      buckets,
+      'metal',
+      [0.034, 0.012, 0.008],
+      [Math.sin(angle) * ringRadius, centerY + Math.cos(angle) * ringRadius, emblemZ + 0.004],
+      segment % 2 === 0 ? palette.metalLight : palette.metal,
+      [0, 0, -angle],
+    );
+  }
+  // Rune ticks standing just outside the ring, the icon's orbiting marks.
+  for (let tick = 0; tick < 6; tick++) {
+    const angle = (tick / 6) * Math.PI * 2 + Math.PI / 12;
+    addBox(
+      buckets,
+      'metal',
+      [0.006, 0.018, 0.005],
+      [Math.sin(angle) * 0.1, centerY + Math.cos(angle) * 0.1, emblemZ + 0.003],
+      palette.accent,
+      [0, 0, -angle],
+    );
+  }
+  // Three arms spiralling in toward the core, each canted off the radius.
+  for (let arm = 0; arm < 3; arm++) {
+    const angle = (arm / 3) * Math.PI * 2;
+    addBox(
+      buckets,
+      'metal',
+      [0.05, 0.009, 0.006],
+      [Math.sin(angle) * 0.046, centerY + Math.cos(angle) * 0.046, emblemZ + 0.006],
+      palette.accentLight,
+      [0, 0, -angle + 0.6],
+    );
+  }
+  // The event horizon: a near-black disc with one bright catch light.
+  addDisc(buckets, 'metal', 0.03, 0.012, [0, centerY, emblemZ + 0.006], palette.coverDeep);
+  addOctahedron(
+    buckets,
+    'metal',
+    0.014,
+    [-0.007, centerY + 0.008, emblemZ + 0.014],
+    palette.accentLight,
+    [1, 1, 0.5],
+  );
+  // The void-metal clasp reaching in from the fore edge, with its own dark
+  // boss: the icon's fitting, and the reason this tome carries no ribbon.
+  addBox(
+    buckets,
+    'metal',
+    [0.07, 0.042, 0.008],
+    [variant.width / 2 - 0.045, centerY, emblemZ + 0.003],
+    palette.metal,
+  );
+  addOctahedron(
+    buckets,
+    'metal',
+    0.014,
+    [variant.width / 2 - 0.045, centerY, emblemZ + 0.01],
+    palette.coverDeep,
+    [1, 1, 0.5],
   );
 }
 
@@ -388,6 +493,8 @@ function buildParts(buckets, variant, stage) {
         palette.metal,
       );
     }
+  } else if (variant.emblem === 'void') {
+    addVoidSigil(buckets, variant, centerY, emblemZ);
   }
 
   if (variant.ribbon !== null) {

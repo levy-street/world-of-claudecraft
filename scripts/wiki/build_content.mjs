@@ -16,6 +16,7 @@ import path from 'node:path';
 import * as esbuild from 'esbuild';
 import { assertFamiliesKnown } from './family_guard.mjs';
 import { stillUrl } from './still_key.mjs';
+import { patternChannelSets, recipeAcquisitionChannel } from './vendor_channel.mjs';
 
 const root = process.cwd();
 // Output-path plumbing. The bare invocation writes the committed file, byte for
@@ -41,7 +42,7 @@ const outLabel = outRelative && !outRelative.startsWith('..') ? outRelative : ou
 const entrySource = `
   export { CLASSES, ABILITIES } from './src/sim/content/classes.ts';
   export { TALENTS } from './src/sim/content/talents.ts';
-  export { ALL_CLASSES, CONSUME_DURATION, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
+  export { ALL_CLASSES, CONSUME_DURATION, DT, FISHING_SESSION_CAP_SEC } from './src/sim/types.ts';
   export { ZONES, DUNGEONS, MOBS, CAMPS, DELVE_LIST, NPCS, ITEMS, QUESTS, zoneAt } from './src/sim/data.ts';
   export { WARLOCK_PET_MOBS } from './src/sim/content/warlock_pets.ts';
   export { DELVE_COMPANIONS, DELVE_AFFIXES } from './src/sim/content/delves/index.ts';
@@ -150,6 +151,7 @@ const {
   VISUALS,
   visualKeyFor,
   CONSUME_DURATION,
+  DT,
   FISHING_SESSION_CAP_SEC,
   ITEMS,
   QUESTS,
@@ -750,31 +752,22 @@ const gainBoundaries = (skillReq) => {
 // AND on the quartermaster at the same time. Every farming pattern is. Left as
 // it was, the vendor arm won outright and the wiki would have told a player
 // "From the Heroic Quartermaster" about a recipe that also drops off the raid,
-// and they would never look in the raid. So the emit is now a THREE-way
+// and they would never look in the raid. So the emit is a FIVE-way
 // classification and the both case gets its own value and its own rendered
 // row, because either single label is a lie about the other channel.
-const vendorPatternItemIds = new Set(HEROIC_VENDOR_STOCK.map((o) => o.itemId));
-const vendorTaughtRecipe = (r) =>
-  Boolean(r.acquisition?.includes('drop')) && vendorPatternItemIds.has(`pattern_${r.resultItemId}`);
-
-// Every pattern id that appears in a LIVE drop table, derived from the tables
-// themselves rather than from a list: the normal mob loot (which carries the
-// raid channel), the heroic-only tables (the five-man channel), and both rift
-// pick lists. A pattern nobody drops is vendor-only and says so; a pattern
-// nobody sells is drop-only and says so.
-const droppedPatternItemIds = new Set([
-  ...Object.values(MOBS).flatMap((m) =>
-    (m.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
-  ),
-  ...Object.values(HEROIC_BOSS_LOOT)
-    .flat()
-    .flatMap((e) => (e.itemId ? [e.itemId] : [])),
-  ...RIFT_PATTERN_ITEM_IDS,
-  ...FARM_RIFT_DROP_ITEM_IDS,
-]);
-const dropTaughtRecipe = (r) =>
-  Boolean(r.acquisition?.includes('drop')) &&
-  droppedPatternItemIds.has(`pattern_${r.resultItemId}`);
+//
+// The expression itself now lives in ./vendor_channel.mjs, imported by this
+// generator AND by the accuracy guard in tests/guide.test.ts, which used to
+// re-derive an identical Set inline under a comment promising it matched this
+// one. Two copies were two chances to drift; the guard would have gone on
+// agreeing with a generator that had moved.
+const patternChannels = patternChannelSets({
+  mobs: MOBS,
+  heroicBossLoot: HEROIC_BOSS_LOOT,
+  riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
+  farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
+  heroicVendorStock: HEROIC_VENDOR_STOCK,
+});
 
 // Consumable effect facts for a recipe's output item, straight from the live
 // def (the C10 effect-prose gap): the foodHp restore and the well-fed boon as
@@ -787,17 +780,46 @@ const dropTaughtRecipe = (r) =>
 // the four farm buff dishes and the three apex role plates alike, gets its
 // effect cell; the generated shape keeps its lowercase `wellfed` key (a
 // wire-shape name in content.generated.ts, not a def read).
+//
+// PLACEABLE FEASTS GO ONE HOP FURTHER (harvest-feast-wiki-effect-cell). A
+// feast def carries NO foodHp and NO wellFed of its own: harvest_feast and the
+// three apex role feasts are kind 'junk', because using one PLACES a world
+// entity rather than feeding you. Reading the output def alone therefore gave
+// every feast row an empty effect cell while the in-game tooltip stated the
+// whole thing, which is exactly backwards for the page whose job is to publish
+// what a recipe is worth. The effect is one hop away, behind
+// `feast.dishItemId`: each serving IS a serving of that dish, so the dish's
+// own foodHp and wellFed apply verbatim and can never drift from the bagged
+// plate (src/sim/professions/feast.ts owns the lifecycle; the def comment on
+// ITEMS.harvest_feast records the same contract). So the served DISH supplies
+// the restore and the boon, and the feast supplies its own two facts beside
+// them. The page then composes feast-SERVING wording rather than the dish's
+// own eat-it templates, because the player SERVES a feast; that split lives at
+// the renderer, since only the templates differ, never the numbers.
 const consumableEffect = (itemId) => {
   const def = ITEMS[itemId];
   if (!def) return null;
   const effect = {};
-  if (def.foodHp) effect.food = { amount: def.foodHp, seconds: CONSUME_DURATION };
-  if (def.wellFed) {
+  const feast = def.feast;
+  const served = feast ? ITEMS[feast.dishItemId] : def;
+  if (feast) {
+    if (!served) {
+      throw new Error(`feast ${itemId} serves unknown dish id: ${feast.dishItemId}`);
+    }
+    effect.feast = {
+      servings: feast.charges,
+      // Ticks are the sim's domain and mean nothing to a reader; minutes are
+      // what the in-game feast tooltip prints from the same record.
+      minutes: (feast.durationTicks * DT) / 60,
+    };
+  }
+  if (served.foodHp) effect.food = { amount: served.foodHp, seconds: CONSUME_DURATION };
+  if (served.wellFed) {
     effect.wellfed = {
-      aura: def.wellFed.aura,
-      kind: def.wellFed.kind,
-      value: def.wellFed.value,
-      minutes: def.wellFed.duration / 60,
+      aura: served.wellFed.aura,
+      kind: served.wellFed.kind,
+      value: served.wellFed.value,
+      minutes: served.wellFed.duration / 60,
     };
   }
   return Object.keys(effect).length > 0 ? effect : null;
@@ -813,19 +835,21 @@ const profRecipeRow = (r) => {
     station: r.stationType ?? null,
     // Drop-taught recipes (the Masterwrought apex rows, R8) say so rather than
     // claiming "Known from the start", and the vendor-sold slice of them says
-    // 'vendor' (see vendorTaughtRecipe above): the wiki row must never
-    // misstate the acquisition.
-    acquisition: r.acquisition?.includes('trainer')
-      ? 'trainer'
-      : vendorTaughtRecipe(r) && dropTaughtRecipe(r)
-        ? 'dropAndVendor'
-        : vendorTaughtRecipe(r)
-          ? 'vendor'
-          : r.acquisition?.includes('drop')
-            ? 'drop'
-            : 'known',
+    // 'vendor' (see vendor_channel.mjs): the wiki row must never misstate the
+    // acquisition.
+    acquisition: recipeAcquisitionChannel(r, patternChannels),
     feeCopper: r.acquisition?.includes('trainer') ? trainingFeeFor(r) : 0,
-    materials: r.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
+    // The bill carries the item ID as well as the English name: the craft
+    // page's materials cell interpolated `name` straight into a t() format
+    // string, so every locale read the reagents in English while the game
+    // itself named them in the player's language. The id is what the page
+    // localizes through; `name` stays for the accuracy guards, which pin the
+    // id against the live def's own name (see tests/guide.test.ts).
+    materials: r.reagents.map((g) => ({
+      itemId: g.itemId,
+      name: itemName(g.itemId),
+      count: g.count,
+    })),
     output: {
       name: itemName(r.resultItemId),
       count: r.resultCount,
@@ -1170,7 +1194,14 @@ const profEnchanting = {
     tier: enchantTier(e),
     skillReq: e.skillReq ?? 0,
     perfectedOnly: e.requiresPerfected === true,
-    reagents: e.reagents.map((g) => ({ name: itemName(g.itemId), count: g.count })),
+    // Same shape and the same reason as a recipe's `materials` above: the
+    // enchant table rides the craft page's one materials cell, so the id is
+    // what the page localizes through.
+    reagents: e.reagents.map((g) => ({
+      itemId: g.itemId,
+      name: itemName(g.itemId),
+      count: g.count,
+    })),
     bonus: Object.entries(e.statBonus).map(([stat, value]) => ({ stat, value })),
   })),
   salvageByQuality: Object.entries(SALVAGE_MATERIAL_BY_QUALITY).map(([quality, m]) => ({
@@ -1448,7 +1479,11 @@ export interface GuideReliquaryPage {
 // row against the live defs. Display names are baked English proper nouns
 // (the GUIDE_DEEDS precedent); ids/slugs localize client-side via t().
 
-export interface GuideProfMaterial { name: string; count: number; }
+/** One reagent line of a recipe or enchant bill. itemId is the LOCALIZED half:
+ *  the craft page resolves the display name through the item-name translation
+ *  key rather than printing name, which is the English source the accuracy
+ *  guards pin the id against and which stays emitted for them. */
+export interface GuideProfMaterial { itemId: string; name: string; count: number; }
 
 export interface GuideProfRecipe {
   id: string;
@@ -1468,8 +1503,18 @@ export interface GuideProfRecipe {
   gain: { reducedAt: number; minimalAt: number; zeroAt: number };
   /** Consumable effect facts from the live output def (absent for a
    *  non-consumable): the craft page composes them through the
-   *  guide.profPages.effect* templates. */
+   *  guide.profPages.effect* templates.
+   *
+   *  A placeable FEAST carries the feast record and takes its food/wellfed
+   *  values from the dish it SERVES, not from itself (it has neither field of
+   *  its own); the page then composes the feast-serving templates instead of
+   *  the eat-it-yourself ones.
+   *
+   *  NOTE for whoever edits this block: it is emitted from inside a template
+   *  literal in scripts/wiki/build_content.mjs, so a backtick here is a
+   *  SyntaxError in the generator itself, not a comment. Name symbols plainly. */
   effect?: {
+    feast?: { servings: number; minutes: number };
     food?: { amount: number; seconds: number };
     wellfed?: { aura: string; kind: string; value: number; minutes: number };
   };

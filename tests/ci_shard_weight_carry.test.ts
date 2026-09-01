@@ -5,7 +5,14 @@
 // rows appended at MEASURED_FALLBACK_MS would pass every pin and leave the
 // balance bar byte-identical. Each arm here trips exactly one clause of the
 // contract the committed-table pin (tests/ci_shard_partition.test.ts) applies.
-import { describe, expect, it } from 'vitest';
+//
+// The last describe drives the ENTRY that consumes this module,
+// scripts/ci_shard_weights_harvest.mjs, over BOTH of its local-carry modes with
+// an injected spawner: neither had a test at all (Phase 18 QA, gate-census
+// items 3, 4 and 6), against this module's own stated principle that the
+// parsers were extracted here "so the fixture suite pins the refusals instead
+// of the entry parsing arguments no test ever drives".
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
   CarriedProvenance,
   CarriedWeightTable,
@@ -25,6 +32,32 @@ import {
   tableRows,
   unionCarried,
 } from '../scripts/lib/ci_shard_weight_carry.mjs';
+
+// The injected spawner (and the rest of the entry's world). vi.mock is hoisted,
+// so these bind before the entry is imported inside runEntry below.
+const entryIo = vi.hoisted(() => ({
+  execFileSync: vi.fn(),
+  spawnSync: vi.fn(),
+  readFileSync: vi.fn(),
+  writeFileSync: vi.fn(),
+  walkShardTestFiles: vi.fn(),
+}));
+
+vi.mock('node:child_process', () => ({
+  execFileSync: entryIo.execFileSync,
+  spawnSync: entryIo.spawnSync,
+}));
+vi.mock('node:fs', () => ({
+  readFileSync: entryIo.readFileSync,
+  writeFileSync: entryIo.writeFileSync,
+}));
+vi.mock('../scripts/lib/ci_shard_walk.mjs', () => ({
+  walkShardTestFiles: entryIo.walkShardTestFiles,
+}));
+vi.mock('../scripts/ci_shard_partition.mjs', () => ({
+  MEASURED_WEIGHTS: { 'tests/measured.test.ts': 120 },
+  MEASURED_FALLBACK_MS: 41,
+}));
 
 // applyLocalCarry refuses a table with no provenance, so every table it returns
 // has one; read it through the declared type rather than casting the union away,
@@ -594,5 +627,255 @@ describe('serializeWeightTable', () => {
         '  "tests/a.test.ts": 10\n' +
         '}\n',
     );
+  });
+});
+
+describe('the harvest entry: the local-carry modes (an injected spawner)', () => {
+  // gate-census items 3, 4 and 6. Two behaviors of this mode are load-bearing
+  // and were unpinned: it ENUMERATES the unmeasured set itself rather than
+  // taking a list, and it REFUSES rather than substituting a guess when a run
+  // yields no measurement. A third was misdiagnosed: vitest prints a FAILED
+  // file as `tests/x.test.ts (1 test | 1 failed)`, which the duration regex
+  // does not match, so a RED suite used to be reported as "printed no parsable
+  // duration" and walked the operator into hand-carrying a weight for a broken
+  // file.
+  const CARRIED = 'tests/measured.test.ts';
+  const NEW_A = 'tests/new_a.test.ts';
+  const NEW_B = 'tests/new_b.test.ts';
+
+  const baseTable = () => ({
+    __provenance: {
+      run: '123',
+      harvested: '2026-08-01',
+      files: 1,
+      harvestedFiles: 0,
+      carried: {
+        [CARRIED]: {
+          ms: 120,
+          method: 'local-median',
+          measured: '2026-08-01',
+          reason: 'an earlier carry',
+          runs: [120],
+        },
+      },
+    },
+    [CARRIED]: 120,
+  });
+
+  class ProcessExited extends Error {
+    constructor(readonly code: number) {
+      super(`process.exit(${code})`);
+    }
+  }
+
+  async function runEntry(args: string[]) {
+    vi.resetModules();
+    const priorArgv = process.argv;
+    const priorExitCode = process.exitCode;
+    process.argv = ['node', 'scripts/ci_shard_weights_harvest.mjs', ...args];
+    const logs: string[] = [];
+    const errs: string[] = [];
+    const log = vi.spyOn(console, 'log').mockImplementation((...a: unknown[]) => {
+      logs.push(a.map(String).join(' '));
+    });
+    const err = vi.spyOn(console, 'error').mockImplementation((...a: unknown[]) => {
+      errs.push(a.map(String).join(' '));
+    });
+    const exit = vi.spyOn(process, 'exit').mockImplementation(((code?: number) => {
+      throw new ProcessExited(code ?? 0);
+    }) as never);
+    let exitCode = 0;
+    try {
+      // @ts-expect-error The executable intentionally has no public module API.
+      await import('../scripts/ci_shard_weights_harvest.mjs');
+      exitCode = typeof process.exitCode === 'number' ? process.exitCode : 0;
+    } catch (e) {
+      if (!(e instanceof ProcessExited)) throw e;
+      exitCode = e.code;
+    } finally {
+      process.argv = priorArgv;
+      process.exitCode = priorExitCode;
+      log.mockRestore();
+      err.mockRestore();
+      exit.mockRestore();
+    }
+    return { exitCode, logs, errs, out: errs.concat(logs).join('\n') };
+  }
+
+  /** The file a `vitest run <file>` invocation was pointed at. */
+  const spawnedFiles = () => entryIo.spawnSync.mock.calls.map((call) => (call[1] as string[])[2]);
+
+  const written = () => {
+    expect(entryIo.writeFileSync).toHaveBeenCalledTimes(1);
+    return JSON.parse(String(entryIo.writeFileSync.mock.calls[0][1]));
+  };
+
+  function primeGreen(durations: Record<string, number>) {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED, NEW_A, NEW_B]);
+    entryIo.spawnSync.mockImplementation((_cmd: string, args: string[]) => {
+      const file = args[2];
+      return {
+        status: 0,
+        signal: null,
+        stdout: `\u2713 ${file} (1 test) ${durations[file] ?? 0}ms`,
+        stderr: '',
+      };
+    });
+  }
+
+  afterEach(() => {
+    entryIo.execFileSync.mockReset();
+    entryIo.spawnSync.mockReset();
+    entryIo.readFileSync.mockReset();
+    entryIo.writeFileSync.mockReset();
+    entryIo.walkShardTestFiles.mockReset();
+  });
+
+  it('ENUMERATES the unmeasured set itself and ignores any file named on the CLI', () => {
+    primeGreen({ [NEW_A]: 200, [NEW_B]: 300 });
+    return runEntry([
+      '--carry-local-missing',
+      '--runs',
+      '1',
+      // A hand-written token: this mode takes no file list, and honoring one
+      // would be the exact hand-listing the enumeration exists to prevent.
+      'tests/never_asked_for.test.ts=999',
+    ]).then(({ exitCode, out }) => {
+      expect(out).not.toContain('never_asked_for');
+      expect(exitCode).toBe(0);
+      expect(spawnedFiles().sort()).toEqual([NEW_A, NEW_B]);
+      // The already-carried row is SKIPPED, not re-measured: missingWeightFiles
+      // filters on `typeof weights[f] !== 'number'`. Its attribution is
+      // untouched, which is what the mode's header comment now says.
+      expect(spawnedFiles()).not.toContain(CARRIED);
+      const table = written();
+      expect(table[NEW_A]).toBe(200);
+      expect(table[NEW_B]).toBe(300);
+      expect(table.__provenance.carried[CARRIED]).toEqual(
+        baseTable().__provenance.carried[CARRIED],
+      );
+      expect(Object.keys(table.__provenance.carried).sort()).toEqual([CARRIED, NEW_A, NEW_B]);
+    });
+  });
+
+  it('takes the MEDIAN of --runs measurements and records every run', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED, NEW_A]);
+    const runs = [500, 200, 300];
+    let i = 0;
+    entryIo.spawnSync.mockImplementation((_cmd: string, args: string[]) => ({
+      status: 0,
+      signal: null,
+      stdout: `\u2713 ${args[2]} (1 test) ${runs[i++]}ms`,
+      stderr: '',
+    }));
+    const { exitCode } = await runEntry(['--carry-local-missing', '--runs', '3']);
+    expect(exitCode).toBe(0);
+    expect(spawnedFiles()).toEqual([NEW_A, NEW_A, NEW_A]);
+    const table = written();
+    expect(table[NEW_A]).toBe(300);
+    expect(table.__provenance.carried[NEW_A].runs).toEqual(runs);
+  });
+
+  it('REFUSES when a green run prints no parsable duration, and writes nothing', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED, NEW_A]);
+    entryIo.spawnSync.mockReturnValue({
+      status: 0,
+      signal: null,
+      // A summary-only reporter: exit 0, no per-file line, nothing to measure.
+      stdout: 'Test Files  1 passed (1)\n',
+      stderr: '',
+    });
+    const { exitCode, out } = await runEntry(['--carry-local-missing', '--runs', '1']);
+    expect(exitCode).toBe(1);
+    expect(out).toContain('printed no parsable duration');
+    // The refusal is the point: never a guess, never the fallback weight.
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  it('names the FAILURE when the run is red, instead of blaming the parser', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED, NEW_A]);
+    entryIo.spawnSync.mockReturnValue({
+      status: 1,
+      signal: null,
+      // The real vitest 4 shape for a red file: no duration, a failed count.
+      stdout: `\u276f ${NEW_A} (1 test | 1 failed)\nTest Files  1 failed (1)\n`,
+      stderr: '',
+    });
+    const { exitCode, out } = await runEntry(['--carry-local-missing', '--runs', '1']);
+    expect(exitCode).toBe(1);
+    expect(out).toContain('FAILED with exit code 1');
+    // The misdiagnosis this replaces: it used to reach the no-duration refusal
+    // and tell the operator to hand-carry a weight for a red test file.
+    expect(out).not.toContain('printed no parsable duration');
+    expect(out).not.toContain('--carry-local rather than guessing');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  it('reports a spawner that could not start at all, and still writes nothing', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED, NEW_A]);
+    entryIo.spawnSync.mockReturnValue({
+      status: null,
+      signal: null,
+      error: new Error('spawn npx ENOENT'),
+      stdout: '',
+      stderr: '',
+    });
+    const { exitCode, out } = await runEntry(['--carry-local-missing', '--runs', '1']);
+    expect(exitCode).toBe(1);
+    expect(out).toContain('could not be started (spawn npx ENOENT)');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  it('does nothing at all when every walked file already has a weight', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.walkShardTestFiles.mockReturnValue([CARRIED]);
+    const { exitCode, out } = await runEntry(['--carry-local-missing', '--runs', '1']);
+    expect(exitCode).toBe(0);
+    expect(out).toContain('nothing to do');
+    expect(entryIo.spawnSync).not.toHaveBeenCalled();
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  // The sibling branch, added by the Phase 18 QA re-review. It is the branch
+  // an operator reaches for by hand, the branch the phase-close step delegates
+  // to, and the item-6 exit restructure moved its terminator; with writeFileSync
+  // injected nothing real is written, so there was no worktree reason to leave
+  // it unpinned.
+  it('--carry-local writes the median row with its attribution and exits 0', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    const { exitCode, out } = await runEntry([
+      '--carry-local',
+      '--reason',
+      'a stated reason',
+      `${NEW_A}=500,200,300`,
+    ]);
+    expect(exitCode).toBe(0);
+    // No measuring: this branch takes the operator's numbers, it never spawns.
+    expect(entryIo.spawnSync).not.toHaveBeenCalled();
+    const table = written();
+    expect(table[NEW_A]).toBe(300);
+    expect(table.__provenance.carried[NEW_A]).toMatchObject({
+      ms: 300,
+      method: 'local-median',
+      reason: 'a stated reason',
+      runs: [500, 200, 300],
+    });
+    // A local carry never moves a row it did not measure.
+    expect(table.__provenance.carried[CARRIED]).toEqual(baseTable().__provenance.carried[CARRIED]);
+    expect(table[CARRIED]).toBe(120);
+    expect(out).toContain('a stated reason');
+  });
+
+  it('--carry-local refuses a token that is not <path>=<ms>, and writes nothing', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    const { exitCode, out } = await runEntry(['--carry-local', NEW_A]);
+    expect(exitCode).toBe(1);
+    expect(out).toContain('is not <path>=<ms>');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
   });
 });

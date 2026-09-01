@@ -1509,15 +1509,36 @@ export function sellItem(
     pid: meta.entityId,
   });
   // A mixed stack sold fewer copies than asked because the clamp above spared
-  // bound ones: say so in one info line instead of a silent partial (the
-  // maintainer-ruled replacement). keptCount counts only bound copies the
-  // player actually asked to sell, since sellCount is pre-clamped to
-  // `available`; a clean unbound sell emits nothing here.
+  // some: say so instead of a silent partial (the maintainer-ruled
+  // replacement). The clamp subtracts TWO classes, and they are different
+  // rules with different remedies, so each gets its own line: a bound copy is
+  // never vendor-sellable (the unbind fee ladder is the only way out), while a
+  // player-locked one sells the moment its owner unlocks it. Reporting a
+  // locked copy as bound sent that player to the wrong remedy.
+  //
+  // sellCount is pre-clamped to `available`, so the shortfall can never exceed
+  // boundHeld + lockedHeld; a clean sell of unlocked, unbound copies emits
+  // nothing here. When the request covers the whole stack (the sell-all case)
+  // the shortfall IS boundHeld + lockedHeld and both counts are exact. A
+  // partial ask that reaches only part way into the spared copies cannot say
+  // WHICH of them it would have taken (a request is a count, not a slot
+  // pick), so the bound ones are named first: they are the copies no click can
+  // free. Either way the two counts sum to the shortfall and neither can
+  // exceed its own tally.
   const keptCount = sellCount - sellableCount;
-  if (keptCount > 0) {
+  const keptBoundCount = Math.min(boundHeld, keptCount);
+  const keptLockedCount = keptCount - keptBoundCount;
+  if (keptBoundCount > 0) {
     ctx.emit({
       type: 'loot',
-      text: `Kept ${keptCount} bound ${keptCount === 1 ? 'copy' : 'copies'}.`,
+      text: `Kept ${keptBoundCount} bound ${keptBoundCount === 1 ? 'copy' : 'copies'}.`,
+      pid: meta.entityId,
+    });
+  }
+  if (keptLockedCount > 0) {
+    ctx.emit({
+      type: 'loot',
+      text: `Kept ${keptLockedCount} locked ${keptLockedCount === 1 ? 'copy' : 'copies'}.`,
       pid: meta.entityId,
     });
   }

@@ -25,6 +25,16 @@
 //   write the session's next autosave would clobber. Cross-process by
 //   construction: the lease table is the one truth a per-process session map
 //   cannot see (the double-boot accident the table exists to catch).
+//   NOT SELF-SUFFICIENT UNDER CONTENTION, and a caller must know it: this
+//   fence is UNCORRELATED with the row it gates (its only reference is $1),
+//   so PostgreSQL hoists it into an InitPlan and gates the statement on a
+//   One-Time Filter decided BEFORE the row lock is taken, and EvalPlanQual
+//   never re-runs an InitPlan after a lock wait. A lease committed during
+//   that wait was therefore unseen and the write landed (reproduced at the
+//   Phase 18 QA database review). Its one caller,
+//   server/offline_character_save_db.ts, takes the characters row lock
+//   FOR UPDATE in a preceding statement for exactly this reason; a SECOND
+//   caller that skips that step reopens the same write loss.
 //
 // Pure apart from the size signal: no pool, no clock of its own, the holder
 // injected, so the statement text is unit-testable

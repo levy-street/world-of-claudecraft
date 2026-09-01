@@ -26,6 +26,8 @@ import {
 } from '../src/render/farm_patches';
 import {
   FARM_ACCENT_MESH_NAME,
+  FARM_APEX_FEAST_MODEL_URL,
+  FARM_FEAST_MODEL_URL,
   FARM_SOIL_SOCKET_NAME,
   farmPrewarmDisabled,
   farmStageModelUrl,
@@ -268,6 +270,70 @@ describe('the placed feast surface (Phase 12)', () => {
       scene.children.find((c) => c.name === 'farmFeast:501'),
       'a despawned feast must leave the scene',
     ).toBeUndefined();
+  });
+
+  // Phase 18: the three apex role feasts get their own table. The pick itself
+  // is the core's pure function (tests/farm_patches_core.test.ts); what this
+  // arm proves is that the ADAPTER builds from the picked url, so an apex
+  // feast cannot silently keep drawing the party trestle table.
+  it('builds each placed feast from the table its templateId picks', () => {
+    const party = new THREE.Group();
+    party.add(
+      new THREE.Mesh(
+        new THREE.BoxGeometry(2, 1, 2),
+        new THREE.MeshStandardMaterial({ name: 'party-table', vertexColors: true }),
+      ),
+    );
+    const apex = new THREE.Group();
+    apex.add(
+      new THREE.Mesh(
+        new THREE.BoxGeometry(2, 1, 2),
+        new THREE.MeshStandardMaterial({ name: 'apex-table', vertexColors: true }),
+      ),
+    );
+    farmPatchesPreloadInternalsForTest.setLoaded(FARM_FEAST_MODEL_URL, party);
+    farmPatchesPreloadInternalsForTest.setLoaded(FARM_APEX_FEAST_MODEL_URL, apex);
+    try {
+      const scene = new THREE.Scene();
+      const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
+      const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink);
+      const { state, source } = fakeWorld([]);
+      state.entities.set(501, feastEntity(501));
+      state.entities.set(
+        502,
+        feastEntity(502, { templateId: 'stonepot_feast' } as Partial<Entity>),
+      );
+      state.entities.set(
+        503,
+        feastEntity(503, { templateId: 'warspice_feast' } as Partial<Entity>),
+      );
+      state.entities.set(
+        504,
+        feastEntity(504, { templateId: 'sageleaf_feast' } as Partial<Entity>),
+      );
+      visuals.sync(source, READ_DT);
+
+      const materialNames = (id: number): string[] => {
+        const group = scene.children.find((c) => c.name === `farmFeast:${id}`);
+        expect(group, `farmFeast:${id} must be in the scene`).toBeDefined();
+        const names: string[] = [];
+        group?.traverse((object) => {
+          const mesh = object as THREE.Mesh;
+          if (!mesh.isMesh) return;
+          for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+            names.push(material.name);
+          }
+        });
+        return names;
+      };
+      expect(materialNames(501)).toEqual(['party-table']);
+      for (const id of [502, 503, 504]) {
+        expect(materialNames(id), `apex feast ${id}`).toEqual(['apex-table']);
+      }
+      visuals.dispose();
+    } finally {
+      farmPatchesPreloadInternalsForTest.clearLoaded();
+    }
   });
 
   it('fires the placement flourish exactly once per feast appearing after the first pass', () => {
@@ -917,10 +983,10 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
         expect((o as THREE.Mesh).castShadow).toBe(false);
       }
     });
-    // The fallback arm: fourteen GLB slots (twelve stage urls, the shared
-    // sprout, the feast) resolve to primitive boxes wearing surfaceMats of one
-    // program signature, so the anchors dedupe to exactly ONE mesh. The GLB
-    // arm is driven below with synthetic scenes.
+    // The fallback arm: fifteen GLB slots (twelve stage urls, the shared
+    // sprout, and both feast tables) resolve to primitive boxes wearing
+    // surfaceMats of one program signature, so the anchors dedupe to exactly
+    // ONE mesh. The GLB arm is driven below with synthetic scenes.
     expect(meshes).toBe(1);
     expect(calls).toHaveLength(1);
     expect(calls[0].label).toBe(FARM_PROGRAM_ANCHORS_LABEL);

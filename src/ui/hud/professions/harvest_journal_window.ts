@@ -41,7 +41,7 @@ import { clockSeconds } from '../../clock_seconds_core';
 import { markDialogRoot } from '../../dialog_root';
 import { itemDisplayName, zoneDisplayName } from '../../entity_i18n';
 import { esc } from '../../esc';
-import { captureFocusKey, restoreFirstEnabled } from '../../focus_restore';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from '../../focus_restore';
 import { formatNumber, type TranslationKey, t } from '../../i18n';
 import { svgIcon } from '../../ui_icons';
 import {
@@ -338,8 +338,17 @@ export class HarvestJournalWindow {
     this.announceReadyFlips(view);
     root.querySelector('[data-close]')?.addEventListener('click', () => this.close());
     if (focusKey !== null) {
+      // findFocusKey, never a selector the key is spliced into: the namespace
+      // is flat and shared across every window, so the captured key is
+      // whatever the focused control carried, and a value holding a quote or
+      // a CSS metacharacter makes querySelector THROW. It throws HERE, above
+      // the paintedSignature latch at the end of this method, so the 1 Hz
+      // countdown tick keeps seeing a moved signature and repaints (and
+      // throws) once a second for as long as the window is open. The helper
+      // discovers the namespace with a literal selector and matches the
+      // identity on the dataset value, the vault_window / bank_window idiom.
       restoreFirstEnabled([
-        root.querySelector<HTMLElement>(`[data-focus-key="${focusKey}"]`),
+        findFocusKey(root, focusKey),
         root.querySelector<HTMLElement>('[data-close]'),
       ]);
     }

@@ -24,12 +24,40 @@
 // deliberate narrowing of "sold volume", not an oversight: this is bucket
 // volume, and the readout says so.
 //
-// RETENTION. Registered with the nightly sweep (server/retention_sweep.ts) via
-// `marketSoldVolumeRetentionTable`, at the window below. The window is a code
-// constant rather than an env key because there is no operational reason to
-// tune it per deployment: the readout only ever asks for a short trailing
-// window, and the rows are aggregates carrying no personal data. 0 would be the
-// explicit keep-forever, matching every sibling primitive.
+// RETENTION, AND WHAT IS STILL OWED. The prune PRIMITIVE exists below
+// (`pruneMarketSoldVolumeBatch`) and so does its sweep registration wrapper
+// (`marketSoldVolumeRetentionTable`), but NOTHING CALLS EITHER YET: this table
+// is registered with no nightly sweep, because the whole cluster is unwired on
+// purpose (see the paragraph below). The registration is owed on the day the
+// writer lands, and its exact form is one line in the `tables:` array that
+// `startRetentionSweep` is given in server/main.ts:
+//
+//     marketSoldVolumeRetentionTable(pool),
+//
+// The window is a code constant rather than an env key because there is no
+// operational reason to tune it per deployment: the readout only ever asks for
+// a short trailing window, and the rows are aggregates carrying no personal
+// data. 0 would be the explicit keep-forever, matching every sibling primitive.
+//
+// WIRED TO NOTHING, AND THAT IS THE CURRENT STATE, NOT AN OVERSIGHT. Four
+// seams are all still absent, and they must land together or not at all:
+//   1. MARKET_SOLD_VOLUME_SCHEMA is not in the ensureSchema DDL ladder
+//      (server/db.ts), so the table exists in no database;
+//   2. marketSoldVolumeRetentionTable is not in the retention sweep's `tables:`
+//      array (server/main.ts), so nothing prunes it;
+//   3. buyWithSoldVolume (server/market_sold_volume.ts) has no caller: the
+//      market_buy dispatch arm in server/game.ts still calls sim.marketBuy
+//      directly, so no sale is observed;
+//   4. configureMarketSoldVolume and configureAdminMarketSoldVolume are never
+//      called, so the observer is inert and AdminMarketMetrics.soldAvailable
+//      is permanently false.
+// THE ORDER IS WHAT MAKES A PARTIAL LANDING DANGEROUS. The writer without the
+// DDL turns every tracked sale into a 42P01 at sale rate; the writer with the
+// DDL but without the sweep registration is an unbounded table. Turning on a
+// new database write per market sale is a production behavior call, so the
+// wiring is deferred to the maintainer rather than guessed here, and
+// tests/server/market_sold_volume.test.ts pins the ALL-FOUR-ABSENT state so
+// the day one seam lands, the pin reds and forces the rest.
 
 import type { RetentionTable } from './retention_sweep';
 
@@ -48,6 +76,14 @@ export interface MarketSoldVolumeEntry {
   quantity: number;
   /** The buyout price in copper, gross of the Merchant's cut. */
   copper: number;
+  /**
+   * How many SALES this entry stands for. Absent means one, which is what a
+   * single observed sale produces. The writer's tail coalesces several queued
+   * sales of one item into one entry (server/market_sold_volume.ts), and every
+   * column here is an accumulator, so the folded entry must carry its own count
+   * or sale_count silently under-counts by exactly what coalescing absorbed.
+   */
+  saleCount?: number;
 }
 
 /** One item's folded totals over the requested window. */
@@ -95,20 +131,82 @@ export const MARKET_SOLD_VOLUME_WINDOW_DAYS = 7;
 // a sale belongs to would split one day's total across two rows.
 const RECORD_SQL = `
 INSERT INTO market_sold_volume (realm, day, item_id, sale_count, quantity, copper)
-VALUES ($1, (now() AT TIME ZONE 'utc')::date, $2, 1, $3, $4)
+VALUES ($1, (now() AT TIME ZONE 'utc')::date, $2, $5, $3, $4)
 ON CONFLICT (realm, day, item_id) DO UPDATE
-   SET sale_count = market_sold_volume.sale_count + 1,
+   SET sale_count = market_sold_volume.sale_count + EXCLUDED.sale_count,
        quantity = market_sold_volume.quantity + EXCLUDED.quantity,
        copper = market_sold_volume.copper + EXCLUDED.copper
 `;
 
-/** Fold one completed sale into its (realm, day, item) row. */
+/** At least one sale, always a whole number: the count reaching SQL. */
+function salesOf(entry: MarketSoldVolumeEntry): number {
+  const raw = entry.saleCount ?? 1;
+  return Number.isFinite(raw) ? Math.max(1, Math.floor(raw)) : 1;
+}
+
+/** Fold one completed sale (or one coalesced run of them) into its
+ *  (realm, day, item) row. */
 export async function recordMarketSoldVolumeRow(
   db: MarketSoldVolumeDb,
   realm: string,
   entry: MarketSoldVolumeEntry,
 ): Promise<void> {
-  await db.query(RECORD_SQL, [realm, entry.itemId, entry.quantity, entry.copper]);
+  await db.query(RECORD_SQL, [realm, entry.itemId, entry.quantity, entry.copper, salesOf(entry)]);
+}
+
+/**
+ * The bounded-connection runner the sale write binds through. Shaped exactly
+ * like db.ts `runWithStatementTimeout` so the day-one wiring can pass that
+ * function itself (pinned as a type assignment in
+ * tests/server/market_sold_volume.test.ts); declared here rather than imported
+ * so this SQL boundary keeps its injected-db seam and never drags the pool into
+ * a unit test.
+ */
+export type MarketSoldVolumeBoundedRunner = <T>(
+  timeoutMs: number,
+  fn: (query: MarketSoldVolumeDb['query']) => Promise<T>,
+) => Promise<T>;
+
+/**
+ * The sale write's own statement allowance, NOT the ambient 15s pool default.
+ * Adopted from the CLEAR_ITEM_NAME_PROBE_TIMEOUT_MS precedent
+ * (server/clear_item_name_db.ts) with the same basis, which transfers exactly:
+ * this is one single-row upsert seeking a three-column primary key, so its
+ * intended cost is milliseconds and its degraded cost must not be a pooled
+ * client pinned for the full default while the 20 Hz loop keeps queueing sales
+ * behind it. Two seconds is generous for a PK upsert and an order of magnitude
+ * under the default.
+ */
+export const MARKET_SOLD_VOLUME_WRITE_TIMEOUT_MS = 2_000;
+
+/**
+ * How long the write may WAIT for a row lock before giving up, the standing
+ * value every marketplace guard already uses (ESCROW_LOCK_TIMEOUT_MS,
+ * server/woc_market_db.ts). statement_timeout alone does not bound a lock wait
+ * usefully here: two realm processes upserting the same (realm, day, item) row
+ * genuinely contend, and a sold-volume row is an OBSERVATION, so waiting is
+ * always worse than losing it. A timed-out write reports and drops like any
+ * other failure.
+ */
+export const MARKET_SOLD_VOLUME_LOCK_TIMEOUT_MS = 2_000;
+
+/**
+ * `recordMarketSoldVolumeRow` under both bounds above. `run` opens the
+ * transaction and applies the statement allowance; the lock bound is SET LOCAL
+ * inside it, which is why it must be a transactional runner and not a bare
+ * pool query (a pool hands each query a different connection, so SET LOCAL
+ * would apply to nothing). The interpolated value is a module constant, never
+ * caller input, matching how db.ts sets statement_timeout.
+ */
+export async function recordMarketSoldVolumeRowBounded(
+  run: MarketSoldVolumeBoundedRunner,
+  realm: string,
+  entry: MarketSoldVolumeEntry,
+): Promise<void> {
+  await run(MARKET_SOLD_VOLUME_WRITE_TIMEOUT_MS, async (query) => {
+    await query(`SET LOCAL lock_timeout = ${MARKET_SOLD_VOLUME_LOCK_TIMEOUT_MS}`);
+    await query(RECORD_SQL, [realm, entry.itemId, entry.quantity, entry.copper, salesOf(entry)]);
+  });
 }
 
 const READ_SQL = `
@@ -177,9 +275,10 @@ export async function pruneMarketSoldVolumeBatch(
 
 /**
  * The sweep registration, ready to drop into the `tables` array in
- * server/main.ts: `marketSoldVolumeRetentionTable(pool),`. Typed as the sweep's
- * own `RetentionTable`, so a drift in that contract fails here at compile time
- * rather than at the registration site.
+ * server/main.ts: `marketSoldVolumeRetentionTable(pool),`. NOT YET REGISTERED
+ * (see RETENTION in the header): this is the line the wiring adds, not a live
+ * one. Typed as the sweep's own `RetentionTable`, so a drift in that contract
+ * fails here at compile time rather than at the registration site.
  */
 export function marketSoldVolumeRetentionTable(
   db: MarketSoldVolumeDb,

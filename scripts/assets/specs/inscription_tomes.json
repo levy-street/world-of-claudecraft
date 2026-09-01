@@ -17,6 +17,12 @@
       "out": "models/weapons/tome_sunpetal.glb",
       "type": "static",
       "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/inscription_tomes/tome_voidbound-final.glb",
+      "out": "models/weapons/tome_voidbound.glb",
+      "type": "static",
+      "keepExtras": true
     }
   ]
 }

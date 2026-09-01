@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 import {
   FARM_ACCENT_MATERIAL_NAME,
   FARM_ACCENT_MESH_NAME,
+  FARM_APEX_FEAST_MODEL_URL,
   FARM_BED_MODEL_URL,
   FARM_BIOME_PALETTES,
   FARM_COMPOST_BIN_MODEL_URL,
@@ -23,6 +24,8 @@ import {
   farmCompostBinPosition,
   farmCropAccent,
   farmCropFamily,
+  farmFeastModelUrl,
+  farmFeastModelUrls,
   farmModelUrls,
   farmPlotKeyMatches,
   farmStageModelUrl,
@@ -31,6 +34,7 @@ import {
 } from '../src/render/farm_patches_core';
 import { FARM_CROP_IDS } from '../src/sim/content/farm_crops';
 import { FARM_PATCHES } from '../src/sim/content/farm_patches';
+import { FARM_FEAST_TEMPLATE_ID, feastTemplateIds } from '../src/sim/professions/feast';
 import type { FarmPlotView } from '../src/world_api/farming';
 
 // A one-hour growth window starting at t=0, so a stage boundary is a round
@@ -288,18 +292,53 @@ describe('plot rebuild key', () => {
 });
 
 describe('model urls', () => {
-  it('names the 16 authored GLBs, all distinct and all under props/', () => {
+  it('names the 17 authored GLBs, all distinct and all under props/', () => {
     const urls = farmModelUrls();
-    expect(urls.length).toBe(16);
-    expect(new Set(urls).size).toBe(16);
+    expect(urls.length).toBe(17);
+    expect(new Set(urls).size).toBe(17);
     for (const url of urls) expect(url.startsWith('/models/props/farm_')).toBe(true);
     expect(urls).toContain(FARM_BED_MODEL_URL);
     expect(urls).toContain(FARM_SPROUT_MODEL_URL);
     expect(urls).toContain(FARM_COMPOST_BIN_MODEL_URL);
-    // The placed feast preloads with the set, and its url is the literal the
-    // shipped farm_feast.glb actually lives at.
+    // BOTH placed feast tables preload with the set, and their urls are the
+    // literals the shipped GLBs actually live at. A feast table that loaded on
+    // first placement instead would hitch the frame that placed it.
     expect(urls).toContain(FARM_FEAST_MODEL_URL);
+    expect(urls).toContain(FARM_APEX_FEAST_MODEL_URL);
     expect(FARM_FEAST_MODEL_URL).toBe('/models/props/farm_feast.glb');
+    expect(FARM_APEX_FEAST_MODEL_URL).toBe('/models/props/farm_feast_apex.glb');
+    expect(farmFeastModelUrls()).toEqual([FARM_FEAST_MODEL_URL, FARM_APEX_FEAST_MODEL_URL]);
+  });
+
+  // Which table a placed feast shows. The three apex role feasts (Phase 11k)
+  // get their own pedestal banquet; the party feast keeps the trestle table.
+  it('picks the apex table for every apex feast templateId and the party table otherwise', () => {
+    expect(farmFeastModelUrl(FARM_FEAST_TEMPLATE_ID)).toBe(FARM_FEAST_MODEL_URL);
+    expect(farmFeastModelUrl('farm_feast')).toBe(FARM_FEAST_MODEL_URL);
+    for (const templateId of ['stonepot_feast', 'warspice_feast', 'sageleaf_feast']) {
+      expect(farmFeastModelUrl(templateId), templateId).toBe(FARM_APEX_FEAST_MODEL_URL);
+    }
+    // Derived, not hand-listed: EVERY placeable feast templateId that is not
+    // the party one resolves to the apex table, so authoring a fourth apex
+    // feast def needs no edit in the core.
+    for (const templateId of feastTemplateIds()) {
+      const expected =
+        templateId === FARM_FEAST_TEMPLATE_ID ? FARM_FEAST_MODEL_URL : FARM_APEX_FEAST_MODEL_URL;
+      expect(farmFeastModelUrl(templateId), templateId).toBe(expected);
+    }
+    // The three apex rungs really are in the derived family (a rename in the
+    // item defs must red this, not silently drop the apex table).
+    expect(feastTemplateIds()).toEqual([
+      'farm_feast',
+      'sageleaf_feast',
+      'stonepot_feast',
+      'warspice_feast',
+    ]);
+    // Off-family and absent template ids fall back to the party table, the
+    // pre-Phase-18 behaviour, rather than throwing in a per-frame path.
+    expect(farmFeastModelUrl(null)).toBe(FARM_FEAST_MODEL_URL);
+    expect(farmFeastModelUrl(undefined)).toBe(FARM_FEAST_MODEL_URL);
+    expect(farmFeastModelUrl('mailbox')).toBe(FARM_FEAST_MODEL_URL);
   });
 
   it('maps each family and stage to its own file, with sprout shared', () => {

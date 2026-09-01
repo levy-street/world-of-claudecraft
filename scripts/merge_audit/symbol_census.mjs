@@ -127,7 +127,16 @@ export const SIM_EVENT_DISCRIMINANT = 'type';
  * three celebration emits it fronts resolve here instead of riding the
  * union-only pin below.
  */
-export const SIM_EVENT_FANOUT_HELPERS = new Set(['emitToZonePlayers', 'announceZoneCelebration']);
+export const SIM_EVENT_FANOUT_HELPERS = new Set([
+  'emitToZonePlayers',
+  'announceZoneCelebration',
+  // release/v0.42.0 (the tenth sync): the release moved the riftState emit one
+  // indirection past its literal, ctx.emit(buildRiftStateEvent(...)), so the
+  // extractor saw an emitted kind with no readable type. The builder is named here
+  // rather than pinning riftState as union-only, because riftState IS emitted and a
+  // union-only pin would have recorded the opposite (src/sim/rift/runs.ts).
+  'buildRiftStateEvent',
+]);
 
 /**
  * SimEvent types the union DECLARES that the emits extractor does not see, pinned
@@ -170,12 +179,6 @@ export const SIM_EVENT_UNION_ONLY = Object.freeze([
   'guildRenamed',
   'motdResult',
   'reliquaryIlluminationBroadcast',
-  // release/v0.41.0 (the seventeenth sync): declared in the union and handled by
-  // hud.ts, but emitted by no sim or server site on ff2837da1f itself (the
-  // tutorial greeting moved to a client-driven flow, src/sim/tutorial/greeting.ts
-  // keeps only the sent flag). A release-side dead declaration, reported upstream;
-  // pinned here so the drift guard stays honest about what the extractor sees.
-  'tutorialGreeting',
 ]);
 
 /**
@@ -1644,6 +1647,48 @@ function cleanCell(s) {
     .trim();
 }
 
+// A blank line inside one of these tables used to be a SILENT row shredder: the
+// `!line.startsWith('|')` arm cleared the active header, and every row after the
+// blank then failed the header sniff and hit a bare `continue`. Measured on the
+// real deletion list, one blank line mid-table dropped 239 of 960 rows AND
+// swallowed the defect a malformed row under it would otherwise have raised
+// (Phase 18 QA, gate-census item 1; Phase 18 had adopted a PROCESS rule for this,
+// and a process rule is not a guard). The structural fix: GFM requires a
+// delimiter row under a header, so the line after a table's first row decides
+// whether that row is a header at all. A table row with no header above it is a
+// DEFECT now, and where the split table's header is still in scope for the
+// section the row is re-read under it rather than dropped.
+/**
+ * The cells of a Markdown table row, or null when the line is not a table row.
+ * @param {string|undefined} raw
+ * @returns {string[]|null}
+ */
+function tableCells(raw) {
+  const line = String(raw ?? '').trim();
+  if (!line.startsWith('|')) return null;
+  return line
+    .slice(1, line.endsWith('|') ? -1 : undefined)
+    .split('|')
+    .map((c) => c.trim());
+}
+
+/** True for the `| --- | --- |` delimiter row that GFM requires under a header. */
+function isDelimiterRow(cells) {
+  return Array.isArray(cells) && cells.length > 0 && cells.every((c) => /^:?-{2,}:?$/.test(c));
+}
+
+/**
+ * True when the table row at hand is a HEADER row rather than a data row, which
+ * in GFM is decided entirely by the line under it: a header must be followed by
+ * the delimiter row. Content-free on purpose, so a table shape neither parser
+ * owns still classifies correctly.
+ *
+ * @param {string|undefined} nextRaw the line after the row being classified
+ */
+function isHeaderRow(nextRaw) {
+  return isDelimiterRow(tableCells(nextRaw));
+}
+
 /**
  * @param {string} markdown
  * @returns {{ rows: Array<{cls: string|null, classLabel: string, oldName: string, newName: string,
@@ -1654,26 +1699,63 @@ export function parseDeletionList(markdown) {
   const defects = [];
   const lines = markdown.split('\n');
   let columns = null;
+  // The last header this parser recognized in the CURRENT section, kept so a
+  // table split by a blank line can be re-read instead of shredded, and the
+  // shape of a table this parser does not own (the extras tables, a prose
+  // table) so its rows are skipped rather than misread.
+  let sectionColumns = null;
+  let sectionForeign = false;
+  let foreignTable = false;
   for (let ln = 0; ln < lines.length; ln++) {
     const raw = lines[ln];
     const line = raw.trim();
     if (!line.startsWith('|')) {
       columns = null;
+      foreignTable = false;
+      if (line.startsWith('#')) {
+        sectionColumns = null;
+        sectionForeign = false;
+      }
       continue;
     }
     const cells = line
       .slice(1, line.endsWith('|') ? -1 : undefined)
       .split('|')
       .map((c) => c.trim());
+    if (isDelimiterRow(cells)) continue;
+    // The body of a table this parser does not own: skipped, never read and
+    // never faulted. Its own blank-line splits are the other parser's business.
+    if (foreignTable && !columns) continue;
     if (!columns) {
       const lower = cells.map((c) => c.toLowerCase());
-      if (lower.includes('class') && lower.includes('old name')) {
-        columns = lower;
+      if (isHeaderRow(lines[ln + 1])) {
+        if (lower.includes('class') && lower.includes('old name')) {
+          columns = lower;
+          sectionColumns = lower;
+          foreignTable = false;
+          sectionForeign = false;
+        } else {
+          foreignTable = true;
+          sectionForeign = true;
+        }
         continue;
       }
-      continue;
+      // Not a header and not a delimiter: a data row with nothing above it.
+      // A defect, except in a section that only ever held tables this parser
+      // does not own, where a split is the other parser's to report.
+      if (sectionForeign && sectionColumns === null) continue;
+      // Where this section's own header is still in scope and the arity
+      // matches, the row is re-read under it rather than dropped.
+      if (foreignTable || sectionColumns === null || cells.length !== sectionColumns.length) {
+        defects.push(`line ${ln + 1}: table row with no header above it`);
+        continue;
+      }
+      defects.push(
+        `line ${ln + 1}: table row with no header above it (the table above it is split by a ` +
+          "blank line); read under that table's header",
+      );
+      columns = sectionColumns;
     }
-    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) continue;
     const get = (name) => {
       const idx = columns.indexOf(name);
       return idx >= 0 ? cleanCell(cells[idx]) : '';
@@ -1748,34 +1830,67 @@ export function parseExplainedExtras(markdown) {
   const lines = markdown.split('\n');
   let inExtrasSection = false;
   let columns = null;
+  // Same section memory as parseDeletionList: recover a table a blank line
+  // split, skip a table this parser does not own (the deletions-format tables
+  // that also live under an `## Explained extras` heading).
+  let sectionColumns = null;
+  let sectionForeign = false;
+  let foreignTable = false;
   for (let ln = 0; ln < lines.length; ln++) {
     const raw = lines[ln];
     const line = raw.trim();
     if (line.startsWith('#')) {
       inExtrasSection = EXTRAS_HEADING_RE.test(line);
       columns = null;
+      sectionColumns = null;
+      sectionForeign = false;
+      foreignTable = false;
       continue;
     }
     if (!inExtrasSection) continue;
     if (!line.startsWith('|')) {
       columns = null;
+      foreignTable = false;
       continue;
     }
     const cells = line
       .slice(1, line.endsWith('|') ? -1 : undefined)
       .split('|')
       .map((c) => c.trim());
+    if (isDelimiterRow(cells)) continue;
+    // The body of a deletions-format table under this heading: parseDeletionList
+    // owns it, so it is skipped here rather than read or faulted.
+    if (foreignTable && !columns) continue;
     if (!columns) {
       const lower = cells.map((c) => c.toLowerCase());
-      // A deletions-format table (with an Old name column) is never an extras
-      // table, even under this heading; parseDeletionList owns that shape.
-      if (lower.includes('class') && lower.includes('name') && !lower.includes('old name')) {
-        columns = lower;
+      if (isHeaderRow(lines[ln + 1])) {
+        // A deletions-format table (with an Old name column) is never an extras
+        // table, even under this heading; parseDeletionList owns that shape.
+        if (lower.includes('class') && lower.includes('name') && !lower.includes('old name')) {
+          columns = lower;
+          sectionColumns = lower;
+          foreignTable = false;
+          sectionForeign = false;
+        } else {
+          foreignTable = true;
+          sectionForeign = true;
+        }
         continue;
       }
-      continue;
+      // Not a header and not a delimiter: a data row with nothing above it.
+      // A deletions-format table under this heading is parseDeletionList's to
+      // report, so a section holding only those stays quiet here.
+      if (sectionForeign && sectionColumns === null) continue;
+      if (foreignTable || sectionColumns === null || cells.length !== sectionColumns.length) {
+        defects.push(`extras line ${ln + 1}: table row with no header above it`);
+        continue;
+      }
+      defects.push(
+        `extras line ${ln + 1}: table row with no header above it (the table above it is split ` +
+          "by a blank line); read under that table's header",
+      );
+      columns = sectionColumns;
     }
-    if (cells.every((c) => /^:?-{2,}:?$/.test(c))) continue;
     const get = (name) => {
       const idx = columns.indexOf(name);
       return idx >= 0 ? cleanCell(cells[idx]) : '';

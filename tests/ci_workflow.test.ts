@@ -915,6 +915,47 @@ describe('CI workflow parity', () => {
     expect(jobSource('release-i18n')).toContain("\n    env:\n      I18N_RELEASE_TIER: '1'");
   });
 
+  it('release-gate arms the mediawiki seed release tier at JOB level', () => {
+    // Phase 18 QA, gate-census item 2. The byte-equality arm of
+    // tests/mediawiki_seed_freshness.test.ts is registered with
+    // `it.runIf(MEDIAWIKI_SEED_RELEASE_TIER === '1')`, so deleting the one env
+    // line in ci.yml leaves EVERY test in the repo green while the demand goes
+    // inert and a stale mediawiki/seed/pages.xml ships. Nothing pinned it. This
+    // is the mirror of the release-i18n assertion one block up, which is why
+    // that flag cannot be deleted the same way.
+    const releaseGate = jobSource('release-gate');
+    // Job level (a six-space key under the four-space `env:`), never a step
+    // env: a step-scoped flag would arm one shard and leave the other seven at
+    // PR tier, which is the same silent half-check in a different shape.
+    expect(releaseGate).toMatch(/^ {4}env:$/m);
+    expect(releaseGate).toMatch(/^ {6}MEDIAWIKI_SEED_RELEASE_TIER: '1'$/m);
+    // Release-gate ALONE: it is a release demand, and arming it on a PR job
+    // would drag the regenerated seed diff into every content PR. Counted over
+    // the WHOLE file, not a hand-listed set of siblings: a named list silently
+    // exempts the jobs it forgets (and every job added later), and a step-level
+    // flag in one of those would arm the tier on a PR job unpinned.
+    expect(workflow.split('MEDIAWIKI_SEED_RELEASE_TIER')).toHaveLength(2);
+    for (const other of [
+      'release-version-gate',
+      'changes',
+      'lint',
+      'browser-gate',
+      'pr-gate',
+      'pr-long-sims-a',
+      'pr-long-sims-b',
+      'pr-checks',
+      'release-checks',
+      'release-i18n',
+    ]) {
+      expect(jobSource(other)).not.toContain('MEDIAWIKI_SEED_RELEASE_TIER');
+    }
+    // The flag is not decorative: the suite still gates that arm on this exact
+    // name, so renaming either half without the other reds here.
+    const seedSuite = readFileSync(join(__dirname, 'mediawiki_seed_freshness.test.ts'), 'utf8');
+    expect(seedSuite).toContain("process.env.MEDIAWIKI_SEED_RELEASE_TIER === '1'");
+    expect(seedSuite).toMatch(/it\.runIf\(RELEASE_TIER\)\(/);
+  });
+
   it('splits the PR tier into parallel test and checks jobs that cover every step', () => {
     const prGate = jobSource('pr-gate');
     const prLongSimsA = jobSource('pr-long-sims-a');

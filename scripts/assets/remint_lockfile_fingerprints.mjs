@@ -67,6 +67,7 @@ const ASSETS = [
   { rel: 'public/models/weapons/tome_silverleaf.glb', kind: 'tomes' },
   { rel: 'public/models/weapons/tome_goldleaf.glb', kind: 'tomes' },
   { rel: 'public/models/weapons/tome_sunpetal.glb', kind: 'tomes' },
+  { rel: 'public/models/weapons/tome_voidbound.glb', kind: 'tomes' },
   ...FENBRIDGE_ASSETS,
   ...FARM_PROPS_ASSETS,
 ];

@@ -1,14 +1,24 @@
-// Thin DOM consumer for the spawn greeting dialog (tutorial island): paints
-// the once-ever choice fired by the `tutorialGreeting` event, spoken by the
-// harbor-guide greeter at the Eastbrook spawn.
+// Thin DOM consumer for the tutorial island's greeter dialogs: the retired
+// take-or-skip choice the harbor-guide greeter once offered at the Eastbrook
+// spawn, and the single-button note that outlived it.
+//
+// renderTutorialGreeting has NO caller left anywhere, tests included: the
+// compulsory tutorial replaced the opt-in offer (sim/tutorial/greeting.ts),
+// and the Phase 18 dead-union sweep took the never-emitted `tutorialGreeting`
+// SimEvent arm and the Hud opener with it. It is kept pending a maintainer
+// ruling, because the five dialog-only catalog keys it renders still carry
+// reviewed rows in 18 locale overlays. renderTutorialGreetingNote below is the
+// LIVE half: hud.ts paints the town bell homecoming and Ferryman Odo's island
+// welcome through it.
 //
 // Reuses the shared confirm-dialog modal family (the .window.panel shell plus
 // the .cd-body / .cd-actions chrome, so no new styles), the
 // profession_tutorial_window precedent. The pure model (which copy, which
 // speaker) lives in tutorial_greeting_view.ts; this consumer only localizes
-// and paints. The Hud owns the focus trap, z-index floor, and the two choice
-// callbacks (play sends the IWorld command; skip just closes), since those
-// need Hud state.
+// and paints. The Hud owns the focus trap and the z-index floor, since those
+// need Hud state; it supplies the note's close callback, and would supply the
+// dialog's two choice callbacks (play sends the IWorld command, skip just
+// closes) if the dialog were opened again.
 
 import { bindDialogKeyActivation } from './dialog_key_activation';
 import { markDialogRoot } from './dialog_root';

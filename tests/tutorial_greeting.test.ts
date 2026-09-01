@@ -11,6 +11,17 @@ import type { SimContext } from '../src/sim/sim_context';
 import { maybeEmitTutorialGreeting, updateTutorialGreeting } from '../src/sim/tutorial/greeting';
 import type { SimEvent } from '../src/sim/types';
 
+/** Type-level pin: the SimEvent union declares NO `tutorialGreeting` arm.
+ *  The old opt-in greeting dialog was retired with the compulsory tutorial
+ *  (src/sim/tutorial/greeting.ts), leaving the arm declared in src/sim/types.ts
+ *  with no emitter anywhere in src/sim or server/. Extract<> collapses to
+ *  `never` while the arm is absent, so this alias reads `true`; re-declaring
+ *  the arm makes it `false` and the assignment in the one-shot case fails tsc.
+ *  The tuple brackets keep the check non-distributive. */
+type NoGreetingArm = [Extract<SimEvent, { type: 'tutorialGreeting' }>] extends [never]
+  ? true
+  : false;
+
 function makeSim(seed = 4120): Sim {
   // The greeting suite exercises the live-world arm, so it opts in like the
   // offline client and the server do (SimConfig.compulsoryTutorial).
@@ -46,8 +57,14 @@ describe('tutorial greeting one-shot', () => {
     expect(events.filter((e) => e.type === 'ferryIslandArrival')).toEqual([
       { type: 'ferryIslandArrival', pid: sim.playerId, firstVisit: true },
     ]);
-    // The old opt-in dialog is gone with the choice itself.
-    expect(events.filter((e) => e.type === 'tutorialGreeting')).toEqual([]);
+    // The old opt-in dialog is gone with the choice itself, and since the
+    // Phase 18 dead-union sweep so is its SimEvent arm. The teeth are at tsc:
+    // re-declaring the arm turns NoGreetingArm into `false` and this
+    // assignment stops compiling. The runtime line below needs its cast for
+    // the same reason, and still reds if an emitter ever comes back.
+    const noGreetingArm: NoGreetingArm = true;
+    expect(noGreetingArm).toBe(true);
+    expect(events.some((e) => (e.type as string) === 'tutorialGreeting')).toBe(false);
     expect(p.pos.x).toBeCloseTo(PROVING_SHORE_ARRIVAL.x, 3);
     expect(p.pos.z).toBeCloseTo(PROVING_SHORE_ARRIVAL.z, 3);
     expect(meta.tutorialGreetingSent).toBe(true);

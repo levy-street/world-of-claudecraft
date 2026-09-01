@@ -112,17 +112,87 @@ describe('applyAuraWire', () => {
       fl: 1,
       bt: 1,
     });
+    // Both paths are compared against a HAND-WRITTEN record, never against each
+    // other's key set. The loop this replaces walked `Object.keys(rebuilt)`, so
+    // it only ever asked about the fields the REBUILD happens to emit: drop
+    // `school` (or value2, stacks, charges, empowerAbilities) from decodeAura
+    // and the key is missing on both sides, compared on neither, and the case
+    // stays green while the field stops crossing the wire.
+    const expected: Aura = {
+      id: 'x',
+      name: 'X',
+      kind: 'buff_int',
+      // exp 160 aged against the stable wire's snapshot clock at 100.
+      remaining: 60,
+      duration: 90,
+      permanent: false,
+      value: 15,
+      value2: 3,
+      value3: 4,
+      tickInterval: 2,
+      sourceId: 77,
+      school: 'nature',
+      stacks: 5,
+      charges: 2,
+      empowerAbilities: ['smite'],
+      unbreakableControl: true,
+      undispellable: true,
+      flask: true,
+      breakThreshold: 1,
+    };
     const rebuilt = applyAuraWire([], [full], STABLE)[0];
     const inPlace = applyAuraWire([{ id: 'x' } as Aura], [full], STABLE)[0];
-    for (const key of Object.keys(rebuilt) as (keyof Aura)[]) {
-      expect(inPlace[key], String(key)).toEqual(rebuilt[key]);
-    }
-    // And the markers really decoded, so the comparison is not two blanks.
-    expect(rebuilt.flask).toBe(true);
-    expect(rebuilt.undispellable).toBe(true);
-    expect(rebuilt.unbreakableControl).toBe(true);
-    expect(rebuilt.breakThreshold).toBe(1);
-    expect(rebuilt.remaining).toBe(60);
+    // toStrictEqual, so a key that is merely PRESENT-and-undefined on one side
+    // counts as a difference, and a field ADDED to the decode without being
+    // added here reds rather than passing unmeasured.
+    expect(rebuilt, 'the rebuild path').toStrictEqual(expected);
+    expect(inPlace, 'the in-place path').toStrictEqual(expected);
+  });
+
+  it('takes the same DEFAULT arms on both paths for a row that omits every optional', () => {
+    // The case above drives a row carrying EVERY optional key, so it measures
+    // the mapped arms and never the `??` defaults sitting beside them. That
+    // hole is real, not theoretical: moving the school default from 'physical'
+    // to 'arcane' on BOTH decode paths left this file,
+    // tests/client_snapshot_timer_wire.test.ts and tests/snapshots.test.ts all
+    // green across 274 cases, because nothing anywhere decoded a row that
+    // omits `school`. A sparse row is the ORDINARY wire shape rather than an
+    // edge: an older server, and any aura with no second value, no stacks and
+    // no recorded caster, sends exactly this one.
+    const bare = row();
+    const defaults: Aura = {
+      id: 'a',
+      name: 'A',
+      kind: 'buff_sta',
+      // legacy timer wire, so remaining is the per-snapshot `rem` verbatim.
+      remaining: 4,
+      duration: 10,
+      permanent: false,
+      // The three defaults with a VALUE, which are the ones a drift can hide
+      // in: an absent amount is 0, an absent caster is entity 0 (matching no
+      // player), and an absent school is physical.
+      value: 0,
+      sourceId: 0,
+      school: 'physical',
+      // ... and every remaining optional spelled as an explicit undefined,
+      // because toStrictEqual separates present-and-undefined from absent and
+      // both decode paths write these keys unconditionally.
+      value2: undefined,
+      value3: undefined,
+      tickInterval: undefined,
+      stacks: undefined,
+      charges: undefined,
+      empowerAbilities: undefined,
+      unbreakableControl: undefined,
+      undispellable: undefined,
+      flask: undefined,
+      breakThreshold: undefined,
+    };
+    expect(applyAuraWire([], [bare], LEGACY)[0], 'the rebuild path').toStrictEqual(defaults);
+    expect(
+      applyAuraWire([{ id: 'a' } as Aura], [bare], LEGACY)[0],
+      'the in-place path',
+    ).toStrictEqual(defaults);
   });
 
   it('CLEARS every presence-only marker when the wire stops sending it', () => {

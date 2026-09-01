@@ -61,7 +61,6 @@ import {
   FARM_ACCENT_MESH_NAME,
   FARM_BED_MODEL_URL,
   FARM_COMPOST_BIN_MODEL_URL,
-  FARM_FEAST_MODEL_URL,
   FARM_SOIL_SOCKET_NAME,
   type FarmCropFamily,
   type FarmPlotVisual,
@@ -70,6 +69,8 @@ import {
   type FarmWetBand,
   farmBiomePalette,
   farmCompostBinPosition,
+  farmFeastModelUrl,
+  farmFeastModelUrls,
   farmModelUrls,
   farmPlotKeyMatches,
   farmPrewarmDisabled,
@@ -116,7 +117,9 @@ const WET_SOIL_DARKEN: Readonly<Record<FarmWetBand, number>> = Object.freeze({
 });
 // Where a stage mesh sits when the bed GLB carries no Socket_Soil node.
 const SOIL_SOCKET_FALLBACK_Y = 0.3;
-// The placed feast table's normalized height (the farm_feast contract).
+// The placed feast table's normalized height. Both feast GLBs are authored to
+// the SAME contract height (farm_feast and farm_feast_apex), so the party and
+// apex tables share this one number and the pick proxy that matches it.
 const FEAST_HEIGHT = 0.9;
 // Where the feast's placement flourish centers, above its ground seat.
 const FEAST_VFX_LIFT = 0.45;
@@ -139,10 +142,10 @@ function ignoreRetiredAttach(error: unknown): void {
   if (!(error instanceof GatedSceneAttachCancelledError)) throw error;
 }
 
-// RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 16 scenes are
+// RESIDENCY, stated on purpose (the Phase 7 QA deferral): these 17 scenes are
 // retained for the whole session, never released. The templates serve every
 // later plot create and the soil-socket resolve, so releasing them buys
-// nothing back; the loader's own gltfCache redundantly retains the 16 gltf
+// nothing back; the loader's own gltfCache redundantly retains the 17 gltf
 // wrappers on top, bounded and accepted (calling releaseGltf in the .then
 // would drop only the wrapper refs and must first prove no other consumer
 // shares these URLs).
@@ -689,7 +692,12 @@ export class FarmPatchVisuals {
     const ownedMaterials: THREE.Material[] = [];
     const ownedGeometries: THREE.BufferGeometry[] = [];
     const shadowMeshes: THREE.Mesh[] = [];
-    const parts = templateParts(FARM_FEAST_MODEL_URL, FEAST_HEIGHT, 0x8a6a4a);
+    // Which table this rung shows is the core's pure call (farmFeastModelUrl):
+    // the party feast keeps the trestle table, the three apex role feasts get
+    // the pedestal banquet. Both envelopes are identical, so the seat, the
+    // shadow budget and the pick proxy are unchanged either way.
+    const modelUrl = farmFeastModelUrl(e.templateId);
+    const parts = templateParts(modelUrl, FEAST_HEIGHT, 0x8a6a4a);
     for (const part of parts) {
       // Owned hook-preserving clones, untinted: the feast ships its authored
       // colors, and per-feast clones keep disposal symmetric with the plots.
@@ -703,7 +711,7 @@ export class FarmPatchVisuals {
       mesh.castShadow = false;
       mesh.receiveShadow = true;
       shadowMeshes.push(mesh);
-      if (!loadedFarmGltf.has(FARM_FEAST_MODEL_URL)) ownedGeometries.push(part.geo);
+      if (!loadedFarmGltf.has(modelUrl)) ownedGeometries.push(part.geo);
       group.add(mesh);
     }
     setRenderCategory(group, 'props');
@@ -929,7 +937,11 @@ function buildFarmProgramAnchors(): THREE.Group {
       );
     }
   }
-  anchor(FARM_FEAST_MODEL_URL, FEAST_HEIGHT, 0x8a6a4a);
+  // Both feast tables, so the apex rung's first placement is a program-cache
+  // hit like the party table's (they share one material recipe today, so the
+  // dedupe below stages one anchor for the pair; an apex-only recipe would
+  // stage its own).
+  for (const url of farmFeastModelUrls()) anchor(url, FEAST_HEIGHT, 0x8a6a4a);
   return root;
 }
 

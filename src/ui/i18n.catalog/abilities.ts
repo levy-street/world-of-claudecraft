@@ -1600,7 +1600,7 @@ const classAbilityNamesEn = {
       [
         'summon_doomguard',
         'Summon Wraithborn',
-        'Binds a Wraithborn to your will — an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
+        'Binds a Wraithborn to your will: an elite demon that rains heavy Shadow damage from afar. A long cooldown gates its devastating power. Summoning a new demon dismisses your current one. You may have one demon at a time.',
       ],
       [
         'battle_stance',

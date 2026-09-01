@@ -3,26 +3,41 @@
 // market_listing_ids.test.ts pattern.
 
 import { describe, expect, it } from 'vitest';
+import { MAX_LEGENDARY_NAME_LOAD_LENGTH } from '../src/sim/item_instance_load';
 import {
   cloneSaleLog,
   emptySaleLog,
   isSaleLogEmpty,
   MARKET_SALE_LOG_MAX,
+  MAX_SALE_ITEM_NAME_LEN,
   type MarketSaleRecord,
   mergeSaleLogs,
   recordSale,
   sanitizeSaleLog,
 } from '../src/sim/market_sale_log';
 
+// The default row carries a CHOSEN NAME. It used to omit itemName entirely,
+// which made every whole-row arm below (the round trip above all) pass without
+// ever touching the field: the load path dropped the name and nothing noticed.
+// A plain copy (no name) is the common case and gets its own explicit arm
+// rather than the default, so the vacuum cannot come back.
 function sale(overrides: Partial<MarketSaleRecord> = {}): MarketSaleRecord {
   return {
     itemId: 'wolf_fang',
+    itemName: 'Dawn Oath',
     count: 1,
     price: 200,
     proceeds: 190,
     buyerName: 'Buyer',
     ...overrides,
   };
+}
+
+/** A plain copy's row: no chosen name, the common case. */
+function plainSale(overrides: Partial<MarketSaleRecord> = {}): MarketSaleRecord {
+  const row = sale(overrides);
+  delete row.itemName;
+  return row;
 }
 
 describe('the World Market pending sale ledger', () => {
@@ -34,6 +49,7 @@ describe('the World Market pending sale ledger', () => {
     expect(log.entries).toEqual([
       {
         itemId: 'copper_ore',
+        itemName: 'Dawn Oath',
         count: 20,
         price: 5000,
         proceeds: 4750,
@@ -131,6 +147,54 @@ describe('the World Market pending sale ledger', () => {
       const log = emptySaleLog();
       recordSale(log, sale({ itemId: 'copper_ore', count: 20, price: 5000, proceeds: 4750 }));
       expect(sanitizeSaleLog(JSON.parse(JSON.stringify(log)))).toEqual(log);
+    });
+
+    it("carries the sold copy's chosen name across the save", () => {
+      // The field's whole reason to exist (see its docblock): the ledger row
+      // describes a PAST transaction, so nothing can recover the name later.
+      // Rebuilding the row without it left a seller who listed two copies of
+      // one id reading two identical Collect rows after any logout.
+      const log = emptySaleLog();
+      recordSale(log, sale({ itemName: 'Dawn Oath' }));
+      const loaded = sanitizeSaleLog(JSON.parse(JSON.stringify(log)));
+      expect(loaded.entries[0].itemName).toBe('Dawn Oath');
+    });
+
+    it('a plain copy loads with no itemName key at all', () => {
+      const log = emptySaleLog();
+      recordSale(log, plainSale());
+      const loaded = sanitizeSaleLog(JSON.parse(JSON.stringify(log)));
+      expect('itemName' in loaded.entries[0]).toBe(false);
+    });
+
+    it('drops an unusable itemName rather than smuggling it to the UI', () => {
+      const loaded = sanitizeSaleLog({
+        entries: [
+          { ...plainSale(), itemName: 42 },
+          { ...plainSale({ itemId: 'copper_ore' }), itemName: '' },
+        ],
+      });
+      expect('itemName' in loaded.entries[0]).toBe(false);
+      expect('itemName' in loaded.entries[1]).toBe(false);
+    });
+
+    it('bounds a chosen name, so a blob cannot smuggle an unbounded string to the UI', () => {
+      // buyerName has been fenced since the ledger landed; itemName was not,
+      // and it renders raw beside it in the Collect tab.
+      const loaded = sanitizeSaleLog({ entries: [sale({ itemName: 'N'.repeat(500) })] });
+      expect(loaded.entries[0].itemName?.length).toBe(MAX_SALE_ITEM_NAME_LEN);
+      // The live stamp is fenced the same way, so the in-memory row and the
+      // reloaded row can never disagree.
+      const log = emptySaleLog();
+      recordSale(log, sale({ itemName: 'N'.repeat(500) }));
+      expect(log.entries[0].itemName?.length).toBe(MAX_SALE_ITEM_NAME_LEN);
+    });
+
+    it('the local fence matches the mint-side load ceiling it mirrors', () => {
+      // market_sale_log.ts keeps its own literal so this leaf stays out of the
+      // content tree item_instance_load.ts pulls in; that is only safe while
+      // the two agree, so the drift is pinned rather than trusted.
+      expect(MAX_SALE_ITEM_NAME_LEN).toBe(MAX_LEGENDARY_NAME_LOAD_LENGTH);
     });
 
     it('drops rows with no usable item id', () => {

@@ -253,8 +253,6 @@ describe('simEventVerdict: the declared-but-unseen pin and the resolver backstop
       'guildRenamed',
       'motdResult',
       'reliquaryIlluminationBroadcast',
-      // The release's never-emitted declaration (see the script's note).
-      'tutorialGreeting',
     ]);
   });
 });
@@ -507,6 +505,119 @@ describe('parseExplainedExtras: the doc-sourced explained-extras tables (Phase 1
     const { rows, defects } = parseExplainedExtras(md);
     expect(defects).toEqual([]);
     expect(rows.length).toBeGreaterThan(400);
+  });
+});
+
+describe('the blank-line table split: a row with no header above it is a DEFECT', () => {
+  // Phase 18 QA, gate-census item 1. Both parsers used to clear the active
+  // header on ANY non-pipe line and then hit a bare `continue` for every row
+  // that failed the header sniff, so ONE blank line typed mid-table shredded
+  // the rest of it in silence: measured on the committed doc, 960 deletion
+  // rows became 721 with ZERO defects, and a malformed row placed after that
+  // blank reported nothing where the same row under the header reported one.
+  // Phase 18 answered it with a PROCESS rule; a process rule is not a guard.
+  const doc = () =>
+    readFileSync(
+      join(__dirname, '..', 'docs', 'prd', 'masterwrought', 'merge-deletion-list.md'),
+      'utf8',
+    );
+
+  /** The index of a line deep inside a table: a data row fenced by table rows. */
+  const midTableIndex = (lines: string[], matchHeader: RegExp) => {
+    let inTable = false;
+    const inner: number[] = [];
+    for (let i = 1; i < lines.length - 1; i++) {
+      const line = lines[i].trim();
+      if (!line.startsWith('|')) {
+        inTable = false;
+        continue;
+      }
+      if (matchHeader.test(line)) {
+        inTable = true;
+        continue;
+      }
+      if (!inTable) continue;
+      if (/^\|[\s|:-]+\|$/.test(line)) continue;
+      if (lines[i - 1].trim().startsWith('|') && lines[i + 1].trim().startsWith('|')) inner.push(i);
+    }
+    expect(inner.length).toBeGreaterThan(20);
+    return inner[Math.floor(inner.length / 2)];
+  };
+
+  const splice = (lines: string[], at: number, ...insert: string[]) =>
+    [...lines.slice(0, at), ...insert, ...lines.slice(at)].join('\n');
+
+  const DELETION_HEADER = /^\|\s*Class\s*\|\s*Old name\s*\|/i;
+  const EXTRAS_HEADER = /^\|\s*Class\s*\|\s*Name\s*\|/i;
+
+  it('the committed doc parses clean through BOTH parsers (the mutation baseline)', () => {
+    const md = doc();
+    const del = parseDeletionList(md);
+    const extras = parseExplainedExtras(md);
+    expect(del.defects).toEqual([]);
+    expect(extras.defects).toEqual([]);
+    // Both counts are floors, not pins: a phase appends rows, it never drops
+    // a section. Without them a parser that returned nothing would pass above.
+    expect(del.rows.length).toBeGreaterThan(700);
+    expect(extras.rows.length).toBeGreaterThan(400);
+  });
+
+  it('one blank line mid-table is REPORTED, and the rows below it are still read', () => {
+    const md = doc();
+    const lines = md.split('\n');
+    const at = midTableIndex(lines, DELETION_HEADER);
+    const before = parseDeletionList(md);
+    const after = parseDeletionList(splice(lines, at, ''));
+    expect(after.defects.some((d) => /table row with no header above it/.test(d))).toBe(true);
+    // The whole point: not one row is lost to the split.
+    expect(after.rows.length).toBe(before.rows.length);
+  });
+
+  it('a malformed row AFTER a blank line still reports its own defect', () => {
+    const md = doc();
+    const lines = md.split('\n');
+    const at = midTableIndex(lines, DELETION_HEADER);
+    const bogus = '| bogusclass | `old` | `new` | 18 | ruling-id | a real reason |';
+    const underHeader = parseDeletionList(splice(lines, at, bogus));
+    const afterBlank = parseDeletionList(splice(lines, at, '', bogus));
+    expect(underHeader.defects.filter((d) => /unknown class/.test(d))).toHaveLength(1);
+    // Used to be zero: the blank hid the class defect AND the rows under it.
+    expect(afterBlank.defects.filter((d) => /unknown class/.test(d))).toHaveLength(1);
+    expect(afterBlank.rows.length).toBe(underHeader.rows.length);
+  });
+
+  it('parseExplainedExtras reports the same split, and keeps its rows', () => {
+    const md = doc();
+    const lines = md.split('\n');
+    const at = midTableIndex(lines, EXTRAS_HEADER);
+    const before = parseExplainedExtras(md);
+    const after = parseExplainedExtras(splice(lines, at, ''));
+    expect(after.defects.some((d) => /table row with no header above it/.test(d))).toBe(true);
+    expect(after.rows.length).toBe(before.rows.length);
+    // The OTHER parser must stay quiet about a table it does not own.
+    expect(parseDeletionList(splice(lines, at, '')).defects).toEqual([]);
+  });
+
+  it('a data row with no header at all in the file is a defect, not a skip', () => {
+    const orphan = ['| export | `alpha` | `beta` | 18 | ruling-id | a real reason |'].join('\n');
+    const { rows, defects } = parseDeletionList(orphan);
+    expect(rows).toEqual([]);
+    expect(defects).toEqual(['line 1: table row with no header above it']);
+  });
+
+  it('a table shape neither parser owns is skipped in silence, not faulted', () => {
+    // The doc opens with a `| Ref | Commit | Role |` table; a parser that
+    // faulted every foreign row would bury the real defects in noise.
+    const md = [
+      '## What this file is',
+      '',
+      '| Ref | Commit | Role |',
+      '|---|---|---|',
+      '| A | abc123 | the parent |',
+      '| B | def456 | the other parent |',
+    ].join('\n');
+    expect(parseDeletionList(md).defects).toEqual([]);
+    expect(parseExplainedExtras(md).defects).toEqual([]);
   });
 });
 

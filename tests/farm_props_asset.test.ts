@@ -1,4 +1,4 @@
-// The shipping contract for the sixteen farming prop GLBs: the deterministic
+// The shipping contract for the seventeen farming prop GLBs: the deterministic
 // source inventory and fingerprint, the optimizer specification, and, per asset,
 // the exact bytes plus the parsed structure the renderer relies on (floor seated
 // bounds, the Socket_Soil mount point, the CropAccent tint channel, and a
@@ -54,8 +54,16 @@ const REPO_ROOT = path.join(__dirname, '..');
 // fingerprint moved; the sixteen shipping GLB extras were restamped in place
 // (both stamp sites per GLB, byte counts held) and the sha pins follow the
 // restamped bytes. No farm source file changed.
-const SOURCE_FINGERPRINT = 'fa8007612a96c7859f740a4eadcf5981221ce986fdbfee74cbf035378a3a475a';
-const SET_BYTES = 190_488;
+// Re-exported at Masterwrought Phase 18 for the APEX feast table: model.js
+// gained the farm_feast_apex builder and contract and the spec gained its row
+// (a REAL source change, not an absorb), so the fingerprint moved and every
+// GLB was re-exported. The sixteen existing byte counts, triangle counts and
+// bounds held exactly; farm_feast_apex is the one new asset and the only new
+// bytes. That re-export also discharged the v0.42.0 lockfile drift this family
+// still owed (the release re-minted its own asset families and could not touch
+// this branch-owned one).
+const SOURCE_FINGERPRINT = 'd3be15761b4891dcf9e30779da9337f5eaf11033f9f36a62f4f84c22f5b2812f';
+const SET_BYTES = 208_200;
 const PER_ASSET_BYTE_CEILING = 35 * 1024;
 const TRIANGLE_CEILING = 1_200;
 
@@ -78,6 +86,7 @@ const EXPECTED_IDS = [
   'farm_gourd_withered',
   'farm_compost_bin',
   'farm_feast',
+  'farm_feast_apex',
 ] as const;
 
 // The six stages that carry crop identity. Every other asset must NOT have one.
@@ -101,113 +110,124 @@ interface AssetPin {
 const PINS: Readonly<Record<string, AssetPin>> = {
   farm_bed: {
     bytes: 6_880,
-    sha256: '2959ab32a9972d8a33af75cb70c536019f9df7942cfa467c8bea1bbfd57d7fdb',
+    sha256: 'daeaa5ace092d41bdbc425ae435c78df32cc1a44dc57fed801d1e91d3f2ea429',
     triangles: 228,
     footprintYd: [3, 2],
     heightYd: 0.34,
   },
   farm_sprout: {
     bytes: 5_168,
-    sha256: '8542d87e47288ea0c96c171791f76a9f5d972db98dd35e991a74a52595604786',
+    sha256: 'e3dabe23ee7ee654b772aba83e1febcf30b2bb9d73b7ce2fe47b94f0360d6ff0',
     triangles: 108,
     footprintYd: [1.67, 0.97],
     heightYd: 0.25,
   },
   farm_grain_stage2: {
     bytes: 5_248,
-    sha256: '032753859d19007d77d72c3d17ee935946a9d51f8ecffe0731db6a89ff1f3ab9',
+    sha256: '75f747cabf837350e513a3847e4edd361bb4636bcb7cd2197c6fd0a968e1838f',
     triangles: 108,
     footprintYd: [1.81, 1.04],
     heightYd: 0.42,
   },
   farm_rootleaf_stage2: {
     bytes: 8_792,
-    sha256: '23141685a5f53d70ffb3ce7f091fb755d4c2c1e611c0f883fe905745bb9e408b',
+    sha256: '06b582fd54d3a46841ab9d298bc2723658bba9d2eeb9bbcd21dbb00ed1f91249',
     triangles: 240,
     footprintYd: [1.61, 1.31],
     heightYd: 0.22,
   },
   farm_gourd_stage2: {
     bytes: 9_580,
-    sha256: '5cad253d8b7632b2d989bfc3438aeca1dae2b4517746e962127de83296a1885a',
+    sha256: '27926d4856d1f148757e7359a8ed4a47cbaa0c8d2c471f934b6686b4862c04ad',
     triangles: 360,
     footprintYd: [1.8, 1.16],
     heightYd: 0.09,
   },
   farm_grain_stage3: {
     bytes: 10_988,
-    sha256: '30b46c42a523c0f71ad43a806cd3580306484efd53311886705991a37621c264',
+    sha256: 'f3dec95cdc4e8b7ee2ca40c1cb149e050d30d414f7114f641e4c14998108e3a2',
     triangles: 288,
     footprintYd: [1.91, 1.31],
     heightYd: 0.82,
   },
   farm_rootleaf_stage3: {
     bytes: 17_776,
-    sha256: '299e924bb101bdf4c756bd14227e44cbc4fdb67add518cb15ec64814ab80a6e9',
+    sha256: '11fdac397e34b7b9eb2029f6c2e0634eb76566a8e9160b5c63f074697b184775',
     triangles: 540,
     footprintYd: [2.16, 1.49],
     heightYd: 0.37,
   },
   farm_gourd_stage3: {
     bytes: 16_460,
-    sha256: '580a14e95cf5a913697377c6c3ee3e471b0ce78aa2eb68f885604874a5538515',
+    sha256: 'a8b9aa53a81d1ae4ecbe0d74159276d5223b7c50901fcb34686d3e75a7f1f15c',
     triangles: 612,
     footprintYd: [2.46, 1.5],
     heightYd: 0.18,
   },
   farm_grain_stage4: {
     bytes: 12_212,
-    sha256: '54aa35569de68970c1cc76d97287263acec2cae8ad994d15c0bcbb20c9fd0e10',
+    sha256: '3f9fa3f0be95bafd6cbcad90c9685692cff6e2e66415259eb62bfa9eff6fcb33',
     triangles: 336,
     footprintYd: [2.54, 1.38],
     heightYd: 1.07,
   },
   farm_rootleaf_stage4: {
     bytes: 22_308,
-    sha256: '44b4afe194cd4755e937421987fa8a5f700dceb0f5f64d7ac111ffc536113625',
+    sha256: '4d23f6706cd3823cb56e6e1f4bba17720be4a1de3589bcb5a32d407dbd7a69f0',
     triangles: 720,
     footprintYd: [2.72, 1.71],
     heightYd: 0.58,
   },
   farm_gourd_stage4: {
     bytes: 16_740,
-    sha256: '28f244ebcf182b563565b3432416602e51428a8a7522c5c91e0f4941cb401bf0',
+    sha256: 'eebdb72321eafa3891481ca3a9917515c40311a41682a7014570634b80582c5f',
     triangles: 620,
     footprintYd: [2.63, 1.61],
     heightYd: 0.4,
   },
   farm_grain_withered: {
     bytes: 9_656,
-    sha256: '16357d9e8cfbbd08c379509763e72c33b97f4b4afc26541b80173e17f31cb65f',
+    sha256: '6879bcaa1a13f08ab6192f67a36506c59c6cb4111426a49dc5c839bb32707ad8',
     triangles: 288,
     footprintYd: [2.17, 1.36],
     heightYd: 0.66,
   },
   farm_rootleaf_withered: {
     bytes: 11_724,
-    sha256: '2d74507d6052d6deb217fe88f4cd3dc77b44e9dcd87b7033188ac3341e5d7ad7',
+    sha256: '7a297afb6a058fea5d7c4d68360666d9392be5ea184f93523740c4289af50deb',
     triangles: 360,
     footprintYd: [2.12, 1.47],
     heightYd: 0.24,
   },
   farm_gourd_withered: {
     bytes: 13_872,
-    sha256: '57c0a4252af608f5d5c27c199640485205a55af0e895fac4a09f8f669503484f',
+    sha256: 'eaa139609c554391fcda9fbe2bd5fc3d28104ed17d7539fc037cf8ea78ba3063',
     triangles: 576,
     footprintYd: [2.43, 1.42],
     heightYd: 0.14,
   },
   farm_compost_bin: {
     bytes: 7_440,
-    sha256: 'c6595ff75f6276bcee3ba151e832a168a6b627d8bd3c0706cb265877a9aa62c4',
+    sha256: 'ae7726735da104c7ed91fd160e32d6b9f038b5e8d9e20f94e167b777e790f29a',
     triangles: 264,
     footprintYd: [1, 1],
     heightYd: 0.8,
   },
   farm_feast: {
     bytes: 15_644,
-    sha256: '63caad03cfa098ff0924ab5e463513c128da7568726502eaae72d46321525325',
+    sha256: '1fad730a050f77a527019aa3903c9b9cb82569b81294b02a0048c8a58d19add0',
     triangles: 656,
+    footprintYd: [1.6, 1.6],
+    heightYd: 0.9,
+  },
+  // The apex feast table. Its footprint and height MUST equal farm_feast's:
+  // both wear the one pick proxy in src/render/quest_objects.ts, and the pin
+  // at the bottom of this file checks that proxy against farm_feast alone, so
+  // the equality is asserted here as well.
+  farm_feast_apex: {
+    bytes: 17_712,
+    sha256: '1d8a48c6c3fa2f93a44f3279275025c9dd828a68d987157273ba869d231dea1c',
+    triangles: 780,
     footprintYd: [1.6, 1.6],
     heightYd: 0.9,
   },
@@ -304,7 +324,7 @@ describe('farm prop authoring pipeline', () => {
     });
   });
 
-  it('covers exactly the sixteen shipped assets with a deep-frozen contract', () => {
+  it('covers exactly the seventeen shipped assets with a deep-frozen contract', () => {
     expect(FARM_PROP_IDS).toEqual([...EXPECTED_IDS]);
     expect(Object.values(FARM_PROP_CONTRACTS).map((contract) => contract.out)).toEqual(
       EXPECTED_IDS.map((id) => `models/props/${id}.glb`),
@@ -339,13 +359,10 @@ describe('farm prop authoring pipeline', () => {
       expect(contract.meshes.includes(FARM_ACCENT_MESH_NODE)).toBe(wantsAccent);
       expect(contract.meshes.includes(FARM_BODY_MESH_NODE)).toBe(true);
       // Only the bed owns a mount point; every crop stage mounts onto it. The
-      // two utility props and the placed feast stand on their own ground.
+      // two utility props and BOTH placed feasts stand on their own ground.
       expect(Object.keys(contract.sockets)).toEqual(id === 'farm_bed' ? ['Socket_Soil'] : []);
-      expect(contract.mountsOn).toBe(
-        id === 'farm_bed' || id === 'farm_compost_bin' || id === 'farm_feast'
-          ? null
-          : 'Socket_Soil',
-      );
+      const standsAlone = ['farm_bed', 'farm_compost_bin', 'farm_feast', 'farm_feast_apex'];
+      expect(contract.mountsOn).toBe(standsAlone.includes(id) ? null : 'Socket_Soil');
     }
   });
 
@@ -505,13 +522,27 @@ describe.each(EXPECTED_IDS)('farm prop GLB %s', (id) => {
   });
 });
 
-describe('farm_feast pick proxy stays in step with the GLB contract', () => {
+describe('feast pick proxy stays in step with the GLB contract', () => {
   // The invisible click box in src/render/quest_objects.ts is hand-sized to
   // the authored prop contract; an authored resize that forgets the proxy
-  // would silently desync the click target from the visible table.
-  it('the proxy pair equals the farm_feast contract bounds', () => {
-    const contract = FARM_PROP_CONTRACTS.farm_feast;
-    expect([NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_FOOTPRINT]).toEqual(contract.footprintYd);
-    expect(NO_ITEM_PICK_HEIGHT).toBe(contract.heightYd);
+  // would silently desync the click target from the visible table. ONE proxy
+  // serves BOTH tables, so both contracts are checked against it.
+  it('the proxy pair equals both feast contracts bounds', () => {
+    for (const id of ['farm_feast', 'farm_feast_apex'] as const) {
+      const contract = FARM_PROP_CONTRACTS[id];
+      expect([NO_ITEM_PICK_FOOTPRINT, NO_ITEM_PICK_FOOTPRINT], id).toEqual(contract.footprintYd);
+      expect(NO_ITEM_PICK_HEIGHT, id).toBe(contract.heightYd);
+    }
+  });
+
+  // The equality between the two tables, stated on its own: the apex prop may
+  // never be authored to a different envelope while one proxy covers both.
+  it('both feast tables share one authored envelope', () => {
+    expect([...FARM_PROP_CONTRACTS.farm_feast_apex.footprintYd]).toEqual([
+      ...FARM_PROP_CONTRACTS.farm_feast.footprintYd,
+    ]);
+    expect(FARM_PROP_CONTRACTS.farm_feast_apex.heightYd).toBe(
+      FARM_PROP_CONTRACTS.farm_feast.heightYd,
+    );
   });
 });

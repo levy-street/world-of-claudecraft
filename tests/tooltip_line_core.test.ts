@@ -293,6 +293,46 @@ describe('one module owns TooltipLineClass for the whole family', () => {
     // narrowing rather than an identity.
     const wide: TooltipLineClass = 'tt-green';
     expect(wide).toBe('tt-green');
+
+    // Everything above is tsc's alone: vitest transpiles without type-checking,
+    // so under a bare `vitest run` the `Exact` annotation is the literal `true`
+    // compared with itself, both `@ts-expect-error` directives are erased, and
+    // each toEqual reads back a literal assigned one line earlier. The shape
+    // that fixes it is tests/wellfed.test.ts: spell each union out as an
+    // exhaustive Record.
+    //
+    // BE EXACT ABOUT WHICH LAYER HOLDS WHAT, since a pin that claims more than
+    // it measures is the defect this file's own history is about. The two
+    // Records are a TSC arm, and they are the arm that really holds both
+    // directions: measured against this file, adding a fifth member to
+    // TooltipLineClass reds as TS2741 on `ownerRoles` and dropping one reds as
+    // TS2353, while all 40 cases here stay GREEN under a bare `vitest run` for
+    // either move. So the key-list assertions below re-state at runtime what
+    // tsc already enforces; they are a readable record of the shipped sets and
+    // a cheap catch for a hand-edit that keeps the types valid, NOT a second
+    // independent guard over the unions. The one arm that answers on its own
+    // without tsc is the round trip through the real builder at the end.
+    const ownerRoles: Record<TooltipLineClass, true> = {
+      'tt-sub': true,
+      'tt-desc': true,
+      'tt-green': true,
+      'tt-red': true,
+    };
+    const domRoles: Record<TooltipLineElementClass, true> = {
+      'tt-desc': true,
+      'tt-sub': true,
+    };
+    expect(Object.keys(ownerRoles).sort()).toEqual(['tt-desc', 'tt-green', 'tt-red', 'tt-sub']);
+    expect(Object.keys(domRoles).sort()).toEqual(['tt-desc', 'tt-sub']);
+    // The DOM path's set is a real subset of the owner's and a real NARROWING of
+    // it, both answered at runtime rather than in the type system.
+    expect(Object.keys(ownerRoles)).toEqual(expect.arrayContaining(Object.keys(domRoles)));
+    expect(Object.keys(domRoles).length).toBeLessThan(Object.keys(ownerRoles).length);
+    // ... and these are the SHIPPED roles rather than four strings this test
+    // made up: every owner key round-trips through the real builder.
+    for (const cls of Object.keys(ownerRoles) as TooltipLineClass[]) {
+      expect(tooltipLine(cls, 'x'), cls).toBe(`<div class="${cls}">x</div>`);
+    }
   });
 });
 

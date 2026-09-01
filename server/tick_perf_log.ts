@@ -84,9 +84,18 @@ export function round2(v: number): number {
 export function formatTickPerfLine(i: TickPerfLineInputs): string {
   const p = i.phases;
   const fmt = (n: string) => `${n}=${p[n].p95}/${p[n].max}`;
+  // Guarded on `p[n]` exactly like the two sibling formatters below. The
+  // profiler registers every outer phase in production, so this arm is
+  // defensive, but the unguarded dereference it replaces made ONE unregistered
+  // phase a TypeError for the whole line: the tick body's guarded arm swallows
+  // it, so the operator loses the heartbeat entirely and learns nothing about
+  // why. Omitting the phase is what the siblings do and what the token-by-name
+  // parser (scripts/lib/mob_stall_parse.mjs) already tolerates, since its
+  // historical samples carry fewer phases than this list.
+  const printed = TICK_PERF_LINE_PHASES.filter((n) => p[n]);
   return (
     `[perf] online=${i.online} ents=${i.ents} tickHz=${i.tickHz == null ? 'n/a' : round2(i.tickHz)} tickMs=${round2(i.tickMs)}${i.overBudget ? ' OVER' : ''}` +
-    ` | p95/max ${TICK_PERF_LINE_PHASES.map(fmt).join(' ')}` +
+    ` | p95/max ${printed.map(fmt).join(' ')}` +
     ` | visits=${i.visits} serializes=${i.serializes} baseSerializes=${i.baseSerializes} serializeMs=${round2(Number(i.serializeNs) / 1e6)} timerVariants=${i.legacySerializes}/${i.stableSerializes} aggroVisits=${i.aggroVisits} threatVisits=${i.threatVisits} blobP99=${i.blobP99Bytes}`
   );
 }

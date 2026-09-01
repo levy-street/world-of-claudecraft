@@ -11,12 +11,16 @@ import {
 } from '../scripts/assets/inscription_tomes/source_fingerprint.mjs';
 import { MEDIA_ASSETS } from '../src/render/assets/manifest.generated';
 
-// The three Masterwrought phase 06 inscription tome held models: the first
-// held_offhand item GLBs, produced by the deterministic procedural pipeline
+// The four Masterwrought inscription tome held models: the first held_offhand
+// item GLBs, produced by the deterministic procedural pipeline
 // (scripts/assets/inscription_tomes, the eastbrook mailbox archetype). Byte,
 // hash, topology, budget, and fingerprint pins; the render-side wiring pins
 // (ITEM_OFFHAND_MODELS rows, VAR_BOOK grips) live in
 // tests/held_weapon_models.test.ts.
+//
+// The family is the phase 06 trio plus the phase 09 apex voidbound grimoire,
+// which joined at phase 18 and took voidbound_grimoire out of the conscious
+// no-model pin in tests/held_weapon_models.test.ts in the same change.
 
 const REPO_ROOT = path.join(__dirname, '..');
 // pnpm-lock.yaml is a pinned input of this family's source fingerprint, so
@@ -25,7 +29,13 @@ const REPO_ROOT = path.join(__dirname, '..');
 // (bytes, triangles, and bounds pins never move): first for the v0.37.0
 // three@0.165.0 patch-hash bump, then v0.38.0, and most recently for the
 // v0.39.0 merge's Three.js r165 to r185 bump (patches/three@0.185.1.patch).
-const SOURCE_FINGERPRINT = '7c631c34abed8b41b17aa457a49c5b9d2ccffc58f56eda3387839939075de020';
+// Moved again at phase 18 by a REAL source change, not an absorb: the family
+// gained a fourth tome (model.js, the spec, the exporter, and the phase 09
+// reference SVG), so all four GLBs were re-exported from source. The three
+// phase 06 tomes came back byte-identical in size, triangles and bounds, with
+// only their stamped fingerprint (and so their sha256) moved. That re-export
+// also discharged the v0.42.0 lockfile drift this family still owed.
+const SOURCE_FINGERPRINT = 'a5195614ecd45e5620c841c1154b7d8ae90f91db40385cdf3263acafd1fcd1de';
 
 interface TomePin {
   itemId: string;
@@ -41,7 +51,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     bytes: 11_136,
-    sha256: '7c94d9169063bc3b5b4d3f53b0bd7a1965015d63e58be28a1643b47f5edb7a33',
+    sha256: '3d37736ce324abe4efc79a0e8fa84c9eb87185e7f234ce22699070486ded758e',
     triangles: 404,
     bounds: { min: [-0.1763, -0.1, -0.0555], max: [0.163, 0.3, 0.0622] },
   },
@@ -49,7 +59,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     bytes: 12_948,
-    sha256: '21fbe077c99d4822952a7baa872c047ffd26e8eebbb3dcb4a9403cf232ea2d3c',
+    sha256: '5e06915a0766c12b79b2017ddad318367f93f8d3e90ca476e28e89ef87521394',
     triangles: 512,
     bounds: { min: [-0.1866, -0.1668, -0.0605], max: [0.1705, 0.33, 0.0672] },
   },
@@ -57,9 +67,20 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     bytes: 13_956,
-    sha256: '71d7977e1cadbef0ee673294f09c58e2946d8c72fcd4e36aa8bb271b8403a46d',
+    sha256: 'd3fdfbd8ba143fe726ee3cc95182484a755ae0f088e6b712b9fc5b0e20ffbe3b',
     triangles: 584,
     bounds: { min: [-0.2007, -0.1668, -0.068], max: [0.1805, 0.36, 0.0863] },
+  },
+  // The phase 09 apex rung: the largest of the family, no bookmark ribbon (the
+  // icon's fore-edge clasp holds it shut instead), and a void sigil in place of
+  // the leaf or the sun boss.
+  tome_voidbound: {
+    itemId: 'voidbound_grimoire',
+    rootName: 'InscriptionTomeVoidbound',
+    bytes: 16_556,
+    sha256: '5cb8f511ccf8af5670b7a8c838c9f5b792d6cdb58e7d555b124eac14d2a601c6',
+    triangles: 724,
+    bounds: { min: [-0.211, -0.1, -0.073], max: [0.188, 0.38, 0.086] },
   },
 };
 
@@ -81,6 +102,7 @@ describe('inscription tome held models', () => {
       'docs/achievements/masterwrought-phase06-art/silverleaf_primer.svg',
       'docs/achievements/masterwrought-phase06-art/goldleaf_folio.svg',
       'docs/achievements/masterwrought-phase06-art/sunpetal_grimoire.svg',
+      'docs/achievements/masterwrought-phase09-art/voidbound_grimoire.svg',
       'scripts/assets/inscription_tomes/model.js',
       'scripts/assets/inscription_tomes/export_entry.js',
       'scripts/assets/inscription_tomes/export_inscription_tomes.mjs',

@@ -95,6 +95,12 @@
       "out": "models/props/farm_feast.glb",
       "type": "static",
       "keepExtras": true
+    },
+    {
+      "src": "tmp/asset_src/farm_props/farm_feast_apex.glb",
+      "out": "models/props/farm_feast_apex.glb",
+      "type": "static",
+      "keepExtras": true
     }
   ]
 }

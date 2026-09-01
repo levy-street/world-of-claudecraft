@@ -1,9 +1,13 @@
 // Per-craft reference page (/wiki/professions/<craftId>), one module driven by
 // craft id for all ten earnable crafts, the classes-page parameterized
 // precedent. Renders entirely from GUIDE_PROF_* generated data plus guide.*
-// t() keys; item/recipe/NPC names are baked English proper nouns (the
+// t() keys; recipe/output/NPC names are baked English proper nouns (the
 // GUIDE_DEEDS precedent) and craft/station/slot/stat/quality labels localize
-// through their existing catalog keys. TRANSPARENCY POLICY
+// through their existing catalog keys. ONE CARVE-OUT since
+// wiki-craft-table-baked-english: a MATERIALS cell name localizes through the
+// item's own entities.items.<id>.name key (materialName below), because that
+// name is interpolated INTO a t() format string and a baked English half made
+// the whole sentence mixed-language for every reader. TRANSPARENCY POLICY
 // professions pages publish EXACT numbers; the mirrored
 // accuracy guards live in tests/guide.test.ts.
 //
@@ -44,12 +48,44 @@ export function craftById(id: string): GuideProfCraft | undefined {
   return GUIDE_PROF_CRAFTS.find((c) => c.id === id);
 }
 
+/** The catalog key holding an item's localized display name.
+ *
+ *  Built here rather than imported. The canonical builder
+ *  (entityTranslationKey in src/ui/entity_i18n.ts) IS exported, but it is
+ *  unusable from this bundle: its module statically imports
+ *  ITEMS/MOBS/NPCS/QUESTS/ZONES from src/sim/data, so pulling in the one
+ *  function drags the whole table with it. The public wiki is spoiler-scoped
+ *  to what the generator publishes, so shipping the bestiary into guide.html
+ *  to read one name would be both a bundle and a spoiler regression. The
+ *  catalog keys themselves ARE in the guide's locale bundle
+ *  (entities.items.<id>.name is dense in every resolved slice), so only the
+ *  key-building needs re-stating, and tests/guide.test.ts pins this builder
+ *  against entityTranslationKey for every material id the generator emits.
+ *  The sanitizer mirrors entityPathSegment, and gets its own arm in that pin
+ *  on SYNTHETIC ids: every shipped material id is word-characters-only, so
+ *  the live sweep alone stays green with the replace() deleted outright.
+ *
+ *  Exported for that pin. */
+export function itemNameKey(itemId: string): TranslationKey {
+  return `entities.items.${itemId.replace(/[^A-Za-z0-9_]/g, '_')}.name` as TranslationKey;
+}
+
+/** A reagent's display name in the READER's language.
+ *
+ *  Was `m.name`, the generator's baked English, interpolated straight into a
+ *  t() format string, so a Spanish reader got "Osmium Ore x4" on the wiki and
+ *  "Mineral de osmio" in the game. The generated `name` stays as the English
+ *  source the accuracy guards pin the id against; nothing renders it. */
+export function materialName(m: GuideProfMaterial): string {
+  return t(itemNameKey(m.itemId));
+}
+
 function materialsCell(materials: GuideProfMaterial[]): string {
   return materials
     .map(
       (m) =>
         `<span class="guide-prof-mat">${esc(
-          t('guide.profPages.matFmt', { name: m.name, count: formatNumber(m.count) }),
+          t('guide.profPages.matFmt', { name: materialName(m), count: formatNumber(m.count) }),
         )}</span>`,
     )
     .join('');
@@ -87,39 +123,95 @@ function sourceCell(r: GuideProfRecipe): string {
  *  not. An unmapped buff kind degrades to the aura-name line rather than
  *  shipping a silent dish (the wellfed_tooltip_view fallback rule); the
  *  interpolated aura value is the def's own baked English proper noun, the
- *  SAME policy every name on this page follows (see the module header's
- *  GUIDE_DEEDS precedent), and tests/guide.test.ts asserts every SHIPPED
+ *  SAME policy the page's remaining baked names follow (see the module
+ *  header's GUIDE_DEEDS precedent and the materials carve-out beside it),
+ *  and tests/guide.test.ts asserts every SHIPPED
  *  wellfed kind is mapped, so the fallback stays a degradation path, never
- *  the live rendering. Exported for the direct fallback-render test. */
+ *  the live rendering. Exported for the direct fallback-render test.
+ *
+ *  A PLACEABLE FEAST reads the same three numbers but says them differently
+ *  (harvest-feast-wiki-effect-cell). Its `effect` is the dish it SERVES, one
+ *  hop through feast.dishItemId, because a feast carries no foodHp and no
+ *  wellFed of its own; the wording has to follow, since the player sets a
+ *  feast out and does not eat it, and the restore and the boon reach whoever
+ *  takes a serving rather than the crafter. So the feast branch swaps the
+ *  templates and nothing else: same resolved values, same stat map, same
+ *  finish-the-meal trigger. The unmapped-kind degradation keeps the ONE
+ *  shared aura line for both shapes, since it names no eater at all and
+ *  nothing shipped ever renders it. */
 export function effectLines(r: GuideProfRecipe): string {
   const effect = r.effect;
   if (!effect) return '';
+  const feast = effect.feast;
   const lines: string[] = [];
-  if (effect.food) {
+  if (feast) {
     lines.push(
-      t('guide.profPages.effectFood', {
-        amount: formatNumber(effect.food.amount),
-        seconds: formatNumber(effect.food.seconds),
+      t('guide.profPages.effectFeast', {
+        servings: formatNumber(feast.servings),
+        minutes: formatNumber(feast.minutes, { maximumFractionDigits: 1 }),
       }),
+    );
+  }
+  if (effect.food) {
+    const values = {
+      amount: formatNumber(effect.food.amount),
+      seconds: formatNumber(effect.food.seconds),
+    };
+    lines.push(
+      feast
+        ? t('guide.profPages.effectFeastServing', values)
+        : t('guide.profPages.effectFood', values),
     );
   }
   if (effect.wellfed) {
     const statKey = WELLFED_STAT_KEYS[effect.wellfed.kind as AuraKind];
     const minutes = formatNumber(effect.wellfed.minutes, { maximumFractionDigits: 1 });
-    lines.push(
-      statKey
-        ? t('guide.profPages.effectWellFed', {
-            stat: t(statKey),
-            value: formatNumber(effect.wellfed.value),
-            minutes,
-          })
-        : t('guide.profPages.effectWellFedAura', { aura: effect.wellfed.aura, minutes }),
-    );
+    if (statKey) {
+      const values = { stat: t(statKey), value: formatNumber(effect.wellfed.value), minutes };
+      lines.push(
+        feast
+          ? t('guide.profPages.effectFeastWellFed', values)
+          : t('guide.profPages.effectWellFed', values),
+      );
+    } else {
+      lines.push(t('guide.profPages.effectWellFedAura', { aura: effect.wellfed.aura, minutes }));
+    }
   }
   return lines.map((line) => `<span class="guide-prof-effect">${esc(line)}</span>`).join('');
 }
 
-function recipeRow(r: GuideProfRecipe): string {
+/** The "Gain fades at" cell: the three Mastery Curve boundaries, with any
+ *  boundary a player can NEVER reach named as such instead of printed as a
+ *  skill number.
+ *
+ *  wiki-craft-gain-clamp, and it is worth recording why this is a REWORD and
+ *  not the clamp the finding asked for. A boundary is (recipeTier + 1|2|3) *
+ *  TIER_SKILL_STEP, the skill at which the player's capability tier passes the
+ *  recipe's by one, two, three. Craft skill is hard-capped at the craft's own
+ *  maxSkill (125 for all ten; src/sim/professions/wheel.ts clamps gain AND
+ *  load against it), so a tier-5 recipe's boundaries land at 150 / 175 / 200
+ *  and none of them exists. 63 of the 170 published rows printed at least one.
+ *
+ *  CLAMPING those numbers to the cap was tried and is WRONG on the merits, not
+ *  merely on the pins: the tier-3 pick would print "gain fades to nothing at
+ *  125" when at 125 it still pays a quarter, so the clamp replaces an
+ *  unreachable number with a FALSE claim about a reachable one. The two guards
+ *  say the same thing, which is what a decisive pin is for: the curve arm in
+ *  tests/guide.test.ts reds with "expected 0.25 to be +0" and the literal row
+ *  reds on {100, 125, 150} becoming {100, 125, 125}. So the generated numbers
+ *  stay the raw, curve-true arithmetic (nothing about the DATA moves) and the
+ *  PAGE stops printing a skill nobody can have. */
+function gainCell(r: GuideProfRecipe, maxSkill: number): string {
+  const bound = (at: number): string =>
+    at > maxSkill ? t('guide.profPages.gainNever') : formatNumber(at);
+  return t('guide.profPages.gainFmt', {
+    reduced: bound(r.gain.reducedAt),
+    minimal: bound(r.gain.minimalAt),
+    zero: bound(r.gain.zeroAt),
+  });
+}
+
+function recipeRow(r: GuideProfRecipe, maxSkill: number): string {
   const combo = r.combo
     ? `<span class="guide-prof-combo">${esc(
         t('guide.profPages.comboReq', {
@@ -145,17 +237,11 @@ function recipeRow(r: GuideProfRecipe): string {
       <td>${esc(r.station ? stationLabel(r.station) : t('guide.profPages.stationAnywhere'))}</td>
       <td>${materialsCell(r.materials)}</td>
       <td>${esc(qualityLabel(r.output.quality))}</td>
-      <td>${esc(
-        t('guide.profPages.gainFmt', {
-          reduced: formatNumber(r.gain.reducedAt),
-          minimal: formatNumber(r.gain.minimalAt),
-          zero: formatNumber(r.gain.zeroAt),
-        }),
-      )}</td>
+      <td>${esc(gainCell(r, maxSkill))}</td>
     </tr>`;
 }
 
-function recipesTable(recipes: GuideProfRecipe[]): string {
+function recipesTable(recipes: GuideProfRecipe[], maxSkill: number): string {
   return `<div class="guide-table-scroll">
       <table class="guide-keytable guide-prof-table">
         <thead><tr>
@@ -167,7 +253,7 @@ function recipesTable(recipes: GuideProfRecipe[]): string {
           <th scope="col">${esc(t('guide.profPages.colQuality'))}</th>
           <th scope="col">${esc(t('guide.profPages.colGain'))}</th>
         </tr></thead>
-        <tbody>${recipes.map(recipeRow).join('')}</tbody>
+        <tbody>${recipes.map((r) => recipeRow(r, maxSkill)).join('')}</tbody>
       </table>
     </div>`;
 }
@@ -334,7 +420,7 @@ export function craftDetailHtml(c: GuideProfCraft): string {
       : `<section class="guide-block" id="prof-recipes">
           <h2>${esc(t('guide.profPages.recipesHeading'))}</h2>
           <p>${esc(t('guide.profPages.recipesNote'))}</p>
-          ${recipesTable(c.recipes)}
+          ${recipesTable(c.recipes, c.maxSkill)}
         </section>`;
   const preSections =
     c.id === 'enchanting'

@@ -32,20 +32,30 @@ describe('buildEventPidIndex', () => {
     expect(index.forPid(7)).toEqual([0, 3]);
     expect(index.forPid(9)).toEqual([2]);
     expect(index.broadcast).toEqual([1, 4]);
-    expect(index.pidCount).toBe(2);
+  });
+
+  it('never aliases two present pids onto one list', () => {
+    // The premise the merge walk's pid comparison rests on: distinct pids key
+    // distinct Map entries, so the ONLY way to hold one list twice is to ask
+    // for one pid twice (the degenerate self-spectate case below). Without
+    // this, that guard's sufficiency is only asserted in a comment.
+    const index = buildEventPidIndex([scoped(7), scoped(9)]);
+    expect(index.forPid(7)).not.toBe(index.forPid(9));
+    expect(index.forPid(7)).toBe(index.forPid(7));
   });
 
   it('returns an empty list for a pid the batch never addresses', () => {
     const index = buildEventPidIndex([scoped(7)]);
     expect(index.forPid(1234)).toEqual([]);
-    // The same shared constant, so a miss allocates nothing per session.
+    // The same shared constant, so a miss allocates nothing per session. Two
+    // pids that both miss therefore DO share one list; it is empty, so the
+    // merge walk contributes no index from it either time.
     expect(index.forPid(1234)).toBe(index.forPid(5678));
   });
 
   it('an empty batch indexes to nothing', () => {
     const index = buildEventPidIndex([]);
     expect(index.broadcast).toEqual([]);
-    expect(index.pidCount).toBe(0);
     expect(index.forPid(1)).toEqual([]);
   });
 });
@@ -81,6 +91,14 @@ describe('forEachSelectedEventIndex', () => {
   it('a session addressed by nothing still visits the whole broadcast set', () => {
     const events = [scoped(7), world(), scoped(9), world()];
     expect(selected(events, 42, 42)).toEqual([1, 3]);
+  });
+
+  it('a spectator whose anchor and own pid BOTH miss shares one empty list harmlessly', () => {
+    // Distinct pids, so the walk takes the index.forPid(selfPid) arm, and both
+    // lookups return the SAME shared EMPTY constant. Sharing it must not
+    // double or drop anything: an empty list contributes no index either time.
+    const events = [scoped(7), world(), scoped(9), world()];
+    expect(selected(events, 42, 43)).toEqual([1, 3]);
   });
 
   it('visits nothing for an empty batch', () => {

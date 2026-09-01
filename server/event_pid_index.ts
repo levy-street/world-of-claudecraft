@@ -28,6 +28,17 @@ import type { SimEvent } from '../src/sim/types';
 // filter, the ignore and block sets, the interest radius) to the events they
 // visit, exactly as the full walk did: this narrows WHICH events a session
 // looks at, never what it decides about one.
+//
+// WHAT IT COSTS, stated honestly because the win is a cost claim. The index is
+// NOT allocation-free per tick: buildEventPidIndex allocates one Map plus one
+// array per DISTINCT pid in the batch, once per batch, and the caller in
+// server/game.ts routeEvents allocates one `visit` closure per session per
+// tick. What is allocation-free is the WALK below (forEachSelectedEventIndex),
+// which adds nothing to either: it is three integer cursors over lists the
+// index already holds. The trade is per-batch allocation (linear in distinct
+// pids) bought against per-session iteration (previously the whole batch, for
+// every session), and at the shape that motivated it the iteration term is
+// four to five orders of magnitude larger.
 
 /** One shared empty list for a pid with no events in this batch. */
 const EMPTY: readonly number[] = [];
@@ -37,8 +48,6 @@ export interface EventPidIndex {
   forPid(pid: number): readonly number[];
   /** Ascending indices of the events carrying no pid (the world/broadcast set). */
   readonly broadcast: readonly number[];
-  /** Distinct pids the batch addresses (the fan-out width; the counting arms read it). */
-  readonly pidCount: number;
 }
 
 /**
@@ -65,7 +74,6 @@ export function buildEventPidIndex(events: readonly SimEvent[]): EventPidIndex {
       return byPid.get(pid) ?? EMPTY;
     },
     broadcast,
-    pidCount: byPid.size,
   };
 }
 
@@ -75,10 +83,12 @@ export function buildEventPidIndex(events: readonly SimEvent[]): EventPidIndex {
  * spectates), the events scoped to its OWN pid when those differ (a spectator
  * still receives its own whispers and party chat), and every pid-less event.
  *
- * Allocation-free: a pointer walk over the three lists the index already holds,
- * so the per-session cost is O(its own pid-scoped events + the broadcast set)
- * and no longer scales with the batch. `selfPid === anchorPid` (the ordinary
- * non-spectating session) walks two lists, never visiting an index twice.
+ * The WALK allocates nothing: three integer cursors over lists the index
+ * already holds, so the per-session cost is O(its own pid-scoped events + the
+ * broadcast set) and no longer scales with the batch. The per-batch index build
+ * and the caller's `visit` closure do allocate; see the header. `selfPid ===
+ * anchorPid` (the ordinary non-spectating session) walks two lists, never
+ * visiting an index twice.
  */
 export function forEachSelectedEventIndex(
   index: EventPidIndex,
@@ -87,9 +97,14 @@ export function forEachSelectedEventIndex(
   visit: (eventIndex: number) => void,
 ): void {
   const anchored = index.forPid(anchorPid);
-  // Deliberately identity-compared against `anchored`, not just pid-compared:
-  // a session spectating its own pid resolves both to the same list, and
-  // visiting it twice would double every event in that session's frame.
+  // A PID comparison is the whole guard, and it is sufficient: distinct pids
+  // key distinct Map entries, so two different pids can never resolve to the
+  // same populated list, and the only way to hold one list twice is to ask for
+  // one pid twice. That is exactly the degenerate spectate case (a session
+  // spectating its own pid), where walking the list twice would double every
+  // event in that session's frame. Two pids that both MISS do share one list,
+  // the EMPTY constant, and sharing it is harmless: an empty list contributes
+  // no index to the merge either time.
   const own = selfPid === anchorPid ? EMPTY : index.forPid(selfPid);
   const broadcast = index.broadcast;
   let a = 0;

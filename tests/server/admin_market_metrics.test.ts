@@ -455,6 +455,14 @@ describe('sold volume (the accumulating store, folded into the readout)', () => 
     // and database-free; the volume half arrives separately.
     const out = buildAdminMarketMetrics(FIXTURE, 'eastbrook');
     expect(out.soldWindowDays).toBe(MARKET_SOLD_VOLUME_WINDOW_DAYS);
+    // ...and the constant itself is pinned to its LITERAL, the sanctioned
+    // mitigation (tests/server/admin_activity_cache.test.ts pins its window and
+    // TTL the same way). Without this line the assertion above compares the
+    // producer's field against the SAME imported constant, so both sides move
+    // together: retuning the window to 8 (still well under the 90-day retention,
+    // so the Postgres leg stays green too) leaves every test passing while the
+    // dashboard silently reads an 8-day window.
+    expect(MARKET_SOLD_VOLUME_WINDOW_DAYS, 'the sold-volume readout window moved').toBe(7);
     expect(out.soldAvailable).toBe(false);
     for (const bucket of out.buckets) {
       expect(bucket.sold, bucket.bucket).toEqual({ saleCount: 0, quantity: 0, copper: 0 });

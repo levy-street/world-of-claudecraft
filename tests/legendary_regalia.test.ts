@@ -38,6 +38,14 @@ import { stripComments } from './helpers/strip_comments';
 const read = (rel: string): string =>
   stripComments(readFileSync(new URL(`../${rel}`, import.meta.url), 'utf8'));
 
+/** Quoted bodies blanked, the quotes kept, so a brace inside a string literal
+ *  cannot skew a brace walk. Comments are already gone: `read` strips them. */
+const blankStrings = (source: string): string =>
+  source
+    .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+    .replace(/"(?:[^"\\\n]|\\.)*"/g, '""')
+    .replace(/`(?:[^`\\]|\\.)*`/g, '``');
+
 describe('legendaryRegaliaActive: the four-field wire predicate', () => {
   const worn = (inst: ItemInstancePayload): Partial<Record<string, ItemInstancePayload>> => ({
     chest: inst,
@@ -526,26 +534,20 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     for (const banned of bannedWiringReads) {
       expect(banned.test(slice), `wiring slice must not read ${banned}`).toBe(false);
     }
-    // Positive control: every banned regex fires on a synthetic leak in the
-    // repo's own spellings, so a dead pattern cannot read as clean forever.
-    const leakSamples = [
-      'e.perfected',
-      'x.perfecting',
-      'e.hpFrac',
-      'e.hp > 0',
-      'e.maxHp',
-      'e.targetId',
-      'e.auras',
-      'e.castingAbility',
-      'this.appliedBudgetLevels',
-      'this.renderBudgetGovernor',
-      'graphicsBucketLevels',
-    ];
+    // Positive control, anchored to SHIPPED SOURCE rather than to a sample list
+    // this test writes for itself. A hand-written corpus is a self-pin: it
+    // spells the token the same way the pattern does, so it stays green even
+    // after the field being banned has been renamed out of the codebase, and a
+    // dead pattern then reads as a clean slice forever. The vocabulary these
+    // patterns ban is real and lives in two shipped files: the entity's
+    // actionable state (src/sim/types.ts) and the renderer's own governor and
+    // budget identifiers. Rename `hpFrac`, or retire `appliedBudgetLevels`, and
+    // the matching pattern stops firing HERE, which is the signal that its ban
+    // has gone dead. The wiring slice cannot be what satisfies this: every
+    // pattern is asserted absent from it directly above.
+    const bannedVocabulary = `${read('src/sim/types.ts')}\n${renderer}`;
     for (const banned of bannedWiringReads) {
-      expect(
-        leakSamples.some((s) => banned.test(s)),
-        `positive control: ${banned} fires on no leak sample`,
-      ).toBe(true);
+      expect(banned.test(bannedVocabulary), `${banned} matches no shipped identifier`).toBe(true);
     }
     // the emit rides the same ambient !e.dead block as the form auras (a
     // corpse must not smolder), under runCharacterPresentation. NESTING, not
@@ -570,15 +572,37 @@ describe('legendary regalia graphics fairness (sheddable prestige cosmetic)', ()
     expect(closeAt, 'the dead-guard block never closes').toBeGreaterThan(openAt);
     const deadBlock = renderer.slice(openAt, closeAt);
     expect(deadBlock).toContain('formAura');
-    // No condition may be WRAPPED around the regalia gate either: the span
-    // from the dead-guard open to the gate carries exactly the form-aura
-    // chain's four ifs, so an inserted gating wrapper (one line above the
-    // pinned gate, outside the banned-token slice) raises this count and is
-    // re-judged by hand.
+    // No condition may WRAP or GUARD the regalia gate either. This was a count
+    // of `if (` tokens in the span, which declared its own evasions in comment
+    // and lost to both of them (each one built against this file and watched to
+    // pass before the rewrite):
+    //   SPELLING: a wrapper carrying no `if (` token at all (`if(cond) {` with
+    //     no space, `for (const _ of once) {`, a bare block) left the count at
+    //     four with the gate running conditionally.
+    //   COMPENSATION: a wrapper that does add one, paid for by folding the
+    //     moonkin and shadowform arms into a single `else if`, also left the
+    //     count at exactly four.
+    // Brace DEPTH answers both, however the wrapper is spelled: every block
+    // opened after the dead guard must close again before the gate, so the gate
+    // is a statement of the dead-guard block itself and of nothing narrower.
+    const between = blankStrings(renderer.slice(openAt + 1, gateAt));
+    let betweenDepth = 0;
+    let escaped = false;
+    for (const ch of between) {
+      if (ch === '{') betweenDepth++;
+      else if (ch === '}' && --betweenDepth < 0) escaped = true;
+    }
+    expect(betweenDepth, 'the regalia gate is WRAPPED in a block inside the dead guard').toBe(0);
+    expect(escaped, 'the regalia gate escaped the dead-guard block').toBe(false);
+    // ... and no BRACELESS guard, which adds no brace to walk: an `if (x)` one
+    // line above with the gate as its single statement, an `else`, or a `&&`
+    // prefix. The gate must BEGIN a statement, so the last code character in
+    // front of it has to close one.
+    const beforeGate = between.trimEnd().slice(-1);
     expect(
-      renderer.slice(openAt, gateAt).match(/if \(/g) ?? [],
-      'an unexpected condition sits between the dead guard and the regalia gate',
-    ).toHaveLength(4);
+      ['{', '}', ';'],
+      `a braceless guard ending in "${beforeGate}" sits in front of the regalia gate`,
+    ).toContain(beforeGate);
     expect(gateAt, 'the regalia gate must open inside the dead guard').toBeGreaterThan(openAt);
     expect(emitAt, 'the regalia emit must land inside the dead guard').toBeLessThan(closeAt);
     // the cached pair lives on the view

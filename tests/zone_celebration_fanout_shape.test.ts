@@ -1,17 +1,16 @@
 // The zone-celebration fan-out shape (Phase 18, item zone-celebration-fanout-
-// tenants): MEASURED, then kept. The three tenants (masterworkZone in
-// src/sim/professions/gather_events.ts, attunedZone in attunement_events.ts,
-// legendaryForgedZone in perfecting.ts) mint one pid-scoped SimEvent per
-// in-zone recipient through emitToZonePlayers, and server/event_frame.ts
-// serializes each copy once. The recorded alternative (serialize the
+// tenants): MEASURED, then kept. The four tenants (gatherRareEvent and
+// masterworkZone in src/sim/professions/gather_events.ts, attunedZone in
+// attunement_events.ts, legendaryForgedZone in perfecting.ts) mint one
+// pid-scoped SimEvent per in-zone recipient through emitToZonePlayers, and
+// server/event_frame.ts serializes each copy once. The recorded alternative (serialize the
 // pid-independent fragment once, splice the pid per recipient) was benched on
 // 2026-08-31 against the real payload shapes:
 //   per recipient: mint + stringify 96 to 119 ns (137 to 192 bytes per copy);
 //   shared-bytes splice 8 to 11 ns; saving 85 to 109 ns per recipient.
 //   per celebration: 200 in-zone = 24 us today vs 2 us shared (22 us saved);
 //   5,000 in one zone (the realm cap) = 594 us vs 53 us (541 us saved, once).
-//   realm rate: at the rare-event design cadence (1 per zone per 20 min, 20
-//   zones, 200 in-zone) the saving is 0.4 us per SECOND; at an implausible
+//   realm rate: 0.4 us per SECOND, derived below; at an implausible
 //   10 celebrations per second with 1,000 in-zone it is 54 us per 50 ms tick
 //   (0.11% of the budget); the absolute ceiling (2.5/s, all 5,000 players in
 //   one zone) is 68 us per tick (0.14%).
@@ -19,6 +18,24 @@
 // cross-module key-order invariant (pid must stay the second key in three sim
 // literals) plus a second serialization path beside serializeEventFragments.
 // REFUSED on the numbers.
+//
+// THE REALM-RATE DERIVATION (re-derived 2026-08-31 from the WIDEST tenant's
+// own cadence, not from a celebration-shaped guess): gatherRareEvent is the
+// fan-out's highest-frequency producer, and its cadence is
+// GATHER_RARE_EVENT_CHANCE = 1/90 per harvest, drawn once per gather-node
+// harvest (professions/gathering.ts) AND once per farming crop harvest
+// (professions/farming.ts, the same shared constant by design). A saturated
+// TUNED zone offers 18 nodes on a 240s respawn, so 1,200s / 240s x 18 = at
+// most ~90 node harvests per zone per 20 minutes, and 90 x 1/90 = about ONE
+// event per zone per 20 minutes. Twenty zones is 1 celebration per minute
+// realm-wide; at the measured 200 in-zone that is ~24 us of stringify per
+// celebration, hence 24 us / 60 s = 0.4 us per second. The farming crop
+// harvest is a SECOND, unpriced stream on the same constant, so the true
+// realm rate is higher than the node-only term above: the refusal does not
+// rest on the exact figure, because the recorded headroom is three orders of
+// magnitude (10 celebrations per SECOND, 25x the node-only realm rate per
+// zone, still costs 0.11% of a tick). The pin below holds the cadence
+// constant so a retune re-opens this paragraph rather than silently aging it.
 //
 // AMENDED 2026-08-31 (the Phase 18 hot-path review): the SERIALIZATION figures
 // above are right, but they priced the wrong term. The dominant cost of a
@@ -46,11 +63,15 @@ import { describe, expect, it } from 'vitest';
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
 import {
+  announceGatherRareEvent,
   announceMasterworkZone,
   announceZoneCelebration,
+  GATHER_RARE_EVENT_CHANCE,
 } from '../src/sim/professions/gather_events';
+import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { SimEvent } from '../src/sim/types';
+import { stripComments } from './helpers/strip_comments';
 
 /** The small-flat-payload premise: every per-recipient copy of every tenant
  *  serializes under this many bytes (the bench's largest copy was 192). */
@@ -102,6 +123,9 @@ function fakeWorld(inZoneCount: number): FakeWorld {
       events.push(ev);
     },
     bumpDeedStat: () => {},
+    // The gather tenant's finder-side mark hook (it fans out first, then
+    // writes one visit mark); the fan-out itself never touches either.
+    markVisited: () => {},
   } as unknown as SimContext;
   return { ctx, events, zoneId, inZone, farZone, instanced };
 }
@@ -128,7 +152,36 @@ function expectOneSmallCopyPerRecipient(world: FakeWorld, type: string): void {
   }
 }
 
+/** The finder the gather tenant announces for. Its reliquary mark is
+ *  pre-held, so noteReliquaryMark returns at its first line: this suite pins
+ *  the FAN-OUT, and the deed/reliquary hooks that ride beside it have their
+ *  own suites. */
+function fakeFinder(entityId: number, name: string, flavor: string): PlayerMeta {
+  return {
+    entityId,
+    name,
+    reliquary: { marks: new Set([`gather_event:${flavor}`]) },
+  } as unknown as PlayerMeta;
+}
+
 describe('zone celebration fan-out: one small pid-only-varying copy per in-zone recipient', () => {
+  it('gatherRareEvent (the widest tenant: it fans out on the rare-event cadence)', () => {
+    // The fourth tenant, and the one the realm-rate derivation above is taken
+    // from. Unlike the other three it names its zone from the node or bed
+    // rather than the celebrant's position, so it reaches emitToZonePlayers
+    // directly instead of through announceZoneCelebration; the recipient rule
+    // (in-zone, overworld only) is the same one.
+    const world = fakeWorld(12);
+    announceGatherRareEvent(
+      world.ctx,
+      fakeFinder(world.inZone[0], 'Celebrant0', 'golden_harvest'),
+      { zoneId: world.zoneId, type: 'crop' },
+      'golden_harvest',
+      'vale_wheat',
+    );
+    expectOneSmallCopyPerRecipient(world, 'gatherRareEvent');
+  });
+
   it('masterworkZone', () => {
     const world = fakeWorld(12);
     announceMasterworkZone(world.ctx, world.inZone[0], 'Grimmschaedel', {
@@ -189,6 +242,32 @@ const CEILING_RECIPIENTS = 5_000;
 const CEILING_SESSIONS = 5_000;
 
 describe('the fan-out measurement premises (batch size x session count)', () => {
+  it('the realm rate rests on the rare-event cadence, one draw per harvest', () => {
+    // The third input, beside the two multiplicands below: how OFTEN a
+    // celebration happens at all. The 0.4 us per second figure is derived from
+    // this constant (see the derivation in this file's header), so a retune
+    // moves the recorded rate and must re-open the record here first.
+    expect(GATHER_RARE_EVENT_CHANCE).toBe(1 / 90);
+    // Both harvest paths draw on the SAME constant (state.md D12: never a
+    // farming copy of it), which is why the realm rate is the node term PLUS
+    // an unpriced farming term rather than the node term alone. Read as source
+    // text: a second constant, or a caller that stops sharing this one, is
+    // exactly the change that would invalidate the derivation.
+    const callers = ['src/sim/professions/gathering.ts', 'src/sim/professions/farming.ts'];
+    for (const caller of callers) {
+      // Comment-stripped: prose naming either symbol must not stand in for a
+      // call site, in EITHER direction (the positive arm would pass on a
+      // mention, the negative one would fail on one).
+      const src = stripComments(readFileSync(resolve(process.cwd(), caller), 'utf8'));
+      expect(src, `${caller} should still roll the shared rare-event cadence`).toContain(
+        'rollGatherRareEvent(',
+      );
+      expect(src, `${caller} must not carry its own copy of the cadence`).not.toContain(
+        'GATHER_RARE_EVENT_CHANCE =',
+      );
+    }
+  });
+
   it('one celebration puts exactly ONE event per recipient in the batch, at every width', () => {
     // The first multiplicand. It is 1:1 and LINEAR, which is what makes
     // "recipients x sessions" the right arithmetic: a tenant that started

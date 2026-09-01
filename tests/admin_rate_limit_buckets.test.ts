@@ -164,9 +164,10 @@ describe('admin oversight rate-limit buckets', () => {
 describe('admin analytics read bucket', () => {
   it('derives both arms from tab-equivalents of the real dashboard poll cadence', () => {
     // One open tab: overview at LIVE_REFRESH_MS, activity at ACTIVITY_REFRESH_MS
-    // (src/admin/state/poll.ts), market metrics at the page's own AUTO_REFRESH_MS
-    // (MarketMetrics.svelte, read from source since a .svelte module has no
-    // node import). 12 + 1 + 2 = 15 requests per tab per minute.
+    // (src/admin/state/poll.ts), online history riding that same activity fetch,
+    // and market metrics at the page's own AUTO_REFRESH_MS (MarketMetrics.svelte,
+    // read from source since a .svelte module has no node import).
+    // 12 + 1 + 1 + 2 = 16 requests per tab per minute.
     const svelte = readFileSync(
       resolve(process.cwd(), 'src/admin/pages/MarketMetrics.svelte'),
       'utf8',
@@ -175,14 +176,31 @@ describe('admin analytics read bucket', () => {
       /const AUTO_REFRESH_MS = ([\d_]+);/.exec(svelte)?.[1]?.replace(/_/g, ''),
     );
     expect(metricsMs).toBe(30_000);
-    const perTab = 60_000 / LIVE_REFRESH_MS + 60_000 / ACTIVITY_REFRESH_MS + 60_000 / metricsMs;
-    expect(perTab).toBe(15);
+    // ONLINE HISTORY is the fourth term, and it is the one this derivation
+    // missed when the bucket was first sized: Overview's refreshActivity fetches
+    // /admin/api/online-history in the SAME Promise.all as /admin/api/activity,
+    // so it has no poll constant of its own and rides the activity cadence. The
+    // arm below reads it out of the page rather than trusting the comment, so a
+    // future edit that moves it onto its own timer, or drops it, fails here
+    // instead of silently under-sizing the bucket by a whole surface.
+    const overview = readFileSync(
+      resolve(process.cwd(), 'src/admin/pages/Overview.svelte'),
+      'utf8',
+    );
+    expect(overview).toMatch(/online-history/);
+    const onlineHistoryPerMinute = 60_000 / ACTIVITY_REFRESH_MS;
+    const perTab =
+      60_000 / LIVE_REFRESH_MS +
+      60_000 / ACTIVITY_REFRESH_MS +
+      onlineHistoryPerMinute +
+      60_000 / metricsMs;
+    expect(perTab).toBe(16);
     expect(ADMIN_ANALYTICS_READS_PER_TAB_PER_MINUTE).toBe(perTab);
     // The account arm is one operator's own tabs; the IP arm a whole NAT.
     expect(ADMIN_ANALYTICS_ACCOUNT_TAB_BUDGET).toBe(8);
     expect(ADMIN_ANALYTICS_IP_TAB_BUDGET).toBe(40);
-    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(8 * 15);
-    expect(ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE).toBe(40 * 15);
+    expect(ADMIN_ANALYTICS_READ_MAX_PER_MINUTE).toBe(8 * 16);
+    expect(ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE).toBe(40 * 16);
     expect(ADMIN_ANALYTICS_READ_IP_MAX_PER_MINUTE).toBeGreaterThan(
       ADMIN_ANALYTICS_READ_MAX_PER_MINUTE,
     );

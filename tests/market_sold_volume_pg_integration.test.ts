@@ -23,7 +23,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
   MARKET_SOLD_VOLUME_RETENTION_DAYS,
   MARKET_SOLD_VOLUME_SCHEMA,
-  MARKET_SOLD_VOLUME_WINDOW_DAYS,
   marketSoldVolumeRetentionTable,
   pruneMarketSoldVolumeBatch,
   readMarketSoldVolumeSince,
@@ -223,9 +222,9 @@ describeDb('market_sold_volume against real Postgres', () => {
     expect(kept.rows[0].n).toBe('1');
   });
 
-  it('keeps the retention window comfortably wider than the readout window', () => {
-    // An operator widening the readout should not immediately fall off the end
-    // of the retained data.
-    expect(MARKET_SOLD_VOLUME_RETENTION_DAYS).toBeGreaterThan(MARKET_SOLD_VOLUME_WINDOW_DAYS);
-  });
+  // The constant relation RETENTION > WINDOW used to sit here as a third case.
+  // It needs no Postgres, and inside this describeDb it was skipped in every
+  // DB-less run, which is every local run without TEST_DATABASE_URL. It lives
+  // in the unit suite now (tests/server/market_sold_volume.test.ts), beside the
+  // other assertions about these constants.
 });

@@ -332,6 +332,39 @@ describe('plant sheet window: selection and knobs', () => {
     expect(world.plantCrop).not.toHaveBeenCalled();
   });
 
+  it('a focus key that is not a legal CSS selector cannot break the repaint', () => {
+    // This sheet keys its controls `seed:<cropId>` and `knob:<knobId>`,
+    // content ids spliced verbatim, and `data-focus-key` is ONE FLAT namespace
+    // shared with every other window, so the key read back here can be any
+    // member of it. A key holding a double quote closes an attribute
+    // selector's own string early, so the interpolating spelling this window
+    // used to run, `root.querySelector('[data-focus-key="' + key + '"]')`,
+    // raises a SyntaxError from inside paint(). It escapes into whatever drove
+    // the repaint: the re-open below never reaches the rest of open(), and an
+    // arrow-key seed pick would lose the radiogroup mid-roving.
+    const win = makeWindow();
+    win.open(BED);
+    const keyed = document.createElement('button');
+    keyed.type = 'button';
+    keyed.dataset.focusKey = 'seed:vale"wheat';
+    root.appendChild(keyed);
+    keyed.focus();
+    expect(document.activeElement).toBe(keyed);
+
+    // A re-press at the same bed is the sheet's own repaint path (open() with
+    // the window already up on this bed refreshes in place).
+    expect(() => win.open(BED)).not.toThrow();
+    // The repaint really ran: the planted node is gone with the old subtree
+    // and the seed rows are back, so the case is not passing by never
+    // reaching the restore.
+    expect(root.contains(keyed)).toBe(false);
+    expect(root.querySelectorAll('[data-seed-crop]').length).toBeGreaterThan(0);
+    // The key resolves to nothing in the rebuilt tree, so the ladder degrades
+    // to its Close rung rather than stranding the player on <body> with the
+    // dialog still up.
+    expect(document.activeElement).toBe(root.querySelector('[data-close]'));
+  });
+
   it('flips a knob toggle in place through aria-pressed', () => {
     makeWindow().open(BED);
     const compost = root.querySelector<HTMLElement>('[data-knob="compost"]');

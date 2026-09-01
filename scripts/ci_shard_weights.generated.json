@@ -2,7 +2,7 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3575,
+    "files": 3574,
     "harvestedFiles": 2939,
     "carried": {
       "tests/ability_drill.test.ts": {
@@ -1416,17 +1416,6 @@
           59,
           58,
           57
-        ]
-      },
-      "tests/ignivar_eastbrook_entrance.test.ts": {
-        "ms": 828,
-        "method": "local-median",
-        "measured": "2026-08-31",
-        "reason": "phase 18 local carry pending the post-push harvest",
-        "runs": [
-          830,
-          828,
-          813
         ]
       },
       "tests/ignivar_encounter.test.ts": {
@@ -5591,7 +5580,6 @@
   "tests/ignivar_dev_raid.test.ts": 3013,
   "tests/ignivar_dialogue.test.ts": 4,
   "tests/ignivar_dressing_plan_core.test.ts": 58,
-  "tests/ignivar_eastbrook_entrance.test.ts": 828,
   "tests/ignivar_encounter.test.ts": 100720,
   "tests/ignivar_encounter_disposal.test.ts": 5,
   "tests/ignivar_encounter_render.test.ts": 257,

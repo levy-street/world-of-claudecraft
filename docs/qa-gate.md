@@ -307,14 +307,25 @@ green; and the diff shows only added rows plus the provenance block, never a cha
 existing row, since a local carry must never move a CI-harvested weight. The carried rows
 are a stopgap, not a result: the post-push harvest below replaces every one of them.
 
-**CARRIED to Phase 20: the post-push harvest.** As of 2026-08-31 the table is under the
-coverage floor: the walked tree carries 3,533 committed test files, 184 of which have no
-row, so coverage is 0.9479 against a 0.95 bar. Every one of those 184 arrived with a release
-sync after the last harvest (run `32621561241`, 2026-08-23), and the deficit cannot be
-closed on this branch: a harvest needs a completed, all-green, FULL-MODE CI run of a branch
-whose commits are pushed, and `feature/masterwrought` is deliberately local until the packet
-lands. The step is therefore owed at Phase 20, immediately after the first push whose CI run
-goes green in full mode, and before the packet's PR is called mergeable:
+**CARRIED to Phase 20: the post-push harvest.** Every row still traces to the harvest of run
+`32621561241` (2026-08-23) or to a local carry standing in for it, so the wholesale re-harvest
+is owed regardless of where coverage sits. Coverage itself is NOT recorded here: the number
+moved three times inside one day (a stale 0.9479 was still printed in this block after
+`1718dd2d80`, "carry a local weight for every unmeasured test file", had already taken the
+committed tree to 1.0000, and the next release sync re-opened it the same afternoon), which
+is exactly the rot the anchor rule forbids. The coverage arm of
+`tests/ci_shard_partition.test.ts` prints the live verdict against the 0.95 bar in under a
+second; read it there, never from a figure written down here.
+
+What the reader needs instead is the SHAPE. A release sync re-opens the deficit by design: it
+lands test files no harvest has measured, and it can also strand a row whose file it removed
+(the stale-row arm of the same suite catches that one). The phase-close step above
+(`--carry-local-missing`) closes the new-file half locally, on the merged tree, as the last
+integration step of the phase. The other half cannot be closed on this branch at all: a
+harvest needs a completed, all-green, FULL-MODE CI run of a branch whose commits are pushed,
+and `feature/masterwrought` is deliberately local until the packet lands. The wholesale
+harvest is therefore owed at Phase 20, immediately after the first push whose CI run goes
+green in full mode, and before the packet's PR is called mergeable:
 
 ```
 gh run list --branch feature/masterwrought --workflow ci.yml --limit 10   # find the run id
@@ -325,15 +336,22 @@ npx @biomejs/biome check --write scripts/ci_shard_weights.generated.json
 
 The run id must be a run whose shard jobs printed `changes-job decision: mode=full` (the
 harvester refuses anything else, because a selective run measures only its slice and would
-silently shrink the table). Acceptance, all four in one pass: the harvester reports at least
-3,533 files written; `__provenance.harvestedFiles` equals the row count with `carried` empty
-(a wholesale harvest measures everything it writes, so nothing is carried and the
-`prose-backfill` block from the Phase 18 attribution is gone); the coverage arm of
-`tests/ci_shard_partition.test.ts` clears 0.95 rather than merely improving; and the
-worst-shard-over-median ratio in that same arm stays at or under 1.15. If a green full-mode
-run is still not available when Phase 20 closes, the fallback is `--carry-local` over the
-184 files (three consecutive single-file runs each, on the merged tree), which restores the
-floor with honest per-row provenance but leaves the wholesale harvest owed.
+silently shrink the table). Acceptance, all four in one pass, and note that NONE of them is a
+copied count, deliberately: the harvester writes at least as many rows as the table it
+replaces already had, read off that table rather than remembered (the floor is the line
+`node -p "Object.keys(require('./scripts/ci_shard_weights.generated.json')).length - 1"`
+prints BEFORE the run, and a smaller result afterwards means the run was not full mode after
+all); `__provenance.harvestedFiles` equals the row count with `carried` empty (a
+wholesale harvest measures everything it writes, so nothing is carried and the
+`prose-backfill` block from the Phase 18 attribution is gone); `tests/ci_shard_partition.test.ts`
+is fully green, which is both the coverage arm clearing 0.95 rather than merely improving AND
+the stale-row arm finding no row whose file the syncs removed; and the worst-shard-over-median
+ratio in that same arm stays at or under 1.15. The earlier wording here fixed the first bar at
+a literal file count taken before the last two syncs, which by this tip sat BELOW the committed
+table and would have signed off a harvest that silently dropped rows. If a green full-mode run
+is still not available when Phase 20 closes, the fallback is `--carry-local-missing` on the
+merged tree (three runs per file, its default), which restores the floor with honest per-row
+provenance but leaves the wholesale harvest owed.
 
 **The long-sims lanes** (Phase 4; split in two by the lane-diet PR). The
 `CI_LONG_SUITES` files (`scripts/lib/ci_shard_plan.mjs`: the suites measured over 90

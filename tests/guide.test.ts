@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
+import { patternChannelSets, recipeAcquisitionChannel } from '../scripts/wiki/vendor_channel.mjs';
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
 // generator's own hand table cannot drift away from what the sheet says.
 import { RELIQUARY_MARK_ENGLISH } from '../server/character_sheet';
@@ -38,7 +39,7 @@ import { controls as controlsPage } from '../src/guide/pages/controls';
 import { catalogSections, deeds as deedsPage } from '../src/guide/pages/deeds';
 import { dungeons as dungeonsPage } from '../src/guide/pages/dungeons';
 import { professions as professionsPage, ringCards } from '../src/guide/pages/professions';
-import { craftDetailHtml, effectLines } from '../src/guide/pages/professions_craft';
+import { craftDetailHtml, effectLines, itemNameKey } from '../src/guide/pages/professions_craft';
 import { FAQ_ANSWER_KEYS, PROF_FAQ_COUNT } from '../src/guide/pages/professions_faq';
 import { gatheringDetailHtml } from '../src/guide/pages/professions_gathering';
 import { reliquaryCatalogSections, reliquary as reliquaryPage } from '../src/guide/pages/reliquary';
@@ -136,8 +137,10 @@ import {
   WIELD_REQUIREMENT_BY_TIER,
 } from '../src/sim/professions/wield_gate';
 import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
-import { CONSUME_DURATION, type DeedDef } from '../src/sim/types';
+import { CONSUME_DURATION, type DeedDef, DT } from '../src/sim/types';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
+import { entityTranslationKey } from '../src/ui/entity_i18n';
+import { esc } from '../src/ui/esc';
 import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
 import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
@@ -1845,7 +1848,8 @@ describe('Guide professions generated content accuracy', () => {
             true,
           );
         }
-        for (const m of r.materials) expect(Object.keys(m).sort()).toEqual(['count', 'name']);
+        for (const m of r.materials)
+          expect(Object.keys(m).sort()).toEqual(['count', 'itemId', 'name']);
         expect(Object.keys(r.output).sort()).toEqual(['count', 'name', 'quality']);
         if (r.combo) expect(Object.keys(r.combo).sort()).toEqual(['crafts', 'minTier']);
         expect(Object.keys(r.gain).sort()).toEqual(['minimalAt', 'reducedAt', 'zeroAt']);
@@ -1854,6 +1858,23 @@ describe('Guide professions generated content accuracy', () => {
   });
 
   it('maps every recipe row back to the sim def with matching numbers', () => {
+    // The channel sets come from the SHARED derivation the generator itself
+    // calls (scripts/wiki/vendor_channel.mjs), not from a second copy of the
+    // expression re-typed here. This guard used to re-derive an identical Set
+    // inline under a comment promising it derived it "exactly as the generator
+    // derives it", which is a promise nothing enforced: a generator that moved
+    // would have kept a green mirror. Sharing the derivation cannot turn this
+    // into a self-comparison, because the per-arm literal exemplars below
+    // ("pins the spot literals...") anchor every one of the five values on a
+    // named recipe id, and tests/wiki_vendor_channel.test.ts drives the module
+    // itself off synthetic tables.
+    const patternChannels = patternChannelSets({
+      mobs: MOBS,
+      heroicBossLoot: HEROIC_BOSS_LOOT,
+      riftPatternItemIds: RIFT_PATTERN_ITEM_IDS,
+      farmRiftDropItemIds: FARM_RIFT_DROP_ITEM_IDS,
+      heroicVendorStock: HEROIC_VENDOR_STOCK,
+    });
     for (const c of GUIDE_PROF_CRAFTS) {
       const simIds = ALL_RECIPES.filter((r) => r.professionId === c.id)
         .map((r) => r.id)
@@ -1866,45 +1887,26 @@ describe('Guide professions generated content accuracy', () => {
         expect(row.skillReq).toBe(def.skillReq);
         expect(row.tier).toBe(tierForSkill(def.skillReq));
         expect(row.station).toBe(def.stationType ?? null);
-        // The channel split mirrors the generator's (phase 11, masterwrought R8, widened at
-        // phase 11f): a drop-acquisition recipe whose teaching pattern is
-        // stocked on the Heroic Quartermaster AND carried by a live drop table
-        // renders as BOTH; one or the other alone renders as that one. The
-        // drop side is derived from the tables themselves, the same way the
-        // generator does it, so a channel added anywhere reaches this pin by
-        // existing rather than by being listed.
-        // Every pattern id a LIVE drop table carries: the normal mob loot
-        // (which holds the raid channel), the heroic-only tables (the
-        // five-man channel), and both rift pick lists. Derived rather than
-        // listed, exactly as the generator derives it, so a channel added
-        // anywhere reaches this pin by existing.
-        const droppedPatternIds = new Set<string>([
-          ...Object.values(MOBS).flatMap((m) =>
-            (m.loot ?? []).flatMap((e) => (e.itemId ? [e.itemId] : [])),
-          ),
-          ...Object.values(HEROIC_BOSS_LOOT)
-            .flat()
-            .flatMap((e) => (e.itemId ? [e.itemId] : [])),
-          ...RIFT_PATTERN_ITEM_IDS,
-          ...FARM_RIFT_DROP_ITEM_IDS,
-        ]);
-        const patternId = `pattern_${def.resultItemId}`;
-        const vendorTaught = HEROIC_VENDOR_STOCK.some((offer) => offer.itemId === patternId);
-        const dropTaught = droppedPatternIds.has(patternId);
-        expect(row.acquisition).toBe(
-          def.acquisition?.includes('trainer')
-            ? 'trainer'
-            : def.acquisition?.includes('drop')
-              ? vendorTaught && dropTaught
-                ? 'dropAndVendor'
-                : vendorTaught
-                  ? 'vendor'
-                  : 'drop'
-              : 'known',
-        );
+        // The channel split IS the generator's (phase 11, masterwrought R8,
+        // widened at phase 11f, shared at phase 18): a drop-acquisition recipe
+        // whose teaching pattern is stocked on the Heroic Quartermaster AND
+        // carried by a live drop table renders as BOTH; one or the other alone
+        // renders as that one. Both sides are derived from the tables
+        // themselves, so a channel added anywhere reaches this pin by existing
+        // rather than by being listed.
+        expect(row.acquisition).toBe(recipeAcquisitionChannel(def, patternChannels));
         expect(row.feeCopper).toBe(def.acquisition?.includes('trainer') ? trainingFeeFor(def) : 0);
+        // The bill carries the reagent ID as well as the English name (the
+        // page localizes through the id and never renders `name`), so the
+        // accuracy guard binds BOTH: the id is the live def's own, and the
+        // English beside it is that id's own live name. An id/name pair that
+        // came apart would render one reagent and pin another.
         expect(row.materials).toEqual(
-          def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+          def.reagents.map((g) => ({
+            itemId: g.itemId,
+            name: ITEMS[g.itemId].name,
+            count: g.count,
+          })),
         );
         expect(row.output.name).toBe(ITEMS[def.resultItemId].name);
         expect(row.output.count).toBe(def.resultCount);
@@ -1935,13 +1937,38 @@ describe('Guide professions generated content accuracy', () => {
     // output carries the row with the def's own numbers, and a row never
     // appears on a non-consumable. Non-vacuity: the four buff dishes and at
     // least a dozen foodHp dishes exist, counted below.
+    //
+    // A PLACEABLE FEAST resolves through its own def's dishItemId
+    // (harvest-feast-wiki-effect-cell): a feast carries no foodHp and no
+    // wellFed, so the values belong to the dish each serving IS, and reading
+    // the output def alone is exactly the bug that left every feast row with
+    // an empty effect cell. The hop is re-walked here off the LIVE defs rather
+    // than taken from the generator, so the guard still binds both ways, and
+    // the feast's own two facts are pinned against the same record.
     let foodRows = 0;
     let wellfedRows = 0;
+    let feastRows = 0;
     for (const c of GUIDE_PROF_CRAFTS) {
       for (const row of c.recipes) {
         const def = ALL_RECIPES.find((r) => r.id === row.id);
         if (!def) continue;
-        const item = ITEMS[def.resultItemId];
+        const output = ITEMS[def.resultItemId];
+        const feastRecord = 'feast' in output ? output.feast : undefined;
+        if (feastRecord) {
+          feastRows++;
+          // A feast def really must carry neither field itself, or the served
+          // hop below would be picking one of two live sources at random.
+          expect(output.foodHp, `${row.id} feast def must carry no foodHp`).toBeUndefined();
+          expect(output.kind, `${row.id} feast def must not be kind food`).not.toBe('food');
+          expect(row.effect?.feast, `${row.id} feast facts missing`).toEqual({
+            servings: feastRecord.charges,
+            minutes: (feastRecord.durationTicks * DT) / 60,
+          });
+        } else {
+          expect(row.effect?.feast, `${row.id} phantom feast facts`).toBeUndefined();
+        }
+        const item = feastRecord ? ITEMS[feastRecord.dishItemId] : output;
+        expect(item, `${row.id} serves an unknown dish`).toBeDefined();
         const itemWellfed = item.kind === 'food' ? item.wellFed : undefined;
         if (item.foodHp) {
           foodRows++;
@@ -1972,16 +1999,22 @@ describe('Guide professions generated content accuracy', () => {
         } else {
           expect(row.effect?.wellfed, `${row.id} phantom wellfed effect`).toBeUndefined();
         }
-        if (!item.foodHp && !itemWellfed) {
+        if (!item.foodHp && !itemWellfed && !feastRecord) {
           expect(row.effect, `${row.id} effect on a non-consumable`).toBeUndefined();
         }
       }
     }
     expect(foodRows).toBeGreaterThanOrEqual(12);
     // The whole unified well-fed family since 11c: the four farm dishes plus
-    // the three apex role plates (the generator reads the one wellFed field,
-    // so the plates gain their effect cells at the same regen).
-    expect(wellfedRows).toBe(7);
+    // the three apex role plates, PLUS the four placeable feasts, which now
+    // reach the same count through their served dishes (harvest_feast serves
+    // evergarden_braised_greens; the three apex feasts serve the three role
+    // plates). The number moving from 7 to 11 IS the fix: before the hop, four
+    // craftable outputs with a real well-fed payload published nothing at all.
+    expect(wellfedRows).toBe(11);
+    // Every shipped feast, not "at least one": the hop is per-def, so a fifth
+    // feast that skipped it would sit silently under a floor.
+    expect(feastRows).toBe(4);
   });
 
   it('the unmapped-kind fallback line renders (never a silent effect cell)', () => {
@@ -2270,6 +2303,19 @@ describe('Guide professions generated content accuracy', () => {
     const apexFlask = alc?.recipes.find((r) => r.id === 'recipe_ironhusk_flask');
     expect(apexFlask?.acquisition).toBe('vendor');
     expect(apexFlask?.feeCopper).toBe(0);
+    // The BOTH-channels arm (phase 11f), the fifth and last value, pinned on a
+    // named row rather than derived. This exemplar is what keeps the shared
+    // channel derivation (scripts/wiki/vendor_channel.mjs, imported by the
+    // generator AND by the mirror above) from becoming a self-comparison:
+    // every farming pattern drops off Nythraxis AND sells on the marks
+    // counter, so a module mutated to collapse the both case into either
+    // single label reds HERE, on a literal, with nothing derived to agree with
+    // it. Named ids on both halves so a table edit that retires one channel
+    // reds rather than silently re-classifying the row.
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const feast = cook?.recipes.find((r) => r.id === 'recipe_harvest_feast');
+    expect(feast?.acquisition).toBe('dropAndVendor');
+    expect(feast?.feeCopper).toBe(0);
     // Specialization: skill 75, 20 percent material discount, from content.
     for (const c of GUIDE_PROF_CRAFTS) {
       expect(c.specialization.at).toBe(PERK_THRESHOLDS[c.id].specializedSkillThreshold);
@@ -3095,8 +3141,15 @@ describe('Guide professions enchanting and economy accuracy', () => {
       const def = ENCHANTS[row.id];
       expect(row.name).toBe(def.name);
       expect(row.slot).toBe(def.itemSlot);
+      // Id AND English name, the same pairing the recipe bills carry: the
+      // enchant table rides the craft page's one materials cell, which
+      // localizes through the id.
       expect(row.reagents).toEqual(
-        def.reagents.map((g) => ({ name: ITEMS[g.itemId].name, count: g.count })),
+        def.reagents.map((g) => ({
+          itemId: g.itemId,
+          name: ITEMS[g.itemId].name,
+          count: g.count,
+        })),
       );
       expect(row.bonus).toEqual(
         Object.entries(def.statBonus).map(([stat, value]) => ({ stat, value })),
@@ -3260,6 +3313,190 @@ describe('Guide professions pages and routes', () => {
       // which is why it sits with these two rather than deriving from a craft.
       'provisioning',
     ]);
+  });
+
+  it('names recipe and enchant materials in the READER locale, never baked English', async () => {
+    // wiki-craft-table-baked-english. The materials cell used to interpolate
+    // the generator's baked English `name` straight into guide.profPages.matFmt,
+    // so a Spanish reader got "Osmium Ore x4" on the wiki and "Mineral de
+    // Osmio" in the game for the same reagent. The generator now emits the item
+    // ID beside the English source and the page localizes through it.
+    //
+    // FIRST: the key the page builds must be the one the game's own entity
+    // resolver builds. The guide cannot import that resolver (src/ui/entity_i18n
+    // pulls ITEMS/MOBS/NPCS/QUESTS/ZONES out of src/sim/data, which the public
+    // wiki bundle deliberately does not carry), so the equality is pinned here,
+    // over EVERY material id the generator emits rather than a sample.
+    let materialIds = 0;
+    const sweep = (bill: readonly { itemId: string }[]): void => {
+      for (const m of bill) {
+        materialIds++;
+        expect(itemNameKey(m.itemId)).toBe(
+          entityTranslationKey({ kind: 'item', id: m.itemId, field: 'name' }),
+        );
+        // itemDisplayName resolves a heroic variant through its base item's
+        // key because the variant has none of its own. The page has no such
+        // hop, so a heroic reagent would resolve to a key that does not exist
+        // and t() would throw. Nothing ships one; pinned so nothing starts to.
+        expect(ITEMS[m.itemId]?.heroicOf, `${m.itemId} is a heroic variant`).toBeUndefined();
+      }
+    };
+    for (const c of GUIDE_PROF_CRAFTS) for (const r of c.recipes) sweep(r.materials);
+    for (const row of GUIDE_PROF_ENCHANTING.enchants) sweep(row.reagents);
+    expect(materialIds, 'material ids swept').toBeGreaterThan(100);
+    // The sweep above cannot reach the SANITIZER half of the builder: every
+    // shipped material id is already word-characters-only, so deleting the
+    // .replace() entirely leaves all 111 ids sweeping green (measured). The
+    // two builders are pinned on synthetic ids carrying each class of
+    // character the segment rule rewrites, so the halves cannot drift before
+    // the day a non-word id ships rather than after it.
+    for (const synthetic of ['a-b', 'a.b', "hunter's", 'a b', 'a/b', 'ok_id9']) {
+      expect(itemNameKey(synthetic), `sanitizer parity for ${synthetic}`).toBe(
+        entityTranslationKey({ kind: 'item', id: synthetic, field: 'name' }),
+      );
+    }
+
+    // SECOND: the render, both ways round. English is unchanged.
+    setLanguage('en');
+    const wc = GUIDE_PROF_CRAFTS.find((c) => c.id === 'weaponcrafting');
+    const ore = wc?.recipes
+      .find((r) => r.id === 'recipe_thorium_warblade')
+      ?.materials.find((m) => m.itemId === 'thorium_ore');
+    expect(ore?.name, 'the generated bill still carries the English source name').toBe(
+      'Osmium Ore',
+    );
+    expect(professionsPage.render(ctx(['weaponcrafting']))).toContain('Osmium Ore');
+
+    await ensureLocaleLoaded('es');
+    try {
+      setLanguage('es');
+      // Premise guard, and the reason the locale is NAMED rather than looped:
+      // es really translates this ore, while de_DE and fr_FR still carry the
+      // English fill for it, so those two would pass the arm below while
+      // rendering English and prove nothing.
+      const esOre = t(itemNameKey('thorium_ore'));
+      expect(esOre, 'es must actually translate the ore for this arm to bite').not.toBe(
+        'Osmium Ore',
+      );
+      const cells = [
+        ...professionsPage
+          .render(ctx(['weaponcrafting']))
+          .matchAll(/<span class="guide-prof-mat">([^<]*)<\/span>/g),
+      ].map((m) => m[1]);
+      expect(cells.length, 'the es page renders material cells at all').toBeGreaterThan(0);
+      expect(cells.some((cell) => cell.includes(esOre))).toBe(true);
+      expect(
+        cells.some((cell) => cell.includes('Osmium Ore')),
+        'no material cell may still read the baked English name',
+      ).toBe(false);
+    } finally {
+      setLanguage('en');
+    }
+  });
+
+  it('renders a feast row through the SERVING templates, never the eat-it-yourself ones', () => {
+    // harvest-feast-wiki-effect-cell, the RENDER half (the data half is pinned
+    // by the C10 mirror above). The values are the served dish's, but the
+    // wording may not be: the player sets a feast out and does not eat it, and
+    // the restore and the boon reach whoever takes a serving. So both the
+    // positive and the NEGATIVE are asserted, because the dish templates would
+    // render perfectly happily off the same numbers and read as a plausible
+    // cell while telling the reader the wrong thing about who eats.
+    setLanguage('en');
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    const feastRow = cook?.recipes.find((r) => r.id === 'recipe_harvest_feast');
+    expect(feastRow?.effect?.feast, 'the feast row carries its placement facts').toEqual({
+      servings: 10,
+      minutes: 3,
+    });
+    // WELLFED_STAT_KEYS is a PARTIAL map (kinds outside it take each
+    // consumer's aura-name fallback), so the stamina row is asserted present
+    // rather than assumed: unmapping it must red here, not degrade the
+    // comparison to a fallback string that would then match a fallback render.
+    const staKey = WELLFED_STAT_KEYS.buff_sta;
+    expect(staKey, 'the stamina well-fed kind must stay mapped').toBeDefined();
+    if (!staKey) return;
+    const html = effectLines(feastRow as (typeof GUIDE_PROF_CRAFTS)[number]['recipes'][number]);
+    expect(html).toContain(t('guide.profPages.effectFeast', { servings: '10', minutes: '3' }));
+    expect(html).toContain(
+      t('guide.profPages.effectFeastServing', { amount: '980', seconds: '18' }),
+    );
+    expect(html).toContain(
+      t('guide.profPages.effectFeastWellFed', {
+        stat: t(staKey),
+        value: '5',
+        minutes: '10',
+      }),
+    );
+    expect(html, 'a feast must not tell the reader they eat it').not.toContain(
+      t('guide.profPages.effectFood', { amount: '980', seconds: '18' }),
+    );
+    expect(html).not.toContain(
+      t('guide.profPages.effectWellFed', {
+        stat: t(staKey),
+        value: '5',
+        minutes: '10',
+      }),
+    );
+    // The cell really reaches the page, and a BAGGED dish on the same page
+    // still uses the eat-it templates (the branch has to be per-row, not
+    // per-page).
+    const page = professionsPage.render(ctx(['cooking']));
+    expect(page, 'the feast effect cell renders on the cooking page').toContain(html);
+    const dish = cook?.recipes.find((r) => r.id === 'recipe_evergarden_braised_greens');
+    const dishHtml = effectLines(dish as (typeof GUIDE_PROF_CRAFTS)[number]['recipes'][number]);
+    expect(dishHtml).toContain(t('guide.profPages.effectFood', { amount: '980', seconds: '18' }));
+    expect(dishHtml).not.toContain(
+      t('guide.profPages.effectFeastServing', { amount: '980', seconds: '18' }),
+    );
+  });
+
+  it('never prints a craft gain boundary a player cannot reach', () => {
+    // wiki-craft-gain-clamp, settled as a REWORD and not the clamp the finding
+    // asked for. The DATA half of that ruling is asserted first, on purpose:
+    // clamping the emitted numbers to the cap replaces an unreachable number
+    // with a FALSE claim about a reachable one (a tier-3 recipe clamped to
+    // "gain fades to nothing at 125" still pays a quarter at 125), and it reds
+    // both the decisive curve arm and the literal row above. So the generator
+    // keeps emitting the raw curve arithmetic and the PAGE stops printing a
+    // skill nobody can have.
+    setLanguage('en');
+    const cook = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    expect(cook?.maxSkill, 'the enforced craft cap the boundaries are read against').toBe(125);
+    const apex = cook?.recipes.find((r) => r.id === 'recipe_stonepot_feast');
+    expect(apex?.skillReq, 'a recipe sitting AT the cap, whose gain never fades').toBe(125);
+    expect(apex?.gain, 'the emitted boundaries stay the raw curve arithmetic, unclamped').toEqual({
+      reducedAt: 150,
+      minimalAt: 175,
+      zeroAt: 200,
+    });
+    // Scale, so this is not one odd row: the exact published counts.
+    const rows = GUIDE_PROF_CRAFTS.flatMap((c) =>
+      c.recipes.map((r) => ({ cap: c.maxSkill, gain: r.gain })),
+    );
+    expect(rows.length, 'published recipe rows').toBe(170);
+    expect(
+      rows.filter((r) => r.gain.zeroAt > r.cap).length,
+      'rows carrying at least one unreachable boundary',
+    ).toBe(63);
+
+    const never = t('guide.profPages.gainNever');
+    const cell = (reduced: string, minimal: string, zero: string): string =>
+      t('guide.profPages.gainFmt', { reduced, minimal, zero });
+    // All three shapes that exist above the cap, each on the cooking page
+    // (which carries all six shapes the catalog produces).
+    const page = professionsPage.render(ctx(['cooking']));
+    expect(page, 'a tier-5 row fades nowhere at all').toContain(cell(never, never, never));
+    expect(page, 'a tier-4 row halves at the cap and stops').toContain(cell('125', never, never));
+    expect(page, 'a tier-3 row reaches the quarter and stops').toContain(cell('100', '125', never));
+    // And the numbers those three used to print are GONE. Without this half
+    // the arms above would pass on a page that printed both.
+    expect(page).not.toContain(cell('150', '175', '200'));
+    expect(page).not.toContain(cell('125', '150', '175'));
+    expect(page).not.toContain(cell('100', '125', '150'));
+    // A fully reachable ladder row still prints all three numbers: the reword
+    // must not swallow the boundaries a player really does cross.
+    expect(professionsPage.render(ctx(['weaponcrafting']))).toContain(cell('75', '100', '125'));
   });
 
   it('carries the Masterwrought endgame prose: the caps, the perfecting odds, the promotion', () => {
@@ -3529,6 +3766,130 @@ describe('Guide professions pages and routes', () => {
     expect(econ).toContain('Forge Work Order');
     // An unknown id renders the inline not-found, never a blank page.
     expect(professionsPage.render(ctx(['nonsense']))).toContain('guide-notfound');
+  });
+
+  // Row extraction shared by the two arms below: the whole <tr> a named output
+  // appears in, so an assertion cannot be satisfied by the same string
+  // appearing in a different row or in the page prose.
+  //
+  // The needle goes through esc() FIRST and is regex-escaped SECOND, in that
+  // order. The page escapes every interpolated name, so a name carrying an
+  // apostrophe ("Hunter's Game Skewer") is `&#39;` in the HTML and a raw match
+  // silently returns '' for it: an empty row string then satisfies every
+  // `not.toContain` arm and the row drops out of the sweep unnoticed. That is
+  // how a page-wide walk quietly becomes a partial one.
+  const rowFor = (html: string, name: string): string => {
+    const needle = esc(name).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return (
+      html.match(
+        new RegExp(`<tr[^>]*>(?:(?!</tr>)[\\s\\S])*${needle}(?:(?!</tr>)[\\s\\S])*</tr>`),
+      )?.[0] ?? ''
+    );
+  };
+
+  it('renders a placeable feast in feast wording, not the served dish (harvest-feast)', () => {
+    setLanguage('en');
+    // harvest-feast-wiki-effect-cell. A feast is kind 'junk' with no foodHp and
+    // no wellFed of its own, so the craft row used to publish NO effect at all
+    // for the one output on the page whose whole point is what it gives a
+    // raid. It now follows feast.dishItemId to the plate each serving IS.
+    //
+    // Two things have to be true and only one of them is about numbers:
+    // the VALUES must be the served dish's, and the WORDING must be the
+    // feast-serving templates rather than the dish's own eat-it ones, because
+    // the player sets a feast out for others. The negative arm is what pins
+    // the second: effectFood ("...when eaten") and effectFeastServing ("Each
+    // serving restores...") are different strings, neither a prefix of the
+    // other, so a branch that fell through to the dish's key reds here.
+    const cooking = professionsPage.render(ctx(['cooking']));
+    const feastRow = rowFor(cooking, 'Harvest Feast');
+    expect(feastRow, 'the feast row must render at all').not.toBe('');
+    const feastDef = ITEMS.harvest_feast;
+    const feastRecord = 'feast' in feastDef ? feastDef.feast : undefined;
+    expect(feastRecord, 'harvest_feast must still carry a feast payload').toBeDefined();
+    if (!feastRecord) return;
+    const dish = ITEMS[feastRecord.dishItemId];
+    const dishWellfed = dish.kind === 'food' ? dish.wellFed : undefined;
+    expect(dish.foodHp, 'the served dish must still restore health').toBeGreaterThan(0);
+    expect(dishWellfed, 'the served dish must still mint Well Fed').toBeDefined();
+    if (!dishWellfed) return;
+    // Partial map (see the sibling arm): assert the mapping rather than assume
+    // it, so an unmapped kind reds instead of quietly comparing two fallbacks.
+    const dishStatKey = WELLFED_STAT_KEYS[dishWellfed.kind];
+    expect(dishStatKey, `the served dish's ${dishWellfed.kind} must be mapped`).toBeDefined();
+    if (!dishStatKey) return;
+    // Placement, from the feast's OWN record.
+    expect(feastRow, 'the placement line').toContain(
+      t('guide.profPages.effectFeast', {
+        servings: String(feastRecord.charges),
+        minutes: String((feastRecord.durationTicks * DT) / 60),
+      }),
+    );
+    // The serving's restore, from the DISH's record, in serving wording.
+    expect(feastRow, 'the serving restore line').toContain(
+      t('guide.profPages.effectFeastServing', {
+        amount: String(dish.foodHp),
+        seconds: String(CONSUME_DURATION),
+      }),
+    );
+    // The serving's boon, from the DISH's record, in serving wording.
+    expect(feastRow, 'the serving well-fed line').toContain(
+      t('guide.profPages.effectFeastWellFed', {
+        stat: t(dishStatKey),
+        value: String(dishWellfed.value),
+        minutes: String(dishWellfed.duration / 60),
+      }),
+    );
+    // The template-choice negative, kept here too because it is row-scoped:
+    // the sibling arm asserts it on the effectLines() output, which cannot see
+    // a page that put the right cell on the wrong row.
+    expect(feastRow, 'a feast must not claim the reader eats it').not.toContain(
+      t('guide.profPages.effectFood', {
+        amount: String(dish.foodHp),
+        seconds: String(CONSUME_DURATION),
+      }),
+    );
+  });
+
+  it('applies the out-of-reach gain rule ROW by row, not somewhere on the page', () => {
+    setLanguage('en');
+    // The row-scoped half of wiki-craft-gain-clamp. The arm above
+    // ("never prints a craft gain boundary a player cannot reach") owns the
+    // ruling, the counts, and the three page-level shapes; it asserts on the
+    // whole page, so a cell rendered against the WRONG recipe satisfies it.
+    // This walks every row of the page instead and demands that row's own
+    // boundaries, which is what makes the reword a rule rather than three
+    // lucky strings. It is also the arm that reds if the cap the rule reads
+    // stops being the craft's own (a hard-coded 125 would survive above and
+    // die here the day one craft's maxSkill moves).
+    const cooking = GUIDE_PROF_CRAFTS.find((c) => c.id === 'cooking');
+    expect(cooking, 'the cooking craft').toBeDefined();
+    if (!cooking) return;
+    const html = professionsPage.render(ctx(['cooking']));
+    const never = t('guide.profPages.gainNever');
+    const cell = (reduced: string, minimal: string, zero: string): string =>
+      t('guide.profPages.gainFmt', { reduced, minimal, zero });
+    let neverRows = 0;
+    for (const r of cooking.recipes) {
+      const bound = (at: number): string => (at > cooking.maxSkill ? never : String(at));
+      const row = rowFor(html, r.name);
+      expect(row, `${r.id} must render a row at all`).not.toBe('');
+      expect(row, `${r.id} gain cell`).toContain(
+        cell(bound(r.gain.reducedAt), bound(r.gain.minimalAt), bound(r.gain.zeroAt)),
+      );
+      if ([r.gain.reducedAt, r.gain.minimalAt, r.gain.zeroAt].some((v) => v > cooking.maxSkill)) {
+        neverRows++;
+      } else {
+        // A fully reachable row must not carry the word at all, so a renderer
+        // that appended it everywhere cannot pass the sweep.
+        expect(row, `${r.id} is reachable throughout and must say so plainly`).not.toContain(never);
+      }
+    }
+    // Non-vacuity in both directions: the rule really splits this page.
+    expect(neverRows, 'rows with an out-of-reach boundary').toBeGreaterThan(0);
+    expect(neverRows, 'and not every row, or the cell would be saying nothing').toBeLessThan(
+      cooking.recipes.length,
+    );
   });
 
   it('the provisioning page tells the story from real generated data', () => {

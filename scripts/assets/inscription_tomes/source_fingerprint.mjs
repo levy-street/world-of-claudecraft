@@ -6,13 +6,15 @@ import { fileURLToPath } from 'node:url';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const INSCRIPTION_TOMES_REPO_ROOT = path.resolve(HERE, '..', '..', '..');
 
-// One fingerprint covers the whole three-tome family: the committed item-icon
-// SVG references, the factory, the exporter chain, the optimizer, and the
-// lockfile. Any change to any of these re-exports all three GLBs.
+// One fingerprint covers the whole four-tome family: the committed item-icon
+// SVG references (the phase 06 trio plus the phase 09 apex tome), the factory,
+// the exporter chain, the optimizer, and the lockfile. Any change to any of
+// these re-exports all four GLBs.
 export const INSCRIPTION_TOMES_SOURCE_FILES = Object.freeze([
   'docs/achievements/masterwrought-phase06-art/silverleaf_primer.svg',
   'docs/achievements/masterwrought-phase06-art/goldleaf_folio.svg',
   'docs/achievements/masterwrought-phase06-art/sunpetal_grimoire.svg',
+  'docs/achievements/masterwrought-phase09-art/voidbound_grimoire.svg',
   'scripts/assets/inscription_tomes/model.js',
   'scripts/assets/inscription_tomes/export_entry.js',
   'scripts/assets/inscription_tomes/export_inscription_tomes.mjs',

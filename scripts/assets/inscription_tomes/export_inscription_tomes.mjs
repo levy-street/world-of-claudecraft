@@ -1,5 +1,6 @@
-// Deterministic export, optimization, and visual evidence for the three
-// Masterwrought phase 06 inscription tome held models.
+// Deterministic export, optimization, and visual evidence for the four
+// Masterwrought inscription tome held models (the phase 06 trio plus the
+// phase 09 apex voidbound grimoire).
 //
 // Usage:
 //   node scripts/assets/inscription_tomes/export_inscription_tomes.mjs
@@ -54,10 +55,9 @@ function candidateOutFor(key) {
   return path.join(CANDIDATE_ROOT, `models/weapons/${key}.glb`);
 }
 function referenceFor(key) {
-  return path.join(
-    ROOT,
-    `docs/achievements/masterwrought-phase06-art/${INSCRIPTION_TOME_VARIANTS[key].itemId}.svg`,
-  );
+  // Variant-declared: the phase 06 trio's icons live in the phase 06 art
+  // batch, the apex tome's in phase 09.
+  return path.join(ROOT, INSCRIPTION_TOME_VARIANTS[key].reference);
 }
 
 function assertCondition(condition, message) {
