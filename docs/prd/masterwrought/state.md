@@ -20911,6 +20911,20 @@ fresh)
   phase file's own out-of-scope; perfectItem has no UI caller yet);
   the Latin-locale noun mismatch (rides the 0.41.0 release fill); no
   client-side soft-masking of the name (the character-name
+  RULED (qr-19-legendary-name-soft-masking, 2026-09-01, under qr-19-best-for-project):
+  the character-name precedent is RATIFIED for player-given legendary names, so the
+  standing answer is server offensiveName screening plus kick-then-clear and NO
+  client-side display-time masking. Re-read live at the close rather than taken from
+  the record: src/sim/professions/legendary_name.ts is shape-only by its own header and
+  names offensiveName as the server pass, the server hands offensiveName to
+  resolvePerfectItemName on the promotion path, the kick-then-clear flow ships with two
+  E2E pins, and USERNAME_BANLIST with its file twin is read only in server/auth.ts,
+  operator-tunable and pinned by tests/security.test.ts. A display-time mask would need
+  a matcher in every name render sink of BOTH hosts and would ship that operator list
+  into the client bundle, which is the one thing the server-side design exists to
+  avoid, and character names deliberately lack it. Reads as one settled position with
+  qr-19-offline-shape-only-name-screen two lines below, which ruled the content half of
+  the same doctrine: screening is the server pass, shape-only on the offline host.
   precedent); the masterwork seal on the legendary lines (phase 16
   owns the orange art); the offline host running shape-only (an
   RULED (qr-19-offline-shape-only-name-screen, 2026-09-01, under qr-19-best-for-project):
