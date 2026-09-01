@@ -344,6 +344,7 @@ import {
 } from './maps_routes';
 import {
   configureMarketSoldVolume,
+  MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS,
   soldVolumeTailStats,
   soldVolumeWriterIdle,
 } from './market_sold_volume';
@@ -4239,8 +4240,11 @@ export async function startServer(): Promise<http.Server> {
     // Drain the market sold-volume FIFO too (qr-19-sold-volume-four-seam-wiring):
     // each queued accumulator entry stands for many coalesced sales, and an entry
     // still on the tail would be rejected by pool.end() with a burst of failure
-    // lines. Rejections log inside the writer; never throws.
-    await soldVolumeWriterIdle();
+    // lines. BOUNDED, unlike the shape progressEventsIdle uses: this drain sits
+    // ahead of the lease sweep, so a wedged database must not hold it long enough
+    // to skip that sweep. A dropped observation on a hard shutdown is acceptable.
+    const soldVolumeDrained = await soldVolumeWriterIdle(MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS);
+    if (!soldVolumeDrained) console.warn('market sold-volume drain deadline reached');
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.

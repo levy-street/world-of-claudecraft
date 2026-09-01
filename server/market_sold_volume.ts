@@ -128,8 +128,9 @@ export interface SoldVolumeTailStats {
 let writer: SoldVolumeWriter | null = null;
 let onWriteError: (err: unknown) => void = (err) =>
   console.error('market sold-volume write failed:', err);
-// The FIFO tail. Always a settled-or-pending promise; never rejects, because
-// every link swallows into onWriteError.
+// The FIFO tail. Always a settled-or-pending promise; never rejects: the inner
+// .catch swallows an async write rejection into onWriteError, and the outer
+// .catch below swallows a synchronous throw, so a later link is never skipped.
 let tail: Promise<void> = Promise.resolve();
 // The QUEUED entries by item id: the coalescing target AND the depth counter,
 // one value rather than two so the two can never disagree. An entry leaves this
@@ -170,8 +171,27 @@ export function resetMarketSoldVolumeForTests(
 }
 
 /** Resolves once every queued write has settled (tests and shutdown drains). */
-export function soldVolumeWriterIdle(): Promise<void> {
-  return tail;
+/** Milliseconds the shutdown drain (server/main.ts) waits for the FIFO to clear
+ *  before the lease sweep and pool.end(). Bounded like the sibling bank-ledger
+ *  drain (BANK_LEDGER_SHUTDOWN_DRAIN_MS): a degraded database must not hold the
+ *  process past the supervisor's kill grace, since that would skip
+ *  releaseAllCharacterLeases and make the next boot wait out the 90 s lease TTL.
+ *  A dropped observation on a hard shutdown is acceptable; a skipped sweep is not. */
+export const MARKET_SOLD_VOLUME_SHUTDOWN_DRAIN_MS = 10_000;
+
+export function soldVolumeWriterIdle(deadlineMs?: number): Promise<boolean> {
+  const drained = tail.then(() => true);
+  if (deadlineMs === undefined) return drained;
+  // Bounded for the shutdown drain: resolve false if the tail has not settled
+  // within the deadline, so a wedged database cannot hold the process past the
+  // supervisor's kill grace and skip the lease sweep that follows.
+  return Promise.race([
+    drained,
+    new Promise<boolean>((resolve) => {
+      const timer = setTimeout(() => resolve(false), deadlineMs);
+      timer.unref?.();
+    }),
+  ]);
 }
 
 /** Queue depth and the lifetime coalesce/drop counters (ops + metrics). */
@@ -233,11 +253,11 @@ function enqueue(entry: MarketSoldVolumeEntry): void {
     // Defense in depth: a writer that throws SYNCHRONOUSLY (its inner .catch
     // never attached) or an onWriteError that itself throws would otherwise
     // reject `tail`, skip every later link, and wedge the FIFO at its cap. Keep
-    // the chain alive and free the queue slot; report directly to avoid
-    // re-entering onWriteError. Today's boot writer is async, so this is a guard
-    // against a future writer, not a live path.
+    // the chain alive; report directly rather than re-entering onWriteError. The
+    // queue slot is already freed by the head above (it retracts the row before
+    // write() runs, so both throw sites are past that point). Today's boot writer
+    // is async, so this guards a future writer, not a live path.
     .catch((err: unknown) => {
-      if (queued.get(row.itemId) === row) queued.delete(row.itemId);
       console.error('market sold-volume write chain error (kept alive):', err);
     });
 }

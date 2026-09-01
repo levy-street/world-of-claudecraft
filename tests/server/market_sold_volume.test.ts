@@ -299,17 +299,16 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
 });
 
 // ---------------------------------------------------------------------------
-// THE DEFERRAL PIN. Three independent reviewers found this whole cluster wired
-// to NOTHING, and the decision recorded here is that it STAYS that way until a
-// maintainer rules on it: turning on a database write for every market sale is
-// a production behavior call, not a QA fix. So rather than wire it, this pins
-// the ALL-FOUR-ABSENT state, and the pin is what makes the deferral safe.
+// THE WIRING PINS. Three independent Phase 18 QA reviewers found this cluster
+// wired to NOTHING; D147 (qr-19-sold-volume-four-seam-wiring) then landed all
+// four seams together, and these arms FLIPPED from pinning the all-four-ABSENT
+// state to pinning the four wiring SITES present, so a regression that unwires
+// any one reds here.
 //
-// THE FAILURE ORDERING IS WHY IT MUST BE ALL FOUR. The writer WITHOUT the DDL
-// turns every tracked sale into a 42P01 at sale rate. The writer WITH the DDL
-// but WITHOUT the sweep registration is an unbounded table. Either half landing
-// alone is worse than nothing landing, so the day one seam lands this reds and
-// names the other three.
+// THE FAILURE ORDERING IS WHY IT WAS ALL FOUR. The writer WITHOUT the DDL turns
+// every tracked sale into a 42P01 at sale rate; the writer WITH the DDL but
+// WITHOUT the sweep registration is an unbounded table. Landing them together is
+// what the WIRED_SEAMS arms below now hold in place.
 //
 // It is written to be DECISIVE in both directions, which a bare `not.toContain`
 // is not: every needle is first proven to MATCH inside the module that defines

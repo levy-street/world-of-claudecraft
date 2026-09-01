@@ -25596,10 +25596,15 @@ carry that argument in its record.
   Phase 19 row D145 with the reproduction and the price.
   RULED (qr-19-live-nonce-fence-write-loss, 2026-09-01, under qr-19-best-for-project):
   TAKE THE ROW LOCK. The four live save paths now take
-  SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE before the
-  fenced UPDATE (runFencedCharacterUpdate, server/character_save_statement.ts),
-  matching the offline arm, so the nonce fence's InitPlan is evaluated with the
-  row already held and a nonce displaced mid-wait is no longer invisible. The
+  SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR NO KEY UPDATE before
+  the fenced UPDATE (runFencedCharacterUpdate, server/character_save_statement.ts),
+  so the nonce fence's InitPlan is evaluated with the row already held and a nonce
+  displaced mid-wait is no longer invisible. The mode is FOR NO KEY UPDATE, NOT
+  the offline arm's FOR UPDATE (the review round's convergent finding): the
+  ordering is the fix, and the weaker mode avoids stalling every FK-child insert
+  of the character on this hot path while buying nothing for the takeover case,
+  which rotates the nonce through an ON CONFLICT DO UPDATE that takes no parent
+  lock. The
   monolith cost was paid by moving liveSaveFence and the fenced executor beside
   the statement builder; server/db.ts is unchanged at its 5123 ceiling. A
   real-Postgres displacement-race arm reds without the lock and passes with it.

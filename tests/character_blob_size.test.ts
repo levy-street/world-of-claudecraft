@@ -219,8 +219,8 @@ describe('saveCharacterState: the size signal never gates the write', () => {
 
   it('takes the characters row lock BEFORE the fenced UPDATE (qr-19-live-nonce-fence-write-loss)', async () => {
     // D145: the four live save paths run their fenced UPDATE through
-    // runFencedCharacterUpdate, which issues the FOR UPDATE row lock FIRST. If
-    // the lock came after (or not at all) the fence's InitPlan is decided before
+    // runFencedCharacterUpdate, which issues the FOR NO KEY UPDATE row lock FIRST.
+    // If the lock came after (or not at all) the fence's InitPlan is decided before
     // the row is held and a mid-wait lease displacement is invisible (the write
     // loss the offline twin red-proved against real Postgres). Position AND text,
     // so a mutant that drops the lock or moves it after the UPDATE reds.
@@ -235,6 +235,19 @@ describe('saveCharacterState: the size signal never gates the write', () => {
     expect(lockIdx).toBeGreaterThanOrEqual(0);
     expect(updateIdx).toBeGreaterThanOrEqual(0);
     expect(lockIdx).toBeLessThan(updateIdx);
+  });
+
+  it('a no-nonce (none) save SKIPS the row lock (the D145 conditional)', async () => {
+    // runFencedCharacterUpdate takes the lock only for a fenced (nonce) save; an
+    // unfenced 'none' write has no uncorrelated subquery and no race, so it must
+    // not pay the extra round trip. A revert to lock-always would red here (the
+    // behavior 0e7ffa296d introduced was otherwise unpinned).
+    const client = transactionClient();
+    dbMock.connect.mockResolvedValue(client as never);
+    await saveCharacterState(106, 12, realCharacterState()); // no leaseNonce -> 'none'
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    expect(statements.some((s) => s.includes('FOR NO KEY UPDATE'))).toBe(false);
+    expect(statements.some((s) => s.includes('UPDATE characters SET'))).toBe(true);
   });
 });
 

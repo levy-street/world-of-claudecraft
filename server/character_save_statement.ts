@@ -23,10 +23,12 @@
 //   maintainer): heartbeatCharacterLeases stays unqualified, so a recovered
 //   process re-arms a lapsed lease and the term narrows the window rather than
 //   closing it. Be honest about how narrow: the autosave and the heartbeat ride
-//   the SAME 30 s flush tick (server/periodic_save_flush.ts), and the unqualified
-//   heartbeat commits first, so in the lapsed-but-UNRECLAIMED case (no peer took
-//   over) the term catches only the sub-tick window before the heartbeat re-arms
-//   the row, which is the LIKELY branch. It fully closes the RECLAIMED-by-a-peer
+//   the SAME 30 s flush tick (server/periodic_save_flush.ts), which launches the
+//   saves FIRST but whose single-statement heartbeat almost always commits first
+//   anyway (ONE round trip against a save's connect, BEGIN, SET, row lock and
+//   UPDATE), so in the lapsed-but-UNRECLAIMED case (no peer took over) the term
+//   catches only the sub-tick window before the heartbeat re-arms the row, which
+//   is the LIKELY branch. It fully closes the RECLAIMED-by-a-peer
 //   case (the holder changed, so the heartbeat cannot match). Qualifying the
 //   heartbeat would shut the residual but risk a stalled process's sessions
 //   becoming permanently unsaveable, which is why B1 is the maintainer's call.
@@ -168,7 +170,8 @@ export function characterUpdateStatement(
  *  a fresh snapshot with the row held (the offline arm measured the repro green
  *  under FOR NO KEY UPDATE too). This LIVE lock is FOR NO KEY UPDATE, the mode the
  *  UPDATE itself would take, deliberately NOT the offline arm's FOR UPDATE: on
- *  this ~33-saves-a-second path FOR UPDATE would conflict with the FOR KEY SHARE
+ *  this hot save path (about 33 saves a second at 1,000 online, one per character
+ *  per 30 s) FOR UPDATE would conflict with the FOR KEY SHARE
  *  every FK-child INSERT of the character takes (chat_logs, character_deeds,
  *  play_sessions and the rest), stalling those inserts and opening a deadlock
  *  edge for the whole save, and it buys nothing here: a same-account takeover
@@ -182,16 +185,20 @@ export function characterUpdateStatement(
 export const CHARACTER_SAVE_ROW_LOCK_SQL =
   'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR NO KEY UPDATE';
 
-/** Run the character UPDATE with the row lock taken FIRST for a FENCED write, the
- *  offline writer's precedent (server/offline_character_save_db.ts) extended to
- *  the four live save paths by qr-19-live-nonce-fence-write-loss (Phase 19). Only
- *  a fenced statement (the nonce or unleased EXISTS over character_leases) needs
- *  the lock: its uncorrelated subquery is an InitPlan decided BEFORE the row lock,
- *  so we take the lock first. A `none` fence is an unconditional write with no
- *  subquery and no race, so it skips the extra round trip and the cheapest save
- *  path stays cheap. `tx` is the caller's transaction or pooled client; the lock
- *  rides the SAME transaction as the UPDATE, so it holds until the caller commits.
- *  Returns the UPDATE result, so a fence miss still surfaces as rowCount 0. */
+/** Run the character UPDATE with the row lock taken FIRST for a NONCE-fenced live
+ *  write, the offline writer's precedent (server/offline_character_save_db.ts)
+ *  extended to the four live save paths by qr-19-live-nonce-fence-write-loss
+ *  (Phase 19). The live callers pass only `none` or `nonce` fences; the nonce
+ *  EXISTS over character_leases is an uncorrelated InitPlan decided BEFORE the row
+ *  lock, so the lock (FOR NO KEY UPDATE) is taken first. A `none` fence is an
+ *  unconditional write with no subquery and no race, so it skips the extra round
+ *  trip and the cheapest save path stays cheap. The condition below keys on the
+ *  `character_leases` reference; the OFFLINE `unleased` writer must NOT be routed
+ *  through this helper (it takes its own FOR UPDATE lock for the fresh-lease
+ *  exclusion), and no unleased caller does today. `tx` is the caller's transaction
+ *  or pooled client; the lock rides the SAME transaction as the UPDATE, so it
+ *  holds until the caller commits. Returns the UPDATE result, so a fence miss
+ *  still surfaces as rowCount 0. */
 export async function runFencedCharacterUpdate(
   tx: { query: (text: string, values?: unknown[]) => Promise<QueryResult> },
   characterId: number,
