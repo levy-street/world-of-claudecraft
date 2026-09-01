@@ -32,11 +32,15 @@ import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
+import { AURA_VISIBLE_CAP_FULL, auraVisibleCap } from '../src/game/ui_tier_knobs';
 import { resolveFarmPlotVisual } from '../src/render/farm_patches_core';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
 import { GATHER_NODES } from '../src/sim/data';
+import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { terrainHeight } from '../src/sim/world';
+import { ALWAYS_VISIBLE_AURA_IDS, selectShedSlots } from '../src/ui/aura_overflow_priority';
+import { type AuraSlotState, isShortDurationBuff } from '../src/ui/auras_view';
 import { HARVEST_JOURNAL_TICK_MS } from '../src/ui/hud/professions/harvest_journal_window';
 import type { FarmPlotView } from '../src/world_api/farming';
 
@@ -273,5 +277,98 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // surfaces above never import the renderer's fog state either.
     expect(read('src/render/fishing_bobber.ts').includes('LOW_FOG')).toBe(false);
     expect(read('src/ui/minimap_markers.ts').includes('LOW_FOG')).toBe(false);
+  });
+
+  // The LOW preset's buff-icon cap (AURA_VISIBLE_CAP_LOW) and Well Fed.
+  // RULED (qr-19-aura-visible-cap-low-fairness, 2026-09-01, under
+  // qr-19-best-for-project): a Well Fed icon shed by the cap is COSMETIC
+  // upkeep, never actionable information. The buff runs whether or not its
+  // icon is on screen, the honest plus-N overflow badge names the shed instead
+  // of hiding it, and Always Show All Buffs opts out of the cap entirely.
+  // The Phase 11 QA's complaint was that NOTHING PINNED THE CONTRACT either
+  // way, which was true; these arms pin the SHIPPED behaviour rather than
+  // exempting the aura, because an exemption would spend one of the low
+  // preset's eight slots permanently and set a precedent every flask and raid
+  // buff could claim.
+
+  // The apex plate payload. The farm buff dishes run 600, both an order of
+  // magnitude past the short-buff priority bar, which is what puts Well Fed in
+  // the bucket the cap sheds FIRST.
+  const WELL_FED_APEX_DURATION_SEC = 900;
+
+  /** A plain slot fixture; only the fields selectShedSlots reads ever vary. */
+  const auraSlot = (over: Partial<AuraSlotState> & { key: string }): AuraSlotState => ({
+    iconKey: over.key,
+    isDebuff: false,
+    school: '',
+    durationText: '',
+    stacksText: '',
+    name: over.key,
+    remaining: 0,
+    cancelable: false,
+    effectHtml: '',
+    own: false,
+    expiring: false,
+    toggle: false,
+    alwaysRender: false,
+    shortDuration: false,
+    ...over,
+  });
+
+  it('COSMETIC: a 900 second Well Fed sheds under the cap; a debuff and an exempt id never do', () => {
+    // Derived from the shipped threshold rather than asserted by hand, so
+    // moving SHORT_BUFF_PRIORITY_SEC past the food durations reds this arm
+    // instead of leaving it quietly true.
+    expect(isShortDurationBuff(WELL_FED_APEX_DURATION_SEC)).toBe(false);
+    expect(ALWAYS_VISIBLE_AURA_IDS.has(WELL_FED_AURA_ID)).toBe(false);
+    const exemptId = [...ALWAYS_VISIBLE_AURA_IDS][0];
+    const slots: AuraSlotState[] = [
+      auraSlot({ key: 'boss_curse', isDebuff: true }),
+      auraSlot({ key: exemptId }),
+      auraSlot({ key: 'bg_carried_flag', alwaysRender: true }),
+      auraSlot({ key: 'raid_buff' }),
+      auraSlot({
+        key: WELL_FED_AURA_ID,
+        name: 'Well Fed',
+        duration: WELL_FED_APEX_DURATION_SEC,
+        shortDuration: isShortDurationBuff(WELL_FED_APEX_DURATION_SEC),
+      }),
+    ];
+    const shed: boolean[] = [];
+    // A budget of ONE ordinary buff. The three exempt slots do not spend it
+    // (the fairness rule), so the raid buff takes it on application order and
+    // Well Fed is the shed: exactly the behaviour the QA note worried about,
+    // pinned as intended rather than fixed.
+    expect(selectShedSlots(slots, slots.length, 1, shed)).toBe(1);
+    expect(slots.filter((_, i) => shed[i]).map((s) => s.key)).toEqual([WELL_FED_AURA_ID]);
+  });
+
+  it('the three exemption kinds do not spend the cap budget', () => {
+    // The other half of the same rule, driven separately so it cannot pass on
+    // the arm above: with the cap at zero, every ordinary buff sheds and every
+    // exempt slot still renders.
+    const slots: AuraSlotState[] = [
+      auraSlot({ key: 'boss_curse', isDebuff: true }),
+      auraSlot({ key: [...ALWAYS_VISIBLE_AURA_IDS][0] }),
+      auraSlot({ key: 'bg_carried_flag', alwaysRender: true }),
+      auraSlot({ key: WELL_FED_AURA_ID, duration: WELL_FED_APEX_DURATION_SEC }),
+    ];
+    const shed: boolean[] = [];
+    expect(selectShedSlots(slots, slots.length, 0, shed)).toBe(1);
+    expect(slots.filter((_, i) => shed[i]).map((s) => s.key)).toEqual([WELL_FED_AURA_ID]);
+  });
+
+  it('the Always Show All Buffs opt-out makes the cap never bite, whatever the preset', () => {
+    // Hud.buffBarFxTier() reports 'ultra' to auraVisibleCap when the setting is
+    // on, scoped to that one painter instance, so a player who would rather pay
+    // the per-frame cost never loses an icon at all. That opt-out plus the
+    // honest plus-N badge are why the shed is upkeep rather than a hidden fact.
+    expect(auraVisibleCap('low')).toBeLessThan(AURA_VISIBLE_CAP_FULL);
+    expect(auraVisibleCap('ultra')).toBe(AURA_VISIBLE_CAP_FULL);
+    const slots: AuraSlotState[] = Array.from({ length: 20 }, (_, i) => auraSlot({ key: `b${i}` }));
+    const shed: boolean[] = [];
+    expect(selectShedSlots(slots, slots.length, auraVisibleCap('ultra'), shed)).toBe(0);
+    // Not vacuous: the same 20 slots DO shed on the real low cap.
+    expect(selectShedSlots(slots, slots.length, auraVisibleCap('low'), shed)).toBeGreaterThan(0);
   });
 });

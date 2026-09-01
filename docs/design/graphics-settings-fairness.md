@@ -193,6 +193,21 @@ What each knob does, and why it is gameplay-neutral:
   cap's usual per-frame cost. It touches only that one painter instance; every other low-tier
   knob (FCT, minimap, the debuff bar, the target strip) is unaffected, so this is a player
   PREFERENCE layered on top of the STATIC preset, never a second preset-like governor.
+  **The 2026-09-01 Well Fed cosmetic-shed ratification:** the farming packet's Phase 11 QA left
+  one fairness READ open against this classification. Well Fed runs 600 sec on the farm buff
+  dishes and 900 sec on the apex plates, an order of magnitude past `SHORT_BUFF_PRIORITY_SEC`, so
+  it sits in exactly the long-duration bucket the priority pass above sheds FIRST, on the one
+  preset, taken from the player whose only cue to re-eat is that icon. RULED
+  (`qr-19-aura-visible-cap-low-fairness`, under `qr-19-best-for-project`): the classification is
+  RATIFIED and Well Fed stays sheddable. The icon is upkeep, not an action: the buff runs whether
+  or not it is on screen, the honest plus-N badge names the shed instead of hiding it, and Always
+  Show All Buffs opts a player out of the cap entirely. Exempting it would spend one of the eight
+  low slots permanently and set a precedent every flask and every raid buff could claim, eroding
+  the cap the low preset exists to enforce. The one part of the QA note still simply true was that
+  nothing pinned the contract either way; `tests/professions_graphics_fairness.test.ts` now does,
+  over the real `selectShedSlots`: a 900 sec Well Fed slot sheds, a debuff does not, an
+  `ALWAYS_VISIBLE_AURA_IDS` id does not, exempt slots do not spend the cap budget, and the
+  `'ultra'` override never caps at all.
 - Target frame, hud + `unit_frame_painter.ts`: on low, the target frame BODY (HP / level /
   portrait) refreshes at about 10 Hz; a target SWAP bypasses the throttle
   (`nonSelfRepaintDue`), and the cast bar and the debuffs strip are both painted OUTSIDE the

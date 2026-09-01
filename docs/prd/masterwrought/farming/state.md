@@ -562,7 +562,7 @@ closed-by-X.
 | Idle sway ignores reducedMotion (foliage precedent) | P7 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-idle-sway-reducedmotion (Phase 19, under qr-19-best-for-project): the ambient plant wind exemption is RATIFIED and the class boundary is recorded in docs/design/graphics-settings-fairness.md. Verified live at the close rather than taken from the record: src/render/farm_patches.ts holds no reducedMotion read at all, its sway being a per-plot JS phase advanced by dt and composed onto the bed's seat quaternion, and the foliage wind it follows is gated only by the STATIC GFX.windSway preset knob over a sharedUniforms.uTime clock the renderer advances unconditionally, so no plant in the game reads the setting today and gating the crops alone would make farm beds the only one that stops. THE BOUNDARY IS NARROWER THAN "WORLD MOTION", stated here so the ratification is not read wider than it is: an ability marker drawn in the world is still gated (umbral_anchor_marker.ts freezes its uTime to zero under the setting), so what is exempt is ambient decorative plant motion carrying no actionable state. No code, pin or ceiling moves. |
 | Phase 9 farmer titles and greetings as authored | P9 | maintainer | CLOSED 2026-09-01 by ruling qr-19-farmer-titles-greetings (Phase 19, under qr-19-best-for-project): signed off as authored, no reword. All four titles ship in content (zone1.ts, zone2.ts, zone3.ts, evergarden.ts) and each names its own zone's real geography; the four ids are in the localized set in src/ui/world_entity_i18n.ts and every non-Latin locale already carries a real translated name, title and greeting. A reword would only restale reviewed overlay prose and the wiki for flavor. The full ruling line sits on the Phase 9 reads bullet in the OPEN items section. |
 | p99 blob-size gauge in the perf heartbeat | P3 | maintainer | handed-to-maintainer |
-| AURA_VISIBLE_CAP_LOW = 8 self-buff cap fairness (pre-existing, not farming's) | P11 QA | maintainer | handed-to-maintainer |
+| AURA_VISIBLE_CAP_LOW = 8 self-buff cap fairness (pre-existing, not farming's) | P11 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-aura-visible-cap-low-fairness (Phase 19, under qr-19-best-for-project): the cosmetic classification is RATIFIED and the shed contract is now pinned in tests/professions_graphics_fairness.test.ts. Well Fed stays sheddable: the icon is upkeep rather than an action, the honest plus-N overflow badge names the shed instead of hiding it, and the Always Show All Buffs opt-out uncaps the bar entirely for a player who would rather pay the per-frame cost, both mitigations postdating the note. Exempting it would spend one of the eight low slots permanently and set a precedent every flask and raid buff could claim. The one part of the note simply true was the missing pin, which the new fairness arms close in four directions over the real selectShedSlots. Not an R5 input: R5's food term is the aura's value and duration, never its icon visibility. |
 | The art batch ledger (gates block item 3: ITEM_ART_PENDING 44 (AMENDED 2026-09-01: reads 81 live in src/ui/icons.ts), wellfed aura icon, cross-family icon reads, hoe 32px, carrots-vs-pottage, pin art plus (bd), tonic sparkle, voice lines, icons.ts comment, DEED_ART_PENDING 8 plus crest replacement (AMENDED 2026-09-01: reads 20 live, ten of the twenty release-owned), chip legibility) | P4 to P12 | maintainer art pass | SCHEDULED 2026-09-01 by qr-19-art-batch-ledger: the wave runs on the maintainer's master SHA after the merge; stays handed-to-maintainer as his queue item |
 | CI shard-weights harvest re-run at go-public (scripts/ci_shard_weights_harvest.mjs) | 16th absorb | go-public session | handed-to-maintainer |
 | gatherDowngrade surface union gains 'crop' (silent signature truncation on full-bag golden wins) | P10 | later phase | closed-by-Phase-14 (item B9: union member, farming.ts emit at the golden grant site, once per harvest command across both grades, always lost 'mark' under nothing-rots; the client resolves the toast off lost plus surface through the one gathering_view dispatch, and the crop surface carries its OWN mark line downgradeMarkCrop with five M16 fills (the qa-checklist's copy finding: 'the find' is prospecting vocabulary and read wrong for a grown harvest); zero golden movement, whole parity directory re-run green) |
@@ -4454,6 +4454,25 @@ question does not arise (farming has no station).
     but the well-fed buff is information a player re-eats on, and no
     test pins that a self-buff survives the cap. Owner: maintainer
     fairness read, not farming's.
+    RULED (qr-19-aura-visible-cap-low-fairness, 2026-09-01, under
+    qr-19-best-for-project): the cosmetic classification is RATIFIED,
+    and well_fed stays sheddable. The icon is upkeep, not an action:
+    the buff runs whether or not it is on screen, and two mitigations
+    this note predates already answer the re-eat worry, the honest
+    plus-N overflow badge and the Always Show All Buffs opt-out
+    (Hud.buffBarFxTier reports 'ultra' to auraVisibleCap, so the cap
+    never bites for a player who opts in). Exempting well_fed would
+    spend one of the eight low slots permanently and set a precedent
+    every flask and every raid buff could claim, eroding the cap the
+    low preset exists to enforce. THE ONE PART OF THIS NOTE SIMPLY
+    TRUE WAS THE MISSING PIN, and it is closed:
+    tests/professions_graphics_fairness.test.ts now runs the real
+    selectShedSlots over plain slot fixtures and asserts that a 900
+    second well_fed slot IS sheddable, that a debuff and an
+    ALWAYS_VISIBLE_AURA_IDS id are not, that exempt slots do not spend
+    the cap budget, and that the 'ultra' override uncaps. NOT AN R5
+    INPUT: R5's food term is the aura's value and duration, never its
+    icon visibility, so nothing here touches the frozen record.
   - The useWellfed/useWellfedAura keys sit in the use* family without a
     Use: prefix for a reason only a source comment states; renaming
     would churn 21 locales for a naming nit, declined. The pending Latin
