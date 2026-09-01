@@ -437,6 +437,8 @@ import {
   attackDragDisposition,
   clearHotbarSlot,
   encodeHotbarAction,
+  type FreedAttackSlotAbility,
+  freedAttackSlotDisplayAbility,
   HOTBAR_ACTION_MIME,
   type HotbarAction,
   isAbilityActionBarEligible,
@@ -1279,6 +1281,10 @@ const CHEAT_DEATH_SAVE_TEXT = 'Cheat Death saves you!';
 function curatorRankDisplayName(rank: number): string {
   return t(curatorRankNameKey(rank), { rank: formatNumber(rank) });
 }
+
+// Module-scope (created once, not per frame): freedAttackSlotAbility's abilityDef
+// callback into freedAttackSlotDisplayAbility.
+const abilityDefLookup = (id: string): AbilityDef | undefined => ABILITIES[id];
 
 export class Hud {
   // Ability slots across three rows: 1..11 primary, 12..22 secondary, and
@@ -7245,6 +7251,28 @@ export class Hud {
     return resolveHunterSharedAbilityForTalents(coldsight, this.sim.player, this.sim.talents);
   }
 
+  // Slot 0's display-only fallback (freedAttackSlotDisplayAbility): memoized by
+  // action id, the same "diff a stable key, reuse the reference" idiom the hot
+  // painters use (action_bar_painter's lastIcon, unit_portrait_painter's imgCache),
+  // so the per-frame ability() accessor below never allocates a fresh object while
+  // the freed slot's assignment is unchanged (ActionBarSlotDescriptor's own
+  // no-per-frame-allocation contract).
+  private freedAttackSlotAbilityCache: { id: string; ability: FreedAttackSlotAbility } | null =
+    null;
+  private freedAttackSlotAbility(): FreedAttackSlotAbility | null {
+    const action = this.actionForSlot(0);
+    const id = action?.type === 'ability' ? action.id : null;
+    if (id === null) {
+      this.freedAttackSlotAbilityCache = null;
+      return null;
+    }
+    if (this.freedAttackSlotAbilityCache?.id !== id) {
+      const ability = freedAttackSlotDisplayAbility(action, abilityDefLookup);
+      this.freedAttackSlotAbilityCache = ability ? { id, ability } : null;
+    }
+    return this.freedAttackSlotAbilityCache?.ability ?? null;
+  }
+
   private itemForSlot(barSlot: number): ItemDef | null {
     const action = this.actionForSlot(barSlot);
     return action?.type === 'item' ? (ITEMS[action.id] ?? null) : null;
@@ -7533,6 +7561,12 @@ export class Hud {
           }
         }
         this.flashActionSlot(barSlot);
+      } else if (barSlot === 0 && this.freedAttackSlotAbility()) {
+        // The freed slot now visibly shows an assigned, named icon (dimmed) even
+        // while unusable, so a press must refuse out loud rather than eating the
+        // click silently, the same courtesy a stale item binding already gets
+        // (castCrossHotbarAction's tSim('error.noItem') a few dozen lines up).
+        this.showError(t('abilityUi.tooltip.unavailable'));
       }
     } else if (action?.type === 'item' && this.isHotbarItemId(action.id)) {
       if (this.tradeOpen) return;
@@ -7721,6 +7755,9 @@ export class Hud {
         const known = this.abilityForSlot(slot);
         const clearHint = `<div class="tt-sub">${esc(t('abilityUi.actionBar.clearHint'))}</div>`;
         if (known) return this.abilityTooltip(known) + clearHint;
+        const freed = slot === 0 && this.freedAttackSlotAbility();
+        if (freed)
+          return `<div class="tt-title">${esc(abilityDisplayName(freed.def))}</div><div class="tt-sub">${esc(t('abilityUi.tooltip.unavailable'))}</div>${clearHint}`;
         const item = this.itemForSlot(slot);
         if (item) {
           return this.itemTooltip(item) + itemInBagsLine(this.inventoryCount(item.id)) + clearHint;
@@ -7932,7 +7969,10 @@ export class Hud {
             // unlearned or item id is unknown): the many-spells count source, kept
             // byte-identical to the former hotbarActions.filter(a => a !== null).
             hasAction: () => this.actionForSlot(i) !== null,
-            ability: () => (i === 0 && this.attackSlotIsAttack() ? null : this.abilityForSlot(i)),
+            ability: () =>
+              i === 0 && this.attackSlotIsAttack()
+                ? null
+                : (this.abilityForSlot(i) ?? (i === 0 ? this.freedAttackSlotAbility() : null)),
             item: () => this.itemForSlot(i),
             keybindLabel: () => keyCapLabel(this.keybinds.primaryLabel(slotKey)),
           };

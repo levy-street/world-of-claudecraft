@@ -119,6 +119,23 @@ const MONOLITHS: MonolithRow[] = [
     // LastKeepMapPainter declarations and the two walk-in map branches on the
     // clearMapHitState pattern), riding on main's zero-slack pin. Exact merged
     // count: any further growth reds again.
+    // Re-pinned to the integration merge of the latest v0.40.0 (the touch UI
+    // rework); exact merged count.
+    // Re-pinned for the tutorial mobile-coach fixes that followed that merge
+    // (SCOPED_POPUP_IDS + the greeting-close window-state resync); exact count.
+    // Re-pinned to the exact merged count of the v0.40.0 sync merge that
+    // brings in the OSSBrain v0.40 batch: the merged file lands below both
+    // parent pins, so the ratchet follows it down. Exact count, zero slack.
+    // Plus 1 for the board-note soft mask: the ONE line is the leaderboard
+    // deps' maskPlayerText wiring onto the existing maskChat. Exact count.
+    // Re-pinned for the signpost guild board window: the construction bag,
+    // the openGuildBoard seam, the noticeboard-event arm, and the close and
+    // relocalize wiring (the window itself lives in
+    // src/ui/hud/guild_board/). Then down one at the controller-tutorial
+    // merge. Exact count, zero slack.
+    // Plus 1 for the Exchange's Solana wallet card: the ONE line is the
+    // onWalletUiChange fan-out onto wocMarketWindow.onWalletChanged(), the
+    // Claudium panel's existing arm. Exact count.
     // Raised for the controller cross hotbar, on top of the moved-base v0.39
     // re-pin. The additions are thin-consumer wiring to an extracted domain
     // (src/ui/hud/cross_hotbar/): the overlay's construction, its per-frame paint,
@@ -273,7 +290,16 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Re-pinned at the release/v0.42.0 sync into fix/actionbar-attack-slot-loadout-switch:
+    // the release arm's chain above lands at 18905; this branch's own arm is the
+    // freed Attack-slot render fix (reopen of #3548, +40 over its own 19002 base):
+    // one import, a memoized freedAttackSlotAbility() per-slot cache, the
+    // tooltip's "Unavailable" fallback branch, the action-bar descriptor's slot-0
+    // fallback, and a castSlot() refusal arm for a press on the now-visibly-assigned
+    // slot. Both arms land in the merged tree (18905 + 40), so the exact merged
+    // count is the honest zero-slack bound. Measured on the merged tree, never
+    // reconciled by arithmetic.
+    ceiling: 18945,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
