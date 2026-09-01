@@ -382,7 +382,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: '골짜기 연대기, 제2장',
-    desc: '사울의 연대기 제2장을 끝마치십시오: 도적과 멀록과 광산의 해로운 짐승들을 처치하고, 소우필드에서 경기를 뛰고, 성물실에 도전하십시오.',
   },
   chr_vale_chapter_iii: {
     name: '골짜기의 연대기',
@@ -400,7 +399,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: '무리를 흩는 자', desc: '10초 안에 숲늑대 3마리를 처치하십시오.' },
   chr_vale_cup_debut: {
     name: '구리 양동이 도전자',
-    desc: '소우필드에서 열리는 골짜기 컵 경기에 나서서 공을 만져 보십시오.',
   },
   chr_vale_rares: {
     name: '골짜기의 공포',
@@ -585,63 +583,49 @@ export const table: DeedLocaleTable = {
   pvp_duel_grace: { name: '겸손의 가르침', desc: '결투에서 지되, 체면은 그럭저럭 지켜 내십시오.' },
   pvp_vcup_first_match: {
     name: '그라운드에 선 첫발',
-    desc: '소우필드에서 골짜기 컵 경기 한 판을 승패에 관계없이 끝까지 치르십시오.',
   },
-  pvp_vcup_first_win: { name: '첫 우승컵', desc: '등급전 골짜기 컵 경기에서 승리하십시오.' },
+  pvp_vcup_first_win: { name: '첫 우승컵' },
   pvp_vcup_wins_10: {
     name: '노련한 멧돼지공 선수',
-    desc: '등급전 골짜기 컵 경기에서 10회 승리하십시오.',
   },
   pvp_vcup_wins_25: {
     name: '멧돼지공의 전설',
-    desc: '등급전 골짜기 컵 경기에서 25회 승리하십시오.',
     title: '멧돼지공의 전설',
   },
-  pvp_vcup_first_goal: { name: '마수걸이 골', desc: '등급전 골짜기 컵 경기에서 골을 넣으십시오.' },
+  pvp_vcup_first_goal: { name: '마수걸이 골' },
   pvp_vcup_hat_trick: {
     name: '해트트릭의 주인공',
-    desc: '3대3 이상 부문의 등급전 골짜기 컵 경기 한 판에서 세 골을 넣으십시오.',
   },
   pvp_vcup_golden_goal: {
     name: '황금의 순간',
-    desc: '등급전 골짜기 컵 경기의 승부를 가르는 골든골을 넣으십시오.',
   },
   pvp_vcup_first_save: {
     name: '든든한 두 손',
-    desc: '등급전 골짜기 컵 경기에서 골키퍼로 선방에 성공하십시오.',
   },
   pvp_vcup_clean_sheet: {
     name: '철벽 수문장',
-    desc: '골키퍼로 한 골도 내주지 않고 등급전 골짜기 컵 경기에서 승리하십시오.',
   },
   pvp_vcup_guild_win: {
     name: '깃발을 위하여',
-    desc: '길드의 깃발 아래 출전한 등급전 골짜기 컵 경기에서 승리하십시오.',
   },
   pvp_fiesta_first_bout: {
     name: '잔치의 불청객',
-    desc: '2대2 피에스타 한 판을 승패에 관계없이 끝까지 싸우십시오.',
   },
   pvp_fiesta_first_win: {
     name: '피에스타의 주인공',
-    desc: '2대2 피에스타 한 판에서 승리하십시오.',
   },
-  pvp_fiesta_double: { name: '연달아 둘', desc: '4초 안에 피에스타 처치 2회를 기록하십시오.' },
+  pvp_fiesta_double: { name: '연달아 둘' },
   pvp_fiesta_shutdown: {
     name: '흥을 깨는 자',
-    desc: '연속 처치 3회 이상을 이어 가던 피에스타 상대를 쓰러뜨리십시오.',
   },
   pvp_fiesta_full_build: {
     name: '완벽한 채비',
-    desc: '세 웨이브 모두에서 증강을 확정한 채 피에스타 한 판에서 승리하십시오.',
   },
   pvp_fiesta_powerups: {
     name: '하나씩 전부',
-    desc: '링의 파워업 네 가지를 각각 한 번 이상 획득하십시오: 질주광, 거상, 달 장화, 광전사.',
   },
   pvp_fiesta_five_kills: {
     name: '잔치를 짊어지다',
-    desc: '피에스타 한 판에서 처치 5회를 기록하십시오.',
   },
   soc_first_party: { name: '함께라면 더 멀리', desc: '다른 플레이어와 함께 파티에 들어가십시오.' },
   soc_full_house: { name: '풀 하우스', desc: '다섯 명이 꽉 찬 파티로 던전을 끝까지 공략하십시오.' },

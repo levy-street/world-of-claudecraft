@@ -370,7 +370,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Kronika Údolí, kapitola II',
-    desc: 'Dokonči druhou kapitolu Saulovy kroniky: bandité, murloci i důlní havěť pobiti, zápas na Prasečím poli odehrán a Relikviář zdolán.',
   },
   chr_vale_chapter_iii: {
     name: 'Kronika Údolí',
@@ -388,7 +387,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Postrach smeček', desc: 'Zab 3 Lesní vlky během 10 sekund.' },
   chr_vale_cup_debut: {
     name: 'Uchazeč o Měděné vědro',
-    desc: 'Nastup na hřiště a dotkni se míče v zápase Poháru Údolí na Prasečím poli.',
   },
   chr_vale_rares: {
     name: 'Hrůzy Údolí',
@@ -573,66 +571,51 @@ export const table: DeedLocaleTable = {
   pvp_duel_grace: { name: 'Lekce pokory', desc: 'Prohraj duel s důstojností víceméně nedotčenou.' },
   pvp_vcup_first_match: {
     name: 'Kopačky na hřišti',
-    desc: 'Odehraj celý zápas Poháru údolí na Prasečím poli, ať vyhraješ, nebo prohraješ.',
   },
-  pvp_vcup_first_win: { name: 'První trofej', desc: 'Vyhraj hodnocený zápas Poháru údolí.' },
+  pvp_vcup_first_win: { name: 'První trofej' },
   pvp_vcup_wins_10: {
     name: 'Ostřílený kančbalista',
-    desc: 'Vyhraj 10 hodnocených zápasů Poháru údolí.',
   },
   pvp_vcup_wins_25: {
     name: 'Legenda kančbalu',
-    desc: 'Vyhraj 25 hodnocených zápasů Poháru údolí.',
     title: 'Legenda kančbalu',
   },
   pvp_vcup_first_goal: {
     name: 'Střelecký účet otevřen',
-    desc: 'Vstřel gól v hodnoceném zápase Poháru údolí.',
   },
   pvp_vcup_hat_trick: {
     name: 'Hrdina hattricku',
-    desc: 'Vstřel tři góly v jediném hodnoceném zápase Poháru údolí, v kategorii 3 na 3 nebo větší.',
   },
   pvp_vcup_golden_goal: {
     name: 'Zlatý okamžik',
-    desc: 'Vstřel zlatý gól, který rozhodne hodnocený zápas Poháru údolí.',
   },
   pvp_vcup_first_save: {
     name: 'Jisté ruce',
-    desc: 'Předveď zákrok jako brankář v hodnoceném zápase Poháru údolí.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Přese mě nic neprojde',
-    desc: 'Vyhraj hodnocený zápas Poháru údolí jako brankář bez inkasovaného gólu.',
   },
   pvp_vcup_guild_win: {
     name: 'Za zástavu',
-    desc: 'Vyhraj hodnocený zápas Poháru údolí odehraný pod zástavou tvého cechu.',
   },
   pvp_fiesta_first_bout: {
     name: 'Nezvaný host',
-    desc: 'Odehraj celý souboj Fiesty 2 na 2, ať vyhraješ, nebo prohraješ.',
   },
-  pvp_fiesta_first_win: { name: 'Duše Fiesty', desc: 'Vyhraj souboj Fiesty 2 na 2.' },
+  pvp_fiesta_first_win: { name: 'Duše Fiesty' },
   pvp_fiesta_double: {
     name: 'Dvojitý malér',
-    desc: 'Zaznamenej dvě eliminace ve Fiestě během čtyř sekund.',
   },
   pvp_fiesta_shutdown: {
     name: 'Kazič zábavy',
-    desc: 'Sejmi soupeře ve Fiestě, který je na sérii tří a více.',
   },
   pvp_fiesta_full_build: {
     name: 'Ve velké parádě',
-    desc: 'Vyhraj souboj Fiesty s vylepšením zajištěným ze všech tří vln.',
   },
   pvp_fiesta_powerups: {
     name: 'Od každého jednou',
-    desc: 'Seber alespoň jednou každý ze čtyř power-upů v ringu: Démona rychlosti, Kolosa, Měsíční boty a Berserkera.',
   },
   pvp_fiesta_five_kills: {
     name: 'Tahoun párty',
-    desc: 'Zaznamenej pět eliminací v jediném souboji Fiesty.',
   },
   soc_first_party: {
     name: 'Ve dvou se to lépe táhne',

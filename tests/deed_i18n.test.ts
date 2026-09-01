@@ -171,9 +171,47 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   });
 
   const tableLocales = (): BaseLocale[] => Object.keys(tables) as BaseLocale[];
+  const retiredDescriptionFallbackIds = [
+    'chr_vale_chapter_ii',
+    'chr_vale_cup_debut',
+    'pvp_vcup_first_match',
+    'pvp_vcup_first_win',
+    'pvp_vcup_wins_10',
+    'pvp_vcup_wins_25',
+    'pvp_vcup_first_goal',
+    'pvp_vcup_hat_trick',
+    'pvp_vcup_golden_goal',
+    'pvp_vcup_first_save',
+    'pvp_vcup_clean_sheet',
+    'pvp_vcup_guild_win',
+    'pvp_fiesta_first_bout',
+    'pvp_fiesta_first_win',
+    'pvp_fiesta_double',
+    'pvp_fiesta_shutdown',
+    'pvp_fiesta_full_build',
+    'pvp_fiesta_powerups',
+    'pvp_fiesta_five_kills',
+  ] as const;
 
   it('carries one chunk per base locale', () => {
     expect(tableLocales().length).toBe(18);
+  });
+
+  it('omits retired-mode description fills until updated translations exist', () => {
+    for (const lang of tableLocales()) {
+      for (const id of retiredDescriptionFallbackIds) {
+        expect(tables[lang][id]?.desc, `${lang}.${id}.desc`).toBeUndefined();
+      }
+    }
+
+    setLanguage('fr_FR');
+    expect(deedName('chr_vale_chapter_ii')).toBe('Chronique du Val, chapitre II');
+    expect(deedDesc('chr_vale_chapter_ii')).toBe(DEEDS.chr_vale_chapter_ii.desc);
+    expect(deedName('pvp_vcup_wins_25')).toBe('Légende de la balle au sanglier');
+    expect(deedTitleText('pvp_vcup_wins_25')).toBe('Légende de la balle au sanglier');
+    expect(deedDesc('pvp_vcup_wins_25')).toBe(DEEDS.pvp_vcup_wins_25.desc);
+    expect(deedName('pvp_fiesta_first_win')).toBe("L'âme de la Fiesta");
+    expect(deedDesc('pvp_fiesta_first_win')).toBe(DEEDS.pvp_fiesta_first_win.desc);
   });
 
   // RELEASE-TIER ONLY: a contributor adds new deeds ENGLISH-only (the deed

@@ -383,7 +383,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Crónica del Valle, capítulo II',
-    desc: 'Termina el segundo capítulo de la crónica de Saul: bandidos, merodeadores Aletabarro y alimañas de la mina abatidos, un partido disputado en el Sembradal y el Relicario desafiado.',
   },
   chr_vale_chapter_iii: {
     name: 'Crónica del Valle',
@@ -404,7 +403,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_cup_debut: {
     name: 'Aspirante al Balde de Cobre',
-    desc: 'Salta al campo y toca el balón en un partido de la Copa del Valle en el Sembradal.',
   },
   chr_vale_rares: {
     name: 'Terrores del Valle',
@@ -598,69 +596,53 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Botas en la cancha',
-    desc: 'Juega un partido completo de la Copa del Valle en el Sembradal, ganes o pierdas.',
   },
   pvp_vcup_first_win: {
     name: 'El primer trofeo',
-    desc: 'Gana un partido clasificatorio de la Copa del Valle.',
   },
   pvp_vcup_wins_10: {
     name: 'Balonjabalista curtido',
-    desc: 'Gana 10 partidos clasificatorios de la Copa del Valle.',
   },
   pvp_vcup_wins_25: {
     name: 'Leyenda del balonjabalí',
-    desc: 'Gana 25 partidos clasificatorios de la Copa del Valle.',
     title: 'Leyenda del balonjabalí',
   },
   pvp_vcup_first_goal: {
     name: 'Estreno goleador',
-    desc: 'Anota un gol en un partido clasificatorio de la Copa del Valle.',
   },
   pvp_vcup_hat_trick: {
     name: 'Héroe del triplete',
-    desc: 'Anota tres goles en un solo partido clasificatorio de la Copa del Valle, en la categoría 3c3 o superior.',
   },
   pvp_vcup_golden_goal: {
     name: 'Momento de oro',
-    desc: 'Anota el gol de oro que decide un partido clasificatorio de la Copa del Valle.',
   },
   pvp_vcup_first_save: {
     name: 'Manos seguras',
-    desc: 'Realiza una atajada como guardameta en un partido clasificatorio de la Copa del Valle.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Por aquí no pasa nada',
-    desc: 'Gana un partido clasificatorio de la Copa del Valle como guardameta sin recibir ningún gol.',
   },
   pvp_vcup_guild_win: {
     name: 'Por el estandarte',
-    desc: 'Gana un partido clasificatorio de la Copa del Valle disputado bajo el estandarte de tu hermandad.',
   },
   pvp_fiesta_first_bout: {
     name: 'Colado en la Fiesta',
-    desc: 'Disputa un combate completo de Fiesta 2c2, ganes o pierdas.',
   },
-  pvp_fiesta_first_win: { name: 'El alma de la Fiesta', desc: 'Gana un combate de Fiesta 2c2.' },
+  pvp_fiesta_first_win: { name: 'El alma de la Fiesta' },
   pvp_fiesta_double: {
     name: 'Doble problema',
-    desc: 'Consigue dos derribos en la Fiesta en un lapso de cuatro segundos.',
   },
   pvp_fiesta_shutdown: {
     name: 'Aguafiestas',
-    desc: 'Derriba a un rival de la Fiesta que lleve una racha de tres o más.',
   },
   pvp_fiesta_full_build: {
     name: 'Vestido para la ocasión',
-    desc: 'Gana un combate de Fiesta con un aumento fijado de cada una de las tres oleadas.',
   },
   pvp_fiesta_powerups: {
     name: 'Uno de cada',
-    desc: 'Recoge al menos una vez cada una de las cuatro mejoras del ring: Demonio Veloz, Coloso, Botas Lunares y Frenético.',
   },
   pvp_fiesta_five_kills: {
     name: 'Cargando con la Fiesta',
-    desc: 'Consigue cinco derribos en un solo combate de Fiesta.',
   },
   soc_first_party: { name: 'Mejor acompañados', desc: 'Únete a un grupo con otro jugador.' },
   soc_full_house: {

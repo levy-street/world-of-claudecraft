@@ -371,7 +371,6 @@ export const table: DeedLocaleTable = {
   },
   chr_vale_chapter_ii: {
     name: 'Vadi Vakayinamesi, II. Bölüm',
-    desc: "Saul'un vakayinamesinin ikinci bölümünü bitir: haydutları, murlocları ve maden haşaratını hakla, Domuz Tarlası'nda sahaya çık ve Emanetlik'e göğüs ger.",
   },
   chr_vale_chapter_iii: {
     name: "Vadi'nin Vakayinamesi",
@@ -389,7 +388,6 @@ export const table: DeedLocaleTable = {
   chr_vale_packbreaker: { name: 'Sürü Kıran', desc: '10 saniye içinde 3 Orman Kurdu öldür.' },
   chr_vale_cup_debut: {
     name: 'Bakır Kova Adayı',
-    desc: "Domuz Tarlası'ndaki bir Vadi Kupası maçında sahaya çık ve topa dokun.",
   },
   chr_vale_rares: {
     name: "Vadi'nin Dehşetleri",
@@ -555,63 +553,49 @@ export const table: DeedLocaleTable = {
   },
   pvp_vcup_first_match: {
     name: 'Sahaya İlk Adım',
-    desc: "Kazan ya da kaybet, Domuz Tarlası'nda bir Vadi Kupası maçını sonuna kadar oyna.",
   },
-  pvp_vcup_first_win: { name: 'İlk Kupa', desc: 'Dereceli bir Vadi Kupası maçı kazan.' },
+  pvp_vcup_first_win: { name: 'İlk Kupa' },
   pvp_vcup_wins_10: {
     name: 'Domuztopunun Eski Kurdu',
-    desc: '10 dereceli Vadi Kupası maçı kazan.',
   },
   pvp_vcup_wins_25: {
     name: 'Domuztopu Efsanesi',
-    desc: '25 dereceli Vadi Kupası maçı kazan.',
     title: 'Domuztopu Efsanesi',
   },
-  pvp_vcup_first_goal: { name: 'Siftah', desc: 'Dereceli bir Vadi Kupası maçında gol at.' },
+  pvp_vcup_first_goal: { name: 'Siftah' },
   pvp_vcup_hat_trick: {
     name: 'Hat-Trick Kahramanı',
-    desc: '3v3 ya da daha büyük ligde, tek bir dereceli Vadi Kupası maçında üç gol at.',
   },
   pvp_vcup_golden_goal: {
     name: 'Altın An',
-    desc: 'Dereceli bir Vadi Kupası maçının kaderini belirleyen altın golü at.',
   },
   pvp_vcup_first_save: {
     name: 'Güvenli Eller',
-    desc: 'Dereceli bir Vadi Kupası maçında kaleci olarak bir kurtarış yap.',
   },
   pvp_vcup_clean_sheet: {
     name: 'Bu Kaleden Geçilmez',
-    desc: 'Dereceli bir Vadi Kupası maçını kaleci olarak gol yemeden kazan.',
   },
   pvp_vcup_guild_win: {
     name: 'Sancak İçin',
-    desc: 'Loncanın sancağı altında katıldığın dereceli bir Vadi Kupası maçını kazan.',
   },
   pvp_fiesta_first_bout: {
     name: 'Davetsiz Misafir',
-    desc: 'Kazan ya da kaybet, eksiksiz bir 2v2 Fiesta müsabakasında dövüş.',
   },
-  pvp_fiesta_first_win: { name: "Fiesta'nın Neşesi", desc: 'Bir 2v2 Fiesta müsabakası kazan.' },
+  pvp_fiesta_first_win: { name: "Fiesta'nın Neşesi" },
   pvp_fiesta_double: {
     name: 'Çifte Bela',
-    desc: "Fiesta'da dört saniye içinde rakiplerini iki kez yere ser.",
   },
   pvp_fiesta_shutdown: {
     name: 'Oyunbozan',
-    desc: "Fiesta'da, serisi üçe ya da daha fazlasına ulaşmış bir rakibi yere ser.",
   },
   pvp_fiesta_full_build: {
     name: 'Tepeden Tırnağa Hazır',
-    desc: 'Üç dalganın her birinden birer takviye kilitlenmiş halde bir Fiesta müsabakası kazan.',
   },
   pvp_fiesta_powerups: {
     name: 'Her Şeyden Bir Tane',
-    desc: 'Dört ring güçlendirmesinin her birini en az bir kez kap: Hız Şeytanı, Kolos, Ay Botları ve Cinnet.',
   },
   pvp_fiesta_five_kills: {
     name: 'Partiyi Sırtlayan',
-    desc: 'Tek bir Fiesta müsabakasında rakiplerini beş kez yere ser.',
   },
   soc_first_party: {
     name: 'Birlikten Kuvvet Doğar',
