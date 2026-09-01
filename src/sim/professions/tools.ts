@@ -352,9 +352,12 @@ export function slotEffect(
  *  whose every resulting mint the resolver refused, so ticking it emptied
  *  the row's slottable set and erased both the buttons and the toggle
  *  itself until the window reopened. Farming refuses because harvest_crop
- *  carries no confirm channel (see the resolver arm's banner); the Phase
- *  7/8 change that lands the channel edits this predicate and the arm
- *  together. */
+ *  carries no confirm channel (see the resolver arm's banner); the change
+ *  that lands the channel edits THREE sites together, this predicate, the
+ *  resolver arm, and the Phase 18 LOAD-side twin in normalizeToolEffectSlots
+ *  below. RULED PERMANENT (qr-19-harvest-confirm-channel, 2026-09-01): the
+ *  refusal is the design rather than a stopgap, so this banner is the
+ *  standing guard for anyone who later reverses it. */
 export function promptSlotRefused(professionId: string): boolean {
   return professionId === 'farming';
 }

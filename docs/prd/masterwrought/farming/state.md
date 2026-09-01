@@ -634,7 +634,7 @@ closed-by-X.
 | Any future farming file under public/ui/skills/ joins the freeze lists plus the sha fixture in the same change | 21st absorb | any future phase | accepted-no-action (rule recorded) |
 | hud.ts sits at an exact-zero-headroom ceiling (19214/19214 after the P12 extraction); extraction-first is mandatory for any Hud line | P12 | every future phase | accepted-no-action (standing constraint) |
 | Stale dev-facing comments (types.ts roster, online.ts gprof pair, guide professions.ts header, load_professions.mjs GATHER_PROFS, build_content.mjs beds prose) | P1 / P3 | inherited debt | accepted-no-action |
-| Harvest confirm channel for prompt-mode tool effects ((af)/(ah)/(ba): mints refused, toggle suppressed, journal informational) | P5 to P8 | whoever lands a confirm channel | accepted-no-action (re-deferred with the paired-edit rule) |
+| Harvest confirm channel for prompt-mode tool effects ((af)/(ah)/(ba): mints refused, toggle suppressed, journal informational) | P5 to P8 | whoever lands a confirm channel | closed-by-Phase-19 (qr-19-harvest-confirm-channel, 2026-09-01: refusal ruled permanent; the banner in src/sim/professions/tools.ts stays as the guard for anyone who reverses it). AMENDED in the same ruling rather than rewritten: that banner is no longer a PAIRED edit, it is a TRIPLE, because Phase 18 added a LOAD-side twin in normalizeToolEffectSlots beside the promptSlotRefused policy authority and the mint-side arm in resolveSlotToolEffect, so whoever lands the channel edits three sites; the banner itself is restated to say so. Ruled permanent rather than re-deferred a fourth time because three records independently accepted no-action, the journal is informational by design, and harvest_crop still carries no confirm channel, so a farming slot minted in prompt mode could never fire or spend. Full ruling line on the (ba) block. |
 | Deploy-order and rollback bullet | P2 / P3 | ops | closed-by-Phase-3 (DEPLOY.md carries it) |
 | (bn) no client-side player verb planted or harvested | P9 QA | Phase 9b | closed-by-Phase-9b (verbs ship; journey 17/17; reachability pin guards the class) |
 | (z) parity-scenario knob coverage | P4 QA | Phase 5 | closed-by-Phase-5 (isolated golden re-record with the knob beats) |
@@ -3489,6 +3489,26 @@ question does not arise (farming has no station).
   (ba) The harvest confirm channel ((ah)/(af)) stays RE-DEFERRED: the
   journal is informational by design (no plant or harvest button, no
   command sent), so promptSlotRefused and the resolver arm are untouched.
+  RULED (qr-19-harvest-confirm-channel, 2026-09-01, under qr-19-best-for-project):
+  (ba) is RATIFIED as PERMANENT and its handoff row CLOSES rather than
+  re-deferring a fourth time. Three records ((af), (ah) and (ba)) independently
+  accepted no-action, the journal is informational by design (no plant or harvest
+  button, no command sent), and harvest_crop still carries no confirm channel, so
+  a farming slot minted in prompt mode could never fire or spend. The row sat open
+  through three sweeps only because its status was accepted-no-action rather than
+  one of the two statuses a sweep looks for; ruling it permanent is what takes it
+  off the table. ONE CORRECTION THE RECORD CARRIED WRONGLY, amended here rather
+  than rewritten: the paired edit is now a TRIPLE. In src/sim/professions/tools.ts
+  the promptSlotRefused policy authority, the mint-side arm in
+  resolveSlotToolEffect and the Phase 18 LOAD-side twin in
+  normalizeToolEffectSlots all read the same predicate, so whoever lands the
+  channel edits three sites, not two, and the banner in that file is restated to
+  say so. (The lift-in-the-same-change instruction lives on the RESOLVER arm's
+  banner, not the load twin's, which defers to it for the reasoning.) The
+  land-the-channel arm stays a sub-feature, never a fix round: its own src/ui
+  confirm flow on the existing HUD seams, the three-site sim edit, sim and parity
+  tests, and i18n keys for the prompt copy. No code moves under this ruling beyond
+  that banner restatement.
   (bb) LINKDEAD ACCEPTANCE, maintainer read owed at feature review: a plot
   ripening during the linkdead grace window loses its transient notice
   permanently (probed: sendRaw drops frames for a non-open socket, and the
