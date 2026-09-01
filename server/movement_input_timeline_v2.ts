@@ -93,7 +93,13 @@ export function applyMovementInputFrame(
         }) === true;
     }
     if (accepted && ctx) {
-      noteBattlegroundWallPressure(ctx, meta, entity, frame.moveInput);
+      noteBattlegroundWallPressure(
+        ctx,
+        meta,
+        entity,
+        frame.moveInput,
+        frame.facing ?? entity.facing,
+      );
     }
     return frame;
   }
@@ -124,7 +130,7 @@ export function consumeMovementFramesV2(
     }
     noteBattlegroundWallPressure(sim.ctx, meta, entity);
     Object.assign(meta.moveInput, frame.mi);
-    noteBattlegroundWallPressure(sim.ctx, meta, entity);
+    noteBattlegroundWallPressure(sim.ctx, meta, entity, frame.mi, frame.facing ?? entity.facing);
     if (frame.facing !== null && (!entity.dead || entity.ghost) && !isStunned(entity)) {
       entity.facing = frame.facing;
     }

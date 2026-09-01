@@ -443,6 +443,47 @@ describe('online unstuck command wiring', () => {
     expect(meta.moveInput.forward).toBe(false);
   });
 
+  it('the Settings command uses queued v2 facing when wall pressure is queued', () => {
+    const server = new GameServer();
+    const { session } = join(server, 29);
+    Object.assign(session, createMovementInputSessionState(2));
+    const { match, pid } = activeBattlegroundForSession(server, session);
+    const player = forceIntoBgWallContact(server, match, pid, false);
+    const meta = must(server.sim.meta(pid), 'wall-contact player meta');
+    player.facing = Math.PI / 2;
+    player.prevFacing = player.facing;
+
+    server.handleMessage(
+      session,
+      JSON.stringify({ t: 'input', seq: 1, ct: 0, mi: { f: 1 }, facing: -Math.PI / 2 }),
+    );
+    expect(meta.moveInput.forward).toBe(false);
+    expect(player.facing).toBeCloseTo(Math.PI / 2, 8);
+
+    send(server, session, { cmd: 'unstuck' });
+
+    expect(meta.pendingUnstuck).toMatchObject({
+      area: {
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      },
+    });
+
+    const events: SimEvent[] = [];
+    for (let i = 0; i < UNSTUCK_COUNTDOWN_SECONDS * 20; i++) events.push(...server.sim.tick());
+
+    expect(events).toContainEqual(
+      expect.objectContaining({ type: 'unstuck', phase: 'completed', pid }),
+    );
+    expect(server.sim.bgMatchFor(pid)).toBe(match);
+    expect(inBgGraveyard(server, match, pid)).toBe(true);
+    expect(player.vx).toBe(0);
+    expect(player.vz).toBe(0);
+    expect(meta.moveInput.forward).toBe(false);
+  });
+
   it('the Settings command ignores wall pressure from rejected v2 input frames', () => {
     const server = new GameServer();
     const { session } = join(server, 28);
