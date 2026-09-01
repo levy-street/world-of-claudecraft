@@ -49,6 +49,11 @@ const worldNormal = { x: 0, z: 0 };
  * TOI of a point moving (dx, dz) from (px, pz) against a circle of radius R
  * (already the Minkowski sum of the obstacle and the body). Returns Infinity
  * on a miss, and 0 with an escape normal when the start is already inside.
+ * Strictly inside (`c < 0`), not merely touching: a start EXACTLY on the
+ * boundary must fall through to the ordinary quadratic below, whose own
+ * `b >= 0` check lets departing or tangential motion miss. Treating touching
+ * as overlapping here would report a hit regardless of direction, freezing a
+ * body caught at exact zero clearance in every direction, including away.
  */
 function sweepPointCircle(
   px: number,
@@ -63,7 +68,7 @@ function sweepPointCircle(
   const fx = px - cx;
   const fz = pz - cz;
   const c = fx * fx + fz * fz - R * R;
-  if (c <= 0) {
+  if (c < 0) {
     // Already overlapping: report an immediate hit whose normal escapes the
     // penetration (depenetration is the caller's job, but the normal must be
     // sane so a slide never drives deeper).

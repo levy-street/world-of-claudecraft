@@ -486,16 +486,17 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
     // the setPlayerLevel writer routing through computeCharacterModifiers
     // (the resolver itself is the extracted module). Exact count, zero slack.
-    // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the
-    // toggleAutoFaceLock thin delegate onto src/sim/auto_face_lock.ts (plus
-    // its import line) is removed. In its place, the round-4 facing rework
-    // adds ONE new PlayerMeta field (nextFacingErrorAt, the auto-attack
-    // facing-refusal throttle clock) with its justification comment: a
-    // session-only field with no clean extraction, same shape as the
-    // stopAutoAttackOnTargetSwitch precedent beside it. Net +1 line over the
-    // de-toggled baseline. Re-measured on this branch, never reconciled by
-    // arithmetic. Exact count, zero slack.
-    ceiling: 12279,
+    // Re-pinned at the release/v0.42.0 sync into the knockback-wall-pin branch:
+    // this branch's applyKnockback extraction (the shove loop, the
+    // SKIN_WIDTH-padded resolve, and the landing seat moved verbatim to
+    // src/sim/knockback.ts behind SimContext, leaving only a thin delegate
+    // plus the ctx binding and isIceBlocked wiring) lands under the release
+    // arm's own growth (the Crucible vendor delegate, the
+    // partyTradeMsRemaining facet wiring, the Phase B set-bonus seam), and
+    // the branch's own removal outweighs the release arm's additions.
+    // Measured on the merged tree, never reconciled by arithmetic. Exact
+    // count, zero slack.
+    ceiling: 12212,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
