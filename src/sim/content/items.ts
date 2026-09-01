@@ -1107,6 +1107,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // ALCHEMIST out of wild Sheenleaf (D7, the cross-profession trade), so it
   // carries sellValue only. A buyValue here would be the dead-row trap's
   // opposite, a price for a faucet that must not exist.
+  // RULED (qr-19-growth-tonic-price-and-skillup-faucet, 2026-09-01, under
+  // qr-19-best-for-project): the tonic's sellValue 6 and the ABSENCE of a
+  // buyValue are ratified as shipped. This paragraph is the design the
+  // ruling rests on, and tests/farm_recipes.test.ts now pins the 6 exactly
+  // rather than merely asserting it is positive.
   compost: {
     id: 'compost',
     name: 'Compost',

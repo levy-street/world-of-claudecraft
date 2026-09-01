@@ -714,6 +714,13 @@ const TONIC_ID = 'recipe_growth_tonic';
 // reagent reds HERE, not only if it happens to cross the strict bound.
 const TONIC_EXPECTED_INPUT_VALUE = 20;
 
+// The tonic's OUTPUT value, pinned the same way after ruling
+// qr-19-growth-tonic-price-and-skillup-faucet (2026-09-01, farming/state.md):
+// the arm below asserted only "greater than zero", so every value from 1 to 19
+// passed silently under the strict input bound, and the one number the ruling
+// ratifies was the only number in the row nothing pinned.
+const TONIC_EXPECTED_SELL_VALUE = 6;
+
 function requireTonic() {
   const row = FARM_RECIPES.find((r) => r.id === TONIC_ID);
   if (!row) throw new Error(`${TONIC_ID} is missing from FARM_RECIPES`);
@@ -833,7 +840,7 @@ describe('FARM_RECIPES: the growth tonic, the farming-alchemy trade (D7)', () =>
       'the growth tonic is NEVER vendor-stocked (this recipe is its only faucet), so a ' +
         'buyValue here would price a faucet that must not exist',
     ).toBeUndefined();
-    expect(def.sellValue, 'growth_tonic sellValue').toBeGreaterThan(0);
+    expect(def.sellValue, 'growth_tonic sellValue').toBe(TONIC_EXPECTED_SELL_VALUE);
   });
 
   it('does NOT join LADDER_RECIPES, whose consumable convention it would fail', () => {

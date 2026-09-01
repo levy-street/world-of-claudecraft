@@ -4137,6 +4137,12 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
     // early tiers with a knob nobody can brew for them, and it is never
     // vendor-stocked (see the growth_tonic ItemDef comment), so the trainer
     // rung is the only faucet there is.
+    // RULED (qr-19-growth-tonic-price-and-skillup-faucet, 2026-09-01, under
+    // qr-19-best-for-project): both flags above are ANSWERED and stand as
+    // shipped. The reagent counts (2 herbs plus the vial) and skillReq 0 do
+    // not move; the cheaper rung-0 skill-up path this bill opens is accepted
+    // with the intent recorded on the (ai) block in
+    // docs/prd/masterwrought/farming/state.md.
     reagents: [
       { itemId: 'silverleaf_herb', count: 2 },
       { itemId: 'glass_vial', count: 1 },

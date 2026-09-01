@@ -435,6 +435,12 @@ closed-by-X.
    mapping. The sim.ts comment-compression ratchet read from Phase 12 is
    DISCHARGED by the Phase 13 M5 extraction (ceiling 12660 lowered to
    12249); recorded here as such, no read owed anymore.
+   The two growth tonic reads listed above (the sell-only price, and the
+   (ai) cheap-skill-up finding) are DISCHARGED by ruling
+   qr-19-growth-tonic-price-and-skillup-faucet (2026-09-01): the price is
+   ratified sell-only at 6, and the faucet is accepted with the intent
+   recorded on the (ai) block, which now carries the RULED line. Neither
+   read is owed any longer.
 
 3. THE ART BATCH HANDOFF. The deliverable here is THIS LEDGER, never
    generated art: committed item art demands the maintainer's master SHA
@@ -534,7 +540,7 @@ closed-by-X.
 | Feast tuning: charges 10, 180 s, trainer fee 10000, sellValue 250, reagents x4/x4/x2 | P12 | maintainer | open ruling-owed |
 | Seed-back rates 0.08/0.40 tier 3, 0.06/0.35 tier 4 (economy-sensitive) | P5 | maintainer | open ruling-owed |
 | Watch fees 2/3/4/6, compost 2/8, FARM_HUSKS_PER_COMPOST 2, tonic bonus 0.5/2 | P4 | maintainer | CLOSED 2026-09-01 by qr-19-watch-fees-compost-husks-tonic: all four RATIFIED as shipped, no retune. Re-read live at the close (fees 2/3/4/6 in farm_watch_fee.ts, compost 2 sell and 8 buy in items.ts, FARM_HUSKS_PER_COMPOST 2 and the tonic 0.5/2 in farming.ts), and no QA or economy sweep in the packet has filed a finding against any of them; a retune would move the dish-assignment curve-point reuses for no recorded gain. |
-| Growth tonic 6 sell-only plus (ai) cheapest rung-0 alchemy skill-up ruling | P4 / P6 QA | maintainer | open ruling-owed |
+| Growth tonic 6 sell-only plus (ai) cheapest rung-0 alchemy skill-up ruling | P4 / P6 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-growth-tonic-price-and-skillup-faucet (Phase 19, under qr-19-best-for-project), both halves. sellValue 6 with NO buyValue is RATIFIED: the sell-only doctrine is written as design twice (src/sim/content/items.ts and this file) and a buyValue would price a faucet the record says must not exist. The (ai) faucet is ACCEPTED with the intent recorded on its own block, which is the second of the two calls the QA addendum offered, and the hazard is measurably NARROWER than that addendum recorded. Re-derived live at the close: the bill is silverleaf_herb x2 (sellValue 4, no buyValue) plus glass_vial x1 (sellValue 3, buyValue 12), so the tonic reads 11 copper on the reagent sell-value basis docs/design/power-verification.md defines and 20 on the basis a player actually pays, against recipe_minor_healing_potion at 15 on both. That potion, not the tonic, is the cheapest rung-0 skill-up a player can buy into, and it is station-free and trainer-free (no stationType and no acquisition list, so it is grandfathered known-to-everyone and frozen into PRE_TRAINING_RECIPE_IDS), which puts it long before farming. The addendum's own parenthetical (herbs x3-x4 plus extras) skipped that row, whose bill is herbs x2 plus two mob drops. Executed in the same change: tests/farm_recipes.test.ts now pins the ratified 6 exactly, where it asserted only greater-than-zero and left every value from 1 to 19 silently green under the strict input bound. NOT taken: raising the herb count 2 to 3 would move recipe_growth_tonic off alchemy's cheap-path column in power-verification.md and the 12.3 band measured from it, which under the packet's stopping rules is an R5 escalation while R5 is frozen rather than an execution. |
 | (aj) 2500/10000 trainer fees on reagent-dormant rungs | P6 QA | maintainer | CLOSED 2026-08-22 by masterwrought Phase 11f, from BOTH ends and neither of them a ruling. The addendum asked why the rung-25 and rung-50 rows charged for dishes nobody could cook. Phase 11e retired the dormancy by stocking all eight upper seeds, and Phase 11f moved every one of the formerly dormant priced rows off the trainer entirely (rung 75 and above is a drop and charges nothing, in advance or otherwise). What still pays the tier-2 fee is the held bannock at rung 50, which is no longer dormant, so the premise is gone rather than accepted. Pinned both ways in tests/farm_recipes.test.ts: the on-ramp still trains at its fees, and every flipped row is REFUSED at a counter even at cooking 100, so the refusal is provably about the channel and not a skill gate. |
 | Tier-3 rung-50 domination (three rungs for four tiers); tier 4 quality rare | P6 / P11 | maintainer | PARTLY CLOSED 2026-08-22 by masterwrought Phase 11f (11f-GATE-A): the domination half is gone. The ladder is band-complete at 0:4, 25:3, 50:1, 75:2, 100:4, so four crop tiers now have five cooking rungs rather than three, pinned in two arms (the exact derived map, plus a non-emptiness arm over every band from 0 through 100 that keeps biting if a later phase adds a row at 125). The tier-4 QUALITY half stays open and deliberately untouched: 11c owns the power ladder and R5 is measured against it, so the rung-100 farm dishes read a lower quality than the apex consumables on the same rung, which is recorded rather than fixed. NOW FULLY CLOSED 2026-09-01 by qr-19-tier4-dish-quality-rare: the quality half is ACCEPTED on the record, no def edit. Measured at the close, the rung-100 farm dish is rare at 5/600s and foodHp 980 while the apex plates are epic at 6/900s and foodHp 1392, so quality tracks power and the split is the classic-era convention working; raising the farm label departs from that pillar and lowering the apex label moves the frozen 11c surface R5 measures. |
 | Dish foodHp/sellValue assignments and reagent counts (all curve-point reuses) | P6 | maintainer | open ruling-owed |
@@ -2958,6 +2964,30 @@ question does not arise (farming has no station).
   way, so either ruling is a visible edit. The tonic craft path itself is
   now executed end to end through real ticks (tests/farm_recipes.test.ts),
   including the deterministic alchemy skill grant.
+  RULED (qr-19-growth-tonic-price-and-skillup-faucet, 2026-09-01, under
+  qr-19-best-for-project): the second of the two calls this addendum
+  offered is taken. The cheap skill-up path is ACCEPTED and the intent is
+  recorded here; the herb count stays 2 and no reagent literal moves. The
+  intent: the tonic is a plant-time knob for EVERY farm tier rather than a
+  late luxury, so it sits on the accessible rung and its cheapness is the
+  price of that reach (the same reason already written into the recipe
+  comment and into the skillReq assertion message). Re-derived live at the
+  close, the hazard is narrower than this addendum recorded. The bill is
+  silverleaf_herb x2 (sellValue 4, no buyValue) plus glass_vial x1
+  (sellValue 3, buyValue 12): 11 copper on the reagent sell-value basis
+  docs/design/power-verification.md defines, 20 on the basis a player
+  actually pays. recipe_minor_healing_potion reads 15 on both, and it
+  carries no stationType and no acquisition list, so it is grandfathered
+  known-to-everyone and frozen into PRE_TRAINING_RECIPE_IDS, which puts it
+  long before farming. This addendum's own parenthetical skipped it: its
+  bill is herbs x2 plus two mob drops, not herbs x3 to x4. Closing the
+  faucet instead (herbs 2 to 3) would move recipe_growth_tonic off
+  alchemy's cheap-path column in power-verification.md and the 12.3 band
+  measured from it, which under the packet's stopping rules is an R5
+  escalation while R5 is frozen, not an execution. Pinned in the same
+  change: tests/farm_recipes.test.ts asserts the ratified sellValue 6
+  exactly, where it asserted only greater-than-zero and left 1 to 19
+  silently green under the strict input bound.
   (aj) all nine FARM_RECIPES rows are TRAINABLE in the live game before
   go-live, deliberately: the binding Live-surface note wants the recipes
   visible in the crafting window while the farm is dormant, trainer
