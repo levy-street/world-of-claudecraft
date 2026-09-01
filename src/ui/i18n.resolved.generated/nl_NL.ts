@@ -324,8 +324,6 @@ export const nl_NL: EnTranslations = {
     "warlock": {
       "doomLabel": "Verdoemenis",
       "fateThreadsLabel": "Lotsdraden",
-      "doomMeterUnlock": "Verplaats de Kwelling-hulpbronbalk",
-      "doomMeterLock": "Vergrendel de Kwelling-hulpbronbalk",
       "doomEmptyStatus": "{value} van {max} Verdoemenis.",
       "doomStatus": "{value} van {max} Verdoemenis; {remaining}.",
       "fateThreadsStatus": "{value} van {max} Lotsdraden.",
@@ -2978,7 +2976,8 @@ export const nl_NL: EnTranslations = {
         "partyFrames": "Groep",
         "swingBar": "Automatische Aanval",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",

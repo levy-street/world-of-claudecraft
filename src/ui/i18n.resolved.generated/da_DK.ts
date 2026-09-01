@@ -324,8 +324,6 @@ export const da_DK: EnTranslations = {
     "warlock": {
       "doomLabel": "Fordømmelse",
       "fateThreadsLabel": "Skæbnetråde",
-      "doomMeterUnlock": "Flyt Lidelse-ressourcebjælken",
-      "doomMeterLock": "Lås Lidelse-ressourcebjælken",
       "doomEmptyStatus": "{value} af {max} Fordømmelse.",
       "doomStatus": "{value} af {max} Fordømmelse; {remaining}.",
       "fateThreadsStatus": "{value} af {max} Skæbnetråde.",
@@ -2978,7 +2976,8 @@ export const da_DK: EnTranslations = {
         "partyFrames": "Gruppe",
         "swingBar": "Autoangreb",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",

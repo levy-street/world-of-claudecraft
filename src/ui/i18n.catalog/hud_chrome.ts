@@ -13,8 +13,9 @@ export const hudChromeStrings = {
   warlock: {
     doomLabel: 'Condemnation',
     fateThreadsLabel: 'Fate Threads',
-    doomMeterUnlock: 'Move Affliction resource bar',
-    doomMeterLock: 'Lock Affliction resource bar',
+    // The doom meter's per-frame move/lock strings retired with its private
+    // mover: the frame rides the shared interfaceUnlock chrome now, and its
+    // name chip is frameNames.doomMeter below.
     doomEmptyStatus: '{value} of {max} Condemnation.',
     doomStatus: '{value} of {max} Condemnation; {remaining}.',
     fateThreadsStatus: '{value} of {max} Fate Threads.',
@@ -3950,12 +3951,14 @@ export const hudChromeStrings = {
       // The auto-attack swing timer (#swingbar), hidden outside combat like
       // the cast bar, so its chip is what names the placeholder.
       swingBar: 'Auto Attack',
-      // The right-stack trackers, movable frames since the 0.42 round. Both
-      // wordy (M16): their five non-Latin fills land in the same change. The
-      // devotion medallion and doom meter reuse their existing name keys
-      // (hudChrome.paladin.devotion, hudChrome.warlock.doomLabel).
+      // The right-stack trackers and the doom meter, movable frames since
+      // the 0.42 round. All wordy (M16): their five non-Latin fills land in
+      // the same change. The devotion medallion reuses its existing name key
+      // (hudChrome.paladin.devotion); the doom meter needs its own row
+      // because doomLabel names the RESOURCE (Condemnation), not the frame.
       questTracker: 'Quest Tracker',
       reliquaryTracker: 'Reliquary Tracker',
+      doomMeter: 'Affliction Bar',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

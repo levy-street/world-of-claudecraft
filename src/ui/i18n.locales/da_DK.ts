@@ -13414,8 +13414,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Sjælesplinter',
   'hudChrome.warlock.doomEmptyStatus': '{value} af {max} Fordømmelse.',
   'hudChrome.warlock.doomLabel': 'Fordømmelse',
-  'hudChrome.warlock.doomMeterLock': 'Lås Lidelse-ressourcebjælken',
-  'hudChrome.warlock.doomMeterUnlock': 'Flyt Lidelse-ressourcebjælken',
   'hudChrome.warlock.doomStatus': '{value} af {max} Fordømmelse; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Tre Skæbnetråde: Fortær kan flette dem ind i yderligere Fordømmelse.',

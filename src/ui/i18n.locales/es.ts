@@ -13633,8 +13633,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.resourceCount': '{value} de {max}',
   'hudChrome.procOverlay.ruinMeter': 'Ruina',
   'hudChrome.procOverlay.ruinStatus': '{value} de {max} de Ruina',
-  'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recursos de Aflicción',
-  'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recursos de Aflicción',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Tres Hilos del destino: Consumir puede tejerlos en Condena adicional.',
   'hudChrome.warlock.fateThreadsSentenceReady':

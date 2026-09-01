@@ -13690,8 +13690,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': "Fragments d'âme",
   'hudChrome.warlock.doomEmptyStatus': '{value} sur {max} Condamnation.',
   'hudChrome.warlock.doomLabel': 'Condamnation',
-  'hudChrome.warlock.doomMeterLock': 'Verrouiller la barre de ressource Affliction',
-  'hudChrome.warlock.doomMeterUnlock': 'Déplacer la barre de ressource Affliction',
   'hudChrome.warlock.doomStatus': '{value} sur {max} Condamnation ; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady': 'Trois Fils du destin : Consumer peut les tisser en Condamnation supplémentaire.',
   'hudChrome.warlock.fateThreadsLabel': 'Fils du destin',

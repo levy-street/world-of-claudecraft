@@ -10,27 +10,33 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "es_ES": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "fr_FR": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "fr_CA": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "en_CA": [],
   "it_IT": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "de_DE": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
@@ -39,39 +45,48 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "nl_NL": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "pl_PL": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "id_ID": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "tr_TR": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "sv_SE": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "vi_VN": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ],
   "da_DK": [
+    "hudChrome.interfaceUnlock.frameNames.doomMeter",
     "hudChrome.interfaceUnlock.frameNames.questTracker",
     "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
   ]

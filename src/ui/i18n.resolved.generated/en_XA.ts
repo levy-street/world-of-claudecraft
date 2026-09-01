@@ -324,8 +324,6 @@ export const en_XA: EnTranslations = {
     "warlock": {
       "doomLabel": "[Çóñðéɱñáţíóñ]",
       "fateThreadsLabel": "[Ƒáţé Ţĥŕéáðš]",
-      "doomMeterUnlock": "[Ɱóʋé Áƒƒļíçţíóñ ŕéšóúŕçé ƀáŕ]",
-      "doomMeterLock": "[Ļóçķ Áƒƒļíçţíóñ ŕéšóúŕçé ƀáŕ]",
       "doomEmptyStatus": "[{value} óƒ {max} Çóñðéɱñáţíóñ.]",
       "doomStatus": "[{value} óƒ {max} Çóñðéɱñáţíóñ; {remaining}.]",
       "fateThreadsStatus": "[{value} óƒ {max} Ƒáţé Ţĥŕéáðš.]",
@@ -2978,7 +2976,8 @@ export const en_XA: EnTranslations = {
         "partyFrames": "[Þáŕţý]",
         "swingBar": "[Áúţó Áţţáçķ]",
         "questTracker": "[Ɋúéšţ Ţŕáçķéŕ]",
-        "reliquaryTracker": "[Ŕéļíɋúáŕý Ţŕáçķéŕ]"
+        "reliquaryTracker": "[Ŕéļíɋúáŕý Ţŕáçķéŕ]",
+        "doomMeter": "[Áƒƒļíçţíóñ Ɓáŕ]"
       },
       "framesMenu": "[Ƒŕáɱéš Šéţţíñĝš]",
       "framesMenuTitle": "[Šĥóŵ óŕ ĥíðé íñðíʋíðúáļ ƒŕáɱéš. Áñ úñţíçķéð ƒŕáɱé šţáýš ĥíððéñ úñţíļ ýóú ţíçķ íţ áĝáíñ óŕ ŕéšéţ ţó ðéƒáúļţš.]",

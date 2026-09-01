@@ -324,8 +324,6 @@ export const fr_FR: EnTranslations = {
     "warlock": {
       "doomLabel": "Condamnation",
       "fateThreadsLabel": "Fils du destin",
-      "doomMeterUnlock": "Déplacer la barre de ressource Affliction",
-      "doomMeterLock": "Verrouiller la barre de ressource Affliction",
       "doomEmptyStatus": "{value} sur {max} Condamnation.",
       "doomStatus": "{value} sur {max} Condamnation ; {remaining}.",
       "fateThreadsStatus": "{value} sur {max} Fils du destin.",
@@ -2978,7 +2976,8 @@ export const fr_FR: EnTranslations = {
         "partyFrames": "Groupe",
         "swingBar": "Attaque automatique",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Paramètres des cadres",
       "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",

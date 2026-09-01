@@ -324,8 +324,6 @@ export const ko_KR: EnTranslations = {
     "warlock": {
       "doomLabel": "단죄",
       "fateThreadsLabel": "운명의 실타래",
-      "doomMeterUnlock": "고통 자원 막대 이동",
-      "doomMeterLock": "고통 자원 막대 고정",
       "doomEmptyStatus": "단죄 {value}/{max}.",
       "doomStatus": "단죄 {value}/{max}, 남은 시간 {remaining}.",
       "fateThreadsStatus": "운명의 실타래 {value}/{max}.",
@@ -2978,7 +2976,8 @@ export const ko_KR: EnTranslations = {
         "partyFrames": "파티",
         "swingBar": "자동 공격",
         "questTracker": "퀘스트 추적기",
-        "reliquaryTracker": "성물고 추적기"
+        "reliquaryTracker": "성물고 추적기",
+        "doomMeter": "고통 자원 막대"
       },
       "framesMenu": "프레임 설정",
       "framesMenuTitle": "각 프레임을 표시하거나 숨깁니다. 선택을 해제한 프레임은 다시 선택하거나 기본값으로 초기화할 때까지 숨겨진 상태로 유지됩니다.",

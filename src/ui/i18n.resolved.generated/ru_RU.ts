@@ -324,8 +324,6 @@ export const ru_RU: EnTranslations = {
     "warlock": {
       "doomLabel": "Осуждение",
       "fateThreadsLabel": "Нити судьбы",
-      "doomMeterUnlock": "Переместить шкалу ресурсов Колдовства",
-      "doomMeterLock": "Закрепить шкалу ресурсов Колдовства",
       "doomEmptyStatus": "Осуждение: {value} из {max}.",
       "doomStatus": "Осуждение: {value} из {max}; осталось {remaining}.",
       "fateThreadsStatus": "Нити судьбы: {value} из {max}.",
@@ -2978,7 +2976,8 @@ export const ru_RU: EnTranslations = {
         "partyFrames": "Группа",
         "swingBar": "Автоатака",
         "questTracker": "Трекер заданий",
-        "reliquaryTracker": "Список Реликвария"
+        "reliquaryTracker": "Список Реликвария",
+        "doomMeter": "Шкала ресурсов Колдовства"
       },
       "framesMenu": "Настройки фреймов",
       "framesMenuTitle": "Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.",

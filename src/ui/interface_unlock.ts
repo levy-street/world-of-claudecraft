@@ -421,10 +421,13 @@ export class InterfaceUnlock {
   }
 
   /** Lock everything and forget every saved box. Wired to the existing
-   *  "Reset Frame Positions" option so one button still undoes every drag. */
+   *  "Reset Frame Positions" option so one button still undoes every drag.
+   *  REVERSE registration order on purpose: the unit frames register after
+   *  the table rows, so the player frame re-docks into #actionbar-stack
+   *  before the doom meter's re-dock tries to insert back beside it. */
   resetAll(): void {
     this.setUnlocked(false);
-    for (const entry of this.entries) entry.mover.reset();
+    for (const entry of [...this.entries].reverse()) entry.mover.reset();
   }
 
   /** Repaint every saved visual-space box after a live UI Scale change. */
@@ -476,6 +479,10 @@ export function makeUiRootDetacher(
       return;
     }
     if (!home || frame.parentNode === home.parent) return;
-    home.parent.insertBefore(frame, home.next);
+    // The captured sibling can itself be elsewhere by now (the doom meter's
+    // home anchor is the player frame, which detaches to #ui too): a stale
+    // reference would make insertBefore throw, so fall back to appending.
+    const next = home.next && home.next.parentNode === home.parent ? home.next : null;
+    home.parent.insertBefore(frame, next);
   };
 }

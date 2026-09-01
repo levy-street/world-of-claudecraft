@@ -13634,8 +13634,6 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Frammenti d\'Anima',
   'hudChrome.warlock.doomEmptyStatus': '{value} su {max} Condanna.',
   'hudChrome.warlock.doomLabel': 'Condanna',
-  'hudChrome.warlock.doomMeterLock': 'Blocca la barra della risorsa Afflizione',
-  'hudChrome.warlock.doomMeterUnlock': 'Sposta la barra della risorsa Afflizione',
   'hudChrome.warlock.doomStatus': '{value} su {max} Condanna; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Tre Filamenti del Fato: Divorare può intrecciarli in Condanna aggiuntiva.',

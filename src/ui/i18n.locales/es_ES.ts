@@ -487,8 +487,6 @@ export const es_ES: Partial<Record<TranslationKey, string>> = {
     'Reduce el daño recibido un {pct}%. El {mana}% de todo el daño que infliges se convierte en maná',
   'hudChrome.auraEffect.galeheartWeapon':
     'Completar la cadencia del Espíritu Guerrero de {steps} golpes hace eco del golpe {count} veces, infligiendo un {pct}% de su daño como daño de Naturaleza',
-  'hudChrome.warlock.doomMeterLock': 'Bloquear la barra de recurso de Aflicción',
-  'hudChrome.warlock.doomMeterUnlock': 'Mover la barra de recurso de Aflicción',
   'hudChrome.warlock.fateThreadsStatus': '{value} de {max} Hilos del destino.',
   'hudChrome.bags.itemAriaLocked': '{item}, cantidad {count}, artículo bloqueado',
   'hudChrome.bags.itemLockedLine': 'Artículo bloqueado',

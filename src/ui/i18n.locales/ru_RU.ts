@@ -813,6 +813,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.swingBar': 'Автоатака',
   'hudChrome.interfaceUnlock.frameNames.questTracker': 'Трекер заданий',
   'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': 'Список Реликвария',
+  'hudChrome.interfaceUnlock.frameNames.doomMeter': 'Шкала ресурсов Колдовства',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
   'hudChrome.interfaceUnlock.snapToGrid': 'Привязка к сетке',
@@ -13995,8 +13996,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.effects.manaRegenCombat': 'Около {value} ед. маны каждые 5 сек. в бою',
   'hudChrome.warlock.doomEmptyStatus': 'Осуждение: {value} из {max}.',
   'hudChrome.warlock.doomLabel': 'Осуждение',
-  'hudChrome.warlock.doomMeterLock': 'Закрепить шкалу ресурсов Колдовства',
-  'hudChrome.warlock.doomMeterUnlock': 'Переместить шкалу ресурсов Колдовства',
   'hudChrome.warlock.doomStatus': 'Осуждение: {value} из {max}; осталось {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Три Нити судьбы: «Поглощение» может сплести их в дополнительное Осуждение.',

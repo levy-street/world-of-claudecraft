@@ -234,8 +234,19 @@ describe('InterfaceUnlock', () => {
     expect(classes.has(INTERFACE_UNLOCKED_BODY_CLASS)).toBe(false);
   });
 
-  it('resetAll locks first, then resets every registered frame', () => {
+  it('resetAll locks first, then resets every registered frame in reverse order', () => {
     const { unlock, movers, classes } = harness({ actionBar1: true, minimap: true });
+    // Reverse registration order matters: the unit frames register AFTER the
+    // table rows, so the player frame must re-dock into the action-bar stack
+    // before the doom meter's re-dock tries to land back beside it.
+    const order: string[] = [];
+    for (const [id, mover] of movers) {
+      const reset = mover.reset.bind(mover);
+      mover.reset = () => {
+        order.push(id);
+        reset();
+      };
+    }
     unlock.setUnlocked(true);
     unlock.resetAll();
     expect(unlock.isUnlocked).toBe(false);
@@ -245,6 +256,7 @@ describe('InterfaceUnlock', () => {
       // Locking must land BEFORE the reset, or a live gesture outlives the clear.
       expect(mover.last).toBe(false);
     }
+    expect(order).toEqual([...movers.keys()].reverse());
   });
 
   it('fans reapply and relocalize out to every frame (the single fan-out arm)', () => {
@@ -610,5 +622,18 @@ describe('makeUiRootDetacher', () => {
     detach(false);
     expect(stack.children.indexOf(frame)).toBe(1);
     expect(frame.nextSibling).toBe(after);
+  });
+
+  it('re-docks by appending when the captured sibling has itself left home', () => {
+    // The doom meter's home anchor is the player frame, which detaches to #ui
+    // too: re-docking against the stale reference would throw NotFoundError
+    // in a real DOM, so the detacher falls back to appending instead.
+    const { uiRoot, stack, frame, after, doc } = scene();
+    const detach = makeUiRootDetacher(doc, spec(true), frame as unknown as HTMLElement);
+    detach(true);
+    uiRoot.appendChild(after);
+    detach(false);
+    expect(frame.parentNode).toBe(stack);
+    expect(stack.children[stack.children.length - 1]).toBe(frame);
   });
 });

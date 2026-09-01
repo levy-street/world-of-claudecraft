@@ -324,8 +324,6 @@ export const sv_SE: EnTranslations = {
     "warlock": {
       "doomLabel": "Fördömelse",
       "fateThreadsLabel": "Ödestrådar",
-      "doomMeterUnlock": "Flytta resurspanelen för Vånda",
-      "doomMeterLock": "Lås resurspanelen för Vånda",
       "doomEmptyStatus": "{value} av {max} Fördömelse.",
       "doomStatus": "{value} av {max} Fördömelse; {remaining}.",
       "fateThreadsStatus": "{value} av {max} Ödestrådar.",
@@ -2978,7 +2976,8 @@ export const sv_SE: EnTranslations = {
         "partyFrames": "Grupp",
         "swingBar": "Autoattack",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",

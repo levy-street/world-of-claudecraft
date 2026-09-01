@@ -224,7 +224,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     id: 'doomMeter',
     elementId: 'warlock-doom-frame',
     storageKey: 'woc_warlock_doom_frame_pos',
-    labelKey: 'hudChrome.warlock.doomLabel',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.doomMeter',
     fallbackSize: { w: 300, h: 48 },
     detachToUiRoot: true,
   },

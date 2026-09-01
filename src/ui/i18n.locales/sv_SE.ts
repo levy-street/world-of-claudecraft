@@ -13433,8 +13433,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Själfragment',
   'hudChrome.warlock.doomEmptyStatus': '{value} av {max} Fördömelse.',
   'hudChrome.warlock.doomLabel': 'Fördömelse',
-  'hudChrome.warlock.doomMeterLock': 'Lås resurspanelen för Vånda',
-  'hudChrome.warlock.doomMeterUnlock': 'Flytta resurspanelen för Vånda',
   'hudChrome.warlock.doomStatus': '{value} av {max} Fördömelse; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Tre Ödestrådar: Förtär kan väva in dem till ytterligare Fördömelse.',

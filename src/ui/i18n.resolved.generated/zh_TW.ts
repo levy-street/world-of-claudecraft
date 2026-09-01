@@ -324,8 +324,6 @@ export const zh_TW: EnTranslations = {
     "warlock": {
       "doomLabel": "譴罪",
       "fateThreadsLabel": "命運絲線",
-      "doomMeterUnlock": "移動痛苦資源條",
-      "doomMeterLock": "鎖定痛苦資源條",
       "doomEmptyStatus": "{value}/{max} 譴罪。",
       "doomStatus": "{value}/{max} 譴罪；剩餘 {remaining}。",
       "fateThreadsStatus": "{value}/{max} 命運絲線。",
@@ -2978,7 +2976,8 @@ export const zh_TW: EnTranslations = {
         "partyFrames": "隊伍",
         "swingBar": "自動攻擊",
         "questTracker": "任務追蹤器",
-        "reliquaryTracker": "聖物庫追蹤器"
+        "reliquaryTracker": "聖物庫追蹤器",
+        "doomMeter": "痛苦資源條"
       },
       "framesMenu": "框體設定",
       "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",

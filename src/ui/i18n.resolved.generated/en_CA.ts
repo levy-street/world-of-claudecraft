@@ -324,8 +324,6 @@ export const en_CA: EnTranslations = {
     "warlock": {
       "doomLabel": "Condemnation",
       "fateThreadsLabel": "Fate Threads",
-      "doomMeterUnlock": "Move Affliction resource bar",
-      "doomMeterLock": "Lock Affliction resource bar",
       "doomEmptyStatus": "{value} of {max} Condemnation.",
       "doomStatus": "{value} of {max} Condemnation; {remaining}.",
       "fateThreadsStatus": "{value} of {max} Fate Threads.",
@@ -2978,7 +2976,8 @@ export const en_CA: EnTranslations = {
         "partyFrames": "Party",
         "swingBar": "Auto Attack",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",

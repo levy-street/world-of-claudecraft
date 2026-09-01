@@ -324,8 +324,6 @@ export const tr_TR: EnTranslations = {
     "warlock": {
       "doomLabel": "Mahkûmiyet",
       "fateThreadsLabel": "Kader İplikleri",
-      "doomMeterUnlock": "Istırap kaynak çubuğunu taşı",
-      "doomMeterLock": "Istırap kaynak çubuğunu kilitle",
       "doomEmptyStatus": "{value} / {max} Mahkûmiyet.",
       "doomStatus": "{value} / {max} Mahkûmiyet; {remaining}.",
       "fateThreadsStatus": "{value} / {max} Kader İpliği.",
@@ -2978,7 +2976,8 @@ export const tr_TR: EnTranslations = {
         "partyFrames": "Grup",
         "swingBar": "Otomatik Saldırı",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",

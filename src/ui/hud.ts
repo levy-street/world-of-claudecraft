@@ -4044,10 +4044,15 @@ export class Hud {
       const cls = this.sim.cfg.playerClass;
       return cls === 'warrior' || cls === 'paladin';
     }
-    // The class resource bars follow the pet-frame rule: only the class that
-    // can ever show one gets its placeholder.
+    // The class resource bars follow the pet-frame rule (only the class that
+    // can ever show one gets a placeholder); the Reliquary tracker follows
+    // the optional-bar rule (switched off stays hidden even while editing;
+    // its menu row stays listed through the rowOverride above).
     if (id === 'paladinDevotion') return this.sim.cfg.playerClass === 'paladin';
     if (id === 'doomMeter') return this.sim.cfg.playerClass === 'warlock';
+    if (id === 'reliquaryTracker') {
+      return (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true;
+    }
     return true;
   }
 
@@ -4073,11 +4078,9 @@ export class Hud {
   // menu, minimap, pet frame, trackers and class resource bars.
   resetUnitFrames(): void {
     // The one button that answers "put the interface back the way the base
-    // game ships": lock everything, forget every saved frame box (all the
-    // registered movers: unit frames, action bars and their combined group,
-    // cast bar, menu, minimap, pet, stance bar, XP bar, aura group, quest and
-    // Reliquary trackers, devotion medallion, doom meter), and re-dock the
-    // panels that keep their own geometry (chat, meter panels,
+    // game ships": lock everything, forget every saved frame box (every
+    // registered mover, the trackers and class resource bars included), and
+    // re-dock the panels that keep their own geometry (chat, meter panels,
     // target auras). Combining the action bars is a layout mode of
     // this same feature, so it splits back apart too, routed through the
     // settings seam so the checkbox, persistence and body class stay in sync.

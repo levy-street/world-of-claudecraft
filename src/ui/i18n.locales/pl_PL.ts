@@ -13500,8 +13500,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Odłamki Duszy',
   'hudChrome.warlock.doomEmptyStatus': '{value} z {max} Potępienia.',
   'hudChrome.warlock.doomLabel': 'Potępienie',
-  'hudChrome.warlock.doomMeterLock': 'Zablokuj pasek zasobu Udręki',
-  'hudChrome.warlock.doomMeterUnlock': 'Przesuń pasek zasobu Udręki',
   'hudChrome.warlock.doomStatus': '{value} z {max} Potępienia; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Trzy Nici Przeznaczenia: Pochłonięcie może wpleść je w dodatkowe Potępienie.',

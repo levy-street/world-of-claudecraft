@@ -813,6 +813,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.swingBar': '자동 공격',
   'hudChrome.interfaceUnlock.frameNames.questTracker': '퀘스트 추적기',
   'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': '성물고 추적기',
+  'hudChrome.interfaceUnlock.frameNames.doomMeter': '고통 자원 막대',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
   'hudChrome.interfaceUnlock.frameNames.xpBar': '경험치 바',
@@ -13775,8 +13776,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.statInfo.effects.manaRegenCombat': '전투 중 5초마다 약 {value} 마나 회복',
   'hudChrome.warlock.doomEmptyStatus': '단죄 {value}/{max}.',
   'hudChrome.warlock.doomLabel': '단죄',
-  'hudChrome.warlock.doomMeterLock': '고통 자원 막대 고정',
-  'hudChrome.warlock.doomMeterUnlock': '고통 자원 막대 이동',
   'hudChrome.warlock.doomStatus': '단죄 {value}/{max}, 남은 시간 {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     '운명의 실타래 3개: 집어삼키기로 추가 단죄를 자아낼 수 있습니다.',

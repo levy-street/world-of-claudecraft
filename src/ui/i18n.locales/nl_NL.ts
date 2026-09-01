@@ -13558,8 +13558,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Zielfragmenten',
   'hudChrome.warlock.doomEmptyStatus': '{value} van {max} Verdoemenis.',
   'hudChrome.warlock.doomLabel': 'Verdoemenis',
-  'hudChrome.warlock.doomMeterLock': 'Vergrendel de Kwelling-hulpbronbalk',
-  'hudChrome.warlock.doomMeterUnlock': 'Verplaats de Kwelling-hulpbronbalk',
   'hudChrome.warlock.doomStatus': '{value} van {max} Verdoemenis; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Drie Lotsdraden: Verteren kan ze verweven tot extra Verdoemenis.',

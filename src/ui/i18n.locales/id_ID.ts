@@ -13555,8 +13555,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.procOverlay.soulFragmentsMeter': 'Serpihan Jiwa',
   'hudChrome.warlock.doomEmptyStatus': '{value} dari {max} Kecaman.',
   'hudChrome.warlock.doomLabel': 'Kecaman',
-  'hudChrome.warlock.doomMeterLock': 'Kunci bilah sumber daya Penderitaan',
-  'hudChrome.warlock.doomMeterUnlock': 'Pindahkan bilah sumber daya Penderitaan',
   'hudChrome.warlock.doomStatus': '{value} dari {max} Kecaman; {remaining}.',
   'hudChrome.warlock.fateThreadsConsumeReady':
     'Tiga Benang Takdir: Melahap dapat menganyamnya menjadi Kecaman tambahan.',

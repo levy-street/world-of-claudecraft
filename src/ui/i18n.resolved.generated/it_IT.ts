@@ -324,8 +324,6 @@ export const it_IT: EnTranslations = {
     "warlock": {
       "doomLabel": "Condanna",
       "fateThreadsLabel": "Filamenti del Fato",
-      "doomMeterUnlock": "Sposta la barra della risorsa Afflizione",
-      "doomMeterLock": "Blocca la barra della risorsa Afflizione",
       "doomEmptyStatus": "{value} su {max} Condanna.",
       "doomStatus": "{value} su {max} Condanna; {remaining}.",
       "fateThreadsStatus": "{value} su {max} Filamenti del Fato.",
@@ -2978,7 +2976,8 @@ export const it_IT: EnTranslations = {
         "partyFrames": "Gruppo",
         "swingBar": "Attacco automatico",
         "questTracker": "Quest Tracker",
-        "reliquaryTracker": "Reliquary Tracker"
+        "reliquaryTracker": "Reliquary Tracker",
+        "doomMeter": "Affliction Bar"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",
