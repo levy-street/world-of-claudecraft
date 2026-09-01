@@ -108,7 +108,7 @@ STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementat
   id off it; never carry an id out of this paragraph.
   WHY: the three added rows are then value-identical, so the differentiation costs exactly
   nothing and DECISION A's cost-spread pin is trivially satisfied, and all three plates ask
-  farming 50 and nothing else, so a role choice is never also an economy choice OR a skill-gate
+  the same of a farmer, farming 50 plus a tier-3 hoe that wields at 70, so a role choice is never also an economy choice OR a skill-gate
   choice.
   SUPERSEDED, not a fallback: the tier-4 halving branch (frost_gourd 2, highland_barley 2,
   evergarden_greens 1). It spreads 30, 30 and 40 of added value and asks farming 75 for one
@@ -117,7 +117,12 @@ STEP 0 - PRE-FLIGHT (canonical Team Workflow, docs/prd/masterwrought/implementat
   Exactly cost-equal and gate-equal, but two of the three plates then read off the same crop
   line, which is most of the reason to differentiate them at all.
   ACCEPTANCE: three distinct crop ids, one per plate; every crop obtainable at the tier its
-  recipe unlocks, derived through farmCropSkillThreshold and ASSERTED by test, never argued.
+  recipe unlocks, derived through max(farmCropSkillThreshold(tier),
+  wieldRequirementForTier(tier)) and ASSERTED by test, never argued.
+  AMENDED IN PLACE 2026-09-01 by qr-19-obtainability-ruling-wield-rung (Phase 19, under
+  qr-19-best-for-project): the plant path runs three gates and the hoe is the binding half,
+  70 at tier 3 and 85 at tier 4, so the threshold alone was a partial derivation. The amended
+  sentence is what 11i, 11j and 11k inherit.
   IF 11e DID NOT MINT A TIER-3 LEAF: that is a STOP, not a branch. 11e owes it under a settled
   ruling, so a session that finds it missing reports the gap rather than falling back.
 

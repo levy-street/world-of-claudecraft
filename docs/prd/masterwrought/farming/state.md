@@ -1039,7 +1039,10 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     (SCOPED at the Phase 11h QA. The comparative claim is what this ruling rests on and it
     holds. The absolute one does not: farmCropSkillThreshold(3) is 50, but the plant path
     also wants a tier-3 hoe, which wields at farming 70, so the effective floor is 70 for
-    all three. The player-facing copy that stated 50 as a floor is corrected there.)
+    all three. The player-facing copy that stated 50 as a floor is corrected there. AMENDED
+    2026-09-01 by qr-19-obtainability-ruling-wield-rung: the acceptance now derives through
+    max(farmCropSkillThreshold(tier), wieldRequirementForTier(tier)) rather than the
+    threshold alone, so this scoping note is the ruling's record rather than its substitute.)
 48. 11h-GATE-C. ONE tier-3 grain at count 2, added IDENTICALLY to all three apex flask bills,
     standing beside sunpetal_herb at that reagent's own count and replacing none of it; the
     flask family stays byte-identical; assert the sunpetal_herb counts before and after. WHY:
@@ -4796,6 +4799,18 @@ through farmCropSkillThreshold", and that is one of the three gates. Phases 11i,
 11j and 11k inherit the same wording. Whether an obtainability ruling should name
 the wield rung as well is farming's call, not a QA session's; the arm measures
 both either way.
+
+RULED (qr-19-obtainability-ruling-wield-rung, 2026-09-01, under qr-19-best-for-project): yes, an
+obtainability ruling names the wield rung, and the decision this note left to farming is taken
+here rather than deferred again. 11h-GATE-B's acceptance is amended in place to derive through
+max(farmCropSkillThreshold(tier), wieldRequirementForTier(tier)), and 11i, 11j and 11k inherit
+the amended sentence. This is the same decision the masterwrought ledger records at its open
+item (6): one question, two ledgers, ONE id, which is the whole reason the two rows were merged
+before execution. The three-gate note above stops being the only place the real floor is written
+down. Nothing behavioral moves and no pin moves: the composition is already what
+src/sim/professions/farming.ts enforces, already what tests/farming_plant_sheet_view.test.ts and
+tests/farming_plant_sheet_window.test.ts compute, and already pinned as the literals 70 and 85
+beside the obtainability sweep in tests/provisioning_supply_line_apex.test.ts.
 
 ONE THING THE AUDIT CONFIRMED FOR FARMING. The fine twins really did have exactly
 one consumer each before 11h, counted off the parent commit rather than off the
