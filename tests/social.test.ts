@@ -15,11 +15,28 @@ import {
 } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { type Party, Sim } from '../src/sim/sim';
-import { dist2d, type Entity, INTERACT_RANGE, type LootSlot } from '../src/sim/types';
+import {
+  dist2d,
+  type Entity,
+  INTERACT_RANGE,
+  type InvSlot,
+  type LootSlot,
+  type SimEvent,
+} from '../src/sim/types';
 import type { PartyMemberInfo } from '../src/world_api';
 import { face, makeFullWorld, makeWorld, mustEntity, nearestMob, teleport } from './social_shared';
 
 const FRESH_CORPSE_TIMER = 60;
+
+type ErrorEvent = Extract<SimEvent, { type: 'error' }>;
+
+function isErrorFor(event: SimEvent, pid: number): event is ErrorEvent {
+  return event.type === 'error' && event.pid === pid;
+}
+
+function errorTextsFor(events: SimEvent[], pid: number): string[] {
+  return events.filter((event) => isErrorFor(event, pid)).map((event) => event.text);
+}
 
 function mustParty(sim: Sim, pid: number): Party {
   const party = sim.partyOf(pid);
@@ -726,18 +743,20 @@ describe('duels', () => {
     sim.startAutoAttack(a);
     expect(sim.entities.get(a)?.autoAttack).toBe(true);
     let ended = false;
-    let winnerEvent: any = null;
+    let winnerEvent: Extract<SimEvent, { type: 'duelEnd' }> | undefined;
     for (let i = 0; i < 20 * 30 && !ended; i++) {
       face(sim, a, b);
       const events = sim.tick();
-      const end = events.find((e) => e.type === 'duelEnd');
+      const end = events.find(
+        (e): e is Extract<SimEvent, { type: 'duelEnd' }> => e.type === 'duelEnd',
+      );
       if (end) {
         ended = true;
         winnerEvent = end;
       }
     }
     expect(ended).toBe(true);
-    expect(winnerEvent.winnerName).toBe('Aleph');
+    expect(winnerEvent?.winnerName).toBe('Aleph');
     expect(eb.hp).toBeGreaterThanOrEqual(1); // nobody dies in a duel
     expect(eb.dead).toBe(false);
     expect(sim.duelFor(a)).toBe(null);
@@ -930,9 +949,9 @@ describe('trading', () => {
       { itemId: 'wolf_fang', count: Infinity },
       { count: 3 },
       { itemId: 'wolf_fang', count: 2 },
-    ] as any;
+    ];
     // must not throw, and only the one valid slot survives
-    expect(() => sim.tradeSetOffer(junk, 0, a)).not.toThrow();
+    expect(() => sim.tradeSetOffer(junk as InvSlot[], 0, a)).not.toThrow();
     expect(sim.tradeFor(a)?.offerA.items).toEqual([{ itemId: 'wolf_fang', count: 2 }]);
     sim.tradeConfirm(a);
     sim.tradeConfirm(b);
@@ -1158,12 +1177,14 @@ describe('dungeon difficulty slash command', () => {
     sim.chat('/dungeon reset', p);
 
     expect(
-      (sim.drainEvents() as any[]).some(
-        (event) =>
-          event.type === 'error' &&
-          event.pid === p &&
-          event.text === 'All instances have been reset.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (event) =>
+            event.type === 'error' &&
+            event.pid === p &&
+            event.text === 'All instances have been reset.',
+        ),
     ).toBe(true);
   });
 
@@ -1174,12 +1195,14 @@ describe('dungeon difficulty slash command', () => {
       sim.drainEvents();
       sim.chat(cmd, p);
       expect(
-        (sim.drainEvents() as any[]).some(
-          (event) =>
-            event.type === 'error' &&
-            event.pid === p &&
-            event.text === 'You have no instances to reset.',
-        ),
+        sim
+          .drainEvents()
+          .some(
+            (event) =>
+              event.type === 'error' &&
+              event.pid === p &&
+              event.text === 'You have no instances to reset.',
+          ),
       ).toBe(true);
     }
   });
@@ -1195,18 +1218,25 @@ describe('dungeon difficulty slash command', () => {
     sim.chat('/dungeon heroic', member);
     expect(sim.dungeonDifficulty(leader)).toBe('normal');
     expect(
-      (sim.drainEvents() as any[]).some(
-        (e) => e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (e) =>
+            e.type === 'error' && e.pid === member && e.text === 'You are not the party leader.',
+        ),
     ).toBe(true);
 
     sim.chat('/dungeon heroic', leader);
     expect(sim.dungeonDifficulty(member)).toBe('heroic');
     expect(
-      (sim.drainEvents() as any[]).some(
-        (e) =>
-          e.type === 'error' && e.pid === leader && e.text === 'Dungeon difficulty set to Heroic.',
-      ),
+      sim
+        .drainEvents()
+        .some(
+          (e) =>
+            e.type === 'error' &&
+            e.pid === leader &&
+            e.text === 'Dungeon difficulty set to Heroic.',
+        ),
     ).toBe(true);
 
     sim.chat('/dungeon normal', leader);
@@ -1231,17 +1261,13 @@ describe('dungeon difficulty slash command', () => {
 
     sim.drainEvents();
     sim.chat('/dungeon', p);
-    let texts = (sim.drainEvents() as any[])
-      .filter((e) => e.type === 'error' && e.pid === p)
-      .map((e) => e.text);
+    let texts = errorTextsFor(sim.drainEvents(), p);
     expect(texts).toContain('Dungeon difficulty: Normal. Use /dungeon heroic to change it.');
 
     sim.chat('/dungeon heroic', p);
     sim.drainEvents();
     sim.chat('/dungeon', p);
-    texts = (sim.drainEvents() as any[])
-      .filter((e) => e.type === 'error' && e.pid === p)
-      .map((e) => e.text);
+    texts = errorTextsFor(sim.drainEvents(), p);
     expect(texts).toContain('Dungeon difficulty: Heroic. Use /dungeon normal to change it.');
   });
 });
