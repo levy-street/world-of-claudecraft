@@ -73,8 +73,10 @@ import { updateBattlegroundOccluderFades } from './battleground_placements';
 import { buildBattlegroundObject } from './battleground_props';
 import {
   type BattlegroundViewHost,
+  createBattlegroundViewState,
   ensureBattlegroundViewNear,
   prebuildBattlegroundView,
+  updateBattlegroundViews,
 } from './battleground_views';
 import { ensureBiomeHazeField, setBiomeHazeCamera, setBiomeHazeGrade } from './biome_haze_field';
 import { type BiomeHazePreset, hazeLightLevel } from './biome_haze_field_core';
@@ -8933,9 +8935,9 @@ export class Renderer {
   // yumi maze copies; the geometry is static, and the only per-frame work is the
   // occluder fade the placements own (battleground_placements.ts).
   private bgViews = new Map<number, BattlegroundView>();
-  // Reused ward-state carrier: setWardState only READS these fields, so the
-  // per-frame push refills this object rather than minting a literal.
-  private bgWardState = { countdown: false, ghost: false, myTeam: null as number | null };
+  // The bookkeeping those copies need beside them (battleground_views.ts): the
+  // reused ward-state carrier, and whether the prebuild's offer was ever seen.
+  private bgViewState = createBattlegroundViewState();
   // Blue/red team arrows above every yumi fighter (yumi_team_markers.ts).
   private readonly yumiTeamMarkers = new YumiTeamMarkers();
   // Affliction's primary and Coven eyes remain actionable on every graphics tier.
@@ -9824,29 +9826,6 @@ export class Renderer {
       },
       compileGate: this.worldCompileGate(),
     };
-  }
-
-  private updateBgWards(): void {
-    if (this.bgViews.size === 0) return;
-    const match = this.sim.bgInfo?.match ?? null;
-    // Scratch state, refilled in place: setWardState only reads the fields, so
-    // a fresh literal every frame would be pure garbage on the render path.
-    const state = this.bgWardState;
-    state.countdown = match?.state === 'countdown';
-    state.myTeam = match ? match.myTeam : null;
-    // The roster scan only matters while the match is live, so it is skipped as
-    // a whole outside that window rather than run and then discarded, and the
-    // plain loop over the at-most-ten rows allocates no per-frame closure.
-    state.ghost = false;
-    if (match?.state === 'active') {
-      const me = this.sim.playerId;
-      for (const row of match.players) {
-        if (row.pid !== me) continue;
-        state.ghost = row.dead;
-        break;
-      }
-    }
-    for (const view of this.bgViews.values()) view.setWardState(state);
   }
 
   private updateCelestialSprites(): void {
@@ -11914,7 +11893,7 @@ export class Renderer {
     );
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'water', worldStart);
     this.bgFx.update(this.time);
-    this.updateBgWards();
+    updateBattlegroundViews(this.bgViews, this.bgViewState, this.sim.bgInfo, this.sim.playerId);
     this.vfx.update(dt);
     // Racing line (cosmetic; reads the self race view only).
     this.raceLine.update(this.sim.mountRaceView(), this.time, dt);

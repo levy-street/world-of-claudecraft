@@ -11,6 +11,7 @@ import {
   LINUX_PRIME_ENV,
   PRIME_RELAUNCH_ADDED_ENV,
   PRIME_RELAUNCH_MARKER,
+  relaunchForLinuxPrime,
 } from '../electron/gpu_preference.cjs';
 import {
   launchSettingsSnapshot,
@@ -107,6 +108,56 @@ describe('restartArgv', () => {
   });
 });
 
+describe('a two-hop PRIME relaunch chain', () => {
+  // The chain the header names: the first relaunch plants the offload variables and the
+  // ozone argument, then electron-updater's restart-to-update respawns with that
+  // environment and an EMPTY argv, and THAT process relaunches once more purely to
+  // restore the argument. The second hop plants no variable (every name is already
+  // present), so a record it replaced rather than accumulated would tell the restart that
+  // only the argument was the shell's, and hand the child the offload env of a player who
+  // just turned the discrete-GPU force off.
+  it('records every hop, so the restart takes back the whole chain', () => {
+    const spawned: Array<{ argv: string[]; env: Record<string, string | undefined> }> = [];
+    const spawn = vi.fn((_file: string, argv: string[], options?: unknown) => {
+      spawned.push({ argv, env: (options as { env: Record<string, string> }).env });
+      return { unref: vi.fn() };
+    });
+    // No NVIDIA EGL json on this machine, so the lever plants the four offload variables.
+    const hop = (env: Record<string, string | undefined>, argv: string[]) =>
+      relaunchForLinuxPrime({
+        platform: 'linux',
+        isHybridGpu: () => true,
+        fileExists: () => false,
+        execPath: '/opt/woc/woc',
+        spawn,
+        env,
+        argv,
+      });
+
+    expect(hop({ HOME: '/home/p' }, [])).toBe(true);
+    const child = spawned[0];
+    expect(hop(child.env, [])).toBe(true);
+    const grandchild = spawned[1];
+
+    expect(grandchild.argv).toEqual([LINUX_OZONE_X11_ARG]);
+    const record = String(grandchild.env[PRIME_RELAUNCH_ADDED_ENV]).split(',');
+    expect(record).toContain(LINUX_OZONE_X11_ARG);
+    for (const name of [
+      'DRI_PRIME',
+      '__NV_PRIME_RENDER_OFFLOAD',
+      '__GLX_VENDOR_LIBRARY_NAME',
+      '__VK_LAYER_NV_optimus',
+    ]) {
+      expect(grandchild.env[name], `the grandchild still carries ${name}`).toBeDefined();
+      expect(record, `the record still names ${name}`).toContain(name);
+    }
+
+    // What the restart strip hands the next launch: nothing of the chain's own.
+    expect(restartEnv(grandchild.env)).toEqual({ HOME: '/home/p' });
+    expect(restartArgv(grandchild.argv, grandchild.env)).toEqual([]);
+  });
+});
+
 describe('restartApp', () => {
   const deps = (child: EventEmitter) => {
     const spawn = vi.fn(() => child);
@@ -162,6 +213,60 @@ describe('restartApp', () => {
     await expect(settled).resolves.toBe(false);
     expect(onSpawned).not.toHaveBeenCalled();
     expect(log.warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('resolves false when the spawn handle has no event surface', async () => {
+    // Defence in depth: nothing can be learned from a handle that emits nothing, and a
+    // promise left unsettled would keep the strip on "Restarting" for the whole session.
+    const { spawn, log, onSpawned } = deps({ unref: vi.fn() } as never);
+    await expect(
+      restartApp({ env: {}, argv: [], execPath: '/x', spawn, log, onSpawned }),
+    ).resolves.toBe(false);
+    expect(onSpawned).not.toHaveBeenCalled();
+  });
+
+  it('refuses to restart under the dev server, where quitting takes Vite down with it', async () => {
+    // npm run electron:dev: this process is one child of an orchestrator that owns Vite
+    // (scripts/electron-dev.mjs), which tears it down when this child exits, so the
+    // detached child would load a dead origin. False is what the strip already renders as
+    // "the restart did not happen".
+    const child = fakeChild();
+    const { spawn, log, onSpawned } = deps(child);
+    await expect(
+      restartApp({
+        env: {},
+        devServerUrl: 'http://127.0.0.1:5173',
+        argv: [],
+        execPath: '/x',
+        spawn,
+        log,
+        onSpawned,
+      }),
+    ).resolves.toBe(false);
+    expect(spawn).not.toHaveBeenCalled();
+    expect(onSpawned).not.toHaveBeenCalled();
+  });
+
+  it('reads an empty dev-server URL as no dev server, and restarts', async () => {
+    // The refusal is the ORCHESTRATOR's presence, which the caller's URL carries; the
+    // raw variable is never read here, so a packaged launch whose environment names it
+    // (main.cjs hands undefined when packaged) is not refused a restart that the strip
+    // would otherwise keep offering.
+    const child = fakeChild();
+    const { spawn, log, onSpawned } = deps(child);
+    const settled = restartApp({
+      env: { VITE_DEV_SERVER_URL: 'http://127.0.0.1:5173' },
+      devServerUrl: '',
+      argv: [],
+      execPath: '/x',
+      spawn,
+      log,
+      onSpawned,
+    });
+    expect(spawn).toHaveBeenCalledTimes(1);
+    child.emit('spawn');
+    await expect(settled).resolves.toBe(true);
+    expect(onSpawned).toHaveBeenCalledTimes(1);
   });
 
   it('resolves false when spawn itself throws', async () => {

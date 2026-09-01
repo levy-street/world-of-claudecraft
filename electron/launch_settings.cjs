@@ -98,13 +98,25 @@ function restartArgv(argv, env) {
  * quits, exactly as the backend rescue does: a child requesting its own lock while the
  * parent still holds it would see itself as a second instance and quit, and a parent that
  * quit on spawn() returning would leave nothing running when the child never starts (an
- * async ENOENT, the 'error' event). Resolves false on that event and when spawn() itself
- * throws, this process still running and still holding its lock, so the options window
- * can say the restart did not happen. Nothing here ever rejects.
+ * async ENOENT, the 'error' event). Resolves false on that event, when spawn() itself
+ * throws, when the handle it returned can report nothing at all, and under the dev
+ * server's orchestrator, this process still running and still holding its lock, so the
+ * options window can say the restart did not happen. Nothing here ever rejects.
  */
 function restartApp(deps = {}) {
   const env = deps.env ?? process.env;
   const log = deps.log;
+  // Under `npm run electron:dev` this program is one child of an orchestrator that owns the
+  // Vite server (scripts/electron-dev.mjs) and stops it the moment this child exits, so a
+  // restart would hand the player a detached shell loading a dead origin. Refused instead,
+  // with the same false the strip already renders as "the restart did not happen"; a dev
+  // run applies a next-launch setting by restarting the dev loop itself. The caller hands
+  // the URL it honours (main.cjs reads it only when unpackaged), so a packaged build whose
+  // environment happens to carry the variable restarts normally.
+  if (typeof deps.devServerUrl === 'string' && deps.devServerUrl !== '') {
+    log?.info?.('[shell] no restart under the dev server; restart npm run electron:dev instead');
+    return Promise.resolve(false);
+  }
   const argv = restartArgv(deps.argv ?? process.argv.slice(1), env);
   return new Promise((resolve) => {
     try {
@@ -119,6 +131,13 @@ function restartApp(deps = {}) {
         },
         onSpawnFailed: (err) => {
           log?.warn?.('[shell] the restart never started; this session keeps running', err);
+          resolve(false);
+        },
+        // A handle with no event surface answers neither callback, so the answer is that
+        // there is none: without this the promise would never settle and the strip would
+        // sit on "Restarting" for the rest of the session.
+        onUnobservable: () => {
+          log?.warn?.('[shell] the restart child cannot be observed; this session keeps running');
           resolve(false);
         },
       });

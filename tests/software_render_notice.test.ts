@@ -35,7 +35,11 @@ import {
 import { activeGpuRendererName, gfxSoftwareRendering } from '../src/render/gfx';
 import { probeMajorPerformanceCaveat } from '../src/render/software_renderer';
 import type { DesktopBridge, DesktopGpuStatus } from '../src/runtime';
-import { gpuNoticeDisplayed, initGpuNotice } from '../src/ui/gpu_notice_toast';
+import {
+  gpuNoticeDisplayed,
+  initGpuNotice,
+  updateGpuNoticeShellVerdict,
+} from '../src/ui/gpu_notice_toast';
 
 const gfxVerdict = vi.mocked(gfxSoftwareRendering);
 const gpuName = vi.mocked(activeGpuRendererName);
@@ -44,6 +48,29 @@ const notice = vi.mocked(initGpuNotice);
 const displayed = vi.mocked(gpuNoticeDisplayed);
 const hybrid = vi.mocked(hybridGpuLikely);
 const platform = vi.mocked(detectDesktopPlatform);
+const lateVerdict = vi.mocked(updateGpuNoticeShellVerdict);
+
+/** The desktop shell's backend channel, the one the late judgement arrives on. */
+function installBackendChannel(): {
+  send(state: { requestedUnavailable?: boolean }): void;
+  unsubscribed(): number;
+} {
+  let push: ((state: unknown) => void) | null = null;
+  let offCalls = 0;
+  (globalThis as unknown as { wocDesktop: unknown }).wocDesktop = {
+    openBrowserLogin: () => Promise.resolve(),
+    takeLoginCode: () => Promise.resolve(null),
+    onLoginCode: () => () => {},
+    onGpuBackendState: (callback: (state: unknown) => void) => {
+      push = callback;
+      return () => {
+        offCalls++;
+        push = null;
+      };
+    },
+  };
+  return { send: (state) => push?.(state), unsubscribed: () => offCalls };
+}
 
 const NOTHING_DISPLAYED = {
   softwareRendering: false,
@@ -73,6 +100,7 @@ beforeEach(() => {
   platform.mockReturnValue('other');
   // Every case starts with no shell verdict latched.
   pushShellVerdict(null);
+  (globalThis as unknown as { wocDesktop?: unknown }).wocDesktop = undefined;
 });
 
 describe('initSoftwareRenderNotice', () => {
@@ -180,6 +208,42 @@ describe('initSoftwareRenderNotice', () => {
       desktopShell: true,
       desktopPlatform: 'other',
     });
+  });
+});
+
+describe('the shell late judgement channel', () => {
+  it('folds in a late unavailable verdict and hands back the unsubscribe', () => {
+    // The shell judges its launch around the time the page reports its
+    // renderer, which can be after this init. The subscription is the second
+    // one on that channel (desktop_gpu_backend_sync.ts owns the other), so it
+    // returns its unsubscribe the same way rather than leaving a listener
+    // nobody can take off.
+    gfxVerdict.mockReturnValue(false);
+    probe.mockReturnValue(false);
+    const shell = installBackendChannel();
+    const off = initSoftwareRenderNotice(true);
+
+    // A judgement that took the asked-for backend says nothing new.
+    shell.send({ requestedUnavailable: false });
+    expect(lateVerdict).not.toHaveBeenCalled();
+
+    shell.send({ requestedUnavailable: true });
+    expect(lateVerdict).toHaveBeenCalledWith({
+      softwareRendering: false,
+      discreteInactive: false,
+      requestedBackendUnavailable: true,
+    });
+
+    off();
+    expect(shell.unsubscribed()).toBe(1);
+    shell.send({ requestedUnavailable: true });
+    expect(lateVerdict).toHaveBeenCalledTimes(1);
+  });
+
+  it('hands back a no-op on a shell without the channel (the web, an older build)', () => {
+    gfxVerdict.mockReturnValue(false);
+    probe.mockReturnValue(false);
+    expect(() => initSoftwareRenderNotice(false)()).not.toThrow();
   });
 });
 

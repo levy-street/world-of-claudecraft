@@ -6456,6 +6456,16 @@
     order: -1;
     text-align: left;
   }
+  /* The restart strip is the same row shape one block above the action row, so
+     it wraps the same way: its status takes a full leading line and the Restart
+     button keeps its comfortable target instead of squeezing the text beside a
+     132px button. The status already leads in DOM order, so no re-ordering. */
+  body.mobile-touch .restart-strip {
+    flex-wrap: wrap;
+  }
+  body.mobile-touch .restart-strip-status {
+    flex-basis: 100%;
+  }
   /* Options/settings row heights (Phase 4, presentation only): every touch-gated
      settings row (graphics/audio/interface panels via settingsViewShell's bare
      .set-rows > .set-row, PLUS the .perf-master/.perf-card row variants below)

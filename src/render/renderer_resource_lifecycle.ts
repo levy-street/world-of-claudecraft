@@ -12,6 +12,11 @@ export interface RendererPrewarmAndGroundFxOwner<T extends RendererDisposable> {
   warlockMeteorFx?: RendererDisposable;
   vfx?: RendererDisposable;
   abilityVfxFx?: RendererDisposable;
+  /** The battleground copies this renderer built, by slot
+   *  (battleground_views.ts). Each owns a field's terrain, its paint array
+   *  texture, the placement instances, the decals and its share of the
+   *  point-light budget. */
+  bgViews?: Map<number, RendererDisposable>;
 }
 
 /**
@@ -30,6 +35,10 @@ export function disposeRendererPrewarmAndGroundFx(
   bestEffort(() => resources.warlockMeteorFx?.dispose());
   bestEffort(() => resources.abilityVfxFx?.dispose());
   bestEffort(() => resources.vfx?.dispose());
+  // The live copies release themselves as the session resolves each offer;
+  // this is the terminal drain for whatever the teardown catches standing.
+  for (const view of resources.bgViews?.values() ?? []) bestEffort(() => view.dispose());
+  resources.bgViews?.clear();
   // The occluder-fade gate and its twins were linked on this renderer's
   // context; a later renderer installs its own (occluder_fade_gate.ts).
   bestEffort(() => uninstallOccluderFadeGate());

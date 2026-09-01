@@ -310,17 +310,21 @@ value. Two things make that usable (`electron/launch_settings.cjs`):
   of such settings is `NEXT_LAUNCH_SETTINGS` in `src/game/desktop_next_launch_settings.ts`;
   a new next-launch setting is one entry there.
 - `desktop-restart-app` restarts the shell at the player's request (`restartApp`): the
-  options window's restart strip (`src/ui/restart_strip.ts`, at the foot of the Graphics
+  options window's restart strip (`src/ui/restart_strip_painter.ts`, at the foot of the Graphics
   panel and of Interface > General) offers "Restart Game" whenever a stored value has
   moved off the snapshot, in place of an Apply that could not help. The child is spawned
   through `spawnDetachedSelf` from an environment stripped of what the shell's own
   relaunch levers planted (the rescue marker, and exactly the PRIME offload variables and
-  X11 ozone argument the PRIME relaunch recorded adding in `WOC_PRIME_RELAUNCH_ADDED`; a
+  X11 ozone argument the PRIME relaunch recorded adding in `WOC_PRIME_RELAUNCH_ADDED`,
+  accumulated across every hop of a relaunch chain rather than replaced at each one; a
   `DRI_PRIME` or `--ozone-platform` the player set themselves stays), the single-instance
   lock is handed over on the child's `spawn` event, and this process quits through
   `app.quit` so the close-time bounds save runs. One restart is in flight at a time; a
   child that never starts answers false and the strip says so, this process keeps
-  running, with its lock. The snapshot is what the PREFS said at launch: under
+  running, with its lock. Under `npm run electron:dev` the restart is refused outright
+  (`VITE_DEV_SERVER_URL` is set): quitting there stops the orchestrator's Vite server with
+  this process, so the child would load a dead origin; the strip reports the failure, and
+  a dev run applies a next-launch setting by restarting `npm run electron:dev`. The snapshot is what the PREFS said at launch: under
   `WOC_GPU_BACKEND` or `WOC_DISABLE_GPU_FORCE=1` the session runs the override, the
   snapshot still names the stored value, and a restart offered against it re-launches
   under the same override (those variables are the player's and are never stripped).

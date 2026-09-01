@@ -355,7 +355,10 @@ const MONOLITHS: MonolithRow[] = [
     // consolidation and set-proc extraction (set_proc_fx.ts) land alongside
     // this branch's extractions; neither parent pin fits the combined file.
     // Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13146,
+    // Lowered again after the battleground view drive (the per-frame ward-state
+    // push, and the release of a copy the session is done with) moved into
+    // src/render/battleground_views.ts beside the build it belongs to.
+    ceiling: 13125,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

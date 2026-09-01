@@ -27,8 +27,12 @@ import { desktopGpuBackendActive } from './desktop_gpu_backend_sync';
 import { latchedDesktopGpuStatus, mergeShellGpuVerdict } from './desktop_gpu_status';
 import { hybridGpuLikely } from './hybrid_gpu_detect';
 
-/** Call AFTER the Renderer is constructed (initGfxTier has resolved by then). */
-export function initSoftwareRenderNotice(desktopShell: boolean): void {
+/** Call AFTER the Renderer is constructed (initGfxTier has resolved by then).
+ *  Returns the unsubscribe for the shell channel it listens on, the way
+ *  initDesktopGpuBackendActive (the other subscriber on that one channel) does:
+ *  a caller that tears the session down has a way to stop this listener instead
+ *  of leaving it on a bridge nobody owns. */
+export function initSoftwareRenderNotice(desktopShell: boolean): () => void {
   const localSoftwareRendering = gfxSoftwareRendering() || probeMajorPerformanceCaveat() === true;
   const localHybridGpuLikely = hybridGpuLikely({
     gpuRenderer: activeGpuRendererName(),
@@ -49,16 +53,15 @@ export function initSoftwareRenderNotice(desktopShell: boolean): void {
   // toast merges, exactly as the shell's GPU status already does.
   const bridge = desktopBridge();
   const subscribe = bridge?.onGpuBackendState;
-  if (typeof subscribe === 'function') {
-    subscribe.call(bridge, (state) => {
-      if (state?.requestedUnavailable !== true) return;
-      updateGpuNoticeShellVerdict({
-        softwareRendering: false,
-        discreteInactive: false,
-        requestedBackendUnavailable: true,
-      });
+  if (typeof subscribe !== 'function') return () => {};
+  return subscribe.call(bridge, (state) => {
+    if (state?.requestedUnavailable !== true) return;
+    updateGpuNoticeShellVerdict({
+      softwareRendering: false,
+      discreteInactive: false,
+      requestedBackendUnavailable: true,
     });
-  }
+  });
 }
 
 // The two exposures below read the notice's per-session display latch rather

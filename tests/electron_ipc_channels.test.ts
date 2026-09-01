@@ -204,6 +204,12 @@ describe('electron IPC channel contract (preload <-> main)', () => {
     expect(save).toContain('next.launchesSinceBackendReprobe = 0;');
     expect(save).not.toContain('next.gpuBackendProof');
     const saveAt = body.indexOf('saveDesktopPrefs(desktopPrefsPath,');
+    // Idempotence, like the display-mode and Discord setters: the world-entry apply-all
+    // loop re-sends the stored setting, and a same-value send must not cost an fsynced
+    // prefs write per launch. After validation, before the save.
+    const sameAt = body.indexOf('if (value === desktopPrefs.gpuBackend) return true;');
+    expect(sameAt).toBeGreaterThan(body.indexOf('GPU_BACKEND_SETTINGS.includes(value)'));
+    expect(sameAt).toBeLessThan(saveAt);
     const commitAt = body.indexOf('desktopPrefs.gpuBackend = value;');
     const verdictAt = body.indexOf('desktopPrefs.gpuBackendToAttempt = undefined;');
     expect(commitAt).toBeGreaterThan(saveAt);

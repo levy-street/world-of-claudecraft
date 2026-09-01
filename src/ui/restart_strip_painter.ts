@@ -10,6 +10,7 @@
 // an in-place repaint keeps the region and can hand focus to the status while
 // the button is disabled, and back to the button when the offer stands again.
 
+import { FOCUS_KEY_ATTR } from './focus_restore';
 import { t } from './i18n';
 import type { RestartStripState } from './restart_strip_core';
 
@@ -34,14 +35,20 @@ export function buildRestartStrip(
 
   const status = document.createElement('div');
   status.className = 'restart-strip-status';
-  // Focusable by script only: where focus parks while the button is disabled.
+  // Focusable by script only: where focus parks while the button is disabled,
+  // and keyed so a panel rebuilt under a waiting player (the shell's own backend
+  // push) carries it to the new node instead of dropping it on the body.
   status.tabIndex = -1;
+  status.setAttribute(FOCUS_KEY_ATTR, 'restart-status');
 
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'btn restart-strip-btn';
   button.dataset.restartGame = '';
-  button.dataset.focusKey = 'restart-game';
+  // Focus identity for a rebuild-crossing restore (focus_restore.ts): the
+  // Graphics panel wipes its subtree on any setting change, and this key is how
+  // the rebuilt Restart button is found again.
+  button.setAttribute(FOCUS_KEY_ATTR, 'restart-game');
   button.textContent = t('hudChrome.options.restartGame');
   button.addEventListener('click', () => hooks.onRestart());
 

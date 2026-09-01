@@ -67,7 +67,7 @@ import {
   type ExternalAuthLoginChoice,
   readDiscordChoice,
 } from './game/discord_login_choice';
-import { desktopPresenceOnFrame, pushDiscordPresenceEnabled } from './game/discord_presence';
+import { desktopPresenceOnFrame } from './game/discord_presence';
 import { cycleHudFocus } from './game/dpad_focus_nav';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {

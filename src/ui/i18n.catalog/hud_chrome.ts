@@ -1900,7 +1900,7 @@ export const hudChromeStrings = {
     // "Currently using OpenGL (slow) (unable to enable Vulkan)" would not do.
     gpuBackendActiveNameVulkan: 'Vulkan',
     gpuBackendActiveNameOpenGL: 'OpenGL',
-    // The restart strip (src/ui/restart_strip.ts): a setting that only applies at
+    // The restart strip (src/ui/restart_strip_painter.ts): a setting that only applies at
     // the next launch of the desktop shell changed, so the panel offers the restart
     // Apply cannot stand in for. Wordy values, M16: the five non-Latin fills land in
     // this same change.

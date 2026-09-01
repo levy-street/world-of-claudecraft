@@ -143,6 +143,9 @@ const state = {
   schedule: null as ShaderWarmClientDeps['schedule'] | null,
   now: null as (() => number) | null,
   readyDeadlineMs: SHADER_WARM_READY_DEADLINE_MS,
+  /** The query string configure resolved against; a later re-read of the
+   *  stored option has to honour the same `?shaderwarm=` pin. */
+  search: '',
   mobile: false,
   platform: 'other' as ShaderWarmPlatform,
   /** Sources handed in before the worker answered ready, sent on ready. */
@@ -156,6 +159,9 @@ const state = {
   lastWarmedAtMs: Number.NEGATIVE_INFINITY,
   /** The last few holds, for the breaker's expired-share rule. */
   holds: createShaderWarmHoldRing(),
+  /** Why the worker was retired FOR CAUSE, if it was. Sticky across a setting
+   *  round trip; only a renderer swap clears it (retireAndForgetWorker). */
+  retiredCause: null as { worker: 'dead' | 'refused'; reason: string | null } | null,
 };
 
 function defaultNow(): number {
@@ -202,6 +208,7 @@ export function setShaderWarmStoredSettingSource(source: () => string | null): v
  *  decides it. */
 export function configureShaderWarm(deps: ShaderWarmClientDeps = {}): void {
   const search = deps.search ?? currentSearch();
+  state.search = search;
   state.setting = readShaderWarmSetting(
     search,
     deps.stored !== undefined ? deps.stored : storedSettingSource(),
@@ -237,8 +244,7 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
         if (queued.length > 0) state.worker?.postMessage({ kind: 'warm', sources: queued });
         syncWorkerPause();
       } else {
-        state.workerState = 'refused';
-        state.refusal = message.reason;
+        retireForCause('refused', message.reason);
         retireWorker();
       }
       break;
@@ -253,8 +259,7 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
       syncWorkerPause();
       break;
     case 'lost':
-      state.workerState = 'dead';
-      state.refusal = 'context-lost';
+      retireForCause('dead', 'context-lost');
       retireWorker();
       break;
     case 'stats':
@@ -274,6 +279,19 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
       };
       break;
   }
+}
+
+/** Record why this worker is not worth asking again, and stop the session
+ *  using it. A cause recorded here survives the player toggling the row Off
+ *  and back on (noteShaderWarmSettingChanged restores it), because the reason
+ *  it was retired, a wedged worker, a drifted extension set, a worker that
+ *  never loaded, is a property of this renderer's context and not of the
+ *  setting: without that, Off then On respawned a worker the breaker or the
+ *  extension sweep had already ruled out, and the drift case never healed. */
+function retireForCause(worker: 'dead' | 'refused', reason: string | null): void {
+  state.workerState = worker;
+  state.refusal = reason;
+  state.retiredCause = { worker, reason };
 }
 
 /** Terminate the worker and fail whoever waits. The browser reclaims the
@@ -311,8 +329,7 @@ function startWorker(context: ShaderWarmContextSource): void {
   if (!state.spawn) configureShaderWarm();
   const worker = state.spawn?.() ?? null;
   if (!worker) {
-    state.workerState = 'refused';
-    state.refusal = 'no-worker';
+    retireForCause('refused', 'no-worker');
     return;
   }
   hookPagehide();
@@ -320,8 +337,7 @@ function startWorker(context: ShaderWarmContextSource): void {
   state.worker = worker;
   worker.onmessage = onWorkerMessage;
   worker.onerror = () => {
-    state.workerState = 'dead';
-    state.refusal = 'worker-error';
+    retireForCause('dead', 'worker-error');
     retireWorker();
   };
   let attributes: Record<string, unknown> | null = null;
@@ -341,8 +357,7 @@ function startWorker(context: ShaderWarmContextSource): void {
   state.cancelReadyDeadline = (state.schedule ?? defaultSchedule)(() => {
     state.cancelReadyDeadline = null;
     if (state.workerState !== 'starting') return;
-    state.workerState = 'refused';
-    state.refusal = 'ready-timeout';
+    retireForCause('refused', 'ready-timeout');
     retireWorker();
   }, state.readyDeadlineMs);
 }
@@ -455,8 +470,7 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
   const wedged = state.consecutiveTimeouts >= SHADER_WARM_TIMEOUT_BREAKER;
   const tooSlow = state.holds.expired() >= SHADER_WARM_EXPIRED_SHARE_BREAKER;
   if ((wedged || tooSlow) && state.workerState !== 'dead') {
-    state.workerState = 'dead';
-    state.refusal = 'hold-timeouts';
+    retireForCause('dead', 'hold-timeouts');
     retireWorker();
   }
 }
@@ -469,8 +483,7 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
  *  to RENDERER_CONTEXT_EXTENSIONS so both contexts enable it up front). */
 export function noteShaderWarmExtensionDrift(name: string): void {
   if (state.workerState === 'dead') return;
-  state.workerState = 'dead';
-  state.refusal = `extension-drift:${name}`;
+  retireForCause('dead', `extension-drift:${name}`);
   retireWorker();
 }
 
@@ -496,6 +509,52 @@ export function noteShaderWarmFrameMs(frameMs: number): void {
   if (noteShaderWarmFrame(state.pause, frameMs)) syncWorkerPause();
 }
 
+/** Retire the worker and forget everything its life owned: the readout, the
+ *  breaker's counts and the request book. A settled entry is never re-sent,
+ *  so a book carried across a retirement would answer the next worker's gates
+ *  from the dead one's outcomes. The player's setting and `armed` outlive it. */
+function retireAndForgetWorker(): void {
+  retireWorker();
+  state.workerState = 'idle';
+  state.refusal = null;
+  state.retiredCause = null;
+  state.adapter = '';
+  state.workerStats = null;
+  state.consecutiveTimeouts = 0;
+  state.lastWarmedAtMs = Number.NEGATIVE_INFINITY;
+  state.holds = createShaderWarmHoldRing();
+  state.requests = createShaderWarmRequests();
+}
+
+/** The player moved the graphics row. The setting is otherwise read once, at
+ *  the first policy call, and `shaderWarm` is not a graphics rebuild key, so
+ *  without this a switch to Off kept the worker, its second WebGL2 context and
+ *  every gate's hold for the rest of the session. Off retires it here; a
+ *  switch back to Auto or On starts a fresh worker at the next policy call,
+ *  which is what the option's note promises. */
+export function noteShaderWarmSettingChanged(): void {
+  // Before the first policy call there is nothing to change: configure reads
+  // the store itself.
+  if (!state.spawn) return;
+  const setting = readShaderWarmSetting(state.search, storedSettingSource());
+  if (setting === state.setting) return;
+  state.setting = setting;
+  state.mode = shaderWarmModeFor(setting, state.backend, state.platform);
+  if (state.mode !== 'off') return;
+  const cause = state.retiredCause;
+  retireAndForgetWorker();
+  if (cause) {
+    // A retirement for cause outlives the round trip: switching back on must
+    // not respawn what the breaker or the extension sweep ruled out, and the
+    // readout keeps naming why.
+    state.workerState = cause.worker;
+    state.refusal = cause.reason;
+    state.retiredCause = cause;
+    return;
+  }
+  if (state.platform === 'ios' && setting !== 'off') state.refusal = 'ios-webkit';
+}
+
 /** The renderer is going: the worker's context contract was that renderer's,
  *  and so were the programs it warmed (their context goes with the worker),
  *  so the request book starts over with the next renderer. */
@@ -504,17 +563,8 @@ export function disposeShaderWarm(): void {
   // land on another backend, software included).
   state.backend = null;
   state.mode = shaderWarmModeFor(state.setting, null, state.platform);
-  retireWorker();
-  state.workerState = 'idle';
-  state.refusal = null;
-  state.adapter = '';
+  retireAndForgetWorker();
   state.armed = false;
-  state.workerStats = null;
-  state.workerPaused = false;
-  state.consecutiveTimeouts = 0;
-  state.lastWarmedAtMs = Number.NEGATIVE_INFINITY;
-  state.holds = createShaderWarmHoldRing();
-  state.requests = createShaderWarmRequests();
 }
 
 export function shaderWarmSnapshot(): ShaderWarmSnapshot {

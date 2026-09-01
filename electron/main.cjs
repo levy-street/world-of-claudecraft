@@ -257,11 +257,6 @@ if (gpuForceDisabledByEnv) {
   forceHighPerformanceGpu({ app, log });
 }
 
-// Linux only: Chromium's default WebGL backend there is ANGLE over OpenGL, where every
-// shader program link stalls the GPU process's presenting thread (100 to 320 ms hitches
-// per program the game cannot avoid); ANGLE's Vulkan backend links in about 10 ms. A
-// forced Vulkan backend has no OpenGL fallback (a machine without a working Vulkan driver
-// lands on SwiftShader), so with the default 'auto' setting the first launch is a TRIAL:
 /**
  * Merge a partial into the live prefs and persist them. The GPU-backend memory is written
  * from several places (the launch counter, a healthy session, a launch-time death), each
@@ -280,12 +275,20 @@ function mergeDesktopPrefs(partial) {
   return true;
 }
 
-// Which rung this launch runs. logGpuStatus below judges what the GPU process ACTUALLY
-// bound and, once the session has proven healthy, writes the Auto memory; a GPU-process
-// death before that rescues the session onto a lower rung, in every mode. Runs before app
-// 'ready' (the switches are read there), after the discrete-GPU force. The decision table
-// (the rescue marker, WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto
-// memory and its climb) lives in electron/gpu_backend.cjs.
+// Linux only: Chromium's default WebGL backend there is ANGLE over OpenGL, where every
+// shader program link stalls the GPU process's presenting thread (100 to 320 ms hitches
+// per program the game cannot avoid); ANGLE's Vulkan backend links in about 10 ms. A
+// forced Vulkan backend has no OpenGL fallback of its own (a machine without a working
+// Vulkan driver lands on SwiftShader), so the shell runs a LADDER of rungs rather than one
+// backend: Auto starts on what this machine has proven it can run and climbs back on a
+// cadence, and a GPU-process death at launch rescues the session onto the rung below, in
+// every mode.
+//
+// Which rung THIS launch runs is decided here, before app 'ready' (the switches are read
+// there) and after the discrete-GPU force; the decision table (the rescue marker,
+// WOC_GPU_BACKEND, the no-lever rescue env, the setting, the Auto memory and its climb)
+// lives in electron/gpu_backend.cjs. logGpuStatus below judges what the GPU process
+// ACTUALLY bound and, once the session has proven healthy, writes the Auto memory.
 // The policy first (electron/gpu_backend_policy.cjs): what this machine's rendering GPU
 // needs on Vulkan (switches every Vulkan launch carries, whatever the mode) and whether
 // Auto is held at a rung there. Read from /sys/class/drm, so it is in hand before the
@@ -1160,13 +1163,17 @@ ipcMain.handle('desktop-get-gpu-force-opt-out', (event) => {
 ipcMain.handle('desktop-set-gpu-backend', (event, value) => {
   if (!trustedSender(event)) return false;
   if (!GPU_BACKEND_SETTINGS.includes(value)) return false;
+  // Idempotent on purpose, like the display-mode and Discord setters: the renderer
+  // re-pushes its stored setting at every boot, and answering that echo with a write
+  // would cost an fsynced prefs write per launch for a value that did not move.
+  if (value === desktopPrefs.gpuBackend) return true;
   // Coming BACK to auto clears the GUESS and starts detection over: whatever this machine
   // did under an explicit choice taught us nothing about what Auto should attempt, and a
   // remembered rung from before the detour may describe a driver that has since changed.
   // The PROOF survives: a session that once ran healthy here still ran healthy here, and
-  // it is what lets the climb aim straight instead of feeling its way up. The same value
-  // written again (the game re-pushes its stored setting at every boot) clears nothing,
-  // or every launch would start detection over.
+  // it is what lets the climb aim straight instead of feeling its way up. A same-value
+  // push is already answered above; the comparison stays here so the reset can never ride
+  // an echo, which would start detection over at every launch.
   const backToAuto = value === 'auto' && desktopPrefs.gpuBackend !== 'auto';
   const next = { ...desktopPrefs, gpuBackend: value };
   if (backToAuto) {
@@ -1235,6 +1242,7 @@ ipcMain.handle('desktop-restart-app', (event) => {
   if (restartInFlight) return restartInFlight;
   restartInFlight = restartApp({
     log,
+    devServerUrl,
     onSpawned: () => {
       app.releaseSingleInstanceLock();
       app.quit();

@@ -105,6 +105,82 @@ function* walkGlbs(dir: string): Generator<string> {
   }
 }
 
+/** A KHR_materials_volume property in a MATERIAL position: an object-literal
+ *  key, or an assignment through a member expression. A plain `const thickness
+ *  = ...` is arithmetic, not a material: `src/render/mage_ground_fx.ts` computes
+ *  the meteor countdown ring's width that way, and a name-only match reads it as
+ *  a second scene pass. */
+const VOLUME_PROPS = 'thickness|attenuationColor|attenuationDistance';
+const VOLUME_PROPERTY_SET = new RegExp(
+  `(?<![.\\w$])(?:${VOLUME_PROPS})\\s*:|\\.\\s*(?:${VOLUME_PROPS})\\s*(?:[-+*/]|\\?\\?|\\|\\||&&)?=(?!=)`,
+);
+
+describe('the volume-property scan reads material positions, not every `thickness`', () => {
+  const flagged = (source: string) => VOLUME_PROPERTY_SET.test(source);
+
+  // Every property in both positions the scan claims to read: an object-literal
+  // key and an assignment through a member expression. One fixture per pair, so
+  // a narrowing that drops a property or a position cannot hide behind another.
+  const IN_MATERIAL_POSITION = [
+    'new THREE.MeshPhysicalMaterial({ transmission: 0.9, thickness: 0.24 })',
+    '    attenuationColor: new THREE.Color(0x88ccff),',
+    '  attenuationDistance: 3,',
+    'material.thickness = 0.24;',
+    'glass.attenuationColor = new THREE.Color(0x88ccff);',
+    'glass.attenuationDistance = 3;',
+  ];
+
+  it.each(IN_MATERIAL_POSITION)('catches a volume property written on a material: %s', (source) => {
+    expect(flagged(source)).toBe(true);
+  });
+
+  it('leaves a local thickness variable and a uniform name alone', () => {
+    expect(flagged('const thickness = radius * (0.05 - collapse * 0.02);')).toBe(false);
+    expect(flagged('let thickness = 0.4;')).toBe(false);
+    expect(flagged('var thickness = wall * 2;')).toBe(false);
+    expect(flagged('const innerRadius = Math.max(radius * 0.06, outerRadius - thickness);')).toBe(
+      false,
+    );
+    expect(flagged("  'thicknessMap',")).toBe(false);
+  });
+
+  // KNOWN BLIND SPOTS, listed so a future narrowing of the pattern is a
+  // conscious act rather than a discovery. Each of these DOES set a volume
+  // property on a material and the scan does not see it: none of these shapes
+  // is written anywhere the sweep below reads today, and the pattern covers the
+  // two spellings this tree actually uses. Widening it to reach one of them
+  // means moving that line out of this list, not deleting the list.
+  // Compound assignments through a member are assignments too.
+  const COMPOUND_ASSIGNMENTS = [
+    'mat.thickness += 0.1;',
+    'glass.attenuationDistance *= 2;',
+    'mat.thickness ??= 0.2;',
+    'mat.attenuationColor ||= tint;',
+  ];
+  it.each(COMPOUND_ASSIGNMENTS)('flags %s', (source) => {
+    expect(flagged(source)).toBe(true);
+  });
+  it('does not read a comparison as an assignment', () => {
+    expect(flagged('if (mat.thickness === 0.3) return;')).toBe(false);
+    expect(flagged('const same = mat.thickness == other.thickness;')).toBe(false);
+  });
+
+  const OUT_OF_REACH = [
+    // Shorthand property: the value is a variable of the same name, so there is
+    // no colon after it.
+    'new THREE.MeshPhysicalMaterial({ transmission: 0.9, thickness })',
+    // Bracket access, with either quote: no member dot to anchor on.
+    "mat['thickness'] = 0.3;",
+    'mat["attenuationDistance"] = 3;',
+    // The property named as a string argument.
+    "Object.defineProperty(mat, 'thickness', { value: 0.3 });",
+  ];
+
+  it.each(OUT_OF_REACH)('is knowingly blind to %s', (source) => {
+    expect(flagged(source)).toBe(false);
+  });
+});
+
 describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
   const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -153,9 +229,7 @@ describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
           offenders.push(`${rel}: construction`);
         if (/\btransmission\s*[:=]\s*(?!0\b)[0-9.]/.test(source))
           offenders.push(`${rel}: transmission set`);
-        if (/\b(thickness|attenuationColor|attenuationDistance)\s*[:=]/.test(source)) {
-          offenders.push(`${rel}: volume set`);
-        }
+        if (VOLUME_PROPERTY_SET.test(source)) offenders.push(`${rel}: volume set`);
       }
     }
     expect(offenders).toEqual([]);

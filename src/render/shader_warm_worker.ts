@@ -74,7 +74,6 @@ let warmed = 0;
 let failed = 0;
 let ticking = false;
 let ticks = 0;
-let disposed = false;
 
 function adapterOf(context: WarmupGl): string {
   try {
@@ -113,6 +112,7 @@ function init(
   try {
     const canvas = new Offscreen(WARM_CANVAS_PX, WARM_CANVAS_PX);
     context = canvas.getContext('webgl2', attributes ?? undefined) as unknown as WarmupGl | null;
+    canvas.addEventListener?.('webglcontextlost', () => noteContextLost());
   } catch {
     context = null;
   }
@@ -164,13 +164,27 @@ function failEverything(reason: 'context-lost' | 'not-ready'): void {
   sources.clear();
 }
 
+/** The context is gone: fail what was waiting and tell the client, which
+ *  retires the worker. Reached from the canvas event (a loss while the worker
+ *  sits idle schedules no tick at all, so nothing would notice until the next
+ *  request) and from the tick's own poll (a driver that loses the context
+ *  without dispatching still gets caught). Idempotent: whichever arrives
+ *  first drops `gl`, and the other returns. */
+function noteContextLost(): void {
+  if (!gl) return;
+  // Dropped BEFORE the retention is released: the handles belong to a context
+  // that is gone, so the releaser must not issue a GL call for them.
+  gl = null;
+  retention.clear();
+  failEverything('context-lost');
+  post({ kind: 'lost' });
+}
+
 function tick(): void {
   ticking = false;
-  if (disposed || !gl || !scheduler) return;
+  if (!gl || !scheduler) return;
   if (contextLost()) {
-    failEverything('context-lost');
-    post({ kind: 'lost' });
-    gl = null;
+    noteContextLost();
     return;
   }
   // Settle what completed, oldest first. A link past its deadline is failed
@@ -225,7 +239,7 @@ function tick(): void {
 }
 
 function schedule(): void {
-  if (ticking || disposed || !scheduler) return;
+  if (ticking || !scheduler) return;
   // Paused with nothing in flight: nothing to poll, resume re-schedules.
   if (inFlight.size === 0 && (!scheduler.active() || scheduler.paused())) return;
   ticking = true;
@@ -275,20 +289,6 @@ scope.onmessage = (event: MessageEvent<ShaderWarmClientMessage>) => {
     case 'resume':
       scheduler?.resume();
       schedule();
-      break;
-    case 'dispose':
-      disposed = true;
-      if (gl) {
-        for (const flight of inFlight.values()) {
-          releaseWarmShaders(gl, flight.handle);
-          deleteWarmProgram(gl, flight.handle);
-        }
-        retention.clear();
-        (gl.getExtension('WEBGL_lose_context') as { loseContext(): void } | null)?.loseContext();
-      }
-      inFlight.clear();
-      sources.clear();
-      gl = null;
       break;
   }
 };

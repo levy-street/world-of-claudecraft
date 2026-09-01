@@ -1,6 +1,6 @@
 // The restart strip's pure core: what the strip shows given what is pending,
 // what the panel around it is doing, and where its own restart request stands.
-// DOM-free; src/ui/restart_strip.ts paints it, and the options window composes
+// DOM-free; src/ui/restart_strip_painter.ts paints it, and the options window composes
 // it at the foot of any panel that hosts a next-launch setting
 // (src/game/desktop_next_launch_settings.ts). Pinned by
 // tests/restart_strip_core.test.ts.

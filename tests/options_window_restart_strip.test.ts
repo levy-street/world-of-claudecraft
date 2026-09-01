@@ -305,6 +305,144 @@ describe('OptionsWindow restart strip', () => {
     expect(strip(root)?.dataset.restartStrip).toBe('ready');
   });
 
+  it('shows the failure after a rebuild swapped the strip out from under the request', async () => {
+    // The panel rebuilds on any setting change, so a player who picks another
+    // backend while the request is out leaves the strip that asked detached. The
+    // false answer then lands on a strip nobody is looking at: without a render
+    // the live one keeps reading "Restarting", its button disabled, and the offer
+    // never comes back.
+    let settle: (started: boolean) => void = () => {};
+    installShell(
+      LAUNCHED_DEFAULTS,
+      () =>
+        new Promise<boolean>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    await syncDesktopLaunchSettings(desktopBridge());
+    const values: Record<string, number | boolean> = { gpuBackend: 2, forceHighPerfGpu: true };
+    const onSettingChange = vi.fn((key: string, value: unknown) => {
+      values[key] = value as number | boolean;
+    });
+    openWindow(root, settingsStore(values), onSettingChange);
+    goTo(root, 'graphics');
+
+    const asked = strip(root);
+    stripButton(root)?.click();
+    expect(strip(root)?.dataset.restartStrip).toBe('restarting');
+    // Another backend picked while waiting: the panel rebuilds, so the strip
+    // that asked is off the tree.
+    root.querySelector<HTMLButtonElement>('[data-focus-key="gpuBackend:1"]')?.click();
+    expect(strip(root)).not.toBe(asked);
+    expect(asked?.isConnected).toBe(false);
+    // Where the player is standing when the answer lands: on the button they
+    // just pressed, as a browser leaves them.
+    const picked = root.querySelector<HTMLButtonElement>('[data-focus-key="gpuBackend:1"]');
+    picked?.focus();
+    expect(document.activeElement).toBe(picked);
+
+    settle(false);
+    await Promise.resolve();
+    await Promise.resolve();
+    const shown = strip(root);
+    expect(shown?.dataset.restartStrip).toBe('failed');
+    const status = shown?.querySelector('.restart-strip-status');
+    expect(status?.getAttribute('role')).toBe('alert');
+    expect(status?.textContent).toBe(t('hudChrome.options.restartFailed'));
+    expect(stripButton(root)?.disabled).toBe(false);
+    // The failure is the answer to the player's own click, so it lands where
+    // the in-place arm lands it: on the button that can retry, never on <body>
+    // outside the window's Tab trap.
+    expect(picked?.isConnected).toBe(false);
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement).toBe(stripButton(root));
+  });
+
+  it('carries a player parked on the waiting status across a rebuild under them', async () => {
+    // Restart pressed: focus parks on the status while the button is disabled.
+    // The Graphics panel then rebuilds for a reason the player did not cause
+    // (the shell's backend push, or here a setting change): the status node is
+    // where focus lives for that whole window, so it carries too.
+    installShell(LAUNCHED_DEFAULTS, () => new Promise<boolean>(() => {}));
+    await syncDesktopLaunchSettings(desktopBridge());
+    const values: Record<string, number | boolean> = { gpuBackend: 2, forceHighPerfGpu: true };
+    const onSettingChange = vi.fn((key: string, value: unknown) => {
+      values[key] = value as number | boolean;
+    });
+    openWindow(root, settingsStore(values), onSettingChange);
+    goTo(root, 'graphics');
+    stripButton(root)?.click();
+    const parked = strip(root)?.querySelector<HTMLElement>('.restart-strip-status');
+    expect(document.activeElement).toBe(parked);
+
+    root.querySelector<HTMLButtonElement>('[data-focus-key="gpuBackend:1"]')?.click();
+    const rebuilt = strip(root)?.querySelector<HTMLElement>('.restart-strip-status');
+    expect(rebuilt).not.toBe(parked);
+    expect(parked?.isConnected).toBe(false);
+    expect(strip(root)?.dataset.restartStrip).toBe('restarting');
+    expect(document.activeElement).toBe(rebuilt);
+  });
+
+  it('keeps a closed window closed when the failure lands, and shows it on the next open', async () => {
+    // The player pressed Restart, then closed the window while the shell was
+    // still answering: the false answer must not reopen or rebuild a panel
+    // nobody asked for. The failure is remembered and greets the next Graphics
+    // build.
+    let settle: (started: boolean) => void = () => {};
+    installShell(
+      LAUNCHED_DEFAULTS,
+      () =>
+        new Promise<boolean>((resolve) => {
+          settle = resolve;
+        }),
+    );
+    await syncDesktopLaunchSettings(desktopBridge());
+    const values: Record<string, number | boolean> = { gpuBackend: 2, forceHighPerfGpu: true };
+    const window = openWindow(root, settingsStore(values), vi.fn());
+    goTo(root, 'graphics');
+    stripButton(root)?.click();
+    expect(strip(root)?.dataset.restartStrip).toBe('restarting');
+    window.toggle();
+    expect(window.isOpen).toBe(false);
+    expect(root.style.display).toBe('none');
+    // Closing hides the panel rather than tearing it down, so the strip that
+    // asked is still the live one and takes the answer in place, out of sight.
+    const asked = strip(root);
+
+    settle(false);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(window.isOpen).toBe(false);
+    expect(root.style.display).toBe('none');
+    expect(strip(root)).toBe(asked);
+    expect(document.activeElement).not.toBe(document.body);
+
+    window.toggle();
+    goTo(root, 'graphics');
+    expect(strip(root)?.dataset.restartStrip).toBe('failed');
+    expect(stripButton(root)?.disabled).toBe(false);
+  });
+
+  it('keeps a player standing on the Restart button there across a panel rebuild', async () => {
+    // The strip's own button carries the rebuild-crossing focus identity too
+    // (restart_strip_painter.ts writes it through FOCUS_KEY_ATTR): the Graphics
+    // panel rebuilds for reasons the player did not ask for (the shell's late
+    // backend verdict), and the offer must not slide out from under them.
+    installShell(LAUNCHED_DEFAULTS, () => Promise.resolve(true));
+    await syncDesktopLaunchSettings(desktopBridge());
+    const window = openWindow(root, settingsStore({ gpuBackend: 2 }));
+    goTo(root, 'graphics');
+
+    const standing = stripButton(root);
+    standing?.focus();
+    expect(document.activeElement).toBe(standing);
+    (window as unknown as { render(): void }).render();
+
+    expect(standing?.isConnected).toBe(false);
+    expect(stripButton(root)).not.toBe(standing);
+    expect(document.activeElement).toBe(stripButton(root));
+  });
+
   it('asks the shell to restart on click, and shows the wait while it takes the window down', async () => {
     let settle: (started: boolean) => void = () => {};
     const { restartApp } = installShell(

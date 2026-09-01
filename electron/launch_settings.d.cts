@@ -37,6 +37,8 @@ export interface RestartAppDeps {
   };
   /** The child's 'spawn' event: it exists (the shell hands over its lock and quits there). */
   onSpawned?: () => void;
+  /** The dev-server URL this process honours (undefined when packaged): set, the restart is refused. */
+  devServerUrl?: string;
 }
 /** Resolves true on the child's 'spawn' event, false when it never started or spawn threw. */
 export function restartApp(deps?: RestartAppDeps): Promise<boolean>;

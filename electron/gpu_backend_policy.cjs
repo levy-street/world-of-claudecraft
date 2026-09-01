@@ -37,6 +37,8 @@ const { PRIME_RELAUNCH_MARKER } = require('./gpu_preference.cjs');
 
 /** PCI vendor ids as sysfs prints them (lowercase, `0x` prefixed). */
 const PCI_VENDOR_AMD = '0x1002';
+// No entry names NVIDIA today; the id is kept beside AMD's for the next one, and names the
+// vendor in the adapter-selection tests rather than leaving a bare literal there.
 const PCI_VENDOR_NVIDIA = '0x10de';
 
 /**
@@ -126,7 +128,9 @@ function linuxGpuAdapters(readdir = nodeReaddirSync, readFile = nodeReadFileSync
  * that way is a switch the driver ignores or a slower backend, the cost of being wrong
  * the other way is a game that renders noise. Known limit: an offload the driver silently
  * ignored (the NVIDIA variables on a machine without the NVIDIA driver) leaves the display
- * card rendering while the offload card is judged.
+ * card rendering while the offload card is judged. Same shape on a MUXED laptop switched to
+ * discrete in firmware: the dGPU carries `boot_vga` there, so "the card that does not drive
+ * the screen" is the integrated one and that is what gets judged, while the dGPU renders.
  */
 function renderingAdapters(adapters, env = {}) {
   const list = Array.isArray(adapters) ? adapters : [];

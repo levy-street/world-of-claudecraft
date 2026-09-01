@@ -78,7 +78,7 @@ import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_
 import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import type { FocusTrapHandle } from './focus_manager';
-import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
+import { captureFocusKey, findFocusKey, restoreFirstEnabled } from './focus_restore';
 import type { BugReportHooks, GraphicsApplyOutcome, OptionsHooks } from './hud';
 import type { ChatClock } from './hud/chat/chat_timestamp';
 import {
@@ -122,8 +122,8 @@ import {
   withGraphicsDraft,
 } from './options_view';
 import { PerfOverlaySettingsPanel, type PerfSettingsHost } from './perf_overlay_settings';
-import { buildRestartStrip, paintRestartStrip } from './restart_strip';
 import { type RestartRequestPhase, restartStripState } from './restart_strip_core';
+import { buildRestartStrip, paintRestartStrip } from './restart_strip_painter';
 import { settingsCard, subhead } from './settings_controls';
 import { exportTransferCode, importTransferCode } from './settings_transfer';
 import type { TransferKind } from './settings_transfer_core';
@@ -740,6 +740,11 @@ export class OptionsWindow {
     slider.step = String(c.step);
     slider.value = String(hooks.settings.get(key));
     slider.setAttribute('aria-label', label);
+    // Focus identity for rebuild-crossing restores (focus_restore.ts), the same
+    // one the choice buttons carry: the Graphics panel rebuilds on its own, on
+    // the shell's late backend verdict, and a dial that came back without its
+    // focus drops a keyboard player on <body>, outside the window's Tab trap.
+    slider.dataset.focusKey = key;
     const val = document.createElement('span');
     val.className = 'set-val';
     const fmt = this.sliderFormatter(c.fmt);
@@ -805,6 +810,8 @@ export class OptionsWindow {
     name.textContent = label;
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
+    // Rebuild-crossing focus identity, as on the slider above.
+    toggle.dataset.focusKey = key;
     const sync = () => {
       const on = toggleIsOn(hooks.settings.get(key));
       toggle.textContent = on ? t('hud.options.on') : t('hud.options.off');
@@ -839,6 +846,11 @@ export class OptionsWindow {
     const toggle = document.createElement('button');
     toggle.className = 'btn set-toggle';
     toggle.dataset.settingKey = key;
+    // Rebuild-crossing focus identity, as on the slider above. Distinct from
+    // the settingKey beside it, which is how a rerendering toggle finds itself
+    // again after its OWN change; this one carries focus across a rebuild the
+    // player did not ask for.
+    toggle.dataset.focusKey = key;
     toggle.disabled = c.disabled ?? false;
     const sync = () => {
       const on = hooks.settings.get(key);
@@ -1146,7 +1158,7 @@ export class OptionsWindow {
     this.render();
   }
 
-  // The restart strip (restart_strip.ts) for the panel being painted, or null
+  // The restart strip (restart_strip_painter.ts) for the panel being painted, or null
   // when it has nothing to offer: no next-launch setting differs from what this
   // launch runs on (whichever panel its row is on: the offer follows what is
   // pending, so a player who toggled the GPU force under Interface and opened
@@ -1156,7 +1168,7 @@ export class OptionsWindow {
   // so a value put back to what is running withdraws the offer without any
   // bookkeeping here. The click repaints the strip IN PLACE rather than through
   // render(): a rebuild would replace the live region with its text and drop
-  // focus to the body (restart_strip.ts).
+  // focus to the body (restart_strip_painter.ts).
   private restartStrip(dirty: boolean, busy: boolean): HTMLElement | null {
     const hooks = this.deps.options();
     if (!hooks) return null;
@@ -1183,13 +1195,31 @@ export class OptionsWindow {
           if (started) return;
           this.restartPhase = 'failed';
           // The panel may have been rebuilt meanwhile (a setting changed while
-          // the request was out): only a strip still in the tree is repainted,
-          // the next render reads the phase anyway.
+          // the request was out), leaving this strip detached: repaint it in
+          // place while it is still the live one, and rebuild the panel
+          // otherwise. Without the second arm the strip on screen keeps reading
+          // "Restarting" with its button disabled and the offer never returns.
           if (strip?.isConnected) paintRestartStrip(strip, 'failed');
+          else this.showRestartFailure();
         });
       },
     });
     return strip;
+  }
+
+  // The failed answer landing after the strip that asked left the tree: only a
+  // panel that hosts a strip is rebuilt (another panel keeps the controls the
+  // player is on; its strip reads failed when it is next built), and the new
+  // node is then painted the way the in-place arm paints it, because a node
+  // built with its alert text already in place is not announced, and the
+  // failure hands focus back to the button that can retry.
+  private showRestartFailure(): void {
+    const hosted =
+      this.view === 'graphics' || (this.view === 'interface' && this.interfaceTab === 'general');
+    if (!this.opened || !hosted) return;
+    this.render();
+    const shown = this.deps.root().querySelector<HTMLElement>('[data-restart-strip]');
+    if (shown) paintRestartStrip(shown, 'failed');
   }
 
   // The panel's ONE inline action row (playtest feedback): Back at the inline
@@ -1345,8 +1375,7 @@ export class OptionsWindow {
     // The generic settingsViewFooter is not used here (the inline action row
     // replaces it), so wire the title-bar close control directly.
     el.querySelector('[data-close]')?.addEventListener('click', () => this.close());
-    if (focusKey !== null)
-      restoreFirstEnabled([el.querySelector<HTMLButtonElement>(`[data-focus-key="${focusKey}"]`)]);
+    if (focusKey !== null) restoreFirstEnabled([findFocusKey(el, focusKey)]);
   }
 
   // -------------------------------------------------------------------------

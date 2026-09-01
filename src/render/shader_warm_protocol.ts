@@ -41,8 +41,11 @@ export interface ShaderWarmCancelMessage {
   ids: number[];
 }
 
+/** No teardown message: the client retires a worker by terminating it, which
+ *  takes the whole scope (its context and its OffscreenCanvas) with it, and a
+ *  message posted right before that terminate is not guaranteed to run. */
 export interface ShaderWarmPauseMessage {
-  kind: 'pause' | 'resume' | 'dispose';
+  kind: 'pause' | 'resume';
 }
 
 export type ShaderWarmClientMessage =

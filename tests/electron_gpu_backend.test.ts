@@ -361,19 +361,40 @@ describe('applyGpuBackendSwitches', () => {
 
   it("appends the policy's per-card switches on every Vulkan launch, never on OpenGL", () => {
     const workaround = [['disable-angle-features', 'supportsImageDrmFormatModifier']] as const;
-    const vulkan = fakeApp();
-    applyGpuBackendSwitches(
-      vulkan.app,
-      { backend: 'vulkan', parallel: true, rung: 'vulkan-parallel-compile' } as never,
-      workaround,
-    );
-    expect(vulkan.switches).toEqual([
+    const vulkanSwitches = [
       ['use-gl', 'angle'],
       ['use-angle', 'vulkan'],
       ['enable-features', 'Vulkan,DefaultANGLEVulkan,VulkanFromANGLE'],
-      ['enable-angle-features', 'enableParallelCompileAndLink'],
-      ['disable-angle-features', 'supportsImageDrmFormatModifier'],
-    ]);
+    ];
+    const parallelSwitch = ['enable-angle-features', 'enableParallelCompileAndLink'];
+    // The card's switches follow the HARDWARE, never the mode and never the rung: every
+    // Vulkan launch on this card carries them. Each rung is exercised, so a card switch
+    // that drifted under the parallel-compile arm (where the AMD workaround would be lost
+    // on every plain-Vulkan launch, which is the rung a rescue lands on) fails here.
+    const rungs = [
+      { what: 'the top rung', parallel: true, rung: 'vulkan-parallel-compile', rescued: false },
+      { what: 'plain Vulkan', parallel: false, rung: 'vulkan-plain', rescued: false },
+      {
+        what: 'a rescued top rung',
+        parallel: true,
+        rung: 'vulkan-parallel-compile',
+        rescued: true,
+      },
+      { what: 'a rescued plain Vulkan', parallel: false, rung: 'vulkan-plain', rescued: true },
+    ];
+    for (const { what, parallel, rung, rescued } of rungs) {
+      const { app, switches } = fakeApp();
+      applyGpuBackendSwitches(
+        app,
+        { backend: 'vulkan', parallel, rung, rescued } as never,
+        workaround,
+      );
+      expect(switches, `the card switches ride ${what}`).toEqual([
+        ...vulkanSwitches,
+        ...(parallel ? [parallelSwitch] : []),
+        ...workaround,
+      ]);
+    }
     const opengl = fakeApp();
     applyGpuBackendSwitches(
       opengl.app,
@@ -1274,10 +1295,12 @@ describe('spawnDetachedSelf (the shared self-relaunch spawn)', () => {
   });
 
   it('tolerates a child handle without unref and propagates a spawn failure', () => {
-    // A handle with no event surface fires neither callback: nothing is
-    // known about that child, and nothing is claimed.
+    // A handle with no event surface fires neither event callback: nothing is
+    // known about that child, and nothing is claimed. `onUnobservable` says
+    // exactly that, for the one caller that waits on an answer (the restart).
     const onSpawned = vi.fn();
     const onSpawnFailed = vi.fn();
+    const onUnobservable = vi.fn();
     expect(
       spawnDetachedSelf({
         env: {},
@@ -1286,10 +1309,23 @@ describe('spawnDetachedSelf (the shared self-relaunch spawn)', () => {
         spawn: () => ({}),
         onSpawned,
         onSpawnFailed,
+        onUnobservable,
       }),
     ).toBe('/bin/woc');
     expect(onSpawned).not.toHaveBeenCalled();
     expect(onSpawnFailed).not.toHaveBeenCalled();
+    expect(onUnobservable).toHaveBeenCalledWith('/bin/woc');
+    // A handle that CAN report events never reaches that arm.
+    const observable = Object.assign(new EventEmitter(), { unref: vi.fn() });
+    const never = vi.fn();
+    spawnDetachedSelf({
+      env: {},
+      argv: [],
+      execPath: '/bin/woc',
+      spawn: () => observable,
+      onUnobservable: never,
+    });
+    expect(never).not.toHaveBeenCalled();
     expect(() =>
       spawnDetachedSelf({
         env: {},

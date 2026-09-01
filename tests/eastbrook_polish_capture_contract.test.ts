@@ -351,8 +351,11 @@ interface AttributionTargetFixture {
 // Re-minted for the 2026-08-31 v0.41.0 sync into the shader-warm branch: both
 // arms had re-minted, and the merged renderer, three patch, lockfile, and
 // re-stamped GLB inputs land together. No capture was retaken.
+// Re-minted for review round 3 of the shader-warm PR (the battleground ward
+// walk left renderer.ts for battleground_views.ts and the prebuild release
+// call replaced it). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '3ec3def5628b6937314babb7465a26303eff75b343275dcab776b385f575cfc1';
+  'f3c315dda9c1a3c9f580ccc7d71a2bab4c871c1814c8aa3849a536f2c0ee59d9';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

@@ -95,6 +95,58 @@ describe('renderer resource lifecycle', () => {
     expect(errors).toHaveLength(2);
   });
 
+  it('drains the battleground copies the teardown catches standing', () => {
+    // Each copy owns a field's terrain, its paint array texture, the placement
+    // instances, the decals and its share of the point-light budget; the map
+    // outlives nothing, so the terminal teardown is what releases whatever the
+    // session had not already resolved.
+    const played = { dispose: vi.fn() };
+    const prebuilt = { dispose: vi.fn() };
+    const bgViews = new Map([
+      [0, prebuilt],
+      [1, played],
+    ]);
+
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map(), bgViews }, (cleanup) =>
+      cleanup(),
+    );
+
+    expect(prebuilt.dispose).toHaveBeenCalledOnce();
+    expect(played.dispose).toHaveBeenCalledOnce();
+    expect(bgViews.size).toBe(0);
+  });
+
+  it('drains every battleground copy when one of them fails to release', () => {
+    // The map is drained at teardown whatever one copy does: a throw inside
+    // one field's release must not strand the next one's terrain, textures
+    // and point lights for the life of the page.
+    const failing = {
+      dispose: vi.fn(() => {
+        throw new Error('field');
+      }),
+    };
+    const played = { dispose: vi.fn() };
+    const bgViews = new Map([
+      [0, failing],
+      [1, played],
+    ]);
+    const errors: unknown[] = [];
+    const bestEffort = (cleanup: () => void): void => {
+      try {
+        cleanup();
+      } catch (error) {
+        errors.push(error);
+      }
+    };
+
+    disposeRendererPrewarmAndGroundFx({ prewarmDepthMaterials: new Map(), bgViews }, bestEffort);
+
+    expect(failing.dispose).toHaveBeenCalledOnce();
+    expect(played.dispose).toHaveBeenCalledOnce();
+    expect(bgViews.size).toBe(0);
+    expect(errors).toHaveLength(1);
+  });
+
   it('runs generic VFX cleanup even when a ground owner fails', () => {
     const mageGroundFx = {
       dispose: vi.fn(() => {

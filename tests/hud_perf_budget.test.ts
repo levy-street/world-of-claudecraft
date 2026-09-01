@@ -595,6 +595,25 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
     allow: { '.textContent': 2, '.classList': 2, '.dataset': 1 },
     reflowAllow: {},
   },
+  // The options window's restart strip: cold (built with the panel that hosts a
+  // next-launch row, no driver of its own) and held to the full write contract
+  // like tab_strip above. buildRestartStrip mints the row once: 3 class
+  // assignments, the [data-restart-game] hook, the button label, and the two
+  // focus keys (status and button), setAttributes through the shared
+  // FOCUS_KEY_ATTR constant rather than dataset writes. paintRestartStrip moves a BUILT row to a new
+  // state in place, which is the other half of each count: the state stamp on
+  // [data-restart-strip], the status text, and the status/alert role swap (the
+  // second setAttribute), at most one pass per player-caused transition
+  // (ready -> restarting -> failed). Those repaint writes are raw and unelided
+  // by design: the painter is cold (no driver, no per-frame call), every
+  // transition is a value change, and a read-compare would guard nothing. A
+  // write this list does not name is a new write path, the shape these counts
+  // exist to make a conscious act.
+  {
+    file: 'restart_strip_painter.ts',
+    allow: { '.className': 3, '.dataset': 2, '.textContent': 2, '.setAttribute': 3 },
+    reflowAllow: {},
+  },
   // yumi builds its whole strip + respawn overlay once in ensureEls (14 class
   // assignments + the two role attributes + the toggle's type); every
   // per-frame write is facet-routed.

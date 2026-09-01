@@ -266,13 +266,59 @@ describe('decideGpuBackendLaunch under a ceiling', () => {
     expect(env.capped).toBe(false);
   });
 
-  it('leaves a rescued child on the rung its parent chose', () => {
+  it('leaves a rescued child on the rung its parent chose, and keeps the cap on it', () => {
+    // The rung is the parent's: it watched the rung above die, and a ceiling never lifts
+    // a rescue back up. The MODE is the policy's: the launch this child prolongs was
+    // capped, so the chain stays outside the memory (no proof written after the healthy
+    // minute, no death counted into the streak) and the options row keeps its line.
     const rescued = linuxLaunch({ gpuBackend: 'auto' }, capped, {
       WOC_GPU_BACKEND_RESCUED_TO: 'vulkan-plain',
     });
     expect(rescued.rung).toBe('vulkan-plain');
     expect(rescued.rescued).toBe(true);
+    expect(rescued.capped).toBe(true);
+    expect(rescued.auto).toBe(false);
+    // The rescue still applies to the child itself.
+    expect(rescued.ladder).toBe(true);
+  });
+
+  it('caps a child rescued BELOW the ceiling too, the first ceiling above OpenGL', () => {
+    // The latent case: a ceiling with a rung under it. Auto runs the ceiling, capped; the
+    // GPU process dies; the rescue lands a rung lower, where the ceiling is no longer
+    // "above" the launch. Read as an ordinary Auto launch there, the child would write a
+    // proof and count a death for a chain the policy had already taken out of the memory.
+    const under = { rung: 'vulkan-plain' as const, why: '0x1002:0x163f: held for the test' };
+    const rescued = linuxLaunch({ gpuBackend: 'auto' }, under, {
+      WOC_GPU_BACKEND_RESCUED_TO: 'opengl',
+    });
+    expect(rescued.rung).toBe('opengl');
+    expect(rescued.capped).toBe(true);
+    expect(rescued.auto).toBe(false);
+  });
+
+  it('leaves the rescued child of an UNCAPPED Auto parent an Auto launch', () => {
+    // A ceiling at the top rung with the memory attempting the rung under it: the parent
+    // ran below the ceiling, uncapped, so its rescued child is the ordinary Auto rescue
+    // (auto, proof-writing, death-counting), and the row does not claim a cap the policy
+    // never applied.
+    const top = { rung: 'vulkan-parallel-compile' as const, why: '0x1002:0x163f: held' };
+    const rescued = linuxLaunch({ gpuBackend: 'auto', gpuBackendToAttempt: 'vulkan-plain' }, top, {
+      WOC_GPU_BACKEND_RESCUED_TO: 'opengl',
+    });
+    expect(rescued.rung).toBe('opengl');
+    expect(rescued.rescued).toBe(true);
     expect(rescued.capped).toBe(false);
+    expect(rescued.auto).toBe(true);
+  });
+
+  it("leaves a rescued EXPLICIT chain uncapped: the ceiling is only ever Auto's", () => {
+    const rescued = linuxLaunch({ gpuBackend: 'vulkan' }, capped, {
+      WOC_GPU_BACKEND_RESCUED_TO: 'opengl',
+    });
+    expect(rescued.rung).toBe('opengl');
+    expect(rescued.rescued).toBe(true);
+    expect(rescued.capped).toBe(false);
+    expect(rescued.auto).toBe(false);
   });
 
   it('caps a memory already AT the ceiling too, so the row can say why', () => {

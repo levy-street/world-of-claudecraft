@@ -47,6 +47,8 @@ export interface SpawnDetachedSelfDeps {
   onSpawned?: (spawnTarget: string) => void;
   /** The child's 'error' event: it never started; this process is still running. */
   onSpawnFailed?: (err: unknown, spawnTarget: string) => void;
+  /** The handle has no event surface: neither callback above can ever fire. */
+  onUnobservable?: (spawnTarget: string) => void;
 }
 export function spawnDetachedSelf(deps: SpawnDetachedSelfDeps): string;
 

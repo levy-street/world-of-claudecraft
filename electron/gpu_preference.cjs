@@ -310,6 +310,7 @@ function buildLinuxPrimeEnv(existingEnv, fileExists = nodeExistsSync) {
 const PRIME_RELAUNCH_MARKER = 'WOC_PRIME_RELAUNCHED';
 // Beside the marker, WHAT the relaunch added, comma-separated: the env names buildLinuxPrimeEnv
 // planted (never one the player had already set) and LINUX_OZONE_X11_ARG when it was appended.
+// Accumulated across a relaunch chain rather than replaced at each hop (primeRelaunchRecord).
 // A player-requested restart (electron/launch_settings.cjs) strips exactly these and nothing of
 // the player's own, so a shell relaunch stays invisible to the environment it inherited.
 const PRIME_RELAUNCH_ADDED_ENV = 'WOC_PRIME_RELAUNCH_ADDED';
@@ -404,6 +405,7 @@ function spawnDetachedSelf({
   spawn = nodeSpawn,
   onSpawned,
   onSpawnFailed,
+  onUnobservable,
 }) {
   const spawnTarget = resolveSelfSpawnTarget(env, execPath);
   const child = spawn(spawnTarget, argv, {
@@ -418,9 +420,35 @@ function spawnDetachedSelf({
   if (typeof child.once === 'function') {
     child.once('spawn', () => onSpawned?.(spawnTarget));
     child.once('error', (err) => onSpawnFailed?.(err, spawnTarget));
+  } else {
+    // No event surface: neither callback can ever fire, so nothing about this child will
+    // ever be known. A caller that only logs claims nothing and passes nothing here; a
+    // caller waiting on an answer (the player-requested restart) is told there will not
+    // be one, rather than waiting for the life of the session.
+    onUnobservable?.(spawnTarget);
   }
   child.unref?.();
   return spawnTarget;
+}
+
+/**
+ * The record this relaunch hands its child: what an earlier hop of the chain recorded
+ * planting, plus what THIS hop plants. Accumulated, never replaced, because a chain can
+ * plant its two halves at different hops: electron-updater's restart-to-update respawns
+ * with the current environment (marker and offload variables included) and EMPTY argv, so
+ * the hop that restores the ozone argument adds no variable at all, and a record replaced
+ * there would tell the player-requested restart (electron/launch_settings.cjs) that only
+ * the argument was the shell's, leaving a player who turned the discrete-GPU force off
+ * with a child still carrying the offload environment. Null when a marked parent left no
+ * record: the restart reads that as "everything the lever can plant", which is the answer
+ * it must keep rather than a partial list naming this hop alone.
+ */
+function primeRelaunchRecord(env, planted) {
+  const marked = env?.[PRIME_RELAUNCH_MARKER] === '1';
+  const inherited = env?.[PRIME_RELAUNCH_ADDED_ENV];
+  if (marked && typeof inherited !== 'string') return null;
+  const names = marked ? inherited.split(',').filter((name) => name !== '') : [];
+  return [...new Set([...names, ...planted])].join(',');
 }
 
 /**
@@ -455,13 +483,10 @@ function relaunchForLinuxPrime(deps = {}) {
     ? baseArgv
     : [...baseArgv, LINUX_OZONE_X11_ARG];
   const additions = buildLinuxPrimeEnv(env, fileExists);
-  const added = [...Object.keys(additions), ...(argv === baseArgv ? [] : [LINUX_OZONE_X11_ARG])];
-  const childEnv = {
-    ...env,
-    ...additions,
-    [PRIME_RELAUNCH_MARKER]: '1',
-    [PRIME_RELAUNCH_ADDED_ENV]: added.join(','),
-  };
+  const planted = [...Object.keys(additions), ...(argv === baseArgv ? [] : [LINUX_OZONE_X11_ARG])];
+  const childEnv = { ...env, ...additions, [PRIME_RELAUNCH_MARKER]: '1' };
+  const record = primeRelaunchRecord(env, planted);
+  if (record !== null) childEnv[PRIME_RELAUNCH_ADDED_ENV] = record;
 
   try {
     const spawnTarget = spawnDetachedSelf({
@@ -477,7 +502,7 @@ function relaunchForLinuxPrime(deps = {}) {
     });
     log?.info?.('[gpu] relaunching for Linux PRIME render offload', {
       spawnTarget,
-      added: Object.keys(additions),
+      added: planted,
     });
     return true;
   } catch (err) {

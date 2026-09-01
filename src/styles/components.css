@@ -13998,7 +13998,7 @@
     min-width: 132px;
     margin: 0;
   }
-  /* The restart strip (restart_strip.ts): a next-launch setting changed, so
+  /* The restart strip (restart_strip_painter.ts): a next-launch setting changed, so
      the panel offers "Restart game" where Apply cannot help. Same row shape
      as .gfx-footer, boxed so it reads as its own notice above the action row. */
   .restart-strip {

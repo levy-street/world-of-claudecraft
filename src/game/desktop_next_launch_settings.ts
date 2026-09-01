@@ -9,7 +9,7 @@
 // also hands out a frozen snapshot of what it started with
 // (electron/launch_settings.cjs, `getLaunchSettings`). A local setting that
 // differs from that snapshot is "changed, restart to apply", and the options
-// window offers the restart (src/ui/restart_strip.ts) wherever such a row
+// window offers the restart (src/ui/restart_strip_painter.ts) wherever such a row
 // lives, since the rows sit in different tabs.
 //
 // Adding a next-launch setting is one entry in NEXT_LAUNCH_SETTINGS: the local

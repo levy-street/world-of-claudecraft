@@ -151,15 +151,16 @@ function isHigherRung(rung, other) {
  *   which are never remembered: explicit means the player decided, not that we learned
  *   something about the machine.
  * - `rescued`: a rescue spawned this process. It inherits `auto` from the chain it
- *   prolongs, but the ATTEMPT and the crash streak are the parent's to move: a rescued
- *   child that runs healthy writes the proof it earned and nothing else, otherwise one
- *   launch-time death would still walk Auto down a rung (through the child instead of
- *   the counter).
+ *   prolongs (and the policy's cap with it, capRescuedLaunch), but the ATTEMPT and the
+ *   crash streak are the parent's to move: a rescued child that runs healthy writes the
+ *   proof it earned and nothing else, otherwise one launch-time death would still walk
+ *   Auto down a rung (through the child instead of the counter).
  * - `reprobed`: an Auto CLIMB (a rung above the remembered one, tried on the cadence);
  *   what the launch counter resets on, so it measures launches since the last attempt.
  * - `capped`: Auto wanted a higher rung and the policy's ceiling held it here
- *   (capAutoLaunch). Not `auto`: nothing is remembered from a capped launch. The
- *   options row reads it, to tell a player on Auto why they are not on Vulkan.
+ *   (capAutoLaunch), or it is the rescued child of such a launch (capRescuedLaunch).
+ *   Not `auto`: nothing is remembered from a capped launch. The options row reads it,
+ *   to tell a player on Auto why they are not on Vulkan.
  */
 function launchForRung(rung, reason, flags = {}) {
   return {
@@ -208,10 +209,11 @@ function decideGpuBackendLaunch({ platform, env, prefs, appVersion, autoCeiling 
   if (rungIndex(rescued) >= 0) {
     // The chain's mode is decided by what the PARENT ran on; the marker only names the
     // rung. An explicit chain stays out of the memory down to its last child.
-    return launchForRung(rescued, `rescued to ${rescued}`, {
+    const launch = launchForRung(rescued, `rescued to ${rescued}`, {
       rescued: true,
       auto: explicit === null,
     });
+    return explicit === null ? capRescuedLaunch(launch, autoCeiling) : launch;
   }
   if (explicit) return explicit;
   return capAutoLaunch(autoLaunch(prefs, appVersion), autoCeiling);
@@ -232,6 +234,29 @@ function capAutoLaunch(launch, ceiling) {
   if (!ceiling || rungIndex(ceiling.rung) < 0) return launch;
   if (isHigherRung(ceiling.rung, launch.rung)) return launch;
   return launchForRung(ceiling.rung, `auto, capped at ${ceiling.rung}: ${ceiling.why}`, {
+    capped: true,
+  });
+}
+
+/**
+ * The same cap on a RESCUED Auto launch. The rung is untouched, at either side of the
+ * ceiling: the parent watched the rung above it die and picked this one, and a ceiling
+ * that pushed the child somewhere else would either re-run a rung this chain has already
+ * buried or overrule the one piece of evidence the chain actually has. What the ceiling
+ * decides is the MODE: the launch this child prolongs was the policy's, not the memory's,
+ * so the child stays out of the memory too, or one rescue would let a capped chain write
+ * a proof and count a death the ceiling exists to keep it out of. `capped` also keeps the
+ * options row's line for the rescued session, which is the same machine it was before.
+ */
+function capRescuedLaunch(launch, ceiling) {
+  if (!ceiling || rungIndex(ceiling.rung) < 0) return launch;
+  // The rescue is one rung down, so the parent's rung is known: a parent that ran
+  // UNDER the ceiling was an ordinary Auto launch (capAutoLaunch left it alone), and
+  // its child stays one, proof and counter included.
+  const parent = rungAbove(launch.rung);
+  if (!parent || isHigherRung(ceiling.rung, parent)) return launch;
+  return launchForRung(launch.rung, `${launch.reason}, capped: ${ceiling.why}`, {
+    rescued: true,
     capped: true,
   });
 }
