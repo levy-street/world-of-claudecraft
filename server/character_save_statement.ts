@@ -12,9 +12,18 @@
 // - none: the unconditional write (tests, resumes, meta-less sessions).
 // - nonce: the live-session fence. The row is written only while THIS
 //   process still holds the character's load lease under the session's
-//   per-join nonce (server/db.ts character_leases), so a displaced session
-//   (a same-account takeover rotated the nonce, or a peer process reclaimed
-//   an expired lease) cannot overwrite the live session's state.
+//   per-join nonce AND that lease has not expired (server/db.ts
+//   character_leases), so a displaced session (a same-account takeover rotated
+//   the nonce, or a peer process reclaimed an expired lease) cannot overwrite
+//   the live session's state. The `AND expires_at > now()` qualifier was added
+//   by qr-19-nonce-fence-expiry-term (Phase 19) so this fence, the unleased
+//   fence below, and acquireCharacterLease's reclaim predicate agree on what a
+//   live lease IS; a lapsed-but-unreclaimed row no longer admits its own
+//   session's autosave over a landed strip. RESIDUAL (B1, carried to the
+//   maintainer): heartbeatCharacterLeases stays unqualified, so a recovered
+//   process re-arms a lapsed lease within one heartbeat tick and the term
+//   narrows the window rather than closing it; qualifying the heartbeat would
+//   risk a stalled process's sessions becoming permanently unsaveable.
 // - unleased: the OFFLINE writer fence (the admin clear-item-name strip, the
 //   phase 13 QA login-race closure). The row is written only while NO live
 //   lease exists for the character. The WS handshake acquires the lease
@@ -121,6 +130,7 @@ export function characterUpdateStatement(
               AND EXISTS (
                 SELECT 1 FROM character_leases
                  WHERE character_id = $1 AND holder = $4 AND nonce = $5
+                   AND expires_at > now()
               )`,
         values: [characterId, level, stateJson, fence.holder, fence.nonce],
       };

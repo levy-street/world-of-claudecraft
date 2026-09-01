@@ -29,7 +29,7 @@ describe('characterUpdateStatement: the three fence shapes', () => {
     expect(stmt.text).not.toContain('character_leases');
   });
 
-  it('nonce: the live-session fence on holder AND nonce, in that parameter order', () => {
+  it('nonce: the live-session fence on holder, nonce AND an unexpired lease', () => {
     const stmt = characterUpdateStatement(7, 3, STATE_JSON, {
       kind: 'nonce',
       holder: 'realm#proc',
@@ -40,6 +40,12 @@ describe('characterUpdateStatement: the three fence shapes', () => {
     expect(stmt.text).toContain('AND EXISTS (');
     expect(stmt.text).toContain('SELECT 1 FROM character_leases');
     expect(stmt.text).toContain('WHERE character_id = $1 AND holder = $4 AND nonce = $5');
+    // qr-19-nonce-fence-expiry-term: the nonce fence gained the expiry qualifier
+    // its unleased sibling already carried. A POSITIVE assertion, because the
+    // holder/nonce toContain above stays green over an appended term and would
+    // not catch a mutant that drops it. The statement built here is the nonce arm
+    // alone, so this is decisive for that arm.
+    expect(stmt.text).toContain('AND expires_at > now()');
     expect(stmt.text).not.toContain('NOT EXISTS');
     expect(stmt.values).toEqual([7, 3, STATE_JSON, 'realm#proc', 'join-nonce']);
   });

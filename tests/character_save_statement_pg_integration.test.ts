@@ -636,6 +636,22 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       expect(await markerOf(id)).toBe('own-nonce');
     });
 
+    it('refuses this session\'s save once its own lease has EXPIRED (qr-19-nonce-fence-expiry-term)', async () => {
+      const id = await makeCharacter();
+      await grantLease(id, 'session-a', 3600);
+      expect(await db.saveCharacterState(id, 7, STATE('before-expiry'), 'session-a')).toBe(true);
+      expect(await markerOf(id)).toBe('before-expiry');
+      // Re-stamp the SAME holder+nonce lease as already expired (secondsFromNow
+      // negative). Before the expiry qualifier the nonce fence matched on
+      // holder+nonce alone and this save LANDED over a landed strip; the
+      // qr-19-nonce-fence-expiry-term qualifier refuses it. Removing the
+      // `AND expires_at > now()` term from the nonce arm reds this arm (the save
+      // returns true and the marker becomes after-expiry).
+      await grantLease(id, 'session-a', -60);
+      expect(await db.saveCharacterState(id, 8, STATE('after-expiry'), 'session-a')).toBe(false);
+      expect(await markerOf(id)).toBe('before-expiry');
+    });
+
     it('the unfenced arm (no nonce) still lands regardless of leases (the legacy shape)', async () => {
       const id = await makeCharacter();
       await grantLease(id, 'whoever', 3600);

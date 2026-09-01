@@ -21409,6 +21409,20 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as enchant-target-row
   expired-but-unreclaimed lease plus a same-realm double boot can
   autosave over a landed strip; the operator answer stays suspend-first
   (DEPLOY.md).
+  RULED (qr-19-nonce-fence-expiry-term, 2026-09-01, under qr-19-best-for-project):
+  ADD THE TERM. The nonce fence now carries `AND expires_at > now()` inside its
+  EXISTS (server/character_save_statement.ts), binding all four live save paths
+  (they share one liveSaveFence shape, so narrowing to autosave-only would cost a
+  fifth shape) and reusing the shipped takeover kick reason, so no new i18n. This
+  makes the three definitions of a live lease agree: the nonce fence, the unleased
+  fence, and acquireCharacterLease's reclaim predicate. B1 (whether
+  heartbeatCharacterLeases takes the same qualifier) is CARRIED to the maintainer,
+  NOT taken: unqualified, a recovered process re-arms a lapsed lease within one
+  heartbeat tick, so the term narrows the window rather than closing it; qualified,
+  one stall past the 90 s TTL makes every session that process holds permanently
+  unsaveable and kicks them all, a larger blast than the hole closed. The heartbeat
+  stays unqualified (the safe default) pending that call, and the operator answer
+  stays suspend-first regardless.
 - characters.ts's rename signer sweep and pbe_boost.ts remain UNFENCED
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as unfenced-offline-writers.
   offline writers; saveOfflineCharacterState is a drop-in when wanted.
