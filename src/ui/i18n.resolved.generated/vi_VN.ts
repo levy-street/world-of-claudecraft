@@ -19828,7 +19828,7 @@ export const vi_VN: EnTranslations = {
       },
       "grovespring": {
         "name": "Phục Trang Suối Rừng",
-        "bonus2": "Swiftmend ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
+        "bonus2": "Hồi Phục Nhanh ưu tiên tiêu thụ Wildbloom hoặc Second Bloom của bạn trước và hồi thêm 25% máu. Sát thương phải chịu không còn làm chậm việc thi triển phép.",
         "bonus4": "Overbloom thu hoạch 75% các hiệu ứng còn lại của bạn và tích trữ 1 Verdance sau đó."
       },
       "hexthread": {
