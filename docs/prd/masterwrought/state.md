@@ -4448,11 +4448,18 @@ recorded, or refuted with the file open)
   Cheater mark and encounter-owned control still while the wearer is a corpse, and that
   file's own header calls its dead guards load-bearing because reordering one forks the
   shared rng stream for every later draw. Exempting flask auras alone is therefore a
-  determinism-visible change to the 20 Hz tick, not a one-line carve-out. It is wire-visible
-  too: server/snapshot_timer_wire.ts encodes a dead wearer's auras as a frozen rem instead of
-  an absolute exp, and tests/snapshots.test.ts pins the freeze-then-resume round trip in
-  'freezes retained auras while dead, then resumes absolute decay after resurrection', so the
-  split would owe that encoder and that pin beside its sim arms. The deviation runs the
+  determinism-visible change to the 20 Hz tick, not a one-line carve-out. Stated precisely
+  after review: the fork follows from the OBVIOUS implementation, loosening the early return,
+  which re-enters the aura loop for every retained aura; a flask-only decrement outside the
+  loop would draw nothing. It is wire-visible too, on the STABLE (v3) timer wire only: that
+  encoder writes a dead wearer's auras as a frozen rem instead of an absolute exp
+  (server/snapshot_timer_wire.ts makes the split, while the dead read is the caller's, since
+  server/game.ts passes e.dead as `paused`), and the LEGACY encoder sends a rem for every aura
+  alive or dead, so it would need no change. tests/snapshots.test.ts pins the
+  freeze-then-resume round trip in 'freezes retained auras while dead, then resumes absolute
+  decay after resurrection'; that case pins the paused-to-rem MECHANISM on a plain retained
+  aura rather than on a flask, and the flask half rests on aurasSurvivingDeath. So the split
+  would owe that encoder and that pin beside its sim arms. The deviation runs the
   player's way, since a death lengthens the worn time rather than shortening it, and no
   player copy claims a tick-through: the Use line promises a duration and
   itemUi.tooltip.flaskThroughDeath promises only that the effect remains through death, both
@@ -18674,12 +18681,12 @@ and D009's affordance gap closes at 14; the two EXACT-SET arms (the thirteen
 survivors, and the unreachable Brightwood pack) are what move.
 
 THE THREE PRICED SHAPES, for the maintainer to pick from:
-(a) shore_scuttler alone. Zero parity goldens move (0 of 83 name it), closes
+(a) shore_scuttler alone. Zero parity goldens move (0 of the 81 name it), closes
     D009's Proving Shore half outright, needs no new mob. Does NOT close the
     zone-1 half.
 (b) amber_hide onto forest_wolf or wild_boar, plus (a). Closes both halves of
     D009 and takes the margin from three to four, but moves up to 27 parity
-    goldens and so owes the UPDATE_PARITY re-record commit.
+    goldens of the 81 and so owes the UPDATE_PARITY re-record commit.
 (c) A new wildlife carrier (a stag, a bird) for the antler and the down. The
     only shape that reaches 16, and the only one that is genuinely new
     content: a mob template, a tail-appended camp row, a world_entity_i18n

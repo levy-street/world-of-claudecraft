@@ -95,10 +95,18 @@ export function unstuckSicknessDuration(level: number): number {
 // included. Used at every player death/respawn site so the rule cannot drift.
 // RULED (qr-19-flask-dead-timer-pause, 2026-09-01, under qr-19-best-for-project): the pause
 // above is the ratified v1 behavior, not a defect awaiting a fix. The recorded fidelity
-// nuance is that classic flasks kept ticking; exempting flask auras from this shared guard
-// would fork the rng draw order updateAuras protects and would also owe the wire encoder,
-// which sends a dead wearer's auras as a frozen remaining rather than an absolute expiry
-// (server/snapshot_timer_wire.ts, pinned freeze-then-resume in tests/snapshots.test.ts). A
+// nuance is that classic flasks kept ticking. Exempting flask auras from this shared guard by
+// loosening the dead early-return would re-enter the whole aura loop for every retained aura
+// and so fork the rng draw order it protects; a flask-only decrement placed OUTSIDE the loop
+// would draw nothing, so the fork is the risk of the obvious implementation rather than a
+// property of every possible one. It would also owe the STABLE (v3) timer wire, which sends a
+// dead wearer's auras as a frozen remaining rather than an absolute expiry: the split is made
+// in server/snapshot_timer_wire.ts, but the dead read itself is the caller's
+// (server/game.ts passes e.dead as `paused`), and the legacy encoder sends a remaining for
+// every aura alive or dead, so it needs no change. tests/snapshots.test.ts pins the
+// freeze-then-resume round trip in 'freezes retained auras while dead, then resumes absolute
+// decay after resurrection'; it pins the paused-to-rem MECHANISM on a plain retained aura
+// rather than a flask specifically, and the flask half rests on aurasSurvivingDeath below. A
 // tick-through build is a sim-systems change of its own, never a content-lane edit.
 //
 // The Cheater mark is here for the same reason the sicknesses are: its aura IS
