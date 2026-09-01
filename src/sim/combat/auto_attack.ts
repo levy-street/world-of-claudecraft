@@ -2,15 +2,9 @@
 // monolith (C5). This module owns:
 //   - startAutoAttack / stopAutoAttack: the public auto-attack toggle (validate
 //     target, aggro an idle mob, enter combat).
-//   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, a range
-//     gate, the ranged-vs-melee branch, and queuedOnSwing consumption that
-//     feeds on-next-swing abilities like Heroic Strike / Raptor Strike into
-//     the swing). Auto-attack NEVER turns the player onto their target
-//     (classic-era facing rule, PvE and PvP alike): a swing that is otherwise
-//     ready but outside MELEE_ARC refuses with a throttled "You must be
-//     facing your target." toast instead (see blockedByFacing below). A
-//     player who wants to hold facing WHILE still landing a hit turns
-//     manually, exactly like every other classic auto-attack.
+//   - updatePlayerAutoAttack: the per-tick driver (swing-timer decay, facing/range
+//     gates, the ranged-vs-melee branch, and queuedOnSwing consumption that feeds
+//     on-next-swing abilities like Heroic Strike / Raptor Strike into the swing).
 //   - rangedSwing: Auto Shot (hunters, 8yd dead zone) and Wand (casters, no dead
 //     zone); miss roll, crit, and armor mitigation for physical shots only.
 //   - meleeSwing: the white-hit table (single rng.next() miss -> dodge -> hit, crit,
@@ -98,14 +92,6 @@ const DUAL_WIELD_WHITE_MISS_PENALTY = 0.1;
 const SUDDEN_DEATH_CHANCE = 0.1;
 const SUDDEN_DEATH_DURATION = 10;
 const OFFHAND_AUTO_ATTACK_DMG_MULT = 0.5;
-// Auto-attack never turns the player onto their target (classic-era facing rule,
-// PvE and PvP alike; see the module header). A swing blocked by facing refuses
-// with this toast instead, throttled to once per this many seconds of sim time
-// (PlayerMeta.nextFacingErrorAt): held facing at 20 Hz would otherwise spam the
-// toast every tick for as long as the bad facing persists, unlike the ability-cast
-// facing refusal it mirrors (casting_lifecycle.ts), which is naturally throttled
-// by one press per cast attempt.
-const FACING_ERROR_THROTTLE_SEC = 1;
 
 // WEAPON DAMAGE CONTRACT: `weapon.min/max` is RAW per-swing damage at the weapon's
 // real speed, with the two-hand premium already folded in by itemization. A weapon's
@@ -207,20 +193,6 @@ export function stopAutoAttack(ctx: SimContext, pid?: number): void {
   if (r) r.e.autoAttack = false;
 }
 
-// Whether the swing this tick is blocked by facing; emits the throttled refusal
-// as a side effect when it is. Called last, right before a swing that already
-// cleared range/LoS would otherwise land, so a target merely out of range never
-// trips the refusal (see FACING_ERROR_THROTTLE_SEC).
-function blockedByFacing(ctx: SimContext, p: Entity, meta: PlayerMeta, t: Entity): boolean {
-  const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
-  if (facingDiff <= MELEE_ARC) return false;
-  if ((meta.nextFacingErrorAt ?? 0) <= ctx.time) {
-    ctx.error(p.id, 'You must be facing your target.');
-    meta.nextFacingErrorAt = ctx.time + FACING_ERROR_THROTTLE_SEC;
-  }
-  return true;
-}
-
 // Eye Jab (gouge): classic WoW's Gouge resets the caster's own swing timer on
 // use, so the auto-attack already in flight cannot land right behind it and
 // break the incapacitate it just applied. Mirrors the exact reset a landed
@@ -256,6 +228,8 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   if (isStunned(p)) return;
   if (isDisarmed(p)) return; // weapon knocked away: no auto-attack swings
   const d = dist2d(p.pos, t.pos);
+  const facingDiff = Math.abs(normAngle(angleTo(p.pos, t.pos) - p.facing));
+  if (facingDiff > MELEE_ARC) return;
 
   // ranged auto-attack: hunters (auto shot, dead zone inside minRange) and
   // casters (wand-style, no dead zone so they don't run into melee, #94).
@@ -268,10 +242,6 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   const ranged = rangedAutoProfile(p, meta.cls);
   if (ranged && d <= ranged.maxRange && d >= (ranged.wand ? 0 : ranged.minRange)) {
     if (!ctx.hasLineOfSight(p, t)) return;
-    // Range and line of sight are established; facing is checked LAST, right
-    // before the shot actually fires, so a target merely out of range never
-    // spams the facing refusal (see blockedByFacing).
-    if (blockedByFacing(ctx, p, meta, t)) return;
     ctx.breakGhostWolf(p);
     // Hunters shoot with their equipped weapon (damage range + speed), casters
     // with their fixed class wand; the shot then fires at that resolved profile.
@@ -288,8 +258,6 @@ export function updatePlayerAutoAttack(ctx: SimContext, p: Entity, meta: PlayerM
   // combatant pressed against a wall could swing through it. See sibling
   // logic in Sim.abilityNeedsLineOfSight.
   if (isArenaPos(p.pos.x) && !ctx.hasLineOfSight(p, t)) return;
-  // Same ordering as the ranged arm: facing is the LAST gate before the swing.
-  if (blockedByFacing(ctx, p, meta, t)) return;
   ctx.breakGhostWolf(p);
   const dualWieldWhiteMissPenalty = hasDualWieldWhiteMissPenalty(ctx, p, meta);
 

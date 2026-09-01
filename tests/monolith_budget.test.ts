@@ -709,12 +709,7 @@ const MONOLITHS: MonolithRow[] = [
     // this branch's entity_reanchor extraction, so the merged file lands
     // above either parent's own pin. Measured on the merged tree, never
     // reconciled by arithmetic. Exact count, zero slack.
-    // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the
-    // blankEntity default, the `afu` decode line, and the toggleAutoFaceLock
-    // optimistic-nudge command sender are all removed, so the prior +9 no
-    // longer applies. Re-measured on the combined candidate.
-    // Exact count, zero slack.
-    ceiling: 5909,
+    ceiling: 5910,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

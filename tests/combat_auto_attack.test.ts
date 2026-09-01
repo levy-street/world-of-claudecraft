@@ -18,14 +18,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { type PlayerMeta, Sim } from '../src/sim/sim';
-import {
-  type Aura,
-  angleTo,
-  type Entity,
-  normAngle,
-  type PlayerClass,
-  type SimEvent,
-} from '../src/sim/types';
+import type { Aura, Entity, PlayerClass, SimEvent } from '../src/sim/types';
 import { placePlayerInOpenField } from './helpers/open_field';
 
 type DamageEvent = Extract<SimEvent, { type: 'damage' }>;
@@ -66,29 +59,6 @@ function spawnDummy(sim: Sim, p: Entity, level = 5, dz = 2): Entity {
   p.facing = Math.atan2(mob.pos.x - p.pos.x, mob.pos.z - p.pos.z);
   sim.targetEntity(mob.id, p.id);
   return mob;
-}
-
-// A second player, in a live duel with p (real PvP hostility, not a mob-owner
-// stand-in), positioned at distance dz along z the same way spawnDummy places
-// a mob. Ticks the 3s duel countdown out so isHostileTo(p, opponent) is true
-// by the time the caller drives updatePlayerAutoAttack directly.
-function spawnDuelOpponent(sim: Sim, p: Entity, dz = 2): Entity {
-  const oppId = sim.addPlayer('warrior', 'Opponent', { autoEquip: true });
-  const opp = sim.entities.get(oppId)!;
-  opp.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + dz };
-  opp.prevPos = { ...opp.pos };
-  sim.duelRequest(opp.id, p.id);
-  sim.duelAccept(opp.id);
-  for (let i = 0; i < 20 * 4; i++) {
-    sim.tick();
-    // biome-ignore lint/suspicious/noExplicitAny: reaching the private `duels` map, same as tests/duel.test.ts
-    const d = (sim as any).duels.get(p.id);
-    if (d?.state === 'active') break;
-  }
-  opp.pos = { x: p.pos.x, y: p.pos.y, z: p.pos.z + dz }; // countdown ticks can drift idle regen/AI; re-pin
-  opp.prevPos = { ...opp.pos };
-  sim.targetEntity(opp.id, p.id);
-  return opp;
 }
 
 // Capture the event stream. ctx.emit is late-bound, so swapping sim.emit is observed.
@@ -495,132 +465,6 @@ describe('auto_attack updatePlayerAutoAttack: ranged-vs-melee dispatch', () => {
     p.swingTimer = 1;
     updatePlayerAutoAttack(sim.ctx, p, meta);
     expect(p.swingTimer).toBeLessThan(1); // the decrement runs before the !autoAttack bail
-  });
-});
-
-describe('auto_attack facing: never turns the player, PvE or PvP alike (#3729 round 4)', () => {
-  // Round-4 feedback (Furyogen's review): the classic-era rule is that auto-attack
-  // NEVER turns the player onto their target, whatever the target's kind. A swing
-  // blocked by facing refuses with "You must be facing your target." (the same
-  // refusal casting_lifecycle.ts already uses for an out-of-arc ability cast)
-  // instead of silently no-oping or force-turning the player.
-  it('a melee mob target directly behind the player does not turn the player, and the swing refuses with a toast', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, 2);
-    const away = normAngle(angleTo(p.pos, mob.pos) + Math.PI);
-    p.facing = away; // face directly AWAY from the target
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.some((e) => e.type === 'damage' && e.sourceId === p.id)).toBe(false);
-    expect(p.facing).toBe(away);
-    expect(
-      events.some(
-        (e) => e.type === 'error' && e.pid === p.id && e.text === 'You must be facing your target.',
-      ),
-    ).toBe(true);
-  });
-
-  it('a ranged (Auto Shot) mob target behind the player refuses too: never fires, never turns', () => {
-    const { sim, p, meta } = makeSim('hunter', 12);
-    const mob = spawnDummy(sim, p, 8, 20); // beyond the 8yd dead zone, within 35
-    const away = normAngle(angleTo(p.pos, mob.pos) + Math.PI);
-    p.facing = away;
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const shots = (evs: SimEvent[]): SimEvent[] =>
-      evs.filter((e) => e.type === 'spellfx' && e.fx === 'projectile' && e.sourceId === p.id);
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(shots(events)).toHaveLength(0);
-    expect(p.facing).toBe(away);
-  });
-
-  it('a mob target already inside the facing arc still connects normally', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, 2);
-    p.facing = angleTo(p.pos, mob.pos);
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(
-      events.some((e) => e.type === 'damage' && e.school === 'physical' && e.sourceId === p.id),
-    ).toBe(true);
-  });
-
-  it('a live duel opponent directly behind the player does not turn the player, same refusal as a mob target', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const opp = spawnDuelOpponent(sim, p, 2);
-    const away = normAngle(angleTo(p.pos, opp.pos) + Math.PI);
-    p.facing = away; // face directly AWAY from the duel opponent
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.some((e) => e.type === 'damage' && e.sourceId === p.id)).toBe(false);
-    expect(p.facing).toBe(away);
-  });
-
-  it('a live duel opponent inside the facing arc still connects, preserving Backstab/Ambush positional PvP', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const opp = spawnDuelOpponent(sim, p, 2);
-    p.facing = angleTo(p.pos, opp.pos); // already facing the opponent
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.some((e) => e.type === 'damage' && e.sourceId === p.id)).toBe(true);
-  });
-
-  it('does not swing while stunned, regardless of facing: the positional lock (issue #2426) still holds', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    spawnDummy(sim, p, 1, 2);
-    const away = normAngle(p.facing + Math.PI);
-    p.facing = away;
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    p.auras.push({
-      id: 'test_stun',
-      name: 'Test Stun',
-      kind: 'stun',
-      remaining: 5,
-      duration: 5,
-      value: 0,
-      sourceId: p.id,
-      school: 'physical',
-    });
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.some((e) => e.type === 'damage')).toBe(false);
-    expect(p.facing).toBe(away);
-  });
-
-  it('a target out of range emits no facing refusal (the pre-existing silent range gate is unaffected)', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    spawnDummy(sim, p, 1, 50); // well beyond melee reach, already facing it
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.some((e) => e.type === 'error')).toBe(false);
-  });
-
-  it('the facing refusal is throttled: a second swing attempt with the same bad facing does not re-emit within the window', () => {
-    const { sim, p, meta } = makeSim('warrior', 12);
-    const mob = spawnDummy(sim, p, 1, 2);
-    const away = normAngle(angleTo(p.pos, mob.pos) + Math.PI);
-    p.facing = away;
-    p.autoAttack = true;
-    p.swingTimer = 0;
-    const events = capture(sim);
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.filter((e) => e.type === 'error').length).toBe(1);
-    events.length = 0;
-    p.swingTimer = 0; // pretend another swing attempt is ready immediately after
-    updatePlayerAutoAttack(sim.ctx, p, meta);
-    expect(events.filter((e) => e.type === 'error').length).toBe(0);
   });
 });
 

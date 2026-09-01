@@ -186,7 +186,6 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'marketQuery',
       'moveInput',
       'name',
-      'nextFacingErrorAt',
       'pendingSkinCatalog',
       'pendingSkinItemId',
       'pendingSkinRank',
@@ -212,7 +211,7 @@ describe('exclude lists are pinned and real (anti-loosening guard)', () => {
       'castConsumedEmpower', // set only while a cast that consumed an empower resolves
       'castRadiantResonance', // set only while Dawn's Embrace has reserved the proc
     ]);
-    const optionalMeta = new Set(['characterId', 'lastWhisperFrom', 'nextFacingErrorAt']);
+    const optionalMeta = new Set(['characterId', 'lastWhisperFrom']);
     for (const k of ENTITY_EXCLUDE) {
       if (!optionalEntity.has(k)) expect(k in entity, `Entity.${k} missing (renamed?)`).toBe(true);
     }

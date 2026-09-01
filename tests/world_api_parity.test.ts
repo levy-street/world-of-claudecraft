@@ -652,10 +652,6 @@ describe('IWORLD_MEMBERS is the pinned IWorld contract (anti-loosening)', () => 
     // The PR 3676 arm's ground-aim landing preview adds groundAimPlacementPreview
     // (IWorldCombat, a method) on top of the bank-storage members at the sixth
     // v0.41.0 sync; the totals below are read off a run on the merged tree.
-    // #3729 round 4 REMOVES toggleAutoFaceLock (IWorldCombat, a method): the
-    // auto-face lock toggle it backed is reverted in favor of never turning the
-    // player onto their target (see combat/auto_attack.ts), so the member count
-    // drops by one from the prior pin.
     //
     // NOTE for the next merge, four syncs run now: BOTH sides of this pin move
     // it independently every cycle. Twice git merged identical numbers with no

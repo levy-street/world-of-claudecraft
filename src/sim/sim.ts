@@ -171,6 +171,7 @@ import {
 } from './content/skins';
 import {
   cloneAllocation,
+  computeTalentModifiers,
   emptyAllocation,
   emptyModifiers,
   FIRST_TALENT_LEVEL,
@@ -1304,13 +1305,6 @@ export interface PlayerMeta {
   // never persisted, and absent/false preserves the classic follow-through
   // default.
   stopAutoAttackOnTargetSwitch?: boolean;
-  // Auto-attack facing-refusal throttle (combat/auto_attack.ts blockedByFacing):
-  // the next sim-clock time (ctx.time) allowed to re-emit "You must be facing
-  // your target." while a swing keeps landing outside MELEE_ARC, so a held bad
-  // facing at 20 Hz doesn't spam the toast every tick. Session-only, never
-  // persisted; absent reads as "due now", same omitted-while-false convention
-  // as stopAutoAttackOnTargetSwitch above.
-  nextFacingErrorAt?: number;
   // One-time riding-lesson fee (100g), charged when the first lesson race starts
   // (or through the legacy mount_train_begin command). Optional so absent === false (pre-feature saves and a
   // fresh character stay byte-equal): never explicitly set to false, only ever
