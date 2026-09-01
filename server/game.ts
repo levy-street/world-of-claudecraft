@@ -304,6 +304,7 @@ import {
 import { type LiveSharedIp, sharedIpsFromLiveSessions } from './live_shared_ips';
 import { mergeCustodyParcelOverlay } from './mail_custody_overlay';
 import { rearmMailPartitionsOnFailure, writeDirtyMailPartitions } from './mail_partition_rearm';
+import { buyWithSoldVolume } from './market_sold_volume';
 import { EMPTY_ACCOUNT_COSMETICS, reconcileWornMechChromaForJoin } from './mech_chroma_reconcile';
 import {
   applyMobScanTick,
@@ -1559,10 +1560,6 @@ function liteEntityJson(id: number, dynJson: string): string {
 
 function logSocialErr(err: unknown): void {
   console.error('social command failed:', err);
-}
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export class GameServer {
@@ -4177,7 +4174,7 @@ export class GameServer {
           LEAVE_SAVE_RETRY_MAX_MS,
         );
         console.error(`save on leave failed for ${session.name}; retrying in ${retryMs}ms:`, err);
-        await delay(retryMs);
+        await new Promise((resolve) => setTimeout(resolve, retryMs));
       }
     }
   }
@@ -7820,7 +7817,7 @@ export class GameServer {
         }
         break;
       case 'market_buy':
-        if (typeof msg.id === 'number') sim.marketBuy(msg.id, pid);
+        if (typeof msg.id === 'number') buyWithSoldVolume(sim, msg.id, pid);
         break;
       case 'market_cancel':
         if (typeof msg.id === 'number') sim.marketCancel(msg.id, pid);

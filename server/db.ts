@@ -62,6 +62,7 @@ import {
 } from './character_save_transaction';
 import { seedChatFilterDefaults } from './chat_filter_db';
 import type { ChatLogRow } from './chat_log';
+import { cleanMetadataText } from './clean_metadata_text';
 import {
   buildCommunityTestCharacters,
   communityTestAccountsEnabled,
@@ -112,6 +113,7 @@ import {
   marketStateKey,
   runMarketBackfill,
 } from './market_backfill';
+import { MARKET_SOLD_VOLUME_SCHEMA } from './market_sold_volume_db';
 import { OAUTH_SCHEMA } from './oauth_db';
 import { runOfflineCharacterSave } from './offline_character_save_db';
 import { PLAY_SESSION_RETENTION_SCHEMA } from './play_session_retention_db';
@@ -1411,6 +1413,9 @@ export async function ensureSchema(): Promise<void> {
     // After SCHEMA: every marketplace table FKs accounts(id), and the custody
     // model rides characters + world_state (the escrow combined save).
     await client.query(WOC_MARKET_SCHEMA);
+    // The World Market sold-volume store (qr-19-sold-volume-four-seam-wiring):
+    // realm x day x tracked-item daily aggregates, no FK, additive, idempotent.
+    await client.query(MARKET_SOLD_VOLUME_SCHEMA);
     // Seed chat-filter defaults once (idempotent), under the same advisory lock.
     await seedChatFilterDefaults(client);
     // Partitioned World Market backfill: runs inside this same advisory-lock
@@ -1797,11 +1802,6 @@ export async function setAccountWeaponSkinLoadout(
     [accountId, JSON.stringify(cleanLoadout)],
   );
   return normalizeAccountCosmeticsRow(res.rows[0]);
-}
-
-function cleanMetadataText(value: string | null | undefined, max: number): string | null {
-  const text = typeof value === 'string' ? value.trim() : '';
-  return text ? text.slice(0, max) : null;
 }
 
 export async function createAccount(

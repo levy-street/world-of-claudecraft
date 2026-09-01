@@ -76,7 +76,11 @@ import {
   pruneSitePresenceSessionsBatch,
   recordSitePresenceSample,
 } from './admin_db';
-import { buildAdminMarketMetrics, configureAdminMarketMetrics } from './admin_market_metrics';
+import {
+  buildAdminMarketMetrics,
+  configureAdminMarketMetrics,
+  configureAdminMarketSoldVolume,
+} from './admin_market_metrics';
 import { permissionsForRoles } from './admin_permissions';
 import { loadAntibotConfig } from './antibot_config_db';
 import {
@@ -205,6 +209,7 @@ import {
   renameCharacter,
   revokeCompanionToken,
   runConcurrentIndexMigrations,
+  runWithStatementTimeout,
   saveToken,
   saveWorldState,
   scopeAllowsMutation,
@@ -337,6 +342,13 @@ import {
   mapsListMineCore,
   mapsPublicListCore,
 } from './maps_routes';
+import { configureMarketSoldVolume } from './market_sold_volume';
+import {
+  MARKET_SOLD_VOLUME_WINDOW_DAYS,
+  marketSoldVolumeRetentionTable,
+  readMarketSoldVolumeSince,
+  recordMarketSoldVolumeRowBounded,
+} from './market_sold_volume_db';
 import { metaEventSourceUrl, metaRequestUserData, trackAccountCreated } from './meta_capi';
 import {
   cleanReportReason,
@@ -3630,6 +3642,15 @@ export async function startServer(): Promise<http.Server> {
   // The market metrics dashboard reads the live listing book through the pure
   // builder; the module-side cache is TTL-only by design (see its header).
   configureAdminMarketMetrics(() => buildAdminMarketMetrics(game.sim.marketListings, REALM));
+  // The sold-volume half of the market dashboard (qr-19-sold-volume-four-seam-wiring):
+  // the observer's durable write is a bounded single-row upsert, and the admin
+  // read is this realm's trailing window. Both realm-scoped like everything else.
+  configureMarketSoldVolume((entry) =>
+    recordMarketSoldVolumeRowBounded(runWithStatementTimeout, REALM, entry),
+  );
+  configureAdminMarketSoldVolume(() =>
+    readMarketSoldVolumeSince(pool, REALM, MARKET_SOLD_VOLUME_WINDOW_DAYS),
+  );
   configureAdminGuildBoardCacheBust(bustBoardCaches);
   configureInternalRuntime(game);
   // Bot detector: replay this realm's saved config overrides onto the fresh
@@ -3930,6 +3951,7 @@ export async function startServer(): Promise<http.Server> {
     // reads this table hot.
     tables: [
       { name: 'chat_logs', pruneBatch: (n) => pruneChatLogsBatch(config.chatLogRetentionDays, n) },
+      marketSoldVolumeRetentionTable(pool),
       {
         name: 'client_perf_reports',
         pruneBatch: (n) => pruneClientPerfReportsBatch(config.perfReportRetentionDays, n),

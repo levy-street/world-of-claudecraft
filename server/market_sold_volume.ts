@@ -243,8 +243,15 @@ function enqueue(entry: MarketSoldVolumeEntry): void {
  */
 export function buyWithSoldVolume(sim: SoldVolumeSim, listingId: number, pid: number): void {
   const before = findListing(sim.marketListings, listingId);
+  const countBefore = sim.marketListings.length;
   sim.marketBuy(listingId, pid);
-  const entry = marketSaleFromBuy(before, findListing(sim.marketListings, listingId));
+  // One scan, not two (the D147 hot-path note): a successful non-house buy
+  // splices the whole listing out (src/sim/market.ts) and nothing else mutates
+  // the book in this synchronous call, so a length drop IS this buy landing. A
+  // house row survives its own sale, which marketSaleFromBuy rejects on
+  // before.house regardless, so length-stable-and-house both resolve to null.
+  const bought = sim.marketListings.length < countBefore;
+  const entry = bought ? marketSaleFromBuy(before, null) : null;
   if (entry === null) return;
   if (classifyMarketMetricsItem(entry.itemId) === null) return;
   enqueue(entry);

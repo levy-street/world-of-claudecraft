@@ -1347,7 +1347,11 @@ const MONOLITHS: MonolithRow[] = [
     // regeneration, never reconciled by arithmetic: the two arms' extractions
     // compose, so the merged file is BELOW the higher parent. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 10350,
+    // LOWERED 10350 -> 10347 at the Masterwrought Phase 19C (D147, the market
+    // sold-volume wiring): the dispatch swap to buyWithSoldVolume added one
+    // import, and inlining the one-use `delay` helper (a setTimeout promise) and
+    // dropping its definition paid for it and then some. Exact count, zero slack.
+    ceiling: 10347,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

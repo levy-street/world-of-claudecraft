@@ -24,40 +24,32 @@
 // deliberate narrowing of "sold volume", not an oversight: this is bucket
 // volume, and the readout says so.
 //
-// RETENTION, AND WHAT IS STILL OWED. The prune PRIMITIVE exists below
-// (`pruneMarketSoldVolumeBatch`) and so does its sweep registration wrapper
-// (`marketSoldVolumeRetentionTable`), but NOTHING CALLS EITHER YET: this table
-// is registered with no nightly sweep, because the whole cluster is unwired on
-// purpose (see the paragraph below). The registration is owed on the day the
-// writer lands, and its exact form is one line in the `tables:` array that
-// `startRetentionSweep` is given in server/main.ts:
+// RETENTION. The prune PRIMITIVE below (`pruneMarketSoldVolumeBatch`) and its
+// sweep registration wrapper (`marketSoldVolumeRetentionTable`) are now LIVE:
+// server/main.ts registers `marketSoldVolumeRetentionTable(pool)` in the nightly
+// retention sweep's `tables:` array, so this table is bounded. The window is a
+// code constant rather than an env key because there is no operational reason to
+// tune it per deployment: the readout only ever asks for a short trailing
+// window, and the rows are aggregates carrying no personal data. 0 would be the
+// explicit keep-forever, matching every sibling primitive.
 //
-//     marketSoldVolumeRetentionTable(pool),
-//
-// The window is a code constant rather than an env key because there is no
-// operational reason to tune it per deployment: the readout only ever asks for
-// a short trailing window, and the rows are aggregates carrying no personal
-// data. 0 would be the explicit keep-forever, matching every sibling primitive.
-//
-// WIRED TO NOTHING, AND THAT IS THE CURRENT STATE, NOT AN OVERSIGHT. Four
-// seams are all still absent, and they must land together or not at all:
-//   1. MARKET_SOLD_VOLUME_SCHEMA is not in the ensureSchema DDL ladder
-//      (server/db.ts), so the table exists in no database;
-//   2. marketSoldVolumeRetentionTable is not in the retention sweep's `tables:`
-//      array (server/main.ts), so nothing prunes it;
-//   3. buyWithSoldVolume (server/market_sold_volume.ts) has no caller: the
-//      market_buy dispatch arm in server/game.ts still calls sim.marketBuy
-//      directly, so no sale is observed;
-//   4. configureMarketSoldVolume and configureAdminMarketSoldVolume are never
-//      called, so the observer is inert and AdminMarketMetrics.soldAvailable
-//      is permanently false.
-// THE ORDER IS WHAT MAKES A PARTIAL LANDING DANGEROUS. The writer without the
-// DDL turns every tracked sale into a 42P01 at sale rate; the writer with the
-// DDL but without the sweep registration is an unbounded table. Turning on a
-// new database write per market sale is a production behavior call, so the
-// wiring is deferred to the maintainer rather than guessed here, and
-// tests/server/market_sold_volume.test.ts pins the ALL-FOUR-ABSENT state so
-// the day one seam lands, the pin reds and forces the rest.
+// WIRED (qr-19-sold-volume-four-seam-wiring, Phase 19). All four seams now land
+// together, in the order that made a partial landing dangerous:
+//   1. MARKET_SOLD_VOLUME_SCHEMA is applied in the ensureSchema DDL ladder
+//      (server/db.ts), so the table exists on every boot;
+//   2. marketSoldVolumeRetentionTable is registered in the retention sweep's
+//      `tables:` array (server/main.ts), so the table is pruned nightly;
+//   3. buyWithSoldVolume (server/market_sold_volume.ts) is the market_buy
+//      dispatch arm in server/game.ts, so every completed sale is observed;
+//   4. configureMarketSoldVolume and configureAdminMarketSoldVolume are called
+//      at boot (server/main.ts), so the observer is live and
+//      AdminMarketMetrics.soldAvailable is true.
+// The DDL-before-writer ordering is preserved by boot: ensureSchema runs before
+// the loop accepts commands, so the writer never sees a 42P01, and the sweep
+// registration lands in the same change so the table can never grow unbounded.
+// tests/server/market_sold_volume.test.ts pins all four seams PRESENT (flipped
+// from the all-four-absent guard), and tests/market_sold_volume_pg_integration
+// proves the observer-to-database path end to end against real Postgres.
 
 import type { RetentionTable } from './retention_sweep';
 

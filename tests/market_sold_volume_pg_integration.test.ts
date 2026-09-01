@@ -21,12 +21,19 @@
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
+  buyWithSoldVolume,
+  resetMarketSoldVolumeForTests,
+  soldVolumeWriterIdle,
+} from '../server/market_sold_volume';
+import {
   MARKET_SOLD_VOLUME_RETENTION_DAYS,
   MARKET_SOLD_VOLUME_SCHEMA,
+  type MarketSoldVolumeBoundedRunner,
   marketSoldVolumeRetentionTable,
   pruneMarketSoldVolumeBatch,
   readMarketSoldVolumeSince,
   recordMarketSoldVolumeRow,
+  recordMarketSoldVolumeRowBounded,
 } from '../server/market_sold_volume_db';
 
 const ADMIN_URL = process.env.TEST_DATABASE_URL;
@@ -222,9 +229,97 @@ describeDb('market_sold_volume against real Postgres', () => {
     expect(kept.rows[0].n).toBe('1');
   });
 
+  it('records a completed sale end to end through the wired observer (D147)', async () => {
+    await reset();
+    // The exact boot wiring (server/main.ts): the observer's writer binds
+    // recordMarketSoldVolumeRowBounded over a real transactional runner, and
+    // buyWithSoldVolume is the function the game.ts market_buy dispatch calls.
+    const run: MarketSoldVolumeBoundedRunner = async (_ms, fn) => {
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+        const out = await fn((text, values) => client.query(text, values));
+        await client.query('COMMIT');
+        return out;
+      } catch (err) {
+        await client.query('ROLLBACK').catch(() => {});
+        throw err;
+      } finally {
+        client.release();
+      }
+    };
+    resetMarketSoldVolumeForTests((entry) =>
+      recordMarketSoldVolumeRowBounded(run, 'eastbrook', entry),
+    );
+    // A fake sim whose successful buy splices the whole listing out, exactly as
+    // the real Sim.marketBuy does (src/sim/market.ts).
+    const book = [{ id: 1, itemId: 'wyrmfall_core', count: 3, price: 900, house: false }];
+    const sim = {
+      marketListings: book,
+      marketBuy: (id: number) => {
+        const idx = book.findIndex((row) => row.id === id);
+        if (idx >= 0) book.splice(idx, 1);
+      },
+    };
+    buyWithSoldVolume(sim, 1, 42);
+    await soldVolumeWriterIdle();
+    resetMarketSoldVolumeForTests();
+    const rows = await readMarketSoldVolumeSince(pool, 'eastbrook', 7);
+    expect(rows).toEqual([{ itemId: 'wyrmfall_core', saleCount: 1, quantity: 3, copper: 900 }]);
+  });
+
   // The constant relation RETENTION > WINDOW used to sit here as a third case.
   // It needs no Postgres, and inside this describeDb it was skipped in every
   // DB-less run, which is every local run without TEST_DATABASE_URL. It lives
   // in the unit suite now (tests/server/market_sold_volume.test.ts), beside the
   // other assertions about these constants.
+});
+
+describeDb('ensureSchema boots the sold-volume table (the D147 boot contract)', () => {
+  const BOOT_DB = 'wocc_market_sold_volume_boot';
+  let admin: Pool;
+  let bootPool: Pool;
+  let db: typeof import('../server/db');
+  const bootUrl = (a: string): string => {
+    const u = new URL(a);
+    u.pathname = `/${BOOT_DB}`;
+    return u.toString();
+  };
+
+  beforeAll(async () => {
+    admin = new Pool({ connectionString: ADMIN_URL, max: 2 });
+    expect(new URL(ADMIN_URL as string).pathname.replace(/^\//, '')).not.toBe(BOOT_DB);
+    await admin.query(
+      `SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()`,
+      [BOOT_DB],
+    );
+    await admin.query(`DROP DATABASE IF EXISTS ${BOOT_DB}`);
+    await admin.query(`CREATE DATABASE ${BOOT_DB}`);
+    // db.ts reads DATABASE_URL at module load; this is the first import of it in
+    // this suite, so point it at the disposable boot database first.
+    process.env.DATABASE_URL = bootUrl(ADMIN_URL as string);
+    db = await import('../server/db');
+    await db.ensureSchema();
+    bootPool = new Pool({ connectionString: bootUrl(ADMIN_URL as string), max: 2 });
+  }, 120_000);
+
+  afterAll(async () => {
+    await bootPool?.end().catch(() => {});
+    await db?.pool?.end().catch(() => {});
+    await admin?.query(`DROP DATABASE IF EXISTS ${BOOT_DB}`).catch(() => {});
+    await admin?.end().catch(() => {});
+  }, 30_000);
+
+  it('creates market_sold_volume through the real boot ladder, and it accepts a row', async () => {
+    const reg = await bootPool.query<{ t: string | null }>(
+      `SELECT to_regclass('public.market_sold_volume')::text AS t`,
+    );
+    expect(reg.rows[0].t).toBe('market_sold_volume');
+    await bootPool.query(
+      `INSERT INTO market_sold_volume (realm, day, item_id, sale_count, quantity, copper)
+       VALUES ('eastbrook', (now() AT TIME ZONE 'utc')::date, 'wyrmfall_core', 1, 3, 900)`,
+    );
+    const rows = await readMarketSoldVolumeSince(bootPool, 'eastbrook', 7);
+    expect(rows).toEqual([{ itemId: 'wyrmfall_core', saleCount: 1, quantity: 3, copper: 900 }]);
+  });
 });

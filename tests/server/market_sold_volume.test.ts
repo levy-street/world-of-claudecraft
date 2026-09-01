@@ -273,31 +273,37 @@ function codeOf(relPath: string): string {
   return stripComments(readFileSync(join(REPO_ROOT, relPath), 'utf8'));
 }
 
-/** The four seams, each with the live anchor proving its file was really read. */
-const UNWIRED_SEAMS = [
+/** The four seams, each with the live anchor proving its file was really read.
+ *  Flipped from absence to PRESENCE by qr-19-sold-volume-four-seam-wiring (Phase
+ *  19): the cluster is wired, so each seam must now be present in its file. Each
+ *  `present` is the WIRING SITE, not the bare symbol: asserting only the token
+ *  would pass on the import alone, so a dispatch reverting to sim.marketBuy (or a
+ *  deleted ensureSchema/registration/boot call) with the import left behind would
+ *  slip through. The call-site strings red on exactly that regression. */
+const WIRED_SEAMS = [
   {
-    what: 'MARKET_SOLD_VOLUME_SCHEMA in the ensureSchema DDL ladder',
+    what: 'MARKET_SOLD_VOLUME_SCHEMA applied in the ensureSchema DDL ladder',
     file: 'server/db.ts',
     anchor: 'await client.query(BANK_LEDGER_BATCH_RECEIPTS_SCHEMA);',
-    absent: 'MARKET_SOLD_VOLUME_SCHEMA',
+    present: 'await client.query(MARKET_SOLD_VOLUME_SCHEMA)',
   },
   {
-    what: "marketSoldVolumeRetentionTable in the retention sweep's tables array",
+    what: "marketSoldVolumeRetentionTable registered in the retention sweep's tables array",
     file: 'server/main.ts',
     anchor: "{ name: 'chat_logs', pruneBatch:",
-    absent: 'marketSoldVolumeRetentionTable',
+    present: 'marketSoldVolumeRetentionTable(pool)',
   },
   {
-    what: 'buyWithSoldVolume at the market_buy dispatch arm',
+    what: 'buyWithSoldVolume called at the market_buy dispatch arm',
     file: 'server/game.ts',
-    anchor: 'sim.marketBuy(msg.id, pid);',
-    absent: 'buyWithSoldVolume',
+    anchor: 'sim.marketCancel(msg.id, pid);',
+    present: 'buyWithSoldVolume(sim, msg.id, pid)',
   },
   {
-    what: 'configureMarketSoldVolume at boot',
+    what: 'configureMarketSoldVolume called at boot',
     file: 'server/main.ts',
     anchor: 'retentionSweep.start();',
-    absent: 'configureMarketSoldVolume',
+    present: 'configureMarketSoldVolume(',
   },
 ] as const;
 
@@ -317,33 +323,36 @@ const CLUSTER_MODULES = new Set([
   'admin_market_metrics.ts',
 ]);
 
-describe('the sold-volume cluster is wired to nothing, and the deferral is pinned', () => {
+describe('the sold-volume cluster is wired, and the four seams stay present', () => {
   it('spells every needle the way its own module does (the anti-vacuity floor)', () => {
-    // Without this, a renamed export would make every absence assertion below
-    // pass forever while the seam it guards quietly landed.
+    // Without this, a renamed export would make every presence assertion below
+    // pass or fail for the wrong reason.
     for (const [needle, home] of Object.entries(NEEDLE_HOMES)) {
       expect(codeOf(home), `${needle} should be defined in ${home}`).toContain(needle);
     }
   });
 
-  it.each(UNWIRED_SEAMS)('$what is still absent from $file', ({ file, anchor, absent }) => {
+  it.each(WIRED_SEAMS)('$what is now wired in $file', ({ file, anchor, present }) => {
     const code = codeOf(file);
-    // The anchor first: an absence assertion over a file that moved, was
-    // renamed, or lost the region entirely would pass while measuring nothing.
+    // The anchor first: a presence assertion over a file that moved, was
+    // renamed, or lost the region entirely would fail for the wrong reason.
     expect(code, `anchor missing from ${file}; re-point this pin`).toContain(anchor);
-    expect(code, `${absent} is now wired in ${file}: land all four seams together`).not.toContain(
-      absent,
+    expect(code, `${present} must stay wired in ${file}: the four seams land together`).toContain(
+      present,
     );
   });
 
-  it('no other server module reaches for the cluster either', () => {
-    // The three file-specific arms above name the seams the reviewers found;
-    // this one closes the rest of the surface, so wiring it up from any other
-    // module (a new boot module, a domain route) reds here instead of shipping.
+  it('only the three wired seam files reach for the cluster, no other module', () => {
+    // The seams now live in exactly three files: db.ts (schema), main.ts
+    // (retention + both configure calls) and game.ts (the dispatch call). Every
+    // OTHER server module must stay clear, so a NEW reach from a fresh boot
+    // module or a domain route reds here instead of shipping.
     const needles = Object.keys(NEEDLE_HOMES);
-    const scanned = tsFilesUnder(join(REPO_ROOT, 'server')).filter(
-      (f) => !CLUSTER_MODULES.has(f.file.split('/').pop() ?? ''),
-    );
+    const WIRED_FILES = new Set(['db.ts', 'main.ts', 'game.ts']);
+    const scanned = tsFilesUnder(join(REPO_ROOT, 'server')).filter((f) => {
+      const base = f.file.split('/').pop() ?? '';
+      return !CLUSTER_MODULES.has(base) && !WIRED_FILES.has(base);
+    });
     // Vacuity floor: server/ is a large tree, so a walk that returned a handful
     // means the scan broke, not that the tree shrank.
     expect(scanned.length).toBeGreaterThan(100);
