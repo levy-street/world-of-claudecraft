@@ -11,11 +11,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { FocusManager } from '../src/ui/focus_manager';
 import {
   closeReportWindow,
   openReportWindow,
   type ReportWindowDeps,
 } from '../src/ui/report_window';
+import { makeWindowFocus } from '../src/ui/window_focus';
 
 let el: HTMLElement;
 let closeOtherWindows: ReturnType<typeof vi.fn<(keep: string) => void>>;
@@ -262,8 +264,12 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
     // armed on nothing. Source-pinned in the shape the sibling windows use
     // (tests/deeds_window.test.ts, tests/reliquary_window.test.ts).
     // process.cwd() is the worktree root under vitest; import.meta.url is not
-    // a file URL in the happy-dom env this suite runs in.
-    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    // a file URL in the happy-dom env this suite runs in. Comments are STRIPPED
+    // first (the tooltip_line_core codeOnly convention): without it a comment
+    // quoting the declaration would satisfy the positive half.
+    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '')
+      .replace(/(^|[^:])\/\/.*$/gm, '$1');
     expect(hud).toContain(
       "private readonly reportWindowFocus = this.windowFocus('#report-window');",
     );
@@ -370,6 +376,55 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
 // by a per-open epoch. The REJECT arm is the sharper of the two and the one the
 // old row never named: it re-queries #report-error live, so unguarded it paints
 // the previous report's failure into the window a player has since reopened.
+// Every arm above drives a FAKE bridge, which pins the module's CALL PATTERN
+// and by construction cannot see where focus actually lands: a vi.fn() restore
+// observes no deferred focus move. That blind spot shipped a real regression
+// once. A close-before-reopen was added here to release the previous trap, and
+// because FocusManager.restore defers by a tick, its return landed AFTER the
+// re-open and parked focus on the PREVIOUS opener, outside the window then on
+// screen, leaving the fresh trap armed but inert. Every fake-bridge arm stayed
+// green through it. So this block drives the REAL makeWindowFocus over a REAL
+// FocusManager and asserts on document.activeElement, the crafting-window
+// precedent (tests/crafting_window_focus.test.ts).
+describe('report window: the REAL focus bridge across a re-open', () => {
+  const realDeps = (bridge: ReturnType<typeof makeWindowFocus>): ReportWindowDeps => ({
+    ...makeDeps(() => ({ submit: vi.fn().mockResolvedValue(undefined) })),
+    ...bridge,
+  });
+
+  it('a re-open never parks focus on the FIRST window s opener', async () => {
+    const first = document.createElement('button');
+    document.body.appendChild(first);
+    first.focus();
+    expect(document.activeElement).toBe(first);
+
+    const bridge = makeWindowFocus(new FocusManager(), () => el);
+    openReportWindow(realDeps(bridge), { pid: 7, name: 'Rega' });
+
+    // The second context-menu open: focus has moved on by the time it fires.
+    const second = document.createElement('button');
+    document.body.appendChild(second);
+    second.focus();
+    openReportWindow(realDeps(bridge), { pid: 9, name: 'Bram' });
+
+    // Flush anything FocusManager.restore may have scheduled. If the re-open
+    // routed through close(), this is where focus would snap back to `first`.
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(document.activeElement).not.toBe(first);
+    expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Bram');
+  });
+
+  it('a real CLOSE does return focus to the opener, so the arm above is not vacuous', async () => {
+    const opener1 = document.createElement('button');
+    document.body.appendChild(opener1);
+    opener1.focus();
+    const bridge = makeWindowFocus(new FocusManager(), () => el);
+    openReportWindow(realDeps(bridge), { pid: 7, name: 'Rega' });
+    closeReportWindow();
+    await vi.waitFor(() => expect(document.activeElement).toBe(opener1));
+  });
+});
+
 describe('report window: a stale submit never touches a reopened window', () => {
   it('a resolve landing after a reopen logs the success but leaves the new window open', async () => {
     let settle: (() => void) | undefined;
