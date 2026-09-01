@@ -2976,7 +2976,9 @@ export const pt_BR: EnTranslations = {
         "playerFrame": "Jogador",
         "targetFrame": "Alvo",
         "partyFrames": "Grupo",
-        "swingBar": "Ataque Automático"
+        "swingBar": "Ataque Automático",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Configurações de Quadros",
       "framesMenuTitle": "Mostre ou oculte quadros individuais. Um quadro desmarcado permanece oculto até que você o marque novamente ou redefina para o padrão.",

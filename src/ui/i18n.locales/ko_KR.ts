@@ -811,6 +811,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.combineActionBars': '액션 바 합치기',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': '액션 바',
   'hudChrome.interfaceUnlock.frameNames.swingBar': '자동 공격',
+  'hudChrome.interfaceUnlock.frameNames.questTracker': '퀘스트 추적기',
+  'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': '성물고 추적기',
   'hudChrome.interfaceUnlock.frameNames.chat': '채팅',
   'hudChrome.interfaceUnlock.frameNames.menu': '메뉴',
   'hudChrome.interfaceUnlock.frameNames.xpBar': '경험치 바',

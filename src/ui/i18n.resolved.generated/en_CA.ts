@@ -2976,7 +2976,9 @@ export const en_CA: EnTranslations = {
         "playerFrame": "Player",
         "targetFrame": "Target",
         "partyFrames": "Party",
-        "swingBar": "Auto Attack"
+        "swingBar": "Auto Attack",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",

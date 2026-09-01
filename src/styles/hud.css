@@ -888,7 +888,7 @@
     margin-bottom: 3px;
     pointer-events: none;
   }
-  .warlock-doom-frame.doom-detached {
+  .warlock-doom-frame.hud-frame-detached {
     position: absolute;
     z-index: 21;
     width: 300px;
@@ -1465,9 +1465,7 @@
   body.target-frame-dragging,
   body.target-frame-dragging *,
   body.player-frame-dragging,
-  body.player-frame-dragging *,
-  body.warlock-doom-frame-dragging,
-  body.warlock-doom-frame-dragging * {
+  body.player-frame-dragging * {
     user-select: none;
   }
   body.mobile-touch .unitframe .tf-move-btn,
@@ -1495,11 +1493,23 @@
   #stancebar.tf-unlocked,
   #xpbar.tf-unlocked,
   #buff-bar.tf-unlocked,
-  #debuff-bar.tf-unlocked {
+  #debuff-bar.tf-unlocked,
+  #quest-tracker.tf-unlocked,
+  #reliquary-tracker.tf-unlocked,
+  #paladin-devotion-frame.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
+  }
+  /* The trackers and the devotion medallion are click-through while locked
+     (their roots carry pointer-events: none so the world stays clickable
+     behind them), so arranging has to switch events back on, the doom
+     meter's own rule above. */
+  #quest-tracker.tf-unlocked,
+  #reliquary-tracker.tf-unlocked,
+  #paladin-devotion-frame.tf-unlocked {
+    pointer-events: auto;
   }
   /* The corner button and grip need a positioned host to hang off. Only the
      action bars lack one: the cast bar, the menu rail and the minimap wrap are
@@ -1527,10 +1537,19 @@
   #stancebar.hud-frame-detached,
   #xpbar.hud-frame-detached,
   #buff-bar.hud-frame-detached,
-  #debuff-bar.hud-frame-detached {
+  #debuff-bar.hud-frame-detached,
+  #quest-tracker.hud-frame-detached,
+  #reliquary-tracker.hud-frame-detached {
     position: absolute;
     margin: 0;
     z-index: 20;
+  }
+  /* A tracker re-homed onto #ui keeps the stack's column width: its docked
+     width: 100% resolved against #right-tracker-stack's 240px, and against
+     #ui it would span the whole screen. */
+  #quest-tracker.hud-frame-detached,
+  #reliquary-tracker.hud-frame-detached {
+    width: 240px;
   }
   #actionbar .tf-move-btn,
   #actionbar2 .tf-move-btn,
@@ -1543,6 +1562,9 @@
   #xpbar .tf-move-btn,
   #buff-bar .tf-move-btn,
   #debuff-bar .tf-move-btn,
+  #quest-tracker .tf-move-btn,
+  #reliquary-tracker .tf-move-btn,
+  #paladin-devotion-frame .tf-move-btn,
   #chatlog-wrap .chat-move-btn {
     position: absolute;
     top: -10px;
@@ -1568,6 +1590,9 @@
   #xpbar .tf-move-btn:focus-visible,
   #buff-bar .tf-move-btn:focus-visible,
   #debuff-bar .tf-move-btn:focus-visible,
+  #quest-tracker .tf-move-btn:focus-visible,
+  #reliquary-tracker .tf-move-btn:focus-visible,
+  #paladin-devotion-frame .tf-move-btn:focus-visible,
   #chatlog-wrap .chat-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -1701,9 +1726,20 @@
      points at the plus/minus buttons for turning more on. */
   body.interface-unlocked #target-frame.tf-unlocked,
   body.interface-unlocked #pet-frame.tf-unlocked,
-  body.interface-unlocked #stancebar.tf-unlocked {
+  body.interface-unlocked #stancebar.tf-unlocked,
+  body.interface-unlocked #paladin-devotion-frame.tf-unlocked,
+  body.interface-unlocked .warlock-doom-frame.tf-unlocked {
     display: flex !important;
     opacity: 0.55;
+  }
+  /* The trackers are block flow (and an empty docked one is folded away by
+     the stack's :empty rule), so their placeholders force block display and
+     keep a graspable minimum box like the stance bar's. */
+  body.interface-unlocked #quest-tracker.tf-unlocked,
+  body.interface-unlocked #reliquary-tracker.tf-unlocked {
+    display: block !important;
+    opacity: 0.55;
+    min-height: 48px;
   }
   /* A resizable unit frame needs a positioned host for its grip; the three
      already carry one (.unitframe and #party-frames are absolute, #player-frame
@@ -1973,6 +2009,30 @@
         #c9a54528 0 1px,
         transparent 1px calc(16px / var(--ui-scale, 1))
       );
+  }
+  /* Screen centerlines while the grid is up: one vertical and one horizontal
+     bar through the middle, brighter than the grid lines, so centering a
+     frame on the screen is a sight line rather than a count of grid cells.
+     Children of the overlay, so they ride the same hidden gate; the 2px
+     thickness divides by the UI scale like the grid pitch above, and the
+     50% midpoint is scale-invariant. */
+  #interface-grid-overlay::before,
+  #interface-grid-overlay::after {
+    content: "";
+    position: absolute;
+    background: #c9a54573;
+  }
+  #interface-grid-overlay::before {
+    top: 0;
+    bottom: 0;
+    left: calc(50% - 1px / var(--ui-scale, 1));
+    width: calc(2px / var(--ui-scale, 1));
+  }
+  #interface-grid-overlay::after {
+    left: 0;
+    right: 0;
+    top: calc(50% - 1px / var(--ui-scale, 1));
+    height: calc(2px / var(--ui-scale, 1));
   }
   #interface-edit-controls {
     position: absolute;
@@ -2569,6 +2629,11 @@
     box-shadow: 0 0 calc(5px * var(--fx-shadow, 1)) #ff5533aa;
     border-color: #ffad99;
   }
+  /* The devotion medallion is a governed HUD frame (HUD_FRAME_SPECS row
+     'paladinDevotion'): pointer-inert while locked so it never eats a world
+     click, and the .tf-unlocked rules below re-enable it for arranging. The
+     centering translate is the stock seat only; a custom position writes
+     left/top from the top-left corner, so the detached state drops it. */
   .paladin-devotion-frame {
     position: fixed;
     left: 50%;
@@ -2580,11 +2645,10 @@
     align-items: center;
     justify-content: center;
     translate: -50% -50%;
-    cursor: grab;
-    touch-action: none;
+    pointer-events: none;
   }
-  .paladin-devotion-frame.dragging {
-    cursor: grabbing;
+  .paladin-devotion-frame.hud-frame-detached {
+    translate: none;
   }
   .paladin-devotion {
     --devotion-scale: 0;
@@ -4758,6 +4822,14 @@
      own root display and keep a skeleton, so only the genuinely empty ones
      match. */
   #right-tracker-stack > :empty {
+    display: none;
+  }
+  /* The quest tracker no longer matches :empty even with no quests: it hosts
+     its movable-frame chrome (corner button, grip, name chip) beside the
+     #qt-body the controller paints, so emptiness is judged on the body. The
+     edit mode's force-shown placeholder (display !important below) still
+     wins while arranging. */
+  #quest-tracker:has(> #qt-body:empty) {
     display: none;
   }
   /* ---------- quest tracker ---------- */

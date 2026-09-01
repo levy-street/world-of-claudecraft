@@ -2976,7 +2976,9 @@ export const cs_CZ: EnTranslations = {
         "playerFrame": "Hráč",
         "targetFrame": "Cíl",
         "partyFrames": "Skupina",
-        "swingBar": "Automatický útok"
+        "swingBar": "Automatický útok",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Nastavení rámečků",
       "framesMenuTitle": "Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.",

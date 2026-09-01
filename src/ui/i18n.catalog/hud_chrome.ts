@@ -3950,6 +3950,12 @@ export const hudChromeStrings = {
       // The auto-attack swing timer (#swingbar), hidden outside combat like
       // the cast bar, so its chip is what names the placeholder.
       swingBar: 'Auto Attack',
+      // The right-stack trackers, movable frames since the 0.42 round. Both
+      // wordy (M16): their five non-Latin fills land in the same change. The
+      // devotion medallion and doom meter reuse their existing name keys
+      // (hudChrome.paladin.devotion, hudChrome.warlock.doomLabel).
+      questTracker: 'Quest Tracker',
+      reliquaryTracker: 'Reliquary Tracker',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

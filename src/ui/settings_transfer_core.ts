@@ -30,6 +30,10 @@ const FRAME_KEYS = [
   'woc_meters_detached',
   'woc_target_auras_frame',
   'woc_warlock_doom_frame_pos',
+  // The doom meter's frames-menu hidden flag: every other governed frame's
+  // rides the woc_hud_frame_ prefix, but the doom row keeps its pre-registry
+  // storage key, so its _hidden sibling is spelled out here.
+  'woc_warlock_doom_frame_pos_hidden',
 ] as const;
 
 /** The extra families the ALL-SETTINGS code carries on top of the layout:

@@ -2976,7 +2976,9 @@ export const ru_RU: EnTranslations = {
         "playerFrame": "Игрок",
         "targetFrame": "Цель",
         "partyFrames": "Группа",
-        "swingBar": "Автоатака"
+        "swingBar": "Автоатака",
+        "questTracker": "Трекер заданий",
+        "reliquaryTracker": "Список Реликвария"
       },
       "framesMenu": "Настройки фреймов",
       "framesMenuTitle": "Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.",

@@ -2976,7 +2976,9 @@ export const vi_VN: EnTranslations = {
         "playerFrame": "Người Chơi",
         "targetFrame": "Mục Tiêu",
         "partyFrames": "Tổ Đội",
-        "swingBar": "Tự Đánh"
+        "swingBar": "Tự Đánh",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Cài Đặt Khung",
       "framesMenuTitle": "Hiện hoặc ẩn từng khung riêng lẻ. Một khung chưa được đánh dấu sẽ vẫn ẩn cho đến khi bạn đánh dấu lại hoặc đặt lại về mặc định.",

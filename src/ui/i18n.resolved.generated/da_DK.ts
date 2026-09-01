@@ -2976,7 +2976,9 @@ export const da_DK: EnTranslations = {
         "playerFrame": "Spiller",
         "targetFrame": "Mål",
         "partyFrames": "Gruppe",
-        "swingBar": "Autoangreb"
+        "swingBar": "Autoangreb",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",

@@ -33,6 +33,10 @@ describe('HUD_FRAME_SPECS', () => {
       'xpBar',
       'buffBar',
       'debuffBar',
+      'questTracker',
+      'reliquaryTracker',
+      'paladinDevotion',
+      'doomMeter',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'actionbar',
@@ -49,6 +53,10 @@ describe('HUD_FRAME_SPECS', () => {
       'xpbar',
       'buff-bar',
       'debuff-bar',
+      'quest-tracker',
+      'reliquary-tracker',
+      'paladin-devotion-frame',
+      'warlock-doom-frame',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -72,14 +80,25 @@ describe('HUD_FRAME_SPECS', () => {
       'woc_hud_frame_xpbar',
       'woc_hud_frame_buffbar',
       'woc_hud_frame_debuffbar',
+      'woc_hud_frame_quest_tracker',
+      'woc_hud_frame_reliquary_tracker',
+      'woc_hud_frame_paladin_devotion',
+      // The doom meter joined the registry AFTER shipping its own mover, so
+      // its row keeps the key that mover persisted under (movable frame
+      // positions are player data; renaming the key orphans saved layouts).
+      'woc_warlock_doom_frame_pos',
     ]);
   });
 
   it('marks exactly the frames that can sit under a transformed ancestor for re-homing', () => {
-    // The action bars, pet frame and XP bar live inside #bottom-bar, whose
+    // The action bars, pet frame, XP bar and doom meter live inside
+    // #bottom-bar, whose
     // centering transform becomes the containing block for absolute positioning;
     // the buff/debuff rows can be re-parented into the player frame at runtime
-    // (auras-on-frame). The cast bar, menu rail and minimap are already #ui
+    // (auras-on-frame), and the two trackers sit inside the positioned
+    // #right-tracker-stack flex column, which would otherwise become their
+    // containing block AND keep them in its flow. The cast bar, menu rail,
+    // minimap and devotion medallion are already positioned #ui
     // children, and the detacher is a no-op for a frame already homed there.
     const detaching = HUD_FRAME_SPECS.filter((s) => s.detachToUiRoot).map((s) => s.id);
     expect(detaching).toEqual([
@@ -92,6 +111,9 @@ describe('HUD_FRAME_SPECS', () => {
       'xpBar',
       'buffBar',
       'debuffBar',
+      'questTracker',
+      'reliquaryTracker',
+      'doomMeter',
     ]);
   });
 

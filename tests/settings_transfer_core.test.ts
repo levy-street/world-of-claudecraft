@@ -78,6 +78,7 @@ describe('settings_transfer_core', () => {
       'woc_meters_detached',
       'woc_target_auras_frame',
       'woc_warlock_doom_frame_pos',
+      'woc_warlock_doom_frame_pos_hidden',
     ] as const;
     for (const key of frameKeys) {
       expect(transferKeyAllowed('frames', key), key).toBe(true);

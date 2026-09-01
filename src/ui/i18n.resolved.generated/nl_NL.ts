@@ -2976,7 +2976,9 @@ export const nl_NL: EnTranslations = {
         "playerFrame": "Speler",
         "targetFrame": "Doelwit",
         "partyFrames": "Groep",
-        "swingBar": "Automatische Aanval"
+        "swingBar": "Automatische Aanval",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",

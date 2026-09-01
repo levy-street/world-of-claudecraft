@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { HUD_FRAME_SPECS } from '../src/ui/interface_unlock_core';
 import type { PainterHostWriters } from '../src/ui/painter_host';
 import { PaladinDevotionPainter } from '../src/ui/paladin_devotion_painter';
 import type { PaladinDevotionState } from '../src/ui/paladin_devotion_view';
@@ -192,12 +193,23 @@ describe('PaladinDevotionPainter', () => {
     for (const entry of [html, playHtml]) {
       expect(entry.match(/id="paladin-devotion-frame"/g)).toHaveLength(1);
       expect(entry.match(/id="paladin-devotion"/g)).toHaveLength(1);
-      expect(entry).toMatch(/id="paladin-devotion-frame"[^>]*tabindex="0"/);
+      // No tabindex: the frame is not its own drag surface any more, so a
+      // focusable-but-inert group would be a dead tab stop. The registry
+      // mover's corner button carries the keyboard path.
+      expect(entry).not.toMatch(/id="paladin-devotion-frame"[^>]*tabindex/);
     }
-    expect(hud).toContain("attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor'");
-    expect(hud).not.toContain('devotionFrameMover');
-    expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*cursor:\s*grab/);
-    expect(css).toMatch(/\.paladin-devotion-frame\.dragging\s*\{[\s\S]*cursor:\s*grabbing/);
+    // Movement is the "Unlock interface" registry's (HUD_FRAME_SPECS row
+    // 'paladinDevotion'), not the old always-on overlay grab-drag: locked, the
+    // medallion is click-through; its centering translate drops while a custom
+    // position applies so the saved top-left lands where it was dropped.
+    expect(hud).not.toContain('attachOverlayDrag(this.paladinDevotionFrameEl');
+    const devotionSpec = HUD_FRAME_SPECS.find((s) => s.id === 'paladinDevotion');
+    expect(devotionSpec?.elementId).toBe('paladin-devotion-frame');
+    expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*pointer-events:\s*none/);
+    expect(css).toMatch(
+      /\.paladin-devotion-frame\.hud-frame-detached\s*\{[\s\S]*translate:\s*none/,
+    );
+    expect(css).not.toMatch(/\.paladin-devotion-frame\s*\{[\s\S]{0,400}cursor:\s*grab/);
   });
 
   it('renders 7 charge pips so Extended Dawn (5 base + 2) can fully light up', () => {

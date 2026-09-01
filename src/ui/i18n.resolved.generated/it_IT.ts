@@ -2976,7 +2976,9 @@ export const it_IT: EnTranslations = {
         "playerFrame": "Giocatore",
         "targetFrame": "Bersaglio",
         "partyFrames": "Gruppo",
-        "swingBar": "Attacco automatico"
+        "swingBar": "Attacco automatico",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Impostazioni riquadri",
       "framesMenuTitle": "Mostra o nascondi i singoli riquadri. Un riquadro deselezionato resta nascosto finché non lo riselezioni o ripristini i valori predefiniti.",

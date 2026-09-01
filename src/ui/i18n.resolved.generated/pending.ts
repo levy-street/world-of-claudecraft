@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "es_ES": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "fr_FR": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "fr_CA": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "de_DE": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "nl_NL": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "pl_PL": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "id_ID": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "tr_TR": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "sv_SE": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "vi_VN": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ],
+  "da_DK": [
+    "hudChrome.interfaceUnlock.frameNames.questTracker",
+    "hudChrome.interfaceUnlock.frameNames.reliquaryTracker"
+  ]
 };

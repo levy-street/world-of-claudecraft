@@ -181,6 +181,53 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     detachToUiRoot: true,
     resizeMode: 'box',
   },
+  // The quest and Reliquary trackers live inside the positioned
+  // #right-tracker-stack flex column, whose box would become the containing
+  // block for their saved left/top, so both re-home onto #ui while positioned
+  // (the stack keeps seating the trackers that stay docked). The Reliquary
+  // row's show/hide checkbox drives the existing showReliquaryTracker setting
+  // through a rowOverride at the wiring site, the optional action bars' shape.
+  {
+    id: 'questTracker',
+    elementId: 'quest-tracker',
+    storageKey: 'woc_hud_frame_quest_tracker',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.questTracker',
+    fallbackSize: { w: 240, h: 160 },
+    detachToUiRoot: true,
+  },
+  {
+    id: 'reliquaryTracker',
+    elementId: 'reliquary-tracker',
+    storageKey: 'woc_hud_frame_reliquary_tracker',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.reliquaryTracker',
+    fallbackSize: { w: 240, h: 120 },
+    detachToUiRoot: true,
+  },
+  // The class resource bars, previously movable outside this option (the
+  // devotion medallion's grab-drag, the doom meter's own corner button), now
+  // ordinary governed frames so they hide and resize like everything else.
+  // The devotion medallion is position:fixed on #ui already; its centering
+  // translate is dropped by the stylesheet while a custom position applies.
+  {
+    id: 'paladinDevotion',
+    elementId: 'paladin-devotion-frame',
+    storageKey: 'woc_hud_frame_paladin_devotion',
+    labelKey: 'hudChrome.paladin.devotion',
+    fallbackSize: { w: 96, h: 96 },
+    detachToUiRoot: false,
+  },
+  // The doom meter docks beside the player frame inside the transformed
+  // #actionbar-stack, so it detaches like the action bars. Its storage key is
+  // the one its pre-registry MovableFrame persisted under, so every saved
+  // spot survives the move into this table.
+  {
+    id: 'doomMeter',
+    elementId: 'warlock-doom-frame',
+    storageKey: 'woc_warlock_doom_frame_pos',
+    labelKey: 'hudChrome.warlock.doomLabel',
+    fallbackSize: { w: 300, h: 48 },
+    detachToUiRoot: true,
+  },
 ] as const;
 
 /** Every storage key the option owns, so a reset can clear the whole set. */

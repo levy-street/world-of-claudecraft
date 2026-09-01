@@ -2976,7 +2976,9 @@ export const de_DE: EnTranslations = {
         "playerFrame": "Spieler",
         "targetFrame": "Ziel",
         "partyFrames": "Gruppe",
-        "swingBar": "Automatischer Angriff"
+        "swingBar": "Automatischer Angriff",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Rahmeneinstellungen",
       "framesMenuTitle": "Einzelne Rahmen ein- oder ausblenden. Ein deaktivierter Rahmen bleibt verborgen, bis du ihn wieder aktivierst oder auf die Standardeinstellungen zurücksetzt.",

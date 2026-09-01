@@ -810,6 +810,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.combineActionBars': 'アクションバーをまとめる',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'アクションバー',
   'hudChrome.interfaceUnlock.frameNames.swingBar': 'オートアタック',
+  'hudChrome.interfaceUnlock.frameNames.questTracker': 'クエストトラッカー',
+  'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': '聖遺物庫トラッカー',
   'hudChrome.interfaceUnlock.frameNames.chat': 'チャット',
   'hudChrome.interfaceUnlock.frameNames.menu': 'メニュー',
   'hudChrome.interfaceUnlock.frameNames.xpBar': '経験値バー',

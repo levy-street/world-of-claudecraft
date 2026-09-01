@@ -811,6 +811,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.combineActionBars': 'Объединить панели действий',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': 'Панели действий',
   'hudChrome.interfaceUnlock.frameNames.swingBar': 'Автоатака',
+  'hudChrome.interfaceUnlock.frameNames.questTracker': 'Трекер заданий',
+  'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': 'Список Реликвария',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
   'hudChrome.interfaceUnlock.snapToGrid': 'Привязка к сетке',

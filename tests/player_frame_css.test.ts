@@ -56,4 +56,17 @@ describe('snap-to-grid alignment overlay', () => {
     expect(block).not.toMatch(/transparent 1px 16px/);
     expect(block).toContain('pointer-events: none;');
   });
+
+  it('draws a scale-compensated centerline pair through the screen middle', () => {
+    // The two ::before/::after bars are overlay children, so they show and
+    // hide with the grid; like the grid pitch, their px thickness divides by
+    // --ui-scale (the 50% midpoint needs no compensation).
+    const overlay = hudCss.slice(hudCss.indexOf('#interface-grid-overlay {'));
+    expect(overlay).toMatch(
+      /#interface-grid-overlay::before\s*\{[\s\S]*?left:\s*calc\(50% - 1px \/ var\(--ui-scale, 1\)\);[\s\S]*?width:\s*calc\(2px \/ var\(--ui-scale, 1\)\);/,
+    );
+    expect(overlay).toMatch(
+      /#interface-grid-overlay::after\s*\{[\s\S]*?top:\s*calc\(50% - 1px \/ var\(--ui-scale, 1\)\);[\s\S]*?height:\s*calc\(2px \/ var\(--ui-scale, 1\)\);/,
+    );
+  });
 });

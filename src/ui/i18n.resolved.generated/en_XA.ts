@@ -2976,7 +2976,9 @@ export const en_XA: EnTranslations = {
         "playerFrame": "[Þļáýéŕ]",
         "targetFrame": "[Ţáŕĝéţ]",
         "partyFrames": "[Þáŕţý]",
-        "swingBar": "[Áúţó Áţţáçķ]"
+        "swingBar": "[Áúţó Áţţáçķ]",
+        "questTracker": "[Ɋúéšţ Ţŕáçķéŕ]",
+        "reliquaryTracker": "[Ŕéļíɋúáŕý Ţŕáçķéŕ]"
       },
       "framesMenu": "[Ƒŕáɱéš Šéţţíñĝš]",
       "framesMenuTitle": "[Šĥóŵ óŕ ĥíðé íñðíʋíðúáļ ƒŕáɱéš. Áñ úñţíçķéð ƒŕáɱé šţáýš ĥíððéñ úñţíļ ýóú ţíçķ íţ áĝáíñ óŕ ŕéšéţ ţó ðéƒáúļţš.]",

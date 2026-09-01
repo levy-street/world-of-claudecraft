@@ -2976,7 +2976,9 @@ export const fr_FR: EnTranslations = {
         "playerFrame": "Joueur",
         "targetFrame": "Cible",
         "partyFrames": "Groupe",
-        "swingBar": "Attaque automatique"
+        "swingBar": "Attaque automatique",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Paramètres des cadres",
       "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",

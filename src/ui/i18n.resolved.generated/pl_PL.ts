@@ -2976,7 +2976,9 @@ export const pl_PL: EnTranslations = {
         "playerFrame": "Gracz",
         "targetFrame": "Cel",
         "partyFrames": "Drużyna",
-        "swingBar": "Automatyczny atak"
+        "swingBar": "Automatyczny atak",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Ustawienia ramek",
       "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",

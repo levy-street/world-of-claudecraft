@@ -2316,7 +2316,9 @@ export class Hud {
     });
     this.questTracker = new QuestTrackerController({
       writers: this.writerFacet,
-      element: $('#quest-tracker'),
+      // #qt-body, never #quest-tracker: the outer element is a movable frame
+      // and a root innerHTML swap would wipe the mover's chrome.
+      element: $('#qt-body'),
       document,
       world: () => this.sim,
       settings: {
@@ -2501,10 +2503,6 @@ export class Hud {
     this.chatWindow.init();
     this.chatGeometry.init();
     this.initFrameMovers();
-    attachOverlayDrag(this.paladinDevotionFrameEl, 'paladinDevotionAnchor', {
-      fx: 0.5,
-      fy: 0.72,
-    });
     this.initWindowManagement();
     this.emoteWheelSlots = this.loadEmoteWheelSlots();
     this.actionBarController.init();
@@ -3957,12 +3955,16 @@ export class Hud {
       // same state the on-bar plus/minus drives), listed in BOTH shapes
       // (owner request): split it shows/enables the standalone row, combined
       // it grows or shrinks the combined block exactly like its plus/minus.
+      // The Reliquary tracker's row drives its existing master switch the
+      // same way, so this checkbox and the Interface option stay one state.
       const optionalBarKey =
         spec.id === 'actionBar2'
           ? ('showSecondaryActionBar' as const)
           : spec.id === 'actionBar3'
             ? ('showThirdActionBar' as const)
-            : null;
+            : spec.id === 'reliquaryTracker'
+              ? ('showReliquaryTracker' as const)
+              : null;
       this.interfaceUnlock.register({
         id: spec.id,
         mover,
@@ -4042,6 +4044,10 @@ export class Hud {
       const cls = this.sim.cfg.playerClass;
       return cls === 'warrior' || cls === 'paladin';
     }
+    // The class resource bars follow the pet-frame rule: only the class that
+    // can ever show one gets its placeholder.
+    if (id === 'paladinDevotion') return this.sim.cfg.playerClass === 'paladin';
+    if (id === 'doomMeter') return this.sim.cfg.playerClass === 'warlock';
     return true;
   }
 
@@ -4064,22 +4070,21 @@ export class Hud {
   // forget the saved drags. Wired to the "Reset Frame Positions" interface option.
   // resetAll() locks the interface first and then resets every registered frame,
   // which covers the three unit frames as well as the action bars, cast bar,
-  // menu, minimap and pet frame. The doom meter runs its own MovableFrame outside
-  // the registry, so it keeps its own line here.
+  // menu, minimap, pet frame, trackers and class resource bars.
   resetUnitFrames(): void {
     // The one button that answers "put the interface back the way the base
     // game ships": lock everything, forget every saved frame box (all the
     // registered movers: unit frames, action bars and their combined group,
-    // cast bar, menu, minimap, pet, stance bar, XP bar, aura group), and
-    // re-dock the panels that keep their own geometry (chat, meter panels,
-    // target auras, doom meter). Combining the action bars is a layout mode of
+    // cast bar, menu, minimap, pet, stance bar, XP bar, aura group, quest and
+    // Reliquary trackers, devotion medallion, doom meter), and re-dock the
+    // panels that keep their own geometry (chat, meter panels,
+    // target auras). Combining the action bars is a layout mode of
     // this same feature, so it splits back apart too, routed through the
     // settings seam so the checkbox, persistence and body class stay in sync.
     // Settings that merely SHOW or HIDE content (the optional bars, the pet
     // frame, buffs on the player frame) keep the player's choice: they have
     // their own checkboxes and are not frame layout.
     this.interfaceUnlock.resetAll();
-    this.doomMeter.resetPosition();
     this.chatGeometry.reset();
     this.meters.resetFrames();
     this.targetAurasWindow.resetFrame();
@@ -4090,7 +4095,6 @@ export class Hud {
   reapplySavedGeometry(): void {
     this.chatGeometry.reapply();
     this.interfaceUnlock.reapplyAll();
-    this.doomMeter.reapplyPosition();
   }
 
   // The player frame docks inside #actionbar-stack, whose #bottom-bar ancestor
@@ -4559,11 +4563,6 @@ export class Hud {
       fateThreadsLabel: () => t('hudChrome.warlock.fateThreadsLabel'),
       formatFateThreadsStatus: (value, max) =>
         t('hudChrome.warlock.fateThreadsStatus', { value, max }),
-    },
-    {
-      detachedParent: $('#ui'),
-      isMobileLayout: () => this.isMobileLayout(),
-      snapToGrid: () => this.frameSnapToGridActive(),
     },
   );
   // One decoded/prescaled marker-art cache is shared by every cartography

@@ -2976,7 +2976,9 @@ export const ja_JP: EnTranslations = {
         "playerFrame": "プレイヤー",
         "targetFrame": "ターゲット",
         "partyFrames": "パーティ",
-        "swingBar": "オートアタック"
+        "swingBar": "オートアタック",
+        "questTracker": "クエストトラッカー",
+        "reliquaryTracker": "聖遺物庫トラッカー"
       },
       "framesMenu": "フレーム設定",
       "framesMenuTitle": "各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。",

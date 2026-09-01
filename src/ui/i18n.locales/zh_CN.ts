@@ -795,6 +795,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.combineActionBars': '合并动作条',
   'hudChrome.interfaceUnlock.frameNames.actionBarGroup': '动作条组',
   'hudChrome.interfaceUnlock.frameNames.swingBar': '自动攻击',
+  'hudChrome.interfaceUnlock.frameNames.questTracker': '任务追踪器',
+  'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': '圣物库追踪器',
   'hudChrome.interfaceUnlock.framesMenu': '框体设置',
   'hudChrome.interfaceUnlock.showHideFrames': '显示或隐藏框体',
   'hudChrome.interfaceUnlock.snapToGrid': '对齐网格',

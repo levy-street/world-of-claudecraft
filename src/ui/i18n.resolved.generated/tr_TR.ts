@@ -2976,7 +2976,9 @@ export const tr_TR: EnTranslations = {
         "playerFrame": "Oyuncu",
         "targetFrame": "Hedef",
         "partyFrames": "Grup",
-        "swingBar": "Otomatik Saldırı"
+        "swingBar": "Otomatik Saldırı",
+        "questTracker": "Quest Tracker",
+        "reliquaryTracker": "Reliquary Tracker"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",

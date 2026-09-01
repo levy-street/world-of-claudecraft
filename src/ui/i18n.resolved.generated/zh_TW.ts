@@ -2976,7 +2976,9 @@ export const zh_TW: EnTranslations = {
         "playerFrame": "玩家",
         "targetFrame": "目標",
         "partyFrames": "隊伍",
-        "swingBar": "自動攻擊"
+        "swingBar": "自動攻擊",
+        "questTracker": "任務追蹤器",
+        "reliquaryTracker": "聖物庫追蹤器"
       },
       "framesMenu": "框體設定",
       "framesMenuTitle": "顯示或隱藏各個框體。取消勾選的框體會一直隱藏，直到你重新勾選或還原預設值。",
