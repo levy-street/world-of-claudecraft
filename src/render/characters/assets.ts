@@ -77,6 +77,7 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
+import { modularMergePartition, modularNameFacts } from './modular_name_facts_core';
 import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,
@@ -1031,10 +1032,10 @@ function modularVariantKey(url: string, names: readonly string[]): string {
  *
  *  This is the set a variant must NOT dispose. A variant root is a
  *  SkeletonUtils clone, which SHARES geometry with its source, and
- *  mergeSkinnedParts only mints new geometry for the buckets it can prove safe:
- *  it refuses anything carrying morph targets (head, eyes, ears, lashes, brows,
- *  mouth) and skips buckets of one. Every one of those meshes is still pointing
- *  at the parsed scene's buffers, which every other variant and every future
+ *  the merge and the shared-skeleton rebind only mint new geometry for what
+ *  they can prove safe: a bucket of one never merges, and the canonical part of
+ *  the rebind (the head) is never rebaked. Every such mesh is still pointing at
+ *  the parsed scene's buffers, which every other variant and every future
  *  compose also point at, and nothing re-creates them. Disposing one would be
  *  the recolorCache bug in a worse place.
  *
@@ -1171,7 +1172,12 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
     if (o !== root && o.type === 'Group' && o.children.length === 0) empty.push(o);
   });
   for (const o of empty) o.removeFromParent();
-  mergeSkinnedParts(root);
+  // Merged by material, and never across a node-name fact a later pass reads
+  // (the lipstick, jewel and band rules): a merged mesh has one name of its
+  // own, and the head is its own partition so it never merges at all.
+  mergeSkinnedParts(root, undefined, {
+    partitionKey: (mesh) => modularMergePartition(mesh.name),
+  });
   // One Skeleton and one bone texture for the whole composed body. The HEAD is
   // the canonical part on purpose: its geometry is the identity the decal cuts
   // are cached against (see modularHeadFor), so it is the one buffer a rebake
@@ -1352,7 +1358,7 @@ function recolored(
  *  cuts are cached per head-geometry uuid, and `modularHeadFor` promises that
  *  buffer is the parsed asset's own, shared by every variant of the GLB). */
 function isComposedHead(mesh: THREE.Object3D): boolean {
-  return mesh.name === headNodeName('male') || mesh.name === headNodeName('female');
+  return modularNameFacts(mesh.name).head;
 }
 
 /** The head a look's decals ride, inside a composed clone (or null when the
@@ -1481,9 +1487,13 @@ export function attachDeferredFaceDecals(
  * miss itself). Reading the variant is what any compose of this look does
  * first, so a miss here (about 3 ms once per part set) is the compose's own
  * cost paid early, not extra work; every later read is a map hit plus a walk.
- * The head is an unmerged, morph-carrying part, so its geometry is the parsed
- * scene's own buffer, shared by every variant of the same GLB and stable to
- * key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ * The head is never merged (it is its own partition, see
+ * modular_name_facts_core.ts) and never rebaked (it is the canonical bind space
+ * of the shared skeleton, see rig_shared_skeleton.ts), so its geometry is the
+ * parsed scene's own buffer, shared by every variant of the same GLB and stable
+ * to key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ * Both of those are deliberate and both are pinned; neither is an accident of
+ * what the merge happens to refuse.
  */
 export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.SkinnedMesh | null {
   let root: THREE.Object3D;
@@ -1504,14 +1514,14 @@ export function recolorMesh(mesh: THREE.Mesh, look: ModularLook): void {
   // skin-atlas swap (SKINS/skinTexture), which must never repaint the
   // colour-picked skin and hair.
   if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
-  // The mouth part is the one place `mod_skin` must not be the skin tone,
-  // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
-  // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
-  const onMouth = mesh.name.includes('_Mouth_');
-  // GLTFLoader suffixes multi-primitive meshes, so match the stem
-  const onJewel = mesh.name.startsWith('E2_');
-  // ...and a hair band is the E2_ subset that must ignore the earring slot
-  const onBand = mesh.name.startsWith('E2_band_');
+  // The mouth part is the one place `mod_skin` must not be the skin tone (that
+  // primitive is the lips), jewellery is only jewellery by its node name, and a
+  // hair band is the E2_ subset that ignores the earring slot. All three are
+  // NODE-NAME facts, so they live in modular_name_facts_core.ts, which is also
+  // where the merge reads them: a merged mesh has one name, and folding two
+  // parts these rules read differently would change what this sweep does to
+  // them.
+  const { mouth: onMouth, jewel: onJewel, band: onBand } = modularNameFacts(mesh.name);
   mesh.material = Array.isArray(mesh.material)
     ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
     : recolored(mesh.material, look, onMouth, onJewel, onBand);

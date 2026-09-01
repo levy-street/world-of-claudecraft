@@ -36,6 +36,7 @@
 // re-runs vertex skinning for each pass, but uploads a changed texture only once.
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { morphTargetDictionaryOf, morphUnionPlan } from './morph_union_core';
 
 /** Bind matrices must match to this tolerance for two parts to be mergeable. */
 export const BIND_EPS = 1e-3;
@@ -111,6 +112,10 @@ export interface MorphRebakePlan {
    *  across the parts being merged, so every merged buffer has the same keys
    *  and the same target count, which is what `mergeGeometries` requires. */
   readonly kinds: readonly { readonly kind: MorphKind; readonly itemSize: number }[];
+  /** The relativity of the MERGED buffer. A morph-free part carries three's
+   *  default (`false`) and would otherwise make `mergeGeometries` refuse the
+   *  whole bucket for disagreeing with the parts that do have targets. */
+  readonly relative: boolean;
 }
 
 /** Rebake one morph target's delta buffer through `m`.
@@ -219,7 +224,7 @@ export function rebakeGeometry(
   }
 
   const vertexCount = out.getAttribute('position')?.count ?? 0;
-  const relative = geo.morphTargetsRelative;
+  const relative = plan ? plan.relative : geo.morphTargetsRelative;
   out.morphTargetsRelative = relative;
   // Absent stays absent without a plan: three defines USE_MORPHTARGETS on
   // PRESENCE, so minting an empty list would change the program key of a part
@@ -276,15 +281,45 @@ function sameAttributeSet(parts: THREE.SkinnedMesh[]): boolean {
 }
 
 /**
- * A merged geometry has ONE morph target list, so parts carrying different
- * targets can only merge through a union plan that pads every part to the same
- * list (see MorphRebakePlan). Until this merge computes one, refuse: the parts
- * that carry morphs are the composed library's face and body sliders, and
- * folding them onto a mismatched list is silent (the wrong blendshape moves).
+ * A part's morph target NAMES, in its own index order, or null when they cannot
+ * be named.
+ *
+ * A merged geometry carries ONE target list, and three drives a target by
+ * index, so parts can only merge once every one of them is padded to the union
+ * of their NAMES (`morph_union_core.ts`). A part whose dictionary does not
+ * account for every target it carries cannot be placed on that list, and
+ * merging it by position would move the wrong blendshape, silently: refuse the
+ * whole bucket instead.
  */
-function hasMorphTargets(sm: THREE.SkinnedMesh): boolean {
+function morphTargetNames(sm: THREE.SkinnedMesh): string[] | null {
   const morphs = sm.geometry.morphAttributes;
-  return !!morphs && Object.keys(morphs).length > 0;
+  const count = (morphs.position ?? morphs.normal ?? morphs.color)?.length ?? 0;
+  if (count === 0) return [];
+  const dict = sm.morphTargetDictionary;
+  if (!dict) return null;
+  const names = new Array<string | undefined>(count).fill(undefined);
+  for (const [name, index] of Object.entries(dict)) {
+    if (Number.isInteger(index) && index >= 0 && index < count) names[index] = name;
+  }
+  return names.every((name) => name !== undefined) ? (names as string[]) : null;
+}
+
+/** The morph kinds (and item sizes) the merged buffer must carry: the union
+ *  over the bucket. Null when two parts disagree on an item size, which
+ *  `mergeGeometries` cannot reconcile either. */
+function morphKindUnion(parts: THREE.SkinnedMesh[]): MorphRebakePlan['kinds'] | null {
+  const kinds: { kind: MorphKind; itemSize: number }[] = [];
+  for (const kind of MORPH_KINDS) {
+    let itemSize = 0;
+    for (const part of parts) {
+      const size = part.geometry.morphAttributes[kind]?.[0]?.itemSize;
+      if (size === undefined) continue;
+      if (itemSize === 0) itemSize = size;
+      else if (itemSize !== size) return null;
+    }
+    if (itemSize > 0) kinds.push({ kind, itemSize });
+  }
+  return kinds;
 }
 
 /** Scene nodes addressed by the supplied Three animation clips. */
@@ -323,24 +358,41 @@ function parentBehaviorKey(
   return `static:${grandparentId}|visible:${chainVisible}`;
 }
 
+export interface MergeSkinnedPartsOptions {
+  /** An extra bucket dimension: two parts may only merge when this agrees.
+   *
+   *  The merged mesh gets ONE name of its own, so any fact a later pass reads
+   *  off a part's node NAME has to be uniform inside a bucket or the merge
+   *  silently changes what that pass does (the composed body's lipstick, jewel
+   *  and band rules all read the name; `modular_name_facts_core.ts` owns them
+   *  and supplies this key). Omit it and only material, bones, transform and
+   *  parent behavior decide, as before. */
+  partitionKey?: (mesh: THREE.SkinnedMesh) => string;
+}
+
 /**
  * Merge every mergeable group of skinned body parts under `root` in place.
  *
  * A part joins the merge only when it shares the canonical part's bone array,
  * material and world transform, has the same attribute set, an equal
- * bind matrix, static-equivalent parent behavior, and bind data satisfying the
- * single-T law. Anything else is left untouched as its own SkinnedMesh, so a
- * rig we cannot prove safe still renders correctly (just without the saving).
+ * bind matrix, static-equivalent parent behavior, nameable morph targets, and
+ * bind data satisfying the single-T law. Anything else is left untouched as its
+ * own SkinnedMesh, so a rig we cannot prove safe still renders correctly (just
+ * without the saving).
  */
-export function mergeSkinnedParts(root: THREE.Object3D, animatedNames?: ReadonlySet<string>): void {
+export function mergeSkinnedParts(
+  root: THREE.Object3D,
+  animatedNames?: ReadonlySet<string>,
+  options?: MergeSkinnedPartsOptions,
+): void {
   root.updateMatrixWorld(true);
   const groups = new Map<string, THREE.SkinnedMesh[]>();
   root.traverse((o) => {
     const sm = o as THREE.SkinnedMesh;
     if (!sm.isSkinnedMesh || !sm.visible) return;
     if (Array.isArray(sm.material)) return; // never happens via GLTFLoader
-    if (hasMorphTargets(sm)) return; // would be silently dropped by the rebake
-    const key = `${bucketKey(sm)}|${parentBehaviorKey(sm, root, animatedNames)}`;
+    const partition = options?.partitionKey?.(sm) ?? '';
+    const key = `${bucketKey(sm)}|${parentBehaviorKey(sm, root, animatedNames)}|${partition}`;
     const bucket = groups.get(key);
     if (bucket) bucket.push(sm);
     else groups.set(key, [sm]);
@@ -353,30 +405,62 @@ export function mergeSkinnedParts(root: THREE.Object3D, animatedNames?: Readonly
     const canon = bucket[0];
     const canonInverses = canon.skeleton.boneInverses;
 
-    // Rebake every part into the canonical bind space, dropping any part whose
-    // bind data does not provably reduce to a single transform.
+    // Accept the parts whose bind data provably reduces to a single transform,
+    // and name their morph targets, BEFORE any rebake: the union plan every
+    // part is padded to is a property of the accepted set, not of one part.
     const parts: THREE.SkinnedMesh[] = [];
-    const geometries: THREE.BufferGeometry[] = [];
+    const transforms: THREE.Matrix4[] = [];
+    const targetNames: string[][] = [];
+    let refusedMorphs = false;
     for (const part of bucket) {
       if (!matricesClose(canon.bindMatrix, part.bindMatrix, BIND_EPS)) continue;
       const t = solveRebindTransform(canonInverses, part.skeleton.boneInverses);
       if (!t) continue;
-      geometries.push(
-        rebakeGeometry(part.geometry, rebakeMatrix(canon.bindMatrix, part.bindMatrix, t)),
-      );
+      const names = morphTargetNames(part);
+      if (!names) {
+        refusedMorphs = true;
+        break;
+      }
       parts.push(part);
+      transforms.push(rebakeMatrix(canon.bindMatrix, part.bindMatrix, t));
+      targetNames.push(names);
     }
-    if (parts.length < 2) {
-      for (const g of geometries) g.dispose();
-      continue;
-    }
+    if (refusedMorphs || parts.length < 2) continue;
 
+    // A merged buffer has one relativity flag; three's own merge refuses a
+    // mismatch, and so does this, before any work is done.
+    const morphed = parts.filter((_, i) => targetNames[i].length > 0);
+    const relative = morphed[0]?.geometry.morphTargetsRelative ?? false;
+    if (morphed.some((part) => part.geometry.morphTargetsRelative !== relative)) continue;
+    const kinds = morphed.length > 0 ? morphKindUnion(parts) : [];
+    if (!kinds) continue;
+    const union = kinds.length > 0 ? morphUnionPlan(targetNames) : null;
+
+    const geometries = parts.map((part, i) =>
+      rebakeGeometry(
+        part.geometry,
+        transforms[i],
+        union
+          ? { names: union.names, sourceIndex: union.sourceIndex[i], kinds, relative }
+          : undefined,
+      ),
+    );
+    // mergeGeometries checks morphTargetsRelative for consistency but never
+    // carries it onto its output, so every rebaked input states it and the
+    // merged geometry is told again below.
     const geo = mergeGeometries(geometries, false);
     for (const g of geometries) g.dispose();
     if (!geo) continue;
+    if (morphed.length > 0) geo.morphTargetsRelative = relative;
 
     const merged = new THREE.SkinnedMesh(geo, canon.material);
     merged.name = `${canon.name}_bodymerged`;
+    if (union && union.names.length > 0) {
+      // The constructor's updateMorphTargets names targets off the ATTRIBUTES
+      // (which carry none), so it would hand back a positional dictionary.
+      merged.morphTargetDictionary = morphTargetDictionaryOf(union.names);
+      merged.morphTargetInfluences = union.names.map(() => 0);
+    }
     merged.position.copy(canon.position);
     merged.quaternion.copy(canon.quaternion);
     merged.scale.copy(canon.scale);

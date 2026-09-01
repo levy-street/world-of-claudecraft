@@ -987,8 +987,10 @@ function cachedFrame(geo: THREE.BufferGeometry): HeadFrame | null {
   return f;
 }
 
-/** The head mesh a decal rides. Named parts survive `mergeSkinnedParts`
- *  untouched, because a part carrying morph targets is never merged. */
+/** The head mesh a decal rides. It survives `mergeSkinnedParts` untouched
+ *  because the head is its own merge partition, and `shareRigSkeleton` keeps
+ *  its GEOMETRY untouched by making it the canonical bind space: both so the
+ *  cut below can key on that one buffer (see modularHeadFor). */
 export function headNodeName(gender: Gender): string {
   return gender === 'female' ? 'F_Head' : 'M_Head';
 }

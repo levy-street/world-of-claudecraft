@@ -6,8 +6,11 @@
 // single skinned part, and the shared tintedMaterial path rebuilds materials
 // as Lambert on the low graphics tier, a shader sway would silently vanish
 // there (the rim-glow lesson), while morph targets work on every material
-// three ships. Carrying morphs also keeps the part out of mergeSkinnedParts,
-// so only the styles that actually hang pay their extra draw.
+// three ships. The driver reads its targets by NAME off each mesh's own
+// dictionary, which is what lets a hanging style keep swaying after
+// mergeSkinnedParts folds it in with the brows it shares a material with: the
+// union plan gives the merged buffer a hair_sway_l slot whose delta is zero on
+// every vertex that is not hair.
 //
 // The driver is a stride oscillator into a lateral spring (so a stop SETTLES,
 // swinging through a couple of diminishing arcs, instead of freezing mid-sway)
