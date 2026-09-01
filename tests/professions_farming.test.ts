@@ -2587,9 +2587,10 @@ describe('the seed-back roll (tier 3/4): the FIRST of the two harvest draws, ban
   });
 
   it('pins the seed-back tuning to its literals (the wire-name-constant rule)', () => {
-    // TUNING, PROVISIONAL, FLAGGED FOR THE MAINTAINER (economy-sensitive):
-    // one literal pin for the maps every arm below reaches through the
-    // import, so a retune is a deliberate edit here too.
+    // TUNING, RULED (qr-19-seed-back-rates, 2026-09-01, under
+    // qr-19-best-for-project): the rates are RATIFIED as shipped and are no
+    // longer provisional. One literal pin for the maps every arm below
+    // reaches through the import, so a retune is a deliberate edit here too.
     expect(FARM_SEED_BACK_MIN_TIER).toBe(3);
     expect(FARM_SEED_BACK_TWO_CHANCE).toEqual({ 3: 0.08, 4: 0.06 });
     expect(FARM_SEED_BACK_ONE_CHANCE).toEqual({ 3: 0.4, 4: 0.35 });

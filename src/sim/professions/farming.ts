@@ -265,9 +265,16 @@ export const FARM_HUSKS_PER_COMPOST = 2;
 // expects 0.48 seeds back (2 x 0.08 + 1 x 0.32) and a tier-4 harvest 0.41
 // (2 x 0.06 + 1 x 0.29), so roughly every second high-tier harvest replants
 // itself and every other plant buys its seed, now from the counter or the
-// market rather than the market alone. Whether the rates should MOVE now that
-// the faucet exists is a live tuning question for the maintainer, recorded
-// rather than answered here.
+// market rather than the market alone.
+//
+// RULED (qr-19-seed-back-rates, 2026-09-01, under qr-19-best-for-project):
+// the four rates and FARM_SEED_BACK_MIN_TIER 3 are RATIFIED as shipped, no
+// retune. The re-argument above IS the answer: the faucet falsified the
+// premise these numbers were authored on, they were re-checked against the
+// faucet and still found defensible, and no phase or QA sweep since has
+// filed a finding against the 0.48 and 0.41 per-harvest expectation. A
+// retune would need numbers the packet does not hold, since it records no
+// replant-cost model and no market price series.
 export const FARM_SEED_BACK_MIN_TIER = 3;
 export const FARM_SEED_BACK_TWO_CHANCE: Readonly<Record<number, number>> = { 3: 0.08, 4: 0.06 };
 export const FARM_SEED_BACK_ONE_CHANCE: Readonly<Record<number, number>> = { 3: 0.4, 4: 0.35 };
