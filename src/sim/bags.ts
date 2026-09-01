@@ -21,10 +21,17 @@
 // transform command models the post-consumption inventory on a scratch copy
 // (removeStacked/consumeOneScratch below) so consuming the inputs can free
 // the room the output needs. Grant paths a player cannot re-try (winning a
-// need/greed roll, master loot, delve end-of-run rewards, dev gives) skip the
+// need/greed roll, master loot, delve end-of-run rewards, dev gives, and the
+// quest requiredItems fallback grant on accept and on giver re-talk) skip the
 // check on purpose: an over-capacity inventory is tolerated (pre-bag saves may
 // load overflowing too) and simply blocks new pickups until space is freed.
-// Items are never destroyed by capacity.
+// Items are never destroyed by capacity. The fallback grant is the entry that
+// most looks like an omission and is not: it re-mints a required item the
+// player can no longer obtain (quest_fallback.ts), so refusing it on a full
+// bag would soft-lock the chain, the same reason fishing.ts states for the
+// once-ever Codfather catch. Ratified 2026-09-01 as
+// qr-19-qprofintro-overflow-grant; the resulting over-capacity bag is visible,
+// since the bag counter paints used over capacity.
 //
 // `src/sim`-pure: no DOM/Three/render-ui-game-net imports, no Math.random/
 // Date.now (enforced by tests/architecture.test.ts). This module draws NO rng.

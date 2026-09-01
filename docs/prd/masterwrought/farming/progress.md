@@ -2223,7 +2223,9 @@ Agent tool with the SendMessage-first line, all delivered first try):
   bags-received arm).
 - SHOULD-FIX ledgered, not fixed: the (bg) faucet has no terminator while
   (bn) stands (security lane); the requiredItems grant bypasses bag
-  capacity (pre-existing q_prof_intro template, visible as 17/16); the
+  capacity (pre-existing q_prof_intro template, visible as 17/16; RATIFIED
+  2026-09-01 by qr-19-qprofintro-overflow-grant, and the path is now named in
+  the src/sim/bags.ts capacity doctrine header); the
   map_doc farmer flag; the tier 3/4 gap above.
 - NICE-TO-HAVE ledgered: the guide's "Shift+K" without "by default" (a
   translated-key reword, release fill); the WCAG label-in-name aria

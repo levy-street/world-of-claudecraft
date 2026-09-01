@@ -547,7 +547,7 @@ closed-by-X.
 | Gathering wiki tools note: five stale non-Latin fills after an English reword (`guide.profPages.toolsNoteThreeRods`) | P11j QA | maintainer | open ruling-owed. The masterwrought Phase 11j QA corrected the English of the note that renders above the tool table on EVERY gathering page, because on the FARMING page it said each land trade has two crafted tools, that every character knows the land recipes (all four hoe rungs are `acquisition: ['trainer']`), and that the land trades' top tools buy no access (planting a tier-N bed needs a tier-N hoe). Corrected in the English catalog only, per the contributor rule that a contributor never edits `src/ui/i18n.locales/`. THE EXPOSURE IS THAT NO GATE CAN SEE IT: a reword leaves a translated row translated, so `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN` and `zh_TW` still carry the retired claims and M16 stays green. Either re-fill those five at release or rule that the key is re-keyed so the pending machinery catches it. The fifteen Latin locales were pending and were re-English-filled by the regen |
 | ONLINE_WORLD_LAYOUT_VERSION epoch bump at farming go-live (dated note 2026-08-30: the epoch has since moved repeatedly and reads 26 after the eighth v0.41.0 sync, which renumbered the branch's 12 past the release's raid ladder 13 to 25; the go-live question this row records stands unchanged) | 19th absorb | maintainer | open ruling-owed |
 | renderer.ts exact-count ceiling re-pin (13774) prepared for feature review | 19th absorb | maintainer | CLOSED 2026-09-01 by qr-19-monolith-ceiling-repin, widened to cover hud.ts: the exact-count posture is KEPT and no margin is minted (root CLAUDE.md's ratchet: never grow a coordinator, extract then lower, and a raise is a maintainer decision). Figure amended in the same ruling rather than rewritten: 13774 is stale; at the Phase 19 close renderer.ts pins 13023 against a file of 13020 and hud.ts pins 18728 against 18708, so the slack is three and twenty lines, not zero. |
-| q_prof_intro requiredItems overflow grant on a full bag (17/16 visible) | P9 QA | maintainer | open ruling-owed |
+| q_prof_intro requiredItems overflow grant on a full bag (17/16 visible) | P9 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-qprofintro-overflow-grant (Phase 19, under qr-19-best-for-project): the template bypass is RATIFIED as shipped and the fallback grant is named in the src/sim/bags.ts capacity doctrine header beside the other deliberately ungated paths. |
 | Journey script joins the gate when the merged Masterwrought PR ships (reworded at the 11b absorb: D22 is superseded, delivery is the one Masterwrought PR, and the script stays off CI until that ships) | P9b QA | maintainer | open ruling-owed |
 | Tier-4-to-tier-1 wellfed downgrade legibility (buff hover is the one surface) | P11 QA | maintainer | open ruling-owed (optional) |
 | (bq) residual: online pendingSend stranding on a silently dropped command (spectate/reconnect), family-consistent | P9b QA | maintainer | open ruling-owed (optional) |
@@ -4084,6 +4084,38 @@ question does not arise (farming has no station).
   family, swept at the Phase 13 art batch when the set moves anyway);
   nearFarmerNpc walks the whole radius after the answer (cosmetic).
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as near-farmer-scan-early-exit.
+  RULED (qr-19-qprofintro-overflow-grant, 2026-09-01, under
+  qr-19-best-for-project): the q_prof_intro template's capacity bypass is
+  RATIFIED as shipped and no grant path moves. Verified live rather than taken
+  from the record: finalizeQuestAccept and its giver-talk twin
+  regrantMissingQuestItems both force-add every questFallbackGrants id through
+  ctx.addItem with no fit pre-check (src/sim/quests/quest_commands.ts),
+  Sim.addItem goes straight to addStacked, and addStacked's own contract states
+  that it applies NO capacity cap because capacity is a pre-check concern. The
+  same file gates the turn-in reward with countFit plus bagsFullError, so the
+  asymmetry is deliberate rather than missed. It is also the shipped house
+  shape: the once-ever Codfather catch in src/sim/professions/fishing.ts is
+  force-added under a comment saying that losing it to full bags could
+  soft-lock the quest chain, and the fallback grant carries the identical
+  reason. THE SEEDED BLAST RADIUS WAS UNDERSTATED and is corrected here rather
+  than rewritten: a capacity gate would be a quest-template rule change
+  reaching NINE requiredItems quests, not the six the read implied, and five of
+  them sit in zone 1 (q_prof_intro, q_farm_intro, q_prof_attune_smith,
+  q_prof_attune_bombardier, q_prof_hobby_switch, plus q_deepfen_purge,
+  q_nythraxis_bound_guardian and the Proving Shore tutorial's ps_briny_lure and
+  ps_passing_stone). It would trade an over-capacity bag the player can drain
+  for a dead end a day-one character cannot. The overflow is visible, not
+  silent: the bag counter takes the over class whenever used exceeds capacity
+  (src/ui/bags_window.ts), so the player reads 17/16 when one of the two items
+  is missing (the ordinary re-talk case, since planting spends the seed) and
+  18/16 only on a cold accept that owes both. WHAT IS OWED, and it is the whole
+  diff: the capacity doctrine header in src/sim/bags.ts enumerates the
+  deliberately ungated grant paths (need/greed, master loot, delve end-of-run
+  rewards, dev gives) and does not name this one, so its absence reads as an
+  oversight; the header gains the quest requiredItems fallback grant on accept
+  and on giver re-talk, carrying that soft-lock reason, plus a pointer at the
+  finalizeQuestAccept grant site. Comments only: no behavior, no pin, no t()
+  key, no parity golden and no ceiling moves.
   Phase 9b QA (2026-08-19, PASS-WITH-FOLLOWUPS; branch
   fix/farming-phase-09b-qa, merge hash in progress.md):
   (bq) THE ERROR-TOAST RE-ARM (a refinement of the husk-trade feedback
