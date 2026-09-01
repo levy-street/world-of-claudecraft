@@ -3,6 +3,7 @@
 // headroom extraction); the Hud keeps a thin wrapper passing this deps bag.
 // The hooks shape mirrors hud.ts's ReportHooks structurally so this module
 // never imports the coordinator.
+import { markDialogRoot } from './dialog_root';
 import { esc } from './esc';
 import { t } from './i18n';
 import { svgIcon } from './ui_icons';
@@ -68,11 +69,18 @@ export function openReportWindow(
   target: { pid?: number; name: string },
 ): void {
   if (!deps.reportHooks()) return;
+  // A RE-OPEN OVER AN OPEN WINDOW IS A CLOSE FIRST, and it is reachable:
+  // Hud.closeOtherWindows no longer closes siblings (it clears the context
+  // menu and the tooltip), and both open sites are context-menu actions, so
+  // reporting a second player while the window stands re-enters here. Without
+  // this the first open's trap is never released and its opener is dropped,
+  // which would make the close() docblock below simply untrue.
+  if (openState) closeReportWindow();
   deps.closeOtherWindows('#report-window');
   const { pid, name } = target;
   const el = $('#report-window');
   el.innerHTML = `
-    <div class="panel-title"><span>${esc(t('hud.report.title', { name }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.report.cancel'))}" title="${esc(t('hud.report.cancel'))}">${svgIcon('close')}</button></div>
+    <div class="panel-title"><span id="report-title">${esc(t('hud.report.title', { name }))}</span><button type="button" class="x-btn" data-close aria-label="${esc(t('hud.report.cancel'))}" title="${esc(t('hud.report.cancel'))}">${svgIcon('close')}</button></div>
     <label class="report-label" for="report-reason">${esc(t('hud.report.reason'))}</label>
     <div id="report-reason-slot" aria-describedby="report-error"></div>
     <label class="report-label" for="report-details">${esc(t('hud.report.details'))}</label>
@@ -83,6 +91,14 @@ export function openReportWindow(
       <button class="btn" type="button" data-close>${esc(t('hud.report.cancel'))}</button>
     </div>`;
   el.style.display = 'block'; // centred by the shared .window rule
+  // The trap's other half (src/ui/CLAUDE.md pairs them): a window that holds
+  // Tab must also carry role=dialog and exactly ONE accessible name, or a
+  // screen reader cycles its user inside an unnamed generic container. The
+  // title span the markup above just minted is that name.
+  // modal is left at its default false, like the sibling windows: this root
+  // traps Tab but does not inert the page, and aria-modal=true would tell a
+  // screen reader the rest of the page is unavailable when it is not.
+  markDialogRoot(el, { labelledBy: 'report-title' });
   // AFTER the display flip and after closeOtherWindows, matching the family:
   // an earlier capture would record whatever the window we just closed handed
   // focus back to rather than this window's own opener.

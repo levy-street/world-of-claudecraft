@@ -1738,6 +1738,9 @@ export class Hud {
   // never installed the shared Tab trap or returned focus to its opener: the
   // same train/unbind shape, added here so it stops being the exception.
   private readonly craftingWindowFocus = this.windowFocus('#crafting-window');
+  // ONE bridge for the Hud's lifetime, like every other window's: a per-open
+  // one has a null handle every time, so it orphans the previous trap.
+  private readonly reportWindowFocus = this.windowFocus('#report-window');
   private craftingOpenerFocus: HTMLElement | null = null;
   // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
@@ -15699,8 +15702,9 @@ export class Hud {
   // focus system entirely: absent from every windowFocus(rootSel) call site and
   // not one of the two documented opt-outs (#bags and #bank-window, which pair
   // with a second window and must stay Tab-passable), so it had no Tab trap and
-  // no return-to-opener. It is not the last one out (vendor, crafting, trade,
-  // map and report still are); it is the one that became REACHABLE, because
+  // no return-to-opener. It was not the last out (vendor, trade and map still
+  // are; crafting joined at #2525, report at qr-19-report-window-focus-trap-carveout);
+  // it is the one that became REACHABLE, because
   // #2500 stopped the panel rebuilding itself twice a second and focus started
   // surviving long enough for the missing hand-back to matter.
   private readonly townFocusWindowFocus = this.windowFocus('#town-focus-window');
@@ -18309,7 +18313,7 @@ export class Hud {
           this.buildDropdown(options, current, onChange, placeholder, a11y),
         log: (text, color) => this.log(text, color),
         localizeReportError: (err) => this.localizeReportError(err),
-        ...this.windowFocus('#report-window'),
+        ...this.reportWindowFocus,
       },
       target,
     );

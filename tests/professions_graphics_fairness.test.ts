@@ -32,11 +32,11 @@ import { readFileSync } from 'node:fs';
 import type * as THREE from 'three';
 import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
-import { AURA_VISIBLE_CAP_FULL, auraVisibleCap } from '../src/game/ui_tier_knobs';
+import { auraVisibleCap } from '../src/game/ui_tier_knobs';
 import { resolveFarmPlotVisual } from '../src/render/farm_patches_core';
 import { buildGatherNodes } from '../src/render/gather_nodes';
 import { NODE_TIER_SCALE_STEP, nodeTierScale } from '../src/render/gather_nodes_lookup';
-import { GATHER_NODES } from '../src/sim/data';
+import { GATHER_NODES, ITEMS } from '../src/sim/data';
 import { WELL_FED_AURA_ID } from '../src/sim/wellfed';
 import { terrainHeight } from '../src/sim/world';
 import { ALWAYS_VISIBLE_AURA_IDS, selectShedSlots } from '../src/ui/aura_overflow_priority';
@@ -291,10 +291,16 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
   // preset's eight slots permanently and set a precedent every flask and raid
   // buff could claim.
 
-  // The apex plate payload. The farm buff dishes run 600, both an order of
-  // magnitude past the short-buff priority bar, which is what puts Well Fed in
-  // the bucket the cap sheds FIRST.
-  const WELL_FED_APEX_DURATION_SEC = 900;
+  // DERIVED from the shipped catalog, never hand-copied: a hand-typed 900
+  // would leave this whole block silently true if the apex plates were ever
+  // retuned SHORT, at which point Well Fed would no longer be in the bucket
+  // the cap sheds first and the arms below would be pinning a hypothetical.
+  // wellFed lives on the FOOD arm of the ItemDef union by design (types.ts), so
+  // the narrowing is the kind check rather than a cast.
+  const WELL_FED_DURATIONS_SEC = Object.values(ITEMS)
+    .map((item) => (item.kind === 'food' ? item.wellFed?.duration : undefined))
+    .filter((d): d is number => d !== undefined);
+  const WELL_FED_APEX_DURATION_SEC = Math.max(...WELL_FED_DURATIONS_SEC);
 
   /** A plain slot fixture; only the fields selectShedSlots reads ever vary. */
   const auraSlot = (over: Partial<AuraSlotState> & { key: string }): AuraSlotState => ({
@@ -316,10 +322,12 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
   });
 
   it('COSMETIC: a 900 second Well Fed sheds under the cap; a debuff and an exempt id never do', () => {
-    // Derived from the shipped threshold rather than asserted by hand, so
-    // moving SHORT_BUFF_PRIORITY_SEC past the food durations reds this arm
-    // instead of leaving it quietly true.
+    // BOTH sides derived, the threshold and the duration, so this reds if
+    // either moves: a longer short-buff bar, or a shorter apex plate.
+    expect(WELL_FED_DURATIONS_SEC.length).toBeGreaterThanOrEqual(7);
     expect(isShortDurationBuff(WELL_FED_APEX_DURATION_SEC)).toBe(false);
+    // Every well-fed food, not only the longest, sits in the shed bucket.
+    for (const d of WELL_FED_DURATIONS_SEC) expect(isShortDurationBuff(d)).toBe(false);
     expect(ALWAYS_VISIBLE_AURA_IDS.has(WELL_FED_AURA_ID)).toBe(false);
     const exemptId = [...ALWAYS_VISIBLE_AURA_IDS][0];
     const slots: AuraSlotState[] = [
@@ -363,8 +371,14 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     // on, scoped to that one painter instance, so a player who would rather pay
     // the per-frame cost never loses an icon at all. That opt-out plus the
     // honest plus-N badge are why the shed is upkeep rather than a hidden fact.
-    expect(auraVisibleCap('low')).toBeLessThan(AURA_VISIBLE_CAP_FULL);
-    expect(auraVisibleCap('ultra')).toBe(AURA_VISIBLE_CAP_FULL);
+    // SHAPE, not self. `auraVisibleCap` RETURNS these constants, so comparing
+    // its result to them (or to AURA_VISIBLE_CAP_FULL, which is Infinity and
+    // swallows any finite value under toBeLessThan) asserts nothing. The cap's
+    // VALUE is pinned once, in tests/ui_tier_knobs.test.ts; what this arm owns
+    // is that low is finite enough to bite while ultra is not capped at all,
+    // and the two selectShedSlots calls below are its real content.
+    expect(Number.isFinite(auraVisibleCap('low'))).toBe(true);
+    expect(auraVisibleCap('ultra')).toBe(Number.POSITIVE_INFINITY);
     const slots: AuraSlotState[] = Array.from({ length: 20 }, (_, i) => auraSlot({ key: `b${i}` }));
     const shed: boolean[] = [];
     expect(selectShedSlots(slots, slots.length, auraVisibleCap('ultra'), shed)).toBe(0);

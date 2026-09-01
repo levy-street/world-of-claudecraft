@@ -155,12 +155,15 @@ function readPanelIds(html: string): string[] {
   return ids;
 }
 
-// The two populations on the day this was written. They are equal by coincidence, not by
-// construction (37 cases = 34 markup panels with a case + 3 code-built; 37 markup ids = those
-// 34 + the 3 without one), so they get two names and must be bumped independently.
-// Re-measured against the live switch at the Masterwrought Phase 19B close: it had drifted
-// SEVEN under, which is exactly the hiding room a floor sitting below the real count buys.
-const CASE_COUNT = 48; // +1: the report window (Masterwrought Phase 19B, D111)
+// The two populations are related but not equal, and they must be bumped independently: the
+// case list counts markup panels that have a case PLUS the code-built ones (five today, see
+// CODE_BUILT), while the markup list counts every `.window.panel` id in either shell,
+// including the ones deliberately excused below.
+// Both were RE-MEASURED against the live tree at the Masterwrought Phase 19B close, where the
+// case floor had drifted SEVEN under: 41 at the tip before this wave, 48 with D111's report
+// window arm. A floor sitting below the real count is exactly the room a case needs to leave
+// unnoticed, which is what the comment above the assertion warns about.
+const CASE_COUNT = 48;
 const MARKUP_COUNT = 38;
 
 const closeSwitch = readCloseManagedWindowSwitch(hudTs);

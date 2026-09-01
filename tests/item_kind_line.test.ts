@@ -154,7 +154,10 @@ describe('the farm fine produce kind line', () => {
       expect(itemKindLabel('junk', id), id).toBe('Fine Material');
       const html = tooltipHtml(id);
       expect(html, id).toContain('Fine Material');
-      expect(html, id).not.toMatch(/(?<!Fine )\bJunk\b/);
+      // The plain refusal is what is meant: "Fine Junk" is a string the label
+      // resolver cannot produce, so the lookbehind the older arms carry would
+      // only weaken this one.
+      expect(html, id).not.toMatch(/\bJunk\b/);
     }
   });
 

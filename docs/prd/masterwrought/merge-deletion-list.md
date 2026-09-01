@@ -2020,6 +2020,7 @@ authors a new name appends its rows in the same change.
 | Class | Name | Phase | Ruling | Reason |
 |---|---|---|---|---|
 | exports | `FARM_FINE_PRODUCE_ITEM_IDS` | 19B | qr-19-farm-fine-produce-kind-label | the twelve farm fine twins derived off the crop catalog, the membership the tooltip kind line reads so a farm twin prints "Fine Material" beside the nine ore, log and herb fine grades; deliberately a SEPARATE set from FARM_MATERIAL_ITEM_IDS (which also carries the seeds, the base produce, the husks and the two knob supplies, so an arm over it would label a seed) and deliberately NOT a MATERIAL_GRADES widening, since materialGradeIds walks that table alone and a twin inside it would begin satisfying a recipe asking for base produce (src/sim/content/farm_crops.ts) |
+| exports | `closeReportWindow` | 19B | qr-19-report-window-focus-trap-carveout | the report window's one close path, so the two [data-close] handlers, the submit success and Hud.closeManagedWindow all release the shared focus trap and return focus to the opener instead of the bare hide the window used to fall to; the export is what lets the coordinator's `case 'report-window':` arm reach it without the module importing Hud (src/ui/report_window.ts) |
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 

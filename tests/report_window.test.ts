@@ -8,6 +8,8 @@
 // routing, the failure re-enable with the localized error line, and the close
 // paths. Copy pins are LITERAL English (never t() compared to t()).
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   closeReportWindow,
@@ -243,6 +245,83 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
     // would strand the trap released over a still-open window.
     expect(el.style.display).toBe('block');
     expect(restoreFocus).not.toHaveBeenCalled();
+    // The POSITIVE half: not-released is only meaningful if the arm is still
+    // live, so prove the state survived by closing and watching it fire with
+    // the opener this open recorded.
+    closeReportWindow();
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
+    expect(restoreFocus).toHaveBeenCalledWith(opener);
+  });
+
+  it('hud.ts arms the bridge on THIS window root, and once for the Hud lifetime', () => {
+    // The behavioural arms above all drive a FAKE bridge, so a typo in the
+    // root selector would leave every one of them green while the shipped trap
+    // armed on nothing. Source-pinned in the shape the sibling windows use
+    // (tests/deeds_window.test.ts, tests/reliquary_window.test.ts).
+    // process.cwd() is the worktree root under vitest; import.meta.url is not
+    // a file URL in the happy-dom env this suite runs in.
+    const hud = readFileSync(join(process.cwd(), 'src/ui/hud.ts'), 'utf8');
+    expect(hud).toContain(
+      "private readonly reportWindowFocus = this.windowFocus('#report-window');",
+    );
+    expect(hud).toContain('...this.reportWindowFocus,');
+    // A per-open bridge defeats makeWindowFocus's own defensive release, so
+    // the field form is the contract, not a style choice.
+    expect(hud).not.toContain("...this.windowFocus('#report-window')");
+  });
+
+  it('marks the root a dialog named by its own title (the trap contract other half)', () => {
+    open({ submit: vi.fn().mockResolvedValue(undefined) });
+    expect(el.getAttribute('role')).toBe('dialog');
+    expect(el.getAttribute('aria-labelledby')).toBe('report-title');
+    expect(el.querySelector('#report-title')?.textContent).toBe('Report Rega');
+    // Exactly ONE accessible name: aria-labelledby shadows aria-label, so a
+    // root must never carry both (src/ui/dialog_root.ts).
+    expect(el.hasAttribute('aria-label')).toBe(false);
+    // Not inert: this root traps Tab but leaves the page available.
+    expect(el.getAttribute('aria-modal')).toBe('false');
+  });
+
+  it('captures AFTER the display flip and AFTER closeOtherWindows, not before', () => {
+    // Ordering is the whole reason the recorded opener is meaningful: capturing
+    // earlier would record whatever the window we are closing hands focus back
+    // to, and capturing before the flip would read a hidden root.
+    let displayAtCapture = '';
+    captureFocus.mockImplementation(() => {
+      displayAtCapture = el.style.display;
+      return opener;
+    });
+    open({ submit: vi.fn().mockResolvedValue(undefined) });
+    expect(displayAtCapture).toBe('block');
+    expect(closeOtherWindows.mock.invocationCallOrder[0]).toBeLessThan(
+      captureFocus.mock.invocationCallOrder[0],
+    );
+  });
+
+  it('a RE-OPEN over an open window releases the first trap and returns its opener', () => {
+    // The one transition every other arm skips, and the one the per-open focus
+    // bridge got wrong: Hud.closeOtherWindows does not close siblings, so
+    // reporting a second player while the window stands re-enters open().
+    // Without a close first, the first trap is orphaned and its opener lost.
+    open({ submit: vi.fn().mockResolvedValue(undefined) });
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    const second = document.createElement('button');
+    document.body.appendChild(second);
+    captureFocus.mockReturnValue(second);
+    openReportWindow(
+      makeDeps(() => ({ submit: vi.fn().mockResolvedValue(undefined) })),
+      { pid: 9, name: 'Bram' },
+    );
+    // Exactly one outstanding trap: the first was released, to its OWN opener.
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
+    expect(restoreFocus).toHaveBeenCalledWith(opener);
+    expect(captureFocus).toHaveBeenCalledTimes(2);
+    expect(el.style.display).toBe('block');
+    expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Bram');
+    // And the SECOND open's opener is what the eventual close returns to.
+    closeReportWindow();
+    expect(restoreFocus).toHaveBeenCalledTimes(2);
+    expect(restoreFocus).toHaveBeenLastCalledWith(second);
   });
 
   it('the exported close() is the one Hud.closeManagedWindow calls, and is idempotent', () => {
