@@ -308,7 +308,7 @@ describe('saveCharacterState lease fence', () => {
     dbMock.connect.mockReset();
   });
 
-  it('fences the write in ONE UPDATE (holder + nonce), with no separate SELECT pre-check', async () => {
+  it('fences the write in ONE UPDATE (holder + nonce), and takes the row lock first (D145)', async () => {
     const client = checkedOutClient(1);
     dbMock.connect.mockResolvedValueOnce(client as any);
 
@@ -318,13 +318,25 @@ describe('saveCharacterState lease fence', () => {
     const stmts = client.query.mock.calls.map((c) => String(c[0]));
     const updates = stmts.filter((s) => /UPDATE characters/i.test(s));
     // Exactly one character write, and the lease check EXISTS-fences it in the SAME
-    // statement. A check-then-write pair would race a same-account takeover that
-    // steals the lease between the SELECT and the UPDATE.
+    // statement. A lease check-then-write pair would race a same-account takeover
+    // that steals the lease between the SELECT and the UPDATE.
     expect(updates).toHaveLength(1);
     expect(updates[0]).toContain('EXISTS');
     expect(updates[0]).toContain('character_leases');
-    // No standalone SELECT statement (the EXISTS subquery rides inside the UPDATE).
-    expect(stmts.some((s) => /^\s*SELECT/i.test(s))).toBe(false);
+    // The LEASE FENCE still rides the UPDATE, never a separate lease check: no
+    // standalone SELECT touches character_leases. D145
+    // (qr-19-live-nonce-fence-write-loss) DOES add one standalone statement, the
+    // characters row lock, taken FIRST so the fence's uncorrelated InitPlan is
+    // evaluated with the row already held; it is a row LOCK, not a lease check.
+    const selects = stmts.filter((s) => /^\s*SELECT/i.test(s));
+    expect(selects.every((s) => !/character_leases/i.test(s))).toBe(true);
+    const lockIdx = stmts.findIndex((s) => /FROM characters\b/i.test(s) && /FOR UPDATE/i.test(s));
+    const updateIdx = stmts.findIndex((s) => /UPDATE characters/i.test(s));
+    expect(
+      lockIdx,
+      'the characters row lock must precede the fenced UPDATE',
+    ).toBeGreaterThanOrEqual(0);
+    expect(lockIdx).toBeLessThan(updateIdx);
     // holder + nonce are bound into that one fenced statement.
     const updateCall = client.query.mock.calls.find((c) => /UPDATE characters/i.test(String(c[0])));
     expect(updateCall?.[1]).toEqual([42, 7, expect.any(String), PROCESS_LEASE_HOLDER, 'nonce-1']);
