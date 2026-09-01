@@ -943,6 +943,12 @@ describe('corpse signed-guard capacity vs merge room (#2139)', () => {
     // such family on one corpse could have its reservation consumed by the
     // first family's signed land and push one slot past capacity. This guard
     // makes that content shape a loud failure instead of a silent overflow.
+    // RULED (qr-19-capacity-pregate-candidate-refusals, 2026-09-01, under
+    // qr-19-best-for-project): the premise is RATIFIED as a capacity-safety
+    // guarantee, and the two spread candidates it refused (dune_troll for
+    // tusk, frostmane_yeti for horn) keep their shipped substitutes instead
+    // of the pre-gate being relaxed. See docs/prd/masterwrought/state.md,
+    // the Phase 11m ledger, DEVIATIONS deviation (c).
     const specimenless = new Set(
       Object.keys(HARVEST_COMPONENT_ITEMS).filter((tag) => !(tag in HARVEST_COMPONENT_SPECIMENS)),
     );
