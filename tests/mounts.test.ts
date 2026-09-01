@@ -1318,6 +1318,117 @@ describe('mount + form/ghost_wolf interaction', () => {
   });
 });
 
+// "Stealth horse": mounting while stealthed used to leave the Duskveil aura active,
+// so a rider stayed concealed (shrunk detection radius, invisible to duel opponents
+// per canObserveEntity in server/game.ts) while ALSO gaining the mount's speed bonus,
+// an invisible-and-fast combination no duel opponent could pin down. Real MMOs prevent
+// this by having mounting break stealth outright; this suite pins that fix the same
+// way the form/ghost_wolf suite above pins its cancellation.
+describe('mount + stealth interaction (stealth horse fix)', () => {
+  // Helper: give the player the real Duskveil stealth aura directly (bypasses cast
+  // gates), matching src/sim/content/classes.ts `stealth` ability's effect exactly.
+  function putInStealth(sim: Sim, pid: number): void {
+    const e = sim.entities.get(pid)!;
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+  }
+
+  function giveReins(sim: Sim, pid: number): void {
+    sim.addItem('reins_valorsteed', 1, pid);
+  }
+
+  it('starting a mount summon breaks stealth', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(true);
+    expect(e.stealthed).toBe(true);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    // Stealth is gone the instant the summon starts: no window where the rider is
+    // both concealed and accelerating toward mount speed.
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
+    const removal = events.find(
+      (ev) => ev.type === 'aura' && ev.targetId === pid && !ev.gained && ev.name === 'Duskveil',
+    );
+    expect(removal).toBeDefined();
+  });
+
+  it("once mounted, full mount speed applies with no lingering stealth slow (the exploit's speed half)", () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+
+    ride(sim, pid, 'valorsteed');
+
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.stealthed).toBe(false);
+    // Full valorsteed speed (1.6): the exploit combined the stealth slow (0.5) with the
+    // mount bonus (1.6) into a 0.8 apparent multiplier while STILL fully concealed; with
+    // stealth broken there is nothing left riding along with the mount speed.
+    expect(moveSpeedMult(e)).toBeCloseTo(1.6, 5);
+  });
+
+  it('summon completion strips a stealth aura that slipped through mid-channel', () => {
+    const sim = new Sim({
+      seed: 42,
+      playerClass: 'warrior',
+      noPlayer: true,
+      world: VENDOR_TEST_WORLD,
+    });
+    const pid = sim.addPlayer('rogue', 'Shade');
+    sim.tick();
+    sim.setPlayerLevel(20, pid);
+    const meta = sim.players.get(pid)!;
+    meta.ridingTrained = true;
+    sim.addItem('reins_valorsteed', 1, pid);
+    const e = sim.entities.get(pid)!;
+
+    // Start the summon channel (no stealth yet).
+    expect(summonMountItem(sim.ctx, pid, 'valorsteed')).toBe(true);
+    expect(e.mountCastKey).toBe('valorsteed');
+
+    // Inject a stealth aura mid-channel (simulates Duskveil cast during the 1.5s window).
+    e.auras.push({
+      id: 'stealth',
+      name: 'Duskveil',
+      kind: 'stealth',
+      remaining: 3600,
+      duration: 3600,
+      value: 0.5,
+      sourceId: pid,
+      school: 'physical',
+    });
+    e.stealthed = true;
+
+    // Act: complete the summon channel (drives updateMountTransition to completion).
+    finishTransition(sim, pid);
+
+    // Assert: the player is mounted AND stealth is gone.
+    expect(e.mountKey).toBe('valorsteed');
+    expect(e.auras.some((a) => a.kind === 'stealth')).toBe(false);
+    expect(e.stealthed).toBe(false);
+  });
+});
+
 describe('riding skill gate (Req 5)', () => {
   it('blocks toggleMount when ridingTrained is absent', () => {
     const sim = makeWorld();
