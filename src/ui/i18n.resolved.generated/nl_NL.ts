@@ -8586,6 +8586,7 @@ export const nl_NL: EnTranslations = {
     "connectingRealm": "Verbinden met wereld...",
     "assetsFailed": "Laden van assets mislukt: probeer opnieuw te laden. {error}",
     "rendererFailed": "Kon de renderer niet starten: probeer opnieuw te laden. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Kon de wereld niet betreden. De verbinding is verlopen. Draait de gameserver?",
     "connectionLost": "De verbinding met de server is verbroken.",
     "reconnectingAttempt": "Verbinding verbroken. Opnieuw verbinding maken... (poging {attempt}/{maxAttempts}, opnieuw proberen over {seconds}s)",

@@ -7,9 +7,7 @@ describe('fused output and grade shader', () => {
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
     const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');
     const bloomSampleAt = shader.indexOf('vec4 bloom = texture(tBloom, inputUv);');
-    const bloomBlendAt = shader.indexOf(
-      'outputColor.rgb = quantizeHalf(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a));',
-    );
+    const bloomBlendAt = shader.indexOf('outputColor.rgb = quantizeHalf(');
     const toneMapAt = shader.indexOf('outputColor.rgb = ACESFilmicToneMapping(outputColor.rgb);');
     const srgbAt = shader.indexOf('outputColor = sRGBTransferOETF(outputColor);');
     const halfAt = shader.indexOf('vec3 c = quantizeHalf(outputColor.rgb);');
@@ -97,7 +95,11 @@ describe('fused output and grade shader', () => {
     // UNSIGNED_BYTE direct-to-canvas tiers clamp it away. Some drivers (ANGLE's
     // OpenGL backend with NVIDIA on Linux) emit those NaNs from the IBL/PBR path,
     // so OutputGradePass must scrub NaN out of BOTH the beauty read and the
-    // (already blur-spread) bloom read. Losing either scrub brings the black back.
+    // (already blur-spread) bloom read, on the bloom ADDEND itself: scrubbing
+    // only the sum turns a NaN bloom tap into `beauty + NaN`, which is NaN
+    // again, and the sum-sanitize would then rewrite the WHOLE pixel to 0
+    // instead of just dropping the bloom contribution. Losing either scrub
+    // brings the black back.
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
     expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
     const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
@@ -110,6 +112,30 @@ describe('fused output and grade shader', () => {
     expect(bloomScrubAt).toBeGreaterThan(-1);
     expect(toneMapAt).toBeGreaterThan(beautyScrubAt);
     expect(toneMapAt).toBeGreaterThan(bloomScrubAt);
+  });
+
+  it('caps a stray +/-Infinity at the beauty target own half-float max before the SUM reaches quantizeHalf', () => {
+    // sanitizeFinite's NaN check alone deliberately lets Infinity and any
+    // runaway-but-finite value through; ACES (and every other selectable
+    // curve) internally divides two quantities that both diverge together on
+    // a uniformly-infinite input, the Infinity/Infinity indeterminate form,
+    // for v = +Inf AND v = -Inf alike, which is NaN again downstream of this
+    // sanitizer where nothing scrubs it a second time. clamp(...) on BOTH
+    // bounds closes that on both signs, while keeping the clamp floor well
+    // clear of the pre-existing legitimate negative-value passthrough (nothing
+    // real sits anywhere near -65504). The SUM of the beauty and bloom terms
+    // must be sanitized IN ADDITION TO the addend (see the NaN test above, a
+    // separate invariant): two terms independently capped at 65504 can still
+    // add to 131008, which packHalf2x16 cannot represent and rounds to
+    // +Infinity, reopening the exact hole this pin exists to keep shut. Never
+    // one scrub instead of the other.
+    const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
+    expect(shader).toContain('return clamp(finite, vec3(-65504.0), vec3(65504.0));');
+    expect(shader).not.toContain('clamp(finite, vec3(0.0), vec3(65504.0))');
+    expect(shader).not.toContain('return min(finite, vec3(65504.0));');
+    expect(shader).toContain(
+      'sanitizeFinite(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a))',
+    );
   });
 
   it('only calls tonemapping functions the installed three chunk defines', () => {

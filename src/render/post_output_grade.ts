@@ -59,12 +59,29 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
   // Linux). Every NaN comparison is false, so the (x < 0.0 || x >= 0.0) test
   // keeps finite and infinite values and rewrites only NaN to zero. This must
   // stay on the beauty AND the bloom read, since the blur already spread the NaN.
+  //
+  // A literal +/-Infinity is a SEPARATE hazard the check above deliberately
+  // lets through (Infinity >= 0.0 and -Infinity < 0.0 are both true): ACES and
+  // every other curve this pass can select compute their own internal ratio of
+  // two quantities that both diverge together on a uniformly-infinite input
+  // (v = +Inf AND v = -Inf drive the same Infinity/Infinity indeterminate form),
+  // which is NaN again, downstream of this sanitizer where nothing scrubs it a
+  // second time. Clamping BOTH bounds at the beauty target's own max finite
+  // magnitude (RGBA16F's ceiling, 65504) keeps every real HDR highlight this
+  // pipeline already renders untouched (none of them are within orders of
+  // magnitude of that ceiling, on either sign) and keeps every legitimate
+  // negative/near-zero value passing the check above exactly as before (nothing
+  // real sits anywhere near -65504), while turning a stray +/-Infinity into the
+  // same deterministic, clean saturation an ordinary very bright or very dark
+  // pixel gets, instead of the undefined per-driver outcome an internal NaN
+  // produces.
   vec3 sanitizeFinite(vec3 v) {
-    return vec3(
+    vec3 finite = vec3(
       (v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0,
       (v.y < 0.0 || v.y >= 0.0) ? v.y : 0.0,
       (v.z < 0.0 || v.z >= 0.0) ? v.z : 0.0
     );
+    return clamp(finite, vec3(-65504.0), vec3(65504.0));
   }
 
   // The display-referred image this pass grades: one scene sample with bloom
@@ -77,8 +94,21 @@ export const OUTPUT_GRADE_FRAGMENT_SHADER = /* glsl */ `
     outputColor.rgb = sanitizeFinite(outputColor.rgb);
 
     #ifdef BLOOM_PREPARED
+      // Sanitize the bloom addend AND the sum: the blur already smeared any
+      // NaN in the beauty target across every bloom mip, so a NaN bloom tap
+      // must be scrubbed here too, before it reaches the sum. Skipping this
+      // scrub turns a NaN bloom tap into beauty + NaN, which is NaN again,
+      // and the sum-sanitize below rewrites the WHOLE pixel to 0 instead of
+      // just dropping the bloom contribution. Sanitizing the sum on top of
+      // that (rather than instead of it) is still required: outputColor.rgb
+      // is already capped at 65504 above, and an equally-capped bloom term
+      // can still add past it (up to 131008), which packHalf2x16 below
+      // cannot represent and rounds to +Infinity, right back to the failure
+      // this pass exists to prevent. Neither scrub substitutes for the other.
       vec4 bloom = texture(tBloom, inputUv);
-      outputColor.rgb = quantizeHalf(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a));
+      outputColor.rgb = quantizeHalf(
+        sanitizeFinite(outputColor.rgb + sanitizeFinite(bloom.rgb * bloom.a))
+      );
     #endif
 
     #ifdef LINEAR_TONE_MAPPING

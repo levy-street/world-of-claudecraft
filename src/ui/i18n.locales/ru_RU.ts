@@ -2069,6 +2069,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': 'Подключение к миру...',
   'loading.assetsFailed': 'Не удалось загрузить ресурсы: попробуйте обновить страницу. {error}',
   'loading.rendererFailed': 'Не удалось запустить рендерер: попробуйте обновить страницу. {error}',
+  'loading.rendererContextLost':
+    '3D-рендерер потерял графический контекст и не смог восстановиться. Попробуйте обновить страницу.',
   'loading.enterTimeout':
     'Не удалось войти в мир. Время подключения истекло. Запущен ли игровой сервер?',
   'loading.connectionLost': 'Соединение с сервером потеряно.',

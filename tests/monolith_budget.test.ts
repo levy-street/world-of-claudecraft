@@ -532,10 +532,20 @@ const MONOLITHS: MonolithRow[] = [
     // repair and auraBarBelowFrame setting: both branches changed main.ts
     // independently, so the merged count is measured directly.
     // Exact merged count, zero headroom.
-    // #3729 removes the auto-face-lock dispatch growth; this candidate also
-    // contains the KTX2, aura placement, and action-bar merges, so the pin
-    // stays on the measured combined file.
-    ceiling: 11520,
+    // Down 11623 -> 11620 on PR #3763's follow-up round: the WebGL
+    // context-recovery callbacks (checkpoint plus console breadcrumbs plus the
+    // fatalOverlay call) moved out into src/game/context_loss_diagnostics.ts,
+    // which also pays for the new webgl-context-stuck checkpoint the round
+    // added.
+    // Re-pinned at the release/v0.42.0 sync merge: the release side's own
+    // /daynight dev-command extraction (to src/game/daynight_dev_command.ts)
+    // landed independently of PR #3763's context-recovery move, so the merged
+    // file is smaller than either parent pin. Exact merged count, zero
+    // headroom.
+    // Re-pinned on the current v0.42 candidate after the action-bar, deed,
+    // window-reflow, controller tutorial, render, and pet merges. Measured on
+    // the merged tree, never reconciled by arithmetic.
+    ceiling: 11518,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

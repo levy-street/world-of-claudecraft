@@ -1969,6 +1969,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': '正在連線至世界...',
   'loading.assetsFailed': '資源載入失敗：請嘗試重新整理。{error}',
   'loading.rendererFailed': '無法啟動渲染器：請嘗試重新整理。{error}',
+  'loading.rendererContextLost': '3D 渲染器遺失了圖形內容，且無法恢復。請嘗試重新整理。',
   'loading.enterTimeout': '無法進入世界。連線已逾時。遊戲伺服器是否正在執行？',
   'loading.connectionLost': '與伺服器的連線已中斷。',
   'loading.reconnectingAttempt':

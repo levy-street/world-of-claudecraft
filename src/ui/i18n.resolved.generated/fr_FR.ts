@@ -8586,6 +8586,7 @@ export const fr_FR: EnTranslations = {
     "connectingRealm": "Connexion au monde...",
     "assetsFailed": "Échec du chargement des ressources: essayez de recharger. {error}",
     "rendererFailed": "Impossible de démarrer le rendu: essayez de recharger. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Impossible d'entrer dans le monde. La connexion a expiré. Le serveur de jeu est-il lancé ?",
     "connectionLost": "La connexion au serveur a été perdue.",
     "reconnectingAttempt": "Connexion perdue. Reconnexion... (tentative de {attempt}/{maxAttempts}, réessais dans {seconds}s)",

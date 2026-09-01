@@ -8586,6 +8586,7 @@ export const en_XA: EnTranslations = {
     "connectingRealm": "[Çóññéçţíñĝ ţó ŵóŕļð...]",
     "assetsFailed": "[Áššéţ ļóáðíñĝ ƒáíļéð: ţŕý ŕéļóáðíñĝ. {error}]",
     "rendererFailed": "[Çóúļð ñóţ šţáŕţ ţĥé ŕéñðéŕéŕ: ţŕý ŕéļóáðíñĝ. {error}]",
+    "rendererContextLost": "[Ţĥé 3Ð ŕéñðéŕéŕ ļóšţ íţš ĝŕáþĥíçš çóñţéẋţ áñð çóúļð ñóţ ŕéçóʋéŕ. Þļéášé ŕéļóáð.]",
     "enterTimeout": "[Çóúļð ñóţ éñţéŕ ŵóŕļð. Ţĥé çóññéçţíóñ ţíɱéð óúţ. Íš ţĥé ĝáɱé šéŕʋéŕ ŕúññíñĝ?]",
     "connectionLost": "[Çóññéçţíóñ ţó ţĥé šéŕʋéŕ ŵáš ļóšţ.]",
     "reconnectingAttempt": "[Çóññéçţíóñ ļóšţ. Ŕéçóññéçţíñĝ... (áţţéɱþţ {attempt}/{maxAttempts}, ŕéţŕýíñĝ íñ {seconds}š)]",

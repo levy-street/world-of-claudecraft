@@ -42,6 +42,8 @@ export const shellStrings = {
       connectingRealm: 'Connecting to world...',
       assetsFailed: 'Asset loading failed: try reloading. {error}',
       rendererFailed: 'Could not start the renderer: try reloading. {error}',
+      rendererContextLost:
+        'The 3D renderer lost its graphics context and could not recover. Please reload.',
       enterTimeout: 'Could not enter world. The connection timed out. Is the game server running?',
       connectionLost: 'Connection to the server was lost.',
       reconnectingAttempt:

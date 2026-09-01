@@ -1968,6 +1968,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': '正在连接服务器...',
   'loading.assetsFailed': '资源加载失败：请尝试刷新。{error}',
   'loading.rendererFailed': '无法启动渲染器：请尝试刷新。{error}',
+  'loading.rendererContextLost': '3D 渲染器丢失了图形上下文，且无法恢复。请尝试刷新。',
   'loading.enterTimeout': '无法进入世界。连接已超时。游戏服务器是否正在运行？',
   'loading.connectionLost': '与服务器的连接已断开。',
   'loading.reconnectingAttempt':

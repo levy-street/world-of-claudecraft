@@ -11747,6 +11747,7 @@ export type TranslationKeyFlat =
   | 'loading.realmFull'
   | 'loading.reconnectingAttempt'
   | 'loading.reconnectingNow'
+  | 'loading.rendererContextLost'
   | 'loading.rendererFailed'
   | 'loading.slowConnection'
   | 'loading.tips.classes'
