@@ -79,6 +79,25 @@ server store always canonical.
    Pinned by `tests/storage_charters.test.ts` (the deed arm); revisit
    deliberately before any deed meter that a paid grant could move joins the
    registry.
+   A second recorded consequence, of retiring a renown-bearing deed to a Feat
+   (the seven `pvp_fiesta_*` deeds, maintainer-vetoable): converting them
+   dropped their renown to 0, which this rule's own scale requires for every
+   Feat, so an existing earner's account Renown total (`recomputeRenown` in
+   `src/sim/deeds.ts`, which re-derives from the live catalog on every load)
+   and their Renown board score (`server/deeds_board.ts`, same re-derivation)
+   both fall by up to 65 on their next login. The ruling is to ALLOW the
+   decrease for a genuine retirement-to-Feat conversion under rule 5: the
+   never-decrease guarantee exists to stop a deed that stays live and
+   obtainable from being re-balanced or nerfed out from under players still
+   earning it, not to freeze a deed's score after the content it measures is
+   gone. The earned RECORD is untouched regardless: the id keeps its `pvp_`
+   prefix rather than moving to `feat_` (an off-prefix feat, the
+   `col_reliquary_complete` precedent), so `PlayerMeta.deedsEarned` never
+   drops it. Pinned by `tests/deeds_content.test.ts` (the `OFF_PREFIX_FEATS`
+   allowlist and the Fiesta-desc arms); revisit deliberately before retiring
+   another renown-bearing deed, and
+   record the account-side fallout (Renown board entry floor and
+   completion-time tie-break, `server/deeds_board.ts`) in the PR that does it.
 3. **Closed trigger vocabulary.** Every trigger is one of the `DeedTrigger`
    kinds in `src/sim/types.ts`: a predicate over persisted state (`level`,
    `lifetimeXp`, `quest`/`quests`, `arenaRating`, `craftSkill`, `gathering`,

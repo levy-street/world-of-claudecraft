@@ -841,18 +841,24 @@ describe('real catalog integration', () => {
     const view = buildDeedsView(
       makeInput({ deeds: DEEDS, order: DEED_ORDER, category: 'progression' }),
     );
-    // 279 deeds - 4 feats - 9 hidden = 268 visible to a fresh character (the
+    // 281 deeds - 11 feats - 9 hidden = 261 visible to a fresh character (the
     // Drakelands brood pair, the four battleground deeds, the Rift coverage
     // pair, the seven per-craft rare-tier profession deeds, the twelve
     // remaining starter-zone chronicle pairs, the four Reliquary Curator rank
     // bridges, the three WARFARE honor ranks, four of the five Phase 18
-    // Reliquary completion-ladder deeds, the walk-in castle visit pair, the
-    // Proving Shore graduation deed, and the five Crucible raid deeds;
-    // col_reliquary_complete is the catalog's one off-prefix feat, so it sits
-    // outside the completion denominator like the three feat_ deeds).
-    expect(view.summary.visibleTotal).toBe(268);
+    // Reliquary completion-ladder deeds, the walk-in castle visit pair, and
+    // the bank socket ladder pair (Bank Storage phase 06) and the Proving
+    // Shore graduation deed, and the five Crucible raid deeds, all non-feat
+    // non-hidden, so all ten join the denominator; col_reliquary_complete and
+    // the seven pvp_fiesta_* deeds
+    // (Fiesta retired from the queueable bracket list) are the catalog's
+    // eight off-prefix feats, so they sit outside the completion denominator
+    // like the three feat_ deeds, marked but still shown on their own shelf
+    // (Collection, PvP and Sport) rather than moved to the Feats shelf).
+    expect(view.summary.visibleTotal).toBe(261);
     // The bucket sum adds the feat-flagged rows back on top (3 on the Feats
-    // shelf plus the off-prefix capstone on Collection).
+    // shelf, the off-prefix capstone on Collection, and the seven off-prefix
+    // Fiesta feats on PvP and Sport).
     expect(view.categories.reduce((n, c) => n + c.visible, 0)).toBe(272);
   });
 
