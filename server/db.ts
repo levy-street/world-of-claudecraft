@@ -3843,7 +3843,7 @@ export async function saveCharacterStateOnClient(
     JSON.stringify(cleanState),
     liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
   );
-  const res = await runFencedCharacterUpdate(client, characterId, stmt);
+  const res = await client.query(stmt.text, stmt.values); // D145-excluded (escrow occupancy invariant, race carried): see runFencedCharacterUpdate JSDoc, qr-19-live-nonce-fence-write-loss
   const saved =
     leaseNonce === undefined && storageEffects.length === 0 && !ledger
       ? true

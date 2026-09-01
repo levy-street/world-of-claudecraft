@@ -187,7 +187,8 @@ export const CHARACTER_SAVE_ROW_LOCK_SQL =
 
 /** Run the character UPDATE with the row lock taken FIRST for a NONCE-fenced live
  *  write, the offline writer's precedent (server/offline_character_save_db.ts)
- *  extended to the four live save paths by qr-19-live-nonce-fence-write-loss
+ *  extended to the THREE DIRECT live save paths (saveCharacterState and its
+ *  market and guild-bank siblings) by qr-19-live-nonce-fence-write-loss
  *  (Phase 19). The live callers pass only `none` or `nonce` fences; the nonce
  *  EXISTS over character_leases is an uncorrelated InitPlan decided BEFORE the row
  *  lock, so the lock (FOR NO KEY UPDATE) is taken first. A `none` fence is an
@@ -198,7 +199,20 @@ export const CHARACTER_SAVE_ROW_LOCK_SQL =
  *  exclusion), and no unleased caller does today. `tx` is the caller's transaction
  *  or pooled client; the lock rides the SAME transaction as the UPDATE, so it
  *  holds until the caller commits. Returns the UPDATE result, so a fence miss
- *  still surfaces as rowCount 0. */
+ *  still surfaces as rowCount 0.
+ *
+ *  The FOURTH live path, db.ts saveCharacterStateOnClient (the marketplace
+ *  escrow / directed / delivered / paid-guild caller), is DELIBERATELY NOT routed
+ *  through this helper and keeps its plain fenced UPDATE with its pre-existing
+ *  InitPlan race. Adding the lock statement there would raise that transaction's
+ *  base workload to six statements, and baseWorkloadCeilingMs
+ *  (ESCROW_STATEMENT_TIMEOUT_MS x 6 + lock + connect) would exceed the autosave
+ *  period the tunables ladder pins as the ceiling (baseWorkloadCeilingMs <
+ *  autosaveMs, tests/server/tunables.test.ts). Closing that path's race is a
+ *  maintainer tuning decision (re-tune ESCROW_STATEMENT_TIMEOUT_MS to fit the
+ *  sixth statement, or accept a higher escrow occupancy); it is CARRIED under
+ *  qr-19-live-nonce-fence-write-loss, and the gate caught the breach the phase
+ *  document's "four live save paths" premise missed. */
 export async function runFencedCharacterUpdate(
   tx: { query: (text: string, values?: unknown[]) => Promise<QueryResult> },
   characterId: number,

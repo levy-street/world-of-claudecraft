@@ -349,16 +349,18 @@ describe('every character write path inherits the signal (the shared chokepoint)
     expect(lockIdx).toBeLessThan(updateIdx);
   });
 
-  it('saveCharacterStateOnClient takes the row lock before the fenced UPDATE (D145)', async () => {
+  it('saveCharacterStateOnClient is EXCLUDED from the D145 row lock (escrow occupancy invariant)', async () => {
+    // This arm's callers are the marketplace escrow and paid guild creation;
+    // adding the D145 row lock there would push their base workload past the
+    // autosave-period occupancy ceiling the tunables ladder pins
+    // (baseWorkloadCeilingMs < autosaveMs). So it keeps its pre-D145 shape: the
+    // fenced UPDATE with no separate row-lock SELECT. The three DIRECT live paths
+    // do take the lock (pinned above and in guild_bank_db.test.ts).
     const client = transactionClient();
     await saveCharacterStateOnClient(client as never, 204, 60, realCharacterState(), 'session-a');
     const statements = client.query.mock.calls.map((call) => String(call[0]));
-    const lockIdx = statements.findIndex(
-      (s) => s.includes('FROM characters') && s.includes('FOR NO KEY UPDATE'),
-    );
-    const updateIdx = statements.findIndex((s) => s.includes('UPDATE characters SET'));
-    expect(lockIdx).toBeGreaterThanOrEqual(0);
-    expect(lockIdx).toBeLessThan(updateIdx);
+    expect(statements.some((s) => s.includes('FOR NO KEY UPDATE'))).toBe(false);
+    expect(statements.some((s) => s.includes('UPDATE characters SET'))).toBe(true);
   });
 
   it('stays silent on all three paths for an ordinary character', async () => {

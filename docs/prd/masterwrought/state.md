@@ -25595,7 +25595,9 @@ carry that argument in its record.
   per save at about 33 saves a second, which is a maintainer call, tabled as
   Phase 19 row D145 with the reproduction and the price.
   RULED (qr-19-live-nonce-fence-write-loss, 2026-09-01, under qr-19-best-for-project):
-  TAKE THE ROW LOCK. The four live save paths now take
+  TAKE THE ROW LOCK. The three DIRECT live save paths (saveCharacterState, the
+  30 s autosave, plus saveCharacterAndMarketState and saveCharacterAndGuildBankState)
+  now take
   SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR NO KEY UPDATE before
   the fenced UPDATE (runFencedCharacterUpdate, server/character_save_statement.ts),
   so the nonce fence's InitPlan is evaluated with the row already held and a nonce
@@ -25611,6 +25613,20 @@ carry that argument in its record.
   The ~33 extra lock acquisitions a second at 1,000 online are on the character's
   own primary-key row the UPDATE locks anyway, taken one statement earlier;
   recorded as the accepted latency cost.
+  PREMISE CORRECTED at the gate (the full suite caught it, the per-unit suites did
+  not): the phase document's "four live save paths" rests on a premise the escrow
+  occupancy invariant FALSIFIES. The fourth path, saveCharacterStateOnClient, is
+  the marketplace escrow / directed / delivered / paid-guild-create caller; adding
+  the row lock there makes its base workload SIX statements, and
+  baseWorkloadCeilingMs = ESCROW_STATEMENT_TIMEOUT_MS x 6 + lock + connect = 31,000
+  exceeds the 30,000 ms autosave period the tunables ladder pins as the ceiling
+  (server/woc_market_db.ts ESCROW_DIRECTED_BASE_WORKLOAD_STATEMENTS,
+  tests/server/tunables.test.ts baseWorkloadCeilingMs < autosaveMs). So
+  saveCharacterStateOnClient is EXCLUDED from the D145 lock and keeps the
+  pre-existing InitPlan behaviour it always shipped (no regression); closing its
+  race needs a maintainer re-tune of ESCROW_STATEMENT_TIMEOUT_MS (or accepting a
+  higher escrow occupancy), CARRIED. The three direct paths, which carry the
+  reproduced 30 s autosave bug, take the lock.
 - The pg integration suites pin FIXED verify-database names by house
   convention (two concurrent runs of ONE suite drop each other's database);
   Phase 18 suffixes the character-save suite's name per worker/pid because the
@@ -26210,9 +26226,12 @@ every pin already read 26). Four land executable code:
   taken: it risks permanent-unsaveable sessions, so the heartbeat stays
   unqualified and the term narrows the window rather than closing it.
 - **D145** (qr-19-live-nonce-fence-write-loss) takes the characters row lock
-  before the fenced UPDATE on the four live save paths, the live twin of the
-  offline fix the Phase 18 QA red-proved. The lock is FOR NO KEY UPDATE (the
-  review round's change from FOR UPDATE, below) and scoped to FENCED saves. The
+  before the fenced UPDATE on the THREE direct live save paths (the escrow caller
+  saveCharacterStateOnClient is excluded, see the CARRIED note; the phase doc's
+  "four" was a premise the escrow occupancy invariant falsified, caught by the
+  full gate), the live twin of the offline fix the Phase 18 QA red-proved. The
+  lock is FOR NO KEY UPDATE (the review round's change from FOR UPDATE, below) and
+  scoped to FENCED saves. The
   monolith cost was paid by moving the lock helper and liveSaveFence beside the
   statement builder; server/db.ts is unchanged at its 5123 ceiling.
 - **D147** (qr-19-sold-volume-four-seam-wiring) wires the four dark market
@@ -26321,6 +26340,17 @@ _Recorded at the phase close after the pg-armed gate; see phase-19c-qa.md._
   window; qualified, one stall past the 90 s TTL makes every session that process
   holds permanently unsaveable. A blast the row reserves for the maintainer; the
   heartbeat stays unqualified pending that call.
+- **D145's fourth path, saveCharacterStateOnClient (the marketplace escrow /
+  directed / delivered / paid-guild-create caller), is EXCLUDED from the row
+  lock.** The phase doc's "four live save paths" rested on a premise the full gate
+  falsified: the lock's extra workload statement pushes the escrow base occupancy
+  (ESCROW_STATEMENT_TIMEOUT_MS x 6 + lock + connect = 31,000 ms) past the 30,000 ms
+  autosave-period ceiling the tunables ladder pins (baseWorkloadCeilingMs <
+  autosaveMs). So that path keeps the pre-existing InitPlan behaviour it always
+  shipped (no regression). Closing its race is a maintainer tuning decision (lower
+  ESCROW_STATEMENT_TIMEOUT_MS to fit the sixth statement, or accept a higher escrow
+  worst-case occupancy). The three direct paths, which carry the reproduced 30 s
+  autosave bug, do take the lock.
 
 ### JUDGED, and not re-raised
 - The seven units, their rulings, and every reviewer and fresh-read finding are

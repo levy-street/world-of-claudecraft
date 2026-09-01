@@ -120,6 +120,24 @@ not an embarrassment.
    unobservable, and a deploy dropped queued entries. Both were wired in the
    review round; the shutdown drain was then BOUNDED at the fresh read's finding
    so a wedged database cannot hold it past the lease sweep.
+3. **The pg-armed GATE caught the biggest one: D145's fourth path breaches the
+   escrow occupancy invariant.** The phase document's "four live save paths"
+   included saveCharacterStateOnClient, the marketplace escrow / directed /
+   delivered / paid-guild caller. Its per-unit affected suites were green, but the
+   full gate went RED on three files the phase doc's D145 file list never named:
+   `woc_market_directed_sql.test.ts` (the escrow workload count 5/12 -> 6/13),
+   `guild_create_db.pg.test.ts` (the paid-create statement sequence), and
+   `suite_duration_budget.test.ts` (the declared-timeout ledger for the new pg
+   arms). The workload count is not cosmetic: `baseWorkloadCeilingMs =
+   ESCROW_STATEMENT_TIMEOUT_MS x N + lock + connect` is pinned strictly below the
+   autosave period (30 s), and the sixth statement makes it 31,000 > 30,000, a
+   real invariant breach. The correct fix was NOT to re-price (that needs a
+   maintainer escrow-timeout re-tune) but to EXCLUDE saveCharacterStateOnClient
+   from the lock: it keeps its pre-existing InitPlan behaviour (no regression),
+   the three DIRECT paths (which carry the reproduced 30 s autosave bug) keep the
+   lock, and the fourth path's race is CARRIED. This is the phase's clearest
+   lesson: a phase document's file list AND its path count are unverified claims,
+   and only the full gate, not the per-unit suites, caught the invariant breach.
 
 Every one of the above passed a green per-unit guard, a fresh reviewer, or both.
 The lesson 19B stated sharply held again: a comment-and-ledger wave is not the
@@ -170,6 +188,13 @@ _Filled at the close, below the verdict._
   the measured worst case), not a maintainer-named number; the shipped code and
   the whole-character arm both say the value is the maintainer's, so the digits
   may be retuned. The direction (above the worst case) is what the ruling fixes.
+- **D145's fourth path (the escrow caller saveCharacterStateOnClient).** Excluded
+  from the row lock because it would breach the escrow occupancy invariant; its
+  pre-existing InitPlan race stays open. Closing it is a maintainer tuning
+  decision: lower ESCROW_STATEMENT_TIMEOUT_MS so the sixth workload statement fits
+  under the autosave-period ceiling, or accept a higher escrow worst-case
+  occupancy. Not taken unilaterally because it re-prices a production $WOC Exchange
+  timeout.
 
 ## JUDGED, and not re-raised
 
