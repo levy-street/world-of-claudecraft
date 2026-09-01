@@ -556,7 +556,7 @@ closed-by-X.
 | renderer.ts exact-count ceiling re-pin (13774) prepared for feature review | 19th absorb | maintainer | CLOSED 2026-09-01 by qr-19-monolith-ceiling-repin, widened to cover hud.ts: the exact-count posture is KEPT and no margin is minted (root CLAUDE.md's ratchet: never grow a coordinator, extract then lower, and a raise is a maintainer decision). Figure amended in the same ruling rather than rewritten: 13774 is stale; at the Phase 19 close renderer.ts pins 13023 against a file of 13020 and hud.ts pins 18728 against 18708, so the slack is three and twenty lines, not zero. |
 | q_prof_intro requiredItems overflow grant on a full bag (17/16 visible) | P9 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-qprofintro-overflow-grant (Phase 19, under qr-19-best-for-project): the template bypass is RATIFIED as shipped and the fallback grant is named in the src/sim/bags.ts capacity doctrine header beside the other deliberately ungated paths. Both-hosts confirmed at review: the grant is one src/sim path with no host branch, and the online client's acceptQuest is a bare pass-through with no bag-full gate, so no player sees a refusal the doctrine says cannot happen. |
 | Journey script joins the gate when the merged Masterwrought PR ships (reworded at the 11b absorb: D22 is superseded, delivery is the one Masterwrought PR, and the script stays off CI until that ships) | P9b QA | maintainer | open ruling-owed |
-| Tier-4-to-tier-1 wellfed downgrade legibility (buff hover is the one surface) | P11 QA | maintainer | open ruling-owed (optional) |
+| Tier-4-to-tier-1 wellfed downgrade legibility (buff hover is the one surface) | P11 QA | maintainer | CLOSED 2026-09-01 by ruling qr-19-wellfed-downgrade-legibility (Phase 19, under qr-19-best-for-project): the downgrade stays invisible in the combat log by design and the buff hover remains the one surface, identically in both hosts. Verified live rather than taken from the record, and the seeded chain is corrected here rather than rewritten: every well-fed food shares WELL_FED_AURA_ID and the buff is self-sourced, so a newer meal is a replacement conflict, and all seven payloads ALSO carry the identical display name 'Well Fed', which is the separate fact that takes the silent branch in Sim.applyAura (a differing displaced name emits the fade, a matching one only sets refresh); the own-aura log line interpolates the name alone, so it could not name a tier even if it fired. The surviving hover is the BUFF BAR's rather than the item tooltip's, auraTooltipBodyHtml falling through to auraEffectDescriptor over the LIVE aura, so the hover renders the ACTIVE payload the meal carried and the state a player acts on is legible the moment they look. A log line would owe a new SimEvent on the displacement path in both hosts for a self-inflicted, reversible outcome. |
 | (bq) residual: online pendingSend stranding on a silently dropped command (spectate/reconnect), family-consistent | P9b QA | maintainer | ACCEPTED 2026-09-01 by qr-19-pendingsend-dropped-command-stranding (Phase 19, under qr-19-best-for-project): the stranding is accepted as family-consistent and no family-wide re-arm is ordered. THE PRICED FIX NAMED THE WRONG FILE and is amended in place rather than rewritten: the gate row costed "pendingSend re-arm on reconnect/spectate across the whole command family in src/net/online.ts", and pendingSend does not exist anywhere under src/net. Live at the close it is HUD window state in exactly two windows, farming_plant_sheet_window.ts and perfecting_window.ts, under the family rule in src/ui/hud/professions/CLAUDE.md, so any fix is a shared clear-on-spectate-or-reconnect arm on the HUD window family, not a transport change. Accepted because the row is ledgered optional, every window under spectate strands the same way, and the control recovers on close and reopen, both windows clearing the flag in open() and close(). Full ruling line on the (bq) block. |
 | CRITICAL preload lane for the 12 crop-stage GLBs (background-lane split invited) | P7 QA | maintainer | CLOSED 2026-09-01 by Phase 19 ruling qr-19-crop-glb-preload-lane: the single CRITICAL lane STANDS and the background-lane split is refused. Measured here, the 12 stage GLBs are 155,356 of the farm set's 208,200 bytes, local bundle files fetched after Play behind the loading screen, nowhere near the launcher-decode class the two lanes exist for; against that, a split would stage buildFarmProgramAnchors off the primitive-box fallback and move the first crop draw's compile on-frame, the exact hitch the anchors exist to prevent, and re-anchoring when the lane settled is a new GPU producer that src/render/CLAUDE.md requires to be a client of the preparation scheduler, never a free draw. The lane mechanism itself is gone (the v0.41.0 sync deleted DeferredPreloadPriority and beginBackgroundPreloads, carried as two written census deletion rows), so re-introducing it would also owe a census edit. No code, pin or doc moves. |
 | Idle sway ignores reducedMotion (foliage precedent) | P7 QA | maintainer | open ruling-owed (glance) |
@@ -4390,6 +4390,25 @@ question does not arise (farming has no station).
     magnitude); the buff hover is the only surface that reveals it,
     identically in both hosts. Owner: maintainer UX read, only if the
     drop should be legible.
+    RULED (qr-19-wellfed-downgrade-legibility, 2026-09-01, under
+    qr-19-best-for-project): the downgrade STAYS INVISIBLE in the combat
+    log by design and the buff hover remains the one surface,
+    identically in both hosts. Verified live rather than taken from the
+    record, and the seeded chain is restated because it was incomplete:
+    all seven wellFed payloads share WELL_FED_AURA_ID and the buff is
+    self-sourced, so a newer meal is a replacement conflict, AND all
+    seven also carry the identical display name 'Well Fed', which is the
+    separate fact that takes the silent branch in Sim.applyAura, since a
+    differing displaced name emits the fade and a matching one only sets
+    refresh. The player's own aura log line interpolates the name alone,
+    so it could not name a tier even if it fired. The surviving hover is
+    the BUFF BAR's, not the item tooltip's: auraTooltipBodyHtml falls
+    through to auraEffectDescriptor over the LIVE aura, so the active
+    payload renders and the state a player acts on is legible the moment
+    they look; src/ui/hud/professions/wellfed_tooltip_view.ts, which the
+    unit named, takes an ItemDef and cannot see a live aura. A log line
+    would owe a new SimEvent on the displacement path in both hosts for a
+    self-inflicted, reversible outcome.
   - AURA_VISIBLE_CAP_LOW = 8 (src/game/ui_tier_knobs.ts) recycles auras
     past the cap on the LOW tier; pre-existing and outside this diff,
     but the well-fed buff is information a player re-eats on, and no
