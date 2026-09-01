@@ -489,28 +489,11 @@ const MONOLITHS: MonolithRow[] = [
     // the interface-editor settings (frame dimensions, aura direction vars,
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work.
-    // The branch's spawn_intro_seen extraction still pays for its own line at
-    // the entry wait (3 under the release row), and the empower-hold sync
-    // merge lowered the release row by 1 (the pad cast routing lives in
-    // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
+    // Re-pinned at the v0.42 candidate merge of the KTX2 restore-upload
+    // repair and auraBarBelowFrame setting: both branches changed main.ts
+    // independently, so the merged count is measured directly.
     // Exact merged count, zero headroom.
-    // Re-pinned at the PR 3676 sync: this branch's reticle-sync closure
-    // extraction pays 2 more under the entry-fade row above. Measured on the
-    // merged tree, never reconciled by arithmetic. Exact merged count, zero
-    // headroom.
-    // Re-pinned after the /daynight dev-command extraction to
-    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    // Down 11551 -> 11516 at the fix/graphics-rebuild-ktx2-restore-stall sync
-    // into release/v0.42.0: the release arm's independent OSSBrain-batch
-    // rewrite of the KTX2 restore-upload wiring (a bare queue argument) was
-    // replaced by this branch's own reviewed design (a queue-AND-host target,
-    // read live through the same restore-upload coordinator the release arm
-    // already wires into the rebuild lifecycle), which nets fewer lines than
-    // either parent's independent count. Exact merged count, zero headroom.
-    ceiling: 11516,
+    ceiling: 11520,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

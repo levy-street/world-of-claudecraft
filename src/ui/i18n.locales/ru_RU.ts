@@ -848,6 +848,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': 'Размер рамки игрока',
   'hudChrome.options.targetFrameScale': 'Размер рамки цели',
   'hudChrome.options.aurasOnPlayerFrame': 'Баффы у рамки игрока',
+  'hudChrome.options.auraBarBelowFrame': 'Баффы под рамкой игрока',
   'hudChrome.options.alwaysShowAllBuffs': 'Всегда показывать все баффы',
   'hud.core.mapCanvasLabel': 'Карта',
   'hud.core.mapSummary': 'Карта зоны {zone}.',
@@ -13787,6 +13788,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': 'Что такое разлом',
   'guide.settingsPage.advancedLadder': 'Сдвиньте любой из них, и пресет качества переключится на «Расширенное», взяв за основу ровно те уровни, что были у вас перед глазами, так что ваше сочетание начинается с уже увиденного, а не с чистого листа. Когда понравится, нажмите «Применить». Именно поэтому «Расширенное» стоит в конце списка пресетов: это профиль для знатоков, где живёт ваше собственное сочетание.',
   'guide.settingsPage.ifAurasOnPlayerFrame': 'Показывает ваши усиления и ослабления не только на панели аур, но и на вашей собственной рамке персонажа.',
+  'guide.settingsPage.ifAuraBarBelowFrame':
+    'Перемещает полосу усилений под рамку персонажа вместо над ней. Действует, только когда усиления отображаются на рамке игрока.',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     'Показывает все активные баффы даже на низком графическом пресете, обходя его обычное ограничение на количество значков баффов.',
   'guide.settingsPage.ifChatFontScale': 'Размер текста в чате.',

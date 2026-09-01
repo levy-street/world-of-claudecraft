@@ -143,6 +143,8 @@ describe('Settings', () => {
     expect(s.get('targetFrameScale')).toBe(1);
     // the classic top-right aura corner stays the default; frame-anchoring is opt-in.
     expect(s.get('aurasOnPlayerFrame')).toBe(false);
+    // the anchored buff row sits above the frame by default; below is opt-in.
+    expect(s.get('auraBarBelowFrame')).toBe(false);
     expect(s.get('joystickDeadzone')).toBe(SETTING_RANGES.joystickDeadzone.def);
     // Interface Mode defaults to Auto (0): detect desktop vs touch from the device.
     expect(s.get('interfaceMode')).toBe(SETTING_RANGES.interfaceMode.def);

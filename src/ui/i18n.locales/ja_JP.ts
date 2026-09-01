@@ -850,6 +850,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': 'プレイヤーフレームの大きさ',
   'hudChrome.options.targetFrameScale': 'ターゲットフレームの大きさ',
   'hudChrome.options.aurasOnPlayerFrame': 'バフをプレイヤーフレームに表示',
+  'hudChrome.options.auraBarBelowFrame': 'バフをプレイヤーフレームの下に表示',
   'hudChrome.options.alwaysShowAllBuffs': 'すべてのバフを常に表示',
   'hud.core.mapCanvasLabel': 'マップ',
   'hud.core.mapSummary': '{zone}のマップ。',
@@ -13550,6 +13551,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.riftsPage.whatHeading': 'リフトとは何か',
   'guide.settingsPage.advancedLadder': 'そのうちのどれか一つでも動かすと、画質プリセットは「詳細」に切り替わり、いま見ていたとおりの段階がそのまま引き継がれます。ですからあなた好みの組み合わせは、ゼロからではなく、すでに目にしていた状態から始まります。気に入ったら「適用」を押しましょう。「詳細」がプリセット一覧の末尾に置かれているのはそのためです。あなた自身の組み合わせが住まう、上級者向けのプロファイルなのです。',
   'guide.settingsPage.ifAurasOnPlayerFrame': '自分のバフとデバフを、オーラバーだけでなく自分のユニットフレームにも表示します。',
+  'guide.settingsPage.ifAuraBarBelowFrame':
+    'バフの列をユニットフレームの上ではなく下に移動します。「バフをプレイヤーフレームに表示」が有効なときのみ効果があります。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '低画質プリセットでも、通常のバフアイコンの上限を無視してすべてのバフを常に表示します。',
   'guide.settingsPage.ifChatFontScale': 'チャットの文字サイズです。',

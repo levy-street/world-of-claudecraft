@@ -10,6 +10,7 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -17,9 +18,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "es_ES": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -27,9 +30,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "fr_FR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -37,9 +42,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "fr_CA": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -47,10 +54,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "en_CA": [],
   "it_IT": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -58,9 +67,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "de_DE": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -68,13 +79,15 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -82,10 +95,12 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -93,9 +108,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "nl_NL": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -103,9 +120,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "pl_PL": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -113,9 +132,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "id_ID": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -123,9 +144,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "tr_TR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -133,9 +156,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "sv_SE": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -143,9 +168,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "vi_VN": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -153,9 +180,11 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ],
   "da_DK": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
     "hudChrome.finder.mech.ancestral_sap",
     "hudChrome.finder.mech.beast_pit_quake",
     "hudChrome.finder.mech.bloodmane_rend",
@@ -163,6 +192,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.finder.mech.jaguar_roar",
     "hudChrome.finder.mech.thickhide_ward",
     "hudChrome.finder.mech.tusk_sweep",
-    "hudChrome.finder.mech.wildheart_pulse"
+    "hudChrome.finder.mech.wildheart_pulse",
+    "hudChrome.options.auraBarBelowFrame"
   ]
 };
