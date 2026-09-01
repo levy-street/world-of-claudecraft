@@ -254,6 +254,9 @@ export const META_EXCLUDE: ReadonlySet<string> = new Set([
   'bankWireRev', // runtime-only bank snapshot dirty counter; never serialized/persisted
   'vaultWireRev', // runtime-only vault snapshot dirty counter; never serialized/persisted
   'wireRev', // runtime-only wire-dirty counter; never serialized/persisted
+  // Auto-attack facing-refusal throttle clock (combat/auto_attack.ts); session-only,
+  // never persisted, purely paces a repeated toast against ctx.time.
+  'nextFacingErrorAt',
 ]);
 
 function sampleExcluding(source: Record<string, unknown>, exclude: ReadonlySet<string>): unknown {

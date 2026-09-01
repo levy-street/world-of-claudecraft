@@ -72,6 +72,7 @@ import {
   MIN_GCD,
   normAngle,
   SALVAGE_CAST_ID,
+  steadyAngleTo,
   TOOL_RECHARGE_CAST_ID,
 } from '../types';
 import { drawWeapon } from '../weapon_stow';
@@ -531,6 +532,22 @@ export function updateCasting(ctx: SimContext, p: Entity, meta: PlayerMeta): voi
   p.castRemaining -= DT;
 
   if (p.channeling) {
+    // Classic-era facing rule (WoW): auto-attack never forces the player to
+    // face their target (see combat/auto_attack.ts), but a unit-targeted
+    // CHANNELED cast (Mind Flay, Drain Life, ...) pins the caster's facing
+    // onto its target for the channel's duration, same as every other
+    // player-facing auto-track in this codebase (updateFollowMovement,
+    // mob/combat_profile.ts). Ground/self channels never populate
+    // castTargetId, so they are naturally excluded. Releasing back to manual
+    // control is free: the instant p.channeling flips false, whether by
+    // normal completion (below) or any cancelCast path, this block simply
+    // stops running.
+    if (p.castTargetId !== null) {
+      const channelTarget = ctx.entities.get(p.castTargetId);
+      if (channelTarget && !channelTarget.dead) {
+        p.facing = steadyAngleTo(p.pos, channelTarget.pos, p.facing);
+      }
+    }
     const fireChannelTick = () => {
       // Read fresh each tick: a tick that cancels the cast (e.g. a LoS block) nulls
       // castingAbility, and the guard here stops the flush from firing any more.

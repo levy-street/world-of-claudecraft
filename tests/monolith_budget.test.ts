@@ -483,7 +483,16 @@ const MONOLITHS: MonolithRow[] = [
     // Plus 2 for the Phase B set-bonus seam: the set_bonus_mods import and
     // the setPlayerLevel writer routing through computeCharacterModifiers
     // (the resolver itself is the extracted module). Exact count, zero slack.
-    ceiling: 12465,
+    // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the
+    // toggleAutoFaceLock thin delegate onto src/sim/auto_face_lock.ts (plus
+    // its import line) is removed. In its place, the round-4 facing rework
+    // adds ONE new PlayerMeta field (nextFacingErrorAt, the auto-attack
+    // facing-refusal throttle clock) with its justification comment: a
+    // session-only field with no clean extraction, same shape as the
+    // stopAutoAttackOnTargetSwitch precedent beside it. Net +1 line over the
+    // de-toggled baseline. Re-measured on this branch, never reconciled by
+    // arithmetic. Exact count, zero slack.
+    ceiling: 12279,
     seam: 'a sim system module behind SimContext (src/sim/CLAUDE.md)',
   },
   {
@@ -519,6 +528,9 @@ const MONOLITHS: MonolithRow[] = [
     // repair and auraBarBelowFrame setting: both branches changed main.ts
     // independently, so the merged count is measured directly.
     // Exact merged count, zero headroom.
+    // #3729 removes the auto-face-lock dispatch growth; this candidate also
+    // contains the KTX2, aura placement, and action-bar merges, so the pin
+    // stays on the measured combined file.
     ceiling: 11520,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
@@ -592,7 +604,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 10641,
+    // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the `afu`
+    // wire-encode line and the toggle_auto_face_lock dispatch case are
+    // removed, so the prior +4 no longer applies. Re-measured on this
+    // branch, never reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 10645,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {
@@ -679,7 +695,12 @@ const MONOLITHS: MonolithRow[] = [
     // this branch's entity_reanchor extraction, so the merged file lands
     // above either parent's own pin. Measured on the merged tree, never
     // reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 5910,
+    // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the
+    // blankEntity default, the `afu` decode line, and the toggleAutoFaceLock
+    // optimistic-nudge command sender are all removed, so the prior +9 no
+    // longer applies. Re-measured on the combined candidate.
+    // Exact count, zero slack.
+    ceiling: 5909,
     seam: 'a src/net sibling module (the refactor/net-online split is the template)',
   },
   {

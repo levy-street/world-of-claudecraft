@@ -75,6 +75,10 @@ const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 // six vcup_* send + dispatch pairs (docs/design/eastbrook-revamp/master-plan.md);
 // the Proving Shore tutorial adds its one start_tutorial pair back on top, and
 // the v0.40.0 sync merge brings the release side's one new pair with it.
+// #3729 round 4 REMOVES toggle_auto_face_lock (send + dispatch pair): the
+// auto-face-lock toggle it backed is reverted, so both counts drop by one
+// from the release/v0.42.0-synced total. Re-derived from source, never
+// reconciled by arithmetic.
 const EXPECTED_SEND_COUNT = 207;
 const EXPECTED_DISPATCH_COUNT = 220;
 const EXPECTED_DISPATCH_ONLY_COUNT = 13;

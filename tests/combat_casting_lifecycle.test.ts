@@ -28,12 +28,14 @@ import { fiestaDownEntity } from '../src/sim/social/fiesta';
 import { releasePlayerSpirit, resurrectAtSpiritHealer } from '../src/sim/spirit';
 import type { Aura, Entity, PlayerClass, WorldContent } from '../src/sim/types';
 import {
+  angleTo,
   CAST_PUSHBACK_SEC,
   CAST_QUEUE_WINDOW_SEC,
   CHANNEL_PUSHBACK_FRACTION,
   DT,
   FISHING_CAST_ID,
   GATHER_CAST_ID,
+  normAngle,
 } from '../src/sim/types';
 import { terrainHeight } from '../src/sim/world';
 import { placePlayerInOpenField } from './helpers/open_field';
@@ -561,6 +563,46 @@ describe('casting_lifecycle: channel start -> tick -> finish', () => {
       .drainEvents()
       .filter((e: any) => e.type === 'castStop' && e.entityId === p.id);
     expect(stops.some((e: any) => e.success === false)).toBe(true);
+  });
+
+  it('pins the caster facing onto the channel target every tick, overriding a manual turn away (WoW facing rule)', () => {
+    // Auto-attack never turns the player onto their target (combat/auto_attack.ts),
+    // but a unit-targeted channel is the one exception: it pins the caster's
+    // facing onto its target for the channel's duration.
+    const { sim, p, meta } = makeSim('warlock', 12);
+    const mob = spawnTarget(sim, p, 12, 6);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    expect(p.channeling).toBe(true);
+    const away = normAngle(p.facing + Math.PI); // simulate a manual turn away mid-channel
+    p.facing = away;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.facing).not.toBe(away);
+    expect(p.facing).toBeCloseTo(angleTo(p.pos, mob.pos));
+  });
+
+  it('releases facing control back to manual input the instant the channel completes normally', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p, 12, 6);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    drainCast(sim, p, meta);
+    expect(p.channeling).toBe(false);
+    const away = normAngle(p.facing + Math.PI);
+    p.facing = away;
+    updateCasting(sim.ctx, p, meta); // no longer channeling: must not re-pin
+    expect(p.facing).toBe(away);
+  });
+
+  it('releases facing control back to manual input the instant the channel is cancelled/interrupted', () => {
+    const { sim, p, meta } = makeSim('warlock', 12);
+    spawnTarget(sim, p, 12, 6);
+    castAbility(sim.ctx, 'drain_life', p.id);
+    expect(p.channeling).toBe(true);
+    cancelCast(sim.ctx, p);
+    expect(p.channeling).toBe(false);
+    const away = normAngle(p.facing + Math.PI);
+    p.facing = away;
+    updateCasting(sim.ctx, p, meta);
+    expect(p.facing).toBe(away);
   });
 
   it('keeps Litany of Woe on the existing projectile channel path', () => {

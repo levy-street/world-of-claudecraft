@@ -124,7 +124,6 @@ import {
   type DelveRunInfo,
   type DelveShopOfferView,
   type DevLeaderboardPage,
-  DUNGEON_ENTRY_FACING_WIRE_VERSION,
   type DuelInfo,
   type FriendInfo,
   type GuildBankInfo,
