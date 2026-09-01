@@ -512,6 +512,11 @@ export class DungeonFinderWindow {
             .join('')}`
         : '',
       ...e.heroicGroups.map((g) => this.lootGroupHtml(g, 'hudChrome.finder.lootHeroic')),
+      e.heroicSingles.length > 0
+        ? `<div class="df-loot-sub">${esc(t('hudChrome.finder.lootHeroic'))}</div>${e.heroicSingles
+            .map((i) => this.lootItemHtml(i, true))
+            .join('')}`
+        : '',
     ].join('');
     const money =
       e.copper > 0 ? `<div class="df-loot-money">${this.deps.moneyHtml(e.copper)}</div>` : '';

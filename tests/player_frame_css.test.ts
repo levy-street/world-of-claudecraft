@@ -102,4 +102,11 @@ describe('player frame buff-row placement (auraBarBelowFrame)', () => {
     const lifted = ruleBlock('body.auras-on-frame.auras-below-frame #player-frame > #buff-bar {');
     expect(lifted).toContain('pointer-events: none;');
   });
+
+  it('keeps detached buff icons interactive below the player frame', () => {
+    const detached = ruleBlock(
+      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached>#buff-bar {',
+    );
+    expect(detached).toContain('pointer-events: auto;');
+  });
 });

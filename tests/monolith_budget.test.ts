@@ -606,9 +606,9 @@ const MONOLITHS: MonolithRow[] = [
     // the composite is the honest size. Exact count, zero slack.
     // #3729 round 4 REVERTS the auto-attack auto-face lock toggle: the `afu`
     // wire-encode line and the toggle_auto_face_lock dispatch case are
-    // removed, so the prior +4 no longer applies. Re-measured on this
-    // branch, never reconciled by arithmetic. Exact count, zero slack.
-    ceiling: 10645,
+    // removed, so the prior +4 no longer applies. Re-measured on the
+    // combined candidate. Exact count, zero slack.
+    ceiling: 10641,
     seam: 'a sibling server module; see the hot-path seams in server/CLAUDE.md',
   },
   {

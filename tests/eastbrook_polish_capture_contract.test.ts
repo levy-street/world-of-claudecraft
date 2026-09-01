@@ -357,7 +357,7 @@ interface AttributionTargetFixture {
 // integrations, so the composite matches neither parent). No capture was
 // retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'd91b63085fc8b63209f994616448ed46d9c546e28fa42b907efb5929d1ce90c7';
+  'f7846522395ef9b736bb5a16908268aa13d278cb12d5dac0809e5ee0faa12b5a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

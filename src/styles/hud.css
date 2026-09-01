@@ -2942,6 +2942,9 @@
     z-index: 6;
     pointer-events: none;
   }
+  body.auras-on-frame.auras-below-frame #player-frame.pf-detached>#buff-bar {
+    pointer-events: auto;
+  }
   /* With the buff row anchored to the frame, the player's own debuffs slide up
      beside the minimap into the vacated top spot (classic WoW's debuff corner),
      keeping the right-to-left stacking and wrapping downward from there. */

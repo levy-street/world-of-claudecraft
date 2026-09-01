@@ -171,6 +171,21 @@ describe('dungeon finder view core', () => {
     // kill actually pays; a non-finale encounter keeps its normal copper.
     expect(boss?.copper).toBe(100000);
     expect(view.detail?.encounters.find((e) => e.mobId === 'sexton_marrow')?.copper).toBe(400);
+
+    const wildheart = live(
+      buildDungeonFinderView(
+        input({
+          playerLevel: 20,
+          specRole: 'tank',
+          selectedActivityId: 'wildheart_basin_heroic',
+        }),
+      ),
+    );
+    const beastmaster = wildheart.detail?.encounters.find(
+      (e) => e.mobId === 'wildheart_beastmaster',
+    );
+    expect(beastmaster?.final).toBe(false);
+    expect(beastmaster?.heroicSingles.map((i) => i.itemId)).toContain('heroic_duskwhisper');
   });
 
   it('maps raid entrances to the Abandoned Crypt door with its zone', () => {
