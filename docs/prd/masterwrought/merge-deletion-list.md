@@ -2025,6 +2025,8 @@ authors a new name appends its rows in the same change.
 | exports | `CHARACTER_SAVE_ROW_LOCK_SQL` | 19C | qr-19-live-nonce-fence-write-loss | the SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE the fenced UPDATE takes first, so the uncorrelated fence InitPlan is evaluated with the row already held and a mid-wait lease displacement is not invisible (server/character_save_statement.ts) |
 | exports | `liveSaveFence` | 19C | qr-19-live-nonce-fence-write-loss | the live-session fence-shape picker, moved beside the statement builder (the process holder passed in as an argument to avoid a db.ts import cycle) to pay for the row-lock fix's growth (server/character_save_statement.ts) |
 | exports | `cleanMetadataText` | 19C | qr-19-sold-volume-four-seam-wiring | the request-metadata trim-and-cap helper, extracted from server/db.ts so the market sold-volume schema wiring lands without growing the db.ts monolith (server/clean_metadata_text.ts) |
+| exports | `WOC_MARKET_SOLD_VOLUME_TAIL` | 19C | qr-19-sold-volume-four-seam-wiring | the /metrics gauge name for the sold-volume write FIFO occupancy (measure=depth/coalesced), added in D147's review round so the live per-sale write path is observable, mirroring woc_bank_ledger_tail (server/http/game_metrics.ts) |
+| exports | `WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL` | 19C | qr-19-sold-volume-four-seam-wiring | the /metrics counter name for sales dropped at the sold-volume FIFO admission cap (server/http/game_metrics.ts) |
 
 ## Literal-only records (not symbols in any census class; kept for the reader)
 
