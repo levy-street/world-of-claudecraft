@@ -4,7 +4,7 @@
 > completion wave is recorded in `placeholder-art-completion-2026-08-09/README.md` and
 > `placeholder-art-completion-2026-08-09/accepted-art.json`. The nine later Reliquary crests are
 > recorded in `release-art-audit-v036-2026-08-10/reliquary-deed-art.md`.
-> `DEED_ART_PENDING` is empty.
+> `DEED_ART_PENDING` is empty. AMENDED 2026-09-01 (qr-19-art-batch-ledger): it is not, and has not been since the walk-in castle pair. It holds 20 rows in `src/ui/icons.ts` today, so the completion sentence above is true only of the wave it names; every one of the 20 is briefed in the dated sections below and awaits the maintainer's post-merge art wave on his master SHA.
 
 Ready to send. One line per new deed, same format as the v1 brief; icon files
 are named exactly by deed id at 512x512 RGBA like the existing set. The original

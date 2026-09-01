@@ -461,6 +461,60 @@ closed-by-X.
    across every procedurally-resolving id when the first debt id leaves
    the pending set; the 10 to 11 px mobile chip legibility revisit
    ((bf)(4)).
+   RULED (qr-19-art-batch-ledger, 2026-09-01, under qr-19-best-for-project):
+   SCHEDULED. The art wave runs as the maintainer's own pass on his master
+   SHA after the merge, and THIS LEDGER stays the deliverable. Nothing in
+   this branch mints art: the profession_icons E2 rule puts committed WebP
+   behind that SHA, so both parks stay exactly as they are, because the
+   parks themselves are what is being handed over. No code, no pin, no
+   generated artifact and no test moves under this ruling, and R5 is
+   untouched.
+   WHAT THIS ONE ID SETTLES, said plainly so the wave does not end up with
+   four ruling ids on it: the routed-out rows D015 (the prog_farming_100
+   Harvestmaster crest), D025 (the painted farm map pin) and D095 (the 81
+   parked item ids) are the SAME wave seen from three ends, and they fold
+   into this scheduling rather than taking rulings of their own.
+   AMENDED IN PLACE, 2026-09-01, re-derived from the live tree rather than
+   rewritten. The "44 ids" figure above reads 81 today: the
+   ITEM_ART_PENDING export in src/ui/icons.ts enumerates 81 ids and the
+   IGNIVAR_ART_PENDING_ITEM_IDS list it spreads in first is empty, so the
+   81 are the whole set. The "8 untitled deeds" figure reads 20, the row
+   count of the DEED_ART_PENDING export in the same file; the commissioned
+   prog_farming_100 crest replacement beside it stands as written.
+   AMENDED IN PLACE, same date: "the four hoe icons" reads five. Phase
+   11j's evergarden_hoe joined garden_hoe, bronze_hoe, skysilver_hoe and
+   osmium_hoe, each of the five carries its own authored icon recipe, and
+   all five park here.
+   AMENDED IN PLACE, same date: the rationale-sweep address moved. The
+   rewritten scheduled-ART-PARK paragraph now sits at src/ui/icons.ts:5808
+   to 5815 rather than at the line cited above, and "no faucet until
+   go-live" no longer appears anywhere under src/, so that sub-item stays
+   DISCHARGED.
+   THE WAVE IS NOW WIDER THAN THIS PACKET, which is what matters to whoever
+   sizes it. Ten of the twenty deed rows are not farming's:
+   exp_the_last_keep and exp_dawnhold_castle (the walk-in castle pair),
+   soc_strongbox_outfitter and soc_four_bags_deep (bank storage),
+   prog_ready_for_an_adventure, and the five Crucible rows dgn_ignivar,
+   dgn_ignivar_heroic, dgn_varkhul, dgn_varkhul_heroic and
+   dgn_varkhul_flawless. All ten are release-owned debt, parked correctly
+   by the same rule and NOT packet obligations, but they are ten more
+   paintings in the same sitting. The packet's own ten are
+   prog_first_planting, the four first-harvest chronicles (chr_vale,
+   chr_marsh, chr_peaks, chr_evergarden), col_golden_harvest,
+   col_deepest_cast, col_farm_roster, prog_field_to_feast, and the Phase 13
+   promotion capstone prog_legendmaker, which is the packet's row and not
+   the release's.
+   THE JUDGMENT SUB-ITEMS RIDE THIS LINE so the scheduling does not lose
+   them: the cross-family icon reads (highwatch_barley_porridge takes a
+   potion primary and fenbridge_rice_pudding a coin primary, both confirmed
+   live in the icon recipes), the alike-at-32px hoe eyeball across all five
+   rungs, the glazed-carrots-vs-pottage eyeball (both sit on the food
+   radial in the ember palette and the pottage's second glyph is the
+   carrots' first, so the worry is real), and the map pin, which per D025
+   is now the painted MapMarkerArtId ALONE: the Phase 18 sweep already put
+   both surfaces on the station family token (colors.stall in
+   map_window_painter.ts, colors.station in minimap_painter.ts), so the
+   color half is closed and only the art remains.
 
 ### The handoff table
 
@@ -502,7 +556,7 @@ closed-by-X.
 | Phase 9 farmer titles and greetings as authored | P9 | maintainer | CLOSED 2026-09-01 by ruling qr-19-farmer-titles-greetings (Phase 19, under qr-19-best-for-project): signed off as authored, no reword. All four titles ship in content (zone1.ts, zone2.ts, zone3.ts, evergarden.ts) and each names its own zone's real geography; the four ids are in the localized set in src/ui/world_entity_i18n.ts and every non-Latin locale already carries a real translated name, title and greeting. A reword would only restale reviewed overlay prose and the wiki for flavor. The full ruling line sits on the Phase 9 reads bullet in the OPEN items section. |
 | p99 blob-size gauge in the perf heartbeat | P3 | maintainer | handed-to-maintainer |
 | AURA_VISIBLE_CAP_LOW = 8 self-buff cap fairness (pre-existing, not farming's) | P11 QA | maintainer | handed-to-maintainer |
-| The art batch ledger (gates block item 3: ITEM_ART_PENDING 44, wellfed aura icon, cross-family icon reads, hoe 32px, carrots-vs-pottage, pin art plus (bd), tonic sparkle, voice lines, icons.ts comment, DEED_ART_PENDING 8 plus crest replacement, chip legibility) | P4 to P12 | maintainer art pass | handed-to-maintainer |
+| The art batch ledger (gates block item 3: ITEM_ART_PENDING 44 (AMENDED 2026-09-01: reads 81 live in src/ui/icons.ts), wellfed aura icon, cross-family icon reads, hoe 32px, carrots-vs-pottage, pin art plus (bd), tonic sparkle, voice lines, icons.ts comment, DEED_ART_PENDING 8 plus crest replacement (AMENDED 2026-09-01: reads 20 live, ten of the twenty release-owned), chip legibility) | P4 to P12 | maintainer art pass | SCHEDULED 2026-09-01 by qr-19-art-batch-ledger: the wave runs on the maintainer's master SHA after the merge; stays handed-to-maintainer as his queue item |
 | CI shard-weights harvest re-run at go-public (scripts/ci_shard_weights_harvest.mjs) | 16th absorb | go-public session | handed-to-maintainer |
 | gatherDowngrade surface union gains 'crop' (silent signature truncation on full-bag golden wins) | P10 | later phase | closed-by-Phase-14 (item B9: union member, farming.ts emit at the golden grant site, once per harvest command across both grades, always lost 'mark' under nothing-rots; the client resolves the toast off lost plus surface through the one gathering_view dispatch, and the crop surface carries its OWN mark line downgradeMarkCrop with five M16 fills (the qa-checklist's copy finding: 'the find' is prospecting vocabulary and read wrong for a grown harvest); zero golden movement, whole parity directory re-run green) |
 | Mobile-window-open body-class gap (harvest journal and plant sheet, family-wide) | P9b QA | Phase 13 polish | closed-by-Phase-14 (item A1: both windows gained the family onVisibilityChange dep fired on both display flips, Hud wires it to syncAnyWindowOpenState at both composition sites; funded by extracting the whole body-class scan to src/ui/window_open_state.ts with the hud ceiling LOWERED 19214 to 19186 and the three source-pin suites re-pointed; behavioral class-flip proof plus the wiring pin in tests/farming_windows_body_class.test.ts; mobile landscape shots in the phase evidence commit) |
