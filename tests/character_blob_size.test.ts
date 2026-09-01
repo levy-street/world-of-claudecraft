@@ -3,7 +3,7 @@
 //
 // Three things are under test and they are deliberately different in kind. The
 // pure helper is pinned on its own, including the threshold LITERAL: asserting
-// the constant against itself would pass for any value, so the number 131_072 is
+// the constant against itself would pass for any value, so the number 163_840 is
 // written out here and a re-mint has to be a reviewed edit in two files. The
 // call site is then exercised through the REAL saveCharacterState with a mocked
 // pool, because the load-bearing claim is not "a warning is produced" but "an
@@ -101,24 +101,24 @@ function characterUpdateCall(client: ReturnType<typeof transactionClient>) {
 
 describe('characterBlobSizeWarning: the pure decision', () => {
   it('pins the warn threshold to its literal value', () => {
-    // The number itself, not the constant compared against itself. 131,072 is
-    // about 3.2x the maximal character (~41.4 KB carried on the merged tree,
-    // where the professions block measures 16,727 bytes, re-derived at Phase
-    // 11d to 16,704 and re-measured at Phase 11e for the wider crop id) and
-    // one power-of-two step below the 262,144-byte guild-bank row scale; see the
-    // derivation in server/character_blob_size.ts. Moving it means re-measuring.
-    expect(CHARACTER_BLOB_WARN_BYTES).toBe(131_072);
+    // The number itself, not the constant compared against itself. 163,840 is
+    // 160 KiB, the smallest 32-KiB step above the measured legal worst case
+    // (151,584 bytes, frozen by the professions_blob_growth whole-character arm)
+    // and one 32-KiB step below the 262,144-byte guild-bank row scale; re-minted
+    // from 131,072 by qr-19-character-blob-warn-threshold. See the derivation in
+    // server/character_blob_size.ts. Moving it means re-measuring.
+    expect(CHARACTER_BLOB_WARN_BYTES).toBe(163_840);
   });
 
   it('stays silent below the threshold and AT it (the bound is inclusive)', () => {
     expect(characterBlobSizeWarning(1, 0)).toBeNull();
     expect(characterBlobSizeWarning(1, 38_900)).toBeNull();
-    expect(characterBlobSizeWarning(1, 131_071)).toBeNull();
-    expect(characterBlobSizeWarning(1, 131_072)).toBeNull();
+    expect(characterBlobSizeWarning(1, 163_839)).toBeNull();
+    expect(characterBlobSizeWarning(1, 163_840)).toBeNull();
   });
 
   it('warns one byte past the threshold and above', () => {
-    expect(characterBlobSizeWarning(1, 131_073)).not.toBeNull();
+    expect(characterBlobSizeWarning(1, 163_841)).not.toBeNull();
     expect(characterBlobSizeWarning(1, 1_000_000)).not.toBeNull();
   });
 
@@ -126,7 +126,7 @@ describe('characterBlobSizeWarning: the pure decision', () => {
     const warning = characterBlobSizeWarning(4291, 200_000);
     expect(warning).toContain('4291');
     expect(warning).toContain('200000');
-    expect(warning).toContain('131072');
+    expect(warning).toContain('163840');
   });
 
   it('leaves a real freshly serialized character far under the threshold', () => {

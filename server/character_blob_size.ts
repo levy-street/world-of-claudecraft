@@ -53,7 +53,7 @@
 // Masterwrought Phase 18 measured a maximal character through the real
 // Sim.serializeCharacter path, settled to a fixed point across two further real
 // loads with every container at its LEGAL ceiling:
-//   maximal character, merged tree: 151,525 bytes measured
+//   maximal character, merged tree: 151,584 bytes measured at the phase close
 //   (pinned with its band and its full derivation in
 //   tests/professions_blob_growth.test.ts, the whole-character arm).
 // That is 3.66x the 41.4 KB carry. The old fixture is why: it armed level,
@@ -64,36 +64,31 @@
 // ladder, and it counted 140 instanced slots where the legal ceiling is now 268
 // (80 carried, 176 bank, 12 buyback).
 //
-// So 131,072 bytes is NOT "about 3.2x the legitimate worst case". It sits BELOW
-// that worst case, at about 0.87x, exceeded by 20,453 bytes: a character who
-// really reached every ceiling would cross this threshold on every autosave.
-// The sentence this replaces claimed the opposite relation and used it to argue
-// the line could not be trained away by ordinary content growth; that argument
-// does not survive its own measurement, and the honest statement is that the
-// headroom it described does not exist.
+// So the OLD 131,072 was NOT "about 3.2x the legitimate worst case": it sat
+// BELOW that worst case, at about 0.87x, so a character who really reached every
+// legal ceiling crossed this threshold on every autosave. That false relation is
+// what row D122 was opened to fix.
 //
-// WHAT THIS COMMENT DELIBERATELY DOES NOT DO is move the number. Whether the
-// threshold should be re-minted, and to what, is a decision tabled as Phase 19
-// row D122, and it is a real decision rather than a clerical one: the maximal
-// character is a legal-ceiling construction rather than a player anyone expects
-// to meet, the p99 gauge and high-water mark below already answer the
-// fleet-creep question this line answers badly, and raising the threshold and
-// leaving it are both defensible. The value stays exactly as it was until that
-// ruling lands. What changed here is only the description, which was false.
-// When the ruling does land, re-mint WITH a fresh measurement (the
-// professions_blob_growth re-mint doctrine) and re-read that suite's
-// whole-character arm in the same change: the arm pins the measured relation
-// between the two numbers, so it reds on a re-mint by design and the two are
-// re-read together.
+// RE-MINTED to 163,840 (160 KiB) by qr-19-character-blob-warn-threshold (Phase
+// 19, under qr-19-best-for-project). The value is DERIVED, not guessed: it is the
+// smallest 32-KiB-aligned step strictly above the measured legal worst case
+// (151,584 bytes, the phase-close figure the professions_blob_growth
+// whole-character arm freezes), and it keeps a full 32-KiB step below the 262,144
+// (256 KiB) guild-bank scale named below. A maxed character therefore no longer
+// trips the line on every save, while a character past 160 KiB is still worth a
+// look. This is a WARN threshold that never blocks a write, so the maintainer may
+// retune the digits; the REAL fleet-creep watch is the p99 windowed gauge and the
+// high-water mark below, and this line is now the coarse over-cap tripwire that
+// gauge stands behind. Re-minting reds the professions_blob_growth whole-character
+// arm BY DESIGN (that arm pins the measured relation between the two numbers), so
+// the threshold and its measurement were re-read together in this same change.
 //
-// The other half of the original rationale is untouched and still true: 131,072
-// is one power-of-two step BELOW the 262,144-byte guild-bank scale, the largest
-// single row this codebase considers plausible at all. A character past this
-// number may be a field that grew per-player without a bound, which is the
-// defect this signal exists to catch early; since Phase 18 it may also be a
-// character who simply owns a great deal, which is precisely what D122 has to
-// weigh. Do not nudge the value up to silence a line.
-export const CHARACTER_BLOB_WARN_BYTES = 131_072;
+// The guild-bank relationship is preserved: 163,840 is 160 KiB, one 32-KiB step
+// below the 262,144-byte (256 KiB) guild-bank scale, the largest single row this
+// codebase considers plausible at all. A character past this number may be a
+// field that grew per-player without a bound, which is the defect this signal
+// exists to catch early; it may also be a character who simply owns a great deal.
+export const CHARACTER_BLOB_WARN_BYTES = 163_840;
 
 // The decision, kept pure so it is unit-testable without a database: returns the
 // dev-channel log line for an oversized blob, or null when the size is

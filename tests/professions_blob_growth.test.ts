@@ -1816,21 +1816,18 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     expect(bytes, reMint).toBeGreaterThan(151203);
     expect(bytes, reMint).toBeLessThan(151585);
 
-    // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, recorded rather
-    // than tuned. The signal's own derivation (server/character_blob_size.ts)
-    // states that 131,072 is "about 3.2x the legitimate worst case". Measured,
-    // the relation is the other way round: the legitimate worst case is 151,525
-    // and the threshold sits BELOW it, at about 0.87x, exceeded by 20,453
-    // bytes, so a character who really reached every ceiling would print the
-    // oversized-save line on every autosave. The direction is what matters and
-    // it does not depend on the re-base: the gap is over 20 KB while the
-    // content rows moving under it are tens of bytes, so no plausible
-    // phase-close measurement changes the finding, only its digits. The pin below
-    // records that direction as measured TODAY; it is
-    // not an endorsement. Re-minting CHARACTER_BLOB_WARN_BYTES is a maintainer
-    // decision and a re-mint reds here BY DESIGN, which is the point: the
-    // threshold and this measurement must be re-read together, the same
-    // contract the professions ceiling above keeps with its own bound.
-    expect(bytes).toBeGreaterThan(CHARACTER_BLOB_WARN_BYTES);
+    // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, now that D122 has
+    // ruled. The OLD 131,072 sat BELOW the measured legal worst case (about
+    // 0.87x), so a maxed character printed the oversized-save line on every
+    // autosave. qr-19-character-blob-warn-threshold (Phase 19) re-minted
+    // CHARACTER_BLOB_WARN_BYTES to 163,840 (160 KiB), the smallest 32-KiB step
+    // above the measured worst case, so the threshold now sits ABOVE it and a
+    // legal maximal character no longer trips it (measured worst case 151,584 <
+    // 163,840 warn). This arm pins that relation and reds BY DESIGN on any future
+    // re-mint that drops the threshold back under the worst case, which is the
+    // contract: the threshold and this measurement are re-read together
+    // (server/character_blob_size.ts). It also reds if content growth ever pushes
+    // the measured worst case above the warn, which is the fleet-creep signal.
+    expect(bytes).toBeLessThan(CHARACTER_BLOB_WARN_BYTES);
   });
 });
