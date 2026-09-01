@@ -1738,10 +1738,10 @@ export class Hud {
   // never installed the shared Tab trap or returned focus to its opener: the
   // same train/unbind shape, added here so it stops being the exception.
   private readonly craftingWindowFocus = this.windowFocus('#crafting-window');
+  private craftingOpenerFocus: HTMLElement | null = null;
   // ONE bridge for the Hud's lifetime, like every other window's: a per-open
   // one has a null handle every time, so it orphans the previous trap.
   private readonly reportWindowFocus = this.windowFocus('#report-window');
-  private craftingOpenerFocus: HTMLElement | null = null;
   // Craft tier-up snapshot (Professions 2.0): the last SYNCED
   // craftSkills observation handleEvents diffs for tier crossings. null until
   // the first synced observation, which initializes silently (no toasts for

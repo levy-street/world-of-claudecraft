@@ -50,11 +50,16 @@ let openState: { deps: ReportWindowDeps; opener: HTMLElement | null } | null = n
 let openEpoch = 0;
 
 /**
- * The one close path: the two [data-close] buttons, the submit success, and
+ * The one CLOSING path: the two [data-close] buttons, the submit success, and
  * Hud.closeManagedWindow (Esc, the gamepad, a replacing modal) all route here,
  * so the trap is released and focus returns to the opener on every one of them
  * (WCAG 2.2 AA). Safe to call when the window is already closed: the hide is
  * idempotent and the focus return is skipped when no open armed it.
+ *
+ * A RE-OPEN is the one way the armed state goes away WITHOUT coming through
+ * here, and that is correct rather than an omission: the window is not closing,
+ * so no focus return is owed, and the bridge's own defensive release drops the
+ * previous trap. See the note at the top of openReportWindow.
  */
 export function closeReportWindow(): void {
   const state = openState;
@@ -69,13 +74,16 @@ export function openReportWindow(
   target: { pid?: number; name: string },
 ): void {
   if (!deps.reportHooks()) return;
-  // A RE-OPEN OVER AN OPEN WINDOW IS A CLOSE FIRST, and it is reachable:
-  // Hud.closeOtherWindows no longer closes siblings (it clears the context
-  // menu and the tooltip), and both open sites are context-menu actions, so
-  // reporting a second player while the window stands re-enters here. Without
-  // this the first open's trap is never released and its opener is dropped,
-  // which would make the close() docblock below simply untrue.
-  if (openState) closeReportWindow();
+  // A RE-OPEN OVER AN OPEN WINDOW does NOT route through close(), deliberately.
+  // It is reachable (Hud.closeOtherWindows no longer closes siblings, and both
+  // open sites are context-menu actions, so reporting a second player while the
+  // window stands re-enters here), and the previous trap IS released: the shared
+  // bridge's captureFocus opens with `handle?.release(false)`, a release WITHOUT
+  // a focus return, written for exactly this case. Closing first instead would
+  // be wrong, not merely redundant: FocusManager.restore defers the focus by a
+  // tick, so the return would land AFTER this open and park focus on the
+  // previous opener, outside the window now on screen, leaving the fresh trap
+  // armed but inert (its Tab cycle only engages once focus is already inside).
   deps.closeOtherWindows('#report-window');
   const { pid, name } = target;
   const el = $('#report-window');
@@ -103,7 +111,14 @@ export function openReportWindow(
   // an earlier capture would record whatever the window we just closed handed
   // focus back to rather than this window's own opener.
   openEpoch++;
-  openState = { deps, opener: deps.captureFocus() };
+  // NEVER record this window's own subtree as the opener. markDialogRoot stamps
+  // role=dialog, which is the pointer-focus park selector, so a click inside can
+  // park focus on this very root; recorded as the opener, the eventual close
+  // would take restoreFocus's in-window-refocus branch and return WITHOUT
+  // releasing the trap, stranding it armed over a hidden window. Null means
+  // "nothing outside to hand back to", which is the honest answer there.
+  const captured = deps.captureFocus();
+  openState = { deps, opener: captured && el.contains(captured) ? null : captured };
   const epoch = openEpoch;
   const reasonDD = deps.buildDropdown(
     [

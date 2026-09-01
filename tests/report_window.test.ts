@@ -301,11 +301,18 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
     );
   });
 
-  it('a RE-OPEN over an open window releases the first trap and returns its opener', () => {
+  it('a RE-OPEN over an open window re-captures WITHOUT returning focus', () => {
     // The one transition every other arm skips, and the one the per-open focus
     // bridge got wrong: Hud.closeOtherWindows does not close siblings, so
     // reporting a second player while the window stands re-enters open().
-    // Without a close first, the first trap is orphaned and its opener lost.
+    //
+    // The window is NOT closing, so no focus return is owed, and returning one
+    // would be actively wrong: FocusManager.restore defers by a tick, so the
+    // return would land after this open and park focus outside the window now
+    // on screen. Releasing the previous trap is the shared bridge's job
+    // (captureFocus opens with handle.release(false), a release with no return),
+    // which a fake bridge cannot show; the source pin below covers the wiring
+    // and tests/focus_manager.test.ts covers the manager.
     open({ submit: vi.fn().mockResolvedValue(undefined) });
     expect(captureFocus).toHaveBeenCalledTimes(1);
     const second = document.createElement('button');
@@ -315,16 +322,31 @@ describe('report window: the focus trap (qr-19-report-window-focus-trap-carveout
       makeDeps(() => ({ submit: vi.fn().mockResolvedValue(undefined) })),
       { pid: 9, name: 'Bram' },
     );
-    // Exactly one outstanding trap: the first was released, to its OWN opener.
-    expect(restoreFocus).toHaveBeenCalledTimes(1);
-    expect(restoreFocus).toHaveBeenCalledWith(opener);
+    expect(restoreFocus).not.toHaveBeenCalled();
     expect(captureFocus).toHaveBeenCalledTimes(2);
     expect(el.style.display).toBe('block');
     expect(el.querySelector('.panel-title span')?.textContent).toBe('Report Bram');
-    // And the SECOND open's opener is what the eventual close returns to.
+    // The SECOND open's opener is what the eventual close returns to, so the
+    // re-capture really did replace the recorded opener rather than keep the
+    // first one alive.
     closeReportWindow();
-    expect(restoreFocus).toHaveBeenCalledTimes(2);
-    expect(restoreFocus).toHaveBeenLastCalledWith(second);
+    expect(restoreFocus).toHaveBeenCalledTimes(1);
+    expect(restoreFocus).toHaveBeenCalledWith(second);
+  });
+
+  it('never records its own subtree as the opener (the role=dialog park hazard)', () => {
+    // markDialogRoot stamps role=dialog, which is the pointer-focus park
+    // selector, so a click inside can park focus on this root. Recorded as the
+    // opener, the close would take restoreFocus's in-window-refocus branch and
+    // return without releasing, stranding the trap over a hidden window.
+    // Queried LIVE at capture time: the open rebuilds innerHTML, so a node
+    // grabbed beforehand is already detached and el.contains() would be false
+    // for the wrong reason.
+    captureFocus.mockImplementation(() => el.querySelector<HTMLElement>('#report-submit'));
+    open({ submit: vi.fn().mockResolvedValue(undefined) });
+    expect(captureFocus).toHaveBeenCalledTimes(1);
+    closeReportWindow();
+    expect(restoreFocus).toHaveBeenCalledWith(null);
   });
 
   // The Hud link itself is source-pinned in tests/managed_window_close_registry
