@@ -2942,7 +2942,7 @@
     z-index: 6;
     pointer-events: none;
   }
-  body.auras-on-frame.auras-below-frame #player-frame.pf-detached>#buff-bar {
+  body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {
     pointer-events: auto;
   }
   /* With the buff row anchored to the frame, the player's own debuffs slide up
