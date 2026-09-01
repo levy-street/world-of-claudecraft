@@ -1787,6 +1787,16 @@ export interface TerrainView {
    * abandoned zone builds keep running on a setTimeout chain.
    */
   cancelStreaming(): void;
+  /**
+   * Terminal teardown: releases every resident chunk regardless of zone
+   * (removes each mesh from `group` and disposes its geometry), plus the
+   * shared terrain material and its per-instance normal map. Call once, when
+   * this view is being discarded for good (renderer shutdown); a later
+   * ensureZone/unloadZone on a disposed view has nothing left to build on.
+   * The normal map and material are built fresh per `buildTerrain` call
+   * (never shared with another view), so disposing them here is safe.
+   */
+  dispose(): void;
 }
 
 export function buildTerrain(seed: number, priorityPoint?: { x: number; z: number }): TerrainView {
@@ -2290,6 +2300,15 @@ export function buildTerrain(seed: number, priorityPoint?: { x: number; z: numbe
     cancelStreaming(): void {
       cancelled = true;
       disposeZoneBuildPool();
+    },
+    dispose(): void {
+      cancelled = true;
+      disposeZoneBuildPool();
+      for (const chunk of chunks) group.remove(chunk.mesh);
+      for (const chunk of chunks) chunk.mesh.geometry.dispose();
+      chunks.length = 0;
+      mat.dispose();
+      normalTex?.dispose();
     },
     unloadZone(zone: ZoneDef): void {
       // A zone with an in-flight ensureZone is not resident yet (it only
