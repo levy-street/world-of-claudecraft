@@ -169,7 +169,7 @@ describe('farSourceMaterials', () => {
   it('reads the captured slots back in bake-group order', () => {
     const root = composedRoot(['sword']);
     root.userData.farMaterials = composedFarMeshes(root).map((m) => m.material);
-    const out = farSourceMaterials(root, 4);
+    const out = farSourceMaterials(root, [0, 1, 2, 3]);
     expect(out.map((m) => (m as THREE.Material & { name: string }).name)).toEqual([
       'mat_head',
       'mat_eyes',
@@ -178,10 +178,23 @@ describe('farSourceMaterials', () => {
     ]);
   });
 
+  it('resolves each group through the bake slot map, not through its own index', () => {
+    // bakeStaticPose coalesces source meshes that resolve to one material into
+    // ONE group, so group index and mesh index part ways: a group reads the
+    // material its FIRST member captured.
+    const root = composedRoot(['sword']);
+    root.userData.farMaterials = composedFarMeshes(root).map((m) => m.material);
+    const out = farSourceMaterials(root, [3, 0]);
+    expect(out.map((m) => (m as THREE.Material & { name: string }).name)).toEqual([
+      'mat_cloth_bodymerged',
+      'mat_head',
+    ]);
+  });
+
   it('pads rather than leaving a group without a material', () => {
     const root = composedRoot([]);
     root.userData.farMaterials = [new THREE.MeshStandardMaterial({ name: 'only' })];
-    const out = farSourceMaterials(root, 3);
+    const out = farSourceMaterials(root, [0, 1, 2]);
     expect(out).toHaveLength(3);
     for (const m of out) expect(m).toBeInstanceOf(THREE.Material);
     // ...and the pad is one shared fallback instance, not three
@@ -248,7 +261,11 @@ describe('far-LOD wiring (source pins)', () => {
     // back out of the same walk, so it is self-consistent and keeps the weapon;
     // the composed bake is shared per part set, which cannot represent one.
     const composed = fnBody('src/render/characters/assets.ts', 'export function modularFarBake(');
-    expect(composed).toContain('bakeStaticPose(norm, composedFarMeshes(temp))');
+    expect(composed).toContain('bakeStaticPose(');
+    expect(composed).toContain('composedFarMeshes(temp)');
+    // ...with the COMPOSED group key, so a coalesced group only ever holds
+    // meshes that resolve to one material for every look.
+    expect(composed).toContain('composedFarBakeGroupKey');
     // The fixed rig captures farBakeMeshes(temp) once, bakes the LOD off that
     // walk, then derives the shadow bake from the same list (the raid mech's
     // shadow-policy split), so the pin follows the capture plus the bake call.
@@ -396,6 +413,7 @@ describe('buildComposedFar catches a fresh far mesh up on effect state', () => {
     vi.spyOn(assets, 'modularFarBake').mockReturnValue({
       geo: new THREE.BufferGeometry(),
       isBody: [true],
+      slots: [0],
     } as unknown as ReturnType<typeof assets.modularFarBake>);
     vi.spyOn(assets, 'prepareVisual').mockReturnValue({
       def: {},
@@ -542,6 +560,7 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
     vi.spyOn(assets, 'modularFarBake').mockReturnValue({
       geo: new THREE.BufferGeometry(),
       isBody: [true],
+      slots: [0],
     } as unknown as ReturnType<typeof assets.modularFarBake>);
     vi.spyOn(assets, 'prepareVisual').mockReturnValue({
       def: {},
@@ -579,11 +598,18 @@ describe('attemptComposedFar keeps farBakeTried in step with a refused budget', 
 // needing authored rig/bone data.
 describe('peekModularFarBake and modularFarBake', () => {
   afterEach(() => {
+    stubScene = null;
     vi.doUnmock('../src/render/assets/loader');
     vi.resetModules();
   });
 
+  // The parsed scene every load in this block answers with. Overridden by the
+  // coalescing test below, which needs more than one primitive to have anything
+  // to coalesce.
+  let stubScene: (() => THREE.Object3D) | null = null;
+
   function stubGltf() {
+    if (stubScene) return { scene: stubScene(), animations: [] };
     const scene = new THREE.Group();
     const m = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), new THREE.MeshStandardMaterial());
     m.name = 'body';
@@ -644,5 +670,44 @@ describe('peekModularFarBake and modularFarBake', () => {
 
     // An unrelated key never matches a cached entry.
     expect(assetsModule.peekModularFarBake('does_not_exist_key', DEFAULT_LOOK)).toBeNull();
+  }, 20000);
+
+  it('coalesces the bake into one group per resolved material, with a slot map', async () => {
+    // A group is a DRAW. One per source primitive is what made the
+    // "single-draw far mesh" the crowd LOD is written around a draw per part.
+    const shared = new THREE.MeshStandardMaterial({ name: 'shared' });
+    const other = new THREE.MeshStandardMaterial({ name: 'other' });
+    stubScene = () => {
+      const scene = new THREE.Group();
+      const mesh = (name: string, material: THREE.Material) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), material);
+        m.name = name;
+        return m;
+      };
+      // shared, other, shared, shared: interleaved on purpose, so a merge that
+      // ignored the grouped order could not produce contiguous runs.
+      scene.add(mesh('a', shared), mesh('b', other), mesh('c', shared), mesh('d', shared));
+      return scene;
+    };
+    const assetsModule = await loadAssetsReady();
+
+    const minted = assetsModule.modularFarBake(MODULAR_WARRIOR_KEY, DEFAULT_LOOK);
+    expect(minted).not.toBeNull();
+    const bake = minted as NonNullable<typeof minted>;
+    // Four source primitives, two distinct materials, two groups.
+    expect(bake.geo.groups).toHaveLength(2);
+    expect(bake.slots).toEqual([0, 1]);
+    expect(bake.isBody).toHaveLength(2);
+    // The groups tile the whole buffer, in merge order, without overlap.
+    const drawCount = bake.geo.index
+      ? bake.geo.index.count
+      : bake.geo.getAttribute('position').count;
+    const sorted = [...bake.geo.groups].sort((x, y) => x.start - y.start);
+    expect(sorted[0].start).toBe(0);
+    expect(sorted[0].count + sorted[1].count).toBe(drawCount);
+    expect(sorted[1].start).toBe(sorted[0].count);
+    // ...and the shared material owns three of the four primitives.
+    expect(sorted[0].count).toBe(drawCount * 0.75);
+    expect(bake.geo.groups.map((g) => g.materialIndex).sort()).toEqual([0, 1]);
   }, 20000);
 });

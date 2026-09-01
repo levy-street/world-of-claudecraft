@@ -751,6 +751,7 @@ const RENDER_PURE_CORES = [
   'src/render/zone_prewarm_templates_core.ts',
   'src/render/characters/skeleton_update_core.ts',
   'src/render/characters/material_program_shape_core.ts',
+  'src/render/characters/far_bake_groups_core.ts',
   'src/render/characters/modular_name_facts_core.ts',
   'src/render/characters/morph_union_core.ts',
   'src/render/characters/tinted_material_cache_core.ts',

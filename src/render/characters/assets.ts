@@ -26,6 +26,7 @@ import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
+import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
@@ -2480,6 +2481,11 @@ export interface ModularFarBake {
   /** One entry per geometry group: whether that group is the character's own
    *  body, the distinction applyMaterials uses to gate the skin override. */
   isBody: boolean[];
+  /** One entry per geometry group: the index, in the `composedFarMeshes` walk,
+   *  of the source mesh it draws. That walk is the one assembleModular captured
+   *  `userData.farMaterials` from, so this is how a character resolves a group
+   *  against its OWN materials once several meshes share a group. */
+  slots: number[];
 }
 
 /** An already-minted far bake for this key + look, or null (WITHOUT baking).
@@ -2574,7 +2580,11 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
     .makeTranslation(0, prep.yOffset, 0)
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
-  const { geo, isBody } = bakeStaticPose(norm, composedFarMeshes(temp));
+  const { geo, isBody, slots } = bakeStaticPose(
+    norm,
+    composedFarMeshes(temp),
+    composedFarBakeGroupKey,
+  );
   // Pin the entry across the handover. Giving the throwaway's ref back can drop
   // this variant to zero live clones, and a release at zero sweeps: without the
   // pin the sweep could evict the very entry the bake is about to be written to,
@@ -2583,7 +2593,7 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
   // unpin below leaves the entry idle for the next sweep to judge normally.
   variant.refs++;
   releaseModularVariant(temp);
-  variant.far = geo ? { geo, isBody } : null;
+  variant.far = geo ? { geo, isBody, slots } : null;
   variant.refs--;
   return variant.far;
 }
@@ -2641,19 +2651,33 @@ export function composedFarMeshes(root: THREE.Object3D): THREE.Mesh[] {
   return farBakeMeshes(root).filter((mesh) => !mesh.userData.weaponMesh);
 }
 
-/** This composed body's far-LOD material slots, in bake-group order (captured by
- *  assembleModular). Padded to `count` so a mismatch can never leave a group
- *  without a material rather than mis-colouring one, and loud about it in dev:
- *  the pad is a fail-soft, and a length that does not match means the two walks
- *  have drifted and everything past the drift is drawing the wrong colour. */
-export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
-  const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
-  if (import.meta.env?.DEV && slots.length > 0 && slots.length !== count) {
+/** This composed body's far-LOD materials, one per bake GROUP.
+ *
+ *  `groupSlots` is the bake's slot map: group g draws the source mesh at index
+ *  `groupSlots[g]` of the composed walk, which is the index this body captured
+ *  its material under (assembleModular, off the SAME `composedFarMeshes` walk).
+ *  The indirection is what lets `bakeStaticPose` coalesce several source meshes
+ *  into one group without breaking that alignment.
+ *
+ *  Padded with a fallback so a mismatch can never leave a group without a
+ *  material rather than mis-colouring one, and loud about it in dev: the pad is
+ *  a fail-soft, and an out-of-range slot means the two walks have drifted and
+ *  everything past the drift is drawing the wrong colour. */
+export function farSourceMaterials(
+  root: THREE.Object3D,
+  groupSlots: readonly number[],
+): THREE.Material[] {
+  const captured = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
+  if (
+    import.meta.env?.DEV &&
+    captured.length > 0 &&
+    groupSlots.some((slot) => slot < 0 || slot >= captured.length)
+  ) {
     console.warn(
-      `[modular] far bake wants ${count} material slots, the composed body captured ${slots.length}; the two far walks have drifted`,
+      `[modular] far bake reads slots up to ${Math.max(...groupSlots)}, the composed body captured ${captured.length}; the two far walks have drifted`,
     );
   }
-  return Array.from({ length: count }, (_, i) => slots[i] ?? FAR_MATERIAL_FALLBACK);
+  return groupSlots.map((slot) => captured[slot] ?? FAR_MATERIAL_FALLBACK);
 }
 
 const FAR_MATERIAL_FALLBACK = new THREE.MeshStandardMaterial();
@@ -2668,12 +2692,52 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   return true;
 }
 
+/** What a baked source mesh's far material is a function of, so two meshes that
+ *  answer the same string can share ONE geometry group.
+ *
+ *  The default is the pair `tintedFarMaterials` reads: the source material and
+ *  the body flag that gates the skin/emissive override. A composed bake adds
+ *  the node-name partition, because a composed group's material is not read off
+ *  this walk at all: it is looked up per character, per slot, through
+ *  `farSourceMaterials`, and that lookup is `recolored(source, look, name
+ *  facts)`. Two slots therefore resolve alike for EVERY look exactly when their
+ *  source material and their name facts agree, which is what this key states.
+ *  (The temp's material identity already implies the source's: the recolour
+ *  cache keys on the source uuid.) */
+function farBakeGroupKey(mesh: THREE.Mesh): string {
+  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  return `${mat?.uuid ?? 'none'}|${mesh.userData.bodyMesh ? 1 : 0}`;
+}
+
+/** The composed arm of the key above. */
+function composedFarBakeGroupKey(mesh: THREE.Mesh): string {
+  return `${farBakeGroupKey(mesh)}|${modularMergePartition(mesh.name)}`;
+}
+
+export interface StaticPoseBake {
+  geo: THREE.BufferGeometry | null;
+  /** One entry per GROUP: the source material of the mesh that group draws. */
+  mats: THREE.Material[];
+  /** One entry per GROUP: the body flag gating the skin/emissive override. */
+  isBody: boolean[];
+  /** One entry per GROUP: the index, in the `meshes` walk, of the source mesh
+   *  the group draws. The identity map before coalescing, and the indirection a
+   *  composed body resolves its per-character materials through. */
+  slots: number[];
+}
+
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
- *  (skinned verts via applyBoneTransform), normalized into world units. */
+ *  (skinned verts via applyBoneTransform), normalized into world units.
+ *
+ *  Meshes whose `groupKey` agrees share ONE group, so the "single-draw far
+ *  mesh" the crowd LOD counts on really is close to one draw instead of a group
+ *  per source primitive. Groups keep the order of their FIRST member, so the
+ *  slot map stays readable and a bake is deterministic. */
 function bakeStaticPose(
   norm: THREE.Matrix4,
   meshes: THREE.Mesh[],
-): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
+  groupKey: (mesh: THREE.Mesh) => string = farBakeGroupKey,
+): StaticPoseBake {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
   const isBody: boolean[] = [];
@@ -2683,7 +2747,7 @@ function bakeStaticPose(
   // The caller passes the walk, so which filter a bake belongs to is decided at
   // the one place that also knows where its materials come from: the composed
   // bake is handed composedFarMeshes, the same list assembleModular captured its
-  // slots from, and group N here is slot N there.
+  // slots from, and group N here names slot `slots[N]` there.
   for (const mesh of meshes) {
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
@@ -2720,14 +2784,34 @@ function bakeStaticPose(
     isBody.push(!!mesh.userData.bodyMesh);
   }
 
-  if (geos.length === 0) return { geo: null, mats: [], isBody: [] };
+  if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [] };
   // uv presence must agree for merging — drop uvs entirely if any geo lacks them
   const allHaveUv = geos.every((g) => g.getAttribute('uv'));
   if (!allHaveUv) for (const g of geos) g.deleteAttribute('uv');
-  const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, true);
-  if (geos.length === 1) {
-    geo.clearGroups();
-    geo.addGroup(0, geo.index ? geo.index.count : geo.getAttribute('position').count, 0);
+
+  // One group per distinct key, fed to the merge in grouped order so each
+  // group's members land CONTIGUOUSLY (one addGroup can only cover a run).
+  const grouping = coalesceFarBakeGroups(meshes.map(groupKey));
+  const geo =
+    grouping.mergeOrder.length === 1
+      ? geos[grouping.mergeOrder[0]]
+      : mergeGeometries(
+          grouping.mergeOrder.map((i) => geos[i]),
+          true,
+        );
+  if (!geo) return { geo: null, mats: [], isBody: [], slots: [] };
+  // mergeGeometries emitted one group per INPUT (and a single geometry keeps
+  // whatever groups it arrived with); rewrite them as one group per coalesced
+  // run, whose material index is the run's own index.
+  const counts = geos.map((g) => (g.index ? g.index.count : g.getAttribute('position').count));
+  geo.clearGroups();
+  for (const range of farBakeGroupRanges(grouping, counts)) {
+    geo.addGroup(range.start, range.count, range.materialIndex);
   }
-  return { geo, mats, isBody };
+  return {
+    geo,
+    mats: grouping.slots.map((i) => mats[i]),
+    isBody: grouping.slots.map((i) => isBody[i]),
+    slots: [...grouping.slots],
+  };
 }
