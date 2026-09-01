@@ -17669,6 +17669,23 @@ the maintainer may want closed in src/ui/item_kind_label.ts. And the
 nameplate_canvas ratchet row lowered to the exact 851 on an upstream-owned
 line: a release-side growth to exactly 852 lands red here (loud, never a
 skip); the row says to keep ours at the next sync.
+RULED (qr-19-farm-fine-produce-kind-label, 2026-09-01, under qr-19-best-for-project): CLOSE the
+label split. The twelve farm fine produce ids now read "Fine Material" on the tooltip kind line,
+matching the nine ore, log and herb fine grades, through a derived FARM_FINE_PRODUCE_ITEM_IDS arm
+in src/ui/item_kind_label.ts placed before the MATERIAL_ITEM_IDS arm. PRESENTATION ONLY, and that
+limit is the ruling rather than an implementation note: the twelve are NOT added to
+MATERIAL_GRADES and baseMaterialFor is not widened, so materialGradeIds still walks the nine node
+yields alone and a fine twin still cannot satisfy a recipe asking for base produce, the rule
+items.ts states beside fine_vale_wheat. Pinned in three directions in tests/item_kind_line.test.ts
+(all twelve twins read Fine Material, the twelve base produce ids and the twelve seeds still read
+Material, and materialGradeIds is unchanged for both the farm ids and a node yield), each arm
+mutated and watched fail alone. No new i18n key and no fills: itemUi.kind.fineMaterial already
+ships in every locale for the node fine grades. THIS CLOSES ONLY THE FIRST HALF OF THIS PARAGRAPH.
+The nameplate_canvas ratchet half above, the exact 851 on an upstream-owned line, is untouched and
+stays with its own row. THE SEEDED ADDRESS WAS WRONG and is corrected here rather than rewritten:
+the gate row files this read under Phase 16 at lines 16953-16958, but it sits in the Phase 11l QA
+ledger and reads at 17662-17671 today; the anchor string itself is unique, so the ruling lands at
+the same place either way.
 
 ### WHAT MOVED IN THE RECORD, AND WHAT DID NOT
 

@@ -7,10 +7,11 @@
 // arm keeps Hud.prototype.itemTooltip honest.
 
 import { describe, expect, it } from 'vitest';
+import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import { RAW_COOKING_CATCH_IDS } from '../src/sim/content/items';
 import { ITEMS } from '../src/sim/data';
 import { MATERIAL_ITEM_IDS } from '../src/sim/material_taxonomy';
-import { baseMaterialFor } from '../src/sim/professions/material_grades';
+import { baseMaterialFor, materialGradeIds } from '../src/sim/professions/material_grades';
 import { Hud } from '../src/ui/hud';
 import { itemKindLabel, itemQualityLabel } from '../src/ui/item_kind_label';
 import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
@@ -131,5 +132,51 @@ describe('the tooltip kind line for material grades', () => {
   it('cooked meals still read Food', () => {
     expect(itemKindLabel('food', 'pan_seared_perch')).toBe('Food');
     expect(tooltipHtml('pan_seared_perch')).toContain('Food');
+  });
+});
+
+// The farm half of the same split (qr-19-farm-fine-produce-kind-label). The
+// twelve farm fine twins used to fall past baseMaterialFor into
+// MATERIAL_ITEM_IDS and read the plain "Material" the nine node fine grades
+// do not. They now read "Fine Material" through a presentation-only arm. The
+// third block below is the load-bearing one: it proves the label moved and
+// the SUBSTITUTION did not, because the tempting fix (adding the twins to
+// MATERIAL_GRADES) would have let a fine twin satisfy a recipe asking for
+// base produce, a gameplay change nobody asked for.
+describe('the farm fine produce kind line', () => {
+  const crops = Object.values(FARM_CROPS);
+
+  it('every farm fine twin reads Fine Material, like the nine node fine grades', () => {
+    expect(crops).toHaveLength(12);
+    for (const crop of crops) {
+      const id = crop.fineProduceItemId;
+      expect(ITEMS[id].kind, id).toBe('junk');
+      expect(itemKindLabel('junk', id), id).toBe('Fine Material');
+      const html = tooltipHtml(id);
+      expect(html, id).toContain('Fine Material');
+      expect(html, id).not.toMatch(/(?<!Fine )\bJunk\b/);
+    }
+  });
+
+  it('the base produce and the seeds still read Material, never Fine Material', () => {
+    for (const crop of crops) {
+      for (const id of [crop.produceItemId, crop.seedItemId]) {
+        expect(MATERIAL_ITEM_IDS.has(id), id).toBe(true);
+        expect(itemKindLabel('junk', id), id).toBe('Material');
+        expect(tooltipHtml(id), id).not.toContain('Fine Material');
+      }
+    }
+  });
+
+  it('the label split leaked no downward substitution into materialGradeIds', () => {
+    for (const crop of crops) {
+      // The twins are still outside the FINE_GRADE pairing, which is what
+      // makes the label arm necessary AND what keeps the substitution shut.
+      expect(baseMaterialFor(crop.fineProduceItemId), crop.id).toBeUndefined();
+      expect(materialGradeIds(crop.produceItemId), crop.id).toEqual([crop.produceItemId]);
+      expect(materialGradeIds(crop.fineProduceItemId), crop.id).toEqual([crop.fineProduceItemId]);
+    }
+    // The nine node yields are untouched: a base still walks to its fine grade.
+    expect(materialGradeIds('iron_ore')).toEqual(['iron_ore', 'fine_iron_ore']);
   });
 });

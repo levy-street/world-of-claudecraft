@@ -2012,6 +2012,15 @@ authors a new name appends its rows in the same change.
 | exports | `farmFeastModelUrl` | 18 | qr-18-REOPEN, item apex-feast-distinct-prop | the pure templateId to table pick the painter consumes: apex when the templateId is a placeable feast that is not the party one, DERIVED from the catalog rather than a hand list, so a fourth apex feast def joins with no edit (src/render/farm_patches_core.ts) |
 | exports | `farmFeastModelUrls` | 18 | qr-18-REOPEN, item apex-feast-distinct-prop | both feast urls in a stable order, so the preload sweep and the farm program anchors cover the new table and no placement links or loads it cold (src/render/farm_patches_core.ts) |
 
+## Explained extras (2026-09-01, the Phase 19B UI wave)
+
+Names authored by the Phase 19B units; per the standing rule every unit that
+authors a new name appends its rows in the same change.
+
+| Class | Name | Phase | Ruling | Reason |
+|---|---|---|---|---|
+| exports | `FARM_FINE_PRODUCE_ITEM_IDS` | 19B | qr-19-farm-fine-produce-kind-label | the twelve farm fine twins derived off the crop catalog, the membership the tooltip kind line reads so a farm twin prints "Fine Material" beside the nine ore, log and herb fine grades; deliberately a SEPARATE set from FARM_MATERIAL_ITEM_IDS (which also carries the seeds, the base produce, the husks and the two knob supplies, so an arm over it would label a seed) and deliberately NOT a MATERIAL_GRADES widening, since materialGradeIds walks that table alone and a twin inside it would begin satisfying a recipe asking for base produce (src/sim/content/farm_crops.ts) |
+
 ## Literal-only records (not symbols in any census class; kept for the reader)
 
 | Class | Old name | New name | Phase | Ruling | Reason |

@@ -357,3 +357,20 @@ export const FARM_MATERIAL_ITEM_IDS: readonly string[] = [
   FARM_WITHERED_HUSK_ITEM_ID,
   ...FARM_SUPPLY_ITEM_IDS,
 ];
+
+// The fine twins alone, derived off the catalog like FARM_CROP_IDS above, so a
+// new crop self-registers here too. The TOOLTIP KIND LINE reads this
+// (src/ui/item_kind_label.ts) so a farm fine twin prints "Fine Material"
+// beside the nine ore, log and herb fine grades instead of the plain
+// "Material" it fell through to.
+//
+// Deliberately a SEPARATE set from FARM_MATERIAL_ITEM_IDS above, which also
+// carries the seeds, the base produce, the husks and the two knob supplies:
+// an arm over that set would print "Fine Material" on a seed. And deliberately
+// NOT a MATERIAL_GRADES widening, which is the trap: materialGradeIds walks
+// MATERIAL_GRADES alone, so a twin that entered it would start satisfying a
+// recipe asking for base produce, the rule items.ts states beside
+// fine_vale_wheat. Presentation only.
+export const FARM_FINE_PRODUCE_ITEM_IDS: ReadonlySet<string> = new Set(
+  Object.values(FARM_CROPS).map((c) => c.fineProduceItemId),
+);
