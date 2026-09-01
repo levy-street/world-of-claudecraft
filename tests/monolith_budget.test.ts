@@ -503,7 +503,14 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the v0.41.0 base sync into the
     // raid branch: both arms extracted and added independently, so neither
     // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 11551,
+    // Down 11551 -> 11516 at the fix/graphics-rebuild-ktx2-restore-stall sync
+    // into release/v0.42.0: the release arm's independent OSSBrain-batch
+    // rewrite of the KTX2 restore-upload wiring (a bare queue argument) was
+    // replaced by this branch's own reviewed design (a queue-AND-host target,
+    // read live through the same restore-upload coordinator the release arm
+    // already wires into the rebuild lifecycle), which nets fewer lines than
+    // either parent's independent count. Exact merged count, zero headroom.
+    ceiling: 11516,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {
