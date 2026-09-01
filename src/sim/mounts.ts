@@ -170,11 +170,12 @@ const RIDING_UNTRAINED_MSG = 'You must learn to ride first. Find a riding traine
  *  entity, emitting aura-removal events for each one removed. Called before a mount
  *  summon starts so the player is never simultaneously shapeshifted/stealthed and
  *  mounting. Stealth is routed through the single `ctx.breakStealth` funnel (not
- *  spliced inline like the forms) so its linger/aftereffect side effects fire exactly
- *  as they do for every other way stealth ends. Without this, a stealthed rider keeps
- *  the aura's shrunk detection radius while moving at full mount speed: invisible AND
- *  fast, the "stealth horse" duel exploit. Calls recalcFor if any aura was removed so
- *  stat effects (speed, etc.) clear immediately. */
+ *  spliced inline like the forms) until no stealth aura remains, so each aura's
+ *  linger/aftereffect side effects fire exactly as they do for every other way
+ *  stealth ends. Without this, a stealthed rider keeps the aura's shrunk detection
+ *  radius while moving at full mount speed: invisible AND fast, the "stealth horse"
+ *  duel exploit. Calls recalcFor if any aura was removed so stat effects (speed,
+ *  etc.) clear immediately. */
 function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
   let stripped = false;
   for (let i = e.auras.length - 1; i >= 0; i--) {
@@ -185,7 +186,7 @@ function cancelFormsAndGhostWolf(ctx: SimContext, e: Entity): void {
       stripped = true;
     }
   }
-  if (e.auras.some((a) => a.kind === 'stealth')) {
+  while (e.auras.some((a) => a.kind === 'stealth')) {
     ctx.breakStealth(e);
     stripped = true;
   }

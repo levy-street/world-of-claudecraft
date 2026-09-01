@@ -1370,6 +1370,51 @@ describe('mount + stealth interaction (stealth horse fix)', () => {
     expect(removal).toBeDefined();
   });
 
+  it('starting a mount summon clears stacked stealth auras through their removal funnel', () => {
+    const sim = makeWorld();
+    const pid = join(sim, 20);
+    const e = sim.entities.get(pid)!;
+    giveReins(sim, pid);
+    putInStealth(sim, pid);
+    e.auras.push({
+      id: 'greater_invisibility',
+      name: 'Greater Invisibility',
+      kind: 'stealth',
+      remaining: 20,
+      duration: 20,
+      value: 1,
+      value2: 0.35,
+      value3: 4,
+      sourceId: pid,
+      school: 'arcane',
+    });
+    expect(e.auras.filter((a) => a.kind === 'stealth').map((a) => a.name)).toEqual([
+      'Duskveil',
+      'Greater Invisibility',
+    ]);
+
+    sim.drainEvents();
+    const started = summonMountItem(sim.ctx, pid, 'valorsteed');
+    const events = sim.drainEvents();
+
+    expect(started).toBe(true);
+    expect(e.auras.filter((a) => a.kind === 'stealth')).toEqual([]);
+    expect(e.stealthed).toBe(false);
+    const removals = events.filter(
+      (ev): ev is Extract<SimEvent, { type: 'aura' }> =>
+        ev.type === 'aura' && ev.targetId === pid && !ev.gained,
+    );
+    expect(removals.map((ev) => ev.name)).toEqual(['Duskveil', 'Greater Invisibility']);
+    expect(e.auras).toContainEqual(
+      expect.objectContaining({
+        id: 'greater_invisibility_dr',
+        kind: 'buff_dr',
+        value: 0.35,
+        remaining: 4,
+      }),
+    );
+  });
+
   it("once mounted, full mount speed applies with no lingering stealth slow (the exploit's speed half)", () => {
     const sim = makeWorld();
     const pid = join(sim, 20);
