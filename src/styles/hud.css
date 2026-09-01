@@ -7715,6 +7715,13 @@
     left: 50%;
     top: 21%;
     transform: translateX(-50%);
+    /* No z-index left this at the implicit auto tier, which paints BEHIND any
+       open .window (base z-index 20, raised to the 50-89 band on focus by
+       bringWindowToFront in hud.ts): a deny toast fired while a window was
+       open (e.g. mailing an unmailable item) rendered invisible under it,
+       visible only once the window was dragged aside. 90 matches the
+       established "always above the window band" tier (#ctx-menu, hud.css). */
+    z-index: 90;
     color: #ff2020;
     font-size: 18px;
     font-weight: bold;
@@ -9329,7 +9336,13 @@
     left: 50%;
     top: 34%;
     transform: translateX(-50%);
-    z-index: 80;
+    /* 80 sat INSIDE the .window focus band (bringWindowToFront cycles 50-89 in
+       hud.ts), so a prompt mounted here (e.g. the vendor sell-confirm prompt,
+       bags_window.ts showSellConfirmPrompt) rendered behind whichever window
+       had most recently climbed past 80, intermittently and only after enough
+       window focus churn in the session: 90 clears the whole band, matching
+       #error-msg and #ctx-menu's "always above the window band" tier. */
+    z-index: 90;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -10007,7 +10020,17 @@
     translate: -50% -50%;
     width: 300px;
     height: 232px;
-    z-index: 30;
+    /* #proc-overlay is appended straight to <body> (hud.ts), a SIBLING of #ui,
+       not a descendant of it: its own position:fixed z-index establishes a
+       stacking context that competes with #ui's as a whole, not with any
+       window's internal 20-89 focus band. #ui's desktop base is z-index 10
+       (base.css), so the old 30 here painted the Rising Phoenix / soul-crystal
+       bank ABOVE every window: opening Bags mid-proc drew the phoenix (or the
+       Warlock's soul fragments) over the bag grid. 5 sits above #nameplates (1)
+       and #game-canvas (0), so the proc stays visible over the 3D world during
+       normal play, but now clears behind #ui (and, on mobile, its already
+       higher in-game/window-open z-index of 80/90) the moment a window opens. */
+    z-index: 5;
     opacity: 0;
     pointer-events: none;
     /* OFF transition = the gentle fade-out (owner: a bit slower, no hard snap);

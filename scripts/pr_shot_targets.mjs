@@ -11723,6 +11723,193 @@ export const TARGETS = [
     },
   },
   {
+    key: 'mailbox-deny-stacking',
+    label:
+      'Mailbox Send tab: a bind-on-trade material names the specific bound reason, and the deny toast stays above the window',
+    when: ['ui/bags_view', 'ui/bags_window', 'styles/hud.css'],
+    // On a base checkout, both denies (the hover hint AND the click toast) read
+    // the same generic "This cannot be mailed." line, and the toast (#error-msg,
+    // no z-index) renders BEHIND the mailbox window, visible only at its edges.
+    // On the fix, the per-copy lock names the specific bound reason and the
+    // toast clears the window (z-index 90).
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Proving Shore's proximity-triggered spawn greeting (Ferryman Odo)
+        // is a scoped popup (z-index 95+, always topmost by design): left up,
+        // it would visually cover the very toast this target exists to prove
+        // now clears the window underneath it.
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim?.player) return { ok: false, reason: 'no sim' };
+        document.getElementById('tutorial-greeting')?.remove();
+        // The exact shape a rare+ disenchant grants (professions/enchanting.ts
+        // resolveDisenchant's typed secondary): armed bind-on-trade, never
+        // freely resold or mailed until traded away in person.
+        sim.addItemInstance('resonant_thread', { bindOnTrade: true });
+        game.hud.openMailbox();
+        document.querySelector('.mail-tab[data-tab="send"]')?.click();
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`mailbox setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#mailbox-window'))) {
+        throw new Error('mailbox window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      const clicked = await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const cell = [...document.querySelectorAll('#bags .bag-item:not(.empty)')].find((b) =>
+          (b.getAttribute('aria-label') ?? '').includes('Resonant Thread'),
+        );
+        cell?.click();
+        return !!cell;
+      });
+      if (!clicked) throw new Error('Resonant Thread bag cell not found');
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'vendor-sell-confirm-stacking',
+    label:
+      'Vendor sell-confirm prompt stays above the vendor window once its z-index has climbed past the old fixed 80',
+    when: ['ui/bags_view', 'ui/bags_window', 'styles/hud.css'],
+    // The window-focus band (hud.ts bringWindowToFront) cycles 50-89 across a
+    // real session's window churn; a fixed inline override stands in for that
+    // churn deterministically rather than looping dozens of real window
+    // toggles through an async MutationObserver. 85 sits INSIDE that band, so
+    // it is the honest "this vendor window happens to have focused recently"
+    // case the report described as intermittent.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Proving Shore's proximity-triggered spawn greeting (Ferryman Odo)
+        // is a scoped popup (z-index 95+, always topmost by design): left up,
+        // it would visually cover the very prompt this target exists to prove
+        // now clears the window underneath it.
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        if (!sim) return { ok: false, reason: 'no sim' };
+        document.getElementById('tutorial-greeting')?.remove();
+        const vendor = [...sim.entities.values()].find(
+          (e) => e.templateId === 'quartermaster_bree',
+        );
+        if (!vendor) return { ok: false, reason: 'no vendor entity' };
+        const p = sim.player;
+        if (!p?.pos) return { ok: false, reason: 'no player' };
+        p.pos.x = vendor.pos.x + 2;
+        p.pos.z = vendor.pos.z;
+        p.prevPos = { ...p.pos };
+        try {
+          sim.addItem('eastbrook_arming_sword', 1);
+        } catch {}
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.display = 'none';
+        game.hud.openVendor(vendor.id);
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`vendor setup failed: ${setup.reason}`);
+      // The position jump above (to stand next to the vendor) can still be
+      // mid-fade on the entry loading curtain under contention; wait it out
+      // before trusting anything the poll below reports as "visible".
+      await pollForNoLoadingCurtain(page);
+      if (!(await pollForSize(page, '#vendor-window'))) {
+        throw new Error('vendor window did not open');
+      }
+      if (!(await pollForSize(page, '#bags'))) throw new Error('bags window did not open');
+      await wait(300);
+      // Stand in for a session that already cycled window focus past the old
+      // fixed #prompt-stack z-index (80): the vendor window itself is the one
+      // most recently brought to front in the real flow this reproduces.
+      await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const el = document.querySelector('#vendor-window');
+        if (el) el.style.zIndex = '85';
+      });
+      const clicked = await page.evaluate(() => {
+        document.getElementById('tutorial-greeting')?.remove();
+        const cell = [...document.querySelectorAll('#bags .bag-item:not(.empty)')].find((b) =>
+          (b.getAttribute('aria-label') ?? '').includes('Eastbrook Arming Sword'),
+        );
+        cell?.click();
+        return !!cell;
+      });
+      if (!clicked) throw new Error('Eastbrook Arming Sword bag cell not found');
+      // Longer than the other targets' closing wait on purpose: this target's
+      // position jump right after entry can leave the loading curtain's
+      // display:none flip a frame or two behind the DOM under SwiftShader
+      // contention (observed: the curtain's classes were already correctly
+      // cleared by the time of a same-tick diagnostic read, yet the very next
+      // screenshot still painted it), so this settles the paint, not the DOM.
+      await pollForNoLoadingCurtain(page);
+      await wait(900);
+      return { clip: '#ui' };
+    },
+  },
+  {
+    key: 'proc-overlay-behind-window',
+    label:
+      'The proc overlay (Rising Phoenix / soul-fragment bank) paints BEHIND an open window instead of over it',
+    when: ['styles/hud.css'],
+    // #proc-overlay is appended straight to <body> (a SIBLING of #ui, not a
+    // descendant), so on a base checkout its z-index (30) sits ABOVE #ui's (10):
+    // opening a window while a proc/resource meter is showing drew it over the
+    // window content. The fix (z-index 5) puts it behind #ui instead.
+    variants: [{ key: 'desktop' }, { key: 'mobile', mobile: true }],
+    async capture(page) {
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+        document.querySelector('.gpu-notice-dismiss')?.click();
+        document.querySelector('#gpu-notice')?.remove();
+        // The Proving Shore's proximity-triggered spawn greeting (Ferryman Odo)
+        // is a scoped popup (z-index 95+, always topmost by design): left up,
+        // it would visually cover the very overlay this target exists to prove
+        // now paints behind the window underneath it.
+        document.getElementById('tutorial-greeting')?.remove();
+      });
+      await wait(300);
+      const setup = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.sim?.player) return { ok: false, reason: 'no sim' };
+        document.getElementById('tutorial-greeting')?.remove();
+        const el = document.getElementById('proc-overlay');
+        if (!el) return { ok: false, reason: 'no proc overlay' };
+        // Force the Warlock soul-fragment bank fully lit: a persistent resource
+        // readout (not a transient proc), the clearest demonstration case.
+        el.classList.add('necromancy', 'n5');
+        el.setAttribute('aria-hidden', 'false');
+        // #bags docks permanently in its own bottom-right gap (components.css)
+        // and never overlaps #proc-overlay's centered spot, so the fix would be
+        // invisible against it. The Spellbook is a plain centered .window
+        // (layout.css) tall enough to cover the overlay's position.
+        if (!document.querySelector('#spellbook')?.checkVisibility?.()) game.hud.toggleSpellbook();
+        return { ok: true };
+      });
+      if (!setup.ok) throw new Error(`proc overlay setup failed: ${setup.reason}`);
+      if (!(await pollForSize(page, '#spellbook'))) throw new Error('spellbook did not open');
+      await wait(400);
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'ground-aim-placement',
     when: [
       'action_bar/ground_aim',

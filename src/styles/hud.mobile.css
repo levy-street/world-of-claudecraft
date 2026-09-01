@@ -6935,6 +6935,14 @@
   body.mobile-touch #ctx-menu {
     z-index: 96;
   }
+  /* Same reasoning as #ctx-menu above: the base #error-msg (hud.css) sits at
+     90, above the ordinary .window focus band (50-89) but still under the
+     mobile Bags sheet's forced 95. A deny toast fired from inside the
+     fullscreen Bags sheet (e.g. a blocked mail attach or vendor sale) needs to
+     clear that sheet too, so touch gets the same one-step-above bump. */
+  body.mobile-touch #error-msg {
+    z-index: 96;
+  }
   /* An Apply Enchant picker row (Professions 2.0) carries a dim meta
      sub-line; the flex row above would seat it inline beside the enchant name
      on a narrow menu, so a meta-bearing row stacks instead. */

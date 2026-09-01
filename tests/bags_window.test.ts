@@ -542,6 +542,22 @@ describe('bags_window: touch peek + bank-cluster close', () => {
       /case 'use': \{[\s\S]{0,400}?if \(!item \|\| !this\.deps\.useGatherTool\(item\)\) \{[\s\S]{0,200}?this\.deps\.world\(\)\.useItem\(s\.itemId/,
     );
   });
+
+  it('mail-attach-blocked-bound shows the specific bound reason, distinct from the generic mail deny', () => {
+    // A per-copy transfer lock (an armed disenchant typed secondary, or an
+    // already-traded boundTo copy) is not simply "unmailable": it clears once
+    // traded in person. The click deny must voice the same specific reason the
+    // sim's own send-time noMailBound refusal uses, never the generic line the
+    // def-level (quest/noMarketList) deny below still correctly uses.
+    const start = painter.indexOf('private runBagAction(');
+    const body = painter.slice(start, painter.indexOf('\n  }\n', start));
+    expect(body).toMatch(
+      /case 'mailAttachBlockedBound':[\s\S]{0,500}?this\.deps\.showError\(t\('hudChrome\.mailbox\.result\.noMailBound'\)\);\s*return;/,
+    );
+    expect(body).toMatch(
+      /case 'mailAttachBlocked':\s*this\.deps\.showError\(t\('hudChrome\.mailbox\.cannotMail'\)\);\s*return;/,
+    );
+  });
 });
 
 describe('bags_window: right-click uses, dragging destroys/equips', () => {
