@@ -77,7 +77,10 @@ describe('player frame buff-row placement (auraBarBelowFrame)', () => {
   });
 
   it('never re-couples the buff row to the frame drag/detach state', () => {
-    expect(hudCss).not.toContain('#player-frame.pf-detached > #buff-bar');
+    const detached = ruleBlock(
+      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {',
+    );
+    expect(detached).not.toMatch(/\b(?:top|bottom):/);
   });
 
   // A docked (never-dragged) frame has no z-index of its own, so before this
@@ -105,7 +108,7 @@ describe('player frame buff-row placement (auraBarBelowFrame)', () => {
 
   it('keeps detached buff icons interactive below the player frame', () => {
     const detached = ruleBlock(
-      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached>#buff-bar {',
+      'body.auras-on-frame.auras-below-frame #player-frame.pf-detached > #buff-bar {',
     );
     expect(detached).toContain('pointer-events: auto;');
   });
