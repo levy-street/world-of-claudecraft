@@ -1219,6 +1219,11 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // tests/professions_hoe_recipes.test.ts). It gained NO dish in the
   // economy-hooks phase, deliberately: the eight dishes took the five twins
   // the hoe ladder had left unconsumed, and this one was already accounted.
+  // RULED (qr-19-fine-twin-dish-consumers, 2026-09-01, under
+  // qr-19-best-for-project): hoe-reagent-only is ratified as shipped design,
+  // and the hoe-only set is THREE, not two: fine_vale_wheat rides
+  // recipe_bronze_hoe the same way. Only fine_evergarden_greens is
+  // double-booked. No dish is owed here.
   fine_marsh_rice: {
     id: 'fine_marsh_rice',
     name: 'Fine Marsh Rice',
@@ -1295,6 +1300,10 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // (ad); pinned in tests/professions_hoe_recipes.test.ts). Like
   // fine_marsh_rice it gained NO dish in the economy-hooks phase, for the
   // same reason: the dishes closed the twins the hoe ladder had left over.
+  // RULED (qr-19-fine-twin-dish-consumers, 2026-09-01, under
+  // qr-19-best-for-project): hoe-reagent-only is ratified as shipped design,
+  // and the hoe-only set is THREE, not two: fine_vale_wheat rides
+  // recipe_bronze_hoe the same way. No dish is owed here.
   fine_highland_barley: {
     id: 'fine_highland_barley',
     name: 'Fine Highland Barley',

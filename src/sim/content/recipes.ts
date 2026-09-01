@@ -3960,8 +3960,11 @@ export const FARM_RECIPES: ProfessionRecipeRecord[] = [
   // the plain twins), so the buff dish costs strictly more produce than its
   // plain sibling at the same rung, plus the kitchen staple salt (the tier-1
   // row adds the pottage-precedent vale_wheat binder, see below). NO fine
-  // twins here: the fine_marsh_rice / fine_highland_barley consumer set is an
-  // OPEN maintainer question, and SEVEN of the NINE dish twins above stay
+  // twins here: the hoe-reagent-only twin set is RULED
+  // (qr-19-fine-twin-dish-consumers, 2026-09-01, under qr-19-best-for-project)
+  // and ratified as shipped design, for the live set of THREE
+  // (fine_vale_wheat, fine_marsh_rice, fine_highland_barley), so no buff dish
+  // gains a fine twin. SEVEN of the NINE dish twins above stay
   // single-owner: 11h gave fine_gilded_sunmelon and fine_evergarden_greens a
   // second owner apiece, the two skill-125 capstones, and the other seven are
   // untouched. (This read "the five dish twins above stay single-owner", stale
