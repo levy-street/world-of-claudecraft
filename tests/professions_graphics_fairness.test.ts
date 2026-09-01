@@ -351,10 +351,16 @@ describe('professions graphics fairness (actionable surfaces stay preset-identic
     expect(slots.filter((_, i) => shed[i]).map((s) => s.key)).toEqual([WELL_FED_AURA_ID]);
   });
 
-  it('the three exemption kinds do not spend the cap budget', () => {
-    // The other half of the same rule, driven separately so it cannot pass on
-    // the arm above: with the cap at zero, every ordinary buff sheds and every
-    // exempt slot still renders.
+  it('every exemption kind still renders with the cap at ZERO', () => {
+    // The sibling claim, driven separately so it cannot pass on the arm above:
+    // exemption is checked BEFORE the budget, so a cap of zero sheds every
+    // ordinary buff and still renders all three exempt kinds.
+    //
+    // Note what this arm does NOT prove, since the two claims are easy to
+    // conflate: at cap zero there is no budget to spend, so "exempt slots do
+    // not SPEND the budget" is not testable here. That claim is the arm above,
+    // where a budget of one survives three exempt slots and still funds the
+    // raid buff; if exempt slots spent it, the raid buff would shed too.
     const slots: AuraSlotState[] = [
       auraSlot({ key: 'boss_curse', isDebuff: true }),
       auraSlot({ key: [...ALWAYS_VISIBLE_AURA_IDS][0] }),
