@@ -3074,6 +3074,21 @@
        a 4px gap. The landscape media block below re-tunes it for that tier's
        0.6 frame scale. */
     --mobile-pet-frame-drop: calc(53px * var(--mobile-chrome-scale, 1) + 4px);
+    /* RULED (qr-19-mobile-pet-frame-combo-overlap, 2026-09-01): the combo-row overlap
+       raised against this constant is UNREACHABLE, so the drop stays as written and takes
+       no class-conditional term. Checked live: the combo row paints only for resourceType
+       'energy' (src/ui/hud.ts, the player-frame pass), which is the rogue
+       (src/sim/content/classes.ts) and the druid's cat form (src/sim/entity.ts, the form
+       resource swap), and neither is a pet class: isPetClass (src/sim/types.ts) is hunter,
+       warlock and mage, and the pet-frame pass paints hidden for the other six classes,
+       always. The roster walk cannot back-door one either, since findOwnPet
+       (src/ui/pet_frame_view.ts) excludes delve companions, guardian_ templates, the pyre
+       guardian and temporary necromancy undead. No player can see the two boxes at once,
+       so paying vertical space, or a conditional in this layer, would be work with no
+       reachable beneficiary. One figure amended in place while here: the estimate above
+       reads about 53px, while the Phase 18 tests unit measured the heraldry-era frame at
+       45.30px painted and 55.06px with the combo row; the constant is deliberately not
+       re-derived off either number, because it is not moving. */
   }
   body.mobile-touch #pet-frame {
     position: fixed;

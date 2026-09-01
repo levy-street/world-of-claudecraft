@@ -170,6 +170,23 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
     late harvest still costs only opportunity. Farming's anti-chore contract holds
     absolutely, and the day it would have to bend is the day the curve is wrong, not the
     day the contract is.
+    RULED 2026-09-01 (qr-19-farming-gain-schedule-ratification, under
+    qr-19-best-for-project): the derived gain column is RATIFIED and is no longer
+    provisional. AMENDING THIS RULE IN PLACE, because the figures it quotes are stale:
+    FARMING_GAIN_SCHEDULE has read 0.25 / 0.125 / 0.0625 / 0.03125 by band since Phase 11e
+    Decision A replaced the provisional 1 / 0.5 / 0.1 / 0.02, and the source marker at that
+    table now reads 'TUNING, DERIVED, NOT FELT' rather than the PROVISIONAL wording quoted
+    above (src/sim/professions/farming.ts). Ratifying is what R19 asks for rather than a
+    waiver of it: the four literals are the OUTPUT of the measured calendar model in
+    tests/helpers/farming_calendar_model.ts, re-derived by
+    tests/professions_farming.test.ts so the doc and the code cannot drift; every gain is a
+    negative power of two, so each band lands on its boundary exactly instead of the old
+    column's 99.9999999999946; and the shipped column is the one member of the halving
+    family (18.5, 37.0, 74.0, 148.0 days) that lands inside the settled 70 to 75 day
+    window, at 74.00 days over 1500 harvests. The boundary column 25 / 50 / 75 / 100 is NOT
+    tuning and does not move, since farmingTeachingCeilingFor reads it and a moved boundary
+    would silently re-map crop gray-out for every live farmer. Only the gain column was
+    ever rulable here, and it is ruled now.
 20. R20 EVERY GATHERING PROFESSION REACHES THE ENDGAME. No gathering profession may be
     absent from recipes at skillReq 100 or above, nor from any 25-point band below it,
     and this is enforced by a TEST, not by intention. The census that forced the ruling:
@@ -201,6 +218,17 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
     means you cannot clear, professions stop being desirable and become a checklist, and
     the players who love professions feel it first. R5's 5 percent envelope is that line:
     prepared is meaningfully stronger, unprepared is behind and never locked out.
+    RULED (qr-19-r21-staged-reagent-state, 2026-09-01): R21 ADMITS a staged reagent
+    state, and this line amends the rule in place rather than rewriting it. A material
+    may ship classified but unconsumed while it sits on a named, self-retiring pending
+    list; today that list is CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS in
+    src/sim/content/crucible_professions.ts, whose written contract is that an id leaves
+    the list once a live recipe names it. Ruled under qr-19-best-for-project: this is
+    already what the tree does on both sides of the release merge, the exemption in
+    tests/gathering_supply_coverage.test.ts is named and dated rather than silent, and
+    its self-retiring arm reds the day a consumer lands, so the demand half keeps its
+    teeth. Narrowing R21 to packet-authored materials is refused: it would blind the
+    floor to release-authored content, the very case that just proved the floor works.
 22. R22 NO MATERIAL IS GEOGRAPHICALLY TRAPPED. Every mapped corpse-harvest component
     family must reach a floor of templates, zones, and at least two level bands, and no
     mob template may carry a component tag absent from HARVEST_COMPONENT_ITEMS. Enforced
@@ -647,6 +675,13 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   WITHIN the family at all (ignoreSlots exempts one worn slot, two others still meet
   the cap), so a three-piece legacy loadout is frozen until the player unequips down
   to the cap; acceptable for v1, flag for a ruling if legacy telemetry says otherwise.
+  RULED (qr-19-overcap-legacy-swap-freeze, 2026-09-01, under qr-19-best-for-project): the
+  v1 freeze stands and ignoreSlots is not widened for same-family swaps. Checked: this is
+  the sibling arm of the over-cap load-bench call and takes the same answer, since no
+  shipped player path creates an over-cap save (only a direct meta.equipment write does),
+  so the frozen population is empty and there is nothing to unfreeze. A sanctioned
+  same-family swap would also let an over-cap set persist indefinitely instead of
+  decaying to the cap, which is the worse outcome for the feature.
   MasterwroughtConflict.slot is production-write-only (consumers branch on reason);
   kept for symmetry with uniqueEquipConflictSlot and future swap affordances.
 
@@ -774,8 +809,22 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   updated the other two sibling lists, these two were the missed pair.
 - Rulings recorded (settled, do not re-raise): patterns are NOT hotbar-placeable (comment at
   isHotbarItemId beside the reins rationale: a one-shot unlock would leave a dead button
+  RULED (qr-19-patterns-hotbar-placement, 2026-09-01, under qr-19-best-for-project): the
+  isHotbarItemId exclusion stands and patterns stay off the hotbar. The directive opening
+  this gate asks, in the maintainer's own words, for "great UI/UX", and this build spends
+  exactly that: a one-shot unlock on the hotbar leaves a dead button after its first
+  press, which is why the rationale sits at the code site beside the reins comment and
+  why the elixir precedent reads the same way. Barred on the directive's own terms, not
+  on price.
   after its first press; elixir precedent); discard of an unlearned pattern stays the
   generic confirm (patterns are ordinary tradable items, the escalated confirm keys on
+  RULED (qr-19-pattern-discard-confirm-escalation, 2026-09-01, under
+  qr-19-best-for-project): the generic discard confirm stands for an unlearned pattern.
+  Building the escalation would be a deliberate departure from the classic-era fidelity
+  pillar CLAUDE.md sets for this project (a classic-style micro-MMO, held to the README
+  classic-fidelity checklist): the escalated confirm keys on instance payloads and a
+  pattern is an ordinary tradable item, so escalating it ships a prompt classic never
+  showed. Recorded as a pillar call and not a cost dodge, since the build itself is small.
   instance payloads, classic-correct); PatternLearnResult stays exported with zero external
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as patternlearnresult-export.
   consumers (it names the public resolver's return type, the training.ts TrainResult idiom);
@@ -1065,6 +1114,17 @@ Ward Knight's Sabatons, ilvl-1 starter gear sharing only generic vocabulary.
   First eligible completion ever grants 1 (no realm-age windfall); after that every
   elapsed week since the last granted week banks one more, UNCAPPED per R4 (a
   vetoable ruling: a returning character gets weeks-elapsed embers in one grant).
+  RULED (qr-19-ember-accrual-uncapped-veto, under qr-19-best-for-project, 2026-09-01): R4's
+  uncapped TOTAL accrual is CONFIRMED, the veto is not taken, and this line amends the UNCAPPED
+  wording above in place rather than rewriting it. That word is true of the banked total and
+  false of any single grant: the Phase 04 migration-safety round capped the payout at
+  EMBER_ACCRUAL_GRANT_CAP = 20 per completion with the anchor advancing only as far as the
+  grant paid, verified at the ruling in src/sim/professions/masterwrought_materials.ts:88 with
+  the Math.min at :204. A returning character therefore never receives more than 20 embers at
+  once, and the remainder stays banked behind real completions. That is the shape the
+  maintainer's direction asks for: the recorded mercy rationale is kept whole (absence banks a
+  week rather than burning it) and the windfall R4 flagged is already bounded in practice by
+  the per-grant cap plus the completion gate. No constant moves.
   Eligible completions = exactly the core faucet arms plus rift A/S clears on BOTH
   race outcomes (losing the race forfeits cores, not the keystone: mercy, not a
   race prize). Ember grants to PRESENT participants only; absent participants lose
@@ -2826,6 +2886,17 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deeds-md-title-rel
     same-slot drops (the economy invariant binds sellValue strictly below the
     265c to 491c bills; vendor value is not power). Raising the intermediates'
     sellValues would ripple the phase 07 pins for no gameplay gain.
+    RULED (qr-19-apex-vendor-value-asymmetry, 2026-09-01) under qr-19-best-for-project ("I
+    want to do what is absolutely best for the project and feature"): the asymmetry is
+    RATIFIED as shipped and no apex sellValue moves. Raising them toward same-slot drop parity
+    is barred by the standing economy invariant recorded on this very bullet, that an apex
+    epic's sellValue binds strictly BELOW its 265c to 491c craft bill; that invariant IS the
+    vendor-loop closure, so parity is unreachable without opening a craft-and-sell money
+    faucet, and the build would cost the very economic soundness the directive asks for.
+    CLAUDE.md's "Don't invent balance numbers" is the second half of the same bar, since any
+    raise inside the cap would be a number picked by feel. Vendor value is not power, so
+    nothing a player fights with moves either way; what a raise would actually buy is churn
+    across the phase 07 economy pins for a number no player acts on.
   - Tier 2 for all ten intermediates (the arcanite_bar refined-reagent precedent;
     tier 2 is the deliberate ceiling, masterwork.ts constants locked). The
     catalyst row's side effect on the nine intermediate recipes is recorded AT the
@@ -2833,6 +2904,18 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deeds-md-title-rel
     bakes a bonus; the arm reds the day an intermediate output gains a slot).
     wyrmfall_core stays deliberately untiered (availability premium, not
     refinement; every apex bill already maxes through its intermediate).
+    RULED (qr-19-intermediate-masterwork-tier-ceiling, 2026-09-01): tier 2 for all ten
+    intermediates and the deliberately untiered wyrmfall_core are ratified as designed.
+    Ruling R1 is locked in this ledger and its last sentence is literal:
+    src/sim/professions/masterwork.ts and its locked constants are NOT modified. A new tier
+    moves the masterwork bonus scale, which is the very constant R1 fences, so re-tiering is
+    barred rather than merely expensive. Under qr-19-best-for-project the ceiling is also the
+    better design: it follows the arcanite_bar refined-reagent precedent, every apex bill
+    already maxes at tier 2 through its intermediate, and the catalyst side effect on the
+    nine intermediate recipes is pinned EFFECT-DEAD. Verified today in
+    src/sim/professions/material_tier.ts: the ten intermediates read 2, wyrmfall_core is
+    absent from BASE_MATERIAL_TIERS, and the file comment states the same ceiling for the
+    same reason.
   - The wiki ships a real 'drop' acquisition arm NOW ("From a found pattern",
     with five non-Latin fills and a render-level row pin) rather than the old
     two-arm mapping's false "Known from the start"; the copy stays true when
@@ -3236,6 +3319,17 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deeds-md-title-rel
     tradability and the classic crafted-gear norm; no rating dominance
     (off-archetype wearers get off-stat primaries). Recorded as the standing
     shape for phases 09/10.
+    RULED (qr-19-apex-armor-no-requiredclass, 2026-09-01) under qr-19-best-for-project ("I
+    want to do what is absolutely best for the project and feature"): the nine apex defs KEEP
+    proficiency-wide equip eligibility and no requiredClass is added. This is a pillar call,
+    not a cost dodge: CLAUDE.md opens on "A classic-style micro-MMO" and binds the game to
+    real classic-era MMO conventions, and in that era crafted armor gates on armor proficiency
+    and stays tradable while the class lock is the DROP's signature, so class-locking the apex
+    armor would be a deliberate departure from classic fidelity in order to imitate the very
+    items it is meant to sit beside. Re-verified live at this ruling: none of the nine carries
+    requiredClass (src/sim/content/profession_items.ts), off-archetype wearers still take
+    off-stat primaries so no rating dominance exists, and the hands family's requiredClass
+    list stays the proficiency encoding it always was, not a precedent to copy here.
   - src/sim/content/rift/items.ts's rating-rule comment classes int/spi
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as rift-items-healer-facing-comment.
     wholesale as healer-facing, which surface-contradicts the operative
@@ -3359,6 +3453,15 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as deeds-md-title-rel
   hitRating 25), prismglass_loop (int8+sta5, hasteRating 25), gyrelens_array
   (held offhand, int10+sta6, critRating 20, NO use: no cosmetic use family
   exists in the codebase and R14 forbids inventing one, the recorded gap),
+  RULED (qr-19-gyrelens-use-effect-gap, 2026-09-01): the no-use gap is ratified as permanent
+  for v1 and R14 is not amended. R14 is a locked design ruling in this ledger: "v1 apex items
+  carry PURE STATS and bounded utility only. No new proc effects anywhere in this packet",
+  and the whole apex catalog was budgeted under that fence, so a cosmetic use family minted
+  for one held offhand is exactly the effect-surface growth R14 exists to refuse. This is a
+  forbidden build, not a cost dodge: qr-19-best-for-project asks for what is best for the
+  feature, and what is best for a catalog balanced without effects is that it stay that way
+  until a v2 opens the question deliberately. Verified today in src/sim/content/items.ts:
+  gyrelens_array still ships pure stats with no use field, its own comment naming R14.
   voidbound_grimoire (held offhand, int8+spi5+sta3 the wraithfire shape,
   hasteRating 20, never Hit), masters_field_forge and makers_charm (tool
   kind, epic, UNflagged, no stats). masterwrought: true on exactly the eight
@@ -7032,6 +7135,14 @@ Fed is transient across save by design).
   an alias, so the premise is now pinned over the whole catalog. Note
   RECORDED, not changed: eating a tier-1 dish after an apex plate
   downgrades the buff, the deliberate classic last-eaten-wins rule.
+RULED (qr-19-well-fed-last-eaten-wins, 2026-09-01): last-eaten-wins STANDS as the
+well-fed mechanic under qr-19-best-for-project, with no downgrade guard. The guard is
+refused as a deliberate departure from a project pillar rather than on price: root
+CLAUDE.md's Invariants require that "Gameplay math follows real classic-era MMO
+formulas", and a food buff that refuses or second-guesses the dish you just ate is not
+classic-era behavior. The note above is ratified as written. Legibility is a separate
+question and stays with its own row (the tier-4-to-tier-1 downgrade legibility item):
+making the drop readable never required changing what the drop does.
 - PARITY: 0 critical, 3 should-fix, 1 nit. THE CATCH WORTH THE ROUND: the
   farming_session scenario's `covers` prose still named wellfed_buff_sta,
   and that array is RECORDED INTO the golden, so 11d's re-record would
@@ -7078,6 +7189,21 @@ Fed is transient across save by design).
   CONSEQUENCE of 11c-D-2 as written (farming tops out one below the apex)
   that the ruling did not name, recorded here so a later phase re-tunes it
   deliberately rather than discovering it.
+  RULED 2026-09-01 (qr-19-harvest-feast-payout-retune, under qr-19-best-for-project): the
+  shared feast's 5 stamina for 600 seconds party payout is RATIFIED as the deliberate
+  value, and this ruling IS the deliberate re-tune the INFO above asked a later phase to
+  make. Verified live: evergarden_braised_greens carries wellFed value 5 duration 600 and
+  harvest_feast points its dishItemId at that def (src/sim/content/profession_items.ts), so
+  the feast serves the capstone dish verbatim and can never drift from the bagged one. The
+  drop from 12/900 is a direct consequence of 11c-D-2 as written ('farming tops out one
+  below the apex'), and that adjacency is now pinned as its own arm on the dominance sweep,
+  so the value is asserted rather than incidental. Nothing to build, and under the
+  perfection directive both richer options are worse on their own terms: a dedicated feast
+  dish would mean inventing a balance number the record holds no basis for, which CLAUDE.md
+  forbids ('Don't invent balance numbers'), and re-pointing the feast at a higher existing
+  dish would break the one-below-the-apex premise the whole well-fed ladder is pinned to.
+  The feast's other tuning reads (charges 10, durationTicks 3600, trainer fee 10000,
+  sellValue 250) are a separate row and are untouched here.
   Its NIT (the "exactly one below the apex" adjacency was unpinned, since
   the value and the apex are pinned independently) was APPLIED as a new
   arm on the dominance sweep.
@@ -9044,6 +9170,16 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as farm-patches-gpu-p
 
 Neither is mine to take and neither was taken:
 1. Whether prog_first_harvest taking a farming-first character FOUR crops
+RULED (qr-19-prog-first-harvest-bootstrap-deed, 2026-09-01, under qr-19-best-for-project):
+accepted as shipped. No bootstrap deed is minted. Checked in the live tree and found already
+correct: chr_vale_first_harvest ("Harvest your first thriving crop from a garden bed in
+Eastbrook Vale", renown 5, src/sim/content/deeds.ts) still pays a first-time farmer on their
+first crop, and it has a per-zone sibling for every farm hub, so the open question was only
+WHICH deed fires, never whether one does. prog_first_harvest also reads more truthfully than it
+did: its own desc is "Harvest your first gathering node" and a farm bed is not a GATHER_NODES
+node. Minting a second deed to tidy the mapping is the "deed minted to make a mapping true"
+shape the packet refused elsewhere, and deeds are cosmetic-only (docs/design/deeds.md), so
+nothing a player acts on rides on the four-crop timing.
    instead of one is accepted as shipped, or gets a bootstrap deed later. Rule 9
    forbids editing the trigger, so the only lever is a new deed.
 2. Whether golden_composition gets the release-parent model symbol_census
@@ -10252,6 +10388,17 @@ draught line; produce in recipe_quickening_catalyst, any gear intermediate, or
 any Perfecting material; a new dish or a new crop; a band-literal edit; reducing
 any herb, fish, meat or salt count anywhere; minting a recipe row to hold produce
 (LADDER_RECIPES is closed at 54); and touching the three role plates.
+RULED (qr-19-produce-vendor-row, 2026-09-01, under qr-19-best-for-project): the rejection stands
+as recorded design. No farm produce beyond brook_carrot gains a buyValue or a vendor row.
+Checked and found already correct: the two rung-0 bills (recipe_hunters_game_skewer,
+recipe_elixir_of_the_boar) stay completable, because vale_wheat is a market-listable kind 'junk'
+material exactly as sunpetal_herb already is in those same bills, so R18 is untouched and what
+the swap cost is the vendor route alone. Best for the project keeps it that way: at 16 of a
+32-copper bill brook_carrot would be half the row's input value, which is the crop-as-body case
+RULE 2 exists to prevent, and a produce counter faucet would undercut the farming loop R19's
+calendar model was tuned on. This closes the read the ledger left open ("a tradeoff worth the
+maintainer's eye rather than a defect"), which sits at state.md:10300 to 10317, not the 10212 to
+10231 the decision row cited.
 
 ### A CROSS-PHASE FINDING this phase INTRODUCED, recorded rather than absorbed
 
@@ -10314,6 +10461,15 @@ material, exactly as sunpetal_herb already is in these same bills, so the
 requirement never falls on a profession. What is gone is the vendor route
 specifically, and that is a tradeoff worth the maintainer's eye rather than a
 defect: the alternative is a rung-0 row where the crop is the body.
+RULED (qr-19-rung0-vendor-route-loss, 2026-09-01): the farm-detour tradeoff is ACCEPTED
+under qr-19-best-for-project and the two rung-0 bills stand as shipped. This is not a
+cost dodge: both build options are barred by recorded design. Vendor-stocking vale_wheat
+is refused by the rejection list above, "Not re-proposed: a produce buyValue or a vendor
+row of any kind", re-affirmed verbatim later in this ledger, and it would undercut the
+farm faucet R19's calendar model was tuned on. Swapping in another vendor-stocked reagent
+walks straight back into the crop-as-body defect RULE 2 exists to prevent, which is the
+paragraph directly above. R18 is not breached and the World Market route stays open, so
+what the swap cost is one convenience route, never completability.
 
 ### One visual note owed at PR time
 
@@ -11078,6 +11234,17 @@ alternatives are (a) ratify the deviations as recorded, (b) amend RULE 2's cap
 or count half, which is a change to a standing rule with its own blast radius,
 or (c) exempt the apex tier from the accent rule, which 11g's QA explicitly
 wrote the sweep to prevent.
+RULED (qr-19-11h-two-deviations, 2026-09-01): RATIFY BOTH DEVIATIONS, alternative (a),
+under the maintainer's standing qr-19-best-for-project direction to take whatever is best
+for the project. Verified in the live tree rather than re-argued: recipe_ironhusk_flask,
+recipe_warboar_flask and recipe_runewater_flask each carry highland_barley at count 1, and
+recipe_grand_cauldron carries gilded_sunmelon 2 beside fine_gilded_sunmelon 1, exactly as
+this block records. The Phase 15 audit re-ran Y8 and Y9 on a frozen tree and both restores
+red tests/provisioning_supply_line.test.ts, so the shipped literals are the only ones the
+standing accent sweep admits and there is no gap to close. Reverting would buy a RULE 2
+amendment plus five re-pinned arms for no gameplay difference, and option (c) stays refused
+on its own terms because 11g's QA wrote the sweep precisely to prevent an apex-tier
+exemption.
 
 ### The final per-row table, with every count derived rather than picked
 
@@ -11505,6 +11672,15 @@ These are the 11g QA's three, carried forward with what this phase did to each.
 - THE TWO DEVIATIONS above (the flask grain at 1, the capstones at 2 plus 1).
   Ratify or revert; the cost of each is one number per row and a red accent
   sweep until RULE 2 is amended.
+RULED (qr-19-flask-capstone-deviations-ratify, 2026-09-01): RATIFY BOTH, the same answer
+recorded at the 11h ledger's ratify-or-revert block under qr-19-11h-two-deviations and
+taken under the maintainer's standing qr-19-best-for-project direction. This hand-back is
+the QA half of the same pair and closes on the same finding: the deviations are FORCED
+rather than chosen. Y8, Y9 and the per-row variants were re-run on a frozen tree, and the
+per-row runs kill the partial revert too (the hearth alone at 3 reds; the runewater flask
+alone at 2 reds five arms across two files), so no half measure buys anything either.
+Nothing is built here because the shipped literals are already the only ones the accent
+sweep admits.
 - THE CAPSTONE INPUT JUMP, recorded because no design doc covers it and nothing
   in this phase is authorised to rule on it: recipe_grand_cauldron's input rises
   39.6 percent (1010 to 1410) and recipe_laden_hearth's 66 percent (606 to 1006),
@@ -11515,6 +11691,17 @@ These are the 11g QA's three, carried forward with what this phase did to each.
   (base 2, no twin) would have been 80 rather than 400. The twin is the deliverable
   (it is what gives both tier-4 twins a consumer at 125, the masterwrought R20
   shape), so this phase authored it as ruled and flags the number.
+  RULED (qr-19-capstone-input-jump, under qr-19-best-for-project, 2026-09-01): the input
+  jump is RATIFIED as authored, and there is no gap to close. The maintainer's standing
+  direction for this packet is to do what is absolutely best for the project and the feature,
+  and on this row the shipped bill IS that: the tier-4 FINE twin at 320 apiece is the
+  deliverable, it is what gives both tier-4 twins a consumer at 125 (the masterwrought R20
+  shape), and the cheaper base-2 no-twin bill at 80 would buy its saving by orphaning that
+  consumer outright. Re-checked at the ruling and found already correct: both rows stay
+  gold-negative by a wide margin, masterwrought R5 is untouched because a reagent moves what a
+  craft costs and never what it produces, and the 11h QA reproduced 1010 to 1410 and 606 to
+  1006 independently. The rise is the price of the R20 shape and is recorded here as a stated
+  cost, not a defect. No recipe literal moves.
 
 ### THE FULL SUITE, ON A FROZEN TREE, BOTH ENDS STAMPED
 
@@ -11673,6 +11860,20 @@ HEROIC_VENDOR_STOCK row at the neck point, the pattern universe and
 ITEM_ART_PENDING counts re-derived, a wield-table tier-6 row authored before
 anything else, and Decision B re-opened. Flipping the ACQUISITION alone, at
 tier 5, is genuinely one line plus its pin.
+RULED (qr-19-apex-hoe-acquisition-channel, 2026-09-01): THE EXECUTED DECISION A IS THE
+AUTHORITATIVE RECORD, tier 5 at engineering 125 on ['trainer'], and the 11i handoff's
+tier-6 drop shape is declined along with the acquisition-only flip. Taken under the
+maintainer's standing qr-19-best-for-project direction, on what the live tree already
+shows: evergarden_hoe ships kind 'tool', quality 'epic', use.tier 5, sellValue 150, and
+recipe_evergarden_hoe ships skillReq 125, stationType 'toolworks' and acquisition
+['trainer']. The trainer channel is the FAMILY convention and not a stray call, since
+recipe_tidewrought_fishing_rod sits at engineering 125 on ['trainer'] at exactly this rung
+and HOE_RECIPES' own post-freeze default is trainer; R18 is satisfied either way by the
+Marks counter. The tier is not arguable on the code: FARM_CROPS' tier field is the 1 to 4
+union this block already quotes, so a tier-6 hoe opens no crop tier without 11e-scope crop
+content, and WIELD_REQUIREMENT_BY_TIER carries no tier-6 row while wieldRequirementForTier
+fails OPEN at 0, so a tier-6 land hoe would ship UNGATED. There is no gap: the built shape
+is the correct one.
 
 ### THE SIX SETTLED DECISIONS, AS EXECUTED
 
@@ -12111,6 +12312,18 @@ decline was correct and simply unwritten, which reads as an omission next to
 `col_deepest_cast`; it is now recorded with the distinction that matters, that
 the rod's deed celebrates reaching a catch band nothing else opens while the
 hoe opens no crop tier at all.
+RULED (qr-19-apex-hoe-deed-decline, 2026-09-01) under qr-19-best-for-project ("I want this
+feature to be PERFECT so I want to address EVERYTHING stated"): the decline STANDS, and
+neither the apex hoe nor the completed tier-5 tool family gets a Book of Deeds record. What
+was checked rather than assumed: the four sibling apex tools carry no deed either (farming
+state.md ruling 73, 11j-VERDICTS, re-verified by the 11j QA), so the shipped state is
+symmetric and not an omission, and the distinction recorded just above is the deciding one,
+since col_deepest_cast marks reaching a catch band nothing else opens while the hoe opens no
+crop tier. Minting a deed to close a felt asymmetry would celebrate a milestone the content
+itself does not mark, the same defect the 11l rejection list refused as a deed minted to make
+a mapping true, and deeds are cosmetic-only so no player power turns on it either way. This
+ruling touches the deed only; the Reliquary decline recorded above keeps its own LAND-tool
+precedent.
 
 **THE WIELD SWEEP FAILED OPEN, on the exact hazard this phase records in
 brainstorm.md as prose.** `wieldRequirementForTier` returns 0 for any tier
@@ -12839,6 +13052,31 @@ acquisition channel), and the shipped-id golden policy. This audit adds:
      Extending the refusal to every band empties no cell (cost table above);
      leaving it is also defensible, since below the cap a tool rung is at least a
      rung a leveller passes through. Ruling wanted, not a fix.
+     RULED 2026-09-01 (qr-19-decision-d-band-scope, under the standing Phase 19
+     directive qr-19-best-for-project: address everything, and take whatever is
+     best for the project and the feature). The endgame-only scope STANDS as
+     shipped and the self-clearing tripwire stays exactly as written. What was
+     checked and found already correct: no band in the merged tree is
+     self-credited-only today, all seven levelling tool rungs sit beside real
+     bills, and the measured cost of extending empties no cell, so the
+     extension would change nothing a player can observe while moving three
+     pins and a design-doc table. The design read this ledger already carries
+     holds: below the cap a tool rung is at least a rung a leveller passes
+     through, which is why R20's worthlessness argument lands on the endgame
+     cell and not on the levelling bands. Two further reasons the extension is
+     the worse build under the directive: the anti-vacuity arm in
+     tests/gathering_supply_coverage.test.ts counts exactly the rows the
+     extension would remove from the matrix, so left as written it becomes an
+     assertion over an empty set, the vacuity class this file has already been
+     caught on twice; and the tripwire itself would become true by construction
+     and have to be deleted, trading a live guard for a one-line predicate
+     change. The tripwire keeps the door open at no cost: if a levelling band
+     ever does become self-credited-only it reds, and its own instruction
+     brings the scope back to the maintainer rather than widening the arm. One
+     observation recorded here that does not move the ruling and owes no work
+     of its own: that arm's comment says "Six tool rungs" above a list pinning
+     seven, a stale comment that corrects itself the next time the file is
+     touched. Deviation 3 above is closed by this line.
 (12) **THE REWORDED WIKI KEY'S FIVE STALE NON-LATIN FILLS.**
      `guide.profPages.toolsNoteThreeRods` in `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN`
      and `zh_TW`. No gate can see a stale reword. Either re-fill at release or
@@ -13655,6 +13893,17 @@ OBTAIN and not CRAFT. A per-item craft mark was the alternative and was declined
 rather than silently taken: it needs a namespace registered plus a save/load
 round-trip pin in the same change, and it makes migration-safety required. THE
 MAINTAINER'S CALL.
+RULED (qr-19-deepest-cast-deed-trigger, under qr-19-best-for-project, 2026-09-01): the
+shipped collectItems trigger is RATIFIED, and there is no gap to close. Verified at the
+ruling against the live tree: src/sim/content/deeds.ts ships col_deepest_cast with trigger
+{ kind: 'collectItems', itemIds: ['clockreel_fishing_rod'] } and a desc that says Obtain and
+not Craft, so the deed already tells a player exactly what it does, and it matches the family
+it sits in (col_glimmerfin and col_full_creel fire the same way). The maintainer's direction
+is what is best for the project, and here that is the honest shipped mechanism: a per-item
+craft mark would register a new mark namespace, force a save/load round-trip pin in the same
+change and make migration-safety required, and all it would buy is excluding a market purchase
+from a renown-10, no-title collection deed. The deviation from the phase file's CRAFT wording
+stands as authored, and the record above is accurate as written.
 
 ### THE FORCED DEVIATION: THE SESSION CAP MOVED, 15 s TO 16 s
 
@@ -13678,6 +13927,29 @@ rarity inversion every player sees in their bags. Trimming
 FISH_REEL_WINDOW_ROD_BONUS_SEC retunes all five shipped rods to fit one new one.
 The cap is a DEFENSIVE timeout casting_lifecycle.ts calls unreachable in normal
 play, so a second on it costs a player nothing. RATIFY OR REVERT.
+
+RULED 2026-09-01 (qr-19-session-cap-15-to-16, under the standing Phase 19
+directive qr-19-best-for-project: address everything, and take whatever is best
+for the project and the feature). RATIFIED AT 16 s. The tree already ships
+FISHING_SESSION_CAP_SEC = 16 (320 ticks at DT = 1/20) and every pin that holds
+the number is green, so ratification moves no code. It is recorded as a pillar
+refusal and not a cost dodge: every build on offer here buys the one tick back
+out of shipped classic-era itemization. Shipping the clockreel RARE clears the
+budget at 296 ticks but puts a rare tier-6 rod above an epic tier-5 one, a
+rarity inversion every player reads in their own bags. Trimming
+FISH_REEL_WINDOW_ROD_BONUS_SEC or the rarity term retunes the reel window of
+every rod already shipped to make room for one new one, which is inventing
+balance numbers on live content, and CLAUDE.md is explicit: gameplay math
+follows real classic-era MMO formulas, and "Don't invent balance numbers."
+Naming a third cap is refused on the same ground: the packet holds no third
+value, anything at or below 15.10 s (302 ticks) truncates the shipped tier-6
+epic reel window, which is the exact defect the move was made to prevent, and
+the wiki tells the player the number, so a round figure is worth keeping. The
+cap stays what casting_lifecycle.ts calls it, a defensive timeout unreachable
+in normal flow, so the extra second costs a player nothing. AMENDS THE
+PARAGRAPH ABOVE, true when written and not now: the tier-6 clockreel has since
+shipped, so trimming the rod bonus today would retune all SIX shipped rods (the
+simple pole plus gatherTool tiers 2 through 6), not five to fit one new one.
 
 ### OPEN ITEMS FOR THE MAINTAINER
 
@@ -13861,6 +14133,19 @@ genuine extraction of LOGIC and not of line count, and the wording now says so.
 And the fishing metrics family pre-seeds 504 series where it pre-seeded 252,
 about 84 percent of them permanent zeros; that is a doubling of an existing
 deliberate pattern rather than a new defect, but nobody had stated the cost.
+RULED (qr-19-fishing-telemetry-preseed, under qr-19-best-for-project, 2026-09-01): the full
+zone-by-band pre-seed is ACCEPTED as authored, there is no gap to close, and the cost is now
+ruled as well as stated. Checked at the ruling: server/fishing_telemetry.ts states the
+contract in its own header (the zone vocabulary is HARVEST_BANDS, cardinality bounded by
+construction, 14 zones x 6 bands = 84 pre-seeded series per counter, the same shape
+server/http/game_signals.ts already uses) and tests/server/http/game_metrics.test.ts derives
+the cross product rather than restating it, so the family cannot drift silently. Bounding the
+vocabulary to the three zones owning a catch table would be a regression under the
+maintainer's own direction: every other zone's water draws the eastbrook_vale fallback and so
+really does fish, real catches there would go uncounted, and a pair that never fires would
+read as a missing series again instead of the real zero the pre-seed exists to give. Static
+series at this cardinality are trivial exporter load. Nothing moves in the exporter or its
+test.
 
 ### THE TEST-COVERAGE AUDIT: FIVE SURVIVED MUTATIONS, ALL FIVE NOW DEAD
 
@@ -15614,10 +15899,46 @@ reading exactly as cheap to settle as it was.
   reaches one TIES, which is already resting on an open reading.
 - The crop at the accent cap of 2. Legal, and refused because it would have
   grown an open maintainer item by three rows.
+RULED (qr-19-crop-accent-cap-refusal, 2026-09-01): THE STANDING READING RULES AND THE
+APEX-FEAST CROP STAYS AT COUNT 1, so this refusal is now permanent rather than pending.
+Taken under the maintainer's standing qr-19-best-for-project direction. Checked rather
+than assumed: at 1 the crop clears BOTH contested readings of RULE 2's value half, while
+at 2 it clears only the permissive one and grows the open census from six entries across
+four rows to nine. The shipped state is therefore correct under every reading of the rule,
+which is the strongest form of correct available here, so there is nothing to build. 11i
+open item (10) retires with it, and the contingent apex-feast crop-count row stays at 1.
 - A distinct apex feast prop, a role-pick interaction at the table, raid-scale
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as apex-feast-distinct-prop.
   charges, a second oncePerDay row, any power on the deed, differentiated feast
   bills: all inherited from the phase file's own list and none re-proposed.
+  RULED (qr-19-feast-role-pick-interaction, under qr-19-best-for-project, 2026-09-01): the
+  role-pick interaction stays REFUSED, and the refusal is now ruled rather than only recorded.
+  This half of the bullet was left unjudged when qr-18-REOPEN actioned the distinct-prop half
+  alone (apex-feast-distinct-prop); it closes here. The build is barred by the packet's own
+  standing design instruction, quoted from phase-11k-provisioning-capstone.md: "A role-pick
+  interaction at the table (one feast, choose your plate). It is a new interaction surface, a
+  new wire arm, and a new refusal family, to replace something three items already express.
+  The dishItemId indirection exists precisely so the role is authored, not chosen." That
+  indirection is live and load-bearing rather than leftover: src/sim/types.ts documents
+  dishItemId as the dish whose serving each bite IS, src/sim/professions/feast.ts resolves the
+  serving aura through it, and the three apex feasts point at three different shipped role
+  plates. Best for the feature is to keep the authored role: reversing it would cost a new
+  interaction surface, an IWorld member in both worlds with its parity pin, a refusal family
+  and its i18n, and would tell a player nothing the plate does not already tell them. Refused
+  on the design instruction, not on price.
+  RULED (qr-19-apex-feast-design-cuts, 2026-09-01) under qr-19-best-for-project ("for all
+  those new findings, drop them into the best for the project and feature"): NONE of the
+  remaining cuts is funded and the shipped feast stands. The deed half is barred outright by a
+  standing instruction, CLAUDE.md's "deeds are cosmetic-only, never power" (the rule lives in
+  docs/design/deeds.md), so no ruling can buy it back. The other four (a role-pick interaction
+  at the table, raid-scale charges, a second oncePerDay row, differentiated feast bills) are
+  each a new sim mechanic owing its own module behind the SimContext seam, IWorld facet and
+  parity work where UI-visible, sim and server tests, and wiki regen; landing four unreviewed
+  features inside a rulings gate would cost the packet exactly the stability the directive
+  asks for, and this phase's own contract executes rulings, it does not open design. They are
+  ruled ROUTED rather than refused: any one of them returns as its own scoped phase on the
+  maintainer's word. The distinct-prop half was the only cut with a build behind it, and Phase
+  18 already actioned it as apex-feast-distinct-prop.
 - Minting six one-word line-label keys on the wiki page when the catalog
   already ships five of them.
 
@@ -16363,12 +16684,34 @@ rather than decided:
 - Stretching a bill to admit `bogiron_hauberk` (300, the flavor match for
   the nugget) at rung 25: it needs ten iron ore or five essence on top of six
   nuggets from a single 0.3 source; `hobnail_boots` at 90 is the honest bill.
+  RULED (qr-19-bogiron-hauberk-bill, 2026-09-01) under qr-19-best-for-project ("I want this
+  feature to be PERFECT so I want to address EVERYTHING stated"): the exclusion STANDS,
+  bogiron_nugget stays output-excluded and no rung-25 armorcrafting trophy row is authored.
+  AMENDED IN PLACE on this same line: "hobnail_boots at 90 is the honest bill" reads as though
+  a hobnail row shipped, and none did. The 11l QA found hobnail_boots itself (mail feet,
+  common, armor 18, no stats, sellValue 90, a 900 counter price at Smith Haldren) strictly
+  dominated by the trainer's OWN rung-0 recipe_coppermail_sabatons (mail feet, armor 38, a 46
+  bill), so armorcrafting keeps no trophy row at all and the nugget has no honest bill
+  anywhere; the live exclusion ledger in src/sim/content/recipes.ts carries it as the ninth
+  output exclusion. Admitting the hauberk would spend two doctrines at once, the stretched-bill
+  bar and the 11l domination standard, to rescue a material with a single 0.3 source, and it
+  would set the precedent that any such material buys a stretched bill. Best for the feature is
+  the standard kept.
 - A rung-50 output above the 460 ceiling for the ogre tusk (every zone3-band
   uncrafted weapon sells 700 or more): a new ceiling and a stretched bill.
 - A rung-25 tailoring row for the bandana on the strength of its two level-20
   galecrest sources: the zone1 band carries two of four sources (vale_bandit,
   gorrak), a tie the QA counted; the tie-break is that galecrest is a level-20
   zone where a rung-0 tailoring row is the honest rung for a 6-copper drop.
+  RULED (qr-19-bandana-tailoring-rung, 2026-09-01) under qr-19-best-for-project ("I want this
+  feature to be PERFECT so I want to address EVERYTHING stated"): the tie-break is RATIFIED
+  and the bandana's row stays at rung 0. Re-checked in the live tree rather than taken on the
+  record's word: bandit_bandana still sells for 6 copper (src/sim/content/items.ts, common
+  since 11l so sellAllJunk never sweeps it) and the row it feeds, recipe_linen_pouch, still
+  ships skillReq 0 on tailoring (src/sim/content/recipes.ts), so both halves of the counted
+  tie stand exactly as the QA left them. Nothing since has moved the drop's value or its four
+  sources, and promoting a 6-copper trophy row to rung 25 on a two-of-four tie would overturn
+  a counted, argued tie-break for no player-visible gain.
 - A per-item `hudChrome.materialHint.*` lead for any of the nine.
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as per-item-material-hint-lead.
 - Editing `col_junk_drawer`'s trigger, or sourcing the wildlife pack, inside
@@ -16827,6 +17170,14 @@ lines still cited the deleted fetish row, five level comments cited the
 deleted lantern note, the potion row's "prize" reason was refuted by the 85
 counter price (Hale and the zone-3 counter sell the same potion under the 109
 floor-plus-sink, so the row is a tallow sink held under the list-count-only
+RULED (qr-19-lesser-healing-potion-tallow-sink, 2026-09-01): the row stays as recorded, at
+its 109 floor-plus-sink price. Checked and found already correct: lesser_healing_potion still
+reads buyValue 85 and sellValue 16 in src/sim/content/items.ts, so the counter really does
+undercut the crafted bill, and that undercut is the row's purpose. It is a deliberate tallow
+sink held under the list-count-only clause this economy is built on, and the only cost falls
+on a buyer who walks past a counter in the same zone. Under qr-19-best-for-project,
+re-pricing to 85 or dropping the row would destroy the sink the row exists to hold and buy
+nothing back. Nothing to build.
 clause, a tuning read beside the boots), and a pre-existing alchemy guide
 sentence (nine recipes three per rung, a 280/360 sunpetal) became this
 packet's the day it put a fifth row on Verane's rung 25; all applied, the
@@ -16947,6 +17298,16 @@ scale), so a starter-zone character has nothing for the Sell Junk button the
 guide teaches until zone 2; the candidates are a poor drop authored back onto
 a zone-1 table or the gap accepted on the record. Two tuning reads join the
 maul's: the quiver is a second faucet under gathered cost (+164 after the
+RULED (qr-19-gathered-cost-surplus-list, 2026-09-01): both gathered-cost surpluses are
+accepted as shipped, bills and outputs unchanged. Under qr-19-best-for-project this is the
+answer that serves the feature and not the cheap one: the surplus prices the crafter's own
+gathering time, and the vendor-purchase floors printed beside it in the same accounting are
+what bar a buy-to-sell loop, so re-tuning would tax gathering to close a leak that does not
+exist. Re-checked in the live tree today: the FLAGGED FOR MAINTAINER EYES note stands in
+src/sim/content/recipes.ts and tests/recipe_economy.test.ts still pins marginAtGathered at
+278 for recipe_fenshadow_maul and 164 for recipe_gravewyrm_bone_quiver, so both figures are
+current and any drift reds. Nothing to build. The maul's specialization-only read is its own
+Phase 19 row and closes there.
 sink against the maul's +278, both pinned), and the lesser healing potion is
 a tallow sink the counter undercuts. The maul's ironshod comparison and the
 oiled boots' fenbridge comparison sit at their rows. One kind-line
@@ -17180,6 +17541,19 @@ and elixir_of_the_bear's Mirefen drop was 0.8 percent when the 11n file
 wrote 7. Newborn characters now spawn on the Proving Shore, so the
 Eastbrook farming intro is no longer a fresh character's first stop: a
 premise shift for the farming packet, recorded, not acted on.
+RULED (qr-19-proving-shore-farming-intro, 2026-09-01, under qr-19-best-for-project): the premise
+shift is discharged with NO new content, and no breadcrumb quest is authored. Checked in the
+live tree and found already correct: the Shore's terminal quest q_ps_set_sail hands the graduate
+straight to the vale in its own copy ("You are ready, and Eastbrook has real work waiting"), and
+the crossing "will set you down in the middle of Eastbrook town"
+(src/sim/content/proving_shore.ts), where Farmer Jessica stands at the allotments carrying
+questIds ['q_farm_intro'] (src/sim/content/zone1.ts). The farming intro therefore re-surfaces at
+exactly the point the tutorial delivers the player. Best for the project is to leave that alone:
+the Shore is deliberately one keeper-to-keeper chain ("Every keeper on this shore hands you to
+the next when your work is done"), so a farming breadcrumb would be a second pointer at a
+destination the chain already sends the player to, adding quest-log noise for no reach. The
+island also stays reachable both ways by the paired ferry bells with no graduation gate, so
+nothing here is missable.
 
 THE GOLDEN COMPOSITION TOOL READS FAIL (55 findings) AND EVERY ONE IS
 EXPLAINED: the release moved the player spawn from (2, -2) to (-94, -58),
@@ -17621,6 +17995,18 @@ zero new proper nouns). ONE WARNING and four INFO rows:
   ruling: whether quest-gated camped templates stay legal floor members.
   If the answer is no, silk's floor is unmeetable on the shipped roster
   without a new template or a flavor-false tag, both outside decision 12.
+RULED (qr-19-quest-gated-silk-floor-ruling, 2026-09-01, under qr-19-best-for-project): YES,
+quest-gated camped templates stay legal harvest-floor members, and the phase's by-the-letter
+reading is ratified. Checked and found already correct: the settled admission qr-11m-SPREAD
+speaks to count-1 named mobs and says nothing about quest gates, and spider_egg carries a real
+overworld camp (two clutch rows), carries silk, and satisfies the camp predicate by the letter.
+The admission cannot widen quietly, because tests/harvest_geography.test.ts pins the whole
+quest-gated census as literals (reachable exactly ['spider_egg'], the refused half empty with a
+campless-clutch positive control beside it), so a second quest-gated floor member can only ever
+land as a conscious edit carrying its own ruling. The refusal is the option that costs the
+project: it drops silk to 5 of 6 with no flavor-true candidate on the shipped roster and forces
+either a new spider template (mob content plus camps, deeds, wiki and art obligations) or a
+flavor-false tag, both outside settled decision 12.
   Standing ungated, non-count-1 reach for the record (the reviewer's
   column): silk 4, horn 4, tusk 5, venomSac 5, gills 6, claw 5 (the floor
   cleared without its count-1 members); the reported mid-band silk hole is
@@ -17858,6 +18244,18 @@ independently and confirmed the sweep.
   phase (the baseline moved before STEP 1; the stamp below is the new one).
 
 ### OPEN ITEMS: THE THIRTEEN ARE THE MAINTAINER'S, AND THIS PHASE ADDS NONE
+RULED (qr-19-thirteen-maintainer-open-items, 2026-09-01): EXPAND ONE ROW EACH, confirmed,
+and the expansion is already done rather than owed. Taken under the maintainer's standing
+qr-19-best-for-project direction and his instruction to address everything stated, which a
+blanket ruling would not do. Verified against the Phase 19 table rather than assumed: each
+of the thirteen now carries its own priced row with its own ruling id (scroll/elixir 15c
+parity D171, RULE 2's value-half reading D004 with its contingent D002, the stale-client
+window D172, 11h's two deviations D001 and D005, 11i's session cap D173,
+prog_first_harvest's thirteen catches D174, the apex hoe channel D003, the shipped-id
+golden policy D175, Decision D's band scope D176, the reworded wiki keys' stale fills D161,
+col_junk_drawer's three of margin D170, zone 1's no-poor-drop D009), and the eleventh-hour
+ledger additions are carried by the completeness pass that added D152 to D176. No blanket
+ruling is taken and none is needed.
 
 The thirteen carried in are unchanged and none was needed (col_junk_drawer
 still three of margin: the live poor set is sixteen, thirteen reachable;
@@ -17871,7 +18269,25 @@ count-1 horn members (the Palecoil a rare, Aurelhorn a rare AND elite, one
 notch weaker as a solo farm source, the 11m QA precision) and the count-1
 tusk member
 (the Sundered Horror, an elite) inside otherwise-met floors, with their density
+RULED (qr-19-count1-hollow-floor-members, under qr-19-best-for-project, 2026-09-01): the
+three count-1 members are ACCEPTED as sufficient floor quality, and there is no gap to close.
+Checked at the ruling and found already correct: the horn floor (Palecoil, a rare; Aurelhorn,
+a rare and elite) and the tusk floor (the Sundered Horror, an elite) are MET, with their
+density recorded here rather than assumed, and 11m logged all three as observations inside
+met floors and never as defects. Doing what is best for the feature does not mean adding
+carriers a met floor does not need: an ungated horn and tusk spread is new content this packet
+never scoped, it would re-derive the corpse-harvest census and the hollowness pins and carry
+the full content obligations (deeds, art, wiki) for every mob minted, and it would buy no
+floor that is not already met. Reopen only on play signal that the rare and elite gating is
+actually starving a farm route.
 recorded; and the qa gate's one design read: the oiled boots trophy
+RULED (qr-19-oiled-boots-signed-scale-margin, 2026-09-01, under qr-19-best-for-project):
+the 83-vs-80 reachable margin is the intended one and stands. Checked: the move came from
+a real mechanic, a gills harvest signing the mudfin scale, not from an authoring error,
+and the gold-negative invariant is machine-checked green on either value, so there is no
+defect to repair. Best for the project is the shipped number here: any move would be a
+formula-owner balance value the standing directive does not supply, and CLAUDE.md forbids
+inventing balance numbers.
 row's reachable margin moved 88-vs-80 to 83-vs-80 because a gills
 harvest signs the scale (the gold-negative invariant is machine-checked
 and green either way; whether the intended margin should move is a
@@ -19304,6 +19720,16 @@ module.
   spelling (065416e8f4).
 - Judged, do not re-raise: the load bound keeps the fields on a non-apex
   id (per-field drop-only doctrine; the sanitizer never sees the def);
+  RULED (qr-19-nonapex-load-keeps-perfecting-fields, 2026-09-01): the per-field drop-only load
+  doctrine is ratified and the keep stands; no def-aware strip is added. The doctrine is this
+  packet's own recorded contract, item_instance_load.ts is drop-only and NOT a whitelist, and
+  revert safety rests on it: an older binary must keep a newer copy's fields verbatim. A
+  def-aware arm would make the load path depend on the item catalog, so a def rename or
+  removal would silently strip legal shipped saves, which is the failure the doctrine exists
+  to prevent. That bars the build rather than merely pricing it, and under
+  qr-19-best-for-project it is the stabler design too: a save format that a content edit
+  cannot corrupt is worth more than a sanitizer arm no legal writer can trigger. Verified
+  today: src/sim/item_instance_load.ts imports no item def and has no apex awareness.
   the Jack 'worse' head-start term (dead code, kept for symmetry); the
   trade-offer and guild-bank head-start visibility (each pipe's standing
   doctrine); the enchanted-only unconfirmed deny reading
@@ -19601,6 +20027,14 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as perfecting-walk-de
 - item_instance_load.ts's heavier import graph (no cycle, call-time
   read; recorded as a weight note only).
 - perfecting+perfected coexistence surviving the per-field load bound
+  RULED (qr-19-perfecting-perfected-coexistence-load, 2026-09-01, under
+  qr-19-best-for-project): coexistence stays tolerated and no cross-field arm is added at
+  item-instance load. The directive asks first that the feature be "as stable" as it can
+  be, and this build spends that: the per-field drop-only load bound is the revert-safety
+  contract every other instance field rests on, and the arm would set the first
+  cross-field precedent against it to defend a state no legal writer produces and no
+  consumer corrupts on. Barred by the doctrine the directive's own stability ask depends
+  on.
   (no legal writer, no corrupting consumer, cross-field arms would
   break the drop-only doctrine); boundTo digit-width floor; the
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as boundto-digit-width-floor.
@@ -19787,6 +20221,20 @@ file's own acceptance overturns (retired dated, D13-4).
   pre-existing col_first_legendary through its quality:legendary
   discovery mark, so ACH_FIRST_LEGENDARY gained a crafted earn path (a
   maintainer read, recorded in the QA ledger).
+  RULED (qr-19-ach-first-legendary-crafted-path, 2026-09-01) under qr-19-best-for-project
+  ("I want this feature to be PERFECT so I want to address EVERYTHING stated"): the crafted
+  earn path is INTENDED and stands as shipped, and the same answer closes the sibling
+  per-material question at item 7b, so no epic or legendary material this packet mints needs
+  a per-item read. Checked before ruling rather than taken on the record's word: the quality
+  discovery marks are the shipped grant path for col_first_epic and col_first_legendary, both
+  renown 0 and title-free, so no power rides them (CLAUDE.md, deeds are cosmetic-only, never
+  power); the storefront rows are pre-existing mirrors of col_first_legendary in
+  server/steam/achievement_map.ts and server/epic/achievement_map.ts, not rows this packet
+  minted; and a discovery mark is honest about what it marks, the first epic or legendary the
+  character ever holds, whatever its source. Gating the marks to drop-sourced items would
+  re-characterize shipped parity goldens (makers_ember already minted col_first_epic for all
+  ten raiders) and split one honest rule into two for no power consequence, which is the
+  opposite of what the directive asks.
 
 ### THE BUILT SHAPE
 - perfecting.ts: resolvePerfectingAttempt's perfected branch DELEGATES
@@ -19876,6 +20324,14 @@ fresh)
   client-side soft-masking of the name (the character-name
   precedent); the masterwork seal on the legendary lines (phase 16
   owns the orange art); the offline host running shape-only (an
+  RULED (qr-19-offline-shape-only-name-screen, 2026-09-01, under qr-19-best-for-project):
+  shape-only stands on the offline host. Checked against the live design: the header of
+  src/sim/professions/legendary_name.ts states SHAPE ONLY, deliberately, content
+  screening is the server offensiveName pass, and the character-name precedent already
+  settled the same split, so an offline name that reaches no other player leaves nothing
+  to screen and no gap to close. Best for the project runs the same way here: moving the
+  banlist and matcher into the client bundle would publish the slur list itself for zero
+  exposure gain.
   offline name never reaches another player); the market Collect-tab
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as market-ledger-rows-def-only.
   sale LEDGER rows staying def-only (a past transaction, not a held
@@ -19885,12 +20341,31 @@ fresh)
   the dedupe claim (pure lookup); the double deny-head run per
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as double-deny-head-run.
   promotion (pure, draw-free); the two markItemDiscovered routes (the
+RULED (qr-19-two-markitemdiscovered-routes, 2026-09-01): the two-route discovery idiom is
+RATIFIED under qr-19-best-for-project. Both routes were re-read in the live tree at this
+sitting and both still earn their keep: the stamp-site mark in
+src/sim/professions/perfecting.ts (promotePerfectedCopy, whose own header states that the
+quality:legendary deed mark lands same-tick, never at the next login's retro pass), and
+the RETRO_SEED sweep in src/sim/deeds.ts seedItemDiscovery, which backfills a legacy save
+on join. Either consolidation deletes a documented behavior, so keeping both is what is
+best for the feature, and the original refusal was right that this is not the mechanical
+refactor it looks like.
   established idiom); the equipCandidateIndex count-0 theoretical; the
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as equipcandidateindex-count0.
   retired-id per-cell targeting consequence (commented at the
   RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as retired-id-per-cell-targeting.
   validator); the peer card showing no unique tag (the D13-3
   consequence); deed_of_making without noDiscard; the writ outside the
+RULED (qr-19-wyrmfall-core-nodiscard, 2026-09-01): the shipped divergence STANDS under
+qr-19-best-for-project. deed_of_making keeps noDiscard and wyrmfall_core stays without
+it. Re-read in the live tree at this sitting and found already correct: the rationale is
+written at the def in src/sim/content/profession_items.ts (a core is a repeatable faucet
+drop, a deed is a single-use capstone whose only replacement is a skill-125 craft on a
+553-basis bill), and the asymmetry is pinned in BOTH directions in
+tests/orange_promotion.test.ts, so it cannot rot silently. Nothing wedges a bag: the deed
+stays tradable, mailable, listable and vendorable at 50. Best for the feature is
+protecting the piece where the loss is real, not symmetry for its own sake across a
+doctrine boundary.
   inscription pair convention (the exact-roster pin owns the census).
 
 ### PINS (predicted before running, observed after)
@@ -19954,12 +20429,27 @@ exception.
 ### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
 - Renown 50 for prog_legendmaker doubles the prog_masterwright 25
   precedent (band-legal; rationale at the row; a balance number).
+  RULED (qr-19-legendmaker-renown-doubling, 2026-09-01): renown 50 stands. Checked and found
+  already correct: src/sim/content/deeds.ts still carries prog_legendmaker at renown 50, the
+  value sits in the prestige band a capstone chain earns, the trigger is effort-paced and
+  never luck-gated under rule 2 of docs/design/deeds.md, and the Phase 13 QA graded the
+  placement defensible. Under qr-19-best-for-project the right answer is the one the design
+  supports, and no ledger argues for a different number: moving it would invent a balance
+  number for no reason, shift the renown-sum pin and force a FROZEN_CATALOG_SHA256 re-mint
+  to buy nothing. Nothing to build.
 - The per-call statSync on the banlist file (only when configured;
   command-lane metered) and the per-broadcast eqi name field: named
   for the Phase 13 QA hot-path lane.
 - The RL/headless host cannot complete Perfecting (the ember faucet
   needs resetDay), so the deed is unearnable there (a pre-existing
   property; deeds are not an RL surface).
+RULED (qr-19-rl-host-perfecting-unreachable, 2026-09-01): the unearnable deed is
+RATIFIED as correct under qr-19-best-for-project, and no headless day cycle is built.
+Checked at this sitting rather than inherited: a grep over headless/ and python/ still
+returns zero resetDay wiring, so the ember faucet has no weekly boundary on that host,
+and no RL reward term reads a deed. The shipped state is what is best for the feature
+here; wiring a calendar nothing reads would buy a determinism surface and drag the
+virtual-clock re-admission question along with it for no measurable gain.
 - The invalid-index UI mirror can still light-then-refuse on a STALE
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as stale-drag-light-then-refuse.
   drag when bags shift mid-drag (the sim refuses authoritatively).
@@ -21067,6 +21557,18 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as same-copy-refusal-
 
 ### RECORDED, NOT ACTED (maintainer reads on top of the standing sets)
 - THE RANK-0 BIND SHAPE: a FAILED first Perfecting attempt leaves a bound
+RULED (qr-19-rank0-bind-shape, 2026-09-01, under qr-19-best-for-project): the live rank-0 unbind
+behavior is RATIFIED as designed, and no first-attempt marker is added. Checked and found
+already correct on this ledger's own merits: at rank 0 there is no power and no economy leak (no
+R5 bonus, the pre-attempt copy was tradable under R2 anyway, and the Maker's Bond fee is a pure
+copper sink), and the shipped copy states live behavior after the Phase 14 QA reword ("binds",
+not "permanently binds"). Best for the project leaves the save shape alone: a first-attempt
+marker is a new persisted field with migration, persistence and parity work behind it, it would
+flip the arm that pins the behavior today (tests/professions_commissions.test.ts, "a FAILED
+first attempt leaves a bound rank-0 copy the unbind service still clears"), and it buys back a
+phase-12 spec nicety nobody is exploiting. Cite correction riding this line: this read sits in
+the Phase 14 QA ledger at state.md:21069 to 21078, not the Phase 16 block at 21018 to 21027 the
+decision row cited.
   copy with no marker that the Maker's Bond unbind clears for its fee
   (pinned live on an apex copy). No power or economy leak (rank 0, no R5
   bonus, the pre-attempt copy was tradable per R2 anyway, the fee is a
@@ -22174,6 +22676,20 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-scre
    is a real hazard. The happy-dom page suite pins the chrome and every
    string; the manifest records the skip.
 2. The regalia glow is hidden below the medium effects tier by the
+RULED (qr-19-regalia-prestige-shed-presumption, 2026-09-01, under qr-19-best-for-project): the
+classification is RATIFIED. Worn-gear legendary-regalia prestige display is sheddable cosmetic
+richness and the medium-effects-tier shed stands. The project pillar is what answers here, not
+cost: root CLAUDE.md's graphics-settings fairness rule holds that a preset may shed cosmetic
+richness but NEVER actionable information, with the rule of thumb that if it hides or delays
+something a player acts on it is not allowed. The forge motes hide nothing a player acts on,
+because the predicate reads only the eqi wire allowlist and never perfected, hp, auras or target
+state, and who is wearing prestige gear is not a combat input; the shed is gated on the STATIC
+preset stamp (gfxTierAtLeast(GFX.effectsTier)), never the FPS governor, exactly as the doctrine
+demands. Reversing it would eat the glow's cost on low tiers for no fairness gain and would
+contradict the shipped bullet in docs/design/graphics-settings-fairness.md that
+tests/legendary_regalia.test.ts pins clause by clause. Cite correction riding this line: this
+read is the Phase 16 ledger's RECORDED, NOT ACTED item 2 at state.md:22176 to 22179, not a Phase
+17 block at 22126 to 22130.
    static preset: classified sheddable prestige (the fairness suite pins
    the classification); the presumption that worn-gear prestige display
    is cosmetic, not actionable, is load-bearing and recorded.
@@ -22195,6 +22711,15 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as admin-metrics-scre
    judged correct because leaving them would keep rendering the exact
    trade dress the re-cut removes, and the naming registry records it.
    Flagged for the maintainer's eye by the QA gate, seconded here.
+   RULED (qr-19-i18n-overlay-edit-departure, 2026-09-01): the departure is acknowledged and
+   the 18 edited overlay files stand. CLAUDE.md tells contributors to add English only to
+   src/ui/i18n.catalog and never to edit the src/ui/i18n.locales overlays, and this phase
+   broke the letter of that rule knowingly. The rule exists so a contributor cannot strand a
+   maintainer fill, not so live locales keep rendering trade dress the re-cut deleted, and
+   reversing would put those strings back in front of players in five non-Latin locales and
+   resurrect 13 stale Latin rows: the opposite of what qr-19-best-for-project asks. Nothing
+   to build. The 13 rows stripped to pending ride the Phase 20 release fill, where the
+   maintainer owns every locale anyway.
 
 ### THE FOUR EXPLICIT RECORDS (in-or-CUT; each is the deliverable)
 
@@ -22788,6 +23313,20 @@ Everything the phase can do without the maintainer is done: matrix executed,
 reviews applied, census green, gates green, the frozen stamp taken, the PR
 body drafted with both screenshot subtrees, the fill package assembled, the
 teardown offer prepared. NO push, NO PR, NO teardown, NO fill: each waits on
+RULED (qr-19-planning-docs-teardown-decision, 2026-09-01, under qr-19-best-for-project): the
+teardown stays DEFERRED past the PR and Phase 19 may not take it. The phase's own standing
+delivery rule bars the build in terms: "STANDING DELIVERY RULE (unchanged): NO push, NO PR, NO
+teardown. LOCAL ONLY" (phase-19-rulings-gate.md). This is a barred build, never a cost dodge:
+the directive to make the feature perfect is what argues hardest for KEEPING the subtrees,
+because docs/prd/masterwrought/ and its farming/ subtree are the reviewer's map for a
+seventeen-phase PR, and deleting them before that review would cost the very reviewability the
+directive asks for. Both preconditions stand and block the teardown, not the merge: the seven
+screenshot cone subtrees referenced only from docs/prd/masterwrought/farming/ (set-equality in
+tests/ci_workflow.test.ts) and the four out-of-packet comment citations in monolith_budget,
+item_art_consistency and mob_portrait_source_manifest. The maintainer's word, recorded: take the
+prepared offer after the merge, in the fixed one-decision shape, re-homing the cone rows and
+rewording the citations in that same change. Cite correction riding this line: this close block
+reads at state.md:22785 to 22793, not the 22722 to 22730 the decision row cited.
 the maintainer's explicit word (ip-17-PUSH the one structural hand-back). The
 close-out list of genuinely open maintainer decisions is in the Phase 17
 report and mirrors the handoff table's open classes.

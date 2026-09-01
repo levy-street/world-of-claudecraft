@@ -112,6 +112,21 @@ retired in the same change, and `farming/qa-checklist.md` cited from
 `tests/farming_anti_chore.test.ts`. The chore's one-decision shape stands; this
 note only states its true blast radius.
 
+RULED (qr-19-teardown-comment-citations, 2026-09-01), under qr-19-best-for-project ("I want
+this feature to be PERFECT so I want to address EVERYTHING stated"): the teardown's DEFERRAL
+is ratified and its one-decision shape stands unchanged. The standing delivery rule that
+governs this phase is what bars taking it here, "NO push, NO PR, NO teardown. LOCAL ONLY."
+(the Phase 19 starter prompt and its stopping rules, reaffirmed at the Phase 18 close), and
+ruling 110's own WHY carries the rest: the packet docs are the review evidence for a
+seventeen-phase PR, so deleting them in the same PR removes the reviewer's map at the exact
+moment it is needed. The answer is therefore the post-merge chore taken whole, in the shape
+already fixed: both doc trees as ONE decision, the eleven screenshot cone rows re-homed in
+the same change, the permanent-test comment citations re-derived by grep at execution time
+rather than from any list, and the two files a test reads from disk (merge-deletion-list.md
+and farming/qa-checklist.md) re-homed or their pins retired beside them. Retiring the chore
+instead is refused under the same directive: permanent stale PRD debt left in docs/prd is
+what the living-versus-historical rule forbids.
+
 EXECUTED 2026-08-30 by Phase 17 (NEW WORK N13): both files moved to
 `docs/design/naming-audit.md` and `docs/design/power-verification.md` with their
 basenames kept, so every bare-name citation stays literally correct; all thirteen

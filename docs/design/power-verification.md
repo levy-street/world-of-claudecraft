@@ -1251,6 +1251,13 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   pinned. No shipped player path reaches three; a direct write to
   `meta.equipment` would. Closing it needs a load-time bench, which is sim logic
   and out of scope.
+  RULED (qr-19-over-cap-load-bench, 2026-09-01, under qr-19-best-for-project): the
+  two-piece bound stays an equip-transition rule and no load-time bench is built.
+  Checked: no shipped player path reaches three worn pieces (only a direct write to
+  meta.equipment does), so the bench would defend a state the game cannot produce, at
+  the price of new sim load logic, a which-piece-benches rule, a full-bag destination
+  answer, and save-migration risk on every legacy character. Ratifying the pinned bound
+  is the stable answer the directive asks for, not a deferral of the work.
 - **The druid balance harness drifted when the packet's defs landed** (its bear
   arm takes 12 percent more damage in the fixture) and was never re-pinned. Its
   assertions are `> 0`, so nothing reds. The per-class gear-identity pin added
