@@ -501,6 +501,12 @@ export function recalcPlayerStats(
     // band while the bear owns the classic big-pool identity. Leather peaks
     // ~1700-2100 armor vs the warrior's 2861; the form multiplier still fakes
     // the missing plate tier, the Dire Bear logic.
+    // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): the
+    // warrior figure quoted above is a PINNED calibration constant from the
+    // floor suites, not a live catalog read. The committed max-armour kit pins
+    // at 4085 (tests/heroic_difficulty_floors.test.ts), and whether 2861 was
+    // ever the raw kit armour or a prot-mastery-folded reading is UNSETTLED, so
+    // it is not re-based here and rides the packet's R5 re-measure.
     s.armor = Math.round(s.armor * 2.1);
     bonusAp += 15 + Math.round(s.agi * 1.5);
   }

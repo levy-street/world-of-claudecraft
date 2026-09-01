@@ -129,6 +129,13 @@ export const RIFT_HEROIC_MIN_MOVE_SPEED = 8;
 // boulder lethality and citadel exclusion (C-only content); the stat transform
 // reads riftRankTuningFor, which is non-null at every rank. See the C-rank
 // note on RIFT_NORMAL_TUNING below.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The ~39.8% above reads about 32.1% on the 4085 kit; the rank targets are
+// unchanged.
 export interface RiftRankTuning {
   // Spawn-list trash, including the two dais guards flanking a boss.
   healthMultiplier: number;

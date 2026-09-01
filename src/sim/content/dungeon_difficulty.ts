@@ -80,6 +80,12 @@ export type HeroicMobTuning = Omit<HeroicDungeonTuning, 'finalBossId' | 'marksPe
 // ../instances/difficulty.ts. Gravebreaker (the raid boss frontal) derives
 // from boss.weapon, so it scales through the template transform on its own.
 // Floors are pinned by tests/heroic_difficulty_floors.test.ts.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The ~39.8% above reads about 32.1% on the 4085 kit.
 // NORMAL-difficulty retunes. Normal spawns default to the raw base templates;
 // a dungeon appears here only when its normal mode needs its own calibration.
 // Unlike the heroic table this one is PER MOB, because the floor-style targets
@@ -146,6 +152,12 @@ export interface NormalDungeonTuning {
 // spawns from the arena spawn list and the waves through spawnNythraxisAdds,
 // both of which pass this seam. Pinned by
 // tests/heroic_difficulty_floors.test.ts.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// The 100 and 200 lines above are measured on 2861, not on the 4085 kit.
 export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   [IGNIVAR_FORGE_APPROACH_ID]: {
     id: IGNIVAR_FORGE_APPROACH_ID,
@@ -210,6 +222,12 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
   // normal Wildheart on the SANCTUM NORMAL calibration: the same DOUBLED health
   // and the same reference warrior (level-20 prot, 2861 armor, Defensive
   // Stance), floored per band at trash 100 / boss 200.
+  // Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+  // PINNED constant, not a live measurement of the catalog. The committed
+  // max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+  // whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+  // UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+  // The trash 100 / boss 200 bands above are measured on 2861.
   //
   // Two Wildheart-specific departures from the Sanctum table, both forced by
   // the roster rather than chosen:

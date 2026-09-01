@@ -12,6 +12,12 @@
 // max-armor kit (full heroic plate + shield, prot mastery), 2861 armor, in
 // Defensive Stance (takes 10% less). Heroic mobs attack at the level-22 pin,
 // so the armor step passes ~44.2% and the stance cut leaves ~39.8%.
+// Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a
+// PINNED constant, not a live measurement of the catalog. The committed
+// max-armour kit pins at 4085 (tests/heroic_difficulty_floors.test.ts), and
+// whether 2861 was ever the raw kit armour or a prot-mastery-folded reading is
+// UNSETTLED, so it is not re-based here and rides the packet's R5 re-measure.
+// On the 4085 kit those two figures read about 35.7% and about 32.1%.
 
 import { describe, expect, it } from 'vitest';
 import {

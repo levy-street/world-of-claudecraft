@@ -1246,6 +1246,33 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   was already so before this packet. Raising it would move every difficulty floor,
   so this phase pinned the claim that protects the model instead: removing the
   packet's defs leaves the max-mitigation kit unchanged.
+  RULED (qr-19-ref-armor-calibration-constant, 2026-09-01, under qr-19-best-for-project): REF_ARMOR
+  stays pinned at 2861 and the widened calibration gap is recorded as the model's stated
+  conservatism. Both ladders were solved AT their floors (`src/sim/content/dungeon_difficulty.ts`
+  solves the 500 floor at each dungeon's weakest spawn-list mob, `src/sim/rift/ranks.ts` at the
+  weakest template of each class), so re-basing the constant is a live difficulty change to R5's two
+  protected assets, not a calibration tidy, and the packet's stopping rule sends it to the row 12
+  re-measure rather than to this gate. Derived from the committed `armorReduction` in
+  `src/sim/types.ts`, never from an R5 re-measure: against the level-22 heroic pin the armour step
+  passes 44.24 percent at 2861 and 35.72 percent at 4085, so post-armour melee falls about 19 percent
+  (19.3 at level 22, 19.0 at the S-rank level 23) and holding a melee floor would need about 24
+  percent more mob melee, while the "~39.8%" the comments quote would read about 32.1 percent.
+  AMENDED (qr-19-ref-armor-calibration-constant, 2026-09-01): the sealed sentence above understates
+  the gap, and on the raw basis it never described it. The committed max-armour kit pins at 4085
+  (`tests/heroic_difficulty_floors.test.ts`, re-pinned 2969 to 4085 at the release/v0.41.0 merge), so
+  the live gap is 1224 points, where the pre-raid gap on that same raw basis was 108 (2969 minus
+  2861). A gap of 508 does exist, but to R5's own prot-spec tank baseline of 3369 in section 9.5,
+  which is a different kit again. The BASIS of 2861 is UNSETTLED and this line does not paper over
+  it: the four floor-suite headers call 2861 the max-armour kit with prot mastery folded in, the
+  re-pin note calls 4085 and 1582 the raw kit numbers without prot mastery, and prot mastery RAISES
+  armour (Recompense `armorPct` 0.10 plus `armorFromStrPct` 0.70 in
+  `src/sim/content/talents_warrior.ts`, applied in `src/sim/entity.ts`), so 2861 cannot be a
+  mastery-folded reading of a catalog whose raw max-armour kit measured 2969. A third reading sits
+  beside those two: `scripts/healing_montecarlo.ts` and `docs/healing-monte-carlo-analysis.md` pair
+  2861 armour with 2762 hp on a max-EHP (stamina-first) pick, not a max-armour one. Settling which
+  tank and which basis 2861 names belongs to the row 12 re-measure. Phase 18's scoped but unlanded
+  provenance debt ("REF_ARMOR's stale calibration comment states its provenance") is paid in this
+  same change at the fifteen sites that quote the constant as live fact.
 - **The two-piece bound is an equip-transition rule, not a worn-set invariant.**
   A save already over the cap keeps everything it was wearing, deliberately and
   pinned. No shipped player path reaches three; a direct write to

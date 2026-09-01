@@ -22288,6 +22288,14 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as pbe-boost-caster-b
   packet. Raising it would move every floor, so the claim pinned instead
   is the one that protects the model: the max-mitigation kit is IDENTICAL
   with and without the packet's defs.
+AMENDED (qr-19-ref-armor-calibration-constant, 2026-09-01): "several hundred points stale" names
+neither raw reading. On the re-pin note's own literals the pre-raid gap was 108 points (2969 minus
+2861) and the merged gap is 1224 (4085 minus 2861); 508 is the gap to R5's prot-spec tank baseline of
+3369 (power-verification.md section 9.5), a different kit again. The basis of 2861 is UNSETTLED and is
+left open here rather than restated: the four floor-suite headers call it the max-armour kit with prot
+mastery folded in, the re-pin note calls 4085 and 1582 the raw kit numbers without prot mastery, prot
+mastery RAISES armour, and the healing Monte Carlo pair reads 2861 armour against 2762 hp on a max-EHP
+(stamina-first) pick. Settling it rides the row 12 re-measure.
 - The two-piece bound is an equip-TRANSITION rule; a save already over cap
   keeps everything, deliberately and pinned. Closing it needs a load-time
   bench, which is sim logic and out of scope.
@@ -22684,6 +22692,17 @@ literal in tests/heroic_difficulty_floors.test.ts was re-pinned to the
 release's catalog (2969 to 4085 armor, 1672 to 1582 pool; named cause the
 Crucible plate; REF_ARMOR 2861 untouched, the calibration gap now over a
 thousand points, which sharpens the section 14 REF_ARMOR read). Three more
+RULED (qr-19-ref-armor-calibration-constant, 2026-09-01, under qr-19-best-for-project): REF_ARMOR
+stays pinned at 2861 and the widened gap (1224 points, where the pre-raid gap on the same raw basis
+was 108) is recorded as the difficulty model's stated conservatism, not re-based here. Both ladders
+were solved AT their floors, heroic Nythraxis and S rift are R5's two protected assets with difficulty
+AS the protected asset, and the frozen harness itself imports both tuning tables, so any raise is an
+R5 escalation under the packet's stopping rule and rides row 12's re-measure. Derived from the
+committed armorReduction rather than an R5 re-measure: the armour step passes 44.24 percent at 2861
+and 35.72 percent at 4085 against the level-22 heroic pin, so post-armour melee falls about 19 percent
+and holding a melee floor would need about 24 percent more mob melee, while the comments' "~39.8%"
+would read about 32.1 percent. Phase 18's scoped but unlanded provenance debt ("REF_ARMOR's stale
+calibration comment states its provenance") is paid in the same change at the fifteen quoting sites.
 records from the audit round: the release span STAGES a Crucible crafted
 tier (docs/prd/ignivar-raid-professions.md and
 src/sim/content/crucible_professions.ts, the PR 3704 fast-follow: crafted

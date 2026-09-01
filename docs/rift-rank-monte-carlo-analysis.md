@@ -14,6 +14,12 @@ raw swing passes and ~40.6% of a level-23 one), plus max HP. That is exactly
 what `tests/heroic_difficulty_floors.test.ts` pins for dungeons, so rift and
 dungeon numbers are directly comparable.
 
+Provenance (qr-19-ref-armor-calibration-constant, 2026-09-01): 2861 is a PINNED constant, not a live
+measurement of the catalog. The committed max-armour kit pins at 4085
+(`tests/heroic_difficulty_floors.test.ts`), and whether 2861 was ever the raw kit armour or a
+prot-mastery-folded reading is UNSETTLED, so it is not re-based here and rides the packet's R5
+re-measure. On the 4085 kit the two passes above read about 32.1% and about 32.9%.
+
 ## The problem
 
 Rift ranks were calibrated on 2026-07-22 (#2260) and never moved. The ladder
