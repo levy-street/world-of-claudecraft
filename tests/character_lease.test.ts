@@ -330,7 +330,9 @@ describe('saveCharacterState lease fence', () => {
     // evaluated with the row already held; it is a row LOCK, not a lease check.
     const selects = stmts.filter((s) => /^\s*SELECT/i.test(s));
     expect(selects.every((s) => !/character_leases/i.test(s))).toBe(true);
-    const lockIdx = stmts.findIndex((s) => /FROM characters\b/i.test(s) && /FOR UPDATE/i.test(s));
+    const lockIdx = stmts.findIndex(
+      (s) => /FROM characters\b/i.test(s) && /FOR NO KEY UPDATE/i.test(s),
+    );
     const updateIdx = stmts.findIndex((s) => /UPDATE characters/i.test(s));
     expect(
       lockIdx,

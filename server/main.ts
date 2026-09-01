@@ -342,7 +342,11 @@ import {
   mapsListMineCore,
   mapsPublicListCore,
 } from './maps_routes';
-import { configureMarketSoldVolume } from './market_sold_volume';
+import {
+  configureMarketSoldVolume,
+  soldVolumeTailStats,
+  soldVolumeWriterIdle,
+} from './market_sold_volume';
 import {
   MARKET_SOLD_VOLUME_WINDOW_DAYS,
   marketSoldVolumeRetentionTable,
@@ -3827,6 +3831,7 @@ export async function startServer(): Promise<http.Server> {
     }),
     dbBackendCancels: () => getBackendCancelCounts(),
     bankLedgerTail: () => bankLedgerTailStats(),
+    soldVolumeTail: () => soldVolumeTailStats(),
     generalChatQuotaInFlight: () => game.generalChatQuotaInFlight(),
     generalChatQuotaCachedAccounts: () => game.generalChatQuotaCachedAccounts(),
     generalChatQuotaDbPool: () => generalChatQuotaDbPoolState(),
@@ -4231,6 +4236,11 @@ export async function startServer(): Promise<http.Server> {
     // unlike deeds these rows have no reconcile heal path, so a row dropped by
     // pool.end() is gone. Rejections log inside the writer; never throws.
     await progressEventsIdle();
+    // Drain the market sold-volume FIFO too (qr-19-sold-volume-four-seam-wiring):
+    // each queued accumulator entry stands for many coalesced sales, and an entry
+    // still on the tail would be rejected by pool.end() with a burst of failure
+    // lines. Rejections log inside the writer; never throws.
+    await soldVolumeWriterIdle();
     // Stop accepted /unstuck report intake and drain only to a finite deadline.
     // Per-query timeouts bound an active write; deadline expiry aborts retry
     // delays and drops queued telemetry before the shared pool closes.

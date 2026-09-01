@@ -21,6 +21,7 @@ import {
   MARKET_SOLD_VOLUME_WINDOW_DAYS,
   MARKET_SOLD_VOLUME_WRITE_TIMEOUT_MS,
   type MarketSoldVolumeBoundedRunner,
+  type MarketSoldVolumeEntry,
   marketSoldVolumeRetentionTable,
   pruneMarketSoldVolumeBatch,
   readMarketSoldVolumeSince,
@@ -28,6 +29,9 @@ import {
   recordMarketSoldVolumeRowBounded,
 } from '../../server/market_sold_volume_db';
 import type { MarketListing } from '../../src/sim/market';
+import { Sim } from '../../src/sim/sim';
+import type { Entity } from '../../src/sim/types';
+import { groundHeight } from '../../src/sim/world';
 import { stripComments } from '../helpers/strip_comments';
 import { tsFilesUnder } from '../helpers/ts_files_under';
 
@@ -43,6 +47,22 @@ function listing(over: Partial<MarketListing> = {}): MarketListing {
     house: false,
     ...over,
   };
+}
+
+function merchant(sim: Sim): Entity {
+  for (const e of sim.entities.values()) if (e.templateId === 'the_merchant') return e;
+  throw new Error('the Merchant was not spawned');
+}
+
+// Stand a player on the Merchant so marketBuy's proximity gate passes.
+function standAtMerchant(sim: Sim, pid: number): void {
+  const e = sim.entities.get(pid);
+  if (!e) throw new Error(`missing entity ${pid}`);
+  const m = merchant(sim);
+  e.pos.x = m.pos.x;
+  e.pos.z = m.pos.z;
+  e.pos.y = groundHeight(e.pos.x, e.pos.z, sim.cfg.seed);
+  e.prevPos = { ...e.pos };
 }
 
 describe('marketSaleFromBuy (the pure sale verdict)', () => {
@@ -111,6 +131,38 @@ describe('buyWithSoldVolume (the dispatch-site observer)', () => {
     // saleCount is stamped at admission (the coalescing accumulator's unit),
     // so the writer always receives an explicit count rather than an implied 1.
     expect(recorded).toEqual([{ itemId: 'wyrmfall_core', quantity: 3, copper: 900, saleCount: 1 }]);
+  });
+
+  it('records a real Sim.marketBuy sale end to end (the length-drop coupling to src/sim/market.ts)', async () => {
+    // buyWithSoldVolume infers "this listing sold" from a length drop, which
+    // couples to Sim.marketBuy splicing exactly one row on a successful non-house
+    // buy. Drive the REAL sim rather than a fake, so a future marketBuy that
+    // removes-and-adds a row (a partial buy, a house restock) reds here instead
+    // of silently mis-recording or dropping the observation.
+    const recorded: MarketSoldVolumeEntry[] = [];
+    resetMarketSoldVolumeForTests((entry) => {
+      recorded.push(entry);
+      return Promise.resolve();
+    });
+    const sim = new Sim({ seed: 42, playerClass: 'warrior', noPlayer: true });
+    const seller = sim.addPlayer('warrior', 'Seller');
+    const buyer = sim.addPlayer('mage', 'Buyer');
+    standAtMerchant(sim, seller);
+    standAtMerchant(sim, buyer);
+    // vale_wheat is a tracked (produce) bucket id that is listable; the SEED
+    // vale_wheat_seed alone carries noMarketList, so it cannot be sold here.
+    sim.addItem('vale_wheat', 3, seller);
+    const buyerPlayer = sim.players.get(buyer);
+    if (!buyerPlayer) throw new Error('missing buyer');
+    buyerPlayer.copper = 1_000;
+    sim.marketList('vale_wheat', 3, 90, seller);
+    const listingRow = sim.marketListings.find((l) => l.itemId === 'vale_wheat');
+    if (!listingRow) throw new Error('seller listing not found');
+    buyWithSoldVolume(sim, listingRow.id, buyer);
+    await soldVolumeWriterIdle();
+    resetMarketSoldVolumeForTests();
+    // The whole listing sold, so the observer records its stack and gross price.
+    expect(recorded).toEqual([{ itemId: 'vale_wheat', quantity: 3, copper: 90, saleCount: 1 }]);
   });
 
   it('records nothing when the buy is refused', async () => {
@@ -304,6 +356,12 @@ const WIRED_SEAMS = [
     file: 'server/main.ts',
     anchor: 'retentionSweep.start();',
     present: 'configureMarketSoldVolume(',
+  },
+  {
+    what: 'configureAdminMarketSoldVolume called at boot',
+    file: 'server/main.ts',
+    anchor: 'retentionSweep.start();',
+    present: 'configureAdminMarketSoldVolume(',
   },
 ] as const;
 

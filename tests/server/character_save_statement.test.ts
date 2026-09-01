@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import * as blobSize from '../../server/character_blob_size';
 import {
   CHARACTER_SAVE_LEASED_LINE,
+  CHARACTER_SAVE_ROW_LOCK_SQL,
   characterUpdateStatement,
 } from '../../server/character_save_statement';
 
@@ -107,6 +108,17 @@ describe('characterUpdateStatement: the three fence shapes', () => {
   it('pins the offline refusal line the endpoint surfaces', () => {
     expect(CHARACTER_SAVE_LEASED_LINE).toBe(
       'character holds a live session lease; kick them (or wait out the lease) and retry',
+    );
+  });
+
+  it('pins the live row-lock SQL: FOR NO KEY UPDATE, realm-scoped (D145)', () => {
+    // The load-bearing lock the four live save paths take before the fenced
+    // UPDATE (qr-19-live-nonce-fence-write-loss). Pinned as a literal so a
+    // dropped realm predicate or a switch to the offline arm's FOR UPDATE (which
+    // would stall every FK-child insert of the character on the ~33-saves-a-second
+    // path, and buys nothing for the takeover case) reds here rather than shipping.
+    expect(CHARACTER_SAVE_ROW_LOCK_SQL).toBe(
+      'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR NO KEY UPDATE',
     );
   });
 });

@@ -217,18 +217,29 @@ function enqueue(entry: MarketSoldVolumeEntry): void {
     saleCount: sales,
   };
   queued.set(entry.itemId, row);
-  tail = tail.then(() => {
-    // Frozen here, at the head of its own link: from this point the row is on
-    // the wire, so a later sale of the same item must queue a NEW entry rather
-    // than change what the database is already being asked to write. Guarded on
-    // identity so a link can only ever retract its own row.
-    if (queued.get(row.itemId) === row) queued.delete(row.itemId);
-    return write(row).catch((err: unknown) => {
-      // Reported and dropped: sold volume is an observation, and losing one
-      // row must never disturb a sale that already happened.
-      onWriteError(err);
+  tail = tail
+    .then(() => {
+      // Frozen here, at the head of its own link: from this point the row is on
+      // the wire, so a later sale of the same item must queue a NEW entry rather
+      // than change what the database is already being asked to write. Guarded on
+      // identity so a link can only ever retract its own row.
+      if (queued.get(row.itemId) === row) queued.delete(row.itemId);
+      return write(row).catch((err: unknown) => {
+        // Reported and dropped: sold volume is an observation, and losing one
+        // row must never disturb a sale that already happened.
+        onWriteError(err);
+      });
+    })
+    // Defense in depth: a writer that throws SYNCHRONOUSLY (its inner .catch
+    // never attached) or an onWriteError that itself throws would otherwise
+    // reject `tail`, skip every later link, and wedge the FIFO at its cap. Keep
+    // the chain alive and free the queue slot; report directly to avoid
+    // re-entering onWriteError. Today's boot writer is async, so this is a guard
+    // against a future writer, not a live path.
+    .catch((err: unknown) => {
+      if (queued.get(row.itemId) === row) queued.delete(row.itemId);
+      console.error('market sold-volume write chain error (kept alive):', err);
     });
-  });
 }
 
 /**

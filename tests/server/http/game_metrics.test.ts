@@ -62,6 +62,8 @@ import {
   WOC_GUILD_BANK_INCIDENTS_TOTAL,
   WOC_GUILD_BANK_LOG_CACHE,
   WOC_INPUT_FRAMES_MISSED_TOTAL,
+  WOC_MARKET_SOLD_VOLUME_TAIL,
+  WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL,
   WOC_PLAYERS_ONLINE,
   WOC_ROD_FEE_COPPER,
   WOC_ROD_FEE_PAYMENTS_TOTAL,
@@ -145,6 +147,7 @@ function stubSource(overrides: Partial<GameStateSource> = {}): GameStateSource {
     dbPool: () => ({ total: 7, idle: 4, waiting: 1 }),
     dbBackendCancels: () => ({ requested: 3, failed: 1 }),
     bankLedgerTail: () => ({ depth: 12, rows: 240, droppedRows: 5 }),
+    soldVolumeTail: () => ({ depth: 3, coalescedSales: 7, droppedSales: 2 }),
     generalChatQuotaDbPool: () => ({ total: 2, idle: 1, waiting: 0 }),
     generalChatQuotaInFlight: () => 0,
     generalChatQuotaCachedAccounts: () => 0,
@@ -527,6 +530,30 @@ describe('registerGameStateMetrics: gauges read the source at scrape time', () =
     expect(sampleValue(text, /^woc_bank_ledger_tail_dropped_rows_total (\d+)$/m)).toBe('5');
     // The retired mixed shape stays retired.
     expect(text).not.toMatch(/^woc_bank_ledger_tail\{measure="dropped_rows"\}/m);
+  });
+
+  it('splits the market sold-volume FIFO into an instantaneous gauge and a drop counter', async () => {
+    const registry = new Registry();
+    registerGameStateMetrics(registry, stubSource());
+    const text = await registry.metrics();
+    expect(WOC_MARKET_SOLD_VOLUME_TAIL).toBe('woc_market_sold_volume_tail');
+    expect(WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL).toBe(
+      'woc_market_sold_volume_tail_dropped_sales_total',
+    );
+    expect(text).toContain(`# TYPE ${WOC_MARKET_SOLD_VOLUME_TAIL} gauge`);
+    expect(text).toContain(`# TYPE ${WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL} counter`);
+    // The stub returns depth 3 (queued write entries) and coalesced 7 (lifetime
+    // sales folded into an already-queued entry): the instantaneous arms.
+    expect(sampleValue(text, /^woc_market_sold_volume_tail\{measure="depth"\} (\d+)$/m)).toBe('3');
+    expect(sampleValue(text, /^woc_market_sold_volume_tail\{measure="coalesced"\} (\d+)$/m)).toBe(
+      '7',
+    );
+    // The lifetime drop total is its OWN counter (rate()/increase() across a
+    // realm restart), never a measure on the gauge.
+    expect(labelValues(text, 'measure', WOC_MARKET_SOLD_VOLUME_TAIL)).toEqual(
+      new Set(['depth', 'coalesced']),
+    );
+    expect(sampleValue(text, /^woc_market_sold_volume_tail_dropped_sales_total (\d+)$/m)).toBe('2');
   });
 
   it('exports the dedicated-side-pool backend cancels as two counters', async () => {

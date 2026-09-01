@@ -266,10 +266,10 @@ export async function pruneMarketSoldVolumeBatch(
 }
 
 /**
- * The sweep registration, ready to drop into the `tables` array in
- * server/main.ts: `marketSoldVolumeRetentionTable(pool),`. NOT YET REGISTERED
- * (see RETENTION in the header): this is the line the wiring adds, not a live
- * one. Typed as the sweep's own `RetentionTable`, so a drift in that contract
+ * The sweep registration, `marketSoldVolumeRetentionTable(pool)` in the `tables`
+ * array of server/main.ts. REGISTERED (qr-19-sold-volume-four-seam-wiring, Phase
+ * 19): this is a live nightly prune, not a deferred one (see RETENTION in the
+ * header). Typed as the sweep's own `RetentionTable`, so a drift in that contract
  * fails here at compile time rather than at the registration site.
  */
 export function marketSoldVolumeRetentionTable(

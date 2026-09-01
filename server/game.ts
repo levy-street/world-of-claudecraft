@@ -4536,7 +4536,7 @@ export class GameServer {
             gameMetricsCounters().guildBankIncident('save_fenced_out');
           }
           console.warn(
-            `character ${session.characterId} (${session.name}) save fenced out by a same-account takeover; skipping deed publish and lastSave`,
+            `character ${session.characterId} (${session.name}) save fenced out (a same-account takeover, or this session's own lease lapsed past the TTL, qr-19-nonce-fence-expiry-term); skipping deed publish and lastSave`,
           );
           // Guild books this save carried were mutated in the LIVE sim by ops
           // whose character half just rolled back, so the LIVE book is ahead

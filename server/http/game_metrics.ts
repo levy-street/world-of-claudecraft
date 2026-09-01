@@ -247,6 +247,17 @@ export const WOC_BANK_LEDGER_TAIL = 'woc_bank_ledger_tail';
  *  restarts, which the old dropped_rows gauge arm did not. */
 export const WOC_BANK_LEDGER_TAIL_DROPPED_ROWS_TOTAL = 'woc_bank_ledger_tail_dropped_rows_total';
 
+/** Market sold-volume write FIFO occupancy (measure=depth queued entries,
+ *  measure=coalesced lifetime sales folded into an already-queued entry).
+ *  Instantaneous only; the lifetime drop total is the counter below. */
+export const WOC_MARKET_SOLD_VOLUME_TAIL = 'woc_market_sold_volume_tail';
+
+/** Total market sales dropped at the sold-volume write FIFO admission cap (each
+ *  is a lost observation, never a lost sale; the sale itself completed). Alert on
+ *  any increase. A Counter, so rate()/increase() read correctly across restarts. */
+export const WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL =
+  'woc_market_sold_volume_tail_dropped_sales_total';
+
 /** Marketplace escrow-queue outcomes (the listing entry on the per-character
  *  save FIFO), by kind. */
 export const WOC_ESCROW_QUEUE_TOTAL = 'woc_escrow_queue_total';
@@ -464,6 +475,10 @@ export interface GameStateSource {
   /** Bank-ledger insert FIFO: live queued ops (depth), the ledger rows those
    *  ops carry, and lifetime rows dropped at either cap. */
   bankLedgerTail(): { depth: number; rows: number; droppedRows: number };
+  /** Market sold-volume write FIFO: live queued entries (depth), lifetime sales
+   *  coalesced into an already-queued entry, and lifetime sales dropped at the
+   *  admission cap (the sale completed; only the observation was lost). */
+  soldVolumeTail(): { depth: number; coalescedSales: number; droppedSales: number };
   generalChatQuotaDbPool(): { total: number; idle: number; waiting: number };
   generalChatQuotaInFlight(): number;
   generalChatQuotaCachedAccounts(): number;
@@ -759,6 +774,28 @@ export function registerGameStateMetrics(
     collect() {
       this.reset();
       this.inc(source.bankLedgerTail().droppedRows);
+    },
+  });
+
+  new Gauge({
+    name: WOC_MARKET_SOLD_VOLUME_TAIL,
+    help: 'Per-process market sold-volume write FIFO occupancy by measure: depth is queued write entries against the admission cap, coalesced is the lifetime count of sales folded into an already-queued entry. Instantaneous only; alert on drops via woc_market_sold_volume_tail_dropped_sales_total.',
+    labelNames: ['measure'],
+    registers: [registry],
+    collect() {
+      const tail = source.soldVolumeTail();
+      this.set({ measure: 'depth' }, tail.depth);
+      this.set({ measure: 'coalesced' }, tail.coalescedSales);
+    },
+  });
+
+  new Counter({
+    name: WOC_MARKET_SOLD_VOLUME_TAIL_DROPPED_SALES_TOTAL,
+    help: 'Total market sales dropped at the sold-volume write FIFO admission cap (alert on any increase; each is a lost observation, the sale itself completed).',
+    registers: [registry],
+    collect() {
+      this.reset();
+      this.inc(source.soldVolumeTail().droppedSales);
     },
   });
 

@@ -55,6 +55,7 @@ import {
   saveCharacterAndGuildBankState,
   saveCharacterAndMarketState,
   saveCharacterState,
+  saveCharacterStateOnClient,
 } from '../server/db';
 import { type CharacterState, type MailSave, type MarketSave, Sim } from '../src/sim/sim';
 
@@ -126,7 +127,7 @@ describe('characterBlobSizeWarning: the pure decision', () => {
     const warning = characterBlobSizeWarning(4291, 200_000);
     expect(warning).toContain('4291');
     expect(warning).toContain('200000');
-    expect(warning).toContain('163840');
+    expect(warning).toContain('163840-byte');
   });
 
   it('leaves a real freshly serialized character far under the threshold', () => {
@@ -228,7 +229,7 @@ describe('saveCharacterState: the size signal never gates the write', () => {
     await saveCharacterState(105, 12, realCharacterState(), 'session-a');
     const statements = client.query.mock.calls.map((call) => String(call[0]));
     const lockIdx = statements.findIndex(
-      (s) => s.includes('FROM characters') && s.includes('FOR UPDATE'),
+      (s) => s.includes('FROM characters') && s.includes('FOR NO KEY UPDATE'),
     );
     const updateIdx = statements.findIndex((s) => s.includes('UPDATE characters SET'));
     expect(lockIdx).toBeGreaterThanOrEqual(0);
@@ -317,6 +318,34 @@ describe('every character write path inherits the signal (the shared chokepoint)
     const statements = client.query.mock.calls.map((call) => String(call[0]));
     expect(statements).toContain('COMMIT');
     expect(statements).not.toContain('ROLLBACK');
+  });
+
+  it('saveCharacterAndMarketState takes the row lock before the fenced UPDATE (D145)', async () => {
+    // The other three live save paths run the fenced UPDATE through the same
+    // runFencedCharacterUpdate, so pin the lock-before-update ordering on each
+    // (a bare transaction.query on any one reinstates the write-loss race).
+    const client = transactionClient();
+    dbMock.connect.mockResolvedValue(client as never);
+    await saveCharacterAndMarketState(203, 60, realCharacterState(), MARKET, MAIL, 'session-a');
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    const lockIdx = statements.findIndex(
+      (s) => s.includes('FROM characters') && s.includes('FOR NO KEY UPDATE'),
+    );
+    const updateIdx = statements.findIndex((s) => s.includes('UPDATE characters SET'));
+    expect(lockIdx).toBeGreaterThanOrEqual(0);
+    expect(lockIdx).toBeLessThan(updateIdx);
+  });
+
+  it('saveCharacterStateOnClient takes the row lock before the fenced UPDATE (D145)', async () => {
+    const client = transactionClient();
+    await saveCharacterStateOnClient(client as never, 204, 60, realCharacterState(), 'session-a');
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    const lockIdx = statements.findIndex(
+      (s) => s.includes('FROM characters') && s.includes('FOR NO KEY UPDATE'),
+    );
+    const updateIdx = statements.findIndex((s) => s.includes('UPDATE characters SET'));
+    expect(lockIdx).toBeGreaterThanOrEqual(0);
+    expect(lockIdx).toBeLessThan(updateIdx);
   });
 
   it('stays silent on all three paths for an ordinary character', async () => {

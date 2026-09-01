@@ -21,9 +21,15 @@
 //   live lease IS; a lapsed-but-unreclaimed row no longer admits its own
 //   session's autosave over a landed strip. RESIDUAL (B1, carried to the
 //   maintainer): heartbeatCharacterLeases stays unqualified, so a recovered
-//   process re-arms a lapsed lease within one heartbeat tick and the term
-//   narrows the window rather than closing it; qualifying the heartbeat would
-//   risk a stalled process's sessions becoming permanently unsaveable.
+//   process re-arms a lapsed lease and the term narrows the window rather than
+//   closing it. Be honest about how narrow: the autosave and the heartbeat ride
+//   the SAME 30 s flush tick (server/periodic_save_flush.ts), and the unqualified
+//   heartbeat commits first, so in the lapsed-but-UNRECLAIMED case (no peer took
+//   over) the term catches only the sub-tick window before the heartbeat re-arms
+//   the row, which is the LIKELY branch. It fully closes the RECLAIMED-by-a-peer
+//   case (the holder changed, so the heartbeat cannot match). Qualifying the
+//   heartbeat would shut the residual but risk a stalled process's sessions
+//   becoming permanently unsaveable, which is why B1 is the maintainer's call.
 // - unleased: the OFFLINE writer fence (the admin clear-item-name strip, the
 //   phase 13 QA login-race closure). The row is written only while NO live
 //   lease exists for the character. The WS handshake acquires the lease
@@ -157,12 +163,24 @@ export function characterUpdateStatement(
  *  InitPlan after a lock wait. A lease that committed (or a nonce that rotated)
  *  during that wait is therefore unseen and the write lands over a live session
  *  (reproduced twice at the Phase 18 QA database review, on the offline twin).
- *  FOR UPDATE, not the FOR NO KEY UPDATE the UPDATE itself takes, so while this
- *  lock is held no fresh character_leases row can commit (its FK parent takes
- *  FOR KEY SHARE, which FOR NO KEY UPDATE does NOT conflict with). Realm-pinned
- *  like the write it precedes, so a cross-realm id locks nothing. */
+ *  The FIX is the statement ORDERING, not the lock strength: any row lock taken
+ *  first moves the whole lock wait ahead of the fence, so the fence evaluates on
+ *  a fresh snapshot with the row held (the offline arm measured the repro green
+ *  under FOR NO KEY UPDATE too). This LIVE lock is FOR NO KEY UPDATE, the mode the
+ *  UPDATE itself would take, deliberately NOT the offline arm's FOR UPDATE: on
+ *  this ~33-saves-a-second path FOR UPDATE would conflict with the FOR KEY SHARE
+ *  every FK-child INSERT of the character takes (chat_logs, character_deeds,
+ *  play_sessions and the rest), stalling those inserts and opening a deadlock
+ *  edge for the whole save, and it buys nothing here: a same-account takeover
+ *  rotates the nonce through acquireCharacterLease's ON CONFLICT DO UPDATE arm,
+ *  which re-checks no FK and takes no parent lock, so FOR UPDATE never excluded
+ *  it anyway. The fence, not the lock, refuses a cross-realm write (a cross-realm
+ *  id has no lease row for this process's holder), so the realm pin here only
+ *  keeps the lock from touching another realm's row; it locks nothing on a
+ *  mismatch and the fence still refuses. The offline writer keeps FOR UPDATE by
+ *  its own rationale (rare, single-lock, and it wants the fresh-lease exclusion). */
 export const CHARACTER_SAVE_ROW_LOCK_SQL =
-  'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE';
+  'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR NO KEY UPDATE';
 
 /** Run the character UPDATE with the row lock taken FIRST for a FENCED write, the
  *  offline writer's precedent (server/offline_character_save_db.ts) extended to

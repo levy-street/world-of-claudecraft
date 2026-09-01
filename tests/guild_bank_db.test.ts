@@ -321,7 +321,9 @@ describe('saveCharacterAndGuildBankState (the game-loop escrow save)', () => {
     // CHARACTERS row lock, which precedes the fenced char UPDATE
     // (qr-19-live-nonce-fence-write-loss).
     const guildLockIndex = sqls.findIndex((s2) => /FROM guild_banks[\s\S]*FOR UPDATE/i.test(s2));
-    const charLockIndex = sqls.findIndex((s2) => /FROM characters\b[\s\S]*FOR UPDATE/i.test(s2));
+    const charLockIndex = sqls.findIndex((s2) =>
+      /FROM characters\b[\s\S]*FOR NO KEY UPDATE/i.test(s2),
+    );
     expect(charIndex).toBeGreaterThan(0);
     expect(guildLockIndex).toBeGreaterThan(charIndex);
     // D145: this is a fenced save, so the characters row lock precedes its UPDATE.
