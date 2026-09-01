@@ -1,3 +1,5 @@
+// biome-ignore-all lint/suspicious/noTemplateCurlyInString: this suite pins literal template source text.
+
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { stripComments } from './helpers/strip_comments';
