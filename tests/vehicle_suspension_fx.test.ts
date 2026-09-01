@@ -44,6 +44,15 @@ const ARCH_Y = 0.25;
 const SILL_Y = 0.05;
 const PLATE_HALF = 0.03;
 
+type VehicleSuspensionRig = NonNullable<ReturnType<typeof createVehicleSuspensionRig>>;
+
+function expectRig(mountRoot: THREE.Object3D, group: THREE.Object3D): VehicleSuspensionRig {
+  const rig = createVehicleSuspensionRig(mountRoot, group);
+  expect(rig).not.toBeNull();
+  if (rig === null) throw new Error('expected suspension rig');
+  return rig;
+}
+
 /**
  * A vehicle with real bodywork, so the envelope is MEASURED rather than
  * falling back. An arch plate sits over each wheel and a low sill runs down
@@ -95,7 +104,7 @@ const expectedGap = (arch = ARCH_Y) =>
 
 /** Run the pass to a settled state. */
 function settle(
-  rig: ReturnType<typeof createVehicleSuspensionRig>,
+  rig: VehicleSuspensionRig,
   v: ReturnType<typeof buildVehicle>,
   sample: (x: number, z: number) => number,
   grounded = true,
@@ -106,7 +115,7 @@ function settle(
 ) {
   for (let i = 0; i < frames; i++) {
     applyVehicleSuspension(
-      rig!,
+      rig,
       v.group,
       v.mountRoot,
       v.riderRoot,
@@ -132,7 +141,7 @@ describe('vehicle suspension scene pass', () => {
 
   it('measures wheelbase and track off the rig, in model units', () => {
     const v = buildVehicle(1, 1);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.wheelbase).toBeCloseTo(2, 6);
     expect(rig.track).toBeCloseTo(1, 6);
   });
@@ -143,7 +152,7 @@ describe('vehicle suspension scene pass', () => {
     // wheelbase/track is what makes travel come out 6x too large in game.
     const v = buildVehicle(1, 1);
     v.mountRoot.scale.setScalar(3);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.wheelbase).toBeCloseTo(2, 6);
     expect(rig.track).toBeCloseTo(1, 6);
     expect(rig.unitScale).toBeCloseTo(3, 6);
@@ -151,12 +160,12 @@ describe('vehicle suspension scene pass', () => {
 
   it('derives the facing and handedness signs from the node layout', () => {
     const normal = buildVehicle(1, 1);
-    const normalRig = createVehicleSuspensionRig(normal.mountRoot, normal.group)!;
+    const normalRig = expectRig(normal.mountRoot, normal.group);
     expect(normalRig.frontSign).toBe(1);
     expect(normalRig.rightSign).toBe(1);
 
     const flipped = buildVehicle(-1, -1);
-    const flippedRig = createVehicleSuspensionRig(flipped.mountRoot, flipped.group)!;
+    const flippedRig = expectRig(flipped.mountRoot, flipped.group);
     expect(flippedRig.frontSign).toBe(-1);
     expect(flippedRig.rightSign).toBe(-1);
   });
@@ -164,7 +173,7 @@ describe('vehicle suspension scene pass', () => {
   it('lifts the nose when the ground rises ahead, whichever way the model faces', () => {
     for (const frontZ of [1, -1]) {
       const v = buildVehicle(frontZ, 1);
-      const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+      const rig = expectRig(v.mountRoot, v.group);
       // Ground climbs toward the vehicle's own front.
       settle(rig, v, (_x, z) => z * 0.1 * frontZ);
 
@@ -180,7 +189,7 @@ describe('vehicle suspension scene pass', () => {
   it('lifts the right side when the ground rises to the right, either handedness', () => {
     for (const rightX of [1, -1]) {
       const v = buildVehicle(1, rightX);
-      const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+      const rig = expectRig(v.mountRoot, v.group);
       settle(rig, v, (x) => x * 0.1 * rightX);
 
       const probe = new THREE.Object3D();
@@ -198,7 +207,7 @@ describe('vehicle suspension scene pass', () => {
     // share geometry, so the result is a property of the MODEL.
     const v = buildBodiedVehicle();
     v.group.updateWorldMatrix(true, true);
-    const first = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const first = expectRig(v.mountRoot, v.group);
 
     // A second rider on the same vehicle: Object3D.clone() shares geometry,
     // exactly as the character asset clones do.
@@ -206,7 +215,7 @@ describe('vehicle suspension scene pass', () => {
     const secondGroup = new THREE.Object3D();
     secondGroup.add(clonedRoot);
     secondGroup.updateWorldMatrix(true, true);
-    const second = createVehicleSuspensionRig(clonedRoot, secondGroup)!;
+    const second = expectRig(clonedRoot, secondGroup);
 
     // Same object, not merely equal: that is what proves it was not re-measured.
     expect(second.envelope).toBe(first.envelope);
@@ -224,11 +233,11 @@ describe('vehicle suspension scene pass', () => {
     // with a cached entry: the arch sits lower here, so the envelope differs.
     const tall = buildBodiedVehicle();
     tall.group.updateWorldMatrix(true, true);
-    const tallRig = createVehicleSuspensionRig(tall.mountRoot, tall.group)!;
+    const tallRig = expectRig(tall.mountRoot, tall.group);
 
     const low = buildBodiedVehicle({ FL: ARCH_Y - 0.05 });
     low.group.updateWorldMatrix(true, true);
-    const lowRig = createVehicleSuspensionRig(low.mountRoot, low.group)!;
+    const lowRig = expectRig(low.mountRoot, low.group);
 
     expect(lowRig.envelope).not.toBe(tallRig.envelope);
     expect(lowRig.envelope.corner.fl.bump).toBeLessThan(tallRig.envelope.corner.fl.bump);
@@ -237,7 +246,7 @@ describe('vehicle suspension scene pass', () => {
   it('measures bump against the tire crown, not its bounding box', () => {
     const v = buildBodiedVehicle();
     v.group.updateWorldMatrix(true, true);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     // 0.85 of the real clearance: a spring that used all of it would put
     // rubber exactly on sheet metal at full travel.
     expect(rig.envelope.corner.fl.bump).toBeCloseTo(expectedGap() * 0.85, 5);
@@ -249,14 +258,14 @@ describe('vehicle suspension scene pass', () => {
   it('measures droop as the hub falling to underbody level', () => {
     const v = buildBodiedVehicle();
     v.group.updateWorldMatrix(true, true);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.envelope.corner.rl.droop).toBeCloseTo((HUB - SILL_Y) * 0.85, 5);
   });
 
   it('gives each corner its own limit, so one tight arch binds only its wheel', () => {
     const v = buildBodiedVehicle({ FL: 0.22 });
     v.group.updateWorldMatrix(true, true);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.envelope.corner.fl.bump).toBeCloseTo(expectedGap(0.22) * 0.85, 5);
     expect(rig.envelope.corner.fr.bump).toBeCloseTo(expectedGap() * 0.85, 5);
     expect(rig.envelope.corner.fl.bump).toBeLessThan(rig.envelope.corner.fr.bump);
@@ -267,7 +276,7 @@ describe('vehicle suspension scene pass', () => {
     // tire crown must read as zero room, never as negative room.
     const v = buildBodiedVehicle({ FL: 0.18 });
     v.group.updateWorldMatrix(true, true);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(expectedGap(0.18)).toBeLessThan(0);
     expect(rig.envelope.corner.fl.bump).toBe(0);
   });
@@ -279,7 +288,7 @@ describe('vehicle suspension scene pass', () => {
     const v = buildBodiedVehicle();
     v.mountRoot.scale.setScalar(6);
     v.group.updateWorldMatrix(true, true);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.unitScale).toBeCloseTo(6, 5);
 
     const rest = HUB;
@@ -307,7 +316,7 @@ describe('vehicle suspension scene pass', () => {
     const wheel = new THREE.Object3D();
     wheel.name = 'Wheel_FL';
     v.corners.Susp_FL.add(wheel);
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
 
     // Rolling: the clip owns the angle and we just watch it.
     const spun = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), 2.1);
@@ -323,14 +332,14 @@ describe('vehicle suspension scene pass', () => {
 
   it('leaves a vehicle with no wheel nodes alone', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.wheels.fl).toBeNull();
     expect(() => settle(rig, v, flat, true, 2, false)).not.toThrow();
   });
 
   it('adds travel to the mixer value instead of replacing it', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     // One wheel over a bump: the ground is high under the front left only.
     const bumpy = (x: number, z: number) => (x < 0 && z > 0 ? 0.1 : 0);
     settle(rig, v, bumpy);
@@ -361,7 +370,7 @@ describe('vehicle suspension scene pass', () => {
 
   it('does not accumulate on frames where the mixer did not run', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     const bumpy = (x: number, z: number) => (x < 0 && z > 0 ? 0.1 : 0);
     settle(rig, v, bumpy);
     const settled = v.corners.Susp_FL.position.y;
@@ -372,7 +381,7 @@ describe('vehicle suspension scene pass', () => {
 
   it('carries the rider rigidly with the body', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     const SEAT = 1.4;
     for (let i = 0; i < 240; i++) {
       applyVehicleSuspension(
@@ -401,7 +410,7 @@ describe('vehicle suspension scene pass', () => {
 
   it('eases upright and hangs the wheels when airborne', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     settle(rig, v, (x) => x * 0.1);
     expect(Math.abs(rig.state.roll)).toBeGreaterThan(1e-3);
 
@@ -506,7 +515,7 @@ function driveTurn(
 describe('front wheel steering', () => {
   it('measures a lock off the bodywork rather than assuming one', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     // Something was found on both sides, and it is tighter than the walls
     // themselves, since the tire's own leading edge reaches them first.
     expect(rig.steerLock.pos).toBeGreaterThan(0.05);
@@ -519,7 +528,7 @@ describe('front wheel steering', () => {
 
   it('turns the front wheels with the yaw rate, and only the front wheels', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     driveTurn(rig, v, Math.PI);
     expect(v.steer.FL.rotation.y).toBeCloseTo(rig.steerLock.pos, 6);
     expect(v.steer.FR.rotation.y).toBeCloseTo(rig.steerLock.pos, 6);
@@ -529,14 +538,14 @@ describe('front wheel steering', () => {
 
   it('turns the other way for the other turn key', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     driveTurn(rig, v, -Math.PI);
     expect(v.steer.FL.rotation.y).toBeCloseTo(-rig.steerLock.neg, 6);
   });
 
   it('never turns past the measured lock, whatever the yaw rate', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     // Far faster than any turn key: a mouse-look flick, or a network correction.
     driveTurn(rig, v, Math.PI * 12);
     expect(v.steer.FL.rotation.y).toBeLessThanOrEqual(rig.steerLock.pos + 1e-9);
@@ -544,7 +553,7 @@ describe('front wheel steering', () => {
 
   it('does not read a freshly summoned mount as one frame of turn', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     // First frame ever, at a facing far from zero: there is no previous frame to
     // difference against, and treating the whole heading as this frame's turn
     // would snap the wheels to full lock on summon.
@@ -554,7 +563,7 @@ describe('front wheel steering', () => {
 
   it('returns to center when the turn stops', () => {
     const v = buildSteeredVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     const facing = driveTurn(rig, v, Math.PI);
     expect(v.steer.FL.rotation.y).toBeGreaterThan(0.05);
     driveTurn(rig, v, 0, 240, facing);
@@ -563,7 +572,7 @@ describe('front wheel steering', () => {
 
   it('leaves a rig with no steering nodes alone', () => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     expect(rig.steer.fl).toBe(null);
     // Still runs, and still costs nothing: every other mount in the game takes
     // this path.
@@ -576,7 +585,7 @@ describe('landing squat', () => {
   /** Fly for a moment at a given descent speed, then touch down. */
   const land = (descent: number, framesAfter = 90) => {
     const v = buildVehicle();
-    const rig = createVehicleSuspensionRig(v.mountRoot, v.group)!;
+    const rig = expectRig(v.mountRoot, v.group);
     settle(rig, v, flat);
     // Airborne and falling: dyRaw is the per-frame vertical delta.
     settle(rig, v, flat, false, 30, true, 0, -descent / 60);
@@ -639,7 +648,7 @@ describe('wheel spin', () => {
       node.add(wheel);
       wheels[wheel.name] = wheel;
     }
-    return { v, wheels, rig: createVehicleSuspensionRig(v.mountRoot, v.group)! };
+    return { v, wheels, rig: expectRig(v.mountRoot, v.group) };
   };
 
   it('rolls the rear wheels against each other when turning on the spot', () => {
