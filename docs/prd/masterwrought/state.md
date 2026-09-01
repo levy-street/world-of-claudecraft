@@ -25594,6 +25594,18 @@ carry that argument in its record.
   shape and was deliberately NOT changed here: the fix costs one extra statement
   per save at about 33 saves a second, which is a maintainer call, tabled as
   Phase 19 row D145 with the reproduction and the price.
+  RULED (qr-19-live-nonce-fence-write-loss, 2026-09-01, under qr-19-best-for-project):
+  TAKE THE ROW LOCK. The four live save paths now take
+  SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE before the
+  fenced UPDATE (runFencedCharacterUpdate, server/character_save_statement.ts),
+  matching the offline arm, so the nonce fence's InitPlan is evaluated with the
+  row already held and a nonce displaced mid-wait is no longer invisible. The
+  monolith cost was paid by moving liveSaveFence and the fenced executor beside
+  the statement builder; server/db.ts is unchanged at its 5123 ceiling. A
+  real-Postgres displacement-race arm reds without the lock and passes with it.
+  The ~33 extra lock acquisitions a second at 1,000 online are on the character's
+  own primary-key row the UPDATE locks anyway, taken one statement earlier;
+  recorded as the accepted latency cost.
 - The pg integration suites pin FIXED verify-database names by house
   convention (two concurrent runs of ONE suite drop each other's database);
   Phase 18 suffixes the character-save suite's name per worker/pid because the
@@ -25756,6 +25768,9 @@ MEASURING NOTHING and told the twin to assume there were more. There were.
   nonce fence has the identical shape on the 30 s autosave path and was
   deliberately not changed, because the fix costs a statement per save at about 33
   a second: Phase 19 row D145.
+  RULED (qr-19-live-nonce-fence-write-loss, 2026-09-01): the live arm now takes the
+  characters row lock first too (runFencedCharacterUpdate); the full ruling is
+  recorded at the Phase 18 QA RECORDED-NOT-ACTED twin bullet above.
 - **THE CENSUS BLANK-LINE TRAP WAS NEVER FIXED**, only adopted as a process rule.
   Measured on the real deletion list: one blank line mid-table drops 245 rows and
   reports zero defects, and a malformed row after a blank line reports zero defects

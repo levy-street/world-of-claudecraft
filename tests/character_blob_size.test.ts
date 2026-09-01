@@ -215,6 +215,26 @@ describe('saveCharacterState: the size signal never gates the write', () => {
     dbMock.connect.mockResolvedValue(held as never);
     expect(await saveCharacterState(104, 60, oversizedCharacterState(), 'nonce-b')).toBe(true);
   });
+
+  it('takes the characters row lock BEFORE the fenced UPDATE (qr-19-live-nonce-fence-write-loss)', async () => {
+    // D145: the four live save paths run their fenced UPDATE through
+    // runFencedCharacterUpdate, which issues the FOR UPDATE row lock FIRST. If
+    // the lock came after (or not at all) the fence's InitPlan is decided before
+    // the row is held and a mid-wait lease displacement is invisible (the write
+    // loss the offline twin red-proved against real Postgres). Position AND text,
+    // so a mutant that drops the lock or moves it after the UPDATE reds.
+    const client = transactionClient();
+    dbMock.connect.mockResolvedValue(client as never);
+    await saveCharacterState(105, 12, realCharacterState(), 'session-a');
+    const statements = client.query.mock.calls.map((call) => String(call[0]));
+    const lockIdx = statements.findIndex(
+      (s) => s.includes('FROM characters') && s.includes('FOR UPDATE'),
+    );
+    const updateIdx = statements.findIndex((s) => s.includes('UPDATE characters SET'));
+    expect(lockIdx).toBeGreaterThanOrEqual(0);
+    expect(updateIdx).toBeGreaterThanOrEqual(0);
+    expect(lockIdx).toBeLessThan(updateIdx);
+  });
 });
 
 // The whole point of measuring inside characterUpdateStatement rather than

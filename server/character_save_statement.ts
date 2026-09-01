@@ -48,11 +48,14 @@
 // Pure apart from the size signal: no pool, no clock of its own, the holder
 // injected, so the statement text is unit-testable
 // (tests/server/character_save_statement.test.ts).
+import type { QueryResult } from 'pg';
+
 import {
   queueCharacterBlobWarning,
   recordCharacterBlobBytes,
   reportCharacterBlobSize,
 } from './character_blob_size';
+import { REALM } from './realm';
 
 export type CharacterSaveFence =
   | { kind: 'none' }
@@ -145,4 +148,42 @@ export function characterUpdateStatement(
         values: [characterId, level, stateJson, fence.realm],
       };
   }
+}
+
+/** The characters row lock the fenced UPDATE needs taken FIRST. The nonce and
+ *  unleased fences are UNCORRELATED subqueries (their only row reference is $1),
+ *  so PostgreSQL hoists each into an InitPlan and decides the One-Time Filter
+ *  BEFORE the UPDATE takes the row lock, and EvalPlanQual never re-runs an
+ *  InitPlan after a lock wait. A lease that committed (or a nonce that rotated)
+ *  during that wait is therefore unseen and the write lands over a live session
+ *  (reproduced twice at the Phase 18 QA database review, on the offline twin).
+ *  FOR UPDATE, not the FOR NO KEY UPDATE the UPDATE itself takes, so while this
+ *  lock is held no fresh character_leases row can commit (its FK parent takes
+ *  FOR KEY SHARE, which FOR NO KEY UPDATE does NOT conflict with). Realm-pinned
+ *  like the write it precedes, so a cross-realm id locks nothing. */
+export const CHARACTER_SAVE_ROW_LOCK_SQL =
+  'SELECT 1 FROM characters WHERE id = $1 AND realm = $2 FOR UPDATE';
+
+/** Run the fenced character UPDATE with the row lock taken FIRST, the offline
+ *  writer's precedent (server/offline_character_save_db.ts) extended to the four
+ *  live save paths by qr-19-live-nonce-fence-write-loss (Phase 19). `tx` is the
+ *  caller's transaction or pooled client; the lock rides the SAME transaction as
+ *  the UPDATE, so it holds until the caller commits. Returns the UPDATE result,
+ *  so a fence miss still surfaces as rowCount 0 to the caller. */
+export async function runFencedCharacterUpdate(
+  tx: { query: (text: string, values?: unknown[]) => Promise<QueryResult> },
+  characterId: number,
+  stmt: { text: string; values: unknown[] },
+): Promise<QueryResult> {
+  await tx.query(CHARACTER_SAVE_ROW_LOCK_SQL, [characterId, REALM]);
+  return tx.query(stmt.text, stmt.values);
+}
+
+/** Build the live-session save fence: no nonce is the unconditional write (tests,
+ *  resumes, meta-less sessions); a nonce is the lease-fenced write under this
+ *  process's holder. Lives here beside the statement builder it feeds so the
+ *  whole fenced-save construction is one module; the holder is passed in rather
+ *  than imported to keep this file free of a db.ts cycle. */
+export function liveSaveFence(leaseNonce: string | undefined, holder: string): CharacterSaveFence {
+  return leaseNonce === undefined ? { kind: 'none' } : { kind: 'nonce', holder, nonce: leaseNonce };
 }

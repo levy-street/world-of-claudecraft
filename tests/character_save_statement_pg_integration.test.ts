@@ -636,7 +636,7 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       expect(await markerOf(id)).toBe('own-nonce');
     });
 
-    it('refuses this session\'s save once its own lease has EXPIRED (qr-19-nonce-fence-expiry-term)', async () => {
+    it("refuses this session's save once its own lease has EXPIRED (qr-19-nonce-fence-expiry-term)", async () => {
       const id = await makeCharacter();
       await grantLease(id, 'session-a', 3600);
       expect(await db.saveCharacterState(id, 7, STATE('before-expiry'), 'session-a')).toBe(true);
@@ -651,6 +651,71 @@ describeDb('lease-fenced character saves (REAL Postgres)', () => {
       expect(await db.saveCharacterState(id, 8, STATE('after-expiry'), 'session-a')).toBe(false);
       expect(await markerOf(id)).toBe('before-expiry');
     });
+
+    it('nonce: REFUSES a displaced lease that lands WHILE the save is parked on the row (qr-19-live-nonce-fence-write-loss)', async () => {
+      // The LIVE twin of the offline displacement race the Phase 18 QA
+      // reproduced. The nonce fence's EXISTS is UNCORRELATED with the row it
+      // gates, so Postgres hoists it into an InitPlan decided BEFORE the row
+      // lock, and EvalPlanQual never re-runs an InitPlan after a lock wait.
+      // Without the lock-first fix a takeover that rotated the nonce mid-wait was
+      // invisible and session-A's autosave landed over session-B's world.
+      const id = await makeCharacter();
+      await grantLease(id, 'session-a', 3600);
+      expect(await db.saveCharacterState(id, 5, STATE('a-owns'), 'session-a')).toBe(true);
+      const holder = await pool.connect();
+      let raced: unknown;
+      // The lock a live save's own UPDATE takes: FOR NO KEY UPDATE does NOT
+      // conflict with the FOR KEY SHARE a character_leases INSERT takes on its FK
+      // parent, which is exactly how the takeover lands its lease mid-wait.
+      await holder.query('BEGIN');
+      await holder.query('SELECT 1 FROM characters WHERE id = $1 FOR NO KEY UPDATE', [id]);
+      // session-A's fenced save starts admissible (its lease still stands) and parks.
+      const write = db
+        .saveCharacterState(id, 6, STATE('a-clobbers-b'), 'session-a')
+        .catch((err: unknown) => {
+          raced = err;
+          return null;
+        });
+      try {
+        await waitForRowLockWaiter();
+        // A takeover displaces the lease to session-B mid-wait (nonce rotated).
+        await grantLease(id, 'session-b', 3600);
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+      // Not a lock timeout, not a throw: an honest fence refusal.
+      expect(raced).toBeUndefined();
+      expect(await write).toBe(false);
+      expect(await markerOf(id)).toBe('a-owns');
+    }, 30_000);
+
+    it('nonce: still LANDS after waiting out a contender when no takeover happens', async () => {
+      // The other half of the pin above: the lock-first fix must not turn every
+      // contended save into a refusal. Same contention, same wait, no takeover,
+      // so session-A's save is admitted the moment the holder lets go.
+      const id = await makeCharacter();
+      await grantLease(id, 'session-a', 3600);
+      const holder = await pool.connect();
+      let raced: unknown;
+      await holder.query('BEGIN');
+      await holder.query('SELECT 1 FROM characters WHERE id = $1 FOR NO KEY UPDATE', [id]);
+      const write = db
+        .saveCharacterState(id, 6, STATE('waited-then-landed'), 'session-a')
+        .catch((err: unknown) => {
+          raced = err;
+          return null;
+        });
+      try {
+        await waitForRowLockWaiter();
+      } finally {
+        await holder.query('ROLLBACK').catch(() => {});
+        holder.release();
+      }
+      expect(raced).toBeUndefined();
+      expect(await write).toBe(true);
+      expect(await markerOf(id)).toBe('waited-then-landed');
+    }, 30_000);
 
     it('the unfenced arm (no nonce) still lands regardless of leases (the legacy shape)', async () => {
       const id = await makeCharacter();

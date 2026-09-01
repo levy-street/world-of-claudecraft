@@ -48,7 +48,12 @@ import {
   configureLifetimeXpRankCache,
   readLifetimeXpRankForCharacter,
 } from './character_rank_cache';
-import { type CharacterSaveFence, characterUpdateStatement } from './character_save_statement';
+import {
+  type CharacterSaveFence,
+  characterUpdateStatement,
+  liveSaveFence,
+  runFencedCharacterUpdate,
+} from './character_save_statement';
 import {
   beginCharacterSaveTx,
   CHARACTER_SAVE_STATEMENT_TIMEOUT_MS,
@@ -3464,15 +3469,10 @@ export async function renameCharacter(
 // pair would race the takeover that steals the lease between the two. The no-nonce path
 // (tests, resumes, meta-less sessions) writes unconditionally and returns true, exactly
 // as before.
-// The statement builder itself (the fence shapes and the size signal) lives in
-// server/character_save_statement.ts since the Masterwrought phase 13 QA (the
-// monolith ratchet); every save-family member below builds through it so the
-// fence stays byte-identical across the family.
-function liveSaveFence(leaseNonce: string | undefined): CharacterSaveFence {
-  return leaseNonce === undefined
-    ? { kind: 'none' }
-    : { kind: 'nonce', holder: PROCESS_LEASE_HOLDER, nonce: leaseNonce };
-}
+// The statement builder, the fence-shape picker (liveSaveFence, holder passed in
+// to avoid a db.ts cycle) and the fenced executor (runFencedCharacterUpdate,
+// which takes the characters row lock FIRST, qr-19-live-nonce-fence-write-loss)
+// all live in server/character_save_statement.ts; live save paths run through them.
 
 export async function saveCharacterState(
   characterId: number,
@@ -3489,14 +3489,14 @@ export async function saveCharacterState(
     characterId,
     level,
     JSON.stringify(cleanState),
-    liveSaveFence(leaseNonce),
+    liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
   );
   const client = await pool.connect();
   const transaction = await beginSaveTx(client, 'character save', signal);
   let ledgerWrite: BankLedgerBatchWriteResult | undefined;
   try {
     await lockSaveEffectAccounts(transaction, storageEffects, ledger);
-    const res = await transaction.query(stmt.text, stmt.values);
+    const res = await runFencedCharacterUpdate(transaction, characterId, stmt);
     const saved =
       leaseNonce === undefined && storageEffects.length === 0 && !ledger
         ? true
@@ -3593,9 +3593,9 @@ export async function saveCharacterAndMarketState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      liveSaveFence(leaseNonce),
+      liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
     );
-    const charRes = await transaction.query(stmt.text, stmt.values);
+    const charRes = await runFencedCharacterUpdate(transaction, characterId, stmt);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
@@ -3696,9 +3696,9 @@ export async function saveCharacterAndGuildBankState(
       characterId,
       level,
       JSON.stringify(cleanState),
-      liveSaveFence(leaseNonce),
+      liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
     );
-    const charRes = await transaction.query(stmt.text, stmt.values);
+    const charRes = await runFencedCharacterUpdate(transaction, characterId, stmt);
     if (
       (leaseNonce !== undefined || storageEffects.length > 0 || ledger) &&
       (charRes.rowCount ?? 0) === 0
@@ -3841,9 +3841,9 @@ export async function saveCharacterStateOnClient(
     characterId,
     level,
     JSON.stringify(cleanState),
-    liveSaveFence(leaseNonce),
+    liveSaveFence(leaseNonce, PROCESS_LEASE_HOLDER),
   );
-  const res = await client.query(stmt.text, stmt.values);
+  const res = await runFencedCharacterUpdate(client, characterId, stmt);
   const saved =
     leaseNonce === undefined && storageEffects.length === 0 && !ledger
       ? true
