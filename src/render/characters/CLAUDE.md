@@ -54,6 +54,14 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `rig_shared_skeleton.ts`: the same bind-pose proof applied WITHOUT merging, so
+  a rig ends with ONE Skeleton, one palette flatten and one GPU bone texture
+  however many parts it draws (`SkeletonUtils.clone` mints one per SkinnedMesh,
+  and the modular GLB ships 246 skins over one 23-joint list). Runs after
+  `mergeSkinnedParts` on the cached variant and again on every clone, where it
+  is a pure rebind. The composed HEAD is its canonical part on purpose: the
+  canonical part is the one whose geometry is not rebaked, and the head's buffer
+  is the identity the stubble/makeup decal cuts are cached on.
 - `index.ts`: public exports + `createCharacterVisual(e, formKey?)` factory,
   plus `setModularLookProvider` (the entity-to-composed-look seam).
   `createCharacterVisual` returns null fail-soft on an asset miss, with

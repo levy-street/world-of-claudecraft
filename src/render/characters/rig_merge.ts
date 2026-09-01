@@ -90,17 +90,88 @@ export function rebakeMatrix(
 // is dequantized to float so parts with different source quantizations merge.
 const INTEGER_ATTRIBUTES = new Set(['skinIndex']);
 
+/** The morph attribute kinds three reads off a geometry, in its own precedence
+ *  order. `color` deltas are not geometry and are copied component-wise. */
+export const MORPH_KINDS = ['position', 'normal', 'color'] as const;
+export type MorphKind = (typeof MORPH_KINDS)[number];
+
+/**
+ * How a rebake lays out the OUTPUT morph target list.
+ *
+ * `names` is the output order; `sourceIndex[slot]` is the index of that target
+ * in the part's OWN list, or -1 when this part does not carry it (the slot is
+ * then written as an all-zero delta, which is the identity for a relative
+ * morph and is what lets differently-targeted parts merge into one buffer).
+ * Omit the plan entirely and a part keeps its own targets in their own order.
+ */
+export interface MorphRebakePlan {
+  readonly names: readonly string[];
+  readonly sourceIndex: readonly number[];
+  /** The morph kinds (and their item sizes) the OUTPUT must carry: the union
+   *  across the parts being merged, so every merged buffer has the same keys
+   *  and the same target count, which is what `mergeGeometries` requires. */
+  readonly kinds: readonly { readonly kind: MorphKind; readonly itemSize: number }[];
+}
+
+/** Rebake one morph target's delta buffer through `m`.
+ *
+ *  A RELATIVE target (every glTF morph target: GLTFLoader sets
+ *  `morphTargetsRelative`) stores a displacement, so it takes the LINEAR part
+ *  of the rebake and never its translation; an absolute one is a position and
+ *  takes the whole matrix. Normal deltas take the normal matrix un-normalized:
+ *  a delta's length is its own, and normalizing it would rewrite the blend. */
+function rebakeMorphAttribute(
+  src: THREE.BufferAttribute | THREE.InterleavedBufferAttribute | null | undefined,
+  count: number,
+  size: number,
+  kind: MorphKind,
+  relative: boolean,
+  m: THREE.Matrix4,
+  linear: THREE.Matrix3,
+  normalMatrix: THREE.Matrix3,
+): THREE.BufferAttribute {
+  const arr = new Float32Array(count * size);
+  if (!src) return new THREE.BufferAttribute(arr, size);
+  const v3 = new THREE.Vector3();
+  const n = Math.min(count, src.count);
+  for (let i = 0; i < n; i++) {
+    if (kind === 'color' || size < 3) {
+      for (let c = 0; c < size; c++) arr[i * size + c] = src.getComponent(i, c);
+      continue;
+    }
+    v3.set(src.getX(i), src.getY(i), src.getZ(i));
+    if (kind === 'normal') v3.applyMatrix3(normalMatrix);
+    else if (relative) v3.applyMatrix3(linear);
+    else v3.applyMatrix4(m);
+    arr[i * size] = v3.x;
+    arr[i * size + 1] = v3.y;
+    arr[i * size + 2] = v3.z;
+    for (let c = 3; c < size; c++) arr[i * size + c] = src.getComponent(i, c);
+  }
+  return new THREE.BufferAttribute(arr, size);
+}
+
 /**
  * Copy `geo` into plain, non-interleaved, dequantized attributes and pre-transform
- * its positions (and normals/tangents) by `m`, so the result skins correctly
- * against the canonical skeleton.
+ * its positions (and normals/tangents/morph deltas) by `m`, so the result skins
+ * correctly against the canonical skeleton.
  *
  * Reading through `getX/getY/...` denormalizes quantized and interleaved sources,
  * which is what lets differently quantized parts share one buffer.
+ *
+ * Morph targets are CARRIED, padded to `plan` when one is given. Dropping them
+ * is silent (a blendshape simply stops working), and every body part of the
+ * composed character library carries the face and body sliders, so a rebake
+ * that lost them would freeze every slider on the parts it touched.
  */
-export function rebakeGeometry(geo: THREE.BufferGeometry, m: THREE.Matrix4): THREE.BufferGeometry {
+export function rebakeGeometry(
+  geo: THREE.BufferGeometry,
+  m: THREE.Matrix4,
+  plan?: MorphRebakePlan,
+): THREE.BufferGeometry {
   const out = new THREE.BufferGeometry();
   const normalMatrix = new THREE.Matrix3().getNormalMatrix(m);
+  const linear = new THREE.Matrix3().setFromMatrix4(m);
   const v3 = new THREE.Vector3();
 
   for (const name of Object.keys(geo.attributes)) {
@@ -147,6 +218,35 @@ export function rebakeGeometry(geo: THREE.BufferGeometry, m: THREE.Matrix4): THR
     out.setAttribute(name, new THREE.BufferAttribute(arr, size));
   }
 
+  const vertexCount = out.getAttribute('position')?.count ?? 0;
+  const relative = geo.morphTargetsRelative;
+  out.morphTargetsRelative = relative;
+  // Absent stays absent without a plan: three defines USE_MORPHTARGETS on
+  // PRESENCE, so minting an empty list would change the program key of a part
+  // that has no blendshapes at all.
+  const outputKinds = plan
+    ? plan.kinds
+    : MORPH_KINDS.filter((kind) => geo.morphAttributes[kind]).map((kind) => ({
+        kind,
+        itemSize: geo.morphAttributes[kind]?.[0]?.itemSize ?? 3,
+      }));
+  for (const { kind, itemSize } of outputKinds) {
+    const list = geo.morphAttributes[kind];
+    const slots = plan ? plan.sourceIndex : (list ?? []).map((_, i) => i);
+    out.morphAttributes[kind] = slots.map((source) =>
+      rebakeMorphAttribute(
+        source >= 0 ? list?.[source] : null,
+        vertexCount,
+        itemSize,
+        kind,
+        relative,
+        m,
+        linear,
+        normalMatrix,
+      ),
+    );
+  }
+
   if (geo.index) {
     const src = geo.index;
     const arr = new Uint32Array(src.count);
@@ -176,11 +276,11 @@ function sameAttributeSet(parts: THREE.SkinnedMesh[]): boolean {
 }
 
 /**
- * `rebakeGeometry` rebuilds positions/normals/tangents and carries nothing else,
- * so a part with morph targets would lose them SILENTLY (a blendshape simply
- * stops working, with no error). No shipped character GLB has any today, but the
- * contract of this module is that anything it cannot prove safe is left alone,
- * so refuse the merge rather than drop data.
+ * A merged geometry has ONE morph target list, so parts carrying different
+ * targets can only merge through a union plan that pads every part to the same
+ * list (see MorphRebakePlan). Until this merge computes one, refuse: the parts
+ * that carry morphs are the composed library's face and body sliders, and
+ * folding them onto a mismatched list is silent (the wrong blendshape moves).
  */
 function hasMorphTargets(sm: THREE.SkinnedMesh): boolean {
   const morphs = sm.geometry.morphAttributes;

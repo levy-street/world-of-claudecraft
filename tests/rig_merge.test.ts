@@ -200,6 +200,60 @@ describe('rebakeGeometry', () => {
     expect(out.attributes.skinIndex.array).toBeInstanceOf(Uint16Array);
     expect(out.attributes.skinIndex.getY(0)).toBe(1);
   });
+
+  it('carries relative morph deltas through the linear part of the rebake', () => {
+    // A glTF morph target is a DISPLACEMENT (morphTargetsRelative), so it takes
+    // the rebake's rotation and scale and never its translation. Applying the
+    // full matrix would offset every blendshape by the part's own dequantization
+    // origin, which reads as a face that jumps the moment a slider leaves zero.
+    const bones = makeBones();
+    const inverses = restInverses(bones);
+    const part = makePart(bones, inverses, [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7]);
+    part.geometry.morphTargetsRelative = true;
+    part.geometry.morphAttributes.position = [
+      new THREE.Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1], 3),
+    ];
+    const m = new THREE.Matrix4().makeScale(2, 3, 4).setPosition(10, 20, 30);
+
+    const out = rebakeGeometry(part.geometry, m);
+
+    expect(out.morphTargetsRelative).toBe(true);
+    const delta = out.morphAttributes.position?.[0];
+    expect(delta?.getX(0)).toBeCloseTo(2, 5);
+    expect(delta?.getY(1)).toBeCloseTo(3, 5);
+    expect(delta?.getZ(2)).toBeCloseTo(4, 5);
+    // the translation must NOT have leaked into a displacement
+    expect(delta?.getY(0)).toBeCloseTo(0, 5);
+  });
+
+  it('transforms an absolute morph target by the whole matrix', () => {
+    const bones = makeBones();
+    const part = makePart(bones, restInverses(bones), [0, 0, 0, 1, 0, 0, 0, 1, 0]);
+    part.geometry.morphTargetsRelative = false;
+    part.geometry.morphAttributes.position = [
+      new THREE.Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1], 3),
+    ];
+
+    const out = rebakeGeometry(
+      part.geometry,
+      new THREE.Matrix4().makeScale(2, 3, 4).setPosition(10, 20, 30),
+    );
+
+    expect(out.morphTargetsRelative).toBe(false);
+    expect(out.morphAttributes.position?.[0]?.getX(0)).toBeCloseTo(12, 5);
+    expect(out.morphAttributes.position?.[0]?.getY(0)).toBeCloseTo(20, 5);
+  });
+
+  it('leaves a morph-free geometry morph-free', () => {
+    // three defines USE_MORPHTARGETS on PRESENCE, so minting an empty list here
+    // would relink every rebaked part against a program it does not need.
+    const bones = makeBones();
+    const part = makePart(bones, restInverses(bones), [0, 0, 0, 1, 0, 0, 0, 1, 0]);
+
+    const out = rebakeGeometry(part.geometry, new THREE.Matrix4());
+
+    expect(Object.keys(out.morphAttributes)).toEqual([]);
+  });
 });
 
 describe('mergeSkinnedParts', () => {

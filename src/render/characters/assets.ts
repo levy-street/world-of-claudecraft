@@ -86,6 +86,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
@@ -957,6 +958,9 @@ function optimizedScene(url: string): THREE.Object3D {
   }
   const root = cloneSkinned(source.scene);
   mergeSkinnedParts(root, animatedNodeNames(clips));
+  // After the merge, so only what the merge could not fold is rebaked, and
+  // before the palette pass, which reads the (now single) skeleton.
+  shareRigSkeleton(root);
   optimizeSkinGpuLayout(root);
   primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
@@ -1168,6 +1172,11 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
   });
   for (const o of empty) o.removeFromParent();
   mergeSkinnedParts(root);
+  // One Skeleton and one bone texture for the whole composed body. The HEAD is
+  // the canonical part on purpose: its geometry is the identity the decal cuts
+  // are cached against (see modularHeadFor), so it is the one buffer a rebake
+  // must leave alone.
+  shareRigSkeleton(root, { preferCanonical: isComposedHead });
   primeSkinnedSortSpheres(root);
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
@@ -1333,6 +1342,17 @@ function recolored(
     // the JS object, once nothing on screen points at it.
   }
   return mat;
+}
+
+/** The composed head, by node name and without knowing the look's gender.
+ *
+ *  It is the canonical bind space of a composed rig (`shareRigSkeleton`) for
+ *  one reason: the canonical part is the one whose geometry is NOT rebaked,
+ *  and the head's buffer is identity elsewhere (the stubble and makeup decal
+ *  cuts are cached per head-geometry uuid, and `modularHeadFor` promises that
+ *  buffer is the parsed asset's own, shared by every variant of the GLB). */
+function isComposedHead(mesh: THREE.Object3D): boolean {
+  return mesh.name === headNodeName('male') || mesh.name === headNodeName('female');
 }
 
 /** The head a look's decals ride, inside a composed clone (or null when the
@@ -1509,7 +1529,14 @@ export function assembleModular(
   // Nested inside the visual's `view-part:assemble` span; the variant step is
   // the cache miss (whole-GLB clone + part merge) or a map hit.
   const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
-  const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
+  const root = timeBuildSpan('view-part:assemble:parts', () => {
+    const clone = cloneSkinned(variant.root);
+    // SkeletonUtils gives every mesh a Skeleton of its own, re-splitting what
+    // the cached variant unified. The clone's inverses are the variant's own
+    // array by reference, so this is a rebind with no geometry work.
+    shareRigSkeleton(clone, { preferCanonical: isComposedHead });
+    return clone;
+  });
   // A skipDecals compose records no decal sample: the kind's EMA prices a real
   // decal step, and the far bake's throwaway would only add zeros to it.
   if (!opts?.skipDecals) {
@@ -1620,6 +1647,7 @@ export function assembleModel(
     return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId, opts);
   }
   const root = cloneSkinned(optimizedScene(def.url));
+  shareRigSkeleton(root);
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below
   root.traverse((o) => {

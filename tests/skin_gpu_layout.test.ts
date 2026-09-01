@@ -79,8 +79,11 @@ describe('skinned character GPU layout', () => {
       'utf8',
     );
 
+    // The palette pass reads the rig AFTER the merge and after the shared-
+    // skeleton rebind (rig_shared_skeleton.ts), which is what leaves it one
+    // skeleton to compact instead of one per surviving part.
     expect(assets).toMatch(
-      /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);\s+optimizeSkinGpuLayout\(root\);/,
+      /mergeSkinnedParts\(root, animatedNodeNames\(clips\)\);[\s\S]*?shareRigSkeleton\(root\);[\s\S]*?optimizeSkinGpuLayout\(root\);/,
     );
     expect(visual.match(/configureTightBoneTextures\((?:this\.model|payload)\)/g)).toHaveLength(3);
   });
