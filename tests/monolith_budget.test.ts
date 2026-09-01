@@ -1155,7 +1155,17 @@ const MONOLITHS: MonolithRow[] = [
     // verbatim at BOTH dispatch sites, moved to src/game/sheathe_toggle.ts,
     // paying for the Perfecting keybind's two dispatch cases (keyboard and
     // gamepad, the silent-drop bug class). Exact count, zero slack.
-    ceiling: 11509,
+    // LOWERED 11509 -> 11459 at the Phase 18 QA. Two movements, recorded apart
+    // because only the second is work: the tenth sync (release/v0.42.0) left the
+    // file at 11469, forty under the ceiling, and a ratcheted row is supposed to
+    // carry ZERO slack, so that alone owed a re-pin the merge did not make. Then
+    // the QA deleted main.ts's byte-identical private copy of trackMetaPixel and
+    // imported src/game/meta_pixel.ts instead, a further ten lines. That copy was
+    // not merely duplication: it meant three shipped pixel events (GitHubClick,
+    // DiscordClick and the registration send) were covered by NOTHING
+    // behavioral, since the only suite that drives the sender drives the module.
+    // Measured with wc -l after biome. Exact count, zero slack.
+    ceiling: 11459,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

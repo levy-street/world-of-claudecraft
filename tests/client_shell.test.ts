@@ -1046,8 +1046,15 @@ describe('client HTML shell', () => {
       "trackMetaPixel( 'ReachedLevel5', { level: ev.level },",
     );
     expect(hudTs).toContain('characterId ? { eventID: `lvl5_$' + '{characterId}` } : undefined');
-    expect(mainTs).toContain("if (options) fbq('trackCustom', eventName, data ?? {}, options);");
-    expect(mainTs).toContain("else fbq('trackCustom', eventName, data ?? {});");
+    // main.ts used to carry a BYTE-IDENTICAL private copy of the sender, and
+    // these two lines pinned that copy's arities. The Phase 18 QA collapsed it
+    // onto src/game/meta_pixel.ts (src/main.ts is a firewall, not a home), so the
+    // arities are pinned ONCE, in metaPixelTs above, and behaviorally in
+    // tests/meta_pixel.test.ts. What main.ts owes now is only that it reaches the
+    // shared sender rather than re-implementing it: while the duplicate stood, its
+    // three events were guarded by nothing behavioral at all.
+    expect(mainTs).toContain("import { trackMetaPixel } from './game/meta_pixel';");
+    expect(mainTs).not.toContain("fbq('trackCustom'");
     expect(mainTs).toContain(
       'registered.accountId ? { eventID: `acct_$' + '{registered.accountId}` } : undefined',
     );

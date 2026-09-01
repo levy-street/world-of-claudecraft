@@ -144,6 +144,7 @@ import {
   resetLoadProfile,
   summarizeLoadProfile,
 } from './game/load_profiler';
+import { trackMetaPixel } from './game/meta_pixel';
 import {
   interfaceModeFromSetting,
   isPhoneTouchDevice,
@@ -687,17 +688,6 @@ function saveHomepageMusicMuted(muted: boolean): void {
   } catch {
     // Private browsing or storage failures should not block the control.
   }
-}
-
-function trackMetaPixel(
-  eventName: string,
-  data?: Record<string, unknown>,
-  options?: Record<string, unknown>,
-): void {
-  const fbq = (window as Window & { fbq?: (...args: unknown[]) => void }).fbq;
-  if (typeof fbq !== 'function') return;
-  if (options) fbq('trackCustom', eventName, data ?? {}, options);
-  else fbq('trackCustom', eventName, data ?? {});
 }
 
 function trackCommunityLinkClicks(): void {
