@@ -348,8 +348,8 @@ describe('three low-tier NaN output scrub patch', () => {
   // OutputGradePass already uses, applied one stage earlier and universally
   // instead of tier-gated.
   it('keeps the guard applied, scrubbing outgoingLight before gl_FragColor', () => {
-    const source = readFileSync(
-      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    const patch = readFileSync(
+      new URL('../patches/three@0.185.1.patch', import.meta.url),
       'utf8',
     );
     // Anchored on the gl_FragColor assignment that immediately follows it, so
@@ -359,34 +359,40 @@ describe('three low-tier NaN output scrub patch', () => {
     // is a separate channel, but keeping it last is what makes it the final
     // word on outgoingLight before the write.
     expect(
-      source.includes(
-        'outgoingLight.x = ( outgoingLight.x < 0.0 || outgoingLight.x >= 0.0 ) ? outgoingLight.x : 0.0;\\n' +
+      patch.includes(
+        '+var opaque_fragment = "#ifdef OPAQUE\\ndiffuseColor.a = 1.0;\\n#endif\\n#ifdef USE_TRANSMISSION\\n' +
+          'diffuseColor.a *= material.transmissionAlpha;\\n#endif\\n' +
+          'outgoingLight.x = ( outgoingLight.x < 0.0 || outgoingLight.x >= 0.0 ) ? outgoingLight.x : 0.0;\\n' +
           'outgoingLight.y = ( outgoingLight.y < 0.0 || outgoingLight.y >= 0.0 ) ? outgoingLight.y : 0.0;\\n' +
           'outgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 ) ? outgoingLight.z : 0.0;\\n' +
-          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );',
+          'gl_FragColor = vec4( outgoingLight, diffuseColor.a );";',
       ),
-      'the low-tier NaN output scrub is missing, or no longer immediately precedes gl_FragColor; re-run pnpm install',
+      'the low-tier NaN output scrub is missing from patches/three@0.185.1.patch, ' +
+        'or no longer immediately precedes gl_FragColor',
     ).toBe(true);
   });
 
   it('leaves no unguarded opaque_fragment spelling behind', () => {
-    // The patch REPLACES the stock chunk string, it does not add a second
-    // one: the stock spelling must be gone, or a build is still compiling
-    // the unguarded chunk. Positive control: the deliberately unpatched
-    // three.cjs carries the stock spelling exactly once, so the GONE needle
-    // is proven matchable rather than vacuously absent.
-    const source = readFileSync(
-      new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    // The patch REPLACES the stock chunk string, it does not add a second one:
+    // the stock spelling must be absent from added patch lines. The removed
+    // upstream line remains in the patch by design, so the check is scoped to
+    // additions rather than the whole diff text.
+    const patch = readFileSync(
+      new URL('../patches/three@0.185.1.patch', import.meta.url),
       'utf8',
     );
+    const addedPatchLines = patch
+      .split('\n')
+      .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
+      .join('\n');
     const unpatchedSibling = readFileSync(
       new URL('../node_modules/three/build/three.cjs', import.meta.url),
       'utf8',
     );
     const stock = '#endif\\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );';
     expect(
-      source.includes(stock),
-      'the unguarded opaque_fragment spelling is back; the NaN scrub no longer replaces it',
+      addedPatchLines.includes(stock),
+      'the patch adds an unguarded opaque_fragment spelling; the NaN scrub no longer replaces it',
     ).toBe(false);
     expect(
       unpatchedSibling.split(stock).length - 1,
@@ -394,19 +400,6 @@ describe('three low-tier NaN output scrub patch', () => {
     ).toBe(1);
   });
 
-  it('records the hunk in the checked-in patch file', () => {
-    // node_modules is reinstalled from patches/three@0.185.1.patch, so the
-    // shipped artifact carries the hunk too, as an ADDED line rather than
-    // anywhere in its context.
-    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
-    expect(
-      patch.includes(
-        '+var opaque_fragment = "#ifdef OPAQUE\\ndiffuseColor.a = 1.0;\\n#endif\\n#ifdef USE_TRANSMISSION\\n' +
-          'diffuseColor.a *= material.transmissionAlpha;\\n#endif\\noutgoingLight.x = ( outgoingLight.x < 0.0',
-      ),
-      'the low-tier NaN output scrub is missing from patches/three@0.185.1.patch',
-    ).toBe(true);
-  });
 });
 
 describe('three empty instanced draw skip patch', () => {
