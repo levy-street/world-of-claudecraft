@@ -897,9 +897,12 @@ export const PROFESSION_ITEMS: Record<string, ItemDef> = {
   // Never vendor-stocked (no buyValue); output quality matches the rung
   // (skillReq 0 common, 25 uncommon, 50 rare).
   //
-  // VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER. Names are IP-safe per
-  // D17: real plant, food and cooking words (loaf, pottage, braise, bannock,
-  // tart, platter) plus this game's own settlement and zone flavor.
+  // VALUES RATIFIED AS SHIPPED, no longer a proposal awaiting sign-off
+  // (masterwrought Phase 19, ruling qr-19-dish-curve-point-assignments, under
+  // qr-19-best-for-project): the eight foodHp and sellValue pairs below are the
+  // settled set, not a proposal. Names are IP-safe per D17: real plant, food
+  // and cooking words (loaf, pottage, braise, bannock, tart, platter) plus this
+  // game's own settlement and zone flavor.
   vale_hearth_loaf: {
     id: 'vale_hearth_loaf',
     name: 'Vale Hearth Loaf',

@@ -3735,7 +3735,11 @@ export const ENGINEERING_ONRAMP_RECIPES: ProfessionRecipeRecord[] = [
 // discounted-input bound), and neither a dish grown from produce nor a tonic
 // brewed from gathered herbs is that shape (Sheenleaf carries no buyValue).
 //
-// VALUES ARE PROPOSED AND FLAGGED FOR THE MAINTAINER: classic-modest, and
+// VALUES RATIFIED AS SHIPPED, no longer a proposal awaiting sign-off
+// (masterwrought Phase 19, ruling qr-19-dish-curve-point-assignments, under
+// qr-19-best-for-project): the pairs and the bills below are the settled set,
+// and the four the 11e widening moved (bannock, gourd soup, sunmelon tart,
+// harvest platter) were re-derived at the time. Classic-modest, and
 // every foodHp/sellValue pair REUSES a point the shipped food curve already
 // ships (980 is the ceiling, conjured_bread4). Reagent counts are sized so
 // each dish vendors strictly below its input value at the LISTED counts on
