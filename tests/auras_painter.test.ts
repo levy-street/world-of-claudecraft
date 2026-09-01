@@ -623,10 +623,22 @@ describe('AurasPainter: static-preset visible-count cap', () => {
 
 // ---------------------------------------------------------------------------
 // The overflow badge: makes the low-tier buff cap's shed count HONEST instead of silent.
-// A painter built with an `overflowEl` reveals it (setDisplay('')) and writes the shed
-// count's label/tooltip through deps ONLY when this frame actually sheds a buff; a
-// painter built without one (the debuff bar, the target strip) never touches an element
-// at all, so nothing here can regress their existing coverage above.
+// A painter built with an `overflowEl` reveals it (setStyleProp('display', 'flex'): the
+// badge's stylesheet default is display:none, so revealing it needs a real value, unlike
+// the stacks badge's revert-to-'') and writes the shed count's label/tooltip through deps
+// ONLY when this frame actually sheds a buff; a painter built without one (the debuff bar,
+// the target strip) never touches an element at all, so nothing here can regress their
+// existing coverage above.
+//
+// WHY setStyleProp AND NOT setDisplay. The badge carries its text AND its visibility on
+// ONE node, and the four single-slot writers (setText / setDisplay / setTransform /
+// setWidth) share one (kind, value) cache entry per element, so routing both through them
+// makes BOTH writes bypass elision on every frame the buff bar paints. Visibility
+// therefore takes its own multi-slot entry, keyed (element, 'display'); the DOM write is
+// byte-identical, only the cache slot differs. Same fix, same reason, as the stacks badge
+// above. The rule is stated in painter_host.ts and scanned tree-wide by
+// tests/painter_single_slot_collision_guard.test.ts, which is why the pins below name the
+// WRITER and not only the value.
 // ---------------------------------------------------------------------------
 
 describe('AurasPainter: the low-tier overflow badge', () => {
@@ -693,7 +705,7 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     const under = tierPainterWithOverflow('low');
     under.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 2));
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'none'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
     expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', ''] });
     expect(labelCalls).toEqual([]);
@@ -702,7 +714,11 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     container = fakeEl('div'); // fresh container: a 2nd painter would else mint a 2nd badge
     const ultra = tierPainterWithOverflow('ultra');
     ultra.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 20));
-    expect(calls).toContainEqual({ m: 'setDisplay', el: overflowEl(), args: ['none'] });
+    expect(calls).toContainEqual({
+      m: 'setStyleProp',
+      el: overflowEl(),
+      args: ['display', 'none'],
+    });
     expect(labelCalls).toEqual([]);
   });
 
@@ -712,11 +728,29 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     painter.paint(manyBuffs(over));
     const shed = over - AURA_VISIBLE_CAP_LOW;
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['flex'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'flex'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [`+${shed}`] });
     expect(calls).toContainEqual({ m: 'setAttr', el, args: ['title', `${shed} hidden`] });
     expect(labelCalls).toEqual([shed]);
     expect(tooltipCalls).toEqual([shed]);
+  });
+
+  it('gives the badge visibility its OWN cache slot, never a second single-slot writer', () => {
+    // Stronger than "the badge said flex": the badge's TEXT and its VISIBILITY live on one
+    // node, and the four single-slot writers share a single (kind, value) entry per
+    // element, so a visibility write through any of them would defeat elision on the text
+    // too, every frame the buff bar paints (the collision the stacks badge shipped with;
+    // painter_host.ts, tests/painter_single_slot_collision_guard.test.ts). setText is
+    // therefore the only single-slot kind allowed to name this element, shown and hidden.
+    const painter = tierPainterWithOverflow('low');
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW + 5)); // shown
+    painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 1)); // and hidden again
+    const el = overflowEl();
+    const singleSlot: Call['m'][] = ['setText', 'setDisplay', 'setTransform', 'setWidth'];
+    expect(calls.filter((c) => c.el === el && singleSlot.includes(c.m)).map((c) => c.m)).toEqual([
+      'setText',
+      'setText',
+    ]);
   });
 
   it('FAIRNESS: shed counts only the dropped BUFFS, never a debuff that rendered past the cap', () => {
@@ -739,13 +773,13 @@ describe('AurasPainter: the low-tier overflow badge', () => {
     calls.length = 0;
     painter.paint(manyBuffs(AURA_VISIBLE_CAP_LOW - 1));
     const el = overflowEl();
-    expect(calls).toContainEqual({ m: 'setDisplay', el, args: ['none'] });
+    expect(calls).toContainEqual({ m: 'setStyleProp', el, args: ['display', 'none'] });
     expect(calls).toContainEqual({ m: 'setText', el, args: [''] });
   });
 
   it('a repeat identical frame re-derives the SAME value (the real elision lives in the injected writer facet, not here)', () => {
     // AurasPainter always calls the writer facet every frame (exactly like every other
-    // write in this painter: setText/setDisplay/setAttr elision is the FACET's job,
+    // write in this painter: setText/setStyleProp/setAttr elision is the FACET's job,
     // proven separately in tests/painter_host.test.ts). What this painter owns is
     // recomputing the SAME output for the SAME state, so a real elided facet would see
     // no-op writes on a steady state.

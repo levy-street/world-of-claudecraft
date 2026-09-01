@@ -361,7 +361,8 @@ Phase 11m ledger STEP 6 writes; until then the spread commit body
 
 - **meat is 17 templates over 10 zones, not 15 over 9** (16 over 10 on the
   reachable subset): the release's Proving Shore added shore_scuttler (levels
-  1 to 2, three camps) and mister_crabs (summon-only, quest-gated, no camp).
+  1 to 2, three camps) and mister_crabs (summon-only, no camp; it WAS quest-gated when this was
+  written, a gate the tenth sync retired on 2026-08-31).
   The two are the release's, not this phase's; the "zero new mobs, zero new
   spawn points" sweep is anchored on the merge commit, never on the 11l stamp.
 - **ZONES is 15, not 14**: proving_shore appended at levelRange 1 to 2. The

@@ -90,6 +90,41 @@
 // recipe or enchant consumer at all and the narrow index would red every one
 // of them as dead content that a farmer spends daily.
 //
+// THE ONE EXEMPTION THE MATERIAL-WIDE ARM CARRIES, named and dated here
+// rather than left silent (added 2026-08-31, at the release/v0.42.0 sync).
+// release/v0.42.0 commit c173606bbb classified lastflame_core, the Crucible
+// of the Last Spring core reagent, as a material: it derives IN through a
+// source this branch had never seen, CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS
+// in src/sim/content/crucible_professions.ts, whose whole written contract is
+// "materials staged before their consuming recipes ship. Remove an id from
+// this list once a live recipe names it". The maintainer's staging call is
+// that the reagent drops ahead of its professions fast-follow (PR 3704, which
+// spends it 3, 6 and 15 per craft), so the consumers exist, on another branch.
+// This arm therefore skips exactly the ids on that LIVE list and not one more,
+// and it pays for the skip twice: the number of ids it skipped is pinned at
+// its literal, and the arm below it requires every skipped id to have ZERO
+// consumers under the wide index. That pairing is what makes the exemption
+// SELF-RETIRING rather than a hole. The moment a live recipe names the core,
+// the zero-consumer arm reds, the reader takes the id off the pending list as
+// that list's own contract instructs, and it lands straight back under the
+// presence floor. Growth is fenced from the other side too, since
+// tests/material_taxonomy.test.ts pins the exact members of
+// MATERIAL_ITEM_IDS, so a second staged material cannot arrive unread.
+//
+// WHAT THE EXEMPTION DOES NOT DO is relax the floor for anything that was
+// ever subject to it. The sync added exactly one id to the material set, 116
+// to 117 (recorded at tests/material_taxonomy_bootstrap.test.ts), so every id
+// this arm covered before the sync still owes its consumer, and the tree now
+// carries MORE assertions about the material set than it did before, not
+// fewer. The shape is not invented here either: the release's own consumer
+// census, tests/material_profession_affinity.test.ts, already pairs this same
+// skip with this same positive arm on this same live list, so the two
+// censuses on the merged tree agree about what a staged material is.
+// Whether masterwrought R21 should admit a staged-reagent state at all, or
+// the classification should instead wait for the recipes, is a scope call on
+// a ratified packet ruling (11m-FLOOR) and belongs to the maintainer: it is
+// routed to the Phase 19 decision table and is NOT settled here.
+//
 // EVERY DERIVATION READS THE LIVE TABLES: the subject list comes from
 // GATHERING_PROFESSION_IDS, the supply sets come from the content tables the
 // engine itself reads, and the band math comes from wheel.ts tierForSkill.
@@ -112,6 +147,7 @@
 // literals stay untouched by it.
 
 import { describe, expect, it } from 'vitest';
+import { CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS } from '../src/sim/content/crucible_professions';
 import { ENCHANTS } from '../src/sim/content/enchants';
 import { FARM_CROPS } from '../src/sim/content/farm_crops';
 import type { GatheringProfessionId } from '../src/sim/content/professions';
@@ -523,8 +559,19 @@ describe('masterwrought R21: the world eats what the gathering families supply',
     // index misses can only produce a FALSE RED (a spent material reported as
     // dead), never a false green, and the failure names the material and the
     // mechanisms walked so the reader knows what to add.
+    //
+    // The one exemption, read off the LIVE list rather than typed as an id
+    // here, and explained in full in the header block above: a material
+    // staged ahead of its own recipes has no consumer yet BY CONSTRUCTION,
+    // and the arm after this one pins that it really has none.
+    const recipePending = new Set<string>(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS);
     const orphans: string[] = [];
+    let exempted = 0;
     for (const id of [...MATERIAL_ITEM_IDS].sort()) {
+      if (recipePending.has(id)) {
+        exempted++;
+        continue;
+      }
       const consumers = consumptionIdsFor(id).reduce(
         (n, spendable) => n + (WIDE_DEMAND.get(spendable)?.consumers.length ?? 0),
         0,
@@ -539,9 +586,45 @@ describe('masterwrought R21: the world eats what the gathering families supply',
       );
     }
     expect(orphans).toEqual([]);
+    // The exemption fired, at its exact size: the literal beside the
+    // derivation this file's header demands of every arm. It reds if the
+    // pending list GROWS, because a second material staged ahead of its
+    // recipes is a fact a reader has to see rather than inherit, and it reds
+    // when the list EMPTIES, because that is this exemption retiring and the
+    // block above it going stale. Either way the fix is to re-read that
+    // block, never to widen this number.
+    expect(exempted).toBe(1);
     // Subject non-vacuity: the material set is the live derived one, and it
     // is not empty (tests/material_taxonomy.test.ts pins its exact members).
     expect(MATERIAL_ITEM_IDS.size).toBeGreaterThan(0);
+  });
+
+  it('the recipe-pending exemption covers only materials with genuinely ZERO consumers', () => {
+    // THE OTHER HALF OF THE EXEMPTION, and the whole reason it is not a hole.
+    // The arm above skips the staged ids; this one refuses to let a skip
+    // survive its reason. Same shape and same live list as the release's own
+    // consumer census (tests/material_profession_affinity.test.ts, whose own
+    // arm is titled "recipe-pending materials have no consumer yet and remain
+    // explicitly classified"), except that the index here is the WIDE one,
+    // so the skip is spent against every spend mechanism this file walks
+    // rather than against crafts alone.
+    expect(CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS.length).toBeGreaterThan(0);
+    for (const id of CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS) {
+      expect(MATERIAL_ITEM_IDS.has(id), `${id} is no longer a material`).toBe(true);
+      const consumers = consumptionIdsFor(id).flatMap(
+        (spendable) => WIDE_DEMAND.get(spendable)?.consumers ?? [],
+      );
+      expect(
+        consumers,
+        `${id} is exempt from the presence floor ONLY while nothing spends it, and ` +
+          `something now does. Its exemption is over: remove the id from ` +
+          `CRUCIBLE_RECIPE_PENDING_MATERIAL_ITEM_IDS ` +
+          `(src/sim/content/crucible_professions.ts), whose own contract retires an id ` +
+          `the moment a live recipe names it, and reagent derivation owns the ` +
+          `classification from then on. Rule: ${WHERE_THE_RULE_LIVES}, state.md row ` +
+          `11m-FLOOR.`,
+      ).toEqual([]);
+    }
   });
 
   it('the wide index really walks the quest and farming mechanisms', () => {

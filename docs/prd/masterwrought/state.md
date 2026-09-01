@@ -17604,14 +17604,18 @@ zero new proper nouns). ONE WARNING and four INFO rows:
   nothing about quest gates, and the predicate has no requiresQuestId arm.
   RULING TAKEN BY THE PHASE, recorded rather than re-decided: the settled
   predicate is the open-world camp, the clutch satisfies it by the letter,
-  and it is the ONLY quest-gated camped template in the game (the other
-  requiresQuestId template, mister_crabs, has no camp and is refused
-  already). A requiresQuestId refusal would put silk at 5 of 6 with no
+  and it is the ONLY quest-gated camped template in the game (as written,
+  the other requiresQuestId template, mister_crabs, had no camp and was
+  refused already; AMENDED 2026-08-31 at the tenth sync, which retired that
+  gate entirely, so spider_egg is now the only requiresQuestId template of
+  any kind, camped or not). A requiresQuestId refusal would put silk at 5 of 6 with no
   flavor-true candidate left (the only other spiders are two instance
   rosters), which is this phase's stop rule and therefore the maintainer's
   call, so the phase did not take it. What it did instead: the fix round
   pins the quest-gated census as literals (reachable quest-gated set
-  exactly [spider_egg], unreachable exactly [mister_crabs]) so a second
+  exactly [spider_egg], and the unreachable set, then exactly [mister_crabs],
+  re-derived to EMPTY at the tenth sync with a positive control added beside
+  it, because an empty literal on its own proves nothing) so a second
   quest-gated floor member can only land as a conscious edit, and the
   header says so beside the count-1 clause. MAINTAINER READ, carrying a
   ruling: whether quest-gated camped templates stay legal floor members.
@@ -24564,3 +24568,19 @@ JUDGED, 0 OPEN.** The table is above.
   both privileged reach paths are loopback-guarded and bite at runtime. Its residual
   cost is assurance, not exposure.
 - **The castle deed art** stays carried on the credential ground.
+
+### A SYNC GOTCHA THIS PHASE PAID FOR, worth carrying past the packet
+
+A release sync that changes a PATCHED dependency's patch leaves node_modules
+holding the OLD application, and nothing says so. The tenth sync rewrote
+patches/three@0.185.1.patch (22 insertions, 80 deletions: the release moved its
+final-color NaN guard to the ShaderChunk seam), and until pnpm install re-ran,
+tests/three_compile_async_patch.test.ts read a three build patched the old way
+and failed two arms. The suite's own message says "re-run pnpm install", which
+is the only reason the diagnosis was cheap.
+
+The rule that follows: after ANY sync whose diff touches patches/, re-install
+BEFORE running the gate, or the gate is measuring a library the tree does not
+describe. It is the dependency twin of the phase-close regeneration rule, and it
+fails in the same quiet direction: a green-looking tree whose artifacts are
+stale, or in this case a red whose cause looks like source and is not.

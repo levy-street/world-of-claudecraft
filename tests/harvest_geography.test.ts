@@ -397,11 +397,39 @@ describe('the reachability predicate', () => {
       .filter((mob) => (mob.componentTags?.length ?? 0) > 0 && mob.requiresQuestId !== undefined)
       .map((mob) => mob.id)
       .sort();
+    // THE CENSUS, RE-DERIVED at the tenth release sync (release/v0.42.0,
+    // 2026-08-31). The release commit d9259b2c18 "fix(sim): correct Mister
+    // Crabs lifecycle" DROPPED requiresQuestId from mister_crabs
+    // (src/sim/content/proving_shore.ts): the king is now an owner-tapped,
+    // hard-despawning scripted summon (summonQuestMob hardDespawnSeconds,
+    // interactions/crab_summon.ts) whose access gate lives in the LURE, which
+    // still refuses a player not on q_ps_mother_of_pearl, and the loot stays
+    // questId-gated, so helpers may fight him without stealing the pearl.
+    // Nothing about his REACH moved: still summon-only, still campless, still
+    // meat-tagged, still refused by name in the zero-camp arm below, and no
+    // family's reachable set, zone span, band span or recorded density
+    // changed. What moved is his membership in THIS census, so the whole
+    // quest-gated set is now the clutch alone.
+    expect(questGated).toEqual(['spider_egg']);
     expect(questGated.filter((id) => isReachable(id, LIVE_WORLD))).toEqual(['spider_egg']);
-    expect(questGated.filter((id) => !isReachable(id, LIVE_WORLD))).toEqual(['mister_crabs']);
-    // Each side is on its side for the stated reason: the clutch has a real
-    // overworld camp and carries silk (the gate named), and the crab has no
-    // camp at all (the summon-only miniboss the zero-camp arm below lists).
+    // The refused half is EMPTY today, and an empty literal proves nothing by
+    // itself, so it is recorded plainly here and ANCHORED by the positive
+    // control below: the split still HAS a refusing side, it is simply
+    // unpopulated on the shipped tree.
+    expect(questGated.filter((id) => !isReachable(id, LIVE_WORLD))).toEqual([]);
+    // POSITIVE CONTROL for that empty half, so a predicate that stopped
+    // refusing anything could not pass this arm: run the same split over a
+    // world whose only difference is that the clutch's camps are gone. The
+    // quest-gated carrier then lands on the REFUSED side, which is where
+    // mister_crabs sat until the sync above.
+    const camplessClutch: HarvestWorld = {
+      ...LIVE_WORLD,
+      camps: CAMPS.filter((camp) => camp.mobId !== 'spider_egg'),
+    };
+    expect(questGated.filter((id) => isReachable(id, camplessClutch))).toEqual([]);
+    expect(questGated.filter((id) => !isReachable(id, camplessClutch))).toEqual(['spider_egg']);
+    // The admitted side is admitted for the stated reason: the clutch has a
+    // real overworld camp and carries silk (the gate named).
     expect(MOBS.spider_egg.requiresQuestId).toBe('q_broodmother');
     expect(MOBS.spider_egg.componentTags).toContain('silk');
     // Predicted from src/sim/content/zone2.ts before running: CAMPS carries
@@ -419,8 +447,15 @@ describe('the reachability predicate', () => {
         (id) => MOBS[id].requiresQuestId === undefined,
       ).length,
     ).toBeLessThan(REACH_FLOOR.templates);
-    expect(MOBS.mister_crabs.requiresQuestId).toBe('q_ps_mother_of_pearl');
+    // What the sync moved, pinned in BOTH directions so the census literal
+    // above can never drift silently again: the king carries no template
+    // quest gate any more (re-adding one reds here, and the fix is then to
+    // re-derive the literal, never to widen it), and he is still campless,
+    // which is exactly why leaving this census cost no family any reach.
+    expect(MOBS.mister_crabs.requiresQuestId).toBeUndefined();
+    expect(MOBS.mister_crabs.componentTags).toContain('meat');
     expect(CAMPS.some((camp) => camp.mobId === 'mister_crabs')).toBe(false);
+    expect(isReachable('mister_crabs', LIVE_WORLD)).toBe(false);
   });
 
   it('admits the Proving Shore as an ordinary open-world zone: shore_scuttler counts', () => {
