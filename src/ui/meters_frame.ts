@@ -83,7 +83,6 @@ const HANDLE_CONTROL_SELECTOR = 'button, a, input, select, textarea';
 export class MeterFrame {
   private geo: MeterFrameGeometry | null = null;
   private gesture: Gesture | null = null;
-  private grip: HTMLElement | null = null;
   /** Where the panel lives in the HUD stack, so reset() can put it back. */
   private home: { parent: Node; next: Node | null } | null = null;
   /** Coalesces the trailing post-resize re-derive (METER_FRAME_RESIZE_SETTLE_MS). */
@@ -104,7 +103,6 @@ export class MeterFrame {
     grip.title = t('hudChrome.meters.resize');
     grip.setAttribute('aria-hidden', 'true');
     el.appendChild(grip);
-    this.grip = grip;
 
     for (const handle of handles) {
       handle.classList.add('mt-move-handle');

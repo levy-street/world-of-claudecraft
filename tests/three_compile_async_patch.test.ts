@@ -348,10 +348,7 @@ describe('three low-tier NaN output scrub patch', () => {
   // OutputGradePass already uses, applied one stage earlier and universally
   // instead of tier-gated.
   it('keeps the guard applied, scrubbing outgoingLight before gl_FragColor', () => {
-    const patch = readFileSync(
-      new URL('../patches/three@0.185.1.patch', import.meta.url),
-      'utf8',
-    );
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
     // Anchored on the gl_FragColor assignment that immediately follows it, so
     // the guard's POSITION is asserted, not just its presence: scrubbing
     // after this point would be too late, and scrubbing earlier (before
@@ -377,10 +374,7 @@ describe('three low-tier NaN output scrub patch', () => {
     // the stock spelling must be absent from added patch lines. The removed
     // upstream line remains in the patch by design, so the check is scoped to
     // additions rather than the whole diff text.
-    const patch = readFileSync(
-      new URL('../patches/three@0.185.1.patch', import.meta.url),
-      'utf8',
-    );
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
     const addedPatchLines = patch
       .split('\n')
       .filter((line) => line.startsWith('+') && !line.startsWith('+++'))
@@ -399,7 +393,6 @@ describe('three low-tier NaN output scrub patch', () => {
       'the unpatched three.cjs control no longer matches the stock needle; the GONE pin above may be vacuous',
     ).toBe(1);
   });
-
 });
 
 describe('three empty instanced draw skip patch', () => {

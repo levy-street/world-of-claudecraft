@@ -499,7 +499,7 @@ describe('chat channels', () => {
     let delivered = 0;
     let throttled = false;
     for (let i = 0; i < 40; i++) {
-      sim.chat('/g spam ' + i, a);
+      sim.chat(`/g spam ${i}`, a);
       const events = sim.tick(); // ~0.05s of refill per tick
       if (events.some((e) => e.type === 'chat')) delivered++;
       if (events.some((e) => e.type === 'error' && /too quickly/i.test(e.text))) throttled = true;

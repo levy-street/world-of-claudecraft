@@ -236,7 +236,8 @@ function buildAtlasTexture(): ParticleAtlas {
     // Read back from the retained composed canvas: composeAtlasCanvas() runs at
     // most once per page, so its local 2d context is not in scope here.
     const size = atlasCanvas.width;
-    const ctx = atlasCanvas.getContext('2d')!;
+    const ctx = atlasCanvas.getContext('2d');
+    if (!ctx) throw new Error('2D canvas context unavailable');
     const pixels = ctx.getImageData(0, 0, size, size).data;
     for (let i = 0; i < SPRITE_FILES.length; i++) {
       earlyRejectRadiusSq[i] = spriteEarlyRejectRadiusSq(

@@ -319,6 +319,9 @@ export function coachPromptPlan(args: {
   if (focus.state === 'ready') {
     return npcPlan(quest.turnInNpcId, 'hudChrome.bootcamp.promptTurnIn');
   }
+  if (focus.questId === DEATH_LESSON_QUEST_ID && deathPhase !== 'alive') {
+    return null;
+  }
   // Materialize ONCE, past the arms that never scan. The live caller hands
   // over `world.entities.values()`, a Map iterator that is spent after a
   // single walk: the pearl detour scans twice (live boss, then his corpse),

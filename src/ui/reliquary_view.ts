@@ -71,7 +71,7 @@ export const CURATOR_RANK_NAME_KEYS: readonly TranslationKey[] = [
  *  assertion and throw inside t() at the caller. */
 export function curatorRankNameKey(rank: number): TranslationKey {
   if (Number.isInteger(rank) && rank >= 1 && rank <= CURATOR_RANK_NAME_KEYS.length) {
-    return CURATOR_RANK_NAME_KEYS[rank - 1]!;
+    return CURATOR_RANK_NAME_KEYS[rank - 1] ?? 'hudChrome.reliquary.curatorRank';
   }
   return 'hudChrome.reliquary.curatorRank';
 }

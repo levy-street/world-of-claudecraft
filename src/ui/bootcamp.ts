@@ -51,26 +51,19 @@ import type { IWorld } from '../world_api';
 import { bagsWindowShown } from './bags_view';
 import {
   BELL_STEP_TARGET,
-  type BootcampParam,
   type BootcampStep,
-  bellCardPlan,
-  bootcampBodyPlan,
   bootcampKeycaps,
-  bootcampTitleKey,
   CAMERA_LESSON_TRAVEL_RAD,
   type CoachFocus,
-  type CoachParam,
   type CoachState,
   coachCardPlan,
   coachFocus,
-  coachKeycaps,
   computeBootcampStep,
   DEATH_LESSON_QUEST_ID,
   type DeathLessonPhase,
   RING_LESSON_ITEM_ID,
   RING_LESSON_QUEST_ID,
   type RingLessonPhase,
-  ringCardPlan,
   ringLessonPhase,
 } from './bootcamp_view';
 import {
@@ -80,7 +73,6 @@ import {
   coachGlowButtonId,
   coachGlowQuestId,
   coachGlowVendorItemId,
-  coachPromptChip,
   coachPromptChips,
   coachPromptInRange,
   coachPromptPlan,
@@ -96,7 +88,7 @@ import {
   VEER_OFF_YD,
 } from './coach_prompt_view';
 import { tEntity } from './entity_i18n';
-import { formatNumber, type TranslationKey, t } from './i18n';
+import { type TranslationKey, t } from './i18n';
 import { iconDataUrl } from './icons';
 import {
   type ObjectiveGlowPlan,
@@ -243,25 +235,19 @@ export class BootcampOverlay {
     // one-shot arrival caption never fires) then no-ops every instruction
     // bubble and edge glow for the whole session. Idempotent.
     this.ensureDom();
-    const mode = currentInputHintMode();
-    let nextRenderKey: string;
     if (this.bellPhase) {
       this.step = null;
-      nextRenderKey = `bell:${mode}`;
     } else if (this.ringPhase !== null) {
       this.step = null;
-      nextRenderKey = `ring:${this.ringPhase}:${mode}`;
-    } else if (isGauntlet) {
+    } else if (isGauntlet && focus) {
       const next = computeBootcampStep({
-        questActive: focus!.state !== 'available',
+        questActive: focus.state !== 'available',
         checkpointsReached: this.lastCounts,
         cameraTurned,
       });
       this.step = next;
-      nextRenderKey = `gauntlet:${next}:${mode}`;
     } else {
       this.step = null;
-      nextRenderKey = `${focus!.questId}:${focus!.state}:${mode}`;
     }
 
     this.ensureDom();
@@ -534,13 +520,6 @@ export class BootcampOverlay {
   }
 
   // ---- internals --------------------------------------------------------
-
-  private courseProgress(): string {
-    return t('hudChrome.bootcamp.courseProgress', {
-      current: formatNumber(Math.min(this.lastCounts + 1, BOOTCAMP_COURSE_CHECKPOINTS.length)),
-      total: formatNumber(BOOTCAMP_COURSE_CHECKPOINTS.length),
-    });
-  }
 
   private ensureDom(): void {
     if (this.prompt) return;
@@ -954,15 +933,6 @@ export class BootcampOverlay {
     this.promptChipEl.style.display = chips.length > 0 ? '' : 'none';
   }
 
-  /** The localized name of the attack this class was taught, for the ability
-   *  drill's card. Falls back to the Attack toggle's own label for a class
-   *  the kit leaves with nothing but a swing. */
-  private taughtAbilityName(): string {
-    const abilityId = this.taughtAbilityId;
-    if (!abilityId) return t('hudChrome.bootcamp.promptAttack');
-    return tEntity({ kind: 'ability', id: abilityId, field: 'name' });
-  }
-
   /** Which action-bar icon the touch combat bubble shows: the Attack toggle
    *  for a class that swings, and the taught spell for one that casts (a
    *  caster has no melee autoattack worth pointing a new player at). */
@@ -1126,16 +1096,6 @@ function railQuestState(world: IWorld, questId: string): CoachState | null {
   if (state === 'available') return 'available';
   if (state === 'ready') return 'ready';
   return null;
-}
-
-/** Keycap chips with a localized "then" between them: every multi-key row
- *  on the island is a press SEQUENCE (D then W, B then F), and the playtest
- *  showed the order must be explicit. */
-function paintChipSequence(host: HTMLElement, caps: readonly string[]): void {
-  paintPromptChipSequence(
-    host,
-    caps.map((cap) => ({ cap })),
-  );
 }
 
 /** Repaint identity for a chip row (the memo key). */
