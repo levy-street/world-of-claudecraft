@@ -290,16 +290,19 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    // Re-pinned at the release/v0.42.0 sync into fix/actionbar-attack-slot-loadout-switch:
-    // the release arm's chain above lands at 18905; this branch's own arm is the
-    // freed Attack-slot render fix (reopen of #3548, +40 over its own 19002 base):
-    // one import, a memoized freedAttackSlotAbility() per-slot cache, the
-    // tooltip's "Unavailable" fallback branch, the action-bar descriptor's slot-0
-    // fallback, and a castSlot() refusal arm for a press on the now-visibly-assigned
-    // slot. Both arms land in the merged tree (18905 + 40), so the exact merged
-    // count is the honest zero-slack bound. Measured on the merged tree, never
-    // reconciled by arithmetic.
-    ceiling: 18945,
+    // Re-pinned at the release/v0.42.0 integration of the
+    // fix/actionbar-attack-slot-loadout-switch and fix/fullscreen-layout-reset
+    // arms. The release chain above lands at 18905; the candidate arm keeps
+    // the freed Attack-slot render fix (reopen of #3548, +40 over its own
+    // 19002 base): one import, a memoized freedAttackSlotAbility() per-slot
+    // cache, the tooltip's "Unavailable" fallback branch, the action-bar
+    // descriptor's slot-0 fallback, and a castSlot() refusal arm for a press on
+    // the now-visibly-assigned slot. PR #3759 keeps its real window re-anchor
+    // mechanism: window_reflow_core.ts remembers the requested spot across a
+    // fullscreen resize, folds release's windowMoved stamp into that path, and
+    // leaves window_position_core.ts fully superseded. Measured on the merged
+    // tree, never reconciled by arithmetic. Exact count, zero slack.
+    ceiling: 18952,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

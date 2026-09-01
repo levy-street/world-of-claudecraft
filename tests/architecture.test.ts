@@ -501,7 +501,7 @@ const UI_PURE_CORES = [
   'src/ui/heal_landing_feedback_core.ts',
   'src/ui/block_landing_feedback_core.ts',
   'src/ui/window_drag_core.ts',
-  'src/ui/window_position_core.ts',
+  'src/ui/window_reflow_core.ts',
   'src/ui/window_resize_core.ts',
   'src/ui/window_stack_state_core.ts',
   'src/ui/target_frame_pos.ts',
@@ -2429,6 +2429,7 @@ const UI_DOM_MODULES = [
   'src/ui/vault_window.ts',
   'src/ui/wiki_link.ts',
   'src/ui/window_drag.ts',
+  'src/ui/window_reflow.ts',
   'src/ui/window_resize.ts',
   'src/ui/woc_market_link.ts',
 ].map((rel) => join(repoRoot, rel));

@@ -829,7 +829,8 @@ import {
   type WindowDragController,
 } from './window_drag';
 import { makeWindowFocus } from './window_focus';
-import { windowPixelPosition } from './window_position_core';
+import { installWindowReflow, rememberWindowPos, requestedWindowPos } from './window_reflow';
+import { placeWindow } from './window_reflow_core';
 import { installWindowResize, markResizableWindow } from './window_resize';
 import { stackedWindowsVisible } from './window_stack_state_core';
 import { wocBalanceChipHtml } from './woc_balance_chip';
@@ -3283,12 +3284,12 @@ export class Hud {
       getScale: () => getUiScale(),
       pinWindow: (el, rect) => this.setWindowPixelPosition(el, rect.left, rect.top, rect),
     });
-    window.addEventListener('resize', () => {
-      document.querySelectorAll<HTMLElement>('.window.panel').forEach((el) => {
-        if (!this.isWindowVisible(el) || el.dataset.windowMoved !== '1') return;
-        const rect = el.getBoundingClientRect();
-        this.setWindowPixelPosition(el, rect.left, rect.top, rect);
-      });
+    installWindowReflow({
+      movedWindows: () =>
+        [...document.querySelectorAll<HTMLElement>('.window.panel')].filter(
+          (el) => this.isWindowVisible(el) && el.dataset.windowMoved === '1',
+        ),
+      reflow: (el, left, top, rect) => this.setWindowPixelPosition(el, left, top, rect, false),
     });
   }
 
@@ -3313,12 +3314,12 @@ export class Hud {
     if (el.dataset.windowOpen !== '1') {
       el.dataset.windowOpen = '1';
       this.placeNewWindow(el);
-      // A window moved or resized at an earlier viewport keeps its inline
-      // left/top while hidden; the viewport-resize re-clamp skips hidden
-      // windows, so re-clamp at show time or it can reopen off-screen.
+      // The viewport-resize reflow skips hidden windows, so re-derive (and
+      // re-anchor) at show time or a stale spot can reopen off-screen.
       if (el.dataset.windowMoved === '1') {
         const rect = el.getBoundingClientRect();
-        this.setWindowPixelPosition(el, rect.left, rect.top, rect);
+        const requested = requestedWindowPos(el, rect);
+        this.setWindowPixelPosition(el, requested.left, requested.top, rect, false);
       }
       this.bringWindowToFront(el);
     }
@@ -3447,28 +3448,34 @@ export class Hud {
     return win.id === 'map-window' && target === win;
   }
 
+  // left/top: visual space (placeWindow); remember=false for a passive reflow.
   private setWindowPixelPosition(
     el: HTMLElement,
     left: number,
     top: number,
     rect = el.getBoundingClientRect(),
+    remember = true,
   ): void {
-    const position = windowPixelPosition({
+    const placement = placeWindow(
       left,
       top,
-      width: rect.width,
-      height: rect.height,
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      scale: getUiScale(),
-    });
-    el.style.left = `${position.left}px`;
-    el.style.top = `${position.top}px`;
+      { w: rect.width, h: rect.height },
+      { w: window.innerWidth, h: window.innerHeight },
+      getUiScale(),
+    );
+    el.style.left = `${placement.css.left}px`;
+    el.style.top = `${placement.css.top}px`;
     el.style.right = 'auto';
     el.style.bottom = 'auto';
     el.style.transform = 'none';
-    // Pixel positions are re-clamped after viewport changes and on reopen.
-    el.dataset.windowMoved = '1';
+    if (remember) {
+      rememberWindowPos(el, placement.visual.left, placement.visual.top);
+      // Every explicit write (drag/resize commit, or the automatic open
+      // cascade in placeNewWindow) marks the window as moved, so a viewport
+      // resize/reopen also reflows a window the player never dragged by hand
+      // (a cascaded window going invisible after a shrink resize otherwise).
+      el.dataset.windowMoved = '1';
+    }
   }
 
   // Place a cursor-anchored popup (context menus, the loot window) at a viewport
