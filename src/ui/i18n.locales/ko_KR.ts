@@ -14068,6 +14068,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '허수아비를 탭해 대상으로 잡고, 행동 단축바의 {ability} 기술을 탭하세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
   'hudChrome.bootcamp.taskHoneBodyPad':
     '허수아비를 대상으로 잡고, {ability} 기술이 놓인 행동 버튼을 누르세요. 평범한 휘두르기가 아니라 당신만의 기술입니다. 세 번 명중시키세요.',
+  'hudChrome.bootcamp.promptAccessInterface': '인터페이스 열기',
+  'hudChrome.bootcamp.promptMoveToTarget': '{target}(으)로 이동',
+  'hudChrome.bootcamp.promptSelectItem': '{item} 선택',
   'hudChrome.bootcamp.promptOpenBags': '가방 열기',
   'hudChrome.bootcamp.promptCharacterSheet': '캐릭터 창 열기',
   'hudChrome.bootcamp.promptLookAround': '오른쪽 버튼을 누른 채 끌어서 둘러보기',
