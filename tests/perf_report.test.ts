@@ -535,6 +535,46 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('strips control characters so a NUL-bearing beacon still inserts', async () => {
+    // Postgres REJECTS U+0000 in a text parameter, so one NUL anywhere in a
+    // renderer or vendor string used to fail the whole INSERT and lose the
+    // entire report, not just the offending field. The sanitizer strips C0 and
+    // DEL from every text field rather than rejecting the beacon, on the same
+    // principle as every other clamp here.
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-control-chars',
+          glRenderer: 'ANGLE (NVIDIA,' + '\u0000' + ' NVIDIA GeForce RTX 3060 (0x00002504))',
+          glVendor: 'NVIDIA' + '\u007f' + 'Corporation',
+          gpuHpAdapter: 'NVIDIA' + '\u0007' + ' GeForce RTX 3060',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.95' },
+      ),
+      fakeRes(),
+    );
+    const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+    const hasControl = (text: string | undefined): boolean =>
+      [...(text ?? '')].some((ch) => {
+        const code = ch.charCodeAt(0);
+        return code < 0x20 || code === 0x7f;
+      });
+    // Nothing a text column cannot hold reaches the insert...
+    for (const field of [row?.glRendererRaw, row?.glVendor, row?.glModel, row?.gpuHpAdapter]) {
+      expect(hasControl(field)).toBe(false);
+    }
+    // The helper is decisive on its own, including the NUL Postgres rejects.
+    expect(perfReportInternalsForTest.stripControlChars('a\u0000b\u001fc\u007fd')).toBe('abcd');
+    expect(perfReportInternalsForTest.stripControlChars('clean text')).toBe('clean text');
+    // ...and stripping costs nothing downstream: the model still resolves off
+    // the cleaned string rather than falling back to the vendor-only key.
+    expect(row?.glRendererRaw).toBe('ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 (0x00002504))');
+    expect(row?.glVendor).toBe('NVIDIACorporation');
+    expect(row?.glModel).toBe('nvidia-rtx-3060');
+    expect(row?.gpuHpAdapter).toBe('nvidia-rtx-3060');
+  });
+
   it('stores empty model dimensions when the client sends no renderer string at all', async () => {
     await handlePerfReport(
       fakeReq({ sessionId: 'gpu-model-absent', rawSummary: {} }, { remoteAddress: '203.0.113.94' }),

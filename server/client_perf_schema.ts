@@ -11,8 +11,15 @@
 // populated production table rewrites no rows.
 import { REALM } from './realm';
 
-// The same escape db.ts applies to its own realm defaults; duplicated rather
-// than imported so this module stays free of the db.ts import cycle.
+// The realm as a SQL string-literal body for the column default below. Spelled
+// here rather than imported from db.ts because a schema module db.ts imports
+// must not import db.ts back (the admin_guilds_schema.ts rule), and this is the
+// SAME shape social_db.ts already uses for the characters.realm default: the
+// house pattern for a schema module that needs it, not a new one. Safe as a
+// complete escape because resolveRealm (realm.ts) bounds REALM to 24 chars of
+// [A-Za-z0-9 '_-], so doubling the apostrophe is the only sequence that can
+// matter; if that validation is ever loosened, all three spellings change
+// together (db.ts REALM_SQL_DEFAULT, social_db.ts, here).
 const REALM_SQL_DEFAULT = REALM.replace(/'/g, "''");
 
 export const CLIENT_PERF_SCHEMA = `

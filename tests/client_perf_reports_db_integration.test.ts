@@ -10,6 +10,7 @@
 // (npm run db:up) to exercise it.
 
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { PERF_SUMMARY_MIN_GROUP_SAMPLES } from '../server/client_perf_summary_shape';
 
 const DB_URL = process.env.TEST_DATABASE_URL;
 const describeDb = DB_URL ? describe : describe.skip;
@@ -177,6 +178,13 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(row?.worst10sFrameP95Ms).toBeCloseTo(180.5, 5);
     expect(row?.zoneOrScenario).toBe('dungeon:hollow_crypt');
     expect(row?.suggestionIds).toEqual(['hardware-acceleration', 'high-dpi']);
+    // The raw renderer string has a READER, so it is not collected without a
+    // consumer: per-report forensics behind the admin gate. It is client text
+    // and is served verbatim, so any future rendering of it must escape it.
+    expect(row?.glRendererRaw).toBe('ANGLE (Roundtrip, Roundtrip Renderer, D3D11-1.2.3.4)');
+    expect(row?.glModel).toBe('roundtrip-model');
+    expect(row?.glLaptop).toBe(false);
+    expect(row?.gpuHpAdapter).toBe('roundtrip-hp-adapter');
   });
 
   it('aggregates suggestionCounts through clientPerfSummary from the live rows', async () => {
@@ -190,24 +198,50 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
   });
 
   it('rolls the GPU model dimensions up through clientPerfSummary against real SQL', async () => {
-    // The one place the model statement's TWO grouping sets, its adapter
-    // filter, and its pre-window rank actually execute: the mocked-pool suite
-    // can only pin the SQL text, and a filter placed after the window function
-    // would still read correctly there while returning an empty byHpMismatch
-    // on a real fleet.
+    // The one place the model statement's two grouping sets, its HAVING bound,
+    // and its pre-window rank actually execute. The mocked-pool suite can only
+    // pin SQL text, and every defect this guards against reads correctly there:
+    // a filter moved after the window function, a mismatch arm dropped, or a
+    // floor that quietly swallows the whole list.
     const adminDb = await import('../server/admin_db');
+    // Clear the sample floor for the mismatch group, and seed two groups that
+    // must NOT appear: one below the floor, one whose adapter AGREES.
+    const rows: [string, string, string, string][] = [];
+    for (let i = 0; i < PERF_SUMMARY_MIN_GROUP_SAMPLES; i++) {
+      rows.push([`${MARKER}-hp-${i}`, 'macos', 'roundtrip-model', 'roundtrip-hp-adapter']);
+      rows.push([`${MARKER}-agree-${i}`, 'macos', 'roundtrip-agree', 'roundtrip-agree']);
+    }
+    rows.push([`${MARKER}-rare`, 'macos', 'roundtrip-rare', 'roundtrip-rare-adapter']);
+    for (const [session, os, model, adapter] of rows) {
+      await db.pool.query(
+        `INSERT INTO client_perf_reports (session_id, os_family, gl_model, gpu_hp_adapter)
+         VALUES ($1, $2, $3, $4)`,
+        [session, os, model, adapter],
+      );
+    }
+
     const summary = await adminDb.clientPerfSummary(24);
     const model = summary.byModel.find(
       (b) => b.osFamily === 'macos' && b.glModel === 'roundtrip-model',
     );
-    expect(model?.sampleCount).toBeGreaterThanOrEqual(1);
+    expect(model?.sampleCount).toBeGreaterThanOrEqual(PERF_SUMMARY_MIN_GROUP_SAMPLES);
     const mismatch = summary.byHpMismatch.find(
       (b) => b.glModel === 'roundtrip-model' && b.gpuHpAdapter === 'roundtrip-hp-adapter',
     );
-    expect(mismatch?.sampleCount).toBeGreaterThanOrEqual(1);
-    // The legacy and no-evidence rows carry gpu_hp_adapter = '', and the
-    // statement filters them out of the mismatch list entirely.
+    expect(mismatch?.sampleCount).toBeGreaterThanOrEqual(PERF_SUMMARY_MIN_GROUP_SAMPLES);
+    // A group that AGREES is not a mismatch, however high its volume: without
+    // the gpu_hp_adapter <> gl_model arm it would outrank every real one.
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'roundtrip-agree')).toBe(false);
+    // The legacy and no-evidence rows carry gpu_hp_adapter = '' and never reach
+    // the list; nor does a row with an adapter but NO renderer string, which
+    // without the gl_model <> '' arm would read as a mismatch against nothing.
     expect(summary.byHpMismatch.some((b) => b.gpuHpAdapter === '')).toBe(false);
+    expect(summary.byHpMismatch.some((b) => b.glModel === '')).toBe(false);
+    // Below the floor, so it is aggregated away rather than sorted: this is the
+    // bound that keeps a wide spread of client-derived keys from making the
+    // server materialize hundreds of thousands of groups to return 100 rows.
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'roundtrip-rare')).toBe(false);
+    expect(summary.byModel.some((b) => b.glModel === 'roundtrip-rare')).toBe(false);
   });
 
   it('leaves an existing pre-phase row on the column defaults the mapper folds', async () => {

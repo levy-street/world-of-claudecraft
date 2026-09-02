@@ -131,8 +131,35 @@ function nullableNumberIn(value: unknown, min: number, max: number): number | nu
   return Math.min(max, Math.max(min, n));
 }
 
+// C0 controls plus DEL. None of them is legitimate in any field this ingest
+// stores, and U+0000 specifically is REJECTED by Postgres in a text parameter:
+// one NUL anywhere in a beacon's renderer or vendor string fails the whole
+// insert, losing the entire report rather than one field. Stripped rather than
+// rejected, on the same principle as every other clamp here (a beacon is never
+// refused over its diagnostics).
+// Written as a code scan rather than a regex literal: a character class over
+// this range is itself a lint error, and the fast path (the overwhelming
+// majority of reports carry none) costs one pass with no allocation.
+function stripControlChars(text: string): string {
+  let hasControl = false;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code < 0x20 || code === 0x7f) {
+      hasControl = true;
+      break;
+    }
+  }
+  if (!hasControl) return text;
+  let out = '';
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    if (code >= 0x20 && code !== 0x7f) out += text[i];
+  }
+  return out;
+}
+
 function textIn(value: unknown, max: number, fallback = ''): string {
-  const text = typeof value === 'string' ? value.trim() : '';
+  const text = typeof value === 'string' ? stripControlChars(value).trim() : '';
   return (text || fallback).slice(0, max);
 }
 
@@ -891,6 +918,7 @@ export async function handlePerfReport(
 
 export const perfReportInternalsForTest = {
   bucketGpu,
+  stripControlChars,
   browserFamily,
   osFamily,
   viewportBucket,

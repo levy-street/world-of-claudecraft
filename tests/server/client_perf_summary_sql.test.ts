@@ -124,11 +124,25 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
       'GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))',
     );
     expect(modelSql).toContain("WHERE created_at > now() - ($1 || ' hours')::interval");
-    // The adapter filter sits in the ranked CTE's WHERE, which SQL evaluates
-    // BEFORE the window function: put it in the outer SELECT instead and the
-    // adapter-less majority would consume every rank slot of the triple set,
-    // so byHpMismatch would come back empty on a real fleet.
-    expect(modelSql).toContain("WHERE g_hp = 1 OR gpu_hp_adapter <> ''");
+    // Everything that bounds this statement is in the HAVING, which prunes at
+    // AGGREGATION time: the rank caps below bound only what crosses to Node,
+    // never what Postgres materializes and sorts, and gl_model's key COUNT is
+    // client-influenced. Move either predicate to the outer SELECT and the
+    // server still sorts every junk group to return the same 100 rows.
+    expect(modelSql).toContain('HAVING count(*) >= 5');
+    // All three mismatch arms, each guarding a different way the list lies:
+    // adapter-less rows taking the slots, agreeing rows taking them, and a
+    // report with an adapter but NO renderer string reading as a mismatch
+    // against nothing.
+    expect(modelSql).toContain(
+      "(gpu_hp_adapter <> '' AND gl_model <> '' AND gpu_hp_adapter <> gl_model)",
+    );
+    // Scoped to the triple set: the pair set must keep every model, mismatch
+    // or not, because it is the denominator the mismatch list is read against.
+    expect(modelSql).toContain('GROUPING(gpu_hp_adapter) = 1');
+    // The ranked CTE ranks; it must not also re-filter (a filter there would
+    // read correctly while leaving the intermediate unbounded).
+    expect(modelSql).not.toContain("WHERE g_hp = 1 OR gpu_hp_adapter <> ''");
     expect(modelSql).toContain(
       "ORDER BY sample_count DESC, os_family ASC, gl_model ASC, COALESCE(gpu_hp_adapter, '') ASC",
     );

@@ -7,6 +7,7 @@ import {
   mapClientPerfSummaryRows,
   mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  PERF_SUMMARY_MIN_GROUP_SAMPLES,
   type PerfHpAdapterBucket,
   type PerfModelBucket,
   type PerfSuggestionCount,
@@ -504,6 +505,10 @@ export interface PerfRawRow {
   osFamily: string;
   glVendor: string;
   glRendererBucket: string;
+  glRendererRaw: string;
+  glModel: string;
+  glLaptop: boolean | null;
+  gpuHpAdapter: string;
   zoneOrScenario: string;
   source: string;
   crowdBucket: string;
@@ -596,13 +601,32 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
     );
     // The THIRD statement, and the reason it is not another grouping set in the
     // first: byModel keys on a PAIR of columns, which the mapper's one-zero-bit
-    // classification cannot express, and byHpMismatch needs a row filter
-    // (gpu_hp_adapter <> '') that a shared statement would apply to every other
-    // set too. Both still ride ONE pass here, as two grouping sets over the same
-    // window, capped per set exactly like the roll-up above. The WHERE runs
-    // BEFORE the window function, so the triple set's rank is computed over
-    // adapter-carrying rows only and the empty-adapter majority (every client
-    // without WebGPU) cannot consume its rank slots.
+    // classification cannot express, and byHpMismatch needs a row filter that a
+    // shared statement would apply to every other set too. Both still ride ONE
+    // pass here, as two grouping sets over the same window, capped per set
+    // exactly like the roll-up above.
+    //
+    // Everything that bounds this read is in the HAVING, which prunes at
+    // aggregation time, BEFORE the window sort. That placement is the whole
+    // design: the per-set rank caps bound only what crosses to Node, never what
+    // Postgres materializes and sorts, and gl_model is derived from a
+    // client-supplied string, so its key COUNT is attacker-influenced even
+    // though modelKey bounds each key's shape. The sample floor turns that into
+    // a structural bound (surviving groups are at most window rows over the
+    // floor) instead of a data-dependent one.
+    //
+    // The mismatch predicate is what byHpMismatch is NAMED for, and all three
+    // of its arms matter: without gpu_hp_adapter <> '' the adapter-less
+    // majority (every client with no WebGPU) takes the rank slots, without
+    // gpu_hp_adapter <> gl_model the AGREEING rows do (on a real fleet, most of
+    // them), and without gl_model <> '' every report that carries an adapter
+    // but no renderer string reads as a mismatch against nothing. Rank first
+    // and filter after, or drop any arm, and the list comes back empty,
+    // truncated, or false while still looking like a complete answer.
+    //
+    // A rarer-than-the-floor mismatch is deliberately not counted here: this is
+    // the fleet-level dimension, and single-report forensics ride clientPerfRaw,
+    // which serves gl_renderer_raw and gpu_hp_adapter per row.
     const models = await query(
       `WITH agg AS (
          SELECT
@@ -620,6 +644,9 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
          FROM client_perf_reports
          WHERE created_at > now() - ($1 || ' hours')::interval
          GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))
+        HAVING count(*) >= ${PERF_SUMMARY_MIN_GROUP_SAMPLES}
+           AND (GROUPING(gpu_hp_adapter) = 1
+                OR (gpu_hp_adapter <> '' AND gl_model <> '' AND gpu_hp_adapter <> gl_model))
        ),
        ranked AS (
          SELECT
@@ -629,7 +656,6 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
              ORDER BY sample_count DESC, os_family ASC, gl_model ASC, COALESCE(gpu_hp_adapter, '') ASC
            ))::int AS vol_rank
          FROM agg
-         WHERE g_hp = 1 OR gpu_hp_adapter <> ''
        )
        SELECT * FROM ranked
        WHERE (g_hp = 1 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byModel})
@@ -673,7 +699,8 @@ export async function clientPerfRaw(
        renderer_calls, renderer_triangles, renderer_textures, renderer_programs, context_lost_count,
        long_task_count, long_task_p95_ms, memory_used_mb, memory_limit_mb,
        dpr, viewport_bucket, device_memory, hardware_concurrency, mobile_touch,
-       browser_family, os_family, gl_vendor, gl_renderer_bucket, zone_or_scenario, source,
+       browser_family, os_family, gl_vendor, gl_renderer_bucket, gl_renderer_raw,
+       gl_model, gl_laptop, gpu_hp_adapter, zone_or_scenario, source,
        crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms,
        suggestion_ids, raw_summary
      FROM client_perf_reports
@@ -720,6 +747,14 @@ export async function clientPerfRaw(
     osFamily: r.os_family,
     glVendor: r.gl_vendor,
     glRendererBucket: r.gl_renderer_bucket,
+    // The raw renderer string is CLIENT text: it is stored verbatim (bounded to
+    // 160 chars, control characters stripped) and served here for per-report
+    // forensics behind the admin gate. Any renderer of this field must escape
+    // it like any other untrusted string; nothing may interpolate it as markup.
+    glRendererRaw: r.gl_renderer_raw,
+    glModel: r.gl_model,
+    glLaptop: r.gl_laptop,
+    gpuHpAdapter: r.gpu_hp_adapter,
     zoneOrScenario: r.zone_or_scenario,
     source: r.source,
     crowdBucket: r.crowd_bucket,

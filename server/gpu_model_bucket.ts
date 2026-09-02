@@ -35,7 +35,16 @@ const UNDECIDABLE_FORM_FACTOR = /\bapple\b|\badreno\b|\bmali\b|\bpowervr\b/i;
 // The markers a vendor puts in the string itself when the part is a mobile one.
 const MOBILE_MARKERS = /\blaptop gpu\b|\bmax-?q\b|\bmobile\b/i;
 
-const APPLE_CHIP = /\bapple\s+(m\d+)(?:\s+(pro|max|ultra))?/i;
+// Every captured run below is LENGTH-BOUNDED, not just the key that comes out
+// of it. modelKey caps a key at 40 chars, but gl_model is a GROUPED column: an
+// unbounded digit run lets a hostile beacon mint arbitrarily many DISTINCT keys
+// and blow up the summary's grouping cardinality even though every individual
+// key is short. Two digits covers every Apple chip generation there will be for
+// a very long time.
+// The trailing \b matters as much as the {1,2}: without it an over-long digit
+// run would TRUNCATE into a plausible-looking chip ("M123456789" reading as
+// M12) instead of falling back to the honest vendor-only key.
+const APPLE_CHIP = /\bapple\s+(m\d{1,2})\b(?:\s+(pro|max|ultra))?/i;
 // GeForce consumer and RTX A-series workstation parts, with the Ti / SUPER
 // suffixes that distinguish real SKUs ("RTX 4070 Ti SUPER").
 const NVIDIA_MODEL = /\b(rtx|gtx)\s*(a?\d{3,4})((?:\s*(?:ti|super))*)/i;
@@ -44,7 +53,7 @@ const INTEL_GRAPHICS_NUMBER = /\bgraphics\s+(\d{3,4})\b/i;
 // The S and M suffixes ride the number with no separator ("RX 7700S"), the
 // XT / XTX / GRE ones are their own token ("RX 6700 XT").
 const AMD_RX = /\brx\s*(\d{3,4})\s*(xtx|xt|gre|s|m)?\b/i;
-const AMD_INTEGRATED = /\bradeon\s+graphics\b|\bvega\s+\d+\b/i;
+const AMD_INTEGRATED = /\bradeon\s+graphics\b|\bvega\s+\d{1,2}\b/i;
 const QUALCOMM_ADRENO = /\badreno\b\D*(\d{3,4})\b/i;
 const ARM_MALI = /\bmali[-\s]*([a-z]\d{2,3})\b/i;
 
@@ -76,9 +85,13 @@ function modelKey(parts: readonly string[]): string {
 function nvidiaModel(clean: string): string | null {
   const m = NVIDIA_MODEL.exec(clean);
   if (!m) return null;
-  // The suffix run is matched as one blob so "Ti SUPER" keeps its order; the
-  // tokens are re-extracted here rather than trusted as raw text.
-  const suffixes = (m[3] ?? '').toLowerCase().match(/ti|super/g) ?? [];
+  // The suffix run is matched as one blob, then rebuilt from a fixed token list:
+  // DEDUPED and in the vendor's own order, never echoed back in the order
+  // and count they arrived in: the run is a `*` over client text, so "RTX 4090
+  // ti ti ti ti ..." would otherwise mint a fresh distinct key per repetition
+  // in a grouped column. Real SKUs carry each token at most once, Ti first.
+  const suffixRun = (m[3] ?? '').toLowerCase();
+  const suffixes = ['ti', 'super'].filter((token) => suffixRun.includes(token));
   return modelKey(['nvidia', m[1], m[2], ...suffixes]);
 }
 

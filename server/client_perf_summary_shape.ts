@@ -31,11 +31,13 @@ export interface PerfModelBucket extends PerfAggregate {
   glModel: string;
 }
 
-// byHpMismatch adds the WebGPU high-performance adapter's family. A row whose
-// gpuHpAdapter differs from its glModel is the signal this dimension exists for:
-// the page is rendering on one GPU while the machine offers a faster one. Rows
-// with no adapter evidence never reach here (the statement filters them out),
-// so an empty list means "no client reported one", never "no mismatches".
+// byHpMismatch adds the WebGPU high-performance adapter's family, and holds ONLY
+// the rows where it differs from glModel: the page is rendering on one GPU while
+// the machine offers another. The statement filters both the adapter-less rows
+// and the agreeing ones out before ranking, so the list means what its name
+// says and its cap can never truncate the signal in favour of agreement. An
+// empty list therefore means "no mismatch reported", and the agreeing
+// population is not counted here at all (byModel is the denominator).
 export interface PerfHpAdapterBucket extends PerfModelBucket {
   gpuHpAdapter: string;
 }
@@ -91,6 +93,26 @@ export const PERF_SUMMARY_LIMITS = Object.freeze({
   // sanitizer-approved ids can reach the column, so this cap is defensive.
   suggestionCounts: 12,
 } as const);
+
+/**
+ * Minimum reports a (os, model) group needs before the GPU model statement
+ * aggregates it.
+ *
+ * Not a display nicety: gl_model is derived from a client-supplied renderer
+ * string, so while every KEY is shape-bounded, the number of DISTINCT keys is
+ * attacker-influenced. The per-set rank caps bound what crosses to Node but not
+ * what Postgres sorts, so without a floor a wide spread of junk keys makes the
+ * server materialize and sort hundreds of thousands of groups to return 100
+ * rows. The floor makes that structural: surviving groups are at most the
+ * window's row count divided by this number.
+ *
+ * Interpolated into SQL text, so it is a module constant, not a parameter.
+ * The cost is that a group seen fewer than this many times in the window is not
+ * counted; both lists are volume-ranked and capped at 50, so on a real fleet
+ * such a group could never have been shown anyway, and single-report forensics
+ * ride clientPerfRaw instead.
+ */
+export const PERF_SUMMARY_MIN_GROUP_SAMPLES = 5;
 
 // Clamp an admin-supplied hours window to whole hours in [1, 168]; a non-finite
 // input falls back to the 24h default. Shared by clientPerfSummary and clientPerfRaw.

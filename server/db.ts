@@ -1289,9 +1289,6 @@ export async function ensureSchema(): Promise<void> {
     await client.query(AD_SPEND_SCHEMA);
     await client.query(SOCIAL_SCHEMA);
     await client.query(ADMIN_GUILDS_SCHEMA);
-    // Client perf telemetry: its account_id/character_id reference the core
-    // tables, so it runs after SCHEMA under the same boot advisory lock.
-    await client.query(CLIENT_PERF_SCHEMA);
     await client.query(SEEKER_ENTITLEMENT_SCHEMA);
     await client.query(OAUTH_SCHEMA);
     // Discord integration tables (links, oauth states, pending logins, reward
@@ -1391,6 +1388,10 @@ export async function ensureSchema(): Promise<void> {
         `[mail-partition-backfill] applied for realm ${REALM} (legacyRowFound=${mailBackfill.legacyRowFound}, recipients=${mailBackfill.recipientCount})`,
       );
     }
+    // Client perf telemetry: after SCHEMA (its FKs reference accounts and
+    // characters), late for the storage-purchase reason below (ADD COLUMN locks
+    // the highest-insert-rate table until COMMIT). Ordering pinned in tests.
+    await client.query(CLIENT_PERF_SCHEMA);
     // Storage purchase parent triggers land late so their first-rollout table
     // locks are held only briefly before COMMIT.
     await client.query(STORAGE_PURCHASE_SCHEMA);
