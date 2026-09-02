@@ -397,7 +397,6 @@ import {
 } from './link_rate_budget';
 import { runWorldGateTouchLane } from './linked_program_touch_lane';
 import * as liveProgramWatch from './live_program_watch';
-import { renderLoadMeasure } from './load_marks';
 import {
   type LocoState,
   type LocoTrack,
@@ -588,6 +587,7 @@ import {
   type RenderableDiagnosticObject,
   RenderDiagnostics,
 } from './render_diagnostics';
+import { createRendererBuildDiag } from './renderer_build_diag';
 import { measureFeatureFootprint, setRenderCategory } from './renderer_diagnostics';
 import { snapshotRendererFrameStats } from './renderer_frame_stats_snapshot';
 import {
@@ -670,6 +670,7 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
+import { SpiritGrade } from './spirit_grade';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -1902,6 +1903,7 @@ export class Renderer {
   private viewport = { width: 1, height: 1 };
   private viewportPollTimer = 0;
   private readonly nameplateCadence = createNameplateCadenceState();
+  private spiritGrade: SpiritGrade;
   private glVendor = '';
   private glRenderer = '';
   private contextLostCount = 0;
@@ -2008,27 +2010,8 @@ export class Renderer {
     setBuildSpanSink(this.buildLedger.record); // view-part:* spans: 'part' lane, out of the frame spend
     // biome-ignore format: Keep the established constructor body stable inside the failure guard.
     try {
-    // Dev-channel build-phase telemetry (English, console.info, Release-silent):
-    // the iPhone 17 Pro WebContent kill lands INSIDE this constructor, after
-    // every preload completes, so localizing which build phase tips the memory
-    // ceiling requires a marker between phases. Wall-clock only, no allocation.
-    // Every segment also stamps a 'woc:load:renderer-ctor/<phase>' measure for
-    // the boot profiler (window.__loadProfile), unconditionally: marks are
-    // cheap and the profiler needs them on production-class devices too.
-    const bdStart = performance.now();
-    let bdLast = bdStart;
-    const bd = (phase: string): void => {
-      const now = performance.now();
-      renderLoadMeasure(`renderer-ctor/${phase}`, bdLast, now);
-      // Gated like [load-diag] and the residency table: dev browsers plus the
-      // iOS WebKit profile under diagnosis, never the production web console.
-      if (import.meta.env.DEV || GFX.iosMemoryProfile) {
-        console.info(
-          `[build-diag] ${phase} +${(now - bdLast).toFixed(0)}ms (total ${(now - bdStart).toFixed(0)}ms)`,
-        );
-      }
-      bdLast = now;
-    };
+    // Dev-channel build-phase telemetry; see renderer_build_diag.ts.
+    const bd = createRendererBuildDiag();
     // The scene root sits at identity forever; with matrixAutoUpdate on it
     // recomposes each frame and three's updateMatrixWorld force-cascades the
     // multiply through every auto-update descendant (r185 still bypasses the
@@ -3134,6 +3117,9 @@ export class Renderer {
         { gradeOnly: !GFX.composer },
       );
 
+    // Ghost tint: the grade pass on composer/grade tiers, the base.css filter on
+    // low. See spirit_grade.ts.
+    this.spiritGrade = new SpiritGrade(canvas, this.post, () => this.reducedMotion());
     bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);
     window.addEventListener('orientationchange', this.onOrientationChange);
@@ -12310,6 +12296,7 @@ export class Renderer {
       nameplateIntervalSec(coerceFxTier(document.documentElement.dataset.fxLevel)),
     );
     this.nameplatePainter.update(fullNameplatePass);
+    this.spiritGrade.update(dt, p.dead && p.ghost);
     this.updateChatBubbles();
     phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);
     this.updateTravelSpeedFx(p, selfPos, dt);

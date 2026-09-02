@@ -124,6 +124,10 @@ export interface PostPipeline {
   /** Advance ripple ages / flash decay and re-project onto the camera; call
    *  once per frame before render(). Toggles the pass off when idle. */
   updateScreenFx(dt: number): void;
+  /** Spirit-mode (ghost) grade amount, 0 alive to 1 fully drained. Folded into
+   *  the output grade pass both chains share, replacing the CSS canvas filter
+   *  (src/render/spirit_grade.ts). */
+  setSpiritGrade(amount: number): void;
 }
 
 export function buildComposer(
@@ -312,6 +316,9 @@ export function buildComposer(
     screenFlash(strength: number): void {
       if (!screenFx) return;
       flash = Math.min(0.4, Math.max(flash, strength));
+    },
+    setSpiritGrade(amount: number): void {
+      grade.uniforms.uSpirit.value = amount;
     },
     updateScreenFx(dt: number): void {
       if (!screenFx) return;
