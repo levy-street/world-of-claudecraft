@@ -9,7 +9,7 @@ import {
 // The live sun geometry: SUN_ANCHOR (90, 62, 50) direction, the 210 u ortho
 // box (2 * S with S = 105 in renderer.ts; the wiring pin in
 // tests/shadow_render_wiring.test.ts holds the renderer to that derivation)
-// over the High-tier 4096 map, ~5.1 cm texels.
+// over the ultra-tier 4096 map, ~5.1 cm texels (High renders 2560, ~8.2 cm).
 const DIR = { x: 90, y: 62, z: 50 };
 const TEXEL = shadowTexelWorldSize(210, 4096);
 

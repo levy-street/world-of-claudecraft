@@ -2287,9 +2287,9 @@ export class Renderer {
     sun.shadow.camera.far = 480;
     // 105u half-extent: the 31° sun throws shadows ~1.7x an object's height,
     // so the frustum must reach further sunward than the old 95 to catch
-    // off-screen casters; ~5.1cm texels at 4096, which the PCF radius below
-    // softens over anyway. (115 cost real shadow-pass draw calls at ultra;
-    // 105 keeps most of the reach.)
+    // off-screen casters; ~5.1cm texels at 4096 and ~8.2cm at High's 2560,
+    // which the PCF radius below softens over anyway. (115 cost real
+    // shadow-pass draw calls at ultra; 105 keeps most of the reach.)
     const S = LOW_GFX ? 85 : 105;
     sun.shadow.camera.left = -S;
     sun.shadow.camera.right = S;
@@ -5564,7 +5564,7 @@ export class Renderer {
       }
 
       // Keep the real shadow-enabled colour-program variant, but do not rebuild
-      // Insane's 4096px shadow map for every child upload. The separate shadow
+      // the ultra tiers' 4096px shadow map for every child upload. The shadow
       // compile lane above already links the skinned depth variants.
       this.webgl.shadowMap.autoUpdate = false;
       this.webgl.shadowMap.needsUpdate = false;

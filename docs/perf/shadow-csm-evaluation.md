@@ -57,12 +57,17 @@ From the sun setup in `src/render/renderer.ts`:
 | `shadowMap.type` | `THREE.PCFShadowMap` |
 | Map size | `GFX.shadowMap` |
 
-`GFX.shadowMap` per profile (`src/render/gfx.ts`): 4096 high/ultra/insane, 2560
-medium, 1536 medium-constrained, 2048 low and constrained, 1024 iOS memory
-profile. `GFX.dynamicShadows` is false on low and on constrained memory, so
+`GFX.shadowMap` per profile (`src/render/gfx.ts`): 4096 ultra/insane, 2560 high
+and medium, 2048 high-constrained, 1536 medium-constrained, 2048 low and
+constrained, 1024 iOS memory profile. High moved from 4096 to 2560 after this
+evaluation was written: at the 210 u box that is ~8.2 cm per texel against
+~5.1 cm, inside what the 2.25-texel PCF radius filters over anyway, and it
+quarters the pass's clear and sampling footprint on the tier most likely to be
+draw-bound. `GFX.dynamicShadows` is false on low and on constrained memory, so
 the shadow pass does not exist at all on the phone-class profiles. The advanced
-Shadow Quality dial now caps at 4096 (the retired 8192 rung falls through to the
-High base).
+Shadow Quality dial caps at 4096, and its top rung is an explicit write (the
+retired 8192 rung lands on it), so a player who chose the top rung keeps the
+showcase map even though the High tier base no longer allocates it.
 
 Texel snapping landed on this branch: `shadowTexelWorldSize` and
 `snapShadowAnchor` in `src/render/shadow_texel_snap_core.ts`, consumed by the
@@ -140,7 +145,8 @@ exactly one cascade: still 17 taps, not 34.
 
 ## 3. Texel density
 
-World units per shadow texel. Current single map over the 210 u box:
+World units per shadow texel. Current single map over the 210 u box (4096 is
+the ultra/insane allocation, 2560 the high/medium one):
 
 | Map size | u per texel | cm per texel |
 |---|---|---|
@@ -405,7 +411,9 @@ a large surface and no existing guard.
 `shadow.radius` is honored per `LightShadow`, so each cascade carries its own.
 `PCFShadowMap`'s kernel offsets are `texelSize * shadowRadius`, and `texelSize`
 is `1.0 / shadowMapSize`, that is in TEXELS, not world units. With one map,
-radius 2.25 at 5.13 cm per texel is a world-space penumbra of about 11.5 cm.
+radius 2.25 at 5.13 cm per texel is a world-space penumbra of about 11.5 cm
+(about 18.5 cm on the high tier's 2560 map: the kernel offsets are in texels,
+so the penumbra widens with the texel).
 With cascades the same radius means about 6.5 cm on the near cascade and about
 27 cm on the far one. Keeping today's look means retuning radius per cascade
 (roughly 4.0 near, 0.95 far at fov 60 and 16:9), and the retune is
