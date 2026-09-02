@@ -564,7 +564,6 @@ import { createPrewarmResumeLedger } from './prewarm_resume_ledger_core';
 import { type PriestMarkersVisual, syncPriestMarkersVisual } from './priest_markers_visual';
 import { pieceProgramSettle } from './program_variant_settle';
 import { buildPropMaterialPrewarmGroup, buildProps, propResidencySources } from './props';
-
 import { makeQuestObjectGate, type QuestObjectGateOptions } from './quest_object_gate_core';
 import { buildGroundQuestObject } from './quest_objects';
 import { RaceLine } from './race_line';
@@ -599,6 +598,7 @@ import {
   type RendererFramePhaseMs,
   type RendererWorldPhaseMs,
 } from './renderer_frame_telemetry_core';
+import { createRendererGlContext } from './renderer_gl_context';
 import type {
   RendererFrameStats,
   RendererPerfStats,
@@ -2043,7 +2043,8 @@ export class Renderer {
     // after the context exists) with the most expensive setting there is.
     this.webgl = new THREE.WebGLRenderer({
       canvas,
-      context: options.context,
+      // Opaque world surface; see renderer_gl_context.ts (?canvasalpha=on A/B).
+      context: options.context ?? createRendererGlContext(canvas) ?? undefined,
       antialias: false,
       powerPreference: 'high-performance',
     });
