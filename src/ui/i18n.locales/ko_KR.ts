@@ -11602,6 +11602,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.filterAll': '전체',
   'hudChrome.reliquary.filterOwned': '수록됨',
   'hudChrome.reliquary.filterMissing': '아직 없음',
+  'hudChrome.reliquary.filterIlluminated': '조명됨',
+  'hudChrome.reliquary.filterRemaining': '남음',
+  'hudChrome.reliquary.filterEmptyPages': '이 필터와 일치하는 페이지가 없습니다.',
+  'hudChrome.reliquary.filterGroupAriaPages': '조명 여부로 페이지 필터',
   'hudChrome.reliquary.gridKeyboardHint':
     '방향키로 성물 사이를 이동하고, Home 키와 End 키로 처음과 끝으로 이동합니다.',
   'hudChrome.plurals.reliquarySearchResults.one': '결과 {count}개.',

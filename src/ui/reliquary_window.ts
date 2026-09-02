@@ -125,6 +125,12 @@ const FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
   owned: 'hudChrome.reliquary.filterOwned',
   missing: 'hudChrome.reliquary.filterMissing',
 };
+/** The shelf's reading of the same chip state: whole pages, by illumination. */
+const SHELF_FILTER_LABEL_KEYS: Record<ReliquaryOwnedFilter, TranslationKey> = {
+  all: 'hudChrome.reliquary.filterAll',
+  owned: 'hudChrome.reliquary.filterIlluminated',
+  missing: 'hudChrome.reliquary.filterRemaining',
+};
 
 /**
  * Hud-supplied glue: shared presentation bag plus the window surface (world
@@ -194,6 +200,8 @@ export class ReliquaryWindow {
   /** Last LOGICAL (pre-marker) announcement, so a world-driven repaint with an
    *  unchanged count never re-marks the region (see announceResults). */
   private lastAnnounced = '';
+  /** The narrowing controls behind lastAnnounced (nav, page, needle, chip). */
+  private lastAnnouncedKey = '';
   // Forces a byte-different write when two keystrokes narrow to the SAME count,
   // so the region still re-reads (the shared DOM-free deterministic marker).
   private readonly liveReannounce = new ReannounceMarker();
@@ -715,6 +723,7 @@ export class ReliquaryWindow {
       // re-narrowing to the same count later still announces cleanly.
       live.textContent = '';
       this.lastAnnounced = '';
+      this.lastAnnouncedKey = '';
       this.liveReannounce.reset();
       return;
     }
@@ -730,8 +739,18 @@ export class ReliquaryWindow {
     // it would make the reader re-read "N results." the player never asked
     // about. Player-driven renders always mark, so two keystrokes landing on
     // the same count still announce.
-    if (worldDriven && text === this.lastAnnounced) return;
+    // A player-driven repaint that changed NEITHER narrowing control (needle,
+    // chip) nor the surface, with the same count, stays silent too: a pin
+    // toggle on a shelf the sticky chip narrows is not a new narrowing, and
+    // re-reading "N results." for it is the noise the chip-on-shelf reach
+    // would otherwise add. Two keystrokes landing on the same count still
+    // announce, because the needle moved.
+    const narrowKey = `${model.nav}|${model.pageId ?? ''}|${this.search}|${this.ownedFilter}`;
+    if (text === this.lastAnnounced && (worldDriven || narrowKey === this.lastAnnouncedKey)) {
+      return;
+    }
     this.lastAnnounced = text;
+    this.lastAnnouncedKey = narrowKey;
     live.textContent = this.liveReannounce.mark(text);
   }
 
@@ -1228,12 +1247,12 @@ export class ReliquaryWindow {
   }
 
   private shelfListHtml(model: ReliquaryViewModel): string {
+    // The same chip row the open page paints, so hiding illuminated pages is
+    // one click on the shelf itself: the chip is shared state, and it carries
+    // into the page a player opens from the narrowed list.
+    const filterBar = this.filterBarHtml('shelf');
     if (model.shelfPages.length === 0) {
-      return `<div class="reliquary-empty">${esc(
-        this.searchActive()
-          ? t('hudChrome.reliquary.searchEmpty')
-          : t('hudChrome.reliquary.shelfEmpty'),
-      )}</div>`;
+      return `${filterBar}<div class="reliquary-empty">${esc(this.emptyGridText(model.filtered, 'shelf'))}</div>`;
     }
     // A real ul/li list, the professions window's structure: the row stays a
     // button (button semantics, one tab stop each) inside its own listitem, so
@@ -1266,7 +1285,7 @@ export class ReliquaryWindow {
         );
       })
       .join('');
-    return `<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
+    return `${filterBar}<ul class="reliquary-page-list" role="list" aria-label="${esc(t(NAV_LABEL_KEYS[model.nav]))}">${rows}</ul>`;
   }
 
   /**
@@ -1437,28 +1456,45 @@ export class ReliquaryWindow {
   }
 
   /**
-   * Which "nothing here" line an empty grid shows. Search wins when a needle is
+   * Which "nothing here" line an empty grid or an empty shelf list shows. Search wins when a needle is
    * live (it is the narrowing the player just performed), then the chip, then
    * the page is genuinely empty. Blaming a search a player never typed, because
    * they clicked Catalogued on a page they own nothing on, sends them looking
    * for a search box to clear.
    */
-  private emptyGridText(filtered: boolean): string {
+  private emptyGridText(filtered: boolean, surface: 'grid' | 'shelf' = 'grid'): string {
     if (this.searchActive()) return t('hudChrome.reliquary.searchEmpty');
-    if (filtered || this.ownedFilter !== 'all') return t('hudChrome.reliquary.filterEmpty');
+    if (filtered || this.ownedFilter !== 'all') {
+      // The shelf narrows PAGES, so its line says pages: blaming missing
+      // relics on a list that holds none would send the player into a page.
+      return surface === 'shelf'
+        ? t('hudChrome.reliquary.filterEmptyPages')
+        : t('hudChrome.reliquary.filterEmpty');
+    }
     return t('hudChrome.reliquary.shelfEmpty');
   }
 
-  private filterBarHtml(): string {
+  /**
+   * The chip row. One state, two readings: on a grid the chips split relics
+   * by ownership; on a shelf the same state splits pages by illumination, so
+   * the shelf paints its own labels and group name while the data-filter ids
+   * and focus keys stay identical (the pressed chip carries across surfaces).
+   */
+  private filterBarHtml(surface: 'grid' | 'shelf' = 'grid'): string {
+    const labels = surface === 'shelf' ? SHELF_FILTER_LABEL_KEYS : FILTER_LABEL_KEYS;
     const chips = RELIQUARY_OWNED_FILTERS.map((filter) => {
       const on = this.ownedFilter === filter;
       return (
         `<button type="button" class="reliquary-filter-chip${on ? ' active' : ''}" ` +
         `data-filter="${esc(filter)}" data-focus-key="${esc(`filter:${filter}`)}" aria-pressed="${on}">` +
-        `${esc(t(FILTER_LABEL_KEYS[filter]))}</button>`
+        `${esc(t(labels[filter]))}</button>`
       );
     }).join('');
-    return `<div class="reliquary-filterbar" role="group" aria-label="${esc(t('hudChrome.reliquary.filterGroupAria'))}">${chips}</div>`;
+    const groupAria =
+      surface === 'shelf'
+        ? t('hudChrome.reliquary.filterGroupAriaPages')
+        : t('hudChrome.reliquary.filterGroupAria');
+    return `<div class="reliquary-filterbar" role="group" aria-label="${esc(groupAria)}">${chips}</div>`;
   }
 
   private cellHtml(

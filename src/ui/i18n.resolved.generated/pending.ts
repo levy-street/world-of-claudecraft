@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "es_ES": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "fr_FR": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "fr_CA": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "de_DE": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "nl_NL": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "pl_PL": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "id_ID": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "tr_TR": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "sv_SE": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "vi_VN": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ],
+  "da_DK": [
+    "hudChrome.reliquary.filterEmptyPages",
+    "hudChrome.reliquary.filterGroupAriaPages",
+    "hudChrome.reliquary.filterIlluminated",
+    "hudChrome.reliquary.filterRemaining"
+  ]
 };

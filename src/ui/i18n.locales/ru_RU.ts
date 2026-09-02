@@ -11833,6 +11833,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.filterAll': 'Все',
   'hudChrome.reliquary.filterOwned': 'Каталогизированы',
   'hudChrome.reliquary.filterMissing': 'Не найдены',
+  'hudChrome.reliquary.filterIlluminated': 'Озарено',
+  'hudChrome.reliquary.filterRemaining': 'Осталось',
+  'hudChrome.reliquary.filterEmptyPages': 'По этому фильтру страниц нет.',
+  'hudChrome.reliquary.filterGroupAriaPages': 'Фильтр страниц по тому, озарены ли они',
   'hudChrome.reliquary.gridKeyboardHint':
     'Используйте стрелки для перехода между реликвиями, Home и End для перехода к началу и концу.',
   'hudChrome.plurals.reliquarySearchResults.one': '{count} результат.',

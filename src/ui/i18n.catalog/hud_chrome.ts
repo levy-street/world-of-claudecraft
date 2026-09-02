@@ -6010,6 +6010,13 @@ export const hudChromeStrings = {
     filterAll: 'All',
     filterOwned: 'Catalogued',
     filterMissing: 'Missing',
+    // The same chip state on a SHELF narrows whole pages by illumination, so
+    // the shelf paints its own labels, empty line and group name: a page is
+    // illuminated or still has relics remaining, never "catalogued".
+    filterIlluminated: 'Illuminated',
+    filterRemaining: 'Remaining',
+    filterEmptyPages: 'No pages match this filter.',
+    filterGroupAriaPages: 'Filter pages by whether they are illuminated',
     // Phase 14: the Overview becomes the way IN to the catalog. Recent finds
     // are jump buttons, each strip keeps its label and explains itself when
     // empty, and three shelf cards summarize the shelves the rail lists.

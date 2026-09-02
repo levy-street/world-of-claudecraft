@@ -5717,6 +5717,47 @@ export const TARGETS = [
     },
   },
   {
+    key: 'reliquary-shelf-filter',
+    label: 'The Reliquary: Conquerors shelf under the Missing chip (illuminated page hidden)',
+    when: ['ui/reliquary_view', 'ui/reliquary_window'],
+    variants: [
+      { key: 'desktop', beforeLoad: seedLowGraphicsPreset },
+      { key: 'mobile', mobile: true, beforeLoad: seedLowGraphicsPreset },
+    ],
+    async capture(page) {
+      await page.evaluate(() => document.getElementById('tutorial-greeting')?.remove());
+      const pageIds = await openReliquaryConquerorsShelf(page);
+      const target = pageIds.includes('conquerors_hollow_crypt')
+        ? 'conquerors_hollow_crypt'
+        : pageIds[0];
+      if (!target) throw new Error('reliquary shelf listed no pages');
+      // Illuminate ONE page by reading its own cells (never a hard-coded relic
+      // list), then return to the shelf and press Missing: the shot is the
+      // shelf with that page gone and the chip row pressed. On a base tree
+      // with no shelf chips the click is a no-op, so the same recipe yields
+      // the honest before shot (full list, illuminated badge showing).
+      await page.evaluate((id) => {
+        document.querySelector(`#reliquary-window [data-page="${id}"]`)?.click();
+      }, target);
+      await wait(250);
+      await page.evaluate(() => {
+        const discovered = window.__game?.sim?.deedStats?.itemsDiscovered;
+        for (const cell of document.querySelectorAll('#reliquary-window .reliquary-cell')) {
+          if (cell.dataset.cellKind === 'item' && cell.dataset.cellId) {
+            discovered?.add(cell.dataset.cellId);
+          }
+        }
+        document.querySelector('#reliquary-window [data-back]')?.click();
+      });
+      await wait(250);
+      await page.evaluate(() => {
+        document.querySelector('#reliquary-window [data-filter="missing"]')?.click();
+      });
+      await wait(300);
+      return { clip: '#reliquary-window' };
+    },
+  },
+  {
     key: 'reliquary-page',
     label: 'The Reliquary: multi-boss page detail with a focused missing cell',
     when: [

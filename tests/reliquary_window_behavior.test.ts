@@ -1500,20 +1500,46 @@ describe('ReliquaryWindow: search filtering', () => {
     expect(second.trim()).toBe(first.trim());
   });
 
+  it('does not re-announce a shelf the sticky chip narrows on a repaint that moved no control', () => {
+    // With the chip reaching the shelf, a pin toggle or a rail round trip on
+    // a narrowed shelf is a player-driven repaint with an unchanged count and
+    // unchanged controls: re-reading "N results." for it is noise. A moved
+    // control (the chip, the needle) with the same count still announces.
+    const state = baseState();
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'conquerors' });
+    click(rig.el, '[data-filter="missing"]');
+    const first = liveRegion(rig.el)?.textContent ?? '';
+    expect(first).not.toBe('');
+    // A pin toggle repaints the shelf; nothing narrowed anew.
+    const pin = rig.el.querySelector<HTMLElement>('[data-pin]');
+    expect(pin).not.toBeNull();
+    pin?.click();
+    expect(liveRegion(rig.el)?.textContent).toBe(first);
+    // Same chip pressed again: the control did not move either.
+    click(rig.el, '[data-filter="missing"]');
+    expect(liveRegion(rig.el)?.textContent).toBe(first);
+    // Clearing then re-pressing the chip is a new narrowing: it announces anew.
+    click(rig.el, '[data-filter="all"]');
+    expect(liveRegion(rig.el)?.textContent).toBe('');
+    click(rig.el, '[data-filter="missing"]');
+    expect(liveRegion(rig.el)?.textContent).not.toBe('');
+  });
+
   it('goes silent again when Back leaves a page whose chip is still set', () => {
     const state = baseState();
     state.itemsDiscovered.add(relicIds(PAGE_ID)[0] ?? '');
     const rig = openPage(state);
-    click(rig.el, '[data-filter="owned"]');
+    click(rig.el, '[data-filter="missing"]');
     expect(liveRegion(rig.el)?.textContent).not.toBe('');
 
     // ownedFilter is sticky for the session, so a gate that read the CHIP would
     // keep announcing a count on the shelf that nothing narrowed, on every
-    // slow-band repaint. The gate reads what THIS paint narrowed instead. (The
-    // chip row lives inside the page detail, so it is gone from the shelf; its
-    // persistence is proven by re-entering the page below.)
+    // slow-band repaint. The gate reads what THIS paint narrowed instead: on
+    // the shelf the Missing chip hides only ILLUMINATED pages, and this
+    // account has none, so the chip stays pressed yet narrows nothing.
     click(rig.el, '[data-back]');
-    expect(rig.el.querySelector('.reliquary-filterbar')).toBeNull();
+    expect(must(rig.el, '[data-filter="missing"]').getAttribute('aria-pressed')).toBe('true');
     expect(liveRegion(rig.el)?.textContent).toBe('');
     rig.w.render();
     expect(liveRegion(rig.el)?.textContent).toBe('');
@@ -1521,7 +1547,7 @@ describe('ReliquaryWindow: search filtering', () => {
     // Re-entering the page: the chip really did survive, and the announcement
     // comes back with it, so the silence above was the gate and not a reset.
     click(rig.el, `[data-page="${PAGE_ID}"]`);
-    expect(must(rig.el, '[data-filter="owned"]').getAttribute('aria-pressed')).toBe('true');
+    expect(must(rig.el, '[data-filter="missing"]').getAttribute('aria-pressed')).toBe('true');
     expect(liveRegion(rig.el)?.textContent).not.toBe('');
   });
 
@@ -1798,6 +1824,70 @@ describe('ReliquaryWindow: owned and missing filter chips', () => {
     expect(missing.classList.contains('active')).toBe(true);
     expect(must(rig.el, '[data-filter="all"]').getAttribute('aria-pressed')).toBe('false');
     expect(must(rig.el, '[data-filter="owned"]').getAttribute('aria-pressed')).toBe('false');
+  });
+
+  it('paints the chips on the shelf list, and Missing hides an illuminated page there', () => {
+    // The chips live on the shelf too, so a completionist hides what is done
+    // and reads only the pages with relics left, without opening each one.
+    const state = baseState();
+    for (const id of relicIds(PAGE_ID)) state.itemsDiscovered.add(id);
+    const rig = makeWindow(state, { nav: 'conquerors' });
+    const rows = () =>
+      [...rig.el.querySelectorAll<HTMLElement>('.reliquary-page-row[data-page]')].map(
+        (node) => node.dataset.page,
+      );
+    expect(rig.el.querySelector('.reliquary-page-list .reliquary-page-row')).not.toBeNull();
+    expect(rows()).toContain(PAGE_ID);
+    // The shelf reads the shared state in page terms: the group and the two
+    // narrowing chips say pages and illumination, never relics.
+    expect(must(rig.el, '.reliquary-filterbar').getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.filterGroupAriaPages'),
+    );
+    expect(must(rig.el, '[data-filter="owned"]').textContent).toBe(
+      t('hudChrome.reliquary.filterIlluminated'),
+    );
+    expect(must(rig.el, '[data-filter="missing"]').textContent).toBe(
+      t('hudChrome.reliquary.filterRemaining'),
+    );
+    focusClick(rig.el, '[data-filter="missing"]');
+    expect(rows()).not.toContain(PAGE_ID);
+    expect(rows().length).toBeGreaterThan(0);
+    const pressed = must(rig.el, '[data-filter="missing"]');
+    expect(pressed.getAttribute('aria-pressed')).toBe('true');
+    // The click rebuilds the window; the focus key puts focus back on the chip.
+    expect(document.activeElement).toBe(pressed);
+    // Catalogued is the mirror: the illuminated page alone.
+    click(rig.el, '[data-filter="owned"]');
+    expect(rows()).toEqual([PAGE_ID]);
+    // The chip is shared state: opening a page from the narrowed list keeps
+    // it pressed on the grid, and Back returns to the narrowed shelf.
+    click(rig.el, `[data-page="${PAGE_ID}"]`);
+    const gridChip = must(rig.el, '[data-filter="owned"]');
+    expect(gridChip.getAttribute('aria-pressed')).toBe('true');
+    // And the grid keeps its own relic wording for the same pressed state.
+    expect(gridChip.textContent).toBe(t('hudChrome.reliquary.filterOwned'));
+    expect(must(rig.el, '.reliquary-filterbar').getAttribute('aria-label')).toBe(
+      t('hudChrome.reliquary.filterGroupAria'),
+    );
+    click(rig.el, '[data-back]');
+    expect(rows()).toEqual([PAGE_ID]);
+  });
+
+  it('shows the chip empty line, not the search line, when a chip empties the shelf', () => {
+    const state = baseState();
+    const rig = makeWindow(state, { nav: 'conquerors' });
+    // A fresh account owns nothing, so Catalogued leaves no page to list.
+    focusClick(rig.el, '[data-filter="owned"]');
+    expect(rig.el.querySelectorAll('.reliquary-page-row')).toHaveLength(0);
+    expect(must(rig.el, '.reliquary-empty').textContent).toBe(
+      t('hudChrome.reliquary.filterEmptyPages'),
+    );
+    // The chip row must still paint on the empty shelf: the only way back,
+    // and focus stays on the chip that emptied it rather than falling to Close.
+    expect(must(rig.el, '[data-filter="all"]')).toBeTruthy();
+    expect(document.activeElement).toBe(must(rig.el, '[data-filter="owned"]'));
+    click(rig.el, '[data-filter="all"]');
+    expect(rig.el.querySelectorAll('.reliquary-page-row').length).toBeGreaterThan(0);
   });
 
   it('shows only owned cells under the owned chip', () => {

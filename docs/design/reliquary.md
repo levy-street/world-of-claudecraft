@@ -170,7 +170,7 @@ repeat at every growth. It owes a release-note line whenever a growth ships.
 
 | Surface | Notes |
 |---|---|
-| Reliquary window | Primary; DESIGN.md window grammar; mobile full-bleed. |
+| Reliquary window | Primary; DESIGN.md window grammar; mobile full-bleed. The All / Catalogued / Missing chip row is ONE shared state painted on both the shelf list and the open page: on a shelf, Catalogued keeps illuminated pages and Missing hides them (`shelfPagePassesOwnedFilter` in `src/ui/reliquary_view.ts`), so a completionist can read only what remains without opening every page. The rail and shelf-card totals never move under a chip. |
 | HUD tracker | Pinned-page strip beside the deed tracker, on by default behind the `showReliquaryTracker` master switch; pins persist per character (visibility and seat: the subsection below). |
 | Live toast / combat log | Relic logged; page Illumination; rank up. All four emitters are node-built and clickable, deep-linking to the page. |
 | Book of Deeds | Optional soft links from collection deeds, plus the "Titles and Borders" shelf. Earned heraldry options show their canonical seal and material sample; hover and focus preview the world and interaction forms without equipping. |
