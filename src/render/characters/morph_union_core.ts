@@ -13,6 +13,19 @@
 // target 3 are unrelated. `applyMorphs` already drives by name off each mesh's
 // own dictionary; this plan is the same rule pushed into the geometry.
 //
+// What the union COSTS, measured rather than assumed (2026-09-02, this repo's
+// Thornpeak hub, offline, gfx=high, Chrome on ANGLE/NVIDIA): the composed
+// body's merged buffer is 846 vertices x 14 targets, and three builds its
+// morph DataArrayTexture lazily in `WebGLMorphtargets.update()` on the FIRST
+// live draw, 185 KB of RGBA32F. That build is outside the compile gate's
+// upload lane, which only enumerates textures reachable from a material, so it
+// is paid in a live frame. Differentially measured against the same geometry
+// with its morph attributes stripped (so the vertex-buffer upload cancels out),
+// the morph half is 0.3 to 0.4 ms median, 0.4 ms worst, per composed part set:
+// under the bar that would earn it a priming arm, and far under what the nine
+// separate parts it replaced cost in draws. Re-measure before growing the
+// target list much past this.
+//
 // Three-free by design: the merge's one hard decision is decided by a plain
 // Vitest, not by building a rig.
 

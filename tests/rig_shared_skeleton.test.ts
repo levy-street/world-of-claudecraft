@@ -262,6 +262,40 @@ describe('shareRigSkeleton', () => {
     expect(prop.skeleton.bones).toEqual(otherBones);
   });
 
+  it('refuses two rigs that only LOOK alike to the cheap bucket key', () => {
+    // The bucket key is length plus the end joints, so two rigs agreeing on
+    // those land in one bucket; skinning one against the other's bones would be
+    // a broken pose, and the exact bone check is what stops it.
+    const bones = makeBones();
+    const root = new THREE.Object3D();
+    root.add(bones[0]);
+    const canon = restInverses(bones);
+    const mine = makePart(bones, canon, [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7]);
+    // Same first and last Bone, same count, a DIFFERENT bone in the middle.
+    const middle = new THREE.Bone();
+    const impostorBones = [bones[0], middle, bones[1]];
+    const mineThree = makePart(
+      [bones[0], bones[1], bones[1]],
+      [canon[0], canon[1], canon[1]],
+      [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7],
+    );
+    const impostor = makePart(
+      impostorBones,
+      [canon[0], canon[1].clone(), canon[1]],
+      [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7],
+    );
+    root.add(mine, mineThree, impostor);
+    root.updateMatrixWorld(true);
+
+    const stats = shareRigSkeleton(root);
+
+    // mine rides two bones and buckets alone; the other two share a key
+    expect(stats.refused).toBe(1);
+    // three's Skeleton constructor slices the array, so compare the BONES
+    expect(impostor.skeleton.bones[1]).toBe(middle);
+    expect(impostor.skeleton).not.toBe(mineThree.skeleton);
+  });
+
   it('refuses a part whose bind data no single transform explains', () => {
     const bones = makeBones();
     const canon = restInverses(bones);

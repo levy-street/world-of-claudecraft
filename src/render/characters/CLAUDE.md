@@ -54,6 +54,10 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
 - `rig_merge.ts`: merges a KayKit rig's quantized body-part SkinnedMeshes into
   one draw per material (`assets.ts` `assembleModel` calls it). Read its
   header bind-pose proof before touching bone inverses.
+- `morph_union_core.ts`: the union target list a merge pads its parts to, and
+  the one place the merged buffer's morph-texture cost is written down (three
+  builds that DataArrayTexture lazily at the first live draw, outside the
+  compile gate's upload lane; measured, see its header).
 - `rig_shared_skeleton.ts`: the same bind-pose proof applied WITHOUT merging, so
   a rig ends with ONE Skeleton, one palette flatten and one GPU bone texture
   however many parts it draws (`SkeletonUtils.clone` mints one per SkinnedMesh,

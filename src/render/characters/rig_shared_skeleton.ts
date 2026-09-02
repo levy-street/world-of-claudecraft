@@ -57,10 +57,26 @@ export interface ShareRigSkeletonOptions {
   preferCanonical?: (mesh: THREE.SkinnedMesh) => boolean;
 }
 
-/** The bones a mesh rides, as an identity. Meshes on different bone arrays are
- *  different rigs and must never be pulled onto one palette. */
+/** A CHEAP bucket key for the bones a mesh rides.
+ *
+ *  Deliberately not an identity: joining every uuid built a 23-segment string
+ *  per mesh per compose for a key that is read once. Length plus the first and
+ *  last joint is enough to separate the rigs this walk ever sees (every skin of
+ *  one asset lists the same joints in the same order, pinned by
+ *  `tests/rig_merge_assets.test.ts`; a held prop is a different clone with
+ *  different Bone objects), and a collision is CAUGHT rather than trusted:
+ *  `sameBones` re-checks object identity before any rebind. */
 function boneSetKey(mesh: THREE.SkinnedMesh): string {
-  return mesh.skeleton.bones.map((bone) => bone.uuid).join(',');
+  const bones = mesh.skeleton.bones;
+  return `${bones.length}|${bones[0].uuid}|${bones[bones.length - 1].uuid}`;
+}
+
+/** The exact check the cheap key above does not make: same bone OBJECTS, in the
+ *  same order. Allocation-free, and it is what makes the key safe to be loose. */
+function sameBones(a: readonly THREE.Bone[], b: readonly THREE.Bone[]): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
 }
 
 const IDENTITY_ELEMENTS = new THREE.Matrix4().elements.slice();
@@ -122,6 +138,13 @@ export function shareRigSkeleton(
 
     for (const mesh of meshes) {
       if (mesh.skeleton === canonSkeleton) continue;
+      // The cheap bucket key can pool two rigs that share a joint count and
+      // their end joints; skinning against another rig's bones would be a
+      // broken pose, so the exact check happens here.
+      if (!sameBones(canonSkeleton.bones, mesh.skeleton.bones)) {
+        stats.refused++;
+        continue;
+      }
       // Reference-equal inverses are the clone case: no algebra, no rebake.
       if (mesh.skeleton.boneInverses !== canonInverses) {
         const t = solveRebindTransform(canonInverses, mesh.skeleton.boneInverses);
