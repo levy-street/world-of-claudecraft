@@ -10026,6 +10026,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
+  'hudChrome.mounts.name_goblin_rocket_sled': '哥布林火箭雪橇',
+  'hudChrome.mounts.name_rallycart_rxt': '拉力卡丁车 RXT',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',
   'hudChrome.mounts.desc_valorsteed': '一匹坚韧稳健的骏马，可提升旅行速度。',
   'hudChrome.mounts.desc_grag_bear': '一头坚韧稳健的巨熊，可提升旅行速度。',
@@ -10040,6 +10042,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一只风暴所生的庞然大火鸡，从觉醒之峰昂首阔步而下，尾羽如雷云般展开。',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     '一台紧凑的装甲机械，配备重型履带、大口径火炮，以及为无畏驾驶员打造的鞍座。',
+  'hudChrome.mounts.desc_goblin_rocket_sled': '一辆结构过剩到危险的哥布林雪橇，靠双发火箭和极差的判断力推进。',
+  'hudChrome.mounts.desc_rallycart_rxt': '一辆小巧却地道的拉力赛车，能提升移动速度。',
   'hudChrome.mounts.desc_rickshaw_mount':
     '一辆嘎吱作响的骸骨货车，一具瘦骨嶙峋的杂兵被套在辕木间，拖着你狂奔向前。',
   'hudChrome.mounts.emptyTitle': '尚未收集坐骑',
@@ -10773,6 +10777,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最后的堡垒印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最后的堡垒那冰冷而寂静的大厅。',
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
+  'entities.items.reins_goblin_rocket_sled.name': '哥布林火箭雪橇点火钥匙',
+  'entities.items.reins_rallycart_rxt.name': '拉力卡丁车 RXT 点火钥匙',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',

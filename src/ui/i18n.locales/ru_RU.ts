@@ -10685,6 +10685,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
+  'hudChrome.mounts.name_goblin_rocket_sled': 'Гоблинские ракетные сани',
+  'hudChrome.mounts.name_rallycart_rxt': 'Ралликарт RXT',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',
   'hudChrome.mounts.desc_valorsteed':
     'Выносливый и твердо стоящий на ногах скакун, повышающий скорость передвижения.',
@@ -10702,6 +10704,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Исполинский индюк, рожденный бурей: он важно спускается с Пробуждающегося пика, распустив хвост, словно грозовой фронт.',
   'hudChrome.mounts.desc_terrorspark_groundshaker':
     'Компактная бронированная машина с тяжёлыми гусеницами, крупнокалиберной пушкой и седлом для бесстрашных пилотов.',
+  'hudChrome.mounts.desc_goblin_rocket_sled': 'Опасно переусложнённые гоблинские сани на двух ракетах и полном отсутствии здравого смысла.',
+  'hudChrome.mounts.desc_rallycart_rxt': 'Компактная, но самая настоящая раллийная машина, повышающая скорость передвижения.',
   'hudChrome.mounts.desc_rickshaw_mount':
     'Дребезжащая костяная повозка, к оглоблям которой впряжен костлявый воин-скелет, тащащий вас во весь опор.',
   'hudChrome.mounts.emptyTitle': 'Скакунов пока нет',
@@ -11503,6 +11507,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': 'Печатка Последнего оплота',
   'entities.dungeons.the_last_keep.enterText': 'Вы входите в холодные безмолвные залы Последнего оплота.',
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
+  'entities.items.reins_goblin_rocket_sled.name': 'Ключ зажигания гоблинских ракетных саней',
+  'entities.items.reins_rallycart_rxt.name': 'Ключ зажигания ралликарта RXT',
   'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',

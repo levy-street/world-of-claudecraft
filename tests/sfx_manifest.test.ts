@@ -164,11 +164,12 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 268-key inventory', () => {
+  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 285-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
-    // 268 = the release catalog plus the two gendered player-voice keys from
-    // PR #2320 and the rickshaw mount's summon/loop cues.
-    expect(keys.size).toBe(268);
+    // 285 = the merged catalog: the release line (rickshaw summon/loop and the
+    // gendered player-voice keys included) plus this branch's sled and
+    // rallycart cues.
+    expect(keys.size).toBe(285);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
@@ -246,7 +247,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(268);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(285);
   });
 });
 

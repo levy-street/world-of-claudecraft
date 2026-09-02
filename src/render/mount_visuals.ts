@@ -20,6 +20,8 @@ export interface MountVisualSpec {
   /** World-unit rider shift along facing (negative = toward the tail) for
    *  mounts whose saddle sits off the model origin (the toad's is well back). */
   seatFwd: number;
+  /** Mount-specific clearance above the terrain before procedural bob. */
+  groundLift: number;
   /** Carries baked Idle/Walk/Run gait clips (scripts/bake_mount_gaits.mjs).
    *  The clipless rest render their generated standing pose and move via the
    *  bob below. */
@@ -34,7 +36,7 @@ export interface MountVisualSpec {
   bobShape: 'hover' | 'hop';
   /** Ambient particle effect the renderer emits for this mount: the snail's
    *  slime path while moving, the hover cycle's aether exhaust. */
-  fx: 'slime' | 'exhaust' | null;
+  fx: 'slime' | 'exhaust' | 'pipes' | null;
 }
 
 const spec = (
@@ -43,12 +45,14 @@ const spec = (
   rigged: boolean,
   bob?: { amp: number; hz: number; idle?: boolean; shape?: 'hover' | 'hop' },
   seatFwd = 0,
-  fx: 'slime' | 'exhaust' | null = null,
+  fx: 'slime' | 'exhaust' | 'pipes' | null = null,
+  groundLift = 0,
   jumpTips = false,
 ): MountVisualSpec => ({
   visualKey,
   seat,
   seatFwd,
+  groundLift,
   rigged,
   bobAmp: bob?.amp ?? 0,
   bobHz: bob?.hz ?? 0,
@@ -80,9 +84,27 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // ships its authored strut cycle as Walk/Run plus a baked breathing Idle;
   // the saddle sits over the hips, behind the neck (hence the rear shift)
   thunderstrut_gobbler: spec('mount_thunderstrut_gobbler', 2.05, true, undefined, -0.15),
+  // Clipless rocket vehicle. Its mount-owned controller drives the exhaust;
+  // the subtle hover engages only under thrust, while the rider rests directly
+  // on the authored cushion when parked.
+  goblin_rocket_sled: spec(
+    'mount_goblin_rocket_sled',
+    1.29,
+    false,
+    { amp: 0.045, hz: 2.1, shape: 'hover' },
+    0.28,
+    null,
+    0.09,
+  ),
   // Compact tracked vehicle with an authored rider socket behind the turret.
   // Its rigid-body clips animate the suspension and track wheels without a
   // procedural bob, keeping the pilot locked to the saddle.
+  // Seat solved in Blender against the car's real features rather than by eye:
+  // the rider's back lands on the backrest cushion face and the underside of
+  // his hips on the real sitting surface, which is the top of the cockpit's
+  // UPWARD-FACING geometry (model z 0.20). Measuring the max z of a probe box
+  // instead caught the base of the backrest and sat him a foot in the air.
+  rallycart_rxt: spec('mount_rallycart_rxt', 1.06, true, undefined, -0.86, 'pipes'),
   terrorspark_groundshaker: spec('mount_terrorspark_groundshaker', 2.38, true, undefined, -0.3),
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
@@ -118,6 +140,7 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     { amp: 0.05, hz: 2.4 },
     -0.3,
     null,
+    0,
     true,
   ),
 };
@@ -138,4 +161,52 @@ export function mountBobY(spec: MountVisualSpec, timeSec: number, moving: boolea
   if (!moving && !spec.bobIdle) return 0;
   const wave = Math.sin(timeSec * Math.PI * 2 * spec.bobHz);
   return (spec.bobShape === 'hover' ? wave : Math.abs(wave)) * spec.bobAmp;
+}
+
+/** Display-only rocket-sled attitude in radians (positive means nose-up).
+ *  Vertical velocity follows the actual rendered jump arc, so unusually long
+ *  drops naturally nose down instead of replaying a canned fixed-duration pose. */
+export function stepRocketSledJumpPitch(
+  current: number,
+  airborne: boolean,
+  verticalVelocity: number,
+  dt: number,
+): number {
+  const safeDt = Math.min(0.1, Math.max(0, Number.isFinite(dt) ? dt : 0));
+  const vy = Number.isFinite(verticalVelocity) ? verticalVelocity : 0;
+  let target = 0;
+  if (airborne) {
+    if (vy > 0.5) {
+      const rise = Math.min(1, Math.max(0, (vy - 0.5) / 7));
+      target = ((12 + rise * 10) * Math.PI) / 180;
+    } else if (vy >= -0.5) {
+      target = (12 * Math.PI) / 180;
+    } else {
+      const fall = Math.min(1, Math.max(0, (-vy - 0.5) / 7));
+      target = ((12 - fall * 16) * Math.PI) / 180;
+    }
+  }
+  const rate = airborne ? 12 : 18;
+  const next = current + (target - current) * (1 - Math.exp(-rate * safeDt));
+  return Math.abs(next) < 1e-5 ? 0 : next;
+}
+
+/** Where the rider root sits once the vehicle tips by `pitch` radians.
+ *
+ *  The rider is a SEPARATE root parented alongside the mount, not under it, so
+ *  a nose-up sled would otherwise leave the rider level and floating off the
+ *  cushion. Rotating the rider's own seat offset about the same vehicle origin
+ *  keeps pelvis and cushion locked together through the whole jump arc.
+ *
+ *  Pure 2D rotation of (seatFwd, seatY) about the origin in the YZ plane, kept
+ *  here rather than inline in renderer.ts so it is unit-testable and so the
+ *  coordinator stays a thin consumer (root CLAUDE.md, module-first). */
+export function rocketSledRiderPivot(
+  seatY: number,
+  seatFwd: number,
+  pitch: number,
+): { y: number; z: number } {
+  const cos = Math.cos(pitch);
+  const sin = Math.sin(pitch);
+  return { y: seatY * cos + seatFwd * sin, z: seatFwd * cos - seatY * sin };
 }

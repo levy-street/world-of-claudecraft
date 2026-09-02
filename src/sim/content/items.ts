@@ -414,6 +414,28 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Developer-only mount checkpoint. It deliberately has no acquisition path;
+  // use /dev mounts or /dev give reins_rallycart_rxt during visual review.
+  reins_rallycart_rxt: {
+    id: 'reins_rallycart_rxt',
+    name: 'Ignition Key: Rallycart RXT',
+    kind: 'mount',
+    mount: 'rallycart_rxt',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
+  reins_goblin_rocket_sled: {
+    id: 'reins_goblin_rocket_sled',
+    name: 'Ignition Key: Goblin Rocket Sled',
+    kind: 'mount',
+    mount: 'goblin_rocket_sled',
+    quality: 'epic',
+    soulbound: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Developer-only, same treatment as the tank above: no acquisition path, so
   // it stays soulbound rather than tradable. Use /dev give reins_rickshaw_mount
   // while the feature remains under development.

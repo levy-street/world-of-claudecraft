@@ -393,7 +393,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The four Crucible raid pages add 41 distinct new item ids (17 arena
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
     // the batch's own page: 340 + 1 + 45.
-    expect(full).toEqual({ owned: 386, total: 386 });
+    expect(full).toEqual({ owned: 388, total: 388 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -405,7 +405,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 357, total: 357 });
+    expect(character).toEqual({ owned: 359, total: 359 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -435,7 +435,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(421);
+    ).toBe(423);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -1618,9 +1618,9 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
       (entry) => entry.itemId,
     );
-    const heroicLootIds = (
-      HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []
-    ).map((entry) => entry.itemId);
+    const heroicLootIds = (HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []).map(
+      (entry) => entry.itemId,
+    );
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
     expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
     expect(normalLootIds).not.toContain('varkhul_emberward');
@@ -2523,12 +2523,19 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
+  // goblin_rocket_sled, rallycart_rxt and terrorspark_groundshaker: dev-grant
+  // only, deliberately absent from vendors,
   // quests, mob loot, heroic loot, and the rift reins pools.
   // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
   // no player-facing acquisition path yet (see the def comment in
   // content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
+  horizons_mounts: [
+    'drakemaw_raptor',
+    'goblin_rocket_sled',
+    'rallycart_rxt',
+    'terrorspark_groundshaker',
+    'rickshaw_mount',
+  ],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3500,6 +3507,8 @@ describe('Reliquary source hint coverage', () => {
     ]);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
+      'goblin_rocket_sled',
+      'rallycart_rxt',
       'terrorspark_groundshaker',
       'rickshaw_mount',
     ]);
@@ -3876,11 +3885,11 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
-    // day content gives either mount ANY route, this reds and forces the hint
+    // day content gives a pending mount ANY route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can
     // never keep painting a blank silhouette content has learned to answer.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -3930,7 +3939,7 @@ describe('Reliquary source hint coverage', () => {
       if (reliquaryRelicSource(page, relic).length === 0) continue;
       watchedAwardIds.add(awardIdForSlot(relic, slotId));
     }
-    // The two PENDING mounts' reins ride along: their whole pending claim is
+    // The PENDING mounts' reins ride along: their whole pending claim is
     // "no route anywhere", and the nine-family inverse sweep above cannot see
     // these three excluded surfaces, so a pending reins entering one must red
     // HERE rather than leave the silhouette blank while content can answer.
