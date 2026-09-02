@@ -61,6 +61,19 @@ describe('materialProfessionHintText', () => {
     expect(materialProfessionHintText('venom_gland')).toBe('Used by Alchemy.');
   });
 
+  it('the Frost Gourd reads three crafts in ring order since D171; its fine twin stays cooking-only', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity): the
+    // rung-50 scroll took the serpent elixir's gourd, the first crop on an
+    // inscription row, so the tooltip's Used-by line gained a third craft.
+    // Pinned as the EXACT rendered string (ring order: alchemy, cooking,
+    // inscription; the en conjunction). The fine twin is farming's own record,
+    // not a material grade, so it inherits nothing and keeps its one consumer.
+    expect(materialProfessionHintText('frost_gourd')).toBe(
+      'Used by Alchemy, Cooking, and Inscription.',
+    );
+    expect(materialProfessionHintText('fine_frost_gourd')).toBe('Used by Cooking.');
+  });
+
   it('phase 11l trophies read the simple Used by line for their adopted craft', () => {
     // Every adopted junk trophy, pinned as an EXACT rendered string so the
     // localized craft name and the sentence template both hold (none carries

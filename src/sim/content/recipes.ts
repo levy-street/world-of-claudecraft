@@ -2125,8 +2125,10 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     // qr-19-scroll-elixir-15c-parity, 2026-09-02): the two routes grant a
     // byte-identical buff, so neither may undercut the other. Phase 11g put a
     // frost_gourd on the elixir as its rung-50 produce consumer (214 to 229)
-    // and this scroll stayed at 214, so the same gourd rides here now, the
-    // only reagent family that lands 15 exactly (the ink register cannot).
+    // and this scroll stayed at 214, so the same gourd rides here now: the
+    // tier-3 crops are the only reagent family whose unit value lands 15
+    // exactly (the ink register cannot), and the elixir's own crop is the
+    // one that keeps the twin bills alike.
     // The parity is PINNED in tests/recipe_economy.test.ts ('the rung-50
     // scroll and the serpent elixir bill at exact input parity'); the byte
     // bill is pinned in tests/inscription_catalog.test.ts.
@@ -2137,7 +2139,8 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     // 11g's bog_beet); the rung-0 pair is 26 against 36 for the same reason.
     // Both stay recorded, not repaired: the ruling covers rung 50 alone.
     // The dust 5th line stays inside the craft's ink register (the rung-0
-    // recipes grind dust) and mirrors the grimoire's own rung-50 shape.
+    // recipes grind dust), an extra tail line the way the grimoire's rung-50
+    // bill carries one (its goldleaf pair).
     reagents: [
       { itemId: 'sunpetal_herb', count: 1 },
       { itemId: 'frost_gourd', count: 1 },

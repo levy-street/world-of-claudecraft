@@ -164,6 +164,19 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   prose states the live scroll bill and its parity with the serpent elixir' and 'the
   inscription materials fills name the gourd, the serpent elixir and the parity in their
   own locale' in tests/guide.test.ts.
+- **One NEW sibling paragraph whose 15 Latin rows the registry carries as pending:**
+  `guide.profPages.farm.bedsBodyThirdCraft` (the D171 review round, frontend-seam-reviewer):
+  the farm page's beds prose enumerates the crafts that buy produce (the kitchens, Marlow's
+  ladder, the apothecary's elixirs) and the parity repair made inscription a third buyer; the
+  shipped `guide.profPages.farm.bedsBody` and its reviewed fills stay untouched (the page's own
+  convention for later shipments) and the new one-sentence paragraph renders right after it.
+  Its five non-Latin fills rode the same change, machine-authored and FLAGGED for the
+  maintainer's re-judgement in phase-19g-qa.md; pinned by 'the farm beds prose names every
+  craft that buys produce: the third one is the scribe (D171)' in tests/guide.test.ts (the
+  buying crafts derived from the live tables). CARRIED from the ja_JP verifier: the shipped
+  `guide.profPages.farm.bedsBody` fill in ja_JP still renders a pre-11g English (it names the
+  kitchens only, not Marlow's ladder or the elixirs) while the registry marks it translated,
+  the D126 reword-staleness class; a maintainer item for this fill, not minted here.
 - **The CI shard-weight harvest (D168) is ESCALATED, not executed, and waits on the push
   ruling (D022):** its precondition is a green FULL-MODE CI run of a PUSHED branch, and its
   dependency D009+D170 is still escalated from 19A, so it could not be the last code-carrying

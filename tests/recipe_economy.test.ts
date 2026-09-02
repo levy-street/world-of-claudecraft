@@ -47,6 +47,7 @@ import { NODE_MATERIAL_TABLE } from '../src/sim/professions/gathering';
 import { stationsOfType, stationTypeForCraft } from '../src/sim/professions/stations';
 import { PRE_TRAINING_RECIPE_IDS, trainingStationTypeFor } from '../src/sim/professions/training';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
+import { reagentUnitValue, recipeInputValue } from './helpers/reagent_unit_value';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { stripComments } from './helpers/strip_comments';
 import { tsFilesUnder } from './helpers/ts_files_under';
@@ -56,17 +57,10 @@ import { tsFilesUnder } from './helpers/ts_files_under';
 // unit value is buyValue when the def carries a finite buyValue > 0 (a vendor
 // staple the player pays for), else sellValue (a harvested/dropped material the
 // player realizes at the vendor floor). outputValue: the result def sellValue
-// times the recipe's resultCount.
-function reagentUnitValue(itemId: string): number {
-  const def = ITEMS[itemId];
-  if (!def) throw new Error(`recipe reagent ${itemId} has no ItemDef`);
-  return typeof def.buyValue === 'number' && def.buyValue > 0 ? def.buyValue : def.sellValue;
-}
-function inputValue(recipe: ProfessionRecipeRecord): number {
-  let total = 0;
-  for (const reagent of recipe.reagents) total += reagent.count * reagentUnitValue(reagent.itemId);
-  return total;
-}
+// times the recipe's resultCount. The rule itself lives ONCE in
+// tests/helpers/reagent_unit_value.ts (the guide suite prices player copy
+// through the same import, so the two can never drift apart).
+const inputValue = (recipe: ProfessionRecipeRecord): number => recipeInputValue(recipe);
 function outputValue(recipe: ProfessionRecipeRecord): number {
   const def = ITEMS[recipe.resultItemId];
   if (!def) throw new Error(`recipe result ${recipe.resultItemId} has no ItemDef`);

@@ -573,6 +573,41 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     expect(accentVerdict(nonProduceBill(scroll), 'frost_gourd', 2).countOk).toBe(false);
   });
 
+  it('the rows the sweep EXCLUDES are exactly the hoe ladder: a gear row that takes a crop reds here', () => {
+    // The D171 coverage audit: widening the sweep from a craft filter to a
+    // slot filter swapped one silent exemption for another. A row whose output
+    // carries an equipment slot is outside RULE 2's scope by design (produce
+    // never reaches gear, tests/provisioner_firewall.test.ts), but nothing
+    // here surfaced a gear row that took a crop: it was exempt AND unfenced by
+    // this file. So the exclusion set is named: every non-farm-own row that
+    // consumes produce and is not governed must be a gathering tool (the hoe
+    // ladder), the set is non-empty (the positive control), and it carries
+    // every hoe the ladder ships, so a crop on a mantle or a ring reds here.
+    const farmOwnIds = new Set(FARM_RECIPES.map((r) => r.id));
+    const governed = new Set(accentGovernedRows().map((r) => r.id));
+    const excluded = ALL_RECIPES.filter(
+      (r) =>
+        !farmOwnIds.has(r.id) &&
+        r.reagents.some((g) => PRODUCE_IDS.has(g.itemId)) &&
+        !governed.has(r.id),
+    );
+    expect(excluded.length, 'the exclusion set is non-empty (the hoe ladder)').toBeGreaterThan(0);
+    for (const r of excluded) {
+      expect(
+        ITEMS[r.resultItemId]?.use?.type,
+        `${r.id} consumes produce outside the sweep and is not a gathering tool`,
+      ).toBe('gatherTool');
+    }
+    const hoes = ALL_RECIPES.filter((r) => r.resultItemId.endsWith('_hoe')).map((r) => r.id);
+    expect(hoes.length, 'the hoe ladder ships').toBeGreaterThan(0);
+    expect(
+      excluded.map((r) => r.id).sort(),
+      'the excluded set is the produce-consuming hoe ladder and nothing else',
+    ).toEqual(
+      hoes.filter((id) => requireRecipe(id).reagents.some((g) => PRODUCE_IDS.has(g.itemId))).sort(),
+    );
+  });
+
   it('the accent rule governs a real, non-empty set of rows', () => {
     // The floor under both arms below. The set is derived, so a later phase's
     // rows join it by existing rather than by somebody remembering to extend a

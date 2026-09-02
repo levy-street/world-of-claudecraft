@@ -233,6 +233,9 @@ describe('inscription catalog shape', () => {
 
   it('consumes EXACTLY the shipped reagent table, every line of every recipe', () => {
     expect(Object.keys(REAGENTS_BY_RECIPE)).toHaveLength(7);
+    // Both sides of the walk are pinned: a removed recipe would otherwise
+    // leave six rows compared against a seven-key map and pass.
+    expect(INSCRIPTION_RECIPES).toHaveLength(7);
     for (const recipe of INSCRIPTION_RECIPES) {
       const shipped = Object.fromEntries(recipe.reagents.map((r) => [r.itemId, r.count]));
       // Distinct-lines control: the object collapse above must not hide a

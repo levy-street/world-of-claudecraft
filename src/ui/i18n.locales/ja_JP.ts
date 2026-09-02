@@ -12609,6 +12609,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.farm.bedsHeading': '畑の手入れ',
   'guide.profPages.farm.bedsBody':
     '手順は短いものです。畑のそばの農夫から種と堆肥を買います。EastbrookのJessicaは渓谷の二種、Fenbridgeの農夫は湿地の二種、HighwatchのテラスのHollisは山の作物、VerbenaはEvergardenの花壇の作物を置いています。高い段の収穫も自前の種を一つ二つ返してくれますし、どの種もWorld Marketで取引され、山と花壇の種は今では終盤コンテンツからも落ち、ヒーロー補給官の店にも並ぶので、畑のそばの農夫は唯一の入り口ではなく最初の入り口です。鍬を袋に入れて種をまき、望むなら勝ちの目を上げましょう。店の堆肥と、まくときに農作物で払う農夫の見回りはどちらも作物が無事に育つ確率を上げ、錬金術師の成長トニックは収穫が増える見込みを与え、熟練が作物の段より丸一帯上がれば、その作物はもう決して枯れません。あとは立ち去るだけです。ログアウト中も畑は育ち続け、熟した作物はいつまでも待っていて、収穫日誌（Shift+K、または専門技能ウィンドウの農耕の行）が植えた畑すべてをタイマーつきで一覧にします。\n\n枯れた作物は農作物の代わりに枯れた籾殻を残し、どの農夫でも籾殻を堆肥に換えてくれるので、悪い季節は次の季節の保険を買います。持ち帰ったものは厨房を支えます。農作物は厨房で料理になり、Cook Marlowの小麦と米の受注はVale WheatとMarsh Riceを、他のどの受注とも同じ時計で買い取ってくれます。',
+  'guide.profPages.farm.bedsBodyThirdCraft':
+    '三つ目の職も畑から買い付けます：銘文師のスキル50の段のサンペタルの巻物はHighwatchのテラスから来る霜瓜をひとつ取り、それは蛇のエリクサーが取るのと同じ瓜ですから、そのバフへ通じる二つの道は同じ費えに揃えられています。',
   'guide.profPages.fish.startHeading': 'はじめかた',
   'guide.profPages.fish.koiHeading': '日映えの錦鯉',
   'guide.profPages.econ.sellsHeading': '何が売れるか、なぜか',
