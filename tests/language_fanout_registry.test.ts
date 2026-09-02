@@ -68,6 +68,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { methodBody } from './helpers/method_body';
 import { readMethodCallSites } from './helpers/method_call_sites';
 import { expectScansOnlyThroughSharedWalkers } from './helpers/scan_guard_self_audit';
 import { stripComments } from './helpers/strip_comments';
@@ -105,6 +106,10 @@ const scan = readMethodCallSites('src/ui/hud.ts', hudSource, 'Hud', 'refreshLoca
 
 /** `call|gate`, the same key `hud_update_drive.test.ts` uses. */
 const FANOUT_ARMS: readonly string[] = [
+  // The coordinator's OWN signature-gated memos, cleared as one arm. This is
+  // what replaced the blanket hud.ts exemption: every memo it clears carries
+  // its own row below (masterwrought qr-19-hud-coordinator-fanout-exemption).
+  'this.relocalizeCoordinatorMemos|',
   'this.bgScoreboard.relocalize|',
   'this.syncDailyRewardsSurfaceLabels|',
   'this.wocMarketWindow.relocalize|',
@@ -446,6 +451,81 @@ const ANSWERED: readonly AnsweredSurface[] = [
     answer: 'this.spellbookWindow.relocalize',
     why: 'the resolved ability ids and their rank/cost/cast/cooldown numbers, plus the hotbar toggle state (#2529)',
   },
+  // THE COORDINATOR'S OWN MEMOS (masterwrought qr-19-hud-coordinator-fanout-exemption).
+  // hud.ts used to carry a single blanket exemption row here; these are the
+  // 46 compared repaint memos it hid, classified one by one. Seven of them
+  // were real defects and are fixed by the relocalizeCoordinatorMemos arm.
+  {
+    file: 'hud.ts',
+    memos: [
+      'lastPlayerFrameHp',
+      'lastPlayerFrameMaxHp',
+      'lastPlayerFrameResource',
+      'lastPlayerFrameMaxResource',
+    ],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: "the player unit frame's raw hp and resource pair, current and max. All four are bare numbers a locale cannot move, while the health and resource TEXT they gate is built by unitFrameCurrentMaxText, whose digits route through formatNumber against the active language; the arm clears all four to NaN, which no live value can equal, so the next painted frame re-resolves both strings (and the absorb suffix, which is elided on the health text) in the new locale",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastResting'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: "a single boolean, true for ANY seated state, collapsing sit / eat / drink / eat-and-drink into one flag, while the rest badge's TOOLTIP it gates is t(rest.labelKey) over four different keys. Worse than an ordinary stale string: the static-shell pass re-stamps #pf-rest from its data-i18n-title, so a switch while eating actively replaced the live Eating tooltip with the static Resting one. Cleared to null (the field is boolean or null for exactly this), so the next frame rewrites the right key",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastAnnouncedTargetId'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: "the id of the last target announced into the #target-live region, tracked apart from the paint cadence so the announcement fires on a real target change. The sentence it gates is a fully localized t('hudChrome.unitFrame.targetAnnounce'), written directly rather than through the elided writer, so a switch left the live region holding the previous locale for as long as that target stayed selected. Cleared to null, which re-announces the current target in the new language",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastCompassFacing', 'lastCompassHeading'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: "the player facing in radians and the nearest rose-point ID. Both are geometry: compass.ts states outright that the id is not display text. They gate the heading readout's t(`hudChrome.compass.${heading}`), and updateCompass early-returns on the facing before it ever reaches that write, so a player standing still kept the old locale's cardinal indefinitely. The arm clears both AND relabels the eight rose spans, which are written once when the pool is built and would otherwise never be rewritten at all",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastMailUnread'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: 'one integer, the clamped unread letter count. Past it the block writes the badge digits through formatNumber and, more to the point, two localized strings on the envelope button: the aria-label and the title, both t() with the count interpolated. Cleared to -1, the same sentinel the mailArrived and mailResult events already use, which no real count can equal',
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastLootSettingsSig'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: 'the Loot Settings repaint signature: a master-loot boolean, the looter and leader pids, the threshold ID and the member pid:name list. Every one of those is text-independent, and past the gate the whole window is rebuilt from t() (the title, the Loot Method and Roll Threshold labels, the method and threshold options, the read-only member view). Cleared to the empty string, which no real signature can equal because every real one carries separators',
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastPetBarSig'],
+    answer: 'this.relocalizeCoordinatorMemos',
+    why: "the pet action bar signature: pet id, primary or secondary, owner class, mode id, two cooldown signatures of integer seconds and autocast flags, plus two booleans. Past the gate the bar's DOM is rebuilt from scratch and every button caption and both tooltip halves are fresh t() calls. Cleared to the empty string, which no real signature can equal",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastCraftingCastSig', 'lastCraftingReagentSig', 'lastCraftingStationSig'],
+    answer: 'this.renderCrafting',
+    why: "the crafting window's cast, reagent and station signatures: cast ids and integer progress, reagent ids and counts, the station set. All text-independent, and the fan-out already forces one full renderCrafting rebuild on a switch when the window is open, which re-runs every t() including the identity card",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastCharSheetSig', 'lastProfessionSurfaceSig'],
+    answer: 'this.charWindow.renderIfOpen',
+    why: "the character sheet's stat signature and the profession surface signature: stat numbers, ids, ranks and counts, none of which a locale moves. Both gate the same window, and the fan-out drives charWindow.renderIfOpen(), which rebuilds it wholesale with fresh t() when it is open",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastPartySig'],
+    answer: 'this.partyFramesPainter.relocalize',
+    why: "the party roster signature: member pids, hp and resource numbers and role ids. The localized text on those frames is repainted by the partyFramesPainter.relocalize() arm the fan-out already drives, which clears the painter's own memo rather than relying on this one",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastTownFocusSig'],
+    answer: 'this.renderTownFocus',
+    why: "the Town Focus signature: the allocation, the budget and the in-town flag, all text-independent by design. The fan-out's own arm re-renders the panel when it is open, which was added for exactly this reason (the slow-band probe would otherwise leave it in the old locale until the player edited it)",
+  },
 ];
 
 /**
@@ -458,12 +538,21 @@ const ANSWERED: readonly AnsweredSurface[] = [
 const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
   readonly file: string;
   /**
-   * The memos the exemption was argued about, or 'coordinator' for hud.ts. Pinned
-   * for the same reason the ANSWERED rows are: an exemption is granted about
-   * SPECIFIC fields, and a module that later grows a real data signature must
-   * not inherit an answer that was given about a different one.
+   * The memos the exemption was argued about. Pinned for the same reason the
+   * ANSWERED rows are: an exemption is granted about SPECIFIC fields, and a
+   * module that later grows a real data signature must not inherit an answer
+   * that was given about a different one.
+   *
+   * There is no longer a whole-file opt-out. hud.ts carried one ('coordinator',
+   * skipped BY NAME by both classification arms) until
+   * qr-19-hud-coordinator-fanout-exemption closed it: a by-name skip on the
+   * largest hand-authored file in the tree could not be argued away by the fact
+   * that its fan-out arms are pinned elsewhere, and the audit that replaced it
+   * found seven real defects. Rows are MEMO-SCOPED now, and a file may hold
+   * several: the arms below require a file's rows to union to exactly its
+   * discovered set, with no memo classified twice.
    */
-  readonly memos: readonly string[] | 'coordinator';
+  readonly memos: readonly string[];
   readonly reason: string;
 }> = [
   {
@@ -532,11 +621,163 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     reason:
       'the trade window repaint signature: it reads no text at all (offer structs, staged items and copper, acceptance flags, partner, the staged quote and consent structural state), so a locale switch cannot move it, and there is deliberately no fan-out arm, exactly as when the method lived on hud.ts. A live trade re-renders in the new locale on the next data motion (either offer, stake, or acceptance change; the standing-offer poll adoption; the 2s poll makes an ACTIVE deal converge within a beat). RE-JUDGED TWICE by the UX-honesty pass, which added the consent row and the quote review to this arm: both of those faces are deliberately STATIC (the staged quote waits for a human and polls keep, the consent row keeps the price outside the signature), so each can sit indefinitely in a stale locale, including a player who switches language to READ the terms and then accepts a label rendered in the language they left. The posture still stands, on narrower grounds: the consent SEND carries a boolean judged by the server, never the label text, and the surface is the short-lived two-player trade window. The polish pass owns the real fix, a self-gated relocalize() with form_draft.ts carrying the price field, if the stale-idle residue is judged worth the behavior change.',
   },
+  // RULED (qr-19-hud-coordinator-fanout-exemption, 2026-09-01, under
+  // qr-19-best-for-project): the blanket `{ file: 'hud.ts', memos: 'coordinator' }`
+  // row that stood HERE is REPLACED by the per-signature list below and in
+  // ANSWERED above. Its stated reason was real (hud.ts's own fan-out arms are
+  // pinned by half 1, so listing its unrelated memos meant re-approving every
+  // hud.ts edit in two places) and it was still wrong: BOTH classification arms
+  // skipped the largest hand-authored file in the tree BY NAME, and this phase
+  // produced the proof, targetDiscordSig, a localized surface discovered and
+  // classified with no arm able to ask the question.
+  //
+  // The audit that replaced it classified all 46 compared memos and found SEVEN
+  // more of the same defect: the rest badge's tooltip (worse than stale, the
+  // static-shell pass actively re-stamped it), the target live region, the
+  // compass heading AND its rose labels, the Loot Settings window, the pet
+  // action bar, and the mail indicator's aria-label and title. All seven are
+  // fixed by the relocalizeCoordinatorMemos arm, which is pinned behaviorally
+  // below rather than only registered. The shipped per-memo LANGUAGE_KEYED
+  // reach stood until this ruling and is now one classification among many.
   {
     file: 'hud.ts',
-    memos: 'coordinator',
+    memos: ['lastArenaStatusSig'],
     reason:
-      'the coordinator itself. Its own signature-gated arms are individually answered inside refreshLocalizedDynamicUi, which half 1 above pins EXACTLY, so pinning its two dozen unrelated memos here as well would only mean every hud.ts edit had to be re-approved in two places.',
+      "lastArenaStatusSig is a hybrid whose middle field is vsBlock, the RESOLVED VS markup built on the same tick: t('hud.core.you') and t('hud.arena.vsLine') on the 2v2 arm, t('hud.arena.vsLine') plus t('hud.arena.levelClass') and the tEntity class name on the 1v1 arm. A locale switch therefore changes the freshly built side of the comparison, the banner rewrites itself on the next update, and the timer label (statusCountdown / statusReturning / statusFight), which is deliberately NOT in the signature, rides the same single innerHTML write and relocalizes with it. Write elision on resolved text wearing a signature's name; the genuinely text-independent fields (format, state, the returning countdown seconds) only add motion, they are not what carries the locale. Note for a future editor: pull vsBlock out of this signature and the banner becomes a stale-language surface needing a fan-out arm",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastClockText'],
+    reason:
+      "lastClockText retains the RESOLVED minimap clock readout and is compared against a freshly built formatClockTime(new Date(), this.clock24), which routes through formatDateTime to Intl.DateTimeFormat(languageTag(currentLanguage)), so the hour cycle, the day-period marker and the digit system are re-resolved in the ACTIVE locale on the very next comparison. updateClock() runs unconditionally on the fastHud band of the frame loop, so it needs no data motion at all: a locale switch that changes the string moves the freshly built side within one fastHud tick and the write happens by itself. Write-elision on resolved text, not a data signature; the only other store, the `this.lastClockText = ''` in the clock click handler, is the 12h/24h toggle forcing that same self-repaint.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastCoordsText'],
+    reason:
+      'lastCoordsText retains the RESOLVED coordinate string it last put on #minimap-coords and is compared against a freshly built formatMinimapCoords(x, z), whose two numbers go through formatNumber, so a locale that formats digits or the minus sign differently produces different text and the readout rewrites itself on the very next fast-band tick without any fan-out arm. It is the write-elision shape (the claudium_window / daily_rewards_window class), not a data signature; the only other thing that moves it is the player stepping across a whole yard, and no t() call sits behind the gate.',
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastHoverTooltipId'],
+    reason:
+      "lastHoverTooltipId is the world-hover tooltip's rebuild key (mob: entity id, level, hostility, the viewer's level and the quest objective counts; player: id, name, level, class id and guild), text-independent by design, and it does gate localized output: the creature-type line t('hudChrome.mobTooltip.familyDemon') / t('guide.family.*.name'), the mob name and class name through tEntity, and the quest title/progress lines, painted as raw innerHTML with no writer elision. What makes it safe is that the surface cannot be on screen when the switch fires. Both language pickers sit inside HUD chrome: the in-game one is an Options sub-view, and main.ts's per-frame updateHoverCursor early-returns into hud.clearHoverTooltip() whenever hud.isModalOpen(), which is true while optionsOpen, so the memo is nulled and #tooltip hidden before woc:languagechange dispatches (the canvas mouseleave that drops input.hoverActive does the same job independently); the other picker is the character-select screen, before any world hover exists. The next hover rebuilds the card through fresh t()/tEntity(), so no arm is owed.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastLifetimeXp'],
+    reason:
+      "lastLifetimeXp retains sim.lifetimeXp, the monotonic lifetime total, a pure number that surfaces only past MAX_LEVEL where the label reads `Lv 20 (+7) · <total> total XP · <pct> to next` from t('game.xp.lv'), t('game.xp.totalXp') and t('game.xp.toNext') (src/ui/xp_bar.ts:83-86). That whole label is rebuilt by the one composite gate at hud.ts:9544-9552, and its last arm compares getLanguage() against lastXpLanguage, so a locale switch alone rebuilds the post-cap line (and the pre-cap one) on the next frame. The memo gates a localized string but cannot strand it, because the gate it sits in is locale-aware by construction.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastLootGeomSig'],
+    reason:
+      "lastLootGeomSig holds the Loot Settings panel's dock key, `${others.length}/${info.raid ? 1 : 0}`: the party row count the painter just synced and the raid-grouping flag. It gates only positionLootSettingsPanel(), which measures #party-frames and writes el.style.left / top / transform on #loot-settings-window, so nothing that carries a character of player text passes through it; every localized string in that window is written by paintLootSettings -> renderLootSettingsWindow behind the separate lastLootSettingsSig gate. A locale switch can change the panel's measured height (a longer label wraps), which leaves the dock a few px off until the roster or the raid flag moves, but that is a coordinate, never a stale language.",
+  },
+  {
+    file: 'hud.ts',
+    memos: [
+      'lastLowResourceActive',
+      'lastLowResourceInput',
+      'lastLowResourceLabel',
+      'lastLowResourceMax',
+      'lastLowResourceOpacity',
+      'lastLowResourcePulseSeconds',
+      'lastLowResourceType',
+    ],
+    reason:
+      "the low-resource flash's seven non-language memos: the active flag, the input value, the resolved label STRING, the max, the opacity, the pulse seconds and the resource type id. The label is compared as a resolved string, which is write elision and moves by itself on a switch; the other six are numbers, a boolean and a type id that no locale can move, and the surface's language question is answered by lastLowResourceLanguage, its explicit locale latch, verified structurally in LANGUAGE_KEYED below",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastLowResourceLanguage'],
+    reason:
+      "the low-resource warning's own language latch: `getLanguage()` is read at hud.ts:9937, compared as the fourth term of the update gate at 9942 and stored at 9948, so a locale switch alone always falls the gate through even when resource, maxResource and resourceType are byte-identical. That is what makes the other three terms of that conjunction safe: they are raw player numbers and the enum, none of which a locale can move, and without this latch the pulse label ('Low Mana' / 'Low Focus' / 'Low Energy', resolved in src/ui/low_resource.ts:71-76) would sit in the previous locale until the player's power happened to change. Note the latch answers the memo family, not refreshLocalizedDynamicUi, which drives no low-resource arm.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastMarketCollectPending'],
+    reason:
+      "lastMarketCollectPending latches one boolean, marketCollectIndicatorView(sim.marketCollectPending).visible, the streamed proceeds-waiting bit, and the entire guarded block is `el.hidden = !view.visible`: a visibility property, not a string. Nothing localized is written under the gate, so there is no text for a switch to strand. Every string on the coin is repainted by a path the memo cannot reach: index.html gives #market-indicator data-i18n-title and data-i18n-aria, which main.ts's translatePage re-stamps on every locale switch whether the badge is hidden or shown, and initMarketIndicator attaches the HUD tooltip as a lazy callback that resolves t('hudChrome.marketIndicator.tip') at hover time. Deliberately unlike its #mail-indicator sibling, whose labels interpolate the unread count and therefore have to be written from inside a count-gated update; if this coin ever grows an interpolated label written past line 9930, it becomes that same hazard and this exemption is void.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastPetPresent'],
+    reason:
+      "lastPetPresent is a plain boolean value-diff over 'a living pet is shown', and it gates exactly one write: document.body.classList.toggle('mobile-pet-active', petPresent), a CSS state class the mobile top-band layout keys on. The class name is a fixed literal and no t()/tPlural()/tEntity() call or view module sits inside the transition, so there is no string for a locale switch to leave stale; the only thing that moves the gate is the pet itself appearing, dying or despawning (including the fall-through to a living Necromancy secondary). The pet bar's localized captions are gated by lastPetBarSig further down the same method, not by this flag",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastPlayerFrameLevel'],
+    reason:
+      "lastPlayerFrameLevel retains the player's LEVEL as a bare integer and gates exactly one write, playerFrame.levelText = String(p.level) (hud.ts:9070). That is a raw number-to-string: unlike the hp and resource texts two blocks above it deliberately does not route through unitFrameCurrentMaxText or formatNumber, so no t() key and no Intl formatter sits behind it and no locale can change the bytes it produces. The painter puts it on screen through the elided writer facet (unit_frame_painter.ts:179, this.writers.setText(this.el.level, view.levelText ?? '')), and the level element carries no label, unit word or aria string written from inside the gate. Only the player levelling moves the memo, which is the only thing that ever needs to move it, so its absence from the four-memo clear at hud.ts:6944-6947 is correct rather than an omission.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastRestedXp'],
+    reason:
+      "lastRestedXp retains sim.restedXp, the inn-rested pool. Most of what it drives is geometry (restedFrac becomes a left/width percentage and the `rested` class, src/ui/xp_bar_painter.ts:48-58), but it also decides the localized tail ` · t('game.xp.rested') +<n>` on the hover label (src/ui/xp_bar.ts:55). It is safe for the same structural reason as its three siblings and for no other: all five XP arms share ONE OR gate (hud.ts:9544-9552) that ends in `xpLanguage !== this.lastXpLanguage`, so a locale switch alone reopens it, re-resolves game.xp.rested and re-groups the +<n> through formatNumber. Remove that language arm and this row becomes a bug, not an exemption.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastShowOverflow'],
+    reason:
+      "lastShowOverflow retains the showOverflowXp OPTION boolean ((settings.get('showOverflowXp') ?? 1) >= 0.5), one clause of the compound OR that guards the xpBarViewCache rebuild. The cached view really is localized (xp_bar.ts builds the hover label and the percent echo from t('game.xp.suffix'), t('game.xp.rested'), t('game.xp.maxLevel'), t('game.xp.totalXp') and formatNumber), but the same guard compares `xpLanguage !== this.lastXpLanguage` with xpLanguage = getLanguage() read one line above the option, so a locale switch always moves the gate, the view is rebuilt on the next frame and XpBarPainter pushes the new label out through the elided writers. The language latch that carries it, lastXpLanguage, is the memo with the LANGUAGE_KEYED row; this boolean rides it, exactly the map_semantic_accessibility_core lastHash shape.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastSubzone'],
+    reason:
+      "lastSubzone retains the nearest POI's raw CONTENT label (nearestSubzone, src/ui/subzone.ts, returns poi.label; it never sees a tEntity() result) and doubles as that helper's hysteresis input, so nothing but the player crossing a POI radius moves it. The one localized string it gates, showSubzone(zonePoiLabel(...)), is a 2600ms landmark announcement that fades itself back to opacity 0: an entry that already fired belongs to the locale it fired in, the same way a chat log line does, and the next crossing announces through a fresh tEntity(). There is no surface left standing in the old locale for a fan-out arm to repaint.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastTargetFrameId'],
+    reason:
+      "lastTargetFrameId is the target frame's cadence id, not a repaint latch. It is never an early return: its one read builds `targetChanged`, the swap-bypass argument to nonSelfRepaintDue(subjectChanged, lastAt, now, targetFrameNonSelfIntervalMs(fxTier)) (src/game/ui_tier_knobs.ts:141-147), whose other arm cadenceDue is unconditionally true when the interval is 0 (every tier but low) and true again 100ms after the last paint on low. So the body it gates re-runs on its own within at most a tenth of a second of a switch and re-resolves every localized face it writes (t('hud.core.dead'), cheaterTagLabel's t(), the titled-name decoration, the formatNumber hp/resource text), and those land through the unit_frame painter's elided writers, which compare the resolved string. The memo holds an entity id; what moves the surface when the locale moves is the cadence, not the id.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastTargetTitleSig'],
+    reason:
+      "the target frame's Book of Deeds titled-name decoration: titledNameDecoration resolves deedTitleText plus t('hudChrome.deeds.titledName') and splits the rendered pattern around the interpolated name, so both halves are pure localized text over a title ID that a locale switch cannot move. The signature is literally `${getLanguage()}|${target.title ?? ''}`, the language leading the identity field in the same shape as targetDiscordSig, so a switch always moves the gate and the decoration is recomposed in the new locale on the target frame's next paint (immediate on every tier but low, within 100ms there). There is nothing for a fan-out arm to repaint: the memo carries the locale itself.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastTotFrameId'],
+    reason:
+      "lastTotFrameId is the target-of-target cadence id, the non-self twin of lastTargetFrameId, and it latches nothing. Its single read builds `totChanged` for nonSelfRepaintDue, so a tot SWAP bypasses the throttle; the cadence arm alone already fires the paint every frame on every tier but low (interval 0 makes cadenceDue unconditionally true) and every 100ms on low. The mini-frame's only localized faces, t('hud.core.dead') and the formatNumber hp text plus the entity display name, are therefore re-resolved on their own within a tenth of a second of a switch and are written through the unit_frame painter's elided writers, which compare the resolved string. The memo holds an entity id; nothing text-shaped is stored and nothing is suppressed past one cadence interval.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastXp'],
+    reason:
+      'lastXp retains sim.xp, the raw current-level XP count that sets the bar fill and the `<xp> / <need>` numbers in the hover label. Those numbers are locale-formatted (formatXp goes through formatNumber, so en "1,000" against de "1.000") and the suffix is t(\'game.xp.suffix\'), which is precisely why the cache gate at hud.ts:9544-9552 carries `xpLanguage !== this.lastXpLanguage` as its final arm: a switch moves that arm on the next frame, xpBarView re-resolves and re-groups everything, and the memo\'s own numeric arm never has to move. Nothing here waits on a fan-out arm.',
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastXpLanguage'],
+    reason:
+      "lastXpLanguage IS the XP bar's language latch: getLanguage() is read at hud.ts:9542, compared at 9551 as the last arm of the xpBarViewCache gate, and stored unchanged at 9558, which is both accepted forms at once (the memo names the latch and the locale flows straight into the stored value). Because the four data arms beside it (level, xp, lifetimeXp, restedXp) share that single OR gate, the latch alone reopens the cache on a runtime switch and every game.xp.* key plus the formatNumber percent re-resolves on the next frame. That is why the XP bar needs no refreshLocalizedDynamicUi arm, and why deleting this arm would silently strand the hover label in the previous locale until the player next gained XP.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastXpLevel'],
+    reason:
+      "lastXpLevel retains p.level, the integer level xpBarView branched on at the last rebuild (pre-cap level bar versus the MAX LEVEL / overflow labels), so the memo itself is a number and holds no text. It never stands alone: it is one arm of the SINGLE OR gate at hud.ts:9544-9552 whose last arm is `xpLanguage !== this.lastXpLanguage`, with xpLanguage read from getLanguage() one line above it, so a locale switch opens the whole gate and rebuilds the cached XpBarView with fresh game.xp.* resolutions on the very next frame (this block sits at method-body level, not on the mediumHud band). Same composite shape as map_semantic_accessibility_core's lastHash sitting beside lastLanguage.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['lastZoneId'],
+    reason:
+      "lastZoneId retains the committed zone id and is moved only by zoneAt flipping under the player, but everything localized behind it is a one-shot TRANSITION event, not a standing surface: the 2600ms zone banner (zoneDisplayName), the enteringZone chat line and the zone welcome line, all of which are history the moment they fire, exactly like any other chat log row. The persistent zone name is a different write entirely: MinimapPainter puts it on #zone-label through the write-elision facet (writers.setText with localizeZone), which compares the resolved string, so it repaints itself on the next minimap tick. The memo's two remaining reads only pick which ZoneDef's cached terrain raster to blit, which carries no text at all.",
+  },
+  {
+    file: 'hud.ts',
+    memos: ['targetDiscordSig'],
+    reason:
+      "the target frame's flair line (the staff role tag, the Discord rank rung, the dev rung, and the [AI] mark plus its screen-reader label). Every other field in the signature is identity data a locale switch cannot move, so keyed on identity alone the line sat in the PREVIOUS locale until that player's flair happened to change; the rebuild itself was always correct, it just never ran, so the fix is the key rather than a fan-out arm. The value is built by targetFlairSignature (src/ui/target_flair_line_view.ts), with getLanguage() read into TargetFlairLineInput.language at the call site and leading the signature, and its paired suite drives the difference across two locales on byte-identical identity data.",
   },
 ];
 
@@ -880,8 +1121,33 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       'unclassified signature-gated src/ui module(s). Each one repaints only when its OWN data signature moves, so a language switch leaves it in the old locale. Either give it a relocalize(), call it from Hud.refreshLocalizedDynamicUi and add an ANSWERED row, or add a NOT_A_LANGUAGE_GATE entry naming the memo and saying what moves it when the locale moves:\n' +
         unclassified.join('\n'),
     ).toEqual([]);
-    const both = [...answered].filter((f) => exempt.has(f));
-    expect(both, 'a module is both answered and exempt: pick one').toEqual([]);
+    // PER MEMO, not per file (masterwrought qr-19-hud-coordinator-fanout-exemption).
+    // A file may now hold several rows, because hud.ts's 46 memos genuinely split
+    // across both classifications: some are repainted by a fan-out arm, some hold
+    // no localized text at all. What must never happen is one MEMO carrying two
+    // answers, which is how a real gate hides behind an exemption argued about a
+    // different field. Strictly stronger than the per-file rule it replaces: that
+    // one could not see inside a file at all.
+    const seen = new Map<string, string[]>();
+    for (const [kind, list] of [
+      ['ANSWERED', ANSWERED],
+      ['NOT_A_LANGUAGE_GATE', NOT_A_LANGUAGE_GATE],
+    ] as const) {
+      for (const row of list) {
+        for (const memo of row.memos) {
+          const key = `${row.file}#${memo}`;
+          seen.set(key, [...(seen.get(key) ?? []), kind]);
+        }
+      }
+    }
+    const twice = [...seen]
+      .filter(([, kinds]) => kinds.length > 1)
+      .map(([key, kinds]) => `${key}: ${kinds.join(' and ')}`);
+    expect(
+      twice,
+      'a memo is classified twice: an exemption and an answer cannot both be granted about the same field\n' +
+        twice.join('\n'),
+    ).toEqual([]);
   });
 
   it('keeps no stale rows for modules the sweep no longer finds', () => {
@@ -907,29 +1173,37 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       ...ANSWERED,
       ...NOT_A_LANGUAGE_GATE,
     ];
+    // UNIONED PER FILE, because a file may now carry several memo-scoped rows.
+    // The contract is unchanged in substance and stricter in reach: the union of
+    // a file's rows must equal its discovered set EXACTLY, so a new memo is
+    // unclassified (not silently absorbed) and a deleted one leaves a stale row.
+    const unionByFile = new Map<string, Set<string>>();
     for (const row of classified) {
-      if (row.memos === 'coordinator') continue;
-      const found = discoveredByFile.get(row.file);
+      const set = unionByFile.get(row.file) ?? new Set<string>();
+      for (const memo of row.memos) set.add(memo);
+      unionByFile.set(row.file, set);
+    }
+    for (const [file, memos] of unionByFile) {
+      const found = discoveredByFile.get(file);
       if (!found) continue; // reported by the stale-row test above
-      if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
-        drift.push(
-          `${row.file}: registry ${row.memos.join(',')} vs source ${found.memos.join(',')}`,
-        );
+      const registry = [...memos].sort().join(',');
+      if (found.memos.join(',') !== registry) {
+        drift.push(`${file}: registry ${registry} vs source ${found.memos.join(',')}`);
       }
     }
-    // The exempt rows hold the SAME pin: their own doc says the exemption was
-    // granted about specific fields, so a module that grows a second compared
-    // memo must not inherit an answer given about a different one. Without
-    // this arm the new gate would be absorbed silently ('coordinator' rows
-    // are the one shape with no field list to compare).
+    // The exempt rows hold the SAME pin, and now they hold it on their own
+    // terms rather than as a whole-file comparison: an exemption is granted
+    // about specific fields, so every memo an exemption names must still be a
+    // discovered gate. A memo that stops being compared leaves a stale claim
+    // behind, which the union above cannot see when another row on the same
+    // file still lists it.
     for (const row of NOT_A_LANGUAGE_GATE) {
-      if (row.memos === 'coordinator') continue;
       const found = discoveredByFile.get(row.file);
       if (!found) continue; // reported by the stale-row test above
-      if (found.memos.join(',') !== [...row.memos].sort().join(',')) {
-        drift.push(
-          `${row.file}: exemption ${row.memos.join(',')} vs source ${found.memos.join(',')}`,
-        );
+      for (const memo of row.memos) {
+        if (!found.memos.includes(memo)) {
+          drift.push(`${row.file}: exemption names ${memo}, which is no longer a compared memo`);
+        }
       }
     }
     expect(
@@ -937,6 +1211,49 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       'a classified module gained or lost a repaint memo. A NEW memo is a NEW gate and needs the language question answered about it, not inherited from the answer given about a different field:\n' +
         drift.join('\n'),
     ).toEqual([]);
+  });
+
+  it('really clears every memo the coordinator arm claims to answer', () => {
+    // THE BEHAVIORAL HALF of the hud.ts rows, and the reason the seven defects
+    // this audit found are fixed rather than merely described. Half 1 pins that
+    // refreshLocalizedDynamicUi CALLS relocalizeCoordinatorMemos; it cannot see
+    // whether that method touches the memos the rows name. Nothing else can
+    // either: these are private fields on an 18k-line coordinator no unit test
+    // instantiates, which is exactly how they sat unanswered behind a blanket
+    // exemption in the first place.
+    //
+    // A CLEAR IS ONLY A FIX IF ITS VALUE CANNOT BE LIVE DATA, so the sentinel is
+    // pinned too. NaN never equals itself, null is outside the boolean and
+    // number-or-null field types, -1 is below any count, and the empty string
+    // carries none of the separators every real signature has.
+    const body = methodBody(strippedHudSource, 'private relocalizeCoordinatorMemos(): void {');
+    const SENTINELS = ['Number.NaN', 'null', '-1', "''"];
+    const claimed = ANSWERED.filter(
+      (row) => row.file === 'hud.ts' && row.answer === 'this.relocalizeCoordinatorMemos',
+    ).flatMap((row) => [...row.memos]);
+    // Non-vacuity: the arm really has rows to check, and the slice really has a
+    // body (methodBody throws on a missing anchor, but an emptied method would
+    // slice to a few characters and pass every loop below over nothing).
+    expect(claimed.length, 'the coordinator arm answers no memo at all').toBeGreaterThanOrEqual(10);
+    expect(body.length, 'the coordinator arm sliced to an empty body').toBeGreaterThan(200);
+    const failures: string[] = [];
+    for (const memo of claimed) {
+      const match = body.match(new RegExp(`this\\.${memo}\\s*=\\s*([^;]+);`));
+      if (!match) {
+        failures.push(`${memo}: claimed by the coordinator arm but never cleared in it`);
+        continue;
+      }
+      const value = match[1].trim();
+      if (!SENTINELS.includes(value)) {
+        failures.push(`${memo}: cleared to ${value}, which live data could equal`);
+      }
+    }
+    // The compass rose labels are the one surface a clear cannot reach: they are
+    // written ONCE when the pool is built, so the arm has to rewrite them.
+    if (!/relabelCompassMarks\(/.test(body)) {
+      failures.push('the compass rose labels are never rewritten by the arm');
+    }
+    expect(failures, failures.join('\n')).toEqual([]);
   });
 
   it('verifies every LANGUAGE_KEYED claim against the real source', () => {
@@ -1110,6 +1427,13 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     expect(
       NOT_A_LANGUAGE_GATE.length,
       'the exemption list grew. Every entry is a memo this repo has decided cannot hold player text; adding one should be argued in review, not absorbed by a floor.',
+      // 33 as of masterwrought Phase 19D (qr-19-hud-coordinator-fanout-exemption):
+      // the single blanket hud.ts row LEFT and 22 memo-scoped hud.ts rows arrived
+      // in its place, covering the 28 of that file's 46 compared memos that hold
+      // no localized text (the other 18 are ANSWERED). The jump is the point of
+      // the ruling: the by-name skip on the largest hand-authored file in the
+      // tree is gone, so its exemptions are argued one at a time like every
+      // other module's.
       // 5 as of the guild bank activity log: its `lastAnnounced` memo gates an
       // assistive-tech RE-ANNOUNCEMENT and nothing that is drawn (argued in the
       // frontend-seam review of that slice; the row states the reasoning).
@@ -1146,7 +1470,7 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
       // cursor-keyword write and can never hold text; the frame's t() labels
       // already ride the interface_unlock relocalize() arm.
-    ).toBe(12);
+    ).toBe(33);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

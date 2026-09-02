@@ -428,7 +428,15 @@ const MONOLITHS: MonolithRow[] = [
     // regeneration, never reconciled by arithmetic: the two arms' extractions
     // compose, so the merged file is BELOW the higher parent. Exact merged
     // count, zero slack: any further growth reds again.
-    ceiling: 18728,
+    // LOWERED 18728 -> 18718 at masterwrought Phase 19D (D129,
+    // qr-19-hud-coordinator-fanout-exemption): the blanket hud.ts language
+    // exemption was replaced by a per-memo registry, which cost a
+    // relocalizeCoordinatorMemos arm, and the compass strip's DOM half
+    // (build, paint, relabel) moved out to src/ui/compass_strip.ts to pay for
+    // it. The merged file lands ONE line above where it started, so the 11
+    // lines of slack an earlier merge had left are given back and the
+    // zero-slack posture returns: any further growth reds again.
+    ceiling: 18718,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

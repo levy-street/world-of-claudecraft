@@ -231,7 +231,13 @@ import {
   shouldPlayMobVoiceSfxForEntity,
   spellFxCue,
 } from './combat_sfx';
-import { type CardinalId, compassView } from './compass';
+import { compassView } from './compass';
+import {
+  buildCompassMarks,
+  type CompassMarkElements,
+  paintCompassMarks,
+  relabelCompassMarks,
+} from './compass_strip';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
@@ -1627,7 +1633,7 @@ export class Hud {
   private lastClockText = ''; // avoid redundant DOM writes each frame
   private lastCoordsText = ''; // cache so we only touch the DOM when coords change
   // heading compass: a pool of rose-label spans built once, repositioned per frame
-  private compassMarks = new Map<string, HTMLElement>();
+  private compassMarks: CompassMarkElements = new Map();
   private compassHeadingEl: HTMLElement | null = null;
   private lastCompassHeading = '';
   // compassView is a pure function of the player facing, so an unchanged facing
@@ -1912,7 +1918,7 @@ export class Hud {
   // loops for casters that left interest mid-channel (no castStop/death arrives).
   private castLoopIds = new Set<number>();
   private lastNythraxisCombatEventAt = 0;
-  private lastResting = false;
+  private lastResting: boolean | null = false;
   private lastZoneId = '';
   private mapZoneId = '';
   private mapZoom = 1; // world-map zoom: 1 = whole zone, up to MAP_MAX_ZOOM
@@ -6933,18 +6939,35 @@ export class Hud {
     return makeWindowFocus(this.focusManager, () => $(rootSel));
   }
 
+  // The signature-gated surfaces that live INSIDE this coordinator, cleared as
+  // one arm. Each memo digests raw numbers, ids or booleans, so setLanguage
+  // alone can never move one and the surface it gates keeps the PREVIOUS locale
+  // until its data happens to change. Clearing to a value live data can never
+  // equal is the whole fix: the next ordinary repaint rebuilds with fresh t().
+  // Every memo here carries its own registry row and its own written reason in
+  // tests/language_fanout_registry.test.ts, which is what replaced the blanket
+  // hud.ts exemption (masterwrought qr-19-hud-coordinator-fanout-exemption).
+  private relocalizeCoordinatorMemos(): void {
+    this.lastPlayerFrameHp = Number.NaN;
+    this.lastPlayerFrameMaxHp = Number.NaN;
+    this.lastPlayerFrameResource = Number.NaN;
+    this.lastPlayerFrameMaxResource = Number.NaN;
+    this.lastResting = null;
+    this.lastAnnouncedTargetId = null;
+    this.lastMailUnread = -1;
+    this.lastLootSettingsSig = '';
+    this.lastPetBarSig = '';
+    this.lastCompassFacing = Number.NaN;
+    this.lastCompassHeading = '';
+    relabelCompassMarks(this.compassMarks);
+  }
+
   private refreshLocalizedDynamicUi(): void {
     this.doomMeter.relocalize();
     // The chat box's geometry chrome (move/resize labels, the arrange-mode
     // name chip) is written once at init, so the switch must rewrite it.
     this.chatGeometry.relocalize();
-    // The player unit frame's hp/resource text is memoized on the raw value,
-    // which does not change on a locale switch, so clear the memo to force
-    // unitFrameCurrentMaxText to re-render for the new language (#2900 review).
-    this.lastPlayerFrameHp = Number.NaN;
-    this.lastPlayerFrameMaxHp = Number.NaN;
-    this.lastPlayerFrameResource = Number.NaN;
-    this.lastPlayerFrameMaxResource = Number.NaN;
+    this.relocalizeCoordinatorMemos();
     this.syncDailyRewardsSurfaceLabels();
     this.wocMarketWindow.relocalize();
     this.storePromoCard?.relocalize({
@@ -10590,19 +10613,10 @@ export class Hud {
     if (el) el.textContent = text;
   }
 
-  // Build the compass rose-label pool once. Each of the 8 points gets a span
-  // that we later slide horizontally; positioning happens in updateCompass().
   private initCompass(): void {
     const track = $('#compass-track');
     if (!track) return;
-    const ids: CardinalId[] = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    for (const id of ids) {
-      const el = document.createElement('span');
-      el.className = `compass-mark${id.length === 1 ? ' major' : ''}`;
-      el.textContent = t(`hudChrome.compass.${id}`);
-      track.appendChild(el);
-      this.compassMarks.set(id, el);
-    }
+    this.compassMarks = buildCompassMarks(track, document);
     this.compassHeadingEl = $('#compass-heading');
   }
 
@@ -10612,20 +10626,7 @@ export class Hud {
     if (facing === this.lastCompassFacing) return; // pure function of facing: nothing can have changed
     this.lastCompassFacing = facing;
     const view = compassView(facing);
-    const visible = this.compassVisibleScratch;
-    visible.clear();
-    for (const m of view.marks) {
-      const el = this.compassMarks.get(m.label);
-      if (!el) continue;
-      visible.add(m.label);
-      // offsetFrac -1..1 → 0..100% across the strip; fade marks near the edges
-      el.style.left = `${(m.offsetFrac * 0.5 + 0.5) * 100}%`;
-      el.style.opacity = `${Math.max(0.2, 1 - Math.abs(m.offsetFrac) * 0.85)}`;
-      el.style.display = 'block';
-    }
-    for (const [label, el] of this.compassMarks) {
-      if (!visible.has(label)) el.style.display = 'none';
-    }
+    paintCompassMarks(this.compassMarks, view, this.compassVisibleScratch);
     if (this.compassHeadingEl && view.heading !== this.lastCompassHeading) {
       this.lastCompassHeading = view.heading;
       this.compassHeadingEl.textContent = t(`hudChrome.compass.${view.heading}`);
