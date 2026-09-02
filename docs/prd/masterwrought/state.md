@@ -27215,6 +27215,26 @@ name sits in the flagged table beside the fills. 19E's seven carried items,
 19D's four, 19C's three and 19B's four remain the maintainer's and were not
 taken here; R5 stays frozen.
 
+### Validation
+node scripts/gate_select.mjs on the committed code tip e58bff734a, pg-armed with
+TEST_DATABASE_URL only (DATABASE_URL never exported; the arming proved by
+contrast on tests/account_wealth_db.pg.test.ts first, skipped unarmed and 3
+passed armed; zero pg suites skipped in the gate), launched in the background
+with a marker file and judged by the real GATE_EXIT=0 line: PASS, all 12 steps
+green, mode full, 8 workers, 12 minutes; the malware scan 7930 files, 442 flags,
+0 high; the real-browser suite 38 files, 332 passed. tsc 0 at every commit; npm
+run ci:changed exit 0 after the last code commit and after every record commit;
+the census RESULT: PASS captured without a pipe at every commit; the guard
+suites green throughout (architecture, monolith, world_api parity, the S3 guard
+tests/localization_fixes.test.ts, tests/i18n_completeness.test.ts,
+tests/guide.test.ts, tests/guide_key_coverage.test.ts,
+tests/i18n_resolved_equivalence.test.ts); I18N_RELEASE_TIER never set. DRIFT
+predicted before the gate and re-derived after each round: files 3670/1 = 3671,
+no new test file; cases +9 exact over the 19E close (54,533/9/28 = 54,570).
+Measured: Test Files 3670 passed, 1 skipped (3671); Tests 54,542 passed, 9
+expected fail, 28 skipped (54,579). Every new pin mutated and watched fail
+alone, the failing test name and counts in phase-19f-qa.md.
+
 ### JUDGED, and not re-raised
 - The ten units, their rulings, and every reviewer and fresh-read finding are
   SETTLED. This ledger records them; it does not reopen them.
