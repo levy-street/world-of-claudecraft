@@ -2,10 +2,10 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3262,
+    "files": 3261,
     "mergedLocal": "2026-08-30",
     "mergedFiles": 238,
-    "note": "v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers."
+    "note": "2026-09-02 prune: dropped 1 row (proc_overlay_drag) whose test file was deleted with the module (the proc overlay moved onto the frames-unlock registry). Prior note: v0.41.0 base sync into the ignivar raid branch 2026-08-30: union of both arms' tables (release harvest wins shared rows, raid rows keep their locally measured durations), pruned to files present in the merged tree. Prior note: v0.41.0 sync into the ignivar raid consolidation: release CI harvest kept for shared files; the raid-branch and post-harvest test files carry locally measured durations (full vitest run of the absent files, jest-json start/end per file, skipped floor 100ms) 2026-08-26 prune: dropped 26 rows whose test file no longer exists in the tree. The 192 mergedLocal rows are LOCAL-scale durations (CI runs ~1.6x slower per ci_shard_plan.mjs); three of them exceed the 90s long-lane threshold locally (varkhul_forge_encounter, ignivar_encounter, nameplate_pledge) and CI_LONG_SUITES membership is deliberately deferred until a full-mode CI shard log provides in-shard numbers."
   },
   "tests/abilities_command.test.ts": 2582,
   "tests/ability_audio_defers_to_recordings.test.ts": 141,
@@ -2122,7 +2122,6 @@
   "tests/priest_talents.test.ts": 10,
   "tests/priest_vespers.test.ts": 30150,
   "tests/proc_fct_notes.test.ts": 6,
-  "tests/proc_overlay_drag.test.ts": 8,
   "tests/proc_overlay_view.test.ts": 47,
   "tests/prof_intro_hint.test.ts": 9,
   "tests/prof_intro_hint_online.test.ts": 1825,
