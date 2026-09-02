@@ -12741,6 +12741,7 @@ The eight inherited are unchanged and NOT re-decided here: the three inherited
 stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 `prog_first_harvest` taking 13 catches for a fishing-only character, and the
 `deepwater_feast` FIX-or-CUT. This phase adds:
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 (9) **THE DECISION-A CONTRADICTION**, costed above.
 (10) **THE SHIPPED-ID GOLDEN POLICY**, deviation 1 above: per-phase re-mint or
@@ -13335,6 +13336,7 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 `prog_first_harvest` taking 13 catches for a fishing-only character, the
 `deepwater_feast` FIX-or-CUT, the DECISION-A contradiction (the apex hoe's
 acquisition channel), and the shipped-id golden policy. This audit adds:
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 (11) **DECISION D'S BAND SCOPE.** The self-feeding refusal applies at the endgame
      band only. A levelling band credited solely by the family's own tool ladder
@@ -13753,7 +13755,7 @@ Unchanged and NOT re-decided here: the three inherited (scroll/elixir 15c
 parity, RULE 2's value-half reading, the inherited stale-client window), 11h's
 two deviations, 11i's session cap 15 s to 16 s (whose forcing arithmetic this
 audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
-`prog_first_harvest` taking 13 catches for a fishing-only character.
+`prog_first_harvest` taking 13 catches for a fishing-only character. (RULED qr-19-prog-first-harvest-thirteen-catches, 2026-09-02: ratified as shipped.)
 
 (8) **THE CAPSTONE FEAST IS UNREACHABLE.** FIX or CUT, both costed above. This
     is the one that makes the verdict FAIL rather than PASS-WITH-FOLLOWUPS.
@@ -14145,6 +14147,7 @@ already found and handled that consequence in the fishing suite and failed to
 carry it into the golden prediction. THE LESSON: a gain-rate change is a
 DEED-TRIGGER change wherever a deed counts the quantity that rate feeds; predict
 the trigger set, not just the number.
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 THE PHASE 11i QA RE-READ THE ARTIFACT AGAINST THIS PARAGRAPH, which is the rule
 the audit was given (check the observed change against the prediction as
@@ -14769,6 +14772,17 @@ correction, only the fills do), so it is recorded for the release fill and
 flagged as arriving with the merge rather than with the phase.
 
 ### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02, under qr-19-best-for-project): the
+13-catch timing is RATIFIED AS SHIPPED; no desc reword, no code, no fills. The mechanic is pinned in
+both directions by 'ACCEPTED DRIFT, NARROWED BY DECISION F: fishing still completes
+prog_first_harvest, no longer on the first catch' (tests/professions_fishing.test.ts), the parity
+golden already carries the non-firing window, and the wiki is held to the live
+FISHING_GAIN_SCHEDULE. The desc 'Harvest your first gathering node' stays: D103
+(qr-19-prog-first-harvest-bootstrap-deed) already read it as truthful for farming (a farm bed is not
+a GATHER_NODES node) and fishing's own instant renown-5 deed chr_vale_first_cast fires on the first
+catch, so the only looseness is fishing's thirteen catches, accepted on the record. The desc rider
+was offered with its price (a replacement desc plus the 18 deed-chunk and 18 guide-overlay fills,
+none owed by M16) and declined in session. Phase 19F.
 
 `prog_first_harvest` ("Harvest your first gathering node", trigger gathering
 amount 1) now takes THIRTEEN catches for a fishing-only character instead of
@@ -16259,6 +16273,7 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 hoe's acquisition channel), the shipped-id golden policy, decision D's band
 scope, and the reworded wiki key's five stale non-Latin fills (to which this
 phase adds a second reworded key, recorded above).
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 This phase adds NO new open item. Where it could have added one, it chose the
 option that closes rather than opens: the crop count at 1 keeps RULE 2's open
@@ -18905,6 +18920,8 @@ of the thirteen now carries its own priced row with its own ruling id (scroll/el
 parity D171, RULE 2's value-half reading D004 with its contingent D002, the stale-client
 window D172, 11h's two deviations D001 and D005, 11i's session cap D173,
 prog_first_harvest's thirteen catches D174, the apex hoe channel D003, the shipped-id
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the prog_first_harvest member of the
+thirteen (D174) is ratified as shipped; the full record sits after the 11i review's hand-back heading.
 golden policy D175, Decision D's band scope D176, the reworded wiki keys' stale fills D161,
 col_junk_drawer's three of margin D170, zone 1's no-poor-drop D009), and the eleventh-hour
 ledger additions are carried by the completeness pass that added D152 to D176. No blanket
