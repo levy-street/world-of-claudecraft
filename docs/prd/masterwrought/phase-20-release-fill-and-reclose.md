@@ -122,13 +122,21 @@ or because a fill's provenance is not something the worklist can say:
   conventions, FLAGGED for the maintainer's read in phase-19f-qa.md); the 15 Latin locales'
   780 rows are on the worklist above. Keys: the `aura.rift*` and `mechanic.rift*` block of
   `baseEnTable`, derived from `RIFT_MOBS` and pinned by `tests/sim_i18n_rift_mechanics.test.ts`.
+  (This bullet PRE-LANDED in the D148 commit 4b0062dc5b, one commit before the fills it
+  describes, so a revert of the D149 commit alone would leave it asserting five fills that
+  no longer exist; recorded at the D149 review round.)
 - **Four retire-and-re-key successors whose 15 Latin rows the registry now carries as
   pending:** `guide.professions.endgameMaterialsBodyAnyRaid` (D144),
   `guide.profPages.toolsNoteFourStarters` (D161, re-keyed twice: toolsNoteFiveLadders was deleted outright at the review round for a false count in its English), `guide.profPages.rareBodyFourFlavors` (D169)
   and `guide.profPages.craftProse.engineering.materialsBodyThreeRods` (the D085 review round).
   Their five non-Latin fills each rode the same change, machine-authored and FLAGGED for the
   maintainer's re-judgement at STEP 1 beside the other machine-anchored sets; the retired
-  predecessors keep their reviewed overlay rows and never reach the worklist.
+  predecessors KEEP their overlay rows (kept, not reviewed: the engineering and rare-finds
+  predecessors' non-Latin rows were stale or short when they were retired) and never reach the
+  worklist. Named plainly: for each successor the Latin locales that carried a translation of
+  the predecessor render ENGLISH on the live page until this fill lands (eleven locales for the
+  engineering materials prose, per the D085 frontend-seam review); the trade was a stale or
+  count-wrong translation for correct English, taken deliberately at 19F.
 - **Two ratified keys with a recorded staleness exposure, no fill owed by any gate:** the
   gathering `gatherDeeds.mining/logging/herbalism` rows and the five non-Latin
   `guide.profPages.rareBody` predecessors (which omitted the flavor names and the deed

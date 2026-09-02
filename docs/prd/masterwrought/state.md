@@ -13137,7 +13137,8 @@ is RETIRED AND RE-KEYED, the 11i mechanism. guide.profPages.toolsNoteThreeRods i
 (the a60aa9a4d7 shape, no RETIRED_KEYS row: the every-locale placeholder pin in tests/guide.test.ts,
 'publishes the tool-gate thresholds through placeholders in EVERY locale', reads the first
 'toolsNote' row of each resolved slice, so a kept old key would have been the row it read) and
-its successor guide.profPages.toolsNoteFiveLadders carries the same English; the five non-Latin
+its successor guide.profPages.toolsNoteFiveLadders (itself re-keyed at the review round to
+toolsNoteFourStarters, the AMENDED block below) carries the same English; the five non-Latin
 overlay rows are REPLACED by fresh full translations of the current note in the same change
 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill conventions and
 flagged for the maintainer's read in phase-19f-qa.md), and the Latin locales' rows (15 today, every
@@ -20401,9 +20402,14 @@ cooking identityBodyOneMeal precedent, which is how a craftProse body on a dynam
 re-keyed; the 11i-era note that these keys 'could not be re-keyed' predates that override), the old
 key is retired in scripts/i18n_retired_keys.mjs, and five fresh non-Latin fills rode the same
 change (machine-authored, flagged for the maintainer's read); the 15 Latin rows land pending for
-the Phase 20 fill. Two corrections to the ratification's own text: the hoe ladder is documented in
-the gathering pages' tools note (guide.profPages.toolsNoteFiveLadders), the guide has no farming
-page; and identityBody already names both on-ramp recipes (the Cogwheel Blank and the Copperlens
+the Phase 20 fill. STATED PLAINLY (the D085 frontend-seam review): eleven of those locales (cs_CZ,
+de_DE, es, es_ES, fr_CA, fr_FR, nl_NL, pt_BR, sv_SE, tr_TR, vi_VN) rendered a real translation
+of the retired body, count-wrong, and render raw English on the live engineering page until the
+Phase 20 fill; the other four (da_DK, id_ID, it_IT, pl_PL) were already English. The trade is a
+count-wrong translation for correct English, taken deliberately. Two corrections to the
+ratification's own text: the hoe ladder is documented in
+the gathering pages' tools note (guide.profPages.toolsNoteFourStarters since the review round's
+second re-key), the guide has no farming page; and identityBody already names both on-ramp recipes (the Cogwheel Blank and the Copperlens
 Ocular), so the altitude call was about the bills, never the recipes.
 note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
 placement note; the amendment-dating shortfall (corrected by this
