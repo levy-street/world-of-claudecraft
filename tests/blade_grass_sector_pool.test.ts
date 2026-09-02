@@ -156,6 +156,28 @@ describe('blade grass sector pool', () => {
     }
   });
 
+  it('re-measures the bounds only of the sectors it touched', () => {
+    const gridW = 8;
+    const { pool } = makePool(gridW, 4);
+    const m = new THREE.Matrix4();
+    const c = new THREE.Color(1, 1, 1);
+    for (let slot = 0; slot < gridW * gridW; slot++) {
+      m.setPosition(slot % gridW, 0, (slot / gridW) | 0);
+      pool.place(slot, m, c);
+    }
+    pool.syncSectors();
+    const untouched = pool.meshes[15];
+    const before = untouched.boundingSphere?.clone();
+    // move one instance of sector 0 far away and re-sync: sector 0 follows it,
+    // every other sector keeps the bounds it already measured
+    m.setPosition(500, 0, 500);
+    pool.place(0, m, c);
+    pool.syncSectors();
+    expect(pool.meshes[0].boundingSphere?.radius).toBeGreaterThan(100);
+    expect(untouched.boundingSphere?.radius).toBe(before?.radius);
+    expect(untouched.boundingSphere?.center.equals(before?.center as THREE.Vector3)).toBe(true);
+  });
+
   it('queues update ranges only for the sectors it touched', () => {
     const gridW = 8;
     const { pool } = makePool(gridW, 4);

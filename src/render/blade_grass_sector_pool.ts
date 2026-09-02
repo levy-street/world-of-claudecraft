@@ -39,6 +39,8 @@ interface Sector {
   readonly dense: DenseSlotState;
   readonly bands: UploadBands;
   readonly ranges: Int32Array;
+  /** Whether this pass wrote or dropped any of this sector's instances. */
+  touched: boolean;
 }
 
 export interface BladeSectorPoolOptions {
@@ -110,6 +112,7 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
         dense: { count: 0, slotToDense, denseToSlot: new Int32Array(capacity).fill(-1) },
         bands,
         ranges: createUploadRangeScratch(bands),
+        touched: false,
       });
     }
   }
@@ -130,12 +133,14 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
       s.im.setMatrixAt(dense, matrix);
       s.im.setColorAt(dense, color);
       markUploadDirty(s.bands, dense);
+      s.touched = true;
     },
     remove(slot: number): void {
       const s = sectors[slotSector[slot]];
       const removedDense = s.dense.slotToDense[slot];
       if (removedDense < 0) return;
       const movedSlot = deactivateDenseSlot(s.dense, slot);
+      s.touched = true;
       if (movedSlot < 0) return;
       // The old last element remains readable at the new count index until
       // this copy completes. Moving it into the gap keeps the submitted
@@ -168,6 +173,11 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
       for (const s of sectors) {
         const count = s.dense.count;
         s.im.count = count;
+        // An untouched sector's clusters did not move, so its bounds still
+        // hold: a crossing re-places one slot line and reaches four sectors of
+        // sixteen, and rescanning the other twelve is pure waste.
+        if (!s.touched) continue;
+        s.touched = false;
         const sphere = s.im.boundingSphere;
         if (!sphere) continue;
         if (count === 0) {
