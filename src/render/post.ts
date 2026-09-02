@@ -286,9 +286,12 @@ export function buildComposer(
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
       // A resize or a render-scale change can move the buffer across the pixel
       // budget; re-resolve here so the AO arm follows the extent it draws at.
+      // The arm in force goes in too: crossing rebuilds and relinks n8ao, so the
+      // budget's hysteresis band holds it through a boundary wobble.
       const resolved = resolveAoFullRes(
         GFX.aoFullRes,
         Math.floor(width * pixelRatio) * Math.floor(height * pixelRatio),
+        aoFullRes,
       );
       if (ao && resolved !== aoFullRes) {
         aoFullRes = resolved;

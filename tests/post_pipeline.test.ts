@@ -327,6 +327,20 @@ describe('live post pipeline', () => {
   it('re-resolves the AO arm when a resize crosses the pixel budget', async () => {
     vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
+    const { postPipelinePlan } = await import('../src/render/post_plan_core');
+    const planInput = {
+      gradeOnly: false,
+      ao: true,
+      aoFullRes: true,
+      bloom: true,
+      smaa: true,
+      fxaa: false,
+      n8aoDisabled: false,
+      smaaDisabled: false,
+      fxaaDisabled: false,
+      isWebGL2: true,
+      msaaSamples: 0,
+    };
     const post = buildComposer(
       rendererStub(1920, 1080),
       new THREE.Scene(),
@@ -339,6 +353,19 @@ describe('live post pipeline', () => {
 
     post.setSize(3840, 2160, 1);
     expect(ao.configuration.halfRes).toBe(true);
+
+    // The live chain after the flip must match the plan for the arm it flipped
+    // to, or the plan stops describing the storage it claims to describe.
+    const halfResPlan = postPipelinePlan({ ...planInput, aoFullRes: false });
+    const aoInternals = post.ao as unknown as {
+      depthDownsampleTarget?: THREE.WebGLRenderTarget | null;
+      writeTargetInternal: THREE.WebGLRenderTarget;
+    };
+    expect(halfResPlan.renderTargets.map((target) => target.id)).toContain('n8ao-depth-downsample');
+    expect(aoInternals.depthDownsampleTarget).toBeTruthy();
+    expect(halfResPlan.renderTargets.find((target) => target.id === 'n8ao-ao-a')?.scale).toBe(0.5);
+    expect(aoInternals.writeTargetInternal.width).toBe(3840 / 2);
+    expect(aoInternals.writeTargetInternal.height).toBe(2160 / 2);
 
     post.setSize(1920, 1080, 1);
     expect(ao.configuration.halfRes).toBe(false);

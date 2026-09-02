@@ -351,8 +351,10 @@ interface AttributionTargetFixture {
 // Re-minted for the post-chain pixel budget: the renderer's coalesced
 // viewport-resize pass moves the runtimeRender.renderer leaf. No capture
 // was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '54cf41aea356a56dc5d74f4e51fc08ccaceec522bd94d5c31c399a3fc68cc5ac';
+  'c70e8499aded38a741fb1043b7068a5764524a90019abfeb59f4d548d8a07245';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

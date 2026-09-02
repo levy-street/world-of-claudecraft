@@ -1037,10 +1037,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the post-chain pixel budget: the renderer's coalesced
 // viewport-resize pass moves the runtimeRender.renderer leaf. No capture
 // was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4c42ffb4503069aa1f406326666314821453c3a1c0ad36f9415fbe3f3f9ba8d0';
+  'c0301cb2f33cc8867a53c0922cedf477e84ab2fa389f3cdec88e4ead538fccc0';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '54cf41aea356a56dc5d74f4e51fc08ccaceec522bd94d5c31c399a3fc68cc5ac';
+  'c70e8499aded38a741fb1043b7068a5764524a90019abfeb59f4d548d8a07245';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2198,7 +2200,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // composite first, then this seal. No capture was retaken.
       // Re-minted for the post-chain pixel budget: the composite first, then
       // this seal. No capture was retaken.
-    ).toBe('eb1e1153bdd2eb1fc124bc14e7dede658bc067d6c67eef5c52c5c3c38b83dfb5');
+    ).toBe('9b849622a9b54df10a1eb5b2c73f6191b96769e01df51dfd4d3b9a0c5af18700');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

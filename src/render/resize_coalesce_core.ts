@@ -17,10 +17,12 @@
 // The extent alone is NOT the whole identity, though, and browser zoom is why:
 // zooming to 150 percent shrinks a 1920x1080 CSS viewport to 1280x720 and
 // raises the ratio to 1.5, so the extent comes out 1920x1080 either way. The
-// pass also writes the renderer's own pixel ratio, which `applyRenderRegion`
-// reads back against the live CSS height to size point sprites, so skipping on
-// a matching extent alone would leave that scale wrong by the zoom factor. The
-// recorded identity is therefore the extent AND the ratio that produced it.
+// pass writes more than storage: the renderer's own pixel ratio, which
+// `applyRenderRegion` reads back against the live CSS height to size point
+// sprites, and the logical size the ripple projection takes its aspect from.
+// So the recorded identity is every INPUT the pass consumes, the CSS size and
+// the ratio, and the extent is what makes a ratio change matter rather than
+// being the identity itself.
 
 export interface DrawingBufferExtent {
   readonly width: number;
@@ -43,20 +45,23 @@ export function drawingBufferExtent(
   };
 }
 
-/** A drawing-buffer extent plus the pixel ratio the renderer was left holding. */
-export interface AllocatedResolution extends DrawingBufferExtent {
+/** Everything one viewport pass consumes, plus the extent those inputs produce. */
+export interface AppliedResolution {
+  readonly cssWidth: number;
+  readonly cssHeight: number;
   readonly pixelRatio: number;
+  readonly extent: DrawingBufferExtent;
 }
 
-export function allocatedResolutionEquals(
-  a: AllocatedResolution | null,
-  b: AllocatedResolution | null,
+export function appliedResolutionEquals(
+  a: AppliedResolution | null,
+  b: AppliedResolution | null,
 ): boolean {
   return (
     a !== null &&
     b !== null &&
-    a.width === b.width &&
-    a.height === b.height &&
+    a.cssWidth === b.cssWidth &&
+    a.cssHeight === b.cssHeight &&
     a.pixelRatio === b.pixelRatio
   );
 }
@@ -75,16 +80,14 @@ export interface ResizeCoalescer {
    * Records the extent, so the next identical pass answers false.
    */
   shouldAllocate(cssWidth: number, cssHeight: number, pixelRatio: number): boolean;
-  /** Forget the allocated resolution, so the next pass reallocates unconditionally. */
-  reset(): void;
-  /** The resolution currently allocated, or null before the first pass. */
-  allocated(): AllocatedResolution | null;
+  /** The resolution currently applied, or null before the first pass. */
+  applied(): AppliedResolution | null;
 }
 
 /** @param run the one viewport pass a coalesced burst produces. */
 export function createResizeCoalescer(run: () => void): ResizeCoalescer {
   let pending = false;
-  let allocated: AllocatedResolution | null = null;
+  let applied: AppliedResolution | null = null;
   return {
     request(schedule: (callback: () => void) => void): void {
       if (pending) return;
@@ -97,16 +100,18 @@ export function createResizeCoalescer(run: () => void): ResizeCoalescer {
       });
     },
     shouldAllocate(cssWidth: number, cssHeight: number, pixelRatio: number): boolean {
-      const next = { ...drawingBufferExtent(cssWidth, cssHeight, pixelRatio), pixelRatio };
-      if (allocatedResolutionEquals(allocated, next)) return false;
-      allocated = next;
+      const next: AppliedResolution = {
+        cssWidth,
+        cssHeight,
+        pixelRatio,
+        extent: drawingBufferExtent(cssWidth, cssHeight, pixelRatio),
+      };
+      if (appliedResolutionEquals(applied, next)) return false;
+      applied = next;
       return true;
     },
-    reset(): void {
-      allocated = null;
-    },
-    allocated(): AllocatedResolution | null {
-      return allocated;
+    applied(): AppliedResolution | null {
+      return applied;
     },
   };
 }

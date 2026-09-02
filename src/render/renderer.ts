@@ -10181,7 +10181,7 @@ export class Renderer {
       this.viewportPollTimer = 0;
       const measured = this.measureViewport();
       if (measured.width !== this.viewport.width || measured.height !== this.viewport.height) {
-        this.resizeViewport(measured);
+        this.onViewportResize();
       }
     }
     this.time += dt;

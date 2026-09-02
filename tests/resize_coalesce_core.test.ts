@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  allocatedResolutionEquals,
+  appliedResolutionEquals,
   createResizeCoalescer,
   drawingBufferExtent,
 } from '../src/render/resize_coalesce_core';
@@ -34,21 +34,28 @@ describe('drawingBufferExtent', () => {
     expect(drawingBufferExtent(1, 1, 0.25)).toEqual({ width: 1, height: 1 });
   });
 
-  it('compares both axes and the ratio, and treats a missing resolution as different', () => {
+  it('compares every input the pass consumes, and a missing one is different', () => {
     const at = (w: number, h: number, r: number) => ({
-      ...drawingBufferExtent(w, h, r),
+      cssWidth: w,
+      cssHeight: h,
       pixelRatio: r,
+      extent: drawingBufferExtent(w, h, r),
     });
     const a = at(1920, 1080, 1);
-    expect(allocatedResolutionEquals(a, at(1920, 1080, 1))).toBe(true);
-    expect(allocatedResolutionEquals(a, at(1921, 1080, 1))).toBe(false);
-    expect(allocatedResolutionEquals(a, at(1920, 1081, 1))).toBe(false);
+    expect(appliedResolutionEquals(a, at(1920, 1080, 1))).toBe(true);
+    expect(appliedResolutionEquals(a, at(1921, 1080, 1))).toBe(false);
+    expect(appliedResolutionEquals(a, at(1920, 1081, 1))).toBe(false);
     // Same extent, different ratio: browser zoom, and the renderer's own pixel
     // ratio still has to be rewritten.
-    expect(allocatedResolutionEquals(a, at(1280, 720, 1.5))).toBe(false);
-    expect(allocatedResolutionEquals(null, a)).toBe(false);
-    expect(allocatedResolutionEquals(a, null)).toBe(false);
-    expect(allocatedResolutionEquals(null, null)).toBe(false);
+    expect(appliedResolutionEquals(a, at(1280, 720, 1.5))).toBe(false);
+    // Same extent AND same ratio but a different CSS size, which a sub-1 ratio
+    // makes reachable: the ripple aspect is taken from the logical size, so
+    // this is a change too.
+    expect(drawingBufferExtent(1920, 1080, 0.75)).toEqual(drawingBufferExtent(1921, 1080, 0.75));
+    expect(appliedResolutionEquals(at(1920, 1080, 0.75), at(1921, 1080, 0.75))).toBe(false);
+    expect(appliedResolutionEquals(null, a)).toBe(false);
+    expect(appliedResolutionEquals(a, null)).toBe(false);
+    expect(appliedResolutionEquals(null, null)).toBe(false);
   });
 });
 
@@ -85,9 +92,14 @@ describe('resize coalescing', () => {
 
   it('allocates once for an extent, then never again for the same one', () => {
     const gate = createResizeCoalescer(() => {});
-    expect(gate.allocated()).toBeNull();
+    expect(gate.applied()).toBeNull();
     expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
-    expect(gate.allocated()).toEqual({ width: 1920, height: 1080, pixelRatio: 1 });
+    expect(gate.applied()).toEqual({
+      cssWidth: 1920,
+      cssHeight: 1080,
+      pixelRatio: 1,
+      extent: { width: 1920, height: 1080 },
+    });
     for (let i = 0; i < 20; i++) expect(gate.shouldAllocate(1920, 1080, 1)).toBe(false);
   });
 
@@ -100,7 +112,7 @@ describe('resize coalescing', () => {
     expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
     expect(drawingBufferExtent(1280, 720, 1.5)).toEqual(drawingBufferExtent(1920, 1080, 1));
     expect(gate.shouldAllocate(1280, 720, 1.5)).toBe(true);
-    expect(gate.allocated()).toEqual({ width: 1920, height: 1080, pixelRatio: 1.5 });
+    expect(gate.applied()?.extent).toEqual({ width: 1920, height: 1080 });
     expect(gate.shouldAllocate(1280, 720, 1.5)).toBe(false);
   });
 
@@ -109,7 +121,7 @@ describe('resize coalescing', () => {
     expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
     // The DPR watch fires with the same CSS box; the backing store still moves.
     expect(gate.shouldAllocate(1920, 1080, 2)).toBe(true);
-    expect(gate.allocated()).toEqual({ width: 3840, height: 2160, pixelRatio: 2 });
+    expect(gate.applied()?.extent).toEqual({ width: 3840, height: 2160 });
     expect(gate.shouldAllocate(1920, 1080, 2)).toBe(false);
     // And back down again.
     expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
@@ -161,14 +173,5 @@ describe('resize coalescing', () => {
     expect(allocations).toBe(3);
     burst(1);
     expect(allocations).toBe(3);
-  });
-
-  it('reallocates unconditionally after a reset', () => {
-    const gate = createResizeCoalescer(() => {});
-    expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
-    expect(gate.shouldAllocate(1920, 1080, 1)).toBe(false);
-    gate.reset();
-    expect(gate.allocated()).toBeNull();
-    expect(gate.shouldAllocate(1920, 1080, 1)).toBe(true);
   });
 });

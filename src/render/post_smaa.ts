@@ -12,7 +12,14 @@ interface SMAAPassTargets {
   weightsRT?: WebGLRenderTarget;
 }
 
-/** The pass's edges and weights targets, whichever field names this three carries. */
+/**
+ * The pass's edges and weights targets, whichever field names this three
+ * carries. Best-effort by design: if a future three renames the fields again
+ * both lookups miss and nothing is re-typed, which would leave
+ * `post_plan_core.ts` declaring rgba8 for HalfFloat targets. The length
+ * assertion in the SMAA case of `tests/post_pipeline.test.ts` is what catches
+ * that, so keep it decisive.
+ */
 export function smaaIntermediateTargets(pass: SMAAPass): WebGLRenderTarget[] {
   const view = pass as unknown as SMAAPassTargets;
   const edges = view._edgesRT ?? view.edgesRT;
