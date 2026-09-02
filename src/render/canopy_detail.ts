@@ -125,10 +125,24 @@ interface CanopyTextures {
 const TEX: CanopyTextures = { normal: null, ao: null };
 let canopyTextureTask: Promise<void> | null = null;
 
+/** The layer a profile compiles, or null when it ships no canopy detail. */
+export function canopyDetailProfileFor(target: Readonly<GfxSettings>): CanopyDetailProfile | null {
+  return target.canopyDetail ? canopyDetailProfile(target.canopyDetailTaps) : null;
+}
+
+/**
+ * Every map an arm actually samples is resolved. The AO-only arm never asks
+ * for the NormalGL map, so it must not WAIT on one either: keyed off
+ * TEX.normal regardless, ultra would fail soft forever and ship plain leaves.
+ */
+function canopyTexturesReady(profile: CanopyDetailProfile): boolean {
+  return TEX.ao !== null && (!profile.normalDetail || TEX.normal !== null);
+}
+
 /** Prepare the canopy texture channel selected by an explicit target profile. */
 export function prepareCanopyDetailProfileAssets(target: Readonly<GfxSettings>): Promise<void> {
-  if (!target.canopyDetail || (TEX.normal && TEX.ao)) return Promise.resolve();
-  if (canopyTextureTask) return canopyTextureTask;
+  const profile = canopyDetailProfileFor(target);
+  if (!profile || canopyTexturesReady(profile)) return Promise.resolve();
   const prep = (name: string): Promise<THREE.Texture> =>
     loadTexture(`${CANOPY_TEXTURE_DIR}${CANOPY_TEXTURE_PREFIX}_${name}.jpg`, {
       repeat: true,
@@ -138,16 +152,39 @@ export function prepareCanopyDetailProfileAssets(target: Readonly<GfxSettings>):
       t.needsUpdate = true;
       return t;
     });
-  canopyTextureTask = Promise.all([prep('NormalGL'), prep('AmbientOcclusion')])
-    .then(([n, a]) => {
-      TEX.normal = n;
-      TEX.ao = a;
-    })
-    .catch((err) => {
-      canopyTextureTask = null;
-      throw err;
-    });
-  return canopyTextureTask;
+  // Chained rather than single-flighted on a fixed pair: the AO-only arm
+  // fetches ONE map, and a profile change up to insane then asks for the
+  // NormalGL map that arm never wanted. Chaining lets the second request
+  // re-read what is still missing instead of joining a task that was never
+  // going to fetch it.
+  const task = (canopyTextureTask ?? Promise.resolve()).then(() => {
+    const jobs: Promise<void>[] = [];
+    if (!TEX.ao) {
+      jobs.push(
+        prep('AmbientOcclusion').then((t) => {
+          TEX.ao = t;
+        }),
+      );
+    }
+    if (profile.normalDetail && !TEX.normal) {
+      jobs.push(
+        prep('NormalGL').then((t) => {
+          TEX.normal = t;
+        }),
+      );
+    }
+    // Both maps of the full arm still fetch in parallel; only the CHAIN is
+    // serial, and it exists so a second request re-reads what is missing.
+    return Promise.all(jobs).then(() => undefined);
+  });
+  const chained: Promise<void> = task.catch((err) => {
+    // Drop the poisoned head so the next request starts a fresh chain (the
+    // callback runs long after this binding is initialized).
+    if (canopyTextureTask === chained) canopyTextureTask = null;
+    throw err;
+  });
+  canopyTextureTask = chained;
+  return chained;
 }
 
 registerDeferredPreload(() => prepareCanopyDetailProfileAssets(GFX));
@@ -159,8 +196,12 @@ registerDeferredPreload(() => prepareCanopyDetailProfileAssets(GFX));
  * live canopy draw. Empty before the preload gate resolves.
  */
 export function canopyDetailPrewarmTextures(): THREE.Texture[] {
+  const profile = canopyDetailProfileFor(GFX);
+  if (!profile) return [];
   const out: THREE.Texture[] = [];
-  if (TEX.normal) out.push(TEX.normal);
+  // Only what this arm samples: uploading the NormalGL map on the AO-only
+  // tier would cost the GPU residency of a 1K map no fragment ever reads.
+  if (profile.normalDetail && TEX.normal) out.push(TEX.normal);
   if (TEX.ao) out.push(TEX.ao);
   return out;
 }
@@ -175,7 +216,7 @@ export function canopyDetailProgramCacheKey(
   profile: CanopyDetailProfile,
   baseProgramKey: string,
 ): string {
-  const ready = TEX.normal && TEX.ao ? 'on' : 'off';
+  const ready = canopyTexturesReady(profile) ? 'on' : 'off';
   const fade = `${(profile.fadeStart * CANOPY_FADE_SCALE).toFixed(1)},${(profile.fadeEnd * CANOPY_FADE_SCALE).toFixed(1)}`;
   return `canopy-detail|${ready}|t${profile.taps}|f${fade}|${baseProgramKey}`;
 }
@@ -218,7 +259,7 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     prev?.call(mat, shader, renderer);
     // Fail soft before the preload gate resolves: the material simply ships
     // without the layer (the detail_normals null contract).
-    if (!TEX.normal || !TEX.ao) return;
+    if (!canopyTexturesReady(profile)) return;
     if (profile.normalDetail) {
       shader.uniforms.uCanopyNormalTex = { value: TEX.normal };
       shader.uniforms.uCanopyStrength = { value: spec.strength };

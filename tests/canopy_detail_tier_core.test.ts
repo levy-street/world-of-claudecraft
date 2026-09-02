@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { canopyDetailProfileFor, canopyDetailProgramCacheKey } from '../src/render/canopy_detail';
 import {
   CANOPY_FADE_END_AO_ONLY,
   CANOPY_FADE_END_FULL,
@@ -103,5 +104,42 @@ describe('canopy detail tier ladder', () => {
     expect(adv(0.5).canopyDetailTaps).toBe(CANOPY_TAPS_OFF);
     expect(adv(1).canopyDetailTaps).toBe(CANOPY_TAPS_AO_ONLY);
     expect(adv(2).canopyDetailTaps).toBe(CANOPY_TAPS_FULL);
+  });
+});
+
+describe('canopy detail material identity and residency', () => {
+  it('gives the two arms different program cache keys', () => {
+    // The arms compile DIFFERENT fragment sources (3 taps against 6), so a
+    // shared program would draw one tier with the other's shader.
+    const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
+    const full = canopyDetailProfile(CANOPY_TAPS_FULL);
+    if (!ao || !full) throw new Error('both shipped arms must resolve');
+    const aoKey = canopyDetailProgramCacheKey(ao, 'base');
+    const fullKey = canopyDetailProgramCacheKey(full, 'base');
+    expect(aoKey).not.toBe(fullKey);
+    expect(aoKey).toContain(`t${CANOPY_TAPS_AO_ONLY}`);
+    expect(fullKey).toContain(`t${CANOPY_TAPS_FULL}`);
+    // The chained base key is still carried, so the collapse semantics that
+    // key ahead of this one keep splitting programs the way they did.
+    expect(aoKey.endsWith('|base')).toBe(true);
+    // A material with no previous hook keys distinctly from one that had one.
+    expect(canopyDetailProgramCacheKey(ao, '')).not.toBe(aoKey);
+  });
+
+  it('resolves the arm a target profile ships, off included', () => {
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('high'))).toBeNull();
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('ultra'))?.normalDetail).toBe(
+      false,
+    );
+    expect(canopyDetailProfileFor(gfxInternalsForTest.settingsFor('insane'))?.normalDetail).toBe(
+      true,
+    );
+    // canopyDetail false wins over any tap count that survived a remap.
+    expect(
+      canopyDetailProfileFor({
+        ...gfxInternalsForTest.settingsFor('insane'),
+        canopyDetail: false,
+      }),
+    ).toBeNull();
   });
 });
