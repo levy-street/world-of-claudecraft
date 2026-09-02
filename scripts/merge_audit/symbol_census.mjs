@@ -220,7 +220,19 @@ export const EXCLUDED_DIR_SEGMENTS = Object.freeze(['node_modules', 'dist']);
  *  authored) and this script's own directory, scripts/merge_audit/, which also holds
  *  the phase's sibling audit tools (shard_weight_union.mjs, golden_composition.mjs):
  *  none of these exist on any parent, so scanning them would only mint EXTRA rows for
- *  the auditors themselves. */
+ *  the auditors themselves.
+ *
+ *  RULED (qr-19-census-allowlist-path-asymmetry, 2026-09-01, under
+ *  qr-19-best-for-project): THE EXCLUSION STANDS. It is lossless for the
+ *  direction that matters, because no parent ref carries scripts/merge_audit/
+ *  at all, so nothing here can ever be MISSING; the only verdict it suppresses
+ *  is EXTRA, which is exactly what it was written to suppress. What changed is
+ *  the ALLOWLIST side: an explained-extras row may now declare a Path, and a
+ *  row naming a name under one of these prefixes is reported as INFORMATIONAL
+ *  rather than as an unsatisfiable entry the tool confidently calls GONE from
+ *  merged. The old message was not merely unhelpful, it asserted the opposite
+ *  of the truth about a live export.
+ */
 export const EXCLUDED_PATH_PREFIXES = Object.freeze([
   'src/ui/i18n.resolved.generated/',
   'scripts/merge_audit/',
@@ -1903,10 +1915,18 @@ export function parseExplainedExtras(markdown) {
       defects.push(`extras line ${ln + 1}: unknown class '${classLabel}'`);
       continue;
     }
+    // OPTIONAL Path (or Scope) column, added under
+    // qr-19-census-allowlist-path-asymmetry. Absent it reads '', which is how
+    // every pre-existing five-column table keeps parsing byte-unchanged; when
+    // present it lets the comparison tell an EXCLUDED-PATH row (a live name the
+    // census can never match, so the entry is informational) from a row that is
+    // genuinely GONE from merged.
+    const path = get('path') || get('scope');
     const row = {
       cls,
       classLabel,
       name: get('name'),
+      path,
       phase: get('phase'),
       ruling: get('ruling'),
       reason: get('reason'),
@@ -1918,6 +1938,15 @@ export function parseExplainedExtras(markdown) {
     if (!row.reason || /^deleted\.?$/i.test(row.reason))
       defects.push(
         `extras line ${ln + 1}: a reason saying only 'deleted' (or nothing) is a defect`,
+      );
+    // A Path is a CLAIM about the census scope, so it is checked rather than
+    // trusted: a row declaring a path the census actually scans would be
+    // claiming an exemption it does not have, and would then be reported as
+    // informational when it is a real regression.
+    if (path && isCensusPath(path))
+      defects.push(
+        `extras line ${ln + 1}: Path '${path}' is IN census scope, so this row is not an ` +
+          'excluded-path record; drop the Path column or file the name as an ordinary extra',
       );
     rows.push(row);
   }
@@ -2233,8 +2262,20 @@ export function compareCensus({
     //  - present, but a PARENT now defines it too: a later release independently
     //    added the same name, so the row is merely obsolete. That is a legitimate
     //    tree, and failing it would red-light an ordinary sync. WARN, drop the row.
+    //  - present on NEITHER side because the row names a path the census does
+    //    not scan (EXCLUDED_PATH_PREFIXES): the name is live, the tool simply
+    //    cannot see it. INFORMATIONAL, never a FAIL (D130,
+    //    qr-19-census-allowlist-path-asymmetry). Before this split the tool
+    //    reported five live, exported, called and asserted names as 'GONE from
+    //    merged', which is the exact opposite of the truth.
     const allowlisted = [...extrasByClass[cls].keys()];
-    const unusedExtras = allowlisted.filter((name) => !m.has(name));
+    const absent = allowlisted.filter((name) => !m.has(name));
+    const excludedPathExtras = absent.filter((name) => {
+      const path = extrasByClass[cls].get(name)?.path;
+      return Boolean(path) && !isCensusPath(path);
+    });
+    const excludedPathSet = new Set(excludedPathExtras);
+    const unusedExtras = absent.filter((name) => !excludedPathSet.has(name));
     const convergedExtras = allowlisted.filter((name) => m.has(name) && union.has(name));
     const staleDeletionRows = [...deletionByClass[cls].keys()].filter(
       (name) => m.has(name) || !union.has(name),
@@ -2330,6 +2371,7 @@ export function compareCensus({
       extraExplained,
       extraUnexplained,
       unusedExtras,
+      excludedPathExtras,
       convergedExtras,
       missingRenameTargets,
       staleDeletionRows,
@@ -2433,6 +2475,11 @@ export function formatReport(r, limit = 60) {
       L.push(
         `  FAIL allowlist entries GONE from merged (the merge authored these and then lost ` +
           `them): ${c.unusedExtras.join(', ')}`,
+      );
+    if (c.excludedPathExtras?.length)
+      L.push(
+        `  INFO allowlist entries under an excluded path prefix, so no census class can match ` +
+          `them (the name is live; the tool does not scan its directory): ${c.excludedPathExtras.join(', ')}`,
       );
     if (c.convergedExtras?.length)
       L.push(

@@ -394,6 +394,113 @@ describe('the fix round own promotions: unusedExtras and rename targets FAIL', (
   });
 });
 
+describe('the excluded-path allowlist row: informational, not GONE (D130)', () => {
+  // THE DEFECT THIS CLOSES. The census filters its MERGED SCAN through
+  // isCensusPath but used to filter nothing on the allowlist side, so a row
+  // naming a live export under an excluded prefix (scripts/merge_audit/, the
+  // auditors' own directory) became an entry nothing could ever satisfy, and
+  // the tool reported it as 'GONE from merged': a confidently WRONG claim about
+  // a symbol that is exported, called and asserted. Five real names hit this.
+  // The arms below reproduce the old verdict on a fixture row and show the same
+  // row become informational once it declares its Path.
+  const SIM = 'src/sim/thing.ts';
+  const tree = (src: string) => censusTree([[SIM, src]]);
+  const cmp = (explainedExtras: unknown[]) =>
+    compareCensus({
+      ours: tree('export const alpha = 1;'),
+      theirs: tree('export const alpha = 1;'),
+      merged: tree('export const alpha = 1;'),
+      deletionRows: [],
+      explainedExtras: explainedExtras as never,
+      floors: NO_FLOORS,
+      releases: [],
+      base: null,
+    });
+
+  it('reads an OPTIONAL Path column and leaves older five-column rows unchanged', () => {
+    const withPath = parseExplainedExtras(
+      [
+        '## Explained extras',
+        '',
+        '| Class | Name | Path | Phase | Ruling | Reason |',
+        '|---|---|---|---|---|---|',
+        '| export | `zeta` | scripts/merge_audit/tool.mjs | 19D | r | a live auditor export |',
+      ].join('\n'),
+    );
+    expect(withPath.defects).toEqual([]);
+    expect(withPath.rows.map((r: { name: string; path: string }) => [r.name, r.path])).toEqual([
+      ['zeta', 'scripts/merge_audit/tool.mjs'],
+    ]);
+    // Append-only: the pre-existing shape still parses, byte for byte, with the
+    // new field simply empty. This is the arm that would red if the column had
+    // been made required.
+    const withoutPath = parseExplainedExtras(
+      [
+        '## Explained extras',
+        '',
+        '| Class | Name | Phase | Ruling | Reason |',
+        '|---|---|---|---|---|',
+        '| export | `zeta` | 19D | r | an ordinary extra |',
+      ].join('\n'),
+    );
+    expect(withoutPath.defects).toEqual([]);
+    expect(withoutPath.rows.map((r: { name: string; path: string }) => [r.name, r.path])).toEqual([
+      ['zeta', ''],
+    ]);
+  });
+
+  it('a Path INSIDE census scope is a DEFECT, not an exemption', () => {
+    // The claim is checked rather than trusted: without this, a row could buy
+    // itself informational treatment by naming any path at all, and a real
+    // regression under src/ would stop failing.
+    const { defects } = parseExplainedExtras(
+      [
+        '## Explained extras',
+        '',
+        '| Class | Name | Path | Phase | Ruling | Reason |',
+        '|---|---|---|---|---|---|',
+        '| export | `zeta` | src/sim/thing.ts | 19D | r | claims an exclusion it does not have |',
+      ].join('\n'),
+    );
+    expect(defects).toHaveLength(1);
+    expect(defects[0]).toContain('IN census scope');
+  });
+
+  it('reproduces the old wrong verdict without a Path, and makes it informational with one', () => {
+    // BEFORE: no Path, so the absent name is read as a symbol the merge lost.
+    const before = cmp([{ cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: '' }]);
+    expect(before.perClass.exports.unusedExtras).toEqual(['zeta']);
+    expect(before.perClass.exports.excludedPathExtras).toEqual([]);
+    expect(before.failed).toBe(true);
+
+    // AFTER: the same absent name, now declaring the excluded path it lives at.
+    const after = cmp([
+      {
+        cls: 'exports',
+        name: 'zeta',
+        phase: '19D',
+        ruling: 'r',
+        path: 'scripts/merge_audit/tool.mjs',
+      },
+    ]);
+    expect(after.perClass.exports.excludedPathExtras).toEqual(['zeta']);
+    expect(after.perClass.exports.unusedExtras).toEqual([]);
+    expect(after.failed).toBe(false);
+  });
+
+  it('an in-scope Path never buys the informational verdict', () => {
+    // The other direction of the same rule, at the comparison rather than the
+    // parser: a row that names a path the census DOES scan keeps failing, so the
+    // new bucket cannot be used to silence a genuine loss.
+    const res = cmp([
+      { cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: 'src/sim/thing.ts' },
+    ]);
+    expect(res.perClass.exports.excludedPathExtras).toEqual([]);
+    expect(res.perClass.exports.unusedExtras).toEqual(['zeta']);
+    expect(res.failed).toBe(true);
+  });
+});
+
 describe('parseDeletionList', () => {
   it('a reason saying only deleted is a defect; a full row parses with its class', () => {
     const md = [

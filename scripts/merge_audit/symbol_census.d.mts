@@ -98,6 +98,9 @@ export interface ExplainedExtraRow {
   cls: CensusClass;
   classLabel: string;
   name: string;
+  /** The OPTIONAL Path (or Scope) column. '' when the row omits it. A path the
+   *  census does not scan makes the row informational rather than unsatisfiable. */
+  path: string;
   phase: string;
   ruling: string;
   reason: string;
@@ -153,6 +156,9 @@ export interface ClassComparison {
   extraExplained: Array<{ name: string }>;
   extraUnexplained: Array<{ name: string }>;
   unusedExtras: string[];
+  /** Allowlist entries absent from merged only because their declared Path is
+   *  outside the census scope: reported, never failed. */
+  excludedPathExtras: string[];
   missingRenameTargets: Array<{ name: string; oldName: string; line: number }>;
   counts: Record<string, number | number[]>;
 }
