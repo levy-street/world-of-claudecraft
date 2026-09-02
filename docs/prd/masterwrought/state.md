@@ -24118,6 +24118,13 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as modal-painters-gat
    class. Still the maintainer's render work item.
 2. Hot-path F4 (two new tenants on the per-recipient zone-celebration fan-out):
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as zone-celebration-fanout-tenants.
+   RULED (qr-19-zone-celebration-fanout-shape, 2026-09-02, under qr-19-best-for-project),
+   the SPLICE half: Phase 18's measured refusal of the shared-bytes splice is RATIFIED as
+   recorded (117 ns and 192 bytes per recipient against 8 to 11 ns shared, 0.4 us per
+   second at design cadence, 0.14 percent of a tick at the absolute ceiling), its premises
+   pinned in tests/zone_celebration_fanout_shape.test.ts; no shape change is owed on that
+   half and nothing re-opens. The half the refusal never touched, the O(all players) zoneAt
+   scan, is MEASURED and ruled at the RECORDED-NOT-ACTED bullet below under the same id.
    recorded so the NEXT tenant is a conscious decision; the seam if the list grows is
    the realm-readout memo plus sendRaw.
 3. The render review's feast click-proxy compile-unit note (one gate unit per feast
@@ -24568,7 +24575,7 @@ The one JUDGED item is the zone-celebration fan-out, refused on a measurement.
 | castle-deed-art-pending | CARRIED | (none) | Ledger CARRIED section, docs/prd/masterwrought/state.md:23985-23992 at the tip: "castle-deed-art-pending: generating the two castle deed paintings from their briefs runs the asset-pipeline skill against the Tripo and gpt-image APIs, whose credentials are maintainer-held and absent from this environment (no TRIPO/OPENAI variable is set); the same credential-gated class the verifier applied to the farmer voice lines. Carried to the maintainer's art wave (the ip-16-ICON park), not to the Phase 19 table (no decision is |
 | farming-zero-blob-serialization | CARRIED | (none) | NOT DONE at 2ab5c2f7d0. src/sim/sim.ts:3953-3954 still serializes the full record unconditionally (`professions: { ...foldedProficiency }, gatheringProficiency: foldedProficiency`), src/sim/professions/gathering.ts:950-952 `emptyGatheringProficiency()` still returns `{ mining: 0, logging: 0, herbalism: 0, fishing: 0, farming: 0 }`, and the wart comment survives verbatim at src/sim/sim.ts:3307: 'this FIELD round-trips (the blob still gains farming: 0)'. No commit in 8d5796808c..2ab5c2f7d0 touches src/sim/professions |
 | reword-staleness-gate | CARRIED | (none) | Not done, and the reason is recorded. No commit in 8d5796808c..2ab5c2f7d0 touches scripts/i18n_scan.mjs or tests/i18n_status_registry.test.ts (`git log --oneline <range> -- <path>` is empty for both). At the tip the dormancy comment survives verbatim at scripts/i18n_scan.mjs:32-37 ('the translated/stale distinction is dormant ... becomes live once sparse overlays and the fill pipeline persist translation-time hashes') and all three emit sites (lines 242, 272, 322) still write `{ state: 'translated', srcHash: enHash |
-| zone-celebration-fanout-tenants | JUDGED | 8cc3248db6b06239ff62ce9c3c370a77a8e0495e | The phase measured the asked splice and refused it, recording the ground in two places. Ledger, state.md:23291-23296: "zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and 192 bytes per recipient today vs 8 to 11 ns shared; 0.4 us per second at design cadence, 0.14 percent of a tick at the absolute ceiling; the splice would buy a cross-module key-order invariant and a second serialization path for nanoseconds), premises pinned in tests/zone_celebration_fanout_shape.test.ts (so Phase 19 seed row 11 is a |
+| zone-celebration-fanout-tenants | JUDGED | 8cc3248db6b06239ff62ce9c3c370a77a8e0495e | The phase measured the asked splice and refused it, recording the ground in two places. Ledger, state.md:23291-23296 (AMENDED 2026-09-02: that address was stale by the time Phase 19E ratified this row; the record is the U-SRV-HOT bullet whose anchor 'zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and' greps 1, at :24969-24974 at the merge tip 2ebe95e731 before this wave's own insertions): "zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and 192 bytes per recipient today vs 8 to 11 ns shared; 0.4 us per second at design cadence, 0.14 percent of a tick at the absolute ceiling; the splice would buy a cross-module key-order invariant and a second serialization path for nanoseconds), premises pinned in tests/zone_celebration_fanout_shape.test.ts (so Phase 19 seed row 11 is a |
 | admin-metrics-serialize-once | CLOSED-DEVIATED | 57a6a5bbb4fd4ae44f087f59ea3472ed3e1a93cb | DEVIATION: Two of the three named routes ride the memo; OVERVIEW is deliberately excluded. server/admin.ts:2352-2356 marks overviewHandler 'EXEMPT from the family's serialize-once memos' because its response embeds the per-request adminStats() merge. Recorded in the ledger twice: '### JUDGED THIS PHASE' (state.md, ph18 ledger) - 'The admin OVERVIEW response is exempt from the serialize-once byte memo: it embeds the per-request live adminStats merge (online, uptimeSeconds, rssBytes, heapUsedBytes), so memoized bytes cannot satisfy the item's own byte-identity criterion... Not a Phase 19 row'; and in the seed-anchor corrections - 'the seed's admin-metrics "family" of three routes is two for the byte memo (overview is exempt, see JUDGED)'. The exemption is itself regression-pinned by tests/server/admin_analytics_reads.test.ts 'overview stays live per-request (the byte-memo exemption)'. Commit 57a6a5bbb4 (plus the review addendum in 8cc3248db6). At 2ab5c2f7d0: server/ok_response_memo.ts exports createOkResponseMemo (WeakMap key-tuple node cache holding {body, bytes}); server/admin.ts:644-645 constructs activityOkMemo and marketMetricsOkMemo, :679 activityOkMemo.send over the frozen |
 | admin-sold-volume-metric | CLOSED-DEVIATED | e986eb3b7370b277cb7db02225e8342011ac976e | DEVIATION: The store is never armed, so the metric can never be anything but unavailable in a real process. At 2ab5c2f7d0 a whole-tree grep for market_sold_volume / marketSoldVolumeRetentionTable / MARKET_SOLD_VOLUME_SCHEMA / configureAdminMarketSoldVolume returns ZERO hits in server/game.ts, server/db.ts and server/main.ts; server/main.ts:3915 'tables: [' (the retention sweep registration array) carries chat_logs, client_perf_reports, daily_reward_events, player_activity_daily, admin_site_presence_samples, site_presence_sessions and no market_sold_volume row. So 'fed at sale time' and 'a retention registration' are both undelivered, and the page permanently renders the soldUnavailable line. The ledger records the split honestly in unit record U-ADMIN-SVELTE: 'Its four arming call sites live in game.ts, db.ts and main.ts and were routed to those holders; until they land the feature is inert AND SAYS SO on the page, which is the honest shape for a split unit.' Those call sites never landed anywhere in 8d5796808c..2ab5c2f7d0. Commit e986eb3b73 landed the modules but NOT the wiring. Present at 2ab5c2f7d0: server/market_sold_volume_db.ts (MARKET_SOLD_VOLUME_SCHEMA 'CREATE TABLE IF NOT EXISTS market_sold_volume', PRIMARY KEY (realm, day, item_id), market_sold_volume_day index, pruneMarketSoldVolumeBatch, marketSoldVolumeRet |
 | autosave-transactional-writes | CLOSED-DEVIATED | f14f015a7b | the ATOMICITY the item asks for is a design call and is tabled as Phase 19 row D146, not guessed. What landed is the extraction (server/periodic_save_flush.ts) with an exactly-once pin per writer, plus the profiler sample the v0.42.0 merge had dropped, so the three writes are attributed to the saves phase again. NOTE the lane first recorded this as repairing a doubled write on this branch; that was wrong and is corrected in the shipped comments: the doubling is the RELEASE branch's and it still ships there. |
@@ -25820,6 +25827,44 @@ carry that argument in its record.
   review found dominant; this scan was left standing. Recorded from the
   net-wire unit's hot-path review of 8cc3248db6 above, where it is written
   as a RECORDED read.
+  RULED (qr-19-zone-celebration-fanout-shape, 2026-09-02, under qr-19-best-for-project),
+  the SCAN half, measured FIRST (Option 2) and then shaped on the number. THE BENCH, on
+  the fanout suite's own fixture shape (in-zone recipients at the zone-1 centre, the
+  other players spread over the fourteen remaining zones, one in ten in instance space
+  past DUNGEON_X_THRESHOLD), Node v26 on the capture machine, median of five runs:
+  the walk costs about 100 ns per non-home player (zoneAt is a linear scan of the
+  15-entry ZONES list with an early return, so a player's cost is the list index of
+  the zone they stand in, 27 ns at index 0 and 103 ns on the spread mix; an instanced
+  player costs one compare), which is 84 us per celebration at 1,000 players with 200
+  in-zone, 471 us at the 5,000-player realm cap with 200 in-zone, 507 us at the cap with
+  12 in-zone, and 165 us with all 5,000 in the celebration zone (cheaper, because every
+  hit returns at index 0). Against the record's terms: the scan is about 20 times the 24
+  us stringify term the splice was weighed against and is the leading per-celebration
+  cost, but it is a per-celebration spike, never a per-tick one: 1 percent of ONE 50 ms
+  tick per celebration at the realm cap, 0.17 percent at 1,000 players; at the record's
+  own cadence (about one celebration a minute realm-wide) it averages 8 us per second,
+  and even ten celebrations a second at the cap average 1 percent of the budget. TWO
+  PREMISES THE RECORD NOW CARRIES that it did not: the fan-out has four tenants and the
+  suite header derives the realm rate from the widest one (gatherRareEvent, the farming
+  crop harvest a second stream on the same constant), so the shared scan runs at every
+  tenant's cadence summed, above the node-only line; and that line assumes twenty zones
+  where ZONES holds 15, which errs conservative. The cheaper shapes, measured on the
+  same fixture: Option 4 (a rect test against the celebration zone's own rect, no new
+  state) 38 us at the cap with 200 in-zone, a 12x constant-factor cut; Option 3's cheap
+  form (a per-player cached zoneId compare, state kept roster-exact elsewhere) 39 us,
+  no better than the rect test on the walk itself while owing the state, the census
+  set, three fake SimContexts and the roster-order pin. THE SHAPE, ruled by the maintainer on those figures: OPTION 1, the scan is ACCEPTED ON
+  RECORD as measured, no production code. Option 4's 12x is a constant-factor cut bought
+  with a membership change at the rect edges (zoneAt's southmost-band fallback and the
+  active-content map) against a cost that is 1 percent of one tick at the realm cap, and
+  Option 3 is premature before there is a per-tick cost at all. The bench stays a scratch
+  harness (maintainer-named; its source and output are in phase-19e-qa.md), and the suite
+  gains a premise arm that pins the walk shape (every roster entry visited once, one
+  zoneAt per overworld player, at widths 1, 12 and 64), mutation-proved against a rect
+  test and a bucket, so an index, a bucket or a rect test re-opens the measurement here
+  first. Harness and
+  figures: the Phase 19E QA record (phase-19e-qa.md); the suite header carries the
+  same numbers beside the two earlier measurements.
 - CHARACTER_BLOB_WARN_BYTES (131,072) sits BELOW the legitimate worst case,
   not the roughly 3.2x above it the standing comment argued. The blob-size
   comment repair (aa184248da above) inverted the recorded relation by

@@ -51,6 +51,26 @@
 // stands on its own numbers, which is why the record is amended in place and
 // not withdrawn.
 //
+// MEASURED 2026-09-02 (Phase 19E, qr-19-zone-celebration-fanout-shape): the half
+// neither record above priced, the O(all players) walk in emitToZonePlayers with a
+// zoneAt call per player. On this file's fixture shape (in-zone recipients at the
+// zone-1 centre, the rest spread over the other fourteen zones, one in ten in instance
+// space), Node v26, median of five: about 100 ns per non-home player (zoneAt is a
+// linear early-return scan of the 15-entry ZONES list, so a player costs the index of
+// the zone they stand in), which is 84 us per celebration at 1,000 players with 200
+// in-zone, 471 us at the 5,000-player realm cap with 200 in-zone, and 165 us with all
+// 5,000 in the celebration zone. That is about 20x the 24 us stringify term above and
+// the leading per-celebration cost, but a per-celebration spike rather than a per-tick
+// one: 1% of one 50 ms tick per celebration at the cap, 0.17% at 1,000 players, 8 us
+// per second at the record's cadence. Two premises corrected while measuring: the
+// realm rate is every tenant's cadence summed (the derivation above prices the widest
+// tenant alone), and ZONES holds 15 where the derivation says twenty (conservative).
+// A rect test against the celebration zone's own rect would cut the walk 12x (38 us at
+// the cap) with no new state; a cached per-player zoneId does no better on the walk.
+// RULED 2026-09-02 (Option 1): ACCEPTED ON THE NUMBER, no production code; the scan-premise
+// arm at the bottom of this file pins the walk shape so an index, a bucket or a rect test
+// re-opens this measurement here first.
+//
 // These pins hold the premises both records rest on: the payload stays small
 // and flat, every copy differs from its siblings by the pid alone (so the day a
 // tenant grows a large per-recipient payload or a second varying field, the
@@ -59,7 +79,7 @@
 // recipient set past the measured shape re-opens THAT one here too).
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
 import {
@@ -72,6 +92,15 @@ import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { SimEvent } from '../src/sim/types';
 import { stripComments } from './helpers/strip_comments';
+
+// The scan-premise arm at the bottom counts zoneAt calls, so the data module is
+// wrapped (a partial mock that delegates to the real function): every importer,
+// the fixture below and src/sim/professions/gather_events.ts alike, sees the
+// same counted binding. Behaviour is unchanged; only the call count is observed.
+vi.mock('../src/sim/data', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('../src/sim/data')>();
+  return { ...mod, zoneAt: vi.fn(mod.zoneAt) };
+});
 
 /** The small-flat-payload premise: every per-recipient copy of every tenant
  *  serializes under this many bytes (the bench's largest copy was 192). */
@@ -300,5 +329,50 @@ describe('the fan-out measurement premises (batch size x session count)', () => 
     // recorded figures bracket the same space rather than describing two.
     expect(MEASURED_RECIPIENTS).toBeLessThan(CEILING_RECIPIENTS);
     expect(MEASURED_SESSIONS).toBeLessThan(CEILING_SESSIONS);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The SCAN premise (Phase 19E, qr-19-zone-celebration-fanout-shape). The half
+// the two records above never priced is the walk itself: emitToZonePlayers
+// visits EVERY player on the realm roster and resolves zoneAt for every
+// overworld one, once per celebration. It was measured (header) and ACCEPTED
+// on the number, so this arm pins the shape the number rests on: the day the
+// walk is indexed, bucketed or rect-tested, this reds first and the
+// measurement re-opens here rather than silently aging.
+// ---------------------------------------------------------------------------
+
+describe('the scan premise: one celebration walks the whole roster, one zoneAt per overworld player', () => {
+  it('visits every roster entry once and resolves zoneAt once per non-instanced player, at every width', () => {
+    for (const recipients of [1, 12, 64]) {
+      const world = fakeWorld(recipients);
+      // The roster the walk must cover: the recipients plus the far-zone
+      // bystander plus the instanced player the fixture always adds.
+      const roster = world.ctx.players.size;
+      expect(roster).toBe(recipients + 2);
+      // The one read the walk makes per player is entities.get; count it on the
+      // fixture's own Map (an own property shadows the prototype method).
+      let visits = 0;
+      const entities = world.ctx.entities as Map<number, unknown>;
+      const rawGet = entities.get.bind(entities);
+      entities.get = ((id: number) => {
+        visits++;
+        return rawGet(id);
+      }) as typeof entities.get;
+      const counted = vi.mocked(zoneAt);
+      counted.mockClear();
+      announceMasterworkZone(world.ctx, world.inZone[0], 'Grimmschaedel', {
+        itemId: 'eastbrook_ritual_vestments',
+        recipeId: 'recipe_eastbrook_ritual_vestments',
+      } as Parameters<typeof announceMasterworkZone>[3]);
+      // announceZoneCelebration resolves the celebrant once (one read, one
+      // zoneAt) before the walk; the walk then reads every roster entry once
+      // and resolves zoneAt for every overworld player, skipping only the
+      // instanced one on the x-threshold compare. A bucket, an index or a rect
+      // test changes one of these two counts; the recipient set does not.
+      expect(visits).toBe(1 + roster);
+      expect(counted).toHaveBeenCalledTimes(1 + (roster - 1));
+      expect(world.events.filter((ev) => ev.type === 'masterworkZone')).toHaveLength(recipients);
+    }
   });
 });
