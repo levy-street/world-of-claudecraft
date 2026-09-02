@@ -19,12 +19,13 @@ decisions went to the maintainer in session (three arms and D074's status quo),
 one premise was escalated, none guessed.
 LOCAL ONLY: no push, no PR, no teardown.
 
-Scope: the ten units of `phase-19f-english-i18n-completeness.md` (D070 D074
-D085 D144 D148 D149 D150 D161 D169 D174), the Step 0 sync check, the fresh
-typed reviews per unit (twenty-three reports plus the one D085's amendment owed,
+Scope: the ten units of `phase-19f-english-i18n-completeness.md` (D070 D074 D085
+D144 D148 D149 D150 D161 D169 D174), the Step 0 sync check, the fresh typed
+reviews per unit (twenty-three reports plus the one D085's amendment owed,
 dispatched at the fresh read), eleven fix rounds, two coverage audits, a sim
-review, and the nine fresh reads that followed the rounds. Commit span c52b275854 through e58bff734a for the work, then the close-out
-record and its correction passes.
+review, and the nine fresh reads that followed the rounds. Commit span
+c52b275854 through e58bff734a for the work, then the close-out record and its
+correction passes.
 
 ## Step 0: the sync check was a no-op
 
