@@ -1,5 +1,7 @@
 import * as THREE from 'three';
+import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
 import { drapeRingLocalY } from '../selection_ring';
+import { DRAPE_AXIS_Z, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Expanding shockwave rings, ported from the gallery's shock-ring shader
@@ -15,6 +17,18 @@ import type { AbilityVfxTextures } from './fx_textures';
 // the shader's uProgress animates), so the drape runs once per spawn - zero
 // steady-state work. A vertical spawn flattens the plane back (only when the
 // slot's previous life draped it) so the billboard stays planar.
+//
+// The drape rides its own single-float attribute (`aDrape`, added to the
+// plane's local up-axis in the vertex shader) rather than a rewrite of the
+// position buffer, so the sixteen slot geometries share ONE position, uv and
+// index buffer, a spawn uploads one column instead of the whole plane, and the
+// permanent flat shape gives a closed-form bounding sphere
+// (../draped_bounds_core) that puts these quads back inside frustum culling.
+// The family also shares one material, with the per-slot colour, intensity and
+// progress pushed through onBeforeRender. Nothing about the wavefront's
+// footprint, radius, timing or visibility changes: every vertex still lands
+// exactly where the exact drape put it. See ground_auras.ts for the same three
+// moves in prose.
 
 const RING_SLOTS = 16;
 // 8x8 subdivisions: enough interior vertices for the footprint to follow the
@@ -25,19 +39,27 @@ const easeOutQuart = (t: number): number => 1 - (1 - t) ** 4;
 
 interface RingSlot {
   mesh: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
   age: number;
   dur: number;
   vertical: boolean;
   active: boolean;
   draped: boolean; // this slot's geometry currently carries a terrain drape
-  drapeZ: Float32Array; // scratch per-vertex drape heights, reused per spawn
+  // Per-slot shader state, pushed into the SHARED material by onBeforeRender.
+  color: THREE.Color;
+  intensity: number;
+  progress: number;
+  // The live drape attribute (one float per vertex, added to the plane's local
+  // up-axis in the vertex shader), written once per spawn.
+  drape: THREE.BufferAttribute;
+  drapeZ: Float32Array;
 }
 
 export class ShockRings {
   private slots: RingSlot[] = [];
   private next = 0;
   private disposed = false;
+  private readonly baseGeometry: THREE.PlaneGeometry;
+  private readonly material: THREE.ShaderMaterial;
   // Center-relative ground-plane XZ of every vertex. The mesh lies flat via
   // rotation.x = -PI/2, which maps local (x, y, z) to world offsets
   // (x, z, -y): the plane's local X/Y span the ground (world Z = -local y)
@@ -51,25 +73,22 @@ export class ShockRings {
     private groundY: (x: number, z: number) => number,
   ) {
     const geo = new THREE.PlaneGeometry(1, 1, RING_SEGMENTS, RING_SEGMENTS);
+    this.baseGeometry = geo;
     const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
     this.localXZ = new Float32Array(basePos.count * 2);
     for (let i = 0; i < basePos.count; i++) {
       this.localXZ[i * 2] = basePos.getX(i);
       this.localXZ[i * 2 + 1] = -basePos.getY(i);
     }
-    const proto = new THREE.ShaderMaterial({
+    this.material = new THREE.ShaderMaterial({
       uniforms: {
         uProgress: { value: 0 },
         uColor: { value: new THREE.Color() },
         uIntensity: { value: 1 },
         uNoise: { value: tex.noise },
+        uDrapeAxis: { value: DRAPE_AXIS_Z },
       },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }`,
+      vertexShader: DRAPED_VERTEX_SHADER,
       fragmentShader: `
         uniform float uProgress;
         uniform vec3 uColor;
@@ -102,30 +121,65 @@ export class ShockRings {
       depthWrite: false,
       side: THREE.DoubleSide,
     });
+    const baseUv = geo.getAttribute('uv');
     for (let i = 0; i < RING_SLOTS; i++) {
-      const mat = proto.clone();
-      mat.uniforms.uNoise.value = tex.noise;
-      // own geometry per slot: each ground spawn drapes it to that terrain
-      const mesh = new THREE.Mesh(geo.clone(), mat);
-      mesh.visible = false;
-      mesh.renderOrder = 5;
-      mesh.userData.renderCategory = 'vfx';
-      // draped geometry: never let a stale bounding sphere cull it on slopes
-      mesh.frustumCulled = false;
-      scene.add(mesh);
-      this.slots.push({
-        mesh,
-        mat,
+      // The slot geometry SHARES the base plane's position, uv and index
+      // buffers and owns only its own drape column.
+      const slotGeo = new THREE.BufferGeometry();
+      slotGeo.setAttribute('position', basePos);
+      if (baseUv) slotGeo.setAttribute('uv', baseUv);
+      slotGeo.setIndex(geo.getIndex());
+      const drapeZ = new Float32Array(basePos.count);
+      const drape = new THREE.BufferAttribute(drapeZ, 1).setUsage(THREE.DynamicDrawUsage);
+      slotGeo.setAttribute('aDrape', drape);
+      slotGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), Math.SQRT1_2);
+      const slot: RingSlot = {
+        mesh: new THREE.Mesh(slotGeo, this.material),
         age: 0,
         dur: 1,
         vertical: false,
         active: false,
         draped: false,
-        drapeZ: new Float32Array(basePos.count),
-      });
+        color: new THREE.Color(),
+        intensity: 1,
+        progress: 0,
+        drape,
+        drapeZ,
+      };
+      const mesh = slot.mesh;
+      mesh.visible = false;
+      mesh.renderOrder = 5;
+      mesh.userData.renderCategory = 'vfx';
+      // Culled again: the flat quad is permanent now, and the sphere is
+      // refreshed from the drape extent at every spawn (see spawn).
+      mesh.frustumCulled = true;
+      // One material for the family: three uploads a ShaderMaterial's uniforms
+      // whenever uniformsNeedUpdate is set, whatever its material-change check
+      // decided, so each slot writes its own state here right before its draw.
+      mesh.onBeforeRender = () => {
+        const uniforms = this.material.uniforms;
+        uniforms.uProgress.value = slot.progress;
+        (uniforms.uColor.value as THREE.Color).copy(slot.color);
+        uniforms.uIntensity.value = slot.intensity;
+        this.material.uniformsNeedUpdate = true;
+      };
+      scene.add(mesh);
+      this.slots.push(slot);
     }
-    geo.dispose();
-    proto.dispose();
+  }
+
+  /** Refresh the bounding sphere the frustum test reads from this slot's drape,
+   *  and upload the column. */
+  private commitDrape(slot: RingSlot): void {
+    slot.drape.clearUpdateRanges();
+    slot.drape.addUpdateRange(0, slot.drapeZ.length);
+    slot.drape.needsUpdate = true;
+    const [low, high] = drapeExtent(slot.drapeZ);
+    // The unit plane's furthest vertex is at its corner, sqrt(2)/2 out.
+    const bounds = drapedBoundingSphere(Math.SQRT1_2, low, high);
+    const sphere = slot.mesh.geometry.boundingSphere as THREE.Sphere;
+    sphere.center.set(0, 0, bounds.center);
+    sphere.radius = bounds.radius;
   }
 
   spawn(
@@ -145,14 +199,13 @@ export class ShockRings {
     slot.age = 0;
     slot.dur = dur;
     slot.vertical = vertical;
-    (slot.mat.uniforms.uColor.value as THREE.Color).setHex(colorHex);
-    slot.mat.uniforms.uIntensity.value = intensity;
-    slot.mat.uniforms.uProgress.value = 0;
+    slot.color.setHex(colorHex);
+    slot.intensity = intensity;
+    slot.progress = 0;
     slot.mesh.position.set(x, y, z);
     slot.mesh.rotation.set(vertical ? 0 : -Math.PI / 2, 0, 0);
     const scale = maxR * 2;
     slot.mesh.scale.setScalar(scale);
-    const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
     if (!vertical) {
       // Drape the footprint over the terrain so the wavefront survives on
       // slopes. The caller's y already carries its intended lift above the
@@ -161,13 +214,12 @@ export class ShockRings {
       // planar quad exactly). Local z is the up-axis under the -PI/2 tilt.
       const lift = y - this.groundY(x, z);
       drapeRingLocalY(this.localXZ, x, z, y, scale, lift, this.groundY, slot.drapeZ);
-      for (let i = 0; i < slot.drapeZ.length; i++) pos.setZ(i, slot.drapeZ[i]);
-      pos.needsUpdate = true;
+      this.commitDrape(slot);
       slot.draped = true;
     } else if (slot.draped) {
       // a billboard must be planar again after a previous ground life
-      for (let i = 0; i < slot.drapeZ.length; i++) pos.setZ(i, 0);
-      pos.needsUpdate = true;
+      slot.drapeZ.fill(0);
+      this.commitDrape(slot);
       slot.draped = false;
     }
     slot.mesh.visible = true;
@@ -179,7 +231,7 @@ export class ShockRings {
       if (!slot.active) continue;
       slot.age += dt;
       const t = Math.min(1, slot.age / slot.dur);
-      slot.mat.uniforms.uProgress.value = easeOutQuart(t);
+      slot.progress = easeOutQuart(t);
       if (slot.vertical) slot.mesh.quaternion.copy(camQuat);
       if (t >= 1) {
         slot.active = false;
@@ -200,9 +252,13 @@ export class ShockRings {
     this.disposed = true;
     this.clear();
     for (const slot of this.slots) {
+      slot.mesh.onBeforeRender = () => {};
       slot.mesh.removeFromParent();
       slot.mesh.geometry.dispose();
-      slot.mat.dispose();
     }
+    // The slot geometries share the base plane's buffers, so the base owns the
+    // release; the family shares one material, so it is disposed once.
+    this.baseGeometry.dispose();
+    this.material.dispose();
   }
 }

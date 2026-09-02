@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { drapeFanLocalY, drapeStrideFor, fanVertexSpacing } from '../drape_lod_core';
+import { drapedBoundingSphere, drapeExtent } from '../draped_bounds_core';
+import { DRAPE_AXIS_Y, DRAPED_VERTEX_SHADER } from './draped_shader';
 import type { AbilityVfxTextures } from './fx_textures';
 
 // Fading ground decals (scorch embers, frost rime, arcane runes, earth
@@ -17,6 +19,15 @@ import type { AbilityVfxTextures } from './fx_textures';
 // still thin with camera distance (../drape_lod_core): a far mark samples the
 // rim more coarsely and interpolates between, keeping its world position and
 // radius exactly as they were.
+//
+// The drape rides its own single-float attribute (`aDrape`) rather than a
+// rewrite of the position buffer, so the twelve slot geometries share ONE
+// position, uv and index buffer, a spawn uploads one column instead of the
+// whole disc, the flat shape is permanent enough for a closed-form bounding
+// sphere (../draped_bounds_core) and the marks are frustum-CULLED again. The
+// family also shares one material: the per-slot style map, colour, dissolve
+// and spin are pushed through onBeforeRender, so twelve cloned materials
+// collapse to one. See ground_auras.ts for the same three moves in prose.
 
 const DECAL_SLOTS = 12;
 const DECAL_SEGMENTS = 24;
@@ -26,12 +37,19 @@ export type DecalStyle = 'ember' | 'rime' | 'rune' | 'crack' | 'char';
 
 interface DecalSlot {
   mesh: THREE.Mesh;
-  mat: THREE.ShaderMaterial;
   age: number;
   dur: number;
   spin: number;
   active: boolean;
-  drapeY: Float32Array; // scratch per-vertex drape heights, reused per spawn
+  // Per-slot shader state, pushed into the SHARED material by onBeforeRender.
+  map: THREE.Texture;
+  color: THREE.Color;
+  dissolve: number;
+  spinPhase: number;
+  // The live drape attribute (one float per vertex, added to the disc's local
+  // up-axis in the vertex shader), written once per spawn.
+  drape: THREE.BufferAttribute;
+  drapeY: Float32Array;
 }
 
 export class GroundDecals {
@@ -39,8 +57,10 @@ export class GroundDecals {
   private next = 0;
   private disposed = false;
   private maps: Record<DecalStyle, THREE.CanvasTexture>;
-  // center-relative XZ of every disc vertex (all slots clone the same base)
+  // center-relative XZ of every disc vertex (all slots share the same base)
   private localXZ: Float32Array;
+  private readonly baseGeometry: THREE.CircleGeometry;
+  private readonly material: THREE.ShaderMaterial;
   // Latest camera position (pushed once a frame from the fx engine) and whether
   // one has ever arrived: before the first frame every drape stays exact.
   private camX = 0;
@@ -60,16 +80,17 @@ export class GroundDecals {
       char: tex.char,
     };
     // Rotation baked into the geometry (instead of mesh.rotation.x) so the
-    // position attribute's Y IS the up-axis the drape writes.
+    // local Y IS the up-axis the drape attribute displaces along.
     const geo = new THREE.CircleGeometry(1, DECAL_SEGMENTS);
     geo.rotateX(-Math.PI / 2);
+    this.baseGeometry = geo;
     const basePos = geo.getAttribute('position') as THREE.BufferAttribute;
     this.localXZ = new Float32Array(basePos.count * 2);
     for (let i = 0; i < basePos.count; i++) {
       this.localXZ[i * 2] = basePos.getX(i);
       this.localXZ[i * 2 + 1] = basePos.getZ(i);
     }
-    const proto = new THREE.ShaderMaterial({
+    this.material = new THREE.ShaderMaterial({
       uniforms: {
         uMap: { value: tex.rune },
         uNoise: { value: tex.noise },
@@ -77,13 +98,9 @@ export class GroundDecals {
         uDissolve: { value: 1 },
         uHdr: { value: 1.6 },
         uSpin: { value: 0 },
+        uDrapeAxis: { value: DRAPE_AXIS_Y },
       },
-      vertexShader: `
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }`,
+      vertexShader: DRAPED_VERTEX_SHADER,
       fragmentShader: `
         uniform sampler2D uMap;
         uniform sampler2D uNoise;
@@ -113,29 +130,52 @@ export class GroundDecals {
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
+    const baseUv = geo.getAttribute('uv');
     for (let i = 0; i < DECAL_SLOTS; i++) {
-      const mat = proto.clone();
-      mat.uniforms.uNoise.value = tex.noise;
-      // own geometry per slot: each spawn drapes it to that spot's terrain
-      const mesh = new THREE.Mesh(geo.clone(), mat);
-      mesh.visible = false;
-      mesh.renderOrder = 3; // over terrain decals, under the shock rings
-      mesh.userData.renderCategory = 'vfx';
-      // draped geometry: never let a stale bounding sphere cull it on slopes
-      mesh.frustumCulled = false;
-      scene.add(mesh);
-      this.slots.push({
-        mesh,
-        mat,
+      // The slot geometry SHARES the base disc's position, uv and index buffers
+      // and owns only its own drape column.
+      const slotGeo = new THREE.BufferGeometry();
+      slotGeo.setAttribute('position', basePos);
+      if (baseUv) slotGeo.setAttribute('uv', baseUv);
+      slotGeo.setIndex(geo.getIndex());
+      const drapeY = new Float32Array(basePos.count);
+      const drape = new THREE.BufferAttribute(drapeY, 1).setUsage(THREE.DynamicDrawUsage);
+      slotGeo.setAttribute('aDrape', drape);
+      slotGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1);
+      const slot: DecalSlot = {
+        mesh: new THREE.Mesh(slotGeo, this.material),
         age: 0,
         dur: 3,
         spin: 0,
         active: false,
-        drapeY: new Float32Array(basePos.count),
-      });
+        map: tex.rune,
+        color: new THREE.Color(),
+        dissolve: 1,
+        spinPhase: 0,
+        drape,
+        drapeY,
+      };
+      const mesh = slot.mesh;
+      mesh.visible = false;
+      mesh.renderOrder = 3; // over terrain decals, under the shock rings
+      mesh.userData.renderCategory = 'vfx';
+      // Culled again: the flat disc is permanent now, and the sphere is
+      // refreshed from the drape extent at every spawn (see spawn).
+      mesh.frustumCulled = true;
+      // One material for the family: three uploads a ShaderMaterial's uniforms
+      // whenever uniformsNeedUpdate is set, whatever its material-change check
+      // decided, so each slot writes its own state here right before its draw.
+      mesh.onBeforeRender = () => {
+        const uniforms = this.material.uniforms;
+        uniforms.uMap.value = slot.map;
+        (uniforms.uColor.value as THREE.Color).copy(slot.color);
+        uniforms.uDissolve.value = slot.dissolve;
+        uniforms.uSpin.value = slot.spinPhase;
+        this.material.uniformsNeedUpdate = true;
+      };
+      scene.add(mesh);
+      this.slots.push(slot);
     }
-    geo.dispose();
-    proto.dispose();
   }
 
   /** Where the camera is this frame, for the drape distance LOD. */
@@ -161,10 +201,10 @@ export class GroundDecals {
     slot.age = 0;
     slot.dur = dur;
     slot.spin = style === 'rune' ? 0.35 : 0;
-    slot.mat.uniforms.uMap.value = this.maps[style];
-    (slot.mat.uniforms.uColor.value as THREE.Color).setHex(colorHex);
-    slot.mat.uniforms.uDissolve.value = 1;
-    slot.mat.uniforms.uSpin.value = 0;
+    slot.map = this.maps[style];
+    slot.color.setHex(colorHex);
+    slot.dissolve = 1;
+    slot.spinPhase = 0;
     slot.mesh.position.set(x, y, z);
     slot.mesh.scale.setScalar(radius);
     // drape the disc over the terrain so no arc buries on a slope (the lift
@@ -188,9 +228,14 @@ export class GroundDecals {
         fanVertexSpacing(radius, DECAL_SEGMENTS),
       ),
     );
-    const pos = slot.mesh.geometry.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < slot.drapeY.length; i++) pos.setY(i, slot.drapeY[i]);
-    pos.needsUpdate = true;
+    slot.drape.clearUpdateRanges();
+    slot.drape.addUpdateRange(0, slot.drapeY.length);
+    slot.drape.needsUpdate = true;
+    const [low, high] = drapeExtent(slot.drapeY);
+    const bounds = drapedBoundingSphere(1, low, high);
+    const sphere = slot.mesh.geometry.boundingSphere as THREE.Sphere;
+    sphere.center.set(0, bounds.center, 0);
+    sphere.radius = bounds.radius;
     slot.mesh.visible = true;
   }
 
@@ -208,8 +253,8 @@ export class GroundDecals {
       // etch in over the first 18%, hold, then dissolve away over the last 45%
       const dissolve =
         t < 0.18 ? 1 - (t / 0.18) * 0.85 : t < 0.55 ? 0.15 : 0.15 + ((t - 0.55) / 0.45) * 0.85;
-      slot.mat.uniforms.uDissolve.value = dissolve;
-      if (slot.spin > 0) slot.mat.uniforms.uSpin.value = slot.age * slot.spin;
+      slot.dissolve = dissolve;
+      if (slot.spin > 0) slot.spinPhase = slot.age * slot.spin;
     }
   }
 
@@ -225,9 +270,13 @@ export class GroundDecals {
     this.disposed = true;
     this.clear();
     for (const slot of this.slots) {
+      slot.mesh.onBeforeRender = () => {};
       slot.mesh.removeFromParent();
       slot.mesh.geometry.dispose();
-      slot.mat.dispose();
     }
+    // The slot geometries share the base disc's buffers, so the base owns the
+    // release; the family shares one material, so it is disposed once.
+    this.baseGeometry.dispose();
+    this.material.dispose();
   }
 }
