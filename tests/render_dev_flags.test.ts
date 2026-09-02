@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // render_dev_flags reads location ONCE at module load (layer gating is
@@ -32,6 +33,45 @@ describe('render dev flags: layer kill switches', () => {
   it('keeps every layer on in a headless host with no location', async () => {
     const { renderLayerDisabled } = await loadFlags(null);
     expect(renderLayerDisabled('n8ao')).toBe(false);
+  });
+});
+
+describe('render dev flags: the character cull A/B arm', () => {
+  // ?charcull=off has to restore the WHOLE pre-cull submission, not just the
+  // renderer's group cull: a skinned caster that keeps three's frustum test on
+  // its padded sphere is still culled, and the A/B arm would measure nothing.
+  function skinnedRig() {
+    const root = new THREE.Group();
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0], 3));
+    const mesh = new THREE.SkinnedMesh(geometry, new THREE.MeshBasicMaterial());
+    root.add(mesh);
+    return { root, mesh };
+  }
+
+  it('names the flag the renderer and the caster bounds both read', async () => {
+    const { renderLayerDisabled } = await loadFlags('?charcull=off');
+    expect(renderLayerDisabled('charcull')).toBe(true);
+  });
+
+  it("leaves a skinned caster exempt from three's frustum test under ?charcull=off", async () => {
+    vi.resetModules();
+    vi.stubGlobal('location', { search: '?charcull=off' });
+    const { applySkinnedCullBounds } = await import('../src/render/characters/skinned_cull_bounds');
+    const { root, mesh } = skinnedRig();
+    applySkinnedCullBounds(mesh, root, 1.8);
+    expect(mesh.frustumCulled).toBe(false);
+    expect(mesh.boundingSphere).toBeNull();
+  });
+
+  it('pads the sphere and lets three cull by default', async () => {
+    vi.resetModules();
+    vi.stubGlobal('location', { search: '' });
+    const { applySkinnedCullBounds } = await import('../src/render/characters/skinned_cull_bounds');
+    const { root, mesh } = skinnedRig();
+    applySkinnedCullBounds(mesh, root, 1.8);
+    expect(mesh.frustumCulled).toBe(true);
+    expect(mesh.boundingSphere?.radius).toBeGreaterThan(0);
   });
 });
 

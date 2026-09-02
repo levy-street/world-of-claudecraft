@@ -579,6 +579,7 @@ const RENDER_PURE_CORES = [
   'src/render/build_ledger_core.ts',
   'src/render/hitch_frame_align_core.ts',
   'src/render/initial_frame_core.ts',
+  'src/render/character_cull_core.ts',
   'src/render/characters/anim_state_entity_core.ts',
   'src/render/characters/death_grounding_core.ts',
   'src/render/entry_detail_horizon_core.ts',

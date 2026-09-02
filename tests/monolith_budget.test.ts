@@ -351,7 +351,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Lowered 13249 -> 13245 by the character cull: the group-level frustum
+    // sphere, its scratch Frustum/Sphere/Matrix4 and the per-frame frustum
+    // rebuild moved into src/render/character_cull_core.ts, which also owns the
+    // new shadow-reach test, so the renderer keeps only the two pushes and the
+    // bitmask read. Exact count, zero headroom.
+    ceiling: 13245,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
