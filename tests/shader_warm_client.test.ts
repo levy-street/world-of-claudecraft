@@ -558,7 +558,7 @@ describe('the breaker on held gates that keep expiring', () => {
     noteShaderWarmHold(false, true, 5_000);
     expect(shaderWarmSnapshot()).toMatchObject({
       worker: 'dead',
-      refusal: 'hold-timeouts',
+      refusal: 'hold-timeouts:wedged',
       heldTimedOut: SHADER_WARM_TIMEOUT_BREAKER,
     });
     expect(worker().terminations).toBe(1);
@@ -608,7 +608,7 @@ describe('the breaker on held gates that keep expiring', () => {
     }
     expect(shaderWarmSnapshot()).toMatchObject({
       worker: 'dead',
-      refusal: 'hold-timeouts',
+      refusal: 'hold-timeouts:expired-share',
       heldTimedOut: SHADER_WARM_EXPIRED_SHARE_BREAKER,
     });
     expect(worker().terminations).toBe(1);
@@ -642,7 +642,7 @@ describe('the breaker on held gates that keep expiring', () => {
       expect(shaderWarmSnapshot().worker).toBe('ready');
       noteShaderWarmHold(false, true, 5_000);
     }
-    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts' });
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts:wedged' });
     expect(worker().terminations).toBe(1);
   });
 
@@ -842,31 +842,76 @@ describe('disposing the shader warm client', () => {
     expect(shaderWarmSnapshot().worker).toBe('starting');
   });
 
+  /** Capture the page listeners the client installs, so a case can fire
+   *  `pagehide` with (or without) the bfcache's `persisted` flag. */
+  async function withPageListeners(
+    run: (fire: (persisted?: boolean) => void) => void | Promise<void>,
+  ): Promise<void> {
+    const scope = globalThis as {
+      addEventListener?: (type: string, cb: (event?: { persisted?: boolean }) => void) => void;
+    };
+    const original = scope.addEventListener;
+    const listeners: Array<(event?: { persisted?: boolean }) => void> = [];
+    scope.addEventListener = (
+      type: string,
+      callback: (event?: { persisted?: boolean }) => void,
+    ) => {
+      if (type === 'pagehide') listeners.push(callback);
+    };
+    try {
+      await run((persisted?: boolean) => {
+        expect(listeners).toHaveLength(1);
+        for (const listener of listeners) {
+          listener(persisted === undefined ? undefined : { persisted });
+        }
+      });
+    } finally {
+      scope.addEventListener = original;
+    }
+  }
+
   it('terminates the worker when the page goes away', async () => {
     // The worker holds one of the GPU process's handful of contexts, and it
     // lives in the worker, so the page's own release hook cannot reach it.
-    const scope = globalThis as { addEventListener?: (type: string, cb: () => void) => void };
-    const original = scope.addEventListener;
-    const listeners = new Map<string, Array<() => void>>();
-    scope.addEventListener = (type: string, callback: () => void) => {
-      const forType = listeners.get(type) ?? [];
-      forType.push(callback);
-      listeners.set(type, forType);
-    };
-    try {
+    await withPageListeners(async (firePagehide) => {
       const { worker, ready } = start();
       ready();
       const settled = warmShaderPrograms([SOURCE], GPU_WORK_PRIORITY.VISIBLE_PREWARM);
 
-      const pagehide = listeners.get('pagehide') ?? [];
-      expect(pagehide).toHaveLength(1);
-      for (const listener of pagehide) listener();
+      firePagehide(false);
 
       expect(worker().terminations).toBe(1);
       expect(await settled).toEqual(['failed']);
-    } finally {
-      scope.addEventListener = original;
-    }
+    });
+  });
+
+  it('keeps the worker through a bfcache freeze, and holds nothing after a real teardown', async () => {
+    // context_release.ts reads the same flag for the same reason: a page frozen
+    // into the bfcache can come back, and startWorker only ever runs from
+    // `idle`, so killing the worker on a persisted pagehide would leave the
+    // session with no worker while availability still said yes.
+    await withPageListeners((firePagehide) => {
+      const { worker, workers, ready, context } = start();
+      ready();
+
+      firePagehide(true);
+      expect(worker().terminations).toBe(0);
+      expect(shaderWarmAvailable()).toBe(true);
+      expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready' });
+
+      // The real teardown retires it FOR CAUSE, so no later gate pays the dry
+      // assembly for a worker that is gone: it bypasses as unavailable, and
+      // nothing respawns a second context during the teardown.
+      firePagehide(false);
+      expect(worker().terminations).toBe(1);
+      expect(shaderWarmAvailable()).toBe(false);
+      expect(shaderWarmSnapshot()).toMatchObject({ worker: 'refused', refusal: 'pagehide' });
+
+      const decision = shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false);
+      expect(decision).toEqual({ hold: false, bypass: 'unavailable' });
+      expect(shaderWarmSnapshot().bypassed.unavailable).toBe(1);
+      expect(workers).toHaveLength(1);
+    });
   });
 
   it('reads out the mode, the arm, the worker state and every counter', () => {

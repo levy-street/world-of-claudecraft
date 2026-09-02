@@ -194,11 +194,11 @@ describe('the shader warm row is live', () => {
     for (let expiry = 0; expiry < SHADER_WARM_TIMEOUT_BREAKER; expiry++) {
       noteShaderWarmHold(false, true, 5_000);
     }
-    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts' });
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts:wedged' });
 
     stored = SHADER_WARM_SETTING_VALUES.off;
     window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
-    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts' });
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'dead', refusal: 'hold-timeouts:wedged' });
 
     stored = SHADER_WARM_SETTING_VALUES.on;
     window.dispatchEvent(new Event(SETTINGS_CHANGE_EVENT));
@@ -209,7 +209,7 @@ describe('the shader warm row is live', () => {
     expect(shaderWarmSnapshot()).toMatchObject({
       mode: 'all',
       worker: 'dead',
-      refusal: 'hold-timeouts',
+      refusal: 'hold-timeouts:wedged',
     });
   });
 

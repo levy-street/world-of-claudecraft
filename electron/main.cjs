@@ -1237,6 +1237,9 @@ ipcMain.handle('desktop-get-launch-settings', (event) => {
 let restartInFlight = null;
 ipcMain.handle('desktop-restart-app', (event) => {
   if (!trustedSender(event)) return false;
+  // No chain cap here, unlike the backend rescue's: this restart is origin-gated
+  // (trustedSender) and single-flighted (below), and each child is a fresh
+  // process the player asked for, so there is no runaway chain to bound.
   // One child at a time: a second ask while the first is still coming up joins its
   // answer rather than spawning a second detached child beside it.
   if (restartInFlight) return restartInFlight;
@@ -1435,9 +1438,15 @@ let rendererErrorsLogged = 0;
 // string still judges as OpenGL through judgeGpuBackendLaunch. Nothing is answered.
 // This makes a page-reported string a LAUNCH-CONTROL input: a reading below the rung
 // asked for re-execs the shell onto the rung below (rescueOntoLowerBackend, app.exit).
+// The parallelCompile flag beside it is the second input, and it writes too: reported
+// false on a launch already judged as vulkan-parallel-compile, it LOWERS the bound rung
+// to vulkan-plain (refineParallelCompile), which the options row then names and which a
+// launch the memory decided, once it proves healthy, then persists as the rung it
+// remembers (armHealthySessionTimer). It never rescues, so nothing re-execs on it.
 // The blast radius is bounded by construction: trusted senders only, judged once per
 // process, one rescue per process, and a chain capped by the rescue marker, so the
-// worst a hostile page could do is cost the player one relaunch onto a slower backend.
+// worst a hostile page could do is cost the player one relaunch onto a slower backend
+// or one lowered rung in the memory.
 ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => {
   if (!trustedSender(event)) return;
   if (typeof renderer !== 'string' || renderer === '') return;

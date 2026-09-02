@@ -686,6 +686,58 @@ describe('recordShaderCorpus', () => {
     await expect(recordShaderCorpus(broken)).resolves.toBe(0);
   });
 
+  it('records nothing on a host whose next boot would never replay it', async () => {
+    // Recording walks every program's source on the main thread and writes a
+    // few MB to IndexedDB. Under a stored Off, and on iOS, the replay side
+    // skips before it reads any of that, so the record side asks the same two
+    // questions first and pays neither cost.
+    const gl = fakeGl();
+    gl.attached = [
+      { type: gl.VERTEX_SHADER, source: 'void vertex1(){}' },
+      { type: gl.FRAGMENT_SHADER, source: 'void frag1(){}' },
+    ];
+    let contextReads = 0;
+    const counted = (): ShaderCorpusRenderer => ({
+      info: { programs: [{ program: {} }] },
+      getContext: () => {
+        contextReads += 1;
+        return gl;
+      },
+    });
+    const sets: string[] = [];
+    const store = {
+      get: () => Promise.resolve(undefined),
+      set: (key: string) => {
+        sets.push(key);
+        return Promise.resolve();
+      },
+    };
+    const common = { store, search: '', buildId: BUILD, tier: TIER } as const;
+
+    expect(
+      await recordShaderCorpus(counted(), { ...common, stored: 'off', platform: 'other' }),
+    ).toBe(0);
+    expect(await recordShaderCorpus(counted(), { ...common, stored: 'all', platform: 'ios' })).toBe(
+      0,
+    );
+    // Neither the walk nor the write happened, and the readout says nothing was
+    // recorded rather than reporting a corpus.
+    expect(contextReads).toBe(0);
+    expect(sets).toEqual([]);
+    expect(shaderWarmupStats().recorded).toBeNull();
+
+    // Auto and On on a desktop are the arms that pay for themselves.
+    for (const stored of ['auto', 'all'] as const) {
+      expect(await recordShaderCorpus(counted(), { ...common, stored, platform: 'other' })).toBe(1);
+    }
+    expect(contextReads).toBe(2);
+    expect(sets).toEqual([
+      shaderWarmupInternalsForTest.corpusKey,
+      shaderWarmupInternalsForTest.corpusKey,
+    ]);
+    expect(shaderWarmupStats().recorded).toBe(1);
+  });
+
   it('is what finishShaderWarmup schedules, after releasing the hidden context', async () => {
     const gl = fakeGl();
     gl.attached = [

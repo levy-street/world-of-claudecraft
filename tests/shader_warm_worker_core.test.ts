@@ -27,6 +27,7 @@ import {
   warmRequestOf,
   warmStatsOf,
 } from '../src/render/shader_warm_worker_core';
+import { stripComments } from './helpers/strip_comments';
 
 interface Rig {
   scheduler: WarmScheduler;
@@ -173,9 +174,10 @@ describe('the programs the worker keeps after they resolved', () => {
     // A source pin on the host (a worker script no node test can import):
     // the cap comes from the init message through this unit, never through
     // an inline clamp of its own.
-    const worker = readFileSync(
-      new URL('../src/render/shader_warm_worker.ts', import.meta.url),
-      'utf8',
+    // Comments stripped (tests/helpers/strip_comments.ts), so a commented-out
+    // call cannot satisfy one of the pins below.
+    const worker = stripComments(
+      readFileSync(new URL('../src/render/shader_warm_worker.ts', import.meta.url), 'utf8'),
     );
     expect(worker).toContain('createWarmRetention<WarmProgramHandle>(');
     expect(worker).toContain('retention.setCap(retain);');

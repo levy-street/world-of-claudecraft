@@ -200,9 +200,13 @@ describe('the cast gate', () => {
       castTotal: 2,
       auras: [{ id: 'frost_armor' }],
     });
-    // The aura and cast reads are what would spawn; a closed gate reaches
-    // none of the engine's spawn methods.
-    for (const key of touched) expect(key).not.toMatch(/spawn|flash|hold|windup|orbit/i);
+    // The exact set, the way the closed-gate cases above assert it: a denylist
+    // over `touched` is non-vacuous only because sleepEntity happens to land in
+    // it, and would keep passing if the sleep itself disappeared. The sleep is
+    // the whole per-frame contract here (it is what releases the held entity's
+    // cosmetic pools), so it is named, and every other engine call is excluded
+    // by the equality rather than by a pattern.
+    expect(touched).toEqual(new Set(['sleepEntity']));
     expect(admit).not.toHaveBeenCalled();
   });
 });

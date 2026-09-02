@@ -28,13 +28,16 @@
 // import-time guess at warm-up time; when the two disagree the identity simply
 // does not match and the warm-up skips, which is the fail-safe direction.
 //
-// Off is Off: the stored Shader Warm-up option and the `?shaderwarm=` pin are
-// read through the worker's own grammar (../render/shader_warmup_core
-// readWarmupQuery), and iOS never mints the hidden context, for the reason the
-// worker refuses it there (a second WebGL2 context beside the world's on a
-// phone-class WebKit). This arm is NOT a client of the renderer's preparation
-// scheduler, and cannot be: it runs on the character-select screen, before any
-// renderer or background_gpu_queue exists, and every world entry stops it as
+// Off is Off, on BOTH of this arm's halves: the stored Shader Warm-up option
+// and the `?shaderwarm=` pin are read through the worker's own grammar
+// (../render/shader_warmup_core readWarmupQuery), and iOS never mints the
+// hidden context, for the reason the worker refuses it there (a second WebGL2
+// context beside the world's on a phone-class WebKit). The RECORD half asks
+// the same two questions before it walks a single program: a host whose next
+// boot would skip the replay is not worth the source walk or the megabytes.
+// This arm is NOT a client of the renderer's preparation scheduler, and cannot
+// be: it runs on the character-select screen, before any renderer or
+// background_gpu_queue exists, and every world entry stops it as
 // its first statement (enterWorld and startOffline), so no live frame ever
 // shares the main thread with a submission. What the GPU process still holds
 // in flight at the click is the entry's own program set resolving into the
@@ -575,6 +578,10 @@ export function releaseShaderWarmup(): void {
 // -- recording -------------------------------------------------------------
 
 export interface RecordShaderCorpusOptions {
+  search?: string;
+  /** The stored Shader Warm-up option; the registered source otherwise. */
+  stored?: string | null;
+  platform?: ShaderWarmPlatform;
   store?: KeyValueStore;
   buildId?: string;
   tier?: string;
@@ -625,6 +632,20 @@ export async function recordShaderCorpus(
   options: RecordShaderCorpusOptions = {},
 ): Promise<number> {
   try {
+    // The record side reads exactly what the replay side reads, because a host
+    // that will never replay a corpus has no reason to pay for one: recording
+    // walks every program's source on the main thread and writes a few MB to
+    // IndexedDB, and under Off or on iOS the next boot skips before it ever
+    // looks at them.
+    const query = readWarmupQuery(
+      options.search ?? currentSearch(),
+      options.stored !== undefined ? options.stored : storedShaderWarmSetting(),
+    );
+    const refused = warmupRefusedOnPlatform(options.platform ?? currentPlatform());
+    if (!query.enabled || refused) {
+      console.info(`${LOG} recording skipped: ${refused ? 'ios-webkit' : 'disabled'}`);
+      return 0;
+    }
     const gl = renderer.getContext() as CorpusGl;
     const entries = renderer.info.programs ?? [];
     const sweep = enableRendererExtensions(gl);

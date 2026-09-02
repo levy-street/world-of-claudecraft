@@ -16,8 +16,8 @@
 //
 // The worker's context is one more WebGL context in the GPU process (the
 // cap is about sixteen, context_release.ts); it lives in the worker, so the
-// page's own release hook cannot reach it, and the client terminates the
-// worker on pagehide itself.
+// page's own release hook cannot reach it, and the client retires the worker
+// itself on a pagehide that is not a bfcache freeze (hookPagehide).
 
 import { GPU_WORK_PRIORITY } from './background_gpu_queue';
 import { mobilePlatformFromNavigator } from './gfx';
@@ -322,12 +322,31 @@ function retireWorker(): void {
   }
 }
 
+/** The page is going away: give its worker's context back with it. Reads the
+ *  event's `persisted` flag for the reason context_release.ts does. A page
+ *  FROZEN into the bfcache can come back, and there would be nothing to come
+ *  back to: the bare terminate leaves `workerState` reading `ready`, while
+ *  startWorker only ever runs from `idle`, so shaderWarmAvailable() would keep
+ *  answering true and every later gate would pay the dry assembly and then
+ *  settle failed on a worker that no longer exists. So a persisted pagehide
+ *  does nothing at all.
+ *  A pagehide without persistence is the page really going away, and there the
+ *  cheapest consistent state is a retirement FOR CAUSE: `refused`, which no
+ *  later policy call respawns from (it is not `idle`), so nothing mints a
+ *  second WebGL2 context during a teardown, availability reads false, every
+ *  gate takes the `unavailable` bypass, and the readout names why. */
 function hookPagehide(): void {
   if (state.pagehideHooked) return;
-  const scope = globalThis as { addEventListener?: (type: string, cb: () => void) => void };
+  const scope = globalThis as {
+    addEventListener?: (type: string, cb: (event?: { persisted?: boolean }) => void) => void;
+  };
   if (typeof scope.addEventListener !== 'function') return;
   state.pagehideHooked = true;
-  scope.addEventListener('pagehide', () => retireWorker());
+  scope.addEventListener('pagehide', (event) => {
+    if (event?.persisted === true) return;
+    retireForCause('refused', 'pagehide');
+    retireWorker();
+  });
 }
 
 function startWorker(context: ShaderWarmContextSource): void {
@@ -487,7 +506,10 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
   const wedged = state.consecutiveTimeouts >= SHADER_WARM_TIMEOUT_BREAKER;
   const tooSlow = state.holds.expired() >= SHADER_WARM_EXPIRED_SHARE_BREAKER;
   if ((wedged || tooSlow) && state.workerState !== 'dead') {
-    retireForCause('dead', 'hold-timeouts');
+    // Named per rule: a capture must say which one fired (a worker that
+    // answered nothing, or one that answered someone while the holds paid the
+    // cap), since the fixes differ.
+    retireForCause('dead', wedged ? 'hold-timeouts:wedged' : 'hold-timeouts:expired-share');
     retireWorker();
   }
 }

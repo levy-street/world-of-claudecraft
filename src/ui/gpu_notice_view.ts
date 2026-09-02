@@ -190,6 +190,12 @@ export function gpuNoticeBodyKey(input: {
   // Last of the four, deliberately: the other three say the hardware is not
   // being used properly, which is the more urgent read when both fire. This one
   // is a setting that did not take on a session that is otherwise fine.
+  // The consequence, stated rather than left to the reader: on a hybrid laptop
+  // both fire together, the hybrid copy wins, and that player learns their
+  // Vulkan pick did not take from the options row instead (src/ui/options_view.ts
+  // arms gpuBackendActiveUnavailable there, with its alert), never from this
+  // toast. The component is still in the verdict, so the notice does show and
+  // its dismissal signature covers both.
   if (!input.verdict.hybridGpuLikely && input.verdict.requestedBackendUnavailable) {
     return 'gpuNotice.bodyRequestedBackend';
   }

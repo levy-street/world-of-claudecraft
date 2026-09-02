@@ -52,6 +52,14 @@ export const RENDERER_CONTEXT_EXTENSIONS: readonly string[] = [
   'WEBGL_compressed_texture_etc',
   'WEBGL_compressed_texture_etc1',
   'WEBGL_compressed_texture_pvrtc',
+  // NOT here, and on purpose: WEBGL_multi_draw, which three asks for at the
+  // FIRST BatchedMesh draw (WebGLRenderer's `object.isBatchedMesh` arm calls
+  // extensions.get for it). No BatchedMesh is constructed under src/ today, so
+  // the name is never asked for; the day one is, that get grows the context's
+  // enabled set mid-session and the drift sentinel
+  // (extension_drift_sentinel.ts) retires the warm worker for the rest of the
+  // renderer's life. Adding a BatchedMesh means adding the name to this list,
+  // so both contexts enable it up front and the key stays shared.
 ];
 
 export interface ExtensionHost {

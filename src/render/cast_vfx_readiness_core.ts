@@ -14,6 +14,16 @@
 // of the gated set, so drawing it through the closed gate may link that one
 // program cold once (the trade the area ring makes too); its unit then settles
 // as a hit and records it like the rest.
+// The SHELL is the one of those four worth deciding out loud, because "this
+// target has an absorb up" IS a read a player acts on: it stays in the sleep
+// because the HUD carries the same information whole and unheld. The target
+// frame's aura strip shows EVERY aura of the current target, buffs included,
+// at full rate on every graphics tier (src/ui/hud.ts, the `all` targetAurasView
+// feeding #tf-debuffs and the target-auras window); the local player's own
+// shield is on the buff bar; and a party member's remaining absorb is a number
+// on the party frame (partyFrameAbsorb, src/sim/party_frame_info.ts). So the
+// slept shell drops an in-world DUPLICATE of a read the HUD keeps, which is
+// the cosmetic trade the rest of the sleep makes, and no carve-out is owed.
 //
 // Why a gate rather than an earlier link: the boot manifest's entry for these
 // programs runs after its 3 s budget on the OpenGL desktops (measured

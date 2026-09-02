@@ -282,7 +282,12 @@ function classMintedProgram(gl: ShaderSourceGl, program: MintedProgramEntry): vo
       : undefined;
   observeMintedProgram(
     state.audit,
-    { cacheKey, name: program.name ?? '', hash, hashSansName },
+    // The fragment source rides along for attribution only: three names a
+    // program after `material.name` alone, so a procedural pass that sets none
+    // arrives here with an empty name and no announcing gate, and its own
+    // uniforms plus its key's hook tail are what name it (the core's
+    // `describeMintedProgram`). Nothing keeps the string.
+    { cacheKey, name: program.name ?? '', hash, hashSansName, fragment },
     state.armed,
   );
 }

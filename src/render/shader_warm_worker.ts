@@ -219,7 +219,12 @@ function tick(): void {
     const source = sources.get(next.id);
     sources.delete(next.id);
     if (!source) {
+      // Every settle is posted, this one included: a client hold waits on the
+      // ids it asked for, so a settle the worker keeps to itself is a gate
+      // holding out its whole cap for an answer that already exists. The text
+      // is gone the way a cancel takes it, so that is the reason it carries.
       scheduler.markFailed(next.id);
+      post({ kind: 'failed', id: next.id, reason: 'cancelled' });
       continue;
     }
     const handle = submitWarmProgram(gl, source);

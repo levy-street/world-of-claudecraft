@@ -115,6 +115,26 @@ const VOLUME_PROPERTY_SET = new RegExp(
   `(?<![.\\w$])(?:${VOLUME_PROPS})\\s*:|\\.\\s*(?:${VOLUME_PROPS})\\s*(?:[-+*/]|\\?\\?|\\|\\||&&)?=(?!=)`,
 );
 
+const PHYSICAL_MATERIAL_CONSTRUCTION = /new\s+(THREE\.)?MeshPhysicalMaterial\s*\(/;
+
+/** A transmission set to anything above zero. The VALUE is read rather than
+ *  pattern-excluded: the previous `(?!0\b)` guard meant to spare the
+ *  neutralizer's own `transmission = 0` and spared every `0.x` with it, which
+ *  is the whole authoring range of the property this scan exists to catch. */
+const TRANSMISSION_ASSIGNMENT = /\btransmission\s*[:=]\s*([0-9]*\.?[0-9]+)/g;
+
+function setsTransmission(source: string): boolean {
+  TRANSMISSION_ASSIGNMENT.lastIndex = 0;
+  for (
+    let match = TRANSMISSION_ASSIGNMENT.exec(source);
+    match !== null;
+    match = TRANSMISSION_ASSIGNMENT.exec(source)
+  ) {
+    if (Number.parseFloat(match[1] ?? '0') > 0) return true;
+  }
+  return false;
+}
+
 describe('the volume-property scan reads material positions, not every `thickness`', () => {
   const flagged = (source: string) => VOLUME_PROPERTY_SET.test(source);
 
@@ -219,19 +239,41 @@ describe('no material buys a second scene pass (src/render/CLAUDE.md)', () => {
     // MeshStandardMaterial with extra uniforms. Translucency here is alpha
     // blending. The neutralizer is the one writer, and it writes zero.
     const offenders: string[] = [];
+    let scanned = 0;
     for (const dir of ['src/render', 'src/ui', 'src/game', 'src/editor', 'src/guide']) {
       for (const { file, full } of tsFilesUnder(join(root, dir))) {
         if (file.endsWith('.test.ts')) continue;
         const rel = `${dir}/${file}`;
         if (rel === 'src/render/assets/transmission_neutralize.ts') continue;
+        scanned++;
         const source = readFileSync(full, 'utf8');
-        if (/new\s+(THREE\.)?MeshPhysicalMaterial\s*\(/.test(source))
-          offenders.push(`${rel}: construction`);
-        if (/\btransmission\s*[:=]\s*(?!0\b)[0-9.]/.test(source))
-          offenders.push(`${rel}: transmission set`);
+        if (PHYSICAL_MATERIAL_CONSTRUCTION.test(source)) offenders.push(`${rel}: construction`);
+        if (setsTransmission(source)) offenders.push(`${rel}: transmission set`);
         if (VOLUME_PROPERTY_SET.test(source)) offenders.push(`${rel}: volume set`);
       }
     }
+    // The vacuity floor, the GLB sweep's twin: a walk that stops finding the
+    // client tree (a moved directory, a broken helper) must fail rather than
+    // report a clean sweep of nothing. Deliberately far under today's count
+    // (about 1,650 files across the five directories), so ordinary deletions
+    // never touch it.
+    expect(scanned).toBeGreaterThan(800);
     expect(offenders).toEqual([]);
+  });
+
+  it('the client-source scan matches what it claims to catch', () => {
+    // The positive control the sweep above cannot give itself: it is green
+    // because the tree is clean, so a regex that matched nothing at all would
+    // read exactly the same. One fixture per arm, plus the two shapes that
+    // must NOT flag (a standard material, and the neutralizer's own zero).
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('new THREE.MeshPhysicalMaterial({})')).toBe(true);
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('const m = new MeshPhysicalMaterial();')).toBe(true);
+    expect(PHYSICAL_MATERIAL_CONSTRUCTION.test('new THREE.MeshStandardMaterial({})')).toBe(false);
+
+    expect(setsTransmission('new THREE.MeshPhysicalMaterial({ transmission: 0.9 })')).toBe(true);
+    expect(setsTransmission('material.transmission = 0.35;')).toBe(true);
+    expect(setsTransmission('glass.transmission = 1;')).toBe(true);
+    expect(setsTransmission('material.transmission = 0;')).toBe(false);
+    expect(setsTransmission('{ transmission: 0.0 }')).toBe(false);
   });
 });

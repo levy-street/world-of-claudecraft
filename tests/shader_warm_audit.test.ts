@@ -17,6 +17,7 @@ import {
   recordNewLivePrograms,
   resetLiveProgramWatchForTest,
 } from '../src/render/live_program_watch';
+import { THREE_PROGRAM_KEY_PARAMETERS } from '../src/render/program_key_ledger_core';
 import type { DryProgramSource } from '../src/render/program_sources';
 import {
   armShaderWarmAudit,
@@ -334,6 +335,55 @@ describe('sweepShaderWarmAudit', () => {
       unexpectedByName: [{ name: 'physical', count: 1 }],
     });
     expect(shaderWarmAuditSnapshot().drifts[0]).toMatchObject({ cacheKey: 'drift', label: 'kit' });
+  });
+
+  it('attributes an unnamed hooked mint from the program alone, name and gate empty', () => {
+    // three names a WebGLProgram after `material.name` only, so a procedural
+    // pass that never set one arrives with an empty name, and an unexpected
+    // mint has no announcing gate either: the readout would otherwise carry a
+    // raw key and nothing else (the Windows D3D11 report). The host hands the
+    // fragment it already read back to the core, which reads the type, the
+    // onBeforeCompile the key carries, the colour space the link ran under,
+    // and the pass's own uniforms.
+    resetShaderWarmAuditForTest('?perf');
+    const hook = 'function (shader) { shader.uniforms.uHaze = h; }';
+    const params = THREE_PROGRAM_KEY_PARAMETERS.map((name) => {
+      if (name === 'precision') return 'highp';
+      if (name === 'outputColorSpace') return 'srgb-linear';
+      return name.endsWith('Uv') ? '' : '0';
+    });
+    const cacheKey = ['861151317', '2113470571', ...params, 0, 0, 'srgb', hook].join(',');
+    const fragment = 'uniform vec3 cameraPosition;\nuniform sampler2D tDiffuse;\nvoid main() {}';
+    const program: MintedProgramEntry = {
+      id: 1,
+      cacheKey,
+      name: '',
+      vertexShader: { source: 'v' },
+      fragmentShader: { source: fragment },
+    };
+    const host = glHost([program]);
+    armShaderWarmAudit(host);
+    sweepShaderWarmAudit(host);
+    const snapshot = shaderWarmAuditSnapshot();
+    expect(snapshot.unexpectedBeforeReveal).toBe(1);
+    // Armed, the same program read live is the entry the tester sees.
+    resetShaderWarmAuditForTest('?perf');
+    const live = glHost([]);
+    armShaderWarmAudit(live);
+    (live.info.programs as MintedProgramEntry[]).push(program);
+    sweepShaderWarmAudit(live);
+    const sample = shaderWarmAuditSnapshot().unexpectedSamples[0];
+    expect(sample).toMatchObject({ name: '', label: '', cacheKey });
+    expect(sample.attribution).toMatchObject({
+      type: 'ShaderMaterial',
+      hooked: true,
+      outputColorSpace: 'srgb-linear',
+      rendererOutputColorSpace: 'srgb',
+      uniforms: ['tDiffuse'],
+    });
+    expect(sample.attribution?.customKeyHead).toBe(hook);
+    // And the tally row names it instead of collapsing on the empty name.
+    expect(shaderWarmAuditSnapshot().unexpectedByName[0].name).toContain('uHaze');
   });
 
   it('sees a mint that landed beside an eviction, when the list length did not move', () => {

@@ -4,8 +4,10 @@
 // this suite only drives the worker scope, on a stubbed OffscreenCanvas and a
 // stubbed WebGL2 context, because a real one needs a browser.
 
+import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ShaderWarmWorkerMessage } from '../src/render/shader_warm_protocol';
+import { stripComments } from './helpers/strip_comments';
 
 /** Only the extension the worker's own contract turns on a decision:
  *  KHR_parallel_shader_compile picks polling over a blocking resolve. */
@@ -212,6 +214,23 @@ describe('the shader warm worker scope', () => {
     // Unknown ids are ignored, and the message never fails anything.
     send({ kind: 'reprioritize', updates: [{ id: 99, priority: 50 }] });
     expect(posted.filter((message) => message.kind === 'failed')).toEqual([]);
+  });
+
+  it('answers even the queued id whose source is gone, so no settle is silent', () => {
+    // A source pin, deliberately: through the message API the two always move
+    // together (a cancel drops the pending entry and its text in one step, and
+    // a submitted text is deleted only once its id is in flight), so the arm is
+    // the defensive one and no message sequence reaches it. What it must not do
+    // is settle in silence: the client's hold waits on the ids it asked for, so
+    // an unanswered settle costs that gate its whole hold cap.
+    const worker = stripComments(
+      readFileSync(new URL('../src/render/shader_warm_worker.ts', import.meta.url), 'utf8'),
+    );
+    // Anchored on code, never on a comment: the source is read stripped.
+    const submitLoop = worker.slice(worker.indexOf('scheduler.takeNext();'));
+    const missingSource = submitLoop.slice(0, submitLoop.indexOf('submitWarmProgram(gl, source)'));
+    expect(missingSource).toContain('scheduler.markFailed(next.id);');
+    expect(missingSource).toContain("post({ kind: 'failed', id: next.id, reason: 'cancelled' });");
   });
 
   it('adds nothing when the canvas announces the loss the poll already reported', async () => {
