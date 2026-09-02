@@ -832,6 +832,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': '玩家框缩放',
   'hudChrome.options.targetFrameScale': '目标框缩放',
   'hudChrome.options.aurasOnPlayerFrame': '增益显示在玩家框',
+  'hudChrome.options.auraBarBelowFrame': '增益显示在玩家框下方',
   'hudChrome.options.alwaysShowAllBuffs': '始终显示所有增益',
   'hud.core.mapCanvasLabel': '地图',
   'hud.core.mapSummary': '{zone}的地图。',
@@ -13148,6 +13149,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '只要动了其中任何一个，画质预设就会切换到“高级”，并以你当时正看着的那些档位为起点，因此你的自定义搭配是从你已经看到的样子开始，而不是从零开始。调得满意了，按“应用”。“高级”排在预设列表的最后正是这个道理：它是专家档，你自己的那套搭配就住在那里。',
   'guide.settingsPage.ifAurasOnPlayerFrame':
     '除了光环条之外，也把你的增益和减益显示在你自己的单位框体上。',
+  'guide.settingsPage.ifAuraBarBelowFrame':
+    '把增益条移到你的单位框体下方，而不是上方。只有在增益显示于玩家框时才有效。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '即使在低画质预设下也显示所有生效中的增益，绕过该档位平时的增益图标上限。',
   'guide.settingsPage.ifChatFontScale': '聊天文字的大小。',

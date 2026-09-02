@@ -406,6 +406,7 @@ import {
   relocalizeAppearancePanels,
 } from './ui/appearance_panel_locale';
 import { setThornhollowPrewarmHooks } from './ui/arena_window';
+import { applyAuraBarSide } from './ui/aura_bar_side';
 import {
   handleKeyboardActivation,
   syncInputAriaState,
@@ -2817,6 +2818,9 @@ async function startGame(
         break;
       case 'aurasOnPlayerFrame':
         hud.setAurasOnPlayerFrame(!!v);
+        break;
+      case 'auraBarBelowFrame':
+        applyAuraBarSide(document.body, !!v);
         break;
       case 'alwaysShowAllBuffs':
         hud.setAlwaysShowAllBuffs(!!v);

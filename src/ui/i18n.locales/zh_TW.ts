@@ -832,6 +832,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.playerFrameScale': '玩家框縮放',
   'hudChrome.options.targetFrameScale': '目標框縮放',
   'hudChrome.options.aurasOnPlayerFrame': '增益顯示在玩家框',
+  'hudChrome.options.auraBarBelowFrame': '增益顯示在玩家框下方',
   'hudChrome.options.alwaysShowAllBuffs': '始終顯示所有增益',
   'hud.core.mapCanvasLabel': '地圖',
   'hud.core.mapSummary': '{zone}的地圖。',
@@ -13152,6 +13153,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '只要動了其中任何一項，品質預設就會切換成「進階」，並以你當時看到的那些檔位為起點，因此你的自訂搭配是從你已經看見的樣子開始，而不是從零開始。滿意之後按下「套用」。「進階」之所以排在預設清單的最後，正是這個原因：它是屬於你自己那套搭配的專家設定檔。',
   'guide.settingsPage.ifAurasOnPlayerFrame':
     '除了光環列之外，也把你的增益與減益顯示在你自己的單位框上。',
+  'guide.settingsPage.ifAuraBarBelowFrame':
+    '把增益列移到你的單位框下方，而不是上方。只有在增益顯示於玩家框時才有效。',
   'guide.settingsPage.ifAlwaysShowAllBuffs':
     '即使在低畫質預設下也顯示所有生效中的增益，繞過該檔位平時的增益圖示上限。',
   'guide.settingsPage.ifChatFontScale': '聊天文字大小。',

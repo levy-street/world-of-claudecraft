@@ -744,7 +744,12 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
-      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
+      boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame', {
+        rerender: true,
+      }),
+      boolToggle(s, 'auraBarBelowFrame', 'hudChrome.options.auraBarBelowFrame', {
+        disabled: !s.bool('aurasOnPlayerFrame'),
+      }),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),
       boolToggle(s, 'showTargetSwingTimer', 'hudChrome.options.showTargetSwingTimer'),

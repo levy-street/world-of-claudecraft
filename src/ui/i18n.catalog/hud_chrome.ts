@@ -1895,6 +1895,10 @@ export const hudChromeStrings = {
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
+    // Interface panel toggle, disabled unless aurasOnPlayerFrame is on: flips
+    // the anchored buff row to the other side of the player frame (wordy, M16:
+    // the five non-Latin fills land in this same change).
+    auraBarBelowFrame: 'Buffs Below the Player Frame',
     // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
     // every active buff always renders, at the cap's per-frame cost (wordy,
     // M16: the five non-Latin fills land in this same change).

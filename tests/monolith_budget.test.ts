@@ -489,21 +489,28 @@ const MONOLITHS: MonolithRow[] = [
     // the interface-editor settings (frame dimensions, aura direction vars,
     // the player-frame bar lock) predate this ratchet; folding them behind a
     // src/game/ settings-application seam is flagged follow-up work.
-    // The branch's spawn_intro_seen extraction still pays for its own line at
-    // the entry wait (3 under the release row), and the empower-hold sync
-    // merge lowered the release row by 1 (the pad cast routing lives in
-    // src/game/pad_cast_routing.ts), so the merged file lands at 11625.
-    // Exact merged count, zero headroom.
-    // Re-pinned at the PR 3676 sync: this branch's reticle-sync closure
-    // extraction pays 2 more under the entry-fade row above. Measured on the
-    // merged tree, never reconciled by arithmetic. Exact merged count, zero
-    // headroom.
-    // Re-pinned after the /daynight dev-command extraction to
-    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 11551,
+    // Raised 11629 -> 11633 (+4) on this branch for the auraBarBelowFrame
+    // settings-dispatch case (the buff-placement fix): a single boolean's
+    // applySetting case, the same three-line shape as its aurasOnPlayerFrame
+    // sibling immediately above it, plus one import line. The toggle itself
+    // DID move out to its own module (src/ui/aura_bar_side.ts,
+    // applyAuraBarSide) so it has a real behavioral Vitest instead of a
+    // source-text scan on this file (which has no lightweight instantiation
+    // seam), but that extraction could only ever be import-plus-one-line-
+    // neutral here: it is purely presentational (no DOM reparenting, no
+    // device/manager state), so there is nothing left for a sibling module to
+    // own the way createGamepadSettingApplier owns the multi-key gamepad
+    // group behind one pre-switch guard. No clean branch-owned extraction
+    // exists that nets fewer lines than this.
+    // Re-pinned at the release/v0.42.0 sync merge: the release arm's own
+    // extractions (spawn_intro_seen, the reticle-sync closure, the /daynight
+    // dev-command move to src/game/daynight_dev_command.ts, and others noted
+    // on its own history) landed independently of this branch's
+    // alwaysShowAllBuffs applySetting case, so neither parent's pin fits the
+    // combined file. Measured on the merged tree, never reconciled by
+    // arithmetic. Exact merged count, zero headroom: any further growth reds
+    // again.
+    ceiling: 11515,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

@@ -9,25 +9,70 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "es_ES": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "fr_FR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "fr_CA": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "de_DE": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "nl_NL": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "pl_PL": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "id_ID": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "tr_TR": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "sv_SE": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "vi_VN": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ],
+  "da_DK": [
+    "guide.settingsPage.ifAuraBarBelowFrame",
+    "hudChrome.options.auraBarBelowFrame"
+  ]
 };

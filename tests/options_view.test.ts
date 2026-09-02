@@ -573,6 +573,7 @@ const FRAMES_KEYS = [
   'partyFrameShowPets',
   'partyFrameShowSelf',
   'aurasOnPlayerFrame',
+  'auraBarBelowFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',
   'showTargetSwingTimer',
@@ -791,6 +792,39 @@ describe('options_view: interface dispatch matrix (cluster 5)', () => {
 
     const off = buildInterfaceControls(makeSource({}, { forceHighPerfGpu: false }), DESKTOP_ENV);
     expect(find(off, 'forceHighPerfGpu')).toMatchObject({ control: 'boolToggle', on: false });
+  });
+
+  // Regression pin for the buff-placement bug (issue: buffs on the player
+  // frame flip above/below unpredictably): the above/below choice is now the
+  // player's OWN setting (auraBarBelowFrame), gated on aurasOnPlayerFrame the
+  // same way a dependent BoolToggleControl always gates on its parent
+  // (disabled until the parent is on, rebuilt immediately via rerender: true
+  // so the disabled state never goes stale).
+  it('enables the below-frame buff placement toggle only while buffs anchor to the player frame', () => {
+    const hidden = buildInterfaceControls(makeSource());
+    expect(find(hidden, 'aurasOnPlayerFrame')).toMatchObject({
+      control: 'boolToggle',
+      rerender: true,
+    });
+    expect(find(hidden, 'auraBarBelowFrame')).toMatchObject({
+      control: 'boolToggle',
+      disabled: true,
+    });
+
+    const visible = buildInterfaceControls(makeSource({}, { aurasOnPlayerFrame: true }));
+    expect(find(visible, 'auraBarBelowFrame')).toMatchObject({ disabled: false });
+  });
+
+  it('reads the stored buff-placement choice straight through, independent of aurasOnPlayerFrame', () => {
+    const on = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: true }),
+    );
+    expect(find(on, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: true });
+
+    const off = buildInterfaceControls(
+      makeSource({}, { aurasOnPlayerFrame: true, auraBarBelowFrame: false }),
+    );
+    expect(find(off, 'auraBarBelowFrame')).toMatchObject({ control: 'boolToggle', on: false });
   });
 
   it('renders NO uiScale row (owner request); the comfort sliders stay live', () => {
