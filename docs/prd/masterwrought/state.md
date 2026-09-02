@@ -23261,7 +23261,14 @@ retired in scripts/i18n_retired_keys.mjs and the successor's five non-Latin fill
 in-change (machine-authored under the i18n-locale-fill conventions and FLAGGED for the maintainer's read in phase-19f-qa.md; the retired key's overlay rows are untouched); the 15 Latin rows land pending for the
 Phase 20 fill. The sundering.ts docblock and the materials suite's comment carry the ruling id,
 and the two guide pins ('exactly one essence', 'one per week per character') hold on the
-successor. Phase 19F.
+successor. RECORDED, not reworded (the D144 gate): the sim refusal line error.sunderTarget
+('Only raid-won epics can be sundered.') has the mirror imprecision (a raid-won sigil is an epic that
+does not sunder); it is reachable only past the bag menu's own isSunderable gate and rewording it is
+a 20-locale matcher change days before the Phase 20 fill, so it is carried, not taken. The materials
+suite comment is the one inside 'the eighth-sync gear allowlist: raid-sourced epic non-gear never
+sunders'. Phase 19F.
+(The sentence below predates the rulings: rows 12 to 15 were ruled by 19A and 19E, and row 16 is
+closed by the line above, 2026-09-02.)
 The open decisions are rows 12 to 16
 of the Phase 19 decision table (phase-19-rulings-gate.md): re-measure R5 on
 the merged world (which also decides whether the Ignivar raid joins the
