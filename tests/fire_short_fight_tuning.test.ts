@@ -175,6 +175,28 @@ function canPress(p: Entity, id: string): boolean {
 // The Ignite bank fraction, read from the live fire mastery so a mastery
 // re-tune moves this estimator with it instead of silently skewing the
 // conservation gate (it was hardcoded 0.4 before the 0.3 re-band).
+//
+// IT DELIBERATELY UNDER-BANKS THE METEOR IMPACTS, and this is the reason,
+// written at the code rather than left to be rediscovered (RULED 2026-09-01,
+// masterwrought qr-19-ignite-bank-estimator-rate). Two DIFFERENT rates bank
+// Ignite in the sim. A fire CRIT banks ignitionPct (0.3) through igniteOnCrit
+// (src/sim/combat/fire_mage.ts:353-354). A Meteor ground impact banks
+// igniteFrac (0.4) through the groundAoE effect
+// (src/sim/content/classes.ts:8080, applied at src/sim/sim.ts:6824-6825), and
+// it banks that INSTEAD of, never as well as, the crit rate: igniteOnCrit
+// returns early on `ability === null`, which is exactly what the groundAoE
+// path passes. So both estimator branches below use 0.3 where the sim uses
+// 0.4 on every Meteor impact, crit or not.
+//
+// The estimate is therefore LOW, which makes `banked` low and the paid/banked
+// ratio HIGH against the `<= banked * 1.02` ceiling: the arm passes for a
+// stated, safe-direction reason instead of by accident, and an under-banking
+// estimator can only make a real double-dip easier to see, never harder.
+// Correcting it to igniteFrac would LOOSEN a conservation arm and force its
+// bounds to be re-derived, which is a balance-adjacent threshold change; under
+// the repo rule that gameplay math follows real classic-era formulas and is
+// never tuned to make a test read better, that is a separate task with the
+// maintainer, not a fix-round edit.
 const IGNITION_PCT = (() => {
   const fire = TALENTS.mage.specs.find((s) => s.id === 'fire');
   const pct = fire?.mastery.effect.global?.ignitionPct;
@@ -201,7 +223,10 @@ interface BurstResult {
   damage: number;
   byAbility: Record<string, number>;
   ignitePaid: number; // Ignite damage actually received by the dummy
-  igniteBanked: number; // estimate: ignitionPct of fire crit damage and of non-crit Meteor impacts
+  // Estimate: ignitionPct of fire crit damage and of Meteor ground impacts.
+  // Deliberately LOW on the Meteor half, which banks igniteFrac in the sim;
+  // see the IGNITION_PCT header for why the gap is left in the safe direction.
+  igniteBanked: number;
 }
 
 // Drive one spec's short-fight loop for `seconds` and sum every point of
@@ -531,7 +556,11 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
 
   it('Ignite conservation: the bank pays out once, buffs never double-dip (review P1)', () => {
     // Paid Ignite over the full buffed rotation must not exceed what the
-    // crits banked (40% each). Rounding can add fractions of a point per
+    // crits banked. The rate is the fire mastery's ignitionPct, 30% per crit
+    // (src/sim/content/talents_classic.ts:154), NOT the 40% this comment
+    // claimed until 2026-09-01: 40% is igniteFrac, the Meteor ground-impact
+    // rate, which the ESTIMATOR deliberately does not model (see the
+    // IGNITION_PCT header). Rounding can add fractions of a point per
     // tick, end-of-fight truncation loses the tail, so the healthy reading
     // sits just under 1.0; the pre-fix Convergence sweep read ~1.05-1.2 with
     // the double-dip active. Reuses the 120s runs measured above: re-running
