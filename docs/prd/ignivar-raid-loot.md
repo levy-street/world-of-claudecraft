@@ -416,9 +416,20 @@ dual-wield white penalty; spell hit 96 percent base, gear-cappable to
 | Damage casters | 40 | waist 60, or ring 25 + weapon 30 | one to two pieces |
 | Healers | none (heals are not resisted) | none | n/a |
 
-Every hit elective sits in a guaranteed sum-to-1 roll group (the waists
-and the two hit weapons in ignivar_offset, necks in ignivar_jewelry,
-rings in varkhul_rings), so hit is farmable, never a lucky bonus drop.
+Every hit elective sits in a guaranteed sum-to-1 roll group (the necks,
+waists and the two hit weapons in Ignivar's Normal-only ignivar_offset
+partition, the rings in Varkhul's varkhul_offset), so hit is farmable,
+never a lucky bonus drop. The one-item-per-five-raiders re-cut halved the
+flow of every elective but kept each in a guaranteed group, with one
+consequence stated plainly: those groups are NORMAL-only. The Heroic
+exclusive partitions carry hit only on the six marquee weapons (30 each),
+so a roster that raided Heroic alone would top out at 60 against the 130
+melee and 110 spell caps. That is the intended shape, not a gap: Heroic
+pays the exclusives, Normal pays the electives, the two difficulties hold
+separate weekly locks, and a Heroic roster farms its cap from its Normal
+lock the same week. Pinned per difficulty by the elective-lanes case in
+tests/ignivar_loot.test.ts, so a re-cut that strands a lane on neither
+table, or quietly re-seats one, re-decides this section.
 
 Against +3 heroic content the windows are 260 melee and 250 spell. After
 the ladder-wide diversification (below), one deliberate Hit piece
@@ -799,91 +810,109 @@ Every weapon gets its WEAPON_TYPE_BY_ITEM row (weapon_skin_rules.ts) and its
 variant art registration; Forgefather's Warhammer deliberately echoes the
 Varkhul encounter prop.
 
-## Boss loot tables: one tier, spread across Normal and Heroic
+## Boss loot tables: one tier, one item per five raiders
 
-Implemented: both bosses now ship these tables (dungeons.ts loot arrays plus
-the HEROIC_BOSS_LOOT appends, pinned by tests/ignivar_loot.test.ts). The
-Inner Crucible carries its own heroic tuning record (provisional multipliers
+Implemented: both bosses ship these tables (dungeons.ts loot arrays plus
+the HEROIC_BOSS_LOOT appends, pinned by tests/ignivar_loot.test.ts, which
+also rolls them through the live rollLoot on both difficulties). The Inner
+Crucible carries its own heroic tuning record (provisional multipliers
 mirroring the arena's) because the wing inherits the raid claim's difficulty
 from the arena, so without it a heroic run would reach a vanilla Varkhul
-while still collecting his heroic-only appends. Varkhul is therefore a
+while still collecting his heroic-only append. Varkhul is therefore a
 registered heroic finale boss and carries the shared raid heroic money base
-like Ignivar. Settled 2026-08-27: this raid has NO
-heroic item-level layer. Instead the single ilvl-35 table spreads across
-the two difficulties: Normal pays four of the five sigil slots (enough for
-the 4-piece bonus), the off-set armor, and the smaller weapons; Heroic
-adds the Robe (chest) sigil, the marquee weapons, and the shields and
-held offhands on top of the Normal groups. A Heroic kill drops its Normal
-groups PLUS its heroic-only groups, so Heroic pays in access and volume,
-never in bigger numbers.
+like Ignivar.
+
+### The cadence rule (re-cut 2026-09-02, maintainer-directed)
+
+A boss kill pays ONE gear item per five raiders, on BOTH difficulties: two
+items per kill on the 10-player raid. This is the settled Karazhan / WotLK
+10-player standard (2 drops per boss for 10 players; vanilla 40-player
+raids paid 2 to 3 per boss, tighter still), adopted to pace the tier over
+months rather than weeks. The launch tables paid four items per Normal kill
+and six to seven per Heroic kill, roughly double and triple that rate; with
+the per-difficulty weekly locks a roster running both difficulties saw about
+two items per player per week and finished its 5-piece sets in about five
+weeks. Under the rule the same roster sees about 0.8 items per player per
+week and finishes in about eleven.
+
+Settled 2026-08-27 and unchanged: this raid has NO heroic item-level layer.
+Heroic pays in ACCESS, never in count or numbers. Each kill's two slots are:
+
+- **Slot one, both difficulties: the boss's sigil partition.** The two
+  Normal sigil slots that boss used to pay every kill (mantle + grip on
+  Ignivar, legging + helm on Varkhul) merged into one exclusive group, both
+  axes balanced: 0.50 per slot, Anvil 0.34 / Ember 0.33 / Tempest 0.33.
+- **Slot two, Normal: the boss's off-set partition**, authored
+  `normalOnly` (LootEntry.normalOnly, gated by
+  src/sim/loot/loot_difficulty_gate.ts). The old jewelry group keeps the
+  half of the slot it used to own outright (0.50); the old off-set group
+  splits the other half (waists or feet 0.3125, the smaller weapons or held
+  offhands 0.1875). Weights are binary fractions so the partition sums to
+  exactly 1.00 in floating point. That constraint moves the old 70:30
+  armor-to-weapon split inside the half to 62.5:37.5, and the shift is
+  deliberate, not a rounding accident: the three weapons and two held
+  offhands are the most broadly wearable pieces in the slot (hit carriers
+  usable across roles), while each of the ten waists or feet serves one
+  archetype, so leaning the fewer shared pieces slightly up spreads the
+  slot's value across more of the raid.
+- **Slot two, Heroic: the boss's exclusive partition** (HEROIC_BOSS_LOOT).
+  A heroic claim skips the Normal-only off-set group, draws nothing for it,
+  and this group pays instead: the Robe sigil that finishes the 5-piece, the
+  marquee weapons, and on Varkhul the shields with Emberward at its
+  unchanged ABSOLUTE 3 percent per heroic kill. So every Heroic kill pays one
+  item Normal can never drop, and Normal remains the only source of necks,
+  waists, feet, rings, held offhands and the smaller weapons: a heroic
+  roster still runs its Normal lock for those.
+
+Consequences worth stating plainly: a Normal-only group can still finish
+helmet, shoulder, gloves, and legs (the 4-piece bonus) since every one of
+those sigils stays in a guaranteed Normal partition; the Robe and the
+marquee weapons remain the Heroic chase; and the crafting reagent
+(lastflame_core, one guaranteed plus a 50 percent second on both bosses)
+rides OUTSIDE the cadence as a material, not gear. The hit program's
+acquisition guarantee survives unchanged: every waist, ring and weapon
+elective still sits in a guaranteed sum-to-1 group, at half the old flow.
 
 Tables are authored as rollGroup entries (one rng draw per group, chances
-summing to 1.0 for guaranteed groups) appended in the listed order. Draw
-order is parity-sensitive: entries append, never reorder, and future
-additions go to the end. These tables are a DRAFT pending #3684: its
-promoted Warden minibosses take over groups when it lands (below).
+summing to exactly 1.0) in the listed order. Draw order is parity-sensitive
+from this re-cut on: entries append, never reorder, and future additions go
+to the end of their group.
 
-### Ignivar, Herald of the Last Flame (both difficulties)
+### Ignivar, Herald of the Last Flame
 
-| Group | Entries | Chance each |
-|---|---|---|
-| copper | 150000 copper | 1.0 |
-| ignivar_sigil_mantle | Mantle Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| ignivar_sigil_grip | Grip Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| ignivar_offset | the 10 waist pieces at 0.07 each, Cinderfang Kris 0.10, Slagrender Cleaver 0.10, Wand of Quenched Sparks 0.10 | sums to 1.0 |
-| ignivar_jewelry | the 4 necks | 0.25 each |
+| Group | Difficulty | Entries | Chance each |
+|---|---|---|---|
+| copper | both | 150000 copper (heroic base on a heroic claim) | 1.0 |
+| ignivar_sigils | both | Mantle Sigil of the Anvil / Ember / Tempest, Grip Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
+| ignivar_offset | Normal only | the 4 necks at 0.125 each, the 10 waist pieces at 0.03125 each, Cinderfang Kris / Slagrender Cleaver / Wand of Quenched Sparks at 0.0625 each | sums to 1.0 |
+| ignivar_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.17 / 0.17 / 0.16, Forgefather's Warhammer / Anvilguard Blade / Springtouched Crozier at 0.17 / 0.17 / 0.16 | sums to 1.0 |
 
-### Ignivar, heroic-only appends
+### Varkhul, Forgefather of the Last Flame
 
-| Group | Entries | Chance each |
-|---|---|---|
-| ignivar_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| ignivar_h_weapon | Forgefather's Warhammer, Anvilguard Blade, Springtouched Crozier | 1/3 each |
-
-### Varkhul, Forgefather of the Last Flame (both difficulties)
-
-| Group | Entries | Chance each |
-|---|---|---|
-| copper | 200000 copper | 1.0 |
-| varkhul_sigil_legging | Legging Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_sigil_helm | Helm Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_offset | the 10 feet pieces at 0.07 each, both held offhands at 0.15 each | sums to 1.0 |
-| varkhul_rings | the 4 rings | 0.25 each |
-
-### Varkhul, heroic-only appends
-
-The shipped append order (parity-sensitive; the code is the authority) is
-robe sigils, shields, weapons:
-
-| Group | Entries | Chance each |
-|---|---|---|
-| varkhul_h_sigil_robe | Robe Sigil of the Anvil / Ember / Tempest | 1/3 each |
-| varkhul_h_shields | Bulwark of the Inner Crucible, Ember Warden's Barrier | 0.5 each |
-| varkhul_h_weapon | Heart of the End Greatblade, Forgefire Spire, Staff of the Last Spring | 1/3 each |
-
-A Normal kill pays five guaranteed drops (two sigils, one off-set piece or
-weapon, one jewelry piece, copper); a Heroic kill pays seven or eight. A
-Normal-only group can finish helmet, shoulder, gloves, and legs, exactly
-the 4-piece bonus; the Robe and the marquee weapons are the Heroic chase,
-which is what makes the fifth slot the prestige piece under the settled
-2/4 breakpoints.
+| Group | Difficulty | Entries | Chance each |
+|---|---|---|---|
+| copper | both | 200000 copper (heroic base on a heroic claim) | 1.0 |
+| varkhul_sigils | both | Legging Sigil of the Anvil / Ember / Tempest, Helm Sigil of the Anvil / Ember / Tempest | 0.17 / 0.17 / 0.16, 0.17 / 0.16 / 0.17 |
+| varkhul_offset | Normal only | the 10 feet pieces at 0.03125 each, both held offhands at 0.09375 each, the 4 rings at 0.125 each | sums to 1.0 |
+| varkhul_h_exclusive | Heroic only (HEROIC_BOSS_LOOT) | Robe Sigil of the Anvil / Ember / Tempest at 0.12 / 0.12 / 0.11, Bulwark of the Inner Crucible 0.135, Ember Warden's Barrier 0.135, Varkhul's Emberward 0.03, Heart of the End Greatblade / Forgefire Spire / Staff of the Last Spring at 0.12 / 0.12 / 0.11 | sums to 1.0 |
 
 ## Future redistribution
 
-More drop surfaces are landing in this phase, starting with #3684's
-promoted Warden minibosses. The intended migration, so nothing here
-paints us into a corner:
+More drop surfaces exist in the raid now (the promoted Warden minibosses
+from #3684 ship with empty loot tables). The intended migration, so nothing
+here paints us into a corner:
 
-- Minibosses take over the off-set and jewelry groups first (waists, feet,
-  necks, rings), then a sigil slot each as the boss count grows; the two
-  named bosses keep the prestige slots.
+- Minibosses can take over slices of the off-set partitions first (waists,
+  feet, necks, rings), then a sigil family each as the boss count grows; the
+  two named bosses keep the prestige slots.
 - Group names are owner-scoped, so moving an entry is a delete-from-one,
   append-to-other change; the parity suite re-mints for any rng
   reordering, which is expected and handled per
   content-adds-shift-every-hunted-seed.
-- Drop cadence stays five guaranteed items per Normal boss kill.
-- The final tables are re-cut in one pass after #3684 merges into the
-  raid branch.
+- The cadence rule above is the invariant any redistribution keeps: one
+  item per five raiders per kill on both difficulties, counted across the
+  whole clear. A miniboss that gains a guaranteed group takes that share OUT
+  of a named boss's partition; it never adds to the weekly total.
 
 ## Content obligations checklist
 
