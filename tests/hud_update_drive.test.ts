@@ -891,11 +891,11 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the combat swords/ring on the player portrait, through the elided writer',
   },
   {
-    call: 'restEl.classList.toggle',
+    call: 'paintRestIndicator',
     band: 'medium',
     gate: 'rest.resting !== this.lastResting',
     surface: 'chrome',
-    why: 'the resting zZz on the player portrait, behind an edge latch',
+    why: 'the resting zZz on the player portrait, behind an edge latch. Was an inline restEl.classList.toggle until masterwrought D129s review round moved the badges whole DOM half (the on/off class plus BOTH text sinks) into rest_indicator_painter.ts: the title was being corrected on a locale switch while the aria-label was left saying Resting through a whole meal, and one function writing both from one resolved string is what stops them drifting again',
   },
   {
     call: 'this.updateQuestTracker',
