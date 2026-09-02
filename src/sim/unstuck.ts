@@ -13,10 +13,11 @@
 // to 5 minutes), and neither outcome can be reached by an attempt that started on
 // the other side of the life/death line (see cancelReason).
 
+import { BG_HALF_X, BG_HALF_Z } from './battleground_layout';
 import { moverHeight, resolvePosition } from './colliders';
 import { isRooted, isStunned } from './combat/cc';
 import {
-  bgOriginAt,
+  battlegroundOrigin,
   INSTANCE_X_BASE,
   isArenaPos,
   isBgPos,
@@ -30,7 +31,12 @@ import { PLAYER_BODY_RADIUS } from './pathfind';
 import { riftInstanceAtPos } from './rift/runs';
 import type { PlayerMeta } from './sim';
 import type { SimContext } from './sim_context';
-import { bgCarryingFlag, bgTeamOf, bgUnstuckDestination } from './social/battleground';
+import {
+  type BgMatch,
+  bgCarryingFlag,
+  bgTeamOf,
+  bgUnstuckDestination,
+} from './social/battleground';
 import {
   applyUnstuckSickness,
   moveToGraveyardForUnstuck,
@@ -98,8 +104,37 @@ function located(area: UnstuckArea, pos: Vec3, origin: { x: number; z: number })
   };
 }
 
+function battlegroundArea(match: BgMatch): UnstuckArea {
+  return {
+    kind: 'battleground',
+    id: 'thornhollow_fields',
+    instanceId: String(match.id),
+    slot: match.slot,
+  };
+}
+
+function battlegroundLocation(
+  match: BgMatch,
+  pos: Vec3,
+): { origin: { x: number; z: number }; point: UnstuckPosition } | null {
+  const origin = battlegroundOrigin(match.slot);
+  const localX = pos.x - origin.x;
+  const localZ = pos.z - origin.z;
+  const margin = PLAYER_BODY_RADIUS + POSITION_EPS;
+  if (Math.abs(localX) > BG_HALF_X + margin || Math.abs(localZ) > BG_HALF_Z + margin) {
+    return null;
+  }
+  return { origin, point: { ...pos, localX, localZ } };
+}
+
 /** Resolve a position into a stable content identity plus instance-local coords. */
 export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): LocatedPoint | null {
+  const bgMatch = ctx.bgMatches.get(pid);
+  if (bgMatch) {
+    const location = battlegroundLocation(bgMatch, pos);
+    if (location) return { area: battlegroundArea(bgMatch), point: location.point };
+  }
+
   const rift = riftInstanceAtPos(ctx, pos);
   if (rift) {
     if (!rift.memberIds.has(pid)) return null;
@@ -134,21 +169,7 @@ export function unstuckLocationAt(ctx: SimContext, pid: number, pos: Vec3): Loca
   }
   if (isDelvePos(pos.x)) return null;
 
-  if (isBgPos(pos.x)) {
-    const match = ctx.bgMatches.get(pid);
-    if (!match || match.slot !== bgOriginAt(pos.z).slot) return null;
-    const origin = bgOriginAt(pos.z);
-    return located(
-      {
-        kind: 'battleground',
-        id: 'thornhollow_fields',
-        instanceId: String(match.id),
-        slot: match.slot,
-      },
-      pos,
-      origin,
-    );
-  }
+  if (isBgPos(pos.x)) return null;
 
   const claimId = ctx.instanceClaimIdAt(pos);
   if (claimId !== null) {
@@ -257,8 +278,7 @@ function battlegroundWallTrap(ctx: SimContext, p: Entity): boolean {
   if (!ctx.bgMatches.has(p.id) || !isBgPos(p.pos.x)) return false;
   const match = ctx.bgMatches.get(p.id);
   if (!match) return false;
-  const origin = bgOriginAt(p.pos.z);
-  if (match.slot !== origin.slot) return false;
+  if (!battlegroundLocation(match, p.pos)) return false;
   const resolved = resolvePosition(
     ctx.cfg.seed,
     p.pos.x,
@@ -310,8 +330,10 @@ function battlegroundBlockedProbe(
     x: p.pos.x + wish.x * BG_WALL_PRESS_PROBE_DISTANCE,
     z: p.pos.z + wish.z * BG_WALL_PRESS_PROBE_DISTANCE,
   };
-  const origin = bgOriginAt(p.pos.z);
-  if (!isBgPos(probe.x) || bgOriginAt(probe.z).slot !== origin.slot) return false;
+  const match = ctx.bgMatches.get(p.id);
+  if (!match || !battlegroundLocation(match, { x: probe.x, y: p.pos.y, z: probe.z })) {
+    return false;
+  }
   const resolved = resolvePosition(
     ctx.cfg.seed,
     probe.x,
@@ -337,8 +359,8 @@ function battlegroundGeometryTrap(ctx: SimContext, meta: PlayerMeta, p: Entity):
 
 function activeBattlegroundAt(ctx: SimContext | undefined, p: Entity): boolean {
   const match = ctx?.bgMatches?.get(p.id);
-  if (!match || !isBgPos(p.pos.x)) return false;
-  return match.slot === bgOriginAt(p.pos.z).slot;
+  if (!match) return false;
+  return battlegroundLocation(match, p.pos) !== null;
 }
 
 function motionBlock(ctx: SimContext, meta: PlayerMeta, p: Entity): UnstuckBlockedReason | null {
@@ -493,10 +515,11 @@ function completeBattlegroundUnstuck(
   meta: PlayerMeta,
   p: Entity,
 ): UnstuckPosition | null {
+  const match = ctx.bgMatches.get(p.id);
+  if (!match) return null;
   const destination = bgUnstuckDestination(ctx, p.id);
   if (!destination) return null;
-  const match = ctx.bgMatches.get(p.id);
-  const team = match ? bgTeamOf(match, p.id) : 0;
+  const team = bgTeamOf(match, p.id);
   p.pos = destination;
   p.prevPos = { ...p.pos };
   p.facing = team === 0 ? 0 : Math.PI;
@@ -514,7 +537,7 @@ function completeBattlegroundUnstuck(
   p.queuedCastAim = null;
   settleTeleportArrival(p);
   if (!p.dead && !p.ghost) applyUnstuckSickness(ctx, p);
-  return unstuckLocationAt(ctx, p.id, p.pos)?.point ?? null;
+  return battlegroundLocation(match, p.pos)?.point ?? null;
 }
 
 function completeUnstuck(

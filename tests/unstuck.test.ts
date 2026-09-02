@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  BG_BASES,
   BG_GRAVEYARDS,
+  BG_HALF_X,
+  BG_HALF_Z,
   battlegroundColliders,
   bgFieldPlanWalls,
 } from '../src/sim/battleground_layout';
@@ -822,6 +825,88 @@ describe('unstuck while dead', () => {
 });
 
 describe('unstuck area identity', () => {
+  it('accepts a battleground inside-wall location through match-owned area identity', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+    const localX = player.pos.x - origin.x;
+    const localZ = player.pos.z - origin.z;
+
+    expect(Math.abs(localX)).toBeLessThan(BG_HALF_X);
+    expect(Math.abs(localZ)).toBeLessThan(BG_HALF_Z);
+    expect(unstuckLocationAt(sim.ctx, pid, player.pos)?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+
+    expect(sim.unstuck(pid)).toBe(true);
+    const startEvents = eventsOf(sim.drainEvents());
+    expect(startEvents).toContainEqual({
+      type: 'unstuck',
+      phase: 'started',
+      seconds: UNSTUCK_COUNTDOWN_SECONDS,
+      pid,
+    });
+    expect(startEvents).not.toContainEqual(
+      expect.objectContaining({ phase: 'blocked', reason: 'invalid_area', pid }),
+    );
+
+    const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+      (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+    );
+
+    expect(completed?.reason).toBe('moved_to_graveyard');
+    expect(completed?.area).toMatchObject({
+      kind: 'battleground',
+      id: 'thornhollow_fields',
+      instanceId: String(match.id),
+      slot: match.slot,
+    });
+    expect(sim.bgMatchFor(pid)).toBe(match);
+    expect(isBgPos(player.pos.x)).toBe(true);
+    const plot = BG_GRAVEYARDS[0];
+    expect(Math.abs(player.pos.x - (origin.x + plot.x))).toBeLessThanOrEqual(plot.hw);
+    expect(Math.abs(player.pos.z - (origin.z + plot.z))).toBeLessThanOrEqual(plot.hd);
+  });
+
+  it('keeps battleground identity when the team graveyard falls back to a clear spawn', () => {
+    const { sim, match, pid } = activeBattleground();
+    const player = forceBattlegroundWallTrap(sim, match, pid);
+    const origin = battlegroundOrigin(match.slot);
+    const originalPlot = { ...BG_GRAVEYARDS[0] };
+
+    Object.assign(BG_GRAVEYARDS[0], { x: 50, z: -140, hw: 0.25, hd: 0.25 });
+    try {
+      expect(sim.unstuck(pid)).toBe(true);
+      sim.drainEvents();
+      const completed = eventsOf(tickMany(sim, UNSTUCK_COUNTDOWN_SECONDS * 20)).find(
+        (event): event is Extract<Event, { phase: 'completed' }> => event.phase === 'completed',
+      );
+
+      expect(completed?.area).toMatchObject({
+        kind: 'battleground',
+        id: 'thornhollow_fields',
+        instanceId: String(match.id),
+        slot: match.slot,
+      });
+      expect(completed?.reason).toBe('moved_to_graveyard');
+      expect(sim.bgMatchFor(pid)).toBe(match);
+      expect(
+        BG_BASES[0].spawns.some(
+          (spawn) =>
+            Math.abs(player.pos.x - (origin.x + spawn.x)) < 1e-6 &&
+            Math.abs(player.pos.z - (origin.z + spawn.z)) < 1e-6,
+        ),
+      ).toBe(true);
+      expect(completed?.destination.localX).toBeCloseTo(player.pos.x - origin.x, 6);
+      expect(completed?.destination.localZ).toBeCloseTo(player.pos.z - origin.z, 6);
+    } finally {
+      Object.assign(BG_GRAVEYARDS[0], originalPlot);
+    }
+  });
+
   it('completes a battleground wall-trap attempt at a safe team graveyard location', () => {
     const { sim, match, pid } = activeBattleground();
     const player = forceBattlegroundWallTrap(sim, match, pid);
