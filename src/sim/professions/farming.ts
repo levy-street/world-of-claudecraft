@@ -1065,9 +1065,10 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // still resolves the bed's authored zone) in
   // tests/farm_patch_placement.test.ts.
   const zoneId = farmBedZoneId(bedId);
-  // `!= null` on purpose (not `!== null`): gatherRareEventFlavor's exhaustive
-  // switch returns undefined for an out-of-union runtime value, and a strict
-  // null check would read that as a WIN. Unreachable with the shipped
+  // `!= null` on purpose (not `!== null`): gatherRareEventFlavor reads a
+  // null-prototype record typed over the source union, so an out-of-union
+  // runtime value (a prototype key included) comes back undefined, and a
+  // strict null check would read that as a WIN. Unreachable with the shipped
   // literals; belt for the type lie.
   const golden = goldenFlavor != null && zoneId !== undefined;
   const count = golden ? armed.count * GATHER_RARE_EVENT_YIELD_MULT : armed.count;

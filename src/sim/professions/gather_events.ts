@@ -38,16 +38,22 @@ export const GATHER_RARE_EVENT_YIELD_MULT = 5;
 // fifth source added to the union fails tsc here instead of silently minting a
 // golden harvest, and the runtime list below is derived from the same record
 // (Masterwrought Phase 19F review round) so a guide pin can walk every source
-// rather than a hand-copied four.
-const FLAVOR_BY_SOURCE: Record<GatherRareEventSource, GatherRareEventFlavor> = {
-  ore: 'pristine_vein',
-  wood: 'ancient_heartwood',
-  herb: 'moonlit_bloom',
-  crop: 'golden_harvest',
-};
-export const GATHER_RARE_EVENT_SOURCES: readonly GatherRareEventSource[] = Object.keys(
-  FLAVOR_BY_SOURCE,
-) as GatherRareEventSource[];
+// rather than a hand-copied four; the list's only consumer is that guide pin
+// (the sim reads the record through gatherRareEventFlavor). NULL-PROTOTYPE and frozen: the switch this
+// replaced returned undefined for an out-of-union runtime value, which the
+// farming harvest's `!= null` belt relies on; a plain object literal would
+// have answered 'constructor' or 'toString' with a function instead.
+const FLAVOR_BY_SOURCE: Record<GatherRareEventSource, GatherRareEventFlavor> = Object.freeze(
+  Object.assign(Object.create(null) as Record<GatherRareEventSource, GatherRareEventFlavor>, {
+    ore: 'pristine_vein',
+    wood: 'ancient_heartwood',
+    herb: 'moonlit_bloom',
+    crop: 'golden_harvest',
+  } satisfies Record<GatherRareEventSource, GatherRareEventFlavor>),
+);
+export const GATHER_RARE_EVENT_SOURCES: readonly GatherRareEventSource[] = Object.freeze(
+  Object.keys(FLAVOR_BY_SOURCE) as (keyof typeof FLAVOR_BY_SOURCE)[],
+);
 export function gatherRareEventFlavor(source: GatherRareEventSource): GatherRareEventFlavor {
   return FLAVOR_BY_SOURCE[source];
 }

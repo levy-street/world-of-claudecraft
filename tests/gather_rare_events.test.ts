@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import { bagCapacity } from '../src/sim/bags';
-import { GATHER_NODES } from '../src/sim/content/gather_nodes';
+import { GATHER_NODE_TYPES, GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
 import {
   announceGatherRareEvent,
   emitToZonePlayers,
   GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_SOURCES,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
   rollGatherRareEvent,
@@ -79,6 +80,20 @@ describe('gather rare events: cadence knob + flavor mapping', () => {
     // The farming harvest source (Professions 2.0 celebrations): the same
     // shared mapping, never a farming copy of the roll or the constants.
     expect(gatherRareEventFlavor('crop')).toBe('golden_harvest');
+  });
+
+  it('the runtime source list is every node type plus the crop, and answers no prototype key', () => {
+    // Derived, not listed: the node types come from the content table and the
+    // crop is the farming source; the export must be exactly their union (a
+    // fifth source lands here the day it compiles). The record behind it is
+    // null-prototype, so the switch's old contract of returning undefined for
+    // an out-of-union value holds for 'constructor' and 'toString' too (the
+    // farming harvest's `!= null` belt depends on it).
+    expect(new Set(GATHER_RARE_EVENT_SOURCES)).toEqual(new Set([...GATHER_NODE_TYPES, 'crop']));
+    expect(GATHER_RARE_EVENT_SOURCES.length).toBe(GATHER_NODE_TYPES.length + 1);
+    expect(Object.isFrozen(GATHER_RARE_EVENT_SOURCES)).toBe(true);
+    for (const stray of ['constructor', 'toString', '__proto__', 'reef'])
+      expect(gatherRareEventFlavor(stray as never), stray).toBeUndefined();
   });
 
   it('hits exactly when the draw lands strictly below the chance', () => {

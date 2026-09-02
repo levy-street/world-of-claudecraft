@@ -186,6 +186,17 @@ describe('i18n whole-catalog completeness', () => {
       // option 1: rift names are translated everywhere, cast ids included).
     ]);
     const wordy = (v: string) => /[a-z]{4,}/.test(v.replace(/\{[^}]*\}/g, ''));
+    // The sixteen rift cast ids that left the allow list above are reached by
+    // this guard and are wordy, so the removal stays load-bearing: rename or
+    // restructure them and this line says so.
+    const riftCasts = Object.keys(enFlat).filter((k) => /^abilityUi\.cast\.rift_/.test(k));
+    expect(riftCasts.length, 'the rift cast ids are in the main catalog').toBe(16);
+    // Fifteen of the sixteen are wordy today ('Void Rift' is not); the floor
+    // keeps the guard's reach over them load-bearing without pinning the English.
+    expect(
+      riftCasts.filter((k) => wordy(enFlat[k])).length,
+      'wordy rift cast ids',
+    ).toBeGreaterThanOrEqual(12);
     // The command center is enabled only in Vite development builds and cannot reach
     // a player-facing production surface. Keep its contributor-owned catalog
     // English-only, like other developer tooling, while release localization remains
