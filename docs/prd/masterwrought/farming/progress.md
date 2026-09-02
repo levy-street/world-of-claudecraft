@@ -1650,12 +1650,11 @@ could not be the LAST code-carrying change even if the run existed. The
 committed table at 6377bed8b0 (unchanged at the escalation commit) is 3650
 rows, 2938 harvested, 712 carried (302 local-median under the reason 'phase
 18 local carry pending the post-push harvest' plus 410 prose-backfill); the
-ready-to-run recipe and the two pins
-the harvest will red ('the identity is non-vacuous: real rows on both sides,
-and every carried row is a row' and 'an undeclared row, a mis-stated ms, and
-a fabricated fallback block each RED it', both in
-tests/ci_shard_partition.test.ts) are recorded on the D168 row of
-docs/prd/masterwrought/phase-19-new-rows.md; the handoff row in
+ready-to-run recipe and the two pins the harvest will red ('the identity is
+non-vacuous: real rows on both sides, and every carried row is a row' and
+'an undeclared row, a mis-stated ms, and a fabricated fallback block each
+RED it', both in tests/ci_shard_partition.test.ts) are recorded on the D168
+row of docs/prd/masterwrought/phase-19-new-rows.md; the handoff row in
 farming/state.md stays handed-to-maintainer, unflipped.
 
 ### Phase 8 QA (2026-08-17, PASS-WITH-FOLLOWUPS, local-only per D22)
