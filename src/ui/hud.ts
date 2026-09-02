@@ -411,6 +411,7 @@ import {
 import type { ActionBarVisibility } from './hud/action_bar/action_bar_visibility_core';
 import {
   abilityStartsAutoAttack,
+  confirmPendingAutoAttackEngage,
   deferAutoAttackUntilCastEnd,
   hasAutoAttackTarget,
   isPvpHostileTarget,
@@ -4813,11 +4814,14 @@ export class Hud {
       stateClasses: true,
     },
   );
-  // Deferred "Auto-Attack on Ability Use" for TIMED casts: set by castSlot when
-  // the QoL would engage but the ability has a cast time, consumed by the
-  // castStop event (engage on success, drop on interrupt), so starting a Smite
-  // never aggros the target before its damage lands.
-  private pendingAutoAttackOnCastEnd = false;
+  // Deferred "Auto-Attack on Ability Use" for TIMED casts: the requested ability
+  // id, recorded by castSlot when the QoL would engage but the ability has a cast
+  // time. Confirmed (or dropped) by the castStart event, consumed by the castStop
+  // event (engage on success, drop on interrupt), so starting a Smite never
+  // aggros the target before its damage lands, and a refused cast never leaks a
+  // stale engage into whatever unrelated cast completes next (see
+  // confirmPendingAutoAttackEngage).
+  private pendingAutoAttackAbilityId: string | null = null;
   // The party rows' mini aura strips share these deps (each row builds its own
   // view + painter instance over them). The wire summaries carry no remaining
   // time (Infinity reaches the core, so the duration label stays blank), which
@@ -7520,13 +7524,13 @@ export class Hud {
               isPvpHostileTarget(tid, this.sim.duelInfo, this.sim.arenaInfo, this.sim.bgInfo),
             )
           ) {
-            // A TIMED cast must not engage yet: startAutoAttack aggros the target
-            // immediately, so engaging at cast start pulled the mob before any
-            // damage existed (the aggro-before-damage bug). Defer to the
-            // successful castStop (handled in the events switch); instants keep
-            // engaging at once since their damage lands this same tick.
+            // A TIMED cast must not engage yet (the aggro-before-damage bug). The
+            // recorded id only ARMS once castStart below confirms this exact cast
+            // began (a refused cast never reaches it); see
+            // confirmPendingAutoAttackEngage for why that matters. Instants still
+            // engage at once since their damage lands this same tick.
             if (deferAutoAttackUntilCastEnd(resolved.castTime)) {
-              this.pendingAutoAttackOnCastEnd = true;
+              this.pendingAutoAttackAbilityId = action.id;
             } else {
               this.sim.startAutoAttack();
             }
@@ -13718,6 +13722,13 @@ export class Hud {
           // share one workbench wind-up (audio.craftCast); completion still
           // uses craftSuccess / disenchant / enchant / salvage.
           if (ev.entityId === sim.playerId) {
+            // Confirm (or drop) any deferred "Auto-Attack on Ability Use" request
+            // against the cast that just actually started; see
+            // confirmPendingAutoAttackEngage for the refused-cast leak it closes.
+            this.pendingAutoAttackAbilityId = confirmPendingAutoAttackEngage(
+              this.pendingAutoAttackAbilityId,
+              ev.ability,
+            );
             if (ev.ability === GATHER_CAST_ID) audio.gatherCast(ev.gatherNodeType);
             else if (ev.ability === FISHING_CAST_ID) audio.fishCast();
             else if (
@@ -13737,8 +13748,8 @@ export class Hud {
           // lands, never at cast start (the aggro-before-damage bug). An
           // interrupted/canceled cast just drops the pending engage; the target
           // is re-validated since the cast itself may have killed or cleared it.
-          if (ev.entityId === sim.playerId && this.pendingAutoAttackOnCastEnd) {
-            this.pendingAutoAttackOnCastEnd = false;
+          if (ev.entityId === sim.playerId && this.pendingAutoAttackAbilityId !== null) {
+            this.pendingAutoAttackAbilityId = null;
             if (ev.success) {
               const castTid = sim.player.targetId;
               const castTarget = castTid !== null ? (sim.entities.get(castTid) ?? null) : null;

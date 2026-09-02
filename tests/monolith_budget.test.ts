@@ -273,7 +273,19 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Raised 18905 -> 18916 (+11) for the Soulwell aggro-pull fix: the deferred
+    // "Auto-Attack on Ability Use" pending state was armed optimistically at
+    // button-press time, before the sim confirmed the cast actually began, so a
+    // refused prior cast left it stuck armed and leaked an unwanted engage into
+    // the next unrelated successful cast (Soulwell, which never arms it itself).
+    // The actual decision (does a just-started cast still match the outstanding
+    // request) is a pure function in the existing sibling module
+    // attack_on_ability.ts, directly unit-tested there; what remains here is the
+    // stateful wiring the fix needs at all three sites that already touched this
+    // field (button press, castStart, castStop) and cannot be extracted further
+    // without duplicating Hud's own event-switch/settings-hook state. A
+    // maintainer decision, taken rather than paid for with someone else's code.
+    ceiling: 18916,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
