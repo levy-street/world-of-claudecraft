@@ -25,6 +25,7 @@
 // legendary kit (orbit motes, aurora, spin) or vice versa; the escalation ramp
 // is the whole point of the collections.
 import * as THREE from 'three';
+import { addRimGlow, GFX } from './gfx';
 import { isSharedTexture, markSharedTexture } from './shared_resource';
 import { DEFAULT_WEAPON_POINT_MAX_PX, maxPointSizePx } from './vfx_screen_bounds_core';
 import {
@@ -2870,6 +2871,17 @@ export interface WeaponVfxCreateOptions {
    * scene) leaves this off and keeps a light that lights immediately.
    */
   budgetedLight?: boolean;
+  /**
+   * Mount the cast light at all. A handful of hand-tuned skins ship
+   * `light: 0` (weapon_vfx_tuning.ts), which used to build the PointLight
+   * anyway, park it in the rig, and let the point-light budget rank a light
+   * whose intensity every update() drove straight back to zero: it holds one of
+   * the fixed counted slots away from a light that would actually shine, and
+   * pays a per-frame ancestor walk for it. The caller knows the effective
+   * tuning (visual.ts resolves it before the rig is built) so it decides.
+   * Default true, which is every showcase and preview host.
+   */
+  withLight?: boolean;
 }
 
 /** Scene-census bucket for every weapon-skin VFX rig (the `?perf` overlay's
@@ -2879,7 +2891,8 @@ export const WEAPON_VFX_RENDER_CATEGORY = 'weaponvfx';
 export interface WeaponVfxHandle {
   group: THREE.Group;
   sceneExtras: THREE.Group;
-  light: THREE.PointLight;
+  /** Null when the skin's tuning mutes the light (see withLight). */
+  light: THREE.PointLight | null;
   tier: WeaponVfxTier;
   spec: WeaponVfxSpec;
   tuning: WeaponVfxTuning;
@@ -2897,6 +2910,7 @@ export function createWeaponVfx(
     grounded = true,
     backdrop: withBackdrop = grounded,
     budgetedLight = false,
+    withLight = true,
   }: WeaponVfxCreateOptions = {},
 ): WeaponVfxHandle {
   const tier = TIERS[spec.tier];
@@ -2988,15 +3002,19 @@ export function createWeaponVfx(
     ...tier.light,
     ...(spec.light ?? {}),
   };
-  const light = new THREE.PointLight(lightSpec.color, lightSpec.intensity, lightSpec.distance, 2);
-  // World-rendered weapon lights move with the held model and drive their own
-  // flicker. The renderer still ranks them inside its fixed point-light count.
-  light.userData.budgetDynamic = true;
-  // Born hidden on a budgeted path: the budget, not this constructor, decides
-  // whether the light is counted. See budgetedLight in WeaponVfxCreateOptions.
-  if (budgetedLight) light.visible = false;
-  light.position.copy(resolvePoint(b, lightSpec.at ?? { yF: 0.7 }));
-  group.add(light);
+  const light = withLight
+    ? new THREE.PointLight(lightSpec.color, lightSpec.intensity, lightSpec.distance, 2)
+    : null;
+  if (light) {
+    // World-rendered weapon lights move with the held model and drive their own
+    // flicker. The renderer still ranks them inside its fixed point-light count.
+    light.userData.budgetDynamic = true;
+    // Born hidden on a budgeted path: the budget, not this constructor, decides
+    // whether the light is counted. See budgetedLight in WeaponVfxCreateOptions.
+    if (budgetedLight) light.visible = false;
+    light.position.copy(resolvePoint(b, lightSpec.at ?? { yF: 0.7 }));
+    group.add(light);
+  }
 
   // 4. Spec'd particle components.
   for (const c of spec.fx ?? []) {
@@ -3116,12 +3134,15 @@ export function createWeaponVfx(
           prev.mat.emissiveIntensity = e.intensity * glowPulse * tuning.glow;
         }
       }
-      const flick =
-        1 -
-        lightSpec.flicker +
-        lightSpec.flicker *
-          (0.6 * Math.sin(time * lightSpec.hz * 6.4) + 0.4 * Math.sin(time * lightSpec.hz * 17.3));
-      light.intensity = lightSpec.intensity * flick * tuning.light;
+      if (light) {
+        const flick =
+          1 -
+          lightSpec.flicker +
+          lightSpec.flicker *
+            (0.6 * Math.sin(time * lightSpec.hz * 6.4) +
+              0.4 * Math.sin(time * lightSpec.hz * 17.3));
+        light.intensity = lightSpec.intensity * flick * tuning.light;
+      }
     },
     dispose() {
       if (rigDisposed) return;
@@ -3238,10 +3259,20 @@ export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
   group.name = `weapon-vfx-program-prewarm:${key}`;
   group.userData.renderCategory = 'prewarm';
 
-  const host = new THREE.Mesh(
-    new THREE.BoxGeometry(0.1, 1, 0.1),
-    new THREE.MeshStandardMaterial({ color: 0xffffff, map: weaponVfxPrewarmHostMap() }),
-  );
+  // The host material must be the SHAPE of a live weapon-skin material, hooks
+  // included: a worn rig material carries the silhouette rim glow
+  // (characters/assets.ts buildTintedClone, on the GFX.standardMaterials arm),
+  // characters/visual.ts hands the isolated weapon a hook-PRESERVING clone of
+  // it, and three's program cache key carries customProgramCacheKey. A
+  // hook-less host would warm a key no live sighting ever asks for and leave
+  // the real one to link on the first arrival. Applied under the same tier
+  // predicate the rig factory uses, so the twin follows it either way.
+  const hostMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    map: weaponVfxPrewarmHostMap(),
+  });
+  if (GFX.standardMaterials) addRimGlow(hostMaterial);
+  const host = new THREE.Mesh(new THREE.BoxGeometry(0.1, 1, 0.1), hostMaterial);
   host.name = `prewarm-skin-host:${key}`;
   host.frustumCulled = false;
 
@@ -3259,7 +3290,7 @@ export function buildWeaponVfxPrewarmSkinGroup(key: string): THREE.Group {
     // A visible light would change the scene's light counts, and those counts
     // are part of every program cache key: one extra point light here and the
     // whole boot compile warms keys no live frame ever asks for.
-    handle.light.visible = false;
+    if (handle.light) handle.light.visible = false;
     // The boot prewarm group is census-tagged 'prewarm' as a whole; keep the
     // rigs inside that bucket rather than reporting as live skins.
     handle.group.userData.renderCategory = 'prewarm';

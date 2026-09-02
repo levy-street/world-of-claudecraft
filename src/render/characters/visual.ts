@@ -2540,9 +2540,15 @@ export class CharacterVisual {
         payload.traverse((o) => {
           const mesh = o as THREE.Mesh;
           if (!mesh.isMesh) return;
+          // cloneMaterialWithHooks, never a bare clone: a rig material carries
+          // the silhouette rim glow (assets.ts buildTintedClone), and
+          // Material.clone() drops onBeforeCompile. The bare clone therefore
+          // rendered the isolated weapon WITHOUT its rim AND, since three's
+          // default program cache key IS the hook source, linked a program the
+          // source had already linked. See ../material_clone_hooks.ts.
           mesh.material = Array.isArray(mesh.material)
-            ? mesh.material.map((m) => m.clone())
-            : mesh.material.clone();
+            ? mesh.material.map((m) => cloneMaterialWithHooks(m))
+            : cloneMaterialWithHooks(mesh.material);
           mesh.userData.weaponSkinIsolated = true;
           markOwnedWeaponSkinMaterials(mesh);
         });
@@ -2739,10 +2745,17 @@ export class CharacterVisual {
     // from it, so it must be kept rather than only pushed once.
     this.weaponVfxAuthored = weaponVfxTuningFor(skin.model, spec.tier);
     this.weaponVfxShed = 1;
+    // A skin whose hand-tuned row mutes the light (weapon_vfx_tuning.ts
+    // `light: 0`) gets no PointLight at all: built anyway it would hold one of
+    // the renderer's fixed counted point-light slots away from a light that
+    // actually shines, and pay a per-frame ancestor walk, while every update()
+    // drove its intensity straight back to zero.
+    const withLight = (this.weaponVfxAuthored.light ?? 1) > 0;
     for (const payload of payloads) {
       const handle = createWeaponVfx(payload, spec, {
         grounded: false,
         budgetedLight: this.budgetedWeaponLight,
+        withLight,
       });
       handle.setBackdropVisible(false);
       handle.setTuning(this.weaponVfxAuthored);
