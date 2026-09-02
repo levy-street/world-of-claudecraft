@@ -15157,6 +15157,13 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as test-title-regex-m
   test, which is what 11h-GATE-A asked for; adding a new player-visible timer
   claim is a copy decision beyond a QA fix round, and it would be a third
   reworded value to fill.
+RULED (qr-19-growth-timer-prose-clause, 2026-09-02, under qr-19-best-for-project): the status quo
+STANDS; the crop growth-timer spread stays a test pin only ('and the WALL-CLOCK spread is 12.5
+percent, the honest half of the same gate' in tests/provisioning_supply_line_apex.test.ts, against
+the live FARM_CROPS durations) and no player-visible timer claim is authored. The deferral arm this
+row priced is DEAD: D012 was CLOSED 2026-09-01 by qr-19-crop-durations-gain-survival (every
+constant ratified as shipped, a re-tune barred), so the choice was binary and the maintainer took
+the status quo in session. Phase 19F; no code moved.
 - Pinning "nothing in src/ or server/ slices a reagent list" with a source scan.
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reagent-slice-source-scan-pin.
   That is the source-scan blind-spot class the packet's own gotcha catalog warns
