@@ -172,9 +172,8 @@ explicit weapon, armor, and held-offhand kind allowlist) whose
 encounter drops it, on either difficulty and from any raid tier (ruled
 qr-19-crucible-gear-sundering-admission, 2026-09-02, the status quo
 ratified); rift legendaries and heroic five-man epics are outside the
-index, and
-patterns, sigils, and other raid-sourced non-gear are outside the
-allowlist. The yield is a deterministic `SUNDERED_ESSENCE_YIELD` per
+index, and patterns, sigils, and other raid-sourced non-gear are outside
+the allowlist. The yield is a deterministic `SUNDERED_ESSENCE_YIELD` per
 epic, no rng anywhere. Any character can sunder, deliberately without a
 profession gate: the research's TBC-tailoring lesson bars stacking
 access gates on the apex chain, and the cost IS the epic.

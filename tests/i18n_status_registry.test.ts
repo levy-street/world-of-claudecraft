@@ -238,6 +238,111 @@ describe('i18n status registry: states', () => {
     expect(denseCount).toBe(Object.keys(simDICT.en).length * langs.length);
     expect(denseCount).toBeGreaterThan(carriedSeen);
   });
+
+  // The two arms below anchor simDictProvidedKeys on something OTHER than
+  // itself (19F review round: the arm above derives its expectation from the
+  // export the scanner reads, so a regression confined to the export's body
+  // leaves both in agreement). Source text is the independent witness: the
+  // sim module is data-as-code, and its locale rows are literal `'key':` lines.
+  const simSource = fs.readFileSync(path.join(root, 'src/ui/sim_i18n.ts'), 'utf8');
+  const newLocalesSource = fs.readFileSync(
+    path.join(root, 'src/ui/sim_i18n.newlocales.ts'),
+    'utf8',
+  );
+  const stripComments = (src: string) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^[ \t]*\/\/.*$/gm, '');
+
+  it('simDictProvidedKeys enumerates exactly the sources the DICT literal spreads', () => {
+    // A sixth per-locale table spread into DICT and forgotten here would read
+    // pending for every key it carries (the fill asked to redo translated
+    // rows); a table dropped from DICT but kept here would read translated
+    // while the runtime serves the English spread (the original D148 bug).
+    const src = stripComments(simSource);
+    const dictStart = src.indexOf('export const DICT');
+    const dictEnd = src.indexOf(
+      ') as Record<SupportedLanguage, Record<SimMessageKey, string>>;',
+      dictStart,
+    );
+    expect(dictStart).toBeGreaterThan(-1);
+    expect(dictEnd).toBeGreaterThan(dictStart);
+    const dictLiteral = src.slice(dictStart, dictEnd);
+    const spread = [...dictLiteral.matchAll(/\.\.\.([A-Za-z_]+)\[lang\]/g)]
+      .map((m) => m[1])
+      .filter((name) => name !== 'baseEnTable')
+      .sort();
+    const exportStart = src.indexOf('export function simDictProvidedKeys');
+    const exportEnd = src.indexOf('\n}\n', exportStart);
+    expect(exportStart).toBeGreaterThan(-1);
+    const exportBody = src.slice(exportStart, exportEnd);
+    const tables = [...exportBody.matchAll(/([A-Za-z_]+)\[lang\]/g)]
+      .map((m) => m[1])
+      .filter((name) => name !== 'ARENA_QUEUE_AUTO_LEAVE_1V1')
+      .sort();
+    expect(spread.length, 'the DICT literal spreads per-locale tables').toBeGreaterThanOrEqual(4);
+    expect(tables).toEqual(spread);
+    // The one non-spread source, the arena literal, is in both.
+    expect(dictLiteral).toContain("'log.arenaQueueAutoLeave1v1': ARENA_QUEUE_AUTO_LEAVE_1V1[lang]");
+    expect(exportBody).toContain('ARENA_QUEUE_AUTO_LEAVE_1V1[lang]');
+    expect(exportBody).toContain("provided.add('log.arenaQueueAutoLeave1v1')");
+  });
+
+  it('every provided sim row is a literal row of some locale block (source-text anchor)', () => {
+    // For each DICT key, the number of locales whose provided set carries it
+    // must equal the number of literal `'key':` rows in the two sim modules
+    // minus the English table's own row. A fallback that grants a locale the
+    // whole DICT, or a spread of BASE_NEW into every locale, over-provides
+    // rows no block spells and reds here; a duplicated row inside one block
+    // reds too (JS keeps the last, and the fill must see it). The arena
+    // literal is excluded (its rows are a per-locale string table, not keyed
+    // rows). Independent of the export's own arithmetic by construction.
+    const text = stripComments(simSource) + '\n' + stripComments(newLocalesSource);
+    const rowCount = new Map<string, number>();
+    for (const m of text.matchAll(/'([A-Za-z0-9_.]+)':/g))
+      rowCount.set(m[1], (rowCount.get(m[1]) ?? 0) + 1);
+    const enStart = text.indexOf('const baseEnTable = {');
+    const enEnd = text.indexOf('\n};', enStart);
+    expect(enStart).toBeGreaterThan(-1);
+    const enRows = new Set(
+      [...text.slice(enStart, enEnd).matchAll(/'([A-Za-z0-9_.]+)':/g)].map((m) => m[1]),
+    );
+    expect(enRows.size).toBeGreaterThan(500);
+    // The pet tables are per-language consts ALIASED across locales (es and
+    // es_ES share PET_DICT_ES) and typed dense, so a pet key's literal rows
+    // never equal its provider count; presence there cannot vary and the
+    // spread-list arm above covers the table. Skip those keys here.
+    const petStart = text.indexOf('const PET_DICT_EN');
+    const petEnd = text.indexOf('\n};', petStart);
+    expect(petStart).toBeGreaterThan(-1);
+    const petKeys = new Set(
+      [...text.slice(petStart, petEnd).matchAll(/'([A-Za-z0-9_.]+)':/g)].map((m) => m[1]),
+    );
+    expect(petKeys.size).toBeGreaterThan(20);
+    const providedBy = new Map<string, Set<string>>();
+    for (const lang of supportedLanguages) providedBy.set(lang, new Set(simDictProvidedKeys(lang)));
+    const violations: string[] = [];
+    let checked = 0;
+    for (const key of Object.keys(simDICT.en)) {
+      if (key === 'log.arenaQueueAutoLeave1v1' || petKeys.has(key)) continue;
+      const providers = supportedLanguages.filter((lang) => providedBy.get(lang)!.has(key)).length;
+      const literalRows = (rowCount.get(key) ?? 0) - (enRows.has(key) ? 1 : 0);
+      if (providers !== literalRows)
+        violations.push(
+          `${key}: ${providers} locales provide it, ${literalRows} locale rows spell it`,
+        );
+      checked++;
+    }
+    expect(violations).toEqual([]);
+    expect(checked).toBeGreaterThan(700);
+    // And no single locale is granted the whole table: every non-English
+    // locale's own sources stop short of the dense DICT today.
+    for (const lang of supportedLanguages) {
+      if (lang === 'en') continue;
+      expect(
+        providedBy.get(lang)!.size,
+        `${lang} provides fewer keys than DICT holds`,
+      ).toBeLessThan(Object.keys(simDICT.en).length);
+    }
+  });
 });
 
 describe('i18n status registry: blocked rows are load-bearing (no over-allow)', () => {

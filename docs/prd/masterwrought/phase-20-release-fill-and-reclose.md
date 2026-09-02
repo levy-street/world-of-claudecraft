@@ -124,7 +124,7 @@ or because a fill's provenance is not something the worklist can say:
   `baseEnTable`, derived from `RIFT_MOBS` and pinned by `tests/sim_i18n_rift_mechanics.test.ts`.
 - **Four retire-and-re-key successors whose 15 Latin rows the registry now carries as
   pending:** `guide.professions.endgameMaterialsBodyAnyRaid` (D144),
-  `guide.profPages.toolsNoteFiveLadders` (D161), `guide.profPages.rareBodyFourFlavors` (D169)
+  `guide.profPages.toolsNoteFourStarters` (D161, re-keyed twice: toolsNoteFiveLadders was deleted outright at the review round for a false count in its English), `guide.profPages.rareBodyFourFlavors` (D169)
   and `guide.profPages.craftProse.engineering.materialsBodyThreeRods` (the D085 review round).
   Their five non-Latin fills each rode the same change, machine-authored and FLAGGED for the
   maintainer's re-judgement at STEP 1 beside the other machine-anchored sets; the retired

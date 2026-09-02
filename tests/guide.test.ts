@@ -102,6 +102,7 @@ import { FISHING_CATCH_BAND_THRESHOLDS } from '../src/sim/professions/fishing_ba
 import {
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
+  gatherRareEventFlavor,
 } from '../src/sim/professions/gather_events';
 import {
   GATHER_CAST_BAND_REDUCTION_SEC,
@@ -2821,8 +2822,9 @@ describe('Guide professions gathering accuracy', () => {
 
   it('the shared tools note is TRUE of farming, not only of the node trades', () => {
     // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added at the masterwrought
-    // Phase 11j QA. professions_gathering.ts renders toolsNoteFiveLadders
-    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161) above
+    // Phase 11j QA. professions_gathering.ts renders toolsNoteFourStarters
+    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161, and once more
+    // at its review round for a false starter count) above
     // the tool table on EVERY gathering page, farming included, and the note
     // described the node trades as if they were all of them. On the farming
     // page it sat directly above a table showing five hoe rungs while saying
@@ -2836,7 +2838,7 @@ describe('Guide professions gathering accuracy', () => {
     // Phase 11g arm above records: an anchor the old wording also carried lets
     // a revert stay green. Apostrophe-free, since the page escapes to &#39;.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteFiveLadders', {
+    const en = t('guide.profPages.toolsNoteFourStarters', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -2865,6 +2867,20 @@ describe('Guide professions gathering accuracy', () => {
       (npc.vendorItems ?? []).filter((id) => id.endsWith('_hoe') && id !== 'garden_hoe'),
     );
     expect(anyHoeSeller, 'no hoe rung above the first is vendor-sold').toEqual([]);
+    // THE FIFTH CLAUSE (19F review round): the note counts the 20-copper land
+    // starters that never sell back, mail or list. Derived from ITEMS, never a
+    // literal: the fenced set is every gatherTool carrying BOTH noVendorSell
+    // and noMarketList (the quest-granted tier-1 kit, the Garden Hoe included
+    // since the farming go-live), and the note must count them and name each.
+    // The 11i note said 'three' for a year of fills; a pin on the count alone
+    // would have passed a note naming the wrong three.
+    const fenced = Object.values(ITEMS).filter(
+      (i) => i.use?.type === 'gatherTool' && i.noVendorSell && i.noMarketList,
+    );
+    expect(fenced.length, 'the fenced starter kit').toBeGreaterThanOrEqual(4);
+    const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
+    expect(en).toContain(`except the ${COUNT_WORDS[fenced.length]} 20-copper land starters`);
+    for (const tool of fenced) expect(en, `names ${tool.id}`).toContain(tool.name);
     // The retired claims, each pinned ABSENT so a revert reds rather than
     // quietly restoring a false page.
     expect(en, 'the node-trade count must not be claimed of every land trade').not.toContain(
@@ -2903,7 +2919,7 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteFiveLadders', {
+    const en = t('guide.profPages.toolsNoteFourStarters', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -2956,8 +2972,16 @@ describe('Guide professions gathering accuracy', () => {
     expect(locales.length).toBeGreaterThan(15);
     for (const file of locales) {
       const source = readFileSync(`${dir}/${file}`, 'utf8');
-      const at = source.indexOf('toolsNote');
-      expect(at, `${file} carries toolsNote`).toBeGreaterThan(-1);
+      // The exact key, and exactly one toolsNote row per slice (19F review
+      // round): a first-substring hit was the looseness that forced two
+      // delete-outright re-keys, since a retired predecessor sorts first and
+      // carries both tokens; a second row on the stem now reds here instead
+      // of being the row this pin silently reads.
+      expect(source.match(/toolsNote/g)?.length, `${file} carries exactly one toolsNote row`).toBe(
+        1,
+      );
+      const at = source.indexOf('"toolsNoteFourStarters"');
+      expect(at, `${file} carries toolsNoteFourStarters`).toBeGreaterThan(-1);
       // Bounded by the value's own line, not a magic width: a window wider
       // than the longest translation reaches into following keys, and the
       // direction of that looseness is a FALSE PASS.
@@ -3131,6 +3155,36 @@ describe('Guide professions gathering accuracy', () => {
     for (const trade of ['mining', 'logging', 'herbalism'] as const) {
       expect(guideStrings.profPages.gatherDeeds[trade]).toContain(chronSentence);
     }
+  });
+
+  it('the rare-finds note names every gather windfall flavor and its zero-Renown deed', () => {
+    // Masterwrought Phase 19F, D169 (qr-19-rarebody-reword-landmine): the shared
+    // note re-keyed to name farming's golden harvest beside the three node
+    // flavors. Derived from the sim, never a list: gatherRareEventFlavor is
+    // exhaustive over the source union (a fifth source reds tsc there), and
+    // each flavor's collector's mark is the col_<flavor> deed its announce
+    // writes. The deed sweep runs the other way too, so a fifth flavor with a
+    // deed and no sentence reds here rather than shipping a note one short.
+    setLanguage('en');
+    const en = t('guide.profPages.rareBodyFourFlavors', { oneIn: '90', mult: '5' });
+    const flavors = (['ore', 'wood', 'herb', 'crop'] as const).map((s) => gatherRareEventFlavor(s));
+    expect(new Set(flavors).size).toBe(flavors.length);
+    for (const flavor of flavors) {
+      expect(en, `names the ${flavor} windfall`).toContain(flavor.replace('_', ' '));
+      const deed = DEEDS[`col_${flavor}`];
+      expect(deed, `col_${flavor} exists`).toBeDefined();
+      expect(deed.renown, `${flavor} deed is cosmetic-only`).toBe(0);
+      expect(deed.trigger).toEqual({ kind: 'visit', markId: `gather_event:${flavor}` });
+    }
+    expect(en).toContain('zero-Renown deed');
+    const gatherMarks = Object.values(DEEDS).flatMap((d) =>
+      d.trigger.kind === 'visit' &&
+      d.trigger.markId.startsWith('gather_event:') &&
+      d.trigger.markId !== 'gather_event:perfect_specimen'
+        ? [d.trigger.markId.slice('gather_event:'.length)]
+        : [],
+    );
+    expect(gatherMarks.sort()).toEqual([...flavors].sort());
   });
 });
 
@@ -4230,6 +4284,42 @@ describe('Guide professions pages and routes', () => {
     // The rod ladder: the shipped count of CRAFTED rods, on the two keys that
     // make a claim about it.
     expect(ROD_RECIPES).toHaveLength(3);
+    // The engineering materials prose (re-keyed at the Phase 19F D085 review
+    // round after it said 'two' for a year): the count word and each rod's bill
+    // derive from ROD_RECIPES and ITEMS, never from a literal, so a fourth rod
+    // or a re-priced bill reds here instead of rotting in the prose.
+    const COUNT_WORDS = [
+      'zero',
+      'one',
+      'two',
+      'three',
+      'four',
+      'five',
+      'six',
+      'seven',
+      'eight',
+      'nine',
+      'ten',
+    ];
+    const rods = prose('guide.profPages.craftProse.engineering.materialsBodyThreeRods');
+    expect(rods).toContain(`The ${COUNT_WORDS[ROD_RECIPES.length]} rod recipes`);
+    for (const recipe of ROD_RECIPES) {
+      const stem = ITEMS[recipe.resultItemId].name.split(' ')[0];
+      expect(rods, `names the ${stem}`).toContain(`the ${stem} `);
+      for (const reagent of recipe.reagents) {
+        const name = ITEMS[reagent.itemId].name;
+        // A rod reagent is 'a Silverstream rod' / 'that Stormreel'; the fish
+        // carry their count word and full name (the koi is shortened to 'Koi'
+        // after its first mention, so pin the count beside the short name).
+        if (ITEMS[reagent.itemId].use?.type === 'gatherTool') continue;
+        const word = COUNT_WORDS[reagent.count];
+        const short = name.endsWith(' Koi') ? 'Koi' : name;
+        expect(
+          rods.includes(`${word} ${name}`) || rods.includes(`${word} ${short}`),
+          `states ${word} ${name}`,
+        ).toBe(true);
+      }
+    }
     expect(
       prose('guide.profPages.fish.startBodyThreeRods'),
       'the fishing page must say THREE rods sit above the vendor ladder',
@@ -4239,7 +4329,7 @@ describe('Guide professions pages and routes', () => {
     // still says TRUTHFULLY about the LAND trades, whose tier 4 and 5 tools
     // really do open no ground. The assertion fired on a true sentence, which is
     // what absence pins do: they cannot tell which subject a phrase is about.
-    const tools = prose('guide.profPages.toolsNoteFiveLadders', {
+    const tools = prose('guide.profPages.toolsNoteFourStarters', {
       tier2Prof: '40',
       tier3Prof: '70',
     });

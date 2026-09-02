@@ -12,7 +12,8 @@
 // The whole rift kit shipped that way: of the 56 names its templates surface,
 // only the four it REUSES from older content (Thunderclap, Howling Gale, Seismic
 // Stomp, Soulrot) had a matcher row, so 52 mechanic names rendered English in the
-// 20 non-English locales.
+// 20 non-English locales (until Phase 19F filled the five non-Latin blocks; the
+// 15 Latin locales ride the Phase 20 fill, see the last describe below).
 //
 // This file DERIVES the set from RIFT_MOBS instead of listing it, so a newly
 // authored rift mechanic reds here until it has a row in sim_i18n.ts. The two
@@ -247,6 +248,18 @@ describe('the rift matcher exemptions are earned', () => {
 // en_CA out of both halves.
 describe('rift mechanic names are filled in the five non-Latin sim blocks', () => {
   const NON_LATIN = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+  // The script each locale's value must carry (19F review round): six of the
+  // 52 English names (Rime, Web, Mana Burn, Void Rot, Pact Rot, Hoof of Ruin)
+  // have no four-letter lowercase run, so the wordy-Latin arm below cannot
+  // see a pasted copy of them, and a Cyrillic transliteration passes it by
+  // construction; a value with none of the locale's own script is a leak.
+  const SCRIPT: Record<(typeof NON_LATIN)[number], RegExp> = {
+    zh_CN: /\p{Script=Han}/u,
+    zh_TW: /\p{Script=Han}/u,
+    ja_JP: /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}]/u,
+    ko_KR: /\p{Script=Hangul}/u,
+    ru_RU: /\p{Script=Cyrillic}/u,
+  };
   const dense = DICT as unknown as Record<string, Record<string, string>>;
   const riftKeys = Object.keys(dense.en).filter((k) => /^(aura|mechanic)\.rift/.test(k));
 
@@ -267,6 +280,10 @@ describe('rift mechanic names are filled in the five non-Latin sim blocks', () =
         else if (dense[lang][key] === dense.en[key]) gaps.push(`${lang} ${key}: English`);
         else if (/[a-z]{4,}/.test(dense[lang][key]))
           gaps.push(`${lang} ${key}: wordy Latin text in a non-Latin value (${dense[lang][key]})`);
+        else if (!SCRIPT[lang].test(dense[lang][key]))
+          gaps.push(
+            `${lang} ${key}: none of the locale's script in the value (${dense[lang][key]})`,
+          );
       }
     }
     expect(gaps).toEqual([]);

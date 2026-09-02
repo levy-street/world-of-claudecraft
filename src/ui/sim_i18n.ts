@@ -766,7 +766,9 @@ const baseEnTable = {
   // label (abilityDisplayNameFromSource). The whole rift kit shipped with no
   // matcher row between them, so all 52 rendered raw English in the 20
   // non-English locales; only the four names rift REUSES from older content
-  // (Thunderclap, Howling Gale, Seismic Stomp, Soulrot) resolved.
+  // (Thunderclap, Howling Gale, Seismic Stomp, Soulrot) resolved. Phase 19F
+  // filled the five non-Latin blocks (qr-19-rift-mechanic-names-translate-or-not);
+  // the 15 Latin locales ride the Phase 20 fill.
   // `aura.rift*` = the name lands as an aura, `mechanic.rift*` = it only ever
   // labels damage or a bark, matching the existing split above.
   // tests/sim_i18n_rift_mechanics.test.ts derives the set from RIFT_MOBS rather
@@ -5160,7 +5162,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftManaShield': '法力护盾',
     'aura.riftTemporalDrag': '时光滞缓',
     'mechanic.riftArcaneVolley': '奥术乱射',
-    'mechanic.riftChainLightning': '闪电链',
+    'mechanic.riftChainLightning': '连环闪电',
     'mechanic.riftThunderSlam': '雷霆猛击',
     'mechanic.riftThunderhead': '雷暴云',
     'aura.riftGalecrash': '狂风碎击',
@@ -5687,13 +5689,13 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftCrush': '粉碎',
     'mechanic.riftPitsteelSweep': '淵鋼橫掃',
     'aura.riftSearingBrand': '灼熱烙印',
-    'aura.riftPactRot': '契約腐魂',
+    'aura.riftPactRot': '契約腐蝕',
     'mechanic.riftGlacialBurst': '冰川爆發',
     'aura.riftGlacialCarapace': '冰川甲殼',
     'mechanic.riftWhiteout': '白茫風雪',
     'mechanic.riftPyroclasm': '火焰爆裂',
     'mechanic.riftCinderWave': '餘燼浪潮',
-    'aura.riftMagmaCrash': '熔岩崩擊',
+    'aura.riftMagmaCrash': '岩漿崩擊',
     'aura.riftDeadlyVenom': '致命劇毒',
     'aura.riftClingingSilk': '纏身蛛絲',
     'mechanic.riftVenomSpray': '毒液噴濺',
@@ -5709,7 +5711,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftManaShield': '法力護盾',
     'aura.riftTemporalDrag': '時光遲滯',
     'mechanic.riftArcaneVolley': '奧術齊射',
-    'mechanic.riftChainLightning': '叉狀閃電',
+    'mechanic.riftChainLightning': '連環閃電',
     'mechanic.riftThunderSlam': '雷霆猛擊',
     'mechanic.riftThunderhead': '雷雲壓頂',
     'aura.riftGalecrash': '狂風墜擊',
@@ -6235,8 +6237,8 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     // the shipped precedent of the rift cast ids).
     'aura.riftRimebite': '서리 이빨',
     'aura.riftRime': '상고대',
-    'aura.riftCinders': '잿불',
-    'aura.riftSmoulder': '이글거림',
+    'aura.riftCinders': '잉걸불',
+    'aura.riftSmoulder': '타들어감',
     'aura.riftVenom': '맹독',
     'aura.riftWeb': '거미줄',
     'aura.riftSerration': '톱니 상처',
@@ -6254,7 +6256,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftGlacialCarapace': '빙하 갑각',
     'mechanic.riftWhiteout': '백색 폭풍',
     'mechanic.riftPyroclasm': '화쇄류',
-    'mechanic.riftCinderWave': '잿불 파도',
+    'mechanic.riftCinderWave': '잉걸불 파도',
     'aura.riftMagmaCrash': '마그마 강타',
     'aura.riftDeadlyVenom': '치명적 맹독',
     'aura.riftClingingSilk': '휘감는 거미줄',
@@ -6271,7 +6273,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftManaShield': '마나 보호막',
     'aura.riftTemporalDrag': '시간 지연',
     'mechanic.riftArcaneVolley': '비전 일제 사격',
-    'mechanic.riftChainLightning': '갈래 번개',
+    'mechanic.riftChainLightning': '사슬 번개',
     'mechanic.riftThunderSlam': '천둥 강타',
     'mechanic.riftThunderhead': '뇌운',
     'aura.riftGalecrash': '강풍 격돌',
@@ -6843,7 +6845,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftManaShield': '魔力の盾',
     'aura.riftTemporalDrag': '時の停滞',
     'mechanic.riftArcaneVolley': '秘術の斉射',
-    'mechanic.riftChainLightning': '枝分かれの稲妻',
+    'mechanic.riftChainLightning': '連鎖雷撃',
     'mechanic.riftThunderSlam': '雷の強打',
     'mechanic.riftThunderhead': '雷雲',
     'aura.riftGalecrash': '烈風の激突',
@@ -7894,9 +7896,9 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     // Rift mechanic names (Masterwrought Phase 19F, ruling
     // qr-19-rift-mechanic-names-translate-or-not: translated everywhere,
     // the shipped precedent of the rift cast ids).
-    'aura.riftRimebite': 'Укус инея',
-    'aura.riftRime': 'Иней',
-    'aura.riftCinders': 'Угли',
+    'aura.riftRimebite': 'Укус изморози',
+    'aura.riftRime': 'Изморозь',
+    'aura.riftCinders': 'Пепел',
     'aura.riftSmoulder': 'Тление',
     'aura.riftVenom': 'Яд',
     'aura.riftWeb': 'Паутина',
@@ -7932,7 +7934,7 @@ const BASE_DICT: Record<SupportedLanguage, Partial<Record<BaseSimMessageKey, str
     'aura.riftManaShield': 'Щит маны',
     'aura.riftTemporalDrag': 'Замедление времени',
     'mechanic.riftArcaneVolley': 'Тайный залп',
-    'mechanic.riftChainLightning': 'Разветвленная молния',
+    'mechanic.riftChainLightning': 'Цепь молний',
     'mechanic.riftThunderSlam': 'Громовой таран',
     'mechanic.riftThunderhead': 'Грозовая туча',
     'aura.riftGalecrash': 'Удар шквала',

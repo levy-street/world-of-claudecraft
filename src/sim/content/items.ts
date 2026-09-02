@@ -666,10 +666,13 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
   // raise a price here is the node ladder these three tools gate, and fishing
   // has no nodes. Their pricing belongs with the rest of the fishing work.
   //
-  // The three TIER-1 tools carry BOTH noVendorSell and noMarketList, and only
-  // those three among the land tools (garden_hoe, the farming rung-one tool
-  // below, joined them at the farming go-live for the same reason: q_farm_intro
-  // hands it over through requiredItems). The gather quests hand a pick or a
+  // The FOUR quest-granted TIER-1 tools carry BOTH noVendorSell and
+  // noMarketList, and only those four among the land tools: the three the
+  // gather quests grant here plus garden_hoe, the farming rung-one tool
+  // below, which joined them at the farming go-live for the same reason
+  // (q_farm_intro hands it over through requiredItems). The wiki's tools note
+  // counts this set (tests/guide.test.ts derives it from these flags), so a
+  // fifth fenced tool moves that prose too. The gather quests hand a pick or a
   // sickle over through requiredItems (zone1.ts), re-granting a missing one
   // on accept, and q_prof_hobby_switch is repeatable, so the grant needs both
   // flags:

@@ -86,10 +86,10 @@ function toolsSection(g: GuideProfGathering): string {
   if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNoteFiveLadders', {
+      ${paras('guide.profPages.toolsNoteFourStarters', {
         // Fed from the live gate constants, the sibling sections' idiom
         // (rhythmBody takes the cast curve, nodesNote the respawn), so a
-        // retune moves the prose in all 19 languages instead of leaving a
+        // retune moves the prose in every locale instead of leaving a
         // stale number behind in each of them. Named ...Prof because the
         // adjacent trainingBody key already uses {tier1}/{tier2} for training
         // COSTS in copper, and a fill pass reading both should never have to

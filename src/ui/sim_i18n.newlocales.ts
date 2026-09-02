@@ -1,4 +1,5 @@
-// GENERATED new-locale sim-message blocks. Spread into the dicts in sim_i18n.ts.
+// Hand-maintained new-locale sim-message blocks (no generator produces this file;
+// the banner once said GENERATED). Spread into the dicts in sim_i18n.ts.
 /* eslint-disable */
 export const BASE_NEW = {
   cs_CZ: {
@@ -191,7 +192,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Nejsi v kanálu {channel}. Nejdřív napiš /join {channel}.',
     'error.notPartyLeader': 'Nejsi vůdce skupiny.',
     'error.nothingRestore': 'Není co obnovit.',
-    'error.nothingToConsume': 'Není co spotřebovat.',
     'loot.rollWinnerOffline': 'Postava {winner} nebyla online; předmět {item} se vrátil k mrtvole.',
     'log.channelInterrupted': 'Schopnost {mechanic} byla přerušena!',
     'error.potionNotReady': 'Ten lektvar ještě není připraven.',
@@ -503,7 +503,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Du er ikke i {channel}-kanalen. Skriv /join {channel} først.',
     'error.notPartyLeader': 'Du er ikke gruppelederen.',
     'error.nothingRestore': 'Intet at gendanne.',
-    'error.nothingToConsume': 'Der er intet at forbruge.',
     'loot.rollWinnerOffline': '{winner} var offline; {item} blev lagt tilbage på liget.',
     'log.channelInterrupted': '{mechanic} blev afbrudt!',
     'error.potionNotReady': 'Den eliksir er ikke klar endnu.',
@@ -821,7 +820,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Kamu tidak berada di saluran {channel}. Ketik /join {channel} dulu.',
     'error.notPartyLeader': 'Kamu bukan pemimpin party.',
     'error.nothingRestore': 'Tidak ada yang bisa dipulihkan.',
-    'error.nothingToConsume': 'Tidak ada efek yang bisa dihabiskan.',
     'loot.rollWinnerOffline': '{winner} sedang offline; {item} dikembalikan ke mayat.',
     'log.channelInterrupted': '{mechanic} telah dihentikan!',
     'error.potionNotReady': 'Ramuan itu belum siap.',
@@ -1138,7 +1136,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Je zit niet in het {channel}-kanaal. Typ eerst /join {channel}.',
     'error.notPartyLeader': 'Je bent niet de groepsleider.',
     'error.nothingRestore': 'Niets om te herstellen.',
-    'error.nothingToConsume': 'Er is niets om te verbruiken.',
     'loot.rollWinnerOffline': '{winner} was offline; {item} is teruggelegd op het lijk.',
     'log.channelInterrupted': '{mechanic} is onderbroken!',
     'error.potionNotReady': 'Die toverdrank is nog niet gereed.',
@@ -1455,7 +1452,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Nie jesteś na kanale {channel}. Najpierw wpisz /join {channel}.',
     'error.notPartyLeader': 'Nie jesteś przywódcą drużyny.',
     'error.nothingRestore': 'Nie ma czego przywracać.',
-    'error.nothingToConsume': 'Nie ma czego zużyć.',
     'loot.rollWinnerOffline': 'Postać {winner} była offline; przedmiot {item} wrócił do zwłok.',
     'log.channelInterrupted': 'Umiejętność {mechanic} została przerwana!',
     'error.potionNotReady': 'Ta mikstura nie jest jeszcze gotowa.',
@@ -1769,7 +1765,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Du är inte i kanalen {channel}. Skriv /join {channel} först.',
     'error.notPartyLeader': 'Du är inte gruppledaren.',
     'error.nothingRestore': 'Inget att återställa.',
-    'error.nothingToConsume': 'Det finns inget att förbruka.',
     'loot.rollWinnerOffline': '{winner} var offline; {item} återlämnades till liket.',
     'log.channelInterrupted': '{mechanic} avbröts!',
     'error.potionNotReady': 'Den drycken är inte redo än.',
@@ -2078,7 +2073,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': '{channel} kanalında değilsin. Önce /join {channel} yaz.',
     'error.notPartyLeader': 'Grup lideri değilsin.',
     'error.nothingRestore': 'Geri yüklenecek bir şey yok.',
-    'error.nothingToConsume': 'Tüketilecek bir şey yok.',
     'loot.rollWinnerOffline': '{winner} çevrimdışıydı; {item} cesede geri döndü.',
     'log.channelInterrupted': '{mechanic} kesintiye uğradı!',
     'error.potionNotReady': 'O iksir henüz hazır değil.',
@@ -2392,7 +2386,6 @@ export const BASE_NEW = {
     'error.notInChannelJoin': 'Bạn không ở trong kênh {channel}. Hãy gõ /join {channel} trước.',
     'error.notPartyLeader': 'Bạn không phải đội trưởng.',
     'error.nothingRestore': 'Không có gì để khôi phục.',
-    'error.nothingToConsume': 'Không có hiệu ứng nào để tiêu thụ.',
     'loot.rollWinnerOffline': '{winner} đang ngoại tuyến; {item} đã được trả lại cho xác chết.',
     'log.channelInterrupted': '{mechanic} đã bị gián đoạn!',
     'error.potionNotReady': 'Bình thuốc đó chưa sẵn sàng.',

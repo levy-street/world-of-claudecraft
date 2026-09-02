@@ -449,6 +449,9 @@ per-surface behavior lives in `tests/language_fanout_relocalize.test.ts`.
    a matcher RULE in the table matching the emit's ORIGIN (`sim_i18n.ts` for a `src/sim/` emit,
    `server_i18n.ts` for a `server/` emit) in the SAME change. The S3 guard
    (`tests/localization_fixes.test.ts`) fails if a new emit is recognized by neither.
+   Add the English to `baseEnTable` ONLY and never copy it into a locale block of
+   `sim_i18n.ts`: the status registry reads each locale's own blocks, so a copied English
+   row reads `translated` and ships English (`docs/i18n-scaling/translation-workflow.md`).
 3. Run `npm run i18n:scan` / `i18n:build` and commit the regenerated files. The PR is green
    at the PR-tier gate; the release-tier gate (`I18N_RELEASE_TIER=1`) hard-fails on any
    `pending` row.

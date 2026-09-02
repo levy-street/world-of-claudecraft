@@ -1181,8 +1181,8 @@ export function harvestCrop(ctx: SimContext, p: Entity, meta: PlayerMeta, bedId:
   // The zone celebration on a golden win, AFTER the grants (the gathering
   // order: announce once the windfall is really in the bags). The announce
   // writes the gather_event:golden_harvest visit mark for the finder
-  // (announceGatherRareEvent; its reliquary note no-ops for this flavor by
-  // design, the ledgered field-note deferral). Draw-free: the fanout and the
+  // (announceGatherRareEvent; its reliquary field note fires for this flavor
+  // too since masterwrought Phase 18 retired the deferral). Draw-free: the fanout and the
   // marks touch no rng, so the draw block's contract holds. The line names
   // the collapsed item id: on an all-fine harvest the primary grant IS the
   // fine item (the same rule the farmHarvested emit applies below, and the

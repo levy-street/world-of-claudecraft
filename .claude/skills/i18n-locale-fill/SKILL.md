@@ -24,14 +24,21 @@ npm run i18n:worklist   # writes one batch per language under docs/i18n-scaling/
 - `main`-scope keys are filled in the matching `src/ui/i18n.locales/<lang>.ts` overlay.
 - `sim` / `server` / `admin` scope keys are filled in their matcher DICTs (the worklist
   header in `scripts/i18n_fill_worklist.mjs` names the exact files).
-- **The worklist NEVER lists sim-scope keys**: the sim DICT builds every language over
-  the English base table, so the scan classifies a sim row `translated` on presence
-  alone and `scripts/i18n_fill_worklist.mjs` (which selects `pending` only) cannot see
-  a missing fill. The net that does catch them is the release-tier S3 arm
-  (`I18N_RELEASE_TIER=1 npx vitest run tests/localization_fixes.test.ts`, the
-  `s3_localized` leak list): run it FIRST, and fill every sim key it names in the
-  per-language `BASE_DICT` blocks of `src/ui/sim_i18n.newlocales.ts` even though no
-  worklist batch mentions them.
+- **Sim-scope keys DO reach the worklist** (since Masterwrought Phase 19F, ruling
+  qr-19-sim-scope-pending-is-unreachable): the registry reads each locale's OWN source
+  blocks through `simDictProvidedKeys` in `src/ui/sim_i18n.ts`, never the assembled
+  `DICT` (which is dense by construction, `baseEnTable` spread under every locale), so a
+  sim row with no fill in a locale's block is `pending` and lands in that locale's
+  batch. Fill a sim key in the locale's `BASE_DICT` block of `src/ui/sim_i18n.ts` (the
+  eight newest locales keep theirs in `BASE_NEW` of `src/ui/sim_i18n.newlocales.ts`, a
+  hand-maintained file despite its old banner), and NEVER paste the English into a
+  locale block: a copied row reads `translated` and ships English (the sim scope has no
+  copied-English guard; only `tests/localization_fixes.test.ts`'s release-tier
+  `s3_localized` arm sees it late). Run `npm run i18n:gen` before the suites: the
+  registry pin compares the artifact against the live source and reds on a stale one.
+  The five per-locale `*_EXTRA` tables the RULES matchers read (arena, battleground,
+  quest, item, raid) are tsc-forced dense and stay outside the registry; check them by
+  eye at release.
 - **`humanRequired` entries are blocked by default** (quest narratives, names, lore, SEO
   copy): never machine-fill them; only `autoFillable` entries are fair game for a model pass.
 

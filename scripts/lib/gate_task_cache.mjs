@@ -70,6 +70,7 @@ export const GATE_CACHE_TASK_INVENTORY = Object.freeze({
       'src/admin/i18n.locales/**',
       'src/admin/i18n.ts',
       'scripts/i18n_*.mjs',
+      'scripts/lib/write_module_dir.mjs',
       'package.json',
     ],
     outputs: [

@@ -115,6 +115,11 @@ const itemStringsEn = {
       // undispellable, so no dispel or steal takes a flask and the flag's
       // standing rule also removes the owner's right-click cancel; the
       // tooltip states all three because the live mechanic refuses all three.
+      // The Spellgnaw devour affix (devourBeneficialAura, src/sim/mob/mob_swing.ts)
+      // does take a flask and is deliberately NOT listed: ruled
+      // qr-19-flask-tooltip-spellgnaw-exception (Masterwrought Phase 19F), the
+      // classic-idiom rule that consumable tooltips do not enumerate mob-affix
+      // interactions, a recorded exception to tooltip-writing.md's item 7.
       flaskUnremovable: 'It cannot be dispelled, stolen, or canceled by hand.',
       flaskThroughDeath:
         'The effect remains through death, but ends when you log out; instanced matches begin and end on a clean slate.',

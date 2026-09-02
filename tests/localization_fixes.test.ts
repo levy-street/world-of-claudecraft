@@ -10,7 +10,7 @@ import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
 import { dungeonText } from '../src/ui/entity_display_core';
-import { itemDisplayName } from '../src/ui/entity_i18n';
+import { itemDisplayName, tEntityOptional } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
   cs_CZ,
@@ -2096,6 +2096,14 @@ describe('deploy-window aliases for wire-carried renames', () => {
     // a reword that moved only one of them would render the other in silence.
     setLanguage('en');
     expect(dungeonText('drowned_temple', 'enterText')).toBe(live);
+    // dungeonText falls back to the content copy when the catalog row is
+    // absent, which would turn the line above into content-equals-content; the
+    // bundle-only read proves the catalog really carries the key (fresh read
+    // of the round-1 fix).
+    expect(
+      tEntityOptional({ kind: 'dungeon', id: 'drowned_temple', field: 'enterText' }),
+      'the English catalog carries the enterText row',
+    ).toBe(live);
     try {
       for (const lang of supportedLanguages) {
         setLanguage(lang);

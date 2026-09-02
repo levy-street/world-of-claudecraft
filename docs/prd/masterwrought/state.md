@@ -5727,16 +5727,30 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-deploy-wi
   Spellgnaw devour exception stays out of the tooltip copy. (3) The
   privacy-security skip rationale is restated with substitute evidence
   (above).
-  RULED (qr-19-flask-tooltip-spellgnaw-exception, 2026-09-02, under qr-19-best-for-project):
-  the judged omission STANDS and itemUi.tooltip.flaskUnremovable keeps its wording. The
-  refusal was taken on the classic-idiom rule (consumable tooltips do not enumerate
-  mob-affix interactions); the Spellgnaw devour behavior is pinned where it matters
-  (tests/mob_purge.test.ts, 'still devours a flask aura: the STK-2 ruling covers player
-  counters only (recorded exception)') and scoped in the Aura.undispellable docblock of
-  src/sim/types.ts; and a reword of a filled key would re-open five non-Latin rows that
-  no gate can see go stale, plus the literal pin in tests/elixir_tooltip_view.test.ts
-  and the guide twin guide.profPages.craftProse.alchemy.ladderBody, days before the
-  Phase 20 fill. Phase 19F; no code moved.
+  RULED (qr-19-flask-tooltip-spellgnaw-exception, 2026-09-02, under qr-19-best-for-project): the
+  judged omission STANDS and itemUi.tooltip.flaskUnremovable keeps its wording, 'It cannot be
+  dispelled, stolen, or canceled by hand.' (src/ui/i18n.catalog/items.ts). The refusal was taken on
+  the classic-idiom rule (consumable tooltips do not enumerate mob-affix interactions), a recorded
+  exception to docs/design/tooltip-writing.md's checklist item 7 (every trigger, limit, reset,
+  consumption rule and failure condition): the Spellgnaw devour is a mob affix acting on the player,
+  not a rule of the flask, and the classic idiom keeps affix interactions in the mob's own surfaces.
+  The behavior is pinned where it matters: devourBeneficialAura in src/sim/mob/mob_swing.ts (the
+  findIndex(isDevourableAura) site), 'still devours a flask aura: the STK-2 ruling covers player
+  counters only (recorded exception)' in tests/mob_purge.test.ts, the second devour assertion in
+  tests/lifesap_adversarial.test.ts, and the Aura.undispellable docblock of src/sim/types.ts. The
+  reword arm's price, stated in this phase's own shape: a reword is a retire-and-re-key (a
+  RETIRED_KEYS row, a successor key, five non-Latin fills in-change, the Latin rows to the release
+  fill, the D085 rule), never an in-place edit; today the key is filled in the five non-Latin
+  locales and pending in the 15 Latin ones, so it rides Phase 20 regardless, and a re-key would also
+  move the FLASK_RULES literal pin in tests/elixir_tooltip_view.test.ts ('a flask adds its four
+  rules under the shared Use line', 'every shipped flask states all four, on its own stat axis') and
+  the guide twin guide.profPages.craftProse.alchemy.ladderBody with its own five non-Latin rows,
+  days before the Phase 20 fill. One adjacent open item is flagged, not taken: the Phase 10 outcome
+  (c) item (i) in this file records the loss of right-click cancel as a fidelity deviation the
+  maintainer may revisit, and the sentence's third verb rests on it; a revert there re-opens this
+  wording. Phase 19F; no code moved at the unit, and the review round added only a comment beside
+  the key in src/ui/i18n.catalog/items.ts carrying this ruling id so the next tooltip audit finds
+  it.
 - AUDIT VERDICTS recorded, no action: the early skillReq obligation
   DISSOLVED (patterns carry no skillReq field; the learn flow gates on
   the recipes, all 28 on tier boundaries 100/125, both reachable; the
@@ -12741,7 +12755,6 @@ The eight inherited are unchanged and NOT re-decided here: the three inherited
 stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 `prog_first_harvest` taking 13 catches for a fishing-only character, and the
 `deepwater_feast` FIX-or-CUT. This phase adds:
-RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 (9) **THE DECISION-A CONTRADICTION**, costed above.
 (10) **THE SHIPPED-ID GOLDEN POLICY**, deviation 1 above: per-phase re-mint or
@@ -12751,6 +12764,9 @@ RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches ar
      additions-only) and the doctrine amended in all three of its homes
      (tests/shipped_item_ids.test.ts, src/sim/content/CLAUDE.md, and the
      acceptance line restored to phase-20). The item is no longer open.
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as
+shipped; the full record sits under '### ONE MORE FOR THE MAINTAINER, raised by the review rather
+than by the phase' in the Phase 11i ledger of this file.
 
 ### THE REJECTION LIST, AS RECORDED DESIGN
 
@@ -13124,10 +13140,26 @@ is RETIRED AND RE-KEYED, the 11i mechanism. guide.profPages.toolsNoteThreeRods i
 its successor guide.profPages.toolsNoteFiveLadders carries the same English; the five non-Latin
 overlay rows are REPLACED by fresh full translations of the current note in the same change
 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill conventions and
-flagged for the maintainer's read in phase-19f-qa.md), and the 15 Latin rows land pending for
-the Phase 20 fill. The three tests/guide.test.ts pins ('the shared tools note is TRUE of
+flagged for the maintainer's read in phase-19f-qa.md), and the Latin locales' rows (15 today, every
+LOCALE outside the five non-Latin ones) land pending for the Phase 20 fill. The three
+tests/guide.test.ts pins ('the shared tools note is TRUE of
 farming, not only of the node trades', 'publishes the tool-gate thresholds through placeholders
 in EVERY locale', 'resolves the new professions keys in English') re-point to the successor.
+AMENDED 2026-09-02 by the D161 review round (content-obligations, frontend-seam, qa-checklist): the
+note's own English was false in one count, misleading in one place and incomplete in one: it said
+THREE 20-copper land starters are fenced from selling back, mail and the Market where the fenced set
+is FOUR (Copper Mining Pick, Handaxe, Gathering Sickle and Garden Hoe, the TIER_1_TOOLS of
+tests/professions_starter_tools.test.ts); it said the allotment farmer sells the tier-1 hoe 'rather
+than at any hub' where she stands at the Eastbrook allotments (not at a tool counter); and it left
+the rods' Delve Marks route out (the Drowned Litany counter stocks the Stormreel and the
+Tidewrought). The five fresh fills had reproduced all three. The successor was therefore re-keyed
+once more, the same delete-outright shape, to guide.profPages.toolsNoteFourStarters with fresh five
+non-Latin fills (tool and rod names kept in Latin to match the tool table rendered beneath the note;
+the delve name in each locale's shipped casing), the three pins re-pointed, a fourth clause arm
+added to 'the shared tools note is TRUE of farming, not only of the node trades' that derives the
+fenced-starter count from ITEMS, and the every-locale placeholder pin now reads the exact key and
+asserts exactly one toolsNote row per slice. The a60aa9a4d7 shape claim above stays true of both
+re-keys.
 Phase 19F; the render site src/guide/pages/professions_gathering.ts re-points, nothing else moves.
 
 **FOUR RECORDS THIS PHASE LEFT WRONG.** The ledger's BEFORE-column
@@ -13336,7 +13368,6 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 `prog_first_harvest` taking 13 catches for a fishing-only character, the
 `deepwater_feast` FIX-or-CUT, the DECISION-A contradiction (the apex hoe's
 acquisition channel), and the shipped-id golden policy. This audit adds:
-RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 (11) **DECISION D'S BAND SCOPE.** The self-feeding refusal applies at the endgame
      band only. A levelling band credited solely by the family's own tool ladder
@@ -13374,8 +13405,11 @@ RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches ar
      `guide.profPages.toolsNoteThreeRods` in `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN`
      and `zh_TW`. No gate can see a stale reword. Either re-fill at release or
      rule that the key is re-keyed instead.
-RULED (qr-19-toolsnote-stale-nonlatin-fills, 2026-09-02): re-keyed; the full record sits after the
-11j QA ledger's 'AND THE EXPOSURE IS RECORDED' paragraph in this file.
+     RULED (qr-19-toolsnote-stale-nonlatin-fills, 2026-09-02): re-keyed; the full record sits
+     after the 11j QA ledger's 'AND THE EXPOSURE IS RECORDED' paragraph in this file.
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as
+shipped; the full record sits under '### ONE MORE FOR THE MAINTAINER, raised by the review rather
+than by the phase' in the Phase 11i ledger of this file.
 
 ### THE HANDOFF TO 11k
 
@@ -13755,7 +13789,8 @@ Unchanged and NOT re-decided here: the three inherited (scroll/elixir 15c
 parity, RULE 2's value-half reading, the inherited stale-client window), 11h's
 two deviations, 11i's session cap 15 s to 16 s (whose forcing arithmetic this
 audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
-`prog_first_harvest` taking 13 catches for a fishing-only character. (RULED qr-19-prog-first-harvest-thirteen-catches, 2026-09-02: ratified as shipped.)
+`prog_first_harvest` taking 13 catches for a fishing-only character. (RULED qr-19-prog-first-harvest-thirteen-catches, 2026-09-02: ratified as shipped; the record
+sits under '### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase'.)
 
 (8) **THE CAPSTONE FEAST IS UNREACHABLE.** FIX or CUT, both costed above. This
     is the one that makes the verdict FAIL rather than PASS-WITH-FOLLOWUPS.
@@ -14147,7 +14182,6 @@ already found and handled that consequence in the fishing suite and failed to
 carry it into the golden prediction. THE LESSON: a gain-rate change is a
 DEED-TRIGGER change wherever a deed counts the quantity that rate feeds; predict
 the trigger set, not just the number.
-RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
 
 THE PHASE 11i QA RE-READ THE ARTIFACT AGAINST THIS PARAGRAPH, which is the rule
 the audit was given (check the observed change against the prediction as
@@ -14777,12 +14811,20 @@ RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02, under qr-19-best-f
 both directions by 'ACCEPTED DRIFT, NARROWED BY DECISION F: fishing still completes
 prog_first_harvest, no longer on the first catch' (tests/professions_fishing.test.ts), the parity
 golden already carries the non-firing window, and the wiki is held to the live
-FISHING_GAIN_SCHEDULE. The desc 'Harvest your first gathering node' stays: D103
-(qr-19-prog-first-harvest-bootstrap-deed) already read it as truthful for farming (a farm bed is not
-a GATHER_NODES node) and fishing's own instant renown-5 deed chr_vale_first_cast fires on the first
-catch, so the only looseness is fishing's thirteen catches, accepted on the record. The desc rider
-was offered with its price (a replacement desc plus the 18 deed-chunk and 18 guide-overlay fills,
-none owed by M16) and declined in session. Phase 19F.
+FISHING_GAIN_SCHEDULE. The desc 'Harvest your first gathering node' stays, and so do the three guide
+gatherDeeds lines that open 'Your first node of any trade earns Fruits of the Field'
+(src/ui/i18n.catalog/guide.ts), which the declined copy rider also covered and which this ruling
+accepts with the desc. Under D103's own criterion (qr-19-prog-first-harvest-bootstrap-deed: a farm
+bed is not a GATHER_NODES node, and neither is a fish, GATHER_NODES being the ore, wood and herb
+table of src/sim/content/gather_nodes.ts) the desc is truthful-but-incomplete for farming and
+fishing alike; fishing's own instant renown-5 deed chr_vale_first_cast fires on the first LANDED
+zone-fish catch (per zone, one sibling deed per fishing zone, Eastbrook Vale the starter), so the
+looseness accepted on the record is fishing's thirteen catches. The desc rider was offered with its
+price (a replacement desc plus the 18 deed-chunk and 18 guide-overlay fills, two separate channels,
+none owed by M16) and declined in session. Phase 19F. AMENDED 2026-09-02 by the D174 review round
+(qa-checklist): the asymmetry in the first draft of this rationale is corrected above, the guide
+lines are recorded as accepted, and the sixth pointer that sat on the golden-prediction post-mortem
+was removed (the amendment prescribed five sites).
 
 `prog_first_harvest` ("Harvest your first gathering node", trigger gathering
 amount 1) now takes THIRTEEN catches for a fishing-only character instead of
@@ -15177,7 +15219,15 @@ percent, the honest half of the same gate' in tests/provisioning_supply_line_ape
 the live FARM_CROPS durations) and no player-visible timer claim is authored. The deferral arm this
 row priced is DEAD: D012 was CLOSED 2026-09-01 by qr-19-crop-durations-gain-survival (every
 constant ratified as shipped, a re-tune barred), so the choice was binary and the maintainer took
-the status quo in session. Phase 19F; no code moved.
+the status quo in session. The declined arm keeps its price on the record: one wordy guide.* key in
+src/ui/i18n.catalog/guide.ts plus its five non-Latin M16 fills and the wiki freshness gate
+(tests/guide.test.ts); with the durations final, a timer claim could now be authored safely against
+them, a re-open the maintainer takes by ruling. D012's closure is its handoff row in
+docs/prd/masterwrought/farming/state.md; the durations themselves are recorded in this file under
+'### The final per-row table, with every count derived rather than picked' (the Phase 11h ledger's
+'11h-GATE-A'S COST SPREAD IS ZERO IN COPPER AND IS PINNED' paragraph); and the farming table keys'
+standing spoiler-altitude note in guide.ts (names and roles only, no durations) leans the same way.
+Phase 19F; no code moved.
 - Pinning "nothing in src/ or server/ slices a reagent list" with a source scan.
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as reagent-slice-source-scan-pin.
   That is the source-scan blind-spot class the packet's own gotcha catalog warns
@@ -16273,7 +16323,9 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 hoe's acquisition channel), the shipped-id golden policy, decision D's band
 scope, and the reworded wiki key's five stale non-Latin fills (to which this
 phase adds a second reworded key, recorded above).
-RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as shipped; the full record sits after the 11i review hand-back heading.
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the 13 catches are ratified as
+shipped; the full record sits under '### ONE MORE FOR THE MAINTAINER, raised by the review rather
+than by the phase' in the Phase 11i ledger of this file.
 
 This phase adds NO new open item. Where it could have added one, it chose the
 option that closes rather than opens: the crop count at 1 keeps RULE 2's open
@@ -18920,12 +18972,13 @@ of the thirteen now carries its own priced row with its own ruling id (scroll/el
 parity D171, RULE 2's value-half reading D004 with its contingent D002, the stale-client
 window D172, 11h's two deviations D001 and D005, 11i's session cap D173,
 prog_first_harvest's thirteen catches D174, the apex hoe channel D003, the shipped-id
-RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the prog_first_harvest member of the
-thirteen (D174) is ratified as shipped; the full record sits after the 11i review's hand-back heading.
 golden policy D175, Decision D's band scope D176, the reworded wiki keys' stale fills D161,
 col_junk_drawer's three of margin D170, zone 1's no-poor-drop D009), and the eleventh-hour
 ledger additions are carried by the completeness pass that added D152 to D176. No blanket
 ruling is taken and none is needed.
+RULED (qr-19-prog-first-harvest-thirteen-catches, 2026-09-02): the prog_first_harvest member of the
+thirteen (D174) is ratified as shipped; the full record sits under '### ONE MORE FOR THE MAINTAINER,
+raised by the review rather than by the phase' in the Phase 11i ledger of this file.
 
 The thirteen carried in are unchanged and none was needed (col_junk_drawer
 still three of margin: the live poor set is sixteen, thirteen reachable;
@@ -20339,13 +20392,13 @@ fill), never an in-place edit. Phase 19F; the ratification itself moved no code.
 AMENDED 2026-09-02 by the D085 review round (qa-checklist, blocking): the ratified value was NOT
 clean. It said 'The two rod recipes break the pattern' where ROD_RECIPES holds three (the Clockreel,
 two Koi, ten Raw Hollowgill Sturgeon and the Tidewrought, was missing), the same by-count class the
-11o sweep fixed on identityBody and ladderBody and missed here; and its five non-Latin fills
+11i fishing-page pass (a60aa9a4d7, 2026-08-23; the fresh read corrected 11o to 11i) fixed on identityBody and ladderBody and missed here; and its five non-Latin fills
 predated the live English (they still said the fine materials were sold at the toolworks). Fixed
 by the retire-and-re-key shape this ruling prescribes: the successor
 guide.profPages.craftProse.engineering.materialsBodyThreeRods (the count corrected, nothing else
 moved) rides the bodyKey override of proseSection in src/guide/pages/professions_craft.ts (the
 cooking identityBodyOneMeal precedent, which is how a craftProse body on a dynamic key path IS
-re-keyed; the 11o-era note that these keys 'could not be re-keyed' predates that override), the old
+re-keyed; the 11i-era note that these keys 'could not be re-keyed' predates that override), the old
 key is retired in scripts/i18n_retired_keys.mjs, and five fresh non-Latin fills rode the same
 change (machine-authored, flagged for the maintainer's read); the 15 Latin rows land pending for
 the Phase 20 fill. Two corrections to the ratification's own text: the hoe ladder is documented in
@@ -24892,7 +24945,7 @@ The one JUDGED item is the zone-celebration fan-out, refused on a measurement.
 | resolve-legendary-promotion-gate | CLOSED | (none) | Commit f746dbecd4 (U-SIM-CRAFT). At the tip, src/sim/professions/perfecting.ts:48 imports `refusedWhileDead` from '../dead_gate' and line 389 is the first statement of resolvePerfectingHead: `if (refusedWhileDead(ctx, pid)) return null;`. The old comment-only claim ("The dead gate rides the Sim wrapper" / "this export runs no refusedWhileDead of its own") is deleted in that diff. Bypass path pinned by two new tests at the tip: tests/orange_promotion.test.ts:772 'a DIRECT headless call of resolveLegendaryPromotion h |
 | retired-id-per-cell-targeting | CLOSED | (none) | Commit b2624cda7f (U-PERSIST). At the tip server/clear_item_name.ts:80 declares `const BAG_ITEM_ID_SHAPE = /^[A-Za-z0-9_.:-]{1,64}$/;` and line 157 reads `if (typeof body.itemId !== 'string'; ; !BAG_ITEM_ID_SHAPE.test(body.itemId))`. The deleted lines are the old `!Object.hasOwn(ITEMS, body.itemId)` check and its "Accepted consequence of the allowlist: a bagged copy of an id RETIRED from the content tables can no longer be targeted per-cell" comment; the `import { ITEMS } from '../src/sim/data'` line is gone from t |
 | rift-items-healer-facing-comment | CLOSED | (none) | Commit 5e1670e829 (U-DOCS, 21 items). The diff deletes both stale lines: '// agi -> crit, int/spi (healer-facing) -> haste (healers are not level-resisted).' and '// Haste suits the sta/spi (healer-facing) stat identity; healers are not / resisted by level so Hit would be wasted.' At the tip they read src/sim/content/rift/items.ts:314-317 '...the int/spi pieces carry haste and NO authored Hit, which under the operative heroic_variants.ts rule (only an authored Hit seed marks a spell-facing piece as caster DPS) read |
-| rift-mechanic-name-matcher-gap | CLOSED | f14f015a7b | 52 rift mechanic names gained English matcher rows plus their AURA_NAME_KEY rows, DERIVED from RIFT_MOBS rather than typed, so a newly authored mechanic reds the suite. Vacuity floors measured against live content. The names remain English in every locale, which is the sanctioned English-only contribution but NOT a no-op here: Phase 19 rows D148 and D149 carry why (sim-scope keys can never reach the fill worklist) and what to do about it. |
+| rift-mechanic-name-matcher-gap | CLOSED | f14f015a7b | 52 rift mechanic names gained English matcher rows plus their AURA_NAME_KEY rows, DERIVED from RIFT_MOBS rather than typed, so a newly authored mechanic reds the suite. Vacuity floors measured against live content. The names remain English in every locale, which is the sanctioned English-only contribution but NOT a no-op here: Phase 19 rows D148 and D149 carry why (sim-scope keys can never reach the fill worklist) and what to do about it. AMENDED 2026-09-02 at 19F: both clauses before this one are history. D148 (qr-19-sim-scope-pending-is-unreachable) made the registry read per-locale source presence, so sim rows reach the worklist, and D149 (qr-19-rift-mechanic-names-translate-or-not) filled the 52 names in the five non-Latin blocks; the 15 Latin locales' 780 rows ride the Phase 20 worklist. The RULED line is in the Phase 19F ledger of this file. |
 | roving-tabindex-radiogroup | CLOSED | (none) | Commit da6443b616 (U-FE-HUD + U-FE-WINDOWS). At the tip both windows import and use the shared core: src/ui/hud/professions/farming_plant_sheet_window.ts:28 `import { rovingTarget } from '../../roving_index';` and :253 `const next = rovingTarget(ke.key, index, seeds.length, 'both');`; src/ui/hud/professions/perfecting_window.ts:38 and :429 the same. The one-tab-stop rendering is real: the plant sheet computes `const tabStop = Math.max(0, view.seedRows.findIndex((row) => row.selected))` and emits `tabindex="${tabSto |
 | rung50-reachability-pin | CLOSED | (none) | Commit 31e8de530d added tests/jewelcrafting_rung50_reachability.test.ts (227 lines, new file), present at the tip. Suite title at line 92: `describe('jewelcrafting rung-50 reachability under 125-cap pacing', ...)`. It derives rather than asserts: it imports the live `craftSkillGainMultiplier` (src/sim/professions/archetype), `gainCraftSkill`/`skillInCraft`/`tierForSkill` (src/sim/professions/wheel), `craftMaxSkillFor` and `ALL_RECIPES`, filters JEWELCRAFTING off the live table, and walks a climb from 0 with `climb( |
 | same-copy-refusal-uncued-edge | CLOSED | da6443b6168d7c987a0239a578dfcc83f36c3758 | Commit da6443b616. At 2ab5c2f7d0, src/ui/hud/professions/perfecting_window.ts:345-355 adds the `else if (prev && this.namingDialog?.isOpen())` arm ending in `this.announce(t('hudChrome.perfecting.namingSelectionUnconfirmed'))`, with the prevSelected doc at :103-111 updated to name it; the key exists at src/ui/i18n.catalog/hud_chrome.ts:6173. Pinned both ways in the window suite: tests/perfecting_window.test.ts:1093 'a refused same-copy pair under the open dialog announces the unconfirmed selection, once' and :1136  |
@@ -25085,6 +25138,13 @@ recommendations, never rulings (no decision is guessed in this phase).
 | D130 | census-allowlist-path-asymmetry | The census filters its MERGED SCAN through isCensusPath but does NOT filter the extras ALLOWLIST, so a row naming a name under an excluded path prefix becomes an entry nothing can ever satisfy, and unusedExtras reports it as 'GONE from merged', which is the exact opposite of the truth. Teach the tool to recognise an excluded-path row, or keep the convention that such names are filed as literal-only records? | The Phase 18 census close-out (this ledger). Five names (releaseParentRefs, newestReleaseRef, classifyLineage, isAnchorPath, Lineage) were reported GONE while all five are defined, exported, called and asserted in scripts/merge_audit/golden_composition.mjs and its .d.mts. Cause established by controlled experiment, not by reading: the identical bytes at both extensions were copied into a scanned directory, where the tool's own readMergedTree ACCEPTED them, and refused them under scripts/merge_audit/. Extension is not the cause (.mjs and .mts are both in SOURCE_EXTENSIONS) and declaration twins DO count (five .d.mts-only names from a neighbouring module already resolve today). The exclusion itself is INTENTIONAL and documented twice in the tool, and it is LOSSLESS for the direction that matters: no parent ref carries scripts/merge_audit/ at all, so nothing there can ever be MISSING, and the only verdict suppressed is EXTRA, which is what it was written to suppress. The tool is right to fail loudly on an unsatisfiable row and wrong about the reason it gives. | Keep the convention: file such names as literal-only records, which is what the doc's own header rule already prescribes (a name the census cannot match does not need an extras row) [what shipped; zero tool change, record preserved, one doc edit; but it is a convention a future author must know, and getting it wrong produces a confidently WRONG failure message rather than a helpful one]; Filter the allowlist through isCensusPath so an excluded-path row is informational rather than unsatisfiable [durable and self-policing, but the rows carry no path column, only prose, so the tool cannot tell an excluded-path row from any other today: it needs a path column or an explicit marker, a parser change and a pin update, which is a SCHEMA change to the census]; Drop the exclusion and explain the auditors [73 rows now and a row for every future auditor export forever, for tools that exist on no parent by construction, which is the cost the exclusion was created to avoid]; Narrow the exclusion to symbol_census.mjs alone [pays most of the previous option's cost and fixes none of the asymmetry] | Filter the allowlist, sized as its own task. The shipped convention is correct and cost nothing, but it fails in the worst direction: an author who files honestly into the wrong table gets a message asserting their live export was lost, which is a confidently wrong claim rather than a missing one. A schema change to the gate is not something a sweep packet should spend, which is why it is tabled rather than taken. | new |
 | D131 | capture-seed-without-marker | Twenty-five capture scripts seed woc_settings graphicsPreset WITHOUT graphicsDefaultApplied, so src/main.ts runs firstRunGraphicsPreset BEFORE the renderer reads the preset and the device probe is free to PERSIST its own tier over the seed. Fix the exposed scripts, add a guard, or accept it? | The Phase 18 E2E unit, measured across five arms rather than read: the marker came back TRUE from a seed that never set it, which is the proof the probe ran. The committed frames were at the lowest preset anyway, but by ACCIDENT, because headless is software GL and resolveDefaultGraphicsPreset lows software GPUs; the seed was advisory and the harness agreed with it by luck. The unit then NARROWED the blast radius honestly instead of reporting all 25: render/gfx.ts tierFromHints consults forcedTierFromSearch FIRST and returns on a hit, so a ?gfx= URL outranks the stored preset outright. 14 of the 25 seed a tier ABOVE low (which headless would replace) and 10 of those force the tier in their URL and are immune. FOUR are genuinely exposed: scripts/climb_stall_shot.mjs, scripts/lib/perf_hitch_browser.mjs, scripts/load_probe.mjs, scripts/perf_tour.mjs. The remaining 11 seed low only, so they are unaffected headless and merely fragile headed. scripts/pr_shot_targets.mjs, the canonical PR screenshot path, is already correct. | Fix the four exposed scripts to seed the marker beside the preset [three of the four are PERF INSTRUMENTS, which is the consequential kind: a tour that believes it is benching a high tier may be benching whatever the machine resolved, and its numbers would be wrong in a way nothing reports; four one-line edits on another unit's surface]; Add a guard that any script seeding graphicsPreset also seeds the marker [durable and catches the next one, but it must not fire on the 10 that force the tier by URL, so it needs to understand forcedTierFromSearch or accept a documented allowlist]; Fix the four AND add the guard [the complete answer, and the guard is what stops the pattern recurring in a 25-script family]; Accept [no-op; every future capture and perf run keeps depending on the machine agreeing with the seed by luck, and the failure is silent] | Fix the four and add the guard, sized as one task on the perf surface. The Phase 18 unit fixed only the two rigs it owned and REPORTED the rest rather than reaching into another unit's files, which is the right boundary; the remainder is a real defect with a silent failure mode and should not be left as a report. | new |
 | D132 | ignite-bank-estimator-rate | The fire short-fight harness models Meteor's Ignite bank at the fire mastery's ignitionPct (0.3), while the sim actually banks igniteFrac (0.4, src/sim/content/classes.ts:8080) on those ground impacts. The estimator therefore UNDER-banks and the conservation ratio reads high. Correct the estimator to 0.4, leave it deliberately conservative, or something else? | The Phase 18 gate fix round. The arm failed at ratio 1.029 for an unrelated reason (a display-name rename dropped every ground impact out of the banked total), and fixing that landed it at 0.994. The rate asymmetry was found while diagnosing it and was deliberately NOT touched, because correcting it would LOOSEN a conservation arm, and loosening a conservation assertion is never a fix-round decision. The arm's bounds are unchanged and byte-identical to HEAD: paid <= banked * 1.02 and paid >= banked * 0.8. | Correct the estimator to igniteFrac so it models what the sim actually banks [the harness then describes the real mechanic rather than an approximation of it, and the ratio's meaning tightens; but the arm currently passes BECAUSE the estimate is conservative, so correcting it moves the reading and the bounds have to be re-derived rather than kept, which is a balance-adjacent change this packet has no mandate for]; Leave it conservative and say so at the code [no-op plus a comment; the arm keeps passing for a reason that is now written down instead of accidental, and an under-banking estimator fails SAFE, since it can only make a real double-dip easier to see, never harder]; Re-derive the bounds against the corrected estimator as one task [the complete answer, and the only one that leaves both the model and the thresholds meaning what they say] | Leave it conservative and write the reason at the code, then re-derive as its own task if anyone wants the tighter model. An estimator that under-banks fails in the safe direction for a conservation arm, and the alternative is re-deriving balance thresholds, which is not something a sweep packet should do. Gameplay math follows real classic-era formulas and is never tuned to make a test read better. | new |
+
+AMENDED 2026-09-02 at the 19F review round: the DRAFT rows above are the STEP 4 draft and are not
+re-edited; the D070 and D074 rows carry premises the 19F execution voided (D074's open crop-duration
+read closed 2026-09-01 by qr-19-crop-durations-gain-survival; D070's state.md addresses drifted).
+The gate copies in phase-19-rulings-gate.md carry the dated amendments and the ANSWERED clauses, and
+the rulings themselves are the RULED lines qr-19-flask-tooltip-spellgnaw-exception and
+qr-19-growth-timer-prose-clause in this file.
 
 ### THE BUCKET-C LIST
 
@@ -27043,3 +27103,33 @@ phase-19e-qa.md.
   SETTLED. This ledger records them; it does not reopen them.
 - The three items 19D carried, the three 19C carried and the four 19B carried
   remain the maintainer's and were not taken here.
+
+## Phase 19F ledger (2026-09-02, the English i18n completeness wave of the rulings gate)
+
+RULED (qr-19-rift-mechanic-names-translate-or-not, 2026-09-02, under qr-19-best-for-project): option
+1, the 52 rift mechanic names (29 aura.rift*, 23 mechanic.rift*, derived from RIFT_MOBS) are
+TRANSLATED EVERYWHERE, the precedent the 16 rift cast ids already shipped. The row's premise was
+false (every rift cast id already carries real fills in every locale, and BRAND_ALLOW never reaches
+a sim-scope key), so it was escalated in session and the maintainer took option 1. The five
+non-Latin BASE_DICT blocks of src/ui/sim_i18n.ts carry the fills (machine-authored under the
+i18n-locale-fill conventions, consistent with each locale's rift cast-id renderings, flagged for the
+maintainer's read in phase-19f-qa.md; the review round retuned thirteen of the 260 rows: the Chain
+Lightning mechanic had collided with the Skybranch ability's localized name in four locales and
+zh_CN had used the trade term, and eight element-family ties were aligned with the shipped rift mob
+and cast names); the 15 Latin locales' 780 rows ride the Phase 20 worklist that D148 made possible.
+Pinned by 'every rift name key carries a real translation in each of the five, from its own block'
+(tests/sim_i18n_rift_mechanics.test.ts), mutation-proved, with a per-locale script-class arm added
+at the review round.
+
+RULED (qr-19-rarebody-reword-landmine, 2026-09-02, under qr-19-best-for-project): the shared 'Rare
+finds' prose of the mining, logging, herbalism and farming pages is RETIRED AND RE-KEYED under the
+reword-is-a-new-key convention: guide.profPages.rareBody retired (RETIRED_KEYS row with its reason
+in scripts/i18n_retired_keys.mjs; its 21 provided rows stay translated) and its successor
+guide.profPages.rareBodyFourFlavors names all four windfalls with the maintainer's wording for the
+crop one, 'a golden harvest from a garden bed', beside the deed sentence; the five non-Latin fills
+rode the same change (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill
+conventions and flagged for the maintainer's read in phase-19f-qa.md; the old five had omitted the
+flavor names and the deed sentence since they were written) and the Latin locales' rows land pending
+for the Phase 20 fill. The handoff row in docs/prd/masterwrought/farming/state.md carries the dated
+close. This record was owed by the unit commit and landed at its review round
+(content-obligations-reviewer).
