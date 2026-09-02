@@ -20,6 +20,26 @@ export interface PerfBucket extends PerfAggregate {
   key: string;
 }
 
+// The GPU model dimensions, which are PAIRS rather than single columns, so they
+// cannot ride the single-bit GROUPING contract below and get their own bounded
+// statement instead. byModel is (os_family, gl_model): the same card behaves
+// differently under different drivers, so the OS is part of the key. Explicit
+// named fields rather than one joined `key` because a reader segments on either
+// half, and re-splitting a composite string at read time invites a delimiter bug.
+export interface PerfModelBucket extends PerfAggregate {
+  osFamily: string;
+  glModel: string;
+}
+
+// byHpMismatch adds the WebGPU high-performance adapter's family. A row whose
+// gpuHpAdapter differs from its glModel is the signal this dimension exists for:
+// the page is rendering on one GPU while the machine offers a faster one. Rows
+// with no adapter evidence never reach here (the statement filters them out),
+// so an empty list means "no client reported one", never "no mismatches".
+export interface PerfHpAdapterBucket extends PerfModelBucket {
+  gpuHpAdapter: string;
+}
+
 export interface ClientPerfSummaryBuckets {
   totals: PerfAggregate;
   byPreset: PerfBucket[];
@@ -60,6 +80,13 @@ export const PERF_SUMMARY_LIMITS = Object.freeze({
   // Six fixed labels (ruling R3) plus the legacy '' bucket and headroom.
   byCrowd: 8,
   worstGpu: 20,
+  // gl_model is higher cardinality than the vendor bucket by construction (that
+  // is the point), and byModel keys on the os_family pair on top of it, so this
+  // cap is what keeps the statement's result set bounded whatever the fleet
+  // looks like. byHpMismatch is filtered to the adapter-carrying minority and
+  // shares the cap for one reason to reason about.
+  byModel: 50,
+  byHpMismatch: 50,
   // Eight allowlisted suggestion ids (ruling R14) plus headroom; only
   // sanitizer-approved ids can reach the column, so this cap is defensive.
   suggestionCounts: 12,
@@ -103,6 +130,26 @@ export type ClientPerfSummaryRow = {
   avg_effective_render_scale: number;
 };
 
+// One flat row of the GPU model statement. g_hp is the ONE GROUPING() bit that
+// separates its two sets: 1 is the (os_family, gl_model) pair set, 0 is the
+// (os_family, gl_model, gpu_hp_adapter) triple set. vol_rank is computed AFTER
+// the statement's own WHERE, so the triple set's rank is over adapter-carrying
+// rows only and the empty-adapter majority cannot starve the list.
+export type ClientPerfModelRow = {
+  os_family: string | null;
+  gl_model: string | null;
+  gpu_hp_adapter: string | null;
+  g_hp: number;
+  vol_rank: number;
+  sample_count: number;
+  median_fps: number;
+  p95_frame_ms: number;
+  p99_frame_ms: number;
+  context_loss_count: number;
+  avg_render_scale: number;
+  avg_effective_render_scale: number;
+};
+
 // One flat row of the suggestion-count statement: the unnested id plus its
 // report count. Kept as a documented contract like ClientPerfSummaryRow so the
 // shape and SQL suites type their fixtures against what the mapper consumes.
@@ -110,6 +157,45 @@ export type PerfSuggestionCountRow = {
   suggestion_id: string | null;
   sample_count: number;
 };
+
+/**
+ * Rebuild byModel and byHpMismatch from the GPU model statement's flat rows.
+ *
+ * Classification is the g_hp bit alone, never the gpu_hp_adapter value: the
+ * column is TEXT NOT NULL DEFAULT '', so a data key of '' must not be confused
+ * with the rolled-up NULL of the pair set (the same rule the GROUPING-bits
+ * mapper below follows). Ordering comes from the statement's rank; the mapper
+ * only maps, sorts by that rank, and defensively caps.
+ */
+export function mapClientPerfModelRows(rows: ReadonlyArray<Record<string, unknown>>): {
+  byModel: PerfModelBucket[];
+  byHpMismatch: PerfHpAdapterBucket[];
+} {
+  const model: { rank: number; bucket: PerfModelBucket }[] = [];
+  const mismatch: { rank: number; bucket: PerfHpAdapterBucket }[] = [];
+  for (const r of rows) {
+    const base = {
+      osFamily: String(r.os_family ?? ''),
+      glModel: String(r.gl_model ?? ''),
+      ...perfAggregateFromRow(r),
+    };
+    const rank = Number(r.vol_rank);
+    if (Number(r.g_hp) === 0) {
+      mismatch.push({ rank, bucket: { ...base, gpuHpAdapter: String(r.gpu_hp_adapter ?? '') } });
+    } else {
+      model.push({ rank, bucket: base });
+    }
+  }
+  const byRank = <T>(list: { rank: number; bucket: T }[], limit: number): T[] =>
+    [...list]
+      .sort((a, b) => a.rank - b.rank)
+      .slice(0, limit)
+      .map((e) => ({ ...e.bucket }));
+  return {
+    byModel: byRank(model, PERF_SUMMARY_LIMITS.byModel),
+    byHpMismatch: byRank(mismatch, PERF_SUMMARY_LIMITS.byHpMismatch),
+  };
+}
 
 // Rebuild the suggestionCounts list from the flat rows. Ordering comes from the
 // statement (sample_count DESC, id ASC); the mapper only maps and defensively

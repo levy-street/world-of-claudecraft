@@ -3,9 +3,12 @@ import type { AdminAccountSort, AdminAccountSortDirection } from './admin_accoun
 import {
   type ClientPerfSummaryBuckets,
   cleanHours,
+  mapClientPerfModelRows,
   mapClientPerfSummaryRows,
   mapSuggestionCountRows,
   PERF_SUMMARY_LIMITS,
+  type PerfHpAdapterBucket,
+  type PerfModelBucket,
   type PerfSuggestionCount,
 } from './client_perf_summary_shape';
 import {
@@ -457,6 +460,11 @@ export interface PerfSummary extends ClientPerfSummaryBuckets {
   // carried each allowlisted perf-doctor suggestion id. A report carries up to
   // three ids, so these never partition the totals row.
   suggestionCounts: PerfSuggestionCount[];
+  // The GPU model dimensions: per-(os, model) aggregates, and the subset of
+  // those that also reported a WebGPU high-performance adapter, keyed by it as
+  // well. Both come from ONE extra statement (see clientPerfSummary).
+  byModel: PerfModelBucket[];
+  byHpMismatch: PerfHpAdapterBucket[];
 }
 
 export interface PerfRawRow {
@@ -519,7 +527,7 @@ function cleanBeforeId(id: number | undefined): number | null {
 
 export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
   const hours = cleanHours(hoursInput);
-  // TWO raised-timeout statements inside one transaction. The first (GROUPING
+  // THREE raised-timeout statements inside one transaction. The first (GROUPING
   // SETS over client_perf_reports) replaced the former seven serialized reads:
   // the () set is the totals row and each single-column set is one bucket list.
   // Postgres computes BOTH orderings as window ranks per grouping set (volume:
@@ -586,6 +594,48 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
           OR (g_crowd = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byCrowd})`,
       [String(hours)],
     );
+    // The THIRD statement, and the reason it is not another grouping set in the
+    // first: byModel keys on a PAIR of columns, which the mapper's one-zero-bit
+    // classification cannot express, and byHpMismatch needs a row filter
+    // (gpu_hp_adapter <> '') that a shared statement would apply to every other
+    // set too. Both still ride ONE pass here, as two grouping sets over the same
+    // window, capped per set exactly like the roll-up above. The WHERE runs
+    // BEFORE the window function, so the triple set's rank is computed over
+    // adapter-carrying rows only and the empty-adapter majority (every client
+    // without WebGPU) cannot consume its rank slots.
+    const models = await query(
+      `WITH agg AS (
+         SELECT
+           os_family,
+           gl_model,
+           gpu_hp_adapter,
+           GROUPING(gpu_hp_adapter) AS g_hp,
+           count(*)::int AS sample_count,
+           COALESCE(percentile_cont(0.5) WITHIN GROUP (ORDER BY fps_avg), 0)::real AS median_fps,
+           COALESCE(percentile_cont(0.95) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p95_frame_ms,
+           COALESCE(percentile_cont(0.99) WITHIN GROUP (ORDER BY frame_p95_ms), 0)::real AS p99_frame_ms,
+           COALESCE(sum(context_lost_count), 0)::int AS context_loss_count,
+           COALESCE(avg(render_scale), 0)::real AS avg_render_scale,
+           COALESCE(avg(effective_render_scale), 0)::real AS avg_effective_render_scale
+         FROM client_perf_reports
+         WHERE created_at > now() - ($1 || ' hours')::interval
+         GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))
+       ),
+       ranked AS (
+         SELECT
+           agg.*,
+           (row_number() OVER (
+             PARTITION BY g_hp
+             ORDER BY sample_count DESC, os_family ASC, gl_model ASC, COALESCE(gpu_hp_adapter, '') ASC
+           ))::int AS vol_rank
+         FROM agg
+         WHERE g_hp = 1 OR gpu_hp_adapter <> ''
+       )
+       SELECT * FROM ranked
+       WHERE (g_hp = 1 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byModel})
+          OR (g_hp = 0 AND vol_rank <= ${PERF_SUMMARY_LIMITS.byHpMismatch})`,
+      [String(hours)],
+    );
     const suggestions = await query(
       `SELECT s.id AS suggestion_id, count(*)::int AS sample_count
          FROM client_perf_reports
@@ -596,12 +646,13 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
         LIMIT ${PERF_SUMMARY_LIMITS.suggestionCounts}`,
       [String(hours)],
     );
-    return { summaryRows: summary.rows, suggestionRows: suggestions.rows };
+    return { summaryRows: summary.rows, modelRows: models.rows, suggestionRows: suggestions.rows };
   });
   return {
     hours,
     generatedAt: new Date().toISOString(),
     ...mapClientPerfSummaryRows(res.summaryRows),
+    ...mapClientPerfModelRows(res.modelRows),
     suggestionCounts: mapSuggestionCountRows(res.suggestionRows),
   };
 }

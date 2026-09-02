@@ -189,13 +189,34 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(byId.get('high-dpi') ?? 0).toBeGreaterThanOrEqual(1);
   });
 
+  it('rolls the GPU model dimensions up through clientPerfSummary against real SQL', async () => {
+    // The one place the model statement's TWO grouping sets, its adapter
+    // filter, and its pre-window rank actually execute: the mocked-pool suite
+    // can only pin the SQL text, and a filter placed after the window function
+    // would still read correctly there while returning an empty byHpMismatch
+    // on a real fleet.
+    const adminDb = await import('../server/admin_db');
+    const summary = await adminDb.clientPerfSummary(24);
+    const model = summary.byModel.find(
+      (b) => b.osFamily === 'macos' && b.glModel === 'roundtrip-model',
+    );
+    expect(model?.sampleCount).toBeGreaterThanOrEqual(1);
+    const mismatch = summary.byHpMismatch.find(
+      (b) => b.glModel === 'roundtrip-model' && b.gpuHpAdapter === 'roundtrip-hp-adapter',
+    );
+    expect(mismatch?.sampleCount).toBeGreaterThanOrEqual(1);
+    // The legacy and no-evidence rows carry gpu_hp_adapter = '', and the
+    // statement filters them out of the mismatch list entirely.
+    expect(summary.byHpMismatch.some((b) => b.gpuHpAdapter === '')).toBe(false);
+  });
+
   it('leaves an existing pre-phase row on the column defaults the mapper folds', async () => {
     await db.pool.query(
       'INSERT INTO client_perf_reports (session_id, zone_or_scenario) VALUES ($1, $2)',
       [`${MARKER}-legacy`, 'gameplay'],
     );
     const res = await db.pool.query(
-      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids FROM client_perf_reports WHERE session_id = $1',
+      'SELECT crowd_bucket, sim_entities, active_views, visible_views, worst_10s_frame_p95_ms, suggestion_ids, gl_renderer_raw, gl_model, gl_laptop, gpu_hp_adapter FROM client_perf_reports WHERE session_id = $1',
       [`${MARKER}-legacy`],
     );
     expect(res.rows[0]).toEqual({
@@ -205,6 +226,13 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       visible_views: 0,
       worst_10s_frame_p95_ms: 0,
       suggestion_ids: [],
+      // The GPU model block on a row inserted WITHOUT it: the additive DDL
+      // gave every pre-column row these defaults, and '' plus NULL is exactly
+      // what the summary reads as "no evidence".
+      gl_renderer_raw: '',
+      gl_model: '',
+      gl_laptop: null,
+      gpu_hp_adapter: '',
     });
   });
 
