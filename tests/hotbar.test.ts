@@ -12,6 +12,7 @@ import {
   clearHotbarSlot,
   dragCarriesAttack,
   encodeStoredHotbarAction,
+  freedAttackSlotDisplayAbility,
   HOTBAR_ACTION_MIME,
   HOTBAR_ATTACK_MIME,
   handleMobileAttackTap,
@@ -715,5 +716,51 @@ describe('desktop attack slot behavior', () => {
     const action = { type: 'ability' as const, id: 'fireball' };
     expect(assignAttackSlotAction(action, 3)).toEqual({ action, clearSourceIndex: 3 });
     expect(assignAttackSlotAction(action, null)).toEqual({ action, clearSourceIndex: null });
+  });
+
+  describe('freedAttackSlotDisplayAbility (reopen of #3548)', () => {
+    // The freed slot's DATA already survives a build switch (ActionBarController,
+    // fixed by #3548); this is the DISPLAY fallback so the bar keeps showing it
+    // instead of painting empty while the granting build is inactive.
+    const defs: Record<string, unknown> = {
+      stormstrike: { id: 'stormstrike', name: 'Stormstrike' },
+      measured_fury: { id: 'measured_fury', name: 'Measured Fury', passive: true },
+      ghost_channel: { id: 'ghost_channel', name: 'Ghost Channel', hiddenFromPlayer: true },
+    };
+    const abilityDef = (id: string) => defs[id] as never;
+
+    it('resolves a real ability id to a display-only stub with known:false', () => {
+      const action = { type: 'ability' as const, id: 'stormstrike' };
+      expect(freedAttackSlotDisplayAbility(action, abilityDef)).toEqual({
+        def: { id: 'stormstrike', name: 'Stormstrike' },
+        cost: 0,
+        known: false,
+      });
+    });
+
+    it('drops a stale id the static ability table no longer resolves', () => {
+      const action = { type: 'ability' as const, id: 'ghost_ability_from_v99' };
+      expect(freedAttackSlotDisplayAbility(action, abilityDef)).toBeNull();
+    });
+
+    it('returns null for an item binding or an empty slot', () => {
+      expect(
+        freedAttackSlotDisplayAbility({ type: 'item', id: 'baked_bread' }, abilityDef),
+      ).toBeNull();
+      expect(freedAttackSlotDisplayAbility(null, abilityDef)).toBeNull();
+    });
+
+    it('drops a passive or hiddenFromPlayer id even though the static table resolves it (defense in depth)', () => {
+      // ActionBarController already filters these out on every write path
+      // (isAttackSlotStoredAbilityEligible / isAbilityPlacementAllowed both apply
+      // isAbilityActionBarEligible), so this re-checks the module's own "passives
+      // are informational only, never occupy an action slot" rule independently.
+      expect(
+        freedAttackSlotDisplayAbility({ type: 'ability', id: 'measured_fury' }, abilityDef),
+      ).toBeNull();
+      expect(
+        freedAttackSlotDisplayAbility({ type: 'ability', id: 'ghost_channel' }, abilityDef),
+      ).toBeNull();
+    });
   });
 });
