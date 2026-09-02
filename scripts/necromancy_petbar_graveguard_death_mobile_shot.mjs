@@ -35,7 +35,7 @@ await page.emulate({
 });
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
   } catch {
     /* ignore */
   }

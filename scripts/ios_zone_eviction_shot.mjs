@@ -40,7 +40,7 @@ await page.setUserAgent(IPHONE_UA);
 // Lowest graphics preset, per the repo's standing capture rule.
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
   } catch {
     /* ignore */
   }

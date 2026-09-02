@@ -48,7 +48,7 @@ try {
 
   // Standing capture rule: seed the lowest graphics preset before boot.
   await page.evaluateOnNewDocument(
-    "localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));",
+    "localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));",
   );
 
   await page.setViewport(VIEWPORT);

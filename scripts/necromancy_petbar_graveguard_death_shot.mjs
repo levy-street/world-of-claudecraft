@@ -87,7 +87,7 @@ const hudRegion = async (ids, pad = 24) =>
 // shot is about HUD/pet-bar state, not a graphics comparison.
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
   } catch {
     /* ignore */
   }

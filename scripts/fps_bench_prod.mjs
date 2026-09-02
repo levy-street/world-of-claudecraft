@@ -222,6 +222,7 @@ for (const t of TARGETS) {
         'woc_settings',
         JSON.stringify({
           graphicsPreset: presetValue,
+          graphicsDefaultApplied: true,
           terrainDetail: 1,
           foliageDensity: 1,
           effectsQuality: 1,

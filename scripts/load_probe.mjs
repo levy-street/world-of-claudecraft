@@ -437,6 +437,7 @@ function installProbeHooks(presetValue) {
       const key = 'woc_settings';
       const current = JSON.parse(localStorage.getItem(key) ?? '{}');
       current.graphicsPreset = presetValue;
+      current.graphicsDefaultApplied = true;
       localStorage.setItem(key, JSON.stringify(current));
     } catch {
       // Storage unavailable: the ?gfx tier override still applies.

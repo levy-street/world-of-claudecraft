@@ -32,7 +32,7 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 // Standing capture rule: seed the LOWEST graphics preset before boot.
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
   } catch {
     /* ignore */
   }

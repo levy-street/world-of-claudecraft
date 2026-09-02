@@ -168,6 +168,7 @@ const SETTINGS_SEED = () => {
     'woc_settings',
     JSON.stringify({
       graphicsPreset: 5,
+      graphicsDefaultApplied: true,
       terrainDetail: 1,
       foliageDensity: 1,
       effectsQuality: 1,

@@ -33,7 +33,13 @@ await page.evaluateOnNewDocument(() => {
   try {
     localStorage.setItem(
       'woc_settings',
-      JSON.stringify({ graphicsPreset: 5, terrainDetail: 1, effectsQuality: 1, shadowQuality: 1 }),
+      JSON.stringify({
+        graphicsPreset: 5,
+        graphicsDefaultApplied: true,
+        terrainDetail: 1,
+        effectsQuality: 1,
+        shadowQuality: 1,
+      }),
     );
   } catch {
     /* ignore */

@@ -33,7 +33,7 @@ const page = await browser.newPage();
 // crowd knee collapses farAnimRangeScale to exactly 1 at 48+ visible rigs
 // regardless of tier, so this repro reproduces identically at any preset.
 await page.evaluateOnNewDocument(() => {
-  localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1 }));
+  localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
 });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 30000 });
