@@ -13158,6 +13158,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': '聊天視窗讀起來的樣子。重設聊天視窗本身的按鈕也在這裡。',
   'guide.settingsPage.ifChatOpacity': '聊天背景有多不透明。',
   'guide.settingsPage.ifChatTimestamps': '替每一行聊天加上時間，可選 12 小時制或 24 小時制。',
+  'guide.settingsPage.ifFilterProfanity': '用星號遮住聊天中的髒話。預設開啟；如果你想不加過濾地閱讀聊天，可以在這裡關閉。',
   'guide.settingsPage.ifCombatIntro': '你的動作列如何運作，以及戰鬥會在畫面上放些什麼。',
   'guide.settingsPage.ifCompactChat': '收緊聊天行距，讓畫面裝得下更多行。',
   'guide.settingsPage.ifDailyChest': '每日獎勵寶箱是否留在你的 HUD 上。',

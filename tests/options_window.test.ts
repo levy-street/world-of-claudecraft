@@ -863,13 +863,14 @@ describe('options_window: off-menu reset keys are pinned per tab', () => {
 });
 
 // Key Bindings' Reset to Defaults used to reset only the rebindable key-code
-// map (Keybinds.reset()), silently leaving the seven GameSettings toggles the
+// map (Keybinds.reset()), silently leaving the six GameSettings toggles the
 // same panel renders (mouse camera, click-to-move + its mouse button, attack
-// move, left-handed touch, profanity filter) untouched.
+// move, left-handed touch) untouched. The profanity filter moved to Interface >
+// Chat, so it is deliberately NOT in this list any more.
 describe('options_window: Key Bindings Reset to Defaults also resets its own toggles', () => {
-  it('names the same seven setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
+  it('names the same six setting keys the panel renders via settingToggleKeybind/clickMoveMouseButtonRow', () => {
     expect(painter).toContain(
-      "const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [\n  'mouseCamera',\n  'lockCursorOnRotate',\n  'clickToMove',\n  'clickToMoveButton',\n  'attackMove',\n  'leftHandedTouch',\n  'filterProfanity',\n];",
+      "const KEYBIND_PANEL_SETTING_KEYS: (keyof GameSettings)[] = [\n  'mouseCamera',\n  'lockCursorOnRotate',\n  'clickToMove',\n  'clickToMoveButton',\n  'attackMove',\n  'leftHandedTouch',\n];",
     );
   });
 

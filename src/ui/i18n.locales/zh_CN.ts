@@ -13154,6 +13154,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': '聊天窗口读起来是什么样。聊天窗口本身的重置也放在这里。',
   'guide.settingsPage.ifChatOpacity': '聊天背景有多实。',
   'guide.settingsPage.ifChatTimestamps': '为每一行聊天加上时间，可选 12 小时制或 24 小时制。',
+  'guide.settingsPage.ifFilterProfanity': '用星号遮住聊天中的脏话。默认开启；如果你想不加过滤地阅读聊天，可以在这里关闭。',
   'guide.settingsPage.ifCombatIntro': '你的技能栏如何表现，以及战斗会在屏幕上放些什么。',
   'guide.settingsPage.ifCompactChat': '收紧聊天行距，让一屏能装下更多内容。',
   'guide.settingsPage.ifDailyChest': '每日奖励宝箱是否显示在你的 HUD 上。',

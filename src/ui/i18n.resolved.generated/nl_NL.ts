@@ -5187,6 +5187,7 @@ export const nl_NL: EnTranslations = {
       "ifChatOpacity": "Hoe dekkend de achtergrond van de chat is.",
       "ifCompactChat": "Maakt de chatregels compacter zodat er meer op het scherm passen.",
       "ifChatTimestamps": "Voegt een tijd toe aan elke chatregel, in 12-uurs of 24-uurs vorm.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Of het gebruiken van een vaardigheid ook je auto-aanval start. Standaard aan, en het klassieke gedrag dat de meeste spelers verwachten.",
       "ifStopAutoAttack": "Of het wisselen van doelwit je aanval stopt. Standaard uit, zodat je aanval overgaat op het nieuwe doelwit.",
       "ifShowAttackButton": "Zet een expliciete knop Aanvallen op je actiebalk.",

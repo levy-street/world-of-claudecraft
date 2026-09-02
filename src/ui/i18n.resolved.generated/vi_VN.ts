@@ -5187,6 +5187,7 @@ export const vi_VN: EnTranslations = {
       "ifChatOpacity": "Nền khung chat đặc đến mức nào.",
       "ifCompactChat": "Thu gọn các dòng chat để hiển thị được nhiều dòng hơn.",
       "ifChatTimestamps": "Thêm giờ vào mỗi dòng chat, theo định dạng 12 giờ hoặc 24 giờ.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Việc dùng một kỹ năng có tự động bắt đầu tự đánh hay không. Mặc định bật, và đây là hành vi cổ điển mà hầu hết người chơi mong đợi.",
       "ifStopAutoAttack": "Việc đổi mục tiêu có dừng đòn tự đánh của bạn hay không. Mặc định tắt, nên đòn tấn công của bạn tiếp tục chuyển sang mục tiêu mới.",
       "ifShowAttackButton": "Đặt hẳn một nút Tấn Công lên thanh hành động của bạn.",

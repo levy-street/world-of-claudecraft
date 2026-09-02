@@ -5187,6 +5187,7 @@ export const pt_BR: EnTranslations = {
       "ifChatOpacity": "O quão sólido é o fundo do chat.",
       "ifCompactChat": "Aperta as linhas do chat para caber mais delas na tela.",
       "ifChatTimestamps": "Adiciona um horário a cada linha do chat, no formato de 12 ou 24 horas.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Se usar uma habilidade também inicia seu ataque automático. Ativado por padrão, e o comportamento clássico que a maioria dos jogadores espera.",
       "ifStopAutoAttack": "Se trocar de alvo interrompe seu golpe. Desativado por padrão, então seu ataque continua no novo alvo.",
       "ifShowAttackButton": "Coloca um botão explícito de Ataque na sua barra de ação.",

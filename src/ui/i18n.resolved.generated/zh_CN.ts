@@ -5187,6 +5187,7 @@ export const zh_CN: EnTranslations = {
       "ifChatOpacity": "聊天背景有多实。",
       "ifCompactChat": "收紧聊天行距，让一屏能装下更多内容。",
       "ifChatTimestamps": "为每一行聊天加上时间，可选 12 小时制或 24 小时制。",
+      "ifFilterProfanity": "用星号遮住聊天中的脏话。默认开启；如果你想不加过滤地阅读聊天，可以在这里关闭。",
       "ifStartAttack": "使用技能时是否同时开始自动攻击。默认开启，也是大多数玩家熟悉的经典行为。",
       "ifStopAutoAttack": "切换目标时是否停下你的挥击。默认关闭，因此你的攻击会延续到新目标身上。",
       "ifShowAttackButton": "在你的动作条上放一个明确的“攻击”按钮。",

@@ -5187,6 +5187,7 @@ export const id_ID: EnTranslations = {
       "ifChatOpacity": "Seberapa pekat latar belakang obrolan.",
       "ifCompactChat": "Merapatkan baris obrolan agar lebih banyak yang muat.",
       "ifChatTimestamps": "Menambahkan waktu pada setiap baris obrolan, dalam format 12 jam atau 24 jam.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Apakah memakai sebuah kemampuan juga memulai serangan otomatis Anda. Aktif secara bawaan, dan inilah perilaku klasik yang diharapkan sebagian besar pemain.",
       "ifStopAutoAttack": "Apakah berganti sasaran menghentikan ayunan Anda. Nonaktif secara bawaan, sehingga serangan Anda berlanjut ke sasaran yang baru.",
       "ifShowAttackButton": "Menampilkan tombol Serang secara eksplisit pada bilah aksi Anda.",

@@ -13531,6 +13531,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': '채팅 창이 어떻게 읽히는지를 다룹니다. 채팅 창 자체를 처음 상태로 되돌리는 초기화도 여기에 있습니다.',
   'guide.settingsPage.ifChatOpacity': '채팅 배경이 얼마나 불투명한지 정합니다.',
   'guide.settingsPage.ifChatTimestamps': '채팅 줄마다 시각을 붙입니다. 12시간제와 24시간제 중에서 고를 수 있습니다.',
+  'guide.settingsPage.ifFilterProfanity': '채팅의 비속어를 별표로 가립니다. 기본적으로 켜져 있으며, 필터 없이 채팅을 읽고 싶다면 여기서 끌 수 있습니다.',
   'guide.settingsPage.ifCombatIntro': '단축바가 어떻게 동작하고 전투가 화면에 무엇을 띄우는지를 다룹니다.',
   'guide.settingsPage.ifCompactChat': '채팅 줄 간격을 좁혀 더 많은 줄이 들어가게 합니다.',
   'guide.settingsPage.ifDailyChest': '일일 보상 상자를 HUD에 둘지 정합니다.',

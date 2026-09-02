@@ -5187,6 +5187,7 @@ export const tr_TR: EnTranslations = {
       "ifChatOpacity": "Sohbet arka planının ne kadar dolgun olduğu.",
       "ifCompactChat": "Sohbet satırlarını sıkılaştırarak daha fazlasının sığmasını sağlar.",
       "ifChatTimestamps": "Her sohbet satırına 12 saatlik ya da 24 saatlik biçimde bir zaman ekler.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Bir yetenek kullanmanın otomatik saldırınızı da başlatıp başlatmayacağı. Varsayılan olarak açıktır ve çoğu oyuncunun beklediği klasik davranıştır.",
       "ifStopAutoAttack": "Hedef değiştirmenin savuruşunuzu durdurup durdurmayacağı. Varsayılan olarak kapalıdır, bu yüzden saldırınız yeni hedefe taşınır.",
       "ifShowAttackButton": "Eylem çubuğuna belirgin bir Saldır düğmesi ekler.",

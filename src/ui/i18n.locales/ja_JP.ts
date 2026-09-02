@@ -13542,6 +13542,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': 'チャットウィンドウの読みやすさに関する設定です。チャットウィンドウそのものをリセットする項目もここにあります。',
   'guide.settingsPage.ifChatOpacity': 'チャット背景の濃さです。',
   'guide.settingsPage.ifChatTimestamps': 'チャットの各行に時刻を添えます。12時間表記と24時間表記を選べます。',
+  'guide.settingsPage.ifFilterProfanity': 'チャット内の暴言をアスタリスクで伏せ字にします。初期状態ではオンです。フィルターなしでチャットを読みたい場合は、ここでオフにしてください。',
   'guide.settingsPage.ifCombatIntro': 'バーの挙動と、戦闘中に画面へ出るものの設定です。',
   'guide.settingsPage.ifCompactChat': 'チャットの行間を詰めて、より多くの行を表示します。',
   'guide.settingsPage.ifDailyChest': 'デイリー報酬の宝箱をHUDに置くかどうかです。',

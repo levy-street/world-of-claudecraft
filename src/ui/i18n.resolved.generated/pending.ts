@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "es_ES": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "fr_FR": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "fr_CA": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "de_DE": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "nl_NL": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "pl_PL": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "id_ID": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "tr_TR": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "sv_SE": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "vi_VN": [
+    "guide.settingsPage.ifFilterProfanity"
+  ],
+  "da_DK": [
+    "guide.settingsPage.ifFilterProfanity"
+  ]
 };

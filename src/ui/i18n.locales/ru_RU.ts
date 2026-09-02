@@ -13777,6 +13777,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'guide.settingsPage.ifChatIntro': 'Как читается окно чата. Здесь же лежит сброс самих окон чата.',
   'guide.settingsPage.ifChatOpacity': 'Насколько плотный фон у чата.',
   'guide.settingsPage.ifChatTimestamps': 'Добавляет к каждой строке чата время, в 12-часовом или 24-часовом виде.',
+  'guide.settingsPage.ifFilterProfanity': 'Скрывает нецензурные слова в чате звёздочками. Включено по умолчанию; отключите здесь, если хотите читать чат без фильтра.',
   'guide.settingsPage.ifCombatIntro': 'Как ведут себя ваши панели и что бой выводит на экран.',
   'guide.settingsPage.ifCompactChat': 'Уплотняет строки чата, чтобы их помещалось больше.',
   'guide.settingsPage.ifDailyChest': 'Стоит ли на вашем интерфейсе сундук ежедневных наград.',

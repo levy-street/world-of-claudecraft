@@ -5187,6 +5187,7 @@ export const sv_SE: EnTranslations = {
       "ifChatOpacity": "Hur solid chattens bakgrund är.",
       "ifCompactChat": "Gör chattraderna tätare så att fler ryms.",
       "ifChatTimestamps": "Lägger till en tid på varje chattrad, i 12- eller 24-timmarsformat.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Om det att använda en förmåga även startar ditt automatiska anfall. Aktiverat som standard, och det klassiska beteendet de flesta spelare förväntar sig.",
       "ifStopAutoAttack": "Om målbyte stoppar ditt anfall. Avstängt som standard, så ditt anfall fortsätter över till det nya målet.",
       "ifShowAttackButton": "Lägger en tydlig Anfall-knapp på ditt handlingsfält.",

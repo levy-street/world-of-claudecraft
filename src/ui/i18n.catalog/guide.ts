@@ -578,6 +578,8 @@ export const guideStrings = {
     ifChatOpacity: 'How solid the chat background is.',
     ifCompactChat: 'Tightens the chat lines so more of them fit.',
     ifChatTimestamps: 'Adds a time to each chat line, in 12-hour or 24-hour form.',
+    ifFilterProfanity:
+      'Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.',
     ifStartAttack:
       'Whether using an ability also starts your auto-attack. On by default, and the classic behavior most players expect.',
     ifStopAutoAttack:
@@ -597,7 +599,7 @@ export const guideStrings = {
     // The Key Bindings panel: what lives there besides the key list.
     keybindsHeading: 'The Key Bindings panel',
     keybindsBody:
-      'The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, the left-handed touch layout, and the profanity filter for chat.',
+      'The key list is only half of that panel. Above it sit the switches that decide how your mouse drives the game: mouse camera, whether the cursor locks while you rotate, click to move and which mouse button triggers it, attack move, and the left-handed touch layout.',
     keybindsMouseBody:
       'Two things there are easy to miss. Mouse buttons bind like keys, so the wheel click and the thumb buttons can carry abilities, while left and right click stay reserved for the camera and for clicking on the world. And you can bind straight from the action bar: turn on the on-bar binding mode here, then click a slot and press the key you want.',
   },

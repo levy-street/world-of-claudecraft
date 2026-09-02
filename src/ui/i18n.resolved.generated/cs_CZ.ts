@@ -5187,6 +5187,7 @@ export const cs_CZ: EnTranslations = {
       "ifChatOpacity": "Jak neprůhledné je pozadí chatu.",
       "ifCompactChat": "Zhustí řádky chatu, aby se jich vešlo víc.",
       "ifChatTimestamps": "Přidá ke každému řádku chatu čas, ve 12hodinovém nebo 24hodinovém formátu.",
+      "ifFilterProfanity": "Masks profanity in chat with asterisks. On by default; switch it off here if you would rather read chat unfiltered.",
       "ifStartAttack": "Zda použití schopnosti spustí i tvůj automatický útok. Ve výchozím stavu zapnuto, klasické chování, které většina hráčů čeká.",
       "ifStopAutoAttack": "Zda přepnutí cíle zastaví tvůj úder. Ve výchozím stavu vypnuto, takže tvůj útok přejde na nový cíl.",
       "ifShowAttackButton": "Přidá na tvou akční lištu výslovné tlačítko Útok.",
