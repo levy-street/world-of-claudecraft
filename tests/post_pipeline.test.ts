@@ -85,7 +85,7 @@ describe('live post pipeline', () => {
       // The ability-VFX screen-fx pass (ripple / flash) sits between the grade
       // and the tail SMAA, so SMAA keeps anti-aliasing the final image.
       'ShaderPass',
-      'SMAAPass',
+      'ByteTargetSMAAPass',
     ]);
     expect(post.grade.fxaa).toBe(false);
     expect(post.composer.renderTarget1).not.toBe(post.composer.renderTarget2);
@@ -254,6 +254,28 @@ describe('live post pipeline', () => {
 
     expect(post.grade.fxaa).toBe(false);
     expect(post.supportsDynamicResolution).toBe(true);
+  });
+
+  it('gives SMAA 8-bit edges and weights, the reference storage', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { smaaIntermediateTargets } = await import('../src/render/post_smaa');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    const smaa = post.composer.passes.at(-1) as unknown as Parameters<
+      typeof smaaIntermediateTargets
+    >[0];
+    const targets = smaaIntermediateTargets(smaa);
+    expect(targets).toHaveLength(2);
+    // Both are [0,1] masks the reference implementation stores 8-bit; three
+    // ships them HalfFloat, which is twice the bytes for precision no shader
+    // in the SMAA chain reads.
+    for (const target of targets) expect(target.texture.type).toBe(THREE.UnsignedByteType);
   });
 
   it('keeps ultra AO full-res at 1080p and drops it to half-res at 4K', async () => {

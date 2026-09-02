@@ -2,7 +2,6 @@ import type { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
@@ -12,6 +11,7 @@ import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
 import { resolveAoFullRes } from './post_pixel_budget_core';
 import { postPipelinePlan } from './post_plan_core';
+import { ByteTargetSMAAPass } from './post_smaa';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: N8AO (high: half-res Low; ultra+insane: full-res Medium while the
@@ -274,7 +274,7 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass());
+  if (plan.composerPasses.includes('smaa')) composer.addPass(new ByteTargetSMAAPass());
 
   return {
     composer,

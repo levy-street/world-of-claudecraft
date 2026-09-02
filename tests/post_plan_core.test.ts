@@ -107,8 +107,8 @@ describe('post pipeline plan', () => {
       { id: 'bloom-v-3', scale: 0.0625, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-h-4', scale: 0.03125, format: 'rgba16f', samples: 0, depth: 'none' },
       { id: 'bloom-v-4', scale: 0.03125, format: 'rgba16f', samples: 0, depth: 'none' },
-      { id: 'smaa-edges', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
-      { id: 'smaa-weights', scale: 1, format: 'rgba16f', samples: 0, depth: 'none' },
+      { id: 'smaa-edges', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
+      { id: 'smaa-weights', scale: 1, format: 'rgba8', samples: 0, depth: 'none' },
     ];
 
     expect(plan.renderTargets).toEqual(expected);
