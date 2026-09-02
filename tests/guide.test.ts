@@ -2829,9 +2829,10 @@ describe('Guide professions gathering accuracy', () => {
 
   it('the shared tools note is TRUE of farming, not only of the node trades', () => {
     // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added at the masterwrought
-    // Phase 11j QA. professions_gathering.ts renders toolsNoteFourStarters
-    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161, and once more
-    // at its review round for a false starter count) above
+    // Phase 11j QA. professions_gathering.ts renders toolsNoteFishingPageMarks
+    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161, once more at its
+    // review round for a false starter count, and a third time for a
+    // cross-page 'table below' phrase) above
     // the tool table on EVERY gathering page, farming included, and the note
     // described the node trades as if they were all of them. On the farming
     // page it sat directly above a table showing five hoe rungs while saying
@@ -2845,7 +2846,7 @@ describe('Guide professions gathering accuracy', () => {
     // Phase 11g arm above records: an anchor the old wording also carried lets
     // a revert stay green. Apostrophe-free, since the page escapes to &#39;.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteFourStarters', {
+    const en = t('guide.profPages.toolsNoteFishingPageMarks', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -2905,6 +2906,12 @@ describe('Guide professions gathering accuracy', () => {
     const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
     expect(COUNT_WORDS[fenced.length], 'a count word for the fenced set').toBeDefined();
     expect(en).toContain(`except the ${COUNT_WORDS[fenced.length]} ${price}-copper land starters`);
+    // THE SIXTH CLAUSE (the round-two fresh read): the note renders on every
+    // gathering page, so a 'below' that only the fishing page can honour is a
+    // false sentence on four of the five; the rods' Marks prices live on the
+    // fishing page's own table and the note must say so.
+    expect(en).toContain("the fishing page's tool table carries their Marks prices");
+    expect(en, 'no cross-page below').not.toContain('fishing table below');
     for (const tool of fenced) expect(en, `names ${tool.id}`).toContain(tool.name);
     // The retired claims, each pinned ABSENT so a revert reds rather than
     // quietly restoring a false page.
@@ -2944,7 +2951,7 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteFourStarters', {
+    const en = t('guide.profPages.toolsNoteFishingPageMarks', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -3008,8 +3015,8 @@ describe('Guide professions gathering accuracy', () => {
       expect(source.match(/toolsNote/g)?.length, `${file} carries exactly one toolsNote row`).toBe(
         1,
       );
-      const at = source.indexOf('"toolsNoteFourStarters"');
-      expect(at, `${file} carries toolsNoteFourStarters`).toBeGreaterThan(-1);
+      const at = source.indexOf('"toolsNoteFishingPageMarks"');
+      expect(at, `${file} carries toolsNoteFishingPageMarks`).toBeGreaterThan(-1);
       // Bounded by the value's own line, not a magic width: a window wider
       // than the longest translation reaches into following keys, and the
       // direction of that looseness is a FALSE PASS.
@@ -4425,7 +4432,7 @@ describe('Guide professions pages and routes', () => {
     // still says TRUTHFULLY about the LAND trades, whose tier 4 and 5 tools
     // really do open no ground. The assertion fired on a true sentence, which is
     // what absence pins do: they cannot tell which subject a phrase is about.
-    const tools = prose('guide.profPages.toolsNoteFourStarters', {
+    const tools = prose('guide.profPages.toolsNoteFishingPageMarks', {
       tier2Prof: '40',
       tier3Prof: '70',
     });

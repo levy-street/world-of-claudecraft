@@ -5736,7 +5736,7 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-deploy-wi
   not a rule of the flask, and the classic idiom keeps affix interactions in the mob's own surfaces.
   The behavior is pinned where it matters: devourBeneficialAura in src/sim/mob/mob_swing.ts (the
   findIndex(isDevourableAura) site), 'still devours a flask aura: the STK-2 ruling covers player
-  counters only (recorded exception)' in tests/mob_purge.test.ts, the second devour assertion in
+  counters only (recorded exception)' in tests/mob_purge.test.ts, the devour assertion in
   tests/lifesap_adversarial.test.ts, and the Aura.undispellable docblock of src/sim/types.ts. The
   reword arm's price, stated in this phase's own shape: a reword is a retire-and-re-key (a
   RETIRED_KEYS row, a successor key, five non-Latin fills in-change, the Latin rows to the release
@@ -13138,7 +13138,7 @@ is RETIRED AND RE-KEYED, the 11i mechanism. guide.profPages.toolsNoteThreeRods i
 'publishes the tool-gate thresholds through placeholders in EVERY locale', reads the first
 'toolsNote' row of each resolved slice, so a kept old key would have been the row it read) and
 its successor guide.profPages.toolsNoteFiveLadders (itself re-keyed at the review round to
-toolsNoteFourStarters, the AMENDED block below) carries the same English; the five non-Latin
+toolsNoteFourStarters and then to toolsNoteFishingPageMarks, the AMENDED block below) carries the same English; the five non-Latin
 overlay rows are REPLACED by fresh full translations of the current note in the same change
 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill conventions and
 flagged for the maintainer's read in phase-19f-qa.md), and the Latin locales' rows (15 today, every
@@ -13160,7 +13160,11 @@ the delve name in each locale's shipped casing), the three pins re-pointed, a fo
 added to 'the shared tools note is TRUE of farming, not only of the node trades' that derives the
 fenced-starter count from ITEMS, and the every-locale placeholder pin now reads the exact key and
 asserts exactly one toolsNote row per slice. The a60aa9a4d7 shape claim above stays true of both
-re-keys.
+re-keys. RE-KEYED A THIRD TIME 2026-09-02 at the fresh read of the same round: the note renders
+on five gathering pages and said 'the fishing table below carries their Marks prices', true on the fishing
+page alone; the successor guide.profPages.toolsNoteFishingPageMarks says 'the fishing page's tool table',
+the five fills carry the same phrase (the only edit to them), toolsNoteFourStarters was deleted outright,
+and a clause arm pins the phrase.
 Phase 19F; the render site src/guide/pages/professions_gathering.ts re-points, nothing else moves.
 
 **FOUR RECORDS THIS PHASE LEFT WRONG.** The ledger's BEFORE-column
@@ -13790,7 +13794,7 @@ Unchanged and NOT re-decided here: the three inherited (scroll/elixir 15c
 parity, RULE 2's value-half reading, the inherited stale-client window), 11h's
 two deviations, 11i's session cap 15 s to 16 s (whose forcing arithmetic this
 audit re-derived and confirms: 160 + 140 + 1 = 301 against 300), and
-`prog_first_harvest` taking 13 catches for a fishing-only character. (RULED qr-19-prog-first-harvest-thirteen-catches, 2026-09-02: ratified as shipped; the record
+`prog_first_harvest` taking 13 catches for a fishing-only character. (RULED qr-19-prog-first-harvest-thirteen-catches, 2026-09-02: ratified as shipped; the full record
 sits under '### ONE MORE FOR THE MAINTAINER, raised by the review rather than by the phase'.)
 
 (8) **THE CAPSTONE FEAST IS UNREACHABLE.** FIX or CUT, both costed above. This
@@ -20410,8 +20414,8 @@ were already English (tr_TR carried no row at the retire tip: its Turkish row wa
 6e93deadc1, the other-game coin strip). The trade is a
 count-wrong translation for correct English, taken deliberately. Two corrections to the
 ratification's own text: the hoe ladder is documented in
-the gathering pages' tools note (guide.profPages.toolsNoteFourStarters since the review round's
-second re-key), the guide has no farming page; and identityBody already names both on-ramp recipes (the Cogwheel Blank and the Copperlens
+the gathering pages' tools note (guide.profPages.toolsNoteFishingPageMarks since the review round's
+third re-key), the guide has no farming page; and identityBody already names both on-ramp recipes (the Cogwheel Blank and the Copperlens
 Ocular), so the altitude call was about the bills, never the recipes.
 note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
 placement note; the amendment-dating shortfall (corrected by this

@@ -31,7 +31,9 @@ npm run i18n:worklist   # writes one batch per language under docs/i18n-scaling/
   sim row with no fill in a locale's block is `pending` and lands in that locale's
   batch. Fill a sim key in the locale's `BASE_DICT` block of `src/ui/sim_i18n.ts` (the
   eight newest locales keep theirs in `BASE_NEW` of `src/ui/sim_i18n.newlocales.ts`, a
-  hand-maintained file despite its old banner), and NEVER paste the English into a
+  hand-maintained file despite its old banner; each of those locales' own block in
+  `sim_i18n.ts` spreads `BASE_NEW` FIRST and then its literal rows, so a row spelled in both
+  is read from the block, and the registry's row-count anchor reds on the duplicate), and NEVER paste the English into a
   locale block: a copied row reads `translated` and ships English (the sim scope has no
   copied-English guard; only `tests/localization_fixes.test.ts`'s release-tier
   `s3_localized` arm sees it late). Run `npm run i18n:gen` before the suites: the
