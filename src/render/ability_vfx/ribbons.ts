@@ -290,7 +290,12 @@ export class AbilityVfxRibbons {
         void main() {
           vec4 base = texture2D(uMap, vUv);
           float flow = 0.6 + 0.9 * texture2D(uNoise, vec2(vUv.x * 1.1 - uTime * 1.8, vUv.y * 0.4)).r;
-          gl_FragColor = vec4(vColor * flow, base.a * min(flow, 1.1));
+          float a = base.a * min(flow, 1.1);
+          // The strip cross-section fades to nothing at both edges: early-out
+          // below the additive floor rather than blend a transparent fragment
+          // the bloom re-reads (../vfx.ts / overlay_sprites.ts idiom).
+          if (a < 0.004) discard;
+          gl_FragColor = vec4(vColor * flow, a);
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

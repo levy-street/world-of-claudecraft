@@ -129,8 +129,13 @@ export class GroundAuras {
           float cs = cos(uSpin), sn = sin(uSpin);
           vec2 ruv = vec2(c.x * cs - c.y * sn, c.x * sn + c.y * cs) + 0.5;
           float n = texture2D(uNoise, ruv * 1.6).r;
+          float a = band * uOpacity * (0.7 + 0.6 * n);
+          // An annulus is mostly hole: early-out below the additive floor
+          // rather than blend a transparent fragment the bloom re-reads
+          // (../vfx.ts / overlay_sprites.ts idiom, depth writes already off).
+          if (a < 0.004) discard;
           vec3 col = uColor * (1.2 + 0.8 * n);
-          gl_FragColor = vec4(col, band * uOpacity * (0.7 + 0.6 * n));
+          gl_FragColor = vec4(col, a);
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

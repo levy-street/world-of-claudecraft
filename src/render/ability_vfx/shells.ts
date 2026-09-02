@@ -60,9 +60,14 @@ export class BuffShells {
           // an ulp, so the base goes negative and pow() returns NaN. One NaN
           // pixel spreads into a hard-edged black rectangle through the bloom.
           float fres = pow(max(0.0, 1.0 - abs(dot(normalize(vNormal), normalize(vView)))), 2.2);
+          float a = uOpacity * (0.12 + 0.88 * fres);
+          // A fresnel shell is nearly transparent where it faces the camera,
+          // which is most of its area: early-out below the additive floor
+          // (../vfx.ts / overlay_sprites.ts idiom, depth writes already off).
+          if (a < 0.004) discard;
           float pulse = 0.85 + 0.15 * sin(uTime * 5.0);
           vec3 col = uColor * (0.25 + 1.9 * fres) * pulse;
-          gl_FragColor = vec4(col, uOpacity * (0.12 + 0.88 * fres));
+          gl_FragColor = vec4(col, a);
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

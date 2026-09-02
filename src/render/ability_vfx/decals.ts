@@ -101,8 +101,13 @@ export class GroundDecals {
           float body = tex.a * smoothstep(uDissolve, uDissolve + 0.14, n);
           float edge = (smoothstep(uDissolve - 0.02, uDissolve + 0.04, n)
             - smoothstep(uDissolve + 0.08, uDissolve + 0.16, n)) * tex.a;
+          float a = clamp(body + edge, 0.0, 1.0);
+          // A dissolving mark is mostly cut away: early-out below the additive
+          // floor rather than blend a transparent fragment the bloom re-reads
+          // (../vfx.ts / overlay_sprites.ts idiom, depth writes already off).
+          if (a < 0.004) discard;
           vec3 col = tex.rgb * uColor * uHdr + vec3(0.92, 0.95, 1.0) * edge * uHdr * 2.0;
-          gl_FragColor = vec4(col, clamp(body + edge, 0.0, 1.0));
+          gl_FragColor = vec4(col, a);
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

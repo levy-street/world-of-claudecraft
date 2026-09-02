@@ -88,8 +88,14 @@ export class ShockRings {
           // readable through the back half of its life (the front-loaded
           // easeOutQuart otherwise kills the band visually by ~40% age).
           float fade = pow(1.0 - uProgress, 1.05);
+          float a = band * fade;
+          // The lit band is ~0.16 of the quad's radius, so most of a ring's
+          // fill is zero-contribution alpha the composer bloom then re-reads.
+          // Early-out below the additive floor (../vfx.ts / overlay_sprites.ts
+          // idiom); depth writes are already off, so nothing depends on it.
+          if (a < 0.004) discard;
           vec3 col = uColor * uIntensity * (0.6 + 1.6 * band);
-          gl_FragColor = vec4(col * band * fade, band * fade);
+          gl_FragColor = vec4(col * a, a);
         }`,
       transparent: true,
       blending: THREE.AdditiveBlending,

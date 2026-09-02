@@ -26,6 +26,7 @@
 // is the whole point of the collections.
 import * as THREE from 'three';
 import { isSharedTexture, markSharedTexture } from './shared_resource';
+import { DEFAULT_WEAPON_POINT_MAX_PX, maxPointSizePx } from './vfx_screen_bounds_core';
 import {
   WEAPON_EMISSIVE_IDLE_CACHE_MAX,
   WeaponEmissiveDerivationCache,
@@ -2382,6 +2383,7 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
     uniforms: {
       uTime: { value: 0 },
       uScale: { value: 600 },
+      uMaxPx: { value: DEFAULT_WEAPON_POINT_MAX_PX },
       uMap: { value: starFlareTex() },
       uColorA: { value: new THREE.Color(c.colorA) },
       uColorB: { value: new THREE.Color(c.colorB) },
@@ -2392,7 +2394,7 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
       attribute float aTiltX; attribute float aTiltZ; attribute float aSize;
       attribute float aMix; attribute float aSeed; attribute float aBob;
       attribute float aEcc;
-      uniform float uTime; uniform float uScale;
+      uniform float uTime; uniform float uScale; uniform float uMaxPx;
       varying float vMix; varying float vTw;
       void main() {
         float a = aPhase + uTime * aSpeed;
@@ -2405,7 +2407,7 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
         vMix = aMix;
         vTw = 0.7 + 0.3 * sin(uTime * (1.5 + aSeed * 2.5) + aSeed * 40.0);
         vec4 mv = modelViewMatrix * vec4(position + p, 1.0);
-        gl_PointSize = aSize * uScale / max(0.15, -mv.z);
+        gl_PointSize = min(aSize * uScale / max(0.15, -mv.z), uMaxPx);
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: `
@@ -2462,6 +2464,7 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
     uniforms: {
       uTime: { value: 0 },
       uScale: { value: 600 },
+      uMaxPx: { value: DEFAULT_WEAPON_POINT_MAX_PX },
       uMap: { value: softDiscTex() },
       uColorA: { value: new THREE.Color(c.colorA) },
       uColorB: { value: new THREE.Color(c.colorB) },
@@ -2471,7 +2474,7 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
     vertexShader: `
       attribute vec3 aVel; attribute float aLife; attribute float aPhase;
       attribute float aSize; attribute float aSeed; attribute float aSwirl;
-      uniform float uTime; uniform float uScale; uniform float uGrow;
+      uniform float uTime; uniform float uScale; uniform float uGrow; uniform float uMaxPx;
       varying float vFade; varying float vSeed;
       void main() {
         float ft = fract(uTime / aLife + aPhase);
@@ -2483,7 +2486,7 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
         vSeed = aSeed;
         float size = aSize * (1.0 + uGrow * ft);
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
-        gl_PointSize = size * uScale / max(0.15, -mv.z);
+        gl_PointSize = min(size * uScale / max(0.15, -mv.z), uMaxPx);
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: `
@@ -2526,13 +2529,14 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
     uniforms: {
       uTime: { value: 0 },
       uScale: { value: 600 },
+      uMaxPx: { value: DEFAULT_WEAPON_POINT_MAX_PX },
       uMap: { value: c.star ? starFlareTex() : softDiscTex() },
       uColor: { value: new THREE.Color(c.color) },
       uOpacity: { value: 1 },
     },
     vertexShader: `
       attribute float aSeed; attribute float aSize; attribute float aRate;
-      uniform float uTime; uniform float uScale;
+      uniform float uTime; uniform float uScale; uniform float uMaxPx;
       varying float vI;
       void main() {
         // clamp() is load-bearing: GLSL leaves the precision of sin() to the
@@ -2542,7 +2546,7 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
         float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);
+        gl_PointSize = min(aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z), uMaxPx);
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: `
@@ -3088,8 +3092,15 @@ export function createWeaponVfx(
     setPixelScale(devicePxHeight: number) {
       // Device px per world unit at distance 1 for a 35-degree vertical fov.
       const s = (devicePxHeight * 0.5) / Math.tan((35 * Math.PI) / 360);
+      // gl_PointSize here divides by view depth, so it diverges as the weapon
+      // approaches the near plane: a sprite that would paint a quarter of the
+      // frame is pure additive fill the composer bloom then re-reads. The
+      // ceiling sits far above any ordinary camera distance
+      // (vfx_screen_bounds_core.ts), so it only trims that close-range case.
+      const maxPx = maxPointSizePx(devicePxHeight);
       for (const m of allMats) {
         if (m.uniforms?.uScale) m.uniforms.uScale.value = s;
+        if (m.uniforms?.uMaxPx) m.uniforms.uMaxPx.value = maxPx;
       }
     },
     update(dt: number) {
