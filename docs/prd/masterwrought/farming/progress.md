@@ -1648,9 +1648,9 @@ branch, unreachable under the standing NO-push rule, and its dependency
 D009+D170 has been escalated and unexecuted since Phase 19A, so the harvest
 could not be the LAST code-carrying change even if the run existed. The
 committed table at 6377bed8b0 (unchanged at the escalation commit) is 3650
-rows, 2938 harvested, 712 carried (302
-local-median under the reason 'phase 18 local carry pending the post-push
-harvest' plus 410 prose-backfill); the ready-to-run recipe and the two pins
+rows, 2938 harvested, 712 carried (302 local-median under the reason 'phase
+18 local carry pending the post-push harvest' plus 410 prose-backfill); the
+ready-to-run recipe and the two pins
 the harvest will red ('the identity is non-vacuous: real rows on both sides,
 and every carried row is a row' and 'an undeclared row, a mis-stated ms, and
 a fabricated fallback block each RED it', both in

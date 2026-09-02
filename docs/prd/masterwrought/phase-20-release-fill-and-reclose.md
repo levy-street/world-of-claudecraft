@@ -168,7 +168,8 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   ruling (D022):** its precondition is a green FULL-MODE CI run of a PUSHED branch, and its
   dependency D009+D170 is still escalated from 19A, so it could not be the last code-carrying
   change even with a run in hand. The ready-to-run recipe sits on the D168 row of
-  phase-19-new-rows.md and the 'CARRIED to Phase 20' block of docs/qa-gate.md stands as
-  written; nothing here is a fill item, recorded so the Phase 20 re-close does not read the
+  phase-19-new-rows.md; the 'CARRIED to Phase 20' block of docs/qa-gate.md stands until the
+  harvest commit replaces it (the recipe names the one step of the block to drop then, its
+  biome line); nothing here is a fill item, recorded so the Phase 20 re-close does not read the
   harvest as done and does not take the qa-gate block's 'before the packet's PR is called
   mergeable' as satisfied.
