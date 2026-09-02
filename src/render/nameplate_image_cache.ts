@@ -20,9 +20,19 @@ interface CachedImage {
 export class NameplateImageCache {
   private readonly entries = new Map<string, CachedImage>();
   private frame = 0;
+  private rev = 0;
 
   beginFrame(): void {
     this.frame++;
+  }
+
+  /** Monotonic stamp of every decode outcome (a badge, raid marker or emote
+   *  icon becoming drawable, or failing and later retrying). Image loads are
+   *  ASYNCHRONOUS: the plate state that names the url does not change when the
+   *  bytes land, so the surface's repaint gate needs this to know that an
+   *  otherwise identical frame would now draw a picture where it drew nothing. */
+  revision(): number {
+    return this.rev;
   }
 
   get(url: string): HTMLImageElement | null {
@@ -56,6 +66,7 @@ export class NameplateImageCache {
       if (this.entries.get(url) !== entry) return;
       entry.status = 'ready';
       entry.failures = 0;
+      this.rev++;
     });
     image.addEventListener('error', () => {
       if (this.entries.get(url) !== entry) return;
@@ -66,10 +77,14 @@ export class NameplateImageCache {
         NAMEPLATE_IMAGE_RETRY_BASE_FRAMES * 2 ** Math.min(5, entry.failures - 1),
       );
       entry.retryFrame = this.frame + delay;
+      this.rev++;
     });
     image.referrerPolicy = 'no-referrer';
     image.src = url;
-    if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
+    if (image.complete && image.naturalWidth > 0) {
+      entry.status = 'ready';
+      this.rev++;
+    }
     return entry;
   }
 

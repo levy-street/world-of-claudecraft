@@ -3,7 +3,6 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
-import { nameplatePixelRatio } from '../game/ui_tier_knobs';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -100,11 +99,14 @@ export interface NameplatePainterDeps {
   layer: HTMLElement;
   getViewport: () => { width: number; height: number };
   getDevicePixelRatio?: () => number;
-  /** The renderer's own effective pixel ratio (its pixelRatioCap times the live
-   *  render scale). The plate surface is bounded by it so a downscaled 3D frame
-   *  is never overlaid by a native-resolution text layer. Absent (the editor
-   *  viewport, a test host) means "no bound beyond the device ratio". */
-  getRenderPixelRatio?: () => number;
+  /** The backing-store pixel ratio the plate surface should size itself at,
+   *  already bounded by the renderer's own effective ratio so a downscaled 3D
+   *  frame is never overlaid by a native-resolution text layer. The renderer
+   *  resolves it through the pure knob module under src/game; this whole file
+   *  is on the deed-accent fairness path (tests/deed_border_accent.test.ts) and
+   *  so reads no quality knob of its own. Absent (the editor viewport, a test
+   *  host) means the device ratio. */
+  getSurfacePixelRatio?: () => number;
   showNameplates: () => boolean;
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
@@ -118,7 +120,7 @@ export class NameplatePainter {
   private readonly world: IWorld;
   private readonly getViewport: () => { width: number; height: number };
   private readonly getDevicePixelRatio: () => number;
-  private readonly getRenderPixelRatio: () => number;
+  private readonly getSurfacePixelRatio: () => number;
   private readonly showNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
@@ -165,7 +167,7 @@ export class NameplatePainter {
     this.getDevicePixelRatio =
       deps.getDevicePixelRatio ??
       (() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
-    this.getRenderPixelRatio = deps.getRenderPixelRatio ?? (() => Number.POSITIVE_INFINITY);
+    this.getSurfacePixelRatio = deps.getSurfacePixelRatio ?? this.getDevicePixelRatio;
     this.showNameplates = deps.showNameplates;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
@@ -280,10 +282,7 @@ export class NameplatePainter {
     // pixels, so the whole clear-and-repaint of this full-viewport surface is
     // skipped. Anything a player reads (a moved plate, HP, cast, selection,
     // threat, content, opacity) differs and paints on its own frame.
-    const surfacePixelRatio = nameplatePixelRatio(
-      this.getDevicePixelRatio(),
-      this.getRenderPixelRatio(),
-    );
+    const surfacePixelRatio = this.getSurfacePixelRatio();
     this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];

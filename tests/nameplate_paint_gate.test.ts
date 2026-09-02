@@ -6,6 +6,7 @@
 // that moves or changes must still paint on its own frame, and the layer must
 // come back the instant a plate does.
 
+import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
@@ -19,6 +20,10 @@ import {
   nameplateFullPassDue,
 } from '../src/render/nameplate_cadence_core';
 import {
+  NAMEPLATE_MAX_PIXEL_RATIO,
+  NAMEPLATE_MIN_PIXEL_RATIO,
+} from '../src/render/nameplate_canvas';
+import {
   NAMEPLATE_ANCHOR_EPSILON_PX,
   type NameplatePaintFields,
   NameplatePaintGate,
@@ -29,6 +34,10 @@ import type { Entity } from '../src/sim/types';
 import type { IWorld } from '../src/world_api';
 
 const VIEWPORT = { width: 1280, height: 720 };
+
+// happy-dom rewrites a LITERAL new URL('...', import.meta.url) into an http URL;
+// keeping the relative path in a variable leaves readFileSync a file URL.
+const readSource = (rel: string): string => readFileSync(new URL(rel, import.meta.url), 'utf8');
 
 function fields(overrides: Partial<NameplatePaintFields> = {}): NameplatePaintFields {
   return {
@@ -193,7 +202,41 @@ describe('nameplate paint gate core', () => {
   });
 });
 
+describe('the gate sees every field the surface draws', () => {
+  it('NameplatePaintFields covers every state.<field> the canvas reads', () => {
+    const canvas = readSource('../src/render/nameplate_canvas.ts');
+    const gate = readSource('../src/render/nameplate_paint_gate_core.ts');
+    const interfaceBody = gate.slice(
+      gate.indexOf('export interface NameplatePaintFields {'),
+      gate.indexOf('interface PlateRecord {'),
+    );
+    const compared = new Set(
+      [...interfaceBody.matchAll(/^\s+readonly (\w+)[?:]/gm)].map((m) => m[1]),
+    );
+    const drawn = new Set([...canvas.matchAll(/\bstate\.(\w+)/g)].map((m) => m[1]));
+    // Never drawn: `initialized` is the resolve latch, `castSource` is the raw
+    // ability id the localized castLabel is derived from.
+    drawn.delete('initialized');
+    drawn.delete('castSource');
+    expect(drawn.size).toBeGreaterThan(20);
+    const missing = [...drawn].filter((field) => !compared.has(field)).sort();
+    expect(
+      missing,
+      'a drawn plate field the repaint gate does not compare would be painted once and then frozen',
+    ).toEqual([]);
+  });
+});
+
 describe('nameplate surface pixel-ratio knob', () => {
+  it('agrees with the surface clamp it feeds', () => {
+    // The surface imports nothing from the knob module: the deed-accent
+    // fairness guard (tests/deed_border_accent.test.ts) forbids any
+    // quality-knob read on the plate-drawing path, so the two bounds are
+    // declared separately and pinned equal here instead.
+    expect(NAMEPLATE_PIXEL_RATIO_MAX).toBe(NAMEPLATE_MAX_PIXEL_RATIO);
+    expect(NAMEPLATE_PIXEL_RATIO_MIN).toBe(NAMEPLATE_MIN_PIXEL_RATIO);
+  });
+
   it('follows the renderer below the device ratio and never exceeds the historical cap', () => {
     // A native 1x panel is unchanged.
     expect(nameplatePixelRatio(1, 1)).toBe(1);
@@ -275,9 +318,21 @@ function fakeContext(): CanvasRenderingContext2D {
   } as unknown as CanvasRenderingContext2D;
 }
 
+// Every <img> the nameplate image cache mints. It never appends them to the
+// document, so this is the only handle a test has on a pending decode.
+let createdImages: HTMLImageElement[] = [];
+
 beforeEach(() => {
+  vi.restoreAllMocks();
+  createdImages = [];
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => fakeContext());
   vi.spyOn(HTMLCanvasElement.prototype, 'toDataURL').mockReturnValue('data:image/png;base64,raid');
+  const create = document.createElement.bind(document);
+  vi.spyOn(document, 'createElement').mockImplementation(((tag: string) => {
+    const element = create(tag);
+    if (tag === 'img') createdImages.push(element as HTMLImageElement);
+    return element;
+  }) as typeof document.createElement);
 });
 
 function entity(id: number, kind: Entity['kind'] = 'mob'): Entity {
@@ -310,6 +365,14 @@ function entity(id: number, kind: Entity['kind'] = 'mob'): Entity {
 }
 
 function harness(options: { devicePixelRatio?: number; renderPixelRatio?: number } = {}) {
+  // The renderer resolves the surface ratio through the pure knob and hands the
+  // painter the result; the painter reads no knob of its own (the deed-accent
+  // fairness path). This mirrors that wiring exactly.
+  const surfacePixelRatio = (): number =>
+    nameplatePixelRatio(
+      options.devicePixelRatio ?? 1,
+      options.renderPixelRatio ?? Number.POSITIVE_INFINITY,
+    );
   const player = entity(1, 'player');
   player.pos = { x: 0, y: 0, z: 3 } as Entity['pos'];
   const target = entity(7);
@@ -341,7 +404,7 @@ function harness(options: { devicePixelRatio?: number; renderPixelRatio?: number
     layer: document.createElement('div'),
     getViewport: () => viewport,
     getDevicePixelRatio: () => options.devicePixelRatio ?? 1,
-    getRenderPixelRatio: () => options.renderPixelRatio ?? Number.POSITIVE_INFINITY,
+    getSurfacePixelRatio: surfacePixelRatio,
     showNameplates: () => showNameplates,
     showDevBadges: () => true,
     showOwnNameplate: () => false,
@@ -420,6 +483,28 @@ describe('nameplate painter surface repaints', () => {
     painter.update(true);
     expect(canvas.hidden).toBe(false);
     expect(painter.paintStats().paints).toBe(afterHide.paints + 1);
+  });
+
+  it('repaints when a badge image finishes decoding, though no plate state moved', () => {
+    const { painter, target } = harness();
+    // A player plate carries badges; give this one a Discord avatar url, which
+    // resolves through the async image cache.
+    Object.assign(target, { kind: 'player', name: 'Raider', discordAvatar: '/avatar.webp' });
+    painter.update(true);
+    const settled = painter.paintStats().paints;
+    painter.update(false);
+    expect(painter.paintStats().paints).toBe(settled);
+
+    // The bytes land: the plate's url did not change, but the surface would now
+    // draw a picture where it drew nothing. The <img> is never in the document
+    // (the cache holds it), so it is captured at creation.
+    const image = createdImages.find((el) => el.src.endsWith('/avatar.webp'));
+    expect(image, 'the badge url should have started a decode').toBeDefined();
+    image?.dispatchEvent(new Event('load'));
+    painter.update(false);
+    expect(painter.paintStats().paints).toBe(settled + 1);
+    painter.update(false);
+    expect(painter.paintStats().paints).toBe(settled + 1);
   });
 
   it('sizes the backing store by the renderer ratio, not the device ratio', () => {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NumberSampleRing } from '../game/sample_ring';
-import { coerceFxTier, nameplateIntervalSec } from '../game/ui_tier_knobs';
+import { coerceFxTier, nameplateIntervalSec, nameplatePixelRatio } from '../game/ui_tier_knobs';
 import { supportHeightAt } from '../sim/colliders';
 import {
   emptyPriestMarkerState,
@@ -2148,10 +2148,13 @@ export class Renderer {
       world: this.sim,
       layer: this.nameplateLayer,
       getViewport: () => this.viewport,
-      // Bound the plate surface by the world's own effective ratio (see
-      // ui_tier_knobs.nameplatePixelRatio).
-      getRenderPixelRatio: () =>
-        Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale,
+      // The plate surface follows the world's own effective ratio, never the
+      // raw device one (ui_tier_knobs.nameplatePixelRatio).
+      getSurfacePixelRatio: () =>
+        nameplatePixelRatio(
+          window.devicePixelRatio,
+          Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale,
+        ),
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,

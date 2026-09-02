@@ -1,4 +1,3 @@
-import { NAMEPLATE_PIXEL_RATIO_MAX, NAMEPLATE_PIXEL_RATIO_MIN } from '../game/ui_tier_knobs';
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
@@ -116,6 +115,16 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
+// The surface's own defensive clamp on the backing-store ratio it is handed.
+// The POLICY that picks that ratio lives in the pure knob module under
+// src/game (nameplatePixelRatio, bounded by the renderer's effective ratio) and
+// is applied by nameplate_painter.ts; this file deliberately imports nothing
+// from there, because the deed-accent fairness guard
+// (tests/deed_border_accent.test.ts) requires every module on the plate-drawing
+// path to be free of quality-knob and governor reads. The two bounds are pinned
+// equal in tests/nameplate_paint_gate.test.ts.
+export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
+export const NAMEPLATE_MIN_PIXEL_RATIO = 1;
 // Nameplate labels scale their backing stores with DPR. The count remains a
 // secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
 // At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
@@ -302,9 +311,12 @@ export class NameplateCanvasSurface {
     }
   }
 
-  /** Monotonic stamp of everything that changes an unchanged plate's pixels. */
+  /** Monotonic stamp of everything that changes an unchanged plate's pixels:
+   *  the style changes above PLUS every image decode outcome, because a badge
+   *  or emote icon arrives asynchronously long after the state naming its url
+   *  stopped changing. Both counters only ever increase, so the sum does too. */
   styleRevision(): number {
-    return this.styleRev;
+    return this.styleRev + this.images.revision();
   }
 
   /** Drop the layer out of the compositor while nothing is drawn on it, and put
@@ -324,8 +336,8 @@ export class NameplateCanvasSurface {
 
   beginFrame(width: number, height: number, surfacePixelRatio: number): void {
     const pixelRatio = Math.max(
-      NAMEPLATE_PIXEL_RATIO_MIN,
-      Math.min(NAMEPLATE_PIXEL_RATIO_MAX, surfacePixelRatio || 1),
+      NAMEPLATE_MIN_PIXEL_RATIO,
+      Math.min(NAMEPLATE_MAX_PIXEL_RATIO, surfacePixelRatio || 1),
     );
     const backingWidth = Math.max(1, Math.ceil(width * pixelRatio));
     const backingHeight = Math.max(1, Math.ceil(height * pixelRatio));
