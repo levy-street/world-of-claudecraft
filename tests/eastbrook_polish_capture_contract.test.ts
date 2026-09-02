@@ -359,7 +359,7 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.42.0 release batch renderer merge: runtimeRender.renderer
 // moved with the shipped renderer tree. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e6134af376ab536c12e618c4ba19c758ba3c6259290ba3b7ef9934880567de3e';
+  'f1021ba495ff3cdd683c08ab11e0a53d22c85c0c33ac30b9365cb8711fab90de';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
