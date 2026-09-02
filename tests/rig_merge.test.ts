@@ -257,6 +257,50 @@ describe('rebakeGeometry', () => {
     expect(out.morphAttributes.position?.[0]?.getY(0)).toBeCloseTo(20, 5);
   });
 
+  it('takes a morph NORMAL delta through the normal matrix, un-normalized', () => {
+    // A morph normal is a DELTA, so its length is its own: normalizing it (the
+    // way the base normal attribute is) would rewrite every blend weight.
+    const bones = makeBones();
+    const part = makePart(bones, restInverses(bones), [0, 0, 0, 1, 0, 0, 0, 1, 0]);
+    part.geometry.morphTargetsRelative = true;
+    part.geometry.morphAttributes.position = [
+      new THREE.Float32BufferAttribute([0, 0, 0, 0, 0, 0, 0, 0, 0], 3),
+    ];
+    part.geometry.morphAttributes.normal = [
+      new THREE.Float32BufferAttribute([1, 0, 0, 0, 1, 0, 0, 0, 1], 3),
+    ];
+
+    const out = rebakeGeometry(part.geometry, new THREE.Matrix4().makeScale(2, 4, 8));
+
+    // normal matrix of a pure scale is the inverse transpose: 1/2, 1/4, 1/8
+    const normal = out.morphAttributes.normal?.[0];
+    expect(normal?.getX(0)).toBeCloseTo(0.5, 5);
+    expect(normal?.getY(1)).toBeCloseTo(0.25, 5);
+    expect(normal?.getZ(2)).toBeCloseTo(0.125, 5);
+  });
+
+  it('copies a morph COLOUR delta component-wise, geometry transforms untouched', () => {
+    const bones = makeBones();
+    const part = makePart(bones, restInverses(bones), [0, 0, 0, 1, 0, 0, 0, 1, 0]);
+    part.geometry.morphTargetsRelative = true;
+    part.geometry.morphAttributes.color = [
+      new THREE.Float32BufferAttribute(
+        [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1, 0.15, 0.25],
+        4,
+      ),
+    ];
+
+    const out = rebakeGeometry(part.geometry, new THREE.Matrix4().makeScale(2, 4, 8));
+
+    const color = out.morphAttributes.color?.[0];
+    expect(color?.itemSize).toBe(4);
+    expect(color?.getX(0)).toBeCloseTo(0.1, 6);
+    expect(color?.getY(0)).toBeCloseTo(0.2, 6);
+    expect(color?.getZ(0)).toBeCloseTo(0.3, 6);
+    expect(color?.getW(0)).toBeCloseTo(0.4, 6);
+    expect(color?.getX(2)).toBeCloseTo(0.9, 6);
+  });
+
   it('leaves a morph-free geometry morph-free', () => {
     // three defines USE_MORPHTARGETS on PRESENCE, so minting an empty list here
     // would relink every rebaked part against a program it does not need.
@@ -595,6 +639,56 @@ describe('mergeSkinnedParts', () => {
     });
 
     expect(countSkinned(root)).toBe(2);
+  });
+
+  it('refuses a bucket whose parts disagree on a morph kind item size', () => {
+    // mergeGeometries cannot reconcile a vec3 and a vec4 target list either;
+    // refusing here keeps the merge's own contract, one shape per output kind.
+    const bones = makeBones();
+    const inverses = restInverses(bones);
+    const material = new THREE.MeshBasicMaterial();
+    const root = new THREE.Object3D();
+    root.add(bones[0]);
+    const pos = [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7];
+    const rgb = makePart(bones, inverses, pos, material, {
+      tint: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    });
+    const rgba = makePart(bones, inverses, pos, material, {
+      tint: [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    });
+    rgb.geometry.morphAttributes.color = [new THREE.Float32BufferAttribute(new Float32Array(9), 3)];
+    rgba.geometry.morphAttributes.color = [
+      new THREE.Float32BufferAttribute(new Float32Array(12), 4),
+    ];
+    root.add(rgb, rgba);
+
+    mergeSkinnedParts(root);
+
+    expect(countSkinned(root)).toBe(2);
+  });
+
+  it('refuses a bucket whose morph dictionary does not account for every target', () => {
+    // A half-named list is worse than an unnamed one: the union plan would place
+    // the named target and silently drop the rest onto slot -1.
+    const bones = makeBones();
+    const inverses = restInverses(bones);
+    const material = new THREE.MeshBasicMaterial();
+    const root = new THREE.Object3D();
+    root.add(bones[0]);
+    const pos = [0.2, 0.6, -0.1, -0.4, 0.9, 0.3, 0.5, -0.2, 0.7];
+    const named = makePart(bones, inverses, pos, material, { jaw_up: new Array(9).fill(0) });
+    const half = makePart(bones, inverses, pos, material, {
+      jaw_up: new Array(9).fill(0),
+      jaw_dn: new Array(9).fill(0),
+    });
+    // two targets, one name: index 1 is unaccounted for
+    half.morphTargetDictionary = { jaw_up: 0 };
+    root.add(named, half);
+
+    mergeSkinnedParts(root);
+
+    expect(countSkinned(root)).toBe(2);
+    expect(half.geometry.morphAttributes.position).toHaveLength(2);
   });
 
   it('refuses a bucket whose parts disagree on which morph kinds are present', () => {

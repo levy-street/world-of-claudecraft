@@ -37,11 +37,16 @@ import {
 } from '../src/render/characters/assets';
 import { DEFAULT_LOOK, MODULAR_WARRIOR_KEY } from '../src/render/characters/modular';
 import { CharacterVisual } from '../src/render/characters/visual';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 type AssetsModule = typeof import('../src/render/characters/assets');
 
+// Every source-scan pin below reads through the shared stripper: the lines they
+// name are routinely explained in prose right beside themselves, so a raw read
+// is satisfied by a commented-out call and the pin stays green over code that
+// is no longer there.
 function src(file: string): string {
-  return readFileSync(resolve(process.cwd(), file), 'utf8');
+  return codeWithoutLineComments(readFileSync(resolve(process.cwd(), file), 'utf8'));
 }
 
 /** The body of a named function, for the statement-order pins below. */
@@ -709,5 +714,32 @@ describe('peekModularFarBake and modularFarBake', () => {
     // ...and the shared material owns three of the four primitives.
     expect(sorted[0].count).toBe(drawCount * 0.75);
     expect(bake.geo.groups.map((g) => g.materialIndex).sort()).toEqual([0, 1]);
+  }, 20000);
+
+  it('never coalesces two meshes on one material that differ by the body flag', async () => {
+    // tintedFarMaterials gates the skin/emissive atlas per SLOT on isBody, so a
+    // baked-in weapon and the body holding it must stay separate groups even
+    // though the bake walk sees one material.
+    const shared = new THREE.MeshStandardMaterial({ name: 'shared' });
+    const other = new THREE.MeshStandardMaterial({ name: 'other' });
+    stubScene = () => {
+      const scene = new THREE.Group();
+      const mesh = (name: string, material: THREE.Material, bodyMesh: boolean) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(1, 2, 1), material);
+        m.name = name;
+        if (bodyMesh) m.userData.bodyMesh = true;
+        return m;
+      };
+      scene.add(mesh('a', shared, false), mesh('b', shared, true), mesh('c', other, false));
+      return scene;
+    };
+    const assetsModule = await loadAssetsReady();
+
+    const minted = assetsModule.modularFarBake(MODULAR_WARRIOR_KEY, DEFAULT_LOOK);
+    const bake = minted as NonNullable<typeof minted>;
+
+    expect(bake.geo.groups).toHaveLength(3);
+    expect(bake.isBody).toEqual([false, true, false]);
+    expect(bake.slots).toEqual([0, 1, 2]);
   }, 20000);
 });

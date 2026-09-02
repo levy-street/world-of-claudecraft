@@ -2714,6 +2714,11 @@ function composedFarBakeGroupKey(mesh: THREE.Mesh): string {
   return `${farBakeGroupKey(mesh)}|${modularMergePartition(mesh.name)}`;
 }
 
+/** Exported for the test rather than for a caller: both keys decide what shares
+ *  a far-LOD draw, and getting either wrong paints a distant body in another
+ *  slot's colours, silently. */
+export const farBakeGroupKeysForTest = { farBakeGroupKey, composedFarBakeGroupKey };
+
 export interface StaticPoseBake {
   geo: THREE.BufferGeometry | null;
   /** One entry per GROUP: the source material of the mesh that group draws. */

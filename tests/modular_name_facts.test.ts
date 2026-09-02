@@ -10,6 +10,7 @@ import {
   modularNameFacts,
 } from '../src/render/characters/modular_name_facts_core';
 import { headNodeName } from '../src/render/characters/stubble';
+import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 describe('modularNameFacts', () => {
   it('names the two head sculpts, and nothing else', () => {
@@ -79,9 +80,13 @@ describe('modularMergePartition', () => {
 
   it('is what the composed merge is actually keyed on', () => {
     // A partition that nothing passes to mergeSkinnedParts protects nothing.
-    const assets = readFileSync(
-      new URL('../src/render/characters/assets.ts', import.meta.url),
-      'utf8',
+    // Through the shared stripper: both calls sit under prose explaining them,
+    // so a raw read is satisfied by a commented-out call. The BEHAVIOUR is
+    // pinned separately (tests/rig_shared_skeleton_wiring.test.ts composes a
+    // real stub rig and asserts the head and the ear do not fold together);
+    // this is the cheap sentinel beside it.
+    const assets = codeWithoutLineComments(
+      readFileSync(new URL('../src/render/characters/assets.ts', import.meta.url), 'utf8'),
     );
     expect(assets).toMatch(/partitionKey: \(mesh\) => modularMergePartition\(mesh\.name\)/);
     expect(assets).toMatch(/modularNameFacts\(mesh\.name\)/);
