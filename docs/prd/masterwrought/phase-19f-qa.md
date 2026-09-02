@@ -14,21 +14,22 @@ caught it. Every ruling survives every correction; three keys were re-keyed a
 second time inside the wave, and the tools note a third time. One hundred
 instruction defects amended in place before execution, four of them changing the
 work (D148's backlog was 4,569 rows, not 7,971; D149's premise was false; D161
-could not be retired, only deleted; D074's deferral arm was dead). Three arms
-went to the maintainer in session, one premise was escalated, none guessed.
+could not be retired, only deleted; D074's deferral arm was dead). Four
+decisions went to the maintainer in session (three arms and D074's status quo),
+one premise was escalated, none guessed.
 LOCAL ONLY: no push, no PR, no teardown.
 
 Scope: the ten units of `phase-19f-english-i18n-completeness.md` (D070 D074
 D085 D144 D148 D149 D150 D161 D169 D174), the Step 0 sync check, the fresh
-typed reviews per unit (twenty reports plus one owed by an amendment and
-dispatched at the fresh read), ten fix rounds, two coverage audits, a sim
-review, and the fresh reads that followed each round. Commit span `c52b275854..HEAD`.
+typed reviews per unit (twenty-three reports plus the one D085's amendment owed,
+dispatched at the fresh read), eleven fix rounds, two coverage audits, a sim
+review, and the nine fresh reads that followed the rounds. Commit span `c52b275854..HEAD`.
 
 ## Step 0: the sync check was a no-op
 
-`origin/release/v0.42.0` had not moved since the 19E close (2ebe95e731 is
-still the merge base's tip); no merge, no audit, recorded as the no-op the
-phase asked for.
+`origin/release/v0.42.0` had not moved since the 19E close (its tip da6458493f
+is still the second parent of the 19E sync merge 2ebe95e731); no merge, no
+audit, recorded as the no-op the phase asked for.
 
 ## Step 1: one hundred corrections, four that changed the work
 
@@ -109,8 +110,8 @@ presented as a reviewed translation. Read them at the Phase 20 STEP 1 pass:
 | key | locales | notes for the read |
 |---|---|---|
 | `guide.professions.endgameMaterialsBodyAnyRaid` | ja_JP ko_KR ru_RU zh_CN zh_TW | four re-filled for the gear qualifier; ru_RU's 'any difficulty' phrasing noted |
-| `guide.profPages.toolsNoteFishingPageMarks` | the five | tool and rod names deliberately in Latin to match the tool table beneath (carried: the table renders English names in every locale); the delve name in each locale's shipped casing; the ja_JP, zh_CN and zh_TW Delve Marks terms restored to the overlays' established forms at the third round; ko_KR keeps the polite register its predecessor used |
-| `guide.profPages.craftProse.engineering.materialsBodyThreeRods` | the five | the zh_CN gloss the English lacked was dropped and Highwatch localized at the third round; the ja_JP and zh_CN Delve Marks terms were restored to the overlays' established forms; the round-five per-clause arm holds every rod, fish, count and prior rod in each fill |
+| `guide.profPages.toolsNoteFishingPageMarks` (the third key of the wave) | the five | tool and rod names deliberately in Latin to match the tool table beneath (carried: the table renders English names in every locale); the delve name in each locale's shipped casing; the ja_JP, zh_CN and zh_TW Delve Marks terms restored to the overlays' established forms at the third round; ko_KR keeps the polite register its predecessor used |
+| `guide.profPages.craftProse.engineering.materialsBodyThreeRods` | the five | the zh_CN gloss the English lacked was dropped and Highwatch localized at the third round; the zh_CN counter phrase is 印记柜台 in the identity and fishing rows (a majority the change made) while this row keeps 探秘印记柜台, the closer 'delve counter': the maintainer's call; the ja_JP and zh_CN Delve Marks terms were restored to the overlays' established forms; the round-five per-clause arm holds every rod, fish, count and prior rod in each fill |
 | `guide.profPages.rareBodyFourFlavors` | the five | ja_JP, ko_KR and ru_RU say 'four' where the English is count-free (a fifth flavor would stale them silently); col_golden_harvest has no localized deed name in any locale, so the crop flavor cannot match a shipped deed name; the coined forms to adopt when the deed is filled: 黄金の収穫, 황금빛 수확, золотой урожай, 金色丰收, 金色豐收 |
 | `aura.rift*` and `mechanic.rift*` (52 keys) | the five, in `src/ui/sim_i18n.ts` | thirteen retuned at the review round; ja_JP and ko_KR split the Rime / Rimebite stem (each half a shipped mob name, judged defensible by the parity reviewer, left for the maintainer); zh_TW's Pact Rot now follows Void Rot's head word |
 
@@ -120,29 +121,25 @@ the keys were deleted (`toolsNoteThreeRods`, `toolsNoteFiveLadders`, `toolsNoteF
 
 ## Reviews
 
-Thirty-two fresh reviewers, auditors and readers in all: twenty fresh typed
-reviewers over the ten units (cross-platform-sync, frontend-seam,
+Thirty-six fresh reviewers, auditors and readers in all: twenty-three fresh
+typed reviewers over the ten units (cross-platform-sync, frontend-seam,
 content-obligations, gate-integrity and qa-checklist as each contract named
 them), plus the frontend-seam review D085's amendment owed, dispatched at the
 fresh read. Round one (a0ecd5344b) applied the D085, D144 and D150 findings; its
 fresh read returned four should-fix and seven nits, all applied in round two.
 Round two (31084b67ef) applied every remaining finding, blocking, should-fix and
 nit alike. Round three (9488022093) applied the frontend-seam review D085's
-amendment owed and the items round two had recorded; round four (92aa815b6d)
-applied the coverage audit of the round-two pins; round five (41f650418d)
-applied the sim reviewer's belt finding on the gather-events refactor and the
-coverage audit of rounds three and four; round six (10ddc1febc) applied the
-fresh read of rounds three and four, including one edit round three had meant to
-make and had not; round seven (911d70f424) applied the fresh read of rounds five
-and six; round eight (64b866e420) applied the replacement fresh read of round
-two (the tools note's third re-key); round nine (b0a171ff45) applied the fresh
-read of round seven; round ten (5e6d6b5453) applied the fresh reads of rounds
-eight and nine. Round seven (911d70f424) applied the fresh read of rounds five
-and six; round eight (64b866e420) the replacement fresh read of round two, the
-tools note's third re-key; round nine (b0a171ff45) the fresh read of round
-seven; round ten (5e6d6b5453) the fresh reads of rounds eight and nine; round
-eleven (e58bff734a) the one cosmetic nit the round-ten read returned. Every
-round was read fresh; the last read returned nothing else.
+amendment owed and the items round two had recorded; round four (92aa815b6d) the
+coverage audit of the round-two pins; round five (41f650418d) the sim reviewer's
+belt finding on the gather-events refactor and the coverage audit of rounds
+three and four; round six (10ddc1febc) the fresh read of rounds three and four,
+including one edit round three had meant to make and had not; round seven
+(911d70f424) the fresh read of rounds five and six; round eight (64b866e420) the
+replacement fresh read of round two, the tools note's third re-key; round nine
+(b0a171ff45) the fresh read of round seven; round ten (5e6d6b5453) the fresh
+reads of rounds eight and nine; round eleven (e58bff734a) the one cosmetic nit
+the round-ten read returned. Every round was read fresh; the last read returned
+nothing else.
 
 Findings that moved a record or the code, chief among them:
 - the tools note's English was false in one count, misleading in one place
@@ -207,9 +204,7 @@ and that class is a fill-quality defect for the maintainer's read.
 - `Hud.localizeSystemText` extraction into a registered pure core (D150).
 - The `error.sunderTarget` emit still says 'raid-won epics' without 'gear'
   (an S3 change with twenty locale rows).
-- `BRAND_ALLOW`'s sixteen dead rift entries have no owner and no retirement
-  condition.
-- `src/sim/content/dungeons/temple.ts` comment dashes (pre-existing).
+- `src/sim/content/temple.ts` comment dashes (pre-existing).
 - The gathering tool table renders every tool name as untranslated English in
   all locales (`esc(tool.name)` in `professions_gathering.ts`) where the
   crafting page resolves `entities.items.<id>.name`; the note's fills keep
@@ -218,7 +213,9 @@ and that class is a fill-quality defect for the maintainer's read.
   raid) plus the arena min-level literal are tsc-forced dense and stay outside
   the registry (zero copied-English rows measured 2026-09-02); the sim scope
   has no copied-English guard (D148 arm 2, declined).
-- `en_CA` carries 245 dead English rows in its `BASE_DICT` block.
+- `en_CA`'s `BASE_DICT` block carries only English copies, dead under the
+  dialect rule (about two hundred rows; the parity reviewer counted 245, the
+  close-out read 203).
 - `log.arenaQueueAutoLeave1v1` has two carriers (several `BASE_DICT` blocks
   spell it; the literal wins).
 - `guide.profPages.farm.tableBodyOneMeal`'s fills render Book of Deeds
@@ -240,7 +237,26 @@ and that class is a fill-quality defect for the maintainer's read.
   rows and not the exports row it also carries; the D148 commit carried one
   D144 record line; the Phase 20 hand-carry for D149 landed in D148's commit.
 
-Not taken, by the phase's own rule: 19E's five carried items, 19D's three,
+- The softer 'the table below' left in the tools note's node-trades Marks
+  sentence, true of each page's own table; a maintainer's call, no fourth
+  re-key (the round-eight read).
+- The Russian binding window of forty characters: the carp's second stem
+  sits twenty-four characters after its numeral, so a rewording that inserts
+  more than about sixteen characters between them reds the locale arm (the
+  round-nine read); widen or keep, the maintainer's choice.
+- The pet tables' over-provision class is unpinnable by construction (every
+  `PET_DICT_*` const carries the same typed key set), stated in the registry
+  suite's comment only.
+- `turbo.json`'s `i18n:gen` inputs gained `scripts/lib/write_module_dir.mjs`
+  with its inventory twin in `scripts/lib/gate_task_cache.mjs`, a gate-integrity
+  surface (the gate-integrity reviewer's own finding, pinned by
+  `tests/gate_task_cache.test.ts`).
+- D174's contract named content-obligations-reviewer and
+  frontend-seam-reviewer beside qa-checklist; the ratify arm moved one ledger
+  file and no content record or presentation surface, so only qa-checklist was
+  dispatched. Recorded as a deviation from the contract, with that reason.
+
+Not taken, by the phase's own rule: 19E's seven carried items, 19D's four,
 19C's three, 19B's four; R5 stays frozen; every judged list binds.
 
 ## Validation
