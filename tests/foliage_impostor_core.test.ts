@@ -30,7 +30,9 @@ import {
   foliageDistanceScale,
   foliageFogLimit,
   LOD_HIGH,
+  lodDistsFor,
 } from '../src/render/foliage_lod';
+import { GFX_BUCKET_BANDS } from '../src/render/gfx';
 
 function spec(over: Partial<ImpostorArchetypeSpec> = {}): ImpostorArchetypeSpec {
   return {
@@ -174,6 +176,41 @@ describe('sprite swap law', () => {
     expect(1 - (swap / budgeted) ** 2).toBeGreaterThan(0.35);
     // and never inside the authors' own clear-air floor
     expect(swap).toBeGreaterThan(SPRITE_SWAP_MIN);
+  });
+
+  it('spreads the real-model radius across the tier ladder, floored at SPRITE_SWAP_MIN', () => {
+    // The shipped clear-air answer per tier: the tier's authored radius
+    // (foliage_lod.ts TREE_DETAIL_FAR_BY_TIER) times its own rested bucket
+    // baseline through foliageDistanceScale, times SPRITE_SWAP_BUDGET, then
+    // floored at SPRITE_SWAP_MIN. Vale fog (near 55, far 700), rested budget.
+    const fogLimit = foliageFogLimit(700, 1);
+    const radiusFor = (tier: 'medium' | 'high' | 'ultra' | 'insane') => {
+      const baseline = GFX_BUCKET_BANDS[tier].foliage.baseline;
+      const dists = lodDistsFor(false, tier);
+      return spriteSwapDistance(
+        dists.treeDetailFar,
+        foliageDistanceScale(baseline, false),
+        55,
+        700,
+        fogLimit,
+      );
+    };
+    const round = (v: number) => Math.round(v * 100) / 100;
+    expect({
+      medium: round(radiusFor('medium')),
+      high: round(radiusFor('high')),
+      ultra: round(radiusFor('ultra')),
+      insane: round(radiusFor('insane')),
+    }).toEqual({ medium: 150, high: 174.38, ultra: 234, insane: 234 });
+    // Medium sits exactly ON the clear-air floor, which is what keeps a
+    // spread base from ever pushing a billboard into the near field.
+    expect(radiusFor('medium')).toBe(SPRITE_SWAP_MIN);
+    // The span the ladder buys: it was 217 / 227 / 234 (an 8 percent spread)
+    // when every non-lean tier read one authored radius.
+    expect(radiusFor('ultra') / radiusFor('medium')).toBeGreaterThan(1.5);
+    // And the disc AREA medium sheds against ultra, which is what the layer
+    // actually costs.
+    expect(1 - (radiusFor('medium') / radiusFor('ultra')) ** 2).toBeGreaterThan(0.55);
   });
 
   it('never hands off closer than the clear-air floor', () => {

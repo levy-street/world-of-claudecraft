@@ -21,6 +21,8 @@
 // floor sits past the cull (very low model quality), trees run to the cull
 // line and the blend law holds vacuously.
 
+import type { GfxTier } from './gfx';
+
 export interface LodDists {
   barkFar: number;
   treeDetailFar: number;
@@ -29,6 +31,11 @@ export interface LodDists {
   treeFillFar: number;
 }
 
+/**
+ * The full-detail table: ultra and insane. Every non-lean tier shares every
+ * row of it EXCEPT `treeDetailFar`, which the per-tier table below spreads
+ * (see TREE_DETAIL_FAR_BY_TIER).
+ */
 export const LOD_HIGH: LodDists = {
   barkFar: 330,
   treeDetailFar: 300,
@@ -48,8 +55,52 @@ export const LOD_LOW: LodDists = {
   treeFillFar: 245,
 };
 
-export function lodDistsFor(leanFoliage: boolean): LodDists {
-  return leanFoliage ? LOD_LOW : LOD_HIGH;
+/**
+ * The authored real-model radius per tier: how far real tree geometry is
+ * allowed to reach before the baked sprite takes over.
+ *
+ * THIS IS THE TIER LADDER'S ONE FOLIAGE-DISTANCE LEVER, and it used to be a
+ * constant. Every non-lean tier read LOD_HIGH's 300, and the only thing that
+ * moved between them was the bucket baseline feeding foliageDistanceScale
+ * (0.74 medium, 0.9 high, 1.0 ultra) and the shared SPRITE_SWAP_BUDGET: that
+ * put the clear-air handoff at 217 / 227 / 234 yards, an 8 percent span
+ * across four tiers, while real-model cost grows with the SQUARE of the
+ * radius. So medium and high paid very nearly ultra's outer ring, which is
+ * the most expensive part of the whole layer.
+ *
+ * Spreading the base is safe precisely because the sprite arm carries
+ * everything past the handoff (foliage_impostor_core.ts): the tree is still
+ * drawn, at the same base, height, tint and sway, as a baked picture of
+ * itself. What a nearer handoff costs is stated in SPRITE_SWAP_BUDGET's own
+ * header and it is the same cost here, one tier earlier: canopy
+ * self-parallax under camera translation, and a silhouette that stops
+ * changing with pitch. SPRITE_SWAP_MIN (150) is untouched and still binds
+ * first, so no tier can push a card into the near field; on medium it is now
+ * the binding term rather than the budget.
+ *
+ * The LEAN tiers are absent on purpose: they have no impostors at all, so
+ * their trees must run to the full budgeted radius or the forest visibly
+ * ends, and they keep LOD_LOW whole (see this module's header).
+ */
+export const TREE_DETAIL_FAR_BY_TIER: Record<GfxTier, number> = {
+  low: LOD_LOW.treeDetailFar,
+  medium: 190,
+  high: 230,
+  ultra: LOD_HIGH.treeDetailFar,
+  insane: LOD_HIGH.treeDetailFar,
+};
+
+/** The non-lean tables: LOD_HIGH with that tier's own real-model radius. */
+export const LOD_BY_TIER: Record<GfxTier, LodDists> = {
+  low: LOD_LOW,
+  medium: { ...LOD_HIGH, treeDetailFar: TREE_DETAIL_FAR_BY_TIER.medium },
+  high: { ...LOD_HIGH, treeDetailFar: TREE_DETAIL_FAR_BY_TIER.high },
+  ultra: LOD_HIGH,
+  insane: LOD_HIGH,
+};
+
+export function lodDistsFor(leanFoliage: boolean, tier: GfxTier): LodDists {
+  return leanFoliage ? LOD_LOW : LOD_BY_TIER[tier];
 }
 
 /**

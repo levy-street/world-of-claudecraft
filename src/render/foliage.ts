@@ -777,7 +777,7 @@ let foliagePrewarmDraws: readonly FoliagePrewarmDraw[] = [];
 // The tree-detail boundary is NOT a constant: it follows the zone's fog, so an
 // impostor can never be caught standing in clear air. See that module's header.
 function lodDists(): LodDists {
-  return lodDistsFor(GFX.leanFoliage);
+  return lodDistsFor(GFX.leanFoliage, GFX.tier);
 }
 
 // Slow travelling gust, shared by the canopy and grass shaders: it scales the

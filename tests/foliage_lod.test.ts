@@ -10,8 +10,15 @@ import {
   LOD_HIGH,
   LOD_LOW,
   lodDistsFor,
+  TREE_DETAIL_FAR_BY_TIER,
   treeDetailDistance,
 } from '../src/render/foliage_lod';
+import type { GfxTier } from '../src/render/gfx';
+
+const TIERS: readonly GfxTier[] = ['low', 'medium', 'high', 'ultra', 'insane'];
+// The tiers that actually reach LOD_BY_TIER: `low` is always leanFoliage, so it
+// keeps LOD_LOW whole and none of the shared-row claims below apply to it.
+const NON_LEAN_TIERS: readonly GfxTier[] = ['medium', 'high', 'ultra', 'insane'];
 
 // The adaptive budget's foliage lever spans [0, 1]; the distance scale and the
 // fog cull both derive from it, so tests must move them as the one dial they
@@ -25,9 +32,10 @@ function detailAt(
   fog: { near: number; far: number },
   modelQuality: number,
   leanFoliage = false,
+  tier: GfxTier = 'ultra',
 ): { detailFar: number; fogLimit: number } {
   const fogLimit = foliageFogLimit(fog.far, modelQuality);
-  const base = lodDistsFor(leanFoliage).treeDetailFar;
+  const base = lodDistsFor(leanFoliage, tier).treeDetailFar;
   const scale = foliageDistanceScale(modelQuality, leanFoliage);
   return { detailFar: treeDetailDistance(base, fog.near, fog.far, scale, fogLimit), fogLimit };
 }
@@ -434,14 +442,49 @@ describe('foliage LOD: sprite rows (the merged per-bucket impostor meshes)', () 
 });
 
 describe('foliage LOD: tiers and purity', () => {
-  it('hands the low tier its own, tighter table', () => {
-    expect(lodDistsFor(true)).toBe(LOD_LOW);
-    expect(lodDistsFor(false)).toBe(LOD_HIGH);
+  it('hands every lean session its own, tighter table whatever the tier says', () => {
+    for (const tier of TIERS) expect(lodDistsFor(true, tier)).toBe(LOD_LOW);
+    expect(lodDistsFor(false, 'ultra')).toBe(LOD_HIGH);
+    expect(lodDistsFor(false, 'insane')).toBe(LOD_HIGH);
     expect(LOD_LOW.treeDetailFar).toBeLessThan(LOD_HIGH.treeDetailFar);
   });
 
-  it('stays a pure decision module: no Three, no sim', () => {
+  it('spreads the authored real-model radius across the non-lean tiers', () => {
+    expect(TIERS.map((tier) => lodDistsFor(false, tier).treeDetailFar)).toEqual([
+      LOD_LOW.treeDetailFar,
+      190,
+      230,
+      300,
+      300,
+    ]);
+    // Only the handoff radius moves: every other row of the table is shared,
+    // so nothing about bark, dressing, rocks or the near-fill cap re-tiers.
+    for (const tier of NON_LEAN_TIERS) {
+      const { barkFar, dressFar, rockFar, treeFillFar } = lodDistsFor(false, tier);
+      expect({ barkFar, dressFar, rockFar, treeFillFar }, tier).toEqual({
+        barkFar: LOD_HIGH.barkFar,
+        dressFar: LOD_HIGH.dressFar,
+        rockFar: LOD_HIGH.rockFar,
+        treeFillFar: LOD_HIGH.treeFillFar,
+      });
+    }
+    // Monotone: a tier never draws real geometry further than the one above it.
+    const bases = NON_LEAN_TIERS.map((tier) => TREE_DETAIL_FAR_BY_TIER[tier]);
+    for (let i = 1; i < bases.length; i++) expect(bases[i]).toBeGreaterThanOrEqual(bases[i - 1]);
+    // The near-fill cap must still sit above the handoff on every tier, or a
+    // near-fill tree would die at its bucket cap before its sprite took over
+    // (the invariant spriteSwapDistance's closing note depends on).
+    for (const tier of NON_LEAN_TIERS) {
+      const d = lodDistsFor(false, tier);
+      expect(d.treeDetailFar, tier).toBeLessThan(d.treeFillFar);
+    }
+  });
+
+  it('stays a pure decision module: no Three, no sim, no runtime import at all', () => {
     const src = readFileSync(new URL('../src/render/foliage_lod.ts', import.meta.url), 'utf8');
-    expect(src).not.toMatch(/^import/m);
+    // The GfxTier import is `import type`, erased at build, so this module
+    // still pulls nothing in at runtime. Any VALUE import would.
+    const imports = [...src.matchAll(/^import\b[^\n]*/gm)].map((m) => m[0]);
+    expect(imports).toEqual(["import type { GfxTier } from './gfx';"]);
   });
 });
