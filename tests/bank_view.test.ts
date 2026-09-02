@@ -760,6 +760,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
   });
 
@@ -769,6 +770,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
   });
 
@@ -786,6 +788,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
       sends: [],
       stacks: 0,
       full: false,
+      notableItemId: null,
     });
     expect(hasDepositableMaterials(inv, questLookup)).toBe(true);
   });
@@ -793,7 +796,7 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
   it('reports the bank already full: nothing sent but full is set', () => {
     const inv: InvSlot[] = [{ itemId: 'copper_ore', count: 1 }];
     const plan = planDepositAllMaterials(inv, [{ itemId: 'gear', count: 1 }], flat(1), lookup);
-    expect(plan).toEqual({ sends: [], stacks: 0, full: true });
+    expect(plan).toEqual({ sends: [], stacks: 0, full: true, notableItemId: null });
   });
 
   it('consumes the two-pool split, not a flat total: the socket-aware precheck pin', () => {
@@ -839,19 +842,96 @@ describe('planDepositAllMaterials: selection and order (synthetic lookup)', () =
     expect(hasDepositableMaterials([{ itemId: 'ghost', count: 1 }], lookup)).toBe(false);
     expect(hasDepositableMaterials([], lookup)).toBe(false);
   });
+
+  // #3xxx: the same "Core of the Last Flame" reports the vault's notable-item
+  // signal closes (see tests/vault_view.test.ts) reproduce identically off the
+  // Bank's own, older Deposit All button, since the reclassification made the
+  // reagent eligible on both surfaces. This pins the mirrored signal here.
+  describe('notableItemId: flags an epic-or-better material the plan actually sends', () => {
+    // Layers a synthetic quality onto game_meat ALONE: every other KINDS id
+    // stays quality-less, so a sweep with no epic-or-better stack proves the
+    // null default rather than free-riding on a lookup that always names one.
+    const notableLookup: ItemLookup = (id) =>
+      KINDS[id]
+        ? ({ id, kind: KINDS[id], ...(id === 'game_meat' ? { quality: 'epic' } : {}) } as ItemDef)
+        : undefined;
+
+    it('an ordinary sweep with no epic-or-better material leaves it null', () => {
+      const inv: InvSlot[] = [
+        { itemId: 'copper_ore', count: 5 },
+        { itemId: 'iron_ore', count: 3 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(24), notableLookup);
+      expect(plan.notableItemId).toBeNull();
+    });
+
+    it('an epic material actually sent is named, even among ordinary ones', () => {
+      const inv: InvSlot[] = [
+        { itemId: 'copper_ore', count: 5 },
+        { itemId: 'game_meat', count: 1 },
+        { itemId: 'iron_ore', count: 3 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(24), notableLookup);
+      expect(plan.notableItemId).toBe('game_meat');
+      expect(plan.stacks).toBe(3);
+    });
+
+    it('an epic stack the bank could not fit is never flagged (nothing of it actually moved)', () => {
+      // Two free bank slots for three materials; game_meat sits at the LOWEST
+      // index, so the descending walk reaches it last, once room is already
+      // gone: the send never happens (whole-stack-or-skip) and notableItemId
+      // stays null, matching the vault's "ceiling-blocked" sibling case.
+      const inv: InvSlot[] = [
+        { itemId: 'game_meat', count: 1 },
+        { itemId: 'copper_ore', count: 1 },
+        { itemId: 'iron_ore', count: 1 },
+      ];
+      const plan = planDepositAllMaterials(inv, [], flat(2), notableLookup);
+      expect(plan.sends).toEqual([
+        { slot: 2, count: 1 },
+        { slot: 1, count: 1 },
+      ]);
+      expect(plan.full).toBe(true);
+      expect(plan.notableItemId).toBeNull();
+    });
+  });
 });
 
-describe('depositAllSummaryKey: the three-arm summary selection', () => {
+describe('depositAllSummaryKey: the five-arm summary selection', () => {
   it('picks None when nothing moved (materials existed but none fit)', () => {
-    expect(depositAllSummaryKey({ stacks: 0, full: true })).toBe('hudChrome.bank.depositAllNone');
+    expect(depositAllSummaryKey({ stacks: 0, full: true, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllNone',
+    );
   });
 
   it('picks Full when some stacks moved but at least one did not fit', () => {
-    expect(depositAllSummaryKey({ stacks: 3, full: true })).toBe('hudChrome.bank.depositAllFull');
+    expect(depositAllSummaryKey({ stacks: 3, full: true, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllFull',
+    );
   });
 
   it('picks Done when every material stack fit', () => {
-    expect(depositAllSummaryKey({ stacks: 3, full: false })).toBe('hudChrome.bank.depositAllDone');
+    expect(depositAllSummaryKey({ stacks: 3, full: false, notableItemId: null })).toBe(
+      'hudChrome.bank.depositAllDone',
+    );
+  });
+
+  it('an epic-or-better item takes priority over full, once anything moved', () => {
+    expect(depositAllSummaryKey({ stacks: 3, full: false, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNotable',
+    );
+    expect(depositAllSummaryKey({ stacks: 3, full: true, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNotableFull',
+    );
+  });
+
+  it('none still wins over notable when nothing actually moved', () => {
+    // Unreachable from the real planDepositAllMaterials (notableItemId is only
+    // ever set alongside a successful send), but the priority order is pinned
+    // directly here rather than only through the reachable shape.
+    expect(depositAllSummaryKey({ stacks: 0, full: true, notableItemId: 'signed_blade' })).toBe(
+      'hudChrome.bank.depositAllNone',
+    );
   });
 });
 

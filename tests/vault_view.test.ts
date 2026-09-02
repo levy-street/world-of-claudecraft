@@ -31,10 +31,16 @@ const LOOKUP_TABLE: Record<string, { quality?: string }> = {
   copper_ore: { quality: 'common' },
   ashwood_log: { quality: 'common' },
   frost_lotus: { quality: 'rare' },
+  ember_core: { quality: 'epic' },
 };
 const lookup = (id: string) => LOOKUP_TABLE[id];
 
-const MATERIALS: ReadonlySet<string> = new Set(['copper_ore', 'ashwood_log', 'frost_lotus']);
+const MATERIALS: ReadonlySet<string> = new Set([
+  'copper_ore',
+  'ashwood_log',
+  'frost_lotus',
+  'ember_core',
+]);
 
 function vinfo(
   stock: Record<string, number>,
@@ -255,10 +261,11 @@ describe('vaultRowAction', () => {
 describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () => {
   it('a locked vault predicts nothing', () => {
     const inv = [slot('copper_ore', 5)];
-    expect(predictVaultDepositAll(inv, vinfo({}, 0, 0), MATERIALS)).toEqual({
+    expect(predictVaultDepositAll(inv, vinfo({}, 0, 0), MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
       full: false,
+      notableItemId: null,
     });
   });
 
@@ -275,10 +282,11 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
       slot('ashwood_log', 4, { craftedRecipeId: 'recipe_x' }),
       slot('ashwood_log', 2),
     ];
-    const p = predictVaultDepositAll(inv, vinfo({ copper_ore: 10 }, 1, 40), MATERIALS);
+    const p = predictVaultDepositAll(inv, vinfo({ copper_ore: 10 }, 1, 40), MATERIALS, lookup);
     // Whole stacks: copper idx 3 + signed idx 2 + both log rows = 4 stacks;
-    // items: 20 + 3 + 4 + 2 + 7 = 36; full: the partial final fill.
-    expect(p).toEqual({ stacks: 4, items: 36, full: true });
+    // items: 20 + 3 + 4 + 2 + 7 = 36; full: the partial final fill. Neither
+    // moved id is epic+, so no notable item.
+    expect(p).toEqual({ stacks: 4, items: 36, full: true, notableItemId: null });
   });
 
   it('counts existing special stock against the shared cap and never splits an instance', () => {
@@ -286,10 +294,11 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
       slot('copper_ore', 8, { craftedRecipeId: 'smelt_copper' }),
     ]);
     const inv = [slot('copper_ore', 5, { instance: { signer: 'Ada' } })];
-    expect(predictVaultDepositAll(inv, info, MATERIALS)).toEqual({
+    expect(predictVaultDepositAll(inv, info, MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
       full: true,
+      notableItemId: null,
     });
   });
 
@@ -298,10 +307,11 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
     // exported predicate feeds both), or a tampered save would show a summary
     // for stock the sweep refuses to touch, or worse, predict a destruction.
     const inv = [slot('copper_ore', -3), slot('copper_ore', 0), slot('copper_ore', Number.NaN)];
-    expect(predictVaultDepositAll(inv, vinfo({ copper_ore: 10 }), MATERIALS)).toEqual({
+    expect(predictVaultDepositAll(inv, vinfo({ copper_ore: 10 }), MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
       full: false,
+      notableItemId: null,
     });
     expect(hasVaultDepositable(inv, MATERIALS)).toBe(false);
   });
@@ -316,27 +326,26 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
       slot('copper_ore', Number.POSITIVE_INFINITY),
       slot('copper_ore', 2.5), // fractional: the delayed-destruction arm
     ];
-    expect(predictVaultDepositAll(inv, vinfo({}, 1, 40), MATERIALS)).toEqual({
+    expect(predictVaultDepositAll(inv, vinfo({}, 1, 40), MATERIALS, lookup)).toEqual({
       stacks: 0,
       items: 0,
       full: false,
+      notableItemId: null,
     });
     expect(hasVaultDepositable(inv, MATERIALS)).toBe(false);
   });
 
   it('a material already at its ceiling flags full with zero movement', () => {
     const inv = [slot('copper_ore', 5)];
-    expect(predictVaultDepositAll(inv, vinfo({ copper_ore: 40 }, 1, 40), MATERIALS)).toEqual({
-      stacks: 0,
-      items: 0,
-      full: true,
-    });
+    expect(
+      predictVaultDepositAll(inv, vinfo({ copper_ore: 40 }, 1, 40), MATERIALS, lookup),
+    ).toEqual({ stacks: 0, items: 0, full: true, notableItemId: null });
   });
 
   it('does NOT mutate the snapshot it replays (inventory or stock)', () => {
     const inv = [slot('copper_ore', 5)];
     const info = vinfo({ copper_ore: 1 });
-    predictVaultDepositAll(inv, info, MATERIALS);
+    predictVaultDepositAll(inv, info, MATERIALS, lookup);
     expect(inv[0].count).toBe(5);
     expect(info.stock).toEqual({ copper_ore: 1 });
   });
@@ -346,14 +355,67 @@ describe('predictVaultDepositAll (the click-time replay of the sim sweep)', () =
     const materials = new Set(['__proto__']);
     // The dormant row is AT cap: nothing moves and nothing lands on
     // Object.prototype (the Map-not-spread rule in the core).
-    const p = predictVaultDepositAll([slot('__proto__', 3)], vinfo(stock, 1, 40), materials);
-    expect(p).toEqual({ stacks: 0, items: 0, full: true });
+    const p = predictVaultDepositAll(
+      [slot('__proto__', 3)],
+      vinfo(stock, 1, 40),
+      materials,
+      lookup,
+    );
+    expect(p).toEqual({ stacks: 0, items: 0, full: true, notableItemId: null });
     // The equality ABOVE is the decisive arm: a plain-record `held` built by
     // keyed ASSIGNMENT would send the row into the __proto__ setter, read
     // `have` back off the inherited accessor, and produce
     // { stacks: 1, items: NaN, full: false }. There is no residue to assert
     // separately (the setter swallows a non-object value without landing
     // anything on Object.prototype), so no second assertion exists here.
+  });
+
+  // #3xxx: "Core of the Last Flame" reports. A newly material-classified epic
+  // raid reagent swept silently into the vault by the pre-existing Deposit
+  // All read as items vanishing, because the aggregate count never named
+  // what moved. These pin the notable-item signal that closes the gap.
+  describe('notableItemId: flags an epic-or-better material the sweep moved', () => {
+    it('an ordinary common/rare sweep leaves it null', () => {
+      const inv = [slot('copper_ore', 5), slot('frost_lotus', 2)];
+      const p = predictVaultDepositAll(inv, vinfo({}, 1, 40), MATERIALS, lookup);
+      expect(p.notableItemId).toBeNull();
+    });
+
+    it('an epic material in the sweep is named, even among ordinary ones', () => {
+      const inv = [slot('copper_ore', 5), slot('ember_core', 1), slot('frost_lotus', 2)];
+      const p = predictVaultDepositAll(inv, vinfo({}, 1, 40), MATERIALS, lookup);
+      expect(p.notableItemId).toBe('ember_core');
+      expect(p.items).toBe(8);
+    });
+
+    it('a ceiling-blocked epic stack is never flagged (nothing of it actually moved)', () => {
+      const inv = [slot('ember_core', 5)];
+      const p = predictVaultDepositAll(inv, vinfo({ ember_core: 40 }, 1, 40), MATERIALS, lookup);
+      expect(p).toEqual({ stacks: 0, items: 0, full: true, notableItemId: null });
+    });
+
+    it('an unknown id never resolves as notable (a lookup miss is simply not notable)', () => {
+      const materials = new Set(['mystery_id']);
+      const p = predictVaultDepositAll(
+        [slot('mystery_id', 3)],
+        vinfo({}, 1, 40),
+        materials,
+        lookup,
+      );
+      expect(p.notableItemId).toBeNull();
+    });
+
+    it('a partially-clamped epic stack is still named: SOME of it moved', () => {
+      // Headroom 5 against an 8-count epic stack: 5 move, 3 stay carried (the
+      // moved < slot.count arm, same clamp as the ordinary partial-fill case
+      // above), so `full` is set for the leftover AND notableItemId still
+      // names the item, because it is not "nothing of it actually moved" (the
+      // ceiling-blocked case above): the vault pane's own headroom readout
+      // explains the rest, so naming what DID move stays consistent here too.
+      const inv = [slot('ember_core', 8)];
+      const p = predictVaultDepositAll(inv, vinfo({ ember_core: 35 }, 1, 40), MATERIALS, lookup);
+      expect(p).toEqual({ stacks: 0, items: 5, full: true, notableItemId: 'ember_core' });
+    });
   });
 });
 
@@ -376,18 +438,42 @@ describe('hasVaultDepositable (the button enable)', () => {
 });
 
 describe('vaultDepositAllSummaryKey', () => {
-  it('exactly one of three arms: none / full / done', () => {
-    expect(vaultDepositAllSummaryKey({ items: 0, full: true })).toBe(
+  it('exactly one of five arms: none / notable / notableFull / full / done', () => {
+    expect(vaultDepositAllSummaryKey({ items: 0, full: true, notableItemId: null })).toBe(
       'hudChrome.bank.vaultDepositAllNone',
     );
-    expect(vaultDepositAllSummaryKey({ items: 0, full: false })).toBe(
+    expect(vaultDepositAllSummaryKey({ items: 0, full: false, notableItemId: null })).toBe(
       'hudChrome.bank.vaultDepositAllNone',
     );
-    expect(vaultDepositAllSummaryKey({ items: 3, full: true })).toBe(
+    expect(vaultDepositAllSummaryKey({ items: 3, full: true, notableItemId: null })).toBe(
       'hudChrome.bank.vaultDepositAllFull',
     );
-    expect(vaultDepositAllSummaryKey({ items: 3, full: false })).toBe(
+    expect(vaultDepositAllSummaryKey({ items: 3, full: false, notableItemId: null })).toBe(
       'hudChrome.bank.vaultDepositAllDone',
+    );
+  });
+
+  it('a notable epic-or-better item takes priority over full, once anything moved', () => {
+    expect(vaultDepositAllSummaryKey({ items: 3, full: false, notableItemId: 'ember_core' })).toBe(
+      'hudChrome.bank.vaultDepositAllNotable',
+    );
+  });
+
+  // #3xxx follow-up: the Notable arm used to swallow the Full arm outright, so a
+  // sweep that both named the epic reagent AND left an ordinary material behind
+  // its ceiling read as if nothing else was capped. NotableFull keeps both facts.
+  it('a notable item alongside a ceiling that also held something back gets its OWN arm', () => {
+    expect(vaultDepositAllSummaryKey({ items: 3, full: true, notableItemId: 'ember_core' })).toBe(
+      'hudChrome.bank.vaultDepositAllNotableFull',
+    );
+  });
+
+  it('none still wins over notable when nothing actually moved', () => {
+    // Unreachable from the real predictVaultDepositAll (notableItemId is only
+    // ever set alongside a positive moved count), but the priority order is
+    // pinned directly here rather than only through the reachable shape.
+    expect(vaultDepositAllSummaryKey({ items: 0, full: true, notableItemId: 'ember_core' })).toBe(
+      'hudChrome.bank.vaultDepositAllNone',
     );
   });
 });

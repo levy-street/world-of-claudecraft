@@ -32,6 +32,7 @@ import { showBuyConfirmPrompt } from './bank_buy_prompt';
 import { showQuantityPrompt } from './bank_quantity_prompt';
 import { appendBankStatusLine, type BankStatusAnnouncementState } from './bank_status_line';
 import { formatCount } from './count_format';
+import { depositAllNotableParams } from './deposit_all_status_text';
 import { itemDisplayName } from './entity_i18n';
 import { esc } from './esc';
 import { FOCUS_KEY_ATTR, findFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -649,7 +650,9 @@ export class VaultTab {
     // pending guard, and the bags repaint with it). Online the mirror lags a
     // tick either way. The dead flag is captured on the same snapshot.
     const dead = world.player.dead;
-    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds());
+    const prediction = predictVaultDepositAll(world.inventory, info, vaultMaterialIds(), (id) =>
+      knownItemDef(ITEMS, id),
+    );
     world.vaultDepositAll();
     // While dead the sim silently no-ops the sweep (the town-service idiom):
     // the command still goes (server decides), but the predicted "Materials
@@ -670,9 +673,14 @@ export class VaultTab {
       this.deps.onInventoryChanged();
     }
     const key = vaultDepositAllSummaryKey(prediction);
+    const notableDef = prediction.notableItemId
+      ? knownItemDef(ITEMS, prediction.notableItemId)
+      : undefined;
     this.setStatus(
       key,
-      prediction.items === 0 ? undefined : { count: formatCount(prediction.items) },
+      prediction.items === 0
+        ? undefined
+        : depositAllNotableParams(formatCount(prediction.items), notableDef),
     );
     this.deps.requestRender();
   }

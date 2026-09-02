@@ -9,25 +9,100 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "es_ES": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "fr_FR": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "fr_CA": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "de_DE": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "nl_NL": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "pl_PL": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "id_ID": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "tr_TR": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "sv_SE": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "vi_VN": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ],
+  "da_DK": [
+    "hudChrome.bank.depositAllNotable",
+    "hudChrome.bank.depositAllNotableFull",
+    "hudChrome.bank.vaultDepositAllNotable",
+    "hudChrome.bank.vaultDepositAllNotableFull"
+  ]
 };

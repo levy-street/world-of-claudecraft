@@ -272,6 +272,18 @@ export interface VaultDepositAllPrediction {
   stacks: number;
   items: number;
   full: boolean;
+  /** The id of an epic-or-better material the sweep moved, or null. A bare
+   *  "Materials deposited: N" reads as unremarkable for the common/uncommon/
+   *  rare fodder deposit-all usually sweeps (ore, cloth, disenchant dusts),
+   *  but an epic-or-better one is rare enough, and valuable enough, to name
+   *  rather than fold into a count: a player who has not yet learned this
+   *  new pane exists reads a silent aggregate as the item simply being gone.
+   *  Picks the FIRST qualifying id the descending walk finds; a sweep could
+   *  in principle carry more than one, and this names one representative
+   *  rather than building a localized list for a case the shipped taxonomy
+   *  does not yet produce (today exactly one material, lastflame_core, is
+   *  epic; tests/vault_view.test.ts pins the epic/legendary threshold). */
+  notableItemId: string | null;
 }
 
 /** Replay the sim's deposit-all sweep on the snapshot WITHOUT mutating it.
@@ -284,13 +296,16 @@ export interface VaultDepositAllPrediction {
  *  exhausted are skipped here with the same clamp, and a partial fill moves
  *  what fits and flags `full`. `materialIds` is the caller-supplied honest set
  *  (vaultMaterialIds()), a parameter so tests drive the replay with a small
- *  fixture set. */
+ *  fixture set. `lookup` resolves each moved id's quality for the notable-item
+ *  flag only (a miss is simply never notable, the bank family's tolerant
+ *  precedent). */
 export function predictVaultDepositAll(
   inventory: readonly InvSlot[],
   info: Pick<VaultInfo, 'stock' | 'special' | 'upgrades' | 'perMaterialCap'>,
   materialIds: ReadonlySet<string>,
+  lookup: BankItemLookup,
 ): VaultDepositAllPrediction {
-  if (info.upgrades <= 0) return { stacks: 0, items: 0, full: false };
+  if (info.upgrades <= 0) return { stacks: 0, items: 0, full: false, notableItemId: null };
   // A Map, not a spread: a tolerated save can stock a dormant own '__proto__'
   // row, which a record rebuild would drop into the prototype setter.
   const held = new Map(Object.entries(info.stock));
@@ -303,6 +318,7 @@ export function predictVaultDepositAll(
   let stacks = 0;
   let items = 0;
   let full = false;
+  let notableItemId: string | null = null;
   for (let i = inventory.length - 1; i >= 0; i--) {
     const slot = inventory[i];
     if (!isVaultDepositableSlot(slot, materialIds)) continue;
@@ -324,8 +340,12 @@ export function predictVaultDepositAll(
     else stacks += 1;
     items += moved;
     held.set(slot.itemId, have + moved);
+    if (notableItemId === null) {
+      const quality = lookup(slot.itemId)?.quality;
+      if (quality === 'epic' || quality === 'legendary') notableItemId = slot.itemId;
+    }
   }
-  return { stacks, items, full };
+  return { stacks, items, full, notableItemId };
 }
 
 /** True when the carried inventory holds at least one stack the deposit-all
@@ -340,20 +360,35 @@ export function hasVaultDepositable(
   return inventory.some((s) => isVaultDepositableSlot(s, materialIds));
 }
 
-/** The three deposit-all summary lines, as t() keys so the painter stays a
+/** The five deposit-all summary lines, as t() keys so the painter stays a
  *  thin consumer and the arm CHOICE is unit-pinned here. */
 export type VaultDepositAllSummaryKey =
   | 'hudChrome.bank.vaultDepositAllNone'
   | 'hudChrome.bank.vaultDepositAllFull'
-  | 'hudChrome.bank.vaultDepositAllDone';
+  | 'hudChrome.bank.vaultDepositAllDone'
+  | 'hudChrome.bank.vaultDepositAllNotable'
+  | 'hudChrome.bank.vaultDepositAllNotableFull';
 
-/** Which transient summary a finished deposit-all earns. Exactly one of three
- *  arms: nothing moved (every candidate ceiling-blocked) -> None; some moved
- *  but a ceiling held something back -> Full; everything moved -> Done. */
+/** Which transient summary a finished deposit-all earns. Nothing moved (every
+ *  candidate ceiling-blocked) -> None. Otherwise, an epic-or-better material
+ *  moved -> Notable (or NotableFull when a ceiling ALSO held something else
+ *  back), which NAMES the epic-or-better item and takes priority over the
+ *  plain Full arm: knowing WHAT moved matters more in the moment than whether
+ *  a ceiling also capped something else, and the vault pane itself still
+ *  shows the exact per-material headroom on demand, but the ceiling fact is
+ *  not dropped either: a player who reads "6, including Core of the Last
+ *  Flame" as the whole story would wrongly conclude nothing else was left
+ *  behind. Absent a notable item: a ceiling held something back -> Full;
+ *  everything moved -> Done. */
 export function vaultDepositAllSummaryKey(
-  p: Pick<VaultDepositAllPrediction, 'items' | 'full'>,
+  p: Pick<VaultDepositAllPrediction, 'items' | 'full' | 'notableItemId'>,
 ): VaultDepositAllSummaryKey {
   if (p.items === 0) return 'hudChrome.bank.vaultDepositAllNone';
+  if (p.notableItemId !== null) {
+    return p.full
+      ? 'hudChrome.bank.vaultDepositAllNotableFull'
+      : 'hudChrome.bank.vaultDepositAllNotable';
+  }
   if (p.full) return 'hudChrome.bank.vaultDepositAllFull';
   return 'hudChrome.bank.vaultDepositAllDone';
 }

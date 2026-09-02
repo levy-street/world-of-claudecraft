@@ -482,12 +482,19 @@ describe('bank_window: search / sort / deposit-all', () => {
   it('renders the summary as a transient polite aria-live status line (no hud.ts toast dep)', () => {
     expect(painter).toContain("status.setAttribute('role', 'status')");
     expect(painter).toContain("status.setAttribute('aria-live', 'polite')");
-    // The arm CHOICE (none fit / partial / all fit) lives in the pure core's
-    // depositAllSummaryKey, pinned per-arm in bank_view.test.ts; here pin that the
-    // painter delegates to it and renders the None arm count-less.
+    // The arm CHOICE (none fit / notable / partial / all fit) lives in the pure
+    // core's depositAllSummaryKey, pinned per-arm in bank_view.test.ts; here pin
+    // that the painter delegates to it, and resolves a notable item's name
+    // through knownItemDef, never a raw ITEMS index (the reviewed
+    // vault_window.ts nit, mirrored here from the start). The actual text
+    // (None arm count-less, {item} interpolation) is shared with the vault via
+    // deposit_all_status_text.ts, pinned directly in that module's own test.
     expect(painter).toContain('depositAllSummaryKey(plan)');
     expect(painter).toContain(
-      'plan.stacks === 0 ? t(key) : t(key, { count: this.fmt(plan.stacks) })',
+      'const notable = plan.notableItemId ? knownItemDef(ITEMS, plan.notableItemId) : undefined;',
+    );
+    expect(painter).toContain(
+      'depositAllStatusText(depositAllSummaryKey(plan), this.fmt(plan.stacks), notable)',
     );
     // Pin the literal like BANK_INFO_GRACE_MS above: it drives BOTH the status-line
     // lifetime and the deposit-all pending-guard fallback timer.

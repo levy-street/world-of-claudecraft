@@ -10279,6 +10279,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositAllDone': 'Материалов положено: {count}.',
   'hudChrome.bank.depositAllFull': 'Материалов положено: {count}. Банк заполнен.',
   'hudChrome.bank.depositAllNone': 'Банк заполнен: ничего не положено.',
+  'hudChrome.bank.depositAllNotable': 'Материалов положено: {count}, включая {item}.',
+  'hudChrome.bank.depositAllNotableFull':
+    'Материалов положено: {count}, включая {item}. Банк заполнен.',
   'hudChrome.bank.bonusTitle': 'Бонусные ячейки',
   'hudChrome.bank.bonusEarned': '+{count}',
   'hudChrome.bank.bonusStatusEarned': '+{count}',
@@ -10311,6 +10314,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultDepositAllDone': 'Сложено материалов: {count}.',
   'hudChrome.bank.vaultDepositAllFull': 'Сложено материалов: {count}. Часть пределов заполнена.',
   'hudChrome.bank.vaultDepositAllNone': 'Пределы хранилища заполнены: ничего не сложено.',
+  'hudChrome.bank.vaultDepositAllNotable': 'Сложено материалов: {count}, включая {item}.',
+  'hudChrome.bank.vaultDepositAllNotableFull':
+    'Сложено материалов: {count}, включая {item}. Часть пределов заполнена.',
   'hudChrome.bank.vaultWithdrawShort': 'В сумки помещается только {fit} из {count}.',
   'hudChrome.bank.vaultDepositHint': 'Щелкните, чтобы поместить в хранилище',
   'hudChrome.bank.vaultCannotDeposit': 'Нельзя поместить в хранилище',

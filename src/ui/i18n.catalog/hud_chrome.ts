@@ -4470,13 +4470,19 @@ export const hudChromeStrings = {
     sortAria: 'Sort bank items',
     searchAria: 'Search bank items by name',
     // Deposit-all-materials button + its transient summary line. {count} is
-    // the number of material stacks moved.
+    // the number of material stacks moved. The Notable arms additionally name
+    // an epic-or-better material the sweep sent (the vaultDepositAllNotable
+    // sibling below; a bare count reads as unremarkable and this reagent is
+    // rare and valuable enough to call out). (Wordy values, M16: the five
+    // non-Latin fills land in this same change.)
     depositAll: 'Deposit all materials',
     depositAllTooltip:
       'Sends every crafting reagent and junk item from your bags to the bank in one trip. Gathering tools, equipped gear, quest items, and consumables are never touched.',
     depositAllDone: 'Materials deposited: {count}.',
     depositAllFull: 'Materials deposited: {count}. Bank now full.',
     depositAllNone: 'Bank full: nothing deposited.',
+    depositAllNotable: 'Materials deposited: {count}, including {item}.',
+    depositAllNotableFull: 'Materials deposited: {count}, including {item}. Bank now full.',
     // Bonus-slot breakdown footer (online only): a header total plus one row
     // per account source, advertising what linking earns. {count} is a slot count.
     bonusTitle: 'Bonus slots',
@@ -4547,6 +4553,9 @@ export const hudChromeStrings = {
     vaultDepositAllDone: 'Materials deposited: {count}.',
     vaultDepositAllFull: 'Materials deposited: {count}. Some ceilings are full.',
     vaultDepositAllNone: 'Vault ceilings full: nothing deposited.',
+    vaultDepositAllNotable: 'Materials deposited: {count}, including {item}.',
+    vaultDepositAllNotableFull:
+      'Materials deposited: {count}, including {item}. Some ceilings are full.',
     vaultWithdrawShort: 'Only {fit} of {count} fit in your bags.',
     // Bags-side hints while the VAULT tab is active (the guild pair's rule:
     // distinct keys because the target differs).

@@ -10084,6 +10084,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.depositAllDone': '보관한 재료: {count}.',
   'hudChrome.bank.depositAllFull': '보관한 재료: {count}. 은행이 가득 찼습니다.',
   'hudChrome.bank.depositAllNone': '은행이 가득 참: 아무것도 보관하지 못했습니다.',
+  'hudChrome.bank.depositAllNotable': '보관한 재료: {count}({item} 포함).',
+  'hudChrome.bank.depositAllNotableFull': '보관한 재료: {count}({item} 포함). 은행이 가득 찼습니다.',
   'hudChrome.bank.bonusTitle': '보너스 칸',
   'hudChrome.bank.bonusEarned': '+{count}',
   'hudChrome.bank.bonusStatusEarned': '+{count}',
@@ -10116,6 +10118,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bank.vaultDepositAllDone': '보관한 재료: {count}개.',
   'hudChrome.bank.vaultDepositAllFull': '보관한 재료: {count}개. 일부 재료가 한도에 도달했습니다.',
   'hudChrome.bank.vaultDepositAllNone': '보관 한도가 가득 차서 아무것도 보관하지 못했습니다.',
+  'hudChrome.bank.vaultDepositAllNotable': '보관한 재료: {count}개({item} 포함).',
+  'hudChrome.bank.vaultDepositAllNotableFull':
+    '보관한 재료: {count}개({item} 포함). 일부 재료가 한도에 도달했습니다.',
   'hudChrome.bank.vaultWithdrawShort': '가방에는 {count}개 중 {fit}개만 들어갑니다.',
   'hudChrome.bank.vaultDepositHint': '클릭하여 보관소에 보관',
   'hudChrome.bank.vaultCannotDeposit': '보관소에 넣을 수 없습니다',
