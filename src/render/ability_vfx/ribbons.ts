@@ -217,6 +217,10 @@ export class AbilityVfxRibbons {
   private v = 0;
   private i = 0;
   private wasEmpty = true;
+  // Has this mesh ever been submitted? Until it has, an empty frame keeps it
+  // visible so the zero-count submit still links its program on a profile that
+  // skipped the ability-primitives prewarm entry (../vfx.ts's cloudWarmed).
+  private warmed = false;
   private time = 0;
 
   private bolts: BoltSlot[] = [];
@@ -260,6 +264,9 @@ export class AbilityVfxRibbons {
       new THREE.BufferAttribute(this.uv, 2).setUsage(THREE.DynamicDrawUsage),
     );
     this.geo.setIndex(new THREE.BufferAttribute(this.idx, 1).setUsage(THREE.DynamicDrawUsage));
+    // Explicit, like ../vfx.ts: the default range is Infinity, which would make
+    // the first submit (before any commit) draw the whole zeroed index buffer.
+    this.geo.setDrawRange(0, 0);
     this.geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
     // Energy visibly flows along the strip: scrolling fBm over the soft ribbon
     // cross-section (the gallery's aFlow collapsed to a constant scroll).
@@ -294,6 +301,15 @@ export class AbilityVfxRibbons {
     this.mesh.frustumCulled = false;
     this.mesh.renderOrder = 6;
     this.mesh.userData.renderCategory = 'vfx';
+    // An idle pool is NOT free: three does not early-out on a zero draw count,
+    // so a drawRange of 0 still pays setProgram, the VAO bind and a zero-count
+    // draw every frame, on every renderer that owns a ribbon pool (this one and
+    // the sentence-VFX pool). Hide when empty, show on the first emit: the
+    // toggle idiom ../vfx.ts uses around its own point cloud.
+    this.mesh.onAfterRender = () => {
+      this.warmed = true;
+      if (this.geo.drawRange.count === 0) this.mesh.visible = false;
+    };
     scene.add(this.mesh);
     for (let i = 0; i < BOLT_SLOTS; i++) {
       this.bolts.push({
@@ -884,6 +900,7 @@ export class AbilityVfxRibbons {
     for (const a of this.arcs) a.active = false;
     this.geo.setDrawRange(0, 0);
     this.wasEmpty = true;
+    this.mesh.visible = !this.warmed;
   }
 
   dispose(): void {
@@ -1274,10 +1291,12 @@ export class AbilityVfxRibbons {
       if (!this.wasEmpty) {
         this.wasEmpty = true;
         this.geo.setDrawRange(0, 0);
+        this.mesh.visible = !this.warmed;
       }
       return;
     }
     this.wasEmpty = false;
+    this.mesh.visible = true;
     // Upload only the prefix this frame actually wrote (the pooled cloud's
     // idiom, ../vfx.ts packRenderCloud). The buffers are sized for the worst
     // case (MAX_VERTS is thousands of vertices, ~180 KB across the three
