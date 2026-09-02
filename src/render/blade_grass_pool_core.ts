@@ -58,6 +58,56 @@ export function poolDiscJitteredLimitSq(radius: number, cell: number): number {
   return limit * limit;
 }
 
+// ---------------------------------------------------------------------------
+// Sector split
+// ---------------------------------------------------------------------------
+//
+// The pool draws as ONE instanced mesh with frustum culling off, because it is
+// centred on the player and something in it is always on screen. That submits
+// every cluster to the vertex shader, and 70 to 80 percent of them sit behind
+// or beside the camera. Splitting the pool into a grid of sectors, each its own
+// mesh with its own bounding sphere, lets three drop the ones the camera is not
+// looking at.
+//
+// The split is over SLOT LINES, not angles around the player. A wedge around
+// the player rotates against the toroidal cell grid as the player walks, so
+// every crossing would move hundreds of clusters from one wedge's buffer to
+// another's, and those moves are scattered the length of each dense prefix:
+// that is exactly the upload the banded ranges exist to avoid. A slot's LINE
+// never changes, so a cluster is written once into one sector and stays there
+// until its own cell changes, which the pool was re-placing anyway. The price
+// is the toroidal seam: the one sector column and one sector row the wrap runs
+// through own two runs of cells at opposite edges of the pool, so their bounds
+// are wide and they rarely cull. The seam moves one line per crossing, so no
+// sector is permanently the wide one.
+
+/** Slot lines per sector when the pool's grid is split `axis` ways. */
+export function poolSectorWidth(gridW: number, axis: number): number {
+  return Math.ceil(gridW / Math.max(1, Math.min(axis | 0, gridW)));
+}
+
+/** Sectors per axis for a given sector width (the last one may be narrower). */
+export function poolSectorAxisCount(gridW: number, width: number): number {
+  return Math.ceil(gridW / width);
+}
+
+/** Slot lines the sector at index `a` owns on one axis. */
+export function poolSectorLines(gridW: number, width: number, a: number): number {
+  return Math.min(width, gridW - a * width);
+}
+
+/** The sector holding slot `gj * gridW + gi`. */
+export function poolSectorOfSlot(
+  slot: number,
+  gridW: number,
+  width: number,
+  axisCount: number,
+): number {
+  const gi = slot % gridW;
+  const gj = (slot / gridW) | 0;
+  return ((gj / width) | 0) * axisCount + ((gi / width) | 0);
+}
+
 /** Whether a cluster placed at (x, z) is inside the pool's fade disc. */
 export function insidePoolDisc(
   x: number,

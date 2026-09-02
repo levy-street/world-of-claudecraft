@@ -252,14 +252,21 @@ describe('blade grass instance upload ranges', () => {
 });
 
 describe('blade grass banded upload wiring', () => {
-  it('queues one range per dirty block on both live pools', async () => {
+  it('queues one range per dirty block on every sector of both live pools', async () => {
     const { readFileSync } = await import('node:fs');
+    const pool = readFileSync(
+      new URL('../src/render/blade_grass_sector_pool.ts', import.meta.url),
+      'utf8',
+    );
+    // one block per sector row of dense indices: the unsplit pool's own
+    // derivation (one grid row) carried down to a sector's width
+    expect(pool).toContain('const bands = createUploadBands(capacity, width);');
+    expect(pool).toContain('const ranges = collectUploadRanges(s.bands, s.ranges);');
+    expect(pool).toContain('s.im.instanceMatrix.addUpdateRange(start * 16, count * 16);');
+    expect(pool).toContain('s.im.instanceColor.addUpdateRange(start * 3, count * 3);');
     for (const file of ['blade_grass.ts', 'blade_grass_band.ts']) {
       const source = readFileSync(new URL(`../src/render/${file}`, import.meta.url), 'utf8');
-      expect(source).toContain('const uploadBands = createUploadBands(POOL, GRID_W);');
-      expect(source).toContain('const ranges = collectUploadRanges(uploadBands, uploadRanges);');
-      expect(source).toContain('im.instanceMatrix.addUpdateRange(start * 16, count * 16);');
-      expect(source).toContain('im.instanceColor.addUpdateRange(start * 3, count * 3);');
+      expect(source).toContain('sectorPool.queueUploads();');
       expect(source).not.toContain('dirtyHi');
     }
   });

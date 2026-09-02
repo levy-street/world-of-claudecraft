@@ -2,29 +2,18 @@ import * as THREE from 'three';
 import { getActiveWorldContent, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../sim/data';
 import { roadDistance, terrainHeight, WATER_LEVEL, zoneBiomeAt } from '../sim/world';
 import {
-  activateDenseSlot,
-  type DenseSlotState,
-  deactivateDenseSlot,
-} from './blade_grass_dense_core';
-import {
   insidePoolDisc,
   poolDiscCenter,
   poolDiscLimitSq,
   toroidalCell,
 } from './blade_grass_pool_core';
-import {
-  clearUploadBands,
-  collectUploadRanges,
-  createUploadBands,
-  createUploadRangeScratch,
-  markUploadDirty,
-} from './blade_grass_upload_bands_core';
+import { buildBladeSectorPool } from './blade_grass_sector_pool';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
 import { GFX, sharedUniforms } from './gfx';
 import { MEADOW_CARPET_FADE_START } from './meadow_tuning';
-import { renderLayerDisabled } from './render_dev_flags';
+import { bladeSectorAxis, renderLayerDisabled } from './render_dev_flags';
 import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 
 // Near-field blade carpet: a single InstancedMesh of low-poly SOLID grass
@@ -34,8 +23,11 @@ import { groundGrassColorAt, groundLushnessAt } from './terrain_chunk_build';
 // where this carpet takes over: thousands of small individually-swaying
 // blades, dense on the lush soil patches and absent between them, tinted by
 // the ground colour under each cluster so the meadow reads as one grown
-// surface. Solid geometry (no alphaTest) keeps the cozy low-poly art style
-// and costs one draw call.
+// surface. Solid geometry (no alphaTest) keeps the cozy low-poly art style.
+//
+// The pool draws as a grid of sector meshes over one geometry and one
+// material (blade_grass_sector_pool.ts), so three can drop the sectors behind
+// the camera instead of vertex-shading the whole disc every frame.
 //
 // The grid is toroidal: slot (i, j) always owns the world cell congruent to
 // (i, j) mod GRID_W nearest the player, so walking re-places only the ring of
@@ -148,6 +140,34 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
   return geo;
 }
 
+// Largest scale placeSlot can compose for one cluster: the 0.56 base spread
+// times the 1.1 lushness ceiling, the 1.8 tuft size class, and the 1.59
+// vertical spread, rounded up. Used to bound how far a cluster reaches beyond
+// its instance origin, never to place one.
+const CLUSTER_MAX_SCALE = 1.8;
+// Local-space reach of the shader's sway at the blade tip (0.085 * (1 + 0.4)),
+// which rides inside the same instance scale.
+const CLUSTER_SWAY_REACH = 0.15;
+
+/**
+ * World-space slack a placed cluster reaches beyond its instance origin: the
+ * cluster geometry's own vertex radius plus the sway, at the largest scale
+ * placement composes. The sector bounding spheres pad by this, so a sector is
+ * culled only when every blade in it is genuinely outside the frustum.
+ */
+export function clusterPlacementPad(geo: THREE.BufferGeometry): number {
+  const pos = geo.getAttribute('position');
+  let maxSq = 0;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const y = pos.getY(i);
+    const z = pos.getZ(i);
+    const d = x * x + y * y + z * z;
+    if (d > maxSq) maxSq = d;
+  }
+  return (Math.sqrt(maxSq) + CLUSTER_SWAY_REACH) * CLUSTER_MAX_SCALE;
+}
+
 export function buildBladeGrass(
   seed: number,
   initialPx: number,
@@ -210,25 +230,22 @@ export function buildBladeGrass(
   };
   const uPlayerPos = { value: new THREE.Vector2(1e9, 1e9) };
 
-  const im = new THREE.InstancedMesh(geo, mat, POOL);
-  im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-  im.receiveShadow = true;
-  im.castShadow = false;
-  im.frustumCulled = false; // pool is centred on the player
-  im.count = 0;
-  im.instanceColor = new THREE.InstancedBufferAttribute(new Float32Array(POOL * 3), 3);
-  im.instanceColor.setUsage(THREE.DynamicDrawUsage);
-  group.add(im);
+  // One mesh per sector instead of one uncullable pool mesh: every sector
+  // shares this geometry and material, so the split adds draw calls and no
+  // program, and three drops the sectors behind the camera
+  // (blade_grass_sector_pool.ts). ?bladesectors=1 restores the single mesh.
+  const sectorPool = buildBladeSectorPool({
+    gridW: GRID_W,
+    axis: bladeSectorAxis(),
+    geometry: geo,
+    material: mat,
+    clusterPad: clusterPlacementPad(geo),
+  });
+  for (const mesh of sectorPool.meshes) group.add(mesh);
 
-  // per-slot current cell (packed), Number.MIN_SAFE_INTEGER = never placed
+  // per-slot current cell (packed); 0x7fffffff = never placed
   const slotCell = new Int32Array(POOL).fill(0x7fffffff);
-  const denseSlots: DenseSlotState = {
-    count: 0,
-    slotToDense: new Int32Array(POOL).fill(-1),
-    denseToSlot: new Int32Array(POOL).fill(-1),
-  };
   const m = new THREE.Matrix4();
-  const movedMatrix = new THREE.Matrix4();
   const q = new THREE.Quaternion();
   const qLean = new THREE.Quaternion();
   const up = new THREE.Vector3(0, 1, 0);
@@ -236,12 +253,6 @@ export function buildBladeGrass(
   const v = new THREE.Vector3();
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
-  const movedColor = new THREE.Color();
-  // One coarse block per grid row's worth of dense indices, so a crossing
-  // uploads the instances it actually touched instead of the span between
-  // the lowest and the highest of them (blade_grass_upload_bands_core.ts).
-  const uploadBands = createUploadBands(POOL, GRID_W);
-  const uploadRanges = createUploadRangeScratch(uploadBands);
   // The grid is square but the fade is a disc, so the corners are placed,
   // uploaded and vertex-shaded only to be collapsed to zero scale in the
   // shader. Rejecting them at placement is invisible by construction (see
@@ -249,26 +260,6 @@ export function buildBladeGrass(
   const discLimitSq = poolDiscLimitSq(RADIUS, CELL);
   let discCenterX = 0;
   let discCenterZ = 0;
-
-  const markDirty = (dense: number): void => {
-    markUploadDirty(uploadBands, dense);
-  };
-
-  // Queue this frame's dirty blocks. Ranges are queued, never cleared here:
-  // the renderer clears them after it actually uploads, so a skipped frame
-  // keeps its pending spans alive.
-  const uploadDirtyRanges = (): void => {
-    const ranges = collectUploadRanges(uploadBands, uploadRanges);
-    if (ranges === 0) return;
-    for (let r = 0; r < ranges; r++) {
-      const start = uploadRanges[r * 2];
-      const count = uploadRanges[r * 2 + 1];
-      im.instanceMatrix.addUpdateRange(start * 16, count * 16);
-      if (im.instanceColor) im.instanceColor.addUpdateRange(start * 3, count * 3);
-    }
-    im.instanceMatrix.needsUpdate = true;
-    if (im.instanceColor) im.instanceColor.needsUpdate = true;
-  };
 
   const hash = (i: number, j: number, k: number): number => {
     let h = (i * 374761393 + j * 668265263 + k * 2246822519) | 0;
@@ -324,27 +315,12 @@ export function buildBladeGrass(
           // slight lift over the raw ground tint: blades catch more sky
           // than the soil they stand on
           c.multiplyScalar(1.18);
-          const dense = activateDenseSlot(denseSlots, slot);
-          im.setMatrixAt(dense, m);
-          im.setColorAt(dense, c);
-          markDirty(dense);
+          sectorPool.place(slot, m, c);
           return;
         }
       }
     }
-    const removedDense = denseSlots.slotToDense[slot];
-    if (removedDense < 0) return;
-    const movedSlot = deactivateDenseSlot(denseSlots, slot);
-    if (movedSlot >= 0) {
-      // The old last element remains readable at the new count index until
-      // this copy completes. Moving it into the gap keeps the submitted
-      // prefix dense without changing the matrix or colour bytes.
-      im.getMatrixAt(denseSlots.count, movedMatrix);
-      im.setMatrixAt(removedDense, movedMatrix);
-      im.getColorAt(denseSlots.count, movedColor);
-      im.setColorAt(removedDense, movedColor);
-      markDirty(removedDense);
-    }
+    sectorPool.remove(slot);
   }
 
   // Scan bookkeeping: the toroidal scan only has work when the target block
@@ -386,8 +362,10 @@ export function buildBladeGrass(
   const initialBaseI = Math.floor(initialPx / CELL) - (GRID_W >> 1);
   const initialBaseJ = Math.floor(initialPz / CELL) - (GRID_W >> 1);
   scanTargetBlock(initialBaseI, initialBaseJ, Number.POSITIVE_INFINITY);
-  im.count = denseSlots.count;
-  clearUploadBands(uploadBands);
+  // Three.js uploads each full attribute on its first draw, so the initial
+  // prefix needs its counts and bounds published but no update ranges.
+  sectorPool.dropUploads();
+  sectorPool.syncSectors();
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
@@ -402,13 +380,12 @@ export function buildBladeGrass(
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
       lastBaseI = baseI;
       lastBaseJ = baseJ;
-      // re-placed slots this frame, banded so the GPU upload covers the
-      // instances that actually moved instead of the span between them
-      clearUploadBands(uploadBands);
-      const previousCount = denseSlots.count;
+      // re-placed slots this frame. Ranges are queued per sector, never
+      // cleared here: the renderer clears them after it actually uploads, so
+      // a skipped frame keeps its pending spans alive.
       pending = scanTargetBlock(baseI, baseJ, PLACE_BUDGET);
-      if (denseSlots.count !== previousCount) im.count = denseSlots.count;
-      uploadDirtyRanges();
+      sectorPool.queueUploads();
+      sectorPool.syncSectors();
     },
   };
 }
