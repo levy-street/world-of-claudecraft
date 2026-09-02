@@ -5,10 +5,11 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import { resolveReportTarget } from '../server/report_target';
 import { DICT as adminDICT, classLabel, setAdminLanguage } from '../src/admin/i18n';
 import { DELVE_MOBS } from '../src/sim/content/delves/mobs';
-import { ABILITIES, ITEMS } from '../src/sim/data';
+import { ABILITIES, DUNGEON_LIST, ITEMS } from '../src/sim/data';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { auraDisplayNameForHud } from '../src/ui/aura_display_name';
+import { dungeonText } from '../src/ui/entity_display_core';
 import { itemDisplayName } from '../src/ui/entity_i18n';
 import { Hud } from '../src/ui/hud';
 import {
@@ -2027,6 +2028,50 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     const canonicalLine = "The dead answer Deacon Vandric's call!";
     expect(localizeSimText(legacyLine)).toBe(localizeSimText(canonicalLine));
     expect(localizeSimText(legacyLine)).not.toBe(legacyLine);
+  });
+
+  it('the Drowned Temple enterText reword keeps its deploy-window alias (D150)', () => {
+    // The Drowned Temple's enterText de-dash (masterwrought Phase 18 QA) is
+    // WIRE-CARRIED: src/sim/instances/dungeons.ts emits DungeonDef.enterText as
+    // raw English and Hud.localizeSystemText matches it by exact bytes, so a
+    // server that has not restarted past the reword still sends the pre-reword
+    // sentence. The alias arm in localizeSystemText resolves that legacy
+    // sentence to the same catalog text as the live one; this pin keeps a
+    // future merge from dropping the arm in silence (ruled
+    // qr-19-drowned-temple-entertext-deploy-alias, 2026-09-02). Driven through a
+    // bare Hud prototype (the localizeLootText harness below) because the
+    // method is private and reads no instance state on this path; the S3
+    // parsers above cannot see a template-literal arm, so a source-text pin
+    // would not do. The old separator is spelled as an ESCAPE, never the byte.
+    // Retire this pin together with the arm once the release carrying this
+    // branch's reword (release/v0.42.0 at the time of writing) is fully
+    // deployed.
+    interface SystemTextHarness {
+      localizeSystemText(text: string): string;
+    }
+    const harness = Object.create(Hud.prototype) as unknown as SystemTextHarness;
+    const live = DUNGEON_LIST.find((d) => d.id === 'drowned_temple')?.enterText;
+    expect(live, 'the Drowned Temple ships').toBeDefined();
+    if (!live) return;
+    expect(live).toContain('the air turns to cold water');
+    expect(live).not.toContain('\u2014');
+    const legacy =
+      'You step through the moongate \u2014 the air turns to cold water and pale light, and the singing closes over your head.';
+    // The legacy sentence differs from the live one by the separator alone,
+    // so the alias covers exactly the reword and nothing wider.
+    expect(legacy).not.toBe(live);
+    expect(legacy.replace(' \u2014 ', ': ')).toBe(live);
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const canonical = harness.localizeSystemText(live);
+        expect(canonical, lang).toBe(dungeonText('drowned_temple', 'enterText'));
+        expect(harness.localizeSystemText(legacy), lang).toBe(canonical);
+        expect(harness.localizeSystemText(legacy), lang).not.toBe(legacy);
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 });
 

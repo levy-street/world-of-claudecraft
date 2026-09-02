@@ -14573,13 +14573,13 @@ export class Hud {
     // sends the pre-reword sentence, which the new client would fail to match and
     // render raw, em dash and all, which is the very thing the reword removed.
     // Same practice as the phase 03 wire-carried renames (pinned in
-    // tests/localization_fixes.test.ts) and the same shape as the arena queue
-    // line's ellipsis twin below. Retire this arm once every realm has restarted
-    // past the reword; D150 carries the ruling.
-    // The old separator is spelled as an ESCAPE, never as the byte: the repo
-    // forbids an em dash in source, and this branch already learned the general
-    // form of that lesson the hard way (a guard keyed on raw NUL bytes made git
-    // classify the whole file as binary). Write the escape, never the byte.
+    // tests/localization_fixes.test.ts, as is this arm) and the same shape as the
+    // arena queue line's ellipsis twin in the exact map above. RULED
+    // qr-19-drowned-temple-entertext-deploy-alias (2026-09-02): ratified; retire
+    // this arm and its pin once the release carrying this branch's reword
+    // (release/v0.42.0 at the time of writing) is fully deployed. The old separator
+    // is spelled as an ESCAPE, never as the byte: the repo forbids an em dash in
+    // source (a raw-NUL guard once made git classify this whole file as binary).
     if (
       text ===
       `You step through the moongate \u2014 the air turns to cold water and pale light, and the singing closes over your head.`
