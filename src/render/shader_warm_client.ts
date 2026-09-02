@@ -243,6 +243,17 @@ function defaultPlatform(): ShaderWarmPlatform {
   return mobilePlatformFromNavigator(typeof navigator === 'undefined' ? null : navigator);
 }
 
+/** Whether the player's shader warm-up choice can do anything on this host.
+ *  False where the mode resolver refuses the platform whatever the setting is
+ *  (phone-class WebKit, where a second WebGL2 context is a per-process memory
+ *  ceiling risk), so a chrome that offers the row asks the RESOLVER rather
+ *  than re-deriving the platform rule of its own: one rule, one place. */
+export function shaderWarmChoiceAvailable(
+  platform: ShaderWarmPlatform = defaultPlatform(),
+): boolean {
+  return shaderWarmModeFor('all', null, platform) !== 'off';
+}
+
 function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
   const message = event.data;
   switch (message.kind) {

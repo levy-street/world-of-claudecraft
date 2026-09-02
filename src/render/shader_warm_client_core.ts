@@ -147,6 +147,11 @@ export function shaderWarmCannotServe(inputs: ShaderWarmCannotServeInputs): bool
   const ahead = Math.floor(inputs.aheadOfOldest);
   if (!Number.isFinite(ahead) || ahead <= 0) return false;
   if (!Number.isFinite(inputs.capMs) || !Number.isFinite(inputs.waitedMs)) return false;
+  // A hold already past its cap is the EXPIRY rules' business, not this one:
+  // the verdict here is final for the session, and a message that arrived
+  // just before the cap but ran after a long task spanning it would otherwise
+  // read a negative remainder and retire the worker on one overrun.
+  if (inputs.waitedMs >= inputs.capMs) return false;
   const meanLinkMs = inputs.linkSumMs / linkCount;
   const window = Math.max(
     SHADER_WARM_WINDOW_FALLBACK,

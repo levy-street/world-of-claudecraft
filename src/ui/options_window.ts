@@ -73,7 +73,7 @@ import {
   normalizeClickMoveButton,
   SETTING_RANGES,
 } from '../game/settings';
-import { mobilePlatformFromNavigator } from '../render/gfx';
+import { shaderWarmChoiceAvailable } from '../render/shader_warm_client';
 import { desktopBridge } from '../runtime';
 import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
@@ -1347,10 +1347,9 @@ export class OptionsWindow {
               // start will really use, over the rung this one is on.
               desktopGpuBackendWriteFailed: desktopGpuBackendWriteFailed(),
               // The shader warm-up worker is forced off on iOS whatever the
-              // setting (shader_warm_client_core.ts), so that host gets no row.
-              shaderWarmChoice:
-                mobilePlatformFromNavigator(typeof navigator === 'undefined' ? null : navigator) !==
-                'ios',
+              // setting, so that host gets no row. The client's resolver owns
+              // that rule; asking it is what keeps the two from drifting.
+              shaderWarmChoice: shaderWarmChoiceAvailable(),
             },
           )
         : [];

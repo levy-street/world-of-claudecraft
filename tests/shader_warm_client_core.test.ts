@@ -629,12 +629,35 @@ describe("the cannot-serve rule (the worker measured against the caller's cap)",
     expect(shaderWarmCannotServe(six)).toBe(false);
   });
 
-  it('never fires on an empty queue, or on a hold that has already outrun its cap alone', () => {
+  it('never fires on an empty queue', () => {
     // Nothing ahead is nothing to wait for, whatever the wall.
     expect(shaderWarmCannotServe({ ...LAPTOP, aheadOfOldest: 0 })).toBe(false);
-    // A hold past its own cap is the caller's business (it gives up itself);
-    // this rule still answers on the queue, not on the overrun.
-    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: 6_000 })).toBe(true);
+  });
+
+  it('says nothing about a hold already past its cap, whatever the queue', () => {
+    // The expiry rules own an overrun. Past the cap the remainder is negative
+    // and the comparison would collapse to "anything at all is queued", so a
+    // fifty-millisecond worker with ONE program left would be retired for the
+    // session on a message that ran after a long task spanning the cap.
+    expect(
+      shaderWarmCannotServe({
+        ...LAPTOP,
+        waitedMs: 6_000,
+        aheadOfOldest: 1,
+        linkSumMs: 5 * 50,
+      }),
+    ).toBe(false);
+    // The same overrun with the laptop's own deep queue: still nothing, the
+    // rule answers on the remaining window and there is none.
+    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: 6_000 })).toBe(false);
+    // Exactly at the cap is already expired.
+    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: 5_000 })).toBe(false);
+  });
+
+  it('still answers on the queue while the hold has cap left', () => {
+    // A millisecond short of the cap is a live hold: 32 links at 560 ms over
+    // four cannot land in the one millisecond that remains.
+    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: 4_999 })).toBe(true);
   });
 
   it('answers false on garbage rather than retiring a working worker', () => {

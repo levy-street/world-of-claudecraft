@@ -23,6 +23,8 @@ import {
   readWarmupQuery,
   SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT,
   SHADER_CORPUS_EXTENSION_LIMIT,
+  SHADER_CORPUS_EXTENSION_NAME_LIMIT,
+  SHADER_CORPUS_IDENTITY_LIMIT,
   SHADER_CORPUS_MAX_BYTES,
   SHADER_CORPUS_PROGRAM_LIMIT,
   SHADER_CORPUS_VERSION,
@@ -234,17 +236,63 @@ describe('isShaderCorpusRecord', () => {
     const three = [pair(1), pair(2), pair(3)];
     expect(isShaderCorpusRecord({ ...record, programs: three }, { programs: 3 })).toBe(true);
     expect(isShaderCorpusRecord({ ...record, programs: three }, { programs: 2 })).toBe(false);
+    // The identity and the extension names are text this record carries, so
+    // they ride the SAME ceiling as the sources: a bound that skipped them
+    // would be a bound on part of the record.
+    const overhead = record.identity.length + record.extensions.join('').length;
     const chars = pair(1).vertex.length + pair(1).fragment.length;
-    expect(isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: chars })).toBe(true);
-    expect(isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: chars - 1 })).toBe(
-      false,
-    );
-    expect(isShaderCorpusRecord({ ...record, programs: three }, { bytes: chars * 2 })).toBe(false);
+    expect(
+      isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: overhead + chars }),
+    ).toBe(true);
+    expect(
+      isShaderCorpusRecord({ ...record, programs: [pair(1)] }, { bytes: overhead + chars - 1 }),
+    ).toBe(false);
+    // The same sources under an identity one character longer no longer fit.
+    expect(
+      isShaderCorpusRecord(
+        { ...record, identity: `${record.identity}x`, programs: [pair(1)] },
+        { bytes: overhead + chars },
+      ),
+    ).toBe(false);
+    // And an extra extension name is charged the same way.
+    expect(
+      isShaderCorpusRecord(
+        { ...record, extensions: [...record.extensions, 'EXT'], programs: [pair(1)] },
+        { bytes: overhead + chars },
+      ),
+    ).toBe(false);
+    expect(
+      isShaderCorpusRecord({ ...record, programs: three }, { bytes: overhead + chars * 2 }),
+    ).toBe(false);
     const manyExtensions = Array.from(
       { length: SHADER_CORPUS_EXTENSION_LIMIT + 1 },
       (_, i) => `EXT_${i}`,
     );
     expect(isShaderCorpusRecord({ ...record, extensions: manyExtensions })).toBe(false);
+    // One name past the name bound: without it, SHADER_CORPUS_EXTENSION_LIMIT
+    // names could carry any amount of text through the check.
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        extensions: ['a'.repeat(SHADER_CORPUS_EXTENSION_NAME_LIMIT + 1)],
+      }),
+    ).toBe(false);
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        extensions: ['a'.repeat(SHADER_CORPUS_EXTENSION_NAME_LIMIT)],
+      }),
+    ).toBe(true);
+    // The identity is the joined tuple, and it is bounded too.
+    expect(
+      isShaderCorpusRecord({
+        ...record,
+        identity: 'a'.repeat(SHADER_CORPUS_IDENTITY_LIMIT + 1),
+      }),
+    ).toBe(false);
+    expect(
+      isShaderCorpusRecord({ ...record, identity: 'a'.repeat(SHADER_CORPUS_IDENTITY_LIMIT) }),
+    ).toBe(true);
     expect(
       isShaderCorpusRecord({
         ...record,
@@ -263,6 +311,21 @@ describe('isShaderCorpusRecord', () => {
     expect(SHADER_CORPUS_MAX_BYTES).toBe(64 * 1024 * 1024);
     expect(SHADER_CORPUS_EXTENSION_LIMIT).toBe(64);
     expect(SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT).toBe(256);
+    expect(SHADER_CORPUS_EXTENSION_NAME_LIMIT).toBe(64);
+    expect(SHADER_CORPUS_IDENTITY_LIMIT).toBe(8 * 1024);
+    // Both bounds are derived from the real values, not guessed: the longest
+    // name the sweep enables and the identity that sweep produces both fit.
+    for (const name of RENDERER_CONTEXT_EXTENSIONS) {
+      expect(name.length).toBeLessThanOrEqual(SHADER_CORPUS_EXTENSION_NAME_LIMIT);
+    }
+    expect(
+      shaderCorpusIdentity({
+        buildId: 'v0.42.0-abcdef0',
+        tier: 'ultra',
+        adapter: 'ANGLE (NVIDIA, NVIDIA GeForce RTX 3090 Direct3D11 vs_5_0 ps_5_0, D3D11)',
+        extensions: [...RENDERER_CONTEXT_EXTENSIONS],
+      }).length,
+    ).toBeLessThanOrEqual(SHADER_CORPUS_IDENTITY_LIMIT);
     expect(RENDERER_CONTEXT_EXTENSIONS.length).toBeLessThanOrEqual(SHADER_CORPUS_EXTENSION_LIMIT);
     expect(
       isShaderCorpusRecord({

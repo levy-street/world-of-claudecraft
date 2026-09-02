@@ -42,6 +42,7 @@ import {
   registerClientPerfMetrics,
   setClientPerfMetricsSink,
   shaderWarmRefusalLabel,
+  WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
 } from '../../../server/http/client_perf_metrics';
 import { handlePerfReport, perfReportInternalsForTest } from '../../../server/perf_report';
 
@@ -174,6 +175,13 @@ describe('vocabulary pins', () => {
       'other',
     ]);
     expect(CLIENT_PERF_JANK_THRESHOLD_MS).toBe(250);
+  });
+
+  it('pins the shader-warm series name as a literal', () => {
+    // It counts the SAME population as woc_client_reports_total, differing
+    // only by labels, so the name has to say which question it answers: a
+    // reader who saw `perf` there would take it for a different population.
+    expect(WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL).toBe('woc_client_shader_warm_reports_total');
   });
 
   it('pins the histogram bucket edges as literals', () => {
@@ -507,7 +515,7 @@ describe('shaderWarmRefusalLabel', () => {
   });
 });
 
-describe('woc_client_perf_reports_total', () => {
+describe('woc_client_shader_warm_reports_total', () => {
   it('exposes the counter type line and the labelled sample for a refused worker', async () => {
     const registry = new Registry();
     const sink = registerClientPerfMetrics(registry);
@@ -517,18 +525,18 @@ describe('woc_client_perf_reports_total', () => {
     );
 
     const text = await registry.metrics();
-    expect(text).toContain('# TYPE woc_client_perf_reports_total counter');
+    expect(text).toContain('# TYPE woc_client_shader_warm_reports_total counter');
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="false",shader_warm_refusal="hold-timeouts:expired-share"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="hold-timeouts:expired-share"\} (\d+)$/m,
       ),
     ).toBe(1);
     // The live cohort is the other arm of the same question and stays at zero.
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
       ),
     ).toBe(0);
   });
@@ -542,7 +550,7 @@ describe('woc_client_perf_reports_total', () => {
     expect(
       value(
         await registry.metrics(),
-        /^woc_client_perf_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="none"\} (\d+)$/m,
       ),
     ).toBe(1);
   });
@@ -571,17 +579,17 @@ describe('woc_client_perf_reports_total', () => {
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="false",shader_warm_refusal="other"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="other"\} (\d+)$/m,
       ),
     ).toBe(1);
     // Both drifts share one series: the extension name never mints its own.
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="false",shader_warm_refusal="extension-drift"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="extension-drift"\} (\d+)$/m,
       ),
     ).toBe(2);
-    const series = text.match(/^woc_client_perf_reports_total\{[^}]*\}/gm) ?? [];
+    const series = text.match(/^woc_client_shader_warm_reports_total\{[^}]*\}/gm) ?? [];
     // Two active values times the fixed refusal vocabulary, whatever arrived.
     expect(series.length).toBe(2 * CLIENT_PERF_SHADER_WARM_REFUSALS.length);
     expect(text).not.toContain('ext_color_buffer_float');
@@ -602,13 +610,13 @@ describe('woc_client_perf_reports_total', () => {
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="false",shader_warm_refusal="pagehide"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="false",shader_warm_refusal="pagehide"\} (\d+)$/m,
       ),
     ).toBe(0);
     expect(
       value(
         text,
-        /^woc_client_perf_reports_total\{shader_warm_active="true",shader_warm_refusal="ios-webkit"\} (\d+)$/m,
+        /^woc_client_shader_warm_reports_total\{shader_warm_active="true",shader_warm_refusal="ios-webkit"\} (\d+)$/m,
       ),
     ).toBe(0);
   });

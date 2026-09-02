@@ -468,6 +468,61 @@ describe('a gate that holds for the worker', () => {
     expect(cancels).toBe(1);
   });
 
+  it('starts the cap clock at the request, not where the queue settled the unit', async () => {
+    // The assembly rides the caller's queue, and that unit's promise can
+    // settle well after the request went out. The client was told the
+    // request's instant (holdShaderPrograms' startedAtMs), so a cap armed
+    // where the hold is entered would bound a window wider than the one the
+    // caller really owns, and the client's cannot-serve rule would price a
+    // cap that had already run down.
+    const worker = armedWorker();
+    const { arms } = armsRig({ sources: { a: [dry('ka', 'va')] } });
+    const log: string[] = [];
+    let releaseAssembly: () => void = () => {};
+    let clock = 1_000;
+    let armedCapMs = -1;
+
+    const submit = (pieces: CompileGatePiece[], firstIndex: number): Promise<CompileGateResult> => {
+      const entries = pieces.map((piece) => `${markerOf(piece)}@${firstIndex}`);
+      log.push(...entries);
+      return Promise.all(pieces.map((piece) => piece({ fired: false }))).then(() => {
+        if (entries[0] !== 'assemble@0') return SETTLED;
+        return new Promise<CompileGateResult>((resolve) => {
+          releaseAssembly = () => resolve(SETTLED);
+        });
+      });
+    };
+
+    const gate = runPiecesWarmed(arms, rootOf(['a']), piecesOf(['a']), {
+      priority: COSMETIC,
+      imminent: false,
+      submit,
+      now: () => clock,
+      schedule: (_callback, ms) => {
+        armedCapMs = ms;
+        return () => {};
+      },
+    });
+    worker.ready();
+    await flush();
+    // The unit ran, so the worker already has the request.
+    expect(worker.askedIds()).toEqual([1]);
+    expect(armedCapMs).toBe(-1);
+
+    // The queue settles that unit 400 ms after the request went out.
+    clock = 1_400;
+    releaseAssembly();
+    await flush();
+    expect(armedCapMs).toBe(SHADER_WARM_HOLD_CAP_MS - 400);
+
+    clock = 1_900;
+    worker.emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    expect(await gate).toEqual(SETTLED);
+    expect(log).toEqual(['assemble@0', 'a@0']);
+    // ... and the wait the readout carries is the wait the client judges.
+    expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldWarm: 1, holdMs: 900 });
+  });
+
   it('pins the hold cap to half the reveal watchdog', () => {
     expect(SHADER_WARM_HOLD_CAP_MS).toBe(REVEAL_GATE_WATCHDOG_MS / 2);
     expect(SHADER_WARM_HOLD_CAP_MS).toBe(5_000);

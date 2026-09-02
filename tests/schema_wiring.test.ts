@@ -854,6 +854,27 @@ describe('ensureSchema wires every schema module at boot', () => {
     );
   });
 
+  it('applies the client-perf schema module AFTER the core SCHEMA (its foreign keys)', async () => {
+    // client_perf_reports FK-references accounts(id) and characters(id), both
+    // created by SCHEMA. Lifting the table's DDL out of server/db.ts put that
+    // ordering at risk: a module applied first would fail on a FRESH database
+    // with "relation accounts does not exist", and every existing database
+    // would keep booting green, so nothing but this pin catches it.
+    await ensureSchema();
+    const applied = h.calls.join('\n');
+    const accountsAt = applied.indexOf('CREATE TABLE IF NOT EXISTS accounts (');
+    const charactersAt = applied.indexOf('CREATE TABLE IF NOT EXISTS characters (');
+    const perfAt = applied.indexOf('CREATE TABLE IF NOT EXISTS client_perf_reports (');
+    expect(accountsAt).toBeGreaterThan(-1);
+    expect(charactersAt).toBeGreaterThan(-1);
+    expect(perfAt).toBeGreaterThan(-1);
+    expect(accountsAt).toBeLessThan(perfAt);
+    expect(charactersAt).toBeLessThan(perfAt);
+    // And the referencing columns really are the ones that need it.
+    expect(applied).toContain('account_id INT REFERENCES accounts(id) ON DELETE SET NULL');
+    expect(applied).toContain('character_id INT REFERENCES characters(id) ON DELETE SET NULL');
+  });
+
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
     // A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart,
     // a crash) strands an INVALID index that IF NOT EXISTS treats as existing

@@ -24,6 +24,15 @@
 // on the party frame (partyFrameAbsorb, src/sim/party_frame_info.ts). So the
 // slept shell drops an in-world DUPLICATE of a read the HUD keeps, which is
 // the cosmetic trade the rest of the sleep makes, and no carve-out is owed.
+// A shielded enemy that is NOT the current target is the case the target
+// frame does not answer, and it is accepted for the same three reasons the
+// rest of the sleep is: the shell is the only read of it, so nothing is
+// contradicted, only absent; the deadline bounds the window to the seconds
+// the cast programs are still linking; and a frustum-culled or far-LOD
+// entity already drops that shell today, so no player was ever owed it
+// off-target. Reading it would mean holding the pools awake for every
+// shielded body on screen, which is the whole cost the sleep exists to
+// avoid.
 //
 // Why a gate rather than an earlier link: the boot manifest's entry for these
 // programs runs after its 3 s budget on the OpenGL desktops (measured
@@ -54,10 +63,13 @@ export interface CastVfxReadinessDeps<M> {
   /** The lazy stand-ins were staged at least once: until then their set is
    *  unknown, so nothing is admitted. */
   staged: () => boolean;
-  /** Whether a settle has PROVED this material's program linked (the host
-   *  reads the settle record, never the driver: a per-frame consult must not
-   *  issue a GPU-process round trip). */
-  linked: (material: M) => boolean;
+  /** The program a settle has PROVED linked for this material, or null when
+   *  its current one is not proved (the host reads the settle record, never
+   *  the driver: a per-frame consult must not issue a GPU-process round
+   *  trip). A HANDLE rather than a boolean because the record answers per
+   *  PROGRAM while the question is asked per material, and a material's
+   *  current program can change before the gate opens. */
+  linked: (material: M) => unknown;
 }
 
 export interface CastVfxReadinessSnapshot {
@@ -80,8 +92,9 @@ export interface CastVfxReadiness {
 }
 
 export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVfxReadiness {
-  // Latched: a linked program stays linked for the life of its material, and
-  // the pools and stand-ins are never disposed.
+  // Latched once every material answered on a proved program: the pools and
+  // stand-ins are never disposed, and a gate that has opened is not asked to
+  // close over a later swap.
   let ready = false;
   let forced = false;
   let refused = 0;
@@ -90,9 +103,6 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
   // From the first consult, not from the staging: the failure this bounds
   // includes the one where the stand-ins are never staged at all.
   let firstConsultAt: number | null = null;
-  // Per material, the same latch: one that answered linked is never asked
-  // again, so the walk shrinks to the materials still pending.
-  const linkedMaterials = new Set<M>();
   const check = (): boolean => {
     if (ready) return true;
     const now = deps.now();
@@ -108,10 +118,15 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
     }
     if (materials === null) materials = deps.materials();
     let unlinked = 0;
+    // Asked per consult, never latched per material: the record answers for
+    // the program the material carries NOW, and a material handed a program
+    // no settle has proved (a clone, a key change) is pending again however
+    // its earlier one answered. The host's answer is a property lookup and a
+    // record read, never a driver query, so the walk stays a live frame's
+    // work; the whole-gate latch below is what ends it.
     for (const material of materials) {
-      if (linkedMaterials.has(material)) continue;
-      if (deps.linked(material)) linkedMaterials.add(material);
-      else unlinked++;
+      const program = deps.linked(material);
+      if (program === null || program === undefined) unlinked++;
     }
     pending = unlinked;
     ready = unlinked === 0;

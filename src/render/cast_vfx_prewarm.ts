@@ -83,11 +83,14 @@ export function createSceneCastVfxReadiness(
     deadlineMs,
     materials: () => [...abilityVfxCompileMaterials(scene), ...(standIns() ?? [])],
     staged: () => standIns() !== null,
+    // The PROGRAM the settle record proved, not a boolean: the core keys its
+    // answer on it, so a material three has repointed at a program no settle
+    // has seen reads pending again instead of riding the earlier one's answer.
     linked: (material) => {
       const program = (
         webgl.properties.get(material) as { currentProgram?: LinkedProgramLike | null }
       ).currentProgram;
-      return !!program && isProgramKnownReady(program);
+      return program && isProgramKnownReady(program) ? program : null;
     },
   });
 }

@@ -22,6 +22,7 @@ import {
   type SceneCensusMeta,
   sceneCensusChild,
 } from '../src/render/scene_census_core';
+import { stripComments } from './helpers/strip_comments';
 
 interface FakeChild {
   category: string;
@@ -576,7 +577,11 @@ describe('the census burst is excluded from BOTH per-frame readouts', () => {
     // census's own links. The audit needs the burst BRACKETED, since it runs
     // in its own task: without the begin, a gate's prologue that minted
     // between the last present and the census is charged to the census.
-    const source = readFileSync(path.resolve(__dirname, '../src/render/renderer.ts'), 'utf8');
+    // Comments stripped like the other source pins here: a prose mention of
+    // the hook must not satisfy a positive match, nor swell the count below.
+    const source = stripComments(
+      readFileSync(path.resolve(__dirname, '../src/render/renderer.ts'), 'utf8'),
+    );
     const begin = /beginOutOfBand: \(\) => ([^\n]*),/.exec(source);
     expect(begin?.[1]).toBe("liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'begin')");
     const hook = /discardOutOfBand: \(\) => \{([\s\S]*?)\},/.exec(source);

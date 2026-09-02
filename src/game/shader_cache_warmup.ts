@@ -299,8 +299,16 @@ export async function encodeCorpus(record: ShaderCorpusRecord): Promise<StoredCo
 }
 
 /** The stored value is untrusted (same origin can write the store): bounded
- *  before inflation, during it, and again on the parsed record's program
- *  count and source size, so nothing past `maxBytes` is ever held. */
+ *  before inflation (the stored byte length), during it (the inflating
+ *  stream), and again on the parsed record (its program count and its summed
+ *  text, identity and extension names included).
+ *
+ *  What that buys is a bound on each STAGE, not one on the peak. JSON.parse
+ *  runs on the whole decoded text before any per-record check, so a value at
+ *  the ceiling holds the inflated bytes, the decoded string AND the parsed
+ *  graph at once: about three times `maxBytes` live at the worst instant.
+ *  The ceiling is chosen for that peak (see SHADER_CORPUS_MAX_BYTES), so this
+ *  is the cost the bound was set against, not a hole in it. */
 export async function decodeCorpus(
   stored: unknown,
   maxBytes: number = SHADER_CORPUS_MAX_BYTES,

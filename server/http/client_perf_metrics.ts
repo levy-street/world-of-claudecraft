@@ -176,7 +176,7 @@ export const WOC_CLIENT_SUGGESTIONS_TOTAL = 'woc_client_suggestions_total';
 // counts, under its own name because its labels are a different question
 // (is the warm-up worker alive on this client, and why not) rather than a
 // different population.
-export const WOC_CLIENT_PERF_REPORTS_TOTAL = 'woc_client_perf_reports_total';
+export const WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL = 'woc_client_shader_warm_reports_total';
 
 // Bucket edges are part of the exporter's public contract (a bucket edit
 // silently rewrites every dashboard quantile), so they are exported and pinned
@@ -391,7 +391,7 @@ export function registerClientPerfMetrics(registry: Registry): ClientPerfMetrics
     registers: [registry],
   });
   const shaderWarmReports = new Counter({
-    name: WOC_CLIENT_PERF_REPORTS_TOTAL,
+    name: WOC_CLIENT_SHADER_WARM_REPORTS_TOTAL,
     help: 'Stored gameplay perf reports by shader warm-up worker state: whether the worker was active on the reporting client, and the bounded refusal cause when it was not.',
     labelNames: ['shader_warm_active', 'shader_warm_refusal'] as const,
     registers: [registry],

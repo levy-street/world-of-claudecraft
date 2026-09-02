@@ -1443,10 +1443,14 @@ let rendererErrorsLogged = 0;
 // to vulkan-plain (refineParallelCompile), which the options row then names and which a
 // launch the memory decided, once it proves healthy, then persists as the rung it
 // remembers (armHealthySessionTimer). It never rescues, so nothing re-execs on it.
-// The blast radius is bounded by construction: trusted senders only, judged once per
-// process, one rescue per process, and a chain capped by the rescue marker, so the
-// worst a hostile page could do is cost the player one relaunch onto a slower backend
-// or one lowered rung in the memory.
+// The blast radius is bounded by construction: trusted senders only (the game page
+// this shell loaded, never a remote frame), judged once per process, one rescue per
+// process, and a chain capped by the rescue marker. Inside those bounds the worst a
+// page could do is not one-shot: refineParallelCompile(false) LOWERS the bound rung,
+// and the healthy-session timer then writes that lower rung to the memory, so every
+// LATER launch starts there until something raises it again. It is a persisted
+// downgrade to a slower backend, never an escape from the backend set, and it is why
+// the trusted-sender check is the load-bearing part of this handler.
 ipcMain.on('desktop-report-gpu-renderer', (event, renderer, parallelCompile) => {
   if (!trustedSender(event)) return;
   if (typeof renderer !== 'string' || renderer === '') return;

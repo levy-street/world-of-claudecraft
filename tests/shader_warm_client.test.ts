@@ -19,6 +19,7 @@ import {
   SHADER_WARM_READY_DEADLINE_MS,
   setShaderWarmStoredSettingSource,
   shaderWarmAvailable,
+  shaderWarmChoiceAvailable,
   shaderWarmDecide,
   shaderWarmSnapshot,
   storedShaderWarmSetting,
@@ -1400,6 +1401,18 @@ describe('the registered stored-option source', () => {
     expect(storedShaderWarmSetting()).toBe('off');
     setShaderWarmStoredSettingSource(() => null);
     expect(storedShaderWarmSetting()).toBeNull();
+  });
+});
+
+describe('whether the player is offered a shader warm-up choice at all', () => {
+  it('refuses the platform the mode resolver refuses, and offers it everywhere else', () => {
+    // The options window drops its row on the answer, so the rule has to be
+    // the resolver's own: iOS is off whatever the setting (a second WebGL2
+    // context is a per-process memory ceiling risk on phone-class WebKit),
+    // and Android keeps the explicit arm even though `auto` reads off there.
+    expect(shaderWarmChoiceAvailable('ios')).toBe(false);
+    expect(shaderWarmChoiceAvailable('android')).toBe(true);
+    expect(shaderWarmChoiceAvailable('other')).toBe(true);
   });
 });
 

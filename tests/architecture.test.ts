@@ -529,6 +529,7 @@ const UI_PURE_CORES = [
   'src/game/stale_chrome_focus.ts',
   'src/game/perf_diagnosis_core.ts',
   'src/game/post_entry_warmups_core.ts',
+  'src/game/perf_shader_warm_core.ts',
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/ui/trade_view.ts',

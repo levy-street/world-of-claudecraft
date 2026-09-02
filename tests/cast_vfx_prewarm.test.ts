@@ -100,10 +100,9 @@ describe('the scene cast-VFX gate over three', () => {
     expect(readiness.ready()).toBe(false);
   });
 
-  it('asks the record only about materials still pending', () => {
-    // A proved material is latched by the core; the record lookup itself is a
-    // WeakSet read, never a driver query, so nothing here reaches the GPU
-    // process however many entities consult per frame.
+  it('answers with the PROGRAM the record proved, not with the material', () => {
+    // The record answers per program while the gate asks per material, so a
+    // boolean would be an answer about a program that can already be gone.
     const ready = vfxMesh('ring');
     const pending = vfxMesh('decal');
     const h = harness([ready, pending]);
@@ -113,5 +112,92 @@ describe('the scene cast-VFX gate over three', () => {
     h.programs.set(h.materialOf(pending), program());
     for (let i = 0; i < 5; i++) expect(h.readiness.ready()).toBe(false);
     expect(h.readiness.snapshot().pending).toBe(1);
+  });
+
+  it('re-closes on a program the record has not proved, however the earlier one answered', () => {
+    // three repoints `currentProgram` on a key change or a clone. A gate
+    // latched on the MATERIAL would keep answering for the program that is
+    // gone and let a cast draw on one still in flight.
+    const ring = vfxMesh('ring');
+    const decal = vfxMesh('decal');
+    const h = harness([ring, decal]);
+    const a = program();
+    markProgramReady(a);
+    h.programs.set(h.materialOf(ring), a);
+    const decalProgram = program();
+    h.programs.set(h.materialOf(decal), decalProgram);
+    // Ring answered on A; the gate is still shut on the other material.
+    expect(h.readiness.ready()).toBe(false);
+    expect(h.readiness.snapshot().pending).toBe(1);
+
+    // Ring is handed B, which no settle has proved: pending again.
+    const b = program();
+    h.programs.set(h.materialOf(ring), b);
+    expect(h.readiness.ready()).toBe(false);
+    expect(h.readiness.snapshot().pending).toBe(2);
+
+    // B proved, and the gate opens once both answer.
+    markProgramReady(b);
+    expect(h.readiness.ready()).toBe(false);
+    markProgramReady(decalProgram);
+    expect(h.readiness.ready()).toBe(true);
+  });
+});
+
+describe('the units the resume lane runs', () => {
+  it('links through the colour arm by default, and marks the program on the settle', async () => {
+    // The shipped arm, with no compile injected: the unit must reach
+    // linkColorPrograms, which submits the root under each colour target the
+    // tier covers and restores the ambient target, and the settle is what
+    // writes the record the gate opens on.
+    const mesh = vfxMesh('ring');
+    const { scene, webgl, readiness, programs, materialOf } = harness([mesh]);
+    const handle = program();
+    programs.set(materialOf(mesh), handle);
+
+    const compiled: Array<{ root: THREE.Object3D; target: THREE.WebGLRenderTarget | null }> = [];
+    let current: THREE.WebGLRenderTarget | null = null;
+    const offscreenTarget = {} as THREE.WebGLRenderTarget;
+    let settle: (value: THREE.Object3D) => void = () => {};
+    const armed = new Promise<THREE.Object3D>((resolve) => {
+      settle = resolve;
+    });
+    const camera = new THREE.PerspectiveCamera();
+    const host: CompileArmHost = {
+      webgl: () => ({
+        getRenderTarget: () => current,
+        setRenderTarget: (target: THREE.WebGLRenderTarget | null) => {
+          current = target;
+        },
+        compileAsync: (root: THREE.Object3D) => {
+          compiled.push({ root, target: current });
+          return armed;
+        },
+      }),
+      camera: () => camera,
+      scene: () => scene,
+      shadowCamera: () => camera,
+      // A direct tier: the canvas variant is its gameplay variant, and the
+      // unit asks for no offscreen one.
+      offscreen: () => false,
+      offscreenTarget: () => offscreenTarget,
+      depthMaterials: () => new Map(),
+      shadowArm: () => false,
+    };
+
+    const [unit] = castVfxProgramUnits(scene, null, host, webgl);
+    const run = unit.run();
+    await Promise.resolve();
+    // Submitted with the unit's own root, under the canvas target.
+    expect(compiled).toEqual([{ root: mesh, target: null }]);
+    expect(unit.roots).toEqual([mesh]);
+    // Nothing is proved until that compile settles.
+    expect(readiness.ready()).toBe(false);
+
+    settle(scene);
+    await run;
+    // The ambient target is back, and the settle wrote the record.
+    expect(current).toBeNull();
+    expect(readiness.ready()).toBe(true);
   });
 });

@@ -661,7 +661,7 @@ For off-box safety, sync the directory to S3 occasionally:
   rate limit, and per-session insert throttle bound the write rate), so
   corroborate a surprising shift against the client_perf_reports table before
   treating it as fleet truth.
-  `woc_client_perf_reports_total` (same module, same stored gameplay reports) is
+  `woc_client_shader_warm_reports_total` (same module, same stored gameplay reports) is
   the shader warm-up cut of that population: `shader_warm_active` says whether
   the warm-up worker was alive on the reporting client, and
   `shader_warm_refusal` carries the cause when it was not (`none` when there is

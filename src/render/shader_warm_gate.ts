@@ -120,6 +120,12 @@ export function runPiecesWarmed(
     let sources: ProgramSourceEntry[] = [];
     let hold: ShaderWarmHold | null = null;
     let warm: Promise<boolean> | null = null;
+    // When the cap clock starts, captured beside the request: the assembly
+    // rides the caller's queue and this piece's promise settles later, so a
+    // cap armed where the hold is entered would give the client an instant it
+    // does not own and the cannot-serve rule would price a window already
+    // spent (shader_warm_lane.ts makes the same capture).
+    let requestedAtMs = 0;
     const assemble: CompileGatePiece = () => {
       const started = now();
       try {
@@ -130,7 +136,8 @@ export function runPiecesWarmed(
       }
       noteShaderWarmAssembly(now() - started);
       if (sources.length > 0) {
-        hold = holdShaderPrograms(sources, priority, holdCapMs);
+        requestedAtMs = now();
+        hold = holdShaderPrograms(sources, priority, holdCapMs, requestedAtMs);
         warm = hold.settled.then(
           (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
           () => false,
@@ -146,7 +153,8 @@ export function runPiecesWarmed(
         return submit([piece], index);
       }
       anyHeld = true;
-      const startedAt = now();
+      const startedAt = requestedAtMs;
+      const remainingMs = Math.max(0, holdCapMs - (now() - startedAt));
       return new Promise<CompileGateResult>((resolve, reject) => {
         let done = false;
         let cancelCap: () => void = () => {};
@@ -159,7 +167,7 @@ export function runPiecesWarmed(
           noteShaderWarmHold(isWarm, timedOut, now() - startedAt);
           submit([piece], index).then(resolve, reject);
         };
-        cancelCap = schedule(() => finish(false, true), holdCapMs);
+        cancelCap = schedule(() => finish(false, true), remainingMs);
         pending.then((isWarm) => finish(isWarm, false));
       });
     });

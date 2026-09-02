@@ -76,6 +76,19 @@ export const SHADER_CORPUS_MAX_BYTES = 64 * 1024 * 1024;
  *  a dozen names; a record naming more than this is not one of ours. */
 export const SHADER_CORPUS_EXTENSION_LIMIT = 64;
 
+/** One extension NAME. The longest the sweep enables is
+ *  `WEBGL_compressed_texture_s3tc_srgb` (34 characters) and the whole WebGL
+ *  registry stays under this, so a longer one is not a name: without the
+ *  bound, `SHADER_CORPUS_EXTENSION_LIMIT` names alone could carry any amount
+ *  of text past the record check. */
+export const SHADER_CORPUS_EXTENSION_NAME_LIMIT = 64;
+
+/** The identity string (shaderCorpusIdentity): the version, the build id, the
+ *  tier, the adapter string and every extension name joined. At the two
+ *  bounds above that tuple is about 4 KB, so this leaves it room and still
+ *  refuses a value grown to hold text. */
+export const SHADER_CORPUS_IDENTITY_LIMIT = 8 * 1024;
+
 /** An attribute name at location 0: `position` in practice. */
 export const SHADER_CORPUS_ATTRIBUTE_NAME_LIMIT = 256;
 
@@ -244,13 +257,22 @@ export function isShaderCorpusRecord(
   const record = value as Partial<ShaderCorpusRecord>;
   if (record.version !== SHADER_CORPUS_VERSION) return false;
   if (typeof record.identity !== 'string' || record.identity.length === 0) return false;
+  if (record.identity.length > SHADER_CORPUS_IDENTITY_LIMIT) return false;
   if (!Array.isArray(record.extensions)) return false;
   if (record.extensions.length > SHADER_CORPUS_EXTENSION_LIMIT) return false;
-  for (const name of record.extensions) if (typeof name !== 'string') return false;
+  for (const name of record.extensions) {
+    if (typeof name !== 'string') return false;
+    if (name.length > SHADER_CORPUS_EXTENSION_NAME_LIMIT) return false;
+  }
   if (typeof record.savedAt !== 'number' || !Number.isFinite(record.savedAt)) return false;
   if (!Array.isArray(record.programs)) return false;
   if (record.programs.length > programLimit) return false;
-  let chars = 0;
+  // The identity and the extension names count toward the same ceiling as the
+  // sources: they are text this record carries, and a size bound that ignored
+  // them would be a bound on part of the record.
+  let chars = record.identity.length;
+  for (const name of record.extensions) chars += name.length;
+  if (chars > byteLimit) return false;
   for (const program of record.programs) {
     if (typeof program !== 'object' || program === null) return false;
     const pair = program as Partial<ShaderProgramSources>;
