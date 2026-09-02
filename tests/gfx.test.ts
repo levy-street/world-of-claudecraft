@@ -280,7 +280,9 @@ describe('graphics tier resolution', () => {
     expect(medium.composer).toBe(false);
     expect(medium.ao).toBe(false);
     expect(medium.shadowMap).toBeGreaterThan(low.shadowMap);
-    expect(medium.shadowMap).toBeLessThan(high.shadowMap);
+    // Medium and High share the 2560 working map: the ladder's next step up
+    // is the ultra tiers' 4096 showcase allocation, not a High-only rung.
+    expect(medium.shadowMap).toBe(high.shadowMap);
     expect(medium.pixelRatioCap).toBeLessThan(high.pixelRatioCap);
     expect(medium.msaaSamples).toBe(0);
     expect(medium.smaa).toBe(false);
@@ -291,14 +293,16 @@ describe('graphics tier resolution', () => {
     expect(high.ao).toBe(true);
     expect(high.msaaSamples).toBe(0);
     expect(high.smaa).toBe(true);
-    expect(high.shadowMap).toBe(4096);
+    expect(high.shadowMap).toBe(2560);
 
     expect(ultra.standardMaterials).toBe(true);
     expect(ultra.composer).toBe(true);
     expect(ultra.ao).toBe(true);
     expect(ultra.msaaSamples).toBe(0);
     expect(ultra.smaa).toBe(true);
-    expect(ultra.shadowMap).toBe(high.shadowMap);
+    // The one knob where ultra outruns high: 4096 against high's 2560.
+    expect(ultra.shadowMap).toBe(4096);
+    expect(ultra.shadowMap).toBeGreaterThan(high.shadowMap);
     expect(ultra.pixelRatioCap).toBe(high.pixelRatioCap);
     expect(GFX_BUCKET_BANDS.ultra.grass.baseline).toBeGreaterThan(
       GFX_BUCKET_BANDS.high.grass.baseline,
@@ -444,8 +448,10 @@ describe('graphics tier resolution', () => {
     expect(effectsHigh.bloom).toBe(true);
     expect(effectsHigh.smaa).toBe(true);
     // Shadows: pure map-size steps; terrain-cast joins at High. The ladder
-    // caps at High's 4096: a historical stored Insane (2) falls through to
-    // the High base instead of the retired ~256 MB-class 8192 map.
+    // caps at 4096: a historical stored Insane (2) lands on that top rung
+    // instead of the retired ~256 MB-class 8192 map. The top rung is an
+    // explicit write, not a fall-through, because the High TIER base is 2560
+    // now and a stored dial value keeps the map size the player chose.
     expect(adv({ shadowQuality: 0 }).shadowMap).toBe(1024);
     expect(adv({ shadowQuality: 0 }).terrainCastShadows).toBe(false);
     expect(adv({ shadowQuality: 0.5 }).shadowMap).toBe(2560);
@@ -454,9 +460,10 @@ describe('graphics tier resolution', () => {
     expect(adv({ shadowQuality: 2 }).shadowMap).toBe(4096);
     expect(adv({ shadowQuality: 2 }).terrainCastShadows).toBe(true);
     // The load-bearing constrained arm: the retired explicit 8192 write used
-    // to OVERRIDE the phone-class 2048 cap; falling through to the base
-    // restores it (dynamicShadows stays off there regardless, so this pins
-    // the allocation, not a visible shadow).
+    // to OVERRIDE the phone-class 2048 cap, and the top rung's 4096 write
+    // must not reintroduce that. The rung stays inside the device policy
+    // (dynamicShadows stays off there regardless, so this pins the
+    // allocation, not a visible shadow).
     const constrainedInsane = gfxInternalsForTest.settingsFor('high', {
       graphicsPreset: 5,
       shadowQuality: 2,

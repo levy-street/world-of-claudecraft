@@ -45,9 +45,10 @@ export const SETTING_RANGES = {
   terrainDetail: { min: 0, max: 2, def: 1 },
   foliageDensity: { min: 0, max: 2, def: 1 },
   effectsQuality: { min: 0, max: 1, def: 1 },
-  // Capped at High (the 4096 map): the retired Insane rung's 8192x8192 shadow
-  // target was a ~256 MB-class GPU allocation redrawn every frame. A stored
-  // historical 2 clamps to 1 on load, and gfx.ts maps it to the High base too.
+  // Capped at High (the 4096 map, above the High tier's own 2560 base): the
+  // retired Insane rung's 8192x8192 shadow target was a ~256 MB-class GPU
+  // allocation redrawn every frame. A stored historical 2 clamps to 1 on
+  // load, and gfx.ts maps it to the same top rung.
   shadowQuality: { min: 0, max: 1, def: 1 },
   // The worn-surface triplanar layer dial (0 Off, 0.5 Basic, 1 Full, 2
   // Insane), new in round 10: the town-street frame-cost dial.

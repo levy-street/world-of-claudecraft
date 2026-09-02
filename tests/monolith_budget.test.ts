@@ -351,7 +351,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Lowered by the sun-shadow shed: the four constructor ortho writes and
+    // the texel derivation folded into applyShadowShed, snapShadowAnchor took
+    // points instead of six scalars (two 11-line call sites became one line
+    // each), and the extent policy moved to src/render/shadow_extent_core.ts.
+    // Exact count, zero headroom.
+    ceiling: 13238,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

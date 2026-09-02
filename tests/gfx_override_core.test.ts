@@ -171,10 +171,15 @@ describe('gfx override application', () => {
     // this one moves a VALUE too: medium and the Advanced grade-only mix are
     // the profiles the new AA policy grants it to, and low/high/ultra/insane
     // move only by the serialized key name.
+    // The HIGH row alone moved once more when the high tier's shadowMap
+    // dropped from 4096 to the 2560 working map (see gfx.ts and
+    // tests/gfx.test.ts). advanced did NOT move, which is the check that the
+    // dial's top rung still writes 4096 explicitly instead of inheriting the
+    // new high base.
     expect(hashes).toEqual({
       low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
       medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
+      high: 'abeba01300c7e11c55187c521feb09719d4dee1a83e3d2b6baca20865e2461cd',
       ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
       insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
       advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',

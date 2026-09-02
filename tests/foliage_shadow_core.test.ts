@@ -30,12 +30,15 @@ import {
   shadowVolumeMoved,
 } from '../src/render/foliage_shadow_core';
 
-/** The shipped outdoor shadow camera, parsed rather than restated. */
+/** The shipped outdoor shadow camera, parsed rather than restated. The
+ *  half-extent is the BASE: the budget governor scales it down under
+ *  sustained pressure (shadow_extent_core.ts), and the base is the widest
+ *  volume, which is the conservative one for these culling tests. */
 function shippedShadowCamera(): { halfExtent: number; near: number; far: number } {
   const src = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
   const near = Number(/sun\.shadow\.camera\.near = ([\d.]+)/.exec(src)?.[1]);
   const far = Number(/sun\.shadow\.camera\.far = ([\d.]+)/.exec(src)?.[1]);
-  const half = Number(/const S = LOW_GFX \? [\d.]+ : ([\d.]+);/.exec(src)?.[1]);
+  const half = Number(/this\.shadowBaseExtent = LOW_GFX \? [\d.]+ : ([\d.]+);/.exec(src)?.[1]);
   expect(near, 'shadow camera near not found in renderer.ts').toBeGreaterThan(0);
   expect(far, 'shadow camera far not found in renderer.ts').toBeGreaterThan(near);
   expect(half, 'shadow ortho half extent not found in renderer.ts').toBeGreaterThan(0);

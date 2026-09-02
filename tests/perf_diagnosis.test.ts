@@ -64,6 +64,9 @@ function baseSnapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 1,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
       renderBudget: {
         enabled: true,
         mode: 'stable',

@@ -42,7 +42,12 @@ export function needsOwnDepthMaterial(material: THREE.Material): boolean {
   return false;
 }
 
-/** The shared depth material for one program shape, minted on first use. */
+/** The shared depth material for one program shape, minted on first use.
+ *  `colorWrite` is deliberately left at its default here: the vendored three
+ *  patch has WebGLShadowMap.getDepthMaterial own it on every material the
+ *  shadow pass resolves, customDepthMaterial included, so the pass writes no
+ *  colour into the shadow map's unread RGBA8 attachment. Do not set it here
+ *  (and do not read it back expecting the constructor value). */
 export function sharedDepthMaterial(shapeKey: string): THREE.MeshDepthMaterial {
   let mat = depthMaterials.get(shapeKey);
   if (!mat) {

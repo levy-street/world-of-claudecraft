@@ -487,6 +487,163 @@ describe('three empty instanced draw skip patch', () => {
   });
 });
 
+describe('three colour-write-free shadow depth pass patch', () => {
+  // Sixth patch hunk (WebGLShadowMap): a non-VSM shadow map allocates an RGBA8
+  // colour texture beside its DepthTexture, because RenderTarget requires at
+  // least one colour attachment (RenderTarget~Options documents count as "must
+  // be at least 1"). Nothing samples it: WebGLLights binds
+  // `light.shadow.map.depthTexture || light.shadow.map.texture` and r185's
+  // shadowmap_pars_fragment reads that depth through sampler2DShadow. Upstream
+  // still let the depth material write it for every rasterized fragment, so the
+  // pass paid full-coverage colour traffic, scaling with shadow-caster
+  // overdraw, for a buffer with no reader. The hunk closes the colour mask on
+  // the depth and distance materials.
+  //
+  // The CLEAR is deliberately left whole, and the test below pins that: a clear
+  // is the cheap load action everywhere (a fast clear on an immediate-mode GPU,
+  // loadAction=clear on a tiler), and dropping the colour bit would turn the
+  // attachment into loadAction=load and make the pass strictly MORE expensive
+  // on the tile-based GPUs this renderer's reference captures come from.
+  //
+  // colorWrite is deliberately NOT a program-cache-key input: WebGLPrograms
+  // never reads it (pinned below), so no program key moves and the prewarm
+  // depth twins in src/render/prewarm_depth_material.ts stay correct.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+  const unpatchedSibling = readFileSync(
+    new URL('../node_modules/three/build/three.cjs', import.meta.url),
+    'utf8',
+  );
+
+  it('closes the colour mask on the shadow depth materials, VSM excepted', () => {
+    expect(
+      source.includes('result.colorWrite = type === VSMShadowMap;'),
+      'the depth-only shadow patch is not applied; re-run pnpm install',
+    ).toBe(true);
+    // Set in getDepthMaterial rather than once on the two shared materials, so
+    // the alpha-test clones in _materialCache and any customDepthMaterial (this
+    // repo mints those in src/render/characters/shadow_depth_materials.ts)
+    // follow the pass too. Pinned by ORDER: the write must sit in the block
+    // that already owns visible/wireframe on the resolved material.
+    expect(
+      source.includes(
+        'result.visible = material.visible;\n\t\tresult.wireframe = material.wireframe;',
+      ),
+      'the fields the shadow pass owns on the resolved depth material moved',
+    ).toBe(true);
+    expect(source.indexOf('result.colorWrite = type === VSMShadowMap;')).toBeGreaterThan(
+      source.indexOf('result.wireframe = material.wireframe;'),
+    );
+    // VSM keeps its colour write: its blur passes read the depth texture and
+    // write the RG half-float colour attachment for real.
+    expect(source).not.toContain('result.colorWrite = false;');
+  });
+
+  it('leaves the shadow-map clear whole, on both attachments', () => {
+    expect(
+      source.includes('const colorWriteFreePass = this.type !== VSMShadowMap;'),
+      'the colour-write-free pass flag is missing; re-run pnpm install',
+    ).toBe(true);
+    // Both clears in the map loop (the cube-face arm and the 2D face-0 arm)
+    // stay upstream's bare renderer.clear(). A depth-only clear would look like
+    // a further saving and is a regression on a tiler; this pins that the
+    // reasoning in the header is what the installed bundle actually does.
+    expect(
+      source.includes('renderer.clear( ! colorWriteFreePass'),
+      'a depth-only shadow-map clear is back; it is a regression on a tiler',
+    ).toBe(false);
+    // Both arms still call upstream's bare, whole clear: the colour-mask
+    // re-open is the ONLY line the patch inserts ahead of them.
+    const reopen = 'if ( colorWriteFreePass ) _state.buffers.color.setMask( true );';
+    expect(
+      source.includes(`${reopen}\n\t\t\t\t\t\trenderer.clear();`),
+      "the 2D shadow-map clear is no longer upstream's whole clear",
+    ).toBe(true);
+    expect(
+      source.includes(`${reopen}\n\t\t\t\t\trenderer.clear();`),
+      "the cube-face shadow-map clear is no longer upstream's whole clear",
+    ).toBe(true);
+    // The flag scopes the colour-mask handling below, so a build that lost
+    // that but kept the flag still reds there.
+    expect(
+      unpatchedSibling.includes('colorWriteFreePass'),
+      'the unpatched three.cjs control already carries the flag; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('re-opens the colour mask before EVERY clear, not only once per pass', () => {
+    // The load-bearing detail. glClear honours the colour write mask and
+    // WebGLRenderer.clear never re-opens it, so once the first shadow map's
+    // depth material has closed the mask, the clear of a SECOND shadow map in
+    // the same frame is a silent no-op and that map keeps the previous frame's
+    // colour. Only the sun casts here today, so it is latent, not live; the pin
+    // is what keeps it that way if a second shadow-casting light ever lands.
+    const reopen = 'if ( colorWriteFreePass ) _state.buffers.color.setMask( true );';
+    // One per clear in the map loop (cube-face arm, 2D face-0 arm) plus the
+    // end-of-pass restore, so nothing outside this file inherits a closed mask.
+    expect(source.split(reopen).length - 1).toBe(3);
+    // Each loop re-open must sit immediately before its own clear, or it
+    // guards nothing.
+    expect(
+      source.includes(`renderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\t${reopen}`),
+      'the 2D shadow-map clear is no longer preceded by the colour-mask re-open',
+    ).toBe(true);
+    expect(
+      source.includes(`renderer.setRenderTarget( shadow.map, face );\n\t\t\t\t\t${reopen}`),
+      'the cube-face shadow-map clear is no longer preceded by the colour-mask re-open',
+    ).toBe(true);
+    // And the end-of-pass restore still lands before the render target is
+    // handed back to the caller.
+    const handBack = source.indexOf(
+      'renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );',
+    );
+    expect(source.lastIndexOf(reopen)).toBeGreaterThan(0);
+    expect(source.lastIndexOf(reopen)).toBeLessThan(handBack);
+  });
+
+  it('leaves the program cache key free of colorWrite, so no program relinks', () => {
+    // The load-bearing claim of the whole hunk: colorWrite changes GL state,
+    // not shader source, so the shadow depth programs (and the prewarm twins
+    // that mirror them) keep their identity. If three ever folds colorWrite
+    // into getParameters/getProgramCacheKey this goes red and
+    // src/render/prewarm_depth_material.ts has to follow.
+    const programs = source.slice(
+      source.indexOf('function WebGLPrograms('),
+      source.indexOf('function WebGLProperties('),
+    );
+    expect(programs.length).toBeGreaterThan(1000);
+    expect(programs).not.toContain('colorWrite');
+  });
+
+  it('records the hunk in the checked-in patch file', () => {
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes('+\t\tconst colorWriteFreePass = this.type !== VSMShadowMap;'),
+      'the colour-write-free pass flag is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('-\t\t\t\t\t\trenderer.clear();'),
+      'the patch removes a shadow-map clear; it must leave both clears whole',
+    ).toBe(false);
+    expect(
+      patch.includes('+\t\tresult.colorWrite = type === VSMShadowMap;'),
+      'the depth-material colour-mask write is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('+\t\tif ( colorWriteFreePass ) _state.buffers.color.setMask( true );'),
+      'the colour-mask restore is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes(
+        '+\t\t\t\t\t\tif ( colorWriteFreePass ) _state.buffers.color.setMask( true );',
+      ),
+      'the per-clear colour-mask re-open is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+  });
+});
+
 // The scan half of the scope note above, so the note is enforced rather than
 // trusted: the day a module consumes build/three.cjs (via a bare CommonJS
 // require), names any unpatched bundle (three.module.min.js and the r185
