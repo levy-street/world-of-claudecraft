@@ -481,7 +481,7 @@ const hudStringsEn = {
       requiresForm: 'You must be in {form} Form.',
       cantInForm: "You can't do that in {form} Form.",
       bear: 'Bruin',
-      cat: 'Wolf',
+      cat: 'Kiwi',
       travel: 'Fleet',
       shapeshifted: 'You cannot do that while shapeshifted.',
       stealthed: 'You must be stealthed.',

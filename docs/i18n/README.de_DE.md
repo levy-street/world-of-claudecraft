@@ -216,7 +216,7 @@ Jede Klasse läuft auf MMO-Mechaniken der klassischen Ära, von Grund auf implem
 - **Shaman**: Arc Bolt, Stonebound Weapon (Imbue), Mending Waters, Earthen Jolt, Thunder Ward (Dornen), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (kanalisiert), Bewitch, Icebind, ein beschworenes Wasserelementar und Chronomancy, eine Heilspezialisierung mit Zeitmagie.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume und sieben beschwörbare Dämonen vom Emberkin bis zum Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots und Gestaltwandel in Wolf Form auf 5, Bruin Form auf 8 und Moonwing Form auf 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots und Gestaltwandel in Kiwi Form auf 5, Bruin Form auf 8 und Moonwing Form auf 10.
 
 Heilungen und Buffs treffen Gruppenmitglieder, Heilung kann critten, und Absorb-Schilde schlucken Schaden, bevor er die Gesundheit erreicht. Verteile Punkte über **drei Talentspezialisierungen pro Klasse** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart und so weiter); die Verteilung wird serverseitig validiert und ist als Build-String exportierbar.
 

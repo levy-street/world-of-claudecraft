@@ -1,7 +1,7 @@
 // Druid v0.29 spec engines. Engine banks are authoritative, visible auras:
 // Moongrove fills one Moontide bank toward a CHOSEN payoff (Moonsurge on the
 // Moonseed button or Sunwake on the Skyfall button, either spend clears it),
-// Wildfang shares Old Blood across Wolf and Bruin forms, and Groveheart
+// Wildfang shares Old Blood across Kiwi and Bruin forms, and Groveheart
 // grows Verdance toward Overbloom.
 
 import {

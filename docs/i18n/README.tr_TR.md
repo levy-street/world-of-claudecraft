@@ -216,7 +216,7 @@ Her sınıf, temelden uygulanmış klasik dönem MMO mekanikleriyle çalışır 
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind, çağrılan bir su elementali ve bir zaman büyüsü iyileştirme uzmanlığı olan Chronomancy.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume ve Emberkin'den Wraithborn'a yedi çağrılabilir iblis.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots ve 5'te Wolf Form, 8'de Bruin Form, 10'da Moonwing Form şekil değiştirmeleri.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots ve 5'te Kiwi Form, 8'de Bruin Form, 10'da Moonwing Form şekil değiştirmeleri.
 
 İyileştirmeler ve buff'lar grup üyelerine iner, iyileştirme crit yapabilir ve absorb kalkanları sağlıktan önce hasarı emer. Puanları **sınıf başına üç yetenek uzmanlığı** boyunca harca (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart ve benzeri); tahsis sunucu tarafından doğrulanır ve bir yapı dizesi olarak dışa aktarılabilir.
 

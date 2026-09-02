@@ -216,7 +216,7 @@ Hver klasse kører på klassiske MMO-mekanikker implementeret fra bunden og lær
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind, en tilkaldt vand-elemental, og Chronomancy, en healing-spec bygget på tidsmagi.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, og syv tilkaldelige dæmoner fra Emberkin til Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, og shapeshifting til Wolf Form ved 5, Bruin Form ved 8, og Moonwing Form ved 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, og shapeshifting til Kiwi Form ved 5, Bruin Form ved 8, og Moonwing Form ved 10.
 
 Heals og buffs lander på party-medlemmer, healing kan critte, og absorb-shields opsuger skade før health. Brug point på tværs af **tre talent-specs per klasse** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, og så videre); allokeringen er server-valideret og kan eksporteres som en build-streng.
 

@@ -394,7 +394,7 @@ const DRUID_SPECS: SpecDef[] = [
     'Wildfang',
     'tank',
     'x',
-    'A shapeshifter whose landed hits build Old Blood in both forms: Wolf spends it for damage, Bruin spends it to tank.',
+    'A shapeshifter whose landed hits build Old Blood in both forms: Kiwi spends it for damage, Bruin spends it to tank.',
     'feral_charge',
     'Primal Heart',
     // The +15% armor carries the v0.27 Dire Bruin retune (the old feral_choice_bear

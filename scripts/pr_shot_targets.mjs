@@ -1847,6 +1847,77 @@ export const TARGETS = [
     },
   },
   {
+    key: 'druid-kiwi-form',
+    label: 'Druid feral form: the kiwi body that replaced the wolf',
+    // The form-visual registry and the slot-to-body decision. classes.ts is left
+    // OUT on purpose: it changes for every content edit in the game and would fire
+    // this recipe on diffs that cannot move a single pixel of the body.
+    when: ['characters/manifest.ts', 'form_visual_selection_core', 'creatures/kiwi_form'],
+    variants: [
+      { key: 'desktop', charClass: 'druid', charName: 'Leafward', beforeLoad: lowGraphicsSeed },
+      {
+        key: 'mobile',
+        charClass: 'druid',
+        charName: 'Leafward',
+        mobile: true,
+        beforeLoad: lowGraphicsSeed,
+      },
+    ],
+    async capture(page) {
+      await page.keyboard.press('Escape');
+      await wait(400);
+      await page.evaluate(() => {
+        document.querySelector('.camera-prompt-confirm')?.click();
+        document.querySelector('.tut-skip')?.click();
+      });
+      await wait(300);
+      const leveled = await page.evaluate(() => {
+        const game = window.__game;
+        const sim = game?.sim;
+        const player = sim?.player;
+        if (!game || !sim || !player) return false;
+        sim.setPlayerLevel?.(20, player.id);
+        player.gm = true;
+        player.resource = player.maxResource;
+        return true;
+      });
+      if (!leveled) throw new Error('no offline game');
+      // Let the level-up deed banners clear the mid-screen before the shift.
+      await wait(5200);
+      await page.evaluate(() => {
+        const game = window.__game;
+        const player = game.sim.player;
+        game.sim.castAbility?.('cat_form', player.id);
+        // Close third person, a little above and swung around toward the front:
+        // the long bill is the whole silhouette cue and a dead-behind chase
+        // camera hides it against the body.
+        game.input.camDist = 6;
+        game.input.camPitch = 0.42;
+        game.input.camYaw = player.facing - 2.2;
+      });
+      // The form rig is built lazily and held behind its compile gate, so the aura
+      // landing is NOT the same as the body being on screen. Wait for the body.
+      let shown = false;
+      for (let poll = 0; poll < 40 && !shown; poll++) {
+        await wait(250);
+        shown = await page.evaluate(() => {
+          const game = window.__game;
+          const player = game?.sim?.player;
+          if (!player?.auras.some((aura) => aura.kind === 'form_cat')) return false;
+          return !!game?.renderer?.views?.get(player.id)?.catVisual?.root.visible;
+        });
+      }
+      if (!shown) throw new Error('the feral form body never became visible');
+      // The shift's own lightning burst sits right on top of the new body; what
+      // this target is evidence ABOUT is the body, so wait the burst out.
+      await wait(1800);
+      await page.evaluate(
+        () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      return { clip: '#ui' };
+    },
+  },
+  {
     key: 'tank-defensive-cds',
     // Widened past the tank when Dawnreaver grew a defensive of its own: the recipe
     // is the same (learn it, arm it, shoot the spellbook row plus the armed slot),
@@ -11270,11 +11341,11 @@ export const TARGETS = [
   },
   {
     key: 'swing-timer',
-    label: 'Swing-timer bar sweep for a Wolf Form druid on a slow staff',
+    label: 'Swing-timer bar sweep for a Kiwi Form druid on a slow staff',
     when: ['src/ui/swing_timer', 'src/sim/combat/form_swing'],
     variants: [
       {
-        key: 'wolf-form-desktop',
+        key: 'kiwi-form-desktop',
         charClass: 'druid',
         charName: 'Pawsteps',
         beforeLoad: lowGraphicsSeed,
@@ -11298,11 +11369,11 @@ export const TARGETS = [
       await page.evaluate(
         () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))),
       );
-      // Stage: level to Wolf Form's learn level, shift through the real cast,
+      // Stage: level to Kiwi Form's learn level, shift through the real cast,
       // stand a durable mob at melee range, and engage auto-attack through the
       // public toggle. The proof is the BAR'S SWEEP between swings, so the
       // burst below samples the #swingbar element at off-period intervals: on
-      // the fixed 1.0s Wolf Form cadence the fill sweeps the whole range,
+      // the fixed 1.0s Kiwi Form cadence the fill sweeps the whole range,
       // while a period wrongly stretched to the staff speed never empties.
       const staged = await page.evaluate(() => {
         document.querySelector('.camera-prompt-confirm')?.click();
@@ -11375,7 +11446,7 @@ export const TARGETS = [
         return { ok: true, inForm, rect: { x: r.x, y: r.y, w: r.width, h: r.height } };
       }, staged.mobId);
       if (!engaged.ok) throw new Error(engaged.reason);
-      if (!engaged.inForm) throw new Error('Wolf Form never landed');
+      if (!engaged.inForm) throw new Error('Kiwi Form never landed');
       // 12 samples at 170ms (~2s): off-period for both the 1.0s cadence and
       // the old staff-stretched period, so the burst catches the full sweep.
       const pad = 10;

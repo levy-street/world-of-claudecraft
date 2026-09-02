@@ -29,7 +29,7 @@ function giveForm(sim: Sim, pid: number, kind: AuraKind, name: string) {
   });
 }
 
-describe('Wolf Form swing speed', () => {
+describe('Kiwi Form swing speed', () => {
   it('pins the classic fast paw cadence at 1.0s', () => {
     expect(CAT_FORM_SWING_SPEED).toBe(1.0);
     // The rogue baseline constant is untouched by the cat cadence change: it
@@ -39,17 +39,17 @@ describe('Wolf Form swing speed', () => {
     expect(CAT_FORM_SWING_SPEED).toBeLessThan(ROGUE_BASE_SWING_SPEED);
   });
 
-  it('a druid in Wolf Form swings at the fixed cat cadence, ignoring its weapon', () => {
+  it('a druid in Kiwi Form swings at the fixed cat cadence, ignoring its weapon', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Bet');
     sim.tick();
     const druid = sim.entities.get(a)!;
 
     // The druid's caster weapon is slower than the cat cadence: that slow speed
-    // is exactly what used to leak into Wolf Form's auto-attacks (the bug).
+    // is exactly what used to leak into Kiwi Form's auto-attacks (the bug).
     expect(druid.weapon.speed).toBeGreaterThan(CAT_FORM_SWING_SPEED);
 
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     expect(baseSwingSpeed(druid)).toBe(CAT_FORM_SWING_SPEED);
   });
 
@@ -130,7 +130,7 @@ describe('Wolf Form swing speed', () => {
     throw new Error('no white hit landed');
   }
 
-  it('Wolf Form normalizes swing DAMAGE to the cat cadence (no AP double-dip)', () => {
+  it('Kiwi Form normalizes swing DAMAGE to the cat cadence (no AP double-dip)', () => {
     const expectAt = (ap: number, speed: number, dr: number, formMult = 1) =>
       Math.max(1, Math.round((ap / 14) * speed * formMult * (1 - dr)));
 
@@ -139,7 +139,7 @@ describe('Wolf Form swing speed', () => {
     sim.setPlayerLevel(20, a);
     sim.tick();
     const staffSpeed = sim.entities.get(a)!.weapon.speed;
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     const wolf = firstWhiteHit(sim, a);
 
     // The control druid on the same staff in BEAR form: a melee shapeshift that
@@ -154,19 +154,19 @@ describe('Wolf Form swing speed', () => {
     giveForm(sim2, b, 'form_bear', 'Bruin Form');
     const staff = firstWhiteHit(sim2, b);
 
-    // Wolf Form's per-swing AP uses the fixed cat cadence (1.0) and the feral
+    // Kiwi Form's per-swing AP uses the fixed cat cadence (1.0) and the feral
     // form damage multiplier; the bear druid's uses the staff, no multiplier.
     expect(wolf.amount).toBe(
       expectAt(wolf.ap, CAT_FORM_SWING_SPEED, wolf.dr, CAT_FORM_DAMAGE_MULT),
     );
     expect(staff.amount).toBe(expectAt(staff.ap, staffSpeed, staff.dr));
-    // The bug would have been Wolf Form normalizing by the slow staff instead: prove
+    // The bug would have been Kiwi Form normalizing by the slow staff instead: prove
     // the fixed cadence value is genuinely smaller, so a faster swing hits softer.
     expect(staffSpeed).toBeGreaterThan(CAT_FORM_SWING_SPEED);
     expect(wolf.amount).toBeLessThan(expectAt(wolf.ap, staffSpeed, wolf.dr, CAT_FORM_DAMAGE_MULT));
   });
 
-  it('Wolf Form auto weapon rolls are normalized to authored DPS: two speeds, one result', () => {
+  it('Kiwi Form auto weapon rolls are normalized to authored DPS: two speeds, one result', () => {
     // Two weapons authored at the SAME dps (20) but different speeds: a fast 2.0
     // (40 per swing) and a slow 3.0 (60 per swing). Under the cat cadence the
     // roll is rescaled by CAT_FORM_SWING_SPEED / speed, so both swings must deal
@@ -178,7 +178,7 @@ describe('Wolf Form swing speed', () => {
       const a = sim.addPlayer('druid', 'Paw');
       sim.setPlayerLevel(20, a);
       sim.tick();
-      giveForm(sim, a, 'form_cat', 'Wolf Form');
+      giveForm(sim, a, 'form_cat', 'Kiwi Form');
       return firstWhiteHit(sim, a, { min: perSwing, max: perSwing, speed });
     };
     const fast = hitWith(2.0, 40);
@@ -252,7 +252,7 @@ describe('Wolf Form swing speed', () => {
     const a = sim.addPlayer('druid', 'Vav');
     sim.setPlayerLevel(20, a);
     sim.tick();
-    const wolf = firstRequitalHit(sim, a, 'form_cat', 'Wolf Form');
+    const wolf = firstRequitalHit(sim, a, 'form_cat', 'Kiwi Form');
     // The ratio denominator is the FROZEN legacy cadence, deliberately not the
     // rogue content lookup, so a rogue starting-weapon retune can never move a
     // druid's Requital damage.
@@ -266,7 +266,7 @@ describe('Wolf Form swing speed', () => {
     expect(firstRequitalHit(sim2, b, 'form_bear', 'Bruin Form')).toBe(22);
   });
 
-  it('a Wolf Form cat lands about one auto swing per second over time', () => {
+  it('a Kiwi Form cat lands about one auto swing per second over time', () => {
     // The cadence over TIME, not just the scalar: 10 seconds of auto-attacks
     // at the fixed 1.0s paw speed must land ~10 swing attempts (every
     // hit/miss/dodge/parry resets the timer). This pins the swing-timer
@@ -276,7 +276,7 @@ describe('Wolf Form swing speed', () => {
     sim.setPlayerLevel(20, a);
     sim.tick();
     const p = sim.entities.get(a)!;
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     p.weapon = { ...p.weapon, min: 1, max: 1 };
     const dummy = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;
     dummy.level = 1;
@@ -305,7 +305,7 @@ describe('Wolf Form swing speed', () => {
   });
 
   it('a cat weaponStrike special keeps its raw roll: AP term at the cat cadence, form mult, no roll rescale', () => {
-    // Rendclaw (claw, rank 1: weaponStrike bonus 25) in Wolf Form on a slow
+    // Rendclaw (claw, rank 1: weaponStrike bonus 25) in Kiwi Form on a slow
     // 3.0-speed weapon pinned at 60 per swing. The special's weapon roll is
     // deliberately NOT rescaled (only the mainhand AUTO arm normalizes), its
     // AP-per-swing term follows baseSwingSpeed (the 1.0s cat cadence), the
@@ -316,7 +316,7 @@ describe('Wolf Form swing speed', () => {
     sim.setPlayerLevel(5, a);
     sim.tick();
     const p = sim.entities.get(a)!;
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     p.critChance = 0;
     p.weapon = { ...p.weapon, min: 60, max: 60, speed: 3.0 };
     const dummy = [...sim.entities.values()].find((e) => e.kind === 'mob' && !e.dead)!;

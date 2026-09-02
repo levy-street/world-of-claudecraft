@@ -59,7 +59,7 @@ describe('Druid v0.29 balance and live-mob harness', () => {
   it('records Bruin mitigation, threat, taunt uptime, and exit behavior', () => {
     const result = runDruidBruinTankProbe(42_920, 'test-head');
     expect(result.head).toBe('test-head');
-    expect(result.bruinIncomingDamage).toBeLessThan(result.wolfIncomingDamage);
+    expect(result.bruinIncomingDamage).toBeLessThan(result.kiwiIncomingDamage);
     expect(result.bruinMitigationPct).toBeGreaterThanOrEqual(0.15);
     // Bear form multiplies all threat by 1.3 (threat.ts) on top of the feral
     // tank talent bonus; a 100-damage hit must clear the bare 100 by half.

@@ -405,9 +405,10 @@ const STATIC_PROP: ClipMap = {
 };
 
 // Custom baked wolf rig (wolf_basic/greyjaw, Dog_Animation donor skeleton): the
-// animal() core plus the donor's Sit/Fall clips so player wolf forms sit and
-// jump properly, and a Walk swim base (a paddling gait at the gentle clip
-// pitch beats the steep no-clip procedural prone on a quadruped).
+// animal() core plus the donor's Sit/Fall clips so the one player wolf form on
+// this rig (the shaman's Ghost Wolf) sits and jumps properly, and a Walk swim
+// base (a paddling gait at the gentle clip pitch beats the steep no-clip
+// procedural prone on a quadruped).
 const WOLF_BAKED: ClipMap = {
   ...animal(['Attack']),
   sitIdle: 'Sit',
@@ -545,6 +546,21 @@ const TRIPO_BIPED_FULL_RIG: ClipMap = {
   death: 'Death',
   cast: 'Cast',
   jump: 'Jump',
+};
+
+// Druid Kiwi Form (kiwi_form.glb). The same Tripo biped vocabulary, minus the
+// Hit_Stagger variant: this rig's retarget baked the single Hit take only.
+const KIWI_FORM: ClipMap = {
+  ...TRIPO_BIPED_FULL_RIG,
+  hit: ['Hit'],
+  // Two of this rig's generic Tripo presets do not survive contact with a bird,
+  // so the form plays authored replacements (scripts/build_kiwi_form_anims.mjs).
+  // Attack was `preset:biped:slash`, an arm swing on a body with no arms; the
+  // peck drives the bill forward instead. Death was `preset:biped:defeat_02`,
+  // which on this rig never falls at all (hand spread and head height sit at
+  // their idle values for the whole 8.5s); the kiwi now topples onto its back.
+  attack: ['Kiwi_Peck'],
+  death: 'Kiwi_Death',
 };
 
 // The Vineclaw Stalker's own attack (scripts/build_wildheart_stalker_anims.mjs, issue
@@ -1856,15 +1872,36 @@ export const VISUALS: Record<string, VisualDef> = {
       cast: 'Cast',
     },
   },
-  // Druid Wolf Form AND shaman Shadewolf (ghost_wolf renders this visual with
-  // the ghost material on top). Same custom baked wolf as the world wolves;
-  // the tawny tint keeps the druid form readable against grey pack wolves.
+  // Shaman Shadewolf (ghost_wolf renders this visual with the ghost material on
+  // top). Same custom baked wolf as the world wolves; the tawny tint keeps it
+  // readable against grey pack wolves. The druid feral form shared this def
+  // until it became a kiwi (form_kiwi below); the key still reads form_cat
+  // because the sim's shapeshift aura kind is a closed wire union.
   form_cat: {
     url: `${CREATURES}/wolf_basic.glb`,
     height: 1.6,
     clips: WOLF_BAKED,
     tint: 0xd08b45,
     tintStrength: 0.35,
+  },
+  // Druid Kiwi Form: the feral body, a chunky flightless kiwi generated through
+  // the asset pipeline (biped rig). No tint, unlike the wolf it replaced: it
+  // ships its own brown plumage and has no world mob to be confused with.
+  form_kiwi: {
+    url: `${CREATURES}/kiwi_form.glb`,
+    // Mesh-free clip donor: the authored peck and death, composed onto the base
+    // rig at load the same way bow_anims.glb rides the hunter.
+    animUrls: [`${CREATURES}/kiwi_form_anims.glb`],
+    height: 1.5,
+    // Tripo bipeds face +X; character visuals face +Z at world facing 0.
+    yaw: -Math.PI / 2,
+    clips: KIWI_FORM,
+    // Both authored clips run at real time: the peck is 0.95s against the fixed
+    // 1.0s feral swing cadence (CAT_FORM_SWING_SPEED in sim/combat/form_swing.ts)
+    // and the fall is 2s from upright to flat. Neither needs the speed-up the
+    // generic presets took to read at all (the slash played at 6.6x).
+    attackTimeScale: 1,
+    deathTimeScale: 1,
   },
   // Druid Travel Form: a daft chicken-cow hybrid (custom GLB). No tint: its
   // authored cow-spots/comb/beak colours carry the look.

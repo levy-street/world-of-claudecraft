@@ -86,7 +86,7 @@ describe('swingTimerState: edge-tracked period recovery (parameter-in / next-sta
   });
 
   it('trusts the reset-edge timer when the true cadence beats the equipped weapon', () => {
-    // Wolf Form: a fixed 1.0s swing while carrying a 2.9-speed staff (haste
+    // Kiwi Form: a fixed 1.0s swing while carrying a 2.9-speed staff (haste
     // does the same). The old max(timer, weapon speed) stretched the period to
     // 2.9, so the bar started ~66% pre-filled every swing; the reset edge must
     // trust the sim's freshly reset timer instead.

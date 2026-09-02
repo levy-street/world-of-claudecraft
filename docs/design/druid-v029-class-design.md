@@ -68,11 +68,11 @@ melee grammar, not an inconsistency.
 
 ## Wildfang
 
-Old Blood is one three-stage bank shared by Wolf and Bruin forms. It advances
+Old Blood is one three-stage bank shared by Kiwi and Bruin forms. It advances
 only when Rendclaw, Flense, Bloodrift, Gorebite, Bonecrush, or Sweeping Claws
 lands. Shifting preserves it; leaving combat clears it.
 
-At full Old Blood, Gorebite becomes Redharvest in Wolf Form. Redharvest
+At full Old Blood, Gorebite becomes Redharvest in Kiwi Form. Redharvest
 consumes the bank, detonates the Druid's remaining Flense and Bloodrift damage
 on the target, and restores energy. Combo points are OPTIONAL on the press:
 any points held strengthen the bite, none are required (owner playtest: the
@@ -85,7 +85,7 @@ Below half health, it instead converts the bank into an absorb based on maximum
 health and restores rage.
 
 Wildfang may select either tank or damage in Dungeon Finder. Bruin remains the
-tank form and Wolf has a full damage budget.
+tank form and Kiwi has a full damage budget.
 
 ## Groveheart
 
@@ -135,14 +135,14 @@ stage cap, builder, and payoff.
 
 Behavior is pinned by `tests/druid_engines.test.ts` and the `druid_engines`
 parity scenario. `scripts/druid_balance_probe.ts` runs one-target Moongrove,
-three-target Moongrove, Wolf damage, and three-ally Groveheart pressure for 123
+three-target Moongrove, Kiwi damage, and three-ally Groveheart pressure for 123
 seconds over eight deterministic seeds in level-20 fixed PBE gear. It measures
-all three capstones and also runs Moonwing, Wolf, and Bruin rotations against an
+all three capstones and also runs Moonwing, Kiwi, and Bruin rotations against an
 attacking live mob.
 
 Two role profiles complete the balance contract. `runDruidBruinTankProbe` is
 the druid arm of the owned-class off-tank probe: real-swing mitigation of
-Bruin against Wolf posture, threat per 100 damage under the bear multiplier,
+Bruin against Kiwi posture, threat per 100 damage under the bear multiplier,
 full-bank Marrowbreak snap threat, Menace forced-target uptime, and the 110%
 threat handoff after leaving the form (pinned in
 `tests/druid_balance_probe.test.ts`). Groveheart heals from a dedicated
@@ -153,9 +153,9 @@ Groveheart's three-ally throughput sits with the triage healers, well under
 the AoE ceiling of Spiritmend chain healing: a flagged PBE tuning question,
 deliberately not resolved by inventing base heal values here.
 
-## Wolf Form swing-cadence standardization (2026-08)
+## Kiwi Form swing-cadence standardization (2026-08)
 
-Wolf Form auto-attacks swing at a fixed fast paw cadence,
+Kiwi Form auto-attacks swing at a fixed fast feral cadence,
 `CAT_FORM_SWING_SPEED` (1.0s) in `src/sim/combat/form_swing.ts`, instead of
 the rogue baseline the form originally borrowed. The mainhand auto's weapon
 roll is rescaled by cadence over weapon speed (`catAutoWeaponRollMult`), so
@@ -166,7 +166,7 @@ shape (fixed paw speed, normalized delivery), adopted for feel and
 itemization cleanliness at neutral DPS.
 
 `CAT_FORM_DAMAGE_MULT` (same module) is the single bench-neutrality knob:
-every Wolf Form melee swing, auto and weaponStrike special, is scaled by it
+every Kiwi Form melee swing, auto and weaponStrike special, is scaled by it
 so the standardization lands DPS-neutral on the wildfang band probe and the
 eight-seed druid matrix rather than as a stealth nerf. It is a tuning
 constant in the same spirit as the Bruin armor multiplier, tuned and

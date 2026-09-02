@@ -2749,7 +2749,7 @@ export const en_CA: EnTranslations = {
       "veiledEdge": "Your next Lurker's Strike strikes for double",
       "duskEconomy": "Abilities cost {pct}% less energy",
       "moontide": "Moontide {stacks}/{max}. Wildbolt, Skyfall, and Moonseed casts in Moonwing Form each add 1. At {max}: Moonseed becomes Moonsurge and Skyfall becomes Sunwake, and using either spends all 3",
-      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Wolf Form, Bonecrush becomes Marrowbreak in Bruin Form",
+      "oldBlood": "Old Blood {stacks}/{max}. Landed hits from Rendclaw, Flense, Bloodrift, Gorebite, Sweeping Claws, and Bonecrush each add 1. At {max}: Gorebite becomes Redharvest in Kiwi Form, Bonecrush becomes Marrowbreak in Bruin Form",
       "verdance": "Verdance {stacks}/{max}. Each NEW Wildbloom or Second Bloom you plant adds 1. At {max}, Swiftmend becomes Overbloom",
       "freeExecute": "Your next eligible execute ability costs nothing",
       "resourceSap": "Restores {value} of your current resource every {interval} sec",
@@ -2812,7 +2812,7 @@ export const en_CA: EnTranslations = {
       "elementalTrance": "Damage taken reduced by {pct}%. {mana}% of all damage you deal is converted to mana",
       "stealth": "Concealed; movement speed reduced by {pct}%",
       "formBear": "Bruin Form: increased health and armor",
-      "formCat": "Wolf Form: melee damage and energy",
+      "formCat": "Kiwi Form: melee damage and energy",
       "formTravel": "Fleet Form: movement speed increased by {pct}%",
       "formFireball": "Ember Form: movement speed increased by {pct}%; attacks and spells are disabled",
       "formMoonkin": "Moonwing Form: spell damage increased by {pct}% and armor increased by {armorPct}%",
@@ -5221,7 +5221,7 @@ export const en_CA: EnTranslations = {
       "deathTitle": "When you fall",
       "deathBody": "If your health reaches zero you are downed where you stand, and your body stays there. Release your spirit and you rise as a ghost at the nearest graveyard: faster on its feet than the living, beyond the reach of your enemies, but unable to fight, loot, or speak with anyone except the Pale Keeper hovering over the stones. From there you choose. Run your ghost back to your body and you revive on the spot with part of your health and mana restored and no penalty at all. Or take the Pale Keeper up on an instant raise where you stand, at the price of the Keeper's Toll: a temporary weakening of all you are that lasts longer the more seasoned you are, and spares brand-new characters entirely. Fall inside a dungeon and your spirit waits at the graveyard outside; walk your ghost back through the door and you revive at the entrance. Delves are the exception: fall there and you are simply set back on your feet at the delve's entry, though a second fall ends the run. Either road, you lose no experience, gear, or coin. Between fights, sit to eat and drink so you start the next one at full strength.",
       "threatTitle": "Who the enemy hits",
-      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
+      "threatBody": "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Kiwi Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
       "hazardsTitle": "The water can kill you",
       "breathBody": "Deep water is swimmable, and you can dive under it. While your head is under, a blue breath bar appears near the top of the screen and drains; break the surface and it refills far faster than it emptied. Let it empty while you are still under and you begin to drown, losing a chunk of your health every second until you reach air, so keep an eye on the bar on a long dive. Death clears it, so a corpse run always starts with a full lungful.",
       "fatigueBody": "The sea has no wall. The crossings the world means you to swim, the straits and meres between one stretch of land and the next, and the inland lakes, are safe to cross however long they take. Strike out past the shore into genuinely open water instead and it starts to sap your strength: a warning appears, you get a real window to turn around, and after that the sea deals steadily heavier damage that nothing can prevent until you head back toward land. Drown or wear yourself out that far from shore and you release like any other death, so treat the horizon as scenery rather than a destination.",
@@ -5610,7 +5610,7 @@ export const en_CA: EnTranslations = {
       "mageEleSummon": "A Frost spell that calls the elemental to your side and sets it on your target.",
       "formName": {
         "form_bear": "Bruin Form",
-        "form_cat": "Wolf Form",
+        "form_cat": "Kiwi Form",
         "form_travel": "Fleet Form"
       }
     },
@@ -6249,7 +6249,7 @@ export const en_CA: EnTranslations = {
       "groupClasses": "Classes",
       "groupForms": "Druid Forms",
       "formBear": "Bruin Form",
-      "formCat": "Wolf Form",
+      "formCat": "Kiwi Form",
       "formTravel": "Fleet Form",
       "groupCreatures": "Creatures",
       "groupPets": "Warlock Demons",
@@ -9282,7 +9282,7 @@ export const en_CA: EnTranslations = {
       "requiresForm": "You must be in {form} Form.",
       "cantInForm": "You can't do that in {form} Form.",
       "bear": "Bruin",
-      "cat": "Wolf",
+      "cat": "Kiwi",
       "travel": "Fleet",
       "shapeshifted": "You cannot do that while shapeshifted.",
       "stealthed": "You must be stealthed.",
@@ -9612,7 +9612,7 @@ export const en_CA: EnTranslations = {
     },
     "forms": {
       "bear": "Bear",
-      "cat": "Wolf"
+      "cat": "Kiwi"
     },
     "cast": {
       "fishing": "Fishing",
@@ -10910,17 +10910,17 @@ export const en_CA: EnTranslations = {
         "description": "A baleful roar: every enemy within 10 yards is taunted, its threat toward you rising to match its most hated enemy, and it is compelled to attack you for 3 sec. Bruin Form only."
       },
       "cat_form": {
-        "name": "Wolf Form",
-        "description": "Shapeshift into a wolf: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
+        "name": "Kiwi Form",
+        "description": "Shapeshift into a kiwi: agility rises with your level, attack power +8 plus 2 per level, your attacks use energy and combo points, and you generate 29% less threat. Cast again to return to caster form."
       },
       "claw": {
         "name": "Rendclaw",
-        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Wolf Form only.",
+        "description": "Claw the enemy for weapon damage plus {damage}. Awards 1 combo point. Kiwi Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "ferocious_bite": {
         "name": "Gorebite",
-        "description": "Finishing move that causes {damage}. Wolf Form only.",
+        "description": "Finishing move that causes {damage}. Kiwi Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood; at 3 Old Blood this button becomes Redharvest, which spends the Old Blood for a stronger strike that also instantly deals all the damage your Flense and Bloodrift would still have dealt, and restores energy."
       },
       "swipe": {
@@ -10972,23 +10972,23 @@ export const en_CA: EnTranslations = {
       },
       "dash": {
         "name": "Dash",
-        "description": "Sprint forward, increasing movement speed by 50% for 15 sec. Wolf Form only."
+        "description": "Sprint forward, increasing movement speed by 50% for 15 sec. Kiwi Form only."
       },
       "pounce": {
         "name": "Slinkstrike",
-        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Wolf Form only."
+        "description": "A stealth opener that stuns the target for 2 sec. Awards 1 combo point. Kiwi Form only."
       },
       "insect_swarm": {
         "name": "Stinging Swarm",
         "description": "The enemy is swarmed by insects, taking {damage} Nature damage over 12 sec."
       },
       "tigers_fury": {
-        "name": "Wolfsblood",
-        "description": "Surges {rage} energy and increases attack power by {buff} for {duration} sec. Wolf Form only."
+        "name": "Kiwiblood",
+        "description": "Surges {rage} energy and increases attack power by {buff} for {duration} sec. Kiwi Form only."
       },
       "rip": {
         "name": "Bloodrift",
-        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Wolf Form only.",
+        "description": "Finishing move that makes the target bleed every 2 sec for 24 sec: 36 damage plus 24 per combo point spent (5 combo points: {damage} total). Kiwi Form only.",
         "specNote_feral": "The landed hit adds 1 Old Blood (max 3)."
       },
       "mortal_strike": {
@@ -11189,7 +11189,7 @@ export const en_CA: EnTranslations = {
       },
       "feral_charge": {
         "name": "Primal Surge",
-        "description": "Unleash a primal surge. In Wolf Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)"
+        "description": "Unleash a primal surge. In Kiwi Form, Energy regeneration is increased by 100% for 10 sec. In Bruin Form, instantly generates 50 Rage. (Feral signature)"
       },
       "swiftmend": {
         "name": "Swiftmend",
@@ -11686,11 +11686,11 @@ export const en_CA: EnTranslations = {
       },
       "prowl": {
         "name": "Stalk",
-        "description": "Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat."
+        "description": "Enter stealth while in Kiwi Form, moving 5% slower. Cannot be used in combat."
       },
       "rake": {
         "name": "Flense",
-        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.",
+        "description": "Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Kiwi Form only.",
         "specNote_feral": "Each hit that lands adds 1 Old Blood (max 3)."
       },
       "revive_pet": {

@@ -5,7 +5,7 @@
   "ticks": 180,
   "coverage": [
     "class:druid (Wildfang cat + Bruin control)",
-    "Wolf Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
+    "Kiwi Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll",
     "bear-form control swinging at the equipped weapon speed on the same loadout"
   ],
   "draws": 1473,
@@ -29,8 +29,8 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 1002,
-      "state": "29dc3612",
-      "events": "e12db479",
+      "state": "03d1cac2",
+      "events": "5d560455",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -40,7 +40,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 1002,
-      "state": "bd358e22",
+      "state": "d20d7f92",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -51,7 +51,7 @@
       "tick": 15,
       "time": 0.75,
       "nextId": 1002,
-      "state": "7420ed5a",
+      "state": "a8aacf0a",
       "events": "af3580eb",
       "rng": {
         "draws": 6,
@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 1002,
-      "state": "d0786058",
+      "state": "9092e008",
       "events": "cd57c7b0",
       "rng": {
         "draws": 6,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 1002,
-      "state": "96616ef8",
+      "state": "42a41628",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 1002,
-      "state": "43ac586b",
+      "state": "bda2875b",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 1002,
-      "state": "9217a543",
+      "state": "65a20373",
       "events": "ca851a45",
       "rng": {
         "draws": 7,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 1002,
-      "state": "4c5c56df",
+      "state": "4253178f",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -117,7 +117,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 1002,
-      "state": "10b3e2c7",
+      "state": "b19797b7",
       "events": "741638a5",
       "rng": {
         "draws": 33,
@@ -128,7 +128,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 1002,
-      "state": "ba5d488e",
+      "state": "b97bfa3e",
       "events": "741638a5",
       "rng": {
         "draws": 71,
@@ -139,7 +139,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 1002,
-      "state": "ef670094",
+      "state": "5d7d3384",
       "events": "60321e7e",
       "rng": {
         "draws": 100,
@@ -150,7 +150,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 1002,
-      "state": "3a7059ae",
+      "state": "0449431e",
       "events": "741638a5",
       "rng": {
         "draws": 143,
@@ -161,7 +161,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 1002,
-      "state": "fd88023e",
+      "state": "2922296e",
       "events": "741638a5",
       "rng": {
         "draws": 189,
@@ -172,7 +172,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 1002,
-      "state": "c58c06d2",
+      "state": "36393b42",
       "events": "ca356e44",
       "rng": {
         "draws": 228,
@@ -183,7 +183,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 1002,
-      "state": "e76fb9f6",
+      "state": "c2ea27a6",
       "events": "59dff633",
       "rng": {
         "draws": 272,
@@ -194,7 +194,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 1002,
-      "state": "9aba4ab1",
+      "state": "ea9e55a1",
       "events": "741638a5",
       "rng": {
         "draws": 312,
@@ -205,7 +205,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 1002,
-      "state": "b6801cf4",
+      "state": "26538fa4",
       "events": "741638a5",
       "rng": {
         "draws": 362,
@@ -216,7 +216,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 1002,
-      "state": "2d1e1770",
+      "state": "e7181a60",
       "events": "741638a5",
       "rng": {
         "draws": 389,
@@ -227,7 +227,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 1002,
-      "state": "7c67c2da",
+      "state": "5ff7738a",
       "events": "59dff633",
       "rng": {
         "draws": 462,
@@ -238,7 +238,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 1002,
-      "state": "8e017c91",
+      "state": "109eaa01",
       "events": "741638a5",
       "rng": {
         "draws": 511,
@@ -249,7 +249,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 1002,
-      "state": "2a2ecfc8",
+      "state": "248713f8",
       "events": "741638a5",
       "rng": {
         "draws": 571,
@@ -260,7 +260,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 1002,
-      "state": "3b0895ca",
+      "state": "c89a40fa",
       "events": "741638a5",
       "rng": {
         "draws": 622,
@@ -271,7 +271,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 1002,
-      "state": "560a212d",
+      "state": "9af90a9d",
       "events": "59dff633",
       "rng": {
         "draws": 683,
@@ -282,7 +282,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 1002,
-      "state": "a93bc288",
+      "state": "5f4340b8",
       "events": "741638a5",
       "rng": {
         "draws": 743,
@@ -293,7 +293,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 1002,
-      "state": "fcadfd47",
+      "state": "f2a86ab7",
       "events": "741638a5",
       "rng": {
         "draws": 800,
@@ -304,7 +304,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 1002,
-      "state": "027cb3b7",
+      "state": "a04f8ce7",
       "events": "41b3e7af",
       "rng": {
         "draws": 848,
@@ -315,7 +315,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 1002,
-      "state": "19d6d8b8",
+      "state": "1fb447a8",
       "events": "29707fc4",
       "rng": {
         "draws": 910,
@@ -326,7 +326,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 1002,
-      "state": "24813348",
+      "state": "ead67138",
       "events": "741638a5",
       "rng": {
         "draws": 973,
@@ -337,7 +337,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 1002,
-      "state": "69e588a0",
+      "state": "ebf87490",
       "events": "741638a5",
       "rng": {
         "draws": 1029,
@@ -348,7 +348,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 1002,
-      "state": "e359ccf3",
+      "state": "cd806d63",
       "events": "741638a5",
       "rng": {
         "draws": 1082,
@@ -359,7 +359,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 1002,
-      "state": "55cfe80a",
+      "state": "f2030c3a",
       "events": "59dff633",
       "rng": {
         "draws": 1144,
@@ -370,7 +370,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 1002,
-      "state": "a41786d6",
+      "state": "d3939f06",
       "events": "741638a5",
       "rng": {
         "draws": 1212,
@@ -381,7 +381,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 1002,
-      "state": "4a6c3c64",
+      "state": "4a964c54",
       "events": "741638a5",
       "rng": {
         "draws": 1269,
@@ -392,7 +392,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1002,
-      "state": "c8e53941",
+      "state": "449d6071",
       "events": "741638a5",
       "rng": {
         "draws": 1338,
@@ -403,7 +403,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 1002,
-      "state": "c8e53941",
+      "state": "449d6071",
       "events": "741638a5",
       "rng": {
         "draws": 1338,
@@ -633,7 +633,7 @@
               "duration": 3600,
               "id": "cat_form",
               "kind": "form_cat",
-              "name": "Wolf Form",
+              "name": "Kiwi Form",
               "remaining": 3591.5,
               "school": "physical",
               "sourceId": 998,
@@ -867,7 +867,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 1002,
-      "state": "e8a09420",
+      "state": "3efbe6d0",
       "events": "741638a5",
       "rng": {
         "draws": 1399,
@@ -878,7 +878,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1002,
-      "state": "3b8eb8bc",
+      "state": "54925bec",
       "events": "741638a5",
       "rng": {
         "draws": 1473,
@@ -889,7 +889,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 1002,
-      "state": "3b8eb8bc",
+      "state": "54925bec",
       "events": "741638a5",
       "rng": {
         "draws": 1473,
@@ -1119,7 +1119,7 @@
               "duration": 3600,
               "id": "cat_form",
               "kind": "form_cat",
-              "name": "Wolf Form",
+              "name": "Kiwi Form",
               "remaining": 3591,
               "school": "physical",
               "sourceId": 998,

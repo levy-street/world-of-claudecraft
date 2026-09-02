@@ -84,9 +84,9 @@ describe('/form command', () => {
     const sim = makeWorld();
     const a = sim.addPlayer('druid', 'Dalet');
     sim.tick();
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
-    expect(lastReply(sim, '/stance', a)).toBe('You are in Wolf Form.');
-    expect(lastReply(sim, '/shapeshift', a)).toBe('You are in Wolf Form.');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
+    expect(lastReply(sim, '/stance', a)).toBe('You are in Kiwi Form.');
+    expect(lastReply(sim, '/shapeshift', a)).toBe('You are in Kiwi Form.');
   });
 
   it('is self-only and never emits a chat event', () => {

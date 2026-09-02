@@ -5,6 +5,7 @@
 import { type Entity, isMechWearer, type PlayerClass } from '../../sim/types';
 import { logAssetMissOnce } from './asset_miss_log';
 import { type AssembleOptions, modularHeadFor } from './assets';
+import type { CharacterFormVisualKey } from './form_visual_selection_core';
 import { composedLookPiecesFor, type LookPieceQueue, type LookPieces } from './look_pieces';
 import {
   mechHeldWeaponOverride,
@@ -104,7 +105,7 @@ export function createMountVisual(visualKey: string): CharacterVisual {
  *  training dummy freeze). */
 export function createCharacterVisual(
   e: Entity,
-  formKey?: 'form_sheep' | 'form_bear' | 'form_cat' | 'form_travel' | 'form_metamorph',
+  formKey?: CharacterFormVisualKey,
   opts?: AssembleOptions,
 ): CharacterVisual | null {
   // Forms are their own models. Skins and held weapons

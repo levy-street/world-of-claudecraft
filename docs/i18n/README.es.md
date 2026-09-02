@@ -216,7 +216,7 @@ Cada clase corre sobre mecánicas de MMO de la era clásica implementadas desde 
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbuir), Mending Waters, Earthen Jolt, Thunder Ward (espinas), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (canalizado), Bewitch, Icebind, un elemental de agua invocado y Chronomancy, una especialización de sanación con magia temporal.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume y siete demonios invocables desde el Emberkin hasta el Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, y transformación en Wolf Form al 5, Bruin Form al 8 y Moonwing Form al 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, y transformación en Kiwi Form al 5, Bruin Form al 8 y Moonwing Form al 10.
 
 Las curaciones y mejoras alcanzan a los miembros del grupo, la sanación puede dar crítico y los escudos de absorción aguantan el daño antes que la vida. Gasta puntos en **tres especializaciones de talentos por clase** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, y demás); la asignación se valida en el servidor y se puede exportar como cadena de build.
 

@@ -5181,7 +5181,7 @@ function druidEngines(): Scenario {
     coverage: [
       'class:druid (Moongrove, Wildfang, Groveheart)',
       'Moontide and Sunwake action replacements with Moonlash and Sunlance phase flips',
-      'Old Blood landed-strike bank across Wolf and Bruin with both payoffs',
+      'Old Blood landed-strike bank across Kiwi and Bruin with both payoffs',
       'Verdance completed-HoT bank and Overbloom harvest',
     ],
     build: () => new Sim({ seed: 2930, playerClass: 'druid', noPlayer: true, autoEquip: true }),
@@ -6057,7 +6057,7 @@ function grixRespawnWindow(): Scenario {
   };
 }
 
-// Wolf Form AUTO attacks, the arm druid_engines deliberately does not drive
+// Kiwi Form AUTO attacks, the arm druid_engines deliberately does not drive
 // (it scripts specials only): the fixed 1.0s cat cadence swings against a
 // bear-form control on the same staff swinging at the weapon speed. The cat
 // lane lands ~1.8x the swings (and rng draws) of the bear lane over the same
@@ -6068,7 +6068,7 @@ function catFormAutoSwing(): Scenario {
     name: 'cat_form_auto_swing',
     coverage: [
       'class:druid (Wildfang cat + Bruin control)',
-      'Wolf Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
+      'Kiwi Form fixed-cadence auto-attack: 1.0s swing timer, normalized mainhand weapon roll',
       'bear-form control swinging at the equipped weapon speed on the same loadout',
     ],
     sampleEvery: 5,

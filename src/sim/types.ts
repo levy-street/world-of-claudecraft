@@ -354,7 +354,7 @@ export type AuraKind =
   // (Moonseed becomes Moonsurge, Skyfall becomes Sunwake); pressing either
   // spends the bank. old_blood is Wildfang's shared bank: form strikes fill
   // it in either form and the form worn at the spend decides the payoff
-  // (Redharvest in Wolf, Marrowbreak in Bruin). verdance is Groveheart's
+  // (Redharvest in Kiwi, Marrowbreak in Bruin). verdance is Groveheart's
   // garden: completed HoT casts plant stages toward Overbloom.
   | 'moontide'
   | 'old_blood'

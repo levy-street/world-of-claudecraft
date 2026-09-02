@@ -216,7 +216,7 @@ Varje klass körs på MMO-mekanik från den klassiska eran, implementerad från 
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (kanaliserad), Bewitch, Icebind, en frammanad vattenelementar, och Chronomancy, en helarspec byggd på tidsmagi.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, och sju framkallningsbara demoner från Emberkin till Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, och skepnadsbyte till Wolf Form vid 5, Bruin Form vid 8 och Moonwing Form vid 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, och skepnadsbyte till Kiwi Form vid 5, Bruin Form vid 8 och Moonwing Form vid 10.
 
 Heals och buffs landar på gruppmedlemmar, healing kan kritta, och absorb-sköldar suger upp skada före hälsa. Spendera poäng över **tre talangspecar per klass** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, och så vidare); fördelningen valideras på servern och kan exporteras som en build-sträng.
 

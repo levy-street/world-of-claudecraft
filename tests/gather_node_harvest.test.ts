@@ -2134,7 +2134,7 @@ describe('harvest breaks stealth and action-locked forms refuse it', () => {
     p.auras.push(
       {
         id: 'cat_form',
-        name: 'Wolf Form',
+        name: 'Kiwi Form',
         kind: 'form_cat',
         value: 0,
         remaining: 600,

@@ -216,7 +216,7 @@ Elke class draait op MMO-mechanieken uit het klassieke tijdperk die vanaf de bas
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind, een opgeroepen waterelementaal, en Chronomancy, een healing-spec met tijdmagie.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, en zeven oproepbare demonen van Emberkin tot Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, en shapeshiften naar Wolf Form op 5, Bruin Form op 8 en Moonwing Form op 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, en shapeshiften naar Kiwi Form op 5, Bruin Form op 8 en Moonwing Form op 10.
 
 Heals en buffs landen op party-leden, healing kan critten, en absorb-shields vangen schade op vóór de health. Besteed punten over **drie talent-specs per class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, enzovoort); de toewijzing wordt door de server gevalideerd en is exporteerbaar als een build-string.
 

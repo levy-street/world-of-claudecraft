@@ -27,7 +27,7 @@ profile on the fixed PBE loadout (a low-SP proxy for Balance; see the caveat).
 |---|---|---|---:|
 | Moongrove, one target | Wild Apex | DPS | 160.8 |
 | Moongrove, three targets | Wild Apex | DPS | 162.7 |
-| Wildfang, Wolf | Quickening | DPS | 176.5 |
+| Wildfang, Kiwi | Quickening | DPS | 176.5 |
 | Groveheart, three injured allies | Wild Apex | HPS | 20.7 |
 
 The v0.29 Balance pass shifted Moongrove's power off flat base numbers onto
@@ -38,8 +38,8 @@ were calibrated down from an earlier over-scaling pass that read 258 there); the
 proxy above reads ~160 because it caps at spell power 105. Un-geared, Balance now
 sits inside the naked peer band (within 15% of the other naked specs) instead of
 towering over it the way the old flat numbers did. The v0.29 cat re-band trimmed
-Wolf (Redharvest, Flense, Rendclaw) so real-BiS Feral seats alongside Balance
-(~200 to 210 on the montecarlo) rather than above it. Wolf pays no hybrid tax.
+Kiwi (Redharvest, Flense, Rendclaw) so real-BiS Feral seats alongside Balance
+(~200 to 210 on the montecarlo) rather than above it. Kiwi pays no hybrid tax.
 Groveheart heals from a dedicated intellect-leather fixture, uses a real
 three-ally pressure profile with normal mana limits, and is not compared
 against a fake damage rotation. On the 60-second owned-class HPS harness it
@@ -49,14 +49,14 @@ the AoE chain healers over long pressure windows is a flagged PBE question.
 
 The attacking-live-mob profile (which equips the shared agility dev best-in-slot,
 so it verifies the rotation fires, not the caster-gear DPS the matrix measures)
-produced 3,232 Moonwing damage with 5 chosen payoffs, 5,044 Wolf damage with 10
+produced 3,232 Moonwing damage with 5 chosen payoffs, 5,044 Kiwi damage with 10
 payoffs, and 2,192 Bruin damage with three Marrowbreaks under Craven Roar upkeep.
 Bruin took 139 incoming damage and built 5,741.4 threat during the 30-second
 profile. This is the tank-behavior check, not a claim that Bruin should match a
 damage arm.
 
 The Bruin tank profile (`runDruidBruinTankProbe`, seed 42920) measured 22.0%
-less incoming damage than Wolf posture over a 30-second passive window under
+less incoming damage than Kiwi posture over a 30-second passive window under
 real mob swings (177 against 227), 182 threat per 100 damage from the bear
 multiplier and the feral threat bonus, a 1,150 snap-threat full-bank
 Marrowbreak, the full 3-second Menace forced-target window, and a 5-second
@@ -68,7 +68,7 @@ handoff under the classic 110% rule after shifting out.
 |---|---:|---:|---:|
 | Moongrove, one target DPS (proxy) | 158.9 | 160.8 | 145.5 |
 | Moongrove, three target DPS (proxy) | 157.7 | 162.7 | 150.0 |
-| Wildfang, Wolf DPS | 175.5 | 170.9 | 176.5 |
+| Wildfang, Kiwi DPS | 175.5 | 170.9 | 176.5 |
 | Groveheart, three ally HPS | 20.3 | 20.7 | 20.3 |
 
 ## Setup
@@ -97,7 +97,7 @@ continue building the bank.
 
 ## Wildfang
 
-Wolf loop: keep Flense active (18 sec), build combo points with Rendclaw,
+Kiwi loop: keep Flense active (18 sec), build combo points with Rendclaw,
 apply Bloodrift (24 sec), and press the Gorebite slot when Old Blood
 transforms it into Redharvest. Combo points are optional on the press: the
 detonation and energy refund always fire, and any points held only grow the
@@ -105,7 +105,7 @@ bite. The long bleeds mean one or two builders after Bloodrift still detonate
 nearly full bleeds.
 
 Bruin loop: keep Craven Roar up and maintain threat with Sweeping Claws and
-Bonecrush. Old Blood is shared with Wolf, so a bank built before shifting
+Bonecrush. Old Blood is shared with Kiwi, so a bank built before shifting
 remains available. At three stages Bonecrush becomes Marrowbreak. Above half
 health it must deal its burst and snap threat without an absorb. Below half
 health it must deal no burst or snap threat and instead grant the absorb and

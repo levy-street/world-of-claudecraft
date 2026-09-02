@@ -1945,6 +1945,46 @@ const PRIMITIVES = {
     ctx.fill();
     edge(ctx, pal.dark, 1);
   },
+  kiwi_head(ctx, _pal) {
+    // Shaggy hair-like plumage: a ring of overlapping tufts behind the head.
+    ctx.fillStyle = rad(ctx, -8, -8, 26, [
+      [0, '#a9764a'],
+      [0.55, '#8a5c36'],
+      [1, '#5a3a22'],
+    ]);
+    for (let i = 0; i < 9; i++) {
+      const a = (i / 9) * TAU;
+      ctx.beginPath();
+      ctx.arc(Math.cos(a) * 9 - 3, Math.sin(a) * 9, 5.2, 0, TAU);
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(-3, 0, 11, 0, TAU);
+    ctx.fill();
+    edge(ctx, '#3c2515', 1.2);
+    // The long tapering bill, the one silhouette cue a kiwi cannot be mistaken for.
+    ctx.fillStyle = lin(ctx, 4, 2, 19, 9, [
+      [0, '#e8dcb4'],
+      [0.6, '#d6c493'],
+      [1, '#a8916a'],
+    ]);
+    ctx.beginPath();
+    ctx.moveTo(4, -1.5);
+    ctx.quadraticCurveTo(13, 2, 18.5, 8.5);
+    ctx.quadraticCurveTo(12, 6.5, 4, 4);
+    ctx.closePath();
+    ctx.fill();
+    edge(ctx, '#7a663f', 1.1);
+    noShadow(ctx);
+    ctx.fillStyle = '#1d130b';
+    ctx.beginPath();
+    ctx.arc(1.5, -4.5, 2, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = '#f2e7cf';
+    ctx.beginPath();
+    ctx.arc(0.9, -5.2, 0.7, 0, TAU);
+    ctx.fill();
+  },
   sheep_head(ctx, _pal) {
     ctx.fillStyle = rad(ctx, -4, -8, 24, [
       [0, '#ffffff'],
@@ -3169,7 +3209,7 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   growl: r('earth', 'earthBrown', ['roar'], ['arcs']),
   challenging_roar: r('fury', 'earthBrown', ['roar', { p: 'paw', ...BR }], ['arcs']),
   demoralizing_roar: r('shadow', 'earthBrown', ['roar'], ['arcs']),
-  cat_form: r('nature', 'leafGreen', ['paw', { p: 'fang', ...BR }]),
+  cat_form: r('nature', 'leafGreen', ['kiwi_head', { p: 'claw_slash', ...BR }]),
   prowl: r('nature', 'leafGreen', ['paw'], ['arcs']),
   rake: r('nature', 'leafGreen', ['claw_slash'], ['drips']),
   claw: r('nature', 'leafGreen', ['claw_slash'], ['motion']),

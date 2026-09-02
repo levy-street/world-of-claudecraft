@@ -220,7 +220,7 @@ describe('Moongrove engine', () => {
 });
 
 describe('Wildfang engine', () => {
-  it('preserves the original Wolf Form attack-power formula', () => {
+  it('preserves the original Kiwi Form attack-power formula', () => {
     const { sim, player } = rig('feral');
     const meta = sim.meta(player.id);
     expect(meta).toBeDefined();

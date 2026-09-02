@@ -692,7 +692,7 @@ export function createActionBarView(
           dominionReady =
             dominionSummonBlockFromMask(dominionComposition, dominionTemplateId) === null;
         }
-        // A druid pressing a heal or a nuke from Bruin/Wolf Form leaves the form
+        // A druid pressing a heal or a nuke from Bruin/Kiwi Form leaves the form
         // and casts it, and the cast is billed against the PARKED mana pool, not
         // the rage or energy bar the button is pressed from (the same predicate
         // the sim's cast gate asks, so the bar cannot paint a slot unusable while

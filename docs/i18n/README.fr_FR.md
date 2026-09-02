@@ -216,7 +216,7 @@ Chaque classe utilise des mécaniques de MMO d'inspiration classique implément�
 - **Shaman** : Arc Bolt, Stonebound Weapon (enchantement d'arme), Mending Waters, Earthen Jolt, Thunder Ward (épines), Cinder Jolt.
 - **Mage** : Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (canalisé), Bewitch, Icebind, un élémentaire d'eau invocable, et Chronomancy, une spécialisation de soin fondée sur la magie temporelle.
 - **Warlock** : Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, et sept démons invocables, d'Emberkin à Wraithborn.
-- **Druid** : Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, et la métamorphose en Wolf Form au niveau 5, Bruin Form au 8 et Moonwing Form au 10.
+- **Druid** : Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, et la métamorphose en Kiwi Form au niveau 5, Bruin Form au 8 et Moonwing Form au 10.
 
 Les soins et les buffs s'appliquent aux membres du groupe, les soins peuvent porter des coups critiques, et les boucliers d'absorption encaissent les dégâts avant les points de vie. Dépensez des points dans **trois spécialisations de talents par classe** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, et ainsi de suite) ; l'allocation est validée par le serveur et exportable sous forme de chaîne de build.
 

@@ -369,7 +369,7 @@ describe('Primal Reflexes (druid): dodge cooldown', () => {
 });
 
 describe('Oakhide (druid): armor cooldown usable while shapeshifted', () => {
-  it('applies its armor buff in Bruin Form and Wolf Form, not just caster form', () => {
+  it('applies its armor buff in Bruin Form and Kiwi Form, not just caster form', () => {
     const { sim, p, pid } = make('druid');
     cast(sim, 'barkskin', pid);
     expect(p.auras.some((a) => a.kind === 'buff_armor' && a.value === 150)).toBe(true);

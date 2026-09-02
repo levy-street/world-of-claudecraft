@@ -1,5 +1,5 @@
 // Auto-unshift: a druid who presses a healing or damaging spell while wearing
-// Bruin, Wolf, or Fleet Form leaves the form and casts, instead of eating
+// Bruin, Kiwi, or Fleet Form leaves the form and casts, instead of eating
 // "You can't do that while shapeshifted."
 //
 // The behavior spans three seams, so the cases below pin all three: the cast
@@ -85,7 +85,7 @@ describe('druid auto-unshift on a healing or damaging cast', () => {
     expect(p.castingAbility).toBe('wrath');
   });
 
-  it('drops Wolf Form and casts Wildmend', () => {
+  it('drops Kiwi Form and casts Wildmend', () => {
     const sim = makeDruid();
     const p = sim.player;
     enterForm(sim, 'cat_form');
@@ -317,7 +317,7 @@ describe('a refusal AFTER the shapeshift gate leaves the form on', () => {
   });
 });
 
-// Stalk is Wolf Form's stealth, so leaving the form has to end it by EITHER
+// Stalk is Kiwi Form's stealth, so leaving the form has to end it by EITHER
 // route. Pressing the form button by hand already does, but only as a side
 // effect (casting anything breaks stealth when its effects resolve), so the
 // auto-unshift had to be given the same behavior explicitly. Raised in review
@@ -366,7 +366,7 @@ describe('Stalk leaves with the form, whichever route drops it', () => {
   });
 
   it('lands in the same state the manual toggle-off does', () => {
-    // The decisive form of the claim: two routes out of Wolf Form, one
+    // The decisive form of the claim: two routes out of Kiwi Form, one
     // resulting state. Compared as data so a future divergence on either side
     // fails, not just a regression on the auto route.
     const manual = prowlingCat();

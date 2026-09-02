@@ -71,6 +71,11 @@ const bundled = await esbuild.build({
     'import.meta.env.VITE_REOWN_PROJECT_ID': '""',
     'import.meta.env.VITE_TURNSTILE_SITEKEY': '""',
     'import.meta.env.VITE_WALLET_DISABLED': '""',
+    // Not an env flag: src/ui/icon_prewarm.ts builds its worker URL from
+    // `new URL('./icon_prewarm_worker.ts', import.meta.url)`, and the same empty-object
+    // rewrite leaves `import_meta.url` in the bundle, which trips the guard below. The
+    // stills page never starts that worker (prewarm is lazy), so any absolute URL will do.
+    'import.meta.url': '"http://localhost/stills-bundle.js"',
   },
   write: false,
   logLevel: 'silent',

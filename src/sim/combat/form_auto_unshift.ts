@@ -4,7 +4,7 @@
 //
 // This is the classic-era `autoUnshift` behavior, and it is deliberately narrow:
 //
-//   scope      Only the three DRUID forms that lock the caster kit (Bruin, Wolf,
+//   scope      Only the three DRUID forms that lock the caster kit (Bruin, Kiwi,
 //              Fleet: the isResourceShiftFormAuraKind set). The mage Ember Form
 //              (form_fireball) is authored as a hard "cannot attack or cast"
 //              transform and keeps its refusal.
@@ -118,7 +118,7 @@ export function applyAutoUnshift(
     p.auras.splice(i, 1);
     ctx.emit({ type: 'aura', targetId: p.id, name: aura.name, gained: false });
   }
-  // Stalk is Wolf Form's stealth (requiresForm: 'cat'), so it goes out with the
+  // Stalk is Kiwi Form's stealth (requiresForm: 'cat'), so it goes out with the
   // form. Pressing the form button by hand already ends it, though only as a
   // side effect: casting an ability breaks stealth when its effects resolve.
   // An auto-unshift casts no form button, so without this the druid would keep

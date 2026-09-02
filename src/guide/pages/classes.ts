@@ -364,7 +364,7 @@ function petsHtml(c: GuideClassInfo): string {
 
 // Druid shapeshifting. The three modelled forms come from the generated roster (the same
 // figures the model gallery spins); Moonwing Form has no model entry, so it is prose.
-// The names are this page's own keys (the sim's Bruin / Wolf / Fleet Form), so a reword on
+// The names are this page's own keys (the sim's Bruin / Kiwi / Fleet Form), so a reword on
 // the model gallery's labels can never silently rename the forms here.
 const FORM_NAME_KEY: Record<string, TranslationKey> = {
   form_bear: 'guide.classPage.formName.form_bear',

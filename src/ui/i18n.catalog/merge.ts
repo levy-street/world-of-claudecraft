@@ -3945,12 +3945,12 @@ const mergeExtraEn = {
     [
       'prowl',
       'Stalk',
-      'Enter stealth while in Wolf Form, moving 5% slower. Cannot be used in combat.',
+      'Enter stealth while in Kiwi Form, moving 5% slower. Cannot be used in combat.',
     ],
     [
       'rake',
       'Flense',
-      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Wolf Form only.',
+      'Flense the enemy for weapon damage plus {damage} and cause bleeding damage over 18 sec. Awards 1 combo point. Kiwi Form only.',
       { feral: 'Each hit that lands adds 1 Old Blood (max 3).' },
     ],
     [

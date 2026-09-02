@@ -123,3 +123,35 @@ describe('localizeErrorText', () => {
     expect(localizeErrorText(unmatched, deps())).toBe(unmatched);
   });
 });
+
+// The sim emits this line as plain English (casting_lifecycle.ts) and the client
+// re-localizes it here, so the two halves have to agree on the form's name. When
+// the feral form became a kiwi, a matcher left on "Wolf" would have kept parsing
+// nothing and shipped the raw English to every non-English client.
+describe('shapeshift form requirement', () => {
+  afterEach(() => setLanguage('en'));
+
+  it('matches the form names the sim actually emits', () => {
+    expect(localizeErrorText('You must be in Kiwi Form.', deps())).toBe(
+      'You must be in Kiwi Form.',
+    );
+    expect(localizeErrorText('You must be in Bruin Form.', deps())).toBe(
+      'You must be in Bruin Form.',
+    );
+  });
+
+  it('routes the matched form through the catalog instead of echoing English', async () => {
+    await ensureLocaleLoaded('de_DE');
+    setLanguage('de_DE');
+    const localized = localizeErrorText('You must be in Kiwi Form.', deps());
+    expect(localized).not.toBe('You must be in Kiwi Form.');
+    expect(localized).toBe(t('hud.errors.requiresForm', { form: t('hud.errors.cat') }));
+  });
+
+  it('no longer matches the retired wolf wording', () => {
+    // Falls through unmatched: proof the arm is keyed on the live name, not both.
+    expect(localizeErrorText('You must be in Wolf Form.', deps())).toBe(
+      'You must be in Wolf Form.',
+    );
+  });
+});

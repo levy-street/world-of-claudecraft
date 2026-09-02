@@ -216,7 +216,7 @@ World of ClaudeCraft является web3-native вокруг **$WOC**, наш�
 - **Shaman**: Arc Bolt, Stonebound Weapon (зачарование оружия), Mending Waters, Earthen Jolt, Thunder Ward (шипы), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (направляемое), Bewitch, Icebind, призываемый элементаль воды и Chronomancy, лечащая специализация магии времени.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume и семь призываемых демонов от Emberkin до Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots и превращение в Wolf Form на 5, Bruin Form на 8 и Moonwing Form на 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots и превращение в Kiwi Form на 5, Bruin Form на 8 и Moonwing Form на 10.
 
 Лечение и баффы накладываются на членов группы, лечение может критовать, а щиты поглощения впитывают урон до здоровья. Распределяйте очки между **тремя специализациями талантов на класс** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart и так далее); распределение проверяется на сервере и экспортируется как строка билда.
 

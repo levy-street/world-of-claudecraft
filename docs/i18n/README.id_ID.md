@@ -216,7 +216,7 @@ Setiap class berjalan pada mekanik MMO era klasik yang diimplementasikan dari pr
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (channeled), Bewitch, Icebind, satu elemental air yang dipanggil, dan Chronomancy, spec healing sihir waktu.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, dan tujuh demon yang dapat dipanggil dari Emberkin hingga Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, dan berubah wujud menjadi Wolf Form di level 5, Bruin Form di 8, dan Moonwing Form di 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, dan berubah wujud menjadi Kiwi Form di level 5, Bruin Form di 8, dan Moonwing Form di 10.
 
 Heal dan buff mengenai anggota party, healing bisa crit, dan absorb shield menyerap damage sebelum health. Belanjakan poin di **tiga talent spec per class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, dan seterusnya); alokasi divalidasi server dan dapat diekspor sebagai string build.
 

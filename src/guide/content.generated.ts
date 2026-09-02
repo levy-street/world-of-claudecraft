@@ -1955,7 +1955,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "cat_form",
-        "name": "Wolf Form"
+        "name": "Kiwi Form"
       },
       {
         "id": "prowl",
@@ -2023,7 +2023,7 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
       },
       {
         "id": "tigers_fury",
-        "name": "Wolfsblood"
+        "name": "Kiwiblood"
       },
       {
         "id": "rip",
@@ -2490,10 +2490,8 @@ export const GUIDE_DRUID_FORMS: GuideDruidForm[] = [
   },
   {
     "id": "form_cat",
-    "model": "form_cat",
-    "tint": "#d08b45",
-    "tintStrength": 0.35,
-    "still": "/guide-stills/form_cat__d08b45__s35.webp"
+    "model": "form_kiwi",
+    "still": "/guide-stills/form_kiwi.webp"
   },
   {
     "id": "form_travel",
@@ -12899,11 +12897,11 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle",
     "height": 2.35
   },
-  "form_cat": {
-    "url": "models/creatures/wolf_basic.glb",
+  "form_kiwi": {
+    "url": "models/creatures/kiwi_form.glb",
     "idle": "Idle",
-    "height": 1.6,
-    "tintStrength": 0.35
+    "height": 1.5,
+    "yaw": -1.5707963267948966
   },
   "form_travel": {
     "url": "models/creatures/chicken_cow.glb",

@@ -2,8 +2,8 @@
 // base swing speed, plus which ranged auto profile (class wand) a shapeshifted
 // player still has.
 //
-// A druid in Wolf Form (internally the `form_cat` shapeshift aura) fights with
-// claws, not the staff/mace it carries, so its auto-attack cadence must NOT come
+// A druid in Kiwi Form (internally the `form_cat` shapeshift aura) fights with
+// talons, not the staff/mace it carries, so its auto-attack cadence must NOT come
 // from the equipped weapon. Classic feral cat forms swing at a fixed fast 1.0s
 // paw speed; the auto path pairs that cadence with a weapon-roll rescale
 // (catAutoWeaponRollMult) so white DPS tracks the weapon's AUTHORED dps.
@@ -16,18 +16,18 @@ import type { Entity, PlayerClass, WeaponInfo } from '../types';
 
 // The rogue's baseline weapon speed (its starting dagger). Sourcing it from the
 // content tables keeps it honest even if the rogue's base weapon is ever
-// retuned, instead of a magic number that could drift. Wolf Form borrowed this
+// retuned, instead of a magic number that could drift. Kiwi Form borrowed this
 // cadence before the classic paw-speed standardization below; the rogue itself
 // still swings at it.
 export const ROGUE_BASE_SWING_SPEED: number = ITEMS[CLASSES.rogue.startWeapon].weapon?.speed ?? 1.8;
 
-// The classic fast feral paw cadence (seconds). Wolf Form used to borrow the
+// The classic fast feral cadence (seconds). Kiwi Form used to borrow the
 // rogue baseline (1.8s) while rolling the carried weapon's full authored
 // min..max every swing, which inflated slow big-roll weapons and made the
 // feral feel sluggish; the classic cat cadence is a fixed fast 1.0s.
 export const CAT_FORM_SWING_SPEED = 1.0;
 
-// The cadence Wolf Form swung at BEFORE the 1.0s standardization, frozen as a
+// The cadence Kiwi Form swung at BEFORE the 1.0s standardization, frozen as a
 // literal: per-swing sources balanced around the old cadence (Requital below)
 // rescale against this number. It happens to equal the rogue's starting dagger
 // speed because that is what cat form borrowed, but it must NOT track a future
@@ -36,8 +36,8 @@ export const CAT_FORM_LEGACY_SWING_SPEED = 1.8;
 
 // The feral form damage knob: the single bench-neutrality constant for the
 // 2026-08 cat swing-cadence standardization (CAT_FORM_SWING_SPEED above; the
-// design home is docs/design/druid-v029-class-design.md, "Wolf Form
-// swing-cadence standardization"). Every Wolf Form melee swing (auto AND
+// design home is docs/design/druid-v029-class-design.md, "Kiwi Form
+// swing-cadence standardization"). Every Kiwi Form melee swing (auto AND
 // weaponStrike special, deliberately: the special's AP term follows the
 // shared cadence, while its weapon roll stays raw per the classic
 // non-normalized special shape) is scaled by it in meleeSwing, so the 1.0s
@@ -57,14 +57,14 @@ export function isCatForm(e: Entity): boolean {
 }
 
 // Effective base swing speed in seconds, BEFORE haste/slow auras
-// (`swingIntervalMult`). Wolf Form ignores the equipped weapon and swings at
+// (`swingIntervalMult`). Kiwi Form ignores the equipped weapon and swings at
 // the fixed cat cadence; every other entity swings at its own weapon speed.
 export function baseSwingSpeed(e: Entity): number {
   return isCatForm(e) ? CAT_FORM_SWING_SPEED : e.weapon.speed;
 }
 
-// Wolf Form auto-attacks rescale the carried weapon's per-swing roll to the
-// fixed paw cadence, the same shape as the instant normalization below: the
+// Kiwi Form auto-attacks rescale the carried weapon's per-swing roll to the
+// fixed feral cadence, the same shape as the instant normalization below: the
 // roll times CAT_FORM_SWING_SPEED over speed reads as the weapon's authored
 // dps delivered at the cat cadence, so a slow big-roll weapon cannot inflate
 // the fast swings and white DPS is weapon-speed independent.
@@ -73,7 +73,7 @@ export function catAutoWeaponRollMult(e: Entity, weapon: WeaponInfo): number {
 }
 
 // The feral form damage multiplier for a swing by this entity: the tuning
-// constant above in Wolf Form, neutral for everyone else.
+// constant above in Kiwi Form, neutral for everyone else.
 export function catFormDamageMult(e: Entity): number {
   return isCatForm(e) ? CAT_FORM_DAMAGE_MULT : 1;
 }

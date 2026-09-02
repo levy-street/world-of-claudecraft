@@ -81,7 +81,7 @@ function isLiveSwingTarget(target: SwingTargetInput | null): boolean {
 // The fill/ready math shared by the main-hand and off-hand bars. Recovers the
 // full interval on the reset edge (timer jumped up): the freshly reset timer IS
 // the interval, so trust it outright. The weapon's speed must not floor it
-// (main-hand: Wolf Form swings a fixed 1.0s on a slow staff; either hand:
+// (main-hand: Kiwi Form swings a fixed 1.0s on a slow staff; either hand:
 // haste shortens any swing below its weapon speed). On first show mid-swing
 // the true interval is unknown, so max(timer, weapon speed) stays the best
 // guess until the first edge corrects it; otherwise carry the previous period

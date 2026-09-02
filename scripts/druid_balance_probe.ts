@@ -45,12 +45,12 @@ export interface DruidLiveMobResult {
 
 /** The Bruin Wildfang tank profile, the druid arm of the owned-class off-tank
  *  probe (runWarspiritOfftankProbe is the reference shape): mitigation vs the
- *  Wolf posture, threat generation, Menace forced-target uptime, Marrowbreak
+ *  Kiwi posture, threat generation, Menace forced-target uptime, Marrowbreak
  *  snap threat, and threat handoff after leaving the form. */
 export interface DruidBruinTankResult {
   head: string;
   seed: number;
-  wolfIncomingDamage: number;
+  kiwiIncomingDamage: number;
   bruinIncomingDamage: number;
   bruinMitigationPct: number;
   bruinThreatFrom100Damage: number;
@@ -268,7 +268,7 @@ function incomingDamageForDruidForm(form: 'cat_form' | 'bear_form', seed: number
 }
 
 export function runDruidBruinTankProbe(seed = 42_920, head = 'working-tree'): DruidBruinTankResult {
-  const wolfIncomingDamage = incomingDamageForDruidForm('cat_form', seed);
+  const kiwiIncomingDamage = incomingDamageForDruidForm('cat_form', seed);
   const bruinIncomingDamage = incomingDamageForDruidForm('bear_form', seed);
   const sim = bruinFixture(seed);
   const player = sim.player;
@@ -329,9 +329,9 @@ export function runDruidBruinTankProbe(seed = 42_920, head = 'working-tree'): Dr
   return {
     head,
     seed,
-    wolfIncomingDamage,
+    kiwiIncomingDamage,
     bruinIncomingDamage,
-    bruinMitigationPct: 1 - bruinIncomingDamage / wolfIncomingDamage,
+    bruinMitigationPct: 1 - bruinIncomingDamage / kiwiIncomingDamage,
     bruinThreatFrom100Damage,
     marrowbreakSnapThreat,
     growlForcedUptimeSeconds: forcedTicks / 20,
@@ -355,7 +355,7 @@ function printResults(): void {
   }
   const tank = runDruidBruinTankProbe();
   console.log(
-    `bruin tank  ${tank.bruinIncomingDamage}/${tank.wolfIncomingDamage} incoming ` +
+    `bruin tank  ${tank.bruinIncomingDamage}/${tank.kiwiIncomingDamage} incoming ` +
       `(${(tank.bruinMitigationPct * 100).toFixed(1)}% less), ` +
       `${tank.bruinThreatFrom100Damage} threat/100 damage, ` +
       `Marrowbreak ${tank.marrowbreakSnapThreat.toFixed(1)} snap threat, ` +

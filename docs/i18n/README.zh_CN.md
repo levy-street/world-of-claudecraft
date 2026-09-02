@@ -216,7 +216,7 @@ $WOC 在实时游戏中也有可选的效用：
 - **Shaman**：Arc Bolt、Stonebound Weapon（附魔）、Mending Waters、Earthen Jolt、Thunder Ward（荆棘）、Cinder Jolt。
 - **Mage**：Cinderbolt、Hoarfrost Mantle、Aether Insight、Rimelance、Waterbind、Cinderfall、Aether Darts（引导）、Bewitch、Icebind，一只召唤的水元素，以及 Chronomancy，一个时间魔法治疗专精。
 - **Warlock**：Gloom Bolt、Fiendhide、Burning Pact、Blackrot、Hard Bargain、Hex of Anguish、Consume，以及从 Emberkin 到 Wraithborn 共七只可召唤的恶魔。
-- **Druid**：Wildbolt、Wildmend、Wildward、Lunar Tempest、Wildbloom、Briarguard、Gripping Roots，以及 5 级变形为 Wolf Form、8 级为 Bruin Form、10 级为 Moonwing Form。
+- **Druid**：Wildbolt、Wildmend、Wildward、Lunar Tempest、Wildbloom、Briarguard、Gripping Roots，以及 5 级变形为 Kiwi Form、8 级为 Bruin Form、10 级为 Moonwing Form。
 
 治疗和增益会作用于队友，治疗可以暴击，吸收护盾会在生命值之前承受伤害。在**每个职业的三个天赋专精**之间分配点数（Battlecraft/Bloodrush/Ironguard、Moongrove/Wildfang/Groveheart 等等）；分配由服务器校验，并可导出为一段构筑字符串。
 

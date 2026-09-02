@@ -175,12 +175,12 @@ export function localizeErrorText(text: string, deps: ErrorTextLockoutDeps): str
   const key = exact[text];
   if (key) return t(key);
 
-  let match = /^You must be in (Bruin|Wolf) Form\.$/.exec(text);
+  let match = /^You must be in (Bruin|Kiwi) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.requiresForm', {
       form: t(match[1] === 'Bruin' ? 'hud.errors.bear' : 'hud.errors.cat'),
     });
-  match = /^You can't do that in (Bruin|Wolf|Fleet) Form\.$/.exec(text);
+  match = /^You can't do that in (Bruin|Kiwi|Fleet) Form\.$/.exec(text);
   if (match)
     return t('hud.errors.cantInForm', {
       form: t(

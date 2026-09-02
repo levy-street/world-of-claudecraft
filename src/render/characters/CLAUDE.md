@@ -174,7 +174,8 @@ humanoid mobs, NPCs, forms). Dispatch precedence in `visualKeyFor`: players to
 `player_<class>` (or `player_mech` for the mech skin catalog); mobs to
 `MOB_KEYS[templateId]`, then `FAMILY_KEYS[MOBS[id].family]` (the family ids
 live in `manifest.ts`), falling back to `mob_bandit`; NPCs to `NPC_KEYS`. Forms
-(`form_sheep`/`form_bear`/`form_cat`/`form_travel`) are passed explicitly by the renderer.
+(`form_sheep`/`form_bear`/`form_kiwi`/`form_cat`/`form_travel`) are passed explicitly by the
+renderer. `form_kiwi` is the druid feral body; `form_cat` is now the shaman Shadewolf only.
 
 ## Animation
 - `AnimState` (the renderer-derived input) and `BaseState`

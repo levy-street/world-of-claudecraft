@@ -216,7 +216,7 @@ Mỗi class chạy trên cơ chế MMO thời kinh điển được hiện thự
 - **Shaman**: Arc Bolt, Stonebound Weapon (phù phép), Mending Waters, Earthen Jolt, Thunder Ward (gai), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (kênh dẫn), Bewitch, Icebind, một thủy nguyên tố được triệu hồi, và Chronomancy, một spec hồi máu dùng ma thuật thời gian.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, và bảy quỷ có thể triệu hồi từ Emberkin đến Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, và biến hình thành Wolf Form ở cấp 5, Bruin Form ở cấp 8, và Moonwing Form ở cấp 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, và biến hình thành Kiwi Form ở cấp 5, Bruin Form ở cấp 8, và Moonwing Form ở cấp 10.
 
 Hồi máu và buff áp lên các thành viên nhóm, hồi máu có thể crit, và khiên hấp thụ thấm sát thương trước khi mất máu. Chuyên hóa qua **ba nhánh talent mỗi class** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart, và cứ thế); việc phân bổ được máy chủ xác thực và có thể xuất ra dưới dạng một chuỗi build.
 

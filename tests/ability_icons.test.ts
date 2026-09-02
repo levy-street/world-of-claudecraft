@@ -130,6 +130,6 @@ describe('ability icons', () => {
 
     const identity = ids.map((id) => ({ id, recipe: abilityIconRecipe(id) }));
     const hash = createHash('sha256').update(stableSerialize(identity)).digest('hex');
-    expect(hash).toBe('fe3038159f06420f59700b3c9654eeac91e12e9b37818db42134c8d11b3a272a');
+    expect(hash).toBe('34d45d77c217f34990e201ee6c7af4d0da1c719bde0022642fc922dc5bff954f');
   });
 });

@@ -216,7 +216,7 @@ Každá třída běží na MMO mechanikách klasické éry implementovaných od 
 - **Shaman**: Arc Bolt, Stonebound Weapon (imbue), Mending Waters, Earthen Jolt, Thunder Ward (thorns), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts (kanálované), Bewitch, Icebind, přivolaný vodní elementál a Chronomancy, léčitelská specializace s magií času.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume a sedm přivolatelných démonů od Emberkin po Wraithborn.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots a proměna do Wolf Form na 5, Bruin Form na 8 a Moonwing Form na 10.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots a proměna do Kiwi Form na 5, Bruin Form na 8 a Moonwing Form na 10.
 
 Léčení a buffy dopadají na členy party, léčení může critnout a absorpční štíty pohltí poškození dřív, než dojde na zdraví. Body rozděluješ mezi **tři talentové specializace na třídu** (Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart a tak dále); rozdělení ověřuje server a dá se vyexportovat jako build string.
 

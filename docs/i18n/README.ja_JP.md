@@ -216,7 +216,7 @@ $WOC はライブなゲーム内でも任意のユーティリティを持ちま
 - **Shaman**: Arc Bolt、Stonebound Weapon（付呪）、Mending Waters、Earthen Jolt、Thunder Ward（とげ）、Cinder Jolt。
 - **Mage**: Cinderbolt、Hoarfrost Mantle、Aether Insight、Rimelance、Waterbind、Cinderfall、Aether Darts（チャネル）、Bewitch、Icebind、召喚する水のエレメンタル、そして時間魔法のヒールスペックである Chronomancy。
 - **Warlock**: Gloom Bolt、Fiendhide、Burning Pact、Blackrot、Hard Bargain、Hex of Anguish、Consume、そして Emberkin から Wraithborn まで召喚可能な7体の悪魔。
-- **Druid**: Wildbolt、Wildmend、Wildward、Lunar Tempest、Wildbloom、Briarguard、Gripping Roots、そしてレベル5で Wolf Form、8で Bruin Form、10で Moonwing Form への変身。
+- **Druid**: Wildbolt、Wildmend、Wildward、Lunar Tempest、Wildbloom、Briarguard、Gripping Roots、そしてレベル5で Kiwi Form、8で Bruin Form、10で Moonwing Form への変身。
 
 ヒールとバフはパーティメンバーに届き、ヒールはクリティカルが出ることがあり、吸収シールドは体力より先にダメージを受け止めます。**クラスごとに3つのタレントスペック**（Battlecraft/Bloodrush/Ironguard、Moongrove/Wildfang/Groveheart、など）にポイントを振り分けます。割り振りはサーバー検証され、ビルド文字列としてエクスポートできます。
 

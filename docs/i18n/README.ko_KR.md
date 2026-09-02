@@ -216,7 +216,7 @@ $WOC는 실시간 게임 안에서 선택적인 용도도 갖습니다:
 - **Shaman**: Arc Bolt, Stonebound Weapon(무기 부여), Mending Waters, Earthen Jolt, Thunder Ward(가시), Cinder Jolt.
 - **Mage**: Cinderbolt, Hoarfrost Mantle, Aether Insight, Rimelance, Waterbind, Cinderfall, Aether Darts(정신 집중), Bewitch, Icebind, 소환하는 물의 정령, 그리고 시간 마법 치유 전문화인 Chronomancy.
 - **Warlock**: Gloom Bolt, Fiendhide, Burning Pact, Blackrot, Hard Bargain, Hex of Anguish, Consume, 그리고 Emberkin부터 Wraithborn까지 소환 가능한 일곱 악마.
-- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, 그리고 5레벨의 Wolf Form, 8레벨의 Bruin Form, 10레벨의 Moonwing Form 변신.
+- **Druid**: Wildbolt, Wildmend, Wildward, Lunar Tempest, Wildbloom, Briarguard, Gripping Roots, 그리고 5레벨의 Kiwi Form, 8레벨의 Bruin Form, 10레벨의 Moonwing Form 변신.
 
 치유와 버프는 파티원에게 적용되고, 치유는 치명타가 날 수 있으며, 흡수 보호막은 체력보다 먼저 피해를 흡수합니다. **클래스당 세 가지 특성 전문화**(Battlecraft/Bloodrush/Ironguard, Moongrove/Wildfang/Groveheart 등)에 점수를 분배하세요; 분배는 서버에서 검증되며 빌드 문자열로 내보낼 수 있습니다.
 

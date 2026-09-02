@@ -344,14 +344,19 @@ const dungeons = Object.values(DUNGEONS)
 // gallery group. Labels are guide.models.form* keys on the client, not baked names.
 // form_sheep stays out: it is the polymorph victim model, not a druid form.
 const DRUID_FORM_KEYS = ['form_bear', 'form_cat', 'form_travel'];
-const druidForms = DRUID_FORM_KEYS.map((vk) => {
+// The feral form's gallery id stays form_cat (the sim's shapeshift aura kind, and
+// every guide.*.form_cat translation key, are stable) while the BODY it wears is
+// the kiwi. form_cat the VISUAL is now the shaman's Shadewolf, not a druid form.
+const DRUID_FORM_VISUAL = { form_cat: 'form_kiwi' };
+const druidForms = DRUID_FORM_KEYS.map((id) => {
+  const vk = DRUID_FORM_VISUAL[id] ?? id;
   const model = modelKeyFor(vk);
   if (!model) throw new Error(`druid form visual missing from the manifest: ${vk}`);
   const tint = tintFor(vk, 0xffffff);
   const tintHex = tint != null ? hex(tint) : null;
   const tintStrength = tintStrengthFor(vk);
   return {
-    id: vk,
+    id,
     model,
     ...(tintHex != null ? { tint: tintHex } : {}),
     ...(tintStrength !== undefined ? { tintStrength } : {}),

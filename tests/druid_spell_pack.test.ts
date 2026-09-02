@@ -139,7 +139,7 @@ describe('druid spell pack — casting applies effects', () => {
     const a = sim.addPlayer('druid', 'Cat');
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     // The giveForm shortcut leaves the pool mid-conversion (still mana), and
     // the next cast finishes the switch by refilling to max, which would mask
     // the surge. Settle the pool as energy FIRST, then the free cast plus 30
@@ -221,7 +221,7 @@ describe('druid spell pack — casting applies effects', () => {
     expect(travel / base).toBeCloseTo(1.4, 1);
   });
 
-  it('Prowl actually moves the druid at half speed in Wolf Form', () => {
+  it('Prowl actually moves the druid at half speed in Kiwi Form', () => {
     const distanceOver = (withProwl: boolean): number => {
       const sim = makeWorld();
       const pid = sim.addPlayer('druid', withProwl ? 'Prowler' : 'Runner');
@@ -404,7 +404,7 @@ describe('druid spell pack — casting applies effects', () => {
     const a = sim.addPlayer('druid', 'Dasher');
     const e = sim.entities.get(a)!;
     sim.setPlayerLevel(20, a);
-    giveForm(sim, a, 'form_cat', 'Wolf Form');
+    giveForm(sim, a, 'form_cat', 'Kiwi Form');
     e.resource = 100;
     sim.castAbility('dash', a);
     sim.tick();

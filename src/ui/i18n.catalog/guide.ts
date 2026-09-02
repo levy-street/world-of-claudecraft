@@ -640,7 +640,7 @@ export const guideStrings = {
     // tables, not on party membership).
     threatTitle: 'Who the enemy hits',
     threatBody:
-      "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Wolf Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
+      "Every enemy keeps a private tally of who has annoyed it most. Damage adds to it, and so does healing: a heal puts threat on the enemies already fighting the person you healed, shared out between them, so the safest heal is one on someone the tank has already taken hold of. Tanks turn on a guarded stance or a protective form that multiplies everything they generate, while the druid's Kiwi Form sheds threat instead, and a taunt lifts the caster straight to the top of the tally and pins the enemy on them for a few seconds. Enemies do not switch the instant somebody passes the tank: it takes a clear lead to pull one off, and a bigger lead at range than in melee, so a little patience at the start of a pull keeps the fight where it belongs.",
     // Environmental hazards. Both are number-free by design: breath drain and the
     // drown pulse live in src/sim/breath.ts, the open-sea clock in src/sim/fatigue.ts.
     hazardsTitle: 'The water can kill you',
@@ -1269,7 +1269,7 @@ export const guideStrings = {
     // gallery's labels so a reword over there cannot silently rename the forms.
     formName: {
       form_bear: 'Bruin Form',
-      form_cat: 'Wolf Form',
+      form_cat: 'Kiwi Form',
       form_travel: 'Fleet Form',
     },
   },
@@ -2334,7 +2334,7 @@ export const guideStrings = {
     // The in-game shapeshift names (bear_form/cat_form/travel_form in classes.ts).
     groupForms: 'Druid Forms',
     formBear: 'Bruin Form',
-    formCat: 'Wolf Form',
+    formCat: 'Kiwi Form',
     formTravel: 'Fleet Form',
     groupCreatures: 'Creatures',
     groupPets: 'Warlock Demons',
