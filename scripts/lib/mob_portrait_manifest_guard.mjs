@@ -56,8 +56,15 @@ export function assertManifestWriteAuthorized({
     // still demands the rendered receipt below, as does any row drift.
     // Residual stated plainly: a pixel-affecting edit INSIDE the bundle's
     // src/render reach is indistinguishable from content churn at this
-    // layer (one bundle digest); splitting the bundle hash is a maintainer
-    // call, ledgered under deviation (al).
+    // layer (one bundle digest). RULED 2026-09-01 under
+    // qr-19-portrait-bundle-hash-split: the single hash STANDS and the
+    // digest is not split, so this is an accepted residual rather than an
+    // open call. It is narrower than it reads: an edit that actually moves
+    // pixels moves portrait OUTPUTS, which is row drift and never
+    // bookkeeping-only, so what the one digest hides is a src/render edit
+    // that changes no shipped byte. The split was refused on price
+    // (schemaVersion 2 exists to prevent a bootstrap migration and its
+    // 242-row re-render).
     const drift = describeManifestDrift(previous, next);
     if (drift.bookkeepingOnly && previous.portraits.length === next.portraits.length) {
       return;
