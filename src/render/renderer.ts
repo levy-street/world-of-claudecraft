@@ -649,6 +649,7 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
+import { createShadowExtent, resetShadowExtent, updateShadowExtent } from './shadow_extent_core';
 import {
   type ShadowAnchor,
   shadowTexelWorldSize,
@@ -1553,6 +1554,9 @@ export class Renderer {
   // render-budget pressure the shadow map updates every other frame, halving
   // the second scene draw; applied right after the governor each frame.
   private readonly shadowCadence = createShadowCadenceState();
+  private readonly shadowExtent = createShadowExtent();
+  private shadowBaseExtent = 105;
+  private shadowMapTexels = 0;
   private sunUp = 1;
   private moonUp = 0;
   private starAmt = 0; // 0 day, 1 deep night: star-field strength for the sky dome
@@ -2289,28 +2293,24 @@ export class Renderer {
     // so the frustum must reach further sunward than the old 95 to catch
     // off-screen casters; ~5.1cm texels at 4096 and ~8.2cm at High's 2560,
     // which the PCF radius below softens over anyway. (115 cost real
-    // shadow-pass draw calls at ultra; 105 keeps most of the reach.)
-    const S = LOW_GFX ? 85 : 105;
-    sun.shadow.camera.left = -S;
-    sun.shadow.camera.right = S;
-    sun.shadow.camera.top = S;
-    sun.shadow.camera.bottom = -S;
+    // shadow-pass draw calls at ultra; 105 keeps most of the reach.) This is
+    // the BASE: applyShadowShed writes the live box, which the budget
+    // governor shrinks under sustained pressure (shadow_extent_core.ts).
+    this.shadowBaseExtent = LOW_GFX ? 85 : 105;
     sun.shadow.bias = -0.0006;
     // 0.05 pushed contact shadows clean off clod/prop-scale relief; 0.035
     // still clears acne on the low-poly facets
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
-    // Texel size from the REAL map size three will use: WebGLShadowMap scales
-    // a requested mapSize down to the GPU's maxTextureSize at render time, so
-    // an unclamped derivation would quantize to a fraction of a real texel on
-    // a capped device and quietly lose the anti-swimming property.
-    this.shadowTexelWorld = shadowTexelWorldSize(
-      2 * S,
-      Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize),
-    );
+    // The REAL map size three will use: WebGLShadowMap scales a requested
+    // mapSize down to the GPU's maxTextureSize at render time, so an
+    // unclamped derivation would quantize to a fraction of a real texel on a
+    // capped device and quietly lose the anti-swimming property.
+    this.shadowMapTexels = Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize);
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
+    this.applyShadowShed();
     // characters can self-cull only where they cast no sun shadow (low/lean tier)
     this.cullCharacters = !sun.castShadow;
     this.sunDir.copy(SUN_DIR);
@@ -4249,7 +4249,8 @@ export class Renderer {
     );
     this.applyRenderBudgetState(this.renderBudgetState);
     resetShadowCadence(this.shadowCadence);
-    this.applyShadowCadence();
+    resetShadowExtent(this.shadowExtent);
+    this.applyShadowShed();
     this.applyResolution();
   }
 
@@ -4598,18 +4599,29 @@ export class Renderer {
     if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
     updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
-    this.applyShadowCadence();
+    updateShadowExtent(this.shadowExtent, dt, state.pressure, state.enabled);
+    this.applyShadowShed();
   }
 
-  /** Write the cadence plan onto three's shadowMap flags. Runs at the top of
-   *  sync(), before the frame's render; the bounded prewarm saves/restores
-   *  BOTH flags around its renders and the per-frame re-assert here makes
-   *  every restore self-healing. An out-of-band render between this write
-   *  and the frame render (renderPrewarmPass, the census probe's frozen
-   *  pass) can consume a pending needsUpdate; the cost is at most one extra
-   *  frame of shadow staleness on those bounded dev/startup paths, never a
-   *  lost update in steady state. */
-  private applyShadowCadence(): void {
+  /** Apply both budget-governed shadow sheds, from the top of sync() so the
+   *  bounded prewarm's and census probe's save/restore of the shadowMap flags
+   *  is self-healing (shadow_cadence_core.ts and shadow_extent_core.ts own
+   *  the decisions and the reasoning). */
+  private applyShadowShed(): void {
+    // The live ortho box. Every consumer reads it from the camera
+    // (foliage_shadow_core via setFoliageShadowVolume) or from
+    // shadowTexelWorld, so writing it here is the whole wiring; nothing
+    // caches the base extent.
+    const cam = this.sun.shadow.camera;
+    const extent = this.shadowBaseExtent * this.shadowExtent.scale;
+    if (cam.top !== extent) {
+      cam.left = -extent;
+      cam.right = extent;
+      cam.top = extent;
+      cam.bottom = -extent;
+      cam.updateProjectionMatrix();
+      this.shadowTexelWorld = shadowTexelWorldSize(2 * extent, this.shadowMapTexels);
+    }
     if (!this.sun.castShadow) return;
     const shadowMap = this.webgl.shadowMap;
     const autoUpdate = !this.shadowCadence.halfRate;
@@ -9838,17 +9850,7 @@ export class Renderer {
     anchor.y = pp.y;
     anchor.z = pp.z;
     if (this.lowGfx) {
-      if (this.sun.castShadow)
-        snapShadowAnchor(
-          SUN_ANCHOR.x,
-          SUN_ANCHOR.y,
-          SUN_ANCHOR.z,
-          pp.x,
-          pp.y,
-          pp.z,
-          this.shadowTexelWorld,
-          anchor,
-        );
+      if (this.sun.castShadow) snapShadowAnchor(SUN_ANCHOR, pp, this.shadowTexelWorld, anchor);
       this.sun.position.set(
         anchor.x + SUN_ANCHOR.x,
         anchor.y + SUN_ANCHOR.y,
@@ -9863,17 +9865,7 @@ export class Renderer {
       t = t < 0 ? 0 : t > 1 ? 1 : t;
       const blend = t * t * (3 - 2 * t);
       this.lightDir.copy(this.sunDir).lerp(this.moonDir, blend).normalize();
-      if (this.sun.castShadow)
-        snapShadowAnchor(
-          this.lightDir.x,
-          this.lightDir.y,
-          this.lightDir.z,
-          pp.x,
-          pp.y,
-          pp.z,
-          this.shadowTexelWorld,
-          anchor,
-        );
+      if (this.sun.castShadow) snapShadowAnchor(this.lightDir, pp, this.shadowTexelWorld, anchor);
       this.sun.position.set(
         anchor.x + this.lightDir.x * SUN_TRAVEL_DISTANCE,
         anchor.y + this.lightDir.y * SUN_TRAVEL_DISTANCE,

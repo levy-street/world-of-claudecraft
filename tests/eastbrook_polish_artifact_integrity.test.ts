@@ -1035,9 +1035,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '840c8ae5b1b641b01e870cedb81da393125c5454a3948b02062abf94e84f6f7c';
+  'adc3720e96ca7f8c3316f3da515a03e89884158d4a9da5245b7ae53f9d01c8a3';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'd9c91f2ec374fcf55aefb6a626135cc52ba4c3f74aa693fa4c585680118519fd';
+  'a5e4a993ebd2548f17a7c9389cfb2d4d5ff8579084d03a306f0f52ab90604944';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2197,7 +2197,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // pnpm-lock.yaml, so the lockfile-coupled asset fingerprints are
       // re-stamped byte-stable, the composite follows them and this seal
       // follows the swept evidence bytes. No capture was retaken.
-    ).toBe('ab2ca43e25a4e4f73c69bd1f34d88e0918541d4ea87568065f00993f9dfa9348');
+      // Re-minted again for the sun-shadow extent shed: renderer.ts is a
+      // fingerprinted input, so the composite follows the edit and this seal
+      // follows the swept evidence bytes. No capture was retaken.
+    ).toBe('9b0b7a2998fcc8dc3f061531ae66684e0d45969520ca0ecaacbdf39c695d6ba6');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

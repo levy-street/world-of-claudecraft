@@ -36,9 +36,11 @@ CSM is N directional lights, which moves `numDirLights` and
 prewarm and compile lane the renderer is built around, and it breaks the
 single-ortho-volume assumption baked into `src/render/foliage_shadow_core.ts`.
 
-The cheaper wins in the same problem space land first, and all three are on
-this branch: the dial cap, the texel snap, and the budget-governed shadow
-cadence (`src/render/shadow_cadence_core.ts`). Revisit CSM only if the
+The cheaper wins in the same problem space land first: the dial cap, the texel
+snap, the budget-governed shadow cadence (`src/render/shadow_cadence_core.ts`)
+and, below it, the budget-governed extent ladder
+(`src/render/shadow_extent_core.ts`), which shrinks the single ortho box under
+sustained pressure instead of splitting it. Revisit CSM only if the
 measurements in "What would change the verdict" come back the way CSM would
 need them to.
 

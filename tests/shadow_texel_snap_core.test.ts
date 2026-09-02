@@ -14,7 +14,7 @@ const DIR = { x: 90, y: 62, z: 50 };
 const TEXEL = shadowTexelWorldSize(210, 4096);
 
 function snap(x: number, y: number, z: number, out: ShadowAnchor = { x: 0, y: 0, z: 0 }) {
-  return snapShadowAnchor(DIR.x, DIR.y, DIR.z, x, y, z, TEXEL, out);
+  return snapShadowAnchor(DIR, { x, y, z }, TEXEL, out);
 }
 
 /**
@@ -173,13 +173,13 @@ describe('snapShadowAnchor', () => {
   it('passes the anchor through untouched on degenerate input', () => {
     const out: ShadowAnchor = { x: 0, y: 0, z: 0 };
     // Zero texel size (snapping disabled).
-    snapShadowAnchor(DIR.x, DIR.y, DIR.z, 1.5, 2.5, 3.5, 0, out);
+    snapShadowAnchor(DIR, { x: 1.5, y: 2.5, z: 3.5 }, 0, out);
     expect(out).toEqual({ x: 1.5, y: 2.5, z: 3.5 });
     // Zero-length direction.
-    snapShadowAnchor(0, 0, 0, 1.5, 2.5, 3.5, TEXEL, out);
+    snapShadowAnchor({ x: 0, y: 0, z: 0 }, { x: 1.5, y: 2.5, z: 3.5 }, TEXEL, out);
     expect(out).toEqual({ x: 1.5, y: 2.5, z: 3.5 });
     // A vertical light has no stable lookAt basis: pass through, not NaN.
-    snapShadowAnchor(0, 1, 0, 1.5, 2.5, 3.5, TEXEL, out);
+    snapShadowAnchor({ x: 0, y: 1, z: 0 }, { x: 1.5, y: 2.5, z: 3.5 }, TEXEL, out);
     expect(out).toEqual({ x: 1.5, y: 2.5, z: 3.5 });
   });
 
