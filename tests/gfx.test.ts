@@ -345,6 +345,16 @@ describe('graphics tier resolution', () => {
       expect(below.canopyDetail).toBe(false);
       expect(below.terrainRelief).toBe(0);
     }
+    // The grass-card ladder: lean tiers keep the legacy pair, medium and high
+    // take the two uprights plus the 45-degree breaker, and the sky-facing cap
+    // card is what ultra and insane buy (grass_tuft_cards_core.ts).
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .grassCardsPerTuft,
+      ),
+    ).toEqual([2, 3, 3, 4, 4]);
     expect(high.surfaceDetail).toBe(true);
     expect(high.surfaceDetailTaps).toBe(0);
     expect(high.surfaceDetailClampK).toBe(0);
@@ -411,6 +421,11 @@ describe('graphics tier resolution', () => {
     expect(foliageHigh.canopyDetail).toBe(true);
     expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
     expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
+    // The Foliage Density dial owns the grass-card ladder too, level by level.
+    expect(foliageLow.grassCardsPerTuft).toBe(2);
+    expect(foliageMedium.grassCardsPerTuft).toBe(3);
+    expect(foliageHigh.grassCardsPerTuft).toBe(4);
+    expect(adv({ foliageDensity: 2 }).grassCardsPerTuft).toBe(4);
     // Surface Detail (the town-cost dial): Off / Basic / Full / Insane.
     const surfaceOff = adv({ surfaceDetail: 0 });
     expect(surfaceOff.surfaceDetail).toBe(false);

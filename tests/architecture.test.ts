@@ -670,6 +670,7 @@ const RENDER_PURE_CORES = [
   'src/render/ground_tilt_core.ts',
   'src/render/grass_build_slicer_core.ts',
   'src/render/grass_cap_collapse_core.ts',
+  'src/render/grass_tuft_cards_core.ts',
   'src/render/step_smooth_core.ts',
   'src/render/eastbrook_town_visibility_core.ts',
   'src/render/fenbridge_town_visibility_core.ts',

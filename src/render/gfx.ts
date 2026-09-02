@@ -17,6 +17,7 @@ import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 import './final_color_nan_guard';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
+import { GRASS_CARDS_FULL, GRASS_CARDS_LEAN, GRASS_CARDS_MID } from './grass_tuft_cards_core';
 import {
   installPbrPointLightShaderPruning,
   patchPbrRimGlowFragmentShader,
@@ -228,6 +229,16 @@ export interface GfxSettings {
   readonly denseDressing: boolean;
   readonly grassRadius: number;
   readonly grassStep: number;
+  /**
+   * Alpha-tested double-sided quads per grass tuft (grass_tuft_cards_core.ts,
+   * which owns the shed order and the placement of each card). The near-field
+   * grass carpet is the densest discard-heavy fill layer in the world and this
+   * count multiplies every tuft it draws, so it is a tier knob rather than the
+   * lean/lush binary it used to be: lean tiers 2, medium and high 3 (the two
+   * uprights plus the 45-degree breaker), ultra and insane 4 (plus the
+   * sky-facing cap card).
+   */
+  readonly grassCardsPerTuft: number;
   /** Stable-prefix floor for grass cards already inside their far alpha-fade band. */
   readonly farGrassDensityFloor: number;
   readonly terrainSplat: boolean;
@@ -1021,6 +1032,9 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // Hoisted out of the literal so denseDressing below can extend the cohort.
   const lowPlus =
     iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software'));
+  // Hoisted out of the literal so the grass-card ladder below can key off the
+  // same cohort the lean model set and the lean LOD table use.
+  const leanFoliage = tier === 'low' || (tier === 'medium' && weakIntegratedGpu);
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -1083,7 +1097,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // Tree and rock placement must match across clients because those decorations
     // occlude world sightlines. Keep the constrained profile on the full placement
     // set and reduce only non-occluding grass below.
-    leanFoliage: tier === 'low' || (tier === 'medium' && weakIntegratedGpu),
+    leanFoliage,
     // The dressing compensation cohort (interface comment carries the why):
     // lowPlus plus the leanFoliage medium session, which the lowPlus re-key
     // had silently stripped of its denser-dressing compensation.
@@ -1110,6 +1124,14 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
               ? 2.35
               : 2.0
             : 1.8,
+    // The card ladder (see the interface comment). Lean keeps the legacy pair;
+    // the cap card, which the carpet tiers already collapse near the player,
+    // is what ultra and insane buy over medium and high.
+    grassCardsPerTuft: leanFoliage
+      ? GRASS_CARDS_LEAN
+      : gfxTierAtLeast(tier, 'ultra')
+        ? GRASS_CARDS_FULL
+        : GRASS_CARDS_MID,
     farGrassDensityFloor: iosMemoryProfile
       ? 0.5
       : constrainedMemory
@@ -1204,6 +1226,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 0,
         cliffScree: false,
         canopyDetail: false,
+        grassCardsPerTuft: GRASS_CARDS_LEAN,
       };
     else if (foliageLevel === 1)
       settings = {
@@ -1212,6 +1235,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 24,
         cliffScree: false,
         canopyDetail: false,
+        grassCardsPerTuft: GRASS_CARDS_MID,
       };
     else if (foliageLevel === 2)
       settings = {
@@ -1219,6 +1243,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 34,
         cliffScree: true,
         canopyDetail: true,
+        grassCardsPerTuft: GRASS_CARDS_FULL,
       };
     else
       settings = {
@@ -1227,6 +1252,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 40,
         cliffScree: true,
         canopyDetail: true,
+        grassCardsPerTuft: GRASS_CARDS_FULL,
       };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;

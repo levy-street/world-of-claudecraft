@@ -171,13 +171,19 @@ describe('gfx override application', () => {
     // this one moves a VALUE too: medium and the Advanced grade-only mix are
     // the profiles the new AA policy grants it to, and low/high/ultra/insane
     // move only by the serialized key name.
+    // Regenerated across the board for `grassCardsPerTuft`, the grass tuft's
+    // card count (grass_tuft_cards_core.ts). This one moves a VALUE on every
+    // row: 2 on low, 3 on medium and high, 4 on ultra, insane and the
+    // Advanced default mix. The ladder itself is pinned by name in
+    // tests/gfx.test.ts and tests/grass_tuft_cards_core.test.ts; this row is
+    // the byte guard that says nothing ELSE moved with it.
     expect(hashes).toEqual({
-      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
-      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
-      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
-      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
-      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
+      low: '424dc8016399c870f6d58d448bcd14b716e73653af3e872dcb99933ff26dc57a',
+      medium: 'dfca781ab3d57a001d8f7a7ebc5642e9f409ddf2b1581c4840eaabf7c5c940c5',
+      high: '6e5db84e098803609ceb154e9877a439405c687c5aefac9fcef0e124043c8ba9',
+      ultra: '67b205f84bceb76769ca8f01a7e84c743ef3e6f82eb310c2f96f9fda68bdc9fe',
+      insane: '1ee13ebb388f1a13566066ee3f78fceec5dc2372de94951ca04cf27c8bede42c',
+      advanced: '6f3c90c63f5cb294e6067c04529390e3da79e6dd91f0143acddf24058bf4c23f',
     });
   });
 
