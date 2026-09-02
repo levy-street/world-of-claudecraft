@@ -68,9 +68,15 @@ Everything else is a sibling module in one of these families:
   rebuild so the same canvas + context is reused instead of a second context
   being minted), `context_release.ts` (forces context loss on `pagehide`:
   browsers cap live WebGL contexts per GPU process at ~16 and reclaim lost
-  ones lazily, and the client reloads on every logout), and
-  `software_renderer.ts` (the SINGLE source of truth for detecting a software
-  rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
+  ones lazily, and the client reloads on every logout),
+  `context_loss_recovery.ts` (`attachContextRecoveryHandlers`: the game
+  canvas's one persistent watchdog for an UNPLANNED loss that never restores,
+  e.g. a genuinely dead GPU/driver; distinct from three.js's own
+  `webglcontextlost` handler, which already requests restoration for the
+  entire life of a live renderer, and from `context_recycle.ts`'s short-lived
+  listener, which covers the deliberate rebuild's dispose-then-reconstruct
+  gap), and `software_renderer.ts` (the SINGLE source of truth for detecting a
+  software rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
   `perf_reporter.ts` all consume it so the detectors cannot drift).
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key

@@ -8568,6 +8568,7 @@ export const tr_TR: EnTranslations = {
     "connectingRealm": "Dünyaya bağlanılıyor...",
     "assetsFailed": "Varlık yüklemesi başarısız oldu: yeniden yüklemeyi deneyin. {error}",
     "rendererFailed": "Görüntüleyici başlatılamadı: yeniden yüklemeyi deneyin. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Dünyaya girilemedi. Bağlantı zaman aşımına uğradı. Oyun sunucusu çalışıyor mu?",
     "connectionLost": "Sunucuyla bağlantı koptu.",
     "reconnectingAttempt": "Bağlantı kesildi. Yeniden bağlanılıyor... (deneme {attempt}/{maxAttempts}, {seconds} sn. içinde yeniden denenecek)",

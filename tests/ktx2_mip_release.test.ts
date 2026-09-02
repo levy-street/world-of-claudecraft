@@ -820,14 +820,24 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
     expect(enableAt).toBeGreaterThanOrEqual(0);
     expect(deferredAt).toBeGreaterThanOrEqual(0);
     expect(enableAt).toBeLessThan(deferredAt);
-    // (2) The re-transcode kick must sit INSIDE the canvas webglcontextlost
-    // listener (it serves both in-place loss and the rebuild recycle), and
-    // must pass a late-bound queue supplier rather than checking rendererReady
-    // in the listener: graphics-rebuild context loss fires after shutdown has
-    // marked the old renderer unready but before the candidate renderer exists.
-    expect(
-      between(mainSrc, "addEventListener('webglcontextlost'", 'webglcontextrestored'),
-    ).toContain('ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current)');
+    // (2) The re-transcode kick must sit INSIDE the onLost callback wired
+    // through attachContextRecoveryHandlers (context_loss_recovery.ts), which
+    // dispatches on the same canvas webglcontextlost event for both in-place
+    // loss and the rebuild recycle. The callbacks themselves are built by
+    // src/game/context_loss_diagnostics.ts (kept out of main.ts's own
+    // zero-headroom line ceiling), so main.ts only needs to pass a thunk that
+    // calls the real ktx2MipsOnContextLost with the late-bound queue supplier
+    // (rather than checking rendererReady in the thunk: graphics-rebuild
+    // context loss fires after shutdown has marked the old renderer unready
+    // but before the candidate renderer exists) through to that builder, and
+    // the builder itself must still call it inside onLost, before onRestored.
+    expect(mainSrc).toContain(
+      'ktx2MipsOnContextLost: () => ktx2MipsOnContextLost(ktx2RestoreUploadQueue.current)',
+    );
+    const buildSrc = read('src/game/context_loss_diagnostics.ts');
+    expect(between(buildSrc, 'onLost: () => {', 'onRestored:')).toContain(
+      'deps.ktx2MipsOnContextLost()',
+    );
     expect(mainSrc).toContain(
       "import { createKtx2RestoreUploadQueueCoordinator } from './game/ktx2_restore_upload_queue'",
     );

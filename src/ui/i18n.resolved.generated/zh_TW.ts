@@ -8568,6 +8568,7 @@ export const zh_TW: EnTranslations = {
     "connectingRealm": "正在連線至世界...",
     "assetsFailed": "資源載入失敗：請嘗試重新整理。{error}",
     "rendererFailed": "無法啟動渲染器：請嘗試重新整理。{error}",
+    "rendererContextLost": "3D 渲染器遺失了圖形內容，且無法恢復。請嘗試重新整理。",
     "enterTimeout": "無法進入世界。連線已逾時。遊戲伺服器是否正在執行？",
     "connectionLost": "與伺服器的連線已中斷。",
     "reconnectingAttempt": "連線已中斷。正在重新連線...（第 {attempt}/{maxAttempts} 次嘗試，{seconds} 秒後重試）",

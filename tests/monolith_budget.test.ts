@@ -498,12 +498,17 @@ const MONOLITHS: MonolithRow[] = [
     // extraction pays 2 more under the entry-fade row above. Measured on the
     // merged tree, never reconciled by arithmetic. Exact merged count, zero
     // headroom.
-    // Re-pinned after the /daynight dev-command extraction to
-    // src/game/daynight_dev_command.ts (net of the Ignivar placer dispatch).
-    // Re-pinned to the exact merged count of the v0.41.0 base sync into the
-    // raid branch: both arms extracted and added independently, so neither
-    // parent pin fits the combined file; the merged count is the honest bound.
-    ceiling: 11551,
+    // Down 11623 -> 11620 on PR #3763's follow-up round: the WebGL
+    // context-recovery callbacks (checkpoint plus console breadcrumbs plus the
+    // fatalOverlay call) moved out into src/game/context_loss_diagnostics.ts,
+    // which also pays for the new webgl-context-stuck checkpoint the round
+    // added.
+    // Re-pinned at the release/v0.42.0 sync merge: the release side's own
+    // /daynight dev-command extraction (to src/game/daynight_dev_command.ts)
+    // landed independently of PR #3763's context-recovery move, so the merged
+    // file is smaller than either parent pin. Exact merged count, zero
+    // headroom.
+    ceiling: 11512,
     seam: 'a src/game/ or src/ui/ sibling module; main.ts is a firewall, not a home',
   },
   {

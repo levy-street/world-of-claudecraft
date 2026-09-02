@@ -2044,6 +2044,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': 'ワールドに接続中...',
   'loading.assetsFailed': 'アセットの読み込みに失敗しました。再読み込みしてください。{error}',
   'loading.rendererFailed': 'レンダラーを開始できません。再読み込みしてください。{error}',
+  'loading.rendererContextLost':
+    '3D レンダラーがグラフィックスコンテキストを失い、復旧できませんでした。再読み込みしてください。',
   'loading.enterTimeout':
     '世界に入れませんでした。接続がタイムアウトしました。ゲームサーバーは動作していますか？',
   'loading.connectionLost': 'サーバーとの接続が切断されました。',

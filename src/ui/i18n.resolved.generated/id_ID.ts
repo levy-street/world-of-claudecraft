@@ -8568,6 +8568,7 @@ export const id_ID: EnTranslations = {
     "connectingRealm": "Menyambung ke dunia...",
     "assetsFailed": "Pemuatan aset gagal: coba muat ulang. {error}",
     "rendererFailed": "Tidak bisa memulai perender: coba muat ulang. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Tidak bisa masuk dunia. Koneksi kehabisan waktu. Apakah server gim berjalan?",
     "connectionLost": "Koneksi ke server terputus.",
     "reconnectingAttempt": "Koneksi terputus. Menyambungkan kembali... (coba {attempt}/{maxAttempts}, coba lagi di {seconds}s)",

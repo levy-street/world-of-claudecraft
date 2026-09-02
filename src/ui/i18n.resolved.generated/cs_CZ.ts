@@ -8568,6 +8568,7 @@ export const cs_CZ: EnTranslations = {
     "connectingRealm": "Připojuje se ke světu...",
     "assetsFailed": "Načítání assetů selhalo: zkus stránku obnovit. {error}",
     "rendererFailed": "Renderer se nepodařilo spustit: zkus stránku obnovit. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Nepodařilo se vstoupit do světa. Připojení vypršelo. Běží herní server?",
     "connectionLost": "Připojení k serveru bylo ztraceno.",
     "reconnectingAttempt": "Spojení ztraceno. Znovu se připojuji... (pokus {attempt}/{maxAttempts}, opakování za {seconds}s)",

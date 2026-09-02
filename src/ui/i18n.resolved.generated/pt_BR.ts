@@ -8568,6 +8568,7 @@ export const pt_BR: EnTranslations = {
     "connectingRealm": "Conectando ao mundo...",
     "assetsFailed": "Falha ao carregar recursos: tente recarregar. {error}",
     "rendererFailed": "Não foi possível iniciar o renderizador: tente recarregar. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Não foi possível entrar no mundo. A conexão expirou. O servidor do jogo está em execução?",
     "connectionLost": "A conexão com o servidor foi perdida.",
     "reconnectingAttempt": "Conexão perdida. Reconectando... (tentativa {attempt}/{maxAttempts}, tentando novamente em {seconds}s)",

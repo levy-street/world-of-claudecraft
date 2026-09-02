@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "loading.rendererContextLost"
+  ],
+  "es_ES": [
+    "loading.rendererContextLost"
+  ],
+  "fr_FR": [
+    "loading.rendererContextLost"
+  ],
+  "fr_CA": [
+    "loading.rendererContextLost"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "loading.rendererContextLost"
+  ],
+  "de_DE": [
+    "loading.rendererContextLost"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "loading.rendererContextLost"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "loading.rendererContextLost"
+  ],
+  "nl_NL": [
+    "loading.rendererContextLost"
+  ],
+  "pl_PL": [
+    "loading.rendererContextLost"
+  ],
+  "id_ID": [
+    "loading.rendererContextLost"
+  ],
+  "tr_TR": [
+    "loading.rendererContextLost"
+  ],
+  "sv_SE": [
+    "loading.rendererContextLost"
+  ],
+  "vi_VN": [
+    "loading.rendererContextLost"
+  ],
+  "da_DK": [
+    "loading.rendererContextLost"
+  ]
 };

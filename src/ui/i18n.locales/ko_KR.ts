@@ -2031,6 +2031,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'loading.connectingRealm': '월드에 연결하는 중...',
   'loading.assetsFailed': '리소스 불러오기에 실패했습니다. 새로고침해 보세요. {error}',
   'loading.rendererFailed': '렌더러를 시작할 수 없습니다. 새로고침해 보세요. {error}',
+  'loading.rendererContextLost':
+    '3D 렌더러가 그래픽 컨텍스트를 잃어 복구할 수 없습니다. 새로고침해 보세요.',
   'loading.enterTimeout':
     '세계에 입장할 수 없습니다. 연결 시간이 초과되었습니다. 게임 서버가 실행 중인가요?',
   'loading.connectionLost': '서버와의 연결이 끊어졌습니다.',

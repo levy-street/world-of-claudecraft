@@ -8568,6 +8568,7 @@ export const da_DK: EnTranslations = {
     "connectingRealm": "Forbinder til verdenen...",
     "assetsFailed": "Indlæsning af aktiver mislykkedes: prøv at genindlæse. {error}",
     "rendererFailed": "Kunne ikke starte gengiveren: prøv at genindlæse. {error}",
+    "rendererContextLost": "The 3D renderer lost its graphics context and could not recover. Please reload.",
     "enterTimeout": "Kunne ikke komme ind i verdenen. Forbindelsen fik timeout. Kører spilserveren?",
     "connectionLost": "Forbindelsen til serveren gik tabt.",
     "reconnectingAttempt": "Forbindelse mistet. Genopretter forbindelse... (forsøg {attempt}/{maxAttempts}, prøver igen om {seconds}s)",

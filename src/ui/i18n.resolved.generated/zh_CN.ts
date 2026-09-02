@@ -8568,6 +8568,7 @@ export const zh_CN: EnTranslations = {
     "connectingRealm": "正在连接服务器...",
     "assetsFailed": "资源加载失败：请尝试刷新。{error}",
     "rendererFailed": "无法启动渲染器：请尝试刷新。{error}",
+    "rendererContextLost": "3D 渲染器丢失了图形上下文，且无法恢复。请尝试刷新。",
     "enterTimeout": "无法进入世界。连接已超时。游戏服务器是否正在运行？",
     "connectionLost": "与服务器的连接已断开。",
     "reconnectingAttempt": "连接已断开。正在重新连接...（第 {attempt}/{maxAttempts} 次尝试，{seconds} 秒后重试）",
