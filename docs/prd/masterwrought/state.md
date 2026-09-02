@@ -18407,7 +18407,68 @@ rung is an OUTLIER against its family median of 40, not a fault: every
 new shard sink would pull on epics. Under 11m-FLOOR the only assertable
 fact is presence, the shard has it, and adding a consumer below the apex
 band would spend a scarce supply to fix a ratio nobody measured. NO shard
-consumer is added. Both branches of the reservation obligation stated: no
+consumer is added.
+RULED (qr-19-disenchant-ratio-outlier, 2026-09-02, under qr-19-best-for-project):
+the outlier is KEPT, and this time on a number rather than on the record's word.
+THE READ, re-derived on the merged tree at the eleventh v0.42.0 sync (2ebe95e731),
+and it answers D047 (which asked to COMMISSION exactly this measurement) and D034
+(the demand risk on the Lucent weapon rung) with the same figure, so the packet
+holds one answer to the one question. DEMAND, the reagent-row census over
+recipes.ts AND enchants.ts (the 11m predicate): arcane_shard 12 consumers / 21
+units, the corrected split exactly (recipe_gatherers_cache 5, recipe_artisans_eye
+5, six Greater etchings at 1, three Lucent etchings at 1, Lucent Infusion at 2);
+arcane_essence 41 / 86 (the census above read 40 / 84; recipe_deed_of_making's
+2-essence row joined since); arcane_dust 42 / 155. So the shard rung holds 29
+percent of essence's rows and 24 percent of its units. A THIRD SINK the reagent
+predicate cannot see, and enchants.ts's own header already counts ("the four
+arcane_shard sinks"): the tool-effect recharge (src/sim/professions/tools.ts, R39)
+prices in DISENCHANT_MATERIAL_BY_QUALITY at the owned tool's rarity rung, so a
+recharger holding an epic tool (35 epic tool defs on the merged catalog, the
+tier-5 family) pays arcane_shard: a full epic-rung slot restores up to 50 charges
+(20 base plus three 10-point rungs) at RECHARGE_CHARGES_PER_MATERIAL 10, so 5
+shards at the generic rate and 3 at the original crafter's 0.5 discount, PER
+RECHARGE. That is a repeating sink beside the 21 fixed units, which no
+"consumers / units" figure can carry. SUPPLY, one route only: resolveDisenchant
+(src/sim/professions/enchanting.ts) with the rung map in
+src/sim/professions/disenchant_reagents.ts: a rare disenchant yields ONE essence
+and an epic or legendary disenchant yields ONE shard, both flat regardless of
+item level, while sub-rare yields dust at the quantity-scaled baseDisenchantYield.
+No loot table, vendor, quest or faucet mints a shard (grep over src/sim and
+server: the items.ts def, the two reagent files and the rung map are the only
+carriers). SUNDERING IS NOT A SHARD SOURCE, correcting the phase text that had it
+on the supply side: it mints sundered_essence at SUNDERED_ESSENCE_YIELD 1 per raid
+gear epic and admits exactly the raid gear epics a shard disenchant would also
+consume, so it is a competing spend of the shard's INPUT. Catalog census: 402
+disenchantable epic-or-legendary defs (394 + 8) against 164 rares; 217 of the
+epics are sunderable raid gear; 17 are the crafted apex pieces themselves (an
+apex crafter can disenchant own output into one shard, at the apex bill). THE
+ESSENCE COMPARISON ON THE SAME BASIS: per disenchant both rungs pay exactly one
+unit, so the supply ratio IS the ratio of rare to epic-or-legendary items reaching
+the disenchant table, and the fixed demand asks 86 essence against 21 shard (4.1
+to 1) plus the recharge stream on shards alone. THE INFLOW, on the merged tables
+rather than the 11m tree: the eleventh sync re-cut the Crucible to ONE gear item
+per five raiders per kill on both difficulties (docs/prd/ignivar-raid-loot.md,
+"The cadence rule", re-cut 2026-09-02: two items per 10-player kill, down from
+four per Normal kill and six to seven per Heroic; about 0.8 items per player per
+week for a roster running both locks, down from about two), and one of a kill's
+two slots is the sigil TOKEN partition on both difficulties, so a kill sheds at
+most one disenchantable gear epic on Normal and a fraction of one on Heroic (the
+heroic exclusive slot mixes tokens with gear). A raider who destroyed EVERY raid
+epic would mint under one shard a week; one charm recipe is five, the fixed rows
+are twenty-one, and a single epic-rung recharge is three to five. THE VERDICT ON
+THE NUMBER: the sink is NOT starved of consumers, it is supply-limited, and the
+sync just cut the supply further; the 11m refusal is ratified as measured, not
+as recorded. WHAT IT BINDS: no new shard consumer lands below the apex band, and
+all four reservations in recipes.ts stand exactly as written and unamended (the
+jewelcrafting hub header, the inscription header, the INTERMEDIATE_RECIPES header,
+and the trophy-exclusion "reserved for the apex band" note); D047's commissioned
+measurement is this read, and D034's accept-on-record stands, because the demand
+risk it priced (a starving lucent_reagent and shard sink) is the opposite of what
+the number shows. No code moved. Derivation harness: the scratch census in the
+Phase 19E QA record (phase-19e-qa.md), re-runnable from the two content files and
+the three profession modules named here.
+
+Both branches of the reservation obligation stated: no
 new consumer lands below the apex band, so none of the three "NEVER
 arcane_shard" reservations in recipes.ts (the jewelcrafting hub header,
 the inscription header, the INTERMEDIATE_RECIPES header, plus the fourth
