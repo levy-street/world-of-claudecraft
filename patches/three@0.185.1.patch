@@ -1,14 +1,29 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf..88336e5 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e6c689da0 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
-@@ -441 +441 @@ var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetB
+@@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
+ 
+ var morphtarget_vertex = "#ifdef USE_MORPHTARGETS\n\ttransformed *= morphTargetBaseInfluence;\n\tfor ( int i = 0; i < MORPHTARGETS_COUNT; i ++ ) {\n\t\tif ( morphTargetInfluences[ i ] != 0.0 ) transformed += getMorph( gl_VertexID, i, 0 ).xyz * morphTargetInfluences[ i ];\n\t}\n#endif";
+ 
 -var normal_fragment_begin = "float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = dFdx( vViewPosition );\n\tvec3 fdy = dFdy( vViewPosition );\n\tvec3 normal = normalize( cross( fdx, fdy ) );\n#else\n\tvec3 normal = normalize( vNormal );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal *= faceDirection;\n\t#endif\n#endif\n#if defined( USE_NORMALMAP_TANGENTSPACE ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn = getTangentFrame( - vViewPosition, normal,\n\t\t#if defined( USE_NORMALMAP )\n\t\t\tvNormalMapUv\n\t\t#elif defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tvClearcoatNormalMapUv\n\t\t#else\n\t\t\tvUv\n\t\t#endif\n\t\t);\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\ttbn[0] *= faceDirection;\n\t\ttbn[1] *= faceDirection;\n\t#endif\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn2 = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn2 = getTangentFrame( - vViewPosition, normal, vClearcoatNormalMapUv );\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\ttbn2[0] *= faceDirection;\n\t\ttbn2[1] *= faceDirection;\n\t#endif\n#endif\nvec3 nonPerturbedNormal = normal;";
 +var normal_fragment_begin = "float faceDirection = gl_FrontFacing ? 1.0 : - 1.0;\n#ifdef FLAT_SHADED\n\tvec3 fdx = dFdx( vViewPosition );\n\tvec3 fdy = dFdy( vViewPosition );\n\tvec3 normal = normalize( cross( fdx, fdy ) ); normal = dot( normal, normal ) > 0.0 ? normal : vec3( 0.0, 0.0, 1.0 );\n#else\n\tvec3 normal = normalize( vNormal ); normal = dot( normal, normal ) > 0.0 ? normal : vec3( 0.0, 0.0, 1.0 );\n\t#ifdef DOUBLE_SIDED\n\t\tnormal *= faceDirection;\n\t#endif\n#endif\n#if defined( USE_NORMALMAP_TANGENTSPACE ) || defined( USE_CLEARCOAT_NORMALMAP ) || defined( USE_ANISOTROPY )\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn = getTangentFrame( - vViewPosition, normal,\n\t\t#if defined( USE_NORMALMAP )\n\t\t\tvNormalMapUv\n\t\t#elif defined( USE_CLEARCOAT_NORMALMAP )\n\t\t\tvClearcoatNormalMapUv\n\t\t#else\n\t\t\tvUv\n\t\t#endif\n\t\t);\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\ttbn[0] *= faceDirection;\n\t\ttbn[1] *= faceDirection;\n\t#endif\n#endif\n#ifdef USE_CLEARCOAT_NORMALMAP\n\t#ifdef USE_TANGENT\n\t\tmat3 tbn2 = mat3( normalize( vTangent ), normalize( vBitangent ), normal );\n\t#else\n\t\tmat3 tbn2 = getTangentFrame( - vViewPosition, normal, vClearcoatNormalMapUv );\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\ttbn2[0] *= faceDirection;\n\t\ttbn2[1] *= faceDirection;\n\t#endif\n#endif\nvec3 nonPerturbedNormal = normal;";
-@@ -461 +461 @@ var iridescence_pars_fragment = "#ifdef USE_IRIDESCENCEMAP\n\tuniform sampler2D
+ 
+ var normal_fragment_maps = "#ifdef USE_NORMALMAP_OBJECTSPACE\n\tnormal = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#ifdef FLIP_SIDED\n\t\tnormal = - normal;\n\t#endif\n\t#ifdef DOUBLE_SIDED\n\t\tnormal = normal * faceDirection;\n\t#endif\n\tnormal = normalize( normalMatrix * normal );\n#elif defined( USE_NORMALMAP_TANGENTSPACE )\n\tvec3 mapN = texture2D( normalMap, vNormalMapUv ).xyz * 2.0 - 1.0;\n\t#if defined( USE_PACKED_NORMALMAP )\n\t\tmapN = vec3( mapN.xy, sqrt( saturate( 1.0 - dot( mapN.xy, mapN.xy ) ) ) );\n\t#endif\n\tmapN.xy *= normalScale;\n\tnormal = normalize( tbn * mapN );\n#elif defined( USE_BUMPMAP )\n\tnormal = perturbNormalArb( - vViewPosition, normal, dHdxy_fwd(), faceDirection );\n#endif";
+ 
+@@ -458,7 +458,7 @@ var clearcoat_pars_fragment = "#ifdef USE_CLEARCOATMAP\n\tuniform sampler2D clea
+ 
+ var iridescence_pars_fragment = "#ifdef USE_IRIDESCENCEMAP\n\tuniform sampler2D iridescenceMap;\n#endif\n#ifdef USE_IRIDESCENCE_THICKNESSMAP\n\tuniform sampler2D iridescenceThicknessMap;\n#endif";
+ 
 -var opaque_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha;\n#endif\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
 +var opaque_fragment = "#ifdef OPAQUE\ndiffuseColor.a = 1.0;\n#endif\n#ifdef USE_TRANSMISSION\ndiffuseColor.a *= material.transmissionAlpha;\n#endif\noutgoingLight.x = ( outgoingLight.x < 0.0 || outgoingLight.x >= 0.0 ) ? outgoingLight.x : 0.0;\noutgoingLight.y = ( outgoingLight.y < 0.0 || outgoingLight.y >= 0.0 ) ? outgoingLight.y : 0.0;\noutgoingLight.z = ( outgoingLight.z < 0.0 || outgoingLight.z >= 0.0 ) ? outgoingLight.z : 0.0;\ngl_FragColor = vec4( outgoingLight, diffuseColor.a );";
-@@ -7992,0 +7993,11 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ var packing = "vec3 packNormalToRGB( const in vec3 normal ) {\n\treturn normalize( normal ) * 0.5 + 0.5;\n}\nvec3 unpackRGBToNormal( const in vec3 rgb ) {\n\treturn 2.0 * rgb.xyz - 1.0;\n}\nconst float PackUpscale = 256. / 255.;const float UnpackDownscale = 255. / 256.;const float ShiftRight8 = 1. / 256.;\nconst float Inv255 = 1. / 255.;\nconst vec4 PackFactors = vec4( 1.0, 256.0, 256.0 * 256.0, 256.0 * 256.0 * 256.0 );\nconst vec2 UnpackFactors2 = vec2( UnpackDownscale, 1.0 / PackFactors.g );\nconst vec3 UnpackFactors3 = vec3( UnpackDownscale / PackFactors.rg, 1.0 / PackFactors.b );\nconst vec4 UnpackFactors4 = vec4( UnpackDownscale / PackFactors.rgb, 1.0 / PackFactors.a );\nvec4 packDepthToRGBA( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec4( 0., 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec4( 1., 1., 1., 1. );\n\tfloat vuf;\n\tfloat af = modf( v * PackFactors.a, vuf );\n\tfloat bf = modf( vuf * ShiftRight8, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec4( vuf * Inv255, gf * PackUpscale, bf * PackUpscale, af );\n}\nvec3 packDepthToRGB( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec3( 0., 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec3( 1., 1., 1. );\n\tfloat vuf;\n\tfloat bf = modf( v * PackFactors.b, vuf );\n\tfloat gf = modf( vuf * ShiftRight8, vuf );\n\treturn vec3( vuf * Inv255, gf * PackUpscale, bf );\n}\nvec2 packDepthToRG( const in float v ) {\n\tif( v <= 0.0 )\n\t\treturn vec2( 0., 0. );\n\tif( v >= 1.0 )\n\t\treturn vec2( 1., 1. );\n\tfloat vuf;\n\tfloat gf = modf( v * 256., vuf );\n\treturn vec2( vuf * Inv255, gf );\n}\nfloat unpackRGBAToDepth( const in vec4 v ) {\n\treturn dot( v, UnpackFactors4 );\n}\nfloat unpackRGBToDepth( const in vec3 v ) {\n\treturn dot( v, UnpackFactors3 );\n}\nfloat unpackRGToDepth( const in vec2 v ) {\n\treturn v.r * UnpackFactors2.r + v.g * UnpackFactors2.g;\n}\nvec4 pack2HalfToRGBA( const in vec2 v ) {\n\tvec4 r = vec4( v.x, fract( v.x * 255.0 ), v.y, fract( v.y * 255.0 ) );\n\treturn vec4( r.x - r.y / 255.0, r.y, r.z - r.w / 255.0, r.w );\n}\nvec2 unpackRGBATo2Half( const in vec4 v ) {\n\treturn vec2( v.x + ( v.y / 255.0 ), v.z + ( v.w / 255.0 ) );\n}\nfloat viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( viewZ + near ) / ( near - far );\n}\nfloat orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\n\t\treturn depth * ( far - near ) - far;\n\t#else\n\t\treturn depth * ( near - far ) - near;\n\t#endif\n}\nfloat viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {\n\treturn ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );\n}\nfloat perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {\n\t\n\t#ifdef USE_REVERSED_DEPTH_BUFFER\n\t\treturn ( near * far ) / ( ( near - far ) * depth - near );\n\t#else\n\t\treturn ( near * far ) / ( ( far - near ) * depth - far );\n\t#endif\n}";
+ 
+@@ -7989,12 +7989,30 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 		return uniforms;
+ 
+ 	}
 +	// World of ClaudeCraft: released program retention. Upstream destroys a
 +	// program the moment its last material lets go, so a material disposed and
 +	// re-minted under the same cache key (a streamed prop cell unloading and
@@ -20,7 +35,12 @@ index ad13abf..88336e5 100644
 +	const RETAINED_PROGRAM_LIMIT = 64;
 +	const retainedPrograms = [];
 +
-@@ -7998,0 +8010,7 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 	function acquireProgram( parameters, cacheKey ) {
+ 
+ 		let program = programsMap.get( cacheKey );
+ 
+ 		if ( program !== undefined ) {
 +			if ( program.usedTimes === 0 ) {
 +
 +				const r = retainedPrograms.indexOf( program );
@@ -28,7 +48,13 @@ index ad13abf..88336e5 100644
 +
 +			}
 +
-@@ -8013,0 +8032,15 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 			++ program.usedTimes;
+ 
+@@ -8010,21 +8028,29 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 		return program;
+ 
+ 	}
 +	function destroyProgram( program ) {
 +
 +		// Remove from unordered set
@@ -44,25 +70,112 @@ index ad13abf..88336e5 100644
 +
 +	}
 +
-@@ -8018,7 +8051 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 	function releaseProgram( program ) {
+ 
+ 		if ( -- program.usedTimes === 0 ) {
+ 
 -			// Remove from unordered set
 -			const i = programs.indexOf( program );
 -			programs[ i ] = programs[ programs.length - 1 ];
 -			programs.pop();
--
++			retainedPrograms.push( program );
+ 
 -			// Remove from map
 -			programsMap.delete( program.cacheKey );
-+			retainedPrograms.push( program );
-@@ -8026,2 +8053 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+-
 -			// Free WebGL resources
 -			program.destroy();
 +			if ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );
-@@ -8053,0 +8080,2 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 
+ 		}
+ 
+@@ -8050,6 +8076,8 @@ function WebGLPrograms( renderer, environments, extensions, capabilities, bindin
+ 		releaseProgram: releaseProgram,
+ 		releaseShaderCache: releaseShaderCache,
+ 		// Exposed for resource monitoring & error feedback via renderer.info:
 +		// Exposed for resource monitoring (World of ClaudeCraft retention):
 +		retainedPrograms: retainedPrograms,
-@@ -16464,0 +16493 @@ class WebGLRenderer {
+ 		programs: programs,
+ 		dispose: dispose
+ 	};
+@@ -9174,6 +9202,21 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 		_state.buffers.depth.setTest( true );
+ 		_state.setScissorTest( false );
+ 
++		// World of ClaudeCraft: depth-only shadow pass. A RenderTarget must carry
++		// at least one colour attachment, so a non-VSM shadow map allocates an
++		// RGBA8 texture beside its DepthTexture that NOTHING ever samples:
++		// WebGLLights binds shadow.map.depthTexture and shadowmap_pars_fragment
++		// reads it through sampler2DShadow. Upstream still cleared that colour
++		// once per updated map and let the depth material write it for every
++		// rasterized fragment, which at a 4096 map is a 16.8 Mpix clear plus
++		// full-coverage colour traffic per frame for a buffer with no reader.
++		// The pass now closes the colour mask on the depth and distance
++		// materials (getDepthMaterial below) and clears depth only. VSM is
++		// untouched: its blur passes write that colour attachment for real.
++		// colorWrite is not a program-cache-key input (WebGLPrograms never reads
++		// it), so no program key moves and no material relinks.
++		const depthOnlyPass = this.type !== VSMShadowMap;
++
+ 		// check for shadow map type changes
+ 
+ 		const typeChanged = _previousType !== this.type;
+@@ -9336,7 +9379,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 				if ( shadow.map.isWebGLCubeRenderTarget ) {
+ 
+ 					renderer.setRenderTarget( shadow.map, face );
+-					renderer.clear();
++					renderer.clear( ! depthOnlyPass, true, true );
+ 
+ 				} else {
+ 
+@@ -9344,7 +9387,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 					if ( face === 0 ) {
+ 
+ 						renderer.setRenderTarget( shadow.map );
+-						renderer.clear();
++						renderer.clear( ! depthOnlyPass, true, true );
+ 
+ 					}
+ 
+@@ -9417,6 +9460,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 
+ 		scope.needsUpdate = false;
+ 
++		// World of ClaudeCraft: the depth materials leave the colour mask closed.
++		// three's own frame clear re-opens it (WebGLBackground), but a masked
++		// glClear is silently a no-op, so the pass restores what it changed
++		// rather than leaving that to every caller.
++		if ( depthOnlyPass ) _state.buffers.color.setMask( true );
++
+ 		renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
+ 
+ 	};
+@@ -9516,6 +9565,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 
+ 		result.visible = material.visible;
+ 		result.wireframe = material.wireframe;
++		// World of ClaudeCraft: depth-only shadow pass (see this.render). Set
++		// here rather than on the two shared materials so the alpha-test clones
++		// in _materialCache and any customDepthMaterial follow the pass too,
++		// alongside the other fields the pass already owns on them.
++		result.colorWrite = type === VSMShadowMap;
+ 
+ 		if ( type === VSMShadowMap ) {
+ 
+@@ -16461,6 +16515,7 @@ class WebGLRenderer {
+ 			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
+ 			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
+ 
 +			info.retainedPrograms = programCache.retainedPrograms;
-@@ -17489,0 +17519,21 @@ class WebGLRenderer {
+ 			info.programs = programCache.programs;
+ 
+ 			/**
+@@ -17486,22 +17541,82 @@ class WebGLRenderer {
+ 			// ready to be used before resolving the promise.
+ 
+ 			return new Promise( ( resolve ) => {
 +				// World of ClaudeCraft: bounded isReady poll pass. Each
 +				// COMPLETION_STATUS_KHR query is a synchronous GPU-process
 +				// round-trip; with hundreds of pending programs and a
@@ -84,7 +197,9 @@ index ad13abf..88336e5 100644
 +				let pollCursor = 0;
 +				let pollIntervalMs = POLL_INTERVAL_MIN_MS;
 +
-@@ -17492 +17542,13 @@ class WebGLRenderer {
+ 
+ 				function checkMaterialsReady() {
+ 
 -					materials.forEach( function ( material ) {
 +					const pending = Array.from( materials );
 +					const passStart = performance.now();
@@ -99,11 +214,13 @@ index ad13abf..88336e5 100644
 +					// isReady()'s own positive cache), so a budgeted pass spends its
 +					// 2 ms on DISTINCT pending programs instead of repeat queries.
 +					const notReadyThisPass = new Set();
-@@ -17493,0 +17556,3 @@ class WebGLRenderer {
 +					for ( let i = 0; i < pending.length; i ++ ) {
 +
 +						const material = pending[ ( pollCursor + i ) % pending.length ];
-@@ -17497 +17562,6 @@ class WebGLRenderer {
+ 
+ 						const materialProperties = properties.get( material );
+ 						const program = materialProperties.currentProgram;
+ 
 -						if ( program.isReady() ) {
 +						// World of ClaudeCraft: three compileAsync disposal race (r165, still
 +						// present in r185). If churn releases renderer properties during this
@@ -111,9 +228,9 @@ index ad13abf..88336e5 100644
 +						// avoids the isReady TypeError and lets the promise settle. Recheck on
 +						// upgrade.
 +						if ( program === undefined ) {
-@@ -17499 +17568,0 @@ class WebGLRenderer {
+ 
 -							// remove any programs that report they're ready to use from the list
-@@ -17501,0 +17571,13 @@ class WebGLRenderer {
+ 							materials.delete( material );
 +						} else if ( notReadyThisPass.has( program ) === false ) {
 +
 +							if ( program.isReady() ) {
@@ -127,7 +244,9 @@ index ad13abf..88336e5 100644
 +
 +							}
 +
-@@ -17504 +17586,8 @@ class WebGLRenderer {
+ 
+ 						}
+ 
 -					} );
 +						if ( performance.now() - passStart >= POLL_PASS_BUDGET_MS && i + 1 < pending.length ) {
 +
@@ -137,7 +256,13 @@ index ad13abf..88336e5 100644
 +						}
 +
 +					}
-@@ -17515 +17604,6 @@ class WebGLRenderer {
+ 
+ 					// once the list of compiling materials is empty, call the callback
+ 
+@@ -17512,9 +17627,19 @@ class WebGLRenderer {
+ 
+ 					}
+ 
 -					// if some materials are still not ready, wait a bit and check again
 +					// if some materials are still not ready, wait a bit and check again.
 +					// The reset keys on CHEAP QUERIES ONLY, deliberately not on progress:
@@ -145,7 +270,7 @@ index ad13abf..88336e5 100644
 +					// would reset to 10 ms every time and still own ~75 percent of the
 +					// main thread while draining. Expensive queries back off whether or
 +					// not they progressed; readiness latency is bounded by the cap.
-@@ -17517 +17611,6 @@ class WebGLRenderer {
+ 
 -					setTimeout( checkMaterialsReady, 10 );
 +					const passMs = performance.now() - passStart;
 +					pollIntervalMs =
@@ -153,10 +278,19 @@ index ad13abf..88336e5 100644
 +							? POLL_INTERVAL_MIN_MS
 +							: Math.min( POLL_INTERVAL_MAX_MS, pollIntervalMs * 2 );
 +					setTimeout( checkMaterialsReady, pollIntervalMs );
-@@ -17879 +17978,5 @@ class WebGLRenderer {
+ 
+ 				}
+ 
+@@ -17876,7 +18001,11 @@ class WebGLRenderer {
+ 
+ 				} else if ( object.isMesh || object.isLine || object.isPoints ) {
+ 
 -					if ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) {
 +					// World of ClaudeCraft: a count 0 InstancedMesh draws nothing, yet the render
 +					// list still reaches setProgram, which LINKS its program for zero pixels.
 +					const drawsNothing = object.isInstancedMesh === true && object.count === 0;
 +
 +					if ( drawsNothing === false && ( ! object.frustumCulled || _frustum.intersectsObject( object ) ) ) {
+ 
+ 						const geometry = objects.update( object );
+ 						const material = object.material;

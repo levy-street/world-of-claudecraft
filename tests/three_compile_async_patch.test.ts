@@ -487,6 +487,130 @@ describe('three empty instanced draw skip patch', () => {
   });
 });
 
+describe('three depth-only shadow pass patch', () => {
+  // Sixth patch hunk (WebGLShadowMap): a non-VSM shadow map allocates an RGBA8
+  // colour texture beside its DepthTexture, because RenderTarget requires at
+  // least one colour attachment (RenderTarget~Options documents count as "must
+  // be at least 1"). Nothing samples it: WebGLLights binds
+  // `light.shadow.map.depthTexture || light.shadow.map.texture` and r185's
+  // shadowmap_pars_fragment reads that depth through sampler2DShadow. Upstream
+  // still cleared that colour once per updated map and let the depth material
+  // write it for every rasterized fragment, so at the ultra tiers' 4096 map the
+  // pass paid a 16.8 Mpix colour clear plus full-coverage colour traffic per
+  // frame for a buffer with no reader. The hunk closes the colour mask on the
+  // depth and distance materials and clears depth only.
+  //
+  // colorWrite is deliberately NOT a program-cache-key input: WebGLPrograms
+  // never reads it (pinned below), so no program key moves and the prewarm
+  // depth twins in src/render/prewarm_depth_material.ts stay correct.
+  const source = readFileSync(
+    new URL('../node_modules/three/build/three.module.js', import.meta.url),
+    'utf8',
+  );
+  const unpatchedSibling = readFileSync(
+    new URL('../node_modules/three/build/three.cjs', import.meta.url),
+    'utf8',
+  );
+  const stockClear =
+    '\n\t\t\t\t\t\trenderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\trenderer.clear();';
+
+  it('closes the colour mask on the shadow depth materials, VSM excepted', () => {
+    expect(
+      source.includes('result.colorWrite = type === VSMShadowMap;'),
+      'the depth-only shadow patch is not applied; re-run pnpm install',
+    ).toBe(true);
+    // Set in getDepthMaterial rather than once on the two shared materials, so
+    // the alpha-test clones in _materialCache and any customDepthMaterial (this
+    // repo mints those in src/render/characters/shadow_depth_materials.ts)
+    // follow the pass too. Pinned by ORDER: the write must sit in the block
+    // that already owns visible/wireframe on the resolved material.
+    expect(
+      source.includes(
+        'result.visible = material.visible;\n\t\tresult.wireframe = material.wireframe;',
+      ),
+      'the fields the shadow pass owns on the resolved depth material moved',
+    ).toBe(true);
+    expect(source.indexOf('result.colorWrite = type === VSMShadowMap;')).toBeGreaterThan(
+      source.indexOf('result.wireframe = material.wireframe;'),
+    );
+    // VSM keeps its colour write: its blur passes read the depth texture and
+    // write the RG half-float colour attachment for real.
+    expect(source).not.toContain('result.colorWrite = false;');
+  });
+
+  it('clears depth only, and only for the non-VSM pass', () => {
+    expect(
+      source.includes('const depthOnlyPass = this.type !== VSMShadowMap;'),
+      'the depth-only pass flag is missing; re-run pnpm install',
+    ).toBe(true);
+    // Both clears in the map loop (the cube-face arm and the 2D face-0 arm)
+    // must be gated, or a second shadow light still pays the colour clear.
+    expect(source.split('renderer.clear( ! depthOnlyPass, true, true );').length - 1).toBe(2);
+    // The stock spelling is REPLACED, not supplemented: an ungated
+    // renderer.clear() left in the loop would re-pay what the hunk removes.
+    expect(
+      source.includes(stockClear),
+      'an ungated shadow-map clear is back; the depth-only clear no longer replaces it',
+    ).toBe(false);
+    expect(
+      unpatchedSibling.split(stockClear).length - 1,
+      'the unpatched three.cjs control no longer matches the ungated clear; the GONE pin may be vacuous',
+    ).toBe(1);
+    expect(
+      unpatchedSibling.includes('depthOnlyPass'),
+      'the unpatched three.cjs control already carries the depth-only pass; the pins above prove nothing',
+    ).toBe(false);
+  });
+
+  it('restores the colour mask the depth materials closed', () => {
+    // A masked glClear is silently a no-op, so a pass that leaves the mask
+    // closed can blank a later frame clear. three re-opens it in
+    // WebGLBackground, but the pass restores what it changed rather than
+    // relying on every caller, and it must do so BEFORE the render target is
+    // handed back.
+    expect(
+      source.includes('if ( depthOnlyPass ) _state.buffers.color.setMask( true );'),
+      'the shadow pass no longer restores the colour mask; re-run pnpm install',
+    ).toBe(true);
+    const restore = source.indexOf('if ( depthOnlyPass ) _state.buffers.color.setMask( true );');
+    const handBack = source.indexOf(
+      'renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );',
+    );
+    expect(restore).toBeGreaterThan(0);
+    expect(restore).toBeLessThan(handBack);
+  });
+
+  it('leaves the program cache key free of colorWrite, so no program relinks', () => {
+    // The load-bearing claim of the whole hunk: colorWrite changes GL state,
+    // not shader source, so the shadow depth programs (and the prewarm twins
+    // that mirror them) keep their identity. If three ever folds colorWrite
+    // into getParameters/getProgramCacheKey this goes red and
+    // src/render/prewarm_depth_material.ts has to follow.
+    const programs = source.slice(
+      source.indexOf('function WebGLPrograms('),
+      source.indexOf('function WebGLProperties('),
+    );
+    expect(programs.length).toBeGreaterThan(1000);
+    expect(programs).not.toContain('colorWrite');
+  });
+
+  it('records the hunk in the checked-in patch file', () => {
+    const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
+    expect(
+      patch.includes('+\t\tconst depthOnlyPass = this.type !== VSMShadowMap;'),
+      'the depth-only pass flag is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('+\t\tresult.colorWrite = type === VSMShadowMap;'),
+      'the depth-material colour-mask write is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes('+\t\tif ( depthOnlyPass ) _state.buffers.color.setMask( true );'),
+      'the colour-mask restore is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+  });
+});
+
 // The scan half of the scope note above, so the note is enforced rather than
 // trusted: the day a module consumes build/three.cjs (via a bare CommonJS
 // require), names any unpatched bundle (three.module.min.js and the r185
