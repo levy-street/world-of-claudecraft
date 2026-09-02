@@ -5727,6 +5727,16 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as sim-i18n-deploy-wi
   Spellgnaw devour exception stays out of the tooltip copy. (3) The
   privacy-security skip rationale is restated with substitute evidence
   (above).
+  RULED (qr-19-flask-tooltip-spellgnaw-exception, 2026-09-02, under qr-19-best-for-project):
+  the judged omission STANDS and itemUi.tooltip.flaskUnremovable keeps its wording. The
+  refusal was taken on the classic-idiom rule (consumable tooltips do not enumerate
+  mob-affix interactions); the Spellgnaw devour behavior is pinned where it matters
+  (tests/mob_purge.test.ts, 'still devours a flask aura: the STK-2 ruling covers player
+  counters only (recorded exception)') and scoped in the Aura.undispellable docblock of
+  src/sim/types.ts; and a reword of a filled key would re-open five non-Latin rows that
+  no gate can see go stale, plus the literal pin in tests/elixir_tooltip_view.test.ts
+  and the guide twin guide.profPages.craftProse.alchemy.ladderBody, days before the
+  Phase 20 fill. Phase 19F; no code moved.
 - AUDIT VERDICTS recorded, no action: the early skillReq obligation
   DISSOLVED (patterns carry no skillReq field; the learn flow gates on
   the recipes, all 28 on tier boundaries 100/125, both reachable; the
