@@ -34,7 +34,12 @@
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
-import { type CanopyDetailProfile, canopyDetailProfile } from './canopy_detail_tier_core';
+import {
+  type CanopyDetailProfile,
+  canopyDetailProfile,
+  canopyDetailProgramCacheKey,
+  canopyTexturesSatisfy,
+} from './canopy_detail_tier_core';
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX, type GfxSettings } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -130,13 +135,9 @@ export function canopyDetailProfileFor(target: Readonly<GfxSettings>): CanopyDet
   return target.canopyDetail ? canopyDetailProfile(target.canopyDetailTaps) : null;
 }
 
-/**
- * Every map an arm actually samples is resolved. The AO-only arm never asks
- * for the NormalGL map, so it must not WAIT on one either: keyed off
- * TEX.normal regardless, ultra would fail soft forever and ship plain leaves.
- */
+/** The pure readiness rule over this module's live texture channel. */
 function canopyTexturesReady(profile: CanopyDetailProfile): boolean {
-  return TEX.ao !== null && (!profile.normalDetail || TEX.normal !== null);
+  return canopyTexturesSatisfy(profile, { ao: TEX.ao !== null, normal: TEX.normal !== null });
 }
 
 /** Prepare the canopy texture channel selected by an explicit target profile. */
@@ -206,21 +207,6 @@ export function canopyDetailPrewarmTextures(): THREE.Texture[] {
   return out;
 }
 
-/**
- * The `canopy-detail` segment of a leaf material's program cache key. The tap
- * arm is in it because the two arms compile DIFFERENT fragment sources, so a
- * shared program would be wrong; the texture-ready state keys too, because
- * before the preload resolves the hook compiles to a plain pass-through.
- */
-export function canopyDetailProgramCacheKey(
-  profile: CanopyDetailProfile,
-  baseProgramKey: string,
-): string {
-  const ready = canopyTexturesReady(profile) ? 'on' : 'off';
-  const fade = `${(profile.fadeStart * CANOPY_FADE_SCALE).toFixed(1)},${(profile.fadeEnd * CANOPY_FADE_SCALE).toFixed(1)}`;
-  return `canopy-detail|${ready}|t${profile.taps}|f${fade}|${baseProgramKey}`;
-}
-
 // Identity-based once-per-instance guard (clone() copies userData, so a
 // userData marker alone would falsely mark clones as applied).
 const applied = new WeakSet<THREE.Material>();
@@ -248,7 +234,6 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   if (applied.has(mat)) return;
   applied.add(mat);
   mat.userData.canopyDetail = sourceName;
-  mat.userData.canopyDetailTaps = profile.taps;
   const aoSpan = CANOPY_AO_SPAN * spec.aoDepth;
   // centered on the measured map mean so overall canopy brightness holds
   const aoLo = 1 - aoSpan * MOSS002_AO_MEAN;
@@ -287,5 +272,11 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // differs, so chain the previous key (the foliage_collapse precedent). The
   // texture-ready state keys too: before the preload resolves the hook
   // compiles to a plain pass-through.
-  mat.customProgramCacheKey = () => canopyDetailProgramCacheKey(profile, prevKey ? prevKey() : '');
+  mat.customProgramCacheKey = () =>
+    canopyDetailProgramCacheKey(
+      profile,
+      canopyTexturesReady(profile),
+      prevKey ? prevKey() : '',
+      CANOPY_FADE_SCALE,
+    );
 }

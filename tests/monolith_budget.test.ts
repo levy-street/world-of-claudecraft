@@ -760,8 +760,10 @@ const MONOLITHS: MonolithRow[] = [
     // into src/render/tree_hide_fade.ts.
     // Lowered again after the grass tuft's card ladder (which quads a tuft
     // carries, and where each one sits) moved to the pure
-    // src/render/grass_tuft_cards_core.ts. Exact count, zero slack.
-    ceiling: 3983,
+    // src/render/grass_tuft_cards_core.ts, and once more when the cap-collapse
+    // band's two-input decision followed it into
+    // grass_cap_collapse_core.ts. Exact count, zero slack.
+    ceiling: 3982,
     seam: 'a new src/render/<thing>.ts module (src/render/CLAUDE.md)',
   },
   {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canopyDetailProfileFor, canopyDetailProgramCacheKey } from '../src/render/canopy_detail';
+import { canopyDetailProfileFor } from '../src/render/canopy_detail';
 import {
   CANOPY_FADE_END_AO_ONLY,
   CANOPY_FADE_END_FULL,
@@ -9,6 +9,8 @@ import {
   CANOPY_TAPS_OFF,
   CANOPY_TRIPLANAR_TAPS,
   canopyDetailProfile,
+  canopyDetailProgramCacheKey,
+  canopyTexturesSatisfy,
 } from '../src/render/canopy_detail_tier_core';
 import { gfxInternalsForTest } from '../src/render/gfx';
 
@@ -108,22 +110,40 @@ describe('canopy detail tier ladder', () => {
 });
 
 describe('canopy detail material identity and residency', () => {
-  it('gives the two arms different program cache keys', () => {
+  it('gives the two arms different program cache keys, on every dimension', () => {
     // The arms compile DIFFERENT fragment sources (3 taps against 6), so a
     // shared program would draw one tier with the other's shader.
     const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
     const full = canopyDetailProfile(CANOPY_TAPS_FULL);
     if (!ao || !full) throw new Error('both shipped arms must resolve');
-    const aoKey = canopyDetailProgramCacheKey(ao, 'base');
-    const fullKey = canopyDetailProgramCacheKey(full, 'base');
+    const aoKey = canopyDetailProgramCacheKey(ao, true, 'base');
+    const fullKey = canopyDetailProgramCacheKey(full, true, 'base');
     expect(aoKey).not.toBe(fullKey);
-    expect(aoKey).toContain(`t${CANOPY_TAPS_AO_ONLY}`);
-    expect(fullKey).toContain(`t${CANOPY_TAPS_FULL}`);
+    // Every OTHER key input moves it too, one dimension at a time.
+    expect(canopyDetailProgramCacheKey(ao, false, 'base')).not.toBe(aoKey);
+    expect(canopyDetailProgramCacheKey(ao, true, '')).not.toBe(aoKey);
+    expect(canopyDetailProgramCacheKey(ao, true, 'base', 2)).not.toBe(aoKey);
     // The chained base key is still carried, so the collapse semantics that
     // key ahead of this one keep splitting programs the way they did.
     expect(aoKey.endsWith('|base')).toBe(true);
-    // A material with no previous hook keys distinctly from one that had one.
-    expect(canopyDetailProgramCacheKey(ao, '')).not.toBe(aoKey);
+    // The shipped arms spelled out, so a silent reshaping of the key reds.
+    expect(aoKey).toBe('canopy-detail|on|t3|f34.0,44.0|base');
+    expect(fullKey).toBe('canopy-detail|on|t6|f34.0,55.0|base');
+  });
+
+  it('waits only on the maps its own arm samples', () => {
+    const ao = canopyDetailProfile(CANOPY_TAPS_AO_ONLY);
+    const full = canopyDetailProfile(CANOPY_TAPS_FULL);
+    if (!ao || !full) throw new Error('both shipped arms must resolve');
+    // The AO arm is ready on the AO map alone: keyed off the normal map too,
+    // ultra would fail soft forever and ship plain leaves.
+    expect(canopyTexturesSatisfy(ao, { ao: true, normal: false })).toBe(true);
+    expect(canopyTexturesSatisfy(ao, { ao: false, normal: true })).toBe(false);
+    expect(canopyTexturesSatisfy(ao, { ao: false, normal: false })).toBe(false);
+    // The full arm needs both.
+    expect(canopyTexturesSatisfy(full, { ao: true, normal: false })).toBe(false);
+    expect(canopyTexturesSatisfy(full, { ao: false, normal: true })).toBe(false);
+    expect(canopyTexturesSatisfy(full, { ao: true, normal: true })).toBe(true);
   });
 
   it('resolves the arm a target profile ships, off included', () => {

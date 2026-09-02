@@ -1096,7 +1096,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // it keeps the full six; ultra takes the AO half over a tightened band.
     canopyDetailTaps: iosMemoryProfile
       ? CANOPY_TAPS_OFF
-      : tier === 'insane'
+      : gfxTierAtLeast(tier, 'insane')
         ? CANOPY_TAPS_FULL
         : gfxTierAtLeast(tier, 'ultra')
           ? CANOPY_TAPS_AO_ONLY
@@ -1257,7 +1257,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         cliffScree: false,
         canopyDetail: false,
         canopyDetailTaps: CANOPY_TAPS_OFF,
-        grassCardsPerTuft: GRASS_CARDS_MID,
+        grassCardsPerTuft: leanFoliage ? GRASS_CARDS_LEAN : GRASS_CARDS_MID,
       };
     else if (foliageLevel === 2)
       settings = {
@@ -1266,7 +1266,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         cliffScree: true,
         canopyDetail: true,
         canopyDetailTaps: CANOPY_TAPS_AO_ONLY,
-        grassCardsPerTuft: GRASS_CARDS_FULL,
+        grassCardsPerTuft: leanFoliage ? GRASS_CARDS_LEAN : GRASS_CARDS_FULL,
       };
     else
       settings = {
@@ -1276,7 +1276,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         cliffScree: true,
         canopyDetail: true,
         canopyDetailTaps: CANOPY_TAPS_FULL,
-        grassCardsPerTuft: GRASS_CARDS_FULL,
+        grassCardsPerTuft: leanFoliage ? GRASS_CARDS_LEAN : GRASS_CARDS_FULL,
       };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;
     // Basic keeps the detail normals + AO grime without the parallax walk;

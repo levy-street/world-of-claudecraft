@@ -17,11 +17,19 @@
 // either and the silhouette collapses to a single plane that vanishes edge-on.
 // The 45-degree card breaks the "4-way image" the perpendicular pair reads as
 // from above. The near-horizontal CAP card exists for a true top-down camera,
-// where every upright goes edge-on and the meadow reads as bare ground; it is
-// also the one card the carpet tiers already collapse near the player
-// (grass_cap_collapse_core.ts), so on a carpet tier its loss is the mid ring
-// only, where the camera is far enough that the uprights still cover the
-// ground. So the ladder sheds the cap first and keeps the diagonal.
+// where every upright goes edge-on and the meadow reads as bare ground. So the
+// ladder sheds the cap first and keeps the diagonal, whose break-up works from
+// every angle rather than one.
+//
+// WHAT THAT COSTS IS NOT THE SAME ON THE TWO TIERS THAT PAY IT, and the
+// difference is the blade carpet (GFX.bladeCarpetRadius: 34 on ultra and up,
+// 24 on high, 0 below). Where a carpet exists the cap card was already
+// collapsed inside it (grass_cap_collapse_core.ts), so on HIGH its loss is the
+// mid ring only, past ~24 yd, where the camera is far enough that the uprights
+// still cover the ground. MEDIUM has no carpet, so it loses the cap outright:
+// a hard top-down camera there sees the meadow through the uprights' edges.
+// That is the deliberate trade, not an oversight, and it is why the diagonal
+// (which never goes fully edge-on) is the card medium keeps.
 
 /** One quad of a tuft, in the order the merged geometry applies its ops. */
 export interface GrassTuftCard {
@@ -52,19 +60,41 @@ export const GRASS_CARDS_FULL = 4;
 export const TRIANGLES_PER_GRASS_CARD = 2;
 
 /** Triangles one tuft's merged geometry carries at `cards` cards. */
-export function grassTuftTriangles(cards: number): number {
-  return grassCardCount(cards) * TRIANGLES_PER_GRASS_CARD;
+export function grassTuftTriangles(cards: number, lush = true): number {
+  return grassCardCount(cards, lush) * TRIANGLES_PER_GRASS_CARD;
 }
 
-/** Clamp an arbitrary knob value onto the shipped ladder. */
-export function grassCardCount(cards: number): number {
-  if (!Number.isFinite(cards)) return GRASS_CARDS_FULL;
+/**
+ * Clamp an arbitrary knob value onto the shipped ladder. A stray value can
+ * only ever cost LESS than it asked for (it floors, and a non-finite value
+ * takes the cheapest rung), the same convention canopy_detail_tier_core.ts
+ * follows: these are cost knobs, and failing open on one is how a garbage
+ * value ends up charging the weakest hardware the most.
+ *
+ * `lush` is a HARD CEILING, not a preference. The diagonal and the cap are
+ * authored at lush proportions only (a lean tuft's uprights are shorter and
+ * narrower, and no lean sizes exist for the other two), so a lean tuft with
+ * three cards would stand a 1.05-tall breaker on top of a 0.76-tall tuft.
+ * A lean session also runs the lean MODEL set because its hardware cannot
+ * afford the full one, which is the same reason it should not be paying for
+ * extra cards. Before the count was a knob this was structural (the extra
+ * cards were built inside an `if (lush)`); it stays structural here rather
+ * than living as a rule every caller has to remember.
+ */
+export function grassCardCount(cards: number, lush = true): number {
+  if (!lush) return GRASS_CARDS_LEAN;
+  if (!Number.isFinite(cards)) return GRASS_CARDS_LEAN;
   return Math.max(GRASS_CARDS_LEAN, Math.min(GRASS_CARDS_FULL, Math.floor(cards)));
 }
 
-/** True when the tuft carries the sky-facing cap card (`aCap` = 1). */
-export function grassTuftHasCap(cards: number): boolean {
-  return grassCardCount(cards) >= GRASS_CARDS_FULL;
+/**
+ * True when the tuft carries the sky-facing cap card (`aCap` = 1). The grass
+ * build keys the whole cap-collapse layer off this: with no cap card there is
+ * no vertex for the collapse to move, so a tier without one carries neither
+ * the `aCap` attribute nor the collapse term in its vertex shader.
+ */
+export function grassTuftHasCap(cards: number, lush = true): boolean {
+  return grassCardCount(cards, lush) >= GRASS_CARDS_FULL;
 }
 
 /**
@@ -74,7 +104,7 @@ export function grassTuftHasCap(cards: number): boolean {
  *
  * The first `cards` entries of the full ladder are returned, so the shed order
  * (cap, then the diagonal) is a property of this list rather than of any
- * caller.
+ * caller, and a lean tuft is always the pair (see grassCardCount).
  */
 export function grassTuftCards(cards: number, lush: boolean, lowPlusScale = 1): GrassTuftCard[] {
   const width = lush ? 1.45 : 1.1 * lowPlusScale;
@@ -107,5 +137,5 @@ export function grassTuftCards(cards: number, lush: boolean, lowPlusScale = 1): 
       cap: 1,
     },
   ];
-  return ladder.slice(0, grassCardCount(cards));
+  return ladder.slice(0, grassCardCount(cards, lush));
 }

@@ -89,6 +89,7 @@ describe('grass tuft card ladder', () => {
 
   it('keeps the lean silhouette and its lowPlus art bump off the lush sizes', () => {
     const lean = grassTuftCards(GRASS_CARDS_LEAN, false, 1.08);
+    expect(lean.every((c) => c.id === 'upright' || c.id === 'upright-cross')).toBe(true);
     expect(lean[0].width).toBeCloseTo(1.1 * 1.08, 12);
     expect(lean[0].height).toBeCloseTo(0.7 * 1.08, 12);
     expect(lean[0].liftY).toBeCloseTo(0.35 * 1.08, 12);
@@ -96,11 +97,39 @@ describe('grass tuft card ladder', () => {
     expect(grassTuftCards(GRASS_CARDS_FULL, true, 1.08)[0].width).toBe(1.45);
   });
 
-  it('clamps a stray knob value onto the shipped ladder', () => {
+  it('never hands a LEAN tuft the lush-only diagonal or cap, whatever it is asked for', () => {
+    // The diagonal (1.15 x 1.05, lift 0.45) and the cap are authored at lush
+    // proportions only. On a lean tuft, whose uprights are 0.756 tall lifted
+    // 0.378, a 1.05-tall breaker stands visibly out the top; and a lean
+    // session runs the lean model set precisely because its hardware cannot
+    // afford extra cards. Before the count was a knob this was structural
+    // (the extra cards were built inside an `if (lush)`), and it stays
+    // structural: the Advanced Foliage Density dial can raise the knob on a
+    // low tier, so a rule the caller has to remember is not enough.
+    for (const asked of [GRASS_CARDS_MID, GRASS_CARDS_FULL, 99]) {
+      expect(
+        grassTuftCards(asked, false).map((c) => c.id),
+        `asked ${asked}`,
+      ).toEqual(['upright', 'upright-cross']);
+      expect(grassCardCount(asked, false)).toBe(GRASS_CARDS_LEAN);
+      expect(grassTuftTriangles(asked, false)).toBe(4);
+      expect(grassTuftHasCap(asked, false)).toBe(false);
+    }
+    // No card the lean arm can emit carries an unscaled lush size.
+    for (const card of grassTuftCards(GRASS_CARDS_FULL, false, 1.08)) {
+      expect(card.width, card.id).toBeCloseTo(1.1 * 1.08, 12);
+    }
+  });
+
+  it('clamps a stray knob value onto the shipped ladder, always downward', () => {
     expect(grassCardCount(0)).toBe(GRASS_CARDS_LEAN);
     expect(grassCardCount(9)).toBe(GRASS_CARDS_FULL);
-    expect(grassCardCount(Number.NaN)).toBe(GRASS_CARDS_FULL);
     expect(grassCardCount(3.7)).toBe(GRASS_CARDS_MID);
+    // A cost knob fails to the CHEAPEST rung, the same direction
+    // canopy_detail_tier_core.ts takes: failing open is how a garbage value
+    // ends up charging the weakest hardware the most.
+    expect(grassCardCount(Number.NaN)).toBe(GRASS_CARDS_LEAN);
+    expect(grassCardCount(Number.POSITIVE_INFINITY)).toBe(GRASS_CARDS_LEAN);
   });
 });
 
@@ -135,6 +164,44 @@ describe('grass tuft triangle cost per tier', () => {
     const counts = TIERS.map((tier) => gfxInternalsForTest.settingsFor(tier).grassCardsPerTuft);
     for (let i = 1; i < counts.length; i++) {
       expect(counts[i], `${TIERS[i]} vs ${TIERS[i - 1]}`).toBeGreaterThanOrEqual(counts[i - 1]);
+    }
+  });
+
+  it('keeps the Advanced Foliage Density dial off a lean session, at every level', () => {
+    // The dial remaps the same derived knobs the tier ladder sets, so without
+    // a clamp it would hand a low tier three or four cards it has never had,
+    // on the weakest hardware in the fleet.
+    for (const foliageDensity of [0, 0.5, 1, 2]) {
+      for (const [tier, hints] of [
+        ['low', {}],
+        ['medium', WEAK_IGPU],
+      ] as const) {
+        const settings = gfxInternalsForTest.settingsFor(tier, {
+          graphicsPreset: 5,
+          foliageDensity,
+          ...hints,
+        });
+        expect(settings.leanFoliage, `${tier} ${foliageDensity}`).toBe(true);
+        expect(settings.grassCardsPerTuft, `${tier} ${foliageDensity}`).toBe(GRASS_CARDS_LEAN);
+      }
+    }
+    // The same dial still reaches the full ladder on a non-lean session.
+    const lush = (foliageDensity: number) =>
+      gfxInternalsForTest.settingsFor('high', { graphicsPreset: 5, foliageDensity })
+        .grassCardsPerTuft;
+    expect([lush(0), lush(0.5), lush(1), lush(2)]).toEqual([2, 3, 4, 4]);
+  });
+
+  it('agrees with what the build actually merges, so the knob never lies', () => {
+    // gfx.ts clamps the knob and the core clamps the plan; if the two ever
+    // disagreed, GFX.grassCardsPerTuft would report a count the meadow does
+    // not have.
+    for (const tier of TIERS) {
+      for (const hints of [undefined, WEAK_IGPU, { graphicsPreset: 5, foliageDensity: 2 }]) {
+        const s = gfxInternalsForTest.settingsFor(tier, hints);
+        const built = grassTuftCards(s.grassCardsPerTuft, !s.leanFoliage).length;
+        expect(built, `${tier} ${JSON.stringify(hints ?? null)}`).toBe(s.grassCardsPerTuft);
+      }
     }
   });
 });

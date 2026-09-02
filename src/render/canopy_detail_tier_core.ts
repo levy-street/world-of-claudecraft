@@ -67,3 +67,40 @@ export function canopyDetailProfile(taps: number): CanopyDetailProfile | null {
     fadeEnd: normalDetail ? CANOPY_FADE_END_FULL : CANOPY_FADE_END_AO_ONLY,
   };
 }
+
+/** What the texture channel has resolved, as booleans a Node test can drive. */
+export interface CanopyTextureState {
+  ao: boolean;
+  normal: boolean;
+}
+
+/**
+ * Whether every map THIS arm samples has resolved. The AO-only arm must never
+ * be keyed off the normal map: it does not request one, so a predicate that
+ * waits for both would leave ultra failing soft forever and shipping plain
+ * leaves while its program key still read `off`.
+ */
+export function canopyTexturesSatisfy(
+  profile: CanopyDetailProfile,
+  state: CanopyTextureState,
+): boolean {
+  return state.ao && (!profile.normalDetail || state.normal);
+}
+
+/**
+ * The `canopy-detail` segment of a leaf material's program cache key. The tap
+ * arm is in it because the two arms compile DIFFERENT fragment sources, so a
+ * shared program would draw one of them with the other's shader; the fade
+ * pair is in it because the arms carry different bands; and the readiness
+ * state is in it because before the textures resolve the hook compiles to a
+ * plain pass-through. `fadeScale` is the dev-only ?wornfade override.
+ */
+export function canopyDetailProgramCacheKey(
+  profile: CanopyDetailProfile,
+  ready: boolean,
+  baseProgramKey: string,
+  fadeScale = 1,
+): string {
+  const fade = `${(profile.fadeStart * fadeScale).toFixed(1)},${(profile.fadeEnd * fadeScale).toFixed(1)}`;
+  return `canopy-detail|${ready ? 'on' : 'off'}|t${profile.taps}|f${fade}|${baseProgramKey}`;
+}

@@ -147,6 +147,32 @@ describe('foliage LOD: the lean-arm treeline never ends in clear air', () => {
     },
   );
 
+  it('holds for every per-tier base, since a session with no sprites still takes one', () => {
+    // The sprite verdict is standardMaterials && !leanFoliage &&
+    // !constrainedMemory (far_terrain_core.ts farFieldPolicy), so an ordinary
+    // constrained-memory phone or tablet resolving to medium or high is NOT
+    // leanFoliage and still has no impostors: it takes a row of
+    // TREE_DETAIL_FAR_BY_TIER and then runs THIS law. The per-tier table is
+    // safe there only because the safety lives in the law: whatever base it
+    // is handed, the blend floor still owns the boundary.
+    for (const tier of NON_LEAN_TIERS) {
+      for (const { biome, near, far } of FOG_ROWS) {
+        for (const q of QUALITY_LEVELS) {
+          const { detailFar, fogLimit } = detailAt({ near, far }, q, false, tier);
+          const label = `${tier} ${biome} q${q}`;
+          expect(detailFar, label).toBeLessThanOrEqual(fogLimit);
+          const fogFloor = near + IMPOSTOR_MIN_FOG_BLEND * (far - near);
+          expect(detailFar, label).toBeGreaterThanOrEqual(Math.min(fogFloor, fogLimit));
+          if (detailFar < fogLimit) {
+            expect(fogBlendAt(detailFar, near, far), label).toBeGreaterThanOrEqual(
+              IMPOSTOR_MIN_FOG_BLEND - 1e-9,
+            );
+          }
+        }
+      }
+    }
+  });
+
   it('regression: a build-time 300u boundary ended the treeline half-clear in long-fog zones', () => {
     // This is the reported bug, not the fix's own arithmetic. The open-sky Vale
     // runs to MAX_OUTDOOR_FOG_FAR; a flat 300u boundary sits far short of its

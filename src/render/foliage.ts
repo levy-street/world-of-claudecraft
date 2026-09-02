@@ -112,11 +112,11 @@ import {
 import { runSlicedBuild } from './grass_build_slicer_core';
 import {
   type GrassCapCollapseBand,
-  grassCapCollapseBand,
   grassCapCollapseShaderPatch,
   grassCardProgramCacheKey,
+  grassCollapseBandFor,
 } from './grass_cap_collapse_core';
-import { grassTuftCards } from './grass_tuft_cards_core';
+import { grassTuftCards, grassTuftHasCap } from './grass_tuft_cards_core';
 import {
   buildGroundDecorPrewarmTwins,
   registerGroundDecorPrewarmDraw,
@@ -2715,12 +2715,11 @@ function buildGrassRing(
   // high tier reads as a lush meadow: wider tufts with more blades; low keeps
   // the legacy sprite size
   const lush = !GFX.leanFoliage;
-  const capCollapseBand = grassCapCollapseBand(GFX.bladeCarpetRadius);
+  const hasCapCard = grassTuftHasCap(GFX.grassCardsPerTuft, lush);
+  const capCollapseBand = grassCollapseBandFor(GFX.bladeCarpetRadius, hasCapCard);
   const capNearCollapse = capCollapseBand !== null;
   const lowPlusGrassScale = GFX.lowPlus ? 1.08 : 1;
   const capPart = (part: THREE.BufferGeometry, cap: 0 | 1): THREE.BufferGeometry =>
-    // Every part carries aCap even when the tier ships no cap card, so the
-    // merged layout and the grass program key stay the tier's own.
     capNearCollapse ? tagCapVertices(part, cap) : part;
   // The card ladder and each card's placement live in the pure core; the tier
   // knob (GFX.grassCardsPerTuft) decides how many of them a tuft gets.

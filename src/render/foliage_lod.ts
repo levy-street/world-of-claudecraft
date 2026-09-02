@@ -78,9 +78,21 @@ export const LOD_LOW: LodDists = {
  * first, so no tier can push a card into the near field; on medium it is now
  * the binding term rather than the budget.
  *
- * The LEAN tiers are absent on purpose: they have no impostors at all, so
- * their trees must run to the full budgeted radius or the forest visibly
- * ends, and they keep LOD_LOW whole (see this module's header).
+ * A SESSION WITH NO IMPOSTORS IS NOT THE SAME SET AS THE LEAN TIERS, and the
+ * table does not try to be. The sprite verdict is
+ * `standardMaterials && !leanFoliage && !constrainedMemory`
+ * (far_terrain_core.ts farFieldPolicy, read through
+ * foliage_impostor.ts impostorsActive), so an ordinary constrained-memory
+ * phone or tablet resolving to medium or high is NOT leanFoliage and still
+ * has no sprites: it takes a row of this table and then runs the LEAN law.
+ * That is safe because the safety lives in the law, not in the table.
+ * treeDetailDistance floors its answer at the fog blend line
+ * (IMPOSTOR_MIN_FOG_BLEND), so however small a base it is handed, its trees
+ * still end at least that far into the murk; a smaller base can only trim
+ * inside a boundary the blend law already owns, and where the floor itself
+ * overshoots the cull it retreats to the cull. Only the SPRITE arm spends the
+ * base directly. The lean TIERS are absent for a different reason: they run
+ * the lean model set and their own decimation, so they keep LOD_LOW whole.
  */
 export const TREE_DETAIL_FAR_BY_TIER: Record<GfxTier, number> = {
   low: LOD_LOW.treeDetailFar,
