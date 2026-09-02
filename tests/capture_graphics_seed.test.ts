@@ -48,13 +48,65 @@ const MARKER = 'graphicsDefaultApplied';
  *  settings object literal and the assignment form used when a rig merges into
  *  an existing `woc_settings` blob. Comments are stripped first, so prose about
  *  the key (this file's own header, and the rigs' own comments) never counts. */
-const PRESET_WRITE = /graphicsPreset\s*[:=]\s*([^,;\n}]+)/g;
+const PRESET_WRITE =
+  /(?:graphicsPreset|\['graphicsPreset'\]|\["graphicsPreset"\])\s*[:=]\s*([^,;\n}]+)/g;
 
 interface SeedSite {
   readonly file: string;
   /** The written values, source text, in order. */
   readonly values: readonly string[];
+  /** True only when EVERY seeding site in the file carries the marker in its own
+   *  enclosing block. A file-wide `includes` was the first draft and it proves
+   *  co-OCCURRENCE, never co-LOCATION: scripts/perf_baseline.mjs deliberately
+   *  scopes its marker inside the branch that seeds, so a second seeding branch
+   *  without one would have passed a file-wide check unnoticed. */
   readonly hasMarker: boolean;
+}
+
+/** The innermost `{ ... }` block containing `index`, as source text. Falls back
+ *  to the whole source when the write is not inside braces at all, which is the
+ *  conservative direction: it can only make a marker COUNT, and the per-site
+ *  loop still requires one per write. */
+function enclosingBlock(source: string, index: number): string {
+  let depth = 0;
+  let start = 0;
+  for (let i = index; i >= 0; i--) {
+    if (source[i] === '}') depth++;
+    else if (source[i] === '{') {
+      if (depth === 0) {
+        start = i;
+        break;
+      }
+      depth--;
+    }
+  }
+  depth = 0;
+  let end = source.length;
+  for (let i = index; i < source.length; i++) {
+    if (source[i] === '{') depth++;
+    else if (source[i] === '}') {
+      if (depth === 0) {
+        end = i + 1;
+        break;
+      }
+      depth--;
+    }
+  }
+  return source.slice(start, end);
+}
+
+/** The marker counts only when it is SET, never merely mentioned: an explicit
+ *  `graphicsDefaultApplied: false` is an invitation to the probe, not a fix.
+ *
+ *  The value is CAPTURED and compared rather than excluded by a lookahead. The
+ *  lookahead form (`\s*(?!false\b)`) reads correctly and is wrong: `\s*`
+ *  backtracks to consume nothing, the lookahead then sits on the space before
+ *  `false` and succeeds, so `graphicsDefaultApplied: false` passes as SET. The
+ *  control below drives exactly that fixture, which is how it was caught. */
+const MARKER_WRITE = /graphicsDefaultApplied\s*[:=]\s*([^,;\n}]+)/g;
+
+function markerIsSet(block: string): boolean {
+  return [...block.matchAll(MARKER_WRITE)].some((entry) => entry[1].trim() !== 'false');
 }
 
 /**
@@ -65,7 +117,9 @@ interface SeedSite {
  * carve-out below has, and widening it would let a real seed through.
  */
 function isSettingsSeed(value: string): boolean {
-  return !/^['"`]/.test(value.trim());
+  // A BACKTICK is not a label: a template literal is the natural way to write a
+  // computed seed, so only the two plain quote forms mark a report field.
+  return !/^['"]/.test(value.trim());
 }
 
 /** Read the seed sites out of already-stripped sources. Separate from the walk
@@ -74,9 +128,11 @@ function isSettingsSeed(value: string): boolean {
 function readSeedSites(sources: ReadonlyArray<{ file: string; source: string }>): SeedSite[] {
   const out: SeedSite[] = [];
   for (const { file, source } of sources) {
-    const values = [...source.matchAll(PRESET_WRITE)].map((m) => m[1].trim());
-    if (values.length === 0) continue;
-    out.push({ file, values, hasMarker: source.includes(MARKER) });
+    const matches = [...source.matchAll(PRESET_WRITE)];
+    if (matches.length === 0) continue;
+    const values = matches.map((m) => m[1].trim());
+    const hasMarker = matches.every((m) => markerIsSet(enclosingBlock(source, m.index ?? 0)));
+    out.push({ file, values, hasMarker });
   }
   return out;
 }
@@ -120,8 +176,24 @@ describe('capture rigs seed the graphics default-applied marker', () => {
     // matching would empty the corpus and pass the arm above over nothing. The
     // family was 50 files at the ruling; the floor is deliberately well under
     // that so ordinary rig churn does not touch it, and well over zero.
-    expect(seedSites.length).toBeGreaterThanOrEqual(40);
-    expect(seedSites.filter((site) => site.hasMarker).length).toBeGreaterThanOrEqual(40);
+    expect(seedSites.length).toBeGreaterThanOrEqual(48);
+    expect(seedSites.filter((site) => site.hasMarker).length).toBeGreaterThanOrEqual(48);
+    // DEPTH, which a flat count cannot see: five of the seed sites are nested,
+    // so a walker that stopped recursing would leave 45 and clear a bare
+    // count floor while silently dropping rigs this ruling seeded. Named,
+    // because that is what makes the check about depth rather than arithmetic.
+    for (const nested of [
+      'lib/perf_hitch_browser.mjs',
+      'assets/banker_chest/capture_ingame.mjs',
+      'assets/ignivar_herald/capture_ingame.mjs',
+      'assets/eastbrook_grand_armoury/capture_contract.mjs',
+      'assets/fenbridge_town/capture_contract.mjs',
+    ]) {
+      expect(
+        seedSites.some((site) => site.file === nested),
+        `the walk no longer reaches ${nested}`,
+      ).toBe(true);
+    }
   });
 
   it('every carve-out entry still writes no settings seed', () => {
@@ -158,10 +230,36 @@ describe('capture rigs seed the graphics default-applied marker', () => {
       },
       { file: 'c.mjs', source: "report({ graphicsPreset: 'low' })" },
       { file: 'd.mjs', source: 'const unrelated = 1;' },
+      // CO-LOCATION, the shape a file-wide `includes` cannot see: the marker is
+      // set in one block and the preset seeded in ANOTHER. That is the real rig
+      // shape (perf_baseline scopes its marker to the branch that seeds), so a
+      // second seeding branch without one has to be caught.
+      {
+        file: 'e.mjs',
+        source:
+          'function a() { s.graphicsDefaultApplied = true; }\nfunction b() { s.graphicsPreset = 5; }\n',
+      },
+      // The marker MENTIONED but set to false is an invitation to the probe.
+      {
+        file: 'f.mjs',
+        source: 'JSON.stringify({ graphicsPreset: 4, graphicsDefaultApplied: false })',
+      },
+      // Bracket access and a template value: a seed either way.
+      { file: 'g.mjs', source: "s['graphicsPreset'] = 3;\n" },
+      { file: 'h.mjs', source: 'JSON.stringify({ graphicsPreset: `${tier}` })' },
     ];
     const sites = readSeedSites(fixtures);
-    expect(sites.map((s) => s.file)).toEqual(['a.mjs', 'b.mjs', 'c.mjs']);
-    expect(sites.map((s) => s.hasMarker)).toEqual([false, true, false]);
+    expect(sites.map((s) => s.file)).toEqual([
+      'a.mjs',
+      'b.mjs',
+      'c.mjs',
+      'e.mjs',
+      'f.mjs',
+      'g.mjs',
+      'h.mjs',
+    ]);
+    expect(sites.map((s) => s.hasMarker)).toEqual([false, true, false, false, false, false, false]);
+    expect(isSettingsSeed('`${tier}`'), 'a template value is a seed, not a label').toBe(true);
     expect(isSettingsSeed('5')).toBe(true);
     expect(isSettingsSeed('presetValue')).toBe(true);
     expect(isSettingsSeed("'low'")).toBe(false);

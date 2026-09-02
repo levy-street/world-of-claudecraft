@@ -237,7 +237,7 @@ import {
   type CompassMarkElements,
   paintCompassMarks,
   relabelCompassMarks,
-} from './compass_strip';
+} from './compass_strip_painter';
 import { ContinentMapPainter } from './continent_map_painter';
 import { type ContinentZoneRegion, continentZoneAt } from './continent_map_view';
 import { formatMinimapCoords } from './coords';
@@ -788,6 +788,7 @@ import {
 import { curatorRankNameKey, ReliquaryWindow } from './reliquary_window';
 import { closeReportWindow, openReportWindow } from './report_window';
 import { restView } from './rest_indicator';
+import { paintRestIndicator } from './rest_indicator_painter';
 import { isTalentRowUnlockLevel } from './row_unlock_toast';
 import { localizeServerText } from './server_i18n';
 import {
@@ -6939,14 +6940,11 @@ export class Hud {
     return makeWindowFocus(this.focusManager, () => $(rootSel));
   }
 
-  // The signature-gated surfaces that live INSIDE this coordinator, cleared as
-  // one arm. Each memo digests raw numbers, ids or booleans, so setLanguage
-  // alone can never move one and the surface it gates keeps the PREVIOUS locale
-  // until its data happens to change. Clearing to a value live data can never
-  // equal is the whole fix: the next ordinary repaint rebuilds with fresh t().
-  // Every memo here carries its own registry row and its own written reason in
-  // tests/language_fanout_registry.test.ts, which is what replaced the blanket
-  // hud.ts exemption (masterwrought qr-19-hud-coordinator-fanout-exemption).
+  // The signature-gated surfaces INSIDE this coordinator, cleared as one arm.
+  // Each memo digests numbers, ids or booleans, so setLanguage alone can never
+  // move one; clearing to a value live data cannot equal is the whole fix.
+  // Every memo here carries its own row and reason in
+  // tests/language_fanout_registry.test.ts (qr-19-hud-coordinator-fanout-exemption).
   private relocalizeCoordinatorMemos(): void {
     this.lastPlayerFrameHp = Number.NaN;
     this.lastPlayerFrameMaxHp = Number.NaN;
@@ -9689,9 +9687,7 @@ export class Hud {
       });
       if (rest.resting !== this.lastResting) {
         this.lastResting = rest.resting;
-        const restEl = $('#pf-rest');
-        restEl.classList.toggle('on', rest.resting);
-        restEl.title = rest.labelKey ? t(rest.labelKey) : '';
+        paintRestIndicator($('#pf-rest'), rest, this.writerFacet);
       }
 
       this.updateQuestTracker(now);
@@ -10626,7 +10622,7 @@ export class Hud {
     if (facing === this.lastCompassFacing) return; // pure function of facing: nothing can have changed
     this.lastCompassFacing = facing;
     const view = compassView(facing);
-    paintCompassMarks(this.compassMarks, view, this.compassVisibleScratch);
+    paintCompassMarks(this.compassMarks, view, this.compassVisibleScratch, this.writerFacet);
     if (this.compassHeadingEl && view.heading !== this.lastCompassHeading) {
       this.lastCompassHeading = view.heading;
       this.compassHeadingEl.textContent = t(`hudChrome.compass.${view.heading}`);
@@ -10818,7 +10814,9 @@ export class Hud {
         }),
       )}</span></div>`;
     }
-    const sig = `${m.format}|${vsBlock}|${m.state}|${m.state === 'over' ? (m.returnIn ?? 0) : ''}`;
+    // `label` is in the sig, not just vsBlock (see the registry row: a locale with
+    // vsBlock English-filled but the status keys translated stranded the timer).
+    const sig = `${m.format}|${vsBlock}|${label}|${m.state}|${m.state === 'over' ? (m.returnIn ?? 0) : ''}`;
     if (sig !== this.lastArenaStatusSig) {
       this.lastArenaStatusSig = sig;
       el.innerHTML = `${vsBlock}<div class="as-timer">${esc(label)}</div>`;

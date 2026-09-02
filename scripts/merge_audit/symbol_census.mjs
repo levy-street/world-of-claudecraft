@@ -1915,13 +1915,16 @@ export function parseExplainedExtras(markdown) {
       defects.push(`extras line ${ln + 1}: unknown class '${classLabel}'`);
       continue;
     }
-    // OPTIONAL Path (or Scope) column, added under
-    // qr-19-census-allowlist-path-asymmetry. Absent it reads '', which is how
-    // every pre-existing five-column table keeps parsing byte-unchanged; when
-    // present it lets the comparison tell an EXCLUDED-PATH row (a live name the
-    // census can never match, so the entry is informational) from a row that is
-    // genuinely GONE from merged.
-    const path = get('path') || get('scope');
+    // OPTIONAL Path column, added under qr-19-census-allowlist-path-asymmetry.
+    // Absent it reads '', which is how every pre-existing five-column table
+    // keeps parsing byte-unchanged; when present it lets the comparison tell an
+    // EXCLUDED-PATH row (a live name the census can never match, so the entry is
+    // informational) from a row that is genuinely GONE from merged.
+    //
+    // ONE spelling, deliberately. An earlier draft also accepted a `Scope`
+    // column, which was a second, undocumented way to reach the exemption that
+    // the doc rule never described.
+    const path = get('path');
     const row = {
       cls,
       classLabel,
@@ -1940,13 +1943,19 @@ export function parseExplainedExtras(markdown) {
         `extras line ${ln + 1}: a reason saying only 'deleted' (or nothing) is a defect`,
       );
     // A Path is a CLAIM about the census scope, so it is checked rather than
-    // trusted: a row declaring a path the census actually scans would be
-    // claiming an exemption it does not have, and would then be reported as
-    // informational when it is a real regression.
-    if (path && isCensusPath(path))
+    // trusted. The check is POSITIVE (the path must actually sit under one of
+    // EXCLUDED_PATH_PREFIXES and carry a source extension), never the negative
+    // "isCensusPath is false": almost every string that is not a well-formed
+    // path fails isCensusPath, so the negative form handed the informational
+    // verdict to `src/sim/thing.ts:42`, `**src/sim/thing.ts**`, `n/a`, `-` and
+    // any prose cell, which is exactly how a name that is genuinely GONE from
+    // merged could buy itself an exemption. `file:line` is this repo's own
+    // anchor idiom, so it is the most likely thing an author writes.
+    if (path && !isExcludedExtraPath(path))
       defects.push(
-        `extras line ${ln + 1}: Path '${path}' is IN census scope, so this row is not an ` +
-          'excluded-path record; drop the Path column or file the name as an ordinary extra',
+        `extras line ${ln + 1}: Path '${path}' does not name a file under an excluded prefix ` +
+          `(${EXCLUDED_PATH_PREFIXES.join(', ')}) with a source extension, so it grants no ` +
+          'exemption; drop the Path column, or fix it if the name really is out of census scope',
       );
     rows.push(row);
   }
@@ -1970,6 +1979,17 @@ export function isCensusPath(relPath) {
   if (p.split('/').some((seg) => EXCLUDED_DIR_SEGMENTS.includes(seg))) return false;
   if (EXCLUDED_PATH_PREFIXES.some((prefix) => p.startsWith(prefix))) return false;
   return true;
+}
+
+/** True when a repo-relative path is a real source file under one of the
+ *  census's EXCLUDED_PATH_PREFIXES, which is the ONLY thing that earns an
+ *  extras row the informational verdict. Positive by construction: anything
+ *  malformed, prose-wrapped, `file:line`-suffixed or simply out of scope for a
+ *  different reason is refused rather than exempted. */
+export function isExcludedExtraPath(relPath) {
+  const p = toPosix(String(relPath ?? '').trim());
+  if (!SOURCE_EXTENSIONS.includes(path.posix.extname(p))) return false;
+  return EXCLUDED_PATH_PREFIXES.some((prefix) => p.startsWith(prefix));
 }
 
 function underRoot(relPath, root) {
@@ -2206,9 +2226,27 @@ export function compareCensus({
   }
   const extrasByClass = {};
   for (const cls of CLASSES) extrasByClass[cls] = new Map();
-  for (const e of explainedExtras) extrasByClass[e.cls]?.set(e.name, e);
+  // LAST WINS is fine while every row for a name says the same thing about
+  // SCOPE, and re-stating a name across sections is long-standing practice here
+  // (48 such pairs today, every one benign). The Path column changed that in one
+  // specific way: the winner now decides FAIL versus INFO, so a duplicate that
+  // DISAGREES about the path can silence the original. Only that disagreement is
+  // a defect; a plain restatement is not, and failing it would red the census on
+  // pre-existing rows this ruling never touched.
+  const duplicateExtras = [];
+  for (const e of explainedExtras) {
+    const bucket = extrasByClass[e.cls];
+    if (!bucket) continue;
+    const prior = bucket.get(e.name);
+    if (prior && (prior.path ?? '') !== (e.path ?? '')) {
+      duplicateExtras.push(
+        `${e.classLabel ?? e.cls}:${e.name} (Path '${prior.path ?? ''}' vs '${e.path ?? ''}')`,
+      );
+    }
+    bucket.set(e.name, e);
+  }
 
-  let failed = false;
+  let failed = duplicateExtras.length > 0;
   for (const cls of CLASSES) {
     const o = ours.sets[cls];
     const t = theirs.sets[cls];
@@ -2271,8 +2309,8 @@ export function compareCensus({
     const allowlisted = [...extrasByClass[cls].keys()];
     const absent = allowlisted.filter((name) => !m.has(name));
     const excludedPathExtras = absent.filter((name) => {
-      const path = extrasByClass[cls].get(name)?.path;
-      return Boolean(path) && !isCensusPath(path);
+      const declared = extrasByClass[cls].get(name)?.path;
+      return Boolean(declared) && isExcludedExtraPath(declared);
     });
     const excludedPathSet = new Set(excludedPathExtras);
     const unusedExtras = absent.filter((name) => !excludedPathSet.has(name));
@@ -2379,7 +2417,7 @@ export function compareCensus({
       newDuplicates,
     };
   }
-  return { perClass, failed };
+  return { perClass, failed, duplicateExtras };
 }
 
 // ---------------------------------------------------------------------------------
@@ -2424,6 +2462,13 @@ export function formatReport(r, limit = 60) {
   if (r.deletionDefects.length) {
     L.push('  DELETION LIST DEFECTS (fail):');
     for (const d of r.deletionDefects) L.push(`    ${d}`);
+  }
+  if (r.duplicateExtras?.length) {
+    L.push(
+      `  FAIL explained-extras rows for one class and name DISAGREE about Path (the last row ` +
+        `wins and the Path decides FAIL versus INFO, so the disagreement silently picks a ` +
+        `verdict): ${r.duplicateExtras.join(', ')}`,
+    );
   }
   if (r.extrasDefects?.length) {
     L.push('  EXPLAINED-EXTRAS DEFECTS (fail):');
@@ -2705,6 +2750,7 @@ export function runCensus(opts = {}) {
     extrasConstantRows: EXPLAINED_EXTRAS.length,
     extrasDocRows: docExtras.rows.length,
     extrasDefects: docExtras.defects,
+    duplicateExtras: cmp.duplicateExtras,
     fileCounts: { ours: ours.fileCounts, theirs: theirs.fileCounts, merged: merged.fileCounts },
     /** SimEvent types the union declares that the emits extractor never sees. */
     simEventUnionOnly,

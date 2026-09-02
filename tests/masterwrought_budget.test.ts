@@ -1762,9 +1762,15 @@ describe('masterwrought apex budget sweep', () => {
     readonly reason: string;
   }> = [];
 
-  it('every band carve-out entry names a real, unflagged, band-reaching recipe', () => {
+  // The per-entry check, hoisted out of the arm so it can be DRIVEN. The list is
+  // empty until PR 3704 lands, so an arm that only walked it would assert
+  // [] === [] and prove nothing about the validation the next author leans on;
+  // the control below runs each refusal branch over synthetic entries.
+  const carveOutDefects = (
+    entries: ReadonlyArray<{ readonly recipeId: string; readonly reason: string }>,
+  ): string[] => {
     const stale: string[] = [];
-    for (const entry of CRUCIBLE_BAND_CARVE_OUT) {
+    for (const entry of entries) {
       const recipe = ALL_RECIPES.find((r) => r.id === entry.recipeId);
       if (!recipe) {
         stale.push(`${entry.recipeId}: no such recipe; drop the entry`);
@@ -1780,9 +1786,41 @@ describe('masterwrought apex budget sweep', () => {
         stale.push(
           `${entry.recipeId}: output IS flagged, so it belongs in the apex arrays, not here`,
         );
-      expect(entry.reason.length, `${entry.recipeId} needs a written reason`).toBeGreaterThan(40);
+      if (entry.reason.length <= 40) stale.push(`${entry.recipeId}: needs a written reason`);
     }
-    expect(stale, stale.join('; ')).toEqual([]);
+    return stale;
+  };
+
+  it('every band carve-out entry names a real, unflagged, band-reaching recipe', () => {
+    expect(carveOutDefects(CRUCIBLE_BAND_CARVE_OUT), 'a carve-out entry is stale').toEqual([]);
+  });
+
+  it('the carve-out validation refuses each shape it exists to refuse', () => {
+    // Every branch, driven, because the live list is empty and stays empty until
+    // another packet's PR lands: the day the first entry arrives the reviewer
+    // must not be trusting unexercised code.
+    const reason = 'a stated reason long enough to clear the written-reason floor here';
+    expect(carveOutDefects([{ recipeId: 'no_such_recipe_id', reason }])).toEqual([
+      'no_such_recipe_id: no such recipe; drop the entry',
+    ]);
+    const flagged = ALL_RECIPES.find(
+      (r) => (ITEMS[r.resultItemId] as ItemDef & { masterwrought?: boolean })?.masterwrought,
+    );
+    expect(flagged, 'the catalog really has a flagged crafted output').toBeTruthy();
+    expect(carveOutDefects([{ recipeId: flagged?.id ?? '', reason }])).toEqual([
+      `${flagged?.id}: output IS flagged, so it belongs in the apex arrays, not here`,
+    ]);
+    const belowBand = ALL_RECIPES.find((r) => {
+      const lvl = itemLevel(ITEMS[r.resultItemId]) ?? 0;
+      return lvl > 0 && lvl < 31;
+    });
+    expect(belowBand, 'the catalog really has a below-band crafted output').toBeTruthy();
+    expect(carveOutDefects([{ recipeId: belowBand?.id ?? '', reason }])).toEqual([
+      `${belowBand?.id}: output does not reach the apex band, so it needs no carve-out`,
+    ]);
+    expect(carveOutDefects([{ recipeId: belowBand?.id ?? '', reason: 'too short' }])).toContain(
+      `${belowBand?.id}: needs a written reason`,
+    );
   });
 
   it('no crafted output outside the apex arrays reaches the apex item level', () => {

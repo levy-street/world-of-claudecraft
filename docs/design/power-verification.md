@@ -140,10 +140,16 @@ any def. Nothing in THIS record is rewritten under that ruling and no figure
 here moves: the sentence above about nothing having been rewritten still holds
 literally. Two of the nine contradicted pins are discharged by it, the
 tests/dev_bis_gear.test.ts pair, re-derived against the merged measurement and
-flipped back to it(). The other seven, including this file's own
-tests/r5_envelope_probe.test.ts arms and the tests/server/pbe_boost.test.ts
-pair, stay expected-fail: they belong to the masterwrought R5 RE-MEASURE
-question, which is a different row and is still the maintainer's.
+flipped back to it(). The other seven stay expected-fail and split between TWO
+owners, which is worth stating because a reader sent to one will not find the
+other: FIVE belong to the masterwrought R5 RE-MEASURE question (this file's own
+tests/r5_envelope_probe.test.ts arms, the tests/server/pbe_boost.test.ts pair
+whose note names that row, and the tests/masterwrought_budget.test.ts lead-cap
+arm). The remaining TWO are the forgefold_legguards and spiritweld_girdle twin
+rows at tests/masterwrought_budget.test.ts, whose own comment offers
+re-complementing the twins against the retuned references as an arm independent
+of any re-measure; they belong to the twin-complement row, not to the
+re-measure. Both rows are still the maintainer's.
 
 ## 1. What R5 measures, and what it does not
 

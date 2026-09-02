@@ -112,6 +112,11 @@ export function parseExplainedExtras(markdown: string): {
 };
 
 export function isCensusPath(relPath: string): boolean;
+/** True when a repo-relative path is a real source file under one of
+ *  EXCLUDED_PATH_PREFIXES, the only thing that earns an extras row the
+ *  informational verdict. Positive by construction: a malformed cell
+ *  ('file.ts:42', 'n/a', prose) is refused rather than exempted. */
+export function isExcludedExtraPath(relPath: string): boolean;
 export function readMergedTree(
   mergedRoot: string,
   roots?: readonly string[],
@@ -165,6 +170,10 @@ export interface ClassComparison {
 export function compareCensus(args: CompareArgs): {
   perClass: Record<CensusClass, ClassComparison>;
   failed: boolean;
+  /** Class:name pairs whose duplicate rows DISAGREE about Path. A disagreement
+   *  lets the last row silently decide FAIL versus INFO, so it is a defect;
+   *  a plain restatement of the same name is not. */
+  duplicateExtras: string[];
 };
 
 export interface SimEventVerdict {

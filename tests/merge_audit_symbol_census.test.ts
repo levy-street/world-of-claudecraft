@@ -463,7 +463,10 @@ describe('the excluded-path allowlist row: informational, not GONE (D130)', () =
       ].join('\n'),
     );
     expect(defects).toHaveLength(1);
-    expect(defects[0]).toContain('IN census scope');
+    // The message changed with the predicate: the check is positive now, so an
+    // in-scope path is refused for the same reason a malformed one is, that it
+    // names nothing under an excluded prefix.
+    expect(defects[0]).toContain('grants no exemption');
   });
 
   it('reproduces the old wrong verdict without a Path, and makes it informational with one', () => {
@@ -486,6 +489,75 @@ describe('the excluded-path allowlist row: informational, not GONE (D130)', () =
     expect(after.perClass.exports.excludedPathExtras).toEqual(['zeta']);
     expect(after.perClass.exports.unusedExtras).toEqual([]);
     expect(after.failed).toBe(false);
+  });
+
+  it('refuses every MALFORMED Path shape rather than exempting it', () => {
+    // THE HOLE THE FIRST DRAFT SHIPPED, caught in review. The exemption used to
+    // be granted by "isCensusPath is false", and that predicate is false for
+    // almost any string that is not a bare, source-extensioned path: a
+    // `file:line` anchor (this repo's own idiom, and the shape used in these
+    // very rows' Reason cells), a bolded path, a path with a prose aside, a bare
+    // directory, `n/a`, `-`. Every one of them would have handed the
+    // informational verdict to a name that is genuinely GONE from merged. The
+    // check is POSITIVE now: the cell must name a file under an excluded prefix
+    // WITH a source extension.
+    for (const bad of [
+      'src/sim/thing.ts:42',
+      '**scripts/merge_audit/tool.mjs**',
+      'scripts/merge_audit/tool.mjs (the auditor)',
+      'scripts/merge_audit/',
+      'merge_audit',
+      'n/a',
+      '-',
+      'src/sim/thing.ts',
+    ]) {
+      const { defects } = parseExplainedExtras(
+        [
+          '## Explained extras',
+          '',
+          '| Class | Name | Path | Phase | Ruling | Reason |',
+          '|---|---|---|---|---|---|',
+          `| export | \`zeta\` | ${bad} | 19D | r | a stated reason here |`,
+        ].join('\n'),
+      );
+      expect(defects, `Path ${bad} must be refused`).toHaveLength(1);
+      expect(defects[0]).toContain('grants no exemption');
+    }
+    // The one shape that IS an exemption still parses clean.
+    const ok = parseExplainedExtras(
+      [
+        '## Explained extras',
+        '',
+        '| Class | Name | Path | Phase | Ruling | Reason |',
+        '|---|---|---|---|---|---|',
+        '| export | `zeta` | scripts/merge_audit/tool.mjs | 19D | r | a stated reason here |',
+      ].join('\n'),
+    );
+    expect(ok.defects).toEqual([]);
+  });
+
+  it('FAILS when two rows for one name DISAGREE about Path', () => {
+    // The last row wins, and with the Path column the winner decides FAIL versus
+    // INFO, so a duplicate carrying a Path could silence the original. Only the
+    // DISAGREEMENT is a defect: restating a name across sections is long-standing
+    // practice in the live doc (48 benign pairs today) and must stay green.
+    const disagreeing = cmp([
+      { cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: '' },
+      {
+        cls: 'exports',
+        name: 'zeta',
+        phase: '19D',
+        ruling: 'r',
+        path: 'scripts/merge_audit/tool.mjs',
+      },
+    ]);
+    expect(disagreeing.duplicateExtras).toHaveLength(1);
+    expect(disagreeing.failed).toBe(true);
+    const agreeing = cmp([
+      { cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: '' },
+      { cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: '' },
+    ]);
+    expect(agreeing.duplicateExtras).toEqual([]);
   });
 
   it('an in-scope Path never buys the informational verdict', () => {
@@ -615,6 +687,22 @@ describe('parseExplainedExtras: the doc-sourced explained-extras tables (Phase 1
     const { rows, defects } = parseExplainedExtras(md);
     expect(defects).toEqual([]);
     expect(rows.length).toBeGreaterThan(400);
+    // THE PATH COLUMN IS HEADER-KEYED, so a typo in the live doc's header
+    // silently yields path:'' for every row in that table, produces no defect,
+    // and quietly returns the five golden_composition names to being reported
+    // GONE from merged. That is the exact defect the column exists to fix, so
+    // the live doc is held to actually carrying them.
+    const withPath = rows.filter((r: { path: string }) => r.path);
+    expect(
+      withPath.map((r: { name: string }) => r.name).sort(),
+      'the live extras tables no longer carry the excluded-path rows',
+    ).toEqual([
+      'Lineage',
+      'classifyLineage',
+      'isAnchorPath',
+      'newestReleaseRef',
+      'releaseParentRefs',
+    ]);
   });
 });
 

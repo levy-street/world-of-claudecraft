@@ -426,15 +426,29 @@ For off-box safety, sync the directory to S3 occasionally:
     coordinates its renderer draws as a black, collider-less void, with the
     exit object invisible, until relog (login is protected: a saved
     inside-instance position ejects to the door). CORRECTED 2026-09-01
-    (qr-19-stale-client-deploy-window): the two sentences that stood here
-    said the fail-closed layout gate was still at
-    ONLINE_WORLD_LAYOUT_VERSION 3 and that stale bundles were therefore
-    still admitted at reconnect, with a bump as the pending answer. Both
-    are false on this branch: the gate reads 26 and the world socket
-    refuses a mismatched first frame outright, so the stale sessions this
-    bullet describes cannot reconnect at all and the surfaced
-    forced-refresh question is answered for the ONLINE path.
-  - NEW client on OLD server (the bounded direction): every gather node the
+    (qr-19-stale-client-deploy-window), and SCOPED, which the first
+    correction was not: the two sentences that stood here said the
+    fail-closed layout gate was still at ONLINE_WORLD_LAYOUT_VERSION 3 and
+    that stale bundles were therefore still admitted at reconnect, with a
+    bump as the pending answer. Both are false on this branch: the gate
+    reads 26 and the world socket refuses a mismatched first frame
+    outright. READ THE SCOPE, because it changes the player-comms plan
+    rather than only the prose. WHEN A DEPLOY MOVES THE EPOCH, none of the
+    symptoms above is reachable at all: every stale tab is hard
+    disconnected with an incompatible-version error and must reload, so
+    plan for that instead of for cosmetic glitches. ON AN ORDINARY
+    SAME-EPOCH CONTENT DEPLOY, which is what this section's heading is
+    about, old clients DO stay in world and every skew above is live
+    exactly as described.
+  - NEW client on OLD server (the bounded direction). SAME SCOPING as the
+    bullet above, added 2026-09-01 (qr-19-stale-client-deploy-window) because
+    the correction there left this one reading as though it were unaffected:
+    the epoch gate closes this direction SYMMETRICALLY. A server still on the
+    older layout refuses a new client's `auth-world-26` first frame the same
+    way, so when a deploy moves the epoch none of the skew below is reachable,
+    including the rate-limit tokens the mount and unstuck paths would spend.
+    On a same-epoch content deploy it is all live as written: every gather node
+    the
     release relocated is unusable, because the client shows it where the old
     server does not have it. Among the zones the deployed server HAS, the
     worst cases are Eastbrook tier-1 herbalism and Mirefen's tier-2 band,
@@ -469,50 +483,81 @@ For off-box safety, sync the directory to S3 occasionally:
     restart the bot with the server or those cards post as empty embeds
     Discord rejects until it picks up the new build.)
   Release-specific caveat for the professions tuning deploy, REWRITTEN
-  2026-09-01 under ruling qr-19-stale-client-deploy-window. What this
-  paragraph used to describe was a LOOT-TABLE EXCLUSION: keep new ids out of
-  mob and chest tables until clients have rolled, because a stale bundle that
-  is handed an id it cannot resolve freezes the panel rendering it. That
-  window is CLOSED, and by a different mechanism than the exclusion:
+  2026-09-01 under ruling qr-19-stale-client-deploy-window and CORRECTED at its
+  review round. SCOPE FIRST, because the rewrite dropped this and two sentences
+  below then read as contradicting each other: the guards described in the
+  bullets above are in bundles built from this release onward. The bundle that
+  was DEPLOYED when this window was measured (9d7a1a021) predates them and
+  THROWS rather than degrading, which is what the rest of this paragraph is
+  about.
+  What this paragraph used to prescribe was a LOOT-TABLE EXCLUSION: keep new ids
+  out of mob and chest tables until clients have rolled, because a stale bundle
+  handed an id it cannot resolve freezes the panel rendering it. That window is
+  CLOSED, and by a different mechanism than the exclusion:
   ONLINE_WORLD_LAYOUT_VERSION now reads 26 (src/world_api.ts), and the world
   socket is FAIL-CLOSED on it. A client whose first frame does not carry
-  `auth-world-26` is refused at the handshake with `incompatibleWorldLayout`
-  before any world work runs (server/ws_auth.ts), so a stale bundle never
-  receives a snapshot, an event, a loot list or a trade offer at all. It
-  cannot be handed an unknown id, which makes every surface the old window
-  covered unreachable rather than merely rare. The epoch bump arrived for
-  wire-shape reasons, not for this, so the closure is by circumstance.
-  Verified rather than asserted, against 9d7a1a021, the commit deployed when
-  the window was measured: all 22 `ITEMS[` sites in its `src/ui/hud.ts` are
-  null-safe and degrade to the raw id or a `[?]`, and exactly ONE reachable
-  throw survives, the trade panel's `itemIcon(item)` at hud.ts:14193, whose
-  `itemIcon(item: ItemDef)` dereferences `item.quality` and `item.id` with no
-  guard. That is the throw this caveat was written about; it is now behind the
-  handshake. `src/ui/market_view.ts` drops unknown listings and
-  `src/ui/mailbox_window.ts` skips them, so those two degrade on their own.
-  WHAT STILL HOLDS at a deploy, and needs no loot rule: two deployed-bundle
-  arms need no loot table at all, because the fine grades are minted by
-  HARVESTING with an outclassing tool. A stale tab that gathers one sees it
-  land in an INVISIBLE bag cell (and bank cell after a deposit) that still
-  consumes capacity, and the profession chat line names the raw id. Cosmetic
-  and self-healing on reload, but they will read as "my ore vanished" in
-  reports. Those arms are OFFLINE-reachable, which is why the epoch gate does
-  not close them. Stale sessions are ended by the pre-deploy restart
-  countdown, but a reconnect rides the same stale page: only a page reload
-  picks up the new bundle.
-  The measurements above were taken against 9d7a1a021, the commit deployed
-  when the window was open; the branch has since merged the true v0.32.0 tip
-  (0b427afca, 685 commits past the measured base), re-synced repeatedly
-  through release/v0.33.0 (last at 2ae71a7fbf), and then merged
-  release/v0.34.0 (94f5ac63d8, at merge 706bec2d21). If the live server moves
-  before this branch deploys, re-run the compatibility diff against the commit
-  actually deployed before trusting any "N new X" claim.
+  `auth-world-26` is refused at the handshake before any world work runs
+  (server/ws_auth.ts): a real stale bundle sends `auth-world-<older>` and is
+  refused with `incompatibleWorldLayout`, while a frame with no recognisable
+  type at all is refused with `authRequired`. Either way it never receives a
+  snapshot, an event, a loot list or a trade offer, so it cannot be handed an
+  unknown id. STATE THE RULE PRECISELY, because it is a property of the
+  surfaces and not of the process: every id-rendering surface in that bundle
+  lives behind the world socket. REST is not epoch-gated, and `/api/characters`
+  really does return item ids to a stale bundle; they are safe only because the
+  character-preview path that consumes them resolves every lookup with optional
+  chaining. A future non-game surface that renders an id from REST would fall
+  outside this rule.
+  The epoch bump arrived for wire-shape reasons, not for this, so the closure is
+  by circumstance rather than by design.
+  VERIFIED rather than asserted, against 9d7a1a021. All 22 `ITEMS[` sites in its
+  `src/ui/hud.ts` are null-safe, and one reachable throw survives there: the
+  trade panel's `itemIcon(item)`, whose `itemIcon(item: ItemDef)` dereferences
+  `item.quality` and `item.id` with no guard. THE FIRST DRAFT OF THIS PARAGRAPH
+  SAID "exactly ONE", scoping the measurement to hud.ts and then generalising it
+  to the bundle; that is corrected here, because the sibling modules carry three
+  more of the same shape and one of them is the very throw the old caveat named:
+  `src/ui/hud/loot/loot_window_controller.ts` passes an unresolved item to
+  `itemIcon` and `itemDisplayName` on its row build and to `itemTooltip` on
+  hover, and `src/ui/disenchant_yield_view.ts` passes one to `itemDisplayName`.
+  All of them are WS-fed, so all of them are behind the handshake and the
+  retirement stands; the count was wrong, not the conclusion.
+  `src/ui/market_view.ts` drops unknown listings and `src/ui/mailbox_window.ts`
+  skips them, so those two degrade on their own. So does the vendor path: the
+  junk preview filters through `junkSellableSlot`, whose first term is a
+  definition check, and vendor stock rows come from local content.
+  "Degrades" is not uniform, and the difference matters when reading a report:
+  several of those sites degrade to NOTHING RENDERED rather than to a raw id (a
+  set-piece count reads low, a gear stat source is omitted, the junk sweep skips
+  the stack, pet food is not seen), which is the same silent-omission family as
+  the invisible bag cell below.
+  WHAT STILL HOLDS at a deploy, and needs no loot rule: a tab that harvests a
+  fine grade with an outclassing tool sees it land in an INVISIBLE bag cell (and
+  bank cell after a deposit) that still consumes capacity, and the profession
+  chat line names the raw id. Cosmetic and self-healing on reload, but it reads
+  as "my ore vanished" in reports. NOTE THE COMBINATION THIS NEEDS, because the
+  measured bundle cannot produce it alone: `src/sim/professions/material_grades.ts`
+  does not exist at 9d7a1a021 and no fine-grade id appears in its `src/`, so
+  that bundle mints no fine grade offline and, with the gate, gathers none
+  online. The arm is a NEWER bundle writing an offline save that an older cached
+  bundle then loads.
+  Stale sessions are ended by the pre-deploy restart countdown, but a reconnect
+  rides the same stale page: only a page reload picks up the new bundle.
+  The measurements above were taken against 9d7a1a021, the commit deployed when
+  the window was open; the branch has since merged the true v0.32.0 tip
+  (0b427afca, 685 commits past the measured base), re-synced repeatedly through
+  release/v0.33.0 (last at 2ae71a7fbf), and then merged release/v0.34.0
+  (94f5ac63d8, at merge 706bec2d21). If the live server moves before this branch
+  deploys, re-run the compatibility diff against the commit actually deployed
+  before trusting any "N new X" claim.
   There is no longer a guard file behind this paragraph.
   `tests/stale_client_rollout.test.ts` and its snapshot froze the
   HEROIC_BOSS_LOOT id set for the deploy window and were RETIRED in the same
-  change as this rewrite: a guard whose premise is closed is a guard that
-  fails for the wrong reason later. Per-surface analysis of the window as it
-  stood: the stale-client compatibility phase of
+  change as this rewrite: a guard whose premise is closed is a guard that fails
+  for the wrong reason later. One thing goes with it and is recorded so nobody
+  looks for it: that frozen set was also the only change-detector on the heroic
+  boss loot table, and no surviving suite pins that id SET. Per-surface analysis
+  of the window as it stood: the stale-client compatibility phase of
   `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state

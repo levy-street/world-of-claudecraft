@@ -53,5 +53,18 @@ describe('shipped item ids stay resolvable forever', () => {
     expect(shipped.length).toBeGreaterThan(500);
     const missing = shipped.filter((id) => !ITEMS[id]);
     expect(missing).toEqual([]);
+    // THE OTHER DIRECTION, which is what makes the cadence real. The filter above
+    // is a SUBSET check, so an un-re-minted golden simply never reds: that is
+    // exactly why five phase ledgers could deviate to a release-time cadence with
+    // nothing noticing (masterwrought qr-19-shipped-id-golden-remint-cadence).
+    // With every id already pinned, the golden and ITEMS are EQUAL, so the
+    // stronger claim is the true one and a change that mints an id without
+    // re-minting here reds on the spot.
+    const pinned = new Set(shipped);
+    const unpinned = Object.keys(ITEMS).filter((id) => !pinned.has(id));
+    expect(
+      unpinned,
+      'item id(s) live in ITEMS but not in the golden. Shipped ids are permanent API, so re-mint in the SAME change that mints them: UPDATE_SHIPPED_ITEMS=1 npx vitest run tests/shipped_item_ids.test.ts, then review the diff as additions-only',
+    ).toEqual([]);
   });
 });

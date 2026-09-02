@@ -330,4 +330,8 @@ locked gameplay contract) before world-mutating code lands:
 - Wiki: `npm run wiki:content` (+ `npm run wiki:stills` for new models).
 - i18n: `npm run i18n:gen`; contributors touch English catalogs only.
 - SFX manifest: `npm run sfx:manifest`.
-- Shipped-item golden: `UPDATE_SHIPPED_ITEMS=1` only at a release re-mint.
+- Shipped-item golden: `UPDATE_SHIPPED_ITEMS=1` in the SAME change that mints an
+  item id, and review the diff as additions-only. AMENDED 2026-09-01 by ruling
+  qr-19-shipped-id-golden-remint-cadence: this line read "only at a release
+  re-mint", which is a prohibition on the per-content-change cadence the repo
+  actually follows and has now adopted explicitly.

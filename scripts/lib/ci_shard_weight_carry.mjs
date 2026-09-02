@@ -406,13 +406,48 @@ export function parseCarryLocalArgs(tokens) {
  * its `carried` entry. Getting that backwards writes a table its own pin
  * refuses, which is why the caller re-runs `carriedDefects` before writing.
  *
+ * THE FLOOR, and it is not decoration. `carriedDefects` cannot catch a mass
+ * prune, because this function preserves `harvestedFiles + carried == rows` by
+ * construction: `pruneMissingRows(table, () => false)` returns ZERO rows with a
+ * self-consistent provenance and no defects at all, so a wrong-root or
+ * wrong-tree `exists` callback (a sparse checkout, a partial clone, a branch
+ * predating most tests) would write an emptied table that passes its own
+ * contract. Anything past a small bound is refused instead of written; the
+ * caller reports the refusal and exits non-zero.
+ *
  * @param {Record<string, any>} table
  * @param {(file: string) => boolean} exists
+ * @param {{ maxDrops?: number }} [options]
  */
-export function pruneMissingRows(table, exists) {
+export const PRUNE_MAX_DROPS = 25;
+
+export function pruneMissingRows(table, exists, options = {}) {
+  const maxDrops = options.maxDrops ?? PRUNE_MAX_DROPS;
   const provenance = table.__provenance ?? {};
   const gone = tableRows(table).filter((file) => !exists(file));
-  if (gone.length === 0) return { table, gone: [] };
+  if (gone.length === 0) return { table, gone: [], refusal: null };
+  // TWO refusals, because the bound alone is not enough: a small table can be
+  // emptied without ever reaching it, which the entry arm for this mode found.
+  if (gone.length === tableRows(table).length) {
+    return {
+      table,
+      gone,
+      refusal:
+        'refusing to prune EVERY row. A prune that empties the table is always a wrong-tree ' +
+        'callback, never a retirement, and the table contract cannot catch it: an emptied ' +
+        'table is self-consistent and raises no defect.',
+    };
+  }
+  if (gone.length > maxDrops) {
+    return {
+      table,
+      gone,
+      refusal:
+        `refusing to prune ${gone.length} rows (bound ${maxDrops}). A prune this large means the ` +
+        'tree is not the one the table was measured against, not that this many suites were ' +
+        'retired; re-run in a full checkout, or raise the bound deliberately.',
+    };
+  }
   const goneSet = new Set(gone);
   const goneCarried = gone.filter((file) => Boolean(provenance.carried?.[file])).length;
   const out = { __provenance: { ...provenance } };
@@ -427,7 +462,7 @@ export function pruneMissingRows(table, exists) {
     out.__provenance.harvestedFiles = provenance.harvestedFiles - (gone.length - goneCarried);
   }
   out.__provenance.files = tableRows(out).length;
-  return { table: out, gone };
+  return { table: out, gone, refusal: null };
 }
 
 /**

@@ -580,6 +580,25 @@ const HOT_PAINTERS: ReadonlyArray<ScannedPainter> = [
   { file: 'hud/cross_hotbar/cross_hotbar_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'hud/warlock/doom_meter_painter.ts', allow: {}, reflowAllow: {} },
   { file: 'party_frames_painter.ts', allow: {}, reflowAllow: {} },
+  // The portrait rest badge. Cold by cadence (the caller gates it on the
+  // resting flag changing, and the language fan-out clears that memo so a
+  // locale switch repaints once), but facet-routed and raw-write-free anyway,
+  // so it belongs here rather than in an allowance list.
+  { file: 'rest_indicator_painter.ts', allow: {}, reflowAllow: {} },
+  // The compass strip. Its PER-FRAME path (paintCompassMarks, driven from
+  // Hud.updateCompass on the fast band) routes every write through the facet:
+  // two setStyleProp calls and setDisplay, zero raw writes. The three allowed
+  // raw writes are both OFF that path, and both are the reason the module
+  // exists as its own file: buildCompassMarks stamps a class and a label onto
+  // each pooled span ONCE when the pool is created, and relabelCompassMarks
+  // rewrites those labels exactly once per runtime language change (the labels
+  // are written at build time and nothing else ever touches them, which is the
+  // i18n defect masterwrought D129 found and fixed).
+  {
+    file: 'compass_strip_painter.ts',
+    allow: { '.className': 1, '.textContent': 2 },
+    reflowAllow: {},
+  },
   // party_below_target measures the target frame, its #tf-debuffs strip, the
   // party container, and (on mobile) the rows wrapper + move zone (five rect
   // reads) ONLY when its cheap invalidation key changes (target/buff-count/

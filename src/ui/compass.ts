@@ -35,6 +35,12 @@ const ROSE: { label: CardinalId; deg: number; major: boolean }[] = [
   { label: 'NW', deg: 315, major: false },
 ];
 
+/** The rose ids in strip order, DERIVED from the table above so a ninth point
+ *  cannot be added to CardinalId (or to ROSE) and leave the DOM pool short: the
+ *  painter builds its span pool from this list. Still language-agnostic; the
+ *  render boundary is what t()s each id. */
+export const COMPASS_ROSE_IDS: readonly CardinalId[] = ROSE.map((r) => r.label);
+
 // Facing radians → compass bearing degrees in [0, 360).
 export function bearingDegrees(facing: number): number {
   if (!Number.isFinite(facing)) return 0;

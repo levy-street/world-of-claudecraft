@@ -1,6 +1,15 @@
 // The compass strip's DOM half: building the rose-label pool, painting it from
 // a CompassView, and RELABELLING it when the locale changes.
 //
+// NAMED `_painter` DELIBERATELY. The per-frame painter gates key on that suffix
+// (tests/hud_perf_budget.test.ts PAINTER_FILE_RE), and this module IS on the
+// fast band: Hud.updateCompass calls paintCompassMarks every frame the player
+// turns. A bare name is the whole of that escape, so the first draft of this
+// extraction landed outside every painter and classification sweep at once
+// while doing raw style writes. Every per-frame write here goes through the
+// PainterHost elided writer facet; the only raw writes left are in the
+// build-once and relabel paths, and both are counted allowances in that suite.
+//
 // Extracted out of the HUD coordinator by masterwrought ruling
 // qr-19-hud-coordinator-fanout-exemption. The relabel is why it exists: the
 // eight rose labels are written ONCE when the pool is built, so a runtime
@@ -11,11 +20,9 @@
 //
 // src/ui/compass.ts stays the DOM-free derivation (bearing math, the rose, the
 // visible window). This file only ever turns that view into element writes.
-import type { CardinalId, CompassView } from './compass';
+import { type CardinalId, COMPASS_ROSE_IDS, type CompassView } from './compass';
 import { t } from './i18n';
-
-/** The rose points, left to right, in the order the strip stacks them. */
-export const COMPASS_ROSE_IDS: readonly CardinalId[] = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+import type { PainterHostWriters } from './painter_host';
 
 /** The strip's element pool, keyed by the language-agnostic rose id. */
 export type CompassMarkElements = Map<CardinalId, HTMLElement>;
@@ -54,6 +61,7 @@ export function paintCompassMarks(
   marks: CompassMarkElements,
   view: CompassView,
   visibleScratch: Set<string>,
+  writers: PainterHostWriters,
 ): void {
   visibleScratch.clear();
   for (const m of view.marks) {
@@ -61,11 +69,11 @@ export function paintCompassMarks(
     if (!el) continue;
     visibleScratch.add(m.label);
     // offsetFrac -1..1 to 0..100% across the strip; fade marks near the edges.
-    el.style.left = `${(m.offsetFrac * 0.5 + 0.5) * 100}%`;
-    el.style.opacity = `${Math.max(0.2, 1 - Math.abs(m.offsetFrac) * 0.85)}`;
-    el.style.display = 'block';
+    writers.setStyleProp(el, 'left', `${(m.offsetFrac * 0.5 + 0.5) * 100}%`);
+    writers.setStyleProp(el, 'opacity', `${Math.max(0.2, 1 - Math.abs(m.offsetFrac) * 0.85)}`);
+    writers.setDisplay(el, 'block');
   }
   for (const [label, el] of marks) {
-    if (!visibleScratch.has(label)) el.style.display = 'none';
+    if (!visibleScratch.has(label)) writers.setDisplay(el, 'none');
   }
 }

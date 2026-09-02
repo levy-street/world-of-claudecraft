@@ -47,6 +47,15 @@
 //     (matching every private field) is 308 discoveries against 106, a registry
 //     nobody could keep green. Name a new memo out of that vocabulary and it is
 //     invisible here; that limit is real and is the price of the sweep existing.
+//     MEASURED ON hud.ts at the 19D review round, because closing that file's
+//     by-NAME skip made its by-SPELLING skip the surviving one: 88 private
+//     fields there are compared with === or !==, 46 match the name family (the
+//     registered set exactly, so the union pin below is honest) and 42 do not.
+//     Every one of the 42 was read; none gates localized text (they drive a
+//     class toggle, a zoom reset, a repaint call). So the limit costs nothing on
+//     this file today, and it is recorded rather than argued away because the
+//     ruling's own reasoning is that an unexamined skip on the largest
+//     hand-authored file is not acceptable.
 //   - Half 1 sees `refreshLocalizedDynamicUi()`'s OWN body. An arm that calls a
 //     `Hud` method which then fails to repaint is invisible here; the delve
 //     tracker was exactly that, and what catches it is the behavioral arm, not
@@ -476,7 +485,7 @@ const ANSWERED: readonly AnsweredSurface[] = [
     file: 'hud.ts',
     memos: ['lastAnnouncedTargetId'],
     answer: 'this.relocalizeCoordinatorMemos',
-    why: "the id of the last target announced into the #target-live region, tracked apart from the paint cadence so the announcement fires on a real target change. The sentence it gates is a fully localized t('hudChrome.unitFrame.targetAnnounce'), written directly rather than through the elided writer, so a switch left the live region holding the previous locale for as long as that target stayed selected. Cleared to null, which re-announces the current target in the new language",
+    why: "the id of the last target announced into the #target-live region, tracked apart from the paint cadence so the announcement fires on a real target change. The sentence it gates is a fully localized t('hudChrome.unitFrame.targetAnnounce'), written directly rather than through the elided writer, so a switch left the live region holding the previous locale for as long as that target stayed selected. Cleared to null, which re-announces the current target in the new language. TWO behaviour notes the clear carries, stated rather than found later: it also forfeits the no-target CLEAR EDGE for one frame (that branch is gated on the memo being non-null, so a target lost between the switch and the next update leaves the region holding the pre-switch sentence), and it deliberately RE-ANNOUNCES a target that did not change. Both accepted: the window is one frame, and a browse-mode reader can reach stale region text",
   },
   {
     file: 'hud.ts',
@@ -643,7 +652,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastArenaStatusSig'],
     reason:
-      "lastArenaStatusSig is a hybrid whose middle field is vsBlock, the RESOLVED VS markup built on the same tick: t('hud.core.you') and t('hud.arena.vsLine') on the 2v2 arm, t('hud.arena.vsLine') plus t('hud.arena.levelClass') and the tEntity class name on the 1v1 arm. A locale switch therefore changes the freshly built side of the comparison, the banner rewrites itself on the next update, and the timer label (statusCountdown / statusReturning / statusFight), which is deliberately NOT in the signature, rides the same single innerHTML write and relocalizes with it. Write elision on resolved text wearing a signature's name; the genuinely text-independent fields (format, state, the returning countdown seconds) only add motion, they are not what carries the locale. Note for a future editor: pull vsBlock out of this signature and the banner becomes a stale-language surface needing a fan-out arm",
+      "lastArenaStatusSig is a hybrid whose middle field is vsBlock, the RESOLVED VS markup built on the same tick: t('hud.core.you') and t('hud.arena.vsLine') on the 2v2 arm, t('hud.arena.vsLine') plus t('hud.arena.levelClass') and the tEntity class name on the 1v1 arm. A locale switch therefore changes the freshly built side of the comparison, the banner rewrites itself on the next update, and the timer label (statusCountdown / statusReturning / statusFight), which is deliberately NOT in the signature, rides the same single innerHTML write and relocalizes with it. Write elision on resolved text wearing a signature's name; the genuinely text-independent fields (format, state, the returning countdown seconds) only add motion, they are not what carries the locale. CLOSED at the 19D review round rather than argued: the timer label IS in the signature now. The exemption used to rest on vsBlock's localized bytes alone, which fails in a locale where those two keys are still English-filled while hudChrome.arena.status* are translated (the normal state under the contributors-add-English-only rule): the sig was byte-identical across a switch and the timer line stranded. Note for a future editor: pull vsBlock or the label out of this signature and the banner becomes a stale-language surface needing a fan-out arm",
   },
   {
     file: 'hud.ts',
@@ -667,7 +676,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastLifetimeXp'],
     reason:
-      "lastLifetimeXp retains sim.lifetimeXp, the monotonic lifetime total, a pure number that surfaces only past MAX_LEVEL where the label reads `Lv 20 (+7) · <total> total XP · <pct> to next` from t('game.xp.lv'), t('game.xp.totalXp') and t('game.xp.toNext') (src/ui/xp_bar.ts:83-86). That whole label is rebuilt by the one composite gate at hud.ts:9544-9552, and its last arm compares getLanguage() against lastXpLanguage, so a locale switch alone rebuilds the post-cap line (and the pre-cap one) on the next frame. The memo gates a localized string but cannot strand it, because the gate it sits in is locale-aware by construction.",
+      "lastLifetimeXp retains sim.lifetimeXp, the monotonic lifetime total, a pure number that surfaces only past MAX_LEVEL where the label reads `Lv 20 (+7) · <total> total XP · <pct> to next` from t('game.xp.lv'), t('game.xp.totalXp') and t('game.xp.toNext') (src/ui/xp_bar.ts:83-86). That whole label is rebuilt by the one composite gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm), and its last arm compares getLanguage() against lastXpLanguage, so a locale switch alone rebuilds the post-cap line (and the pre-cap one) on the next frame. The memo gates a localized string but cannot strand it, because the gate it sits in is locale-aware by construction.",
   },
   {
     file: 'hud.ts',
@@ -693,7 +702,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastLowResourceLanguage'],
     reason:
-      "the low-resource warning's own language latch: `getLanguage()` is read at hud.ts:9937, compared as the fourth term of the update gate at 9942 and stored at 9948, so a locale switch alone always falls the gate through even when resource, maxResource and resourceType are byte-identical. That is what makes the other three terms of that conjunction safe: they are raw player numbers and the enum, none of which a locale can move, and without this latch the pulse label ('Low Mana' / 'Low Focus' / 'Low Energy', resolved in src/ui/low_resource.ts:71-76) would sit in the previous locale until the player's power happened to change. Note the latch answers the memo family, not refreshLocalizedDynamicUi, which drives no low-resource arm.",
+      "the low-resource warning's own language latch: `getLanguage()` is read at updateLowResource, compared as the fourth term of the update gate at 9942 and stored at 9948, so a locale switch alone always falls the gate through even when resource, maxResource and resourceType are byte-identical. That is what makes the other three terms of that conjunction safe: they are raw player numbers and the enum, none of which a locale can move, and without this latch the pulse label ('Low Mana' / 'Low Focus' / 'Low Energy', resolved in src/ui/low_resource.ts:71-76) would sit in the previous locale until the player's power happened to change. Note the latch answers the memo family, not refreshLocalizedDynamicUi, which drives no low-resource arm.",
   },
   {
     file: 'hud.ts',
@@ -711,13 +720,13 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastPlayerFrameLevel'],
     reason:
-      "lastPlayerFrameLevel retains the player's LEVEL as a bare integer and gates exactly one write, playerFrame.levelText = String(p.level) (hud.ts:9070). That is a raw number-to-string: unlike the hp and resource texts two blocks above it deliberately does not route through unitFrameCurrentMaxText or formatNumber, so no t() key and no Intl formatter sits behind it and no locale can change the bytes it produces. The painter puts it on screen through the elided writer facet (unit_frame_painter.ts:179, this.writers.setText(this.el.level, view.levelText ?? '')), and the level element carries no label, unit word or aria string written from inside the gate. Only the player levelling moves the memo, which is the only thing that ever needs to move it, so its absence from the four-memo clear at hud.ts:6944-6947 is correct rather than an omission.",
+      "lastPlayerFrameLevel retains the player's LEVEL as a bare integer and gates exactly one write, playerFrame.levelText = String(p.level) (the levelText write in updatePlayerFrame). That is a raw number-to-string: unlike the hp and resource texts two blocks above it deliberately does not route through unitFrameCurrentMaxText or formatNumber, so no t() key and no Intl formatter sits behind it and no locale can change the bytes it produces. The painter puts it on screen through the elided writer facet (unit_frame_painter.ts:179, this.writers.setText(this.el.level, view.levelText ?? '')), and the level element carries no label, unit word or aria string written from inside the gate. Only the player levelling moves the memo, which is the only thing that ever needs to move it, so its absence from the four-memo clear at the four-memo clear in relocalizeCoordinatorMemos is correct rather than an omission.",
   },
   {
     file: 'hud.ts',
     memos: ['lastRestedXp'],
     reason:
-      "lastRestedXp retains sim.restedXp, the inn-rested pool. Most of what it drives is geometry (restedFrac becomes a left/width percentage and the `rested` class, src/ui/xp_bar_painter.ts:48-58), but it also decides the localized tail ` · t('game.xp.rested') +<n>` on the hover label (src/ui/xp_bar.ts:55). It is safe for the same structural reason as its three siblings and for no other: all five XP arms share ONE OR gate (hud.ts:9544-9552) that ends in `xpLanguage !== this.lastXpLanguage`, so a locale switch alone reopens it, re-resolves game.xp.rested and re-groups the +<n> through formatNumber. Remove that language arm and this row becomes a bug, not an exemption.",
+      "lastRestedXp retains sim.restedXp, the inn-rested pool. Most of what it drives is geometry (restedFrac becomes a left/width percentage and the `rested` class, src/ui/xp_bar_painter.ts:48-58), but it also decides the localized tail ` · t('game.xp.rested') +<n>` on the hover label (src/ui/xp_bar.ts:55). It is safe for the same structural reason as its three siblings and for no other: all five XP arms share ONE OR gate (the composite XP-bar gate in updateXpBar (the xpBarViewCache arm)) that ends in `xpLanguage !== this.lastXpLanguage`, so a locale switch alone reopens it, re-resolves game.xp.rested and re-groups the +<n> through formatNumber. Remove that language arm and this row becomes a bug, not an exemption.",
   },
   {
     file: 'hud.ts',
@@ -753,19 +762,19 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastXp'],
     reason:
-      'lastXp retains sim.xp, the raw current-level XP count that sets the bar fill and the `<xp> / <need>` numbers in the hover label. Those numbers are locale-formatted (formatXp goes through formatNumber, so en "1,000" against de "1.000") and the suffix is t(\'game.xp.suffix\'), which is precisely why the cache gate at hud.ts:9544-9552 carries `xpLanguage !== this.lastXpLanguage` as its final arm: a switch moves that arm on the next frame, xpBarView re-resolves and re-groups everything, and the memo\'s own numeric arm never has to move. Nothing here waits on a fan-out arm.',
+      'lastXp retains sim.xp, the raw current-level XP count that sets the bar fill and the `<xp> / <need>` numbers in the hover label. Those numbers are locale-formatted (formatXp goes through formatNumber, so en "1,000" against de "1.000") and the suffix is t(\'game.xp.suffix\'), which is precisely why the cache gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm) carries `xpLanguage !== this.lastXpLanguage` as its final arm: a switch moves that arm on the next frame, xpBarView re-resolves and re-groups everything, and the memo\'s own numeric arm never has to move. Nothing here waits on a fan-out arm.',
   },
   {
     file: 'hud.ts',
     memos: ['lastXpLanguage'],
     reason:
-      "lastXpLanguage IS the XP bar's language latch: getLanguage() is read at hud.ts:9542, compared at 9551 as the last arm of the xpBarViewCache gate, and stored unchanged at 9558, which is both accepted forms at once (the memo names the latch and the locale flows straight into the stored value). Because the four data arms beside it (level, xp, lifetimeXp, restedXp) share that single OR gate, the latch alone reopens the cache on a runtime switch and every game.xp.* key plus the formatNumber percent re-resolves on the next frame. That is why the XP bar needs no refreshLocalizedDynamicUi arm, and why deleting this arm would silently strand the hover label in the previous locale until the player next gained XP.",
+      "lastXpLanguage IS the XP bar's language latch: getLanguage() is read at the xpBarViewCache gate in updateXpBar, compared at 9551 as the last arm of the xpBarViewCache gate, and stored unchanged at 9558, which is both accepted forms at once (the memo names the latch and the locale flows straight into the stored value). Because the four data arms beside it (level, xp, lifetimeXp, restedXp) share that single OR gate, the latch alone reopens the cache on a runtime switch and every game.xp.* key plus the formatNumber percent re-resolves on the next frame. That is why the XP bar needs no refreshLocalizedDynamicUi arm, and why deleting this arm would silently strand the hover label in the previous locale until the player next gained XP.",
   },
   {
     file: 'hud.ts',
     memos: ['lastXpLevel'],
     reason:
-      "lastXpLevel retains p.level, the integer level xpBarView branched on at the last rebuild (pre-cap level bar versus the MAX LEVEL / overflow labels), so the memo itself is a number and holds no text. It never stands alone: it is one arm of the SINGLE OR gate at hud.ts:9544-9552 whose last arm is `xpLanguage !== this.lastXpLanguage`, with xpLanguage read from getLanguage() one line above it, so a locale switch opens the whole gate and rebuilds the cached XpBarView with fresh game.xp.* resolutions on the very next frame (this block sits at method-body level, not on the mediumHud band). Same composite shape as map_semantic_accessibility_core's lastHash sitting beside lastLanguage.",
+      "lastXpLevel retains p.level, the integer level xpBarView branched on at the last rebuild (pre-cap level bar versus the MAX LEVEL / overflow labels), so the memo itself is a number and holds no text. It never stands alone: it is one arm of the SINGLE OR gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm) whose last arm is `xpLanguage !== this.lastXpLanguage`, with xpLanguage read from getLanguage() one line above it, so a locale switch opens the whole gate and rebuilds the cached XpBarView with fresh game.xp.* resolutions on the very next frame (this block sits at method-body level, not on the mediumHud band). Same composite shape as map_semantic_accessibility_core's lastHash sitting beside lastLanguage.",
   },
   {
     file: 'hud.ts',
@@ -1227,7 +1236,28 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
     // number-or-null field types, -1 is below any count, and the empty string
     // carries none of the separators every real signature has.
     const body = methodBody(strippedHudSource, 'private relocalizeCoordinatorMemos(): void {');
-    const SENTINELS = ['Number.NaN', 'null', '-1', "''"];
+    // PER MEMO, not a global whitelist. The whitelist form ('Number.NaN', 'null',
+    // '-1', "''") reads like a proof and is a heuristic: it cannot see any one
+    // memo's live domain, so a future `lastFooOffset` legitimately reaching -1,
+    // or a `lastBarText` legitimately empty, would be accepted with a clear that
+    // is a no-op and the fix would be silently inert. Each row below pairs the
+    // memo with the ONE sentinel its own field can never hold, and why.
+    const SENTINEL_BY_MEMO: Readonly<Record<string, { value: string; why: string }>> = {
+      lastPlayerFrameHp: { value: 'Number.NaN', why: 'hp is a number; NaN never equals itself' },
+      lastPlayerFrameMaxHp: { value: 'Number.NaN', why: 'max hp is a number' },
+      lastPlayerFrameResource: { value: 'Number.NaN', why: 'resource is a number' },
+      lastPlayerFrameMaxResource: { value: 'Number.NaN', why: 'max resource is a number' },
+      lastResting: {
+        value: 'null',
+        why: 'the field is boolean | null purely so null is unreachable',
+      },
+      lastAnnouncedTargetId: { value: 'null', why: 'a real target id is a number' },
+      lastMailUnread: { value: '-1', why: 'mailIndicatorView clamps the count at 0' },
+      lastLootSettingsSig: { value: "''", why: 'every real sig carries / separators' },
+      lastPetBarSig: { value: "''", why: 'every real sig starts with the pet id and a colon' },
+      lastCompassFacing: { value: 'Number.NaN', why: 'facing is a float; NaN never equals itself' },
+      lastCompassHeading: { value: "''", why: 'a heading is one of the eight rose ids' },
+    };
     const claimed = ANSWERED.filter(
       (row) => row.file === 'hud.ts' && row.answer === 'this.relocalizeCoordinatorMemos',
     ).flatMap((row) => [...row.memos]);
@@ -1244,8 +1274,25 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
         continue;
       }
       const value = match[1].trim();
-      if (!SENTINELS.includes(value)) {
-        failures.push(`${memo}: cleared to ${value}, which live data could equal`);
+      const expected = SENTINEL_BY_MEMO[memo];
+      if (!expected) {
+        failures.push(`${memo}: claimed by the coordinator arm with no sentinel recorded for it`);
+      } else if (value !== expected.value) {
+        failures.push(
+          `${memo}: cleared to ${value}, not the ${expected.value} its own field needs (${expected.why})`,
+        );
+      }
+    }
+    // THE REVERSE SWEEP. Everything above walks CLAIMED memos; a memo cleared in
+    // the arm but classified as an exemption elsewhere passes both this and the
+    // classified-twice check, and the exemption would then be arguing that a
+    // field the coordinator actively repaints holds no text.
+    const claimedSet = new Set(claimed);
+    for (const [, memo] of body.matchAll(/this\.(\w+)\s*=/g)) {
+      if (!claimedSet.has(memo)) {
+        failures.push(
+          `${memo}: cleared by the coordinator arm but not claimed by any ANSWERED row`,
+        );
       }
     }
     // The compass rose labels are the one surface a clear cannot reach: they are

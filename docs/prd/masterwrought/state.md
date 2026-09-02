@@ -12696,6 +12696,15 @@ full suite found them. A fix round is a content change and owes the same sweep.
    one-line additions-only diff (reins_rickshaw_mount, the dev-grant-only mount
    whose two siblings were already pinned), so the tree is ratified as it stands
    in substance and made honest in its doctrine.
+   DISCLOSED, because the framing above is about branch-only ids and this one is
+   not: reins_rickshaw_mount is RELEASE-OWNED. Its def exists on origin/main and
+   on origin/release/v0.42.0 and is absent from the golden on both, so the
+   re-mint closes an UPSTREAM gap from a feature branch rather than pinning
+   anything masterwrought minted. That makes the pin safer than the
+   branch-only-permanence argument implies, and it is also why the equality arm
+   added at the review round couples this branch to upstream content: a sync
+   that brings a new id owes the re-mint in the same merge. Accepted with the
+   maintainer's ruling, which is what the cadence now means.
    THE CONSEQUENCE LINE, because the tree has changed what the doctrine means:
    with every branch-only id pinned, the "delete outright" escape at
    src/sim/content/CLAUDE.md is closed IN PRACTICE, and a Phase-20 cut of any of

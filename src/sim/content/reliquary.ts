@@ -292,6 +292,14 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // ocular un-pended it on that ruling's own condition, so the pending list is
 // mounts-only now.
 //
+// ONE CONSEQUENCE, recorded 2026-09-01 under masterwrought ruling
+// qr-19-shipped-id-golden-remint-cadence: reins_rickshaw_mount's id is now
+// pinned in tests/shipped_item_ids.golden.json, which makes it permanent API.
+// The DELETE arm of this pending question is therefore closed for it, and the
+// retirement remedy that replaces deletion is degenerate here, because the item
+// has no acquisition path to drop. Settling the row upward (give it a source)
+// stays available; settling it downward no longer means removing the def.
+//
 // Keys are typed against the live mount ladder so a misspelled or renamed key
 // fails tsc at the authoring site instead of falling through to the pending
 // pin one layer later.

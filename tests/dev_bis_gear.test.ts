@@ -186,6 +186,11 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         `${cls} dev bis flagged picks: ${flagged.join(', ')}`,
       ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
     }
+    // The bound is imported and the code under test reads the SAME constant, so
+    // both sides of that comparison move together on a cap edit. Pin the value
+    // once here, the way masterwrought_cap and masterwrought_tooltip already do,
+    // so this file is self-contained about what the cap is.
+    expect(MASTERWROUGHT_EQUIP_CAP).toBe(2);
     expect(
       [...flaggedByClass].filter(([, flagged]) => flagged.length > 0),
       'OBSERVATION 2026-09-01: no class outfit picks a flagged piece. If this reds, a flagged piece has re-entered a dev loadout: re-read the placement ruling before re-cutting any band around it',
@@ -235,7 +240,21 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     // up and is what the placement ruling accepts. Pinned by id in both
     // directions: a regression that puts the crafted shield back over the raid
     // line reds here as well as in tests/masterwrought_budget.test.ts.
-    expect(warrior.offhand).toBe('bulwark_of_the_inner_crucible');
+    // DERIVED, not a hand-picked winner: this literal has already rotted once
+    // (it read heroic_bonewrought_bulwark until the v0.42.0 merge moved the slot
+    // one tier up), which is precisely the argmax-literal trap the mainhand
+    // above avoids. Re-derive with the module's own scoring over the same
+    // candidate shape and assert the pick IS that argmax.
+    const offhandPool = Object.values(ITEMS)
+      .filter(
+        (i) =>
+          i.quality === 'epic' &&
+          // canEquipItemInSlot owns the two-hand exclusion for this slot, so
+          // there is no hand term here (and no narrowing to reach one).
+          canEquipItemInSlot('warrior', i, 'offhand', null),
+      )
+      .sort((a, b) => devScore(b) - devScore(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    expect(warrior.offhand).toBe(offhandPool[0].id);
     const offhand = ITEMS[warrior.offhand as string];
     expect(offhand.masterwrought).toBeUndefined();
     expect(offhand.kind === 'armor' && 'shield' in offhand && offhand.shield === true).toBe(true);
@@ -261,11 +280,15 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
     // assertion cannot say WHY it moved; this can. Any future def that enters
     // or leaves a pick reds here first, naming the class and the slot, and a
     // reviewer decides before a band is re-cut around it.
-    const flaggedPicks = (cls: (typeof CLASSES)[number]): string[] =>
-      Object.entries(bestEpicGearFor(cls, null))
+    // ONE filter, used by the sweep and by its own control below, so the control
+    // really exercises the code the sweep runs.
+    const flaggedFrom = (picks: Record<string, string | undefined>): string[] =>
+      Object.entries(picks)
         .filter(([, id]) => id && ITEMS[id as string]?.masterwrought)
         .map(([slot, id]) => `${slot}:${id}`)
         .sort();
+    const flaggedPicks = (cls: (typeof CLASSES)[number]): string[] =>
+      flaggedFrom(bestEpicGearFor(cls, null) as Record<string, string | undefined>);
     // RE-AUTHORED to the merged truth rather than flipped and hoped: every
     // class's flagged set is EMPTY. Before the release/v0.42.0 merge the
     // warrior wore mainhand:duskforged_warblade plus neck:wyrmfall_pendant and
@@ -284,11 +307,18 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       Object.values(ITEMS).filter((d) => d.masterwrought).length,
       'the flagged family is really there',
     ).toBe(17);
-    const anyFlaggedId = Object.values(ITEMS).find((d) => d.masterwrought)?.id as string;
+    // AND the helper itself really reads the flag. The first draft of this guard
+    // re-spelled the predicate inline (`ITEMS[anyFlaggedId]?.masterwrought`),
+    // which is true by construction because that id was FOUND by the same
+    // predicate: a flaggedPicks mutated to return [] passed it, which is exactly
+    // the "helper that stopped looking" hole the guard claimed to close. Drive
+    // the helper's own filter over a synthetic loadout instead.
+    const flaggedId = Object.values(ITEMS).find((d) => d.masterwrought)?.id as string;
+    expect(flaggedId, 'the catalog really has a flagged def').toBeTruthy();
     expect(
-      flaggedPicks('warrior').length + (ITEMS[anyFlaggedId]?.masterwrought ? 1 : 0),
-      'the flag predicate this arm runs on really returns true for a flagged def',
-    ).toBe(1);
+      flaggedFrom({ neck: flaggedId, chest: 'no_such_item_id' }),
+      'the flag filter this arm runs on does not see a flagged pick',
+    ).toEqual([`neck:${flaggedId}`]);
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {

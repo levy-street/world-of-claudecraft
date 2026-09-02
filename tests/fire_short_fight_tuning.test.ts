@@ -180,10 +180,12 @@ function canPress(p: Entity, id: string): boolean {
 // written at the code rather than left to be rediscovered (RULED 2026-09-01,
 // masterwrought qr-19-ignite-bank-estimator-rate). Two DIFFERENT rates bank
 // Ignite in the sim. A fire CRIT banks ignitionPct (0.3) through igniteOnCrit
-// (src/sim/combat/fire_mage.ts:353-354). A Meteor ground impact banks
-// igniteFrac (0.4) through the groundAoE effect
-// (src/sim/content/classes.ts:8080, applied at src/sim/sim.ts:6824-6825), and
-// it banks that INSTEAD of, never as well as, the crit rate: igniteOnCrit
+// (src/sim/combat/fire_mage.ts, reading the fire mastery's global ignitionPct,
+// authored in src/sim/content/talents_classic.ts). A Meteor ground impact banks
+// igniteFrac (0.4) instead, through the igniteFrac field on its groundAoE
+// effect (src/sim/content/classes.ts), applied by the groundAoE pulse in
+// src/sim/sim.ts, and it banks that INSTEAD of, never as well as, the crit
+// rate: igniteOnCrit
 // returns early on `ability === null`, which is exactly what the groundAoE
 // path passes. So both estimator branches below use 0.3 where the sim uses
 // 0.4 on every Meteor impact, crit or not.
@@ -557,7 +559,8 @@ describe('sustained parity, entire fight (Monte Carlo follow-up 2026-07-24)', ()
   it('Ignite conservation: the bank pays out once, buffs never double-dip (review P1)', () => {
     // Paid Ignite over the full buffed rotation must not exceed what the
     // crits banked. The rate is the fire mastery's ignitionPct, 30% per crit
-    // (src/sim/content/talents_classic.ts:154), NOT the 40% this comment
+    // (the fire mastery global in src/sim/content/talents_classic.ts), NOT the
+    // 40% this comment
     // claimed until 2026-09-01: 40% is igniteFrac, the Meteor ground-impact
     // rate, which the ESTIMATOR deliberately does not model (see the
     // IGNITION_PCT header). Rounding can add fractions of a point per

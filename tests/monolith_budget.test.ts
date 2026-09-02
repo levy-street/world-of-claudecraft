@@ -436,7 +436,12 @@ const MONOLITHS: MonolithRow[] = [
     // it. The merged file lands ONE line above where it started, so the 11
     // lines of slack an earlier merge had left are given back and the
     // zero-slack posture returns: any further growth reds again.
-    ceiling: 18718,
+    // LOWERED again 18718 -> 18716 at the 19D review round: the rest badge's
+    // DOM half (the on/off class plus BOTH of its text sinks) moved out to
+    // src/ui/rest_indicator_painter.ts, which paid for writing the accessible
+    // name beside the tooltip AND for the two-line arena-signature note.
+    // Exact count, zero slack.
+    ceiling: 18716,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

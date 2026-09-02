@@ -55,8 +55,10 @@ export function parseCarryLocalCli(argv: readonly string[]): {
 export function parseCarryLocalArgs(
   tokens: readonly string[],
 ): Array<{ file: string; runs: number[] }>;
+export const PRUNE_MAX_DROPS: number;
 export function pruneMissingRows(
   table: Record<string, unknown>,
   exists: (file: string) => boolean,
-): { table: Record<string, unknown>; gone: string[] };
+  options?: { maxDrops?: number },
+): { table: Record<string, unknown>; gone: string[]; refusal: string | null };
 export function serializeWeightTable(table: Record<string, unknown>): string;

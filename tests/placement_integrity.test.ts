@@ -192,12 +192,22 @@ function reachesRoad(x0: number, z0: number): boolean {
 //
 // A RADIAL rim-slope walk (the literal generalization of the Highwatch pin's
 // spoke comparison) was measured first and REFUSED, so the next reader does
-// not re-derive it: over the 901 surviving open-world pads it reports 389
-// over-gate steps on natural terrain (worst 13.64 yd at the Duskfall dungeon
-// door pad) and 468 on the calm lift alone. Rim climbability in every radial
-// direction is not a property this roster has or needs, because a player
-// routes AROUND a cliff. The escape walk models that; the radial form does not.
-const PAD_ESCAPE_MARGIN = 6;
+// not re-derive it. The measurement, with the parameters it needs to be
+// reproducible: 8 spokes, a 1 yd radial step, a strict `>` against
+// PLAYER_MAX_CLIMB_SLOPE, walked from rIn+1 to rOut over the 901 surviving
+// open-world pads. It reports 389 over-gate steps against the LIVE terrain
+// field (terrainHeight) and 468 against the calm-lifted field; the worst single
+// step is 13.64 yd at the IGNIVAR KEEP door pad (503.05, 2243.70), which passes
+// both the road walk and the escape walk. Rim climbability in every radial
+// direction is not a property this roster has or needs, because a player routes
+// AROUND a cliff. The escape walk models that; the radial form does not.
+// The one hand-chosen number here, and it is a SEARCH BOUND rather than a
+// threshold: the walk must actually get CLEAR of the ring, not merely take one
+// step past it, so success is measured at rOut plus this margin and the queue
+// is bounded by the same distance. Three lattice cells. It cannot make a
+// failing pad pass (a wider margin only asks for more walking); the CLIMB and
+// DROP gates are what decide the verdict, and those are the live constants.
+const PAD_ESCAPE_MARGIN = 3 * WALK_CELL;
 
 /** True when a walk from the pad centre leaves its surviving ring under the
  *  climb gate. `h` is injected so the arm below can be driven over synthetic
@@ -207,6 +217,7 @@ function escapesPad(
   row: Pick<CalmPadRow, 'x' | 'z'>,
   rOut: number,
   h: (x: number, z: number) => number,
+  waterAt: (x: number, z: number) => number = (x, z) => waterLevelAt(x, z, SEED),
 ): boolean {
   const limit = rOut + PAD_ESCAPE_MARGIN;
   const sx = Math.round(row.x / WALK_CELL) * WALK_CELL;
@@ -228,16 +239,24 @@ function escapesPad(
       const key = `${nx},${nz}`;
       if (seen.has(key)) continue;
       const d = Math.hypot(nx - row.x, nz - row.z);
-      if (d > limit) continue;
+      if (d > limit + WALK_CELL) continue;
       const hNext = h(nx, nz);
-      const wl = waterLevelAt(nx, nz, SEED);
+      const wl = waterAt(nx, nz);
       const swim = wl !== -Infinity && hNext < wl;
+      // FORWARD, unlike reachesRoad above. That walk searches in REVERSE (pad
+      // out to a road) and so reads the forward climb as `hHere - hNext`; this
+      // one walks the direction the player actually travels, centre outward, so
+      // the climb is `hNext - hHere` and the drop is `hHere - hNext`. Copying
+      // the reverse form here gated the outward CLIMB at the hop-down cap (8 yd
+      // over a 2 yd cell) and the outward DROP at the climb gate, which waves a
+      // 7 yd wall through and refuses a legal 4 yd hop down; the control below
+      // drives exactly those two cases.
       if (
         !swim &&
-        (hHere - hNext > PLAYER_MAX_CLIMB_SLOPE * WALK_CELL || hNext - hHere > WALK_DROP_MAX)
+        (hNext - hHere > PLAYER_MAX_CLIMB_SLOPE * WALK_CELL || hHere - hNext > WALK_DROP_MAX)
       )
         continue;
-      if (d > rOut) return true;
+      if (d > rOut + PAD_ESCAPE_MARGIN) return true;
       seen.add(key);
       queue.push([nx, nz]);
     }
@@ -325,13 +344,20 @@ describe('every placement is walkable from the road network', () => {
     // which is memoized on a rounded cell and may leave through a NEIGHBOUR's
     // graded ground; this one has to leave THIS ring.
     const failures: string[] = [];
+    let walked = 0;
     for (const row of openWorldPads) {
       const rOut = survivingROut(row);
       if (rOut === null) continue;
+      walked++;
       if (!escapesPad(row, rOut, hAt)) {
         failures.push(`${row.category} (${row.x}, ${row.z}) rOut=${rOut.toFixed(1)}`);
       }
     }
+    // OCCUPANCY FLOOR. Every pad here is skipped when its skirt is dropped, so a
+    // calmSkirtWidth regression that returned null everywhere would empty this
+    // arm and pass green over nothing. 901 walk today; the floor sits under that
+    // with room for ordinary roster churn.
+    expect(walked, 'the escape sweep walked almost no pads').toBeGreaterThanOrEqual(800);
     expect(failures, failures.join('; ')).toEqual([]);
   });
 
@@ -341,12 +367,24 @@ describe('every placement is walkable from the road network', () => {
     // from `return true`. Synthetic ground, driven through the same function
     // the arm above uses.
     const pad = { x: 0, z: 0 };
-    const flat = (): number => 0;
-    const walled = (x: number, z: number): number => (Math.hypot(x, z) > 10 ? 100 : 0);
-    const pit = (x: number, z: number): number => (Math.hypot(x, z) > 10 ? -100 : 0);
-    expect(escapesPad(pad, 10, flat), 'flat ground must escape').toBe(true);
-    expect(escapesPad(pad, 10, walled), 'a wall at the ring edge must refuse').toBe(false);
-    expect(escapesPad(pad, 10, pit), 'a lethal drop at the ring edge must refuse').toBe(false);
+    // Fully synthetic: the water probe is injected too, so the control cannot
+    // depend on the live water field near the origin (a swimmable cell would
+    // let the pit case escape and silently invert the assertion).
+    const dry = (): number => -Infinity;
+    const ring = (inside: number, outside: number) => (x: number, z: number) =>
+      Math.hypot(x, z) > 10 ? outside : inside;
+    const escapes = (h: (x: number, z: number) => number) => escapesPad(pad, 10, h, dry);
+    expect(escapes(ring(0, 0)), 'flat ground must escape').toBe(true);
+    expect(escapes(ring(0, 100)), 'a wall at the ring edge must refuse').toBe(false);
+    expect(escapes(ring(0, -100)), 'a lethal drop at the ring edge must refuse').toBe(false);
+    // AT THE THRESHOLDS, which is what an extreme-only control cannot see: a
+    // +100 wall and a -100 pit are refused under EITHER gate orientation, so
+    // they certify nothing about the gates themselves. These two do: a 7 yd rise
+    // is over the climb gate (PLAYER_MAX_CLIMB_SLOPE * WALK_CELL = 3) and under
+    // the hop-down cap (8), and a 4 yd drop is the reverse. With the climb and
+    // drop terms swapped, both of these invert.
+    expect(escapes(ring(0, 7)), 'a rise over the climb gate must refuse').toBe(false);
+    expect(escapes(ring(0, -4)), 'a drop under the hop-down cap must escape').toBe(true);
   });
 });
 

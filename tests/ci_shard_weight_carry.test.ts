@@ -26,6 +26,7 @@ import {
   medianMs,
   missingWeightFiles,
   modes,
+  PRUNE_MAX_DROPS,
   parseCarryLocalArgs,
   parseCarryLocalCli,
   pruneMissingRows,
@@ -881,6 +882,53 @@ describe('the harvest entry: the local-carry modes (an injected spawner)', () =>
     expect(out).toContain('is not <path>=<ms>');
     expect(entryIo.writeFileSync).not.toHaveBeenCalled();
   });
+
+  // --prune-missing, the third mode. The pure half is pinned above; these drive
+  // the WIRING, which is where an inverted callback, a dropped refusal or a
+  // missing write would live and where nothing looked before.
+  it('--prune-missing writes nothing when every row names a file that exists', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.existsSync.mockReturnValue(true);
+    const { exitCode, out } = await runEntry(['--prune-missing']);
+    expect(exitCode).toBe(0);
+    expect(out).toContain('nothing to do');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  it('--prune-missing drops exactly the absent row and writes the table', async () => {
+    // baseTable() carries ONE row, and dropping it would trip the empty-table
+    // refusal rather than exercising the write, so this arm brings its own
+    // two-row table: one harvested (the victim) and the shared carried row.
+    const base = baseTable() as Record<string, unknown> & {
+      __provenance: { files: number; harvestedFiles: number };
+    };
+    const victim = 'tests/victim.test.ts';
+    base[victim] = 55;
+    base.__provenance = { ...base.__provenance, files: 2, harvestedFiles: 1 };
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(base));
+    entryIo.existsSync.mockImplementation(((p: string) => !String(p).endsWith(victim)) as never);
+    const { exitCode, out } = await runEntry(['--prune-missing']);
+    expect(exitCode).toBe(0);
+    expect(out).toContain(`dropped ${victim}`);
+    expect(entryIo.writeFileSync).toHaveBeenCalledTimes(1);
+    const written = JSON.parse(entryIo.writeFileSync.mock.calls[0][1] as string);
+    expect(Object.keys(written)).not.toContain(victim);
+    // The callback is really consulted per row, and in the right sense: an
+    // INVERTED `exists` would drop everything else and keep this one.
+    expect(tableRows(written).length).toBe(1);
+  });
+
+  it('--prune-missing REFUSES a mass prune and writes nothing', async () => {
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.existsSync.mockReturnValue(false);
+    const { exitCode, out } = await runEntry(['--prune-missing']);
+    // This fixture is small enough that the DROP BOUND is never reached, which
+    // is exactly how the first draft of this mode would have written an emptied
+    // table: the arm found it, and the empty-table refusal is the fix.
+    expect(exitCode).toBe(1);
+    expect(out).toContain('refusing to prune EVERY row');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
 });
 
 describe('pruneMissingRows: dropping a retired row without hand-editing the table', () => {
@@ -945,6 +993,54 @@ describe('pruneMissingRows: dropping a retired row without hand-editing the tabl
     const snapshot = JSON.stringify(input);
     pruneMissingRows(input, (file) => file !== 'tests/b.test.ts');
     expect(JSON.stringify(input)).toBe(snapshot);
+  });
+
+  it('REFUSES a mass prune, which the table contract cannot catch', () => {
+    // The dangerous case, and carriedDefects is blind to it BY CONSTRUCTION:
+    // pruneMissingRows preserves harvestedFiles + carried == rows whatever it
+    // drops, so an emptied table has a self-consistent provenance and no
+    // defects at all. A wrong-root or wrong-tree `exists` callback (a sparse
+    // checkout, a partial clone, a branch predating most tests) is the live
+    // trigger. Shown both ways: the emptied result really does pass the
+    // contract, and the floor really does refuse it.
+    const emptied = { __provenance: { ...table().__provenance }, ...{} } as Record<string, unknown>;
+    (emptied.__provenance as { files: number; harvestedFiles: number; carried: object }).files = 0;
+    (emptied.__provenance as { harvestedFiles: number }).harvestedFiles = 0;
+    (emptied.__provenance as { carried: object }).carried = {};
+    expect(
+      carriedDefects(emptied, { fallbackMs: 41, requireMap: true }),
+      'an emptied table passes the contract, which is why the floor exists',
+    ).toEqual([]);
+
+    const { table: out, gone, refusal } = pruneMissingRows(table(), () => false, { maxDrops: 1 });
+    expect(refusal, 'a prune past the bound must be refused').toContain('refusing to prune');
+    expect(gone).toHaveLength(3);
+    expect(out, 'a refused prune returns the table untouched').toEqual(table());
+    expect(PRUNE_MAX_DROPS).toBe(25);
+  });
+
+  it('handles a MIXED drop, and tables missing the optional provenance fields', () => {
+    // The arithmetic that can invert is `gone.length - goneCarried`, and neither
+    // single-kind arm above exercises it: drop one harvested AND one carried in
+    // the same call.
+    const { table: out, gone } = pruneMissingRows(
+      table(),
+      (file) => file !== 'tests/b.test.ts' && file !== 'tests/c.test.ts',
+    );
+    expect(gone.sort()).toEqual(['tests/b.test.ts', 'tests/c.test.ts']);
+    const prov = (out as { __provenance: { files: number; harvestedFiles: number } }).__provenance;
+    expect(prov.files).toBe(1);
+    // One of the two was carried, so only the other decrements harvestedFiles.
+    expect(prov.harvestedFiles).toBe(1);
+    expect(carriedDefects(out, { fallbackMs: 41, requireMap: true })).toEqual([]);
+
+    // Both optional provenance fields are guarded branches; drive them.
+    const bare = { __provenance: { run: '1' }, 'tests/a.test.ts': 10, 'tests/b.test.ts': 20 };
+    const pruned = pruneMissingRows(bare, (file) => file !== 'tests/b.test.ts');
+    const bareProv = (pruned.table as { __provenance: Record<string, unknown> }).__provenance;
+    expect(bareProv.files).toBe(1);
+    expect(bareProv.harvestedFiles, 'absent harvestedFiles is left absent').toBeUndefined();
+    expect(bareProv.carried).toBeUndefined();
   });
 
   it('a prune that moved the WRONG attribution would fail the table contract', () => {

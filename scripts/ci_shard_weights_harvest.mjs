@@ -108,7 +108,16 @@ if (process.argv[2] === '--carry-local') {
   // weight, and it refuses to write a table that fails carriedDefects.
   const table = JSON.parse(readFileSync(target, 'utf8'));
   const before = table.__provenance ?? {};
-  const { table: out, gone } = pruneMissingRows(table, (file) => existsSync(resolve(ROOT, file)));
+  const {
+    table: out,
+    gone,
+    refusal,
+  } = pruneMissingRows(table, (file) => existsSync(resolve(ROOT, file)));
+  if (refusal) {
+    console.error(`[prune-missing] ${refusal}`);
+    console.error(`[prune-missing] first few: ${gone.slice(0, 5).join(', ')}`);
+    process.exit(1);
+  }
   if (gone.length === 0) {
     console.log('[prune-missing] every measured row names a file that exists; nothing to do');
     process.exitCode = 0;
