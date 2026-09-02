@@ -1126,7 +1126,9 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
       // rollGroup, 0.04 each (0.40 total: at most one pattern per kill, 60% of
       // kills shed none). APPENDED AT THE TAIL by contract: loot_roll.ts
       // consumes rng draws in array order (one draw per rollGroup at its first
-      // member's index), so a tail append leaves every existing draw's stream
+      // member's index; a normalOnly group draws nothing on a heroic claim, and
+      // no row in this table is normalOnly), so a tail append leaves every
+      // existing draw's stream
       // position byte-identical WITHIN THE BASE WALK (a heroic claim's
       // HEROIC_BOSS_LOOT draws roll after the base table in the same rollLoot
       // call, so they sit one draw later; benign, and PINNED since Phase 11f,
