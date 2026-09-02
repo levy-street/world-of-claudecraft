@@ -2846,9 +2846,9 @@ export const guideStrings = {
         // Superseded by materialsBodyThreeRods below, wired through the
         // bodyKey override in src/guide/pages/professions_craft.ts, and listed
         // in scripts/i18n_retired_keys.mjs; kept so the overlay rows it still
-        // carries never strand (kept, not reviewed: the five non-Latin ones were
-        // stale and all of its translated rows count two rods; the
-        // reword-is-a-new-key convention).
+        // carries never strand (kept, not reviewed: its ten Latin translations
+        // count two rods and its five non-Latin rows predate the rod sentence
+        // altogether; the reword-is-a-new-key convention).
         materialsBody:
           "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
         materialsBodyThreeRods:

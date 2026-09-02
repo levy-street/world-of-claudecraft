@@ -20406,7 +20406,8 @@ the Phase 20 fill. STATED PLAINLY (the D085 frontend-seam review, the count corr
 fresh read): TEN of those locales (cs_CZ, de_DE, es, es_ES, fr_CA, fr_FR, nl_NL, pt_BR, sv_SE,
 vi_VN) rendered a real translation of the retired body, count-wrong, and render raw English on the
 live engineering page until the Phase 20 fill; the other five (da_DK, id_ID, it_IT, pl_PL, tr_TR)
-were already English (tr_TR never carried the row). The trade is a
+were already English (tr_TR carried no row at the retire tip: its Turkish row was stripped at
+6e93deadc1, the other-game coin strip). The trade is a
 count-wrong translation for correct English, taken deliberately. Two corrections to the
 ratification's own text: the hoe ladder is documented in
 the gathering pages' tools note (guide.profPages.toolsNoteFourStarters since the review round's

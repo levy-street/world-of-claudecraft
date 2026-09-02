@@ -4389,15 +4389,32 @@ describe('Guide professions pages and routes', () => {
       // And nothing that is NOT in the bill: another rod's stem (its own prior
       // rod aside) or a fish the bill does not take. The audit showed a clause
       // could gain a false reagent and stay green.
-      for (const other of stems) {
-        if (other === stem) continue;
-        const isPrior = recipe.reagents.some((x) => ITEMS[x.itemId].name.split(' ')[0] === other);
-        if (!isPrior)
-          expect(wordAt(clause, other), `the ${stem} clause names no ${other}`).toBe(false);
+      const rodStems = new Set([
+        ...stems,
+        ...ROD_RECIPES.flatMap((r) =>
+          r.reagents
+            .map((x) => ITEMS[x.itemId])
+            .filter((it) => it.use?.type === 'gatherTool')
+            .map((it) => it.name.split(' ')[0]),
+        ),
+      ]);
+      const priorStems = new Set(
+        recipe.reagents
+          .map((x) => ITEMS[x.itemId])
+          .filter((it) => it.use?.type === 'gatherTool')
+          .map((it) => it.name.split(' ')[0]),
+      );
+      for (const other of rodStems) {
+        if (other === stem || priorStems.has(other)) continue;
+        expect(wordAt(clause, other), `the ${stem} clause names no ${other}`).toBe(false);
       }
-      for (const fish of fishNames)
-        if (!own.has(fish))
-          expect(clause, `the ${stem} clause takes no ${fish}`).not.toContain(fish);
+      for (const fish of fishNames) {
+        if (own.has(fish)) continue;
+        expect(clause, `the ${stem} clause takes no ${fish}`).not.toContain(fish);
+        const shortFish = fish.split(' ').pop() ?? fish;
+        if (![...own].some((o) => o.endsWith(` ${shortFish}`)))
+          expect(wordAt(clause, shortFish), `the ${stem} clause takes no ${shortFish}`).toBe(false);
+      }
     }
     expect(
       prose('guide.profPages.fish.startBodyThreeRods'),
@@ -4450,17 +4467,17 @@ describe('Guide professions pages and routes', () => {
   it('the engineering materials fills name every rod and fish in their own locale', async () => {
     // The D085 frontend-seam review: the successor's five non-Latin fills were
     // pinned by nothing, and a stale count in a fill is the defect class the
-    // re-key exists to fix. PER CLAUSE (the round-four coverage audit): each
-    // filled locale's prose is cut at that locale's shipped rod names, in
+    // re-key exists to fix. PER CLAUSE (the coverage audits and fresh reads):
+    // each filled locale's prose is cut at that locale's shipped rod names, in
     // ROD_RECIPES order, and each rod's clause must carry its own fish (by that
-    // locale's shipped item name), each fish's COUNT in the locale's numeral
-    // form, and its prior rod. The fifteen Latin locales render English until
-    // the Phase 20 fill and are deliberately not walked here.
+    // locale's shipped item name) with the count BOUND to the fish in the
+    // locale's own order, its prior rod, and nothing that is not in the bill.
+    // The fifteen Latin locales render English until the Phase 20 fill and are
+    // deliberately not walked here.
     const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
     type Filled = (typeof filled)[number];
-    // The numeral each locale's fill uses for a fish count, bound to the
-    // counter it carries (匹, 마리, 条/條) so a bare digit elsewhere in the
-    // clause cannot satisfy it; Russian and Chinese spell the number out.
+    // The numeral each locale's fill uses for a fish count, with its counter
+    // (匹, 마리, 条/條); Russian and Chinese spell the number out.
     const NUMERAL: Record<Filled, Record<number, string[]>> = {
       ja_JP: { 2: ['2匹'], 4: ['4匹'], 8: ['8匹'], 10: ['10匹'] },
       ko_KR: { 2: ['2마리'], 4: ['4마리'], 8: ['8마리'], 10: ['10마리'] },
@@ -4469,8 +4486,8 @@ describe('Guide professions pages and routes', () => {
       ru_RU: { 2: ['два', 'две'], 4: ['четыре'], 8: ['восемь'], 10: ['десять'] },
     };
     // Russian declines every name inside the prose, so its needles are explicit
-    // per-item stems (the audit showed an algorithmic two-letter strip let a
-    // replaced head noun through), each proved by deleting the name in turn.
+    // per-item stems for the REAGENTS (the heads are matched by the full
+    // shipped name), each proved by deleting the name in turn.
     const RU_STEMS: Record<string, string[]> = {
       glimmerfin_koi: ['кои'],
       raw_stonescale_carp: ['сланцеплавников', 'карп'],
@@ -4478,11 +4495,45 @@ describe('Guide professions pages and routes', () => {
       silverstream_fishing_rod: ['серебрян'],
       stormreel_fishing_rod: ['штормов'],
       tidewrought_fishing_rod: ['приливн'],
+      // Never a reagent, so never a needle: it only feeds the foreign-rod
+      // exclusion below.
       clockreel_fishing_rod: ['часов'],
     };
     const fold = (v: string) => v.toLowerCase().replace(/ё/g, 'е');
-    const needlesFor = (lang: Filled, id: string, localName: string) =>
-      lang === 'ru_RU' ? (RU_STEMS[id] ?? []) : [localName];
+    // The forms a fish may take in a clause: the full shipped name, and for the
+    // koi the short form the fills use after its first mention (錦鯉, 코이,
+    // 锦鲤 / 錦鯉), or the Russian stems.
+    const fishForms = (lang: Filled, id: string, localName: string): string[] => {
+      if (lang === 'ru_RU') return RU_STEMS[id] ?? [];
+      if (id !== 'glimmerfin_koi') return [localName];
+      const short =
+        lang === 'ja_JP'
+          ? (localName.split('の').pop() ?? localName)
+          : lang === 'ko_KR'
+            ? (localName.split(' ').pop() ?? localName)
+            : localName.slice(-2);
+      return [localName, short];
+    };
+    // The count is BOUND to its fish: numeral then name in zh and ru, name then
+    // numeral in ja and ko (a within-clause swap of two counts reds).
+    const bound = (lang: Filled, clause: string, numeral: string, form: string) => {
+      const n = fold(numeral);
+      if (lang === 'zh_CN' || lang === 'zh_TW') return clause.includes(`${n}${form}`);
+      if (lang === 'ja_JP') return clause.includes(`${form}${n}`);
+      if (lang === 'ko_KR') return clause.includes(`${form} ${n}`);
+      const at = clause.indexOf(n);
+      if (at === -1) return false;
+      const stemAt = clause.indexOf(form, at);
+      return stemAt > at && stemAt - at <= 40;
+    };
+    const priorStemOf = (lang: Filled, id: string, localName: string) =>
+      lang === 'ru_RU'
+        ? (RU_STEMS[id] ?? [''])[0]
+        : lang === 'ja_JP'
+          ? localName.split('の')[0]
+          : lang === 'ko_KR'
+            ? localName.split(' ')[0]
+            : localName;
     try {
       for (const lang of filled) {
         await ensureLocaleLoaded(lang);
@@ -4491,78 +4542,86 @@ describe('Guide professions pages and routes', () => {
         expect(body, `${lang} carries a fill`).not.toBe(
           fold(guideStrings.profPages.craftProse.engineering.materialsBodyThreeRods),
         );
-        const rodName = (id: string) => fold(t(`entities.items.${id}.name` as never));
-        // The clause heads are the rods' full shipped names in recipe order;
-        // a prior rod is only ever an EARLIER rod, so a forward search for the
-        // next head never lands on a prior-rod mention.
+        const name = (id: string) => fold(t(`entities.items.${id}.name` as never));
+        // Clause heads: each rod's full shipped name, found forward in recipe
+        // order and then refined to the LAST occurrence before the next head,
+        // so a stray earlier mention of a rod cannot widen its window (a prior
+        // rod is only ever an earlier rod, so it sits after the next head).
+        const heads: number[] = [];
         let cursor = 0;
-        for (const [i, recipe] of ROD_RECIPES.entries()) {
-          const head = rodName(recipe.resultItemId);
-          if (lang === 'ru_RU')
-            expect(
-              RU_STEMS[recipe.resultItemId],
-              `ru stem for ${recipe.resultItemId}`,
-            ).toBeDefined();
-          const start = body.indexOf(head, cursor);
+        for (const recipe of ROD_RECIPES) {
+          const head = name(recipe.resultItemId);
+          const at = body.indexOf(head, cursor);
           expect(
-            start,
+            at,
             `${lang} names ${recipe.resultItemId} (${head}) as a clause head`,
           ).toBeGreaterThan(-1);
-          const next = ROD_RECIPES[i + 1];
-          const paraEnd = body.indexOf('\n\n', start);
-          const stop = next
-            ? body.indexOf(rodName(next.resultItemId), start + head.length)
-            : paraEnd === -1
-              ? body.length
-              : paraEnd;
-          expect(stop, `${lang} ${recipe.resultItemId} clause ends`).toBeGreaterThan(start);
-          const clause = body.slice(start, stop);
-          cursor = stop;
+          heads.push(at);
+          cursor = at + head.length;
+        }
+        for (let i = heads.length - 2; i >= 0; i--) {
+          const head = name(ROD_RECIPES[i].resultItemId);
+          heads[i] = body.lastIndexOf(head, heads[i + 1] - 1);
+        }
+        const paraEnd = body.indexOf('\n\n', heads[heads.length - 1]);
+        const allFish = ROD_RECIPES.flatMap((r) =>
+          r.reagents.map((x) => x.itemId).filter((id) => ITEMS[id].use?.type !== 'gatherTool'),
+        );
+        const allRods = [
+          ...ROD_RECIPES.map((r) => r.resultItemId),
+          ...ROD_RECIPES.flatMap((r) =>
+            r.reagents.map((x) => x.itemId).filter((id) => ITEMS[id].use?.type === 'gatherTool'),
+          ),
+        ];
+        for (const [i, recipe] of ROD_RECIPES.entries()) {
+          const stop = i + 1 < heads.length ? heads[i + 1] : paraEnd === -1 ? body.length : paraEnd;
+          expect(stop, `${lang} ${recipe.resultItemId} clause ends`).toBeGreaterThan(heads[i]);
+          const clause = body.slice(heads[i], stop);
+          const own = new Set(recipe.reagents.map((x) => x.itemId));
           for (const reagent of recipe.reagents) {
             const id = reagent.itemId;
-            const localName = fold(t(`entities.items.${id}.name` as never));
-            const needles = needlesFor(lang, id, localName);
-            expect(needles.length, `${lang} needles for ${id}`).toBeGreaterThan(0);
-            const isRod = ITEMS[id].use?.type === 'gatherTool';
-            if (isRod) {
-              // The prior rod is named by its stem in ja/ko ('その嵐リール'), in
-              // full in zh, declined in ru: the first needle is the stem.
-              const stem =
-                lang === 'ru_RU'
-                  ? needles[0]
-                  : lang === 'ja_JP'
-                    ? localName.split('の')[0]
-                    : lang === 'ko_KR'
-                      ? localName.split(' ')[0]
-                      : localName;
+            const localName = name(id);
+            if (ITEMS[id].use?.type === 'gatherTool') {
+              const stem = priorStemOf(lang, id, localName);
+              expect(stem.length, `${lang} prior-rod stem for ${id}`).toBeGreaterThan(0);
               expect(
                 clause,
                 `${lang} ${recipe.resultItemId} clause names its prior rod ${localName}`,
               ).toContain(stem);
               continue;
             }
-            // The koi is shortened after its first mention the way the English
-            // shortens it to 'Koi' (錦鯉, 코이, 锦鲤 / 錦鯉): the short form is the
-            // name's last segment and is accepted for that fish alone.
-            const koiShort =
-              id === 'glimmerfin_koi' && lang !== 'ru_RU'
-                ? lang === 'ja_JP'
-                  ? (localName.split('の').pop() ?? localName)
-                  : lang === 'ko_KR'
-                    ? (localName.split(' ').pop() ?? localName)
-                    : localName.slice(-2)
-                : null;
-            for (const needle of needles)
+            const forms = fishForms(lang, id, localName);
+            expect(forms.length, `${lang} forms for ${id}`).toBeGreaterThan(0);
+            for (const form of lang === 'ru_RU' ? forms : [forms[0]])
               expect(
-                clause.includes(needle) || (koiShort !== null && clause.includes(koiShort)),
-                `${lang} ${recipe.resultItemId} clause names ${id} (${localName})`,
+                forms.some((f) => clause.includes(f)),
+                `${lang} ${recipe.resultItemId} clause names ${id} (${localName}) [${form}]`,
               ).toBe(true);
-            const forms = NUMERAL[lang][reagent.count];
-            expect(forms, `${lang} numeral for ${reagent.count}`).toBeDefined();
+            const numerals = NUMERAL[lang][reagent.count];
+            expect(numerals, `${lang} numeral for ${reagent.count}`).toBeDefined();
             expect(
-              forms.some((form) => clause.includes(fold(form))),
-              `${lang} ${recipe.resultItemId} clause states ${reagent.count} of ${id}`,
+              numerals.some((numeral) => forms.some((form) => bound(lang, clause, numeral, form))),
+              `${lang} ${recipe.resultItemId} clause binds ${reagent.count} to ${id}`,
             ).toBe(true);
+          }
+          // Nothing that is not in the bill: a fish the bill does not take, or
+          // a rod that is neither this one nor its prior.
+          for (const id of allFish) {
+            if (own.has(id)) continue;
+            const forms = fishForms(lang, id, name(id));
+            // The koi's short form is shared by every koi bill, so only the
+            // distinguishing forms are forbidden.
+            for (const form of forms.filter((f) => f.length >= 4))
+              expect(clause, `${lang} ${recipe.resultItemId} clause takes no ${id}`).not.toContain(
+                form,
+              );
+          }
+          for (const id of allRods) {
+            if (id === recipe.resultItemId || own.has(id)) continue;
+            const stem = priorStemOf(lang, id, name(id));
+            expect(clause, `${lang} ${recipe.resultItemId} clause names no ${id}`).not.toContain(
+              stem,
+            );
           }
         }
       }
