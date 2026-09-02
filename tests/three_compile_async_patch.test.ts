@@ -543,49 +543,64 @@ describe('three colour-write-free shadow depth pass patch', () => {
 
   it('leaves the shadow-map clear whole, on both attachments', () => {
     expect(
-      source.includes('const depthOnlyPass = this.type !== VSMShadowMap;'),
-      'the depth-only pass flag is missing; re-run pnpm install',
+      source.includes('const colorWriteFreePass = this.type !== VSMShadowMap;'),
+      'the colour-write-free pass flag is missing; re-run pnpm install',
     ).toBe(true);
     // Both clears in the map loop (the cube-face arm and the 2D face-0 arm)
     // stay upstream's bare renderer.clear(). A depth-only clear would look like
     // a further saving and is a regression on a tiler; this pins that the
     // reasoning in the header is what the installed bundle actually does.
     expect(
-      source.includes('renderer.clear( ! depthOnlyPass'),
+      source.includes('renderer.clear( ! colorWriteFreePass'),
       'a depth-only shadow-map clear is back; it is a regression on a tiler',
     ).toBe(false);
+    // Both arms still call upstream's bare, whole clear: the colour-mask
+    // re-open is the ONLY line the patch inserts ahead of them.
+    const reopen = 'if ( colorWriteFreePass ) _state.buffers.color.setMask( true );';
     expect(
-      source.includes('renderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\trenderer.clear();'),
+      source.includes(`${reopen}\n\t\t\t\t\t\trenderer.clear();`),
       "the 2D shadow-map clear is no longer upstream's whole clear",
     ).toBe(true);
     expect(
-      source.includes('renderer.setRenderTarget( shadow.map, face );\n\t\t\t\t\trenderer.clear();'),
+      source.includes(`${reopen}\n\t\t\t\t\trenderer.clear();`),
       "the cube-face shadow-map clear is no longer upstream's whole clear",
     ).toBe(true);
-    // The flag exists only to scope the colour-mask restore below, so a build
-    // that lost the restore but kept the flag still reds there.
+    // The flag scopes the colour-mask handling below, so a build that lost
+    // that but kept the flag still reds there.
     expect(
-      unpatchedSibling.includes('depthOnlyPass'),
+      unpatchedSibling.includes('colorWriteFreePass'),
       'the unpatched three.cjs control already carries the flag; the pins above prove nothing',
     ).toBe(false);
   });
 
-  it('restores the colour mask the depth materials closed', () => {
-    // A masked glClear is silently a no-op, so a pass that leaves the mask
-    // closed can blank a later frame clear. three re-opens it in
-    // WebGLBackground, but the pass restores what it changed rather than
-    // relying on every caller, and it must do so BEFORE the render target is
-    // handed back.
+  it('re-opens the colour mask before EVERY clear, not only once per pass', () => {
+    // The load-bearing detail. glClear honours the colour write mask and
+    // WebGLRenderer.clear never re-opens it, so once the first shadow map's
+    // depth material has closed the mask, the clear of a SECOND shadow map in
+    // the same frame is a silent no-op and that map keeps the previous frame's
+    // colour. Only the sun casts here today, so it is latent, not live; the pin
+    // is what keeps it that way if a second shadow-casting light ever lands.
+    const reopen = 'if ( colorWriteFreePass ) _state.buffers.color.setMask( true );';
+    // One per clear in the map loop (cube-face arm, 2D face-0 arm) plus the
+    // end-of-pass restore, so nothing outside this file inherits a closed mask.
+    expect(source.split(reopen).length - 1).toBe(3);
+    // Each loop re-open must sit immediately before its own clear, or it
+    // guards nothing.
     expect(
-      source.includes('if ( depthOnlyPass ) _state.buffers.color.setMask( true );'),
-      'the shadow pass no longer restores the colour mask; re-run pnpm install',
+      source.includes(`renderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\t${reopen}`),
+      'the 2D shadow-map clear is no longer preceded by the colour-mask re-open',
     ).toBe(true);
-    const restore = source.indexOf('if ( depthOnlyPass ) _state.buffers.color.setMask( true );');
+    expect(
+      source.includes(`renderer.setRenderTarget( shadow.map, face );\n\t\t\t\t\t${reopen}`),
+      'the cube-face shadow-map clear is no longer preceded by the colour-mask re-open',
+    ).toBe(true);
+    // And the end-of-pass restore still lands before the render target is
+    // handed back to the caller.
     const handBack = source.indexOf(
       'renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );',
     );
-    expect(restore).toBeGreaterThan(0);
-    expect(restore).toBeLessThan(handBack);
+    expect(source.lastIndexOf(reopen)).toBeGreaterThan(0);
+    expect(source.lastIndexOf(reopen)).toBeLessThan(handBack);
   });
 
   it('leaves the program cache key free of colorWrite, so no program relinks', () => {
@@ -605,8 +620,8 @@ describe('three colour-write-free shadow depth pass patch', () => {
   it('records the hunk in the checked-in patch file', () => {
     const patch = readFileSync(new URL('../patches/three@0.185.1.patch', import.meta.url), 'utf8');
     expect(
-      patch.includes('+\t\tconst depthOnlyPass = this.type !== VSMShadowMap;'),
-      'the depth-only pass flag is missing from patches/three@0.185.1.patch',
+      patch.includes('+\t\tconst colorWriteFreePass = this.type !== VSMShadowMap;'),
+      'the colour-write-free pass flag is missing from patches/three@0.185.1.patch',
     ).toBe(true);
     expect(
       patch.includes('-\t\t\t\t\t\trenderer.clear();'),
@@ -617,8 +632,14 @@ describe('three colour-write-free shadow depth pass patch', () => {
       'the depth-material colour-mask write is missing from patches/three@0.185.1.patch',
     ).toBe(true);
     expect(
-      patch.includes('+\t\tif ( depthOnlyPass ) _state.buffers.color.setMask( true );'),
+      patch.includes('+\t\tif ( colorWriteFreePass ) _state.buffers.color.setMask( true );'),
       'the colour-mask restore is missing from patches/three@0.185.1.patch',
+    ).toBe(true);
+    expect(
+      patch.includes(
+        '+\t\t\t\t\t\tif ( colorWriteFreePass ) _state.buffers.color.setMask( true );',
+      ),
+      'the per-clear colour-mask re-open is missing from patches/three@0.185.1.patch',
     ).toBe(true);
   });
 });

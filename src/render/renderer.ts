@@ -649,7 +649,12 @@ import {
   resetShadowCadence,
   updateShadowCadence,
 } from './shadow_cadence_core';
-import { createShadowExtent, resetShadowExtent, updateShadowExtent } from './shadow_extent_core';
+import {
+  createShadowExtent,
+  resetShadowExtent,
+  shadowExtentHalf,
+  updateShadowExtent,
+} from './shadow_extent_core';
 import {
   type ShadowAnchor,
   shadowTexelWorldSize,
@@ -2289,23 +2294,18 @@ export class Renderer {
     sun.shadow.mapSize.set(GFX.shadowMap, GFX.shadowMap);
     sun.shadow.camera.near = 30;
     sun.shadow.camera.far = 480;
-    // 105u half-extent: the 31° sun throws shadows ~1.7x an object's height,
-    // so the frustum must reach further sunward than the old 95 to catch
-    // off-screen casters; ~5.1cm texels at 4096 and ~8.2cm at High's 2560,
-    // which the PCF radius below softens over anyway. (115 cost real
-    // shadow-pass draw calls at ultra; 105 keeps most of the reach.) This is
-    // the BASE: applyShadowShed writes the live box, which the budget
-    // governor shrinks under sustained pressure (shadow_extent_core.ts).
+    // 105u BASE half-extent: the 31° sun throws shadows ~1.7x an object's
+    // height, so the frustum must reach further sunward than the old 95 to
+    // catch off-screen casters (115 cost real shadow-pass draws at ultra).
+    // applyShadowShed writes the LIVE box; shadow_extent_core.ts bounds it.
     this.shadowBaseExtent = LOW_GFX ? 85 : 105;
     sun.shadow.bias = -0.0006;
-    // 0.05 pushed contact shadows clean off clod/prop-scale relief; 0.035
-    // still clears acne on the low-poly facets
+    // 0.05 pushed contact shadows off clod-scale relief; 0.035 still clears acne
     sun.shadow.normalBias = LOW_GFX ? 0.02 : 0.035;
     sun.shadow.radius = 2.25;
-    // The REAL map size three will use: WebGLShadowMap scales a requested
-    // mapSize down to the GPU's maxTextureSize at render time, so an
-    // unclamped derivation would quantize to a fraction of a real texel on a
-    // capped device and quietly lose the anti-swimming property.
+    // The REAL map size three will use: it clamps a requested mapSize to
+    // maxTextureSize, and an unclamped derivation would quantize to a
+    // fraction of a real texel on a capped device.
     this.shadowMapTexels = Math.min(GFX.shadowMap, this.webgl.capabilities.maxTextureSize);
     this.scene.add(sun);
     this.scene.add(sun.target);
@@ -4361,6 +4361,10 @@ export class Renderer {
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
       shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      // The live extent shed: a capture must state its step to be comparable.
+      shadowExtentStep: this.shadowExtent.step,
+      shadowExtentScale: this.shadowExtent.scale,
+      shadowExtentHalf: shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale),
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
@@ -4604,16 +4608,13 @@ export class Renderer {
   }
 
   /** Apply both budget-governed shadow sheds, from the top of sync() so the
-   *  bounded prewarm's and census probe's save/restore of the shadowMap flags
-   *  is self-healing (shadow_cadence_core.ts and shadow_extent_core.ts own
-   *  the decisions and the reasoning). */
+   *  prewarm's and census probe's save/restore of the shadowMap flags heals
+   *  itself (shadow_cadence_core.ts / shadow_extent_core.ts own the rules). */
   private applyShadowShed(): void {
-    // The live ortho box. Every consumer reads it from the camera
-    // (foliage_shadow_core via setFoliageShadowVolume) or from
-    // shadowTexelWorld, so writing it here is the whole wiring; nothing
-    // caches the base extent.
+    // The live ortho box: consumers read it back off the camera, so this write
+    // is the whole wiring.
     const cam = this.sun.shadow.camera;
-    const extent = this.shadowBaseExtent * this.shadowExtent.scale;
+    const extent = shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale);
     if (cam.top !== extent) {
       cam.left = -extent;
       cam.right = extent;
@@ -4626,9 +4627,8 @@ export class Renderer {
     const shadowMap = this.webgl.shadowMap;
     const autoUpdate = !this.shadowCadence.halfRate;
     if (shadowMap.autoUpdate !== autoUpdate) shadowMap.autoUpdate = autoUpdate;
-    // Under half rate three skips the pass when both flags are false and
-    // clears needsUpdate after each rendered pass, so the every-other-frame
-    // arm is exactly this write.
+    // Under half rate three skips the pass when both flags are false and clears
+    // needsUpdate after each pass, so the every-other-frame arm is this write.
     if (!autoUpdate && this.shadowCadence.renderThisFrame) shadowMap.needsUpdate = true;
   }
 

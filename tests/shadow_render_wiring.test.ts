@@ -1,6 +1,10 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
+import {
+  SHADOW_EXTENT_BASE_YARDS,
+  SHADOW_EXTENT_PROXY_RANGE_YARDS,
+} from '../src/render/shadow_extent_core';
 
 // Source-scan guard for the renderer WIRING of the shadow features whose
 // logic lives in pure cores (shadow_texel_snap_core.ts, shadow_cadence_core.ts,
@@ -55,9 +59,35 @@ describe('shadow feature renderer wiring', () => {
     expect(shed).not.toMatch(/shadowTexelWorldSize\(\s*2 \* this\.shadowBaseExtent/);
   });
 
-  it('writes the live ortho box from the base times the governor shed scale', () => {
+  it('cross-pins the constants the extent core restates from renderer.ts', () => {
+    // shadow_extent_core.ts imports nothing (pinned below), so it carries COPIES
+    // of the base half-extent and the proxy-shadow range. Copies drift silently:
+    // these are the only checks that keep the core's fairness argument true.
+    const base = Number(
+      /this\.shadowBaseExtent = LOW_GFX \? [\d.]+ : ([\d.]+);/.exec(rendererSource)?.[1],
+    );
+    const proxySq = Number(
+      /const ENTITY_PROXY_SHADOW_RANGE_SQ = (\d+) \* \d+;/.exec(rendererSource)?.[1],
+    );
+    expect(base, 'shadowBaseExtent not found in renderer.ts').toBeGreaterThan(0);
+    expect(proxySq, 'ENTITY_PROXY_SHADOW_RANGE_SQ not found in renderer.ts').toBeGreaterThan(0);
+    expect(base).toBe(SHADOW_EXTENT_BASE_YARDS);
+    expect(proxySq ** 2).toBe(SHADOW_EXTENT_PROXY_RANGE_YARDS ** 2);
+    // And the renderer really does square it, so the yards-vs-squared reading
+    // above is not a coincidence of two equal literals.
+    expect(rendererSource).toContain(
+      `const ENTITY_PROXY_SHADOW_RANGE_SQ = ${SHADOW_EXTENT_PROXY_RANGE_YARDS} * ${SHADOW_EXTENT_PROXY_RANGE_YARDS};`,
+    );
+  });
+
+  it('writes the live ortho box through the core clamp, never a bare multiply', () => {
     const shed = methodBody('private applyShadowShed');
-    expect(shed).toContain('const extent = this.shadowBaseExtent * this.shadowExtent.scale');
+    // The floor is a WORLD-SPACE clamp inside the core; a bare `base * scale`
+    // here would reintroduce the lean arm's 51 yd floor inside the proxy band.
+    expect(shed).toContain(
+      'const extent = shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale)',
+    );
+    expect(shed).not.toMatch(/this\.shadowBaseExtent \* this\.shadowExtent\.scale/);
     // All four planes and the projection matrix, or the box three culls
     // against and the box every consumer reads would disagree.
     for (const write of [
@@ -79,6 +109,26 @@ describe('shadow feature renderer wiring', () => {
     expect(rendererSource).toContain(
       'setFoliageShadowVolume(this.lightDir, anchor, this.sun.shadow.camera, SUN_TRAVEL_DISTANCE)',
     );
+  });
+
+  it('surfaces the live extent shed on the perf snapshot', () => {
+    // A time-varying render knob with no readout makes two captures
+    // incomparable; the step, its multiplier and the written half-extent all
+    // ride perfStats so a capture can state which extent was live.
+    expect(rendererSource).toContain('shadowExtentStep: this.shadowExtent.step');
+    expect(rendererSource).toContain('shadowExtentScale: this.shadowExtent.scale');
+    expect(rendererSource).toContain(
+      'shadowExtentHalf: shadowExtentHalf(this.shadowBaseExtent, this.shadowExtent.scale)',
+    );
+    const stats = readFileSync(
+      path.join(__dirname, '..', 'src', 'render', 'renderer_perf_stats.ts'),
+      'utf8',
+    );
+    for (const field of ['shadowExtentStep', 'shadowExtentScale', 'shadowExtentHalf']) {
+      expect(stats, `${field} must be declared on RendererPerfStats`).toContain(
+        `${field}: number;`,
+      );
+    }
   });
 
   it('applies the extent shed before the sun is first used, and resets it with the governor', () => {

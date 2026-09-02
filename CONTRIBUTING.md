@@ -177,6 +177,15 @@ API, while `@typescript/native` provides the `tsc` binary. Things to know:
   the prewarm depth twins in `src/render/prewarm_depth_material.ts` have to
   follow) alike (`tests/three_compile_async_patch.test.ts` pins them all),
   before dropping or re-rolling it.
+  One scope limit worth stating for every hunk, not just this one: the patch covers
+  `build/three.module.js` ONLY. `build/three.cjs`, the `.min.js` bundles, `three.core*`
+  and `three.webgpu*`/`three.tsl*` carry the UNPATCHED code, so a CommonJS
+  `require('three')` (which resolves the package's `require` export condition to
+  `three.cjs`) or a `three/webgpu` / `three/tsl` subpath import would silently run a
+  different renderer with none of these fixes. `tests/three_compile_async_patch.test.ts`
+  scans the tree to prove nothing outside `node_modules` reaches those bundles, and uses
+  `three.cjs` as the unpatched control for its GONE pins; keep both roles in mind before
+  adding a dependency that pulls three through CJS.
 - **When to revisit.** Collapse the dual alias back to a single `typescript`
   dependency once BOTH hold: the TypeScript 7.1 stable JS API has shipped
   (TypeScript 7.0 ships no JS API at all; the replacement is tracked in

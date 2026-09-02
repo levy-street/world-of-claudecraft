@@ -62,14 +62,17 @@ From the sun setup in `src/render/renderer.ts`:
 `GFX.shadowMap` per profile (`src/render/gfx.ts`): 4096 ultra/insane, 2560 high
 and medium, 2048 high-constrained, 1536 medium-constrained, 2048 low and
 constrained, 1024 iOS memory profile. High moved from 4096 to 2560 after this
-evaluation was written: at the 210 u box that is ~8.2 cm per texel against
-~5.1 cm, inside what the 2.25-texel PCF radius filters over anyway, and it
-quarters the pass's clear and sampling footprint on the tier most likely to be
-draw-bound. `GFX.dynamicShadows` is false on low and on constrained memory, so
-the shadow pass does not exist at all on the phone-class profiles. The advanced
-Shadow Quality dial caps at 4096, and its top rung is an explicit write (the
-retired 8192 rung lands on it), so a player who chose the top rung keeps the
-showcase map even though the High tier base no longer allocates it.
+evaluation was written: at the 210 u box that is 0.082 u per texel against
+0.051 u, inside what the 2.25-texel PCF radius filters over anyway, and it cuts
+the pass's texel count by 2.56x (2560^2 / 4096^2 = 0.39), and with it the clear,
+the sampling footprint and the resident allocation, on the tier most likely to
+be draw-bound. Which population that reaches: the High PRESET and any device
+whose auto-detected tier is high. The Advanced mix is unaffected by design,
+because it always resolves on the high-tier base and its Shadow Quality dial's
+top rung writes 4096 explicitly, so a player who chose that rung keeps the
+showcase map (the dial caps at 4096, and the retired 8192 rung lands on that
+same top rung). `GFX.dynamicShadows` is false on low and on constrained memory,
+so the shadow pass does not exist at all on the phone-class profiles.
 
 Texel snapping landed on this branch: `shadowTexelWorldSize` and
 `snapShadowAnchor` in `src/render/shadow_texel_snap_core.ts`, consumed by the
@@ -148,9 +151,14 @@ exactly one cascade: still 17 taps, not 34.
 ## 3. Texel density
 
 World units per shadow texel. Current single map over the 210 u box (4096 is
-the ultra/insane allocation, 2560 the high/medium one):
+the ultra/insane allocation, 2560 the high/medium one).
 
-| Map size | u per texel | cm per texel |
+UNITS. The sim's world unit is a yard (`src/sim/` and the design docs say yd
+throughout). The centimetre columns below are a readability aid only: they read
+one world unit as one metre, so they are metric-per-unit, not a conversion from
+yards. Compare the `u per texel` column when the absolute figure matters.
+
+| Map size | u per texel | cm per texel (1 u read as 1 m) |
 |---|---|---|
 | 4096 | 0.051270 | 5.13 |
 | 2560 | 0.082031 | 8.20 |
@@ -167,7 +175,7 @@ term.
 
 Near cascade at 2048, split ending at 25 u (the articulated band):
 
-| Camera | Box side | u per texel | cm per texel | vs today's 5.13 cm |
+| Camera | Box side | u per texel | cm per texel (1 u = 1 m) | vs today's 0.05127 u |
 |---|---|---|---|---|
 | fov 60, 4:3 | 48.11 u | 0.023492 | 2.35 | 2.18x finer |
 | fov 60, 16:9 | 58.88 u | 0.028751 | 2.88 | 1.78x finer |
@@ -176,7 +184,7 @@ Near cascade at 2048, split ending at 25 u (the articulated band):
 
 Far cascade at 2048, split 25 u to 105 u (matching today's reach):
 
-| Camera | Box side | u per texel | cm per texel | vs today's 5.13 cm |
+| Camera | Box side | u per texel | cm per texel (1 u = 1 m) | vs today's 0.05127 u |
 |---|---|---|---|---|
 | fov 60, 16:9 | 247.30 u | 0.120754 | 12.08 | **2.36x coarser** |
 | fov 60, 21:9 | 307.79 u | 0.150287 | 15.03 | **2.93x coarser** |
@@ -413,11 +421,11 @@ a large surface and no existing guard.
 `shadow.radius` is honored per `LightShadow`, so each cascade carries its own.
 `PCFShadowMap`'s kernel offsets are `texelSize * shadowRadius`, and `texelSize`
 is `1.0 / shadowMapSize`, that is in TEXELS, not world units. With one map,
-radius 2.25 at 5.13 cm per texel is a world-space penumbra of about 11.5 cm
-(about 18.5 cm on the high tier's 2560 map: the kernel offsets are in texels,
+radius 2.25 at 0.05127 u per texel is a world-space penumbra of about 0.115 u
+(about 0.185 u on the high tier's 2560 map: the kernel offsets are in texels,
 so the penumbra widens with the texel).
-With cascades the same radius means about 6.5 cm on the near cascade and about
-27 cm on the far one. Keeping today's look means retuning radius per cascade
+With cascades the same radius means about 0.065 u on the near cascade and about
+0.27 u on the far one. Keeping today's look means retuning radius per cascade
 (roughly 4.0 near, 0.95 far at fov 60 and 16:9), and the retune is
 aspect-ratio-dependent, because the cascade box side is. The penumbra will also
 visibly step at the cascade boundary unless `CSM.fade` is enabled, and `fade`
@@ -425,7 +433,7 @@ adds a `CSM_FADE` define that toggles `material.needsUpdate = true` from
 `updateUniforms`, that is a recompile trigger inside a per-frame path.
 
 `shadow.bias` and `normalBias` need the same per-cascade treatment for the same
-reason: they are tuned against today's 5.13 cm texel.
+reason: they are tuned against today's 0.05127 u texel.
 
 ### 5e. The foliage shadow volume seam
 

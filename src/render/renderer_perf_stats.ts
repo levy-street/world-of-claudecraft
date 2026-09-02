@@ -88,6 +88,15 @@ export interface RendererPerfStats {
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
+  /** The budget-governed sun-shadow EXTENT shed (shadow_extent_core.ts), the
+   *  render knob a capture most easily forgets it was taken under: the ladder
+   *  step (0 is full quality), the multiplier it carries, and the half-extent
+   *  actually written onto the shadow camera in world units after the
+   *  world-space floor clamp. Two shadow-pass readings are only comparable at
+   *  the same step. */
+  shadowExtentStep: number;
+  shadowExtentScale: number;
+  shadowExtentHalf: number;
   pixelRatio: number;
   width: number;
   height: number;

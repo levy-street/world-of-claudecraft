@@ -1040,27 +1040,25 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     // the stricter iOS WebKit residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,
     // 2560 is the working map size for every tier that is not paying for a
-    // showcase: at the 210 yd ortho box it is ~8.2 cm per texel against
-    // 4096's ~5.1 cm, and the sun's own PCF radius (2.25 texels) filters over
-    // more than that difference, so High reads the same and stops clearing
-    // and writing a 16.8 Mpix target for a pass that is already about a third
-    // of the frame's draw calls. Ultra and Insane keep 4096 as the showcase
+    // showcase: at the 210 yd ortho box it is 0.082 yd per texel against
+    // 4096's 0.051, and the sun's own PCF radius (2.25 texels) filters over
+    // more than that difference, so High reads the same for 2.56x fewer texels
+    // (2560^2 / 4096^2) on a pass that is already about a third of the frame's
+    // draw calls. 4096 is gated on `gfxTierAtLeast(tier, 'ultra')` rather than
+    // spelled as the fall-through arm, so a NEW top tier added below ultra
+    // defaults to the cheap side instead of silently inheriting the showcase
     // allocation.
     shadowMap: iosMemoryProfile
       ? 1024
       : tier === 'low'
         ? 2048
-        : tier === 'medium'
-          ? constrainedMemory
+        : constrainedMemory
+          ? tier === 'medium'
             ? 1536
-            : 2560
-          : tier === 'high'
-            ? constrainedMemory
-              ? 2048
-              : 2560
-            : constrainedMemory
-              ? 2048
-              : 4096,
+            : 2048
+          : gfxTierAtLeast(tier, 'ultra')
+            ? 4096
+            : 2560,
     standardMaterials: !iosMemoryProfile && gfxTierAtLeast(tier, 'medium'),
     // Round-10 detail-knob defaults (see the interface comment): High takes the
     // existing Advanced-Medium profile to bound its steady cost (basic worn

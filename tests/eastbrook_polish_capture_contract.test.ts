@@ -349,7 +349,7 @@ interface AttributionTargetFixture {
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'b976264c2cd8512cf9a7d4f0ed2f39ba6bcf243f8561dee9528512421cf65490';
+  '33de43372d17e8a50b05650c35407bcb9591ed63e6ddebf7007c2229858c55dc';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

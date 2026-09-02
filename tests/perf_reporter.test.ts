@@ -519,6 +519,9 @@ function snapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 0.9,
       shadowCadenceHalfRate: false,
+      shadowExtentStep: 0,
+      shadowExtentScale: 1,
+      shadowExtentHalf: 105,
       renderBudget: {
         enabled: true,
         mode: 'stable',

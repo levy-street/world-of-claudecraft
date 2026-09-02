@@ -1,19 +1,26 @@
 import { describe, expect, it } from 'vitest';
+import { SHADOW_CASTER_MARGIN } from '../src/render/foliage_shadow_core';
 import {
+  createShadowCadenceState,
   SHADOW_CADENCE_ENTER_SECONDS,
   SHADOW_CADENCE_EXIT_SECONDS,
+  updateShadowCadence,
 } from '../src/render/shadow_cadence_core';
 import {
   createShadowExtent,
   resetShadowExtent,
   SHADOW_EXTENT_BASE_YARDS,
+  SHADOW_EXTENT_CASTER_MARGIN_YARDS,
   SHADOW_EXTENT_ENTER_PRESSURE,
   SHADOW_EXTENT_ENTER_SECONDS,
   SHADOW_EXTENT_EXIT_PRESSURE,
   SHADOW_EXTENT_EXIT_SECONDS,
+  SHADOW_EXTENT_FLOOR_YARDS,
   SHADOW_EXTENT_PROXY_RANGE_YARDS,
+  SHADOW_EXTENT_RIG_RADIUS_YARDS,
   SHADOW_EXTENT_SCALES,
   type ShadowExtentState,
+  shadowExtentHalf,
   updateShadowExtent,
 } from '../src/render/shadow_extent_core';
 
@@ -144,10 +151,84 @@ describe('shadow extent ladder shape', () => {
     expect(floor).toBeGreaterThanOrEqual(SHADOW_EXTENT_PROXY_RANGE_YARDS);
   });
 
-  it('sheds after the cadence and restores before it, in both directions', () => {
-    // The extent is the deeper, more visible shed, so it must never engage
-    // before the cadence nor outlast it on the way back.
+  it('lets the cadence both engage first and release first', () => {
+    // The ORDER, stated the way it actually runs: the cadence engages before
+    // the extent (1.5 s against 3 s) AND releases before it (4 s against 6 s),
+    // so the extent is the deeper shed going down and the LAST thing given
+    // back coming up. An earlier draft of the core header claimed the extent
+    // was restored while the cadence was still engaged, which is the opposite
+    // of what these constants do; this is the pin that keeps the header true.
     expect(SHADOW_EXTENT_ENTER_SECONDS).toBeGreaterThan(SHADOW_CADENCE_ENTER_SECONDS);
     expect(SHADOW_EXTENT_EXIT_SECONDS).toBeGreaterThan(SHADOW_CADENCE_EXIT_SECONDS);
+  });
+
+  it('walks the cadence and the extent together, and pins the release order', () => {
+    // Both ladders driven off ONE pressure trace, so the claim above is proven
+    // on behaviour and not just on the constants.
+    const extent = createShadowExtent();
+    const cadence = createShadowCadenceState();
+    const step = (seconds: number, pressure: number) => {
+      for (let t = 0; t < seconds; t += DT) {
+        updateShadowExtent(extent, DT, pressure, true);
+        updateShadowCadence(cadence, DT, pressure, true);
+      }
+    };
+    // Going down: the cadence sheds while the extent is still at full.
+    step(SHADOW_CADENCE_ENTER_SECONDS + 0.5, 2);
+    expect(cadence.halfRate).toBe(true);
+    expect(extent.step).toBe(0);
+    step(30, 2);
+    expect(extent.step).toBe(SHADOW_EXTENT_SCALES.length - 1);
+    // Coming up: the cadence is back at full rate while the box is still shed.
+    step(SHADOW_CADENCE_EXIT_SECONDS + 0.5, 0.2);
+    expect(cadence.halfRate).toBe(false);
+    expect(extent.step).toBeGreaterThan(0);
+    step(60, 0.2);
+    expect(extent.step).toBe(0);
+  });
+
+  it('floors the half-extent in WORLD space, so the lean base cannot undercut it', () => {
+    // The floor is the range past which a character stops casting at all, plus
+    // the margin the other shadow culls use, plus a rig radius.
+    expect(SHADOW_EXTENT_FLOOR_YARDS).toBe(
+      SHADOW_EXTENT_PROXY_RANGE_YARDS +
+        SHADOW_EXTENT_CASTER_MARGIN_YARDS +
+        SHADOW_EXTENT_RIG_RADIUS_YARDS,
+    );
+    // The outdoor base: the deepest step clamps UP to the floor rather than
+    // taking the raw 0.6 multiplier.
+    const deepest = SHADOW_EXTENT_SCALES.at(-1) ?? 0;
+    expect(SHADOW_EXTENT_BASE_YARDS * deepest).toBeLessThan(SHADOW_EXTENT_FLOOR_YARDS);
+    expect(shadowExtentHalf(SHADOW_EXTENT_BASE_YARDS, deepest)).toBe(SHADOW_EXTENT_FLOOR_YARDS);
+    // The lean arm (renderer.ts's LOW_GFX base), which a pure scale floor
+    // would have driven to 51 yd, well inside the proxy band.
+    expect(85 * deepest).toBeLessThan(SHADOW_EXTENT_PROXY_RANGE_YARDS);
+    expect(shadowExtentHalf(85, deepest)).toBe(SHADOW_EXTENT_FLOOR_YARDS);
+    // Every step of every base clears the proxy band.
+    for (const base of [85, 105]) {
+      for (const scale of SHADOW_EXTENT_SCALES) {
+        expect(shadowExtentHalf(base, scale)).toBeGreaterThan(SHADOW_EXTENT_PROXY_RANGE_YARDS);
+      }
+    }
+  });
+
+  it('never widens the box past the base, and answers 0 for a degenerate base', () => {
+    // The clamp may only keep the box BIGGER than the scale alone would; a
+    // base already at or under the floor is passed through unshed, never
+    // inflated to the floor (that would make a shed cost MORE than no shed).
+    for (const scale of SHADOW_EXTENT_SCALES) {
+      for (const base of [10, 40, SHADOW_EXTENT_FLOOR_YARDS, 85, 105, 200]) {
+        expect(shadowExtentHalf(base, scale)).toBeLessThanOrEqual(base);
+      }
+    }
+    expect(shadowExtentHalf(0, 1)).toBe(0);
+    expect(shadowExtentHalf(-5, 1)).toBe(0);
+    expect(shadowExtentHalf(105, 1)).toBe(105);
+  });
+
+  it("restates foliage_shadow_core's caster margin without drifting from it", () => {
+    // This core imports nothing (the wiring test scans it), so the margin is a
+    // copy. The copy is only safe while this pin holds.
+    expect(SHADOW_EXTENT_CASTER_MARGIN_YARDS).toBe(SHADOW_CASTER_MARGIN);
   });
 });

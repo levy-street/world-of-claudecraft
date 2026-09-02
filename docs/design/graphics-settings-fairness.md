@@ -54,6 +54,23 @@ COSMETIC (may be tiered down on lower presets):
   conveys nothing a player acts on. This is a GOVERNOR-driven shed by design, like the
   weapon-VFX `vfx` bucket arm below: a perf-governor output, not a UI tier knob, so the
   static-preset rule at the bottom of this doc does not apply to it.
+- Sun-shadow ortho EXTENT under the same pressure (`src/render/shadow_extent_core.ts`), the
+  deeper step below that cadence. The one orthographic box the sun renders shrinks from its
+  105 yd half-extent to 78.75 and then 67 (the third step's 0.6 multiplier would give 63, and
+  the world-space floor below clamps it up), one step per 3 s of sustained over-budget
+  readings, and widens back one step per 6 s of calm. A caster whose shadow the narrower box
+  drops is STILL DRAWN, still nameplated and still clickable at exactly the same range: only
+  the shadow it casts on distant ground goes, which is the same class of information the
+  cadence already sheds. What makes it safe near the player is a WORLD-SPACE floor rather
+  than a multiplier: `shadowExtentHalf` never returns less than `SHADOW_EXTENT_FLOOR_YARDS`
+  (67), the 62 yd range past which a character stops casting a shadow at all
+  (`ENTITY_PROXY_SHADOW_RANGE_SQ` in `renderer.ts`) plus the 4 yd caster margin the other
+  shadow culls use plus a 1 yd rig radius. So no rig that still casts can lose its shadow to
+  the shed, on either tier base: the lean 85 yd base would have floored at 51 yd on a plain
+  scale, inside the proxy band, and the clamp is what stops it. Governor-driven like the
+  cadence, so the static-preset rule does not apply, and the live step is on the perf
+  snapshot (`shadowExtentStep` / `shadowExtentScale` / `shadowExtentHalf`) so a capture
+  cannot silently compare two different extents.
   VFX-bearing weapon skin (glow, motes, aurora, shell, cast light) FADES on two inputs.
   Neither reaches zero: what removes a rig is the character LOD swap, which replaces the whole
   articulated rig with one baked mesh and is shared by the entire render path. The fade exists
@@ -346,6 +363,15 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   cap path for the sap).
 - `tests/auras_view.test.ts`: `isAuraDebuff` classifies a negative-value `buff_*` sap identically
   for the Sim aura and its `ClientWorld` mirror.
+- `tests/shadow_extent_core.test.ts` + `tests/shadow_render_wiring.test.ts`: the sun-shadow
+  EXTENT shed. The policy core imports nothing (same blindness as the cadence: pressure,
+  enabled and dt only), the ladder is proven to walk ONE step per dwell and never to reach
+  the floor on a spike, the world-space floor is proven to clear the proxy-shadow band on
+  BOTH tier bases (the lean 85 yd arm included, where a plain scale would have floored
+  inside it) and never to widen the box past the base, the release order against the cadence
+  is pinned on one shared pressure trace rather than on prose, and the wiring scan
+  cross-pins the base half-extent and the proxy range the core restates from `renderer.ts`
+  and pins the perf-snapshot readout.
 - `tests/shadow_cadence_core.test.ts` + `tests/shadow_render_wiring.test.ts`: the sun-shadow
   cadence shed. The policy core imports nothing (preset, tier, and profile blind; its only
   inputs are the governor's pressure/enabled plus dt), the dwell thresholds are

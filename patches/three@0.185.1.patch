@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb0130af2c 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..e581201ed1fb2f2b769a40eb15362505ff117038 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -99,7 +99,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
  		programs: programs,
  		dispose: dispose
  	};
-@@ -9174,6 +9202,30 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9174,6 +9202,38 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  		_state.buffers.depth.setTest( true );
  		_state.setScissorTest( false );
  
@@ -122,15 +122,39 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
 +		// renderer's own reference measurements come from a Metal tiler, so the
 +		// clear stays.
 +		//
++		// Which is exactly why the mask is re-opened BEFORE each clear below and
++		// not only once at the end of the pass. glClear honours the colour write
++		// mask and WebGLRenderer.clear never re-opens it, so once the first
++		// shadow map's depth material has closed the mask, the clear of a SECOND
++		// shadow map in the same frame would be a silent no-op and that map would
++		// keep the previous frame's colour. Only the sun casts here today, so it
++		// is latent; it is still wrong, and it costs one cached state write.
++		//
 +		// VSM is untouched: its blur passes write that colour attachment for
 +		// real. colorWrite is not a program-cache-key input (WebGLPrograms never
 +		// reads it), so no program key moves and no material relinks.
-+		const depthOnlyPass = this.type !== VSMShadowMap;
++		const colorWriteFreePass = this.type !== VSMShadowMap;
 +
  		// check for shadow map type changes
  
  		const typeChanged = _previousType !== this.type;
-@@ -9417,6 +9469,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9336,6 +9396,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 				if ( shadow.map.isWebGLCubeRenderTarget ) {
+ 
+ 					renderer.setRenderTarget( shadow.map, face );
++					if ( colorWriteFreePass ) _state.buffers.color.setMask( true );
+ 					renderer.clear();
+ 
+ 				} else {
+@@ -9344,6 +9405,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+ 					if ( face === 0 ) {
+ 
+ 						renderer.setRenderTarget( shadow.map );
++						if ( colorWriteFreePass ) _state.buffers.color.setMask( true );
+ 						renderer.clear();
+ 
+ 					}
+@@ -9417,6 +9479,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  
  		scope.needsUpdate = false;
  
@@ -138,12 +162,12 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
 +		// and a masked glClear is silently a no-op. three's own frame clear
 +		// re-opens the mask first (WebGLBackground), but the pass restores what
 +		// it changed rather than leaving that to every caller.
-+		if ( depthOnlyPass ) _state.buffers.color.setMask( true );
++		if ( colorWriteFreePass ) _state.buffers.color.setMask( true );
 +
  		renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
  
  	};
-@@ -9516,6 +9574,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9516,6 +9584,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  
  		result.visible = material.visible;
  		result.wireframe = material.wireframe;
@@ -155,7 +179,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
  
  		if ( type === VSMShadowMap ) {
  
-@@ -16461,6 +16524,7 @@ class WebGLRenderer {
+@@ -16461,6 +16534,7 @@ class WebGLRenderer {
  			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
  			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
  
@@ -163,7 +187,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
  			info.programs = programCache.programs;
  
  			/**
-@@ -17486,22 +17550,82 @@ class WebGLRenderer {
+@@ -17486,22 +17560,82 @@ class WebGLRenderer {
  			// ready to be used before resolving the promise.
  
  			return new Promise( ( resolve ) => {
@@ -250,7 +274,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -17512,9 +17636,19 @@ class WebGLRenderer {
+@@ -17512,9 +17646,19 @@ class WebGLRenderer {
  
  					}
  
@@ -272,7 +296,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb
  
  				}
  
-@@ -17876,7 +18010,11 @@ class WebGLRenderer {
+@@ -17876,7 +18020,11 @@ class WebGLRenderer {
  
  				} else if ( object.isMesh || object.isLine || object.isPoints ) {
  
