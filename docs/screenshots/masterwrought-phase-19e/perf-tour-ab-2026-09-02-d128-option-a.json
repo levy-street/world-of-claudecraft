@@ -1,0 +1,187 @@
+{
+ "_purpose": "Committed evidence for Phase 19E D128 (qr-19-single-slot-writer-slot-key): the same-machine, same-Vite-tree before/after of the single-slot elision cache under Option A (four independent slots per element). Both sides: scripts/perf_tour.mjs headless swiftshader (the default mode, NOT PERF_GPU=1), PERF_VIEWPORT=both, two runs each; before = the merge tip 2ebe95e731 unmodified, after = the same tree with the Option A prototype applied to src/ui/painter_host.ts (reverted from a disk copy afterwards; the prototype never landed). hudHotDomWrites is the run-length-independent anchor; the headless mode agreed with the HEADED golden anchor (1054 worst healthy, 1062 committed) to within two writes on before-run1 but shows a 20-write run-to-run band on desktop, so it can say whether a reduction EXISTS and cannot re-mint the golden. The full tour JSONs these rows are extracted from are session artifacts (about 3 MB each), not committed. Every run exited 1 on the same two pre-existing console lines (character asset not preloaded), with zero budget or FCT-burst failures.",
+ "before-run1": {
+  "generatedAt": "2026-09-02T12:44:09.597Z",
+  "gpuMode": "swiftshader-headless",
+  "scenario": "bench_perf_tour",
+  "browserPath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewports": [
+   {
+    "viewport": "desktop",
+    "dimensions": {
+     "width": 1600,
+     "height": 900,
+     "deviceScaleFactor": 1,
+     "isMobile": false,
+     "hasTouch": false
+    },
+    "hudHotDomWrites": 1052,
+    "hudHotDomSkippedWrites": 69071,
+    "hudHotDomSkipRate": 0.985,
+    "frameLong50": 29,
+    "fps": 2.86,
+    "samples": 6,
+    "errors": 2,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   },
+   {
+    "viewport": "mobile",
+    "dimensions": {
+     "width": 844,
+     "height": 390,
+     "deviceScaleFactor": 3,
+     "isMobile": true,
+     "hasTouch": true
+    },
+    "hudHotDomWrites": 575,
+    "hudHotDomSkippedWrites": 38990,
+    "hudHotDomSkipRate": 0.985,
+    "frameLong50": 48,
+    "fps": 5.25,
+    "samples": 6,
+    "errors": 1,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   }
+  ]
+ },
+ "before-run2": {
+  "generatedAt": "2026-09-02T12:46:02.035Z",
+  "gpuMode": "swiftshader-headless",
+  "scenario": "bench_perf_tour",
+  "browserPath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewports": [
+   {
+    "viewport": "desktop",
+    "dimensions": {
+     "width": 1600,
+     "height": 900,
+     "deviceScaleFactor": 1,
+     "isMobile": false,
+     "hasTouch": false
+    },
+    "hudHotDomWrites": 1072,
+    "hudHotDomSkippedWrites": 74267,
+    "hudHotDomSkipRate": 0.986,
+    "frameLong50": 33,
+    "fps": 2.43,
+    "samples": 6,
+    "errors": 2,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   },
+   {
+    "viewport": "mobile",
+    "dimensions": {
+     "width": 844,
+     "height": 390,
+     "deviceScaleFactor": 3,
+     "isMobile": true,
+     "hasTouch": true
+    },
+    "hudHotDomWrites": 575,
+    "hudHotDomSkippedWrites": 41798,
+    "hudHotDomSkipRate": 0.986,
+    "frameLong50": 54,
+    "fps": 5.25,
+    "samples": 6,
+    "errors": 1,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   }
+  ]
+ },
+ "after-run1": {
+  "generatedAt": "2026-09-02T12:50:44.215Z",
+  "gpuMode": "swiftshader-headless",
+  "scenario": "bench_perf_tour",
+  "browserPath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewports": [
+   {
+    "viewport": "desktop",
+    "dimensions": {
+     "width": 1600,
+     "height": 900,
+     "deviceScaleFactor": 1,
+     "isMobile": false,
+     "hasTouch": false
+    },
+    "hudHotDomWrites": 1062,
+    "hudHotDomSkippedWrites": 75954,
+    "hudHotDomSkipRate": 0.986,
+    "frameLong50": 33,
+    "fps": 3.7,
+    "samples": 6,
+    "errors": 2,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   },
+   {
+    "viewport": "mobile",
+    "dimensions": {
+     "width": 844,
+     "height": 390,
+     "deviceScaleFactor": 3,
+     "isMobile": true,
+     "hasTouch": true
+    },
+    "hudHotDomWrites": 585,
+    "hudHotDomSkippedWrites": 39007,
+    "hudHotDomSkipRate": 0.985,
+    "frameLong50": 57,
+    "fps": 4.59,
+    "samples": 6,
+    "errors": 1,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   }
+  ]
+ },
+ "after-run2": {
+  "generatedAt": "2026-09-02T12:52:36.920Z",
+  "gpuMode": "swiftshader-headless",
+  "scenario": "bench_perf_tour",
+  "browserPath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "viewports": [
+   {
+    "viewport": "desktop",
+    "dimensions": {
+     "width": 1600,
+     "height": 900,
+     "deviceScaleFactor": 1,
+     "isMobile": false,
+     "hasTouch": false
+    },
+    "hudHotDomWrites": 1079,
+    "hudHotDomSkippedWrites": 88073,
+    "hudHotDomSkipRate": 0.988,
+    "frameLong50": 45,
+    "fps": 3.8,
+    "samples": 6,
+    "errors": 2,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   },
+   {
+    "viewport": "mobile",
+    "dimensions": {
+     "width": 844,
+     "height": 390,
+     "deviceScaleFactor": 3,
+     "isMobile": true,
+     "hasTouch": true
+    },
+    "hudHotDomWrites": 589,
+    "hudHotDomSkippedWrites": 42226,
+    "hudHotDomSkipRate": 0.986,
+    "frameLong50": 59,
+    "fps": 5.14,
+    "samples": 6,
+    "errors": 1,
+    "budgetFailures": [],
+    "fctBurstFailures": []
+   }
+  ]
+ }
+}

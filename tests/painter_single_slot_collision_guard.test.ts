@@ -16,6 +16,8 @@
 // pins in three places, so it is a maintainer decision, measured against
 // tests/hud_perf_budget.baseline.md, not something a fix unit slips in. Until
 // then this scan holds the line at no cost to the running client.
+// (RULED 2026-09-02: that decision was taken, on a measurement; see the tail comment.
+// The slot key is routed out of the packet and this scan stays the defence.)
 //
 // AST, NOT REGEX, and that is load-bearing: the shape is a CALL, so a parameter
 // declaration (`setText(el: HTMLElement, text: string): void` in
@@ -70,9 +72,10 @@ interface ScanResult {
  * what makes this cheap and also bounds what it can see: it catches the shape
  * that actually ships, two writers naming one node in one module. It does NOT
  * catch an element reached through two different expressions (`d.more` here,
- * `this.moreEl` there) or written from two modules. That limit is stated rather
- * than hidden, because a guard read as complete when it is not is worse than no
- * guard.
+ * `this.moreEl` there) or written from two modules, and it walks src/ui only
+ * (UI_ROOT), which is lossless today because nothing outside src/ui imports
+ * painter_host. That limit is stated rather than hidden, because a guard read as
+ * complete when it is not is worse than no guard.
  */
 function scanSingleSlotCollisions(root: string): ScanResult {
   const files = tsFilesUnder(root);
@@ -268,37 +271,68 @@ describe('the detector itself, driven over a fixture tree', () => {
 // cache in the HUD, the other widens a standing gate's reach).
 //
 // RULED (qr-19-single-slot-writer-slot-key, 2026-09-02, under qr-19-best-for-project):
-// MEASURED FIRST, then shaped on the number. Option A was prototyped (SingleSlotEntry
-// as four independent slots, shouldWriteSingleSlot comparing the requested kind's
-// slot) and driven through the whole battery it would have to pass: exactly the three
-// pins the row predicted go red (the DEFEAT arm, the entry-shape pin, and the
-// cross-kind clobber arm in tests/painter_host.test.ts) and nothing else moves, ARM 2's
-// deterministic skip-rate and allocation budgets pass unchanged, and
-// tests/painter_slot_collision.test.ts passes with its EXACT write and skip literals,
-// which means the real painters' steady-state write set is byte-identical under both
-// shapes. The tour (scripts/perf_tour.mjs, headless swiftshader, both viewports, two
-// runs each way on the same machine and the same Vite tree): hudHotDomWrites before
-// 1052 and 1072 desktop, 575 and 575 mobile; after 1062 and 1079 desktop, 585 and 589
-// mobile. No reduction exists to measure, and the after runs sit 7 to 14 writes above
-// the before runs on both viewports, inside the 20-write run-to-run band the two before
-// runs showed on desktop under software rasterization (the headed golden anchor 1062
-// was minted from 1054; this mode agrees with it to within two writes on run 1). The
-// per-element price is real and small: +16 bytes per routed element for the four-slot
-// record (72 to 88 bytes retained per entry, Node v26, median of five GC-fenced runs),
-// +144 bytes for a per-element Map. So the number says: Option A removes ZERO live
-// writes today, because every one of the seven shipped sites was already fixed in
-// Phase 18 and this scan holds the line, and what it buys is the deletion of the class
-// (the shapes the scan admits it cannot see) at +16 bytes per element.
-// RULED ON THE NUMBER: Option A is ROUTED OUT of this packet as a maintainer-owned
-// change (the row's own reading, taken by the maintainer on the figures above), this
-// scan stays the defence, and the follow-up is recorded in
-// docs/prd/masterwrought/phase-19-routed-followups.md (row D128). If a collision the
-// scan cannot see is ever measured, the prototype and the three pins it reds are the
-// starting point.
-// The two riders ride regardless: this guard stays keyed on the SHAPE and stays an AST
-// walk, and ARM 2's exemption rationale already states the per-(element, KIND)
-// guarantee exactly (hud_perf_budget.test.ts, landed 2026-08-31, so that rider was
-// already true when the phase document named it).
+// MEASURED FIRST, then shaped on the number; the evidence is committed under
+// docs/screenshots/masterwrought-phase-19e/ (the prototype as
+// d128-option-a-prototype.patch, the tour summaries, the heap probe and its output).
+//
+// THE PROOF OF ZERO is deductive, and the tour corroborates it. With all seven shipped
+// sites fixed, every element the HUD routes a write through carries ONE kind, and for a
+// single-kind element the two predicates (`entry.kind === kind && entry.value === value`
+// against `entry[kind] === value`) are the same predicate, so Option A changes no live
+// write. The prototype (SingleSlotEntry as four independent slots, shouldWriteSingleSlot
+// comparing the requested kind's slot) was driven through the four suites that touch
+// the seam (this file, tests/painter_host.test.ts, tests/painter_slot_collision.test.ts,
+// tests/hud_perf_budget.test.ts: 195 cases, 188 passed, 3 failed, 4 skipped, the
+// skipped four being ARM 3 with its tour env unset). The three reds are exactly the
+// three pins the row predicted (the DEFEAT arm, the entry-shape pin inside the
+// "skip path neither re-sets the cache nor mints" arm, and the cross-kind clobber arm),
+// and no fourth arm moves. What the green arms prove is bounded: ARM 2's floors and
+// `extra === 0` are immune to added skips, so they show nothing got WORSE, and
+// tests/painter_slot_collision.test.ts drives two painters with exact write literals
+// and positive skip floors, so it shows those two painters' steady-state write sets
+// are empty under both shapes, no more.
+//
+// THE TOUR (scripts/perf_tour.mjs, headless swiftshader, both viewports, two runs each
+// way on one Vite process and one tree, the merge tip 2ebe95e731, Chrome 152 headless,
+// macOS 26.5.2, Node v26.5.0): hudHotDomWrites before 1052 and 1072 desktop, 575 and
+// 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. The differences are
+// FRAME-COUNT-DRIVEN, not jitter: the first four per-step samples are identical across
+// all four runs, the count is still climbing at about five writes per frame through the
+// tail (the headless mode renders 39 to 100 frames against the headed golden's 1,400
+// plus, so the world never reaches the steady state where this metric becomes the
+// run-length-independent anchor the baseline defines), and at matched frame counts the
+// two shapes read byte-identical. That bounds the scan's admitted blind spot: a hidden
+// hot per-frame cross-kind site would add roughly 80 to 200 writes over that window,
+// and the whole spread across the four runs is 27. A reduction smaller than that
+// window would be invisible here. Both tours exited 1 on the same two pre-existing
+// console lines (character asset not preloaded), with zero budget or FCT failures.
+// THESE ARTIFACTS MUST NEVER BE FED TO ARM 3: three of the four desktop captures sit
+// at or above the committed anchor 1062 (before-run2 read 1072 on UNMODIFIED code),
+// and they are frame-floor-ineligible anyway; a golden update, if the shape ever lands
+// and the anchor moves, is a headed PERF_GPU=1 two-run capture, never this mode.
+//
+// THE PRICE: the establishing write still allocates ONE object per element, only
+// bigger (a four-slot record; only a per-element Map would add an allocation). Retained
+// per entry, Node v26 without pointer compression, 200,000 entries in an array,
+// GC-fenced heapUsed delta, median of five, shared value strings (the harness is the
+// committed d128-slot-entry-heap-probe.mjs): 72 bytes for the two-field entry, 88 for
+// the four-slot record, 216 for a Map, so +16 bytes per routed element in Node and
+// about +8 in Chrome, whose V8 runs pointer compression; the absolutes include the
+// array slot and the value string and exclude the WeakMap entry, so the delta is the
+// sound number.
+//
+// So the number says: Option A removes ZERO live writes today and costs about +8
+// bytes per routed element in the browser, and what it buys is the deletion of the
+// class for the shapes this scan cannot see. RULED ON THE NUMBER: Option A is ROUTED
+// OUT of this packet as a maintainer-owned change (the row's own reading, taken by the
+// maintainer on the figures above), this scan stays the defence, and the follow-up is
+// recorded in docs/prd/masterwrought/phase-19-routed-followups.md (row D128). If a
+// collision the scan cannot see is ever measured, the committed patch and the three
+// pins it reds are the starting point.
+// The one rider rides regardless: this guard stays keyed on the SHAPE and stays an AST
+// walk; ARM 2's exemption rationale already states the per-(element, KIND) guarantee
+// exactly (hud_perf_budget.test.ts, landed 2026-08-31, before the phase document named
+// it as a rider).
 //
 // The scan above is the CHEAP half and it is already in place. What follows is
 // what would make the class impossible rather than merely detected, with what

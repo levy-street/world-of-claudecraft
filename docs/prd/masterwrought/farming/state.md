@@ -1841,7 +1841,7 @@ daily gate anywhere in professions is out of ruling and STOPS.
      lands in brainstorm.md's future-tier block. WHY recorded rather than fixed: the fix
      is a pacing redesign, not a tune, and every pacing model in this packet was derived
      against the shipped multiplier.
-     AMENDED IN PLACE 2026-09-02 (qr-19-qr-gray-row-wording-false, under
+     AMENDED IN PLACE, 2026-09-02 (qr-19-qr-gray-row-wording-false, under
      qr-19-best-for-project): the sentence above, "the cheapest path to any craft skill
      number is always bulk-spamming low recipes rather than crafting the band's real
      content", is measurably FALSE as written and is superseded by the measured read in
@@ -1859,7 +1859,9 @@ daily gate anywhere in professions is out of ruling and STOPS.
      tierProgressMultiplier ladder) and the DECIDED half (no gain-curve change in this
      packet, because the 11e, 11f and 11i pacing models were derived against the shipped
      multiplier) both stand untouched; only the premise sentence is corrected, and the
-     future-tier revisit aims at the per-point arbitrage, not the floor.
+     future-tier revisit aims at the per-point arbitrage, not the floor. The row's own
+     "crafts-to-cap for the cheap path" names the column section 12.2 now calls floor
+     spam (renamed the same day); the phrase stands as written, per this file's rule.
 129. qr-12-CADENCE. THE PERFECTING CADENCE GETS AN ACCEPTANCE CRITERION, closing the one
      unbounded design number the review found. Phase 12's rank and attempt counts are
      DERIVED (never pasted) against this target: the reference endgame character (one

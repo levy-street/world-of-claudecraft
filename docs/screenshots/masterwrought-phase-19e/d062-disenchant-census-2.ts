@@ -1,0 +1,10 @@
+import { ITEMS } from '../../../src/sim/data';
+import { isDisenchantable } from '../../../src/sim/professions/enchanting';
+import { itemFromRaid, itemFromHeroicRaid } from '../../../src/sim/item_level';
+const all = Object.values(ITEMS) as any[];
+const gt = all.filter((d) => d.use?.type === 'gatherTool');
+const byQ: Record<string, string[]> = {}; for (const d of gt) (byQ[d.quality ?? 'none'] ??= []).push(`${d.id}(t${d.tier ?? d.toolTier ?? '?'})`);
+console.log('gatherTool defs by quality:', JSON.stringify(byQ));
+const ep = all.filter((d) => isDisenchantable(d) && (d.quality === 'epic' || d.quality === 'legendary'));
+const raid = ep.filter((d) => itemFromRaid(d.id) || itemFromHeroicRaid(d.id));
+console.log(`disenchantable epic+: ${ep.length}; raid-flagged: ${raid.length}; non-raid: ${ep.length - raid.length}; non-raid legendaries: ${ep.filter((d) => d.quality === 'legendary' && !(itemFromRaid(d.id) || itemFromHeroicRaid(d.id))).length}`);

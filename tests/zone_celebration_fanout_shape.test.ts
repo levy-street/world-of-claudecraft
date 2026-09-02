@@ -36,6 +36,16 @@
 // magnitude (10 celebrations per SECOND, 25x the node-only realm rate per
 // zone, still costs 0.11% of a tick). The pin below holds the cadence
 // constant so a retune re-opens this paragraph rather than silently aging it.
+// AMENDED 2026-09-02 (Phase 19E, qr-19-zone-celebration-fanout-shape): "the
+// fan-out's highest-frequency producer" above is FALSE as a cadence claim.
+// gatherRareEvent is bounded by a world resource (nodes on a respawn), which is
+// why it is about one event per zone per 20 minutes; masterworkZone
+// (announceMasterworkZone, fired by crafting.ts on EVERY masterwork proc, 3% base
+// to a 15% cap, on casts of 1.5 to 5 s) is bounded only by how many players are
+// crafting, and a hundred continuous crafters alone proc about 0.75 per second,
+// sixty times the node line. The stringify refusal above survives (0.75 per
+// second times 24 us is 18 us per second), and the line stands as the node-only
+// floor it always was; the scan measurement below prices the craft-driven rate.
 //
 // AMENDED 2026-08-31 (the Phase 18 hot-path review): the SERIALIZATION figures
 // above are right, but they priced the wrong term. The dominant cost of a
@@ -53,23 +63,44 @@
 //
 // MEASURED 2026-09-02 (Phase 19E, qr-19-zone-celebration-fanout-shape): the half
 // neither record above priced, the O(all players) walk in emitToZonePlayers with a
-// zoneAt call per player. On this file's fixture shape (in-zone recipients at the
-// zone-1 centre, the rest spread over the other fourteen zones, one in ten in instance
-// space), Node v26, median of five: about 100 ns per non-home player (zoneAt is a
-// linear early-return scan of the 15-entry ZONES list, so a player costs the index of
-// the zone they stand in), which is 84 us per celebration at 1,000 players with 200
-// in-zone, 471 us at the 5,000-player realm cap with 200 in-zone, and 165 us with all
-// 5,000 in the celebration zone. That is about 20x the 24 us stringify term above and
-// the leading per-celebration cost, but a per-celebration spike rather than a per-tick
-// one: 1% of one 50 ms tick per celebration at the cap, 0.17% at 1,000 players, 8 us
-// per second at the record's cadence. Two premises corrected while measuring: the
-// realm rate is every tenant's cadence summed (the derivation above prices the widest
-// tenant alone), and ZONES holds 15 where the derivation says twenty (conservative).
-// A rect test against the celebration zone's own rect would cut the walk 12x (38 us at
-// the cap) with no new state; a cached per-player zoneId does no better on the walk.
-// RULED 2026-09-02 (Option 1): ACCEPTED ON THE NUMBER, no production code; the scan-premise
-// arm at the bottom of this file pins the walk shape so an index, a bucket or a rect test
-// re-opens this measurement here first.
+// zoneAt call per player. The bench (committed as
+// docs/screenshots/masterwrought-phase-19e/d139-fanout-scan-bench.ts and its
+// shapes twin, outputs beside them) ran a SCALED VARIANT of this file's fixture,
+// the same three populations at realm widths (in-zone recipients at the zone-1
+// centre, non-recipients spread over the other fourteen zones, one in ten in
+// instance space; the committed fakeWorld below adds one far-zone and one
+// instanced player), timing the whole walk including the per-recipient event mint
+// and emit. Node v26, median of five: about 100 ns per non-home player (zoneAt is
+// a linear early-return scan of the 15-entry ZONES list, pinned below, so a player
+// costs the index of the zone they stand in; a walk whose every player sits at
+// index 0 costs 27 ns per player, and zoneAt alone reads about 104 ns on the
+// spread mix), which is 84 us per celebration at 1,000 players with 200 in-zone
+// (3.5x the 24 us stringify term above), 471 us at the 5,000-player realm cap
+// with 200 in-zone (20x that term), and 165 us with all 5,000 in the celebration
+// zone. Those are FIXTURE-SHAPED figures with the home zone at index 0: a
+// celebration in a late-index zone (farshore_isle and proving_shore, where an
+// influx population stands, sit at 13 and 14) costs every in-zone recipient up to
+// fifteen iterations instead of one, so read the cap figure as carrying an upper
+// band near 1.8x, about 850 us. The leading per-celebration cost, but a
+// per-celebration spike rather than a per-tick one: 0.94% of one 50 ms tick per
+// celebration at the cap (1.7% at the band), 0.17% at 1,000 players.
+// THE CADENCE, corrected: the derivation above prices gatherRareEvent as the
+// widest tenant, and it is not (see the dated amendment there). masterworkZone
+// fires on every masterwork proc and crafting is bounded only by players and cast
+// time, so a hundred continuously crafting players (0.75 procs per second) put
+// about 350 us per second through this walk at the cap, roughly 0.035% of one
+// core; the node-only line (8 us per second) is a floor, not the rate. Two axes
+// the record must name: the per-second cost is SUPERLINEAR in realm size (rate
+// times roster), and the 5,000 cap is the code default, which MAX_PLAYERS_PER_REALM
+// overrides (0 disables it). The cost is not observable in production today
+// (it folds into the sim phase of server/tick_profiler.ts, with no celebration
+// counter), carried for the maintainer. A rect test against the celebration
+// zone's own rect would cut the walk 12x (38 us at the cap) with no new state; a
+// cached per-player zoneId does no better on the walk.
+// RULED 2026-09-02 (Option 1): ACCEPTED ON THE NUMBER, no production code; the
+// scan-premise arms at the bottom of this file pin the walk shape, the zone count
+// and the tenant set, so an index, a bucket, a rect test, a sixteenth zone or a
+// fifth tenant re-opens this measurement here first.
 //
 // These pins hold the premises both records rest on: the payload stays small
 // and flat, every copy differs from its siblings by the pid alone (so the day a
@@ -80,7 +111,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { DUNGEON_X_THRESHOLD, zoneAt } from '../src/sim/data';
+import { DUNGEON_X_THRESHOLD, ZONES, zoneAt } from '../src/sim/data';
 import { announceAttunement } from '../src/sim/professions/attunement_events';
 import {
   announceGatherRareEvent,
@@ -92,6 +123,7 @@ import type { PlayerMeta } from '../src/sim/sim';
 import type { SimContext } from '../src/sim/sim_context';
 import type { SimEvent } from '../src/sim/types';
 import { stripComments } from './helpers/strip_comments';
+import { tsFilesUnder } from './helpers/ts_files_under';
 
 // The scan-premise arm at the bottom counts zoneAt calls, so the data module is
 // wrapped (a partial mock that delegates to the real function): every importer,
@@ -343,36 +375,122 @@ describe('the fan-out measurement premises (batch size x session count)', () => 
 // ---------------------------------------------------------------------------
 
 describe('the scan premise: one celebration walks the whole roster, one zoneAt per overworld player', () => {
-  it('visits every roster entry once and resolves zoneAt once per non-instanced player, at every width', () => {
+  // The per-player cost the header records is the index of the player's zone in
+  // ZONES (zoneAt returns at the first containing rect), so the list length is a
+  // premise of that number the way the cadence constant and the realm cap are of
+  // the two records above. tests/professions_zone_rollout.test.ts pins the roster
+  // for its own reasons; this one routes a sixteenth zone back to this record.
+  it('the zone list the per-player cost is indexed over holds fifteen entries', () => {
+    expect(ZONES).toHaveLength(15);
+  });
+
+  /** Drive `fire` with the fixture's entity reads and zoneAt calls counted. The
+   *  zoneAt calls are returned as (x, z) pairs so the arms can pin WHICH players
+   *  were resolved, not just how many. */
+  function countedWalk(
+    world: FakeWorld,
+    fire: () => void,
+  ): { visits: number; calls: readonly (readonly [number, number])[] } {
+    let visits = 0;
+    const entities = world.ctx.entities as Map<number, unknown>;
+    const rawGet = entities.get.bind(entities);
+    entities.get = ((id: number) => {
+      visits++;
+      return rawGet(id);
+    }) as typeof entities.get;
+    const counted = vi.mocked(zoneAt);
+    counted.mockClear();
+    fire();
+    return { visits, calls: counted.mock.calls.map(([x, z]) => [x, z] as const) };
+  }
+
+  it('through the shared prologue: one celebrant lookup, then every roster entry once and one zoneAt per overworld player, at every width', () => {
     for (const recipients of [1, 12, 64]) {
       const world = fakeWorld(recipients);
-      // The roster the walk must cover: the recipients plus the far-zone
-      // bystander plus the instanced player the fixture always adds.
+      // A ghost roster entry (a player whose entity is gone) is still visited and
+      // still costs one read; the walk skips it before any zoneAt.
+      const ghost = 902;
+      world.ctx.players.set(ghost, { entityId: ghost, name: 'Ghost' } as never);
+      // The roster the walk must cover: the recipients, the far-zone bystander and
+      // the instanced player the fixture always adds, and the ghost.
       const roster = world.ctx.players.size;
-      expect(roster).toBe(recipients + 2);
-      // The one read the walk makes per player is entities.get; count it on the
-      // fixture's own Map (an own property shadows the prototype method).
-      let visits = 0;
-      const entities = world.ctx.entities as Map<number, unknown>;
-      const rawGet = entities.get.bind(entities);
-      entities.get = ((id: number) => {
-        visits++;
-        return rawGet(id);
-      }) as typeof entities.get;
-      const counted = vi.mocked(zoneAt);
-      counted.mockClear();
-      announceMasterworkZone(world.ctx, world.inZone[0], 'Grimmschaedel', {
-        itemId: 'eastbrook_ritual_vestments',
-        recipeId: 'recipe_eastbrook_ritual_vestments',
-      } as Parameters<typeof announceMasterworkZone>[3]);
-      // announceZoneCelebration resolves the celebrant once (one read, one
-      // zoneAt) before the walk; the walk then reads every roster entry once
-      // and resolves zoneAt for every overworld player, skipping only the
-      // instanced one on the x-threshold compare. A bucket, an index or a rect
-      // test changes one of these two counts; the recipient set does not.
-      expect(visits).toBe(1 + roster);
-      expect(counted).toHaveBeenCalledTimes(1 + (roster - 1));
-      expect(world.events.filter((ev) => ev.type === 'masterworkZone')).toHaveLength(recipients);
+      expect(roster, `width ${recipients}: roster`).toBe(recipients + 3);
+      // Celebrate from a player who is NOT the roster's first entry where the width
+      // allows, so the prologue's zoneAt is distinguishable from the walk's first.
+      const celebrantPid = world.inZone[recipients > 3 ? 3 : 0];
+      const celebrant = world.ctx.entities.get(celebrantPid) as {
+        pos: { x: number; z: number };
+      };
+      const { visits, calls } = countedWalk(world, () =>
+        announceMasterworkZone(world.ctx, celebrantPid, 'Grimmschaedel', {
+          itemId: 'eastbrook_ritual_vestments',
+          recipeId: 'recipe_eastbrook_ritual_vestments',
+        } as Parameters<typeof announceMasterworkZone>[3]),
+      );
+      // announceZoneCelebration reads and resolves the celebrant once before the
+      // walk; the walk then reads every roster entry once (the ghost included)
+      // and resolves zoneAt for every player that has an entity and is not past
+      // the instance threshold. The count is pinned as its parts, never as the
+      // sum alone: the FIRST call must be the celebrant's (the prologue), NO call
+      // may carry an instanced x (the threshold compare short-circuits first),
+      // and the total is one for the prologue plus one per overworld player.
+      expect(visits, `width ${recipients}: entity reads`).toBe(1 + roster);
+      expect(calls[0], `width ${recipients}: the prologue resolves the celebrant first`).toEqual([
+        celebrant.pos.x,
+        celebrant.pos.z,
+      ]);
+      expect(
+        calls.some(([x]) => x > DUNGEON_X_THRESHOLD),
+        `width ${recipients}: an instanced player must never reach zoneAt`,
+      ).toBe(false);
+      const overworld = roster - 2; // minus the instanced player and the ghost
+      expect(calls, `width ${recipients}: zoneAt calls`).toHaveLength(1 + overworld);
+      expect(
+        world.events.filter((ev) => ev.type === 'masterworkZone'),
+        `width ${recipients}: recipients`,
+      ).toHaveLength(recipients);
     }
+  });
+
+  it('through the direct entry (the gather tenant): no prologue, every roster entry once, one zoneAt per overworld player', () => {
+    const world = fakeWorld(12);
+    const roster = world.ctx.players.size;
+    const { visits, calls } = countedWalk(world, () =>
+      announceGatherRareEvent(
+        world.ctx,
+        fakeFinder(world.inZone[0], 'Celebrant0', 'golden_harvest'),
+        { zoneId: world.zoneId, type: 'crop' },
+        'golden_harvest',
+        'vale_wheat',
+      ),
+    );
+    expect(visits).toBe(roster);
+    expect(calls.some(([x]) => x > DUNGEON_X_THRESHOLD)).toBe(false);
+    expect(calls).toHaveLength(roster - 1);
+    expect(world.events.filter((ev) => ev.type === 'gatherRareEvent')).toHaveLength(12);
+  });
+
+  it('the tenant set the shared scan runs for is exactly the four recorded producers', () => {
+    // A fifth tenant joins the scan at its own cadence and ages the realm-rate
+    // record above, so it lands here first. Source text, comment-stripped, over
+    // every sim file: the direct callers of emitToZonePlayers and the producers on
+    // announceZoneCelebration, definitions excluded.
+    const root = resolve(process.cwd(), 'src/sim');
+    const direct = /(?<!function )\bemitToZonePlayers\(/g;
+    const prologue = /(?<!function )\bannounceZoneCelebration\(/g;
+    const seen: Record<string, { direct: number; prologue: number }> = {};
+    for (const source of tsFilesUnder(root)) {
+      const text = stripComments(readFileSync(source.full, 'utf8'));
+      const d = (text.match(direct) ?? []).length;
+      const p = (text.match(prologue) ?? []).length;
+      if (d + p > 0) seen[source.file] = { direct: d, prologue: p };
+    }
+    expect(seen).toEqual({
+      // The gather tenant's direct call plus the prologue's own call into the walk,
+      // and the masterwork producer on the prologue.
+      'professions/gather_events.ts': { direct: 2, prologue: 1 },
+      'professions/attunement_events.ts': { direct: 0, prologue: 1 },
+      'professions/perfecting.ts': { direct: 0, prologue: 1 },
+    });
   });
 });

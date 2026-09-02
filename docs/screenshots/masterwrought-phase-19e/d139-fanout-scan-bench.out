@@ -1,0 +1,18 @@
+ZONES=15 DUNGEON_X_THRESHOLD=100000 GATHER_RARE_EVENT_CHANCE=0.011111111111111112
+rows: total players | in-zone | ns per celebration (median of 5) | ns per player walked | recipients
+200 | 200 | 5335 ns | 26.7 ns | 200
+200 | 12 | 17374 ns | 86.9 ns | 12
+1000 | 200 | 84059 ns | 84.1 ns | 200
+1000 | 12 | 99489 ns | 99.5 ns | 12
+5000 | 200 | 471192 ns | 94.2 ns | 200
+5000 | 5000 | 164936 ns | 33.0 ns | 5000
+5000 | 12 | 506910 ns | 101.4 ns | 12
+zoneAt alone over 5000 positions: 103.6 ns per call (sink true)
+zoneContaining alone over 5000 positions: 51.9 ns per call
+instanced (threshold-skipped) players in that world: 500
+upper bound on the per-recipient mint+emit term (200/200 row / 200): 26.7 ns
+total/in-zone | zoneAt walk (today) | rect test (opt 4) | cached zoneId (opt 3 cheap) | recipients agree
+1000/200 | 82.6 us | 6.6 us | 5.8 us | 200/200/200
+5000/200 | 493.1 us | 37.7 us | 38.9 us | 200/200/200
+5000/5000 | 170.1 us | 47.9 us | 55.8 us | 5000/5000/5000
+5000/12 | 502.6 us | 37.2 us | 33.9 us | 12/12/12

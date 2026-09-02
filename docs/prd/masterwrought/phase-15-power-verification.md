@@ -140,6 +140,9 @@ tune:** print, per craft, the crafts-to-cap count for the cheapest below-band sp
 beside the intended band-matched path. No gain-curve change lands in this packet (the 11e,
 11f and 11i pacing models were all derived against the shipped multiplier); the record is
 the judgment surface for the future-tier revisit brainstorm.md carries.
+(NOTE 2026-09-02, qr-19-qr-gray-row-wording-false: the path this names is section
+12.2's floor-spam column, renamed from "cheap path" that day; the premise sentence stands
+as history, and row 128's dated amendment carries the measured read.)
 
 **STEP 0 additions.**
 - DECISION 2 (the well-fed unification and power ladder) IS SETTLED (2026-08-20, row

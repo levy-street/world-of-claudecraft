@@ -1096,8 +1096,10 @@ Character's craft is its active archetype (ceiling unbounded). `oncePerDay` rows
 excluded from both paths. Intended = the band-matched recipe at every step.
 Floor spam = the lowest-`skillReq` recipe that still yields anything. (RENAMED
 2026-09-02 under qr-19-qr-gray-row-wording-false: this path was labelled "cheap" here
-while section 12.3 measures it DEARER than the intended path on eight of the ten crafts,
-so 12.2 now carries the floor-spam name 12.3 uses; the numbers are unchanged.)
+while the table below shows it LONGER than the intended path on all ten crafts and
+section 12.3 measures it DEARER in reagent value on eight of the ten, only
+leatherworking and inscription coming out cheaper, so 12.2 now carries the floor-spam
+name 12.3 uses; the numbers are unchanged.)
 
 | craft | intended | floor spam | ratio | the floor recipe (skillReq, reagent value) |
 |---|---|---|---|---|
@@ -1166,6 +1168,8 @@ and start at the craft's own lowest `skillReq`.
   to 2.6x the crafts; enchanting is the tenth and it ties at 1.00, because with
   only three rows its cheapest-per-point path IS its intended path. That
   arbitrage, not the floor spam, is what a future revisit should aim at.
+  (AMENDED 2026-09-02, qr-19-qr-gray-row-wording-false: the qr-GRAY row now carries
+  this correction in place, dated, and section 12.2's label is renamed to match.)
 - **Enchanting's cheapest path is not a recipe.** Its roster is three rows (two
   at 25, one at 75) with no tier-0, tier-2, tier-4 or tier-5 recipe at all, so
   its recipe path costs 150 crafts rather than 125. 125 disenchants of epic input
@@ -1248,6 +1252,11 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   the binding lane), and raising it is precisely the move R5 forbids. Recorded
   as a judged risk to the `lucent_reagent` sink for a future demand pass, not
   tuned here.
+  (RULED 2026-09-02, qr-19-disenchant-ratio-outlier, under qr-19-best-for-project:
+  ACCEPTED on the record with this note standing; the commissioned shard
+  supply-and-demand read lives in docs/prd/masterwrought/state.md, THE SINKS
+  section of the Phase 11m ledger, and counts reagent rows rather than spend,
+  so it leaves this substitution risk as recorded.)
 - **The phase file's "11e decision 6"** is ruling 11g-D-C, landed in 11g. The
   content is correct; the label is stale.
   ACTIONED (qr-18-REOPEN, 2026-08-31): Phase 18 corrected the label everywhere

@@ -879,6 +879,9 @@ Deliverables:
   count for the cheapest below-band spam path beside the intended band-matched path, as a
   recorded measurement only; no gain-curve change lands in this packet, and the revisit
   lives in brainstorm.md's future-tier block.
+  (NOTE 2026-09-02, qr-19-qr-gray-row-wording-false: the path this names is section
+  12.2's floor-spam column, renamed from "cheap path" that day; the premise sentence
+  stands as history, and row 128's dated amendment carries the measured read.)
 - Premise check (qr-11o-WEAR, row 118): Phase 11o re-leveled the rung-50/75 crafted rares
   before this phase runs, so the level-20 shelf this phase measures against must be shown
   UNMOVED by that change (re-derive the shelf, do not assume it).

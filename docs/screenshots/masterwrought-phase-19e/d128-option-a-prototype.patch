@@ -1,0 +1,33 @@
+--- a/src/ui/painter_host.ts
++++ b/src/ui/painter_host.ts
+@@ -142,8 +142,10 @@
+  * the skip path and the repeat-write path allocate nothing.
+  */
+ export interface SingleSlotEntry {
+-  kind: SingleSlotKind;
+-  value: string;
++  text: string | null;
++  display: string | null;
++  transform: string | null;
++  width: string | null;
+ }
+ 
+ /** The shared single-slot elision cache (Hud's private `hotWriteCache` field).
+@@ -171,12 +173,13 @@
+ ): boolean {
+   const entry = cache.get(el);
+   if (entry === undefined) {
+-    cache.set(el, { kind, value });
++    const fresh: SingleSlotEntry = { text: null, display: null, transform: null, width: null };
++    fresh[kind] = value;
++    cache.set(el, fresh);
+     return true;
+   }
+-  if (entry.kind === kind && entry.value === value) return false;
+-  entry.kind = kind;
+-  entry.value = value;
++  if (entry[kind] === value) return false;
++  entry[kind] = value;
+   return true;
+ }
+ 

@@ -18418,58 +18418,87 @@ recipes.ts AND enchants.ts (the 11m predicate): arcane_shard 12 consumers / 21
 units, the corrected split exactly (recipe_gatherers_cache 5, recipe_artisans_eye
 5, six Greater etchings at 1, three Lucent etchings at 1, Lucent Infusion at 2);
 arcane_essence 41 / 86 (the census above read 40 / 84; recipe_deed_of_making's
-2-essence row joined since); arcane_dust 42 / 155. So the shard rung holds 29
-percent of essence's rows and 24 percent of its units. A THIRD SINK the reagent
-predicate cannot see, and enchants.ts's own header already counts ("the four
-arcane_shard sinks"): the tool-effect recharge (src/sim/professions/tools.ts, R39)
-prices in DISENCHANT_MATERIAL_BY_QUALITY at the owned tool's rarity rung, so a
-recharger holding an epic tool (35 epic tool defs on the merged catalog, the
-tier-5 family) pays arcane_shard: a full epic-rung slot restores up to 50 charges
-(20 base plus three 10-point rungs) at RECHARGE_CHARGES_PER_MATERIAL 10, so 5
-shards at the generic rate and 3 at the original crafter's 0.5 discount, PER
-RECHARGE. That is a repeating sink beside the 21 fixed units, which no
+2-essence row joined since); arcane_dust 42 / 155 (the census above read 41 /
+152; recipe_copperlens_ocular's 3-dust row joined since). So the shard rung holds
+29 percent of essence's rows and 24 percent of its units. ONE SINK OUTSIDE BOTH
+REAGENT FILES, which the reagent-row predicate cannot see: the tool-effect
+recharge (src/sim/professions/tools.ts, R39; enchants.ts's own header counts it
+among "the four arcane_shard sinks" beside the two charms and the Greater rung,
+and that header itself undercounts, since it omits the four Lucent rows the
+census above carries). Under R47 the recharge prices in
+DISENCHANT_MATERIAL_BY_QUALITY at the HIGHER of the owned gather tool's rarity
+rung and the rung the slot's latched durability ceiling implies, so a slot minted
+on an epic tool keeps paying shards even when its owner carries a lesser tool.
+The epic rung is reachable: six epic gather-tool defs ship on the merged catalog
+(arcanite_mining_pick, elderwood_axe, sunpetal_sickle, tidewrought_fishing_rod and
+evergarden_hoe at tier 5, clockreel_fishing_rod at tier 6; the legendary rung has
+no gather tool and is unreachable today). A full epic-rung slot restores up to 50
+charges (20 base plus three 10-point rungs) at RECHARGE_CHARGES_PER_MATERIAL 10,
+so a recharge costs 5 shards at the generic rate, 3 at the original crafter's
+0.5 discount, and 2 when that crafter is also specialized (0.5 times 0.75): TWO
+TO FIVE SHARDS PER RECHARGE, a repeating sink beside the 21 fixed units, which no
 "consumers / units" figure can carry. SUPPLY, one route only: resolveDisenchant
 (src/sim/professions/enchanting.ts) with the rung map in
 src/sim/professions/disenchant_reagents.ts: a rare disenchant yields ONE essence
-and an epic or legendary disenchant yields ONE shard, both flat regardless of
-item level, while sub-rare yields dust at the quantity-scaled baseDisenchantYield.
-No loot table, vendor, quest or faucet mints a shard (grep over src/sim and
-server: the items.ts def, the two reagent files and the rung map are the only
-carriers). SUNDERING IS NOT A SHARD SOURCE, correcting the phase text that had it
-on the supply side: it mints sundered_essence at SUNDERED_ESSENCE_YIELD 1 per raid
-gear epic and admits exactly the raid gear epics a shard disenchant would also
-consume, so it is a competing spend of the shard's INPUT. Catalog census: 402
-disenchantable epic-or-legendary defs (394 + 8) against 164 rares; 217 of the
-epics are sunderable raid gear; 17 are the crafted apex pieces themselves (an
-apex crafter can disenchant own output into one shard, at the apex bill). THE
+and an epic or legendary disenchant yields ONE shard, the arcane primary flat
+regardless of item level (the rare-plus arm also mints a typed bind-on-trade
+secondary for armor with an armorType and for weapons, one for rare and one or
+two for epic or legendary through a single rng draw; jewelry and held offhands
+draw none), while sub-rare yields dust at the quantity-scaled baseDisenchantYield
+plus a 0-or-1 coin flip. No PRODUCTION faucet mints a shard: over src/sim and
+server the only mint sites are the rung map's two rows, and the only other
+carriers are the items.ts def, the two reagent files' rows and comments, and one
+doc comment in enchanting.ts (the PTR dev vendor and the PBE boost mint the
+INPUT, epic gear, on dev realms only). SUNDERING IS NOT A SHARD SOURCE,
+correcting the phase text that had it on the supply side: it mints
+sundered_essence at SUNDERED_ESSENCE_YIELD 1 per raid gear epic and admits exactly
+the raid gear epics a shard disenchant would also consume, so it is a competing
+spend of the shard's INPUT. Catalog census: 402 disenchantable epic-or-legendary
+defs (394 + 8) against 164 rares; 223 of the 402 are raid-flagged (217 of them
+sunderable raid gear) and 179 are NOT (five-man and dungeon epics, world and
+quest epics, two non-raid legendaries, and the 17 crafted apex pieces themselves,
+which an apex crafter can disenchant into one shard at the apex bill). THE
 ESSENCE COMPARISON ON THE SAME BASIS: per disenchant both rungs pay exactly one
 unit, so the supply ratio IS the ratio of rare to epic-or-legendary items reaching
 the disenchant table, and the fixed demand asks 86 essence against 21 shard (4.1
 to 1) plus the recharge stream on shards alone. THE INFLOW, on the merged tables
-rather than the 11m tree: the eleventh sync re-cut the Crucible to ONE gear item
-per five raiders per kill on both difficulties (docs/prd/ignivar-raid-loot.md,
-"The cadence rule", re-cut 2026-09-02: two items per 10-player kill, down from
-four per Normal kill and six to seven per Heroic; about 0.8 items per player per
-week for a roster running both locks, down from about two), and one of a kill's
-two slots is the sigil TOKEN partition on both difficulties, so a kill sheds at
-most one disenchantable gear epic on Normal and a fraction of one on Heroic (the
-heroic exclusive slot mixes tokens with gear). A raider who destroyed EVERY raid
-epic would mint under one shard a week; one charm recipe is five, the fixed rows
-are twenty-one, and a single epic-rung recharge is three to five. THE VERDICT ON
-THE NUMBER: the sink is NOT starved of consumers, it is supply-limited, and the
-sync just cut the supply further; the 11m refusal is ratified as measured, not
-as recorded. WHAT IT BINDS: no new shard consumer lands below the apex band, and
-all four reservations in recipes.ts stand exactly as written and unamended (the
-jewelcrafting hub header, the inscription header, the INTERMEDIATE_RECIPES header,
-and the trophy-exclusion "reserved for the apex band" note); D047's commissioned
-measurement is this read, and D034's accept-on-record stands, because the demand
-risk it priced (a starving lucent_reagent and shard sink) is the opposite of what
-the number shows. No code moved. Derivation harness: the scratch census in the
-Phase 19E QA record (phase-19e-qa.md), re-runnable from the two content files and
-the three profession modules named here.
+rather than the 11m tree, the RAID ARM first because it is the arm this sync
+moved: the eleventh sync re-cut the Crucible to ONE gear item per five raiders
+per kill on both difficulties (docs/prd/ignivar-raid-loot.md, "The cadence rule",
+re-cut 2026-09-02: two items per 10-player kill, down from four per Normal kill
+and six to seven per Heroic; about 0.8 items per player per week for a roster
+running both locks, down from about two), and one of a kill's two slots is the
+sigil TOKEN partition on both difficulties, so a kill sheds at most one
+disenchantable gear epic on Normal and a fraction of one on Heroic (the heroic
+exclusive slot mixes tokens with gear). A raider who destroyed EVERY raid epic
+would mint under one shard a week. That raid figure is a LOWER BOUND on the
+shard's inflow, not the inflow: the 179 non-raid epic-plus defs add to it at
+rates no packet record carries (dungeon and world drops, quest rewards, crafted
+apex output), and every omitted source raises supply. Against it, one charm
+recipe is five shards, the fixed rows are twenty-one, and a single epic-rung
+recharge is two to five. THE VERDICT ON THE NUMBER: the sink is NOT starved of
+consumers, and on every accounting the per-player supply is small, so the 11m
+refusal is ratified as measured, not as recorded, and the recommended arm (the
+no-op) survives whichever way the unpriced non-raid inflow falls. WHAT IT BINDS:
+no new shard consumer lands below the apex band, and all four reservations in
+recipes.ts stand exactly as written and unamended (the jewelcrafting hub header,
+the inscription header, the INTERMEDIATE_RECIPES header, and the trophy-exclusion
+"reserved for the apex band" note). D047's commissioned measurement is this read
+(a dated pointer sits on its row). D034's accept-on-record stands ON ITS ARM (the
+record, with the future-demand-pass note standing; a dated pointer sits on its
+row and on both of its records): a reagent-row census counts listed rows, not
+player spend, so it neither confirms nor refutes the substitution risk D034
+prices, and a scarce shard supply is exactly what would sharpen substitution
+toward the higher-value sinks. WHAT RE-OPENS THIS READ: a new shard consumer, a
+change to the disenchant rung map or the rare-plus yield, or the Crucible
+cadence moving again. No code moved. Derivation harness: the scratch censuses
+committed as docs/screenshots/masterwrought-phase-19e/d062-disenchant-census.ts
+and d062-disenchant-census-2.ts with their outputs (the Phase 19E QA record,
+phase-19e-qa.md, restates the figures), re-runnable with npx tsx from the two
+content files and the four profession modules named here.
 
-Both branches of the reservation obligation stated: no
-new consumer lands below the apex band, so none of the three "NEVER
+Both branches of the reservation obligation stated: no new consumer lands
+below the apex band, so none of the three "NEVER
 arcane_shard" reservations in recipes.ts (the jewelcrafting hub header,
 the inscription header, the INTERMEDIATE_RECIPES header, plus the fourth
 "reserved" mention in the trophy exclusion ledger) is amended; all four
@@ -22740,11 +22769,24 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-craft-gain-cl
   own "cheap path" label (the definition line, the column header's two uses, and the
   two prose uses) is renamed to the floor-spam name section 12.3 already uses, with a
   dated rename note, closing the contradiction inside the authority document. The
-  amendment keeps the two eights apart: LONGER on all ten crafts, DEARER on eight.
+  amendment keeps the LONGER-on-ten and DEARER-on-eight sets apart.
   The two historical phase specs that repeat "the cheapest below-band spam path"
   (implementation-plan.md, phase-15-power-verification.md) are left as history
-  (option B not taken), and rider F, a committed three-path walk on the r5_envelope_probe precedent, was offered and NOT taken (the amended numbers are the measured ones section 12.3 already records). Docs only: no code, no test, no wiki regen,
-  tierProgressMultiplier untouched, the R5 surface untouched.
+  (option B not taken), each with a dated one-line note saying the column the
+  phrase names is now called floor spam, so a reader is not sent looking for a
+  column that no longer exists; rider F, a committed three-path walk on the
+  r5_envelope_probe precedent, was offered and NOT taken. Stated plainly: the
+  LONGER-on-ten half reproduces from section 12.2 alone, while the DEARER-on-eight
+  half and the 0.66 to 0.88 per-point band rest on a RECORDED measurement (the
+  reagent-value column does not reproduce from the document, section 12.2 says
+  so), and this amendment copies that half into three more homes without a pin.
+  If the decline is ever reversed, the minimal pin is one derived test on the
+  tests/professions_crafts_to_mastery.test.ts precedent walking the three paths
+  over ALL_RECIPES through the live craftSkillGainMultiplier and gainCraftSkill,
+  asserting floor spam strictly longer on every craft, the dearer set equal to
+  eight with leatherworking and inscription its complement, and the per-point
+  band. Docs only: no code, no test, no wiki regen, tierProgressMultiplier
+  untouched, the R5 surface untouched.
 
 ### PINS ADDED OR MOVED
 Moved by the tunes: the sunspun_vestments rating row and the armour and
@@ -22923,6 +22965,11 @@ stays alive, and this is that shape one tier up. The envelope forced it
 binding lane) and raising it is exactly the move R5 forbids. It is a
 demand risk under R21 for a future pass, recorded in
 power-verification.md section 14 and beside the def.
+RULED (qr-19-disenchant-ratio-outlier, 2026-09-02, under qr-19-best-for-project):
+the D034 risk is ACCEPTED ON THE RECORD with this demand-pass note standing; the
+commissioned shard measurement is the read in THE SINKS section of the Phase 11m
+ledger (grep the ruling id), which counts rows, not spend, and so leaves this
+substitution risk exactly as recorded.
 
 ### THE VERDICT IS SUSPENDED, and why (2026-08-28, the fresh-reader round)
 The review-fix round's own fresh reader found what four earlier reviewers and
@@ -24575,7 +24622,7 @@ The one JUDGED item is the zone-celebration fan-out, refused on a measurement.
 | castle-deed-art-pending | CARRIED | (none) | Ledger CARRIED section, docs/prd/masterwrought/state.md:23985-23992 at the tip: "castle-deed-art-pending: generating the two castle deed paintings from their briefs runs the asset-pipeline skill against the Tripo and gpt-image APIs, whose credentials are maintainer-held and absent from this environment (no TRIPO/OPENAI variable is set); the same credential-gated class the verifier applied to the farmer voice lines. Carried to the maintainer's art wave (the ip-16-ICON park), not to the Phase 19 table (no decision is |
 | farming-zero-blob-serialization | CARRIED | (none) | NOT DONE at 2ab5c2f7d0. src/sim/sim.ts:3953-3954 still serializes the full record unconditionally (`professions: { ...foldedProficiency }, gatheringProficiency: foldedProficiency`), src/sim/professions/gathering.ts:950-952 `emptyGatheringProficiency()` still returns `{ mining: 0, logging: 0, herbalism: 0, fishing: 0, farming: 0 }`, and the wart comment survives verbatim at src/sim/sim.ts:3307: 'this FIELD round-trips (the blob still gains farming: 0)'. No commit in 8d5796808c..2ab5c2f7d0 touches src/sim/professions |
 | reword-staleness-gate | CARRIED | (none) | Not done, and the reason is recorded. No commit in 8d5796808c..2ab5c2f7d0 touches scripts/i18n_scan.mjs or tests/i18n_status_registry.test.ts (`git log --oneline <range> -- <path>` is empty for both). At the tip the dormancy comment survives verbatim at scripts/i18n_scan.mjs:32-37 ('the translated/stale distinction is dormant ... becomes live once sparse overlays and the fill pipeline persist translation-time hashes') and all three emit sites (lines 242, 272, 322) still write `{ state: 'translated', srcHash: enHash |
-| zone-celebration-fanout-tenants | JUDGED | 8cc3248db6b06239ff62ce9c3c370a77a8e0495e | The phase measured the asked splice and refused it, recording the ground in two places. Ledger, state.md:23291-23296 (AMENDED 2026-09-02: that address was stale by the time Phase 19E ratified this row; the record is the U-SRV-HOT bullet whose anchor 'zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and' greps 1, at :24969-24974 at the merge tip 2ebe95e731 before this wave's own insertions): "zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and 192 bytes per recipient today vs 8 to 11 ns shared; 0.4 us per second at design cadence, 0.14 percent of a tick at the absolute ceiling; the splice would buy a cross-module key-order invariant and a second serialization path for nanoseconds), premises pinned in tests/zone_celebration_fanout_shape.test.ts (so Phase 19 seed row 11 is a |
+| zone-celebration-fanout-tenants | JUDGED | 8cc3248db6b06239ff62ce9c3c370a77a8e0495e | The phase measured the asked splice and refused it, recording the ground in two places. Ledger, state.md:23291-23296 (AMENDED 2026-09-02: that address was stale by the time Phase 19E ratified this row; the record is the U-SRV-HOT bullet whose anchor 'zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and' greps 2, the other hit being this row, at :24969-24975 at the merge tip 2ebe95e731 before this wave's own insertions): "zone-celebration-fanout-tenants is a MEASURED REFUSAL (117 ns and 192 bytes per recipient today vs 8 to 11 ns shared; 0.4 us per second at design cadence, 0.14 percent of a tick at the absolute ceiling; the splice would buy a cross-module key-order invariant and a second serialization path for nanoseconds), premises pinned in tests/zone_celebration_fanout_shape.test.ts (so Phase 19 seed row 11 is a |
 | admin-metrics-serialize-once | CLOSED-DEVIATED | 57a6a5bbb4fd4ae44f087f59ea3472ed3e1a93cb | DEVIATION: Two of the three named routes ride the memo; OVERVIEW is deliberately excluded. server/admin.ts:2352-2356 marks overviewHandler 'EXEMPT from the family's serialize-once memos' because its response embeds the per-request adminStats() merge. Recorded in the ledger twice: '### JUDGED THIS PHASE' (state.md, ph18 ledger) - 'The admin OVERVIEW response is exempt from the serialize-once byte memo: it embeds the per-request live adminStats merge (online, uptimeSeconds, rssBytes, heapUsedBytes), so memoized bytes cannot satisfy the item's own byte-identity criterion... Not a Phase 19 row'; and in the seed-anchor corrections - 'the seed's admin-metrics "family" of three routes is two for the byte memo (overview is exempt, see JUDGED)'. The exemption is itself regression-pinned by tests/server/admin_analytics_reads.test.ts 'overview stays live per-request (the byte-memo exemption)'. Commit 57a6a5bbb4 (plus the review addendum in 8cc3248db6). At 2ab5c2f7d0: server/ok_response_memo.ts exports createOkResponseMemo (WeakMap key-tuple node cache holding {body, bytes}); server/admin.ts:644-645 constructs activityOkMemo and marketMetricsOkMemo, :679 activityOkMemo.send over the frozen |
 | admin-sold-volume-metric | CLOSED-DEVIATED | e986eb3b7370b277cb7db02225e8342011ac976e | DEVIATION: The store is never armed, so the metric can never be anything but unavailable in a real process. At 2ab5c2f7d0 a whole-tree grep for market_sold_volume / marketSoldVolumeRetentionTable / MARKET_SOLD_VOLUME_SCHEMA / configureAdminMarketSoldVolume returns ZERO hits in server/game.ts, server/db.ts and server/main.ts; server/main.ts:3915 'tables: [' (the retention sweep registration array) carries chat_logs, client_perf_reports, daily_reward_events, player_activity_daily, admin_site_presence_samples, site_presence_sessions and no market_sold_volume row. So 'fed at sale time' and 'a retention registration' are both undelivered, and the page permanently renders the soldUnavailable line. The ledger records the split honestly in unit record U-ADMIN-SVELTE: 'Its four arming call sites live in game.ts, db.ts and main.ts and were routed to those holders; until they land the feature is inert AND SAYS SO on the page, which is the honest shape for a split unit.' Those call sites never landed anywhere in 8d5796808c..2ab5c2f7d0. Commit e986eb3b73 landed the modules but NOT the wiring. Present at 2ab5c2f7d0: server/market_sold_volume_db.ts (MARKET_SOLD_VOLUME_SCHEMA 'CREATE TABLE IF NOT EXISTS market_sold_volume', PRIMARY KEY (realm, day, item_id), market_sold_volume_day index, pruneMarketSoldVolumeBatch, marketSoldVolumeRet |
 | autosave-transactional-writes | CLOSED-DEVIATED | f14f015a7b | the ATOMICITY the item asks for is a design call and is tabled as Phase 19 row D146, not guessed. What landed is the extraction (server/periodic_save_flush.ts) with an exactly-once pin per writer, plus the profiler sample the v0.42.0 merge had dropped, so the three writes are attributed to the saves phase again. NOTE the lane first recorded this as repairing a doubled write on this branch; that was wrong and is corrected in the shipped comments: the doubling is the RELEASE branch's and it still ships there. |
@@ -25828,43 +25875,79 @@ carry that argument in its record.
   net-wire unit's hot-path review of 8cc3248db6 above, where it is written
   as a RECORDED read.
   RULED (qr-19-zone-celebration-fanout-shape, 2026-09-02, under qr-19-best-for-project),
-  the SCAN half, measured FIRST (Option 2) and then shaped on the number. THE BENCH, on
-  the fanout suite's own fixture shape (in-zone recipients at the zone-1 centre, the
-  other players spread over the fourteen remaining zones, one in ten in instance space
-  past DUNGEON_X_THRESHOLD), Node v26 on the capture machine, median of five runs:
-  the walk costs about 100 ns per non-home player (zoneAt is a linear scan of the
-  15-entry ZONES list with an early return, so a player's cost is the list index of
-  the zone they stand in, 27 ns at index 0 and 103 ns on the spread mix; an instanced
-  player costs one compare), which is 84 us per celebration at 1,000 players with 200
-  in-zone, 471 us at the 5,000-player realm cap with 200 in-zone, 507 us at the cap with
-  12 in-zone, and 165 us with all 5,000 in the celebration zone (cheaper, because every
-  hit returns at index 0). Against the record's terms: the scan is about 20 times the 24
-  us stringify term the splice was weighed against and is the leading per-celebration
-  cost, but it is a per-celebration spike, never a per-tick one: 1 percent of ONE 50 ms
-  tick per celebration at the realm cap, 0.17 percent at 1,000 players; at the record's
-  own cadence (about one celebration a minute realm-wide) it averages 8 us per second,
-  and even ten celebrations a second at the cap average 1 percent of the budget. TWO
-  PREMISES THE RECORD NOW CARRIES that it did not: the fan-out has four tenants and the
-  suite header derives the realm rate from the widest one (gatherRareEvent, the farming
-  crop harvest a second stream on the same constant), so the shared scan runs at every
-  tenant's cadence summed, above the node-only line; and that line assumes twenty zones
-  where ZONES holds 15, which errs conservative. The cheaper shapes, measured on the
-  same fixture: Option 4 (a rect test against the celebration zone's own rect, no new
-  state) 38 us at the cap with 200 in-zone, a 12x constant-factor cut; Option 3's cheap
-  form (a per-player cached zoneId compare, state kept roster-exact elsewhere) 39 us,
-  no better than the rect test on the walk itself while owing the state, the census
-  set, three fake SimContexts and the roster-order pin. THE SHAPE, ruled by the maintainer on those figures: OPTION 1, the scan is ACCEPTED ON
-  RECORD as measured, no production code. Option 4's 12x is a constant-factor cut bought
-  with a membership change at the rect edges (zoneAt's southmost-band fallback and the
-  active-content map) against a cost that is 1 percent of one tick at the realm cap, and
-  Option 3 is premature before there is a per-tick cost at all. The bench stays a scratch
-  harness (maintainer-named; its source and output are in phase-19e-qa.md), and the suite
-  gains a premise arm that pins the walk shape (every roster entry visited once, one
-  zoneAt per overworld player, at widths 1, 12 and 64), mutation-proved against a rect
-  test and a bucket, so an index, a bucket or a rect test re-opens the measurement here
-  first. Harness and
-  figures: the Phase 19E QA record (phase-19e-qa.md); the suite header carries the
-  same numbers beside the two earlier measurements.
+  the SCAN half, measured FIRST (Option 2) and then shaped on the number. THE BENCH
+  (committed as docs/screenshots/masterwrought-phase-19e/d139-fanout-scan-bench.ts
+  and d139-fanout-scan-shapes-bench.ts with their outputs beside them, restated in
+  phase-19e-qa.md) ran a SCALED VARIANT of the fanout suite's fixture, the same
+  three populations at realm widths (in-zone recipients at the zone-1 centre,
+  non-recipients spread over the fourteen other zones, one in ten in instance space
+  past DUNGEON_X_THRESHOLD; the committed fixture adds one far-zone and one
+  instanced player), timing the whole walk including the per-recipient event mint
+  and emit, Node v26 on the capture machine, median of five runs. The walk costs
+  about 100 ns per non-home player (zoneAt is a linear scan of the 15-entry ZONES
+  list with an early return, so a player's cost is the list index of the zone they
+  stand in: a walk whose every player is home at index 0 costs 27 ns per player,
+  and zoneAt alone reads about 104 ns per call on the spread mix, that standalone
+  figure inflated some 8 percent by the instanced positions the real walk never
+  resolves; an instanced player costs one compare), which is 84 us per celebration
+  at 1,000 players with 200 in-zone, 471 us at the 5,000-player realm cap with 200
+  in-zone, 507 us at the cap with 12 in-zone, and 165 us with all 5,000 in the
+  celebration zone (cheaper, because every hit returns at index 0). THOSE FIGURES
+  ARE FIXTURE-SHAPED, not worst-case: the home zone sits at index 0 and the
+  non-home players are spread uniformly, while a live population stands in the
+  level-20 band (indices 8 to 12) and the two influx zones appended last
+  (farshore_isle 13, proving_shore 14), and a celebration in a late-index zone
+  costs every in-zone recipient up to fifteen iterations instead of one; read the
+  cap figure as carrying an upper band near 1.8x, about 850 us, with the capital at
+  index 0 the offsetting cheap case. Against the record's terms: the scan is about
+  20 times the 24 us stringify term the splice was weighed against at the cap (3.5
+  times at 1,000 players) and is the leading per-celebration cost, but a
+  per-celebration spike, never a per-tick one: 0.94 percent of ONE 50 ms tick per
+  celebration at the cap (1.7 percent at the band), 0.17 percent at 1,000 players;
+  ten celebrations a second at the cap average about 0.5 percent of the budget
+  (235 us per tick). THE CADENCE, and a premise BOTH records had wrong: the suite
+  header derives the realm rate from gatherRareEvent as "the fan-out's
+  highest-frequency producer", and it is not. Gathering is bounded by a world
+  resource, so its line (about one celebration a minute realm-wide, 8 us per second
+  through this walk) is a FLOOR; masterworkZone fires on every masterwork proc (3
+  percent base to a 15 percent cap on 1.5 to 5 s casts) and is bounded only by how
+  many players are crafting: a hundred continuous crafters, 2 percent of a capped
+  realm, proc about 0.75 a second, sixty times the node line, which is about 350 us
+  per second through this walk at the cap, roughly 0.035 percent of one core. The
+  header is amended in place, dated; the earlier line about ZONES holding 15 where
+  the derivation says twenty stands (conservative). THREE AXES THE RECORD NAMES SO
+  THE ACCEPTANCE CANNOT AGE SILENTLY: (1) the per-second cost is SUPERLINEAR in
+  realm size, since the celebration rate grows with player count and each
+  celebration walks the whole roster, and the 5,000 ceiling the suite pins is the
+  code DEFAULT (DEFAULT_MAX_PLAYERS_PER_REALM), which the MAX_PLAYERS_PER_REALM
+  override moves and an explicit 0 disables, so a realm deployed above the default
+  invalidates the cap figure with nothing going red; (2) tenant growth: a fifth
+  producer joins the scan at its own cadence, so the suite now pins the tenant set;
+  (3) the cost is NOT OBSERVABLE in production today, folding into the sim phase of
+  server/tick_profiler.ts with no celebration counter or PERF_TICK_LOG token
+  (mob_scan_tick_stats.ts is the precedent), so the implicit withdrawal condition
+  cannot be seen on a live realm; a counter is CARRIED for the maintainer, not
+  taken here (Option 1 lands no production code). The cheaper shapes, measured on
+  the same fixture: Option 4 (a rect test against the celebration zone's own rect,
+  no new state) 38 us at the cap with 200 in-zone, a 12x constant-factor cut,
+  bought with membership semantics at the rect edges (an inline test against the
+  ZoneDef the prologue already resolved keeps the active-content map, so in that
+  form only zoneAt's southmost-band fallback differs); Option 3's cheap form (a
+  per-player cached zoneId compare, state kept roster-exact elsewhere) 39 us, no
+  better than the rect test on the walk itself while owing the state, two of the
+  three fake SimContexts, the roster-order pin, and the census set if it adds a
+  named indirection. THE SHAPE, ruled by the maintainer on those figures: OPTION 1,
+  the scan is ACCEPTED ON RECORD as measured, no production code; the gate row's
+  Option 1 sentence at gather_events.ts:71 ("O(all players) and never measured") is
+  deliberately NOT shipped, because "never measured" is now false and the module is
+  untouched. The bench stays a scratch harness (maintainer-named), committed as
+  evidence rather than as a test; the suite gains premise arms that pin the walk
+  shape (every roster entry visited once, the prologue's celebrant lookup first, no
+  instanced player reaching zoneAt, one zoneAt per overworld player, on both the
+  prologue and the direct-entry path, at widths 1, 12 and 64), the zone count, and
+  the tenant set, mutation-proved against a rect test and a bucket, so an index, a
+  bucket, a rect test, a sixteenth zone or a fifth tenant re-opens the measurement
+  here first.
 - CHARACTER_BLOB_WARN_BYTES (131,072) sits BELOW the legitimate worst case,
   not the roughly 3.2x above it the standing comment argued. The blob-size
   comment repair (aa184248da above) inverted the recorded relation by
