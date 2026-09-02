@@ -323,6 +323,9 @@ interface AttributionTargetFixture {
 // Re-minted for the v0.40.0 sync merge into the guild pledge branch (the
 // OSSBrain v0.40 batch landed on the release arm; renderer inputs moved on
 // both sides). No capture was retaken.
+// Re-minted for the weapon-stow overlay fix (renderer.ts: single-writer
+// removal + the mount sheathe clause): the renderer integration leaf moved.
+// No capture was retaken.
 // Re-minted for the entry-horizon scenery cull (renderer.ts hands the four
 // reveal-gated painters the horizon-capped cull far at both frame sites): the
 // renderer integration leaf moved. No capture was retaken.
@@ -348,8 +351,13 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the release/v0.42.0 merge into the weapon-sheathe-swim-mount
+// branch (the merged renderer.ts carries this branch's mount sheathe overlay
+// beside the release's forge-lift room and Drakelands entrance render
+// integrations, so the composite matches neither parent). No capture was
+// retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  'd91b63085fc8b63209f994616448ed46d9c546e28fa42b907efb5929d1ce90c7';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
