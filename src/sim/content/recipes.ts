@@ -2126,9 +2126,10 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     // byte-identical buff, so neither may undercut the other. Phase 11g put a
     // frost_gourd on the elixir as its rung-50 produce consumer (214 to 229)
     // and this scroll stayed at 214, so the same gourd rides here now: the
-    // tier-3 crops are the only reagent family whose unit value lands 15
-    // exactly (the ink register cannot), and the elixir's own crop is the
-    // one that keeps the twin bills alike.
+    // tier-3 crops are the only family IN USE AS A REAGENT whose unit value
+    // lands 15 exactly (chipped_tusk lands 15 too and no recipe consumes it;
+    // the ink register cannot reach it), and the elixir's own crop is the one
+    // that keeps the twin bills alike.
     // The parity is PINNED in tests/recipe_economy.test.ts ('the rung-50
     // scroll and the serpent elixir bill at exact input parity'); the byte
     // bill is pinned in tests/inscription_catalog.test.ts.

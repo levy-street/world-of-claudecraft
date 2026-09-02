@@ -2538,6 +2538,11 @@ describe('Guide professions gathering accuracy', () => {
     // possessive anchor would never match the HTML this reads.
     expect(html).toContain('turn up in endgame drops');
     expect(html).toContain('and on the Heroic Quartermaster');
+    // farm.bedsBodyThirdCraft (Masterwrought Phase 19G, D171): the sibling
+    // paragraph that names the scribe as a produce buyer, rendered after
+    // bedsBody. Its own clause, apostrophe-free, so deleting the paras() call
+    // in professions_gathering.ts reds here (the key arm reads t(), not HTML).
+    expect(html).toContain('takes a Frost Gourd off the Highwatch terraces, the same gourd the');
     // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
     // the only section with no anchor tying it to the faucet: its two anchors
     // were Jessica alone, who has stocked the Vale pair since the growth engine
@@ -4533,15 +4538,18 @@ describe('Guide professions pages and routes', () => {
     expect(count(scroll, 'frost_gourd')).toBe(1);
     expect(FARM_CROPS.frost_gourd.tier).toBe(3);
     expect(once(clause, `and a ${ITEMS.frost_gourd.name} off the Highwatch terraces`)).toBe(1);
+    // Exactly once by the shipped name: a plural or a second singular mention
+    // both fail this count, so no hardcoded plural is needed beside it.
     expect(once(clause, ITEMS.frost_gourd.name)).toBe(1);
-    expect(clause).not.toContain('Frost Gourds');
     // The parity clause is TRUE on the live bills, and names the elixir by its
     // shipped name; the two bills are equal through the shipped rule.
     expect(bill(scroll), 'the scroll bill').toBe(bill(elixir));
     expect(clause).toContain(`which prices it even with the ${ITEMS.elixir_of_the_serpent.name}`);
-    // The grimoire clause: two goldleaf besides its (two) sunpetal.
+    // The grimoire clause: two goldleaf besides its sunpetal. The prose states
+    // no sunpetal count ('besides its sunpetal'), so only presence is pinned
+    // here; the exact bill lives in tests/inscription_catalog.test.ts.
     expect(count(grimoire, 'goldleaf_herb')).toBe(2);
-    expect(count(grimoire, 'sunpetal_herb')).toBe(2);
+    expect(count(grimoire, 'sunpetal_herb')).toBeGreaterThan(0);
     expect(body).toContain('the rare grimoire takes two goldleaf besides its sunpetal');
     // The closing sentence: no counter stocks the herbs, the dust or the
     // gourd, and the vial is bought. Derived from the live vendor rosters.
@@ -4622,13 +4630,26 @@ describe('Guide professions pages and routes', () => {
         parity: string;
         neverSold: string;
         garden: string;
-        // How many times the gourd stem appears in the scroll clause of this
-        // fill's reviewed shape (the bound form, plus one anaphoric mention
-        // where the locale attributes the parity to 'this gourd').
+        // The locale's numeral tokens per count, so a count form is welded to
+        // its NUMBER as well as to its noun (a form whose numeral disagrees
+        // with the count it is keyed by reds); forms that count by idiom (a
+        // pinch, a bare singular) are listed in idioms instead.
+        numerals: Record<number, string[]>;
+        idioms: string[];
+        // SHAPE ANCHORS, re-cut at the Phase 20 re-read rather than defended:
+        // gourdMentions is how many times the gourd stem appears in the scroll
+        // clause of this fill's reviewed shape (the bound form, plus one
+        // anaphoric mention where the locale attributes the parity to 'this
+        // gourd'); closingEnd is the fill's last words (the vial-only clause);
+        // undo is the exact per-locale narrowness transform: each pair maps a
+        // successor-only run of paragraph two back to the predecessor's text,
+        // applied once each, and the result must equal the predecessor's
+        // paragraph two byte for byte, so anything inserted ANYWHERE in the
+        // paragraph reds (the round-one coverage read's blocking finding: the
+        // text before the grimoire head and the closing region were free).
         gourdMentions: number;
-        // The fill's last words (the vial-only clause), so a sentence appended
-        // after the reviewed shape reds (the coverage audit's M7, per locale).
         closingEnd: string;
+        undo: ReadonlyArray<readonly [string, string]>;
       }
     > = {
       ja_JP: {
@@ -4651,8 +4672,15 @@ describe('Guide professions pages and routes', () => {
         parity: '同じ費えに揃え',
         neverSold: '霜瓜も店では買えません',
         garden: '畑から収穫',
+        numerals: { 1: ['ひとつ', '一つ', 'もう一つ'], 2: ['二つ', 'ふたつ'] },
+        idioms: ['ひとつまみの粉塵'],
         gourdMentions: 2,
         closingEnd: 'コインで買えるのは小瓶だけです。',
+        undo: [
+          ['、それにHighwatchのテラスから来る霜瓜ひとつを取り、この霜瓜が加わることで', 'を取り'],
+          ['霜瓜も', ''],
+          ['畑から収穫するか、', ''],
+        ],
       },
       ko_KR: {
         grimoireHead: '희귀 마법서',
@@ -4674,8 +4702,18 @@ describe('Guide professions pages and routes', () => {
         parity: '값을 나란히',
         neverSold: '박도 상점에서는 팔지 않는다',
         garden: '밭에서 거두',
+        numerals: { 1: ['하나', '한 '], 2: ['두 ', '둘'] },
+        idioms: [],
         gourdMentions: 1,
         closingEnd: '돈으로 사는 것은 유리병뿐이다.',
+        undo: [
+          [
+            '과 Highwatch 단구에서 나는 서리 박 하나를 함께 섞는데, 그 박 하나가 같은 축복을 비추는 뱀의 비약과 값을 나란히 맞춰 준',
+            '을 섞어, 같은 축복을 비추는 뱀의 비약과 값을 나란히 맞춘',
+          ],
+          ['박도 ', ''],
+          ['밭에서 거두거나 ', ''],
+        ],
       },
       ru_RU: {
         grimoireHead: 'редкому гримуару',
@@ -4697,8 +4735,17 @@ describe('Guide professions pages and routes', () => {
         parity: 'вровень',
         neverSold: 'ни тыкву не продает',
         garden: 'с грядки',
+        numerals: { 1: ['втор', 'одн'], 2: ['два', 'две'] },
+        idioms: ['щепотью пыли', 'Морозную тыкву'],
         gourdMentions: 2,
         closingEnd: 'за монету покупается только флакон.',
+        undo: [
+          ['Морозную тыкву с террас Highwatch, и как раз за счет тыквы ', ''],
+          [
+            ', ни тыкву не продает ни один прилавок: они приходят из мира, с грядки',
+            ' не продает ни один прилавок: они приходят из мира',
+          ],
+        ],
       },
       zh_CN: {
         grimoireHead: '那部精良魔典',
@@ -4720,8 +4767,17 @@ describe('Guide professions pages and routes', () => {
         parity: '持平',
         neverSold: '尘与霜瓜都无处花钱购买',
         garden: '田畦',
+        numerals: { 1: ['一个', '一份'], 2: ['两', '二'] },
+        idioms: ['那撮尘'],
         gourdMentions: 1,
         closingEnd: '只有瓶子用钱能买。',
+        undo: [
+          ['再加一个出自Highwatch梯田的霜瓜，如此一来，造价便', '造价'],
+          [
+            '、尘与霜瓜都无处花钱购买：它们来自世界本身，来自田畦',
+            '与尘都无处花钱购买：它们来自世界本身',
+          ],
+        ],
       },
       zh_TW: {
         grimoireHead: '精良魔典',
@@ -4743,8 +4799,17 @@ describe('Guide professions pages and routes', () => {
         parity: '持平',
         neverSold: '塵與霜瓜都無處花錢購買',
         garden: '田畦',
+        numerals: { 1: ['一顆', '一份'], 2: ['兩', '二'] },
+        idioms: ['那撮塵'],
         gourdMentions: 1,
         closingEnd: '只有瓶子用錢能買。',
+        undo: [
+          ['再添一顆來自Highwatch梯田的霜瓜，正是這顆瓜讓卷軸的造價與其', '造價與它'],
+          [
+            '、塵與霜瓜都無處花錢購買：它們來自世界本身、一方田畦',
+            '與塵都無處花錢購買：它們來自世界本身',
+          ],
+        ],
       },
     };
     const key = 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd';
@@ -4782,10 +4847,29 @@ describe('Guide professions pages and routes', () => {
         expect(body, `${lang} carries a fill`).not.toBe(
           guideStrings.profPages.craftProse.inscription.materialsBodyFrostGourd,
         );
-        // Narrowness: paragraph one is the predecessor's, byte for byte.
-        expect(body.split('\n\n')[0], `${lang} keeps the predecessor's first paragraph`).toBe(
-          t(predecessorKey as never).split('\n\n')[0],
+        // Narrowness, EXACT: paragraph one is the predecessor's byte for byte,
+        // and paragraph two is the predecessor's once this locale's undo pairs
+        // are applied (each successor-only run present exactly once, mapped
+        // back to the predecessor's text), so a false count at the head of the
+        // paragraph or a sentence slipped into the closing reds here (the
+        // round-one coverage read's two green mutants).
+        const [succOne, succTwo] = body.split('\n\n');
+        const [predOne, predTwo] = (t(predecessorKey as never) as string).split('\n\n');
+        expect(succOne, `${lang} keeps the predecessor's first paragraph`).toBe(predOne);
+        let undone = succTwo;
+        for (const [from, to] of n.undo) {
+          expect(once(undone, from), `${lang} carries the successor-only run once: ${from}`).toBe(
+            1,
+          );
+          undone = undone.replace(from, to);
+        }
+        expect(undone, `${lang} paragraph two is the predecessor's plus the two repairs`).toBe(
+          predTwo,
         );
+        // The essence count the 'a second essence' idiom rests on, absolute as
+        // well as relative (the forms are keyed by the difference, so a
+        // three-over-two re-tune would keep the key at one; this reds it).
+        expect(count(scroll, 'arcane_essence'), `${lang} essence absolute`).toBe(2);
         // The stems are welded to the SHIPPED names of this locale (folded,
         // since Russian declines and the fills inflect), and every count form
         // carries its item's stem, so the table cannot drift from the catalog.
@@ -4794,10 +4878,21 @@ describe('Guide professions pages and routes', () => {
           expect(shipped, `${lang} shipped ${item} name carries ${n.stems[item]}`).toContain(
             fold(n.stems[item]),
           );
-          for (const form of Object.values(n.forms[item]))
+          for (const [key, form] of Object.entries(n.forms[item])) {
             expect(fold(form), `${lang} ${item} form carries its stem`).toContain(
               fold(n.stems[item]),
             );
+            // ...and its NUMBER: the form keyed by count N carries one of the
+            // locale's tokens for N, unless it counts by idiom (a pinch, a bare
+            // singular), listed as such (the round-one frontend read).
+            if (n.idioms.includes(form)) continue;
+            const tokens = n.numerals[Number(key)];
+            expect(tokens, `${lang} has numeral tokens for ${key}`).toBeDefined();
+            expect(
+              (tokens ?? []).some((tok) => form.includes(tok)),
+              `${lang} ${item} form '${form}' carries a numeral for ${key}`,
+            ).toBe(true);
+          }
         }
         // The first elixir needle is the form the clause must carry; every
         // needle after it is a stem of the SHIPPED name (Russian declines the
@@ -4869,56 +4964,208 @@ describe('Guide professions pages and routes', () => {
         expect(body.trimEnd().endsWith(n.closingEnd), `${lang} ends on the vial-only clause`).toBe(
           true,
         );
+        expect(once(body, n.closingEnd), `${lang} carries the vial-only clause once`).toBe(1);
       }
     } finally {
       setLanguage('en');
     }
   });
 
-  it('the farm beds prose names every craft that buys produce: the third one is the scribe (D171)', () => {
-    // The D171 frontend-seam review: farm.bedsBody enumerates the crafts that
-    // buy produce (the kitchens, Marlow's ladder, the apothecary's elixirs) and
-    // the parity repair made inscription a third buyer the page never named.
-    // The shipped bedsBody and its reviewed fills stay untouched (the page's
-    // own convention for later shipments); a sibling paragraph names the third
-    // craft, and it is DERIVED here: the set of crafts with a non-farm-own
-    // consumable row that consumes produce must be exactly the three the
-    // prose implies, and every fact in the sentence is read off the live bill.
+  it('the farm beds prose names the scribe as a produce buyer, and every craft that buys produce is accounted for (D171)', () => {
+    // The D171 frontend-seam review: farm.bedsBody names two crafts that buy
+    // produce (cooking through the kitchens and Marlow's ladder, alchemy
+    // through the elixirs) and the parity repair made the scribe a buyer the
+    // page never named. The shipped bedsBody and its reviewed fills stay
+    // untouched (the page's own convention for later shipments); a sibling
+    // paragraph names the scribe and NO ordinal, because the hoe ladder
+    // (engineering) takes fine produce as a tool reagent and a count would
+    // have been contestable (the round-one reads). DERIVED here two ways: the
+    // crafts whose consumable rows consume produce include inscription, and
+    // the crafts that consume ANY produce (base or fine, tool rows included)
+    // are exactly those plus engineering, whose every such row is a gathering
+    // tool: the carve-out is pinned positively so a gear or tool row taking a
+    // crop under some other craft reds instead of being silently exempt.
     setLanguage('en');
     const body = t('guide.profPages.farm.bedsBodyThirdCraft');
-    const produceIds = new Set(Object.values(FARM_CROPS).map((c) => c.produceItemId));
-    const farmOwn = new Set(FARM_RECIPES.map((r) => r.id));
-    const buyers = new Set(
-      ALL_RECIPES.filter(
-        (r) =>
-          !farmOwn.has(r.id) &&
-          ITEMS[r.resultItemId]?.slot === undefined &&
-          ITEMS[r.resultItemId]?.use?.type !== 'gatherTool' &&
-          r.reagents.some((g) => produceIds.has(g.itemId)),
-      ).map((r) => r.professionId),
+    const produceIds = new Set(
+      Object.values(FARM_CROPS).flatMap((c) => [c.produceItemId, c.fineProduceItemId]),
     );
-    expect([...buyers].sort()).toEqual(['alchemy', 'cooking', 'inscription']);
-    expect(buyers.size, "'a third craft' is exactly the third").toBe(3);
-    expect(body).toContain('A third craft buys from the beds too');
+    const farmOwn = new Set(FARM_RECIPES.map((r) => r.id));
+    const anyBuyerRows = ALL_RECIPES.filter(
+      (r) => !farmOwn.has(r.id) && r.reagents.some((g) => produceIds.has(g.itemId)),
+    );
+    const consumableBuyers = new Set(
+      anyBuyerRows
+        .filter(
+          (r) =>
+            ITEMS[r.resultItemId]?.slot === undefined &&
+            ITEMS[r.resultItemId]?.use?.type !== 'gatherTool',
+        )
+        .map((r) => r.professionId),
+    );
+    expect([...consumableBuyers].sort()).toEqual(['alchemy', 'cooking', 'inscription']);
+    const anyBuyers = new Set(anyBuyerRows.map((r) => r.professionId));
+    expect([...anyBuyers].sort()).toEqual(['alchemy', 'cooking', 'engineering', 'inscription']);
+    for (const r of anyBuyerRows.filter((x) => x.professionId === 'engineering')) {
+      expect(ITEMS[r.resultItemId]?.use?.type, `${r.id} is the hoe ladder`).toBe('gatherTool');
+    }
+    // The sentence: the scribe, no ordinal, the live bill's facts.
+    expect(body).toContain("The scribe's desk buys from the beds too");
+    expect(body).not.toMatch(/\b(third|fourth|three|four) craft/i);
     const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
     const elixir = ALL_RECIPES.find((r) => r.id === 'recipe_elixir_of_the_serpent');
     expect(scroll).toBeDefined();
     expect(elixir).toBeDefined();
     if (!scroll || !elixir) return;
     expect(scroll.professionId).toBe('inscription');
-    expect(scroll.skillReq).toBe(50);
-    expect(body).toContain(`rung-50 ${ITEMS[scroll.resultItemId].name}`);
+    expect(body).toContain(`rung-${scroll.skillReq} ${ITEMS[scroll.resultItemId].name}`);
     const gourdOf = (r: typeof scroll) => r.reagents.find((g) => g.itemId === 'frost_gourd')?.count;
     expect(gourdOf(scroll)).toBe(1);
     expect(gourdOf(elixir)).toBe(1);
-    expect(body).toContain(`takes a ${ITEMS.frost_gourd.name} off the Highwatch terraces`);
-    expect(body).not.toContain('Frost Gourds');
-    expect(body).toContain(`the same gourd the ${ITEMS.elixir_of_the_serpent.name} takes`);
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    expect(once(body, `takes a ${ITEMS.frost_gourd.name} off the Highwatch terraces`)).toBe(1);
+    expect(once(body, ITEMS.frost_gourd.name)).toBe(1);
+    expect(once(body, `the same gourd the ${ITEMS.elixir_of_the_serpent.name} takes`)).toBe(1);
     // 'priced even' is true on the live bills through the shipped rule.
     expect(recipeInputValue(scroll)).toBe(recipeInputValue(elixir));
     expect(body).toContain('prices the two routes to that buff even');
-    // The two routes really are one buff (the exclusivity family).
+    // The two routes really are one buff (the exclusivity family), both
+    // payloads present.
+    expect(ITEMS[scroll.resultItemId].elixir).toBeDefined();
     expect(ITEMS[scroll.resultItemId].elixir).toStrictEqual(ITEMS[elixir.resultItemId].elixir);
+  });
+
+  it('the farm beds fills name the scribe, the scroll, one gourd, the elixir and the parity in their own locale', async () => {
+    // The five non-Latin fills of farm.bedsBodyThirdCraft, machine-authored
+    // and flagged for the maintainer's read, pinned the way the inscription
+    // fills are: the shipped names welded through entities.items.<id>.name,
+    // the gourd in the locale's count-of-one form exactly once, the rung
+    // derived from the live skillReq, the terraces, the parity word, and NO
+    // ordinal (the ordinal the first draft carried had no antecedent for these
+    // readers, whose bedsBody fills name the kitchens only).
+    const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    type Filled = (typeof filled)[number];
+    const NEEDLES: Record<
+      Filled,
+      {
+        scribe: string;
+        scroll: string;
+        rung: (n: number) => string;
+        gourdOne: string;
+        gourdStem: string;
+        terrace: string;
+        elixir: string;
+        parity: string;
+        ordinal: RegExp;
+      }
+    > = {
+      ja_JP: {
+        scribe: '銘文師',
+        scroll: 'サンペタルの巻物',
+        rung: (n) => `スキル${n}の段`,
+        gourdOne: '霜瓜をひとつ',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatchのテラス',
+        elixir: '蛇のエリクサー',
+        parity: '同じ費えに揃え',
+        ordinal: /三つ目|三番目|第三|四つ目/,
+      },
+      ko_KR: {
+        scribe: '필경',
+        scroll: '태양꽃잎 두루마리',
+        rung: (n) => `${n} 단`,
+        gourdOne: '서리 박 하나',
+        gourdStem: '서리 박',
+        terrace: 'Highwatch 단구',
+        elixir: '뱀의 비약',
+        parity: '값을 나란히',
+        ordinal: /세 번째|셋째|네 번째|세 가지/,
+      },
+      ru_RU: {
+        scribe: 'начертател',
+        scroll: 'Свиток солнцелепеста',
+        rung: (n) => `ступени ${n}`,
+        gourdOne: 'Морозную тыкву',
+        gourdStem: 'тыкв',
+        terrace: 'террас Highwatch',
+        elixir: 'Эликсир змея',
+        parity: 'вровень',
+        ordinal: /трет|четверт/i,
+      },
+      zh_CN: {
+        scribe: '铭文师',
+        scroll: '阳瓣卷轴',
+        rung: (n) => `${n}档`,
+        gourdOne: '一个出自Highwatch梯田的霜瓜',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatch梯田',
+        elixir: '巨蛇药剂',
+        parity: '持平',
+        ordinal: /第三|三门|三种|第四/,
+      },
+      zh_TW: {
+        scribe: '銘文師',
+        scroll: '陽瓣卷軸',
+        rung: (n) => `${n}檔`,
+        gourdOne: '一顆來自Highwatch梯田的霜瓜',
+        gourdStem: '霜瓜',
+        terrace: 'Highwatch梯田',
+        elixir: '巨蛇藥劑',
+        parity: '持平',
+        ordinal: /第三|三門|三種|第四/,
+      },
+    };
+    const key = 'guide.profPages.farm.bedsBodyThirdCraft';
+    const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
+    expect(scroll).toBeDefined();
+    if (!scroll) return;
+    expect(scroll.reagents.find((g) => g.itemId === 'frost_gourd')?.count).toBe(1);
+    const once = (text: string, needle: string) => text.split(needle).length - 1;
+    const fold = (v: string) => v.toLowerCase().replace(/ё/g, 'е');
+    try {
+      for (const lang of filled) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const body = t(key);
+        const n = NEEDLES[lang];
+        expect(body, `${lang} carries a fill`).not.toBe(
+          guideStrings.profPages.farm.bedsBodyThirdCraft,
+        );
+        // One sentence, one paragraph.
+        expect(body, `${lang} is one paragraph`).not.toContain('\n');
+        // The shipped names weld the table: the scroll needle IS the shipped
+        // name, the gourd form and stem are of the shipped gourd name (stems
+        // for Russian, which declines), the elixir needle is the shipped name.
+        const scrollName = t('entities.items.sunpetal_scroll.name' as never);
+        const gourdName = fold(t('entities.items.frost_gourd.name' as never));
+        const elixirName = t('entities.items.elixir_of_the_serpent.name' as never);
+        expect(n.scroll, `${lang} scroll needle is the shipped name`).toBe(scrollName);
+        expect(gourdName, `${lang} shipped gourd name carries the stem`).toContain(
+          fold(n.gourdStem),
+        );
+        expect(fold(n.gourdOne), `${lang} gourd form carries the stem`).toContain(
+          fold(n.gourdStem),
+        );
+        expect(n.elixir, `${lang} elixir needle is the shipped name`).toBe(elixirName);
+        // The facts, each exactly once where a count is at stake.
+        expect(body, `${lang} names the scribe`).toContain(n.scribe);
+        expect(body, `${lang} names the scroll`).toContain(n.scroll);
+        expect(body, `${lang} states the live rung`).toContain(n.rung(scroll.skillReq));
+        expect(once(body, n.gourdOne), `${lang} binds one gourd`).toBe(1);
+        expect(once(fold(body), fold(n.gourdStem)), `${lang} names the gourd stem`).toBe(
+          lang === 'ru_RU' ? 2 : 1,
+        );
+        expect(body, `${lang} names the terraces`).toContain(n.terrace);
+        expect(once(body, n.elixir), `${lang} names the elixir once`).toBe(1);
+        expect(body, `${lang} states the parity`).toContain(n.parity);
+        expect(body, `${lang} carries no ordinal`).not.toMatch(n.ordinal);
+        expect(body, `${lang} does not name the fine twin`).not.toContain(
+          t('entities.items.fine_frost_gourd.name' as never),
+        );
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('the engineering materials fills name every rod and fish in their own locale', async () => {

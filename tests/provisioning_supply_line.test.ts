@@ -31,6 +31,7 @@ import { stationsOfType } from '../src/sim/professions/stations';
 import type { ProfessionRecipeRecord } from '../src/sim/professions/types';
 import { materialCostMultiplier } from '../src/sim/professions/wheel';
 import { Sim } from '../src/sim/sim';
+import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog. The
  *  seed ids are deliberately NOT here: a seed is the input side of the farming
@@ -52,13 +53,9 @@ function produceTier(itemId: string): number | undefined {
   return undefined;
 }
 
-/** The economy unit basis, the same rule tests/recipe_economy.test.ts reads:
- *  buyValue when the def carries a positive one, else sellValue. */
-function reagentUnitValue(itemId: string): number {
-  const def = ITEMS[itemId];
-  if (!def) throw new Error(`reagent ${itemId} has no ItemDef`);
-  return typeof def.buyValue === 'number' && def.buyValue > 0 ? def.buyValue : def.sellValue;
-}
+// The economy unit basis, the ONE rule tests/helpers/reagent_unit_value.ts states
+// (buyValue when the def carries a positive one, else sellValue), imported so
+// this suite can never drift from tests/recipe_economy.test.ts.
 
 const produceConsumers = (): ProfessionRecipeRecord[] =>
   ALL_RECIPES.filter((r) => r.reagents.some((g) => PRODUCE_IDS.has(g.itemId)));
@@ -624,8 +621,13 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
     // rulings (the flask grain at 1, the capstones at 2 plus 1) are justified
     // by this sweep governing those rows, so a sweep that stopped covering them
     // would retire the justification silently.
+    //
+    // RAISED SEVENTEEN TO TWENTY-ONE at masterwrought Phase 19G (D171's content
+    // review): the set had grown to twenty by the syncs since 11h and D171's
+    // scroll row made it twenty-one, with the floor still at seventeen, the
+    // very slack this comment warns about. Tight again; a later row raises it.
     const rows = accentGovernedRows();
-    expect(rows.length, 'the accent-governed sweep').toBeGreaterThanOrEqual(17);
+    expect(rows.length, 'the accent-governed sweep').toBeGreaterThanOrEqual(21);
     // And the two exclusions really exclude: farming's own dishes and the hoe
     // ladder are OUT, which is what makes the sweep a rule about shipped ladder
     // rows rather than about every produce consumer in the game.

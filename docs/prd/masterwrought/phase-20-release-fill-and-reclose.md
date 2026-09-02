@@ -166,17 +166,29 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   own locale' in tests/guide.test.ts.
 - **One NEW sibling paragraph whose 15 Latin rows the registry carries as pending:**
   `guide.profPages.farm.bedsBodyThirdCraft` (the D171 review round, frontend-seam-reviewer):
-  the farm page's beds prose enumerates the crafts that buy produce (the kitchens, Marlow's
-  ladder, the apothecary's elixirs) and the parity repair made inscription a third buyer; the
-  shipped `guide.profPages.farm.bedsBody` and its reviewed fills stay untouched (the page's own
-  convention for later shipments) and the new one-sentence paragraph renders right after it.
+  the farm page's beds prose names two crafts that buy produce (cooking through the kitchens
+  and Marlow's ladder, alchemy through the elixirs) and the parity repair made the scribe a
+  buyer too; the shipped `guide.profPages.farm.bedsBody` and its reviewed fills stay untouched
+  (the page's own convention for later shipments) and the new one-sentence paragraph renders
+  right after it, naming the scribe and NO ordinal (the hoe ladder takes fine produce as a
+  tool reagent, so 'a third craft' was a count the page never defines, and the five reviewed
+  bedsBody fills name only the kitchens, so the ordinal had no antecedent for those readers).
   Its five non-Latin fills rode the same change, machine-authored and FLAGGED for the
-  maintainer's re-judgement in phase-19g-qa.md; pinned by 'the farm beds prose names every
-  craft that buys produce: the third one is the scribe (D171)' in tests/guide.test.ts (the
-  buying crafts derived from the live tables). CARRIED from the ja_JP verifier: the shipped
-  `guide.profPages.farm.bedsBody` fill in ja_JP still renders a pre-11g English (it names the
-  kitchens only, not Marlow's ladder or the elixirs) while the registry marks it translated,
-  the D126 reword-staleness class; a maintainer item for this fill, not minted here.
+  maintainer's re-judgement in phase-19g-qa.md; pinned by 'the farm beds prose names the
+  scribe as a produce buyer, and every craft that buys produce is accounted for (D171)' in
+  tests/guide.test.ts (the buying crafts derived from the live tables, the hoe ladder pinned as
+  the excluded tool buyer) and per locale beside it. CARRIED (the ja_JP verifier, confirmed
+  for all five by the round-one frontend read): the shipped `guide.profPages.farm.bedsBody`
+  fills in ALL FIVE non-Latin locales render a pre-11g English (the kitchens as the only
+  buyer; no Marlow's ladder, no elixirs, no terrace crops in the raid plates and apex flasks,
+  no Evergarden capstones) while the registry marks them translated, the D126
+  reword-staleness class, and the same five keep 'Vale Wheat' and 'Marsh Rice' in English
+  where the items have shipped localized names; maintainer items for these fills, not minted
+  here. ALSO FLAGGED for this fill pass: the inscription page's materials heading
+  `guide.profPages.craftProse.inscription.materialsHeading` ('Herbs, ink, and a vial to hold
+  it') now under-enumerates the rung-50 scroll's bill by the gourd; re-authoring it was
+  refused at 19G on cost (a heading re-key mints 15 pending rows and five fills for a section
+  whose body names the gourd) and belongs with the Latin rows when they are filled anyway.
 - **The CI shard-weight harvest (D168) is ESCALATED, not executed, and waits on the push
   ruling (D022):** its precondition is a green FULL-MODE CI run of a PUSHED branch, and its
   dependency D009+D170 is still escalated from 19A, so it could not be the last code-carrying

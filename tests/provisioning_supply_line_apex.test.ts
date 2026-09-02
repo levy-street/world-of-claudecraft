@@ -40,6 +40,7 @@ import {
   wieldRequirementForTier,
 } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
+import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 /** Every farm PRODUCE id and its fine twin, derived from the crop catalog, the
  *  same derivation the sweeps one rung down use. Seeds are deliberately out:
@@ -48,13 +49,9 @@ const PRODUCE_IDS: ReadonlySet<string> = new Set(
   Object.values(FARM_CROPS).flatMap((crop) => [crop.produceItemId, crop.fineProduceItemId]),
 );
 
-/** The economy unit basis, the same rule tests/recipe_economy.test.ts reads:
- *  buyValue when the def carries a positive one, else sellValue. */
-function reagentUnitValue(itemId: string): number {
-  const def = ITEMS[itemId];
-  if (!def) throw new Error(`reagent ${itemId} has no ItemDef`);
-  return typeof def.buyValue === 'number' && def.buyValue > 0 ? def.buyValue : def.sellValue;
-}
+// The economy unit basis, the ONE rule tests/helpers/reagent_unit_value.ts states
+// (buyValue when the def carries a positive one, else sellValue), imported so
+// this suite can never drift from tests/recipe_economy.test.ts.
 
 function requireRecipe(id: string): ProfessionRecipeRecord {
   const recipe = ALL_RECIPES.find((r) => r.id === id);

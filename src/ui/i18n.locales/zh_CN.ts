@@ -12048,7 +12048,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.farm.bedsBody':
     '流程很短。向田畦旁的农夫购买种子和堆肥：Eastbrook的Jessica备有谷地的两种，Fenbridge的农夫备有沼泽的两种，Highwatch梯田的Hollis备有山地作物，Verbena备有Evergarden花圃的作物。高阶收成还会返还一两粒自己的种子，任何种子也都在World Market上流转，而山地与花圃的种子如今还会从终局内容中掉落，也在英雄军需官的柜台上出售，所以田畦旁的农夫是入门的途径，而不是唯一的途径。行囊里带着锄头播种，愿意的话再压一压胜算：柜台的堆肥和播种时用农产品支付的农夫看护都会提高作物成活的几率，炼金术士的生长滋补剂让收成有机会更丰，而一旦你的熟练比作物所在阶高出整整一档，那种作物就再也不会失败。然后走开就好。你下线时田畦照样生长，成熟的作物你放多久它等多久，收成日志（Shift+K，或专业窗口的耕作一行）列出你种下的每一畦及其计时。\n\n失败的作物留下枯萎的谷壳而非农产品，任何农夫都会用谷壳换堆肥，于是坏年景买下了下一季的保险。收上来的东西供养厨房：农产品在厨房烹成菜肴，Cook Marlow的小麦和稻米工单按与其他任何工单相同的钟点，用铜币收走你的Vale Wheat和Marsh Rice。',
   'guide.profPages.farm.bedsBodyThirdCraft':
-    '向田畦采买的还有第三门手艺：铭文师50档的阳瓣卷轴要用一个出自Highwatch梯田的霜瓜，正是巨蛇药剂所用的同一种瓜，如此一来，通往那份增益的两条路便造价持平。',
+    '铭文师的书案也向田畦采买：50档的阳瓣卷轴要用一个出自Highwatch梯田的霜瓜，正是巨蛇药剂所用的同一种瓜，如此一来，通往那份增益的两条路便造价持平。',
   'guide.profPages.fish.startHeading': '入门',
   'guide.profPages.fish.koiHeading': '日辉锦鲤',
   'guide.profPages.econ.sellsHeading': '什么好卖，为什么',

@@ -3137,14 +3137,17 @@ export const guideStrings = {
       bedsBody:
         "The loop is short. Buy seeds and compost from the farmer beside the beds: Jessica in Eastbrook stocks the Vale pair, the Fenbridge farmer the marsh pair, Hollis on the Highwatch terraces the mountain crops, and Verbena the Evergarden parterre. A high-tier harvest also hands back a seed or two of its own, any seed changes hands on the World Market, and the mountain and parterre seeds now turn up in endgame drops and on the Heroic Quartermaster's counter besides, so the farmer beside the beds is the way in rather than the only way. Sow with a hoe in your bags, and tip the odds if you like: compost from the counter and the farmer's watch, paid in produce as you plant, each raise a crop's chance of coming through, an alchemist's growth tonic gives the harvest a shot at a larger yield, and once your skill has climbed a full band past a crop's tier that crop never fails at all. Then walk away. The bed keeps growing while you are logged out, a ripe crop waits as long as you leave it, and the Harvest Journal (Shift+K, or the Farming row of your professions window) lists every bed you have planted with its timer.\n\nA crop that fails leaves withered husks in place of produce, and any farmer trades husks for compost, so a bad season buys the next one's insurance. What you bring in feeds more than your own recipes: the produce cooks into the farm dishes at the kitchens, and it now goes into Cook Marlow's own trainer ladder and into the apothecary's elixirs besides, so a farmer has a buyer from the very first rung. And the garden no longer stops at the trainer ladder: the terrace crops season the raid's own role plates and every apex flask, and the Evergarden beds feed the two skill-125 capstone stations, so the last rung of both crafts is bought from a farmer too. Marlow's wheat and rice orders take Vale Wheat and Marsh Rice off your hands for coin on the same clock as every other work order.",
       // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity): the
-      // rung-50 scroll took the serpent elixir's gourd, so a THIRD craft buys
-      // produce and the beds prose above, which names two, went silent on it.
-      // A NEW sibling paragraph rendered after bedsBody (the same shape as the
-      // table keys below) so the shipped bedsBody prose and its reviewed fills
-      // stay untouched; pinned in tests/guide.test.ts by deriving the buying
-      // crafts and the scroll's bill from the live tables.
+      // rung-50 scroll took the serpent elixir's gourd, so the scribe now buys
+      // produce and the beds prose above, which names the kitchens, Marlow's
+      // ladder and the elixirs, went silent on it. A NEW sibling paragraph
+      // rendered after bedsBody (the same shape as the table keys below) so the
+      // shipped bedsBody prose and its reviewed fills stay untouched; pinned in
+      // tests/guide.test.ts by deriving the buying crafts and the scroll's bill
+      // from the live tables. It names the scribe and no ordinal: the hoe
+      // ladder (engineering) takes fine produce as a tool reagent too, so 'a
+      // third craft' would have been a count the page never defines.
       bedsBodyThirdCraft:
-        "A third craft buys from the beds too: the scribe's rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
+        "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
       // The table half of the loop, the later phases' shipments (the
       // golden-harvest celebration, the well-fed dishes, the shared feast),
       // as NEW keys so the shipped bedsBody prose stays untouched. Written

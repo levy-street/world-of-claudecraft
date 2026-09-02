@@ -106,8 +106,10 @@ describe('craftIdsForMaterialItem', () => {
     // were the sole consumers and NO alchemy recipe consumed farm output at all
     // (pinned at zero in tests/farm_seed_channels.test.ts until that phase gave
     // it a floor). The elixir line changed it, so materialProfessionHintText
-    // now renders "Used by Alchemy and Cooking." on these three item tooltips
-    // where it used to read "Used by Cooking.".
+    // rendered "Used by Alchemy and Cooking." on these three item tooltips
+    // from Phase 11g until Phase 19G (history: the gourd's line has since
+    // gained a third craft, the addendum below), where it used to read
+    // "Used by Cooking.".
     //
     // PHASE 11h ADDED TWO MORE, and they arrive from the APEX tier rather than
     // the elixir ladder: highland_barley is the grain in all three apex flasks

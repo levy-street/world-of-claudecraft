@@ -29,6 +29,7 @@ import {
 import { type PlayerMeta, Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
 import { completeRechargeCast, runRecharge } from './helpers/enchant_family_cast';
+import { reagentUnitValue } from './helpers/reagent_unit_value';
 
 const makeSim = (seed = 11) => new Sim({ seed, playerClass: 'warrior', autoEquip: false });
 const metaOf = (sim: Sim): PlayerMeta => sim.meta(sim.playerId) as PlayerMeta;
@@ -408,13 +409,9 @@ describe('the recharge command: price, consume, refill', () => {
 });
 
 describe('the R39 economics inequality: a fresh mint always out-costs a generic recharge', () => {
-  // The same price basis recipe_economy.test.ts uses: buyValue when a vendor
-  // sells the reagent for copper, else sellValue.
-  const unitValue = (itemId: string): number => {
-    const def = ITEMS[itemId];
-    if (!def) throw new Error(`no ItemDef for ${itemId}`);
-    return typeof def.buyValue === 'number' && def.buyValue > 0 ? def.buyValue : def.sellValue;
-  };
+  // The same price basis recipe_economy.test.ts uses, imported from its one
+  // home (tests/helpers/reagent_unit_value.ts) rather than restated.
+  const unitValue = reagentUnitValue;
 
   // Every rarity rung a SHIPPED gathering tool can resolve at recharge time:
   // derived from the live item table, so the day a legendary tool ships, its
