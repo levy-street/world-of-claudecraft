@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { FINITE_GUARD_GLSL } from '../src/render/post_finite_guard_glsl';
 import { OUTPUT_GRADE_FRAGMENT_SHADER, OutputGradePass } from '../src/render/post_output_grade';
 
 describe('fused output and grade shader', () => {
@@ -99,7 +100,12 @@ describe('fused output and grade shader', () => {
     // so OutputGradePass must scrub NaN out of BOTH the beauty read and the
     // (already blur-spread) bloom read. Losing either scrub brings the black back.
     const shader = OUTPUT_GRADE_FRAGMENT_SHADER;
-    expect(shader).toContain('(v.x < 0.0 || v.x >= 0.0) ? v.x : 0.0');
+    // Bit-exact, never a comparison: Mali evaluates NaN comparisons as finite
+    // (see post_finite_guard_glsl.ts), which is how the phone went black with
+    // the comparison form in place.
+    expect(shader).toContain(FINITE_GUARD_GLSL);
+    expect(shader).toContain('return wocSanitizeFinite(v);');
+    expect(shader).not.toContain('v.x < 0.0 || v.x >= 0.0');
     const helperAt = shader.indexOf('vec3 sanitizeFinite(vec3 v) {');
     const beautyScrubAt = shader.indexOf('outputColor.rgb = sanitizeFinite(outputColor.rgb);');
     const diffuseSampleAt = shader.indexOf('vec4 outputColor = texture(tDiffuse, inputUv);');

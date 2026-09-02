@@ -136,7 +136,9 @@ describe('patchOpaqueFragmentNanGuard coverage in stock shaders', () => {
       if (hasOpaque) withOpaque.push(name);
     }
     expect(withOpaque.length).toBeGreaterThan(0);
-    expect(THREE.ShaderChunk.opaque_fragment).toContain('outgoingLight.x = ( outgoingLight.x');
+    expect(THREE.ShaderChunk.opaque_fragment).toContain(
+      'outgoingLight.x = ( ( floatBitsToUint( outgoingLight.x )',
+    );
     expect(THREE.ShaderChunk.opaque_fragment).not.toContain('#ifndef USE_FOG');
   });
 

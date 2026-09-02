@@ -1,11 +1,16 @@
+import { finiteGuardStatement } from './post_finite_guard_glsl';
+
 const OPAQUE_GUARD_MARKER = 'WOC_OPAQUE_NAN_GUARD';
 const FOG_GUARD_MARKER = 'WOC_FOG_NAN_GUARD';
 
 const OPAQUE_WRITE = 'gl_FragColor = vec4( outgoingLight, diffuseColor.a );';
 const FOG_WRITE = 'gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor );';
 
-// Every NaN comparison is false, so (x < 0.0 || x >= 0.0) keeps finite and
-// infinite values and rewrites only NaN to zero. This is generic hardening,
+// The scrub is the bit-exact exponent test from post_finite_guard_glsl.ts
+// (NaN and Inf to zero): the earlier comparison form, (x < 0.0 || x >= 0.0),
+// is implementation-defined for NaN in GLSL ES and evaluates as "finite" on
+// Mali (Android Chrome), which is how the phone rendered black frames through
+// a scrub that read as correct. This is generic hardening,
 // installed unconditionally on every tier and platform: GLES leaves the
 // conversion of a NaN fragment output into a fixed-point (UNSIGNED_BYTE)
 // render target undefined, so "the direct-to-canvas tiers clamp it away" is
@@ -21,14 +26,14 @@ const FOG_WRITE = 'gl_FragColor.rgb = mix( gl_FragColor.rgb, fogColor, fogFactor
 // depend on the answer.
 function scrubStatements(target: string): string {
   return (
-    `${target}.x = ( ${target}.x < 0.0 || ${target}.x >= 0.0 ) ? ${target}.x : 0.0;\n` +
-    `${target}.y = ( ${target}.y < 0.0 || ${target}.y >= 0.0 ) ? ${target}.y : 0.0;\n` +
-    `${target}.z = ( ${target}.z < 0.0 || ${target}.z >= 0.0 ) ? ${target}.z : 0.0;\n`
+    finiteGuardStatement(`${target}.x`) +
+    finiteGuardStatement(`${target}.y`) +
+    finiteGuardStatement(`${target}.z`)
   );
 }
 
 function scrubScalar(target: string): string {
-  return `${target} = ( ${target} < 0.0 || ${target} >= 0.0 ) ? ${target} : 0.0;\n`;
+  return finiteGuardStatement(target);
 }
 
 /**

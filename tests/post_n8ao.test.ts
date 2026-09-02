@@ -153,3 +153,80 @@ describe('reversed-depth premises behind the dropped surgery arm', () => {
     }
   });
 });
+
+describe('degenerate depth-derived normal guard', () => {
+  // On Mali-G715 (Android Chrome) the HALFRES compositer wrote exactly one NaN
+  // texel per affected frame into the composer beauty while the raw scene target
+  // stayed finite: normalize(cross(dpdx, dpdy)) of a zero cross product. Both
+  // shaders that reconstruct that normal from depth carry the length-checked
+  // form, on the full-resolution and the half-resolution configurations alike.
+  // The fallback sits on the `<` branch on purpose: a NaN comparison is
+  // implementation-defined in GLSL ES, so the safe branch must be the one a
+  // non-finite length lands on wherever the driver sends it.
+  const SAFE_RETURN = 'return faceNormalLengthSq < 1e-12';
+  const BARE_RETURN = 'return normalize(cross(dpdx, dpdy));';
+
+  interface CompositerInternals {
+    effectShaderQuad: { material: THREE.ShaderMaterial };
+    effectCompositerQuad: { material: THREE.ShaderMaterial };
+    depthDownsampleQuad?: { material: THREE.ShaderMaterial } | null;
+  }
+
+  const expectGuarded = (shader: string): void => {
+    expect(shader).not.toContain(BARE_RETURN);
+    expect(shader.split(SAFE_RETURN)).toHaveLength(2);
+    expect(shader).toContain('vec3 faceNormal = cross(dpdx, dpdy);');
+    expect(shader).toContain('? vec3(0.0, 1.0, 0.0)');
+    expect(shader).toContain(': faceNormal * inversesqrt(faceNormalLengthSq);');
+  };
+
+  it.each([
+    ['full resolution', false],
+    ['half resolution with depth-aware upsampling', true],
+  ])('guards the evaluation and compositer normals at %s', (_label, halfRes) => {
+    const pass = new StaticOpaqueN8AOPass(
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1279,
+      719,
+    );
+    pass.setQualityMode(halfRes ? 'Low' : 'Medium');
+    if (halfRes) {
+      pass.configuration.halfRes = true;
+      pass.configuration.depthAwareUpsampling = true;
+    }
+    const shaders = pass as unknown as CompositerInternals;
+    expectGuarded(shaders.effectShaderQuad.material.fragmentShader);
+    expectGuarded(shaders.effectCompositerQuad.material.fragmentShader);
+    if (halfRes) {
+      // The half-resolution tiers reconstruct the live normal in the depth
+      // downsample pass (a HalfFloat attachment, where a NaN survives), so it
+      // must carry the guard as well.
+      expect(shaders.depthDownsampleQuad).toBeTruthy();
+      expectGuarded(shaders.depthDownsampleQuad?.material.fragmentShader ?? '');
+    } else {
+      expect(shaders.depthDownsampleQuad ?? null).toBeNull();
+    }
+    pass.dispose();
+  });
+
+  it('applies once per material rebuild and never twice to the same source', () => {
+    const pass = new StaticOpaqueN8AOPass(
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1279,
+      719,
+    );
+    pass.setQualityMode('Low');
+    pass.configuration.halfRes = true;
+    // A second reconfiguration rebuilds every material from the pristine
+    // n8ao source; the guard must be present exactly once afterwards.
+    pass.configuration.halfRes = false;
+    pass.configuration.halfRes = true;
+    const shaders = pass as unknown as CompositerInternals;
+    expectGuarded(shaders.effectShaderQuad.material.fragmentShader);
+    expectGuarded(shaders.effectCompositerQuad.material.fragmentShader);
+    expectGuarded(shaders.depthDownsampleQuad?.material.fragmentShader ?? '');
+    pass.dispose();
+  });
+});
