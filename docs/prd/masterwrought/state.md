@@ -12683,6 +12683,31 @@ full suite found them. A fix round is a content change and owes the same sweep.
    102 unshipped branch-only ids as permanent API on a branch that has not
    merged. Phases 11e through 11i all declined for the same reason (none of
    their ids are in the golden). Ratify or overrule.
+   RULED (qr-19-shipped-id-golden-remint-cadence, 2026-09-01, under
+   qr-19-best-for-project): PER-CONTENT-CHANGE re-mint is adopted explicitly,
+   the golden is re-minted now, and the doctrine is amended to match what this
+   branch has always done. The deviation's own premise is FALSE on the tree and
+   that is why the ruling goes this way: the line it was avoiding was crossed
+   long ago. Every branch-only id the packet owns is ALREADY pinned, by this
+   branch's own content commits, and the count is 171 rather than the 172 the
+   record carries. The cadence never had enforcement either: the assertion is a
+   SUBSET filter, so an un-re-minted golden simply never reds, which is how five
+   phase ledgers could deviate without anything noticing. The re-mint is a
+   one-line additions-only diff (reins_rickshaw_mount, the dev-grant-only mount
+   whose two siblings were already pinned), so the tree is ratified as it stands
+   in substance and made honest in its doctrine.
+   THE CONSEQUENCE LINE, because the tree has changed what the doctrine means:
+   with every branch-only id pinned, the "delete outright" escape at
+   src/sim/content/CLAUDE.md is closed IN PRACTICE, and a Phase-20 cut of any of
+   them is now a RETIREMENT (keep the def, drop its acquisition paths, the
+   RETIRED_HEROIC_ITEMS exemplar) plus its merge-deletion-list row, never a
+   delete. NOT taken: pruning the branch delta back out, which is the one diff
+   shape the golden's own header reads as a dead shipped id and which would also
+   throw away 246 release-content pins the branch made for free.
+   RECORDED HONESTLY: this is the ONE row in Phase 19D whose executed arm is not
+   the arm its source row recommends (phase-19-new-rows.md recommends the
+   paper-only ratify). It was put to the maintainer in session and ruled for the
+   re-mint, so it OVERRULES that recommendation rather than restating it.
 2. **Deliverable 2 SHIPPED NO FILL AT ALL**, on either arm. The supply audit
    found zero empty bands, and the demand side's three candidates were
    withdrawn with the false claim behind them, so the fill this phase briefly
@@ -12701,6 +12726,11 @@ stale-client window), 11h's two deviations, 11i's session cap 15 s to 16 s,
 (9) **THE DECISION-A CONTRADICTION**, costed above.
 (10) **THE SHIPPED-ID GOLDEN POLICY**, deviation 1 above: per-phase re-mint or
      release-time re-mint. Five phases have now assumed release-time.
+     CLOSED 2026-09-01 by ruling qr-19-shipped-id-golden-remint-cadence:
+     PER-CONTENT-CHANGE, adopted explicitly, the golden re-minted (one id,
+     additions-only) and the doctrine amended in all three of its homes
+     (tests/shipped_item_ids.test.ts, src/sim/content/CLAUDE.md, and the
+     acceptance line restored to phase-20). The item is no longer open.
 
 ### THE REJECTION LIST, AS RECORDED DESIGN
 
@@ -13252,6 +13282,11 @@ reason they are recorded as holes rather than as opinions.
    branch-only ids as permanent API on a branch that has not merged, and the pin
    is a SUBSET check that passes untouched. This is a standing policy question,
    open item (10) below, not a missed obligation.
+   SUPERSEDED 2026-09-01 by qr-19-shipped-id-golden-remint-cadence, and the
+   reasoning above is left standing as the record of what was believed: the line
+   it was avoiding had already been crossed by this branch's own content
+   commits, which pinned every branch-only id it owns. Per-content-change is
+   now the doctrine and the golden is re-minted.
 2. **The five non-Latin overlays were left stale on the reworded wiki key**, per
    the repo rule that a contributor never edits `src/ui/i18n.locales/`. Recorded
    above with the exact key and locales so the release fill can find it; the M16
@@ -16165,6 +16200,9 @@ census, the material taxonomy allowlist, and M16's fifteen guide keys.
    share one authority. Not in the file; forced by the page's data needs.
 6. **THE SHIPPED-ID GOLDEN WAS NOT RE-MINTED**, ratifying the same call 11e
    through 11j made. Open item (10), unchanged.
+   SUPERSEDED 2026-09-01 by qr-19-shipped-id-golden-remint-cadence: open item
+   (10) is CLOSED, the cadence is per content change, and the golden carries
+   the one id it was missing.
 7. **A LIVE DEFECT WAS FIXED IN PASSING** (the "Gathered by" mislabel on the
    shipped party feast). Out of the phase's stated scope, in scope for not
    shipping three more instances of it.

@@ -79,6 +79,16 @@ has seen fail is not a census. The 11d pre-run's four outcomes are recorded in t
   commit, or a ledger section), and a real REASON, and the Class is always a census
   class. The census consumes them in union with the script's `EXPLAINED_EXTRAS`
   constant; an EXTRA with no row in either place fails.
+- RETIREMENT, NOT DELETION, for any id this branch has already pinned (added
+  2026-09-01, ruling qr-19-shipped-id-golden-remint-cadence). Every branch-only
+  item id the packet owns is already in `tests/shipped_item_ids.golden.json`, so
+  the escape at `src/sim/content/CLAUDE.md` ("only an item that never left your
+  unmerged feature branch may be deleted outright") is closed in practice: a
+  Phase-20 cut of one of those ids is a RETIREMENT (keep the def, drop its
+  acquisition paths, exemplar `RETIRED_HEROIC_ITEMS` in
+  `src/sim/content/heroic_loot.ts`) plus a row in this file, never an outright
+  delete and never a removal from the golden. A REMOVED golden line is that
+  file's own stated signature of a dead shipped id.
 - THE PATH COLUMN (added 2026-09-01, ruling qr-19-census-allowlist-path-asymmetry).
   A name that is real, exported and live but sits under one of the census's
   `EXCLUDED_PATH_PREFIXES` (`scripts/merge_audit/`, the resolved-i18n artifacts) can

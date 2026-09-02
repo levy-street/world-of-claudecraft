@@ -341,7 +341,12 @@ contract is `docs/design/reliquary.md`.
   are display-only through the i18n catalog; the id stays frozen. Watch the
   generated tier too: dropping a base item from a mob's `loot[]` also deletes its
   generated `heroic_<id>` variant def, which players may hold. Only an item that
-  never left your unmerged feature branch may be deleted outright.
-  `tests/shipped_item_ids.test.ts` pins every shipped id against `ITEMS`
-  (append-only golden; after a release re-mint with `UPDATE_SHIPPED_ITEMS=1` and
-  review the diff as additions-only).
+  never left your unmerged feature branch may be deleted outright, and note that
+  escape is closed in practice on a branch whose ids are already pinned (see the
+  cadence below). `tests/shipped_item_ids.test.ts` pins every shipped id against
+  `ITEMS` (append-only golden; re-mint PER CONTENT CHANGE, in the same commit
+  that mints the id, with `UPDATE_SHIPPED_ITEMS=1`, and review the diff as
+  additions-only). AMENDED 2026-09-01 by masterwrought ruling
+  qr-19-shipped-id-golden-remint-cadence: this used to read "after a release",
+  which is not what any content change here has ever done, and the check is a
+  subset filter so nothing ever red-flagged the drift.

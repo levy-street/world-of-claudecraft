@@ -78,6 +78,12 @@ STEP 3 - THE RE-CLOSE (the Phase 17 battery, whole, at the final tip):
   fill line now reading pending 0, the three new phases in the summary, both screenshot
   subtrees, the honest R5 story unchanged).
 
+- tests/shipped_item_ids.golden.json re-minted with UPDATE_SHIPPED_ITEMS=1 and the diff
+  reviewed for ADDITIONS ONLY, if anything in this phase mints an item id. A removed line
+  means a shipped id died and the fix is a retirement, never a re-mint. RESTORED 2026-09-01
+  by ruling qr-19-shipped-id-golden-remint-cadence: five phases dropped this acceptance line
+  while deviating to a release-time cadence, and the cadence is now per content change.
+
 STEP 4 - DOCS: progress.md Phase 20 row; the Phase 20 ledger in state.md (the fill by
 locale and by class, the re-close matrix delta, the stamps); the close-out list, which
 must now read ip-17-PUSH alone (anything else still open carries a Phase 19 ruling id

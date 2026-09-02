@@ -11,10 +11,26 @@
 // instead: keep the def and remove its acquisition paths (exemplar:
 // RETIRED_HEROIC_ITEMS in src/sim/content/heroic_loot.ts).
 //
-// The golden is APPEND-ONLY. After new items ship in a release, re-mint with
-// `UPDATE_SHIPPED_ITEMS=1 npx vitest run tests/shipped_item_ids.test.ts` and
-// review the diff: additions only. A removed line means a shipped id died and
-// the fix is a retirement, never a re-mint.
+// The golden is APPEND-ONLY, and it is re-minted PER CONTENT CHANGE, not after
+// a release: any change that mints an item id re-mints here in the SAME commit,
+// with `UPDATE_SHIPPED_ITEMS=1 npx vitest run tests/shipped_item_ids.test.ts`,
+// and the diff reviewed for ADDITIONS ONLY. A removed line means a shipped id
+// died and the fix is a retirement, never a re-mint.
+//
+// THE CADENCE CHANGED because the tree had already changed what it meant
+// (masterwrought ruling qr-19-shipped-id-golden-remint-cadence, 2026-09-01).
+// The header used to say "after new items ship in a release", which five phase
+// ledgers deviated to while the branch's own content commits re-minted per
+// change anyway, and there was never anything behind the cadence: the check
+// below is a SUBSET filter, so an un-re-minted golden simply never reds. The
+// doctrine now says what the repo does.
+//
+// THE CONSEQUENCE, worth stating where the next reader is: pinning an id here
+// makes it permanent API, and every branch-only id already IS pinned. So the
+// escape at src/sim/content/CLAUDE.md ("only an item that never left your
+// unmerged feature branch may be deleted outright") is closed in practice, and
+// cutting one of those ids is a RETIREMENT (keep the def, drop its acquisition
+// paths) plus its merge-deletion-list row, never a delete.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
