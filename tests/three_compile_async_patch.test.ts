@@ -487,18 +487,23 @@ describe('three empty instanced draw skip patch', () => {
   });
 });
 
-describe('three depth-only shadow pass patch', () => {
+describe('three colour-write-free shadow depth pass patch', () => {
   // Sixth patch hunk (WebGLShadowMap): a non-VSM shadow map allocates an RGBA8
   // colour texture beside its DepthTexture, because RenderTarget requires at
   // least one colour attachment (RenderTarget~Options documents count as "must
   // be at least 1"). Nothing samples it: WebGLLights binds
   // `light.shadow.map.depthTexture || light.shadow.map.texture` and r185's
   // shadowmap_pars_fragment reads that depth through sampler2DShadow. Upstream
-  // still cleared that colour once per updated map and let the depth material
-  // write it for every rasterized fragment, so at the ultra tiers' 4096 map the
-  // pass paid a 16.8 Mpix colour clear plus full-coverage colour traffic per
-  // frame for a buffer with no reader. The hunk closes the colour mask on the
-  // depth and distance materials and clears depth only.
+  // still let the depth material write it for every rasterized fragment, so the
+  // pass paid full-coverage colour traffic, scaling with shadow-caster
+  // overdraw, for a buffer with no reader. The hunk closes the colour mask on
+  // the depth and distance materials.
+  //
+  // The CLEAR is deliberately left whole, and the test below pins that: a clear
+  // is the cheap load action everywhere (a fast clear on an immediate-mode GPU,
+  // loadAction=clear on a tiler), and dropping the colour bit would turn the
+  // attachment into loadAction=load and make the pass strictly MORE expensive
+  // on the tile-based GPUs this renderer's reference captures come from.
   //
   // colorWrite is deliberately NOT a program-cache-key input: WebGLPrograms
   // never reads it (pinned below), so no program key moves and the prewarm
@@ -511,8 +516,6 @@ describe('three depth-only shadow pass patch', () => {
     new URL('../node_modules/three/build/three.cjs', import.meta.url),
     'utf8',
   );
-  const stockClear =
-    '\n\t\t\t\t\t\trenderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\trenderer.clear();';
 
   it('closes the colour mask on the shadow depth materials, VSM excepted', () => {
     expect(
@@ -538,27 +541,32 @@ describe('three depth-only shadow pass patch', () => {
     expect(source).not.toContain('result.colorWrite = false;');
   });
 
-  it('clears depth only, and only for the non-VSM pass', () => {
+  it('leaves the shadow-map clear whole, on both attachments', () => {
     expect(
       source.includes('const depthOnlyPass = this.type !== VSMShadowMap;'),
       'the depth-only pass flag is missing; re-run pnpm install',
     ).toBe(true);
     // Both clears in the map loop (the cube-face arm and the 2D face-0 arm)
-    // must be gated, or a second shadow light still pays the colour clear.
-    expect(source.split('renderer.clear( ! depthOnlyPass, true, true );').length - 1).toBe(2);
-    // The stock spelling is REPLACED, not supplemented: an ungated
-    // renderer.clear() left in the loop would re-pay what the hunk removes.
+    // stay upstream's bare renderer.clear(). A depth-only clear would look like
+    // a further saving and is a regression on a tiler; this pins that the
+    // reasoning in the header is what the installed bundle actually does.
     expect(
-      source.includes(stockClear),
-      'an ungated shadow-map clear is back; the depth-only clear no longer replaces it',
+      source.includes('renderer.clear( ! depthOnlyPass'),
+      'a depth-only shadow-map clear is back; it is a regression on a tiler',
     ).toBe(false);
     expect(
-      unpatchedSibling.split(stockClear).length - 1,
-      'the unpatched three.cjs control no longer matches the ungated clear; the GONE pin may be vacuous',
-    ).toBe(1);
+      source.includes('renderer.setRenderTarget( shadow.map );\n\t\t\t\t\t\trenderer.clear();'),
+      "the 2D shadow-map clear is no longer upstream's whole clear",
+    ).toBe(true);
+    expect(
+      source.includes('renderer.setRenderTarget( shadow.map, face );\n\t\t\t\t\trenderer.clear();'),
+      "the cube-face shadow-map clear is no longer upstream's whole clear",
+    ).toBe(true);
+    // The flag exists only to scope the colour-mask restore below, so a build
+    // that lost the restore but kept the flag still reds there.
     expect(
       unpatchedSibling.includes('depthOnlyPass'),
-      'the unpatched three.cjs control already carries the depth-only pass; the pins above prove nothing',
+      'the unpatched three.cjs control already carries the flag; the pins above prove nothing',
     ).toBe(false);
   });
 
@@ -600,6 +608,10 @@ describe('three depth-only shadow pass patch', () => {
       patch.includes('+\t\tconst depthOnlyPass = this.type !== VSMShadowMap;'),
       'the depth-only pass flag is missing from patches/three@0.185.1.patch',
     ).toBe(true);
+    expect(
+      patch.includes('-\t\t\t\t\t\trenderer.clear();'),
+      'the patch removes a shadow-map clear; it must leave both clears whole',
+    ).toBe(false);
     expect(
       patch.includes('+\t\tresult.colorWrite = type === VSMShadowMap;'),
       'the depth-material colour-mask write is missing from patches/three@0.185.1.patch',

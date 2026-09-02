@@ -1,5 +1,5 @@
 diff --git a/build/three.module.js b/build/three.module.js
-index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e6c689da0 100644
+index ad13abf7d128bee607a7672646ca543327e258d3..cacbc9fd7ebff06a6a4de7d7b808f3eb0130af2c 100644
 --- a/build/three.module.js
 +++ b/build/three.module.js
 @@ -438,7 +438,7 @@ var morphtarget_pars_vertex = "#ifdef USE_MORPHTARGETS\n\t#ifndef USE_INSTANCING
@@ -79,11 +79,11 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
 -			const i = programs.indexOf( program );
 -			programs[ i ] = programs[ programs.length - 1 ];
 -			programs.pop();
-+			retainedPrograms.push( program );
- 
+-
 -			// Remove from map
 -			programsMap.delete( program.cacheKey );
--
++			retainedPrograms.push( program );
+ 
 -			// Free WebGL resources
 -			program.destroy();
 +			if ( retainedPrograms.length > RETAINED_PROGRAM_LIMIT ) destroyProgram( retainedPrograms.shift() );
@@ -99,60 +99,51 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
  		programs: programs,
  		dispose: dispose
  	};
-@@ -9174,6 +9202,21 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9174,6 +9202,30 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  		_state.buffers.depth.setTest( true );
  		_state.setScissorTest( false );
  
-+		// World of ClaudeCraft: depth-only shadow pass. A RenderTarget must carry
-+		// at least one colour attachment, so a non-VSM shadow map allocates an
-+		// RGBA8 texture beside its DepthTexture that NOTHING ever samples:
-+		// WebGLLights binds shadow.map.depthTexture and shadowmap_pars_fragment
-+		// reads it through sampler2DShadow. Upstream still cleared that colour
-+		// once per updated map and let the depth material write it for every
-+		// rasterized fragment, which at a 4096 map is a 16.8 Mpix clear plus
-+		// full-coverage colour traffic per frame for a buffer with no reader.
-+		// The pass now closes the colour mask on the depth and distance
-+		// materials (getDepthMaterial below) and clears depth only. VSM is
-+		// untouched: its blur passes write that colour attachment for real.
-+		// colorWrite is not a program-cache-key input (WebGLPrograms never reads
-+		// it), so no program key moves and no material relinks.
++		// World of ClaudeCraft: colour-write-free shadow depth pass. A RenderTarget
++		// must carry at least one colour attachment, so a non-VSM shadow map
++		// allocates an RGBA8 texture beside its DepthTexture that NOTHING ever
++		// samples: WebGLLights binds shadow.map.depthTexture and
++		// shadowmap_pars_fragment reads it through sampler2DShadow. Upstream let
++		// the depth material write that texture for every rasterized fragment,
++		// so the pass paid full-coverage colour traffic (blending off, but the
++		// ROP write and its bandwidth are real, and they scale with shadow-caster
++		// overdraw) for a buffer with no reader. Closing the colour mask on the
++		// depth and distance materials (getDepthMaterial below) removes it.
++		//
++		// The CLEAR is deliberately left whole. Skipping the colour bit would
++		// look like a further saving, but a clear is the cheap load action
++		// everywhere: a fast clear on an immediate-mode GPU, and loadAction=clear
++		// on a tile-based one, where dropping it turns the attachment into
++		// loadAction=load and makes the pass strictly more expensive. This
++		// renderer's own reference measurements come from a Metal tiler, so the
++		// clear stays.
++		//
++		// VSM is untouched: its blur passes write that colour attachment for
++		// real. colorWrite is not a program-cache-key input (WebGLPrograms never
++		// reads it), so no program key moves and no material relinks.
 +		const depthOnlyPass = this.type !== VSMShadowMap;
 +
  		// check for shadow map type changes
  
  		const typeChanged = _previousType !== this.type;
-@@ -9336,7 +9379,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
- 				if ( shadow.map.isWebGLCubeRenderTarget ) {
- 
- 					renderer.setRenderTarget( shadow.map, face );
--					renderer.clear();
-+					renderer.clear( ! depthOnlyPass, true, true );
- 
- 				} else {
- 
-@@ -9344,7 +9387,7 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
- 					if ( face === 0 ) {
- 
- 						renderer.setRenderTarget( shadow.map );
--						renderer.clear();
-+						renderer.clear( ! depthOnlyPass, true, true );
- 
- 					}
- 
-@@ -9417,6 +9460,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9417,6 +9469,12 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  
  		scope.needsUpdate = false;
  
-+		// World of ClaudeCraft: the depth materials leave the colour mask closed.
-+		// three's own frame clear re-opens it (WebGLBackground), but a masked
-+		// glClear is silently a no-op, so the pass restores what it changed
-+		// rather than leaving that to every caller.
++		// World of ClaudeCraft: the depth materials leave the colour mask closed,
++		// and a masked glClear is silently a no-op. three's own frame clear
++		// re-opens the mask first (WebGLBackground), but the pass restores what
++		// it changed rather than leaving that to every caller.
 +		if ( depthOnlyPass ) _state.buffers.color.setMask( true );
 +
  		renderer.setRenderTarget( currentRenderTarget, activeCubeFace, activeMipmapLevel );
  
  	};
-@@ -9516,6 +9565,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
+@@ -9516,6 +9574,11 @@ function WebGLShadowMap( renderer, objects, capabilities ) {
  
  		result.visible = material.visible;
  		result.wireframe = material.wireframe;
@@ -164,7 +155,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
  
  		if ( type === VSMShadowMap ) {
  
-@@ -16461,6 +16515,7 @@ class WebGLRenderer {
+@@ -16461,6 +16524,7 @@ class WebGLRenderer {
  			bufferRenderer = new WebGLBufferRenderer( _gl, extensions, info );
  			indexedBufferRenderer = new WebGLIndexedBufferRenderer( _gl, extensions, info );
  
@@ -172,7 +163,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
  			info.programs = programCache.programs;
  
  			/**
-@@ -17486,22 +17541,82 @@ class WebGLRenderer {
+@@ -17486,22 +17550,82 @@ class WebGLRenderer {
  			// ready to be used before resolving the promise.
  
  			return new Promise( ( resolve ) => {
@@ -259,7 +250,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
  
  					// once the list of compiling materials is empty, call the callback
  
-@@ -17512,9 +17627,19 @@ class WebGLRenderer {
+@@ -17512,9 +17636,19 @@ class WebGLRenderer {
  
  					}
  
@@ -281,7 +272,7 @@ index ad13abf7d128bee607a7672646ca543327e258d3..299d0c330511da684383474eb9c55c0e
  
  				}
  
-@@ -17876,7 +18001,11 @@ class WebGLRenderer {
+@@ -17876,7 +18010,11 @@ class WebGLRenderer {
  
  				} else if ( object.isMesh || object.isLine || object.isPoints ) {
  
