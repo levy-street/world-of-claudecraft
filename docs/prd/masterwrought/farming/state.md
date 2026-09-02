@@ -873,6 +873,11 @@ existing row that was wrong is AMENDED IN PLACE with a dated line rather than re
     a union under 95 percent of test files means the harvest runs before the phase closes. WHY:
     a union under 95 percent is a named way a non-trivial merge reds the gate, and invented
     weights make the LPT balancer distribute against fiction.
+    POINTER (2026-09-02, Phase 19G): the fresh harvest this item asks for is the D168 row
+    (qr-19-ci-shard-weights-go-public-harvest), ESCALATED to the push ruling with its recipe
+    on the row in docs/prd/masterwrought/phase-19-new-rows.md; the 95 percent named here is
+    the docs' and the union tool's floor, while the partition test's literal sits at 0.94
+    since the release commit b38f38ba16 (reconcile toward 0.95 at the harvest).
 22. 11e-D-A. The calendar target is about 10 weeks (70 to 75 days) for the reference farmer,
     with a floor of about 5 weeks at maximum dedication; the four gain VALUES are DERIVED and
     recorded, and the four belowProficiency BOUNDARIES (25/50/75/100) are FROZEN; acceptance is

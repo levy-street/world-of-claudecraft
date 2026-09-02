@@ -146,6 +146,9 @@ or because a fill's provenance is not something the worklist can say:
 
 ### Hand-carried fill entries from Phase 19G (2026-09-02)
 
+Written at Phase 19G execution: one fill entry the registry now carries as pending and one
+non-fill item recorded here so the re-close reads the packet's own procedure doc correctly.
+
 - **One more retire-and-re-key successor whose 15 Latin rows the registry carries as
   pending:** `guide.profPages.craftProse.inscription.materialsBodyFrostGourd` (D171, ruling
   qr-19-scroll-elixir-15c-parity). The predecessor
