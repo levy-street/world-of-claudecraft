@@ -172,7 +172,7 @@ describe('tutorialSlayHintPlan', () => {
 });
 
 describe('the island arrival note', () => {
-  // Ferryman Odo's once-per-device welcome is the only dialog a newcomer sees
+  // Ferryman Odo's first-arrival welcome is the only dialog a newcomer sees
   // on the Proving Shore, so it is also the one place the way OUT is stated:
   // the bell beside his pier is clickable from the moment they land, not a
   // reward for finishing the rail (playtester feedback: players who wanted to
