@@ -19,6 +19,7 @@ import {
   RIFT_COIN_BONUS_C,
   RIFT_COIN_BONUS_S,
   RIFT_EPIC_MOUNT_CHANCE,
+  RIFT_EPIC_MOUNT_CHANCE_PER_MOUNT,
   RIFT_EPIC_MOUNT_REINS,
   RIFT_GREEN_MOUNT_CHANCE,
   RIFT_GREEN_MOUNT_REINS,
@@ -1041,6 +1042,36 @@ describe('rift ranks: clear-time epic and legendary payout', () => {
         hits,
         `${tier.rank} observed ${hits}/${SAMPLE}, expected about ${expected}`,
       ).toBeLessThan(expected * 1.7);
+    }
+  });
+
+  it('splits the S epic gate evenly, so each epic mount lands at 0.10% per clear', () => {
+    // The aggregate test above cannot see dilution: adding a fourth epic would
+    // keep the pooled rate identical while quietly halving each chase mount.
+    // This pins the SHARE, which is the number a player actually experiences.
+    expect(RIFT_EPIC_MOUNT_REINS).toHaveLength(3);
+    expect(RIFT_EPIC_MOUNT_CHANCE_PER_MOUNT).toBeCloseTo(0.001, 10);
+
+    const SAMPLE = 60_000;
+    const hits = new Map<string, number>(RIFT_EPIC_MOUNT_REINS.map((id) => [id, 0]));
+    for (let seed = 1; seed <= SAMPLE; seed++) {
+      const boss = { loot: { copper: 0, items: [] }, lootable: false } as unknown as Entity;
+      const ctx = { rng: new Rng(seed) } as unknown as SimContext;
+      addRiftClearGearLoot(ctx, boss, 28);
+      for (const item of boss.loot?.items ?? []) {
+        const id = item.itemId ?? '';
+        if (hits.has(id)) hits.set(id, (hits.get(id) ?? 0) + 1);
+      }
+    }
+    const expected = SAMPLE * RIFT_EPIC_MOUNT_CHANCE_PER_MOUNT;
+    for (const [id, count] of hits) {
+      expect(
+        count,
+        `${id} observed ${count}/${SAMPLE}, expected about ${expected}`,
+      ).toBeGreaterThan(expected * 0.5);
+      expect(count, `${id} observed ${count}/${SAMPLE}, expected about ${expected}`).toBeLessThan(
+        expected * 1.7,
+      );
     }
   });
 

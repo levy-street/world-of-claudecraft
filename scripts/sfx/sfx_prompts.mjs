@@ -139,6 +139,12 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Riftbound Boulder's roll. mountRun fires it per stride, so the take
+    // overlaps itself into a continuous rumble rather than reading as thuds.
+    key: 'mount_run_riftbound_boulder',
+    custom: true,
+  },
+  {
     key: 'mount_run_terrorspark_groundshaker_stop',
     custom: true,
   },

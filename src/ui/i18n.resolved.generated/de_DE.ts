@@ -1387,6 +1387,7 @@ export const de_DE: EnTranslations = {
       "name_thunderstrut_gobbler": "Donnerstolz der Große Puter",
       "name_terrorspark_groundshaker": "Schreckfunke, der Bodenerschütterer",
       "name_drakemaw_raptor": "Drakenrachen-Raptor",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Knochengebundene Rikscha",
       "desc_valorsteed": "Ein robustes, trittsicheres Ross, das die Reisegeschwindigkeit erhöht.",
       "desc_grag_bear": "Ein robuster, trittsicherer Bär, der die Reisegeschwindigkeit erhöht.",
@@ -1397,6 +1398,7 @@ export const de_DE: EnTranslations = {
       "desc_thunderstrut_gobbler": "Ein kolossaler sturmgeborener Puter, der vom Erwachenden Gipfel herabstolziert, den Schwanz gefächert wie eine Gewitterfront.",
       "desc_terrorspark_groundshaker": "Eine kompakte gepanzerte Maschine mit schweren Ketten, einer großkalibrigen Kanone und einem Sattel für furchtlose Piloten.",
       "desc_drakemaw_raptor": "Ein zugerittener Brutraptor aus der Drakenrachen-Caldera, ganz Sehne und Sprint, der noch schwach nach Asche riecht.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Ein klappernder Knochenkarren, an dessen Deichseln ein knochiger Scherge angeschirrt ist und Euch im vollen Lauf zieht."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const de_DE: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Zügel von Donnerstolz, dem Großen Puter"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Schmiedebrecher, Triebwerk von Varkhul"

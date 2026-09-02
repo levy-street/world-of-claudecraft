@@ -2774,6 +2774,17 @@
       }
     ]
   },
+  "mount_run_riftbound_boulder": {
+    "ceilingDb": 5.3,
+    "tracks": [
+      {
+        "filename": "mount_run_riftbound_boulder.mp3",
+        "sha256": "951ca0d3bf670761b141bf5fb8beb329b3314460f8433d12f19c747f64a6c29b",
+        "size": 16344,
+        "peakDb": -6.3
+      }
+    ]
+  },
   "mount_run_shadowjump_toad": {
     "ceilingDb": 5.3,
     "tracks": [

@@ -1387,6 +1387,7 @@ export const ja_JP: EnTranslations = {
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "name_terrorspark_groundshaker": "地揺らしのテラースパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_riftbound_boulder": "リフトの縛り岩",
       "name_rickshaw_mount": "骨縛りの人力車",
       "desc_valorsteed": "頑健で足取り確かな駿馬。移動速度を高める。",
       "desc_grag_bear": "頑健で足取り確かな熊。移動速度を高める。",
@@ -1397,6 +1398,7 @@ export const ja_JP: EnTranslations = {
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_riftbound_boulder": "突進の途中で止められ、縛りつけられたリフトの岩。鞍はない。頂に立って後ろ向きに踏めば、岩は足の下で前へ転がっていく。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "大七面鳥サンダーストラットの手綱"
+      },
+      "reins_riftbound_boulder": {
+        "name": "リフトの縛り岩の縛石"
       },
       "varkhul_forgebreaker": {
         "name": "フォージブレイカー、ヴァルクールの機関"

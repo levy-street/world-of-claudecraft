@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'riftbound_boulder'
   | 'terrorspark_groundshaker'
   | 'rickshaw_mount';
 
@@ -101,6 +102,15 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // A Rift boulder stopped mid-charge and bound to a rider: the hazard, broken
+  // to the saddle. Ordered BEFORE the developer mount so the tests that pin
+  // terrorspark as the catalog tail keep holding.
+  riftbound_boulder: {
+    key: 'riftbound_boulder',
+    name: 'Riftbound Boulder',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },

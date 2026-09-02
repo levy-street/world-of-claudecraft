@@ -1387,6 +1387,7 @@ export const id_ID: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut Sang Kalkun Agung",
       "name_terrorspark_groundshaker": "Percik Teror, Pengguncang Bumi",
       "name_drakemaw_raptor": "Raptor Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Becak Terikat Tulang",
       "desc_valorsteed": "Kuda tunggangan tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
       "desc_grag_bear": "Beruang tangguh berpijakan mantap yang memberikan kecepatan perjalanan tambahan.",
@@ -1397,6 +1398,7 @@ export const id_ID: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kalkun raksasa tetasan badai yang melenggak-lenggok turun dari Puncak yang Terjaga, ekornya terkembang bagai awan guntur.",
       "desc_terrorspark_groundshaker": "Mesin lapis baja ringkas dengan rantai roda berat, meriam berkaliber besar, dan pelana yang dibuat untuk pilot tanpa rasa takut.",
       "desc_drakemaw_raptor": "Seekor raptor sarang dari Kaldera Drakemaw yang telah dijinakkan untuk ditunggangi, seluruhnya otot dan kecepatan, masih samar berbau abu.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Gerobak tulang yang berderak, dengan serdadu kurus bertulang diikat pada porosnya, menarikmu melaju kencang."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const id_ID: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Tali Kekang Kalkun Agung Penderap Guntur"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Forgebreaker, Mesin Varkhul"

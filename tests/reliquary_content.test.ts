@@ -393,7 +393,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // The four Crucible raid pages add 41 distinct new item ids (17 arena
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
     // the batch's own page: 340 + 1 + 45.
-    expect(full).toEqual({ owned: 386, total: 386 });
+    expect(full).toEqual({ owned: 387, total: 387 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -405,7 +405,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 357, total: 357 });
+    expect(character).toEqual({ owned: 358, total: 358 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -435,7 +435,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(421);
+    ).toBe(422);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -1618,9 +1618,9 @@ describe('Reliquary dungeon and raid pages derive from live mob loot', () => {
     const normalLootIds = (MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []).map(
       (entry) => entry.itemId,
     );
-    const heroicLootIds = (
-      HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []
-    ).map((entry) => entry.itemId);
+    const heroicLootIds = (HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []).map(
+      (entry) => entry.itemId,
+    );
     expect(IGNIVAR_DROP_PLACEHOLDER_IDS.size).toBe(0);
     expect(isCataloguedRelicItem('varkhul_emberward')).toBe(true);
     expect(normalLootIds).not.toContain('varkhul_emberward');

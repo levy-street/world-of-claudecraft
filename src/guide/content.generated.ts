@@ -6561,6 +6561,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Riftbound Boulder"
+      },
+      {
+        "kind": "mount",
         "name": "Terrorspark Groundshaker"
       },
       {

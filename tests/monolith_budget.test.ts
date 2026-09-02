@@ -351,7 +351,12 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Raised 13249 -> 13257 by the Riftbound Boulder branch. The whole
+    // per-frame mount step already lives in src/render/mount_presentation.ts
+    // and the rider pose decision in mount_visuals.riderPoseFlags; what stays
+    // on the coordinator is only what needs the per-view state: the pose
+    // write, the frame scratch, and the anim-scratch fill both arms read.
+    ceiling: 13257,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

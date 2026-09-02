@@ -8648,6 +8648,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
+  'entities.items.reins_riftbound_boulder.name': '裂隙巨石的缚石',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -10022,8 +10023,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跃蟾蜍卡玛影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天风暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龙喉迅猛龙',
+  'hudChrome.mounts.name_riftbound_boulder': '裂隙巨石',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
+  'hudChrome.mounts.desc_riftbound_boulder': '一块在冲锋途中被拦下并缚住的裂隙巨石。它没有鞍：你站在石顶向后踏行，巨石便载着你向前滚动。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆阔步大火鸡',
   'hudChrome.mounts.name_terrorspark_groundshaker': '惊雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力车',

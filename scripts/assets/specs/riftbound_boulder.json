@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/riftbound_boulder/riftbound_boulder-final.glb",
+      "out": "models/mounts/riftbound_boulder.glb",
+      "type": "static",
+      "keepExtras": true
+    }
+  ]
+}

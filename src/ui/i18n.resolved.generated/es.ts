@@ -1387,6 +1387,7 @@ export const es: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavoneatruenos, el Gran Pavo",
       "name_terrorspark_groundshaker": "Aterrachispa, Sacudetierras",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Rickshaw Atahuesos",
       "desc_valorsteed": "Un corcel resistente y de paso firme que aumenta la velocidad de viaje.",
       "desc_grag_bear": "Un oso resistente y de paso firme que aumenta la velocidad de viaje.",
@@ -1397,6 +1398,7 @@ export const es: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un pavo colosal nacido de la tormenta que baja pavoneándose del Pico Despierto, con la cola desplegada como un frente de tormenta.",
       "desc_terrorspark_groundshaker": "Una máquina blindada y compacta con orugas pesadas, un cañón de gran calibre y una silla hecha para pilotos intrépidos.",
       "desc_drakemaw_raptor": "Un raptor de cría domado para la silla, procedente de la Caldera de Drakemaw, puro tendón y arranque, que aún huele ligeramente a ceniza.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Un carromato de huesos traqueteante, con un soldado esquelético enganchado a las varas, que te arrastra a toda carrera."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const es: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Riendas de Pavoneatruenos, el Gran Pavo"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Rompeforjas, Motor de Varkhul"

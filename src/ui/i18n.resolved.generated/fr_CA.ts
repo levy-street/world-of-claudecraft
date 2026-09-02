@@ -1387,6 +1387,7 @@ export const fr_CA: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavane-Tonnerre, le Grand Dindon",
       "name_terrorspark_groundshaker": "Terrétincelle, l’Ébranleur de sol",
       "name_drakemaw_raptor": "Raptor du Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Rickshaw d'os liés",
       "desc_valorsteed": "Un destrier robuste au pied sûr qui accroît la vitesse de déplacement.",
       "desc_grag_bear": "Un ours robuste au pied sûr qui accroît la vitesse de déplacement.",
@@ -1397,6 +1398,7 @@ export const fr_CA: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un dindon colossal né de l’orage qui descend du Pic Éveillé en se pavanant, la queue déployée comme un front d’orage.",
       "desc_terrorspark_groundshaker": "Un engin blindé compact doté de chenilles lourdes, d’un canon de gros calibre et d’une selle conçue pour les pilotes intrépides.",
       "desc_drakemaw_raptor": "Un raptor de couvée dressé à la selle, originaire de la Caldeira de Drakemaw : tout en muscles et en vitesse, encore empreint d'une légère odeur de cendre.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Une carriole d'os bringuebalante, avec un soldat osseux attelé aux brancards, qui vous tire au pas de course."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const fr_CA: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Rênes de Pavane-Tonnerre, le Grand Dindon"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Brise-forge, engin de Varkhul"

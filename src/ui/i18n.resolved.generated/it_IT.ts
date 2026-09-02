@@ -1387,6 +1387,7 @@ export const it_IT: EnTranslations = {
       "name_thunderstrut_gobbler": "Passotuono, il Gran Tacchino",
       "name_terrorspark_groundshaker": "Terrorscintilla, Scuoteterra",
       "name_drakemaw_raptor": "Raptor di Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Risciò Vincolato alle Ossa",
       "desc_valorsteed": "Un destriero robusto e dal passo sicuro che aumenta la velocità di viaggio.",
       "desc_grag_bear": "Un orso robusto e dal passo sicuro che aumenta la velocità di viaggio.",
@@ -1397,6 +1398,7 @@ export const it_IT: EnTranslations = {
       "desc_thunderstrut_gobbler": "Un tacchino colossale nato dalla tempesta che scende impettito dal Picco Risvegliato, con la coda spiegata come un fronte di tempesta.",
       "desc_terrorspark_groundshaker": "Una macchina corazzata compatta con cingoli pesanti, un cannone di grosso calibro e una sella costruita per piloti impavidi.",
       "desc_drakemaw_raptor": "Un raptor da covata domato per la sella, proveniente dalla Caldera di Drakemaw, tutto muscoli e scatto, che sa ancora vagamente di cenere.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Un carro d'ossa sferragliante, con un gregario ossuto imbragato alle stanghe, che ti trascina in una corsa sfrenata."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const it_IT: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Redini di Passotuono, il Gran Tacchino"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Spezzaforgia, Motore di Varkhul"

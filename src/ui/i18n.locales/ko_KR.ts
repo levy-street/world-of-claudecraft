@@ -9004,6 +9004,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
+  'entities.items.reins_riftbound_boulder.name': '균열에 묶인 바위의 결속석',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -10476,8 +10477,11 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
+  'hudChrome.mounts.name_riftbound_boulder': '균열에 묶인 바위',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
+  'hudChrome.mounts.desc_riftbound_boulder':
+    '돌진하던 도중에 멈춰 세워져 묶인 균열의 바위. 안장은 없다. 꼭대기에 올라서서 뒤로 밟으면, 바위가 발밑에서 앞으로 굴러간다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',

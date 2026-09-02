@@ -231,12 +231,29 @@ export const RIFT_GREEN_MOUNT_CHANCE = 0.005; // 0.5%, the heroic five-man green
 export const RIFT_BLUE_MOUNT_REINS = ['reins_grag_bear', 'reins_stalkglider_snail'] as const;
 export const RIFT_BLUE_MOUNT_CHANCE = 0.001; // 0.1%, the heroic five-man blue rate
 
-/** Epic mount reins, on S clears only. Rifts are their sole source. */
+/** Epic mount reins, on S clears only. Rifts are their sole source.
+ *
+ * The draw is ONE gate at RIFT_EPIC_MOUNT_CHANCE and then a uniform pick, so
+ * the aggregate epic-mount rate is fixed and each entry gets an equal share of
+ * it. Adding the Riftbound Boulder therefore moved the per-mount rate from
+ * 0.15% to 0.10% per S clear (about 667 expected clears for a named mount, now
+ * about 1000). That dilution is DELIBERATE: the aggregate chase rate is the
+ * tuned quantity, a third epic should not make S clears 50% more generous at
+ * handing out mounts, and 0.10% per mount is the intended rate for this pool.
+ * tests/rift_rank_tuning.test.ts pins the per-mount share, not just the
+ * aggregate, so a fourth entry cannot dilute it again without a decision.
+ */
 export const RIFT_EPIC_MOUNT_REINS = [
   'reins_aether_hover_cycle',
   'reins_thunderstrut_gobbler',
+  'reins_riftbound_boulder',
 ] as const;
-export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear
+export const RIFT_EPIC_MOUNT_CHANCE = 0.003; // 0.3% per S clear, split evenly
+/** The per-mount share the pool is tuned to: one entry out of the pool, at the
+ *  pool's own gate. Kept as a named constant so the intended rate is a fact in
+ *  the content rather than an arithmetic accident of the array length. */
+export const RIFT_EPIC_MOUNT_CHANCE_PER_MOUNT =
+  RIFT_EPIC_MOUNT_CHANCE / RIFT_EPIC_MOUNT_REINS.length;
 
 /** Rank-gated gear payout on the winning clear: pushed onto the final boss's
  * corpse as PLAIN drops, so the normal party loot rules (rolls) decide who

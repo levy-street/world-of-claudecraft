@@ -417,13 +417,17 @@ import { collectObjectTextures } from './material_texture_slots';
 import { buildMobNightGlow, type MobNightGlowView } from './mob_night_glow';
 import { buildMotes, type MotesView } from './motes';
 import { MountBeacon } from './mount_beacon';
-import { applyMountJumpAttitude } from './mount_jump_attitude';
+import {
+  createMountFrameScratch,
+  fillMountAnimState,
+  updateMountPresentation,
+} from './mount_presentation';
 import {
   mountPrewarmKeys,
   stageMountPrewarmVisual,
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
-import { mountVisualSpec } from './mount_visuals';
+import { mountVisualSpec, riderPoseFlags } from './mount_visuals';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -1094,6 +1098,10 @@ export interface EntityView extends RickshawMountViewState {
   /** world-unit rider saddle lift while mounted (0 dismounted); the nameplate,
    *  chat-bubble, and sloppy-pick overhead anchors add it (scaled by e.scale) */
   mountLift: number;
+  /** Accumulated roll of a ROLLING mount (radians, wrapped). Kept per view
+   *  because it integrates travel: it is the one thing about this mount that
+   *  cannot be recomputed from the current frame alone. */
+  mountRoll: number;
   /** Display-only jump attitude; see mount_jump_attitude. */
   mountJumpPitch: number;
   metamorphVisual: CharacterVisual | null; // Necromancy Lich Form, built lazily
@@ -1486,6 +1494,9 @@ export class Renderer {
   };
   // Second scratch for the mount rig: the rider's state minus the rider-only
   // facts (casting/sitting/dead never reach the mount's locomotion clips).
+  // Refilled once per mounted rider per frame, never reallocated: the same
+  // caller-owned-scratch rule as mountAnimScratch and updateLocomotionInto.
+  private readonly mountFrameScratch = createMountFrameScratch();
   private readonly mountAnimScratch: AnimState = {
     speed: 0,
     moving: false,
@@ -8478,6 +8489,7 @@ export class Renderer {
       mountVisualKey: '',
       mountPullerVisual: null,
       mountLift: 0,
+      mountRoll: 0,
       mountJumpPitch: 0,
       metamorphVisual: null,
       fireballTravelVisual: null,
@@ -10923,6 +10935,9 @@ export class Renderer {
           v.mountVisual = createMountVisual(mountSpec.visualKey);
           this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);
           v.group.add(v.mountVisual.root); // group.scale already carries e.scale
+          // A rolling mount rests one radius off the ground: a static property
+          // of the spec, so seed it here rather than wait for a gated frame.
+          v.mountVisual.root.position.y = mountSpec.rollRadius;
           v.mountVisualKey = mountSpec.visualKey;
           attachPullerIfRickshaw(v, mountSpec.visualKey, v.mountVisual.root);
           // A newly summoned mount is exactly a brand-new rig's materials
@@ -11262,12 +11277,12 @@ export class Renderer {
       st.swimPitch = v.swimPitch;
       st.wading = wading;
       if (isSelf) this.selfSubmerged = submerged && !visuallyDead;
-      // A mounted rider holds the seated pose (the sit loop reads as riding);
-      // swim/cast still outrank it in desiredBaseState, so mounted casting
-      // and swimming animate normally.
-      st.sitting =
-        e.kind === 'player' &&
-        (e.sitting || e.eating !== null || e.drinking !== null || riderMounted);
+      // Seated in a saddle, or treading the boulder: mount_visuals.riderPoseFlags.
+      const resting =
+        e.kind === 'player' && (e.sitting || e.eating !== null || e.drinking !== null);
+      const pose = riderPoseFlags(e.mountKey, riderMounted, resting, moving);
+      st.sitting = pose.sitting;
+      if (pose.treading) st.backwards = true;
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead);
@@ -11398,6 +11413,10 @@ export class Renderer {
       const contactHalfLength = swimming
         ? Math.min(1.05, Math.max(contactRadius * 0.9, active.height * v.liveScale * 0.3))
         : contactRadius * 0.22;
+      // A treading rider is NOT seated, so a rolling mount reaches this where the
+      // nine saddle mounts never do. Deliberate: the wake and splash spawn at the
+      // entity position, which is the stone contact patch, so it reads as the
+      // boulder displacing water rather than the rider wading.
       const touchesWater =
         !visuallyDead &&
         !st.sitting &&
@@ -11569,22 +11588,25 @@ export class Renderer {
       // skin VFX point light on it) is rebuilt inside update(), not at the diff.
       if (v.visual.consumeWeaponGraphDirty()) this.reconcileViewLights(v);
 
-      // The mount animates from the same locomotion inputs as its rider: the
-      // rigged quadrupeds run their baked gait clips (a live Idle loop while
-      // standing, Walk/Run on the move, scripts/bake_mount_gaits.mjs), and
-      // the clipless mounts bob procedurally (the hover cycle floats, the
-      // griffin canters, the snail glides flat). `airborne` here is the real
-      // flag, not the rider's suppressed one: the mount carries the jump.
+      // The mount step: animation, bob, roll, particles (mount_presentation.ts).
       if (v.mountVisual && mountSpec && mountShown) {
-        const mst = this.mountAnimScratch;
-        mst.speed = st.speed;
-        mst.moving = st.moving;
-        mst.running = st.running;
-        mst.airborne = airborne;
-        mst.backwards = st.backwards;
-        mst.swimming = st.swimming;
+        // Filled for BOTH arms: the puller below reads it off-screen too.
+        fillMountAnimState(this.mountAnimScratch, st, mountSpec, airborne);
         if (runCharacterPresentation) {
-          v.mountVisual.update(dt, mst, animate);
+          const frame = this.mountFrameScratch;
+          frame.mount = v.mountVisual;
+          frame.riderVisual = v.visual;
+          frame.spec = mountSpec;
+          frame.dt = dt;
+          frame.timeSec = this.time;
+          frame.animate = animate;
+          frame.moving = moving;
+          frame.airborne = airborne;
+          frame.facing = facing;
+          frame.stepX = vx;
+          frame.stepZ = vz;
+          frame.verticalVelocity = dt > 1e-4 ? dyRaw / dt : 0;
+          updateMountPresentation(v, this.mountAnimScratch, this.vfx, frame);
           // RAW per-frame travel, not st.speed. loco.speed is exponentially
           // smoothed for footstep cadence and additionally latches its last
           // value while "stalled", so it keeps reporting motion for a beat
@@ -11593,36 +11615,25 @@ export class Renderer {
           // the wheels should agree with anyway: if the cart did not move this
           // frame, the wheels must not turn this frame.
           spinMountWheels(v, dt > 0 ? Math.hypot(vx, vz) / dt : 0, st.backwards, dt);
-          applyMountJumpAttitude(
-            v,
-            v.mountVisual.root,
-            v.visual.root,
-            mountSpec,
-            this.time,
-            moving,
-            airborne,
-            dt > 1e-4 ? dyRaw / dt : 0,
-            dt,
-          );
-          // ambient mount particles: the snail paints its slime path while
-          // gliding, the hover cycle streams aether exhaust off its tail
-          if (mountSpec.fx === 'slime') {
-            if (moving) this.vfx.mountSlimeTrail(v.group.position, dt);
-          } else if (mountSpec.fx === 'exhaust') {
-            this.vfx.mountExhaust(v.group.position, facing, dt, moving);
-          }
         } else {
           v.mountVisual.advanceOffscreen(dt);
         }
-        updateRickshawPuller(v, dt, mst, animate, runCharacterPresentation);
+        updateRickshawPuller(v, dt, this.mountAnimScratch, animate, runCharacterPresentation);
       }
 
       const emoteId =
         e.kind === 'player' && e.overheadEmoteId && !e.dead ? e.overheadEmoteId : null;
       const emoteKey = emoteId ? `${emoteId}:${e.overheadEmoteSeq}` : null;
       if (emoteKey !== v.lastOverheadEmoteKey) {
+        // Mounted riders emote only when their mount says so (pose.mayEmote,
+        // src/render/mount_visuals.ts); on foot the seated flag still decides.
         const canPlayEmote =
-          emoteId && !moving && !st.airborne && !st.swimming && !st.casting && !st.sitting;
+          emoteId &&
+          !moving &&
+          !st.airborne &&
+          !st.swimming &&
+          !st.casting &&
+          (riderMounted ? pose.mayEmote : !st.sitting);
         if (canPlayEmote) {
           active.playEmote(emoteId);
           v.lastOverheadEmoteKey = emoteKey;

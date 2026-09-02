@@ -1978,6 +1978,25 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 12.6,
     lazyPreload: true,
   },
+  // The Riftbound Boulder. Clipless (no rig, no clips, no textures: 930 flat
+  // triangles and vertex colors, authored by
+  // scripts/assets/riftbound_boulder/), because its motion is not a gait. The
+  // renderer ROLLS it, at the rate its own travel demands.
+  //
+  // height + hover are a matched pair, not two independent knobs. The exporter
+  // guarantees the authored stone is exactly 2.0 tall and origin-centred, so
+  // height 1.6 scales it to a 0.8-yard radius and hover -0.8 slides the mesh
+  // back down until the model's centre sits ON the visual root's origin. That
+  // is what lets the renderer spin the stone in place by rotating the root
+  // instead of swinging it around its own contact point, and it is why
+  // mount_visuals' rollRadius (0.8) has to stay half of this height.
+  mount_riftbound_boulder: {
+    url: `${MOUNTS_DIR}/riftbound_boulder.glb`,
+    height: 1.6,
+    hover: -0.8,
+    clips: MOUNT_RIGGED,
+    lazyPreload: true,
+  },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its
   // own): height is the measured shipped bbox (npx gltf-transform inspect).
   // The puller is a SEPARATE visual (skel_rickshaw_puller) composed at

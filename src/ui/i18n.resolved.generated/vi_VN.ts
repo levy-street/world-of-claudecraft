@@ -1387,6 +1387,7 @@ export const vi_VN: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut, Gà Tây Vĩ Đại",
       "name_terrorspark_groundshaker": "Tia Kinh Hoàng, Kẻ Rung Chuyển Mặt Đất",
       "name_drakemaw_raptor": "Cuồng Long Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Xe kéo Buộc Xương",
       "desc_valorsteed": "Một con chiến mã khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
       "desc_grag_bear": "Một chú gấu khỏe mạnh, bước chân vững chãi, giúp tăng tốc độ di chuyển.",
@@ -1397,6 +1398,7 @@ export const vi_VN: EnTranslations = {
       "desc_thunderstrut_gobbler": "Một con gà tây khổng lồ nở ra từ giông bão, sải bước xuống từ Đỉnh Tỉnh Thức, đuôi xòe rộng như đám mây giông.",
       "desc_terrorspark_groundshaker": "Một cỗ máy bọc giáp nhỏ gọn với bánh xích nặng, pháo nòng lớn và yên ngồi dành cho những người lái gan dạ.",
       "desc_drakemaw_raptor": "Một con Cuồng Long thuộc bầy đàn đã được thuần yên cương từ Miệng Núi Lửa Drakemaw, toàn thân gân cốt và tốc lực, vẫn còn phảng phất mùi tro tàn.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Một cỗ xe xương lọc cọc, với một tên lính xương xẩu bị buộc vào càng xe, kéo bạn lao đi hết tốc lực."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const vi_VN: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Dây cương Gà Tây Chúa Sải Bước Sấm"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Kẻ Phá Lò, Cỗ Máy Của Varkhul"

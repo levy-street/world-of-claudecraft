@@ -1387,6 +1387,7 @@ export const cs_CZ: EnTranslations = {
       "name_thunderstrut_gobbler": "Hromokrok, Velký krocan",
       "name_terrorspark_groundshaker": "Hrůzojiskra, otřásač země",
       "name_drakemaw_raptor": "Raptor z Dračí tlamy",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Kostipoutaná rikša",
       "desc_valorsteed": "Otužilý, jistonohý oř poskytující zvýšenou rychlost cestování.",
       "desc_grag_bear": "Otužilý, jistonohý medvěd poskytující zvýšenou rychlost cestování.",
@@ -1397,6 +1398,7 @@ export const cs_CZ: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kolosální krocan zrozený z bouře, který se hrdě prochází z Probouzejícího se vrcholu, s ocasem rozevřeným jako bouřkový mrak.",
       "desc_terrorspark_groundshaker": "Kompaktní obrněný stroj s těžkými pásy, velkorážním kanónem a sedlem pro nebojácné piloty.",
       "desc_drakemaw_raptor": "Osedlaný raptor z líhně v Kaldeře Dračí tlamy, samé šlachy a hbitost, ještě slabě páchnoucí popelem.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Chrastící kostěný vozík s kostnatým pěšákem zapřaženým do ojí, který tě veze tryskem."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const cs_CZ: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Otěže Hromokroka, velkého krocana"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Drtič kovárny, Varkhulův nástroj"

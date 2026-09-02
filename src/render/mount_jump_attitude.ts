@@ -94,6 +94,13 @@ export function mountRiderPivot(
  *
  * `tips` false still runs, so a mount that does not tip relaxes any residual
  * pitch to zero through the same damped path instead of snapping.
+ *
+ * `rollAngle` is a ROLLING mount's accumulated spin (mount_visuals), composed
+ * onto the same axis as the pitch because a rolling mount can also be
+ * airborne. It is the mount body only: the rider rides the pitch, never the
+ * roll, or a boulder would tumble its rider with it. The matching ground lift
+ * comes off the spec, so a rolling mount rests one radius up and a walking one
+ * is unaffected (rollRadius 0).
  */
 export function applyMountJumpAttitude(
   view: { mountJumpPitch: number; mountLift: number },
@@ -105,6 +112,7 @@ export function applyMountJumpAttitude(
   airborne: boolean,
   verticalVelocity: number,
   dt: number,
+  rollAngle = 0,
 ): void {
   // The rider floats WITH the procedural bob, not just the mount body.
   const bob = mountBobY(spec, time, moving);
@@ -117,8 +125,8 @@ export function applyMountJumpAttitude(
   );
   const pitch = view.mountJumpPitch;
   const rotationX = -pitch;
-  mountRoot.rotation.x = rotationX;
-  mountRoot.position.y = bob;
+  mountRoot.rotation.x = rollAngle + rotationX;
+  mountRoot.position.y = bob + spec.rollRadius;
   // Carry the separately-rooted rider around the same vehicle origin, or a
   // nose-up cart leaves them sitting level and off the seat.
   const seat = mountRiderPivot(seatLift, spec.seatFwd, pitch);

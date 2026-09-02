@@ -103,8 +103,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly ten mounts with the horse first and the developer rickshaw last', () => {
-    expect(MOUNT_KEYS).toHaveLength(10);
+  it('has exactly eleven mounts with the horse first and the developer rickshaw last', () => {
+    expect(MOUNT_KEYS).toHaveLength(11);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -122,6 +122,7 @@ describe('mount catalog', () => {
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
+    expect(spec('riftbound_boulder')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no

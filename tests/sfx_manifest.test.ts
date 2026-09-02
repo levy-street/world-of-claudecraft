@@ -164,11 +164,11 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 62 UI cues in one 268-key inventory', () => {
+  it('keeps the release catalog, all 14 mount cues, and all 62 UI cues in one 269-key inventory', () => {
     const keys = new Set(SFX.map((entry) => entry.key));
     // 268 = the release catalog plus the two gendered player-voice keys from
     // PR #2320 and the rickshaw mount's summon/loop cues.
-    expect(keys.size).toBe(268);
+    expect(keys.size).toBe(269);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(62);
     expect(keys.has('ui_craft_cast')).toBe(true);
     for (const key of [
@@ -191,6 +191,9 @@ describe('buildManifest', () => {
       'mount_run_terrorspark_groundshaker',
       // the Drakemaw Raptor, the ninth mount cue (the brood rework's legendary)
       'mount_run_drakemaw_raptor',
+      // the Riftbound Boulder: a stone grinding over ground rather than a
+      // stride, so it is a roll bed and not a footfall
+      'mount_run_riftbound_boulder',
       'fear_shout',
       'fear',
       'intimidating_shout',
@@ -246,7 +249,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(268);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(269);
   });
 });
 

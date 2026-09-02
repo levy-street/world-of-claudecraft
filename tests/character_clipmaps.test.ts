@@ -223,6 +223,10 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
  * silently loses its clips in an asset update is not waved through here.
  */
 const CLIPLESS_RIGS = new Set([
+  // The Riftbound Boulder: clipless on purpose. Its motion is a ROLL derived
+  // from travel (mount_visuals.mountRollStep), not a gait, so there is no clip
+  // to bake and nothing for a ClipMap to resolve.
+  'mount_riftbound_boulder',
   'mount_stalkglider_snail',
   'mount_aether_hover_cycle',
   'mount_rickshaw_mount',

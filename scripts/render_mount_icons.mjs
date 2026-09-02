@@ -78,6 +78,16 @@ const JOBS = [
     cfg: { headFwd: 0.1, headUp: 0, fill: 1.18, yaw: 0.68, pitch: 0.24 },
   },
   {
+    // The boulder has no head to frame: it is a sphere, so anchor dead centre
+    // (headFwd/headUp 0) and fill the frame with the whole stone. The yaw and
+    // pitch are only there to catch the rift seams across the terminator rather
+    // than flat-on, where they would read as scratches.
+    file: 'riftbound_boulder.glb',
+    id: 'reins_riftbound_boulder',
+    cfg: { headFwd: 0, headUp: 0, fill: 1.08, yaw: 0.62, pitch: 0.22 },
+    opaque: true,
+  },
+  {
     // The raptor carries its head high and well forward on a long neck, above a
     // saddle set back over the hips: anchor forward and high, and look slightly
     // down so the snout reads rather than the saddle behind it.
@@ -97,12 +107,51 @@ const built = await esbuild.build({
   platform: 'browser',
   write: false,
   logLevel: 'silent',
+  // An IIFE bundle has no module record, so esbuild rewrites bare `import.meta`
+  // to `{}` and three's KTX2Loader ends up calling `new URL(undefined, ...)`,
+  // which throws 'Invalid URL' before the entry can set window.__ready. The page
+  // then only times out, with the real cause 20 seconds upstream. Any absolute
+  // base works: nothing is fetched relative to it (the GLB arrives as base64 and
+  // the transcoder is inlined as its own script tag), it just has to parse. The
+  // page's own baseURI does NOT, because setContent leaves that as about:blank.
+  define: { 'import.meta.url': JSON.stringify('https://mount-icon.invalid/entry.js') },
 });
 const bundleJs = built.outputFiles[0].text;
 const ktx2Tag = ktx2TranscoderScriptTag(
   path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'),
 );
 const html = `<!doctype html><html><head><meta charset="utf8"><style>html,body{margin:0;background:transparent}</style></head><body>${ktx2Tag}<script>${bundleJs}</script></body></html>`;
+
+// The woc-item-icon-v1 shipping contract (public/ui/items/mapping.json) requires an
+// OPAQUE dark ground: a transparent icon fails the catalog gate in
+// tests/item_art_consistency.test.ts. A job that opts in with `opaque: true`
+// gets its render composited over this vignette, which is built to the same
+// values the painted catalog art sits on (near-black corners falling off from a
+// slightly lifted centre). Jobs without the flag keep the historical
+// transparent output untouched.
+const GROUND_CENTER = { r: 0x24, g: 0x21, b: 0x2a };
+const GROUND_EDGE = { r: 0x08, g: 0x07, b: 0x0a };
+
+function paintedGround(size) {
+  const pixels = Buffer.alloc(size * size * 3);
+  const half = (size - 1) / 2;
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // Radial falloff normalized so the corners, not the edge midpoints, are
+      // the darkest point: a vignette that bottoms out at the edges leaves the
+      // corners flat and the icon reads as a rounded rectangle on a card.
+      const radius = Math.min(1, Math.hypot(x - half, y - half) / (half * Math.SQRT2));
+      const t = radius * radius;
+      const at = (y * size + x) * 3;
+      pixels[at] = Math.round(GROUND_CENTER.r + (GROUND_EDGE.r - GROUND_CENTER.r) * t);
+      pixels[at + 1] = Math.round(GROUND_CENTER.g + (GROUND_EDGE.g - GROUND_CENTER.g) * t);
+      pixels[at + 2] = Math.round(GROUND_CENTER.b + (GROUND_EDGE.b - GROUND_CENTER.b) * t);
+    }
+  }
+  return sharp(pixels, { raw: { width: size, height: size, channels: 3 } })
+    .png()
+    .toBuffer();
+}
 
 // 2) Drive headless Chrome over software WebGL.
 const browser = await puppeteer.launch({
@@ -145,13 +194,19 @@ for (const job of JOBS) {
     if (!alpha || alpha.max < 8) {
       throw new Error(`blank render (alpha max ${alpha ? alpha.max : 'none'})`);
     }
-    const webp = await sharp(png)
+    const framed = job.opaque
+      ? await sharp(await paintedGround((await sharp(png).metadata()).width))
+          .composite([{ input: png }])
+          .png()
+          .toBuffer()
+      : png;
+    const webp = await sharp(framed)
       .resize(OUT_PX, OUT_PX, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
       .webp({ quality: 90, alphaQuality: 100, effort: 6 })
       .toBuffer();
     writeFileSync(path.join(outDir, `${job.id}.webp`), webp);
     if (debugDir) {
-      const previewPng = await sharp(png)
+      const previewPng = await sharp(framed)
         .resize(OUT_PX, OUT_PX, { fit: 'contain', background: { r: 0, g: 0, b: 0, alpha: 0 } })
         .png()
         .toBuffer();

@@ -1387,6 +1387,7 @@ export const ko_KR: EnTranslations = {
       "name_thunderstrut_gobbler": "천둥활보 대왕 칠면조",
       "name_terrorspark_groundshaker": "대지를 뒤흔드는 테러스파크",
       "name_drakemaw_raptor": "화산구 랩터",
+      "name_riftbound_boulder": "균열에 묶인 바위",
       "name_rickshaw_mount": "뼈에 묶인 인력거",
       "desc_valorsteed": "여행 속도를 높여 주는 튼튼하고 발이 안정된 군마입니다.",
       "desc_grag_bear": "여행 속도를 높여 주는 튼튼하고 발이 안정된 곰입니다.",
@@ -1397,6 +1398,7 @@ export const ko_KR: EnTranslations = {
       "desc_thunderstrut_gobbler": "깨어나는 봉우리에서 꼬리깃을 뇌운처럼 펼친 채 활보하며 내려오는, 폭풍이 낳은 거대한 칠면조입니다.",
       "desc_terrorspark_groundshaker": "묵직한 궤도와 대구경 포, 겁 없는 조종사를 위한 안장을 갖춘 소형 장갑 기계입니다.",
       "desc_drakemaw_raptor": "화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.",
+      "desc_riftbound_boulder": "돌진하던 도중에 멈춰 세워져 묶인 균열의 바위. 안장은 없다. 꼭대기에 올라서서 뒤로 밟으면, 바위가 발밑에서 앞으로 굴러간다.",
       "desc_rickshaw_mount": "덜컹거리는 뼈 수레입니다. 뼈만 앙상한 잡졸이 채에 매인 채 전속력으로 당신을 끌고 달립니다."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const ko_KR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "천둥활보 대왕 칠면조의 고삐"
+      },
+      "reins_riftbound_boulder": {
+        "name": "균열에 묶인 바위의 결속석"
       },
       "varkhul_forgebreaker": {
         "name": "화로파괴자, 바르쿨의 기관"

@@ -102,13 +102,14 @@ const build = await buildItemArtAudit({
     // + the ignivar-varkhul-drop-renders-2026-08-28 batch (2 rendered
     // legendaries) + the crucible-set-icons-2026-08-29 wave (all 192
     // non-weapon Crucible pieces; the art-pending ledger is now empty).
+    // + the Riftbound Boulder reins (this branch).
     // + the OSSBrain v0.41 batch's own painted piece, carried through the
     // base merge alongside the release-side Crucible waves.
-    catalogCount: 1041,
+    catalogCount: 1042,
     // 844 + the 201 Crucible raid loot definitions (192 of them art-pending)
     // + the base's 2 Varkhul legendary definitions, + the release sync's 7
-    // bank-storage painted bags.
-    liveItemCount: 1056,
+    // bank-storage painted bags, + this branch's Riftbound Boulder reins.
+    liveItemCount: 1057,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,

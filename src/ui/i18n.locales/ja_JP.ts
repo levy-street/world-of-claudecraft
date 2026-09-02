@@ -9022,6 +9022,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
   'entities.items.reins_drakemaw_raptor.name': '火口のラプトルの手綱',
   'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
+  'entities.items.reins_riftbound_boulder.name': 'リフトの縛り岩の縛石',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -10498,8 +10499,11 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影跳びのカマカゲ',
   'hudChrome.mounts.name_stormfeather_griffin': 'スカイリーチ・ストームフェザー',
   'hudChrome.mounts.name_drakemaw_raptor': '火口のラプトル',
+  'hudChrome.mounts.name_riftbound_boulder': 'リフトの縛り岩',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
+  'hudChrome.mounts.desc_riftbound_boulder':
+    '突進の途中で止められ、縛りつけられたリフトの岩。鞍はない。頂に立って後ろ向きに踏めば、岩は足の下で前へ転がっていく。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '大七面鳥サンダーストラット',
   'hudChrome.mounts.name_terrorspark_groundshaker': '地揺らしのテラースパーク',
   'hudChrome.mounts.name_rickshaw_mount': '骨縛りの人力車',

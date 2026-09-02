@@ -399,6 +399,19 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // Collectible mount, Rift S clears only (RIFT_EPIC_MOUNT_REINS). Tradable on
+  // the same terms as the other Rift epics: owning the reins IS owning the
+  // mount, and it stays valid from the bank.
+  reins_riftbound_boulder: {
+    id: 'reins_riftbound_boulder',
+    name: 'Bindstone of the Riftbound Boulder',
+    kind: 'mount',
+    mount: 'riftbound_boulder',
+    quality: 'epic',
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.

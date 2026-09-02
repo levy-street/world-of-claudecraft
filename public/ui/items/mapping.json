@@ -244,6 +244,14 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "itemId": "reins_riftbound_boulder",
+      "name": "Bindstone of the Riftbound Boulder",
+      "sourcePack": "world-of-claudecraft procedural asset pipeline",
+      "sourceFile": "rendered by scripts/render_mount_icons.mjs from public/models/mounts/riftbound_boulder.glb (authored by scripts/assets/riftbound_boulder/), composited on the woc-item-icon-v1 opaque ground",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "itemId": "resonant_hide",
       "name": "Resonant Hide",
       "sourcePack": "woc_professions_art",

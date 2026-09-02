@@ -1387,6 +1387,7 @@ export const pt_BR: EnTranslations = {
       "name_thunderstrut_gobbler": "Pavoneia-Trovões, o Grande Peru",
       "name_terrorspark_groundshaker": "Faíscaterror, Abala-Terra",
       "name_drakemaw_raptor": "Raptor de Drakemaw",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Riquixá de Ossos Vinculados",
       "desc_valorsteed": "Um corcel resistente e de passo firme que aumenta a velocidade de viagem.",
       "desc_grag_bear": "Um urso resistente e de passo firme que aumenta a velocidade de viagem.",
@@ -1397,6 +1398,7 @@ export const pt_BR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Um peru colossal nascido da tempestade que desce do Pico Desperto se pavoneando, com a cauda aberta como uma frente de tempestade.",
       "desc_terrorspark_groundshaker": "Uma máquina blindada compacta com esteiras pesadas, um canhão de grande calibre e uma sela feita para pilotos destemidos.",
       "desc_drakemaw_raptor": "Um raptor da ninhada domado na sela, vindo da Caldeira de Drakemaw, puro músculo e velocidade, ainda com um leve cheiro de cinzas.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Uma carroça de ossos rangente, com um serviçal ossudo atrelado às varas, puxando você em disparada."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const pt_BR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Rédeas de Pavoneia-Trovões, o Grande Peru"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Quebraforja, Engenho de Varkhul"

@@ -81,3 +81,17 @@ hash must then agree with both the current item file and this batch's generation
 Current provenance ownership lives only in `public/ui/items/mapping.json`. Each of these 274 IDs
 was removed from its prior current owner and appears exactly once in the
 `item-art-consistency-2026-08-09` generated batch.
+
+## Contact-sheet reproducibility (noted 2026-08-28)
+
+The review-mode contact sheets under the audit output are **not byte-reproducible across
+environments**. A `--refresh-verdict` run on a different machine re-encodes all 208 sheets: every
+sheet sha256 moves and the set size shifts by a couple of percent, including sheets containing no
+art that changed. The catalog, the shipping-art digests, and the per-item seals are unaffected;
+only the rendered sheets drift, and they drift with the imaging toolchain rather than with any
+content.
+
+`rendererFingerprint` does not cover that toolchain, so a sheet-digest diff on its own is not
+evidence that art moved. Read the catalog and shipping digests for that. Folding an imaging
+toolchain component into the fingerprint would make the sheet seals meaningful again; until then,
+treat a whole-set sheet churn accompanied by an unchanged `shippingCatalogSha256` as environmental.

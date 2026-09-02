@@ -1387,6 +1387,7 @@ export const da_DK: EnTranslations = {
       "name_thunderstrut_gobbler": "Tordenspanker den Store Kalkun",
       "name_terrorspark_groundshaker": "Skrækgnist, jordrysteren",
       "name_drakemaw_raptor": "Dragegabets Raptor",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Knogebundet Rickshaw",
       "desc_valorsteed": "En hårdfør, sikker ganger, der giver øget rejsehastighed.",
       "desc_grag_bear": "En hårdfør, sikker bjørn, der giver øget rejsehastighed.",
@@ -1397,6 +1398,7 @@ export const da_DK: EnTranslations = {
       "desc_thunderstrut_gobbler": "En kolossal, stormudklækket kalkun, der spankulerer ned fra Den Opvågnende Tinde, med halen udfoldet som en tordensky.",
       "desc_terrorspark_groundshaker": "En kompakt panseret maskine med tunge larvebånd, en grovkalibret kanon og en saddel bygget til frygtløse førere.",
       "desc_drakemaw_raptor": "En saddelvant yngelraptor fra Dragegabets Caldera, kun sener og spurt, som stadig lugter svagt af aske.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "En raslende knoglekærre med en knoklet håndlanger spændt for skafterne, der trækker dig af sted i fuldt firspring."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const da_DK: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Tøjler til Tordenspankeren, den store kalkun"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Smedjebryderen, Varkhuls maskine"

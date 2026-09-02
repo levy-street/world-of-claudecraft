@@ -266,6 +266,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
+  'riftbound_boulder',
   'terrorspark_groundshaker',
   'rickshaw_mount',
 ] as const;
@@ -324,6 +325,7 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  riftbound_boulder: fromRift('S'),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS

@@ -1732,6 +1732,7 @@ export const en = {
       reins_shadowjump_toad: { name: 'Reins of Kama-Kage the Shadow-Jump Toad' },
       reins_stormfeather_griffin: { name: 'Reins of the Sky-Reach Stormfeather' },
       reins_thunderstrut_gobbler: { name: 'Reins of Thunderstrut the Grand Gobbler' },
+      reins_riftbound_boulder: { name: 'Bindstone of the Riftbound Boulder' },
       // Ignivar raid legendary drops (Varkhul the Forgefather); dev-give-only
       // until the raid loot pass wires them.
       varkhul_forgebreaker: { name: 'Forgebreaker, Engine of Varkhul' },

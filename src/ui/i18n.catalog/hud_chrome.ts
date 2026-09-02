@@ -1591,6 +1591,7 @@ export const hudChromeStrings = {
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Terrorspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_riftbound_boulder: 'Riftbound Boulder',
     name_rickshaw_mount: 'Bonebound Rickshaw',
     desc_valorsteed: 'A hardy, sure-footed steed that provides enhanced travel speed.',
     desc_grag_bear: 'A hardy, sure-footed bear that provides enhanced travel speed.',
@@ -1607,6 +1608,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_riftbound_boulder:
+      'A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.',
     desc_rickshaw_mount:
       'A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run.',
   },

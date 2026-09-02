@@ -6,6 +6,10 @@ const characterVisual = readFileSync(
   new URL('../src/render/characters/visual.ts', import.meta.url),
   'utf8',
 );
+const mountPresentation = readFileSync(
+  new URL('../src/render/mount_presentation.ts', import.meta.url),
+  'utf8',
+);
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 
 describe('character presentation sleep wiring', () => {
@@ -52,6 +56,11 @@ describe('character presentation sleep wiring', () => {
   });
 
   it('sleeps ability VFX semantically while mount particles remain presentation-gated', () => {
+    // The mount step moved to src/render/mount_presentation.ts, so the gating
+    // this guards now spans two files: the renderer decides WHETHER to run the
+    // step, and the module emits the particles once it does. Both halves are
+    // pinned, because either one alone would let the particles keep spawning
+    // for an off-screen rider (the failure this exists to prevent).
     const mountStart = renderer.indexOf('if (v.mountVisual && mountSpec && mountShown) {');
     const abilityStart = renderer.indexOf('// per-ability windup orb + buff-orbit bands');
     expect(mountStart).toBeGreaterThan(-1);
@@ -59,8 +68,19 @@ describe('character presentation sleep wiring', () => {
 
     const mountBlock = renderer.slice(mountStart, abilityStart);
     expect(mountBlock).toContain('if (runCharacterPresentation) {');
-    expect(mountBlock).toContain('this.vfx.mountSlimeTrail');
-    expect(mountBlock).toContain('this.vfx.mountExhaust');
+    // Gated arm calls the step; ungated arm only advances the clock.
+    expect(mountBlock).toContain('updateMountPresentation(');
+    expect(mountBlock).toContain('v.mountVisual.advanceOffscreen(dt);');
+    expect(mountBlock.indexOf('updateMountPresentation(')).toBeLessThan(
+      mountBlock.indexOf('v.mountVisual.advanceOffscreen(dt);'),
+    );
+    // ...and the particles really do live behind that call, not somewhere the
+    // renderer reaches unconditionally.
+    expect(mountPresentation).toContain('fx.mountSlimeTrail(');
+    expect(mountPresentation).toContain('fx.mountExhaust(');
+    expect(renderer).not.toContain('this.vfx.mountSlimeTrail');
+    expect(renderer).not.toContain('this.vfx.mountExhaust');
+
     expect(renderer.slice(abilityStart)).toContain(
       'this.abilityVfx.syncEntity(e, runCharacterPresentation);',
     );

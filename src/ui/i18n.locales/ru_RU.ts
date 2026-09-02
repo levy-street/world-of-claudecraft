@@ -9166,6 +9166,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
   'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
+  'entities.items.reins_riftbound_boulder.name': 'Камень уз Валуна Разлома',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -10682,7 +10683,10 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': 'Кама-Кагэ, жаба теневых прыжков',
   'hudChrome.mounts.name_stormfeather_griffin': 'Штормокрыл Поднебесный',
   'hudChrome.mounts.name_drakemaw_raptor': 'Раптор Дрейкмо',
+  'hudChrome.mounts.name_riftbound_boulder': 'Валун Разлома',
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
+  'hudChrome.mounts.desc_riftbound_boulder':
+    'Валун из Разлома, остановленный на полном ходу и скованный. Седла нет: вы встаете на его гребень и шагаете назад, а камень катится вперед под вами.',
   'hudChrome.mounts.name_thunderstrut_gobbler': 'Громоступ, великий индюк',
   'hudChrome.mounts.name_terrorspark_groundshaker': 'Страхоискр, сотрясатель земли',
   'hudChrome.mounts.name_rickshaw_mount': 'Костяная рикша',

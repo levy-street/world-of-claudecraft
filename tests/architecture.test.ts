@@ -618,6 +618,10 @@ const RENDER_PURE_CORES = [
   'src/render/camera_director_core.ts',
   'src/render/camera_feel_core.ts',
   'src/render/cast_bar.ts',
+  // Bare-named, so the *_view/*_core sweep cannot find it on its own. Registered
+  // explicitly: it is the mount view's pure math (seat lift, bob, roll, ride
+  // pose), Node-tested, and it must stay free of DOM and nondeterminism.
+  'src/render/mount_visuals.ts',
   'src/render/character_effects_core.ts',
   'src/render/character_presentation_core.ts',
   'src/render/character_view_core.ts',
@@ -837,6 +841,7 @@ const BARE_NAMED = [
   'src/game/ui_effects_profile.ts',
   'src/game/ui_tier_knobs.ts',
   'src/render/cast_bar.ts',
+  'src/render/mount_visuals.ts',
   'src/ui/safe_local_storage.ts',
   'src/ui/claudium_purchase_bridge.ts',
   'src/ui/store_purchase_intent.ts',
@@ -1847,6 +1852,7 @@ const EXPECTED_BARE_NAMED = [
   'src/render/frame_present.ts',
   'src/render/interior_encounter_prewarm.ts',
   'src/render/link_rate_budget.ts',
+  'src/render/mount_visuals.ts',
   'src/render/preview_prewarm_lane.ts',
   'src/render/prewarm_compile_lifecycle.ts',
   'src/render/prewarm_pass.ts',

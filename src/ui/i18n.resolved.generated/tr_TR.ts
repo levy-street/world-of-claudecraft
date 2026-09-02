@@ -1387,6 +1387,7 @@ export const tr_TR: EnTranslations = {
       "name_thunderstrut_gobbler": "Gürlemeadım, Büyük Hindi",
       "name_terrorspark_groundshaker": "Dehşetkıvılcım, Yer Sarsan",
       "name_drakemaw_raptor": "Ejder Ağzı Raptoru",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Kemikbağlı Çekçek",
       "desc_valorsteed": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir küheylan.",
       "desc_grag_bear": "Gelişmiş seyahat hızı sağlayan, dayanıklı ve sağlam adımlı bir ayı.",
@@ -1397,6 +1398,7 @@ export const tr_TR: EnTranslations = {
       "desc_thunderstrut_gobbler": "Uyanan Zirve'den kabararak inen, kuyruğu bir fırtına bulutu gibi açılmış devasa bir fırtına hindisi.",
       "desc_terrorspark_groundshaker": "Ağır paletleri, büyük çaplı bir topu ve korkusuz pilotlar için yapılmış bir eyeri olan kompakt zırhlı bir makine.",
       "desc_drakemaw_raptor": "Ejder Ağzı Kalderası'ndan gelen, eyere alıştırılmış bir yuva raptoru: tepeden tırnağa kas ve hız, hâlâ hafiften kül kokuyor.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Sırıklarına kemikleri çıkmış bir avanenin koşulduğu, seni ölümüne bir koşuyla çeken takırdayan kemik arabası."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const tr_TR: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Yıldırım Adımlı Büyük Hindinin Dizginleri"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Dövme Kıran, Varkhul Motoru"

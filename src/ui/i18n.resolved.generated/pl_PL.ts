@@ -1387,6 +1387,7 @@ export const pl_PL: EnTranslations = {
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_riftbound_boulder": "Riftbound Boulder",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1397,6 +1398,7 @@ export const pl_PL: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_riftbound_boulder": "A Rift boulder stopped mid-charge and bound. There is no saddle: you stand on the crown and tread it backward, and the stone rolls forward under you.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
@@ -14668,6 +14670,9 @@ export const pl_PL: EnTranslations = {
       },
       "reins_thunderstrut_gobbler": {
         "name": "Wodze Gromostępa, Wielkiego Indora"
+      },
+      "reins_riftbound_boulder": {
+        "name": "Bindstone of the Riftbound Boulder"
       },
       "varkhul_forgebreaker": {
         "name": "Łamacz Kuźni, Machina Varkhula"
