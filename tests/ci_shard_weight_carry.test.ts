@@ -918,6 +918,18 @@ describe('the harvest entry: the local-carry modes (an injected spawner)', () =>
     expect(tableRows(written).length).toBe(1);
   });
 
+  it('--prune-missing refuses a bad --max-drops and writes nothing', async () => {
+    // The refusal message tells the operator to raise the bound deliberately, so
+    // the bound is reachable from the CLI; a bad value must not fall through to
+    // a default and silently prune with the wrong one.
+    entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
+    entryIo.existsSync.mockReturnValue(true);
+    const { exitCode, out } = await runEntry(['--prune-missing', '--max-drops', '0']);
+    expect(exitCode).toBe(1);
+    expect(out).toContain('--max-drops takes a positive integer');
+    expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+
   it('--prune-missing REFUSES a mass prune and writes nothing', async () => {
     entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
     entryIo.existsSync.mockReturnValue(false);

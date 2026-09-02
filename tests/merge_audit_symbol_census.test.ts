@@ -510,6 +510,14 @@ describe('the excluded-path allowlist row: informational, not GONE (D130)', () =
       'n/a',
       '-',
       'src/sim/thing.ts',
+      // TRAVERSAL, found by the fresh read of the fix round: a bare startsWith
+      // is satisfied by a path that walks back OUT of the excluded prefix, so
+      // these named a file in full census scope and still took the exemption.
+      'scripts/merge_audit/../../src/sim/thing.ts',
+      'scripts/merge_audit/a/../../../src/sim/sim.ts',
+      // Absolute and drive-letter forms: every census path is repo-relative.
+      '/scripts/merge_audit/tool.mjs',
+      'C:/scripts/merge_audit/tool.mjs',
     ]) {
       const { defects } = parseExplainedExtras(
         [
@@ -534,13 +542,25 @@ describe('the excluded-path allowlist row: informational, not GONE (D130)', () =
       ].join('\n'),
     );
     expect(ok.defects).toEqual([]);
+    // A redundant './' segment is still the same real file and stays accepted,
+    // so the normalization refuses escapes without refusing spelling.
+    const dotted = parseExplainedExtras(
+      [
+        '## Explained extras',
+        '',
+        '| Class | Name | Path | Phase | Ruling | Reason |',
+        '|---|---|---|---|---|---|',
+        '| export | `zeta` | scripts/merge_audit/./tool.mjs | 19D | r | a stated reason here |',
+      ].join('\n'),
+    );
+    expect(dotted.defects).toEqual([]);
   });
 
   it('FAILS when two rows for one name DISAGREE about Path', () => {
     // The last row wins, and with the Path column the winner decides FAIL versus
     // INFO, so a duplicate carrying a Path could silence the original. Only the
     // DISAGREEMENT is a defect: restating a name across sections is long-standing
-    // practice in the live doc (48 benign pairs today) and must stay green.
+    // practice in the live doc (49 benign pairs today) and must stay green.
     const disagreeing = cmp([
       { cls: 'exports', name: 'zeta', phase: '19D', ruling: 'r', path: '' },
       {

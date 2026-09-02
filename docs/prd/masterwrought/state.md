@@ -26465,3 +26465,130 @@ _Recorded at the phase close after the pg-armed gate; see phase-19c-qa.md._
   SETTLED. This ledger records them; it does not reopen them.
 - The FOUR items 19B carried for the maintainer remain the maintainer's and are
   NOT taken here (they are UI-domain, out of 19C's scope).
+
+## Phase 19D ledger (2026-09-02, the tooling-and-guards wave of the rulings gate)
+
+STATUS: **COMPLETE, 12 of 12 units executed, ZERO escalations.** One commit per
+unit, every ruling written where its open record actually stands rather than in
+the decision table, following the qr-19 pattern. Then seven fresh typed
+reviewers, a fix round that applied every finding, and a fresh read of that
+round.
+
+THE WAVE'S OWN RULE, and it is what the findings are measured against: a
+selection-semantics mistake in a gate silently skips tests repo-wide, so every
+change here had to fail TOWARD MORE tests, never fewer. Two of the wave's own
+changes failed that test on first draft and are the story below.
+
+### What moved, stated as narrowly as it is true
+Five units are docs-only ratifications: D027 (qr-19-pending-art-allowlist-signoff,
+the self-clearing gather_farming icon park), D029 (qr-19-portrait-bundle-hash-split,
+the single stills-bundle digest kept, plus the guard's residual comment), D152
+(qr-19-structural-affinity-exemption, ratified with its stale 27 amended to the
+live 39), D164 (qr-19-journey-script-gate-entry, the journey rig permanently off
+CI), and the placement half of D141. Seven land executable change:
+- **D155** (qr-19-npc-terrain-pad-rule) ratifies the required NPC calm pad and
+  arms the number-free half as a per-pad ESCAPE walk over all 901 surviving
+  open-world pads. The ruled "cheap executable half", a radial rim-slope
+  generalization of the Highwatch pin, was MEASURED AND REFUSED: 389 over-gate
+  steps on live terrain, 468 on the calm-lifted field, because rim climbability
+  in every direction is not a property this roster has or needs.
+- **D132** (qr-19-ignite-bank-estimator-rate) writes the estimator's reason at
+  the code and corrects a FALSE number the arm's own comment carried (it said
+  crits bank 40%; that is igniteFrac, the Meteor rate the estimator deliberately
+  does not model).
+- **D131** (qr-19-capture-seed-without-marker) seeds graphicsDefaultApplied in
+  all 31 markerless rigs and adds a source-scan guard with NO rig allowlist.
+- **D130** (qr-19-census-allowlist-path-asymmetry) gives the census extras
+  allowlist an optional Path column so an excluded-path row is INFORMATIONAL
+  rather than reported as GONE from merged. The row prescribed a NEGATIVE
+  predicate and a `Scope` alias; both were corrected at the review round and the
+  row is amended in place, dated. The alias WAS described by the ruled
+  instruction, so dropping it is a correction to the record, not a tidy-up of
+  something undocumented.
+- **D141** (qr-19-apex-tier-vs-crucible-placement) accepts the raid tier above
+  apex, amends the placement prose in four homes, rescopes the band pin with a
+  named Crucible carve-out and re-derives both dev-bis pins from expected-fail.
+- **D172** (qr-19-stale-client-deploy-window) retires the R34 apparatus as closed
+  by the branch's own epoch-26 handshake, and pays the deletion's real cost: a
+  new --prune-missing mode on the shard-weight harvest.
+- **D129** (qr-19-hud-coordinator-fanout-exemption) replaces the blanket hud.ts
+  language exemption with 46 memo-scoped rows and fixes the SEVEN i18n defects
+  the audit found behind it.
+
+### The wave's own instructions were wrong in seventy-one places
+Every row was verified against the tree before a byte moved, and every
+correction is amended IN PLACE and dated in phase-19d-tooling-and-guards.md.
+**71 corrections** (19A hit 16, 19B 51, 19C 11). The same defect families, plus
+five falsified premises that changed the work:
+- **Six pipe-flattened anchors** (D027, D131 twice, D132 twice, D152, D155,
+  D164), the fourth wave running.
+- **Nine stale line addresses** and **two line-wrapped quotes** that cannot be
+  grepped whole.
+- **D131's exposed set was four; the tree says 31**, and the `?gfx=` immunity the
+  ruled carve-out rests on is FALSE for the rigs that most need the seed:
+  forcedTierFromSearch forces the RENDERER tier only, and perf_baseline.mjs and
+  load_probe.mjs say so in their own comments.
+- **D172's "LEAVE IT, generated" shard-weight row** reds a committed pin.
+- **D152's prescribed status cell** credited the Phase 5 QA; it was the Phase 4
+  QA, and that sentence was headed verbatim into a permanent record.
+- **D141's crucible_professions.ts** is 32 lines with a second export, not 27.
+- **D029's "record only, no code"** missed the guard comment still calling the
+  split an open call.
+- **D129 under-priced its own row**: 46 compared memos, not "about two dozen",
+  and the registry's row types could not express a per-signature list at all.
+
+### The seven i18n defects behind the hud.ts exemption
+The blanket row's stated reason was real and still not sufficient: both
+classification arms skipped the largest hand-authored file in the tree BY NAME.
+Classifying all 46 memos found seven live defects, every one confirmed against
+source: the rest badge's tooltip (worse than stale, the static-shell pass
+actively re-stamped it), the target live region, the compass heading AND its
+rose labels, the Loot Settings window, the pet action bar, and the mail
+indicator's aria-label and title. All seven are fixed by one
+relocalizeCoordinatorMemos arm.
+
+### Four arms were put to the maintainer in session, none guessed
+D175's arm (the ONE row in the wave whose executed arm is not the arm its source
+row recommends: phase-19-new-rows.md recommends the paper-only ratify, and the
+maintainer ruled for the re-mint, so it OVERRULES rather than restates), D131's
+scope (universal, no rig allowlist), D130's doc half (relocate the five records
+with a Path column), D141's two maintainer-named pin shapes (a named Crucible
+carve-out, and the invariant plus a dated zero observation), and the golden
+equality arm added at the review round.
+
+### The reviews, and the two blocking findings in the wave's own code
+Seven fresh typed reviewers. Both blocking findings were in code this wave
+wrote, and both were the wave's own rule turned against it:
+- **The census Path column granted exemptions it should refuse.** The check was
+  "isCensusPath is false", and that predicate is false for almost any string
+  that is not a bare source path, so a `file:line` anchor (this repo's own
+  idiom, used in the very rows the wave added), a bolded path, `n/a` or `-` all
+  bought the informational verdict for a name genuinely GONE from merged.
+  Reproduced against the real module, then made POSITIVE.
+- **The compass extraction landed BARE-NAMED**, so it sat outside every painter
+  and classification gate at once while doing raw per-frame style writes, and it
+  had no test, so an empty relabel body passed green.
+- The heaviest should-fix was also the wave's: **D155's escape walk gated with
+  the reverse-walk convention while walking forward**, so it waved a 7 yd wall
+  through and refused a legal 4 yd hop. Both orientations give zero failures on
+  the live roster, so no verdict moved, but the arm had lost its discriminating
+  power and its control was too extreme to notice.
+Every finding was applied, blocking, should-fix and nit alike.
+
+### CARRIED for the maintainer, not taken unilaterally
+- **The golden equality arm couples this branch to upstream content.** The one id
+  the D175 re-mint added, reins_rickshaw_mount, is RELEASE-owned, so a future
+  release sync that brings a new id now owes the re-mint in the same merge. Ruled
+  in session and recorded at the ledger line; one line to relax if the cost is
+  not wanted.
+- **D141 leaves seven expected-fail pins standing**, and they split between TWO
+  owners: five belong to the masterwrought R5 re-measure row, and the two apex
+  twin rows belong to the twin-complement row. Neither is this wave's.
+- **The heroic-boss-loot id set has no change-detector** now that D172's frozen
+  snapshot is retired. Nothing gated on it, but no surviving suite pins that set.
+
+### JUDGED, and not re-raised
+- The twelve units, their rulings, and every reviewer and fresh-read finding are
+  SETTLED. This ledger records them; it does not reopen them.
+- The three items 19C carried and the four 19B carried remain the maintainer's
+  and were not taken here.

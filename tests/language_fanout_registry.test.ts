@@ -676,7 +676,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastLifetimeXp'],
     reason:
-      "lastLifetimeXp retains sim.lifetimeXp, the monotonic lifetime total, a pure number that surfaces only past MAX_LEVEL where the label reads `Lv 20 (+7) · <total> total XP · <pct> to next` from t('game.xp.lv'), t('game.xp.totalXp') and t('game.xp.toNext') (src/ui/xp_bar.ts:83-86). That whole label is rebuilt by the one composite gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm), and its last arm compares getLanguage() against lastXpLanguage, so a locale switch alone rebuilds the post-cap line (and the pre-cap one) on the next frame. The memo gates a localized string but cannot strand it, because the gate it sits in is locale-aware by construction.",
+      "lastLifetimeXp retains sim.lifetimeXp, the monotonic lifetime total, a pure number that surfaces only past MAX_LEVEL where the label reads `Lv 20 (+7) · <total> total XP · <pct> to next` from t('game.xp.lv'), t('game.xp.totalXp') and t('game.xp.toNext') (src/ui/xp_bar.ts:83-86). That whole label is rebuilt by the one composite gate in the composite xpBarViewCache gate in updateXpBar, and its last arm compares getLanguage() against lastXpLanguage, so a locale switch alone rebuilds the post-cap line (and the pre-cap one) on the next frame. The memo gates a localized string but cannot strand it, because the gate it sits in is locale-aware by construction.",
   },
   {
     file: 'hud.ts',
@@ -702,7 +702,7 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastLowResourceLanguage'],
     reason:
-      "the low-resource warning's own language latch: `getLanguage()` is read at updateLowResource, compared as the fourth term of the update gate at 9942 and stored at 9948, so a locale switch alone always falls the gate through even when resource, maxResource and resourceType are byte-identical. That is what makes the other three terms of that conjunction safe: they are raw player numbers and the enum, none of which a locale can move, and without this latch the pulse label ('Low Mana' / 'Low Focus' / 'Low Energy', resolved in src/ui/low_resource.ts:71-76) would sit in the previous locale until the player's power happened to change. Note the latch answers the memo family, not refreshLocalizedDynamicUi, which drives no low-resource arm.",
+      "the low-resource warning's own language latch: `getLanguage()` is read at updateLowResource, compared as the fourth term of the update gate and stored on the same pass, so a locale switch alone always falls the gate through even when resource, maxResource and resourceType are byte-identical. That is what makes the other three terms of that conjunction safe: they are raw player numbers and the enum, none of which a locale can move, and without this latch the pulse label ('Low Mana' / 'Low Focus' / 'Low Energy', resolved in src/ui/low_resource.ts:71-76) would sit in the previous locale until the player's power happened to change. Note the latch answers the memo family, not refreshLocalizedDynamicUi, which drives no low-resource arm.",
   },
   {
     file: 'hud.ts',
@@ -720,13 +720,13 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastPlayerFrameLevel'],
     reason:
-      "lastPlayerFrameLevel retains the player's LEVEL as a bare integer and gates exactly one write, playerFrame.levelText = String(p.level) (the levelText write in updatePlayerFrame). That is a raw number-to-string: unlike the hp and resource texts two blocks above it deliberately does not route through unitFrameCurrentMaxText or formatNumber, so no t() key and no Intl formatter sits behind it and no locale can change the bytes it produces. The painter puts it on screen through the elided writer facet (unit_frame_painter.ts:179, this.writers.setText(this.el.level, view.levelText ?? '')), and the level element carries no label, unit word or aria string written from inside the gate. Only the player levelling moves the memo, which is the only thing that ever needs to move it, so its absence from the four-memo clear at the four-memo clear in relocalizeCoordinatorMemos is correct rather than an omission.",
+      "lastPlayerFrameLevel retains the player's LEVEL as a bare integer and gates exactly one write, playerFrame.levelText = String(p.level) (the levelText write in updatePlayerFrame). That is a raw number-to-string: unlike the hp and resource texts two blocks above it deliberately does not route through unitFrameCurrentMaxText or formatNumber, so no t() key and no Intl formatter sits behind it and no locale can change the bytes it produces. The painter puts it on screen through the elided writer facet (unit_frame_painter.ts:179, this.writers.setText(this.el.level, view.levelText ?? '')), and the level element carries no label, unit word or aria string written from inside the gate. Only the player levelling moves the memo, which is the only thing that ever needs to move it, so its absence from the memo clears in relocalizeCoordinatorMemos is correct rather than an omission.",
   },
   {
     file: 'hud.ts',
     memos: ['lastRestedXp'],
     reason:
-      "lastRestedXp retains sim.restedXp, the inn-rested pool. Most of what it drives is geometry (restedFrac becomes a left/width percentage and the `rested` class, src/ui/xp_bar_painter.ts:48-58), but it also decides the localized tail ` · t('game.xp.rested') +<n>` on the hover label (src/ui/xp_bar.ts:55). It is safe for the same structural reason as its three siblings and for no other: all five XP arms share ONE OR gate (the composite XP-bar gate in updateXpBar (the xpBarViewCache arm)) that ends in `xpLanguage !== this.lastXpLanguage`, so a locale switch alone reopens it, re-resolves game.xp.rested and re-groups the +<n> through formatNumber. Remove that language arm and this row becomes a bug, not an exemption.",
+      "lastRestedXp retains sim.restedXp, the inn-rested pool. Most of what it drives is geometry (restedFrac becomes a left/width percentage and the `rested` class, src/ui/xp_bar_painter.ts:48-58), but it also decides the localized tail ` · t('game.xp.rested') +<n>` on the hover label (src/ui/xp_bar.ts:55). It is safe for the same structural reason as its three siblings and for no other: all five XP arms share ONE OR gate, the composite xpBarViewCache gate in updateXpBar, that ends in `xpLanguage !== this.lastXpLanguage`, so a locale switch alone reopens it, re-resolves game.xp.rested and re-groups the +<n> through formatNumber. Remove that language arm and this row becomes a bug, not an exemption.",
   },
   {
     file: 'hud.ts',
@@ -762,19 +762,19 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
     file: 'hud.ts',
     memos: ['lastXp'],
     reason:
-      'lastXp retains sim.xp, the raw current-level XP count that sets the bar fill and the `<xp> / <need>` numbers in the hover label. Those numbers are locale-formatted (formatXp goes through formatNumber, so en "1,000" against de "1.000") and the suffix is t(\'game.xp.suffix\'), which is precisely why the cache gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm) carries `xpLanguage !== this.lastXpLanguage` as its final arm: a switch moves that arm on the next frame, xpBarView re-resolves and re-groups everything, and the memo\'s own numeric arm never has to move. Nothing here waits on a fan-out arm.',
+      'lastXp retains sim.xp, the raw current-level XP count that sets the bar fill and the `<xp> / <need>` numbers in the hover label. Those numbers are locale-formatted (formatXp goes through formatNumber, so en "1,000" against de "1.000") and the suffix is t(\'game.xp.suffix\'), which is precisely why the cache gate in the composite xpBarViewCache gate in updateXpBar carries `xpLanguage !== this.lastXpLanguage` as its final arm: a switch moves that arm on the next frame, xpBarView re-resolves and re-groups everything, and the memo\'s own numeric arm never has to move. Nothing here waits on a fan-out arm.',
   },
   {
     file: 'hud.ts',
     memos: ['lastXpLanguage'],
     reason:
-      "lastXpLanguage IS the XP bar's language latch: getLanguage() is read at the xpBarViewCache gate in updateXpBar, compared at 9551 as the last arm of the xpBarViewCache gate, and stored unchanged at 9558, which is both accepted forms at once (the memo names the latch and the locale flows straight into the stored value). Because the four data arms beside it (level, xp, lifetimeXp, restedXp) share that single OR gate, the latch alone reopens the cache on a runtime switch and every game.xp.* key plus the formatNumber percent re-resolves on the next frame. That is why the XP bar needs no refreshLocalizedDynamicUi arm, and why deleting this arm would silently strand the hover label in the previous locale until the player next gained XP.",
+      "lastXpLanguage IS the XP bar's language latch: getLanguage() is read at the xpBarViewCache gate in updateXpBar, compared as the last arm of that gate, and stored unchanged on the same pass, which is both accepted forms at once (the memo names the latch and the locale flows straight into the stored value). Because the four data arms beside it (level, xp, lifetimeXp, restedXp) share that single OR gate, the latch alone reopens the cache on a runtime switch and every game.xp.* key plus the formatNumber percent re-resolves on the next frame. That is why the XP bar needs no refreshLocalizedDynamicUi arm, and why deleting this arm would silently strand the hover label in the previous locale until the player next gained XP.",
   },
   {
     file: 'hud.ts',
     memos: ['lastXpLevel'],
     reason:
-      "lastXpLevel retains p.level, the integer level xpBarView branched on at the last rebuild (pre-cap level bar versus the MAX LEVEL / overflow labels), so the memo itself is a number and holds no text. It never stands alone: it is one arm of the SINGLE OR gate at the composite XP-bar gate in updateXpBar (the xpBarViewCache arm) whose last arm is `xpLanguage !== this.lastXpLanguage`, with xpLanguage read from getLanguage() one line above it, so a locale switch opens the whole gate and rebuilds the cached XpBarView with fresh game.xp.* resolutions on the very next frame (this block sits at method-body level, not on the mediumHud band). Same composite shape as map_semantic_accessibility_core's lastHash sitting beside lastLanguage.",
+      "lastXpLevel retains p.level, the integer level xpBarView branched on at the last rebuild (pre-cap level bar versus the MAX LEVEL / overflow labels), so the memo itself is a number and holds no text. It never stands alone: it is one arm of the SINGLE OR gate in the composite xpBarViewCache gate in updateXpBar whose last arm is `xpLanguage !== this.lastXpLanguage`, with xpLanguage read from getLanguage() one line above it, so a locale switch opens the whole gate and rebuilds the cached XpBarView with fresh game.xp.* resolutions on the very next frame (this block sits at method-body level, not on the mediumHud band). Same composite shape as map_semantic_accessibility_core's lastHash sitting beside lastLanguage.",
   },
   {
     file: 'hud.ts',

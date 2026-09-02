@@ -108,11 +108,24 @@ if (process.argv[2] === '--carry-local') {
   // weight, and it refuses to write a table that fails carriedDefects.
   const table = JSON.parse(readFileSync(target, 'utf8'));
   const before = table.__provenance ?? {};
+  // The refusal below tells the operator to raise the bound deliberately, so the
+  // bound has to be reachable from here: without this flag that sentence names
+  // an option the CLI does not offer.
+  const boundAt = process.argv.indexOf('--max-drops');
+  const maxDrops = boundAt >= 0 ? Number(process.argv[boundAt + 1]) : undefined;
+  if (boundAt >= 0 && (!Number.isInteger(maxDrops) || maxDrops < 1)) {
+    console.error('[prune-missing] --max-drops takes a positive integer');
+    process.exit(1);
+  }
   const {
     table: out,
     gone,
     refusal,
-  } = pruneMissingRows(table, (file) => existsSync(resolve(ROOT, file)));
+  } = pruneMissingRows(
+    table,
+    (file) => existsSync(resolve(ROOT, file)),
+    maxDrops === undefined ? {} : { maxDrops },
+  );
   if (refusal) {
     console.error(`[prune-missing] ${refusal}`);
     console.error(`[prune-missing] first few: ${gone.slice(0, 5).join(', ')}`);
@@ -240,7 +253,9 @@ if (process.argv[2] === '--carry-local') {
     console.error(
       '       node scripts/ci_shard_weights_harvest.mjs --carry-local-missing [--runs N]',
     );
-    console.error('       node scripts/ci_shard_weights_harvest.mjs --prune-missing');
+    console.error(
+      '       node scripts/ci_shard_weights_harvest.mjs --prune-missing [--max-drops N]',
+    );
     process.exit(1);
   }
 

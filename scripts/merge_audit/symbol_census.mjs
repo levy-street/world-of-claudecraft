@@ -1987,7 +1987,16 @@ export function isCensusPath(relPath) {
  *  malformed, prose-wrapped, `file:line`-suffixed or simply out of scope for a
  *  different reason is refused rather than exempted. */
 export function isExcludedExtraPath(relPath) {
-  const p = toPosix(String(relPath ?? '').trim());
+  const raw = toPosix(String(relPath ?? '').trim());
+  // NORMALIZED BEFORE THE PREFIX TEST, and refused outright if it still escapes.
+  // A bare startsWith is satisfied by a path that walks back OUT of the prefix
+  // ('scripts/merge_audit/../../src/sim/thing.ts'), which would hand the
+  // informational verdict to a name in full census scope: the same class of hole
+  // as the negative predicate this replaced, one layer down. Absolute paths go
+  // too, since every census path is repo-relative.
+  if (raw.startsWith('/') || /^[A-Za-z]:/.test(raw)) return false;
+  const p = path.posix.normalize(raw);
+  if (p.startsWith('../') || p === '..') return false;
   if (!SOURCE_EXTENSIONS.includes(path.posix.extname(p))) return false;
   return EXCLUDED_PATH_PREFIXES.some((prefix) => p.startsWith(prefix));
 }
@@ -2228,7 +2237,7 @@ export function compareCensus({
   for (const cls of CLASSES) extrasByClass[cls] = new Map();
   // LAST WINS is fine while every row for a name says the same thing about
   // SCOPE, and re-stating a name across sections is long-standing practice here
-  // (48 such pairs today, every one benign). The Path column changed that in one
+  // (49 such pairs today, every one benign). The Path column changed that in one
   // specific way: the winner now decides FAIL versus INFO, so a duplicate that
   // DISAGREES about the path can silence the original. Only that disagreement is
   // a defect; a plain restatement is not, and failing it would red the census on

@@ -515,13 +515,20 @@ For off-box safety, sync the directory to S3 occasionally:
   trade panel's `itemIcon(item)`, whose `itemIcon(item: ItemDef)` dereferences
   `item.quality` and `item.id` with no guard. THE FIRST DRAFT OF THIS PARAGRAPH
   SAID "exactly ONE", scoping the measurement to hud.ts and then generalising it
-  to the bundle; that is corrected here, because the sibling modules carry three
-  more of the same shape and one of them is the very throw the old caveat named:
+  to the bundle; that is corrected here. THE ENUMERATION BELOW IS SCOPED TO
+  WS-FED SURFACES, and says so, because the same generalisation is easy to make
+  twice: three more WS-fed siblings carry the same unguarded shape, and one of
+  them is the very throw the old caveat named:
   `src/ui/hud/loot/loot_window_controller.ts` passes an unresolved item to
   `itemIcon` and `itemDisplayName` on its row build and to `itemTooltip` on
   hover, and `src/ui/disenchant_yield_view.ts` passes one to `itemDisplayName`.
-  All of them are WS-fed, so all of them are behind the handshake and the
-  retirement stands; the count was wrong, not the conclusion.
+  All three are WS-fed, so all three are behind the handshake and the retirement
+  stands; the count was wrong, not the conclusion. The identical shape also
+  exists in the quest log, the quest dialog and the bag reagent menu at that
+  commit, and those are deliberately NOT in the count: every one of them takes
+  its id from client-local content (the quest tables, a quest reward record, a
+  recipe's reagents), never from the server, so no unknown id can reach them by
+  any vector and they were never part of this window.
   `src/ui/market_view.ts` drops unknown listings and `src/ui/mailbox_window.ts`
   skips them, so those two degrade on their own. So does the vendor path: the
   junk preview filters through `junkSellableSlot`, whose first term is a

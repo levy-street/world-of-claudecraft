@@ -432,7 +432,7 @@ const MONOLITHS: MonolithRow[] = [
     // qr-19-hud-coordinator-fanout-exemption): the blanket hud.ts language
     // exemption was replaced by a per-memo registry, which cost a
     // relocalizeCoordinatorMemos arm, and the compass strip's DOM half
-    // (build, paint, relabel) moved out to src/ui/compass_strip.ts to pay for
+    // (build, paint, relabel) moved out to src/ui/compass_strip_painter.ts to pay
     // it. The merged file lands ONE line above where it started, so the 11
     // lines of slack an earlier merge had left are given back and the
     // zero-slack posture returns: any further growth reds again.

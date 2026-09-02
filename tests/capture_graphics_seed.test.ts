@@ -48,8 +48,14 @@ const MARKER = 'graphicsDefaultApplied';
  *  settings object literal and the assignment form used when a rig merges into
  *  an existing `woc_settings` blob. Comments are stripped first, so prose about
  *  the key (this file's own header, and the rigs' own comments) never counts. */
+//
+// A SEED IS A PROPERTY WRITE, never a bare declaration. `graphicsPreset:` names
+// a key in a settings object; `.graphicsPreset =` and `['graphicsPreset'] =`
+// name a member on one. A top-level `const graphicsPreset = ...` is a local,
+// and two rigs have one; counting those as seed sites is what forced the
+// enclosing-block scan below into a whole-file fallback.
 const PRESET_WRITE =
-  /(?:graphicsPreset|\['graphicsPreset'\]|\["graphicsPreset"\])\s*[:=]\s*([^,;\n}]+)/g;
+  /(?:\.graphicsPreset|\['graphicsPreset'\]|\["graphicsPreset"\])\s*=\s*([^,;\n}]+)|graphicsPreset\s*:\s*([^,;\n}]+)/g;
 
 interface SeedSite {
   readonly file: string;
@@ -64,25 +70,35 @@ interface SeedSite {
 }
 
 /** The innermost `{ ... }` block containing `index`, as source text. Falls back
- *  to the whole source when the write is not inside braces at all, which is the
- *  conservative direction: it can only make a marker COUNT, and the per-site
- *  loop still requires one per write. */
-function enclosingBlock(source: string, index: number): string {
+ *  or '' when the write is not inside braces at all.
+ *
+ *  FAILS CLOSED, and the first draft did not: it returned the WHOLE SOURCE in
+ *  that case, quietly restoring the file-wide `includes` this scan exists to
+ *  replace. For a guard, the direction that can only make a check PASS is the
+ *  unsafe one, whatever it is called. */
+function enclosingBlock(source: string, index: number, level = 0): string {
+  let skips = level;
   let depth = 0;
-  let start = 0;
+  let start = -1;
   for (let i = index; i >= 0; i--) {
     if (source[i] === '}') depth++;
     else if (source[i] === '{') {
       if (depth === 0) {
+        if (skips > 0) {
+          skips--;
+          depth = 0;
+          continue;
+        }
         start = i;
         break;
       }
       depth--;
     }
   }
+  if (start === -1) return '';
   depth = 0;
   let end = source.length;
-  for (let i = index; i < source.length; i++) {
+  for (let i = start + 1; i < source.length; i++) {
     if (source[i] === '{') depth++;
     else if (source[i] === '}') {
       if (depth === 0) {
@@ -93,6 +109,23 @@ function enclosingBlock(source: string, index: number): string {
     }
   }
   return source.slice(start, end);
+}
+
+/** True when the marker is set in the seed's own block OR in any block
+ *  enclosing it, up to file scope.
+ *
+ *  THE INNERMOST BLOCK ALONE IS TOO STRICT, and would refuse a legitimate rig:
+ *  a marker set once above an if/else that seeds two different presets in its
+ *  arms is correct and would have been reported as an offender. Co-location
+ *  still means something, because a SIBLING block is never in the chain: the
+ *  fixture whose marker sits in a different function still fails. */
+function markerSetForSeed(source: string, index: number): boolean {
+  for (let level = 0; level < 12; level++) {
+    const block = enclosingBlock(source, index, level);
+    if (block === '') return false;
+    if (markerIsSet(block)) return true;
+  }
+  return false;
 }
 
 /** The marker counts only when it is SET, never merely mentioned: an explicit
@@ -130,8 +163,8 @@ function readSeedSites(sources: ReadonlyArray<{ file: string; source: string }>)
   for (const { file, source } of sources) {
     const matches = [...source.matchAll(PRESET_WRITE)];
     if (matches.length === 0) continue;
-    const values = matches.map((m) => m[1].trim());
-    const hasMarker = matches.every((m) => markerIsSet(enclosingBlock(source, m.index ?? 0)));
+    const values = matches.map((m) => (m[1] ?? m[2] ?? '').trim());
+    const hasMarker = matches.every((m) => markerSetForSeed(source, m.index ?? 0));
     out.push({ file, values, hasMarker });
   }
   return out;
@@ -174,10 +207,12 @@ describe('capture rigs seed the graphics default-applied marker', () => {
   it('holds the whole rig family, not a handful', () => {
     // Anti-vacuity: a broken walk, a broken stripper or a regex that stopped
     // matching would empty the corpus and pass the arm above over nothing. The
-    // family was 50 files at the ruling; the floor is deliberately well under
-    // that so ordinary rig churn does not touch it, and well over zero.
-    expect(seedSites.length).toBeGreaterThanOrEqual(48);
-    expect(seedSites.filter((site) => site.hasMarker).length).toBeGreaterThanOrEqual(48);
+    // family measures 50 seed sites today. The floor is 45, five under that: a
+    // count floor is a blunt instrument and a near-zero-slack one reds on
+    // ordinary rig churn instead of on a broken scan, which is why DEPTH is
+    // checked by NAME below rather than by arithmetic.
+    expect(seedSites.length).toBeGreaterThanOrEqual(45);
+    expect(seedSites.filter((site) => site.hasMarker).length).toBeGreaterThanOrEqual(45);
     // DEPTH, which a flat count cannot see: five of the seed sites are nested,
     // so a walker that stopped recursing would leave 45 and clear a bare
     // count floor while silently dropping rigs this ruling seeded. Named,
@@ -247,6 +282,20 @@ describe('capture rigs seed the graphics default-applied marker', () => {
       // Bracket access and a template value: a seed either way.
       { file: 'g.mjs', source: "s['graphicsPreset'] = 3;\n" },
       { file: 'h.mjs', source: 'JSON.stringify({ graphicsPreset: `${tier}` })' },
+      // A bare top-level DECLARATION is not a seed site. Two live rigs have one
+      // (`const graphicsPreset = mobile ? 1 : 5;`), and counting them forced the
+      // enclosing-block scan into a whole-file fallback that quietly restored
+      // the file-wide marker check. Not a seeder, so not listed below.
+      { file: 'i.mjs', source: 'const graphicsPreset = mobile ? 1 : 5;\n' },
+      // OUTER SCOPE counts: a marker set once above an if/else that seeds two
+      // presets in its arms is correct, and an innermost-block-only rule would
+      // have reported it as an offender. The sibling case (e.mjs) still fails,
+      // because a sibling block is never in the enclosing chain.
+      {
+        file: 'k.mjs',
+        source:
+          'function seed() {\n  s.graphicsDefaultApplied = true;\n  if (low) { s.graphicsPreset = 1; } else { s.graphicsPreset = 6; }\n}\n',
+      },
     ];
     const sites = readSeedSites(fixtures);
     expect(sites.map((s) => s.file)).toEqual([
@@ -257,9 +306,24 @@ describe('capture rigs seed the graphics default-applied marker', () => {
       'f.mjs',
       'g.mjs',
       'h.mjs',
+      'k.mjs',
     ]);
-    expect(sites.map((s) => s.hasMarker)).toEqual([false, true, false, false, false, false, false]);
+    expect(sites.map((s) => s.hasMarker)).toEqual([
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+    ]);
     expect(isSettingsSeed('`${tier}`'), 'a template value is a seed, not a label').toBe(true);
+    // enclosingBlock fails CLOSED: a write outside any brace yields no block, so
+    // no marker can be found for it, rather than the whole file being searched.
+    expect(readSeedSites([{ file: 'j.mjs', source: 's.graphicsPreset = 5;\n' }])[0].hasMarker).toBe(
+      false,
+    );
     expect(isSettingsSeed('5')).toBe(true);
     expect(isSettingsSeed('presetValue')).toBe(true);
     expect(isSettingsSeed("'low'")).toBe(false);

@@ -31,6 +31,13 @@
 // unmerged feature branch may be deleted outright") is closed in practice, and
 // cutting one of those ids is a RETIREMENT (keep the def, drop its acquisition
 // paths) plus its merge-deletion-list row, never a delete.
+//
+// AND THE OTHER HALF, which is what a merge engineer will actually hit: the
+// equality arm below reds for ANY id reaching ITEMS from ANY source, so a
+// RELEASE SYNC that brings a new item id reds this suite and owes
+// `UPDATE_SHIPPED_ITEMS=1` in the SAME merge commit. That coupling is the
+// accepted cost of having enforcement at all, ruled with the cadence: before
+// it, a forgotten re-mint went unnoticed for five phases.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
