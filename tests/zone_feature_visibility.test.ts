@@ -1,6 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  createShadowVolumeBasis,
+  SHADOW_CASTER_MARGIN,
+  setShadowVolumeBasis,
+  shadowVolumeIntersectsBox,
+} from '../src/render/foliage_shadow_core';
+import {
   type FeatureFootprint,
   featureEdgeDistance,
   hasUnseededInstanceMatrix,
@@ -76,6 +82,90 @@ describe('zone feature distance visibility', () => {
 describe('zone-feature shadow casting range', () => {
   // A neighbour town's footprint, well outside the 105 yd sun shadow volume.
   const farTown: FeatureFootprint = { centerX: 0, centerZ: 300, halfX: 40, halfZ: 40 };
+
+  it('stays inside the geometric reach of the shipped shadow volume', () => {
+    // The derivation in the core's header, recomputed here from the SHIPPED
+    // constants: the sun anchor and shadow camera in renderer.ts / gfx.ts, the
+    // camera zoom cap in input.ts, and foliage_shadow_core's own caster margin
+    // and volume test. Restating a number here would let the header rot.
+    const renderer = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+    const gfx = readFileSync(new URL('../src/render/gfx.ts', import.meta.url), 'utf8');
+    const input = readFileSync(new URL('../src/game/input.ts', import.meta.url), 'utf8');
+    const half = Number(
+      /this\.shadowBaseExtent = LOW_GFX \? [\d.]+ : ([\d.]+);/.exec(renderer)?.[1],
+    );
+    const near = Number(/sun\.shadow\.camera\.near = ([\d.]+)/.exec(renderer)?.[1]);
+    const far = Number(/sun\.shadow\.camera\.far = ([\d.]+)/.exec(renderer)?.[1]);
+    const anchor = /SUN_ANCHOR = new THREE\.Vector3\((-?[\d.]+), (-?[\d.]+), (-?[\d.]+)\)/.exec(
+      gfx,
+    );
+    const zoomCap = Number(
+      /Math\.min\((\d+), Math\.max\(3, this\.camDist \+ delta\)\)/.exec(input)?.[1],
+    );
+    expect(half, 'shadow base half-extent not found in renderer.ts').toBeGreaterThan(0);
+    expect(far, 'shadow camera far not found in renderer.ts').toBeGreaterThan(near);
+    expect(anchor, 'SUN_ANCHOR not found in gfx.ts').not.toBe(null);
+    expect(zoomCap, 'camera zoom cap not found in input.ts').toBeGreaterThan(0);
+
+    const [ax, ay, az] = [Number(anchor?.[1]), Number(anchor?.[2]), Number(anchor?.[3])];
+    const lightDistance = Math.hypot(ax, ay, az);
+    const dir = { x: ax / lightDistance, y: ay / lightDistance, z: az / lightDistance };
+
+    // Analytic strip: `half` across the light's right axis, half / sin(elevation)
+    // along its azimuth, because the light-space up axis carries only
+    // sin(elevation) of horizontal length. The corner of that strip is the
+    // furthest a ground caster can sit from the shadow TARGET.
+    const analytic = Math.hypot(half, half / dir.y);
+
+    // The same reach found by the SHIPPED volume test, swept over azimuth, so
+    // the analytic form above is checked against the code that actually culls.
+    const basis = setShadowVolumeBasis(createShadowVolumeBasis(), {
+      dirX: dir.x,
+      dirY: dir.y,
+      dirZ: dir.z,
+      targetX: 0,
+      targetY: 0,
+      targetZ: 0,
+      halfExtent: half,
+      lightDistance,
+      near,
+      far,
+    });
+    // A POINT caster on the target's own ground plane, so the sweep measures
+    // the volume itself; a real caster's own half-extents only add to it.
+    const reaches = (d: number, ang: number): boolean =>
+      shadowVolumeIntersectsBox(basis, d * Math.cos(ang), 0, d * Math.sin(ang), 0, 0, 0);
+    let measured = 0;
+    for (let i = 0; i < 720; i++) {
+      const ang = (i / 720) * Math.PI * 2;
+      let lo = 0;
+      let hi = 2000;
+      if (!reaches(lo, ang)) continue;
+      for (let k = 0; k < 60; k++) {
+        const mid = (lo + hi) / 2;
+        if (reaches(mid, ang)) lo = mid;
+        else hi = mid;
+      }
+      measured = Math.max(measured, lo);
+    }
+    // The sweep sees the strip's corner only to its 0.5 degree resolution, so
+    // it lands just short of the analytic corner and never past it.
+    expect(measured).toBeLessThanOrEqual(analytic);
+    expect(measured).toBeGreaterThan(analytic - 0.5);
+    expect(analytic).toBeCloseTo(229.02, 2);
+
+    // The decision measures from the camera, which trails the volume's centre
+    // by up to the zoom cap, and the shed only commits past the hysteresis
+    // band. So this is the range at which no legitimate caster could ever be
+    // lost, and the shipped constant is deliberately INSIDE it.
+    const neverLose = analytic + zoomCap + SHADOW_CASTER_MARGIN + ZONE_FEATURE_SHADOW_HYSTERESIS;
+    expect(neverLose).toBeCloseTo(275.02, 2);
+    expect(ZONE_FEATURE_SHADOW_RANGE).toBeLessThan(neverLose);
+    // ...and never so far inside that a caster the player is standing beside
+    // loses its shadow: the shed has to clear the volume's SHORT axis, which
+    // is the plain half-extent.
+    expect(ZONE_FEATURE_SHADOW_RANGE - ZONE_FEATURE_SHADOW_HYSTERESIS).toBeGreaterThan(half);
+  });
 
   it('pins the shipped range and hysteresis to their literals', () => {
     // Every camera position below derives from these constants, so without
