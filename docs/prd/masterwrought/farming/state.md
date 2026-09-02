@@ -412,8 +412,8 @@ closed-by-X.
    extensions plus the sharpened bundle-hash renderer/content split; (ap)
    the farmNowMs facet member; (be) the
    simplified-mode gathering rows; (bg) the intro grant fence, its
-   trade-pipe leak, and the garden_hoe reagent knock-on; (bh) the
-   NPCs-are-terrain calm-pad rule; (bs) the dormant-deed waiver plus the
+   trade-pipe leak, and the garden_hoe reagent knock-on; (bs) the
+   dormant-deed waiver plus the
    D12 golden-harvest cadence read (1/90 per harvest times survival). The
    tuning reads: feast charges 10 / durationTicks 3600 (180 s) / trainer
    fee 10000 / sellValue 250; the Phase 11 well-fed magnitudes 3/600s,
@@ -536,7 +536,7 @@ closed-by-X.
 | (bb) linkdead transient-notice loss acceptance | P8 | maintainer | RATIFIED 2026-09-01 by qr-19-linkdead-notice-loss (Phase 19, under qr-19-best-for-project): the transient ripe-notice loss during the linkdead grace window is ACCEPTED as recommended. Every durable surface shows the truth on resume (journal, map pins, fplot status), and every honest fix needs a connectivity concept the deterministic sim deliberately lacks (new sim state persisted and replayed on resume across all three hosts, re-seating every farming parity golden, a per-player delivery record on a 20 Hz tick the server hot-path rule bars). The smaller sibling (a disconnect inside the one tick between addPlayer and its event drain) rides the same ruling. |
 | (be) simplified-mode gathering rows (a Professions 2.0 surface change) | P8 QA | maintainer | CLOSED 2026-09-01 by qr-19-simplified-gathering-rows: the shipped worked-rows shape is RATIFIED as written, no code change. Skill-0 rows stay hidden so a fresh character's window is unchanged and both modes paint through the one gatheringSectionHtml builder; narrowing to the Farming row or reverting to CTA-only would take back the only journal entry a pre-attunement touch farmer has, the (az) reachability defect this deviation closed. |
 | (bg) intro grant fence, trade-pipe leak, garden_hoe reagent knock-on | P9 | maintainer | CLOSED 2026-09-01 by ruling qr-19-intro-grant-fence-trade-pipe (Phase 19, under qr-19-best-for-project): the leak is ACCEPTED AND RECORDED and the face-to-face trade guard is NOT extended. Barred rather than deferred: CLAUDE.md's default task workflow says 'Preserve existing behavior unless the goal explicitly requires changing it' and 'Avoid unrelated refactors. Keep the diff scoped to the task', and src/sim/social/trade.ts fences every requiredItems item in the game, so the change would land general trade behavior this packet's goal never required. On the merits too: the ledger sizes the leak at 4 copper per cycle and calls it a balance leak, not a security hole, while extending the guard would cut the last cooperative route for the garden_hoe crafting reagent and make the bronze-hoe path worse. Full ruling line on the (bg) block. |
-| (bh) NPCs-are-terrain pad rule (Highwatch eyeballed, no re-seat) | P9 | maintainer | open ruling-owed |
+| (bh) NPCs-are-terrain pad rule (Highwatch eyeballed, no re-seat) | P9 | maintainer | CLOSED 2026-09-01 by ruling qr-19-npc-terrain-pad-rule (Phase 19, under qr-19-best-for-project): the rule is RATIFIED as shipped. Every NPCS row stays a REQUIRED calm-anchor pad at rIn 6 / rOut 14 (src/sim/terrain_calm_anchors.ts:160-163), Hollis keeps the Highwatch shelf on the Phase 9 QA three-angle LOW-preset read (a natural terrace, no mound, crater or seam), and no golden re-mints. The module argues the rule in place at :92-97: un-padding an existing NPC would itself move minted terrain, which is the failure this ratification avoids. The closing pad-delta advisory is NOT armed as a delta gate (the packet holds two measurements and no sanctioned ceiling, so the bound is still the maintainer's); what IS armed instead is the number-free half, a per-pad ESCAPE walk over the whole roster (tests/placement_integrity.test.ts), bounded by the live climb gate. The literal radial rim-slope generalization of the Highwatch pin was measured and REFUSED as unsound, with its numbers recorded at the code. |
 | Well-fed ladder magnitudes: capstone at the elixir ceiling, 24-stam stacking, twins stat-identity, tier-1 inversion, unanchored raid-floor phrase | P11 / P11 QA | maintainer | CLOSED 2026-08-21 by decision 2 (11c-D-2), executed in MW 11c: farming rungs 2/3/4/5 at 600s, apex plates 6/900 (derived: entry value; entry duration plus the elixir ladder's own 300s step); one 'well_fed' id retires the stacking read (dish plus elixir tops at 17) and resolves the tier-1 inversion at 2; the raid-floor phrase is anchored by the untouched R5 kit arithmetic (flask 15 plus food 6 equals 21) |
 | Feast tuning: charges 10, 180 s, trainer fee 10000, sellValue 250, reagents x4/x4/x2 | P12 | maintainer | open ruling-owed |
 | Seed-back rates 0.08/0.40 tier 3, 0.06/0.35 tier 4 (economy-sensitive) | P5 | maintainer | CLOSED 2026-09-01 by ruling qr-19-seed-back-rates (Phase 19, under qr-19-best-for-project): all four rates and FARM_SEED_BACK_MIN_TIER 3 are RATIFIED as shipped, no retune. The constants were deliberately RE-ARGUED at the Phase 11e QA after GATE 1 stocked all eight upper-tier seeds and falsified the no-vendor-faucet premise they were authored on, and were still found defensible: the seed-back is now a discount on a counter route that exists, not the only route to a tier 3/4 seed. The derived expectation stands at 0.48 seeds per tier-3 harvest and 0.41 per tier-4, re-derived live at the close off the ONE-DRAW TWO-THRESHOLD resolve rather than read off the comment (2 x 0.08 plus 1 x 0.32 for tier 3, 2 x 0.06 plus 1 x 0.29 for tier 4; the thresholds are nested, not independent), and no phase or QA sweep since has filed a finding against it: 11e's own rejection list refuses a seed-back rate bump outright, as a second faucet GATE 1 does not need. A re-tune would need the maintainer's own numbers, which the packet does not hold: it records no replant-cost model and no market price series. |
@@ -4686,10 +4686,13 @@ question does not arise (farming has no station).
 - Crop display names: ids are locked (D11), English display names get a maintainer
   lore pass in the content phase PR.
 - Phase 9 reads owed: (bg) the intro grant fence (accept the trade-pipe leak or
-  extend the trade guard to honor noVendorSell/noMarketList), (bh) the Highwatch
-  farmer's terrain pad (the QA eyeballed it: no re-seat; the pad rule itself is
-  the read), and the four farmer titles/greetings as authored (Allotment Keeper,
-  Fen Paddy Farmer, Highwatch Terrace Farmer, Parterre Gardener).
+  extend the trade guard to honor noVendorSell/noMarketList), and the four farmer
+  titles/greetings as authored (Allotment Keeper, Fen Paddy Farmer, Highwatch
+  Terrace Farmer, Parterre Gardener). (bh), the Highwatch farmer's terrain pad and
+  the pad rule itself, is CLOSED 2026-09-01 by qr-19-npc-terrain-pad-rule: the rule
+  is ratified as shipped, Hollis is not re-seated, and the executable half landed
+  as the roster-wide pad-escape walk rather than the pad-delta gate, whose bound
+  the packet still does not hold.
 - Phase 9 QA DECISIONS OWED (blocking the player-complete go-live): (bn) adopt the
   PROPOSED Phase 9b (docs/prd/masterwrought/farming/phase-09b-bed-verbs.md: the bed interaction
   that plants and harvests through IWorldFarming, before Phase 10) or re-dormant

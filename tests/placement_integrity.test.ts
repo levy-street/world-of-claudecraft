@@ -179,6 +179,72 @@ function reachesRoad(x0: number, z0: number): boolean {
   return result;
 }
 
+// A pad the player cannot walk OFF is the "combat dummy on an unreachable
+// ledge" report in its general form, and it is what the Highwatch training
+// dummy pin below characterizes by hand at one spot. This generalizes that pin
+// over the whole roster, under ruling qr-19-npc-terrain-pad-rule.
+//
+// NUMBER-FREE ON PURPOSE: the bounds are the live climb gate
+// (PLAYER_MAX_CLIMB_SLOPE) and the same hop-down cap the reachability walk
+// uses, so the arm invents no threshold. The packet holds only two pad-delta
+// measurements and no sanctioned ceiling, which is why the DELTA form of this
+// question stays with the maintainer and this shape does not need it.
+//
+// A RADIAL rim-slope walk (the literal generalization of the Highwatch pin's
+// spoke comparison) was measured first and REFUSED, so the next reader does
+// not re-derive it: over the 901 surviving open-world pads it reports 389
+// over-gate steps on natural terrain (worst 13.64 yd at the Duskfall dungeon
+// door pad) and 468 on the calm lift alone. Rim climbability in every radial
+// direction is not a property this roster has or needs, because a player
+// routes AROUND a cliff. The escape walk models that; the radial form does not.
+const PAD_ESCAPE_MARGIN = 6;
+
+/** True when a walk from the pad centre leaves its surviving ring under the
+ *  climb gate. `h` is injected so the arm below can be driven over synthetic
+ *  ground: a sweep whose only run is over the real world cannot tell a working
+ *  predicate from one that returns true unconditionally. */
+function escapesPad(
+  row: Pick<CalmPadRow, 'x' | 'z'>,
+  rOut: number,
+  h: (x: number, z: number) => number,
+): boolean {
+  const limit = rOut + PAD_ESCAPE_MARGIN;
+  const sx = Math.round(row.x / WALK_CELL) * WALK_CELL;
+  const sz = Math.round(row.z / WALK_CELL) * WALK_CELL;
+  const seen = new Set<string>([`${sx},${sz}`]);
+  const queue: [number, number][] = [[sx, sz]];
+  let read = 0;
+  while (read < queue.length) {
+    const [cx, cz] = queue[read++];
+    const hHere = h(cx, cz);
+    for (const [dx, dz] of [
+      [WALK_CELL, 0],
+      [-WALK_CELL, 0],
+      [0, WALK_CELL],
+      [0, -WALK_CELL],
+    ] as const) {
+      const nx = cx + dx;
+      const nz = cz + dz;
+      const key = `${nx},${nz}`;
+      if (seen.has(key)) continue;
+      const d = Math.hypot(nx - row.x, nz - row.z);
+      if (d > limit) continue;
+      const hNext = h(nx, nz);
+      const wl = waterLevelAt(nx, nz, SEED);
+      const swim = wl !== -Infinity && hNext < wl;
+      if (
+        !swim &&
+        (hHere - hNext > PLAYER_MAX_CLIMB_SLOPE * WALK_CELL || hNext - hHere > WALK_DROP_MAX)
+      )
+        continue;
+      if (d > rOut) return true;
+      seen.add(key);
+      queue.push([nx, nz]);
+    }
+  }
+  return false;
+}
+
 // ---------------------------------------------------------------------------
 // 2. Pad classicness
 // ---------------------------------------------------------------------------
@@ -251,6 +317,36 @@ describe('every placement is walkable from the road network', () => {
       }
     }
     expect(failures, failures.join('; ')).toEqual([]);
+  });
+
+  it('every surviving pad can be walked off its own ring', () => {
+    // The roster-wide form of the Highwatch pin: no pad's own skirt may be a
+    // wall the player is stuck inside. Distinct from the road walk above,
+    // which is memoized on a rounded cell and may leave through a NEIGHBOUR's
+    // graded ground; this one has to leave THIS ring.
+    const failures: string[] = [];
+    for (const row of openWorldPads) {
+      const rOut = survivingROut(row);
+      if (rOut === null) continue;
+      if (!escapesPad(row, rOut, hAt)) {
+        failures.push(`${row.category} (${row.x}, ${row.z}) rOut=${rOut.toFixed(1)}`);
+      }
+    }
+    expect(failures, failures.join('; ')).toEqual([]);
+  });
+
+  it('the escape walk refuses a walled pad and accepts a flat one', () => {
+    // The positive control, because every pad on the real roster escapes: a
+    // sweep that only ever sees passing input cannot tell a working predicate
+    // from `return true`. Synthetic ground, driven through the same function
+    // the arm above uses.
+    const pad = { x: 0, z: 0 };
+    const flat = (): number => 0;
+    const walled = (x: number, z: number): number => (Math.hypot(x, z) > 10 ? 100 : 0);
+    const pit = (x: number, z: number): number => (Math.hypot(x, z) > 10 ? -100 : 0);
+    expect(escapesPad(pad, 10, flat), 'flat ground must escape').toBe(true);
+    expect(escapesPad(pad, 10, walled), 'a wall at the ring edge must refuse').toBe(false);
+    expect(escapesPad(pad, 10, pit), 'a lethal drop at the ring edge must refuse').toBe(false);
   });
 });
 
