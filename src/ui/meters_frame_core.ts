@@ -12,11 +12,18 @@
 // domain to get a rectangle clamped. The two stay independent on purpose; if a
 // third movable panel appears, THAT is the moment to lift one shared core.
 
+import { anchorAxis } from './target_frame_pos';
+
 export interface MeterFrameGeometry {
   left: number;
   top: number;
   width: number;
   height: number;
+  /** The visual viewport the box was saved under (both or neither), so a
+   *  later apply can re-anchor it when the window size changes (fullscreen
+   *  exit): see anchorAdjustedMeterFrame. */
+  vw?: number;
+  vh?: number;
 }
 
 export interface MeterFrameLimits {
@@ -124,12 +131,25 @@ export function placeMeterFrame(
 }
 
 export function serializeMeterFrame(geo: MeterFrameGeometry): string {
-  return JSON.stringify({ left: geo.left, top: geo.top, width: geo.width, height: geo.height });
+  const out: Record<string, number> = {
+    left: geo.left,
+    top: geo.top,
+    width: geo.width,
+    height: geo.height,
+  };
+  // The viewport the box was saved under, so a later apply can re-anchor it
+  // when the window size changes (anchorAdjustedMeterFrame).
+  if (geo.vw !== undefined && geo.vh !== undefined) {
+    out.vw = Math.round(geo.vw);
+    out.vh = Math.round(geo.vh);
+  }
+  return JSON.stringify(out);
 }
 
 /**
  * Parse persisted geometry, returning null for missing or corrupt data so the
- * caller falls back to the CSS default anchor. Every field must be finite.
+ * caller falls back to the CSS default anchor. Every field must be finite;
+ * the saved-viewport pair is optional (older payloads), both fields or neither.
  */
 export function parseMeterFrame(raw: string | null | undefined): MeterFrameGeometry | null {
   if (!raw) return null;
@@ -138,10 +158,42 @@ export function parseMeterFrame(raw: string | null | undefined): MeterFrameGeome
     const nums = ['left', 'top', 'width', 'height'].map((key) => parsed[key]);
     if (nums.some((n) => typeof n !== 'number' || !Number.isFinite(n))) return null;
     const [left, top, width, height] = nums as number[];
-    return { left, top, width, height };
+    const out: MeterFrameGeometry = { left, top, width, height };
+    if (
+      typeof parsed.vw === 'number' &&
+      Number.isFinite(parsed.vw) &&
+      parsed.vw > 0 &&
+      typeof parsed.vh === 'number' &&
+      Number.isFinite(parsed.vh) &&
+      parsed.vh > 0
+    ) {
+      out.vw = parsed.vw;
+      out.vh = parsed.vh;
+    }
+    return out;
   } catch {
     return null;
   }
+}
+
+/** Re-anchor a saved panel box to the CURRENT viewport, exactly as
+ *  anchorAdjustedPos does for the movable frames and anchorAdjustedChatBox
+ *  does for the chat box (the shared anchorAxis rule: each axis keeps its
+ *  distance to whichever of start / center / end it sat closest to when
+ *  saved). A box saved by an older build carries no viewport and returns
+ *  unchanged. */
+export function anchorAdjustedMeterFrame(
+  geo: MeterFrameGeometry,
+  viewport: { w: number; h: number },
+): MeterFrameGeometry {
+  const { vw, vh } = geo;
+  if (vw === undefined || vh === undefined) return geo;
+  if (vw === viewport.w && vh === viewport.h) return geo;
+  return {
+    ...geo,
+    left: anchorAxis(geo.left, geo.width, vw, viewport.w),
+    top: anchorAxis(geo.top, geo.height, vh, viewport.h),
+  };
 }
 
 /**

@@ -273,7 +273,17 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Re-pinned at the release/v0.42.0 sync into fix/fullscreen-layout-reset:
+    // both arms rewrote setWindowPixelPosition, release's own arm marking
+    // every explicit write for viewport/reopen clamping
+    // (window_position_core.ts) and this branch's arm remembering the
+    // requested spot for a real re-anchor (window_reflow_core.ts). The merge
+    // keeps this branch's re-anchor mechanism (it also fixes a stranding bug
+    // release's naive re-clamp does not) and folds release's windowMoved
+    // stamp into it, so window_position_core.ts drops out as fully
+    // superseded. Measured on the merged tree, never reconciled by
+    // arithmetic. Exact count, zero slack.
+    ceiling: 18912,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {
