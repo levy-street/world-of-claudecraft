@@ -1639,6 +1639,21 @@ GATE_MAX_WORKERS=8: "[gate:select] PASS: all 12 steps green (vitest
 workers: 8)", 39,695 passed, zero FAIL lines. Lesson for future gates on
 this box: prefer GATE_MAX_WORKERS=8 when the full-suite fallback is
 expected.
+ESCALATED (D168, qr-19-ci-shard-weights-go-public-harvest, 2026-09-02, Phase 19G,
+under qr-19-best-for-project): the wholesale shard-weight harvest deferred here
+to go-public is NOT executed and waits on the push ruling (D022,
+ip-17-push-consent), by the maintainer's word in session ('Escalate whole').
+Its hard precondition is a completed, all-green, FULL-MODE CI run of a PUSHED
+branch, unreachable under the standing NO-push rule, and its dependency
+D009+D170 has been escalated and unexecuted since Phase 19A, so the harvest
+could not be the LAST code-carrying change even if the run existed. The
+committed table at this tip is 3650 rows, 2938 harvested, 712 carried (302
+local-median under the reason 'phase 18 local carry pending the post-push
+harvest' plus 410 prose-backfill); the ready-to-run recipe and the pin the
+harvest will red ('the identity is non-vacuous: real rows on both sides, and
+every carried row is a row' in tests/ci_shard_partition.test.ts) are recorded
+on the D168 row of docs/prd/masterwrought/phase-19-new-rows.md; the handoff
+row in farming/state.md stays handed-to-maintainer, unflipped.
 
 ### Phase 8 QA (2026-08-17, PASS-WITH-FOLLOWUPS, local-only per D22)
 Branch fix/farming-phase-08-qa off feature/farming-plan at df340ea91f (the

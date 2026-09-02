@@ -161,3 +161,11 @@ or because a fill's provenance is not something the worklist can say:
   prose states the live scroll bill and its parity with the serpent elixir' and 'the
   inscription materials fills name the gourd, the serpent elixir and the parity in their
   own locale' in tests/guide.test.ts.
+- **The CI shard-weight harvest (D168) is ESCALATED, not executed, and waits on the push
+  ruling (D022):** its precondition is a green FULL-MODE CI run of a PUSHED branch, and its
+  dependency D009+D170 is still escalated from 19A, so it could not be the last code-carrying
+  change even with a run in hand. The ready-to-run recipe sits on the D168 row of
+  phase-19-new-rows.md and the 'CARRIED to Phase 20' block of docs/qa-gate.md stands as
+  written; nothing here is a fill item, recorded so the Phase 20 re-close does not read the
+  harvest as done and does not take the qa-gate block's 'before the packet's PR is called
+  mergeable' as satisfied.
