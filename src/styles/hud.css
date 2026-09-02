@@ -1951,47 +1951,10 @@
   body.interface-unlocked #party-frames > .party-rows {
     display: none;
   }
-  .tf-preview-unit {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-  }
-  .tf-preview-portrait {
-    width: 26px;
-    height: 26px;
-    flex: none;
-    border: 1px solid var(--gold);
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 30%, #3a3a4c, #15151f);
-  }
-  .tf-preview-bars {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-  }
-  .tf-preview-name {
-    font-size: 10px;
-    line-height: 12px;
-    color: #fff0d0;
-    text-shadow: 1px 1px 1px #000;
-    white-space: nowrap;
-    overflow: hidden;
-  }
-  .tf-preview-hp {
-    height: 8px;
-    width: 78%;
-    border-radius: 2px;
-    background: linear-gradient(#7ddb8a, #2e8f3e 60%, #1d5c28);
-  }
-  .tf-preview-mp {
-    height: 5px;
-    width: 62%;
-    border-radius: 2px;
-    background: linear-gradient(#8fb6e6, #3d6ea8 60%, #274a74);
-  }
+  /* The generic .tf-preview-unit portrait/hp/mp mock retired with the pet
+     frame's sample: like the target frame, its placeholder shows the REAL
+     unit-frame chrome, and the mock read as a second fake frame on top
+     (owner feedback). */
   /* The filled cast/swing samples: a fill under the frame's own label layer. */
   .tf-preview-bar {
     inset: 0;

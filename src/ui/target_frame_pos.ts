@@ -32,13 +32,15 @@ export interface TargetFramePos {
 }
 
 /** The effective per-axis multipliers a position resolves to: an explicit axis
- *  value wins, else the uniform `scale`, else 1; each clamped into the band. */
+ *  value wins, else the uniform `scale`, else 1; each clamped into the band
+ *  (`max` is the frame's own ceiling: MovableFrameConfig.maxScale). */
 export function frameScales(
   pos: Pick<TargetFramePos, 'scale' | 'scaleX' | 'scaleY'> | null | undefined,
+  max: number = FRAME_SCALE_MAX,
 ): { sx: number; sy: number } {
   return {
-    sx: clampFrameScale(pos?.scaleX ?? pos?.scale ?? 1),
-    sy: clampFrameScale(pos?.scaleY ?? pos?.scale ?? 1),
+    sx: clampFrameScale(pos?.scaleX ?? pos?.scale ?? 1, FRAME_SCALE_MIN, max),
+    sy: clampFrameScale(pos?.scaleY ?? pos?.scale ?? 1, FRAME_SCALE_MIN, max),
   };
 }
 
@@ -507,7 +509,10 @@ export function serializeTargetFramePos(pos: TargetFramePos): string {
 // fields are optional, and a corrupt one is DROPPED rather than failing the
 // whole parse, so a bad multiplier or box costs the player that dimension and
 // never their position.
-export function parseTargetFramePos(raw: string | null | undefined): TargetFramePos | null {
+export function parseTargetFramePos(
+  raw: string | null | undefined,
+  maxScale: number = FRAME_SCALE_MAX,
+): TargetFramePos | null {
   if (!raw) return null;
   try {
     const o = JSON.parse(raw) as Record<string, unknown>;
@@ -516,7 +521,9 @@ export function parseTargetFramePos(raw: string | null | undefined): TargetFrame
     const [left, top] = nums as number[];
     const out: TargetFramePos = { left, top };
     const finiteScale = (v: unknown): number | undefined =>
-      typeof v === 'number' && Number.isFinite(v) ? clampFrameScale(v) : undefined;
+      typeof v === 'number' && Number.isFinite(v)
+        ? clampFrameScale(v, FRAME_SCALE_MIN, maxScale)
+        : undefined;
     const scale = finiteScale(o.scale);
     const scaleX = finiteScale(o.scaleX);
     const scaleY = finiteScale(o.scaleY);

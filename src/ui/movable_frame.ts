@@ -28,6 +28,8 @@ import {
   clampFrameDimension,
   clampFrameScale,
   cursorForFrameEdge,
+  FRAME_SCALE_MAX,
+  FRAME_SCALE_MIN,
   type FrameEdge,
   frameEdgeAtPoint,
   frameScales,
@@ -102,6 +104,11 @@ export interface MovableFrameConfig {
    *  means never snap: the same optional-dep shape the chat controller's
    *  snapToGrid takes. */
   snapToGrid?: () => boolean;
+  /** This frame's own zoom ceiling, replacing the shared FRAME_SCALE_MAX
+   *  (owner request: the Steam Wishlist chip may grow without limit, so its
+   *  row passes Infinity). The floor stays shared: FRAME_SCALE_MIN is what
+   *  keeps every frame grabbable. */
+  maxScale?: number;
 }
 
 /** One settings-backed axis for resizeMode 'dimensions'. `factor` converts one
@@ -378,7 +385,7 @@ export class MovableFrame {
     } catch {
       /* storage unavailable */
     }
-    const parsedSaved = parseTargetFramePos(saved);
+    const parsedSaved = parseTargetFramePos(saved, this.maxScale());
     const adopted = this.adoptPos(parsedSaved);
     this.pos = adopted;
     if (this.pos) {
@@ -410,6 +417,11 @@ export class MovableFrame {
   /** Re-resolve the button's + grip's t() labels in place (language switch). */
   relocalize(): void {
     this.refreshChrome();
+  }
+
+  /** This frame's zoom ceiling (config maxScale, else the shared band's). */
+  private maxScale(): number {
+    return this.cfg.maxScale ?? FRAME_SCALE_MAX;
   }
 
   /** Localized display name for menus (the frames show/hide list); empty for a
@@ -513,7 +525,7 @@ export class MovableFrame {
     } catch {
       /* storage unavailable */
     }
-    this.pos = this.adoptPos(parseTargetFramePos(saved));
+    this.pos = this.adoptPos(parseTargetFramePos(saved, this.maxScale()));
     if (this.pos) this.applyPos();
   }
 
@@ -691,7 +703,7 @@ export class MovableFrame {
     edge: FrameEdge,
     rect: { left: number; top: number; width: number; height: number },
   ): void {
-    const { sx, sy } = frameScales(this.pos);
+    const { sx, sy } = frameScales(this.pos, this.maxScale());
     this.gesture = {
       kind: 'scale',
       pointerId: ev.pointerId,
@@ -718,7 +730,7 @@ export class MovableFrame {
   ): void {
     // The visual-to-author factor: the live uniform zoom times the UI scale
     // (box frames keep their axes equal, so sx stands in for the uniform zoom).
-    const factor = frameScales(this.pos).sx * getUiScale();
+    const factor = frameScales(this.pos, this.maxScale()).sx * getUiScale();
     this.gesture = {
       kind: 'stretch',
       pointerId: ev.pointerId,
@@ -804,6 +816,8 @@ export class MovableFrame {
         { w: g.startW, h: g.startH },
         ev.clientX - g.startX,
         ev.clientY - g.startY,
+        FRAME_SCALE_MIN,
+        this.maxScale(),
       );
       if (snap) {
         // Snap the zoom so the frame's visual size lands on the grid. A
@@ -811,19 +825,27 @@ export class MovableFrame {
         // the snapped ratio and both axes take it.
         if (g.edge === 'e' || g.edge === 'w') {
           next = {
-            sx: clampFrameScale(snapScaleToGrid(g.startW, g.startSx, next.sx)),
+            sx: clampFrameScale(
+              snapScaleToGrid(g.startW, g.startSx, next.sx),
+              FRAME_SCALE_MIN,
+              this.maxScale(),
+            ),
             sy: next.sy,
           };
         } else if (g.edge === 'n' || g.edge === 's') {
           next = {
             sx: next.sx,
-            sy: clampFrameScale(snapScaleToGrid(g.startH, g.startSy, next.sy)),
+            sy: clampFrameScale(
+              snapScaleToGrid(g.startH, g.startSy, next.sy),
+              FRAME_SCALE_MIN,
+              this.maxScale(),
+            ),
           };
         } else if (g.startSx > 0) {
           const ratio = snapScaleToGrid(g.startW, g.startSx, next.sx) / g.startSx;
           next = {
-            sx: clampFrameScale(g.startSx * ratio),
-            sy: clampFrameScale(g.startSy * ratio),
+            sx: clampFrameScale(g.startSx * ratio, FRAME_SCALE_MIN, this.maxScale()),
+            sy: clampFrameScale(g.startSy * ratio, FRAME_SCALE_MIN, this.maxScale()),
           };
         }
       }
@@ -979,7 +1001,7 @@ export class MovableFrame {
     } catch {
       /* storage unavailable */
     }
-    const parsed = this.adoptPos(parseTargetFramePos(savedNow));
+    const parsed = this.adoptPos(parseTargetFramePos(savedNow, this.maxScale()));
     // A payload without the viewport stamp cannot re-anchor honestly; the
     // in-memory pos carries the stamp of the viewport it was last applied
     // under (the pre-change one), so it is the better basis then.
@@ -1050,7 +1072,7 @@ export class MovableFrame {
     // Both axes step together (a proportional zoom, like the grip); a frame
     // that was side-stretched keeps its chosen aspect while the keyboard walks
     // its overall size, since each axis takes the same additive step.
-    const { sx, sy } = frameScales(this.pos);
+    const { sx, sy } = frameScales(this.pos, this.maxScale());
     const snap = !ev.shiftKey && (this.cfg.snapToGrid?.() ?? false);
     if (snap) {
       // Step the frame's VISUAL width to the next grid line and give both
@@ -1059,13 +1081,17 @@ export class MovableFrame {
       const width = this.cfg.frame.getBoundingClientRect().width;
       if (width > 0 && sx > 0) {
         const ratio =
-          clampFrameScale(stepCoordToGridLine(width, direction as 1 | -1) / (width / sx)) / sx;
+          clampFrameScale(
+            stepCoordToGridLine(width, direction as 1 | -1) / (width / sx),
+            FRAME_SCALE_MIN,
+            this.maxScale(),
+          ) / sx;
         this.pos = {
           ...this.pos,
           left: this.pos?.left ?? 0,
           top: this.pos?.top ?? 0,
-          scaleX: clampFrameScale(sx * ratio),
-          scaleY: clampFrameScale(sy * ratio),
+          scaleX: clampFrameScale(sx * ratio, FRAME_SCALE_MIN, this.maxScale()),
+          scaleY: clampFrameScale(sy * ratio, FRAME_SCALE_MIN, this.maxScale()),
         };
         this.applyPos();
         this.persistPos();
@@ -1076,8 +1102,8 @@ export class MovableFrame {
       ...this.pos,
       left: this.pos?.left ?? 0,
       top: this.pos?.top ?? 0,
-      scaleX: scaleFromKeyStep(sx, direction, ev.shiftKey),
-      scaleY: scaleFromKeyStep(sy, direction, ev.shiftKey),
+      scaleX: scaleFromKeyStep(sx, direction, ev.shiftKey, FRAME_SCALE_MIN, this.maxScale()),
+      scaleY: scaleFromKeyStep(sy, direction, ev.shiftKey, FRAME_SCALE_MIN, this.maxScale()),
     };
     this.applyPos();
     this.persistPos();
@@ -1170,7 +1196,7 @@ export class MovableFrame {
     // than distort; an axis never stretched writes nothing and keeps its
     // stylesheet size.
     if (this.cfg.scalable && this.cfg.resizeMode !== 'dimensions') {
-      const { sx, sy } = frameScales(this.pos);
+      const { sx, sy } = frameScales(this.pos, this.maxScale());
       frame.style.transformOrigin = 'top left';
       // The one-argument form when the axes agree, so a frame that was never
       // side-stretched writes the exact transform it always had.

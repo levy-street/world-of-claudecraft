@@ -56,7 +56,10 @@ export class InterfaceUnlockPreview {
     // The TARGET frame deliberately gets no sample: its placeholder already
     // shows the real frame chrome (portrait ring, bars), and a second set of
     // sample bars over it read as clutter (owner feedback).
-    this.mount('pet-frame', this.unitSample(t('hudChrome.unitFrame.petLabel')));
+    // The PET frame deliberately gets no sample either (same rationale as the
+    // target frame above): its placeholder already shows the real unit-frame
+    // chrome, and the old generic portrait/hp/mp mock read as a second fake
+    // frame stacked on it (owner feedback). The name chip says whose it is.
     const petIcons = this.petBarIcons?.();
     if (petIcons && petIcons.length > 0) this.mount('petbar', this.auraRow(petIcons, 'ability'));
     this.mount(
@@ -91,31 +94,6 @@ export class InterfaceUnlockPreview {
       row.appendChild(icon);
     }
     return row;
-  }
-
-  private unitRow(name: string): HTMLElement {
-    const unit = this.doc.createElement('div');
-    unit.className = 'tf-preview-unit';
-    const portrait = this.doc.createElement('div');
-    portrait.className = 'tf-preview-portrait';
-    const bars = this.doc.createElement('div');
-    bars.className = 'tf-preview-bars';
-    const label = this.doc.createElement('span');
-    label.className = 'tf-preview-name';
-    label.textContent = name;
-    const hp = this.doc.createElement('div');
-    hp.className = 'tf-preview-hp';
-    const mp = this.doc.createElement('div');
-    mp.className = 'tf-preview-mp';
-    bars.append(label, hp, mp);
-    unit.append(portrait, bars);
-    return unit;
-  }
-
-  private unitSample(name: string): HTMLElement {
-    const shell = this.shell('tf-preview-unit-host');
-    shell.appendChild(this.unitRow(name));
-    return shell;
   }
 
   /** The party sample: a host the Hud fills with REAL party-frame rows via

@@ -261,6 +261,22 @@ describe('clampFrameScale', () => {
       expect(clampFrameScale(bad)).toBe(1);
     }
   });
+
+  it('honors a per-frame ceiling, Infinity meaning no upper limit at all', () => {
+    // The wishlist chip's registry row lifts its ceiling (HudFrameSpec
+    // maxScale); the shared floor still applies so the frame stays grabbable.
+    expect(clampFrameScale(7, FRAME_SCALE_MIN, Number.POSITIVE_INFINITY)).toBe(7);
+    expect(clampFrameScale(0.1, FRAME_SCALE_MIN, Number.POSITIVE_INFINITY)).toBe(FRAME_SCALE_MIN);
+    expect(frameScales({ scale: 6 }, Number.POSITIVE_INFINITY)).toEqual({ sx: 6, sy: 6 });
+    expect(frameScales({ scale: 6 })).toEqual({ sx: FRAME_SCALE_MAX, sy: FRAME_SCALE_MAX });
+  });
+
+  it('parse keeps an over-band saved scale when the frame allows it', () => {
+    const raw = JSON.stringify({ left: 10, top: 20, scale: 5 });
+    expect(parseTargetFramePos(raw, Number.POSITIVE_INFINITY)?.scale).toBe(5);
+    // The default band still tames the same payload for every other frame.
+    expect(parseTargetFramePos(raw)?.scale).toBe(FRAME_SCALE_MAX);
+  });
 });
 
 describe('scaleFromGripDrag', () => {

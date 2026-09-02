@@ -3966,11 +3966,11 @@ export class Hud {
         isMobileLayout,
         scalable: true,
         resizeMode: spec.resizeMode,
+        maxScale: spec.maxScale,
         buttonOnlyWhenUnlocked: true,
         onPositioned,
       });
-      // Rows whose show/hide checkbox drives a real SETTING instead of the
-      // hidden flag (the pure table documents which and why).
+      // Rows whose checkbox drives a real SETTING (see frameRowSettingKey).
       const optionalBarKey = frameRowSettingKey(spec.id);
       this.interfaceUnlock.register({
         id: spec.id,

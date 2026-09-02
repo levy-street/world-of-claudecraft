@@ -137,6 +137,15 @@ describe('HUD_FRAME_SPECS', () => {
     expect(box).toEqual(['buffBar', 'debuffBar', 'damageMeter']);
   });
 
+  it('lifts the zoom ceiling for exactly the wishlist chip', () => {
+    // Owner request: the Steam Wishlist reminder may grow without limit; every
+    // other frame keeps the shared FRAME_SCALE_MAX band so a stray drag cannot
+    // swallow the viewport. The FLOOR stays shared (grabbability).
+    const unlimited = HUD_FRAME_SPECS.filter((s) => s.maxScale !== undefined);
+    expect(unlimited.map((s) => s.id)).toEqual(['steamWishlist']);
+    expect(unlimited[0]?.maxScale).toBe(Number.POSITIVE_INFINITY);
+  });
+
   it('names every frame with a label key so no placeholder is anonymous', () => {
     for (const spec of HUD_FRAME_SPECS) {
       expect(spec.labelKey, `frame ${spec.id} has no name chip key`).toBeTruthy();

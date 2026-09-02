@@ -42,6 +42,9 @@ export interface HudFrameSpec {
    * as broken. See MovableFrameConfig.resizeMode.
    */
   resizeMode?: 'scale' | 'box';
+  /** This frame's own zoom ceiling, replacing the shared FRAME_SCALE_MAX
+   *  (see MovableFrameConfig.maxScale); Infinity means no upper limit. */
+  maxScale?: number;
 }
 
 /**
@@ -107,7 +110,9 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
   },
   // The Wishlist on Steam reminder chip (#community-hud, PR 3616), movable
   // like any other corner chrome so a player can park it out of the way.
-  // Already absolutely positioned in #ui, so no re-home is needed.
+  // Already absolutely positioned in #ui, so no re-home is needed. Its zoom
+  // has no ceiling (owner request): a chip meant to be noticed may grow as
+  // large as the player likes, and the shared floor keeps it grabbable.
   {
     id: 'steamWishlist',
     elementId: 'community-hud',
@@ -115,6 +120,7 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     labelKey: 'hudChrome.interfaceUnlock.frameNames.steamWishlist',
     fallbackSize: { w: 160, h: 30 },
     detachToUiRoot: false,
+    maxScale: Number.POSITIVE_INFINITY,
   },
   {
     id: 'menu',
