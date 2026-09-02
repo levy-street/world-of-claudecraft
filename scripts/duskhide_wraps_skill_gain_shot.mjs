@@ -34,7 +34,10 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 // Lowest graphics preset, per the repo's standing capture rule, seeded before
 // the app boots.
 await page.evaluateOnNewDocument(() => {
-  localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
+  localStorage.setItem(
+    'woc_settings',
+    JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }),
+  );
 });
 
 await page.goto(URL, { waitUntil: 'networkidle0', timeout: 120000 });

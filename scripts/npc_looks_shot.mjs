@@ -97,7 +97,10 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 // player path sheds the same way), so use --gfx high to review colorways.
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }),
+    );
   } catch {
     /* ignore */
   }

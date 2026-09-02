@@ -29,7 +29,10 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 // Standing capture rule: seed the lowest graphics preset before boot (this is
 // a bug-repro shot, not a graphics-tier comparison).
 await page.evaluateOnNewDocument(() => {
-  localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
+  localStorage.setItem(
+    'woc_settings',
+    JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }),
+  );
 });
 
 await page.goto(URL, { waitUntil: 'load', timeout: 90000 });

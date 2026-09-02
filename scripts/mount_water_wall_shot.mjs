@@ -33,7 +33,10 @@ page.on('pageerror', (e) => console.log('PAGEERROR:', e.message));
 // a gameplay/physics proof, not a graphics comparison).
 await page.evaluateOnNewDocument(() => {
   try {
-    localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
+    localStorage.setItem(
+      'woc_settings',
+      JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }),
+    );
   } catch {
     /* ignore */
   }

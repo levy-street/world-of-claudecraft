@@ -79,7 +79,10 @@ async function main() {
     // Lowest graphics preset, per the repo's standing capture rule.
     await page.evaluateOnNewDocument(() => {
       try {
-        localStorage.setItem('woc_settings', JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }));
+        localStorage.setItem(
+          'woc_settings',
+          JSON.stringify({ graphicsPreset: 1, graphicsDefaultApplied: true }),
+        );
       } catch {
         /* ignore */
       }
