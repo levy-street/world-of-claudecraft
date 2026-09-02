@@ -25,6 +25,7 @@
 // "unknownRelic" copy, which is honest in every language.
 
 import { DEEDS } from '../sim/content/deeds';
+import { type DelveShopGate, delveShopGateClears } from '../sim/content/delves';
 import {
   RELIQUARY_ACTIVITY_SOURCE_IDS,
   RELIQUARY_RIFT_RANK_SOURCE_IDS,
@@ -37,7 +38,7 @@ import { craftNameKey } from './craft_name_view';
 import { deedName, deedTitleText } from './deed_i18n';
 import { dungeonDisplayName, itemDisplayName, tEntity, zoneDisplayName } from './entity_i18n';
 import { gatheringProfessionNameKey } from './gathering_profession_name';
-import { formatList, hasTranslation, type TranslationKey, t } from './i18n';
+import { formatList, formatNumber, hasTranslation, type TranslationKey, t } from './i18n';
 import { ownEntry } from './known_item';
 import { MOUNT_NAME_KEYS } from './mount_labels';
 import {
@@ -130,6 +131,23 @@ function bossName(mobId: string): string | null {
 
 function vendorName(npcId: string): string | null {
   return ownEntry(NPCS, npcId) ? tEntity({ kind: 'npc', id: npcId, field: 'name' }) : null;
+}
+
+/**
+ * The vendor line's optional unlock note, in the SAME words the delve shop's
+ * own lock badge shows (delveUi.shop.reqHeroic / reqClears), so a player who
+ * has already seen "Requires a Heroic clear" on the vendor's row recognizes
+ * the identical phrase here rather than learning a second vocabulary for one
+ * fact. Null for an ungated ('available') or unstocked (undefined) source, so
+ * the plain "Sold by {vendor}" line is unaffected for every other relic on
+ * this page (e.g. the class-neutral utility pieces sold from the first visit).
+ */
+function vendorGateRequirementText(gate: DelveShopGate | undefined): string | null {
+  if (gate === undefined || gate === 'available') return null;
+  if (gate === 'heroicClear') return t('delveUi.shop.reqHeroic');
+  const count = delveShopGateClears(gate);
+  if (count === null) return null;
+  return t('delveUi.shop.reqClears', { count: formatNumber(count, { maximumFractionDigits: 0 }) });
 }
 
 function dungeonName(dungeonId: string): string | null {
@@ -244,7 +262,11 @@ export function reliquarySourceLineText(plan: ReliquarySourceLinePlan | undefine
     }
     case 'vendor': {
       const vendor = vendorName(plan.npcId);
-      return vendor === null ? '' : t('hudChrome.reliquary.sourceVendor', { vendor });
+      if (vendor === null) return '';
+      const requirement = vendorGateRequirementText(plan.gate);
+      return requirement === null
+        ? t('hudChrome.reliquary.sourceVendor', { vendor })
+        : t('hudChrome.reliquary.sourceVendorGated', { vendor, requirement });
     }
     case 'bossZone': {
       const boss = bossName(plan.bossId);

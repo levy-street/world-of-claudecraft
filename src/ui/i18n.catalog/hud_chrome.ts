@@ -5962,6 +5962,13 @@ export const hudChromeStrings = {
     sourceProfession: 'Earned through {profession}',
     sourceDeed: 'Awarded by the deed {deed}',
     sourceVendor: 'Sold by {vendor}',
+    // {requirement} is the vendor's own lock-badge phrase (delveUi.shop.reqHeroic
+    // / reqClears), pre-localized before it reaches this template: a signature
+    // rare gated behind a delve clear reads "Sold by {vendor} (Requires a
+    // Heroic clear)" instead of an unconditional "Sold by {vendor}" that looks
+    // buyable on sight and reads as removed once it is not actually on the
+    // counter yet.
+    sourceVendorGated: 'Sold by {vendor} ({requirement})',
     // A relic with several live routes shows one line per route, so these read
     // as siblings of the six above rather than as a summary of them.
     // {boss} here is the open-world rare and {zone} where it camps: half an

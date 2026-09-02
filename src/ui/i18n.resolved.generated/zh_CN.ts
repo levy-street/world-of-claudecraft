@@ -4241,6 +4241,7 @@ export const zh_CN: EnTranslations = {
       "sourceProfession": "通过{profession}获得",
       "sourceDeed": "功绩“{deed}”奖励",
       "sourceVendor": "由{vendor}出售",
+      "sourceVendorGated": "由{vendor}出售（{requirement}）",
       "sourceBossZone": "由{zone}的{boss}掉落",
       "sourceDelve": "在探秘“{delve}”中获得",
       "sourceRift": "通关{rank}级裂隙时掉落",

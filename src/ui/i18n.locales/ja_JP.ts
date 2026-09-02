@@ -11606,6 +11606,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.reliquary.sourceProfession': '{profession}で入手',
   'hudChrome.reliquary.sourceDeed': '功績「{deed}」の報酬',
   'hudChrome.reliquary.sourceVendor': '{vendor}が販売',
+  'hudChrome.reliquary.sourceVendorGated': '{vendor}が販売（{requirement}）',
   'hudChrome.reliquary.sourceBossZone': '{zone}の{boss}がドロップ',
   'hudChrome.reliquary.sourceDelve': 'デルヴ「{delve}」で入手',
   'hudChrome.reliquary.sourceRift': '{rank}ランク・リフトのクリアでドロップ',

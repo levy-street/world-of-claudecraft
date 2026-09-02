@@ -4241,6 +4241,7 @@ export const zh_TW: EnTranslations = {
       "sourceProfession": "透過{profession}獲得",
       "sourceDeed": "功績「{deed}」獎勵",
       "sourceVendor": "由{vendor}販售",
+      "sourceVendorGated": "由{vendor}販售（{requirement}）",
       "sourceBossZone": "由{zone}的{boss}掉落",
       "sourceDelve": "在秘探「{delve}」中獲得",
       "sourceRift": "通關{rank}級裂隙時掉落",

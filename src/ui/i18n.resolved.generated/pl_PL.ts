@@ -4241,6 +4241,7 @@ export const pl_PL: EnTranslations = {
       "sourceProfession": "Zdobywana dzięki: {profession}",
       "sourceDeed": "Przyznawana za czyn {deed}",
       "sourceVendor": "Sprzedaje {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Wypada z {boss} w {zone}",
       "sourceDelve": "Do znalezienia na wyprawie {delve}",
       "sourceRift": "Wypada z przejść Szczelin rangi {rank}",

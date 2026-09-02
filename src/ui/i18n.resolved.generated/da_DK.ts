@@ -4241,6 +4241,7 @@ export const da_DK: EnTranslations = {
       "sourceProfession": "Optjenes gennem {profession}",
       "sourceDeed": "Gives af bedriften {deed}",
       "sourceVendor": "Sælges af {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Falder fra {boss} i {zone}",
       "sourceDelve": "Findes i delven {delve}",
       "sourceRift": "Falder fra gennemførsler af Rifter med rang {rank}",

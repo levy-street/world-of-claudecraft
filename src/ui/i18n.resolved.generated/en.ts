@@ -4241,6 +4241,7 @@ export const en: EnTranslations = {
       "sourceProfession": "Earned through {profession}",
       "sourceDeed": "Awarded by the deed {deed}",
       "sourceVendor": "Sold by {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Drops from {boss} in {zone}",
       "sourceDelve": "Found in the delve {delve}",
       "sourceRift": "Drops from {rank}-rank Rift clears",

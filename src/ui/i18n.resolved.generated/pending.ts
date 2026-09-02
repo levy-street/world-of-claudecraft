@@ -9,25 +9,55 @@
 // Reproducibility is checked by tests/i18n_resolved_equivalence.test.ts.
 
 export const pending: Record<string, readonly string[]> = {
-  "es": [],
-  "es_ES": [],
-  "fr_FR": [],
-  "fr_CA": [],
+  "es": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "es_ES": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "fr_FR": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "fr_CA": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
   "en_CA": [],
-  "it_IT": [],
-  "de_DE": [],
+  "it_IT": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "de_DE": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
-  "pt_BR": [],
+  "pt_BR": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
   "ru_RU": [],
-  "cs_CZ": [],
-  "nl_NL": [],
-  "pl_PL": [],
-  "id_ID": [],
-  "tr_TR": [],
-  "sv_SE": [],
-  "vi_VN": [],
-  "da_DK": []
+  "cs_CZ": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "nl_NL": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "pl_PL": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "id_ID": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "tr_TR": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "sv_SE": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "vi_VN": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ],
+  "da_DK": [
+    "hudChrome.reliquary.sourceVendorGated"
+  ]
 };

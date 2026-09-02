@@ -4241,6 +4241,7 @@ export const nl_NL: EnTranslations = {
       "sourceProfession": "Verdiend via {profession}",
       "sourceDeed": "Geschonken door de daad {deed}",
       "sourceVendor": "Verkocht door {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Valt bij {boss} in {zone}",
       "sourceDelve": "Te vinden in de delve {delve}",
       "sourceRift": "Valt bij voltooiingen van Rifts met rang {rank}",

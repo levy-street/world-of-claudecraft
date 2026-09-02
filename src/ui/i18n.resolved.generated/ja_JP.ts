@@ -4241,6 +4241,7 @@ export const ja_JP: EnTranslations = {
       "sourceProfession": "{profession}で入手",
       "sourceDeed": "功績「{deed}」の報酬",
       "sourceVendor": "{vendor}が販売",
+      "sourceVendorGated": "{vendor}が販売（{requirement}）",
       "sourceBossZone": "{zone}の{boss}がドロップ",
       "sourceDelve": "デルヴ「{delve}」で入手",
       "sourceRift": "{rank}ランク・リフトのクリアでドロップ",

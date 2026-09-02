@@ -4241,6 +4241,7 @@ export const es_ES: EnTranslations = {
       "sourceProfession": "Se consigue con {profession}",
       "sourceDeed": "La otorga la gesta {deed}",
       "sourceVendor": "La vende {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "La suelta {boss} en {zone}",
       "sourceDelve": "Se encuentra en la expedición {delve}",
       "sourceRift": "La sueltan las conquistas de Brechas de rango {rank}",

@@ -17,6 +17,7 @@
 // carry, so a player searches the names their own client shows them.
 
 import { DEEDS } from '../sim/content/deeds';
+import { type DelveShopGate, delveShopGateForItem } from '../sim/content/delves';
 import {
   type ReliquaryClearSource,
   type ReliquaryPageDef,
@@ -159,7 +160,10 @@ export type ReliquarySourceLinePlan =
   | { kind: 'zone'; zoneId: string }
   | { kind: 'profession'; professionId: string }
   | { kind: 'deed'; deedId: string }
-  | { kind: 'vendor'; npcId: string }
+  // `gate` is omitted for an ungated ('available') or unstocked vendor row, so
+  // a plain "Sold by {vendor}" line is unaffected: only a real DelveShopGate
+  // ('heroicClear' or 'clears:N') ever reaches the localized text.
+  | { kind: 'vendor'; npcId: string; gate?: DelveShopGate }
   | { kind: 'delve'; delveId: string }
   | { kind: 'rift'; rank: string }
   | { kind: 'quest'; questId: string }
@@ -177,6 +181,7 @@ const NO_SOURCE_LINES: readonly ReliquarySourceLinePlan[] = Object.freeze([]);
 function sourceLineForHint(
   hint: ReliquarySourceHint,
   clearSource: ReliquaryClearSource | undefined,
+  vendorGate: DelveShopGate | undefined,
 ): ReliquarySourceLinePlan {
   switch (hint.sourceKind) {
     case 'boss':
@@ -190,7 +195,9 @@ function sourceLineForHint(
     case 'deed':
       return { kind: 'deed', deedId: hint.sourceId };
     case 'vendor':
-      return { kind: 'vendor', npcId: hint.sourceId };
+      return vendorGate !== undefined && vendorGate !== 'available'
+        ? { kind: 'vendor', npcId: hint.sourceId, gate: vendorGate }
+        : { kind: 'vendor', npcId: hint.sourceId };
     case 'delve':
       return { kind: 'delve', delveId: hint.sourceId };
     case 'rift':
@@ -229,10 +236,16 @@ function sourceLineForHint(
  * line. One line per door is the pattern everywhere else in this function, and
  * a reader who has learned to count doors by counting lines should not have to
  * unlearn it for the one shape where the doors happen to share a roof.
+ *
+ * `vendorGate` is the relic's static DELVE_SHOPS gate (undefined for a relic
+ * with no vendor hint, or one no shop table stocks): it rides every 'vendor'
+ * line this call produces, so the caller resolves it once per relic rather
+ * than per hint.
  */
 export function reliquarySourceLinePlan(
   hints: readonly ReliquarySourceHint[],
   clearSource: ReliquaryClearSource | undefined,
+  vendorGate?: DelveShopGate,
 ): readonly ReliquarySourceLinePlan[] {
   if (hints.length === 0) return NO_SOURCE_LINES;
   let soleBoss: ReliquarySourceHint | null = null;
@@ -271,7 +284,7 @@ export function reliquarySourceLinePlan(
         continue;
       }
     }
-    lines.push(sourceLineForHint(hint, clearSource));
+    lines.push(sourceLineForHint(hint, clearSource, vendorGate));
   }
   return lines;
 }
@@ -594,6 +607,26 @@ function relicSlotId(relic: ReliquaryRelicDef): string {
   }
 }
 
+/**
+ * The DELVE_SHOPS gate (if any) to name on one relic's vendor source line, so
+ * production (buildReliquaryPageCells below) and its test oracle
+ * (tests/reliquary_window_behavior.test.ts sourceLinesFor) resolve it through
+ * the SAME implementation rather than two hand-derivations that can drift.
+ * Keyed by BOTH the item id and the page's own delve (never item id alone: a
+ * relic could in principle be stocked, at a different gate, by a delve this
+ * page is not about), so it only ever names the gate on the vendor the page
+ * itself already claims; a page with no single delve clearSource, or a
+ * non-item relic, answers undefined.
+ */
+export function relicVendorGate(
+  page: ReliquaryPageDef,
+  relic: ReliquaryRelicDef,
+): DelveShopGate | undefined {
+  if (relic.kind !== 'item') return undefined;
+  const pageDelveId = page.clearSource?.kind === 'delve' ? page.clearSource.delveId : undefined;
+  return pageDelveId !== undefined ? delveShopGateForItem(pageDelveId, relic.itemId) : undefined;
+}
+
 /** Build ordered grid cells for one page (owned vs missing). */
 export function buildReliquaryPageCells(
   page: ReliquaryPageDef,
@@ -622,7 +655,11 @@ export function buildReliquaryPageCells(
     // that precedence (reliquaryRelicSource). It takes the INJECTED page def,
     // never a catalog lookup by id, so a synthetic test page resolves its own
     // sourceDefault instead of a live RELIQUARY_PAGES row that shares its id.
-    const plans = reliquarySourceLinePlan(reliquaryRelicSource(page, relic), page.clearSource);
+    const plans = reliquarySourceLinePlan(
+      reliquaryRelicSource(page, relic),
+      page.clearSource,
+      relicVendorGate(page, relic),
+    );
     if (plans.length > 0) cell.sourcePlans = plans;
     if (owned && relic.kind === 'item') {
       const clears = opts.firstFind?.[id]?.clears;

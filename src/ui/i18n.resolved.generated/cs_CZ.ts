@@ -4241,6 +4241,7 @@ export const cs_CZ: EnTranslations = {
       "sourceProfession": "Získáno díky {profession}",
       "sourceDeed": "Uděluje skutek {deed}",
       "sourceVendor": "Prodává {vendor}",
+      "sourceVendorGated": "Sold by {vendor} ({requirement})",
       "sourceBossZone": "Padá z {boss} v {zone}",
       "sourceDelve": "K nalezení ve výpravě {delve}",
       "sourceRift": "Padá z průchodů trhlinami hodnosti {rank}",

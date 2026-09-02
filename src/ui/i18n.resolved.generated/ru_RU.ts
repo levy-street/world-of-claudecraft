@@ -4241,6 +4241,7 @@ export const ru_RU: EnTranslations = {
       "sourceProfession": "Добывается профессией {profession}",
       "sourceDeed": "Награда за деяние {deed}",
       "sourceVendor": "Продаёт {vendor}",
+      "sourceVendorGated": "Продаёт {vendor} ({requirement})",
       "sourceBossZone": "Падает с {boss} в регионе {zone}",
       "sourceDelve": "Находится в вылазке {delve}",
       "sourceRift": "Падает при прохождении разломов ранга {rank}",
