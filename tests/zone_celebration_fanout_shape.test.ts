@@ -92,8 +92,9 @@
 // time, so a hundred continuously crafting players put about 350 us per second
 // through this walk at the cap, roughly 0.035% of one core, at the 3% base chance
 // on 4 s casts (0.75 procs per second); the same hundred at the 15% cap on 1.5 s
-// casts proc ten a second, the case priced below at about 0.5% of the budget, so
-// the craft-driven rate is a band and 0.75 is its floor. The node-only line (8 us
+// casts proc ten a second, which is 4.7 ms per second through the walk, about 0.5%
+// of one core (235 us per tick), so the craft-driven rate is a band and 0.75 is
+// its floor. The node-only line (8 us
 // per second) sits under both. Two axes
 // the record must name: the per-second cost is SUPERLINEAR in realm size (rate
 // times roster), and the 5,000 cap is the code default, which MAX_PLAYERS_PER_REALM
@@ -379,7 +380,7 @@ describe('the fan-out measurement premises (batch size x session count)', () => 
 // measurement re-opens here rather than silently aging.
 // ---------------------------------------------------------------------------
 
-describe('the scan premise: one celebration walks the whole roster, one zoneAt per overworld player', () => {
+describe('the scan premise: one celebration walks the whole roster, one zoneAt per player', () => {
   // The per-player cost the header records is the index of the player's zone in
   // ZONES (zoneAt returns at the first containing rect), so the list length is a
   // premise of that number the way the cadence constant and the realm cap are of
@@ -409,7 +410,7 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
     return { visits, calls: counted.mock.calls.map(([x, z]) => [x, z] as const) };
   }
 
-  it('shared prologue: celebrant first, every roster entry once, one zoneAt per overworld player', () => {
+  it('shared prologue: celebrant first, every roster entry once, one zoneAt each', () => {
     for (const recipients of [1, 12, 64]) {
       const world = fakeWorld(recipients);
       // A ghost roster entry (a player whose entity is gone) is still visited and

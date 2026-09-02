@@ -295,29 +295,36 @@ describe('the detector itself, driven over a fixture tree', () => {
 // THE TOUR (scripts/perf_tour.mjs, headless swiftshader, both viewports, two runs each
 // way on one Vite process and one tree, the merge tip 2ebe95e731, Chrome 152 headless,
 // macOS 26.5.2, Node v26.5.0): hudHotDomWrites before 1052 and 1072 desktop, 575 and
-// 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. The differences are
-// FRAME-COUNT-DRIVEN, not jitter (the per-step series is in the committed summary):
-// the eight per-step series agree at every step except where one run rendered
+// 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. The per-step series
+// is in the committed summary, and what it shows is bounded. Through the first
+// four steps the eight series agree exactly, except where one run rendered
 // markedly fewer frames at that step (before-run2 desktop at the fourth step, 20
-// frames against 33 to 39; before-run1 mobile at the second, 9 against 21 to 24),
-// the count is still climbing through the look step at about five writes per frame
-// (the headless mode renders 39 to 100 frames against the headed golden's 1,400
-// plus, so the world never reaches the steady state where this metric becomes the
-// run-length-independent anchor the baseline defines), and at matched frame counts
-// the two shapes read byte-identical (the look step: seven frames and +37 writes on
-// both before-run1 and after-run1). Mobile's two before runs read identical, so no
-// band was ever measured there; the attribution, not a band, is the explanation on
-// both viewports. That bounds the scan's admitted blind spot: a hidden hot per-frame
-// cross-kind site would add roughly 80 to 200 writes over that window, and the whole
-// spread across the four runs is 27. A reduction smaller than that window would be
-// invisible here. Every tour exited 1 on pre-existing console lines (character asset
+// frames against 33 to 39; before-run1 mobile at the second, 9 against 21 to 24).
+// At the look and final steps the count is still climbing (desktop 5.3 to 6.5
+// writes per frame, mobile 6.1 to 9.8: the headless mode renders 39 to 100 frames
+// against the headed golden's 1,400 plus, so the world never reaches the steady
+// state where this metric becomes the run-length-independent anchor the baseline
+// defines), and there the series vary run to run on BOTH sides independent of the
+// shape: the one desktop pair at equal frames reads identical (+37 over 7 frames on
+// before-run1 and after-run1), while mobile's after runs sit 7 to 10 writes above
+// its before runs at comparable frame counts (+46 at 6 frames against +39 at 6).
+// That mobile excess cannot be the shape: the four-slot cache elides a superset of
+// what the single slot elides, so Option A can only remove writes, and any after
+// figure above a before figure is tour variation. So the tour is corroboration,
+// not the proof: no reduction appeared inside a 27-write spread across the four
+// runs, which bounds the scan's admitted blind spot (a hidden hot per-frame
+// cross-kind site would add roughly 80 to 200 writes over that window), and a
+// reduction smaller than that window would be invisible here. Every tour exited 1
+// on pre-existing console lines (character asset
 // not preloaded: two on desktop, one on mobile), with zero budget or FCT failures;
 // the after runs served the four-slot shape (the Vite log records the painter_host
 // reload between the before and after runs and the reload of the revert after).
 // THESE ARTIFACTS MUST NEVER BE FED TO ARM 3: three of the four desktop captures sit
 // at or above the committed anchor 1062 (before-run2 read 1072 on UNMODIFIED code),
-// and they are frame-floor-ineligible anyway; a golden update, if the shape ever lands
-// and the anchor moves, is a headed PERF_GPU=1 two-run capture, never this mode.
+// and they are frame-floor-ineligible anyway (ARM 3 never checks an artifact's gpuMode,
+// a pre-existing gap the frame floor covers; carried for the maintainer); a golden
+// update, if the shape ever lands and the anchor moves, is a headed PERF_GPU=1
+// two-run capture, never this mode.
 //
 // THE PRICE: the establishing write still allocates ONE object per element, only
 // bigger (a four-slot record; only a per-element Map would add an allocation). Retained
