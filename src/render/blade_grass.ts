@@ -140,9 +140,11 @@ export function clusterGeometry(rng: () => number): THREE.BufferGeometry {
 // vertical spread, rounded up. Used to bound how far a cluster reaches beyond
 // its instance origin, never to place one.
 const CLUSTER_MAX_SCALE = 1.8;
-// Local-space reach of the shader's sway at the blade tip (0.085 * (1 + 0.4)),
-// which rides inside the same instance scale.
-const CLUSTER_SWAY_REACH = 0.15;
+// Local-space reach of the shader's sway at a blade tip, which rides inside
+// the same instance scale: amplitude 0.085 across the two sine terms (1 + 0.4),
+// weighted by position.y squared (a blade reaches y = 0.55 + 0.55), applied to
+// x and to 0.7 of z, so the displacement is that magnitude times hypot(1, 0.7).
+const CLUSTER_SWAY_REACH = 0.085 * (1 + 0.4) * (1.1 * 1.1) * Math.SQRT2;
 
 /**
  * World-space slack a placed cluster reaches beyond its instance origin: the

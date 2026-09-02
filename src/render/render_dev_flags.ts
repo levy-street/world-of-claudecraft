@@ -29,9 +29,12 @@
 // Beside the ?<name>=off layer switches, two knobs with their own accessors:
 //   ?bladesectors=<n> - how many ways each blade-grass pool's slot grid is split
 //                  per axis, so three can frustum-cull the sectors behind the
-//                  camera (blade_grass_sector_pool.ts). 1 restores the single
-//                  uncullable mesh per pool, which is the A/B arm for pricing
-//                  the split against the extra draw calls on a given driver.
+//                  camera (blade_grass_sector_pool.ts). 1 collapses each pool
+//                  back to ONE mesh, the A/B arm for pricing the split against
+//                  the extra draw calls on a given driver. It is not the
+//                  pre-split build: that one mesh still carries a measured
+//                  bounding sphere and the banded uploads, so a verdict about
+//                  those belongs to a real before/after build, not to this arm.
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
 //                  is admitted as its turn comes and the ledger keeps learning.
 //                  It does NOT revert the reveal-gate policy (piecewise reveal,

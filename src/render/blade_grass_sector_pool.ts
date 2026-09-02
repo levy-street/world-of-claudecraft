@@ -84,7 +84,10 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
   // One logical slot lives in exactly one sector for the pool's whole life, so
   // every sector's packer can share this one slot -> dense index table.
   const slotToDense = new Int32Array(pool).fill(-1);
-  const slotSector = new Uint8Array(pool);
+  // Uint16, not Uint8: the dev flag clamps `axis` at 16, which puts the
+  // largest sector index at exactly 255, so a Uint8 has zero headroom and a
+  // raised clamp would wrap silently into the wrong sector's buffer.
+  const slotSector = new Uint16Array(pool);
   for (let slot = 0; slot < pool; slot++) {
     slotSector[slot] = poolSectorOfSlot(slot, gridW, width, axisCount);
   }
@@ -93,9 +96,10 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
   for (let sj = 0; sj < axisCount; sj++) {
     for (let si = 0; si < axisCount; si++) {
       const capacity = poolSectorLines(gridW, width, si) * poolSectorLines(gridW, width, sj);
-      // one block per sector row of dense indices, the same derivation the
-      // unsplit pool used with its own grid width
-      const bands = createUploadBands(capacity, width);
+      // a quarter grid row of dense indices per block, the same derivation the
+      // unsplit pool used, so the split does not change how finely the uploads
+      // are banded (blade_grass_upload_bands_core.ts)
+      const bands = createUploadBands(capacity, Math.max(1, gridW >> 2));
       const im = new THREE.InstancedMesh(geometry, material, capacity);
       im.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
       im.receiveShadow = true;
@@ -156,6 +160,19 @@ export function buildBladeSectorPool(opts: BladeSectorPoolOptions): BladeSectorP
         const ranges = collectUploadRanges(s.bands, s.ranges);
         clearUploadBands(s.bands);
         if (ranges === 0) continue;
+        // Three clears an attribute's update ranges only after it uploads them,
+        // and it uploads only what it draws, so a sector the camera has been
+        // ignoring accumulates one pass's ranges on top of the last. Past one
+        // pass's worth of blocks it has plainly missed an upload: drop the
+        // ranges and let the needsUpdate below re-send the whole sector, which
+        // is what three does for an empty range list.
+        if (s.im.instanceMatrix.updateRanges.length > s.bands.blocks) {
+          s.im.instanceMatrix.clearUpdateRanges();
+          s.im.instanceColor?.clearUpdateRanges();
+          s.im.instanceMatrix.needsUpdate = true;
+          if (s.im.instanceColor) s.im.instanceColor.needsUpdate = true;
+          continue;
+        }
         for (let r = 0; r < ranges; r++) {
           const start = s.ranges[r * 2];
           const count = s.ranges[r * 2 + 1];

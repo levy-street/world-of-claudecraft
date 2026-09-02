@@ -202,4 +202,28 @@ describe('blade grass sector pool', () => {
     pool.queueUploads();
     expect(touched[0].instanceMatrix.updateRanges).toHaveLength(1);
   });
+
+  it('stops a culled sector from hoarding update ranges across passes', () => {
+    // Three clears an attribute's ranges only after it uploads them, and it
+    // uploads only what it draws, so a sector the camera ignores would pile up
+    // one pass's ranges on top of the last for as long as it stays off screen.
+    const gridW = 16;
+    const { pool } = makePool(gridW, 4);
+    const m = new THREE.Matrix4();
+    const c = new THREE.Color(1, 1, 1);
+    for (let slot = 0; slot < gridW * gridW; slot++) pool.place(slot, m, c);
+    pool.queueUploads();
+    const mesh = pool.meshes[0];
+    mesh.instanceMatrix.clearUpdateRanges();
+    mesh.instanceColor?.clearUpdateRanges();
+
+    // 200 passes with nothing ever uploading, each marking a different instance
+    for (let pass = 0; pass < 200; pass++) {
+      pool.place(pass % 16, m, c);
+      pool.queueUploads();
+      expect(mesh.instanceMatrix.updateRanges.length).toBeLessThanOrEqual(17);
+    }
+    // and the fallback still asks for the whole sector
+    expect(mesh.instanceMatrix.needsUpdate || mesh.instanceMatrix.version > 0).toBe(true);
+  });
 });
