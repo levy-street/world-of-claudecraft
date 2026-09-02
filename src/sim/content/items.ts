@@ -3034,8 +3034,9 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     stackSize: 20,
     sellValue: 50,
   },
-  // The bound ceiling material: sundering any raid-sourced epic of the tier
-  // (a cast-paced extraction, disenchant-adjacent) breaks it into essence.
+  // The bound ceiling material: sundering any raid-sourced piece of epic GEAR,
+  // from any raid tier (ruled qr-19-crucible-gear-sundering-admission; sigils
+  // and the lastflame core are refused as non-gear), breaks it into essence.
   // Token shape follows heroic_mark (tool + explicit stackSize + soulbound +
   // noDiscard: a chase material is never lost to a stray discard; it is spent
   // by the Perfecting stage).

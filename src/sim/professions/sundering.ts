@@ -1,6 +1,7 @@
 // The Sundered Essence extraction (Masterwrought phase 04): a cast-paced,
-// disenchant-adjacent action that breaks a RAID-sourced epic of the tier into
-// the bound ceiling material the Perfecting stage consumes (ruling R1). Any
+// disenchant-adjacent action that breaks a RAID-sourced piece of epic GEAR, from
+// any raid tier (R1's "of the tier", ruled qr-19-crucible-gear-sundering-admission),
+// into the bound ceiling material the Perfecting stage consumes (ruling R1). Any
 // character can sunder (no profession gate: the research's TBC-tailoring
 // lesson bars stacking access gates on the apex chain); the cost IS the epic.
 //

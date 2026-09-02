@@ -435,7 +435,17 @@ export function craftDetailHtml(c: GuideProfCraft): string {
           // convention); the heading key is unchanged.
           c.id === 'cooking' ? 'guide.profPages.craftProse.cooking.identityBodyOneMeal' : undefined,
         ) +
-        proseSection(c.id, 'materials', 'prof-materials') +
+        proseSection(
+          c.id,
+          'materials',
+          'prof-materials',
+          // Engineering's materials body was retired and re-keyed at Phase 19F
+          // (its rod count was wrong: three recipes, not two); the heading key
+          // is unchanged.
+          c.id === 'engineering'
+            ? 'guide.profPages.craftProse.engineering.materialsBodyThreeRods'
+            : undefined,
+        ) +
         proseSection(c.id, 'ladder', 'prof-ladder');
   const postSections =
     c.id === 'enchanting'

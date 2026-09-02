@@ -6567,6 +6567,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.craftProse.engineering.ladderBody'
   | 'guide.profPages.craftProse.engineering.ladderHeading'
   | 'guide.profPages.craftProse.engineering.materialsBody'
+  | 'guide.profPages.craftProse.engineering.materialsBodyThreeRods'
   | 'guide.profPages.craftProse.engineering.materialsHeading'
   | 'guide.profPages.craftProse.engineering.routeBody'
   | 'guide.profPages.craftProse.engineering.routeHeading'

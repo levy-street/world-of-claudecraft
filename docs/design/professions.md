@@ -168,8 +168,11 @@ raid-won epics: `extractEssence` and `completeSunderCast`
 session seam with the disenchant-style pinned-slot re-check at
 completion. Eligibility is `isSunderable`: an epic GEAR item (the
 explicit weapon, armor, and held-offhand kind allowlist) whose
-`itemFromRaid` source index says a raid encounter drops it; rift
-legendaries and heroic five-man epics are outside the index, and
+`itemFromRaid` or `itemFromHeroicRaid` source index says a raid
+encounter drops it, on either difficulty and from any raid tier (ruled
+qr-19-crucible-gear-sundering-admission, 2026-09-02, the status quo
+ratified); rift legendaries and heroic five-man epics are outside the
+index, and
 patterns, sigils, and other raid-sourced non-gear are outside the
 allowlist. The yield is a deterministic `SUNDERED_ESSENCE_YIELD` per
 epic, no rng anywhere. Any character can sunder, deliberately without a

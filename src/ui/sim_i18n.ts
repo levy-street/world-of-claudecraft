@@ -10408,10 +10408,10 @@ const AURA_NAME_KEY: Record<string, SimMessageKey> = {
   Wintergnaw: 'aura.frostbite',
   // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
   // still emits the pre-rename aura string. The rename ships with the
-  // masterwrought branch, which integrates onto release/v0.41.0; drop once that
-  // release is fully deployed. Named as a version, not as "a future release",
-  // because the Venomfire alias this pattern came from said "drop after v0.29.0"
-  // and outlived its window by eleven releases before Phase 18 removed it.
+  // masterwrought branch; drop once the release it integrates onto
+  // (release/v0.42.0 at the time of writing) is fully deployed. Named as a
+  // version, not as "a future release", because the Venomfire alias this came
+  // from said "drop after v0.29.0" and outlived its window by eleven releases.
   Winterbite: 'aura.frostbite',
   'Maddening Whisper': 'aura.maddeningWhisper',
   'Wyrmward Sigil': 'aura.wyrmwardSigil',
@@ -13621,8 +13621,8 @@ const RULES: Rule[] = [
   {
     // Legacy alias for mixed-fleet deploy windows: a not-yet-restarted server
     // still emits the pre-rename line. The rename ships with the masterwrought
-    // branch, which integrates onto release/v0.41.0; drop once that release is
-    // fully deployed (same horizon as the Winterbite aura alias).
+    // branch; drop once the release it integrates onto (release/v0.42.0 at the
+    // time of writing) is fully deployed (same horizon as the Winterbite alias).
     re: /^The dead answer Deacon Varric's call!$/,
     build: () => t('delveUi.boss.varric.raise.interrupt_fail'),
   },

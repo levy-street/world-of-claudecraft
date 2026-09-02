@@ -5923,7 +5923,7 @@ export const hudChromeStrings = {
     salvage: 'Salvage',
     applyEnchant: 'Apply Enchant',
     // The Sundered Essence extraction row (Masterwrought phase 04), offered
-    // on raid-won epics only (bag_item_context_menu.ts isSunderable).
+    // on raid-won epic GEAR only (bag_item_context_menu.ts isSunderable).
     sunder: 'Sunder',
     // The vendor right-click / tap menu's own default row (Sell, since that is
     // what it runs there) and its Sell all (N) row (bag_item_context_menu.ts

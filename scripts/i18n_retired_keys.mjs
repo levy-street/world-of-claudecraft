@@ -151,6 +151,13 @@ export const RETIRED_KEYS = [
   // endgameMaterialsBodyAnyRaid says what the predicate does, and its five
   // non-Latin fills rode the same change.
   'guide.professions.endgameMaterialsBody',
+  // Phase 19F review round (2026-09-02, under qr-19-materialsbody-onramp-bill-
+  // omission): the engineering materials prose counted TWO rod recipes where
+  // ROD_RECIPES holds three; the successor materialsBodyThreeRods names the
+  // Clockreel bill and rides the bodyKey override in professions_craft.ts, and
+  // its five non-Latin fills (fresh, the old ones predated the live English)
+  // rode the same change.
+  'guide.profPages.craftProse.engineering.materialsBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

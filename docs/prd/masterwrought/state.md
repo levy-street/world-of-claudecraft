@@ -325,7 +325,7 @@ rescoped rather than any code changed.
 ## Naming registry (web-verified by the Phase 03 audit, 2026-08-07)
 Cap tag: "Unique-Equipped: Masterwrought (2)". Stage: "Perfecting".
 Shared items: Wyrmfall Core (tradable making-core), Sundered Essence (bound, from breaking
-down any raid epic of the tier), Maker's Ember (keystone), Apex Patterns (recipe items).
+down any raid epic of the tier; RULED qr-19-crucible-gear-sundering-admission 2026-09-02: any raid tier, either difficulty, GEAR only), Maker's Ember (keystone), Apex Patterns (recipe items).
 Per profession: Duskforged Billet / Forgefold Plating / Wyrmhide Cording / Sunspun Bolt /
 Prismglass Setting / Precision Chassis / Quickening Catalyst / Seasoned Stock / Lucent
 Reagent (intermediates); Ridgebreaker (2H), Gyrelens Array (gadget), Master's Field Forge,
@@ -20311,7 +20311,23 @@ ratification: its 'every land tool recipe' means the pick, axe and sickle lines 
 enumerates; the bronze hoe consumes Fine Vale Wheat, a farm fine roll rather than a vein material,
 and the hoe ladder is documented on the farming page. A future reword is a retire-and-re-key (a
 RETIRED_KEYS row, a successor key, five non-Latin fills in-change, the Latin rows to the release
-fill), never an in-place edit. Phase 19F; no code moved.
+fill), never an in-place edit. Phase 19F; the ratification itself moved no code.
+AMENDED 2026-09-02 by the D085 review round (qa-checklist, blocking): the ratified value was NOT
+clean. It said 'The two rod recipes break the pattern' where ROD_RECIPES holds three (the Clockreel,
+two Koi, ten Raw Hollowgill Sturgeon and the Tidewrought, was missing), the same by-count class the
+11o sweep fixed on identityBody and ladderBody and missed here; and its five non-Latin fills
+predated the live English (they still said the fine materials were sold at the toolworks). Fixed
+by the retire-and-re-key shape this ruling prescribes: the successor
+guide.profPages.craftProse.engineering.materialsBodyThreeRods (the count corrected, nothing else
+moved) rides the bodyKey override of proseSection in src/guide/pages/professions_craft.ts (the
+cooking identityBodyOneMeal precedent, which is how a craftProse body on a dynamic key path IS
+re-keyed; the 11o-era note that these keys 'could not be re-keyed' predates that override), the old
+key is retired in scripts/i18n_retired_keys.mjs, and five fresh non-Latin fills rode the same
+change (machine-authored, flagged for the maintainer's read); the 15 Latin rows land pending for
+the Phase 20 fill. Two corrections to the ratification's own text: the hoe ladder is documented in
+the gathering pages' tools note (guide.profPages.toolsNoteFiveLadders), the guide has no farming
+page; and identityBody already names both on-ramp recipes (the Cogwheel Blank and the Copperlens
+Ocular), so the altitude call was about the bills, never the recipes.
 note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
 placement note; the amendment-dating shortfall (corrected by this
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as amendment-dating-shortfall; refusal-control-placement.
@@ -26144,6 +26160,15 @@ draft, 120 of 120, verified by slug. The draft's own prose was stale in one plac
   Temple entry and re-localized by matching that raw text, so both layers an
   English player resolves through carried the dash. Fixed in both files
   byte-identically, with a deploy-window alias (below).
+  THE ALIAS RECORD (RULED qr-19-drowned-temple-entertext-deploy-alias, 2026-09-02, Phase 19F):
+  the arm is the template-literal branch of Hud.localizeSystemText (src/ui/hud.ts) that
+  resolves the pre-reword sentence to dungeonText('drowned_temple', 'enterText'); it rode the
+  tenth-sync merge c659387f9a as this QA round's edit and became an alias in f14f015a7b, the
+  reword. Pinned at Phase 19F by 'the Drowned Temple enterText reword keeps its deploy-window
+  alias (D150)' in tests/localization_fixes.test.ts (a bare Hud prototype drives the private
+  method in every locale; mutation-proved red with the arm removed); retire arm and pin once
+  the release this branch integrates onto (release/v0.42.0 at the time of writing) is fully
+  deployed. The full ruling sits on the D150 row of phase-19-rulings-gate.md.
 - **THE CENSUS RELOCATION: five rows, and the "three" is a different event.** The
   five literal-only rows moved out of the extras table are real and each carries
   its definition line, call site, test assertion and the exclusion that makes it

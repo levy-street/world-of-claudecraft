@@ -2005,7 +2005,13 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
       setLanguage('en');
     }
   });
+});
 
+// --- Deploy-window aliases for wire-carried renames. A not-yet-restarted
+// server still emits the pre-rename or pre-reword bytes, so the client keeps a
+// legacy match arm until the release carrying the change is fully deployed,
+// then drops it (the Venomfire precedent below is the retired shape).
+describe('deploy-window aliases for wire-carried renames', () => {
   it('the retired Venomfire Vigor deploy-window alias stays deleted', () => {
     // The alias row ("drop after v0.29.0 ships") outlived its deploy window by
     // eleven releases; Phase 18 removed it. An unmapped legacy aura name now
@@ -2020,14 +2026,38 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     // long shipped): a not-yet-restarted server still emits the pre-rename
     // strings, so the new client must localize them until the release
     // carrying the rename fully ships. These two ride the masterwrought
-    // branch, which integrates onto release/v0.41.0; drop them once that
-    // release is fully deployed.
+    // branch; drop them once the release it integrates onto (release/v0.42.0
+    // at the time of writing) is fully deployed.
     setLanguage('en');
     expect(localizeSimAuraName('Winterbite')).toBe(localizeSimAuraName('Wintergnaw'));
     const legacyLine = "The dead answer Deacon Varric's call!";
     const canonicalLine = "The dead answer Deacon Vandric's call!";
     expect(localizeSimText(legacyLine)).toBe(localizeSimText(canonicalLine));
     expect(localizeSimText(legacyLine)).not.toBe(legacyLine);
+  });
+
+  it('the arena queue line keeps its three-dot legacy twin beside the ellipsis form', () => {
+    // The same class as the two pins around it: the sim emits the ellipsis
+    // form (src/sim/social/arena.ts) and the exact map in localizeSystemText
+    // carries the three-dot spelling a not-yet-restarted server still sends.
+    // Nothing pinned the legacy row until the D150 review found it, so a
+    // merge could have dropped it in silence.
+    interface SystemTextHarness {
+      localizeSystemText(text: string): string;
+    }
+    const harness = Object.create(Hud.prototype) as unknown as SystemTextHarness;
+    const legacy = 'You join the Ashen Coliseum queue. Stand by for a worthy opponent...';
+    const live = 'You join the Ashen Coliseum queue. Stand by for a worthy opponent…';
+    try {
+      for (const lang of supportedLanguages) {
+        setLanguage(lang);
+        const canonical = harness.localizeSystemText(live);
+        expect(canonical, lang).toBe(t('hud.logs.arenaJoin'));
+        expect(harness.localizeSystemText(legacy), lang).toBe(canonical);
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('the Drowned Temple enterText reword keeps its deploy-window alias (D150)', () => {
@@ -2052,7 +2082,7 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     const harness = Object.create(Hud.prototype) as unknown as SystemTextHarness;
     const live = DUNGEON_LIST.find((d) => d.id === 'drowned_temple')?.enterText;
     expect(live, 'the Drowned Temple ships').toBeDefined();
-    if (!live) return;
+    if (!live) throw new Error('the Drowned Temple left DUNGEON_LIST');
     expect(live).toContain('the air turns to cold water');
     expect(live).not.toContain('\u2014');
     const legacy =
@@ -2061,6 +2091,11 @@ describe('elixir aura names stay wired to the sim aura matcher', () => {
     // so the alias covers exactly the reword and nothing wider.
     expect(legacy).not.toBe(live);
     expect(legacy.replace(' \u2014 ', ': ')).toBe(live);
+    // The English catalog copy must equal the content copy byte for byte: the
+    // content copy is the match key and the catalog copy is what renders, so
+    // a reword that moved only one of them would render the other in silence.
+    setLanguage('en');
+    expect(dungeonText('drowned_temple', 'enterText')).toBe(live);
     try {
       for (const lang of supportedLanguages) {
         setLanguage(lang);
