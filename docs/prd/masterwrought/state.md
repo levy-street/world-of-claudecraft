@@ -94,6 +94,13 @@ Branch: `feature/masterwrought` (worktree `~/Documents/wocc-masterwrought`), bas
 3. R3 Orange is prestige and process only in v1: unique name via Deed of Making, distinct
    visuals, crafter signature, deed credit. No unique combat effects. Sub-cap: at most ONE
    legendary-quality crafted piece equipped, inside the global cap.
+   AMENDED 2026-09-01 by qr-19-apex-tier-vs-crucible-placement (sub-decision S1):
+   read "one MASTERWROUGHT-FLAGGED legendary-quality crafted piece". The English
+   was written when the packet's family was the only crafted tier and reads on
+   ANY crafted legendary, which the staged Crucible fast-follow's crafted
+   legendary would satisfy; the code has always been narrower
+   (masterwroughtConflictSlot returns null on an unflagged def), so this makes
+   the prose agree with the implementation rather than changing behavior.
 4. R4 Keystone: "Maker's Ember", soulbound, 1 per week per character, BANKABLE (missed
    weeks accrue), earnable from any endgame pillar (raid, heroic five-mans, rifts).
 5. R5 Power envelope: full kit (2 Perfected pieces + apex enchants + flask + food) at most
@@ -300,6 +307,20 @@ packet rule: the R5 surface is frozen until ruled.
   every apex piece's rating allocation is pinned against the same-band raid or
   heroic-vendor equivalent in tests. This is the throttle-proof surface; treat it as
   budgeted even though the formula does not.
+RULED (qr-19-apex-tier-vs-crucible-placement, 2026-09-01, under
+qr-19-best-for-project): the raid tier sits ABOVE the apex tier, and that is
+ACCEPTED. The three lines the eighth sync stamped stale stay exactly as
+written, as the record of what the phases authored against; this line is the
+live placement. Nothing above is rewritten and no def, recipe level or item id
+moves, because re-tiering the apex pieces would re-cut the frozen R5 surface
+and would also outbid the maintainer's own fixed Crucible scope. Apex base
+stays ilvl 31 and Perfected ilvl 34; the Crucible dropped epics sit at 35 and
+its staged crafted epics at 37, so "one to two points over the raid chest per
+slot" is superseded and "below raid 33/23" now reads against a raid the packet
+predates. SUB-DECISION S1, ruled with it: the staged Crucible crafted
+fast-follow stays OUTSIDE the masterwrought family (no flag, no cap), which is
+what src/sim/equipment_rules.ts already implements, so R3's sub-cap wording is
+rescoped rather than any code changed.
 
 ## Naming registry (web-verified by the Phase 03 audit, 2026-08-07)
 Cap tag: "Unique-Equipped: Masterwrought (2)". Stage: "Perfecting".
@@ -22963,6 +22984,23 @@ against the retuned references; REF_ARMOR against the raid-era live kit; the
 Crucible gear tier's sundering admission. The four ratified rulings and the
 closure record above stand untouched; what moved is the CATALOG under the
 measurement, not any packet def or record row.
+RULED (qr-19-apex-tier-vs-crucible-placement, 2026-09-01, under
+qr-19-best-for-project), answering the apex-versus-Crucible placement half of
+this block and the crafted fast-follow folded into it: the raid tier above the
+apex tier is ACCEPTED and the packet's placement PROSE is amended, never any
+def. The measured facts this rests on were re-measured at execution and hold:
+all nine classes' dev-bis loadouts carry ZERO flagged pieces, the flagged
+family is still 17, and every one of the 17 at-band crafted outputs is flagged.
+The ilvl-31 crafted-band pin, which is green today and reds when PR 3704 lands,
+is rescoped with a NAMED Crucible carve-out (empty until those recipes exist,
+each entry checked against the tree) rather than re-keyed to the family, which
+would have removed the unflagged-band-reacher hole the arm exists to close. The
+two dev-bis premise pins are re-derived and flipped back to it(): the exact
+count becomes the INVARIANT (at most the cap) plus a dated ZERO observation,
+and the by-id lists are re-authored to the merged truth with the displaced ids
+kept in the comment. The R5 lead-cap arm and the pbe_boost pair are NOT flipped
+here: their own notes assign them to the re-measure question, which is a
+different row.
 
 ### THE FROZEN STAMP: EXIT=0 at e611b0639d, the gate's bounded form
 Taken 2026-08-29T12:38:33Z to 12:48:32Z, one run, first try, at the phase

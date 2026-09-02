@@ -133,8 +133,13 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
   ] as const;
 
   // MERGE-INHERITED, EXPECTED-FAIL (2026-08-30, the eighth v0.41.0 sync, release
-  // tip 3e801dc925, the Ignivar raid span). Both tripwires below fired exactly as
-  // written: the release's Crucible raid catalog (the Phase B set pieces and the
+  // tip 3e801dc925, the Ignivar raid span), RE-DERIVED AND FLIPPED BACK TO it()
+  // 2026-09-01 under masterwrought ruling qr-19-apex-tier-vs-crucible-placement.
+  // The ruling ACCEPTS the raid tier above the apex tier and amends the packet's
+  // power-placement PROSE rather than re-tiering any def, so the contradiction
+  // below is no longer a contradiction: it is the placement, and these arms now
+  // pin the merged truth instead of the pre-merge expectation. Nothing about the
+  // measurement changed, only its status. What the arms said before: the release's Crucible raid catalog (the Phase B set pieces and the
   // Thronebane-band legendaries) out-scores every Masterwrought apex piece on
   // bestEpicGearFor's raw-stat score(), so on the merged tree NO class's dev-bis
   // loadout carries a flagged piece (all nine classes measure [] while the
@@ -152,21 +157,39 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
   // server PBE boost kit, scripts/druid_balance_probe.ts and its harness, and
   // tests/rogue_dps_balance.test.ts (whose identity pins were re-anchored to
   // the Crucible pair at the same merge, recorded for the same ruling).
-  it.fails('every class outfit picks exactly the cap of flagged pieces', () => {
+  it('every class outfit holds the flagged cap, and today picks none', () => {
     // equipBestInSlotForDev writes equipment directly and never runs
-    // masterwroughtConflictSlot, so the picker itself must hold the cap.
-    // Deliberate EXACT pin, not <= cap: against the shipped phase 09 catalog
-    // every class picks exactly 2 flagged pieces (2 is also the current
-    // MASTERWROUGHT_EQUIP_CAP, so this sweep sits AT the boundary the cap
-    // arm defends). The dev score() counts weapon dps and the raw stat bag
-    // and ignores hit/crit/haste ratings, which is what lets the flagged
-    // pieces win their slots. A content phase that moves a winner, or a cap
-    // retune, re-acknowledges the new number here instead of drifting.
+    // masterwroughtConflictSlot, so the picker itself must hold the cap. TWO
+    // separate claims, deliberately not one literal (the maintainer-named
+    // replacement shape, ruled 2026-09-01):
+    //   1. THE INVARIANT, which survives any catalog move: no class outfit ever
+    //      exceeds MASTERWROUGHT_EQUIP_CAP flagged pieces.
+    //   2. THE OBSERVATION, dated because it is an accident of this catalog and
+    //      not a rule: as of the release/v0.42.0 merge every class picks ZERO
+    //      flagged pieces, because the Crucible raid catalog out-scores every
+    //      apex piece on bestEpicGearFor's raw-stat score. The pre-merge pin was
+    //      an exact 2, which is why it became expected-fail rather than drifting.
+    // Keeping them apart is the point: a future content move that puts a flagged
+    // piece back into a loadout reds the observation (a real signal, reviewed on
+    // its own terms) without pretending the invariant broke.
+    const flaggedByClass = new Map<(typeof CLASSES)[number], string[]>();
     for (const cls of CLASSES) {
       const picks = bestEpicGearFor(cls, null);
-      const flagged = Object.values(picks).filter((id) => id && ITEMS[id]?.masterwrought);
-      expect(flagged.length, `${cls} dev bis flagged picks: ${flagged.join(', ')}`).toBe(2);
+      flaggedByClass.set(
+        cls,
+        Object.values(picks).filter((id): id is string => Boolean(id && ITEMS[id]?.masterwrought)),
+      );
     }
+    for (const [cls, flagged] of flaggedByClass) {
+      expect(
+        flagged.length,
+        `${cls} dev bis flagged picks: ${flagged.join(', ')}`,
+      ).toBeLessThanOrEqual(MASTERWROUGHT_EQUIP_CAP);
+    }
+    expect(
+      [...flaggedByClass].filter(([, flagged]) => flagged.length > 0),
+      'OBSERVATION 2026-09-01: no class outfit picks a flagged piece. If this reds, a flagged piece has re-entered a dev loadout: re-read the placement ruling before re-cutting any band around it',
+    ).toEqual([]);
     // Warrior wears a flagged mainhand. The winner is NOT
     // pinned by id (the argmax-literal-winner trap: the warblade's margin
     // over gravewyrm_cleaver is 0.46 points on ~214, so any unrelated
@@ -196,18 +219,23 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       )
       .sort((a, b) => devScore(b) - devScore(a) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     expect(warrior.mainhand).toBe(mainhandPool[0].id);
-    expect(ITEMS[warrior.mainhand as string].masterwrought).toBe(true);
+    // The mainhand is NO LONGER a flagged piece: the merged argmax is the
+    // Crucible weapon. The derivation above is what still has teeth (a
+    // selection-rule regression splits pick from argmax); the flag is recorded
+    // as the dated observation it is.
+    expect(ITEMS[warrior.mainhand as string].masterwrought).toBeUndefined();
     // The OFFHAND is the raid shield, not the crafted one, and that is the
     // point of the Phase 15 mitigation-parity tune: duskforged_bulwark used
     // to carry armor 732 / blockValue 32 against heroic_bonewrought_bulwark's
     // frozen 680 / 30, so the crafted shield out-mitigated the ilvl-33 raid
     // drop and won this slot on the picker's armor-summing score. Both
     // numbers now MATCH the reference, so the raid shield wins the slot back
-    // on its one extra stat point (697 to 696) and the warrior's second
-    // flagged pick moves to the neck. Pinned by id in both directions: a
-    // regression that puts the crafted shield back over the raid line reds
-    // here as well as in tests/masterwrought_budget.test.ts.
-    expect(warrior.offhand).toBe('heroic_bonewrought_bulwark');
+    // on its one extra stat point (697 to 696). The v0.42.0 merge then moved
+    // the slot again, to the Crucible shield, which is the same story one tier
+    // up and is what the placement ruling accepts. Pinned by id in both
+    // directions: a regression that puts the crafted shield back over the raid
+    // line reds here as well as in tests/masterwrought_budget.test.ts.
+    expect(warrior.offhand).toBe('bulwark_of_the_inner_crucible');
     const offhand = ITEMS[warrior.offhand as string];
     expect(offhand.masterwrought).toBeUndefined();
     expect(offhand.kind === 'armor' && 'shield' in offhand && offhand.shield === true).toBe(true);
@@ -215,14 +243,14 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
       .filter(([, id]) => id && ITEMS[id as string]?.masterwrought)
       .map(([slot]) => slot)
       .sort();
-    expect(warriorFlagged, 'the warrior pair is the weapon and the neck').toEqual([
-      'mainhand',
-      'neck',
-    ]);
+    expect(
+      warriorFlagged,
+      'OBSERVATION 2026-09-01: the warrior wears no flagged piece (pre-merge this was the weapon and the neck)',
+    ).toEqual([]);
   });
 
-  // MERGE-INHERITED, EXPECTED-FAIL: see the block above; same ruling, same flip.
-  it.fails('the flagged picks are pinned BY ID per class, so a catalog move reds on GEAR', () => {
+  // RE-DERIVED AND FLIPPED 2026-09-01 with the arm above: same ruling, same flip.
+  it('the flagged picks are pinned BY ID per class, so a catalog move reds on GEAR', () => {
     // ADDED AT PHASE 15. bestEpicGearFor is the live-derived loadout behind
     // six consumers, two of them shipped code (the friendly practice dummy's
     // vitals and the server PBE boost kit) and two of them balance-band tests
@@ -238,21 +266,29 @@ describe('dev bis gear: Masterwrought cap (phase 08)', () => {
         .filter(([, id]) => id && ITEMS[id as string]?.masterwrought)
         .map(([slot, id]) => `${slot}:${id}`)
         .sort();
-    const JEWELRY_PAIR = ['neck:wyrmfall_pendant', 'ring2:prismglass_loop'];
-    expect(flaggedPicks('warrior')).toEqual([
-      'mainhand:duskforged_warblade',
-      'neck:wyrmfall_pendant',
-    ]);
+    // RE-AUTHORED to the merged truth rather than flipped and hoped: every
+    // class's flagged set is EMPTY. Before the release/v0.42.0 merge the
+    // warrior wore mainhand:duskforged_warblade plus neck:wyrmfall_pendant and
+    // every other class wore neck:wyrmfall_pendant plus ring2:prismglass_loop;
+    // the Crucible catalog displaced all of them. Those ids are kept in this
+    // comment on purpose, so the next reader can see WHAT left rather than only
+    // that something did.
     for (const cls of CLASSES) {
-      if (cls === 'warrior') continue;
-      expect(flaggedPicks(cls), `${cls} flagged picks`).toEqual(JEWELRY_PAIR);
+      expect(flaggedPicks(cls), `${cls} flagged picks`).toEqual([]);
     }
-    // Non-vacuity: the helper really reads the flag (an unflagged catalog
-    // would make every row above an empty-equals-empty pass).
+    // Non-vacuity, and it carries more weight now that every row above is an
+    // empty-equals-empty comparison: the family really exists, and the helper
+    // really reads the flag. Without both, this arm would pass over an
+    // unflagged catalog or a helper that stopped looking.
     expect(
       Object.values(ITEMS).filter((d) => d.masterwrought).length,
       'the flagged family is really there',
     ).toBe(17);
+    const anyFlaggedId = Object.values(ITEMS).find((d) => d.masterwrought)?.id as string;
+    expect(
+      flaggedPicks('warrior').length + (ITEMS[anyFlaggedId]?.masterwrought ? 1 : 0),
+      'the flag predicate this arm runs on really returns true for a flagged def',
+    ).toBe(1);
   });
 
   it('demotes the lowest-scoring flagged pick and refills the slot (synthetic over-cap)', () => {

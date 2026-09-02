@@ -1739,6 +1739,52 @@ describe('masterwrought apex budget sweep', () => {
     }
   });
 
+  // THE NAMED CRUCIBLE CARVE-OUT (masterwrought ruling
+  // qr-19-apex-tier-vs-crucible-placement, 2026-09-01). The arm below sweeps
+  // EVERY recipe in the game, which is the whole point of it: an unflagged,
+  // full-budget, item-level-31 epic authored into any OTHER recipe array is
+  // invisible to the two-piece family cap, because masterwroughtConflictSlot
+  // returns null on an unflagged def. The release's staged Crucible crafted
+  // fast-follow (PR 3704) will land epics at ilvl 37 that are DELIBERATELY
+  // outside the masterwrought family (sub-decision S1: the fast-follow does not
+  // inherit the flag or the cap, which is what the code already implements), so
+  // it would red this arm for a ruled reason.
+  //
+  // The ruling's shape is a NAMED carve-out on the ignivar_loot precedent, NOT
+  // a re-key of the sweep to the masterwrought family: re-keying would remove
+  // exactly the hole the arm exists to close. Empty today, because none of
+  // those recipes is in the tree yet. Adding an entry is a reviewable act with
+  // a written reason, and the arm below checks the claim rather than trusting
+  // it, so an entry that does not describe a real band-reaching unflagged
+  // recipe fails here instead of silently exempting something else.
+  const CRUCIBLE_BAND_CARVE_OUT: ReadonlyArray<{
+    readonly recipeId: string;
+    readonly reason: string;
+  }> = [];
+
+  it('every band carve-out entry names a real, unflagged, band-reaching recipe', () => {
+    const stale: string[] = [];
+    for (const entry of CRUCIBLE_BAND_CARVE_OUT) {
+      const recipe = ALL_RECIPES.find((r) => r.id === entry.recipeId);
+      if (!recipe) {
+        stale.push(`${entry.recipeId}: no such recipe; drop the entry`);
+        continue;
+      }
+      const def = ITEMS[recipe.resultItemId] as (ItemDef & Record<string, unknown>) | undefined;
+      const ilvl = def ? itemLevel(def) : undefined;
+      if (ilvl === undefined || ilvl < 31)
+        stale.push(
+          `${entry.recipeId}: output does not reach the apex band, so it needs no carve-out`,
+        );
+      if (def?.masterwrought === true)
+        stale.push(
+          `${entry.recipeId}: output IS flagged, so it belongs in the apex arrays, not here`,
+        );
+      expect(entry.reason.length, `${entry.recipeId} needs a written reason`).toBeGreaterThan(40);
+    }
+    expect(stale, stale.join('; ')).toEqual([]);
+  });
+
   it('no crafted output outside the apex arrays reaches the apex item level', () => {
     // ADDED AT PHASE 15. The completeness arm above enumerates only three of
     // ALL_RECIPES' arrays, so an unflagged, full-budget, item-level-31 epic
@@ -1753,10 +1799,12 @@ describe('masterwrought apex budget sweep', () => {
         (r) => r.resultItemId,
       ),
     );
+    const carvedOut = new Set(CRUCIBLE_BAND_CARVE_OUT.map((entry) => entry.recipeId));
     let scanned = 0;
     const offenders: string[] = [];
     for (const recipe of ALL_RECIPES) {
       scanned++;
+      if (carvedOut.has(recipe.id)) continue;
       const def = ITEMS[recipe.resultItemId] as (ItemDef & Record<string, unknown>) | undefined;
       if (!def) continue;
       const ilvl = itemLevel(def);
@@ -1768,7 +1816,12 @@ describe('masterwrought apex budget sweep', () => {
     // Non-vacuity: the sweep's own filter really finds the apex band when it
     // is there, so an empty offender list means "all flagged", not "none
     // reached the band".
-    const atBand = ALL_RECIPES.filter((r) => (itemLevel(ITEMS[r.resultItemId]) ?? 0) >= 31);
+    const atBand = ALL_RECIPES.filter(
+      (r) => !carvedOut.has(r.id) && (itemLevel(ITEMS[r.resultItemId]) ?? 0) >= 31,
+    );
+    // The literal survives the carve-out by construction: an entry only ever
+    // removes a recipe the packet does not own, so 17 is still the packet's own
+    // at-band family. If this number moves, a masterwrought recipe moved.
     expect(atBand.length, 'recipes really do reach the apex band').toBe(17);
     for (const r of atBand) expect(apexOutputs.has(r.resultItemId), r.id).toBe(true);
     expect(offenders, 'an unflagged crafted output reached the apex item level').toEqual([]);
