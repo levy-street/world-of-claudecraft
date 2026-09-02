@@ -158,6 +158,14 @@ export const RETIRED_KEYS = [
   // its five non-Latin fills (fresh, the old ones predated the live English)
   // rode the same change.
   'guide.profPages.craftProse.engineering.materialsBody',
+  // Phase 19F (2026-09-02, ruling qr-19-rarebody-reword-landmine): the shared
+  // 'Rare finds' prose of the four gathering pages named the three node
+  // windfalls and not farming's golden harvest, which rolls the same event;
+  // the successor rareBodyFourFlavors names all four with the maintainer's
+  // wording, and its five non-Latin fills rode the same change (the old key's
+  // five non-Latin fills had omitted the flavor names and the deed sentence
+  // since they were written).
+  'guide.profPages.rareBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

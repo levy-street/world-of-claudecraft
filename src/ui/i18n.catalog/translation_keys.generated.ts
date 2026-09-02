@@ -6784,6 +6784,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.prov.tableHeading'
   | 'guide.profPages.prov.title'
   | 'guide.profPages.rareBody'
+  | 'guide.profPages.rareBodyFourFlavors'
   | 'guide.profPages.rareHeading'
   | 'guide.profPages.recipesHeading'
   | 'guide.profPages.recipesNote'

@@ -11925,6 +11925,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.rareHeading': '稀有發現',
   'guide.profPages.rareBody':
     '每次採集都有{oneIn}分之一的機率觸發稀有發現：產量乘以{mult}、必定署名，並向全區域播報。',
+  'guide.profPages.rareBodyFourFlavors':
+    '無論你的熟練度高低，每一次採集都有{oneIn}分之一的機率觸發稀有發現：礦石中的純淨礦脈、木材裡的遠古心木、草藥間的月光之花，或田畦上的金色豐收。這次發現會讓該次採集的產量乘以{mult}倍，不論擲出的品質如何，每一個單位都會署上你的名字，而整個區域都會聽到這項發現連著你的名字一同播報。每一種稀有發現還會在你的功績之書裡銘刻各自的零名望功績，一枚純粹用來證明這件事確實發生在你身上的收藏印記。',
   'guide.profPages.specimenBody':
     '採集屍體還可能獲得署名的完美標本：約{pct}%的屍體採集會擲出精良或更高品質。',
   'guide.profPages.fish.biteHeading': '咬鉤與收線',

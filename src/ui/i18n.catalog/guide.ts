@@ -3029,8 +3029,17 @@ export const guideStrings = {
       "Proficiency bands are the shared 0/100/200 ladder over a land trade's counter: the band crossed at 100 shaves the gather cast, and the land cap makes band 1 the ceiling. Fishing keeps a ladder of its own, six rungs at 0, 100, 150 and then three more at 200. Its bands shave nothing; they select the catch tables, each with a rod to match. After that third rung the gate moves once more, to the 200 cap, and then stops: from the cap on, the rod alone decides how far the table goes. The climb is what pulls an angler to deeper water, where the better tables and the further lessons both live.",
     bandFmt: 'Band {band}: from {at} proficiency',
     rareHeading: 'Rare finds',
+    // RETIRED at masterwrought Phase 19F (2026-09-02, ruling
+    // qr-19-rarebody-reword-landmine): shared by the four gathering pages, it
+    // named the three node windfalls and not farming's golden harvest, which
+    // rolls the same event. Superseded by rareBodyFourFlavors below (the
+    // maintainer's wording for the crop windfall) and listed in
+    // scripts/i18n_retired_keys.mjs; kept so the reviewed overlay rows never
+    // strand (the reword-is-a-new-key convention).
     rareBody:
       "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
+    rareBodyFourFlavors:
+      "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs, a golden harvest from a garden bed. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
     specimenBody:
       'Keep a little bag room spare when you farm: a signed windfall needs room of its own or a matching signed stack to land in, and if nothing fits the yield still arrives but the signature is lost. Corpse harvesting has its own jackpot arm too: about {pct}% of each harvested component comes up rare or better. A family with a perfect specimen to give (hide, silk, venom, meat) keeps its ordinary yield plain and mints the signed specimen beside it; every other family signs the yield itself.',
     gatherDeedsHeading: 'Deeds along the way',

@@ -12483,6 +12483,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.rareHeading': '珍しい発見',
   'guide.profPages.rareBody':
     '採集のたびに{oneIn}分の1の確率で珍しい発見が起こり、収穫が{mult}倍になり、必ず署名され、ゾーン全体に告知されます。',
+  'guide.profPages.rareBodyFourFlavors':
+    '採集のたびに、熟練の高さを問わず{oneIn}分の1の確率で珍しい発見が起こります。鉱石なら純粋な鉱脈、材木なら太古の心木、薬草の茂みなら月光の花、畑の畝からなら黄金の収穫です。発見が起きるとその回の収穫は{mult}倍になり、引き当てた品質にかかわらず一つ残らずあなたの名前で署名され、ゾーン全体があなたの名とともにその報せを耳にします。さらに四つの発見はそれぞれ専用の名声ゼロの功績を功績の書に刻みます。それがあなたの身に起きたと証明するためだけに存在する収集印です。',
   'guide.profPages.specimenBody':
     '死体の採集では署名入りの完璧な標本が見つかることもあります。死体採集の約{pct}%はレア以上を引き当てます。',
   'guide.profPages.fish.biteHeading': 'アタリとリール',

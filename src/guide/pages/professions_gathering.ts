@@ -178,7 +178,7 @@ function rareSection(): string {
   const rare = GUIDE_PROF_CURVE.rareEvent;
   return `<section class="guide-block" id="prof-rare">
       <h2>${esc(t('guide.profPages.rareHeading'))}</h2>
-      ${paras('guide.profPages.rareBody', {
+      ${paras('guide.profPages.rareBodyFourFlavors', {
         oneIn: formatNumber(rare.oneIn),
         mult: formatNumber(rare.yieldMult),
       })}
