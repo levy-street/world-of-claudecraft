@@ -11,6 +11,16 @@
 // tests/blade_grass_pool_core.test.ts.
 
 /**
+ * The world cell, on one axis, that grid line `g` owns for the block starting
+ * at `base`: the unique cell congruent to `g` modulo the grid width inside
+ * [base, base + gridW). This is what makes the pool toroidal, so walking
+ * re-places only the lines whose owned cell changed.
+ */
+export function toroidalCell(base: number, g: number, gridW: number): number {
+  return base + ((((g - base) % gridW) + gridW) % gridW);
+}
+
+/**
  * World coordinate, on one axis, of the centre of the cell the player stands
  * in for the block starting at `base`. The block base is
  * `floor(playerAxis / cell) - (gridW >> 1)`, so adding the same half-width

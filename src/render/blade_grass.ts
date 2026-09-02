@@ -6,7 +6,19 @@ import {
   type DenseSlotState,
   deactivateDenseSlot,
 } from './blade_grass_dense_core';
-import { insidePoolDisc, poolDiscCenter, poolDiscLimitSq } from './blade_grass_pool_core';
+import {
+  insidePoolDisc,
+  poolDiscCenter,
+  poolDiscLimitSq,
+  toroidalCell,
+} from './blade_grass_pool_core';
+import {
+  clearUploadBands,
+  collectUploadRanges,
+  createUploadBands,
+  createUploadRangeScratch,
+  markUploadDirty,
+} from './blade_grass_upload_bands_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -225,8 +237,11 @@ export function buildBladeGrass(
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
   const movedColor = new THREE.Color();
-  let dirtyLo = POOL;
-  let dirtyHi = -1;
+  // One coarse block per grid row's worth of dense indices, so a crossing
+  // uploads the instances it actually touched instead of the span between
+  // the lowest and the highest of them (blade_grass_upload_bands_core.ts).
+  const uploadBands = createUploadBands(POOL, GRID_W);
+  const uploadRanges = createUploadRangeScratch(uploadBands);
   // The grid is square but the fade is a disc, so the corners are placed,
   // uploaded and vertex-shaded only to be collapsed to zero scale in the
   // shader. Rejecting them at placement is invisible by construction (see
@@ -236,8 +251,23 @@ export function buildBladeGrass(
   let discCenterZ = 0;
 
   const markDirty = (dense: number): void => {
-    if (dense < dirtyLo) dirtyLo = dense;
-    if (dense > dirtyHi) dirtyHi = dense;
+    markUploadDirty(uploadBands, dense);
+  };
+
+  // Queue this frame's dirty blocks. Ranges are queued, never cleared here:
+  // the renderer clears them after it actually uploads, so a skipped frame
+  // keeps its pending spans alive.
+  const uploadDirtyRanges = (): void => {
+    const ranges = collectUploadRanges(uploadBands, uploadRanges);
+    if (ranges === 0) return;
+    for (let r = 0; r < ranges; r++) {
+      const start = uploadRanges[r * 2];
+      const count = uploadRanges[r * 2 + 1];
+      im.instanceMatrix.addUpdateRange(start * 16, count * 16);
+      if (im.instanceColor) im.instanceColor.addUpdateRange(start * 3, count * 3);
+    }
+    im.instanceMatrix.needsUpdate = true;
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
   };
 
   const hash = (i: number, j: number, k: number): number => {
@@ -331,11 +361,11 @@ export function buildBladeGrass(
     for (let gi = 0; gi < GRID_W; gi++) {
       // world cell owned by slot (gi, gj): the unique cell in the target
       // block congruent to (gi, gj) mod GRID_W
-      colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
+      colCi[gi] = toroidalCell(baseI, gi, GRID_W);
     }
     let budget = initialBudget;
     for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
-      const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
+      const cjj = toroidalCell(baseJ, gj, GRID_W);
       const packedLo = cjj & 0xffff;
       const rowBase = gj * GRID_W;
       for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
@@ -357,8 +387,7 @@ export function buildBladeGrass(
   const initialBaseJ = Math.floor(initialPz / CELL) - (GRID_W >> 1);
   scanTargetBlock(initialBaseI, initialBaseJ, Number.POSITIVE_INFINITY);
   im.count = denseSlots.count;
-  dirtyLo = POOL;
-  dirtyHi = -1;
+  clearUploadBands(uploadBands);
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
@@ -373,25 +402,13 @@ export function buildBladeGrass(
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
       lastBaseI = baseI;
       lastBaseJ = baseJ;
-      // dirty slot span: re-placed slots this frame, so the GPU upload can
-      // cover just that range of the instance buffers instead of the pool
-      dirtyLo = POOL;
-      dirtyHi = -1;
+      // re-placed slots this frame, banded so the GPU upload covers the
+      // instances that actually moved instead of the span between them
+      clearUploadBands(uploadBands);
       const previousCount = denseSlots.count;
       pending = scanTargetBlock(baseI, baseJ, PLACE_BUDGET);
       if (denseSlots.count !== previousCount) im.count = denseSlots.count;
-      if (dirtyHi >= 0) {
-        // partial upload: only the touched slot span goes to the GPU. Ranges
-        // are queued, never cleared here: the renderer clears them after it
-        // actually uploads, so a skipped frame keeps its pending span alive.
-        const count = dirtyHi - dirtyLo + 1;
-        im.instanceMatrix.addUpdateRange(dirtyLo * 16, count * 16);
-        im.instanceMatrix.needsUpdate = true;
-        if (im.instanceColor) {
-          im.instanceColor.addUpdateRange(dirtyLo * 3, count * 3);
-          im.instanceColor.needsUpdate = true;
-        }
-      }
+      uploadDirtyRanges();
     },
   };
 }

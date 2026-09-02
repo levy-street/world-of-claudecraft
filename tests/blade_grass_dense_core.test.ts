@@ -60,8 +60,9 @@ describe('blade grass dense submission', () => {
     for (const transitionWork of [
       'scanTargetBlock(baseI, baseJ, PLACE_BUDGET)',
       'im.count = denseSlots.count;',
-      'im.instanceMatrix.needsUpdate = true;',
-      'im.instanceColor.needsUpdate = true;',
+      // the queued ranges themselves live in uploadDirtyRanges, banded by
+      // blade_grass_upload_bands_core.ts; the update only calls it
+      'uploadDirtyRanges();',
     ]) {
       expect(updateSource.indexOf(transitionWork)).toBeGreaterThan(steadyReturn);
     }

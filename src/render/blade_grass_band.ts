@@ -30,7 +30,19 @@ import {
   type DenseSlotState,
   deactivateDenseSlot,
 } from './blade_grass_dense_core';
-import { insidePoolDisc, poolDiscCenter, poolDiscLimitSq } from './blade_grass_pool_core';
+import {
+  insidePoolDisc,
+  poolDiscCenter,
+  poolDiscLimitSq,
+  toroidalCell,
+} from './blade_grass_pool_core';
+import {
+  clearUploadBands,
+  collectUploadRanges,
+  createUploadBands,
+  createUploadRangeScratch,
+  markUploadDirty,
+} from './blade_grass_upload_bands_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -178,8 +190,11 @@ export function buildBladeGrassBand(
   const sv = new THREE.Vector3();
   const c = new THREE.Color();
   const movedColor = new THREE.Color();
-  let dirtyLo = POOL;
-  let dirtyHi = -1;
+  // One coarse block per grid row's worth of dense indices, so a crossing
+  // uploads the instances it actually touched instead of the span between
+  // the lowest and the highest of them (blade_grass_upload_bands_core.ts).
+  const uploadBands = createUploadBands(POOL, GRID_W);
+  const uploadRanges = createUploadRangeScratch(uploadBands);
   // The carpet's disc rejection, at the band's radius: the square grid's
   // corners fade to zero scale in the shader whatever uBandFar says, so they
   // are placed and vertex-shaded for nothing (blade_grass_pool_core.ts).
@@ -188,8 +203,23 @@ export function buildBladeGrassBand(
   let discCenterZ = 0;
 
   const markDirty = (dense: number): void => {
-    if (dense < dirtyLo) dirtyLo = dense;
-    if (dense > dirtyHi) dirtyHi = dense;
+    markUploadDirty(uploadBands, dense);
+  };
+
+  // Queue this frame's dirty blocks. Ranges are queued, never cleared here:
+  // the renderer clears them after it actually uploads, so a skipped frame
+  // keeps its pending spans alive.
+  const uploadDirtyRanges = (): void => {
+    const ranges = collectUploadRanges(uploadBands, uploadRanges);
+    if (ranges === 0) return;
+    for (let r = 0; r < ranges; r++) {
+      const start = uploadRanges[r * 2];
+      const count = uploadRanges[r * 2 + 1];
+      im.instanceMatrix.addUpdateRange(start * 16, count * 16);
+      if (im.instanceColor) im.instanceColor.addUpdateRange(start * 3, count * 3);
+    }
+    im.instanceMatrix.needsUpdate = true;
+    if (im.instanceColor) im.instanceColor.needsUpdate = true;
   };
 
   const hash = (i: number, j: number, k: number): number => {
@@ -259,11 +289,11 @@ export function buildBladeGrassBand(
     discCenterX = poolDiscCenter(baseI, GRID_W, CELL);
     discCenterZ = poolDiscCenter(baseJ, GRID_W, CELL);
     for (let gi = 0; gi < GRID_W; gi++) {
-      colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
+      colCi[gi] = toroidalCell(baseI, gi, GRID_W);
     }
     let budget = initialBudget;
     for (let gj = 0; gj < GRID_W && budget > 0; gj++) {
-      const cjj = baseJ + ((((gj - baseJ) % GRID_W) + GRID_W) % GRID_W);
+      const cjj = toroidalCell(baseJ, gj, GRID_W);
       const packedLo = cjj & 0xffff;
       const rowBase = gj * GRID_W;
       for (let gi = 0; gi < GRID_W && budget > 0; gi++) {
@@ -282,8 +312,7 @@ export function buildBladeGrassBand(
   const initialBaseJ = Math.floor(initialPz / CELL) - (GRID_W >> 1);
   scanTargetBlock(initialBaseI, initialBaseJ, Number.POSITIVE_INFINITY);
   im.count = denseSlots.count;
-  dirtyLo = POOL;
-  dirtyHi = -1;
+  clearUploadBands(uploadBands);
   let lastBaseI = initialBaseI;
   let lastBaseJ = initialBaseJ;
   let pending = false;
@@ -300,20 +329,11 @@ export function buildBladeGrassBand(
       if (baseI === lastBaseI && baseJ === lastBaseJ && !pending) return;
       lastBaseI = baseI;
       lastBaseJ = baseJ;
-      dirtyLo = POOL;
-      dirtyHi = -1;
+      clearUploadBands(uploadBands);
       const previousCount = denseSlots.count;
       pending = scanTargetBlock(baseI, baseJ, MEADOW_BAND_PLACE_BUDGET);
       if (denseSlots.count !== previousCount) im.count = denseSlots.count;
-      if (dirtyHi >= 0) {
-        const count = dirtyHi - dirtyLo + 1;
-        im.instanceMatrix.addUpdateRange(dirtyLo * 16, count * 16);
-        im.instanceMatrix.needsUpdate = true;
-        if (im.instanceColor) {
-          im.instanceColor.addUpdateRange(dirtyLo * 3, count * 3);
-          im.instanceColor.needsUpdate = true;
-        }
-      }
+      uploadDirtyRanges();
     },
   };
 }
