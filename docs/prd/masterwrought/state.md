@@ -27202,16 +27202,18 @@ sets are FLAGGED there for the maintainer's read.
 
 ### Carried for the maintainer, not taken
 The full list is in phase-19f-qa.md: the localizeSystemText extraction, the
-error.sunderTarget emit, the gathering tool table's English names, the five
-*_EXTRA sim tables outside the registry and the absent copied-English guard, the
-en_CA dead rows, the two arena carriers, the farm tableBodyOneMeal off-glossary
-fills, the three-member generated flavor record, D103's 'new' rows, the
-hardcoded five-locale lists, the softer 'table below' phrase, the Russian
-binding window, the pet over-provision class, the turbo input, the census WARN,
-the registry stderr line and the commit-message imprecisions; the
-col_golden_harvest deed name sits in the flagged table beside the fills. 19E's
-seven carried items, 19D's four, 19C's three and 19B's four remain the
-maintainer's and were not taken here; R5 stays frozen.
+error.sunderTarget emit, the gathering tool table's English names, the temple.ts
+comment dashes, the five *_EXTRA sim tables outside the registry and the absent
+copied-English guard, the en_CA dead rows, the two arena carriers, the farm
+tableBodyOneMeal off-glossary fills, the three-member generated flavor record,
+D103's 'new' rows, the hardcoded five-locale lists, the softer 'table below'
+phrase, the Russian binding window, the pet over-provision class, the turbo
+input, the locale arm's head-refinement limits with the hours homograph, the
+split JUDGED sentence around D085's AMENDED block, the census WARN, the registry
+stderr line and the commit-message imprecisions; the col_golden_harvest deed
+name sits in the flagged table beside the fills. 19E's seven carried items,
+19D's four, 19C's three and 19B's four remain the maintainer's and were not
+taken here; R5 stays frozen.
 
 ### JUDGED, and not re-raised
 - The ten units, their rulings, and every reviewer and fresh-read finding are

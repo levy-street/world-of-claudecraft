@@ -23,7 +23,8 @@ Scope: the ten units of `phase-19f-english-i18n-completeness.md` (D070 D074
 D085 D144 D148 D149 D150 D161 D169 D174), the Step 0 sync check, the fresh
 typed reviews per unit (twenty-three reports plus the one D085's amendment owed,
 dispatched at the fresh read), eleven fix rounds, two coverage audits, a sim
-review, and the nine fresh reads that followed the rounds. Commit span `c52b275854..HEAD`.
+review, and the nine fresh reads that followed the rounds. Commit span c52b275854 through e58bff734a for the work, then the close-out
+record and its correction passes.
 
 ## Step 0: the sync check was a no-op
 
@@ -277,8 +278,8 @@ armed; zero pg suites skipped in the gate), launched in the background with a
 marker file and judged by the real GATE_EXIT=0 line: PASS, all 12 steps green,
 mode full (a broad change set: 2148 paths against origin/release/v0.42.0), 8
 workers, 12 minutes; the malware scan PASS (7930 files, 442 flags, 0 high after
-priors); the real-browser suite 38 files, 332 passed. tsc 0 at every one of the
-the 24 commits before the close-out record (c52b275854..e58bff734a) and at each
+priors); the real-browser suite 38 files, 332 passed. tsc 0 at every one of
+the 24 commits before the close-out record (c52b275854 through e58bff734a) and at each
 record commit after it; npm run ci:changed exit 0 after the LAST code commit and again after
 the close-out; the census RESULT: PASS captured without a pipe at every commit
 (one pre-existing WARN: the rename row for the branch-authored
