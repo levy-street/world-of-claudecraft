@@ -21,16 +21,20 @@
 // tiles below they read as 0.3-0.7yd foliage clumps, not noise. Measured over
 // the shipped 1K maps: AO mean 0.474, sd 0.117, row/col isotropy 0.73;
 // NormalGL x/y sd 0.104/0.103 (isotropy 1.00).
-// Cost: alpha-rejected fragments pay zero canopy taps; surviving fragments
-// inside CANOPY_FADE_END pay 6, and fragments past it pay zero (distance fade
-// below). There is no per-frame CPU work. Gated to ULTRA AND UP
-// (GFX.canopyDetail; the Advanced Foliage Density dial can opt in separately).
+// Cost: alpha-rejected fragments pay zero canopy taps; a surviving fragment
+// inside the fade end pays the tier's tap count, and fragments past it pay
+// zero (distance fade below). There is no per-frame CPU work. Gated to ULTRA
+// AND UP (GFX.canopyDetail; the Advanced Foliage Density dial can opt in
+// separately), and the tap count itself is the tier knob GFX.canopyDetailTaps:
+// ultra runs the AO half alone over a tightened band, insane the full six.
+// canopy_detail_tier_core.ts owns that split and the reasoning behind it.
 // High keeps plain leaf materials in the recovery profile. There is
 // intentionally no parallax here, a cutout canopy has no coherent view-ray
 // height field to walk.
 import type * as THREE from 'three';
 import { loadTexture } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { type CanopyDetailProfile, canopyDetailProfile } from './canopy_detail_tier_core';
 import { patchCanopyDetailShaderSource } from './foliage_shader_core';
 import { GFX, type GfxSettings } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
@@ -47,18 +51,18 @@ const CANOPY_AO_SPAN = 0.62;
  *  points below the horizon by START and saturates at FULL. */
 const CANOPY_CREVICE_DOWN_START = 0.15;
 const CANOPY_CREVICE_DOWN_FULL = 0.7;
-/** Distance fade (perf): the 6 taps per leaf fragment exist to break up NEAR
+/** Distance fade (perf): the taps per leaf fragment exist to break up NEAR
  *  canopies; past ~50yd a 0.3-0.7yd clump projects a handful of pixels and
  *  the break-up is carried by the canopy geometry itself. Across the band
  *  the AO term eases back to 1.0, which IS its value at the measured map
  *  mean (the remap is mean-centered, see MOSS002_AO_MEAN), and the normal
  *  blend eases to identity, so a distant canopy's brightness and silhouette
- *  cannot shift; past the end all 6 taps are branch-skipped. The geometric
+ *  cannot shift; past the end every tap is branch-skipped. The geometric
  *  crevice term (no taps) keeps running at every distance so stacked tiers
- *  never re-merge. Verified by screenshot A/B via the shared ?wornfade dev
- *  override (scripts/round9_fade_shots.mjs). */
-const CANOPY_FADE_START = 34;
-const CANOPY_FADE_END = 55;
+ *  never re-merge. The start and the two ends live in
+ *  canopy_detail_tier_core.ts (the AO-only arm pulls the end in). Verified by
+ *  screenshot A/B via the shared ?wornfade dev override
+ *  (scripts/round9_fade_shots.mjs). */
 const CANOPY_FADE_SCALE = ((): number => {
   if (typeof location === 'undefined') return 1;
   const v = new URLSearchParams(location.search).get('wornfade');
@@ -161,6 +165,21 @@ export function canopyDetailPrewarmTextures(): THREE.Texture[] {
   return out;
 }
 
+/**
+ * The `canopy-detail` segment of a leaf material's program cache key. The tap
+ * arm is in it because the two arms compile DIFFERENT fragment sources, so a
+ * shared program would be wrong; the texture-ready state keys too, because
+ * before the preload resolves the hook compiles to a plain pass-through.
+ */
+export function canopyDetailProgramCacheKey(
+  profile: CanopyDetailProfile,
+  baseProgramKey: string,
+): string {
+  const ready = TEX.normal && TEX.ao ? 'on' : 'off';
+  const fade = `${(profile.fadeStart * CANOPY_FADE_SCALE).toFixed(1)},${(profile.fadeEnd * CANOPY_FADE_SCALE).toFixed(1)}`;
+  return `canopy-detail|${ready}|t${profile.taps}|f${fade}|${baseProgramKey}`;
+}
+
 // Identity-based once-per-instance guard (clone() copies userData, so a
 // userData marker alone would falsely mark clones as applied).
 const applied = new WeakSet<THREE.Material>();
@@ -180,11 +199,15 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // maps onto the same knob); ?canopy=off is
   // the dev-only perf-attribution kill switch (render_dev_flags.ts).
   if (!GFX.canopyDetail || renderLayerDisabled('canopy')) return;
+  // Which half of the layer this tier compiles, and how far it runs.
+  const profile = canopyDetailProfile(GFX.canopyDetailTaps);
+  if (!profile) return;
   const std = mat as THREE.MeshStandardMaterial;
   if (!std.isMeshStandardMaterial) return;
   if (applied.has(mat)) return;
   applied.add(mat);
   mat.userData.canopyDetail = sourceName;
+  mat.userData.canopyDetailTaps = profile.taps;
   const aoSpan = CANOPY_AO_SPAN * spec.aoDepth;
   // centered on the measured map mean so overall canopy brightness holds
   const aoLo = 1 - aoSpan * MOSS002_AO_MEAN;
@@ -196,9 +219,11 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     // Fail soft before the preload gate resolves: the material simply ships
     // without the layer (the detail_normals null contract).
     if (!TEX.normal || !TEX.ao) return;
-    shader.uniforms.uCanopyNormalTex = { value: TEX.normal };
+    if (profile.normalDetail) {
+      shader.uniforms.uCanopyNormalTex = { value: TEX.normal };
+      shader.uniforms.uCanopyStrength = { value: spec.strength };
+    }
     shader.uniforms.uCanopyAoTex = { value: TEX.ao };
-    shader.uniforms.uCanopyStrength = { value: spec.strength };
     shader.uniforms.uCanopyTile = { value: spec.tileScale };
     shader.uniforms.uCanopyAoLo = { value: aoLo };
     shader.uniforms.uCanopyAoSpan = { value: aoSpan };
@@ -207,10 +232,11 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
     // The pure patch keeps the RGB-only AO work after the stock alpha test,
     // while leaving the original visible-fragment operation order intact.
     const patched = patchCanopyDetailShaderSource(shader.vertexShader, shader.fragmentShader, {
-      fadeStart: CANOPY_FADE_START * CANOPY_FADE_SCALE,
-      fadeEnd: CANOPY_FADE_END * CANOPY_FADE_SCALE,
+      fadeStart: profile.fadeStart * CANOPY_FADE_SCALE,
+      fadeEnd: profile.fadeEnd * CANOPY_FADE_SCALE,
       creviceDownStart: CANOPY_CREVICE_DOWN_START,
       creviceDownFull: CANOPY_CREVICE_DOWN_FULL,
+      normalDetail: profile.normalDetail,
     });
     shader.vertexShader = patched.vertexShader;
     shader.fragmentShader = patched.fragmentShader;
@@ -220,6 +246,5 @@ export function applyCanopyDetail(mat: THREE.Material, sourceName: string): void
   // differs, so chain the previous key (the foliage_collapse precedent). The
   // texture-ready state keys too: before the preload resolves the hook
   // compiles to a plain pass-through.
-  mat.customProgramCacheKey = () =>
-    `canopy-detail|${TEX.normal && TEX.ao ? 'on' : 'off'}|f${(CANOPY_FADE_START * CANOPY_FADE_SCALE).toFixed(1)},${(CANOPY_FADE_END * CANOPY_FADE_SCALE).toFixed(1)}|${prevKey ? prevKey() : ''}`;
+  mat.customProgramCacheKey = () => canopyDetailProgramCacheKey(profile, prevKey ? prevKey() : '');
 }

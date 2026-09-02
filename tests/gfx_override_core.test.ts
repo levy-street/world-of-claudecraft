@@ -177,13 +177,18 @@ describe('gfx override application', () => {
     // Advanced default mix. The ladder itself is pinned by name in
     // tests/gfx.test.ts and tests/grass_tuft_cards_core.test.ts; this row is
     // the byte guard that says nothing ELSE moved with it.
+    // Regenerated across the board again for `canopyDetailTaps`, the canopy
+    // clump layer's per-tier tap count (canopy_detail_tier_core.ts): 0 below
+    // ultra, 3 on ultra and the Advanced default mix, 6 on insane. Named pins
+    // for it live in tests/gfx.test.ts and
+    // tests/canopy_detail_tier_core.test.ts.
     expect(hashes).toEqual({
-      low: '424dc8016399c870f6d58d448bcd14b716e73653af3e872dcb99933ff26dc57a',
-      medium: 'dfca781ab3d57a001d8f7a7ebc5642e9f409ddf2b1581c4840eaabf7c5c940c5',
-      high: '6e5db84e098803609ceb154e9877a439405c687c5aefac9fcef0e124043c8ba9',
-      ultra: '67b205f84bceb76769ca8f01a7e84c743ef3e6f82eb310c2f96f9fda68bdc9fe',
-      insane: '1ee13ebb388f1a13566066ee3f78fceec5dc2372de94951ca04cf27c8bede42c',
-      advanced: '6f3c90c63f5cb294e6067c04529390e3da79e6dd91f0143acddf24058bf4c23f',
+      low: '1b4559cd53dfa04a243eabb5bb01d2843cf7a0a9a2205e02110910e37cd6f42f',
+      medium: '3c859917380988dde4dc455aea2efb3391e987e952b64f039e973308ead2ad21',
+      high: 'cff719d3f5abea2658e0406bebad03f52df8015390c423725b37639acb1ff3fa',
+      ultra: 'b64b55668c28b2d0eaaa95580885b4276e99b2aa95f6777303922a6cf2116f22',
+      insane: '7ec7889501315477ef4f107088b0f618dd16d7c40e9ccb9712b27d5d8a3d93e3',
+      advanced: '7d357c28f5aa9b54c6190a1e12dd274c0a05c0b804ac349990a6a50f768f5da1',
     });
   });
 

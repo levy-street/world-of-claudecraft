@@ -698,6 +698,7 @@ const RENDER_PURE_CORES = [
   // Same reason, one seam over: the per-interior encounter prewarm's decision
   // layer (which interior warms what, the kill switch, the live-queue verdict).
   'src/render/interior_encounter_prewarm.ts',
+  'src/render/canopy_detail_tier_core.ts',
   'src/render/camp_brazier_placement_core.ts',
   'src/render/night_accents_core.ts',
   'src/render/night_light_field_core.ts',

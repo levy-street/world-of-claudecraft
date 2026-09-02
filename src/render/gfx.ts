@@ -15,6 +15,7 @@ import { FAR_ANIM_RANGE_SCALE_MAX } from './crowd_lod';
 // gives characters/preview.ts, characters/portrait.ts and armory_preview.ts
 // the guard, transitively: they reach it via gfx.ts, never call it directly.
 import './final_color_nan_guard';
+import { CANOPY_TAPS_AO_ONLY, CANOPY_TAPS_FULL, CANOPY_TAPS_OFF } from './canopy_detail_tier_core';
 import { gfxAaPolicy } from './gfx_aa_policy_core';
 import { applyGfxOverridesFromSearch } from './gfx_override_core';
 import { GRASS_CARDS_FULL, GRASS_CARDS_LEAN, GRASS_CARDS_MID } from './grass_tuft_cards_core';
@@ -197,6 +198,16 @@ export interface GfxSettings {
   readonly cliffScree: boolean;
   /** canopy clump-detail layer (canopy_detail.ts) */
   readonly canopyDetail: boolean;
+  /**
+   * Triplanar taps a surviving leaf fragment pays inside the canopy layer's
+   * fade band: 0 off, 3 the AO half alone (ultra), 6 AO plus the NormalGL
+   * shading-normal bend (insane). Leaves are alpha-tested AND double-sided,
+   * so nothing writes early-Z under them and every overlapping canopy
+   * fragment pays this in full. canopy_detail_tier_core.ts owns the split and
+   * the fade end that comes with each arm. Always 0 exactly when
+   * `canopyDetail` is false.
+   */
+  readonly canopyDetailTaps: number;
   /** terrain relief ladder: 0 none, 1 cavity shade, 2 +parallax walk, 3 +micro sun-shadow */
   readonly terrainRelief: number;
   /** N8AO at full resolution + Medium quality (vs half-res Low) */
@@ -1081,6 +1092,15 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
           : 0,
     cliffScree: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
     canopyDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'ultra'),
+    // Insane is the declared showcase tier and only ever a manual opt-in, so
+    // it keeps the full six; ultra takes the AO half over a tightened band.
+    canopyDetailTaps: iosMemoryProfile
+      ? CANOPY_TAPS_OFF
+      : tier === 'insane'
+        ? CANOPY_TAPS_FULL
+        : gfxTierAtLeast(tier, 'ultra')
+          ? CANOPY_TAPS_AO_ONLY
+          : CANOPY_TAPS_OFF,
     terrainRelief: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')
@@ -1226,6 +1246,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 0,
         cliffScree: false,
         canopyDetail: false,
+        canopyDetailTaps: CANOPY_TAPS_OFF,
         grassCardsPerTuft: GRASS_CARDS_LEAN,
       };
     else if (foliageLevel === 1)
@@ -1235,6 +1256,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 24,
         cliffScree: false,
         canopyDetail: false,
+        canopyDetailTaps: CANOPY_TAPS_OFF,
         grassCardsPerTuft: GRASS_CARDS_MID,
       };
     else if (foliageLevel === 2)
@@ -1243,6 +1265,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 34,
         cliffScree: true,
         canopyDetail: true,
+        canopyDetailTaps: CANOPY_TAPS_AO_ONLY,
         grassCardsPerTuft: GRASS_CARDS_FULL,
       };
     else
@@ -1252,6 +1275,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
         bladeCarpetRadius: 40,
         cliffScree: true,
         canopyDetail: true,
+        canopyDetailTaps: CANOPY_TAPS_FULL,
         grassCardsPerTuft: GRASS_CARDS_FULL,
       };
     // Surface Detail (the town-cost dial): Off sheds the whole worn layer;

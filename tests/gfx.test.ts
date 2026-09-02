@@ -369,6 +369,15 @@ describe('graphics tier resolution', () => {
       expect(tier.canopyDetail).toBe(true);
       expect(tier.bloom).toBe(true);
     }
+    // Canopy clump detail splits by half, not by on/off: ultra runs the AO
+    // taps alone, insane keeps the NormalGL half too (canopy_detail_tier_core).
+    expect(
+      ['low', 'medium', 'high', 'ultra', 'insane'].map(
+        (tier) =>
+          gfxInternalsForTest.settingsFor(tier as 'low' | 'medium' | 'high' | 'ultra' | 'insane')
+            .canopyDetailTaps,
+      ),
+    ).toEqual([0, 0, 0, 3, 6]);
     expect(ultra.surfaceDetailTaps).toBe(3);
     expect(ultra.surfaceDetailClampK).toBe(0.85);
     expect(insane.surfaceDetailTaps).toBe(4);
@@ -419,6 +428,8 @@ describe('graphics tier resolution', () => {
     expect(foliageHigh.bladeCarpetRadius).toBe(34);
     expect(foliageHigh.cliffScree).toBe(true);
     expect(foliageHigh.canopyDetail).toBe(true);
+    expect(foliageHigh.canopyDetailTaps).toBe(3);
+    expect(adv({ foliageDensity: 2 }).canopyDetailTaps).toBe(6);
     expect(adv({ foliageDensity: 2 }).bladeCarpetRadius).toBe(40);
     expect(adv({ foliageDensity: 2 }).farGrassDensityFloor).toBe(0.85);
     // The Foliage Density dial owns the grass-card ladder too, level by level.
