@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   appliedResolutionEquals,
@@ -6,19 +7,10 @@ import {
 } from '../src/render/resize_coalesce_core';
 
 // Node-only (RENDER_PURE_CORES): no Three, no DOM, no requestAnimationFrame.
-function fakeFrames(): { schedule: (cb: () => void) => void; run(): number } {
-  const queued: Array<() => void> = [];
-  return {
-    schedule: (cb) => {
-      queued.push(cb);
-    },
-    run(): number {
-      const batch = queued.splice(0, queued.length);
-      for (const cb of batch) cb();
-      return batch.length;
-    },
-  };
-}
+const coreSource = readFileSync(
+  new URL('../src/render/resize_coalesce_core.ts', import.meta.url),
+  'utf8',
+);
 
 describe('drawingBufferExtent', () => {
   it('floors the way WebGLRenderer.setSize does', () => {
@@ -60,33 +52,47 @@ describe('drawingBufferExtent', () => {
 });
 
 describe('resize coalescing', () => {
+  it('books no frame of its own', () => {
+    // The regression this pin exists for: scheduling the pass on its own rAF
+    // put it AFTER the game loop's already-registered frame callback, so the
+    // canvas was resized and cleared once the frame had been painted and the
+    // whole screen flashed black on every resize. Scheduling belongs to the
+    // host, which drains this coalescer at the top of its frame.
+    expect(coreSource).not.toContain('requestAnimationFrame(');
+    expect(coreSource).not.toContain('setTimeout(');
+    expect(coreSource).not.toContain('queueMicrotask(');
+  });
+
   it('collapses a burst of resize events onto one pass', () => {
-    const frames = fakeFrames();
     let passes = 0;
     const gate = createResizeCoalescer(() => passes++);
 
-    for (let i = 0; i < 20; i++) gate.request(frames.schedule);
+    for (let i = 0; i < 20; i++) gate.request();
     expect(passes).toBe(0);
-    expect(frames.run()).toBe(1);
+    gate.flush();
     expect(passes).toBe(1);
 
-    // The next burst books a fresh frame rather than being swallowed.
-    for (let i = 0; i < 20; i++) gate.request(frames.schedule);
-    frames.run();
+    // A frame with nothing pending costs nothing.
+    gate.flush();
+    gate.flush();
+    expect(passes).toBe(1);
+
+    // The next burst runs on the next frame rather than being swallowed.
+    for (let i = 0; i < 20; i++) gate.request();
+    gate.flush();
     expect(passes).toBe(2);
   });
 
   it('books the next frame for a resize the pass itself provokes', () => {
-    const frames = fakeFrames();
     let passes = 0;
     const gate = createResizeCoalescer(() => {
       passes++;
-      if (passes === 1) gate.request(frames.schedule);
+      if (passes === 1) gate.request();
     });
-    gate.request(frames.schedule);
-    frames.run();
+    gate.request();
+    gate.flush();
     expect(passes).toBe(1);
-    frames.run();
+    gate.flush();
     expect(passes).toBe(2);
   });
 
@@ -140,7 +146,6 @@ describe('resize coalescing', () => {
     // The renderer composes exactly this: every listener calls request(), the
     // frame pass runs resizeViewport, and applyResolution asks shouldAllocate
     // before it touches any storage.
-    const frames = fakeFrames();
     let allocations = 0;
     let cssWidth = 1920;
     let cssHeight = 1080;
@@ -149,8 +154,8 @@ describe('resize coalescing', () => {
       if (gate.shouldAllocate(cssWidth, cssHeight, ratio)) allocations++;
     });
     const burst = (times: number): void => {
-      for (let i = 0; i < times; i++) gate.request(frames.schedule);
-      frames.run();
+      for (let i = 0; i < times; i++) gate.request();
+      gate.flush();
     };
 
     burst(20);

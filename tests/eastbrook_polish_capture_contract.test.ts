@@ -353,8 +353,10 @@ interface AttributionTargetFixture {
 // was retaken.
 // Re-minted again for the review answers on the same branch (the viewport
 // poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c70e8499aded38a741fb1043b7068a5764524a90019abfeb59f4d548d8a07245';
+  '44df800fb52fcbbd8dc5fa08f2624f13df9fbc81312e4627886f4d79c78ad7e8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

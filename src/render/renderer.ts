@@ -1924,8 +1924,7 @@ export class Renderer {
     this.vfx?.onContextRestored();
   };
   private readonly resizeGate = createResizeCoalescer(() => this.resizeViewport());
-  private readonly onViewportResize = (): void =>
-    this.resizeGate.request((run) => requestAnimationFrame(run));
+  private readonly onViewportResize = (): void => this.resizeGate.request();
   private readonly onOrientationChange = (): void => {
     this.onViewportResize();
     this.resizeTimers.push(window.setTimeout(this.onViewportResize, 250));
@@ -10136,6 +10135,7 @@ export class Renderer {
   ): void {
     if (this.shutdownStarted) return;
     const totalStart = performance.now();
+    this.resizeGate.flush(); // before anything draws: see resize_coalesce_core.ts
     // The hitch sample's start reading, before any view creation, then a new
     // ledger frame: what the ledger holds here is the previous callback plus
     // the gap before this one, the span this callback's dt measures.

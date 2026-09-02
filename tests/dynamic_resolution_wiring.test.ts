@@ -61,9 +61,15 @@ describe('dynamic resolution renderer wiring', () => {
     expect(renderer).toContain(
       'private readonly resizeGate = createResizeCoalescer(() => this.resizeViewport());',
     );
-    expect(renderer).toMatch(
-      /private readonly onViewportResize = \(\): void =>\s+this\.resizeGate\.request\(\(run\) => requestAnimationFrame\(run\)\);/,
+    expect(renderer).toContain(
+      'private readonly onViewportResize = (): void => this.resizeGate.request();',
     );
+    // The gate must never book a frame of its own. Its own rAF ran AFTER the
+    // game loop's already-registered frame callback, so the canvas was resized
+    // and cleared once the frame had been painted: every resize flashed the
+    // screen black. Scheduling is the frame's job, below.
+    expect(renderer).not.toContain('this.resizeGate.request((run) =>');
+    expect(renderer).not.toMatch(/resizeGate[\s\S]{0,120}requestAnimationFrame/);
     // Every listener and the DPR watch share that one entry point: none of them
     // may call resizeViewport straight.
     for (const source of [
@@ -98,6 +104,22 @@ describe('dynamic resolution renderer wiring', () => {
     expect(update).toContain('const resolutionRange = dynamicResolutionGovernorRange(');
     expect(update).toContain('sample.minRenderScale = resolutionRange.minRenderScale;');
     expect(update).toContain('sample.maxRenderScale = resolutionRange.maxRenderScale;');
+  });
+
+  it('applies a pending resize at the top of the frame, before anything draws', () => {
+    const frame = methodSource('  sync(\n    alpha: number,');
+    const flush = frame.indexOf('this.resizeGate.flush();');
+    expect(flush).toBeGreaterThanOrEqual(0);
+    // Same rAF turn as the render that follows it: the reallocation lands
+    // before the draw, so the resized canvas is painted on this very frame
+    // rather than staying cleared until the next one.
+    expect(frame.slice(0, flush)).not.toContain('presentFrame(');
+    for (const drawn of ['presentFrame(', 'this.webgl.render(', 'this.post']) {
+      const at = frame.indexOf(drawn);
+      if (at >= 0) expect(at).toBeGreaterThan(flush);
+    }
+    // And it is inside the frame body, not before the shutdown guard.
+    expect(frame.indexOf('if (this.shutdownStarted) return;')).toBeLessThan(flush);
   });
 
   it('keeps the FPS governor out of the AO arm on the composer tiers', () => {
