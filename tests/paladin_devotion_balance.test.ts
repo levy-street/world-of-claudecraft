@@ -3,6 +3,7 @@ import { MOBS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 type PaladinSpec = 'holy' | 'protection' | 'retribution';
 
@@ -73,7 +74,12 @@ function castFirstReady(
 }
 
 function secondsToTwenty(spec: PaladinSpec): number {
-  const sim = new Sim({ seed: 53, playerClass: 'paladin', autoEquip: true });
+  const sim = new Sim({
+    seed: 53,
+    playerClass: 'paladin',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  });
   sim.setPlayerLevel(20);
   sim.setSpec(spec);
   if (spec === 'protection') {
@@ -107,7 +113,12 @@ function secondsToTwenty(spec: PaladinSpec): number {
 }
 
 function protectionSecondsToTwentyWhileBlocking(): { seconds: number; devotionFromBlocks: number } {
-  const sim = new Sim({ seed: 61, playerClass: 'paladin', autoEquip: true });
+  const sim = new Sim({
+    seed: 61,
+    playerClass: 'paladin',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  });
   sim.setPlayerLevel(20);
   sim.setSpec('protection');
   sim.addItem('eastbrook_buckler', 1);

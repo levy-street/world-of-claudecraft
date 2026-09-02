@@ -426,7 +426,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: '城壁の型稽古',
-    desc: 'ハイウォッチの高台にある訓練用ダミーに合計1,000のダメージを与える。',
+    desc: '訓練用ダミーに合計1,000のダメージを与える。',
   },
   chr_peaks_glimmer_cast: {
     name: '冷たい水、さらに冷たい光',

@@ -448,7 +448,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Latihan Tembok',
-    desc: 'Berikan total 1.000 kerusakan pada Boneka Latihan di atas Menara Pengawas.',
+    desc: 'Berikan total 1.000 kerusakan pada sebuah boneka latihan.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Air Dingin, Cahaya Lebih Dingin',

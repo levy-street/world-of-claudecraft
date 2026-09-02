@@ -466,7 +466,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Exercices de rempart',
-    desc: "Infliger 1 000 points de dégâts au total au Mannequin d'entraînement qui surplombe Highwatch.",
+    desc: "Infliger 1 000 points de dégâts au total à un mannequin d'entraînement.",
   },
   chr_peaks_glimmer_cast: {
     name: 'Eau froide, lumière plus froide encore',

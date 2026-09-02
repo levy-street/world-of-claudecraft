@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "3013e788",
       "events": "741638a5",
       "rng": {
@@ -152,7 +152,7 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "7f83ce42",
       "events": "b4175b02",
       "rng": {
@@ -163,7 +163,7 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "efceed52",
       "events": "741638a5",
       "rng": {
@@ -174,7 +174,7 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "830b6db3",
       "events": "741638a5",
       "rng": {
@@ -185,7 +185,7 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "1c89b4ec",
       "events": "741638a5",
       "rng": {
@@ -196,9 +196,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1000,
-      "state": "563c316c",
-      "events": "ec77a677",
+      "nextId": 1002,
+      "state": "89c6205b",
+      "events": "b7e069ca",
       "rng": {
         "draws": 487,
         "digest": "60c31138"
@@ -207,9 +207,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1001,
-      "state": "7a63d790",
-      "events": "1861909d",
+      "nextId": 1003,
+      "state": "d584b210",
+      "events": "361c7aaf",
       "rng": {
         "draws": 677,
         "digest": "55e5f1d8"
@@ -218,9 +218,9 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1001,
-      "state": "0a48a101",
-      "events": "fa1fb9df",
+      "nextId": 1003,
+      "state": "806eb029",
+      "events": "01525c69",
       "rng": {
         "draws": 902,
         "digest": "764eb9c7"
@@ -229,9 +229,9 @@
     {
       "tick": 160,
       "time": 8,
-      "nextId": 1001,
-      "state": "4a10755a",
-      "events": "c739c1f5",
+      "nextId": 1003,
+      "state": "7ea0c490",
+      "events": "a5f3a6d7",
       "rng": {
         "draws": 1147,
         "digest": "3f5358b9"
@@ -240,9 +240,9 @@
     {
       "tick": 180,
       "time": 9,
-      "nextId": 1001,
-      "state": "b926f0b8",
-      "events": "a0be293a",
+      "nextId": 1003,
+      "state": "fffa3f98",
+      "events": "0d8e9282",
       "rng": {
         "draws": 1423,
         "digest": "5ff960aa"
@@ -251,9 +251,9 @@
     {
       "tick": 200,
       "time": 10,
-      "nextId": 1001,
-      "state": "066bd274",
-      "events": "ad88c54f",
+      "nextId": 1003,
+      "state": "e189effa",
+      "events": "d3d61a85",
       "rng": {
         "draws": 1692,
         "digest": "83d0b4ee"
@@ -262,9 +262,9 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 1001,
-      "state": "b261646f",
-      "events": "a05f7e77",
+      "nextId": 1003,
+      "state": "13cc56d3",
+      "events": "7aba250b",
       "rng": {
         "draws": 1853,
         "digest": "4dfcf0d9"
@@ -273,8 +273,8 @@
     {
       "tick": 220,
       "time": 11,
-      "nextId": 1001,
-      "state": "efab4d41",
+      "nextId": 1003,
+      "state": "0a93ed4f",
       "events": "741638a5",
       "rng": {
         "draws": 1853,
@@ -425,7 +425,7 @@
             "str": 11
           },
           "swingTimer": 1.25,
-          "targetId": 1000,
+          "targetId": 1002,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -434,18 +434,18 @@
           }
         },
         {
-          "aggroTargetId": 1000,
+          "aggroTargetId": 1002,
           "aiState": "idle",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": 2.077895,
+          "facing": 2.199213,
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 345,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -482,21 +482,21 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 1001,
           "aiState": "attack",
           "autoAttack": true,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "facing": -1.063698,
+          "facing": -0.94238,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 999,
+          "forcedTargetId": 1001,
           "forcedTargetTimer": 3,
           "hostile": true,
           "hp": 49959,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -535,7 +535,7 @@
               21
             ],
             [
-              999,
+              1001,
               23
             ]
           ],
@@ -550,9 +550,9 @@
     {
       "tick": 224,
       "time": 11.2,
-      "nextId": 1001,
-      "state": "dfbf20b5",
-      "events": "a86087ec",
+      "nextId": 1003,
+      "state": "dc97434f",
+      "events": "816ff2ca",
       "rng": {
         "draws": 1890,
         "digest": "f679fd73"
@@ -702,7 +702,7 @@
             "str": 11
           },
           "swingTimer": 1.05,
-          "targetId": 1000,
+          "targetId": 1002,
           "templateId": "warlock",
           "weapon": {
             "max": 6,
@@ -711,7 +711,7 @@
           }
         },
         {
-          "aggroTargetId": 1000,
+          "aggroTargetId": 1002,
           "aiState": "idle",
           "autoAttack": true,
           "combatTimer": 0.15,
@@ -723,7 +723,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 345,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "level": 12,
@@ -760,7 +760,7 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 1001,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 0.2,
@@ -771,11 +771,11 @@
           "facing": -1.570796,
           "fallStartY": -2,
           "fiveSecondRule": 99,
-          "forcedTargetId": 999,
+          "forcedTargetId": 1001,
           "forcedTargetTimer": 2.8,
           "hostile": true,
           "hp": 49948,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -814,7 +814,7 @@
               21
             ],
             [
-              999,
+              1001,
               34
             ]
           ],

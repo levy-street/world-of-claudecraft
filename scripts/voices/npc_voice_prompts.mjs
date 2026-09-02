@@ -1128,6 +1128,9 @@ export const VOICE_ALIAS = {
   // Keeper of the Strand tallying shells and salvage: the harbor captain's
   // weathered, water-wise authority.
   tidewarden_nel: 'captain_thessaly',
+  // Quay Sparring Master introducing the hub dummy and the meters: the same
+  // parade-ground bark the island's Yard Master borrows.
+  drillmaster_hale: 'marshal_redbrook',
 };
 
 /** Resolve any NPC content id to the id of the voice that should speak for it. */

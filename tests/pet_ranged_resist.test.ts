@@ -17,6 +17,7 @@ import { petRangedAttack } from '../src/sim/pet/pet_ai';
 import { advancePendingProjectiles } from '../src/sim/projectile_travel';
 import { Sim } from '../src/sim/sim';
 import { type Entity, spellHitChance } from '../src/sim/types';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 type AnySim = Sim & Record<string, any>;
 type AnyEntity = Entity & Record<string, any>;
@@ -28,7 +29,12 @@ function makeImpVsTarget(targetLevel: number): {
   imp: AnyEntity;
   mob: AnyEntity;
 } {
-  const sim = new Sim({ seed: 7, playerClass: 'warlock', autoEquip: true }) as AnySim;
+  const sim = new Sim({
+    seed: 7,
+    playerClass: 'warlock',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  }) as AnySim;
   sim.setPlayerLevel(12);
   sim.castAbility('summon_imp');
   for (let i = 0; i < 20 * 12 && sim.player.castingAbility; i++) sim.tick();

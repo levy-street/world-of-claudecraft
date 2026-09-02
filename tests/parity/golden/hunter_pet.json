@@ -14,7 +14,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "5727ba5f",
       "events": "741638a5",
       "rng": {
@@ -147,9 +147,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1002,
-      "state": "1e5823c9",
-      "events": "f9813d22",
+      "nextId": 1004,
+      "state": "1e475f38",
+      "events": "74366c57",
       "rng": {
         "draws": 10,
         "digest": "cc772239"
@@ -158,8 +158,8 @@
     {
       "tick": 40,
       "time": 2,
-      "nextId": 1002,
-      "state": "b6f72bd2",
+      "nextId": 1004,
+      "state": "f1e4bffb",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -169,9 +169,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1002,
-      "state": "98bfc5da",
-      "events": "132690c6",
+      "nextId": 1004,
+      "state": "df8cb76f",
+      "events": "17b81675",
       "rng": {
         "draws": 174,
         "digest": "4d2cc9f8"
@@ -180,8 +180,8 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1002,
-      "state": "d874743d",
+      "nextId": 1004,
+      "state": "7f745328",
       "events": "741638a5",
       "rng": {
         "draws": 339,
@@ -191,9 +191,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1002,
-      "state": "124fb070",
-      "events": "ad595128",
+      "nextId": 1004,
+      "state": "d059a2bb",
+      "events": "f7c90c7d",
       "rng": {
         "draws": 533,
         "digest": "db23c13c"
@@ -202,8 +202,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1002,
-      "state": "6f3997b7",
+      "nextId": 1004,
+      "state": "8e10a130",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -213,8 +213,8 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1002,
-      "state": "6f3997b7",
+      "nextId": 1004,
+      "state": "8e10a130",
       "events": "741638a5",
       "rng": {
         "draws": 736,
@@ -361,7 +361,7 @@
             "str": 25
           },
           "swingTimer": 0.9,
-          "targetId": 1000,
+          "targetId": 1002,
           "templateId": "hunter",
           "weapon": {
             "max": 5,
@@ -370,7 +370,7 @@
           }
         },
         {
-          "aggroTargetId": 1000,
+          "aggroTargetId": 1002,
           "aiState": "idle",
           "combatTimer": 1.95,
           "comboUntil": -1,
@@ -381,7 +381,7 @@
           "fallStartY": -2,
           "fiveSecondRule": 99,
           "hp": 56,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "level": 8,
@@ -415,7 +415,7 @@
           }
         },
         {
-          "aggroTargetId": 999,
+          "aggroTargetId": 1001,
           "aiState": "attack",
           "autoAttack": true,
           "combatTimer": 1.35,
@@ -428,7 +428,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 49898,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -467,7 +467,7 @@
               48
             ],
             [
-              999,
+              1001,
               54
             ]
           ],
@@ -490,7 +490,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 50000,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "mob",
           "level": 8,

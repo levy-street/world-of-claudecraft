@@ -2160,9 +2160,10 @@ export const VISUALS: Record<string, VisualDef> = {
   // biped skeleton, KAYKIT_CLIP_PLAN vocabulary. The dummy never casts or
   // jumps (sim's dummy handling holds it stationary and ability-less), so
   // those two clips are stripped from the shipped GLB rather than carried as
-  // dead weight. Shared by the whole Highwatch practice row (MOB_VISUALS below
-  // points all four dummy templates here), which is still exactly one hub, so
-  // it stays lazy-preloaded rather than joining every client's eager boot set.
+  // dead weight. Shared by the whole Highwatch practice row and the Eastbrook
+  // hub dummy (MOB_VISUALS below points all four dummy templates here): two
+  // fixed spots in the whole world, so it stays lazy-preloaded (fetched on
+  // first sight, renderer.ts) rather than joining every client's eager boot set.
   mob_training_dummy: {
     url: `${CREATURES}/training_dummy.glb`,
     height: 2.3,

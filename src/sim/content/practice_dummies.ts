@@ -29,7 +29,7 @@
 // carry zero damage, zero move speed and zero aggro radius on top of that, so the
 // inertness holds even for a code path that reads the template numbers directly.
 
-import type { CampDef, MobTemplate } from '../types';
+import type { CampDef, MobTemplate, NpcDef, QuestDef } from '../types';
 import { HEROIC_DUNGEON_TUNING } from './dungeon_difficulty';
 import { DUNGEON_MOBS } from './dungeons';
 import { NYTHRAXIS_RAID_BOSS_ID } from './heroic_loot';
@@ -192,3 +192,92 @@ export const PRACTICE_ROW_CAMPFIRE: [number, number] = [
   PRACTICE_ROW_X + PRACTICE_ROW_CAMPFIRE_OFFSET,
   practiceRowZ(PRACTICE_ROW_ORDER.indexOf(NORMAL_BOSS_DUMMY_ID)),
 ];
+
+// The Eastbrook hub dummy: a second `training_dummy` (zone3.ts owns the
+// template) on the quay pad where every new character first stands, eleven
+// yards inland of the player start (eastbrook_layout.ts services.playerStart,
+// (-94, -58)). The Highwatch row is a level-20 measuring station; this one is
+// the hub's, so a player can test a build, a new piece of gear or a rotation
+// the moment they respec in town instead of riding to the hill above Highwatch.
+//
+// The mark sits on the dock's levelled shelf (zone1.ts levels it flat), six
+// yards east of the quay-walk road centreline (x -92, halfWidth 1.5), clear of
+// Fisherman Brandt (-95, -50), Foreman Odell (-84, -63) and the watchtower and
+// crate colliders on the pad's north edge, so findSafePos never has to move it
+// (tests/training_dummy.test.ts pins that it lands on its authored mark).
+export const HUB_TRAINING_DUMMY_POS = { x: -86, z: -50 } as const;
+
+// NOT a CAMPS entry: the hub yard (dummy + sparring master) spawns after the
+// player in sim/hub_practice.ts so it consumes only trailing entity ids;
+// a camp appended here shifted the player's id and re-minted every parity
+// golden. The def stays as data for the spawn hook and its tests.
+export const HUB_PRACTICE_DUMMY_CAMPS: CampDef[] = [
+  { mobId: 'training_dummy', center: { ...HUB_TRAINING_DUMMY_POS }, radius: 0, count: 1 },
+];
+
+// The quay's sparring master: the hub dummy's one-line tutorial, on the model
+// of the Proving Shore's yard keepers. A dummy standing alone on the pad tells
+// a newcomer nothing about WHY it is there, and the Damage Meters window (the
+// meters keybind, Shift+H by default) is the least discoverable window in the
+// HUD: nothing in the world names it. Hale's greeting and his one quest do.
+//
+// Placed a few yards SOUTH of the dummy (north is the pad's watchtower and
+// crate edge), east of the quay-walk road (centreline x -92, halfWidth 1.5)
+// and clear of Fisherman Brandt (-95, -50), facing north-east across the
+// dummy so a player walking up from the start sees him address it.
+// tests/hub_dummy_drill.test.ts pins that findSafePos leaves him on his
+// mark and that nothing else stands within arm's reach.
+export const HUB_SPARRING_MASTER_ID = 'drillmaster_hale';
+export const HUB_SPARRING_MASTER_POS = { x: -88, z: -45 } as const;
+
+export const HUB_PRACTICE_NPCS: Record<string, NpcDef> = {
+  [HUB_SPARRING_MASTER_ID]: {
+    id: HUB_SPARRING_MASTER_ID,
+    name: 'Drillmaster Hale',
+    title: 'Quay Sparring Master',
+    pos: { ...HUB_SPARRING_MASTER_POS },
+    facing: -0.38,
+    color: 0x7a4a4a,
+    questIds: ['q_hub_know_your_numbers'],
+    // Spawned by sim/hub_practice.ts after the player (trailing ids), not by
+    // the surface-placement loop; the def stays in NPCS so the online client
+    // resolves his questIds and world_entity_i18n his strings.
+    dynamic: true,
+    greeting:
+      'That post behind me is a training dummy, $C: hit it as hard and as often as you like, it never swings back and it never goes down. What it is FOR is the tally. Hold Shift and press H to open your Damage Meters: every blow you land on it is counted there, per second and in total, and the practice strip beside it keeps your best run so you can tell whether a new weapon, a new talent or a new rotation actually made you stronger.',
+  },
+};
+
+// The dummy's one lesson. The objective is a sentinel 'interact' with no
+// ground entity of its own (the ps_ability_drill idiom): tutorial/
+// dummy_drill.ts credits it off every blow that lands on a training dummy,
+// autoattacks included, because the lesson is the METER, not the button.
+export const HUB_DUMMY_DRILL_OBJECT_ITEM_ID = 'hub_dummy_drill';
+export const HUB_DUMMY_DRILL_QUEST_ID = 'q_hub_know_your_numbers';
+
+export const HUB_PRACTICE_QUESTS: Record<string, QuestDef> = {
+  [HUB_DUMMY_DRILL_QUEST_ID]: {
+    id: HUB_DUMMY_DRILL_QUEST_ID,
+    name: 'Know Your Numbers',
+    giverNpcId: HUB_SPARRING_MASTER_ID,
+    turnInNpcId: HUB_SPARRING_MASTER_ID,
+    text: 'Strength you cannot measure is strength you cannot improve, $N. Left-click the training dummy behind me to make it your target, then hold Shift and press H to open your Damage Meters before you swing. Now land ten blows on it, swings or spells, and watch the window while you do: it counts what you deal per second and in total, and the practice strip beside it remembers your best run. When the ten are in, come back and tell me the number.',
+    completionText:
+      'Ten blows, and now you know what they are worth. Every time you take a new weapon, a new talent or a new idea, $N, come back to this post and put a number on it. The meters are honest even when the vale is not.',
+    objectives: [
+      {
+        type: 'interact',
+        targetObjectItemId: HUB_DUMMY_DRILL_OBJECT_ITEM_ID,
+        count: 10,
+        label: 'Blow landed on the Training Dummy',
+      },
+    ],
+    // Sized with the Proving Shore drills (Strike True, Hone the Edge): one
+    // lesson's worth, never a level's.
+    xpReward: 60,
+    copperReward: 40,
+    itemRewards: {},
+  },
+};
+
+export const HUB_PRACTICE_QUEST_ORDER: string[] = [HUB_DUMMY_DRILL_QUEST_ID];

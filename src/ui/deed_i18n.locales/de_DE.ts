@@ -449,7 +449,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Drill an der Mauer',
-    desc: 'Verursache insgesamt 1.000 Schaden an der Trainingspuppe über Highwatch.',
+    desc: 'Verursache insgesamt 1.000 Schaden an einer Trainingspuppe.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Kaltes Wasser, kälteres Licht',

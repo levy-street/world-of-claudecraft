@@ -1251,6 +1251,15 @@ export const ja_JP: EnTranslations = {
       "heroicName": "ヒロイック:{name}",
       "heroicLocked": "ヒロイックの{name}にロックされています。"
     },
+    "practiceDps": {
+      "title": "練習用ダミー",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "ダミーを攻撃して計測を開始",
+      "previous": "これまでの計測",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
     "riftTracker": {
       "title": "リフト",
       "floor": "フロア {current}/{total}",
@@ -1286,6 +1295,8 @@ export const ja_JP: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/秒",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
@@ -15910,6 +15921,11 @@ export const ja_JP: EnTranslations = {
         "title": "浜辺の番人",
         "greeting": "潮は奪い、潮は払う、{playerName}。私はその両方の帳簿をつけている。蟹どもが難破船から掠め取るものと、正直な手がこの道を運び上げてくるものとをね。"
       },
+      "drillmaster_hale": {
+        "name": "教練官ヘイル",
+        "title": "波止場の稽古師範",
+        "greeting": "後ろの柱は訓練用の人形だ、{className}。好きなだけ強く、好きなだけ何度でも打て。打ち返しては来ないし、倒れもしない。あれの本当の役目は勘定だ。Shift を押しながら H でダメージメーターを開け。お前が当てた一撃は残らずそこに記録される、毎秒の値も合計もな。横の練習欄はお前の最高記録を覚えているから、新しい武器や才能、新しい手順で本当に強くなったかどうかが分かる。"
+      },
       "tidewatcher_ondrel": {
         "name": "オンドレル・ヴェイン",
         "title": "潮見の番人",
@@ -18102,6 +18118,16 @@ export const ja_JP: EnTranslations = {
         "objectives": {
           "0": {
             "label": "レックウォーデンを打ち倒した"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "己の数字を知れ",
+        "text": "測れない力は伸ばせない力だ、{playerName}。後ろの訓練用人形を左クリックして標的にしろ。それから振る前に Shift を押しながら H でダメージメーターを開け。次に十回当てろ、剣でも呪文でも構わん。打ちながら窓を見ていろ。毎秒と合計の与ダメージを数えてくれるし、横の練習欄が最高記録を覚えていてくれる。十回入ったら戻ってきて、その数字を教えろ。",
+        "completion": "十発、これでそれぞれの値打ちが分かったな。新しい武器、新しい才能、新しい思いつきを手にするたびに、{playerName}、この柱の前に戻って数字を付けろ。谷は嘘をつくこともあるが、メーターは嘘をつかない。",
+        "objectives": {
+          "0": {
+            "label": "訓練用人形に一撃を当てた"
           }
         }
       },

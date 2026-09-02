@@ -439,7 +439,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Sur Talimi',
-    desc: "Yüksek Gözcü'nün üstündeki antrenman kuklasına toplam 1.000 hasar ver.",
+    desc: 'Bir antrenman kuklasına toplam 1.000 hasar ver.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Soğuk Su, Daha Soğuk Işık',

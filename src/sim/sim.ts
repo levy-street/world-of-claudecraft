@@ -272,6 +272,7 @@ import { formatMoney } from './format_money';
 import * as groundAoeReadouts from './ground_aoe_readouts';
 import type { GuildBankState, GuildMembership } from './guild_bank';
 import * as guildBankMod from './guild_bank';
+import { spawnHubPractice } from './hub_practice';
 import * as raidReadouts from './ignivar_raid_readouts';
 import * as interaction from './interaction';
 import type { ExtractOutcome, ExtractRef } from './inventory_extract';
@@ -2440,10 +2441,11 @@ export class Sim {
       }
     }
 
-    // Escort quest NPCs (src/sim/escort.ts). Last on purpose: the spawns draw
-    // no rng and only consume trailing entity ids, so every id and rng draw
-    // above stays byte-identical to a world without escorts.
+    // Escort NPCs (escort.ts) and the hub practice yard (hub_practice.ts) last
+    // on purpose: rng-free, trailing ids only, so everything above is byte-
+    // identical to a world without them.
     initEscortsImpl(this.ctx);
+    spawnHubPractice(this.ctx, worldContent);
   }
 
   private spawnHealerPracticeDummy(): void {

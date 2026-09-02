@@ -2010,6 +2010,27 @@ export const NPC_LOOKS: Record<string, NpcLookDef> = {
     worn: kit('druid'),
     props: 'oak_stave',
   },
+  // Drillmaster Hale: the Eastbrook quay's sparring master, keeper of the hub
+  // training dummy (content/practice_dummies.ts). Grey-shaved veteran in the
+  // marshal's brick red with a warhammer: Rook's trade, not his face.
+  drillmaster_hale: {
+    app: {
+      gender: 'male',
+      hair: 'buzz',
+      ...hair(30, 0.06, 0.55),
+      beard: 'stubble',
+      brows: 'bushy',
+      eyeShape: 'narrow',
+      ...eyes(30, 0.3, 0.32),
+      ...skin(24, 0.45, 0.42),
+      mouth: 'frown',
+      face: face({ brow: 0.4, jaw: 0.35, cheeks: -0.15 }),
+      body: body({ shoulders: 0.4, chest: 0.3, elbows: 0.2 }),
+      outfit: 'crimson',
+    },
+    worn: kit('knight'),
+    props: 'hammer',
+  },
 };
 
 /**

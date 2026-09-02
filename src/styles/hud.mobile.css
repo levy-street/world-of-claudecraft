@@ -2591,6 +2591,16 @@
     overflow-y: auto;
     pointer-events: auto;
   }
+  /* The practice DPS tracker (src/ui/hud/practice/) is a live child of this
+     stack too: a dummy run's live number is what a player changes a build
+     against, so it stays up in this seat under the same bound and affordance
+     as the two above (its own rule so the pinned two-selector rule above stays
+     byte-stable for tests/mobile_touch_xhb_exclusivity.test.ts). */
+  body.mobile-touch.xhb-mode #practice-tracker {
+    max-height: calc((var(--app-vh, 100vh) - 128px) / var(--ui-scale, 1) - 172px);
+    overflow-y: auto;
+    pointer-events: auto;
+  }
   /* Trimmed to the launchers with no other pad-reachable path: Quick Actions'
      own strip (#mobile-menu-strip, kept up alongside this rail per the review
      above) already covers Character, Spellbook, World Map, Bags, Quest Log,
@@ -3690,6 +3700,26 @@
     right: max(10px, env(safe-area-inset-right));
     top: max(150px, env(safe-area-inset-top));
     width: calc(190px * var(--mobile-chrome-scale, 1));
+  }
+  /* The practice DPS tracker leaves the stack on touch: the stack's seat runs
+     down into the action ring, and this strip is tall (a live number plus a
+     run list). It re-seats under the target frame in the left column, the
+     one span the touch HUD leaves clear between the frame and the move zone,
+     compacted (smaller live number, the per-run total/time detail line
+     dropped; the per-second figures a build is compared on stay). */
+  body.mobile-touch #practice-tracker {
+    position: fixed;
+    left: max(18px, env(safe-area-inset-left));
+    right: auto;
+    top: max(96px, env(safe-area-inset-top));
+    width: calc(170px * var(--mobile-chrome-scale, 1));
+    font-size: 11px;
+  }
+  body.mobile-touch #practice-tracker .pt-live {
+    font-size: 16px;
+  }
+  body.mobile-touch #practice-tracker .pt-run-sum {
+    display: none;
   }
   /* The right-anchored tracker is REPLACED on touch by #quest-strip above, not
      restyled: it is fixed-width per tier and unbounded in height, so every extra

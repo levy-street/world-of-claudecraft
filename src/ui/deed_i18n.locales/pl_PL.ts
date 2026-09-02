@@ -448,7 +448,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Musztra na murach',
-    desc: 'Zadaj łącznie 1000 punktów obrażeń manekinowi treningowemu nad Wysoką Strażnicą.',
+    desc: 'Zadaj łącznie 1000 punktów obrażeń manekinowi treningowemu.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Zimna woda, zimniejsze światło',

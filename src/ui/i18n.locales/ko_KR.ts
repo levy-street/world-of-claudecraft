@@ -4940,6 +4940,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '영웅의 징표',
   'hudChrome.raidLockout.heroicName': '영웅: {name}',
   'hudChrome.raidLockout.heroicLocked': '영웅 난이도 {name}에 귀속되었습니다.',
+  'hudChrome.practiceDps.title': '훈련용 허수아비',
+  'hudChrome.practiceDps.prompt': '허수아비를 공격하여 측정을 시작하세요',
+  'hudChrome.practiceDps.previous': '이전 측정',
   'hudChrome.riftTracker.title': '균열',
   'hudChrome.riftTracker.floor': '{total}층 중 {current}층',
   'hudChrome.riftTracker.closesIn': '균열이 {time} 후 닫힙니다',
@@ -5367,6 +5370,12 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '그것이 쓰러지는 순간 백사장이 침묵했다네, {playerName}. 이 물가에서 십 년을 일하며 처음 듣는 침묵이었지. 선원들은 이제 그저 뼈일 뿐이야. 쉬고 있는 뼈지. 보물 더미 맨 위의 어깨덮개를 가져가게. 어차피 산 사람의 등에 더 잘 맞을 물건이었으니.',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '난파선 감시자 처치',
+  'entities.quests.q_hub_know_your_numbers.title': '네 숫자를 알아라',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '잴 수 없는 힘은 키울 수 없는 힘이다, {playerName}. 내 뒤의 훈련용 허수아비를 왼쪽 클릭해서 대상으로 삼아라. 그다음 휘두르기 전에 Shift를 누른 채 H를 눌러 피해량 미터를 열어라. 이제 열 번 맞혀라. 베기든 주문이든 상관없다. 치는 동안 창을 지켜봐라. 초당 피해와 총 피해를 세어 주고, 옆의 연습 표시줄이 최고 기록을 기억해 준다. 열 번을 채우면 돌아와서 그 숫자를 말해라.',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '열 번을 쳤으니 이제 그 값어치를 알겠지. 새 무기, 새 특성, 새 생각을 얻을 때마다, {playerName}, 이 기둥 앞으로 돌아와서 숫자를 매겨라. 골짜기는 거짓말을 해도 미터는 정직하다.',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '훈련용 허수아비에 일격 명중',
   'entities.quests.q_gc_wind_against_the_wick.title': '심지를 노리는 바람',
   'entities.quests.q_gc_wind_against_the_wick.text':
     '돌풍 정령은 심술이 난 바람이라네, {playerName}. 거울 호수 옆 높은 구릉에 모여들어서는, 눈에 띄는 불꽃마다 꺼 버리지. 등불 하나, 화롯불 하나, 그리고 언젠가는 이 등불까지. 삼십구 년을 이 올드 비컨의 불을 지켜 왔는데, 앙심 품은 날씨 따위에 잃을 수는 없네. 여덟을 흩어 버리게.',
@@ -14146,6 +14155,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '바닷가의 파수꾼',
   'entities.npcs.tidewarden_nel.greeting':
     '조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요.',
+  'entities.npcs.drillmaster_hale.name': '교관 헤일',
+  'entities.npcs.drillmaster_hale.title': '부두 대련 사범',
+  'entities.npcs.drillmaster_hale.greeting':
+    '내 뒤에 있는 기둥은 훈련용 허수아비다, {className}. 원하는 만큼 세게, 원하는 만큼 오래 쳐도 된다. 되받아치지도 않고 쓰러지지도 않으니까. 저놈의 진짜 쓸모는 장부다. Shift를 누른 채 H를 눌러 피해량 미터를 열어 봐라. 네가 저기에 꽂은 일격은 하나도 빠짐없이 거기 기록된다. 초당 수치도, 합계도. 옆의 연습 표시줄은 네 최고 기록을 기억해 두니, 새 무기나 새 특성이나 새 순환이 정말로 널 강하게 만들었는지 알 수 있지.',
   'entities.quests.q_ps_the_gauntlet.title': '건틀릿 완주',
   'entities.quests.q_ps_the_gauntlet.text':
     '골짜기가 인정하는 다리는 모두 이 길부터 달렸습니다, {playerName}. 첫 번째 길을 서쪽 깃발까지 걷고, 몸을 빙 돌려 남쪽 길을 두 번째 깃발까지 걸은 다음, 마지막 길은 옆걸음으로 붉은 깃발까지 가세요. 깃발은 순서대로 지나야 합니다. 화면 위의 카드가 그때그때 필요한 버튼을 보여 줄 거예요. 감독관 펠이 길 끝에서 모든 완주를 재고 있습니다. 붉은 깃발을 지나면 바로 그 자리에 서서 당신의 완주를 받아 줄 겁니다.',

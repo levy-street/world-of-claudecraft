@@ -415,6 +415,12 @@ const NOT_A_LANGUAGE_GATE: ReadonlyArray<{
       'lastHtml retains the last BUILT html (the repaint memo compares against it rather than the live innerHTML, so the island coach decorating painted rows in place no longer forces a rewrite-and-strobe every update). The built html embeds every localized string through t(), so a locale switch changes the freshly built side of the comparison and the tracker repaints by itself. Write-elision, not a data signature.',
   },
   {
+    file: 'hud/practice/practice_dps_controller.ts',
+    memos: ['lastHtml'],
+    reason:
+      'lastHtml retains the last BUILT markup of the practice DPS strip (the quest tracker idiom above): every string in it is resolved through t() and formatNumber at build time, so a locale switch changes the freshly built side of the comparison and the strip repaints on its next 250ms tick by itself. Write-elision over resolved text, not a data signature.',
+  },
+  {
     file: 'claudium_window.ts',
     memos: ['paintedWalletMarkup'],
     reason:
@@ -764,7 +770,10 @@ describe('language fan-out: half 2, every signature-gated src/ui surface is clas
       // hover row: movable_frame's `lastHoverCursor` elides an inline CSS
       // cursor-keyword write and can never hold text; the frame's t() labels
       // already ride the interface_unlock relocalize() arm.
-    ).toBe(12);
+      // 13 as of the practice DPS tracker's `lastHtml`: the quest tracker's
+      // built-markup idiom again (every string in it is resolved at build
+      // time, so the fresh side of the compare moves with the locale).
+    ).toBe(13);
   });
 
   it('gives every relocalize() in src/ui a caller in the fan-out', () => {

@@ -454,7 +454,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Ejercicios de muralla',
-    desc: 'Inflige 1000 de daño total al muñeco de entrenamiento sobre Highwatch.',
+    desc: 'Inflige 1000 de daño total a un muñeco de entrenamiento.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Agua fría, luz más fría',

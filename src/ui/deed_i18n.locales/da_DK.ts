@@ -420,7 +420,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Øvelser på Muren',
-    desc: 'Tilføj træningsdukken over Højvagten 1.000 skade i alt.',
+    desc: 'Tilføj en træningsdukke 1.000 skade i alt.',
   },
   chr_peaks_glimmer_cast: { name: 'Koldt Vand, Koldere Lys', desc: 'Fang en fisk i Glimmersøen.' },
   chr_peaks_moongate: {

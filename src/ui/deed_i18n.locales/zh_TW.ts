@@ -370,7 +370,7 @@ export const table: DeedLocaleTable = {
     desc: '見證山嶽故事的始末：擊潰龍教、讓聖所歸於沉寂、擊倒覺醒之峰，並剷除峭壁間每一個有名有姓的惡煞。',
     title: '荊峰之譽',
   },
-  chr_peaks_sparring: { name: '城牆操練', desc: '對高望上方的訓練假人造成總計 1,000 點傷害。' },
+  chr_peaks_sparring: { name: '城牆操練', desc: '對訓練假人造成總計 1,000 點傷害。' },
   chr_peaks_glimmer_cast: { name: '水寒，光更寒', desc: '在微光湖釣起一條魚。' },
   chr_peaks_moongate: { name: '穿過寒門', desc: '穿過微光湖畔的月門。' },
   chr_peaks_waking_witness: {

@@ -1251,6 +1251,15 @@ export const de_DE: EnTranslations = {
       "heroicName": "Heroisch {name}",
       "heroicLocked": "Du bist für Heroisch {name} gesperrt."
     },
+    "practiceDps": {
+      "title": "Practice Dummy",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "Attack the dummy to start a run",
+      "previous": "Previous runs",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
     "riftTracker": {
       "title": "Riss",
       "floor": "Ebene {current} von {total}",
@@ -1286,6 +1295,8 @@ export const de_DE: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/s",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m} Min. {s} Sek.",
       "seconds": "{s} Sek.",
@@ -15910,6 +15921,11 @@ export const de_DE: EnTranslations = {
         "title": "Hüterin des Strands",
         "greeting": "Die Flut nimmt, und die Flut zahlt, {playerName}. Ich führe die Rechnung über beides: was die Krabbler von den Wracks zwicken, und was ehrliche Hände diesen Pfad wieder heraufbringen."
       },
+      "drillmaster_hale": {
+        "name": "Drillmaster Hale",
+        "title": "Quay Sparring Master",
+        "greeting": "That post behind me is a training dummy, {className}: hit it as hard and as often as you like, it never swings back and it never goes down. What it is FOR is the tally. Hold Shift and press H to open your Damage Meters: every blow you land on it is counted there, per second and in total, and the practice strip beside it keeps your best run so you can tell whether a new weapon, a new talent or a new rotation actually made you stronger."
+      },
       "tidewatcher_ondrel": {
         "name": "Ondrel Vane",
         "title": "Gezeitenwächter",
@@ -18102,6 +18118,16 @@ export const de_DE: EnTranslations = {
         "objectives": {
           "0": {
             "label": "Der Wrackwächter gefällt"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "Know Your Numbers",
+        "text": "Strength you cannot measure is strength you cannot improve, {playerName}. Left-click the training dummy behind me to make it your target, then hold Shift and press H to open your Damage Meters before you swing. Now land ten blows on it, swings or spells, and watch the window while you do: it counts what you deal per second and in total, and the practice strip beside it remembers your best run. When the ten are in, come back and tell me the number.",
+        "completion": "Ten blows, and now you know what they are worth. Every time you take a new weapon, a new talent or a new idea, {playerName}, come back to this post and put a number on it. The meters are honest even when the vale is not.",
+        "objectives": {
+          "0": {
+            "label": "Blow landed on the Training Dummy"
           }
         }
       },

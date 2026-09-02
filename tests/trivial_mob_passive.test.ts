@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
 import type { Entity } from '../src/sim/types';
 import { dist2d } from '../src/sim/types';
+import { WORLD_WITHOUT_HUB_YARD } from './helpers/hub_yard';
 
 type TestSim = Sim & {
   dealDamage(
@@ -25,7 +26,12 @@ function testSim(sim: Sim): TestSim {
 }
 
 function makeSim() {
-  return new Sim({ seed: 42, playerClass: 'warrior', autoEquip: true });
+  return new Sim({
+    seed: 42,
+    playerClass: 'warrior',
+    autoEquip: true,
+    world: WORLD_WITHOUT_HUB_YARD,
+  });
 }
 
 function nearestMob(sim: Sim): Entity {

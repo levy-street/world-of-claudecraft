@@ -40,7 +40,12 @@ const NYTHRAXIS_ARENA = 'nythraxis_boss_arena';
 // Sim-construction overhead (same trimming as tests/training_dummy.test.ts).
 const PRACTICE_ROW_WORLD: WorldContent = {
   ...BUILTIN_WORLD,
-  camps: BUILTIN_WORLD.camps.filter((camp) => PRACTICE_ROW_ORDER.includes(camp.mobId)),
+  // Filtered by the row's own x too: the Eastbrook hub dummy is a second
+  // `training_dummy` camp (content/practice_dummies.ts HUB_PRACTICE_DUMMY_CAMPS)
+  // and must not stand in for the row's slot 1.
+  camps: BUILTIN_WORLD.camps.filter(
+    (camp) => PRACTICE_ROW_ORDER.includes(camp.mobId) && camp.center.x === PRACTICE_ROW_X,
+  ),
   npcs: {},
   groundObjects: [],
 };

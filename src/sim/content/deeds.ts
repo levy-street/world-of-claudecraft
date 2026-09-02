@@ -964,7 +964,7 @@ export const DEEDS: Record<string, DeedDef> = {
   chr_peaks_sparring: {
     id: 'chr_peaks_sparring',
     name: 'Wall Drills',
-    desc: 'Deal 1,000 total damage to the training dummy above Highwatch.',
+    desc: 'Deal 1,000 total damage to a training dummy.',
     category: 'chronicle',
     renown: 5,
     trigger: { kind: 'stat', stat: 'dummyDamage', count: 1000 },

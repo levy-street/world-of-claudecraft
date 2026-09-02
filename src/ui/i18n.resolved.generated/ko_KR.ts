@@ -1251,6 +1251,15 @@ export const ko_KR: EnTranslations = {
       "heroicName": "영웅: {name}",
       "heroicLocked": "영웅 난이도 {name}에 귀속되었습니다."
     },
+    "practiceDps": {
+      "title": "훈련용 허수아비",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "허수아비를 공격하여 측정을 시작하세요",
+      "previous": "이전 측정",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
     "riftTracker": {
       "title": "균열",
       "floor": "{total}층 중 {current}층",
@@ -1286,6 +1295,8 @@ export const ko_KR: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/초",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total} ({rate})",
       "minutesSeconds": "{m}분 {s}초",
       "seconds": "{s}초",
@@ -15910,6 +15921,11 @@ export const ko_KR: EnTranslations = {
         "title": "바닷가의 파수꾼",
         "greeting": "조수는 앗아 가고, 조수는 값을 치릅니다, {playerName}. 나는 그 양쪽 장부를 다 맡고 있죠. 종종게들이 난파선에서 집어 가는 것과, 정직한 손이 이 길로 날라 오는 것을요."
       },
+      "drillmaster_hale": {
+        "name": "교관 헤일",
+        "title": "부두 대련 사범",
+        "greeting": "내 뒤에 있는 기둥은 훈련용 허수아비다, {className}. 원하는 만큼 세게, 원하는 만큼 오래 쳐도 된다. 되받아치지도 않고 쓰러지지도 않으니까. 저놈의 진짜 쓸모는 장부다. Shift를 누른 채 H를 눌러 피해량 미터를 열어 봐라. 네가 저기에 꽂은 일격은 하나도 빠짐없이 거기 기록된다. 초당 수치도, 합계도. 옆의 연습 표시줄은 네 최고 기록을 기억해 두니, 새 무기나 새 특성이나 새 순환이 정말로 널 강하게 만들었는지 알 수 있지."
+      },
       "tidewatcher_ondrel": {
         "name": "온드렐 베인",
         "title": "조수지기",
@@ -18102,6 +18118,16 @@ export const ko_KR: EnTranslations = {
         "objectives": {
           "0": {
             "label": "난파선 감시자 처치"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "네 숫자를 알아라",
+        "text": "잴 수 없는 힘은 키울 수 없는 힘이다, {playerName}. 내 뒤의 훈련용 허수아비를 왼쪽 클릭해서 대상으로 삼아라. 그다음 휘두르기 전에 Shift를 누른 채 H를 눌러 피해량 미터를 열어라. 이제 열 번 맞혀라. 베기든 주문이든 상관없다. 치는 동안 창을 지켜봐라. 초당 피해와 총 피해를 세어 주고, 옆의 연습 표시줄이 최고 기록을 기억해 준다. 열 번을 채우면 돌아와서 그 숫자를 말해라.",
+        "completion": "열 번을 쳤으니 이제 그 값어치를 알겠지. 새 무기, 새 특성, 새 생각을 얻을 때마다, {playerName}, 이 기둥 앞으로 돌아와서 숫자를 매겨라. 골짜기는 거짓말을 해도 미터는 정직하다.",
+        "objectives": {
+          "0": {
+            "label": "훈련용 허수아비에 일격 명중"
           }
         }
       },

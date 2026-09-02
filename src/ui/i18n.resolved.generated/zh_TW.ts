@@ -1251,6 +1251,15 @@ export const zh_TW: EnTranslations = {
       "heroicName": "英雄難度:{name}",
       "heroicLocked": "你已被鎖定至英雄難度的{name}。"
     },
+    "practiceDps": {
+      "title": "訓練假人",
+      "liveDps": "{value} DPS",
+      "liveLabel": "This run",
+      "prompt": "攻擊假人以開始一輪測試",
+      "previous": "先前的測試",
+      "runLabel": "Run {index}",
+      "runSummary": "{total} in {time}"
+    },
     "riftTracker": {
       "title": "裂隙",
       "floor": "第 {current} 層，共 {total} 層",
@@ -1286,6 +1295,8 @@ export const zh_TW: EnTranslations = {
     },
     "meters": {
       "perSecond": "{value}/秒",
+      "thousands": "{value}k",
+      "millions": "{value}m",
       "perSecondRow": "{total}（{rate}）",
       "minutesSeconds": "{m}分{s}秒",
       "seconds": "{s}秒",
@@ -15910,6 +15921,11 @@ export const zh_TW: EnTranslations = {
         "title": "海灘的看守",
         "greeting": "潮水會拿走，潮水也會償還，{playerName}。這兩筆帳都由我來記：掠蟹從殘骸裡夾走的，和誠實的雙手沿這條路扛上來的。"
       },
+      "drillmaster_hale": {
+        "name": "操練官黑爾",
+        "title": "碼頭陪練師",
+        "greeting": "我身後那根樁子是訓練假人，{className}：想打多重、打多久都隨你，它不會還手，也永遠倒不下。它真正的用處，是那本帳。按住 Shift 再按 H 打開你的傷害統計：你落在它身上的每一擊都會記在那裡，有每秒的，也有總計的，旁邊的練習條還會記住你最好的一輪，這樣你就能看出一件新武器、一個新天賦或一套新循環到底有沒有讓你變強。"
+      },
       "tidewatcher_ondrel": {
         "name": "翁德瑞爾·韋恩",
         "title": "守潮者",
@@ -18102,6 +18118,16 @@ export const zh_TW: EnTranslations = {
         "objectives": {
           "0": {
             "label": "已擊倒沉船守衛"
+          }
+        }
+      },
+      "q_hub_know_your_numbers": {
+        "title": "認清你的數字",
+        "text": "量不出的力量就是提不高的力量，{playerName}。左鍵點擊我身後的訓練假人把它設為目標，然後在揮出第一擊之前按住 Shift 再按 H 打開你的傷害統計。接著往它身上落十擊，揮砍或法術都行，邊打邊盯著那扇視窗：它會統計你每秒和總共造成的傷害，旁邊的練習條會記住你最好的一輪。十擊打滿，回來把那個數字告訴我。",
+        "completion": "十擊打完，現在你知道它們值多少了。以後每拿到一件新武器、一個新天賦或一個新想法，{playerName}，就回到這根樁子前，給它記上一個數字。山谷未必誠實，統計永遠誠實。",
+        "objectives": {
+          "0": {
+            "label": "命中訓練假人"
           }
         }
       },

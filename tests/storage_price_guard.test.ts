@@ -194,8 +194,8 @@ const TREE_ALLOWANCES: ReadonlyArray<[file: string, value: number, anchor: strin
   // The /dev gold prompt's input bound (dev-gated tooling, not a price render).
   ['src/ui/dev_command_view.ts', 100000, 'boundedInteger'],
   // The millions threshold and divisor of the meter number formatter.
-  ['src/ui/meters.ts', 1000000, 'v >= 1000000'],
-  ['src/ui/meters.ts', 1000000, 'v / 1000000'],
+  ['src/ui/meters_format.ts', 1000000, 'v >= 1000000'],
+  ['src/ui/meters_format.ts', 1000000, 'v / 1000000'],
   // The census millions divisor.
   ['src/render/scene_census_core.ts', 1000000, 'const M = 1000000'],
   // A memo-size cap, not money.
@@ -423,7 +423,7 @@ describe('arm (c): distinctive table values (>= 100000) appear nowhere in any wa
     );
     // Every allowance is exercised: a stale entry (the constant moved, was
     // renamed, or changed value) reds here and gets deleted instead of
-    // lingering as a silent hole. The file:value keys dedupe (meters.ts
+    // lingering as a silent hole. The file:value keys dedupe (meters_format.ts
     // carries two anchored lines for one value); the ANCHOR set is pinned
     // exactly, per entry.
     expect([...used].sort()).toEqual(

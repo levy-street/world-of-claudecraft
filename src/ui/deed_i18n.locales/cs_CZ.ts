@@ -438,7 +438,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Dril na hradbách',
-    desc: 'Uštědři celkem 1 000 poškození Cvičnému panákovi nad Highwatchem.',
+    desc: 'Uštědři celkem 1 000 poškození cvičnému panákovi.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Studená voda, chladnější světlo',

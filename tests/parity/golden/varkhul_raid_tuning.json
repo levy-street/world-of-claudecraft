@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "c6eb4032",
       "events": "741638a5",
       "rng": {
@@ -161,8 +161,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1002,
-      "state": "fbad7e50",
+      "nextId": 1004,
+      "state": "1f7969cd",
       "events": "2d012d81",
       "rng": {
         "draws": 1,
@@ -172,8 +172,8 @@
     {
       "tick": 1,
       "time": 0.05,
-      "nextId": 1002,
-      "state": "fbad7e50",
+      "nextId": 1004,
+      "state": "1f7969cd",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -358,7 +358,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 999,
+          "id": 1001,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -437,9 +437,9 @@
     {
       "tick": 2,
       "time": 0.1,
-      "nextId": 1003,
-      "state": "8dd3270b",
-      "events": "4db61433",
+      "nextId": 1005,
+      "state": "eb757d64",
+      "events": "f0c3d653",
       "rng": {
         "draws": 1,
         "digest": "b0b9b284"
@@ -448,9 +448,9 @@
     {
       "tick": 3,
       "time": 0.15,
-      "nextId": 1003,
-      "state": "641ebbad",
-      "events": "6e11a49a",
+      "nextId": 1005,
+      "state": "e5663448",
+      "events": "403ffa10",
       "rng": {
         "draws": 1,
         "digest": "b0b9b284"
@@ -459,9 +459,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1003,
-      "state": "2ff6e7ae",
-      "events": "744c2efc",
+      "nextId": 1005,
+      "state": "ea5b3bb3",
+      "events": "bf4cf83b",
       "rng": {
         "draws": 1,
         "digest": "b0b9b284"
@@ -470,8 +470,8 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1003,
-      "state": "2ff6e7ae",
+      "nextId": 1005,
+      "state": "ea5b3bb3",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -638,7 +638,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1002,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -741,7 +741,7 @@
           }
         },
         {
-          "aggroTargetId": 1002,
+          "aggroTargetId": 1004,
           "aiState": "attack",
           "ccImmune": true,
           "comboUntil": -1,
@@ -753,7 +753,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "level": 22,
@@ -809,7 +809,7 @@
               9
             ],
             "attemptParticipantIds": [
-              1002
+              1004
             ],
             "cinderOrbsTimer": 998.95,
             "engage": {
@@ -869,7 +869,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 1002
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -887,7 +887,7 @@
           "fiveSecondRule": 99.15,
           "healPower": 5,
           "hp": 200,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -932,8 +932,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1003,
-      "state": "e8c371de",
+      "nextId": 1005,
+      "state": "6188c24f",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -943,8 +943,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1003,
-      "state": "e8c371de",
+      "nextId": 1005,
+      "state": "6188c24f",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1111,7 +1111,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1002,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1214,7 +1214,7 @@
           }
         },
         {
-          "aggroTargetId": 1002,
+          "aggroTargetId": 1004,
           "aiState": "idle",
           "ccImmune": true,
           "combatTimer": 0.05,
@@ -1227,7 +1227,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 999,
+          "id": 1001,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -1271,7 +1271,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 1002
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -1284,7 +1284,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.2,
           "healPower": 5,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 20,
@@ -1329,8 +1329,8 @@
     {
       "tick": 5,
       "time": 0.25,
-      "nextId": 1003,
-      "state": "e8c371de",
+      "nextId": 1005,
+      "state": "6188c24f",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -1497,7 +1497,7 @@
           ],
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1002,
+          "entityId": 1004,
           "equipment": {
             "chest": "recruit_tunic",
             "mainhand": "worn_sword",
@@ -1600,7 +1600,7 @@
           }
         },
         {
-          "aggroTargetId": 1002,
+          "aggroTargetId": 1004,
           "aiState": "idle",
           "ccImmune": true,
           "combatTimer": 0.05,
@@ -1613,7 +1613,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 200000,
-          "id": 999,
+          "id": 1001,
           "kind": "mob",
           "level": 22,
           "lootFfaTimer": "Infinity",
@@ -1657,7 +1657,7 @@
               "name": "Battle Stance",
               "remaining": 3599.85,
               "school": "physical",
-              "sourceId": 1002
+              "sourceId": 1004
             }
           ],
           "blockChance": 0.05,
@@ -1670,7 +1670,7 @@
           "dodgeChance": 0.0695,
           "fiveSecondRule": 99.2,
           "healPower": 5,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "player",
           "level": 20,

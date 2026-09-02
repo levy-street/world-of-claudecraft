@@ -15,7 +15,7 @@
     {
       "tick": 0,
       "time": 0,
-      "nextId": 999,
+      "nextId": 1001,
       "state": "06cbf5e3",
       "events": "741638a5",
       "rng": {
@@ -162,9 +162,9 @@
     {
       "tick": 4,
       "time": 0.2,
-      "nextId": 1001,
-      "state": "679c3955",
-      "events": "05ddda04",
+      "nextId": 1003,
+      "state": "2fd96a2c",
+      "events": "e0d347e9",
       "rng": {
         "draws": 0,
         "digest": "811c9dc5"
@@ -173,9 +173,9 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 1001,
-      "state": "e067e690",
-      "events": "8741bcf5",
+      "nextId": 1003,
+      "state": "d4081619",
+      "events": "3fb0604f",
       "rng": {
         "draws": 4,
         "digest": "f2a09d25"
@@ -184,8 +184,8 @@
     {
       "tick": 8,
       "time": 0.4,
-      "nextId": 1001,
-      "state": "e067e690",
+      "nextId": 1003,
+      "state": "d4081619",
       "events": "741638a5",
       "rng": {
         "draws": 4,
@@ -327,7 +327,7 @@
               "z": 14.20594
             }
           ],
-          "chargeTargetId": 999,
+          "chargeTargetId": 1001,
           "chargeTimeLeft": 2.6,
           "combatTimer": 0.05,
           "comboUntil": -1,
@@ -379,7 +379,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 999,
+          "targetId": 1001,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -410,7 +410,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -466,7 +466,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -514,9 +514,9 @@
     {
       "tick": 12,
       "time": 0.6,
-      "nextId": 1002,
-      "state": "f83146ed",
-      "events": "a70b698e",
+      "nextId": 1004,
+      "state": "1b0a5718",
+      "events": "7433b2da",
       "rng": {
         "draws": 4,
         "digest": "f2a09d25"
@@ -525,9 +525,9 @@
     {
       "tick": 16,
       "time": 0.8,
-      "nextId": 1002,
-      "state": "c858f7b9",
-      "events": "6c6eefa9",
+      "nextId": 1004,
+      "state": "141bb8a8",
+      "events": "ae98ee13",
       "rng": {
         "draws": 7,
         "digest": "6fb8517f"
@@ -536,9 +536,9 @@
     {
       "tick": 20,
       "time": 1,
-      "nextId": 1002,
-      "state": "f5f1a7df",
-      "events": "71e92f8c",
+      "nextId": 1004,
+      "state": "03b1e1d0",
+      "events": "5262959b",
       "rng": {
         "draws": 7,
         "digest": "6fb8517f"
@@ -547,8 +547,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1002,
-      "state": "73878666",
+      "nextId": 1004,
+      "state": "6be196c9",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -558,8 +558,8 @@
     {
       "tick": 24,
       "time": 1.2,
-      "nextId": 1002,
-      "state": "73878666",
+      "nextId": 1004,
+      "state": "6be196c9",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -713,7 +713,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -817,7 +817,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 1001,
+          "targetId": 1003,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -838,7 +838,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -893,7 +893,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -960,7 +960,7 @@
           "fiveSecondRule": 99.8,
           "healPower": 12,
           "hp": 51,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1005,8 +1005,8 @@
     {
       "tick": 28,
       "time": 1.4,
-      "nextId": 1002,
-      "state": "c660e4a3",
+      "nextId": 1004,
+      "state": "ad26e0c4",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -1016,8 +1016,8 @@
     {
       "tick": 32,
       "time": 1.6,
-      "nextId": 1002,
-      "state": "dc914066",
+      "nextId": 1004,
+      "state": "54a6b109",
       "events": "741638a5",
       "rng": {
         "draws": 7,
@@ -1027,9 +1027,9 @@
     {
       "tick": 32,
       "time": 1.6,
-      "nextId": 1002,
-      "state": "11ed8ac3",
-      "events": "20780a3f",
+      "nextId": 1004,
+      "state": "5e92bfd8",
+      "events": "19dc2d73",
       "rng": {
         "draws": 10,
         "digest": "77bce0dc"
@@ -1182,7 +1182,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1291,7 +1291,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 1001,
+          "targetId": 1003,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -1326,7 +1326,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1395,7 +1395,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1462,7 +1462,7 @@
           "fiveSecondRule": 100.2,
           "healPower": 12,
           "hp": 51,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -1507,19 +1507,8 @@
     {
       "tick": 36,
       "time": 1.8,
-      "nextId": 1002,
-      "state": "12948214",
-      "events": "741638a5",
-      "rng": {
-        "draws": 10,
-        "digest": "77bce0dc"
-      }
-    },
-    {
-      "tick": 40,
-      "time": 2,
-      "nextId": 1002,
-      "state": "fd9f92b7",
+      "nextId": 1004,
+      "state": "58357171",
       "events": "741638a5",
       "rng": {
         "draws": 10,
@@ -1530,8 +1519,19 @@
       "tick": 40,
       "time": 2,
       "nextId": 1004,
-      "state": "133373c4",
-      "events": "dd4a7249",
+      "state": "767c9a7e",
+      "events": "741638a5",
+      "rng": {
+        "draws": 10,
+        "digest": "77bce0dc"
+      }
+    },
+    {
+      "tick": 40,
+      "time": 2,
+      "nextId": 1006,
+      "state": "f3c33a44",
+      "events": "e50e6893",
       "rng": {
         "draws": 19,
         "digest": "cc56cc1a"
@@ -1689,7 +1689,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -1799,7 +1799,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 1003,
+          "targetId": 1005,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -1831,7 +1831,7 @@
               "name": "Pack Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 999,
+              "sourceId": 1001,
               "value": 1.3
             }
           ],
@@ -1845,7 +1845,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1911,7 +1911,7 @@
               "name": "Pack Frenzy",
               "remaining": 8,
               "school": "physical",
-              "sourceId": 1000,
+              "sourceId": 1002,
               "value": 1.3
             }
           ],
@@ -1925,7 +1925,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -1992,7 +1992,7 @@
           "fiveSecondRule": 100.6,
           "healPower": 12,
           "hp": 51,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2043,7 +2043,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2099,7 +2099,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8969,
-          "id": 1003,
+          "id": 1005,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2147,9 +2147,9 @@
     {
       "tick": 44,
       "time": 2.2,
-      "nextId": 1004,
-      "state": "d13f1ca4",
-      "events": "b6777161",
+      "nextId": 1006,
+      "state": "ce2a0c78",
+      "events": "8a3f6e1b",
       "rng": {
         "draws": 48,
         "digest": "af3ea2a7"
@@ -2158,8 +2158,8 @@
     {
       "tick": 48,
       "time": 2.4,
-      "nextId": 1004,
-      "state": "6a2fb447",
+      "nextId": 1006,
+      "state": "063655c7",
       "events": "741638a5",
       "rng": {
         "draws": 84,
@@ -2169,8 +2169,8 @@
     {
       "tick": 52,
       "time": 2.6,
-      "nextId": 1004,
-      "state": "0affac18",
+      "nextId": 1006,
+      "state": "950f697e",
       "events": "741638a5",
       "rng": {
         "draws": 108,
@@ -2180,9 +2180,9 @@
     {
       "tick": 56,
       "time": 2.8,
-      "nextId": 1004,
-      "state": "c981923f",
-      "events": "ef496b78",
+      "nextId": 1006,
+      "state": "0ee3fa6d",
+      "events": "d4299d7e",
       "rng": {
         "draws": 133,
         "digest": "adf9125a"
@@ -2191,9 +2191,9 @@
     {
       "tick": 60,
       "time": 3,
-      "nextId": 1004,
-      "state": "38e5f520",
-      "events": "00167b10",
+      "nextId": 1006,
+      "state": "2ae7ebd6",
+      "events": "5bfa44f7",
       "rng": {
         "draws": 164,
         "digest": "730bbad5"
@@ -2202,8 +2202,8 @@
     {
       "tick": 64,
       "time": 3.2,
-      "nextId": 1004,
-      "state": "6bfb1170",
+      "nextId": 1006,
+      "state": "897a4b4e",
       "events": "741638a5",
       "rng": {
         "draws": 210,
@@ -2213,8 +2213,8 @@
     {
       "tick": 68,
       "time": 3.4,
-      "nextId": 1004,
-      "state": "a231802f",
+      "nextId": 1006,
+      "state": "ed6cf5b1",
       "events": "741638a5",
       "rng": {
         "draws": 240,
@@ -2224,8 +2224,8 @@
     {
       "tick": 72,
       "time": 3.6,
-      "nextId": 1004,
-      "state": "31167020",
+      "nextId": 1006,
+      "state": "27bffafa",
       "events": "22f84f13",
       "rng": {
         "draws": 270,
@@ -2235,8 +2235,8 @@
     {
       "tick": 76,
       "time": 3.8,
-      "nextId": 1004,
-      "state": "88078a4b",
+      "nextId": 1006,
+      "state": "72053e49",
       "events": "741638a5",
       "rng": {
         "draws": 298,
@@ -2246,9 +2246,9 @@
     {
       "tick": 80,
       "time": 4,
-      "nextId": 1004,
-      "state": "98c5f01b",
-      "events": "21669516",
+      "nextId": 1006,
+      "state": "dc962f9d",
+      "events": "927c4228",
       "rng": {
         "draws": 337,
         "digest": "ed84449e"
@@ -2257,9 +2257,9 @@
     {
       "tick": 84,
       "time": 4.2,
-      "nextId": 1004,
-      "state": "daf77962",
-      "events": "b126b330",
+      "nextId": 1006,
+      "state": "78c6820c",
+      "events": "380e5066",
       "rng": {
         "draws": 369,
         "digest": "7dd150f5"
@@ -2268,8 +2268,8 @@
     {
       "tick": 88,
       "time": 4.4,
-      "nextId": 1004,
-      "state": "e7e37564",
+      "nextId": 1006,
+      "state": "50cb0352",
       "events": "741638a5",
       "rng": {
         "draws": 409,
@@ -2279,8 +2279,8 @@
     {
       "tick": 92,
       "time": 4.6,
-      "nextId": 1004,
-      "state": "8c5eb953",
+      "nextId": 1006,
+      "state": "8d703f95",
       "events": "741638a5",
       "rng": {
         "draws": 463,
@@ -2290,9 +2290,9 @@
     {
       "tick": 96,
       "time": 4.8,
-      "nextId": 1004,
-      "state": "5ca1b10e",
-      "events": "6c6eefa9",
+      "nextId": 1006,
+      "state": "0b45726c",
+      "events": "ae98ee13",
       "rng": {
         "draws": 503,
         "digest": "1674fb7c"
@@ -2301,9 +2301,9 @@
     {
       "tick": 100,
       "time": 5,
-      "nextId": 1004,
-      "state": "c90f9c0d",
-      "events": "d783add7",
+      "nextId": 1006,
+      "state": "a3f54c71",
+      "events": "48f03551",
       "rng": {
         "draws": 548,
         "digest": "408384eb"
@@ -2312,8 +2312,8 @@
     {
       "tick": 104,
       "time": 5.2,
-      "nextId": 1004,
-      "state": "0778fd54",
+      "nextId": 1006,
+      "state": "a8fb9f84",
       "events": "741638a5",
       "rng": {
         "draws": 581,
@@ -2323,8 +2323,8 @@
     {
       "tick": 108,
       "time": 5.4,
-      "nextId": 1004,
-      "state": "13e3bfa8",
+      "nextId": 1006,
+      "state": "b6ba15cc",
       "events": "741638a5",
       "rng": {
         "draws": 626,
@@ -2334,9 +2334,9 @@
     {
       "tick": 112,
       "time": 5.6,
-      "nextId": 1004,
-      "state": "88d0f3cb",
-      "events": "7d2e60a3",
+      "nextId": 1006,
+      "state": "ee94c54b",
+      "events": "6e0ec798",
       "rng": {
         "draws": 670,
         "digest": "31981420"
@@ -2345,8 +2345,8 @@
     {
       "tick": 116,
       "time": 5.8,
-      "nextId": 1004,
-      "state": "49e16dbe",
+      "nextId": 1006,
+      "state": "c602e23e",
       "events": "741638a5",
       "rng": {
         "draws": 720,
@@ -2356,9 +2356,9 @@
     {
       "tick": 120,
       "time": 6,
-      "nextId": 1004,
-      "state": "197e02d7",
-      "events": "c4c16498",
+      "nextId": 1006,
+      "state": "a91a5a59",
+      "events": "e1cdcdfa",
       "rng": {
         "draws": 756,
         "digest": "742325a0"
@@ -2367,8 +2367,8 @@
     {
       "tick": 124,
       "time": 6.2,
-      "nextId": 1004,
-      "state": "6b17d29b",
+      "nextId": 1006,
+      "state": "032d301d",
       "events": "741638a5",
       "rng": {
         "draws": 802,
@@ -2378,9 +2378,9 @@
     {
       "tick": 128,
       "time": 6.4,
-      "nextId": 1004,
-      "state": "70d1896f",
-      "events": "f3433a48",
+      "nextId": 1006,
+      "state": "20f38909",
+      "events": "36b34ec2",
       "rng": {
         "draws": 845,
         "digest": "26d144a9"
@@ -2389,8 +2389,8 @@
     {
       "tick": 132,
       "time": 6.6,
-      "nextId": 1004,
-      "state": "4970c868",
+      "nextId": 1006,
+      "state": "d9eb881a",
       "events": "741638a5",
       "rng": {
         "draws": 895,
@@ -2400,9 +2400,9 @@
     {
       "tick": 136,
       "time": 6.8,
-      "nextId": 1004,
-      "state": "d9337878",
-      "events": "319d63a6",
+      "nextId": 1006,
+      "state": "2d7fc430",
+      "events": "f107543d",
       "rng": {
         "draws": 936,
         "digest": "c32d5366"
@@ -2411,8 +2411,8 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1004,
-      "state": "41bbe900",
+      "nextId": 1006,
+      "state": "be7819c6",
       "events": "741638a5",
       "rng": {
         "draws": 976,
@@ -2422,8 +2422,8 @@
     {
       "tick": 140,
       "time": 7,
-      "nextId": 1004,
-      "state": "41bbe900",
+      "nextId": 1006,
+      "state": "be7819c6",
       "events": "741638a5",
       "rng": {
         "draws": 976,
@@ -2588,7 +2588,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -2714,7 +2714,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 1003,
+          "targetId": 1005,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -2733,7 +2733,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.95,
               "school": "physical",
-              "sourceId": 999,
+              "sourceId": 1001,
               "value": 1.3
             }
           ],
@@ -2748,7 +2748,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 7974,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2803,7 +2803,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.95,
               "school": "physical",
-              "sourceId": 1000,
+              "sourceId": 1002,
               "value": 1.3
             }
           ],
@@ -2817,7 +2817,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2871,7 +2871,7 @@
           "fiveSecondRule": 105.6,
           "healPower": 12,
           "hp": 48,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -2922,7 +2922,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -2978,7 +2978,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.95,
               "school": "physical",
-              "sourceId": 1003,
+              "sourceId": 1005,
               "value": 1.3
             }
           ],
@@ -2993,7 +2993,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8877,
-          "id": 1003,
+          "id": 1005,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3042,9 +3042,9 @@
     {
       "tick": 144,
       "time": 7.2,
-      "nextId": 1004,
-      "state": "015170d1",
-      "events": "e0843107",
+      "nextId": 1006,
+      "state": "a92d30a3",
+      "events": "5dcd9be9",
       "rng": {
         "draws": 1011,
         "digest": "fbf95731"
@@ -3053,8 +3053,8 @@
     {
       "tick": 144,
       "time": 7.2,
-      "nextId": 1004,
-      "state": "015170d1",
+      "nextId": 1006,
+      "state": "a92d30a3",
       "events": "741638a5",
       "rng": {
         "draws": 1011,
@@ -3219,7 +3219,7 @@
           },
           "delveClears": {},
           "delveDaily": {},
-          "entityId": 1001,
+          "entityId": 1003,
           "equipment": {
             "chest": "apprentice_robe",
             "mainhand": "gnarled_staff"
@@ -3345,7 +3345,7 @@
             "sta": 61,
             "str": 61
           },
-          "targetId": 1003,
+          "targetId": 1005,
           "templateId": "warrior",
           "weapon": {
             "max": 5,
@@ -3364,7 +3364,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.75,
               "school": "physical",
-              "sourceId": 999,
+              "sourceId": 1001,
               "value": 1.3
             }
           ],
@@ -3379,7 +3379,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 7974,
-          "id": 999,
+          "id": 1001,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3434,7 +3434,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.75,
               "school": "physical",
-              "sourceId": 1000,
+              "sourceId": 1002,
               "value": 1.3
             }
           ],
@@ -3448,7 +3448,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8000,
-          "id": 1000,
+          "id": 1002,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3502,7 +3502,7 @@
           "fiveSecondRule": 105.8,
           "healPower": 12,
           "hp": 48,
-          "id": 1001,
+          "id": 1003,
           "inCombat": true,
           "kind": "player",
           "level": 1,
@@ -3553,7 +3553,7 @@
           "fallStartY": 6.672031,
           "fiveSecondRule": 99,
           "hostile": true,
-          "id": 1002,
+          "id": 1004,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {
@@ -3609,7 +3609,7 @@
               "name": "Pack Frenzy",
               "remaining": 4.75,
               "school": "physical",
-              "sourceId": 1003,
+              "sourceId": 1005,
               "value": 1.3
             }
           ],
@@ -3624,7 +3624,7 @@
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 8877,
-          "id": 1003,
+          "id": 1005,
           "inCombat": true,
           "kind": "mob",
           "leashAnchor": {

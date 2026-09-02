@@ -442,7 +442,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Luyện Đòn Trên Tường',
-    desc: 'Gây tổng cộng 1.000 sát thương lên Hình Nộm Tập Luyện phía trên Vọng Đài Cao.',
+    desc: 'Gây tổng cộng 1.000 sát thương lên một hình nộm tập luyện.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Nước Lạnh, Ánh Sáng Còn Lạnh Hơn',

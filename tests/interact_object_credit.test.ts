@@ -193,12 +193,20 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // sentinel: tutorial/ability_drill.ts credits it off the DAMAGE the
     // class's taught attack delivers, never through this ledger's object
     // path, so it has no objects to be distinct about.
-    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(24);
+    //
+    // Plus the hub dummy drill (q_hub_know_your_numbers, count 10), a fifth:
+    // tutorial/dummy_drill.ts credits it off every blow that lands on a
+    // training dummy, never through this ledger.
+    expect(interactObjectives.filter((o) => o.count > 1).length).toBe(25);
   });
 
   it.each(
     interactObjectives.filter(
-      (o) => o.count > 1 && o.itemId !== 'ps_gauntlet_flag' && o.itemId !== 'ps_ability_drill',
+      (o) =>
+        o.count > 1 &&
+        o.itemId !== 'ps_gauntlet_flag' &&
+        o.itemId !== 'ps_ability_drill' &&
+        o.itemId !== 'hub_dummy_drill',
     ),
   )('$questId can reach $count on distinct $itemId objects', ({ itemId, count }) => {
     expect(placedByItem.get(itemId) ?? 0).toBeGreaterThanOrEqual(count);
@@ -249,7 +257,7 @@ describe('every multi-count interact objective has enough distinct objects to fi
     }
   });
 
-  it('places every interact target in the world, a dungeon, or the five sentinels', () => {
+  it('places every interact target in the world, a dungeon, or the six sentinels', () => {
     // train_valorsteed (mounts_training.ts credits it off the trainer NPC),
     // ps_gauntlet_flag (tutorial/gauntlet_run.ts credits it by ordered
     // position against the authored checkpoints), ps_guild_signpost
@@ -260,7 +268,9 @@ describe('every multi-count interact objective has enough distinct objects to fi
     // ps_passing_stone joined them when the death lesson became a CARRIED
     // single-use item instead of a fixture to walk to (CX): its objective is
     // credited by the resurrection that ends the corpse run
-    // (tutorial/death_lesson.ts), never by an object click. Anything ELSE missing from both placement
+    // (tutorial/death_lesson.ts), never by an object click. hub_dummy_drill
+    // (tutorial/dummy_drill.ts) credits off every blow that lands on a
+    // training dummy. Anything ELSE missing from both placement
     // registries would mean an objective whose object spawns somewhere this
     // reasoning has not checked.
     const placedItemIds = new Set([
@@ -271,6 +281,7 @@ describe('every multi-count interact objective has enough distinct objects to fi
       (id) => !placedItemIds.has(id),
     );
     expect(unplaced.sort()).toEqual([
+      'hub_dummy_drill',
       'ps_ability_drill',
       'ps_gauntlet_flag',
       'ps_guild_signpost',

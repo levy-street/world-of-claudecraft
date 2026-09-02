@@ -367,7 +367,7 @@ export const table: DeedLocaleTable = {
     desc: '见证高山故事的始末：击溃龙教，肃清墓龙圣所，扳倒觉醒之峰，将峭壁间每一个恶名之敌尽数讨灭。',
     title: '荆峰之子',
   },
-  chr_peaks_sparring: { name: '城墙操练', desc: '对高望上方的训练假人造成总计 1,000 点伤害。' },
+  chr_peaks_sparring: { name: '城墙操练', desc: '对训练假人造成总计 1,000 点伤害。' },
   chr_peaks_glimmer_cast: { name: '水冷，光更冷', desc: '在微光湖钓起一条鱼。' },
   chr_peaks_moongate: { name: '穿过冰冷之门', desc: '踏入微光湖岸边的月门。' },
   chr_peaks_waking_witness: {

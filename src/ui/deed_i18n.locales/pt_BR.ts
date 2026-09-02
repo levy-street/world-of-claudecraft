@@ -454,7 +454,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Treino de Muralha',
-    desc: 'Cause 1.000 de dano total ao Boneco de Treino acima de Highwatch.',
+    desc: 'Cause 1.000 de dano total a um boneco de treino.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Água Fria, Luz Mais Fria',

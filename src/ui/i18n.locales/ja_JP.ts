@@ -4961,6 +4961,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄の証',
   'hudChrome.raidLockout.heroicName': 'ヒロイック:{name}',
   'hudChrome.raidLockout.heroicLocked': 'ヒロイックの{name}にロックされています。',
+  'hudChrome.practiceDps.title': '練習用ダミー',
+  'hudChrome.practiceDps.prompt': 'ダミーを攻撃して計測を開始',
+  'hudChrome.practiceDps.previous': 'これまでの計測',
   'hudChrome.riftTracker.title': 'リフト',
   'hudChrome.riftTracker.floor': 'フロア {current}/{total}',
   'hudChrome.riftTracker.closesIn': 'リフトは{time}後に閉じます',
@@ -5390,6 +5393,12 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '奴が倒れた瞬間、浜が静まり返った、{playerName}。この岸で働いて十年、初めて聞く静けさだった。船員たちはもうただの骨だ。休んでいる骨だよ。ほら、山のてっぺんのマントをお取り。もともと、生きた背中にこそ似合うものだったのさ。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': 'レックウォーデンを打ち倒した',
+  'entities.quests.q_hub_know_your_numbers.title': '己の数字を知れ',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '測れない力は伸ばせない力だ、{playerName}。後ろの訓練用人形を左クリックして標的にしろ。それから振る前に Shift を押しながら H でダメージメーターを開け。次に十回当てろ、剣でも呪文でも構わん。打ちながら窓を見ていろ。毎秒と合計の与ダメージを数えてくれるし、横の練習欄が最高記録を覚えていてくれる。十回入ったら戻ってきて、その数字を教えろ。',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '十発、これでそれぞれの値打ちが分かったな。新しい武器、新しい才能、新しい思いつきを手にするたびに、{playerName}、この柱の前に戻って数字を付けろ。谷は嘘をつくこともあるが、メーターは嘘をつかない。',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '訓練用人形に一撃を当てた',
   'entities.quests.q_gc_wind_against_the_wick.title': '灯芯に逆らう風',
   'entities.quests.q_gc_wind_against_the_wick.text':
     'ゲイルウィスプは、性悪になった風だ、{playerName}。ミラーターンのそばの高い丘陵に集まって、見つけた炎を片端から吹き消していく。ランタンを、炉の火を、そしていつかは、このランプをな。三十九年、わたしはビーコンを灯し続けてきた。逆恨みした天気なんぞに、消させてたまるか。八体、散らしてこい。',
@@ -14141,6 +14150,10 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '浜辺の番人',
   'entities.npcs.tidewarden_nel.greeting':
     '潮は奪い、潮は払う、{playerName}。私はその両方の帳簿をつけている。蟹どもが難破船から掠め取るものと、正直な手がこの道を運び上げてくるものとをね。',
+  'entities.npcs.drillmaster_hale.name': '教練官ヘイル',
+  'entities.npcs.drillmaster_hale.title': '波止場の稽古師範',
+  'entities.npcs.drillmaster_hale.greeting':
+    '後ろの柱は訓練用の人形だ、{className}。好きなだけ強く、好きなだけ何度でも打て。打ち返しては来ないし、倒れもしない。あれの本当の役目は勘定だ。Shift を押しながら H でダメージメーターを開け。お前が当てた一撃は残らずそこに記録される、毎秒の値も合計もな。横の練習欄はお前の最高記録を覚えているから、新しい武器や才能、新しい手順で本当に強くなったかどうかが分かる。',
   'entities.quests.q_ps_the_gauntlet.title': 'ガントレットを走れ',
   'entities.quests.q_ps_the_gauntlet.text':
     '渓谷に名を知られた者は皆、まずこのレーンを走った、{playerName}。最初のレーンを西へ旗まで歩き、その場で向きを変え、南のレーンを二本目の旗まで歩き、それから最後のレーンを赤い旗まで横歩きで進むんだ。旗は順番どおりに通ること。画面上部のカードが、そのつど必要なボタンを見せてくれる。監督官ペルがレーンの先で走りをすべて計っている。赤い旗を越えれば、彼がすぐそこに立って走りを受け取ってくれるよ。',

@@ -450,7 +450,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: '성벽 훈련',
-    desc: '하이워치 위쪽의 훈련용 허수아비에게 총 1,000의 피해를 입히십시오.',
+    desc: '훈련용 허수아비에게 총 1,000의 피해를 입히십시오.',
   },
   chr_peaks_glimmer_cast: {
     name: '찬 물, 더 찬 빛',

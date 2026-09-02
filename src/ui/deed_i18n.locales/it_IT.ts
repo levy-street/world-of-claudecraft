@@ -466,7 +466,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Esercitazioni sul Muro',
-    desc: "Infliggi 1.000 danni totali al manichino d'allenamento sopra Highwatch.",
+    desc: "Infliggi 1.000 danni totali a un manichino d'allenamento.",
   },
   chr_peaks_glimmer_cast: {
     name: 'Acqua Fredda, Luce più Fredda',

@@ -451,7 +451,7 @@ export const table: DeedLocaleTable = {
   },
   chr_peaks_sparring: {
     name: 'Muuroefeningen',
-    desc: 'Breng in totaal 1.000 schade toe aan de oefenpop boven Hoogwacht.',
+    desc: 'Breng in totaal 1.000 schade toe aan een oefenpop.',
   },
   chr_peaks_glimmer_cast: {
     name: 'Koud Water, Kouder Licht',

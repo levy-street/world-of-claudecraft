@@ -4787,6 +4787,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.heroic_mark.name': '英雄徽记',
   'hudChrome.raidLockout.heroicName': '英雄难度：{name}',
   'hudChrome.raidLockout.heroicLocked': '你已被锁定至英雄难度的{name}。',
+  'hudChrome.practiceDps.title': '训练假人',
+  'hudChrome.practiceDps.prompt': '攻击假人以开始一轮测试',
+  'hudChrome.practiceDps.previous': '之前的测试',
   'hudChrome.riftTracker.title': '裂隙',
   'hudChrome.riftTracker.floor': '第 {current} 层，共 {total} 层',
   'hudChrome.riftTracker.closesIn': '裂隙将在 {time} 后关闭',
@@ -5209,6 +5212,12 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.quests.q_gc_the_wreck_warden.completion':
     '它倒下的那一刻，海滩静了，{playerName}。我在这片岸上讨了十年生活，头一次听见这样的寂静。船员们如今只是白骨了，安息的白骨。把财货堆顶上那件披风拿走吧，它反正更合活人的背。',
   'entities.quests.q_gc_the_wreck_warden.objectives.0.label': '已击倒沉船守卫',
+  'entities.quests.q_hub_know_your_numbers.title': '认清你的数字',
+  'entities.quests.q_hub_know_your_numbers.text':
+    '量不出的力量就是提不高的力量，{playerName}。左键点击我身后的训练假人把它设为目标，然后在挥出第一击之前按住 Shift 再按 H 打开你的伤害统计。接着往它身上落十击，挥砍或法术都行，边打边盯着那扇窗口：它会统计你每秒和总共造成的伤害，旁边的练习条会记住你最好的一轮。十击打满，回来把那个数字告诉我。',
+  'entities.quests.q_hub_know_your_numbers.completion':
+    '十击打完，现在你知道它们值多少了。以后每拿到一件新武器、一个新天赋或一个新想法，{playerName}，就回到这根桩子前，给它记上一个数字。山谷未必诚实，统计永远诚实。',
+  'entities.quests.q_hub_know_your_numbers.objectives.0.label': '命中训练假人',
   'entities.quests.q_gc_the_wreck_warden.text':
     '现在你明白水手们为什么会爬起来了，{playerName}。有个东西披着这片岸上第一艘失事船的藤壶甲板，像看守一座受雇照管的墓园一样，看守着滩上的每一具船壳。它守着一批我垂涎了十年的财货，还有一群我更愿看到安息的船员。终结沉船守卫。带上朋友，死人站岗站得很牢。',
   'entities.quests.q_gc_the_wreck_warden.title': '沉船守卫',
@@ -13844,6 +13853,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.npcs.tidewarden_nel.title': '海滩的看守',
   'entities.npcs.tidewarden_nel.greeting':
     '潮水会拿走，潮水也会偿还，{playerName}。这两笔账都由我来记：掠蟹从残骸里夹走的，和诚实的双手沿这条路扛上来的。',
+  'entities.npcs.drillmaster_hale.name': '操练官黑尔',
+  'entities.npcs.drillmaster_hale.title': '码头陪练师',
+  'entities.npcs.drillmaster_hale.greeting':
+    '我身后那根桩子是训练假人，{className}：想打多重、打多久都随你，它不会还手，也永远倒不下。它真正的用处，是那本账。按住 Shift 再按 H 打开你的伤害统计：你落在它身上的每一击都会记在那里，有每秒的，也有总计的，旁边的练习条还会记住你最好的一轮，这样你就能看出一件新武器、一个新天赋或一套新循环到底有没有让你变强。',
   'entities.quests.q_ps_the_gauntlet.title': '跑过试炼跑道',
   'entities.quests.q_ps_the_gauntlet.text':
     '谷地敬重的每一双腿，都是先从这几条跑道跑出来的，{playerName}。沿第一条跑道向西走到旗帜处，原地转过身来，沿南边的跑道走到第二面旗，最后沿末尾的跑道横移到红旗处。旗帜要按顺序经过；屏幕上方的卡片会随时告诉你该按哪个键。监工佩尔在跑道尽头掐着每一趟的表：等红旗被你甩在身后，他就站在那里等着收你的成绩。',

@@ -41,6 +41,7 @@ import { computeCharacterModifiers } from '../set_bonus_mods';
 import type { PlayerMeta } from '../sim';
 import type { DamageResolution, SimContext } from '../sim_context';
 import { addThreat, clearThreat, petCanSeeStealthedTarget } from '../threat';
+import { creditDummyDrill } from '../tutorial/dummy_drill';
 import type { DamageEventKind, Entity } from '../types';
 import {
   berserkerCritDamage,
@@ -1094,6 +1095,9 @@ export function dealDamage(
   // persisted lifetime damage counters beside the session RewardCounters
   // below, plus encounter participant tracking for the roster tasks.
   if (source) deedsMod.onDamageDealtForDeeds(ctx, source, target, amount, crit, kind);
+  // The hub dummy lesson (tutorial/dummy_drill.ts): one credit per blow that
+  // actually lands on a training dummy. Zero rng.
+  if (source && amount > 0) creditDummyDrill(ctx, source, target);
 
   // Thornhollow Fields assists: remember who softened a player before the blow
   // that finishes them. Only real damage on a live player counts, and the

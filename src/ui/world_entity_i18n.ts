@@ -363,6 +363,8 @@ const NPC_IDS = [
   'overseer_pell',
   'drillmaster_rook',
   'tidewarden_nel',
+  // the Eastbrook quay's sparring master (content/practice_dummies.ts)
+  'drillmaster_hale',
 ] as const;
 
 const QUEST_IDS = [
@@ -589,6 +591,8 @@ const QUEST_IDS = [
   'q_gc_the_far_shore',
   'q_gc_dead_mens_cargo',
   'q_gc_the_wreck_warden',
+  // the Eastbrook hub dummy lesson (content/practice_dummies.ts)
+  'q_hub_know_your_numbers',
 ] as const;
 
 const ZONE_IDS = [
