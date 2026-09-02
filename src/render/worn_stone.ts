@@ -38,6 +38,7 @@ import { registerDeferredPreload } from './assets/preload';
 import { GFX, type GfxSettings, type SurfaceMatOpts, surfaceMat } from './gfx';
 import { renderLayerDisabled } from './render_dev_flags';
 import { markSharedMaterial } from './shared_resource';
+import { applyTextureAnisotropy } from './texture_anisotropy';
 
 export type SurfaceFamily = 'stone' | 'rock' | 'wood' | 'plaster' | 'bark' | 'fabric' | 'metal';
 
@@ -400,7 +401,7 @@ function prepareFamilyTexture(
   const task = loadKtx2Texture(ktx2SiblingUrl(url), { repeat: true })
     .then((tex) => {
       const clone = tex.clone();
-      clone.anisotropy = 4;
+      applyTextureAnisotropy(clone, 'normal');
       clone.needsUpdate = true;
       fam.tex[channel] = clone;
     })

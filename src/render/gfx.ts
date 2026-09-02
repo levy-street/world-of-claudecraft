@@ -188,6 +188,21 @@ export interface GfxSettings {
   readonly surfaceDetail: boolean;
   /** worn-layer parallax refinement taps per fragment (0 = no parallax walk) */
   readonly surfaceDetailTaps: number;
+  /**
+   * Anisotropic-filtering taps for COLOUR maps (the terrain splat albedo array,
+   * every GLB albedo, water, the worn-stone family, face detail). Each tap is
+   * another texel fetch on every ground-adjacent fragment at a grazing angle,
+   * so the whole ground at 8x is memory bandwidth the integrated GPUs that
+   * carry the low tiers do not have, while a discrete desktop GPU absorbs it.
+   * A sampler parameter only: never actionable information (fairness rule).
+   */
+  readonly anisotropy: number;
+  /**
+   * Anisotropic taps for NORMAL and data maps: half the colour budget, floored
+   * at 1. Normals feed lighting rather than the read of a surface, so they buy
+   * less per tap than the colour map beside them.
+   */
+  readonly normalAnisotropy: number;
   /** worn-layer share of the full 2.2sd parallax offset clamp (0..1) */
   readonly surfaceDetailClampK: number;
   /** blade-grass carpet radius in world units; 0 disables the carpet */
@@ -1021,6 +1036,14 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
   // Hoisted out of the literal so denseDressing below can extend the cohort.
   const lowPlus =
     iosMemoryProfile || (tier === 'low' && (gpuClass === 'weak' || gpuClass === 'software'));
+  // Anisotropy ladder for colour maps; normals take half of it. Derived from
+  // the TIER (plus the memory profiles, which constrainedMemory already folds
+  // iosMemoryProfile into) and nothing else on purpose: the GLB loader stamps
+  // a parsed texture's anisotropy before the world renderer ever uploads it,
+  // and a value that also read the live adapter string would differ between
+  // the import-time profile and the post-initGfxTier one for the same tier.
+  const colourAnisotropy =
+    constrainedMemory || tier === 'low' ? 1 : tier === 'medium' ? 2 : tier === 'high' ? 4 : 8;
   let settings: GfxSettings = {
     graphicsConfigVersion: GFX_CONFIG_VERSION,
     tier,
@@ -1058,6 +1081,8 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     surfaceDetail: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     surfaceDetailTaps: tier === 'insane' ? 4 : gfxTierAtLeast(tier, 'ultra') ? 3 : 0,
     surfaceDetailClampK: tier === 'insane' ? 1 : tier === 'ultra' ? 0.85 : 0,
+    anisotropy: colourAnisotropy,
+    normalAnisotropy: Math.max(1, colourAnisotropy / 2),
     bladeCarpetRadius: iosMemoryProfile
       ? 0
       : gfxTierAtLeast(tier, 'ultra')

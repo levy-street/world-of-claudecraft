@@ -13,6 +13,8 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   surfaceDetail: 'boolean',
   surfaceDetailTaps: 'number',
   surfaceDetailClampK: 'number',
+  anisotropy: 'number',
+  normalAnisotropy: 'number',
   terrainRelief: 'number',
   bladeCarpetRadius: 'number',
   cliffScree: 'boolean',
