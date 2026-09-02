@@ -14,6 +14,7 @@ import {
   deedTitleText,
   deedTranslationManifest,
   ensureDeedLocalesLoaded,
+  RETIRED_DEED_DESCRIPTION_FALLBACK_IDS,
   titledDisplayName,
   titledNameDecoration,
 } from '../src/ui/deed_i18n';
@@ -47,26 +48,29 @@ describe('deed_i18n English resolution', () => {
     expect(deedTitleText('dgn_deepward')).toBe('');
   });
 
-  it('manifests one row per name and desc plus one per title reward', () => {
+  it('manifests one row per release-filled name and desc plus one per title reward', () => {
     const manifest = deedTranslationManifest();
-    // 279 deeds x (name + desc) + the 43 shipped title rewards (both counts
-    // pinned by tests/deeds_content.test.ts): the Drakelands brood pair, the
-    // four Thornhollow Fields battleground deeds, the Rift coverage pair
-    // (dgn_rift, dgn_rift_s_rank), the seven per-craft rare-tier profession
-    // deeds, the twelve remaining starter-zone chronicle pairs, the four
-    // Reliquary Curator rank bridges (3 titles + 1 border; the border has no
-    // title manifest row), the three WARFARE lifetime-honor rank titles, the
-    // five Phase 18 Reliquary completion-ladder titles, the walk-in castle
-    // visit pair (no title reward), the Proving Shore graduation deed
-    // (no title reward), and the five Crucible raid deeds (the Varkhul
-    // flawless task carries the 43rd title).
-    expect(manifest.length).toBe(281 * 2 + 43);
-    expect(manifest.filter((row) => row.field === 'title').length).toBe(43);
+    const titleCount = Object.values(DEEDS).filter((d) => d.reward?.kind === 'title').length;
+    expect(manifest.length).toBe(
+      Object.keys(DEEDS).length * 2 + titleCount - RETIRED_DEED_DESCRIPTION_FALLBACK_IDS.length,
+    );
+    expect(manifest.filter((row) => row.field === 'title').length).toBe(titleCount);
     expect(manifest).toContainEqual({
       id: 'prog_veteran',
       field: 'title',
       source: 'Veteran',
     });
+    for (const id of RETIRED_DEED_DESCRIPTION_FALLBACK_IDS) {
+      expect(manifest).toContainEqual({ id, field: 'name', source: DEEDS[id].name });
+      if (DEEDS[id].reward?.kind === 'title') {
+        expect(manifest).toContainEqual({ id, field: 'title', source: DEEDS[id].reward.text });
+      }
+      expect(manifest, `${id}.desc`).not.toContainEqual({
+        id,
+        field: 'desc',
+        source: DEEDS[id].desc,
+      });
+    }
     for (const row of manifest) expect(row.source.length).toBeGreaterThan(0);
   });
 });
@@ -171,35 +175,13 @@ describe('deed locale chunks (the per-base-locale release fill)', () => {
   });
 
   const tableLocales = (): BaseLocale[] => Object.keys(tables) as BaseLocale[];
-  const retiredDescriptionFallbackIds = [
-    'chr_vale_chapter_ii',
-    'chr_vale_cup_debut',
-    'pvp_vcup_first_match',
-    'pvp_vcup_first_win',
-    'pvp_vcup_wins_10',
-    'pvp_vcup_wins_25',
-    'pvp_vcup_first_goal',
-    'pvp_vcup_hat_trick',
-    'pvp_vcup_golden_goal',
-    'pvp_vcup_first_save',
-    'pvp_vcup_clean_sheet',
-    'pvp_vcup_guild_win',
-    'pvp_fiesta_first_bout',
-    'pvp_fiesta_first_win',
-    'pvp_fiesta_double',
-    'pvp_fiesta_shutdown',
-    'pvp_fiesta_full_build',
-    'pvp_fiesta_powerups',
-    'pvp_fiesta_five_kills',
-  ] as const;
-
   it('carries one chunk per base locale', () => {
     expect(tableLocales().length).toBe(18);
   });
 
   it('omits retired-mode description fills until updated translations exist', () => {
     for (const lang of tableLocales()) {
-      for (const id of retiredDescriptionFallbackIds) {
+      for (const id of RETIRED_DEED_DESCRIPTION_FALLBACK_IDS) {
         expect(tables[lang][id]?.desc, `${lang}.${id}.desc`).toBeUndefined();
       }
     }
