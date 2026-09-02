@@ -1,6 +1,6 @@
 // Opt-in real-Postgres roundtrip for insertClientPerfReport and the phase 03
-// dimension columns plus the phase 05 suggestion_ids array. The insert's 44
-// positional parameters are the one place a renumbering slip lands values in
+// dimension columns plus the phase 05 suggestion_ids array and the GPU model
+// block. The insert's 48 positional parameters are the one place a renumbering slip lands values in
 // the wrong columns while every mocked-pool suite stays green, so this
 // roundtrip is the ONLY decisive guard: it writes a row of pairwise-distinct
 // values through the real statement, reads every column back by name, and
@@ -91,6 +91,14 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       osFamily: 'macos',
       glVendor: 'RoundtripVendor',
       glRendererBucket: 'apple-m3-pro',
+      // The GPU model block. Pairwise-distinct like every value above, and
+      // gl_laptop is deliberately FALSE rather than null here so a positional
+      // slip into another boolean column (auto_governor is true, mobile_touch
+      // is false) still flips an assertion.
+      glRendererRaw: 'ANGLE (Roundtrip, Roundtrip Renderer, D3D11-1.2.3.4)',
+      glModel: 'roundtrip-model',
+      glLaptop: false,
+      gpuHpAdapter: 'roundtrip-hp-adapter',
       zoneOrScenario: 'dungeon:hollow_crypt',
       source: 'gameplay',
       crowdBucket: '25-49',
@@ -141,6 +149,10 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     expect(r.os_family).toBe('macos');
     expect(r.gl_vendor).toBe('RoundtripVendor');
     expect(r.gl_renderer_bucket).toBe('apple-m3-pro');
+    expect(r.gl_renderer_raw).toBe('ANGLE (Roundtrip, Roundtrip Renderer, D3D11-1.2.3.4)');
+    expect(r.gl_model).toBe('roundtrip-model');
+    expect(r.gl_laptop).toBe(false);
+    expect(r.gpu_hp_adapter).toBe('roundtrip-hp-adapter');
     expect(r.zone_or_scenario).toBe('dungeon:hollow_crypt');
     expect(r.source).toBe('gameplay');
     expect(r.crowd_bucket).toBe('25-49');

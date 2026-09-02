@@ -5,6 +5,7 @@ import {
   getCharacter,
   insertClientPerfReport,
 } from './db';
+import { glLaptop, glModel } from './gpu_model_bucket';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
@@ -795,6 +796,10 @@ export async function handlePerfReport(
   const accountId = await authenticatedAccountId(req);
   const userAgent = String(req.headers['user-agent'] ?? '');
   const glRenderer = textIn(body.glRenderer, 160);
+  // The client's WebGPU high-performance adapter description
+  // (src/game/gpu_adapter_probe.ts), '' from a client that has none: an absent
+  // navigator.gpu, a refused adapter, or a client older than the probe.
+  const gpuHpAdapter = textIn(body.gpuHpAdapter, 160);
   const releaseVersion = textIn(body.releaseVersion, 40);
   const buildId = textIn(body.buildId, 40);
   const source = choiceIn(body.source, ['gameplay', 'benchmark'], 'gameplay');
@@ -852,6 +857,16 @@ export async function handlePerfReport(
     ),
     glVendor: textIn(body.glVendor, 80),
     glRendererBucket: bucketGpu(glRenderer || textIn(body.glRendererBucket, 80)),
+    // GPU model dimensions, one block on purpose. The renderer string was
+    // sanitized to 160 chars at the top and then DROPPED before storage; it is
+    // stored as received now, and gpu_model_bucket.ts parses the family key and
+    // form-factor verdict off it server-side (the client is never trusted to
+    // bucket). An absent renderer stores '' rather than the 'other' key, so a
+    // grouped read tells "no evidence" apart from "unrecognised GPU".
+    glRendererRaw: glRenderer,
+    glModel: glRenderer ? glModel(glRenderer) : '',
+    glLaptop: glLaptop(glRenderer),
+    gpuHpAdapter: gpuHpAdapter ? glModel(gpuHpAdapter) : '',
     zoneOrScenario: textIn(
       body.zoneOrScenario,
       80,

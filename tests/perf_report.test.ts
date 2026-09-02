@@ -129,6 +129,12 @@ describe('perf report ingestion', () => {
         graphicsPreset: 'ultra',
         gfxTier: 'ultra',
         glRendererBucket: 'apple-m2',
+        // The renderer string used to be dropped after bucketing; it is stored
+        // as received now, beside its parsed family and form-factor verdict.
+        glRendererRaw: 'ANGLE (Apple, ANGLE Metal Renderer: Apple M2)',
+        glModel: 'apple-m2',
+        glLaptop: null,
+        gpuHpAdapter: '',
         browserFamily: 'safari',
         osFamily: 'macos',
         viewportBucket: 'large-1440x900',
@@ -443,6 +449,107 @@ describe('perf report ingestion', () => {
       perfReportInternalsForTest.bucketGpu('ANGLE (Intel, Intel(R) Iris(TM) Plus Graphics 655)'),
     ).toBe('intel-iris');
     expect(perfReportInternalsForTest.bucketGpu('ANGLE (AMD Radeon Pro)')).toBe('amd');
+  });
+
+  it('stores the raw renderer string beside a parsed model and laptop verdict', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-laptop',
+          glRenderer:
+            'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Laptop GPU (0x000028A0) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.6094)',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.90' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        // The vendor bucket stays coarse: this row and a desktop 3060 are the
+        // same 'nvidia' there, which is exactly why the model block exists.
+        glRendererBucket: 'nvidia',
+        glRendererRaw:
+          'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 Laptop GPU (0x000028A0) Direct3D11 vs_5_0 ps_5_0, D3D11-32.0.15.6094)',
+        glModel: 'nvidia-rtx-4070',
+        glLaptop: true,
+      }),
+    );
+  });
+
+  it('clamps the stored renderer string to the wire bound and never stores a client bucket', async () => {
+    const oversized = `ANGLE (NVIDIA, NVIDIA GeForce RTX 3060 ${'x'.repeat(400)})`;
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-model-clamp',
+          glRenderer: oversized,
+          // A hostile client cannot hand the server a family key: gl_model is
+          // parsed server-side from the renderer string, never accepted.
+          glModel: 'nvidia-rtx-4090',
+          glLaptop: true,
+          glRendererRaw: 'attacker supplied',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.91' },
+      ),
+      fakeRes(),
+    );
+    const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+    expect(row?.glRendererRaw).toBe(oversized.slice(0, 160));
+    expect(row?.glRendererRaw.length).toBe(160);
+    expect(row?.glModel).toBe('nvidia-rtx-3060');
+    expect(row?.glLaptop).toBe(false);
+  });
+
+  it('buckets the WebGPU high-performance adapter with the same parser, and stores nothing without one', async () => {
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'gpu-hp-adapter',
+          glRenderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11)',
+          // The mismatch this column exists to find: the page renders on the
+          // iGPU while the high-performance adapter names a discrete part.
+          gpuHpAdapter: 'NVIDIA NVIDIA GeForce RTX 4070 Laptop GPU',
+          rawSummary: {},
+        },
+        { remoteAddress: '203.0.113.92' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glModel: 'intel-iris-xe', gpuHpAdapter: 'nvidia-rtx-4070' }),
+    );
+
+    // A client with no WebGPU (or one older than the probe) stores '', not the
+    // 'other' key: the summary reads '' as "no evidence" and skips the row.
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'gpu-hp-adapter-absent', glRenderer: 'Mali-G78 MP20', rawSummary: {} },
+        { remoteAddress: '203.0.113.93' },
+      ),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({ glModel: 'arm-mali-g78', glLaptop: null, gpuHpAdapter: '' }),
+    );
+  });
+
+  it('stores empty model dimensions when the client sends no renderer string at all', async () => {
+    await handlePerfReport(
+      fakeReq({ sessionId: 'gpu-model-absent', rawSummary: {} }, { remoteAddress: '203.0.113.94' }),
+      fakeRes(),
+    );
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        // '' rather than the 'other' key, so a grouped read tells a report with
+        // no renderer apart from one whose GPU could not be recognised.
+        glRendererRaw: '',
+        glModel: '',
+        glLaptop: null,
+        gpuHpAdapter: '',
+      }),
+    );
   });
 
   it('drops duplicate inserts from the same session inside the server throttle window', async () => {

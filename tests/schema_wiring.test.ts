@@ -812,6 +812,32 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(applied).toContain(
       "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] NOT NULL DEFAULT '{}'",
     );
+    // The GPU model block: additive, idempotent, and default-valued so a boot
+    // against a populated table rewrites no rows and every pre-column row
+    // reads as "no evidence" rather than as a wrong model.
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_renderer_raw TEXT NOT NULL DEFAULT ''",
+    );
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_model TEXT NOT NULL DEFAULT ''",
+    );
+    // Nullable on purpose: "cannot tell the form factor" is the common answer,
+    // and a NOT NULL default would flatten it into a claim.
+    expect(applied).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gl_laptop BOOLEAN',
+    );
+    expect(applied).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS gpu_hp_adapter TEXT NOT NULL DEFAULT ''",
+    );
+    // The vendor-level bucket is pinned coarse elsewhere; the model block sits
+    // BESIDE it and must never be spelled as a change to it.
+    expect(applied).not.toContain(
+      'ALTER TABLE client_perf_reports ALTER COLUMN gl_renderer_bucket',
+    );
+    // No new index rides the boot DDL for these columns: the summary reads them
+    // through a created_at-windowed aggregate, and a big live table's indexes go
+    // through the CONCURRENTLY seam.
+    expect(applied).not.toContain('client_perf_reports_os_model_created');
     // The worst-10s index must NEVER appear as transactional boot DDL: the
     // only CREATE for it is the post-commit CONCURRENTLY build (ruling R7).
     const commitIndex = h.calls.indexOf('COMMIT');
