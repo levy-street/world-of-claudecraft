@@ -134,7 +134,7 @@ or because a fill's provenance is not something the worklist can say:
   predecessors KEEP their overlay rows (kept, not reviewed: the engineering and rare-finds
   predecessors' non-Latin rows were stale or short when they were retired) and never reach the
   worklist. Named plainly: for each successor the Latin locales that carried a translation of
-  the predecessor render ENGLISH on the live page until this fill lands (eleven locales for the
+  the predecessor render ENGLISH on the live page until this fill lands (ten locales for the
   engineering materials prose, per the D085 frontend-seam review); the trade was a stale or
   count-wrong translation for correct English, taken deliberately at 19F.
 - **Two ratified keys with a recorded staleness exposure, no fill owed by any gate:** the

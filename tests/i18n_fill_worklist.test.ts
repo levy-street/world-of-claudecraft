@@ -192,7 +192,9 @@ describe('sibling selection (deterministic context)', () => {
 //       end to end (not just at the classify() unit level), plus the glossary ships
 //       in every batch and resolves each term per-locale.
 describe('worklist assembly (deterministic + blocked-prose segregation, end to end)', () => {
-  // A minimal but representative in-memory registry + sources. de_DE has 3 pending
+  // A minimal but representative in-memory registry + sources. de_DE has 5 pending
+  // (three main, two sim: the sim scope is allow-by-default, so a sim row is chrome
+  // unless its prefix is dialogue. or lore., which route to humanRequired). Main:
   // keys: one chrome (loading.worldProgress, with {done}/{total}), two prose
   // (classes.mage, entities.quests.q_wolves.title). es is fully translated (no work).
   const enFlat: Record<string, string> = {

@@ -20402,10 +20402,11 @@ cooking identityBodyOneMeal precedent, which is how a craftProse body on a dynam
 re-keyed; the 11i-era note that these keys 'could not be re-keyed' predates that override), the old
 key is retired in scripts/i18n_retired_keys.mjs, and five fresh non-Latin fills rode the same
 change (machine-authored, flagged for the maintainer's read); the 15 Latin rows land pending for
-the Phase 20 fill. STATED PLAINLY (the D085 frontend-seam review): eleven of those locales (cs_CZ,
-de_DE, es, es_ES, fr_CA, fr_FR, nl_NL, pt_BR, sv_SE, tr_TR, vi_VN) rendered a real translation
-of the retired body, count-wrong, and render raw English on the live engineering page until the
-Phase 20 fill; the other four (da_DK, id_ID, it_IT, pl_PL) were already English. The trade is a
+the Phase 20 fill. STATED PLAINLY (the D085 frontend-seam review, the count corrected by the
+fresh read): TEN of those locales (cs_CZ, de_DE, es, es_ES, fr_CA, fr_FR, nl_NL, pt_BR, sv_SE,
+vi_VN) rendered a real translation of the retired body, count-wrong, and render raw English on the
+live engineering page until the Phase 20 fill; the other five (da_DK, id_ID, it_IT, pl_PL, tr_TR)
+were already English (tr_TR never carried the row). The trade is a
 count-wrong translation for correct English, taken deliberately. Two corrections to the
 ratification's own text: the hoe ladder is documented in
 the gathering pages' tools note (guide.profPages.toolsNoteFourStarters since the review round's

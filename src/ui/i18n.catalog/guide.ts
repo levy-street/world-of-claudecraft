@@ -2845,8 +2845,10 @@ export const guideStrings = {
         // missing), and its five non-Latin fills predated the live English.
         // Superseded by materialsBodyThreeRods below, wired through the
         // bodyKey override in src/guide/pages/professions_craft.ts, and listed
-        // in scripts/i18n_retired_keys.mjs; kept so the reviewed overlay rows
-        // never strand (the reword-is-a-new-key convention).
+        // in scripts/i18n_retired_keys.mjs; kept so the overlay rows it still
+        // carries never strand (kept, not reviewed: the five non-Latin ones were
+        // stale and all of its translated rows count two rods; the
+        // reword-is-a-new-key convention).
         materialsBody:
           "Every land tool recipe consumes the tool one tier below it plus a FINE material, and that pairing is the whole land ladder: four Fine Iron Ore and a Skysilver Mining Pick become the Osmium Mining Pick, then two Glyphsteel Bars, two Fine Osmium Ore and that osmium pick become the Glyphsteel Mining Pick. The axe and sickle lines mirror the fine-plus-prior-tool shape with Fine Ashwood and Fine Highpine Logs, Fine Goldleaf and Fine Sunpetal Herbs, though their tier 5 rungs ask no Glyphsteel Bars: the pick is the one line that gets dearer at the top. The two rod recipes break the pattern on purpose: the Stormreel takes four Sunglint Koi and a Silverstream rod, the Tidewrought two Koi, eight Raw Slatefin Carp and that Stormreel, so the top of the angler's ladder is paid for on the water rather than at a vein.\n\nA fine material is not sold anywhere and does not drop from an ordinary harvest: you get it by working one of a zone's full-grade veins with a tool ranked above the material itself, which in practice means the tool one rung below the one you are trying to build (the easier veins a zone keeps for travellers yield the plain material whatever you swing). That is deliberate. On the craft route, a tier 5 tool comes from actually swinging the tier 4 one, not from a shopping trip; the Delve Marks counter is the one way around it. The single exception is the Glyphsteel Bar, refined and vendor-only, 1 silver 60 copper a bar from Quartermaster Bree in Highwatch or from Gizzel's own counter, so the Glyphsteel Mining Pick alone carries a fixed coin floor built into its cost.",
         materialsBodyThreeRods:
@@ -3043,8 +3045,9 @@ export const guideStrings = {
     // named the three node windfalls and not farming's golden harvest, which
     // rolls the same event. Superseded by rareBodyFourFlavors below (the
     // maintainer's wording for the crop windfall) and listed in
-    // scripts/i18n_retired_keys.mjs; kept so the reviewed overlay rows never
-    // strand (the reword-is-a-new-key convention).
+    // scripts/i18n_retired_keys.mjs; kept so the overlay rows it still carries
+    // never strand (kept, not reviewed: its five non-Latin rows omitted the
+    // flavor names and the deed sentence; the reword-is-a-new-key convention).
     rareBody:
       "Every harvest, whatever your skill, carries a 1 in {oneIn} chance of a rare find: a pristine vein in ore, ancient heartwood in timber, a moonlit bloom among the herbs. The find multiplies that harvest's yield {mult} times over, every unit arrives signed with your name regardless of the quality rolled, and the whole zone hears about it by name. Each flavor also inscribes its own zero-Renown deed in your Book of Deeds, a collector's mark that exists purely to prove it happened to you.",
     rareBodyFourFlavors:

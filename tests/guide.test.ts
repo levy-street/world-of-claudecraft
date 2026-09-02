@@ -2996,7 +2996,7 @@ describe('Guide professions gathering accuracy', () => {
     const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
     // Every shipped locale plus the pseudo-locale: a bundle missing from the
     // sweep is a locale this pin silently stopped guarding.
-    expect(locales.length).toBeGreaterThanOrEqual(supportedLanguages.length);
+    expect(locales.length).toBeGreaterThanOrEqual(supportedLanguages.length + 1);
     expect(supportedLanguages.length, 'the shipped locale count').toBe(22);
     for (const file of locales) {
       const source = readFileSync(`${dir}/${file}`, 'utf8');
