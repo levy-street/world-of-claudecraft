@@ -267,6 +267,39 @@ describe('the detector itself, driven over a fixture tree', () => {
 // on, because both options below are maintainer calls (one changes the hottest
 // cache in the HUD, the other widens a standing gate's reach).
 //
+// RULED (qr-19-single-slot-writer-slot-key, 2026-09-02, under qr-19-best-for-project):
+// MEASURED FIRST, then shaped on the number. Option A was prototyped (SingleSlotEntry
+// as four independent slots, shouldWriteSingleSlot comparing the requested kind's
+// slot) and driven through the whole battery it would have to pass: exactly the three
+// pins the row predicted go red (the DEFEAT arm, the entry-shape pin, and the
+// cross-kind clobber arm in tests/painter_host.test.ts) and nothing else moves, ARM 2's
+// deterministic skip-rate and allocation budgets pass unchanged, and
+// tests/painter_slot_collision.test.ts passes with its EXACT write and skip literals,
+// which means the real painters' steady-state write set is byte-identical under both
+// shapes. The tour (scripts/perf_tour.mjs, headless swiftshader, both viewports, two
+// runs each way on the same machine and the same Vite tree): hudHotDomWrites before
+// 1052 and 1072 desktop, 575 and 575 mobile; after 1062 and 1079 desktop, 585 and 589
+// mobile. No reduction exists to measure, and the after runs sit 7 to 14 writes above
+// the before runs on both viewports, inside the 20-write run-to-run band the two before
+// runs showed on desktop under software rasterization (the headed golden anchor 1062
+// was minted from 1054; this mode agrees with it to within two writes on run 1). The
+// per-element price is real and small: +16 bytes per routed element for the four-slot
+// record (72 to 88 bytes retained per entry, Node v26, median of five GC-fenced runs),
+// +144 bytes for a per-element Map. So the number says: Option A removes ZERO live
+// writes today, because every one of the seven shipped sites was already fixed in
+// Phase 18 and this scan holds the line, and what it buys is the deletion of the class
+// (the shapes the scan admits it cannot see) at +16 bytes per element.
+// RULED ON THE NUMBER: Option A is ROUTED OUT of this packet as a maintainer-owned
+// change (the row's own reading, taken by the maintainer on the figures above), this
+// scan stays the defence, and the follow-up is recorded in
+// docs/prd/masterwrought/phase-19-routed-followups.md (row D128). If a collision the
+// scan cannot see is ever measured, the prototype and the three pins it reds are the
+// starting point.
+// The two riders ride regardless: this guard stays keyed on the SHAPE and stays an AST
+// walk, and ARM 2's exemption rationale already states the per-(element, KIND)
+// guarantee exactly (hud_perf_budget.test.ts, landed 2026-08-31, so that rider was
+// already true when the phase document named it).
+//
 // The scan above is the CHEAP half and it is already in place. What follows is
 // what would make the class impossible rather than merely detected, with what
 // each actually costs, so the choice is between two priced options and not
