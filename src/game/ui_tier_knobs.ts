@@ -189,6 +189,49 @@ export function nameplateIntervalSec(tier: UiEffectsTier): number {
 }
 
 // ---------------------------------------------------------------------------
+// Nameplate SURFACE resolution: the backing-store pixel ratio of the one
+// full-viewport 2D canvas the overhead plates are composited on. This is a
+// compositor-cost knob, not a tier shed: the plate layer used to size itself at
+// min(devicePixelRatio, 2) whatever the 3D frame was doing, so a 1440p HiDPI
+// panel running the world at a 1.48 or 1.75 pixel-ratio cap (gfx_aa_policy_core)
+// still paid a native-resolution second full-screen surface. Bounding it by the
+// renderer's own EFFECTIVE ratio (the tier's pixelRatioCap times the live render
+// scale) means the text layer is never finer than the world under it.
+//
+// Two rules keep it fairness-safe and cheap:
+//  - a FLOOR of 1: a plate is text a player reads, so it never drops below CSS
+//    resolution however far the adaptive render scale backs off. Nothing is
+//    hidden or delayed by this knob, only resampled.
+//  - a QUANTIZED step: TextSpriteCache.setPixelRatio CLEARS the sprite cache on
+//    any change, and the adaptive render scale moves continuously, so an
+//    unquantized bound would re-rasterize every label on a scale wobble. The
+//    step rounds DOWN so the bound stays at or under the world ratio.
+// ---------------------------------------------------------------------------
+
+/** Never below CSS resolution: overhead plates are read, not decoration. */
+export const NAMEPLATE_PIXEL_RATIO_MIN = 1;
+/** The historical nameplate ceiling (min(devicePixelRatio, 2)), kept as the cap. */
+export const NAMEPLATE_PIXEL_RATIO_MAX = 2;
+/** Quantization step of the bound, so a moving render scale does not thrash the
+ *  label sprite cache (which clears on every pixel-ratio change). */
+export const NAMEPLATE_PIXEL_RATIO_STEP = 0.125;
+
+/** The nameplate surface's backing-store pixel ratio: the device ratio, capped at
+ *  NAMEPLATE_PIXEL_RATIO_MAX, bounded by the renderer's effective pixel ratio,
+ *  floored at NAMEPLATE_PIXEL_RATIO_MIN and quantized DOWN to
+ *  NAMEPLATE_PIXEL_RATIO_STEP. Pure: both ratios are injected (the painter reads
+ *  window.devicePixelRatio and the renderer reports its own). A non-finite or
+ *  non-positive input falls back to 1 rather than poisoning the surface size. */
+export function nameplatePixelRatio(devicePixelRatio: number, rendererPixelRatio: number): number {
+  const device = devicePixelRatio > 0 && Number.isFinite(devicePixelRatio) ? devicePixelRatio : 1;
+  const renderer =
+    rendererPixelRatio > 0 && Number.isFinite(rendererPixelRatio) ? rendererPixelRatio : device;
+  const bounded = Math.min(NAMEPLATE_PIXEL_RATIO_MAX, device, renderer);
+  const quantized = Math.floor(bounded / NAMEPLATE_PIXEL_RATIO_STEP) * NAMEPLATE_PIXEL_RATIO_STEP;
+  return Math.max(NAMEPLATE_PIXEL_RATIO_MIN, quantized);
+}
+
+// ---------------------------------------------------------------------------
 // Shared cadence predicate + tier coercion.
 // ---------------------------------------------------------------------------
 

@@ -4,13 +4,15 @@ import { existsSync, readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   createNameplateCanvasState,
-  NAMEPLATE_IMAGE_CACHE_LIMIT,
-  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
   NAMEPLATE_MARKER_ROW_HEIGHT,
   NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES,
   NAMEPLATE_TEXT_SPRITE_LIMIT,
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
+import {
+  NAMEPLATE_IMAGE_CACHE_LIMIT,
+  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
+} from '../src/render/nameplate_image_cache';
 import {
   NAMEPLATE_HERALDRY_EXTRA_LIFT,
   NAMEPLATE_HERALDRY_PLAQUE_PAD_X,

@@ -424,6 +424,7 @@ import {
   stageResidentMountPrewarmVisual,
 } from './mount_prewarm';
 import { mountVisualSpec } from './mount_visuals';
+import { createNameplateCadenceState, nameplateFullPassDue } from './nameplate_cadence_core';
 import { NameplatePainter } from './nameplate_painter';
 import {
   isProjectedNameplateAnchorVisible,
@@ -1900,7 +1901,7 @@ export class Renderer {
   private godRayZoneScale = 1;
   private viewport = { width: 1, height: 1 };
   private viewportPollTimer = 0;
-  private nameplateTimer = 0;
+  private readonly nameplateCadence = createNameplateCadenceState();
   private glVendor = '';
   private glRenderer = '';
   private contextLostCount = 0;
@@ -2163,6 +2164,10 @@ export class Renderer {
       world: this.sim,
       layer: this.nameplateLayer,
       getViewport: () => this.viewport,
+      // Bound the plate surface by the world's own effective ratio (see
+      // ui_tier_knobs.nameplatePixelRatio).
+      getRenderPixelRatio: () =>
+        Math.min(window.devicePixelRatio, GFX.pixelRatioCap) * this.effectiveRenderScale,
       showNameplates: () => this.showNameplates,
       showDevBadges: () => this.showDevBadges,
       showOwnNameplate: () => this.showOwnNameplate,
@@ -4388,6 +4393,7 @@ export class Renderer {
       contextRestored: this.contextRestoredCount,
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
+      nameplates: this.nameplatePainter.paintStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,
       lastFrame: snapshotRendererFrameStats(this.lastFrameStats),
       prewarm: this.lastPrewarmStats,
@@ -12296,20 +12302,12 @@ export class Renderer {
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'godRays', worldStart);
     phaseStart = this.markRendererPhase(framePhaseMs, 'world', phaseStart);
 
-    this.nameplateTimer += dt;
-    // Static-preset tiered cadence: the nameplate refresh interval follows
-    // the player's chosen graphics tier (the data-fx-level the preset applier
-    // stamps), NEVER the FPS governor (the two-controller rule). The
-    // LOW tier runs 1/15s, richer tiers 1/24s. The axis is the PRESET, not the device:
-    // the weak-GPU cost ceiling (the PR901 lesson) is restored through the device-aware
-    // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
-    // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
-    // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
-    const nameplateInterval = nameplateIntervalSec(
-      coerceFxTier(document.documentElement.dataset.fxLevel),
+    // The tier cadence rule and its rationale live in nameplate_cadence_core.ts.
+    const fullNameplatePass = nameplateFullPassDue(
+      this.nameplateCadence,
+      dt,
+      nameplateIntervalSec(coerceFxTier(document.documentElement.dataset.fxLevel)),
     );
-    const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
-    if (fullNameplatePass) this.nameplateTimer = 0;
     this.nameplatePainter.update(fullNameplatePass);
     this.updateChatBubbles();
     phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);

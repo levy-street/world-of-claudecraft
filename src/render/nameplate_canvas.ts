@@ -1,3 +1,4 @@
+import { NAMEPLATE_PIXEL_RATIO_MAX, NAMEPLATE_PIXEL_RATIO_MIN } from '../game/ui_tier_knobs';
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
@@ -9,6 +10,7 @@ import {
   nameplateHeraldryInto,
   nameplateHeraldryLift,
 } from './nameplate_heraldry_core';
+import { NameplateImageCache } from './nameplate_image_cache';
 import { drawNameplateLootIcon } from './nameplate_loot_icon';
 import { NAMEPLATE_BASE_WIDTH, nameplateHealthBarWidth } from './nameplate_pick_core';
 
@@ -114,7 +116,6 @@ export function createNameplateCanvasState(): NameplateCanvasState {
 }
 
 export const NAMEPLATE_MARKER_ROW_HEIGHT = 26;
-export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 // Nameplate labels scale their backing stores with DPR. The count remains a
 // secondary guard, while the 16 MiB RGBA budget is the hard memory ceiling.
 // At DPR 2 a representative 126x43 logical label retains about 85 KiB, so the
@@ -122,10 +123,6 @@ export const NAMEPLATE_MAX_PIXEL_RATIO = 2;
 // case from a 1536-entry count alone.
 export const NAMEPLATE_TEXT_SPRITE_LIMIT = 512;
 export const NAMEPLATE_TEXT_SPRITE_BUDGET_BYTES = 16 * 1024 * 1024;
-export const NAMEPLATE_IMAGE_CACHE_LIMIT = 160;
-export const NAMEPLATE_IMAGE_RETRY_BASE_FRAMES = 30;
-const NAMEPLATE_IMAGE_RETRY_MAX_FRAMES = 600;
-
 const TITLE_FONT = 'Cinzel, Georgia, serif';
 const NAME_STYLE: TextSpriteStyle = {
   font: `700 12px ${TITLE_FONT}`,
@@ -215,77 +212,6 @@ const HERALDRY_FRAME_WIDTH = 1;
 const HERALDRY_MOTIF_WIDTH = 1.25;
 const HERALDRY_RIVET_RADIUS = 1;
 
-interface CachedImage {
-  image: HTMLImageElement;
-  status: 'loading' | 'ready' | 'failed';
-  failures: number;
-  retryFrame: number;
-}
-
-class NameplateImageCache {
-  private readonly entries = new Map<string, CachedImage>();
-  private frame = 0;
-
-  beginFrame(): void {
-    this.frame++;
-  }
-
-  get(url: string): HTMLImageElement | null {
-    if (!url) return null;
-    let entry = this.entries.get(url);
-    if (!entry) {
-      entry = this.load(url, 0);
-      this.entries.set(url, entry);
-      this.trim();
-    } else if (entry.status === 'failed' && this.frame >= entry.retryFrame) {
-      entry = this.load(url, entry.failures);
-      this.entries.set(url, entry);
-    }
-    // Map insertion order is the LRU order. Every hit moves to the back, so a
-    // live working set above the cap evicts the least recently used URL even
-    // when every entry was touched in this frame.
-    this.entries.delete(url);
-    this.entries.set(url, entry);
-    return entry.status === 'ready' ? entry.image : null;
-  }
-
-  private load(url: string, failures: number): CachedImage {
-    const image = document.createElement('img');
-    const entry: CachedImage = {
-      image,
-      status: 'loading',
-      failures,
-      retryFrame: this.frame,
-    };
-    image.addEventListener('load', () => {
-      if (this.entries.get(url) !== entry) return;
-      entry.status = 'ready';
-      entry.failures = 0;
-    });
-    image.addEventListener('error', () => {
-      if (this.entries.get(url) !== entry) return;
-      entry.status = 'failed';
-      entry.failures++;
-      const delay = Math.min(
-        NAMEPLATE_IMAGE_RETRY_MAX_FRAMES,
-        NAMEPLATE_IMAGE_RETRY_BASE_FRAMES * 2 ** Math.min(5, entry.failures - 1),
-      );
-      entry.retryFrame = this.frame + delay;
-    });
-    image.referrerPolicy = 'no-referrer';
-    image.src = url;
-    if (image.complete && image.naturalWidth > 0) entry.status = 'ready';
-    return entry;
-  }
-
-  private trim(): void {
-    for (const key of this.entries.keys()) {
-      if (this.entries.size <= NAMEPLATE_IMAGE_CACHE_LIMIT) return;
-      this.entries.delete(key);
-    }
-  }
-}
-
 function roundedRect(
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -332,6 +258,12 @@ export class NameplateCanvasSurface {
   private readonly emoteStyle: TextSpriteStyle = { ...EMOTE_STYLE };
   private width = 0;
   private height = 0;
+  private layerHidden = false;
+  // Bumped by anything that changes how an UNCHANGED plate would be drawn: a
+  // late web-font load (which clears the sprite cache) and a forced-colors flip
+  // (which repaints every fill and stroke through the system palette). The
+  // repaint gate folds it in, so those two never leave a stale surface up.
+  private styleRev = 0;
   private readonly heraldry = createNameplateHeraldry();
   private readonly heraldryInput: NameplateHeraldryInput = {
     screenX: 0,
@@ -357,15 +289,44 @@ export class NameplateCanvasSurface {
       typeof window !== 'undefined' && typeof window.matchMedia === 'function'
         ? window.matchMedia('(forced-colors: active)')
         : null;
+    // Feature-detected: older WebKit MediaQueryList has only addListener, and a
+    // stub host may have neither. A missing listener costs a repaint on a
+    // forced-colors flip, never correctness on any frame that draws.
+    if (typeof this.forcedColorsMql?.addEventListener === 'function') {
+      this.forcedColorsMql.addEventListener('change', this.handleStyleChange);
+    }
     parent.appendChild(canvas);
     if (document.fonts) {
-      void document.fonts.ready.then(() => this.text.clear());
-      document.fonts.addEventListener('loadingdone', this.handleFontsLoaded);
+      void document.fonts.ready.then(this.handleStyleChange);
+      document.fonts.addEventListener('loadingdone', this.handleStyleChange);
     }
   }
 
-  beginFrame(width: number, height: number, devicePixelRatio: number): void {
-    const pixelRatio = Math.max(1, Math.min(NAMEPLATE_MAX_PIXEL_RATIO, devicePixelRatio || 1));
+  /** Monotonic stamp of everything that changes an unchanged plate's pixels. */
+  styleRevision(): number {
+    return this.styleRev;
+  }
+
+  /** Drop the layer out of the compositor while nothing is drawn on it, and put
+   *  it back the moment a plate returns. An always-present full-viewport canvas
+   *  is a second full-screen surface Chrome keeps composited even when every one
+   *  of its pixels is transparent; `hidden` removes it from the tree's boxes
+   *  entirely. The backing store is cleared on the way out, so an unhide can
+   *  never flash the plates of a previous frame. */
+  setLayerHidden(hidden: boolean): void {
+    if (hidden === this.layerHidden) return;
+    this.layerHidden = hidden;
+    this.canvas.hidden = hidden;
+    if (!hidden) return;
+    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  beginFrame(width: number, height: number, surfacePixelRatio: number): void {
+    const pixelRatio = Math.max(
+      NAMEPLATE_PIXEL_RATIO_MIN,
+      Math.min(NAMEPLATE_PIXEL_RATIO_MAX, surfacePixelRatio || 1),
+    );
     const backingWidth = Math.max(1, Math.ceil(width * pixelRatio));
     const backingHeight = Math.max(1, Math.ceil(height * pixelRatio));
     if (
@@ -389,8 +350,10 @@ export class NameplateCanvasSurface {
     this.images.beginFrame();
   }
 
+  /** Drop every baked label sprite (a language switch). Bumps the style
+   *  revision too: the same plate must be repainted in the new language. */
   clearTextCache(): void {
-    this.text.clear();
+    this.handleStyleChange();
   }
 
   drawBase(state: NameplateCanvasState, screenX: number, screenY: number): void {
@@ -529,12 +492,16 @@ export class NameplateCanvasSurface {
   }
 
   dispose(): void {
-    document.fonts?.removeEventListener('loadingdone', this.handleFontsLoaded);
+    document.fonts?.removeEventListener('loadingdone', this.handleStyleChange);
+    if (typeof this.forcedColorsMql?.removeEventListener === 'function') {
+      this.forcedColorsMql.removeEventListener('change', this.handleStyleChange);
+    }
     this.canvas.remove();
   }
 
-  private readonly handleFontsLoaded = (): void => {
+  private readonly handleStyleChange = (): void => {
     this.text.clear();
+    this.styleRev++;
   };
 
   private heraldryLift(state: NameplateCanvasState): number {

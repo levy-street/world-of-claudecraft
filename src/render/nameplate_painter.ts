@@ -3,6 +3,7 @@
 // projection, decluttering, text/image caches, and the single canvas surface.
 
 import * as THREE from 'three';
+import { nameplatePixelRatio } from '../game/ui_tier_knobs';
 import { ABILITIES, MOBS, QUESTS } from '../sim/data';
 import { specialRoleColor } from '../sim/discord_roles';
 import { isQuestGatedEntityHidden } from '../sim/quest_gated_entity';
@@ -37,6 +38,7 @@ import {
 import { COMBO_PIP_MAX } from './nameplate_combo';
 import { declutterNameplatesInPlace, type NameplateAnchor } from './nameplate_declutter';
 import { nameplateHeraldryLift } from './nameplate_heraldry_core';
+import { NameplatePaintGate } from './nameplate_paint_gate_core';
 import { type NameplatePickCandidate, pickNameplateHealthBarAt } from './nameplate_pick_core';
 import {
   isNameplateScreenAnchorVisible,
@@ -98,6 +100,11 @@ export interface NameplatePainterDeps {
   layer: HTMLElement;
   getViewport: () => { width: number; height: number };
   getDevicePixelRatio?: () => number;
+  /** The renderer's own effective pixel ratio (its pixelRatioCap times the live
+   *  render scale). The plate surface is bounded by it so a downscaled 3D frame
+   *  is never overlaid by a native-resolution text layer. Absent (the editor
+   *  viewport, a test host) means "no bound beyond the device ratio". */
+  getRenderPixelRatio?: () => number;
   showNameplates: () => boolean;
   showDevBadges: () => boolean;
   showOwnNameplate: () => boolean;
@@ -111,6 +118,7 @@ export class NameplatePainter {
   private readonly world: IWorld;
   private readonly getViewport: () => { width: number; height: number };
   private readonly getDevicePixelRatio: () => number;
+  private readonly getRenderPixelRatio: () => number;
   private readonly showNameplates: () => boolean;
   private readonly showDevBadges: () => boolean;
   private readonly showOwnNameplate: () => boolean;
@@ -124,6 +132,9 @@ export class NameplatePainter {
   private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
   private anchorCount = 0;
   private i18nRevision = -1;
+  private readonly paintGate = new NameplatePaintGate();
+  private paints = 0;
+  private paintsSkipped = 0;
   // Quest-marker inputs (the shared quest_marker_kind rule), resolved lazily
   // on the first quest-bearing plate of a pass and dropped at every full
   // pass: craftingIdentity is a per-access allocation on the offline Sim,
@@ -154,6 +165,7 @@ export class NameplatePainter {
     this.getDevicePixelRatio =
       deps.getDevicePixelRatio ??
       (() => (typeof window === 'undefined' ? 1 : window.devicePixelRatio || 1));
+    this.getRenderPixelRatio = deps.getRenderPixelRatio ?? (() => Number.POSITIVE_INFINITY);
     this.showNameplates = deps.showNameplates;
     this.showDevBadges = deps.showDevBadges;
     this.showOwnNameplate = deps.showOwnNameplate;
@@ -172,7 +184,6 @@ export class NameplatePainter {
       this.i18nRevision = revision;
       this.surface.clearTextCache();
     }
-    this.surface.beginFrame(width, height, this.getDevicePixelRatio());
     this.anchorCount = 0;
 
     const showNameplates = this.showNameplates();
@@ -261,6 +272,39 @@ export class NameplatePainter {
     }
 
     declutterNameplatesInPlace(this.anchorScratch, this.anchorCount);
+
+    // The repaint decision comes AFTER decluttering, because decluttering is
+    // what moves an anchor: the gate must compare the anchors that will
+    // actually be drawn. A pass whose plates, anchors, viewport, surface ratio
+    // and style revision all match the last PAINTED pass would redraw the same
+    // pixels, so the whole clear-and-repaint of this full-viewport surface is
+    // skipped. Anything a player reads (a moved plate, HP, cast, selection,
+    // threat, content, opacity) differs and paints on its own frame.
+    const surfacePixelRatio = nameplatePixelRatio(
+      this.getDevicePixelRatio(),
+      this.getRenderPixelRatio(),
+    );
+    this.paintGate.beginPass(width, height, surfacePixelRatio, this.surface.styleRevision());
+    for (let i = 0; i < this.anchorCount; i++) {
+      const anchor = this.anchorScratch[i];
+      const state = this.states.get(anchor.id);
+      if (state) this.paintGate.notePlate(anchor.id, anchor.sx, anchor.sy, state);
+    }
+    if (!this.paintGate.needsPaint()) {
+      this.paintsSkipped++;
+      return;
+    }
+    this.paints++;
+    // Zero plates drawn (the toggle is off, or none are in view): drop the
+    // layer so the compositor stops carrying a full-screen surface for it. The
+    // first plate back unhides it below, before anything is drawn.
+    this.surface.setLayerHidden(this.anchorCount === 0);
+    if (this.anchorCount === 0) {
+      this.paintGate.commit();
+      return;
+    }
+
+    this.surface.beginFrame(width, height, surfacePixelRatio);
     for (let i = 0; i < this.anchorCount; i++) {
       const anchor = this.anchorScratch[i];
       const state = this.states.get(anchor.id);
@@ -273,6 +317,13 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawEmote(state, anchor.sx, anchor.sy);
     }
+    this.paintGate.commit();
+  }
+
+  /** Surface repaint accounting for `Renderer.perfStats()`: how many passes
+   *  painted the plate canvas and how many were skipped as identical. */
+  paintStats(): { paints: number; paintsSkipped: number } {
+    return { paints: this.paints, paintsSkipped: this.paintsSkipped };
   }
 
   remove(id: number): void {
@@ -292,6 +343,7 @@ export class NameplatePainter {
   dispose(): void {
     this.anchorCount = 0;
     this.states.clear();
+    this.paintGate.invalidate();
     this.surface.dispose();
   }
 
