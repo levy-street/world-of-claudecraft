@@ -36,6 +36,11 @@ export const SPIRIT_URLS: Record<string, string> = {
   wolf: 'models/creatures/wolf.glb',
   // the real quadruped, not the brown-tinted yeti biped this used to conjure
   bear: 'models/creatures/bear_form.glb',
+  // The druid tank form is the Kauriki, so its apparition has to be the
+  // Kauriki too: the spirit rises a moment before the caster's own body
+  // morphs, and a spectral bear ahead of a kiwi reads as the wrong spell.
+  // The bear entry stays because moonkin_form still borrows that silhouette.
+  kauriki: 'models/creatures/kauriki_form.glb',
   raptor: 'models/creatures/velociraptor.glb',
   stag: 'models/creatures/stag.glb',
   fox: 'models/creatures/fox.glb',
@@ -60,6 +65,7 @@ const SPIRIT_HEIGHT: Record<string, number> = {
   stag: 2.0,
   bull: 2.2,
   bear: 2.5,
+  kauriki: 2.5,
   hawk: 1.4,
   demon: 1.0,
   voidwalker: 2.4,
@@ -70,6 +76,7 @@ const SPIRIT_HEIGHT: Record<string, number> = {
 // Per-species animation tempo (a bear strides slower than a fox).
 const SPIRIT_TEMPO: Record<string, number> = {
   bear: 0.85,
+  kauriki: 0.85,
   bull: 1.0,
   wolf: 1.15,
   fox: 1.25,

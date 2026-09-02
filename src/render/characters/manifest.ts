@@ -431,29 +431,37 @@ const GREYJAW_WOLF: ClipMap = {
   attack: ['Greyjaw_Attack'],
 };
 
-// Druid Bear Form: a purpose-built quadruped rig (29 deform bones; the gaits are
-// authored as IK foot paths, so walkRef/runRef below are MEASURED off the clips
-// rather than guessed). Jump/Land are a pair: `land` opts the rig into the held
-// airborne treatment (see ClipMap.land).
+// Druid tank form: the Kauriki, a hulking white kiwi on a Tripo biped rig.
+// Replaces the quadruped bear.
 //
-// It deliberately names no `cast`, no `emote` and no `attackByAbility`. Bear-form
-// abilities are instant, and the ability-VFX painter gates its ceremonial cast
-// gesture on an authored per-ability clip (hasGestureClip) while the cast base
-// state falls back to idle without a `cast` clip. Leaving all three out is what
-// keeps an instant cast from firing a swipe; real attacks still resolve `attack`.
-const BEAR_FORM: ClipMap = {
-  idle: 'Idle',
-  walk: 'Walk',
-  run: 'Run',
-  attack: ['Attack'],
-  hit: ['Hit'],
-  death: 'Death',
-  jump: 'Jump',
-  land: 'Land',
-  sitIdle: 'Sit',
-  // a paddling walk beats the steep no-clip procedural prone on a quadruped,
-  // the same call the wolf forms make
-  swim: 'Walk',
+// It keeps the bear ClipMap's deliberate omissions, which are load-bearing:
+// no `cast`, no `emote`, no `attackByAbility`. Tank-form abilities are
+// instant, and the ability-VFX painter gates its ceremonial cast gesture on an
+// authored per-ability clip (hasGestureClip) while the cast base state falls
+// back to idle without a `cast` clip. Leaving all three out is what keeps an
+// instant cast from firing a swing; real attacks still resolve `attack`.
+// The rig DOES carry a retargeted Cast clip, which is exactly why it must not
+// be named here.
+//
+// Two entries the bear had are absent because this rig ships no such clip:
+// `land` (so a jump plays without the held airborne treatment) and `sitIdle`
+// (so sitting falls back to idle). `swim` reuses the walk, the same call the
+// bear and wolf forms make.
+//
+// walkRef/runRef are deliberately NOT set. The bear measured them off IK foot
+// paths authored for that quadruped; these gaits are retargeted biped presets,
+// and a stance-slide measurement on them is not stable enough to defend (the
+// walk estimate flips sign depending on how strictly a planted frame is
+// defined). Every other biped visual in this file omits them too.
+const KAURIKI_FORM: ClipMap = {
+  idle: 'Kauriki_Idle',
+  walk: 'Kauriki_Walk',
+  run: 'Kauriki_Run',
+  attack: ['Kauriki_Haka'],
+  hit: ['Kauriki_Hit'],
+  death: 'Kauriki_Death',
+  jump: 'Kauriki_Jump',
+  swim: 'Kauriki_Walk',
 };
 
 // Custom wild boar rig (wild_boar.glb)
@@ -1822,18 +1830,17 @@ export const VISUALS: Record<string, VisualDef> = {
     height: 1.2,
     clips: animal(['Attack_Headbutt']),
   },
-  // Purpose-built quadruped (replaced a brown-tinted yeti, which was a biped
-  // standing in for a bear). No tint: the sculpt ships its own texture.
-  // walkRef/runRef are measured from the clips themselves (a planted foot slides
-  // backwards relative to the hips at exactly body speed), scaled by
-  // height/rawHeight = 2.35/0.588. They put full run (RUN_SPEED 7) at timeScale
-  // 1.30, clear of the 1.6 clamp where feet start skating.
+  // The Kauriki: the druid tank body, a hulking white kiwi (replaced a
+  // purpose-built bear quadruped). No tint: the sculpt ships its own texture.
+  // Tripo bipeds face +X while character visuals face +Z at world facing 0,
+  // hence the yaw. The attack is a haka, authored to 0.783s so it drops into
+  // the same swing slot the bear Attack occupied at attackTimeScale 1.
   form_bear: {
-    url: `${CREATURES}/bear_form.glb`,
-    height: 2.35,
-    clips: BEAR_FORM,
-    walkRef: 1.6,
-    runRef: 5.4,
+    url: `${CREATURES}/kauriki_form.glb`,
+    animUrls: [`${CREATURES}/kauriki_form_anims.glb`],
+    height: 2.5,
+    yaw: -Math.PI / 2,
+    clips: KAURIKI_FORM,
     attackTimeScale: 1,
   },
   form_metamorph: {

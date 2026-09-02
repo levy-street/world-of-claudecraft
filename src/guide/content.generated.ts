@@ -12895,9 +12895,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ]
   },
   "form_bear": {
-    "url": "models/creatures/bear_form.glb",
-    "idle": "Idle",
-    "height": 2.35
+    "url": "models/creatures/kauriki_form.glb",
+    "idle": "Kauriki_Idle",
+    "height": 2.5,
+    "yaw": -1.5707963267948966
   },
   "form_cat": {
     "url": "models/creatures/wolf_basic.glb",
