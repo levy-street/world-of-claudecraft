@@ -101,6 +101,7 @@ import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
 import { FISHING_CATCH_BAND_THRESHOLDS } from '../src/sim/professions/fishing_bands';
 import {
   GATHER_RARE_EVENT_CHANCE,
+  GATHER_RARE_EVENT_SOURCES,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
 } from '../src/sim/professions/gather_events';
@@ -143,7 +144,13 @@ import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { entityTranslationKey } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
 import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
-import { ensureLocaleLoaded, type SupportedLanguage, setLanguage, t } from '../src/ui/i18n';
+import {
+  ensureLocaleLoaded,
+  type SupportedLanguage,
+  setLanguage,
+  supportedLanguages,
+  t,
+} from '../src/ui/i18n';
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { itemStrings } from '../src/ui/i18n.catalog/items';
 
@@ -2874,12 +2881,23 @@ describe('Guide professions gathering accuracy', () => {
     // since the farming go-live), and the note must count them and name each.
     // The 11i note said 'three' for a year of fills; a pin on the count alone
     // would have passed a note naming the wrong three.
+    // LAND tools only (the sentence says so, and a fenced fishing rod would
+    // otherwise make this pin demand a false sentence), and the price the
+    // sentence states is derived from the set, never held as a literal.
     const fenced = Object.values(ITEMS).filter(
-      (i) => i.use?.type === 'gatherTool' && i.noVendorSell && i.noMarketList,
+      (i) =>
+        i.use?.type === 'gatherTool' &&
+        i.use.professionId !== 'fishing' &&
+        i.noVendorSell &&
+        i.noMarketList,
     );
     expect(fenced.length, 'the fenced starter kit').toBeGreaterThanOrEqual(4);
+    const prices = new Set(fenced.map((i) => i.buyValue));
+    expect(prices.size, 'one starter price').toBe(1);
+    const [price] = prices;
     const COUNT_WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven'];
-    expect(en).toContain(`except the ${COUNT_WORDS[fenced.length]} 20-copper land starters`);
+    expect(COUNT_WORDS[fenced.length], 'a count word for the fenced set').toBeDefined();
+    expect(en).toContain(`except the ${COUNT_WORDS[fenced.length]} ${price}-copper land starters`);
     for (const tool of fenced) expect(en, `names ${tool.id}`).toContain(tool.name);
     // The retired claims, each pinned ABSENT so a revert reds rather than
     // quietly restoring a false page.
@@ -2969,7 +2987,9 @@ describe('Guide professions gathering accuracy', () => {
     // loader map, and the pending slice.
     const INFRA = new Set(['index.ts', 'loaders.ts', 'pending.ts']);
     const locales = readdirSync(dir).filter((f) => f.endsWith('.ts') && !INFRA.has(f));
-    expect(locales.length).toBeGreaterThan(15);
+    // Every shipped locale plus the pseudo-locale: a bundle missing from the
+    // sweep is a locale this pin silently stopped guarding.
+    expect(locales.length).toBeGreaterThanOrEqual(supportedLanguages.length);
     for (const file of locales) {
       const source = readFileSync(`${dir}/${file}`, 'utf8');
       // The exact key, and exactly one toolsNote row per slice (19F review
@@ -3167,7 +3187,10 @@ describe('Guide professions gathering accuracy', () => {
     // deed and no sentence reds here rather than shipping a note one short.
     setLanguage('en');
     const en = t('guide.profPages.rareBodyFourFlavors', { oneIn: '90', mult: '5' });
-    const flavors = (['ore', 'wood', 'herb', 'crop'] as const).map((s) => gatherRareEventFlavor(s));
+    // GATHER_RARE_EVENT_SOURCES is derived from the flavor record typed over the
+    // source union, so a fifth source reaches this loop the day it compiles.
+    expect(GATHER_RARE_EVENT_SOURCES.length).toBeGreaterThanOrEqual(4);
+    const flavors = GATHER_RARE_EVENT_SOURCES.map((s) => gatherRareEventFlavor(s));
     expect(new Set(flavors).size).toBe(flavors.length);
     for (const flavor of flavors) {
       expect(en, `names the ${flavor} windfall`).toContain(flavor.replace('_', ' '));
@@ -4320,10 +4343,17 @@ describe('Guide professions pages and routes', () => {
       const clause = rods.slice(start, stop);
       for (const reagent of recipe.reagents) {
         const name = ITEMS[reagent.itemId].name;
-        // A rod reagent is 'a Silverstream rod' / 'that Stormreel'; the fish
-        // carry their count word and full name (the koi is shortened to 'Koi'
-        // after its first mention, so the short form is accepted too).
-        if (ITEMS[reagent.itemId].use?.type === 'gatherTool') continue;
+        // A rod reagent is 'a Silverstream rod' / 'that Stormreel': its stem
+        // must sit in this clause (a bill re-based on another rod reds); the
+        // fish carry their count word and full name (the koi is shortened to
+        // 'Koi' after its first mention, so the short form is accepted too).
+        if (ITEMS[reagent.itemId].use?.type === 'gatherTool') {
+          const priorStem = name.split(' ')[0];
+          expect(clause, `the ${stem} clause names its prior rod ${priorStem}`).toContain(
+            priorStem,
+          );
+          continue;
+        }
         const word = COUNT_WORDS[reagent.count];
         expect(word, `a count word exists for ${reagent.count}`).toBeDefined();
         const short = name.endsWith(' Koi') ? 'Koi' : name;

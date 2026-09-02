@@ -205,7 +205,7 @@ describe('worklist assembly (deterministic + blocked-prose segregation, end to e
     'nav.home': 'Home',
   };
   const dictEn = {
-    sim: { 'combat.miss': 'Miss' },
+    sim: { 'combat.miss': 'Miss', 'dialogue.wolfmotherIntro': 'The pack remembers your scent.' },
     server: { 'who.online': 'Online' },
     admin: { 'app.title': 'Admin' },
   };
@@ -237,6 +237,8 @@ describe('worklist assembly (deterministic + blocked-prose segregation, end to e
         'main:classes.warrior': row('main', T),
         'main:entities.quests.q_wolves.title': row('main', P), // prose -> humanRequired
         'main:nav.home': row('main', T),
+        'sim:combat.miss': row('sim', P), // sim chrome -> autoFillable
+        'sim:dialogue.wolfmotherIntro': row('sim', P), // sim narrative -> humanRequired
       },
     },
     enFlat: { ...enFlat },
@@ -283,6 +285,19 @@ describe('worklist assembly (deterministic + blocked-prose segregation, end to e
         `prose ${pk} not in autoFillable`,
       ).toBe(false);
     }
+    // the sim scope end to end (Phase 19F): chrome rows are fillable, the
+    // boss dialogue row is narrative and routes to humanRequired.
+    expect(de.autoFillable.some((e: any) => e.scope === 'sim' && e.key === 'combat.miss')).toBe(
+      true,
+    );
+    expect(
+      de.humanRequired.some((e: any) => e.scope === 'sim' && e.key === 'dialogue.wolfmotherIntro'),
+      'sim dialogue in humanRequired',
+    ).toBe(true);
+    expect(
+      de.autoFillable.some((e: any) => e.key === 'dialogue.wolfmotherIntro'),
+      'sim dialogue not in autoFillable',
+    ).toBe(false);
     // stopping rule across the WHOLE batch: no autoFillable entry is prose
     const PROSE = ['entities.', 'classes.', 'classDetails.lore.', 'seo.'];
     expect(

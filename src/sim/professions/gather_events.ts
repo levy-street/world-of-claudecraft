@@ -34,19 +34,22 @@ export const GATHER_RARE_EVENT_CHANCE = 1 / 90;
 // regardless of the rolled material rarity.
 export const GATHER_RARE_EVENT_YIELD_MULT = 5;
 
-// Exhaustive on purpose (no default arm): a fifth source added to the union
-// fails tsc here instead of silently minting a golden harvest.
+// Exhaustive on purpose: the record is typed over the whole source union, so a
+// fifth source added to the union fails tsc here instead of silently minting a
+// golden harvest, and the runtime list below is derived from the same record
+// (Masterwrought Phase 19F review round) so a guide pin can walk every source
+// rather than a hand-copied four.
+const FLAVOR_BY_SOURCE: Record<GatherRareEventSource, GatherRareEventFlavor> = {
+  ore: 'pristine_vein',
+  wood: 'ancient_heartwood',
+  herb: 'moonlit_bloom',
+  crop: 'golden_harvest',
+};
+export const GATHER_RARE_EVENT_SOURCES: readonly GatherRareEventSource[] = Object.keys(
+  FLAVOR_BY_SOURCE,
+) as GatherRareEventSource[];
 export function gatherRareEventFlavor(source: GatherRareEventSource): GatherRareEventFlavor {
-  switch (source) {
-    case 'ore':
-      return 'pristine_vein';
-    case 'wood':
-      return 'ancient_heartwood';
-    case 'herb':
-      return 'moonlit_bloom';
-    case 'crop':
-      return 'golden_harvest';
-  }
+  return FLAVOR_BY_SOURCE[source];
 }
 
 // Draw #2 of resolveHarvest (after rollMaterialRarity, a pinned determinism

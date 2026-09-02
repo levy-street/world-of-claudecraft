@@ -266,7 +266,7 @@ describe('i18n status registry: states', () => {
     expect(dictStart).toBeGreaterThan(-1);
     expect(dictEnd).toBeGreaterThan(dictStart);
     const dictLiteral = src.slice(dictStart, dictEnd);
-    const spread = [...dictLiteral.matchAll(/\.\.\.([A-Za-z_]+)\[lang\]/g)]
+    const spread = [...dictLiteral.matchAll(/\.\.\.([A-Za-z0-9_]+)\[lang\]/g)]
       .map((m) => m[1])
       .filter((name) => name !== 'baseEnTable')
       .sort();
@@ -274,7 +274,7 @@ describe('i18n status registry: states', () => {
     const exportEnd = src.indexOf('\n}\n', exportStart);
     expect(exportStart).toBeGreaterThan(-1);
     const exportBody = src.slice(exportStart, exportEnd);
-    const tables = [...exportBody.matchAll(/([A-Za-z_]+)\[lang\]/g)]
+    const tables = [...exportBody.matchAll(/([A-Za-z0-9_]+)\[lang\]/g)]
       .map((m) => m[1])
       .filter((name) => name !== 'ARENA_QUEUE_AUTO_LEAVE_1V1')
       .sort();
@@ -300,12 +300,14 @@ describe('i18n status registry: states', () => {
     for (const m of text.matchAll(/'([A-Za-z0-9_.]+)':/g))
       rowCount.set(m[1], (rowCount.get(m[1]) ?? 0) + 1);
     const enStart = text.indexOf('const baseEnTable = {');
-    const enEnd = text.indexOf('\n};', enStart);
+    const enEnd = text.indexOf('} as const;', enStart);
     expect(enStart).toBeGreaterThan(-1);
+    expect(enEnd).toBeGreaterThan(enStart);
     const enRows = new Set(
       [...text.slice(enStart, enEnd).matchAll(/'([A-Za-z0-9_.]+)':/g)].map((m) => m[1]),
     );
     expect(enRows.size).toBeGreaterThan(500);
+    expect(enRows.size).toBeLessThan(Object.keys(simDICT.en).length);
     // The pet tables are per-language consts ALIASED across locales (es and
     // es_ES share PET_DICT_ES) and typed dense, so a pet key's literal rows
     // never equal its provider count; presence there cannot vary and the

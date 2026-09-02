@@ -253,6 +253,10 @@ describe('rift mechanic names are filled in the five non-Latin sim blocks', () =
   // have no four-letter lowercase run, so the wordy-Latin arm below cannot
   // see a pasted copy of them, and a Cyrillic transliteration passes it by
   // construction; a value with none of the locale's own script is a leak.
+  // Residual, stated: zh_CN and zh_TW share Han and ja_JP accepts Han-only,
+  // so a value pasted from another CJK locale passes every arm below; many
+  // short names are legitimately identical across the two Chinese scripts,
+  // so no equality check can close it. The maintainer's read is the net.
   const SCRIPT: Record<(typeof NON_LATIN)[number], RegExp> = {
     zh_CN: /\p{Script=Han}/u,
     zh_TW: /\p{Script=Han}/u,
