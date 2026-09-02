@@ -20286,6 +20286,17 @@ spoiler-altitude judgment call and nothing it says is false).
 
 ### JUDGED THIS ROUND, do not re-raise
 The materialsBody omission; the trophy-trio band-vs-mover precision
+RULED (qr-19-materialsbody-onramp-bill-omission, 2026-09-02, under qr-19-best-for-project): the
+current spoiler altitude is RATIFIED; nothing the prose says is false at that altitude and no
+reword lands on the eve of the Phase 20 fill. The key, named here so no later session guesses:
+guide.profPages.craftProse.engineering.materialsBody ('Reagents and prior tools'), the engineering
+on-ramp round's prose, which never names the cogwheel and ocular on-ramp bills
+(ENGINEERING_ONRAMP_RECIPES in src/sim/content/recipes.ts). Scoping recorded with the
+ratification: its 'every land tool recipe' means the pick, axe and sickle lines the paragraph
+enumerates; the bronze hoe consumes Fine Vale Wheat, a farm fine roll rather than a vein material,
+and the hoe ladder is documented on the farming page. A future reword is a retire-and-re-key (a
+RETIRED_KEYS row, a successor key, five non-Latin fills in-change, the Latin rows to the release
+fill), never an in-place edit. Phase 19F; no code moved.
 note; the 0.06-vs-0.08 masterwork precision note; the refusal-control
 placement note; the amendment-dating shortfall (corrected by this
 RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as amendment-dating-shortfall; refusal-control-placement.
