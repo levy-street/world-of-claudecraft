@@ -2978,7 +2978,9 @@ export const sv_SE: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Raminställningar",
       "framesMenuTitle": "Visa eller göm enskilda ramar. En avbockad ram förblir dold tills du bockar för den igen eller återställer till standard.",

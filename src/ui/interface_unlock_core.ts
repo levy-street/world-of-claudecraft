@@ -9,6 +9,7 @@
 // wiring site, never a new branch in the coordinator. Registered in
 // tests/architecture.test.ts UI_PURE_CORES.
 
+import { isPetClass, type PlayerClass } from '../sim/types';
 import type { TranslationKey } from './i18n.catalog';
 
 /** One movable HUD frame under the global unlock toggle. */
@@ -241,10 +242,80 @@ export const HUD_FRAME_SPECS: readonly HudFrameSpec[] = [
     fallbackSize: { w: 300, h: 48 },
     detachToUiRoot: true,
   },
+  // The spell-proc overlay (the mage birds, the warlock soul bank and Ruin
+  // ritual), previously movable only through its own always-on grab-drag. It
+  // is minted straight onto #ui and position:fixed with a centering translate
+  // the stylesheet drops while a custom position applies, the devotion
+  // medallion's shape exactly.
+  {
+    id: 'procOverlay',
+    elementId: 'proc-overlay',
+    storageKey: 'woc_hud_frame_proc_overlay',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.procOverlay',
+    fallbackSize: { w: 300, h: 232 },
+    detachToUiRoot: false,
+  },
+  // The tabbed combat meter (#meters-window). Its two pop-out windows (heal,
+  // threat) keep their own MeterFrame drag: they are transient windows, not
+  // standing HUD chrome. Box resize: the row list genuinely reflows and the
+  // detached column scrolls inside the chosen height.
+  {
+    id: 'damageMeter',
+    elementId: 'meters-window',
+    storageKey: 'woc_hud_frame_meters',
+    labelKey: 'hudChrome.interfaceUnlock.frameNames.damageMeter',
+    fallbackSize: { w: 240, h: 220 },
+    detachToUiRoot: true,
+    resizeMode: 'box',
+  },
 ] as const;
 
 /** Every storage key the option owns, so a reset can clear the whole set. */
 export const HUD_FRAME_STORAGE_KEYS: readonly string[] = HUD_FRAME_SPECS.map((s) => s.storageKey);
+
+/**
+ * The class-conditional half of Hud.isHudFrameActive: could this frame EVER
+ * appear for a character of `playerClass`? Only a pet class gets the pet
+ * frame and bar placeholders; the stance bar mirrors renderStanceBar's own
+ * warrior/paladin gate; the class resource bars and the spell-proc overlay
+ * belong to the class that shows them. Returns null for a row this table
+ * does not decide (the action-bar shapes, the trackers, the meters), which
+ * the wiring site resolves from its own live state.
+ */
+export function classGatedFrameActive(id: string, playerClass: PlayerClass): boolean | null {
+  switch (id) {
+    case 'petFrame':
+    case 'petBar':
+      return isPetClass(playerClass);
+    case 'stanceBar':
+      return playerClass === 'warrior' || playerClass === 'paladin';
+    case 'paladinDevotion':
+      return playerClass === 'paladin';
+    case 'doomMeter':
+      return playerClass === 'warlock';
+    case 'procOverlay':
+      return playerClass === 'mage' || playerClass === 'warlock';
+    default:
+      return null;
+  }
+}
+
+/**
+ * Frames whose show/hide menu row drives a real SETTING instead of the
+ * per-frame hidden flag: the optional action bars toggle their ENABLED
+ * setting (the same state the on-bar plus/minus drives, listed in BOTH bar
+ * shapes by owner request), and the Reliquary tracker drives its existing
+ * master switch, so the frames-menu checkbox and the Interface option stay
+ * one state. Returns null for every ordinary row.
+ */
+export function frameRowSettingKey(
+  id: string,
+): 'showSecondaryActionBar' | 'showThirdActionBar' | 'showReliquaryTracker' | null {
+  if (id === 'actionBar2') return 'showSecondaryActionBar';
+  if (id === 'actionBar3') return 'showThirdActionBar';
+  if (id === 'reliquaryTracker') return 'showReliquaryTracker';
+  return null;
+}
 
 /** Label the Interface option row shows: it names the ACTION the press performs,
  *  so it reads "Unlock interface" while locked and "Lock interface" once every

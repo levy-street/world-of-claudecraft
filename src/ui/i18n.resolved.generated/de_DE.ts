@@ -2978,7 +2978,9 @@ export const de_DE: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Rahmeneinstellungen",
       "framesMenuTitle": "Einzelne Rahmen ein- oder ausblenden. Ein deaktivierter Rahmen bleibt verborgen, bis du ihn wieder aktivierst oder auf die Standardeinstellungen zurücksetzt.",

@@ -2978,7 +2978,9 @@ export const cs_CZ: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Nastavení rámečků",
       "framesMenuTitle": "Zobraz nebo skryj jednotlivé rámečky. Nezaškrtnutý rámeček zůstane skrytý, dokud ho znovu nezaškrtneš nebo neobnovíš výchozí nastavení.",

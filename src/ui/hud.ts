@@ -120,7 +120,6 @@ import {
   type ItemDef,
   type ItemInstancePayload,
   isMechWearer,
-  isPetClass,
   MAX_LEVEL,
   type MailResultCode,
   type MotdResultCode,
@@ -554,7 +553,11 @@ import {
 import { iconDataUrl, QUALITY_COLOR, raidMarkerDataUrl } from './icons';
 import { InspectWindow } from './inspect_window';
 import { InterfaceUnlock, makeUiRootDetacher } from './interface_unlock';
-import { HUD_FRAME_SPECS } from './interface_unlock_core';
+import {
+  classGatedFrameActive,
+  frameRowSettingKey,
+  HUD_FRAME_SPECS,
+} from './interface_unlock_core';
 import {
   buildFramesMenuSelects,
   buildFramesMenuToggles,
@@ -661,7 +664,12 @@ import type { PartyRowAuraDeps } from './party_frame_row';
 import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
-import { PET_ACTION_ICONS, petFeedButtonState, petSpecialButtonState } from './pet_action_icons';
+import {
+  PET_ACTION_ICONS,
+  petBarPreviewIconIds,
+  petFeedButtonState,
+  petSpecialButtonState,
+} from './pet_action_icons';
 import { isControllableOwnedPet, ownedCombatSourceOwnerId } from './pet_entity';
 import { findOwnPet, findPetsByOwner, petFrameDescriptorInto } from './pet_frame_view';
 import {
@@ -687,7 +695,6 @@ import { buildHudPreviewPrewarmUnits } from './preview_prewarm_wiring';
 import { armPreviewOpen, previewTouchQueueOf } from './preview_stand_in';
 import { procAuraConsumeSelfNoteText, procAuraGainSelfNoteText } from './proc_fct_notes';
 import { buildProcOverlay } from './proc_overlay_dom';
-import { attachOverlayDrag } from './proc_overlay_drag';
 import { ProcOverlayPainter } from './proc_overlay_painter';
 import {
   chronoOverlayCharges,
@@ -1980,63 +1987,76 @@ export class Hud {
   // over sample members (owner request: identical to a live party, not an
   // approximation); a fresh writer facet per build keeps the shared elision
   // caches free of entries for the discarded preview rows.
-  private readonly unlockPreview = new InterfaceUnlockPreview(document, (host) => {
-    const noopWrite = () => {};
-    const writers = makeWriterFacet(
-      new Map(),
-      new Map(),
-      new Map(),
-      new Map(),
-      noopWrite,
-      noopWrite,
-    );
-    const painter = new PartyFramesPainter(writers, host, {
-      classCss,
-      onTarget: noopWrite,
-      onContextMenu: noopWrite,
-      onHover: noopWrite,
-      onTargetPet: noopWrite,
-      petLabel: (name, frac) =>
-        t('hudChrome.partyFrames.petHealth', {
-          name,
-          pct: formatNumber(frac, { style: 'percent', maximumFractionDigits: 0 }),
-        }),
-      chipLabel: () => t('hudChrome.unitFrame.partyChip'),
-      onToggleCollapse: noopWrite,
-      partyAuras: this.partyAurasDeps,
-    });
-    const settings = this.optionsHooks?.settings;
-    const config = {
-      showSelf: settings?.get('partyFrameShowSelf') ?? false,
-      showResource: settings?.get('partyFrameShowResource') ?? true,
-      showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
-      showAuras: settings?.get('partyFrameShowAuras') ?? true,
-      showPets: settings?.get('partyFrameShowPets') ?? true,
-      presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
-      healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
-      sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
-    };
-    // The player's REAL party renders first, selected through the exact
-    // pipeline the live frames use; the pure core pads the roster out to the
-    // full sample stack (interface_unlock_menu_core.ts).
-    const info = this.sim.partyInfo;
-    const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
-    const real = info
-      ? selectPartyFrameMembers(
-          info,
-          this.sim.playerId,
-          this.sim.player.pos,
-          undefined,
-          config,
-          pets,
-        )
-      : [];
-    const members = buildPartySampleMembers(real);
-    painter.sync(members, info?.leader ?? members[0]?.pid ?? 0, false, config);
-  });
+  private readonly unlockPreview = new InterfaceUnlockPreview(
+    document,
+    (host) => {
+      const noopWrite = () => {};
+      const writers = makeWriterFacet(
+        new Map(),
+        new Map(),
+        new Map(),
+        new Map(),
+        noopWrite,
+        noopWrite,
+      );
+      const painter = new PartyFramesPainter(writers, host, {
+        classCss,
+        onTarget: noopWrite,
+        onContextMenu: noopWrite,
+        onHover: noopWrite,
+        onTargetPet: noopWrite,
+        petLabel: (name, frac) =>
+          t('hudChrome.partyFrames.petHealth', {
+            name,
+            pct: formatNumber(frac, { style: 'percent', maximumFractionDigits: 0 }),
+          }),
+        chipLabel: () => t('hudChrome.unitFrame.partyChip'),
+        onToggleCollapse: noopWrite,
+        partyAuras: this.partyAurasDeps,
+      });
+      const settings = this.optionsHooks?.settings;
+      const config = {
+        showSelf: settings?.get('partyFrameShowSelf') ?? false,
+        showResource: settings?.get('partyFrameShowResource') ?? true,
+        showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
+        showAuras: settings?.get('partyFrameShowAuras') ?? true,
+        showPets: settings?.get('partyFrameShowPets') ?? true,
+        presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
+        healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
+        sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
+      };
+      // The player's REAL party renders first, selected through the exact
+      // pipeline the live frames use; the pure core pads the roster out to the
+      // full sample stack (interface_unlock_menu_core.ts).
+      const info = this.sim.partyInfo;
+      const pets = config.showPets ? findPetsByOwner(this.sim.entities.values()) : undefined;
+      const real = info
+        ? selectPartyFrameMembers(
+            info,
+            this.sim.playerId,
+            this.sim.player.pos,
+            undefined,
+            config,
+            pets,
+          )
+        : [];
+      const members = buildPartySampleMembers(real);
+      painter.sync(members, info?.leader ?? members[0]?.pid ?? 0, false, config);
+      // Third arg: the pet bar placeholder previews THIS class's real commands.
+    },
+    () => petBarPreviewIconIds(this.sim.cfg.playerClass),
+  );
   private readonly interfaceUnlock = new InterfaceUnlock({
     document,
-    onUnlockedChanged: (unlocked) => this.unlockPreview.setActive(unlocked),
+    onUnlockedChanged: (unlocked) => {
+      this.unlockPreview.setActive(unlocked);
+      // The proc overlay's placeholder art: warlock states paint themselves;
+      // the mage side borrows the login preview's unlit bird. setEditing
+      // lifts the inactive states' aria-hidden while the mover chrome is up.
+      const previewBird = unlocked && this.sim.cfg.playerClass === 'mage';
+      this.procOverlayEl.classList.toggle('preview', previewBird);
+      this.procOverlayPainter.setEditing(unlocked);
+    },
     lockAllLabel: () => t('hudChrome.interfaceUnlock.lockAll'),
     lockAllTitle: () => t('hudChrome.interfaceUnlock.frozenNote'),
     framesMenuLabel: () => t('hudChrome.interfaceUnlock.framesMenu'),
@@ -3928,13 +3948,11 @@ export class Hud {
       // every position apply (a drag move, a resolution re-anchor, the
       // detach/re-dock transitions) re-evaluates whether the player frame
       // should be sitting inside it.
-      const onPositioned =
-        spec.id === 'actionBarGroup'
-          ? (active: boolean) => {
-              detach(active);
-              this.applyPlayerFrameBarLock();
-            }
-          : detach;
+      const onPositioned = (active: boolean) => {
+        detach(active);
+        if (spec.id === 'actionBarGroup') this.applyPlayerFrameBarLock();
+        if (spec.id === 'damageMeter') this.meters.mainFramed(active);
+      };
       const mover = new MovableFrame({
         frame,
         storageKey: spec.storageKey,
@@ -3951,18 +3969,9 @@ export class Hud {
         buttonOnlyWhenUnlocked: true,
         onPositioned,
       });
-      // The optional bars' menu row toggles the bar's ENABLED setting (the
-      // same state the on-bar plus/minus drives), listed in BOTH shapes
-      // (owner request); the Reliquary tracker's row drives its existing
-      // master switch the same way, so checkbox and option stay one state.
-      const optionalBarKey =
-        spec.id === 'actionBar2'
-          ? ('showSecondaryActionBar' as const)
-          : spec.id === 'actionBar3'
-            ? ('showThirdActionBar' as const)
-            : spec.id === 'reliquaryTracker'
-              ? ('showReliquaryTracker' as const)
-              : null;
+      // Rows whose show/hide checkbox drives a real SETTING instead of the
+      // hidden flag (the pure table documents which and why).
+      const optionalBarKey = frameRowSettingKey(spec.id);
       this.interfaceUnlock.register({
         id: spec.id,
         mover,
@@ -3970,9 +3979,6 @@ export class Hud {
         ...(optionalBarKey
           ? {
               rowOverride: {
-                // Listed in BOTH shapes (owner request): while combined the
-                // rows still toggle the bar's ENABLED setting, which grows or
-                // shrinks the combined block exactly like its plus/minus.
                 listed: () => true,
                 value: () => !!this.optionsHooks?.settings.get(optionalBarKey),
                 set: (checked: boolean) => {
@@ -4035,19 +4041,12 @@ export class Hud {
     if (id === 'actionBar3') {
       return !this.combineActionBars && document.body.classList.contains('show-actionbar3');
     }
-    if (id === 'petFrame' || id === 'petBar') return isPetClass(this.sim.cfg.playerClass);
-    // The stance-style choice bar exists only for the two classes that get one
-    // (warrior stances, paladin auras), mirroring renderStanceBar's own gate.
-    if (id === 'stanceBar') {
-      const cls = this.sim.cfg.playerClass;
-      return cls === 'warrior' || cls === 'paladin';
-    }
-    // The class resource bars follow the pet-frame rule (only the class that
-    // can ever show one gets a placeholder); the Reliquary tracker follows
-    // the optional-bar rule (switched off stays hidden; its menu row stays
-    // listed through the rowOverride above).
-    if (id === 'paladinDevotion') return this.sim.cfg.playerClass === 'paladin';
-    if (id === 'doomMeter') return this.sim.cfg.playerClass === 'warlock';
+    // The class-conditional rows (pet frame and bar, stance bar, the class
+    // resource bars, the proc overlay) share one pure table.
+    const classGate = classGatedFrameActive(id, this.sim.cfg.playerClass);
+    if (classGate !== null) return classGate;
+    // The Reliquary tracker follows the optional-bar rule (switched off stays
+    // hidden; its menu row stays listed through the rowOverride above).
     if (id === 'reliquaryTracker') {
       return (this.optionsHooks?.settings.get('showReliquaryTracker') ?? true) === true;
     }
@@ -4612,15 +4611,12 @@ export class Hud {
   private readonly swingTimerBars = new SwingTimerBars(this.writerFacet);
   private readonly targetSwingTimerBars = new TargetSwingTimerBars(this.writerFacet);
   // The spell-activation proc overlay (the Rising Phoenix, owner design
-  // 2026-07-11): built ONCE here (proc_overlay_dom), draggable + persistent
-  // (proc_overlay_drag), class-toggled per frame via the elided writers
-  // (proc_overlay_painter + the pure proc_overlay_view rule).
+  // 2026-07-11): built ONCE here (proc_overlay_dom), class-toggled per frame
+  // via the elided writers. Mounted on #ui, not body: it is a movable HUD
+  // frame ('procOverlay') and MovableFrame positions in #ui space.
   private readonly procOverlayEl = (() => {
     const el = buildProcOverlay(t('hudChrome.procOverlay.soulFragmentsMeter'));
-    document.body.appendChild(el);
-    // Owner request: grab the phoenix while it burns and park it anywhere;
-    // the spot persists (viewport fractions, so a resize keeps it sensible).
-    attachOverlayDrag(el, 'procOverlayAnchor', { fx: 0.5, fy: 0.42 });
+    $('#ui').appendChild(el);
     return el;
   })();
   private readonly procOverlayPainter = new ProcOverlayPainter(
@@ -9381,8 +9377,8 @@ export class Hud {
     // The phoenix: Heating Up lights its left half, Hot Streak completes it,
     // spending puts it out (pure rule in proc_overlay_view; an unchanged state
     // writes nothing). On the FIRST frame in-world, preview the unlit bird for
-    // a few seconds so the player can find it and drag it into place (one-shot
-    // timer, not per-frame work; the painter's two classes never conflict).
+    // a few seconds so the player can see where it lives (moving it is the
+    // Unlock Interface mode's; the same class is its edit-mode sample art).
     // The login preview only makes sense where the bird is otherwise RARE: the
     // fire mage (Hot Streak procs occasionally). It is gated to fire so it never
     // flashes on a warrior/other class, and never on a Chronomancer (whose bird
@@ -9392,7 +9388,11 @@ export class Hud {
     if (!this.procOverlayPreviewed && this.sim.talentSpec === 'fire') {
       this.procOverlayPreviewed = true;
       this.procOverlayEl.classList.add('preview');
-      window.setTimeout(() => this.procOverlayEl.classList.remove('preview'), 8000);
+      window.setTimeout(() => {
+        // The unlock hook drives this class as edit-mode sample art too.
+        if (this.interfaceUnlock.isUnlocked && this.sim.cfg.playerClass === 'mage') return;
+        this.procOverlayEl.classList.remove('preview');
+      }, 8000);
     }
     // Chronomancy (arcane spec) drives the same bird from its Aether Surge
     // charges (one quarter per charge); every other spec/class keeps the fire

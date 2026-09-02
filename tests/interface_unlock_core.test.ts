@@ -4,6 +4,7 @@
 // DOM-free by construction, so this drives the real module directly.
 import { describe, expect, it } from 'vitest';
 import {
+  classGatedFrameActive,
   framesToLock,
   HUD_FRAME_SPECS,
   HUD_FRAME_STORAGE_KEYS,
@@ -38,6 +39,8 @@ describe('HUD_FRAME_SPECS', () => {
       'reliquaryTracker',
       'paladinDevotion',
       'doomMeter',
+      'procOverlay',
+      'damageMeter',
     ]);
     expect(HUD_FRAME_SPECS.map((s) => s.elementId)).toEqual([
       'actionbar',
@@ -59,6 +62,8 @@ describe('HUD_FRAME_SPECS', () => {
       'reliquary-tracker',
       'paladin-devotion-frame',
       'warlock-doom-frame',
+      'proc-overlay',
+      'meters-window',
     ]);
     // A duplicated storage key would make two frames overwrite each other's
     // saved box, which is silent and only shows up after a reload.
@@ -90,6 +95,8 @@ describe('HUD_FRAME_SPECS', () => {
       // its row keeps the key that mover persisted under (movable frame
       // positions are player data; renaming the key orphans saved layouts).
       'woc_warlock_doom_frame_pos',
+      'woc_hud_frame_proc_overlay',
+      'woc_hud_frame_meters',
     ]);
   });
 
@@ -118,14 +125,16 @@ describe('HUD_FRAME_SPECS', () => {
       'questTracker',
       'reliquaryTracker',
       'doomMeter',
+      'damageMeter',
     ]);
   });
 
   it('reserves box (layout) resize for the frames that genuinely reflow', () => {
     // Everything else is fixed content (46px slots, a minimap canvas, a
-    // portrait), where stretching one axis only grew empty space.
+    // portrait), where stretching one axis only grew empty space. The meter
+    // rows reflow too, and its detached column scrolls inside the box.
     const box = HUD_FRAME_SPECS.filter((s) => s.resizeMode === 'box').map((s) => s.id);
-    expect(box).toEqual(['buffBar', 'debuffBar']);
+    expect(box).toEqual(['buffBar', 'debuffBar', 'damageMeter']);
   });
 
   it('names every frame with a label key so no placeholder is anonymous', () => {
@@ -138,6 +147,38 @@ describe('HUD_FRAME_SPECS', () => {
     for (const spec of HUD_FRAME_SPECS) {
       expect(spec.fallbackSize.w).toBeGreaterThan(0);
       expect(spec.fallbackSize.h).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('classGatedFrameActive', () => {
+  it('gives class-conditional frames to exactly the classes that can show them', () => {
+    // Pet frame and bar: the three pet classes (hunter beast, warlock demon,
+    // the frost mage Water Elemental), per isPetClass.
+    for (const id of ['petFrame', 'petBar']) {
+      expect(classGatedFrameActive(id, 'hunter')).toBe(true);
+      expect(classGatedFrameActive(id, 'mage')).toBe(true);
+      expect(classGatedFrameActive(id, 'warlock')).toBe(true);
+      expect(classGatedFrameActive(id, 'warrior')).toBe(false);
+      expect(classGatedFrameActive(id, 'priest')).toBe(false);
+    }
+    expect(classGatedFrameActive('stanceBar', 'warrior')).toBe(true);
+    expect(classGatedFrameActive('stanceBar', 'paladin')).toBe(true);
+    expect(classGatedFrameActive('stanceBar', 'rogue')).toBe(false);
+    expect(classGatedFrameActive('paladinDevotion', 'paladin')).toBe(true);
+    expect(classGatedFrameActive('paladinDevotion', 'warrior')).toBe(false);
+    expect(classGatedFrameActive('doomMeter', 'warlock')).toBe(true);
+    expect(classGatedFrameActive('doomMeter', 'mage')).toBe(false);
+    // The proc overlay serves the mage birds AND the warlock soul bank and
+    // Ruin ritual, so both classes get its placeholder.
+    expect(classGatedFrameActive('procOverlay', 'mage')).toBe(true);
+    expect(classGatedFrameActive('procOverlay', 'warlock')).toBe(true);
+    expect(classGatedFrameActive('procOverlay', 'druid')).toBe(false);
+  });
+
+  it('declines the rows whose activity is live state, not class', () => {
+    for (const id of ['actionBar1', 'actionBarGroup', 'questTracker', 'damageMeter', 'minimap']) {
+      expect(classGatedFrameActive(id, 'warrior')).toBeNull();
     }
   });
 });

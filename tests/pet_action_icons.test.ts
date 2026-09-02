@@ -8,6 +8,7 @@ import { abilityImageUrl, hasExplicitAbilityIcon } from '../src/ui/icons';
 import {
   PET_ACTION_ICONS,
   PET_ACTION_IMAGE_IDS,
+  petBarPreviewIconIds,
   petFeedButtonState,
   petSpecialButtonState,
 } from '../src/ui/pet_action_icons';
@@ -174,5 +175,38 @@ describe('petFeedButtonState', () => {
       reasonKey: 'hudChrome.petFeed.disabledNoFood',
     });
     expect(petFeedButtonState(0, 0, true)).toEqual({ disabled: false, reasonKey: null });
+  });
+});
+
+describe('petBarPreviewIconIds', () => {
+  // The edit mode's pet-bar placeholder previews the CLASS's real command
+  // set, mirroring renderPetBar's buttons: the warlock demon mends instead of
+  // feeding and leads with Felbolt; the frost mage elemental jets water; the
+  // hunter beast growls and feeds.
+  it('previews each pet class with its own command icons', () => {
+    expect(petBarPreviewIconIds('hunter')).toEqual([
+      'pet_attack',
+      'pet_growl',
+      'pet_feed',
+      'pet_defensive',
+    ]);
+    expect(petBarPreviewIconIds('mage')).toEqual([
+      'pet_attack',
+      'pet_water_jet',
+      'pet_feed',
+      'pet_defensive',
+    ]);
+    expect(petBarPreviewIconIds('warlock')).toEqual([
+      'pet_attack',
+      'emberkin_felbolt',
+      'pet_mend',
+      'pet_defensive',
+    ]);
+  });
+
+  it('previews the warlock special with a real templated pet ability id', () => {
+    // emberkin_felbolt is the id renderPetBar shows for the Emberkin; the
+    // preview must track a live id so icons.ts resolves real art.
+    expect(MOBS.emberkin?.petRanged?.ability).toBe('emberkin_felbolt');
   });
 });

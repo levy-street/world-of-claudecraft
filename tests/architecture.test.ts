@@ -2360,7 +2360,6 @@ const UI_DOM_MODULES = [
   'src/ui/perf_overlay_settings.ts',
   'src/ui/portrait_chip.ts',
   'src/ui/proc_overlay_dom.ts',
-  'src/ui/proc_overlay_drag.ts',
   'src/ui/profession_identity_card.ts',
   'src/ui/profession_tutorial_window.ts',
   'src/ui/preview_stand_in.ts',

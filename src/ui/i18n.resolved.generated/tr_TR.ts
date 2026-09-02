@@ -2978,7 +2978,9 @@ export const tr_TR: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Çerçeve Ayarları",
       "framesMenuTitle": "Ayrı ayrı çerçeveleri göster ya da gizle. İşareti kaldırılmış bir çerçeve, tekrar işaretleyene ya da varsayılanlara sıfırlayana kadar gizli kalır.",

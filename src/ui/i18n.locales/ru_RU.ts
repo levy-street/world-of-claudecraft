@@ -814,6 +814,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.questTracker': 'Трекер заданий',
   'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': 'Список Реликвария',
   'hudChrome.interfaceUnlock.frameNames.doomMeter': 'Шкала ресурсов Колдовства',
+  'hudChrome.interfaceUnlock.frameNames.procOverlay': 'Срабатывания заклинаний',
+  'hudChrome.interfaceUnlock.frameNames.damageMeter': 'Счетчик урона',
   'hudChrome.interfaceUnlock.framesMenu': 'Настройки фреймов',
   'hudChrome.interfaceUnlock.showHideFrames': 'Показать или скрыть фреймы',
   'hudChrome.interfaceUnlock.snapToGrid': 'Привязка к сетке',

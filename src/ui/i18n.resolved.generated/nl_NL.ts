@@ -2978,7 +2978,9 @@ export const nl_NL: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Frame-instellingen",
       "framesMenuTitle": "Toon of verberg afzonderlijke frames. Een uitgevinkt frame blijft verborgen tot je het weer aanvinkt of terugzet naar de standaardinstellingen.",

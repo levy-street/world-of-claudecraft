@@ -2978,7 +2978,9 @@ export const ja_JP: EnTranslations = {
         "questTracker": "クエストトラッカー",
         "reliquaryTracker": "聖遺物庫トラッカー",
         "doomMeter": "苦痛リソースバー",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "スペル発動",
+        "damageMeter": "ダメージメーター"
       },
       "framesMenu": "フレーム設定",
       "framesMenuTitle": "各フレームの表示・非表示を切り替えます。チェックを外したフレームは、再度チェックするか初期設定に戻すまで非表示のままです。",

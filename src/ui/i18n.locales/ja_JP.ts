@@ -813,6 +813,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.interfaceUnlock.frameNames.questTracker': 'クエストトラッカー',
   'hudChrome.interfaceUnlock.frameNames.reliquaryTracker': '聖遺物庫トラッカー',
   'hudChrome.interfaceUnlock.frameNames.doomMeter': '苦痛リソースバー',
+  'hudChrome.interfaceUnlock.frameNames.procOverlay': 'スペル発動',
+  'hudChrome.interfaceUnlock.frameNames.damageMeter': 'ダメージメーター',
   'hudChrome.interfaceUnlock.frameNames.chat': 'チャット',
   'hudChrome.interfaceUnlock.frameNames.menu': 'メニュー',
   'hudChrome.interfaceUnlock.frameNames.xpBar': '経験値バー',

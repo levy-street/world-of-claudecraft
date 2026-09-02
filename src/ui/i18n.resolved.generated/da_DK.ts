@@ -2978,7 +2978,9 @@ export const da_DK: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Rammeindstillinger",
       "framesMenuTitle": "Vis eller skjul enkelte rammer. En fravalgt ramme forbliver skjult, indtil du vælger den igen eller nulstiller til standard.",

@@ -2978,7 +2978,9 @@ export const pl_PL: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Ustawienia ramek",
       "framesMenuTitle": "Pokazuj lub ukrywaj poszczególne ramki. Odznaczona ramka pozostaje ukryta, dopóki jej ponownie nie zaznaczysz albo nie przywrócisz ustawień domyślnych.",

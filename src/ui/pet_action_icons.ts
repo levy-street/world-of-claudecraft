@@ -22,6 +22,40 @@ export const PET_ACTION_ICONS = {
 /** Closed painted-art inventory for synthetic pet action-bar commands. */
 export const PET_ACTION_IMAGE_IDS: ReadonlySet<string> = new Set(Object.values(PET_ACTION_ICONS));
 
+/**
+ * The icon ids the edit mode's force-shown pet-bar placeholder previews for a
+ * class, mirroring the real renderPetBar button set: attack, the class's
+ * signature command (the hunter beast's Growl, the frost mage elemental's
+ * Water Jet, the warlock demon's Felbolt), the heal command (Feed Pet, or
+ * Mend Demon for the warlock), and the stance toggle. Only the three pet
+ * classes ever see the placeholder (Hud.isHudFrameActive gates on
+ * isPetClass), so everything else previews the hunter shape as the fallback.
+ */
+export function petBarPreviewIconIds(playerClass: string): readonly string[] {
+  if (playerClass === 'warlock') {
+    return [
+      PET_ACTION_ICONS.attack,
+      'emberkin_felbolt',
+      PET_ACTION_ICONS.healDemon,
+      PET_ACTION_ICONS.defensive,
+    ];
+  }
+  if (playerClass === 'mage') {
+    return [
+      PET_ACTION_ICONS.attack,
+      PET_ACTION_ICONS.waterJet,
+      PET_ACTION_ICONS.feed,
+      PET_ACTION_ICONS.defensive,
+    ];
+  }
+  return [
+    PET_ACTION_ICONS.attack,
+    PET_ACTION_ICONS.taunt,
+    PET_ACTION_ICONS.feed,
+    PET_ACTION_ICONS.defensive,
+  ];
+}
+
 // Pure decision for the hunter Feed Pet button's disabled state. Previously
 // the button always looked identically clickable, but clicking it with no
 // eligible food just popped an error toast, and there was no way to tell in

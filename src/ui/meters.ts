@@ -43,7 +43,7 @@ import {
   buildMeterBreakdown,
 } from './meters_breakdown_view';
 import { MeterFrame } from './meters_frame';
-import { METER_FRAME_LIMITS, TABBED_METER_FRAME_LIMITS } from './meters_frame_core';
+import { METER_FRAME_LIMITS } from './meters_frame_core';
 import { buildMeterTabMenu, type MeterMenuRow } from './meters_menu_view';
 import { buildMeterRows, type MeterPet, type MeterTab } from './meters_rows_view';
 import type { SimpleMenuItem } from './simple_context_menu';
@@ -490,17 +490,19 @@ export class MetersPanel {
 
     // The panel title doubles as the move handle (the chat box uses its tab
     // strip the same way); a press on any button inside it stays that button's.
+    // DETACHED windows only: the tabbed damage window is a movable HUD frame
+    // (HUD_FRAME_SPECS 'damageMeter'), so the Unlock Interface registry owns
+    // its drag, resize, hide and persistence instead of a private MeterFrame.
     const title = this.root.querySelector('.panel-title') as HTMLElement | null;
-    if (title && deps?.storage && deps.uiScale && deps.isMobileLayout) {
+    if (title && spec.lockedTab && deps?.storage && deps.uiScale && deps.isMobileLayout) {
       this.frame = new MeterFrame(
         {
           el: this.root,
           handles: [title, this.titleEl],
           storageKey: spec.frameStorageKey,
           fallbackSize: { w: METERS_DEFAULT_WIDTH, h: METERS_DEFAULT_HEIGHT },
-          // The tabbed window cannot shrink past its own chrome; a detached
-          // window carries far less and may go narrower.
-          limits: spec.lockedTab ? METER_FRAME_LIMITS : TABBED_METER_FRAME_LIMITS,
+          // Only detached windows reach here, and they carry little chrome.
+          limits: METER_FRAME_LIMITS,
         },
         {
           document,
@@ -526,13 +528,29 @@ export class MetersPanel {
   }
 
   setOpen(on: boolean): void {
-    this.root.style.display = on ? (this.frame?.isFramed ? 'flex' : 'block') : 'none';
+    this.root.style.display = on ? (this.isFramed ? 'flex' : 'block') : 'none';
     if (!this.spec.lockedTab) document.body.classList.toggle('meters-open', on);
     if (on) {
       // A box saved at another viewport must be re-clamped before it paints.
       this.frame?.refresh();
       this.render(true);
     }
+  }
+
+  /** Whether a custom box applies: a detached window's own MeterFrame, or the
+   *  tabbed window's registry mover (which reports through setRegistryFramed
+   *  since its display flip must be inline; see the mt-framed CSS comment). */
+  private get isFramed(): boolean {
+    return this.registryFramed || this.frame?.isFramed === true;
+  }
+
+  private registryFramed = false;
+
+  /** The damageMeter registry row's onPositioned arm: while a custom position
+   *  applies, an OPEN panel lays out as the fixed-height scrolling column. */
+  setRegistryFramed(active: boolean): void {
+    this.registryFramed = active;
+    if (this.isOpen) this.root.style.display = active ? 'flex' : 'block';
   }
 
   /** Switch the tabbed window's meter (used when a tab pops out). */
@@ -966,10 +984,17 @@ export class Meters {
     });
   }
 
-  /** Return every panel to its stylesheet anchor (the layout reset path). */
+  /** Return every panel to its stylesheet anchor (the layout reset path).
+   *  The tabbed window's box is the registry's (interfaceUnlock.resetAll
+   *  covers it); this resets the two detached windows' own MeterFrames. */
   resetFrames(): void {
     this.main.resetFrame();
     for (const panel of this.detached.values()) panel.resetFrame();
+  }
+
+  /** Forwarded from the damageMeter registry row's onPositioned. */
+  mainFramed(active: boolean): void {
+    this.main.setRegistryFramed(active);
   }
 
   private restoreDetached(): void {

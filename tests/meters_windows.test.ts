@@ -2,8 +2,10 @@
 //
 // The detachable meter windows: popping Healing / Threat out of the tabbed
 // damage window, docking them back, and each panel keeping its own segment
-// paging and movable/resizable frame. The geometry math is covered by
-// tests/meters_frame_core.test.ts and the bar model by
+// paging. The two DETACHED windows keep their own MeterFrame drag; the tabbed
+// damage window is a movable HUD frame instead (HUD_FRAME_SPECS row
+// 'damageMeter'), reporting through Meters.mainFramed. The geometry math is
+// covered by tests/meters_frame_core.test.ts and the bar model by
 // tests/meters_rows_view.test.ts; this file pins the wiring between them.
 
 import { beforeEach, describe, expect, it } from 'vitest';
@@ -233,15 +235,15 @@ describe('detachable meter windows', () => {
     expect(second.shown('heal-window')).toBe(false);
   });
 
-  it('restores a saved box and re-clamps it into the viewport', () => {
+  it('restores a detached window saved box and re-clamps it into the viewport', () => {
     const storage = new FakeStorage();
-    // saved off the right edge of an 1024x768 jsdom viewport
+    // saved off the right edge of an 1024x768 viewport
     storage.setItem(
-      'woc_meters_frame',
+      'woc_meters_frame_heal',
       JSON.stringify({ left: 5000, top: 5000, width: 300, height: 200 }),
     );
     const { el } = setup(storage);
-    const panel = el('meters-window');
+    const panel = el('heal-window');
     expect(panel.classList.contains('mt-framed')).toBe(true);
     expect(panel.style.position).toBe('absolute');
     // clamped back on screen rather than restored verbatim
@@ -261,75 +263,67 @@ describe('detachable meter windows', () => {
     expect(panel.style.width).toBe('');
   });
 
-  it('gives every panel a resize grip and two move handles', () => {
+  it('gives the two detached windows a resize grip and two move handles each', () => {
     const { el } = setup();
-    for (const id of ['meters-window', 'heal-window', 'threat-window']) {
+    for (const id of ['heal-window', 'threat-window']) {
       expect(el(id).querySelector('.panel-resize-grip')).not.toBeNull();
-      // The title bar, plus the summary line under it: on the tabbed window the
-      // title is packed with tabs and controls, leaving little bare strip.
+      // The title bar, plus the summary line under it.
       expect(el(id).querySelector('.panel-title')?.classList.contains('mt-move-handle')).toBe(true);
       expect(el(id).querySelector('.mt-view')?.classList.contains('mt-move-handle')).toBe(true);
     }
+    // The tabbed damage window carries NO MeterFrame chrome of its own: its
+    // move/resize come from the Unlock Interface registry mover, which mints
+    // its grip and corner button in the live Hud, not in this rig.
+    expect(el('meters-window').querySelector('.panel-resize-grip')).toBeNull();
+    expect(el('meters-window').querySelector('.mt-move-handle')).toBeNull();
   });
 
-  it('resets every panel back to its stylesheet anchor', () => {
+  it('resets the detached windows back to their stylesheet anchors', () => {
     const storage = new FakeStorage();
     storage.setItem(
-      'woc_meters_frame',
+      'woc_meters_frame_heal',
       JSON.stringify({ left: 100, top: 100, width: 300, height: 200 }),
     );
     const { meters, el } = setup(storage);
-    expect(el('meters-window').classList.contains('mt-framed')).toBe(true);
+    expect(el('heal-window').classList.contains('mt-framed')).toBe(true);
 
     meters.resetFrames();
-    const panel = el('meters-window');
+    const panel = el('heal-window');
     expect(panel.classList.contains('mt-framed')).toBe(false);
     expect(panel.style.left).toBe('');
     expect(panel.style.height).toBe('');
-    expect(storage.getItem('woc_meters_frame')).toBeNull();
+    expect(storage.getItem('woc_meters_frame_heal')).toBeNull();
   });
 
   it('writes no geometry on a mobile layout, where the stylesheet owns placement', () => {
     const storage = new FakeStorage();
     storage.setItem(
-      'woc_meters_frame',
+      'woc_meters_frame_heal',
       JSON.stringify({ left: 100, top: 100, width: 300, height: 200 }),
     );
     const { el } = setup(storage, true);
-    const panel = el('meters-window');
+    const panel = el('heal-window');
     expect(panel.classList.contains('mt-framed')).toBe(false);
     expect(panel.style.left).toBe('');
   });
 
-  it('opens as a plain block on a mobile layout, even with a saved box', () => {
-    const storage = new FakeStorage();
-    storage.setItem(
-      'woc_meters_frame',
-      JSON.stringify({ left: 100, top: 100, width: 300, height: 200 }),
-    );
-    const { meters, el } = setup(storage, true);
+  it('lays the tabbed window out as a column exactly while its registry box applies', () => {
+    // The damageMeter registry row's onPositioned arm calls mainFramed: an
+    // OPEN positioned panel must flip to the fixed-height flex column (the
+    // display is inline because open/closed is an inline display too), and a
+    // reset back to the dock restores the plain block.
+    const { meters, el } = setup();
     meters.toggle();
     const panel = el('meters-window');
-    // `mt-framed` is what supplies flex-direction: column, and apply() refuses to
-    // write it on a mobile layout. Opening as 'flex' regardless would lay the
-    // title, summary, hint and rows out in a ROW. Reachable rather than
-    // theoretical: mobile-touch toggles at runtime from the touch-controls
-    // setting, so a desktop player who moved a panel then turned touch controls
-    // on lands here.
-    expect(panel.classList.contains('mt-framed')).toBe(false);
     expect(panel.style.display).toBe('block');
-  });
-
-  it('opens as a flex column on a desktop layout with the same saved box', () => {
-    const storage = new FakeStorage();
-    storage.setItem(
-      'woc_meters_frame',
-      JSON.stringify({ left: 100, top: 100, width: 300, height: 200 }),
-    );
-    const { meters, el } = setup(storage);
+    meters.mainFramed(true);
+    expect(panel.style.display).toBe('flex');
+    meters.mainFramed(false);
+    expect(panel.style.display).toBe('block');
+    // Reopening remembers the framed state too.
+    meters.mainFramed(true);
     meters.toggle();
-    const panel = el('meters-window');
-    expect(panel.classList.contains('mt-framed')).toBe(true);
+    meters.toggle();
     expect(panel.style.display).toBe('flex');
   });
 
@@ -363,17 +357,23 @@ describe('detachable meter windows', () => {
     expect(shown('heal-window')).toBe(false);
   });
 
-  it('advertises the move gesture on the handles only, never on the tab buttons', () => {
+  it('advertises the move gesture on the detached handles only, never on the tabbed window', () => {
     const { el } = setup();
-    const main = el('meters-window');
-    const move = main.querySelector('.panel-title')?.getAttribute('title') ?? '';
+    // The detached windows keep their MeterFrame drag, so their handles carry
+    // the move tooltip.
+    const heal = el('heal-window');
+    const move = heal.querySelector('.panel-title')?.getAttribute('title') ?? '';
     expect(move).not.toBe('');
-    expect(main.querySelector('.mt-view')?.getAttribute('title')).toBe(move);
-    // A container's title is inherited by every descendant carrying none of its
-    // own, so each tab would otherwise advertise a drag that pressing it does
-    // NOT perform (onMoveStart hands a press on a control back to that control).
+    expect(heal.querySelector('.mt-view')?.getAttribute('title')).toBe(move);
+    // The tabbed damage window's movement is the Unlock Interface registry's,
+    // so its title bar advertises no drag of its own, and the tabs stay bare
+    // (a container title would be inherited by every descendant without one).
+    const main = el('meters-window');
+    expect(main.querySelector('.panel-title')?.getAttribute('title') ?? '').toBe('');
     for (const tab of ['dmg', 'heal', 'threat']) {
-      expect(main.querySelector(`.mt-tab[data-tab="${tab}"]`)?.getAttribute('title')).toBe('');
+      expect(main.querySelector(`.mt-tab[data-tab="${tab}"]`)?.getAttribute('title') ?? '').toBe(
+        '',
+      );
     }
     // The pager and close controls keep the tooltips they set for themselves.
     for (const control of ['.mt-prev', '.mt-next', '.mt-close']) {

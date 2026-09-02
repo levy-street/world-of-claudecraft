@@ -1501,19 +1501,22 @@
   #debuff-bar.tf-unlocked,
   #quest-tracker.tf-unlocked,
   #reliquary-tracker.tf-unlocked,
-  #paladin-devotion-frame.tf-unlocked {
+  #paladin-devotion-frame.tf-unlocked,
+  #proc-overlay.tf-unlocked,
+  #meters-window.tf-unlocked {
     cursor: var(--cursor-move, move);
     outline: 1px dashed var(--gold);
     outline-offset: -1px;
     touch-action: none;
   }
-  /* The trackers and the devotion medallion are click-through while locked
-     (their roots carry pointer-events: none so the world stays clickable
-     behind them), so arranging has to switch events back on, the doom
-     meter's own rule above. */
+  /* The trackers, the devotion medallion and the proc overlay are
+     click-through while locked (their roots carry pointer-events: none so the
+     world stays clickable behind them), so arranging has to switch events
+     back on, the doom meter's own rule above. */
   #quest-tracker.tf-unlocked,
   #reliquary-tracker.tf-unlocked,
-  #paladin-devotion-frame.tf-unlocked {
+  #paladin-devotion-frame.tf-unlocked,
+  #proc-overlay.tf-unlocked {
     pointer-events: auto;
   }
   /* The corner button and grip need a positioned host to hang off. Only the
@@ -1572,6 +1575,8 @@
   #quest-tracker .tf-move-btn,
   #reliquary-tracker .tf-move-btn,
   #paladin-devotion-frame .tf-move-btn,
+  #proc-overlay .tf-move-btn,
+  #meters-window .tf-move-btn,
   #chatlog-wrap .chat-move-btn {
     position: absolute;
     top: -10px;
@@ -1601,6 +1606,8 @@
   #reliquary-tracker .tf-move-btn:focus-visible,
   #paladin-devotion-frame .tf-move-btn:focus-visible,
   #petbar .tf-move-btn:focus-visible,
+  #proc-overlay .tf-move-btn:focus-visible,
+  #meters-window .tf-move-btn:focus-visible,
   #chatlog-wrap .chat-move-btn:focus-visible {
     outline: 2px solid var(--color-border-focus);
     outline-offset: 1px;
@@ -1776,6 +1783,22 @@
   body.interface-unlocked #petbar.tf-unlocked {
     min-width: 200px;
     min-height: 44px;
+  }
+  /* The tabbed damage window is usually CLOSED (inline display: none written
+     by its toggle), so its placeholder forces the framed column shape; its
+     title bar and tabs are the sample content. */
+  body.interface-unlocked #meters-window.tf-unlocked {
+    display: flex !important;
+    flex-direction: column;
+    opacity: 0.55;
+    min-height: 140px;
+  }
+  /* The proc overlay hides through OPACITY, not display (a 0.7s burn-out
+     fade), so its placeholder brightens rather than un-hiding: the warlock
+     states paint their art continuously and the mage side gets the preview
+     bird from the unlock hook in hud.ts. */
+  body.interface-unlocked #proc-overlay.tf-unlocked {
+    opacity: 0.55;
   }
   /* The arrange-mode name chip: which frame is which, sitting just ABOVE the
      frame so it never covers the frame's own contents. A frame parked against
@@ -2662,7 +2685,8 @@
     translate: -50% -50%;
     pointer-events: none;
   }
-  .paladin-devotion-frame.hud-frame-detached {
+  .paladin-devotion-frame.hud-frame-detached,
+  #proc-overlay.hud-frame-detached {
     translate: none;
   }
   .paladin-devotion {
@@ -3443,6 +3467,8 @@
     display: flex;
     align-items: flex-end;
     gap: 8px;
+    /* The containing block for #meters-window's absolute dock seat below. */
+    position: relative;
   }
   /* xp bar sits UNDER the action bar as the stack's last row, pinned to the
      bottom of the screen; the taller side-button column must not push the
@@ -5279,9 +5305,11 @@
   /* ---------- combat meters ---------- */
   /* The damage window and the two detachable meters (Healing, Threat) share one
      panel shape. Undisturbed they sit in the bottom-right HUD stack exactly as
-     the meters window always has; once the player drags or resizes one,
-     meters_frame.ts switches it to absolute left/top/width/height and stamps
-     .mt-framed, which is what turns it into a fixed-height scrolling column. */
+     the meters window always has. Once moved, a DETACHED window's own
+     MeterFrame stamps .mt-framed; the TABBED window is the 'damageMeter'
+     Unlock Interface registry frame instead, whose detacher stamps
+     .hud-frame-detached. Either class turns the panel into the fixed-height
+     scrolling column below. */
   .mt-panel {
     width: 240px;
     padding: 8px 10px;
@@ -5289,6 +5317,24 @@
     align-self: flex-end;
     margin-bottom: 6px;
     text-align: left;
+  }
+  /* The tabbed damage window's DOCK is an absolute seat beside the action-bar
+     row, not a flex slot: #bottom-bar re-centers itself with translateX(-50%),
+     so a 240px flex item appearing on open slid the whole action-bar stack
+     sideways (the reported "opening the meters moves the UI around"). The
+     seat reproduces the old flex-end spot; the detached state below clears it
+     so the registry mover's inline left/top own the box. The two pop-out
+     meters keep their flex slots: they are transient windows a player has
+     usually already parked via their own title drag. */
+  #meters-window {
+    position: absolute;
+    left: calc(100% + 8px);
+    bottom: 6px;
+    margin-bottom: 0;
+  }
+  #meters-window.hud-frame-detached {
+    left: auto;
+    bottom: auto;
   }
   .mt-panel .panel-title {
     margin-bottom: 4px;
@@ -5298,11 +5344,19 @@
   /* The framed column's `display: flex` is written inline alongside the box (the
      panel's open/closed state is an inline display too, so the class cannot win
      that tie); this carries the rest of the framed layout. */
-  .mt-panel.mt-framed {
+  .mt-panel.mt-framed,
+  #meters-window.hud-frame-detached {
     flex-direction: column;
     z-index: 21;
   }
-  .mt-panel.mt-framed .mt-rows {
+  /* A positioned tabbed window that has never been height-stretched still
+     needs a bound, or the row list grows the panel with the encounter and
+     the scrolling column never engages; a box-resize height (inline) wins. */
+  #meters-window.hud-frame-detached {
+    height: 320px;
+  }
+  .mt-panel.mt-framed .mt-rows,
+  #meters-window.hud-frame-detached .mt-rows {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
@@ -10051,7 +10105,8 @@
 /* Spell-activation proc overlay: the Rising Phoenix (owner design, replacing
    the twin proc arcs). Heating Up lights the LEFT half; Hot Streak completes
    the RIGHT, whitens the core and beats both wings once; the proc fading or
-   being spent puts the fire out. Drag it (proc_overlay_drag) to park it. */
+   being spent puts the fire out. Parking it is the Unlock Interface mode's:
+   the overlay is the 'procOverlay' registry frame (interface_unlock_core). */
 /* This whole tail of the file (through EOF) had fallen OUTSIDE @layer
    components: nothing reopened the layer after the small #aura-overlays
    block closed it below, so every rule from here on (proc-overlay, the
@@ -10337,13 +10392,12 @@
     }
   }
   /* The login preview: for a few seconds after entering the world the whole
-   bird glows dimly, so the player can see where it lives and drag it BEFORE
-   any proc lights it for real. Placed before the proc rules so a real proc
-   arriving mid-preview wins the cascade. */
+   bird glows dimly, so the player can see where it lives (moving it is the
+   Unlock Interface mode's: the overlay is the 'procOverlay' registry frame,
+   and this same class doubles as its edit-mode sample art). Placed before
+   the proc rules so a real proc arriving mid-preview wins the cascade. */
   #proc-overlay.preview {
     opacity: 1;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.preview .fire-embers {
     opacity: 0.38;
@@ -10352,16 +10406,12 @@
   #proc-overlay.hot,
   #proc-overlay.combustion {
     /* Lit but a touch translucent (owner: softer over the scene), shared with the
-     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak). */
+     Chronomancy .c1 rule; fire is TWO procs (Heating Up, then Hot Streak).
+     Pointer-inert in every state: moving lives with the registry frame, so
+     the burning bird never eats a click meant for the world behind it. */
     opacity: 0.85;
-    /* Grabbable only while it burns; hidden it can never eat a click. */
-    pointer-events: auto;
-    cursor: grab;
     /* Quick to light (the ON transition); the slow OFF fade lives on the base. */
     transition: opacity 0.2s ease;
-  }
-  #proc-overlay.dragging {
-    cursor: grabbing;
   }
   #proc-overlay .fire-bird {
     position: absolute;
@@ -10620,12 +10670,10 @@
     filter: saturate(1.18) brightness(1.2) drop-shadow(0 0 10px rgba(139, 92, 246, 0.8))
       drop-shadow(0 0 24px rgba(103, 232, 249, 0.62));
   }
-  /* Visible and grabbable once any charge is held (a touch translucent, matching
-   the fire bird's .heating/.hot opacity). */
+  /* Visible once any charge is held (a touch translucent, matching the fire
+   bird's .heating/.hot opacity); pointer-inert like every overlay state. */
   #proc-overlay.chrono.c1 {
     opacity: 0.85;
-    pointer-events: auto;
-    cursor: grab;
   }
   /* Reveal order: left wing, right wing, central bird, final temporal flare. */
   #proc-overlay.chrono.c1 .chrono-left,
@@ -10749,15 +10797,8 @@
   #proc-overlay.destruction .ruin-ritual {
     display: block;
   }
-  #proc-overlay.destruction .ruin-ritual,
-  #proc-overlay.destruction .ruin-mark {
-    pointer-events: auto;
-    cursor: grab;
-  }
-  #proc-overlay.destruction.dragging .ruin-ritual,
-  #proc-overlay.destruction.dragging .ruin-mark {
-    cursor: grabbing;
-  }
+  /* The artwork stays pointer-inert: moving the always-on ritual lives with
+     the Unlock Interface registry frame, so it never eats a world click. */
   #proc-overlay.destruction .ruin-ritual::before,
   #proc-overlay.destruction .ruin-ritual::after {
     content: "";
@@ -10812,8 +10853,6 @@
       inset 0 3px var(--color-ruin-ritual-shadow),
       0 -1px var(--color-ruin-inner-shine);
     opacity: 0.76;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.destruction.r5 .ruin-ring {
     border-top-color: var(--color-ruin-lit-border);
@@ -11049,15 +11088,9 @@
     opacity: 0.9;
     animation: soul-bank-full-flare 1.8s ease-in-out infinite;
   }
-  #proc-overlay.necromancy .soul-rail,
-  #proc-overlay.necromancy .soul-crystal {
-    pointer-events: auto;
-    cursor: grab;
-  }
-  #proc-overlay.necromancy.dragging .soul-rail,
-  #proc-overlay.necromancy.dragging .soul-crystal {
-    cursor: grabbing;
-  }
+  /* The soul bank's artwork stays pointer-inert: moving the always-on bank
+     lives with the Unlock Interface registry frame, so it never eats a world
+     click behind the crystals. */
   #proc-overlay.necromancy .soul-rail {
     position: absolute;
     left: 3px;
@@ -11346,8 +11379,6 @@
   }
   #proc-overlay.frost.f1 {
     opacity: 0.88;
-    pointer-events: auto;
-    cursor: grab;
   }
   #proc-overlay.frost .frost-part {
     position: absolute;

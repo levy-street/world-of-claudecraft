@@ -2978,7 +2978,9 @@ export const en_CA: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Frames Settings",
       "framesMenuTitle": "Show or hide individual frames. An unticked frame stays hidden until you tick it again or reset to defaults.",

@@ -20,9 +20,6 @@ import { iconDataUrl } from './icons';
  *  and name), so these only need to LOOK like a plausible row. */
 const PREVIEW_BUFFS = ['battle_shout', 'arcane_intellect', 'renew', 'blessing_of_might'];
 const PREVIEW_DEBUFFS = ['rend', 'curse_of_agony', 'frostbite'];
-/** Sample pet commands for the force-shown pet ACTION bar (no pet out means
- *  its real buttons are wiped, so the placeholder shows a plausible row). */
-const PREVIEW_PET_ACTIONS = ['pet_attack', 'pet_mend', 'pet_defensive'];
 const PREVIEW_ICON_SIZE = 24;
 /** Sample fill fractions: mid-cast and mid-swing read as live bars. */
 const PREVIEW_CAST_FRAC = 0.62;
@@ -39,6 +36,11 @@ export class InterfaceUnlockPreview {
      *  approximation. Optional so a host without the painter (tests) still
      *  gets the other samples. */
     private readonly buildPartySample?: (host: HTMLElement) => void,
+    /** The pet ACTION bar's sample command icons, resolved per build so the
+     *  placeholder shows this CLASS's real buttons (petBarPreviewIconIds:
+     *  Growl for a hunter, Water Jet for a frost mage, Mend for a warlock),
+     *  never a generic dummy row. Absent (tests) skips the sample. */
+    private readonly petBarIcons?: () => readonly string[],
   ) {}
 
   /** Mint the sample overlays (true) or remove them all (false). Rebuilding
@@ -55,7 +57,8 @@ export class InterfaceUnlockPreview {
     // shows the real frame chrome (portrait ring, bars), and a second set of
     // sample bars over it read as clutter (owner feedback).
     this.mount('pet-frame', this.unitSample(t('hudChrome.unitFrame.petLabel')));
-    this.mount('petbar', this.auraRow(PREVIEW_PET_ACTIONS, 'ability'));
+    const petIcons = this.petBarIcons?.();
+    if (petIcons && petIcons.length > 0) this.mount('petbar', this.auraRow(petIcons, 'ability'));
     this.mount(
       'castbar',
       this.barSample(PREVIEW_CAST_FRAC, t('hudChrome.interfaceUnlock.previewSpell'), 'cast'),

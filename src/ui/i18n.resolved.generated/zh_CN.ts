@@ -2978,7 +2978,9 @@ export const zh_CN: EnTranslations = {
         "questTracker": "任务追踪器",
         "reliquaryTracker": "圣物库追踪器",
         "doomMeter": "痛苦资源条",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "法术触发",
+        "damageMeter": "伤害统计"
       },
       "framesMenu": "框体设置",
       "framesMenuTitle": "显示或隐藏各个框体。取消勾选的框体会一直隐藏，直到你重新勾选或恢复默认设置。",

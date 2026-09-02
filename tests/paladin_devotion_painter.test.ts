@@ -206,8 +206,10 @@ describe('PaladinDevotionPainter', () => {
     const devotionSpec = HUD_FRAME_SPECS.find((s) => s.id === 'paladinDevotion');
     expect(devotionSpec?.elementId).toBe('paladin-devotion-frame');
     expect(css).toMatch(/\.paladin-devotion-frame\s*\{[\s\S]*pointer-events:\s*none/);
+    // The detached rule is a selector GROUP (the proc overlay shares its
+    // translate reset), so allow list members between selector and brace.
     expect(css).toMatch(
-      /\.paladin-devotion-frame\.hud-frame-detached\s*\{[\s\S]*translate:\s*none/,
+      /\.paladin-devotion-frame\.hud-frame-detached[^{}]*\{[^}]*translate:\s*none/,
     );
     expect(css).not.toMatch(/\.paladin-devotion-frame\s*\{[\s\S]{0,400}cursor:\s*grab/);
   });

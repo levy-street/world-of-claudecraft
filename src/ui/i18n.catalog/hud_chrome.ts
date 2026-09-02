@@ -3961,6 +3961,11 @@ export const hudChromeStrings = {
       doomMeter: 'Affliction Bar',
       // The pet ACTION bar (#petbar); the pet unit frame reuses its aria key.
       petBar: 'Pet Bar',
+      // The spell-proc overlay (#proc-overlay: the mage birds, the warlock
+      // soul bank and Ruin ritual) and the tabbed combat meter
+      // (#meters-window). Both wordy (M16): non-Latin fills in this change.
+      procOverlay: 'Spell Procs',
+      damageMeter: 'Damage Meter',
     },
     // The frames settings dropdown beside the floating Lock Interface button:
     // a show/hide sub-menu plus the frame-behavior toggles that used to live

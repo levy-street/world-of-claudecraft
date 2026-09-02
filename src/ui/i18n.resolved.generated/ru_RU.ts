@@ -2978,7 +2978,9 @@ export const ru_RU: EnTranslations = {
         "questTracker": "Трекер заданий",
         "reliquaryTracker": "Список Реликвария",
         "doomMeter": "Шкала ресурсов Колдовства",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Срабатывания заклинаний",
+        "damageMeter": "Счетчик урона"
       },
       "framesMenu": "Настройки фреймов",
       "framesMenuTitle": "Показать или скрыть отдельные фреймы. Снятый флажок скрывает фрейм, пока вы не включите его снова или не сбросите настройки.",

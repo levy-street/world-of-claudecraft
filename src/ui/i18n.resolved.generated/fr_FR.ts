@@ -2978,7 +2978,9 @@ export const fr_FR: EnTranslations = {
         "questTracker": "Quest Tracker",
         "reliquaryTracker": "Reliquary Tracker",
         "doomMeter": "Affliction Bar",
-        "petBar": "Pet Bar"
+        "petBar": "Pet Bar",
+        "procOverlay": "Spell Procs",
+        "damageMeter": "Damage Meter"
       },
       "framesMenu": "Paramètres des cadres",
       "framesMenuTitle": "Affiche ou masque chaque cadre individuellement. Un cadre décoché reste masqué jusqu'à ce que vous le recochiez ou que vous rétablissiez les valeurs par défaut.",

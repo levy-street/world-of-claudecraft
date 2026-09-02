@@ -64,13 +64,13 @@
     touch-action: none;
   }
   /* The shared Fire, Chronomancy and Frost phoenix keeps its desktop artwork
-     proportions while taking less of the phone battlefield. The root is
-     already draggable, and scale composes with its independent translate. */
+     proportions while taking less of the phone battlefield. Scale composes
+     with the root's independent translate. */
   body.mobile-touch #proc-overlay {
     scale: 0.2;
   }
   /* The Soul Fragment bank is a persistent resource readout, not a transient
-     proc silhouette. Keep its crystals legible and draggable on touch screens. */
+     proc silhouette. Keep its crystals legible on touch screens. */
   body.mobile-touch #proc-overlay.necromancy {
     scale: 0.55;
   }
