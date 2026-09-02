@@ -12,7 +12,7 @@ import { RETIRED_KEY_SET, RETIRED_REASON } from '../scripts/i18n_retired_keys.mj
 import { DICT as adminDICT } from '../src/admin/i18n';
 import { en, supportedLanguages } from '../src/ui/i18n';
 import { DICT as serverDICT } from '../src/ui/server_i18n';
-import { DICT as simDICT } from '../src/ui/sim_i18n';
+import { DICT as simDICT, simDictProvidedKeys } from '../src/ui/sim_i18n';
 import { assertDeterministic } from './helpers/i18n_determinism';
 
 // src/ui/i18n.status.json is the generated per-key per-locale status
@@ -190,6 +190,53 @@ describe('i18n status registry: states', () => {
         if (row.by !== 'human' && row.by !== 'agent') violations.push(`${ck} ${loc} unattributed`);
       }
     expect(violations).toEqual([]);
+  });
+
+  it('sim-scope rows report per-locale SOURCE presence, never the assembled English spread', () => {
+    // The sim DICT is dense by construction (baseEnTable is spread under every
+    // locale), so a scan of the assembled table marked every sim key translated
+    // everywhere and the release fill could never see a sim-scope row
+    // (Masterwrought Phase 19F, qr-19-sim-scope-pending-is-unreachable). The
+    // scanner now reads simDictProvidedKeys, the union of a locale's own source
+    // blocks. Both directions are pinned against the LIVE sources rather than
+    // against the scanner's own arithmetic: a key no source block of a locale
+    // carries reads pending, a key the block carries reads translated, and the
+    // English dialect (en_CA, whose base is en) reads translated for every key.
+    // Non-vacuity: at least one pending sim row must exist today (the rift
+    // mechanic names alone are English in the Latin locales until the Phase 20
+    // fill), and at least one carried row must exist per locale.
+    const langs = NON_EN.filter((l) => l !== 'en_CA');
+    let pendingSeen = 0;
+    let carriedSeen = 0;
+    const violations: string[] = [];
+    for (const [ck, entry] of keyEntries()) {
+      if (!ck.startsWith('sim:')) continue;
+      const key = ck.slice('sim:'.length);
+      for (const lang of langs) {
+        const row = entry.locales[lang];
+        if (row.state === 'blocked') continue;
+        const carried = simDictProvidedKeys(lang).has(key);
+        const want = carried ? 'translated' : 'pending';
+        if (row.state !== want) violations.push(`${ck} ${lang}: ${row.state}, source says ${want}`);
+        if (carried) carriedSeen++;
+        else pendingSeen++;
+      }
+      if (entry.locales.en_CA.state !== 'translated')
+        violations.push(`${ck} en_CA: ${entry.locales.en_CA.state}, the English dialect inherits`);
+    }
+    expect(violations).toEqual([]);
+    expect(pendingSeen, 'the sim scope has unfilled rows today').toBeGreaterThan(0);
+    expect(carriedSeen, 'the sim scope has filled rows today').toBeGreaterThan(0);
+    // The assembled DICT stays dense (the runtime English spread is the
+    // fallback, not the coverage): the two readings must disagree somewhere
+    // or the pin above is a self-comparison.
+    const dense = simDICT as unknown as Record<string, Record<string, string>>;
+    const denseCount = langs.reduce(
+      (n, lang) => n + Object.keys(dense.en).filter((k) => Boolean(dense[lang][k])).length,
+      0,
+    );
+    expect(denseCount).toBe(Object.keys(simDICT.en).length * langs.length);
+    expect(denseCount).toBeGreaterThan(carriedSeen);
   });
 });
 

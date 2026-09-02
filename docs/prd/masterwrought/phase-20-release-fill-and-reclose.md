@@ -98,3 +98,40 @@ release-tier result, the re-close matrix delta, the drift-attributed stamp, the 
 PR body, the teardown OFFER (unchanged shape, the blast-radius addendum in
 decisions-index.md), and then ASK for the word: push and open the PR.
 ```
+
+### Hand-carried fill entries from Phase 19F (2026-09-02)
+
+Written at Phase 19F execution because the registry could not carry them before that wave,
+or because a fill's provenance is not something the worklist can say:
+
+- **The sim scope is on the worklist for the first time** (ruling
+  qr-19-sim-scope-pending-is-unreachable). `scripts/i18n_scan.mjs` now reads each locale's OWN
+  `sim_i18n` source blocks through `simDictProvidedKeys`, so `npm run i18n:worklist` lists the
+  sim-scope rows every locale never carried: 4,569 rows across the 20 non-English locales at
+  the 19F measurement (206 to 246 per locale; en_CA inherits English and carries none), every
+  one byte-identical English today. They land in the per-locale `BASE_DICT` blocks of
+  `src/ui/sim_i18n.ts` (or, for the eight newest locales, in `src/ui/sim_i18n.newlocales.ts`,
+  whose `BASE_NEW` blocks each `BASE_DICT` block spreads; the passthrough suite
+  `tests/sim_i18n_base_new_passthrough.test.ts` guards the spread). The sim DICT has NO dialect
+  inheritance: es_ES and fr_CA are filled as their own blocks. The release-tier pin 'the pending
+  set is empty' in `tests/i18n_status_registry.test.ts` stays red until they are filled; that is
+  the release-i18n job's contract, not a regression.
+- **The 52 rift mechanic display names** (ruling qr-19-rift-mechanic-names-translate-or-not,
+  option 1: translated everywhere, the shipped precedent of the 16 rift cast ids). The five
+  non-Latin fills landed in-change at 19F (machine-authored under the i18n-locale-fill
+  conventions, FLAGGED for the maintainer's read in phase-19f-qa.md); the 15 Latin locales'
+  780 rows are on the worklist above. Keys: the `aura.rift*` and `mechanic.rift*` block of
+  `baseEnTable`, derived from `RIFT_MOBS` and pinned by `tests/sim_i18n_rift_mechanics.test.ts`.
+- **Four retire-and-re-key successors whose 15 Latin rows the registry now carries as
+  pending:** `guide.professions.endgameMaterialsBodyAnyRaid` (D144),
+  `guide.profPages.toolsNoteFiveLadders` (D161), `guide.profPages.rareBodyFourFlavors` (D169)
+  and `guide.profPages.craftProse.engineering.materialsBodyThreeRods` (the D085 review round).
+  Their five non-Latin fills each rode the same change, machine-authored and FLAGGED for the
+  maintainer's re-judgement at STEP 1 beside the other machine-anchored sets; the retired
+  predecessors keep their reviewed overlay rows and never reach the worklist.
+- **Two ratified keys with a recorded staleness exposure, no fill owed by any gate:** the
+  gathering `gatherDeeds.mining/logging/herbalism` rows and the five non-Latin
+  `guide.profPages.rareBody` predecessors (which omitted the flavor names and the deed
+  sentence before 19F re-keyed the note) are superseded or left as-is per their rulings
+  (qr-19-prog-first-harvest-thirteen-catches, qr-19-rarebody-reword-landmine); nothing to
+  fill for them.

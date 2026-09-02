@@ -23258,7 +23258,7 @@ restriction the predicate never made is reworded as a NEW key,
 guide.professions.endgameMaterialsBodyAnyRaid ('breaks a raid-won piece of epic gear, from any
 raid and either difficulty, into exactly one essence'), with guide.professions.endgameMaterialsBody
 retired in scripts/i18n_retired_keys.mjs and the successor's five non-Latin fills carried
-in-change (the retired key's overlay rows are untouched); the 15 Latin rows land pending for the
+in-change (machine-authored under the i18n-locale-fill conventions and FLAGGED for the maintainer's read in phase-19f-qa.md; the retired key's overlay rows are untouched); the 15 Latin rows land pending for the
 Phase 20 fill. The sundering.ts docblock and the materials suite's comment carry the ruling id,
 and the two guide pins ('exactly one essence', 'one per week per character') hold on the
 successor. Phase 19F.

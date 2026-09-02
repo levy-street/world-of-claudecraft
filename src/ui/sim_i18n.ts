@@ -10078,6 +10078,36 @@ export const DICT: Record<SupportedLanguage, Record<SimMessageKey, string>> = Ob
   ]),
 ) as Record<SupportedLanguage, Record<SimMessageKey, string>>;
 
+/** The keys a locale's OWN sources carry, before the English spread above fills
+ *  the rest: the union of its BASE_DICT, PET_DICT, RAID_BOSS_DIALOGUE_DICT and
+ *  IGNIVAR_DICT blocks plus the one-row arena literal. The status registry
+ *  (scripts/i18n_scan.mjs) reads this instead of the assembled DICT, because
+ *  DICT is dense by construction (baseEnTable is spread under every locale) and
+ *  so could never report a sim-scope key as pending; a key absent here is an
+ *  untranslated row the release fill must carry (Masterwrought Phase 19F,
+ *  ruling qr-19-sim-scope-pending-is-unreachable). The runtime never calls
+ *  this; tSim keeps reading the dense DICT. */
+export function simDictProvidedKeys(lang: SupportedLanguage): ReadonlySet<string> {
+  const provided = new Set<string>();
+  const tables: ReadonlyArray<Readonly<Record<string, string>> | undefined> = [
+    BASE_DICT[lang],
+    PET_DICT[lang],
+    RAID_BOSS_DIALOGUE_DICT[lang],
+    IGNIVAR_DICT[lang],
+  ];
+  for (const table of tables) {
+    if (!table) continue;
+    for (const [key, value] of Object.entries(table)) {
+      if (typeof value === 'string' && value.trim().length > 0) provided.add(key);
+    }
+  }
+  const arena = ARENA_QUEUE_AUTO_LEAVE_1V1[lang];
+  if (typeof arena === 'string' && arena.trim().length > 0) {
+    provided.add('log.arenaQueueAutoLeave1v1');
+  }
+  return provided;
+}
+
 function interpolate(template: string, params?: InterpolationValues): string {
   if (!params) return template;
   return template.replace(/\{([A-Za-z0-9_]+)\}/g, (m, name: string) => {
