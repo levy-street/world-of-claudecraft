@@ -112,6 +112,15 @@ import { canopyDetailPrewarmTextures } from './canopy_detail';
 import { canvasDataUrlAsync } from './canvas_data_url';
 import { buildCastleFeatures, type CastleFeaturesView } from './castle_features';
 import { buildCelestialSprites, type CelestialSprites } from './celestial_sprites';
+import {
+  CHARACTER_CULL_ALL,
+  CHARACTER_CULL_CASTS,
+  CHARACTER_CULL_DRAWS,
+  characterCullBits,
+  createCharacterCullPass,
+  setCharacterCullCamera,
+  setCharacterCullShadow,
+} from './character_cull_core';
 import { buildCharacterEffectPrewarmGroup } from './character_effect_prewarm';
 import {
   type CharacterWeaponAura,
@@ -582,7 +591,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode } from './render_dev_flags';
+import { gpuPrepMode, renderLayerDisabled } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -1081,6 +1090,8 @@ interface AoeRingSlot {
 
 export interface EntityView extends RickshawMountViewState {
   group: THREE.Group;
+  /** Last frame's range verdict, kept off group.visible so the cull cannot latch it. */
+  inDrawRange: boolean;
   /** rigged glTF visual for characters; null for object views (doors/crates) */
   visual: CharacterVisual | null;
   visualKey: string | null;
@@ -1452,16 +1463,8 @@ export class Renderer {
   private sloppyCandidates: SloppyPickCandidate[] = [];
   private tmpV2 = new THREE.Vector3();
   private tmpV3 = new THREE.Vector3();
-  // Manual frustum cull for characters. Their skinned meshes keep
-  // frustumCulled=false (a skinned mesh's bind-pose bounds don't follow the
-  // animated pose, so Three's own cull pops visible rigs out), which means an
-  // off-screen rig otherwise issues its draws every frame. We instead cull at
-  // the group level from the rig's real world position + a generous radius.
-  // Gated to shadowless tiers so a culled off-screen caster can never drop a
-  // shadow that was actually visible in-frame.
-  private cullFrustum = new THREE.Frustum();
-  private cullViewProj = new THREE.Matrix4();
-  private cullSphere = new THREE.Sphere();
+  // Group-level cull for both passes; character_cull_core.ts owns the rule.
+  private readonly characterCull = createCharacterCullPass();
   private cullCharacters = false;
   // Scratch AnimState reused across the per-entity sync loop: CharacterVisual
   // .update() and the pose-selection helpers only read it within the call (the
@@ -2311,8 +2314,8 @@ export class Renderer {
     this.scene.add(sun);
     this.scene.add(sun.target);
     this.sun = sun;
-    // characters can self-cull only where they cast no sun shadow (low/lean tier)
-    this.cullCharacters = !sun.castShadow;
+    // ?charcull=off restores the pre-cull behaviour for an A/B bench run
+    this.cullCharacters = !renderLayerDisabled('charcull');
     this.sunDir.copy(SUN_DIR);
 
     // visible sun disc + bloom halo. The sprite construction (cratered moon
@@ -8528,6 +8531,7 @@ export class Renderer {
       // composed with it just now, so there is nothing to reconcile yet.
       modularAppearance: e.modularAppearance,
       liveScale: e.scale,
+      inDrawRange: true,
       loco: newLocoTrack(),
       locoState: newLocoState(),
       stepAccum: 0,
@@ -10247,15 +10251,11 @@ export class Renderer {
     // frame parity for distance-tiered mixer throttling
     this.frameIdx = (this.frameIdx + 1) & 0xffff;
 
-    // world-space view frustum for the per-character cull below. Built from last
-    // frame's camera (it's repositioned after this loop); the one-frame lag is
-    // absorbed by the generous per-rig cull radius.
+    // Camera and key light for the per-character cull below, both of them last
+    // frame's (each is repositioned after this loop); the core covers the lag.
     if (this.cullCharacters) {
-      this.cullViewProj.multiplyMatrices(
-        this.camera.projectionMatrix,
-        this.camera.matrixWorldInverse,
-      );
-      this.cullFrustum.setFromProjectionMatrix(this.cullViewProj);
+      setCharacterCullCamera(this.characterCull, this.camera);
+      setCharacterCullShadow(this.characterCull, this.sun, ENTITY_PROXY_SHADOW_RANGE_SQ);
     }
 
     // Crowd-adaptive LOD/shadow distances, derived from last frame's visible-rig
@@ -10286,16 +10286,17 @@ export class Renderer {
         cdz = e.pos.z - p.pos.z;
       const d2 = cdx * cdx + cdz * cdz;
       const isSelf = id === p.id;
-      if (
-        !isSelf &&
-        characterViewOutsideHysteresis(
-          v.group.visible,
+      const inDrawRange =
+        isSelf ||
+        isDistanceCullExemptObject(e) ||
+        !characterViewOutsideHysteresis(
+          v.inDrawRange,
           d2,
           this.entityViewCreateRangeSq,
           this.entityViewDestroyRangeSq,
-        ) &&
-        !isDistanceCullExemptObject(e)
-      ) {
+        );
+      v.inDrawRange = inDrawRange;
+      if (!inDrawRange) {
         v.group.visible = false;
         continue;
       }
@@ -10650,18 +10651,15 @@ export class Renderer {
       const paladinAegisActive = e.castingAbility === 'aegis_first_dawn' && e.channeling && !e.dead;
       // Decide visibility from the real world position before presentation work.
       // Audio and state derivation below remain active even for hidden actors.
-      let characterBodyOnScreen = true;
+      let cullBits = CHARACTER_CULL_ALL;
       if (this.cullCharacters && id !== p.id) {
-        this.cullSphere.center.set(x, y + v.height * 0.5 * v.liveScale, z);
-        const characterRadius = (v.height * 0.7 + 1.5) * v.liveScale;
-        this.cullSphere.radius = paladinAegisActive
-          ? Math.max(characterRadius, PALADIN_AEGIS_DOME_RADIUS + 1)
-          : characterRadius;
-        characterBodyOnScreen = this.cullFrustum.intersectsSphere(this.cullSphere);
+        const minR = paladinAegisActive ? PALADIN_AEGIS_DOME_RADIUS + 1 : 0;
+        cullBits = characterCullBits(this.characterCull, x, y, z, v.height, v.liveScale, minR, d2);
       }
+      const characterBodyOnScreen = (cullBits & CHARACTER_CULL_DRAWS) !== 0;
       const charOnScreen = characterBodyOnScreen || raidEncounterBypassesCharacterCulling(e);
       const runCharacterPresentation = shouldRunCharacterPresentationWork(
-        charOnScreen,
+        charOnScreen || (cullBits & CHARACTER_CULL_CASTS) !== 0,
         actionablePose,
       );
       syncRaidEncounterRigVisuals(
@@ -11755,8 +11753,9 @@ export class Renderer {
       // re-entry must not replay the skull burst; a real aura end re-arms it.
       v.recklessSkullsSpawned = nextRecklessSkullsLatch;
 
-      // skip the draw for off-screen rigs (pose/audio above already ran)
-      if (!charOnScreen) v.group.visible = false;
+      // Off-screen rigs stop drawing. One whose shadow still lands in the shot
+      // stays in scene: three culls its colour draw on the padded sphere.
+      if (!charOnScreen && (cullBits & CHARACTER_CULL_CASTS) === 0) v.group.visible = false;
     }
     this.lastVisibleRigCount = visibleRigCount;
     this.blobShadows?.commit();
