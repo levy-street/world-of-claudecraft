@@ -154,9 +154,12 @@ describe('live graphics profile architecture', () => {
       readFileSync(join(repoRoot, 'src', 'render', relativePath), 'utf8');
     const props = renderSource('props.ts');
     const foliage = renderSource('foliage.ts');
+    // The merge band depth moved out of props.ts with the static merge itself
+    // (src/render/static_merge.ts); the live-GFX rule follows the code.
+    const staticMerge = renderSource('static_merge.ts');
 
-    expect(props).not.toMatch(/\bconst\s+MERGE_BAND_DEPTH\s*=\s*GFX\b/);
-    expect(props).toContain('const mergeBandDepth = ():');
+    expect(staticMerge).not.toMatch(/\bconst\s+MERGE_BAND_DEPTH\s*=\s*GFX\b/);
+    expect(staticMerge).toContain('export const mergeBandDepth = ():');
     expect(props).toContain('deferredPropKeys ??= preloadPropKeys(GFX.standardMaterials)');
     expect(foliage).not.toMatch(/\bconst\s+MODEL_URLS\s*=\s*GFX\b/);
     expect(foliage).toContain('const foliageModelUrls = ():');
@@ -714,6 +717,7 @@ const RENDER_PURE_CORES = [
   'src/render/self_render_position_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
+  'src/render/static_merge_shadow_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
