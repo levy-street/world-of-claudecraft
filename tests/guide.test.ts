@@ -4523,15 +4523,19 @@ describe('Guide professions pages and routes', () => {
     };
     // The count is BOUND to its fish: numeral then name in zh and ru, name then
     // numeral in ja and ko (a within-clause swap of two counts reds).
+    // Russian stems match at a word start only (JS \b is ASCII-only, so the
+    // boundary is spelled out): 'кои' cannot ride 'покои', 'карп' cannot ride
+    // 'Карпаты'.
+    const ruAt = (stem: string) => `(?:^|[^а-яё])${stem}`;
+    const hasRu = (clause: string, stem: string) => new RegExp(ruAt(stem)).test(clause);
     const bound = (lang: Filled, clause: string, numeral: string, form: string) => {
       const n = fold(numeral);
       if (lang === 'zh_CN' || lang === 'zh_TW') return clause.includes(`${n}${form}`);
       if (lang === 'ja_JP') return clause.includes(`${form}${n}`);
       if (lang === 'ko_KR') return clause.includes(`${form} ${n}`);
-      const at = clause.indexOf(n);
-      if (at === -1) return false;
-      const stemAt = clause.indexOf(form, at);
-      return stemAt > at && stemAt - at <= 40;
+      // Russian: the stem within forty characters after ANY occurrence of the
+      // numeral word, at a word start on both sides.
+      return new RegExp(`${ruAt(n)}[\\s\\S]{0,40}${ruAt(form)}`).test(clause);
     };
     const priorStemOf = (lang: Filled, id: string, localName: string) =>
       lang === 'ru_RU'
@@ -4599,15 +4603,30 @@ describe('Guide professions pages and routes', () => {
             }
             const forms = fishForms(lang, id, localName);
             expect(forms.length, `${lang} forms for ${id}`).toBeGreaterThan(0);
-            for (const form of lang === 'ru_RU' ? forms : [forms[0]])
+            // Russian: EVERY stem of the name, each at a word start (a species
+            // word dropped from the fill reds); the others: the full name or
+            // the koi's short form.
+            if (lang === 'ru_RU')
+              for (const form of forms)
+                expect(
+                  hasRu(clause, form),
+                  `${lang} ${recipe.resultItemId} clause names ${id} (${localName}) [${form}]`,
+                ).toBe(true);
+            else
               expect(
                 forms.some((f) => clause.includes(f)),
-                `${lang} ${recipe.resultItemId} clause names ${id} (${localName}) [${form}]`,
+                `${lang} ${recipe.resultItemId} clause names ${id} (${localName})`,
               ).toBe(true);
             const numerals = NUMERAL[lang][reagent.count];
             expect(numerals, `${lang} numeral for ${reagent.count}`).toBeDefined();
+            // Bound: in Russian every stem must follow the numeral; elsewhere
+            // the full name or the koi's short form.
             expect(
-              numerals.some((numeral) => forms.some((form) => bound(lang, clause, numeral, form))),
+              numerals.some((numeral) =>
+                lang === 'ru_RU'
+                  ? forms.every((form) => bound(lang, clause, numeral, form))
+                  : forms.some((form) => bound(lang, clause, numeral, form)),
+              ),
               `${lang} ${recipe.resultItemId} clause binds ${reagent.count} to ${id}`,
             ).toBe(true);
           }
@@ -4616,19 +4635,24 @@ describe('Guide professions pages and routes', () => {
           for (const id of allFish) {
             if (own.has(id)) continue;
             const forms = fishForms(lang, id, name(id));
-            // The koi's short form is shared by every koi bill, so only the
-            // distinguishing forms are forbidden.
-            for (const form of forms.filter((f) => f.length >= 4))
-              expect(clause, `${lang} ${recipe.resultItemId} clause takes no ${id}`).not.toContain(
-                form,
-              );
+            // The koi's short form is shared by every koi bill and is exempt
+            // explicitly (the second CJK form); every Russian stem and every
+            // full name is forbidden.
+            const forbidden =
+              lang === 'ru_RU' || id !== 'glimmerfin_koi' ? forms : forms.slice(0, 1);
+            for (const form of forbidden)
+              expect(
+                lang === 'ru_RU' ? hasRu(clause, form) : clause.includes(form),
+                `${lang} ${recipe.resultItemId} clause takes no ${id} (${form})`,
+              ).toBe(false);
           }
           for (const id of allRods) {
             if (id === recipe.resultItemId || own.has(id)) continue;
             const stem = priorStemOf(lang, id, name(id));
-            expect(clause, `${lang} ${recipe.resultItemId} clause names no ${id}`).not.toContain(
-              stem,
-            );
+            expect(
+              lang === 'ru_RU' ? hasRu(clause, stem) : clause.includes(stem),
+              `${lang} ${recipe.resultItemId} clause names no ${id}`,
+            ).toBe(false);
           }
         }
       }
