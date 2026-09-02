@@ -26575,6 +26575,19 @@ wrote, and both were the wave's own rule turned against it:
   power and its control was too extreme to notice.
 Every finding was applied, blocking, should-fix and nit alike.
 
+### Validation
+gate_select PASS all 12 steps pg-armed at 6afc7054b7, GATE_EXIT=0, full-suite
+fallback 3669/1 (3670 files) and 54,515/9/28 (54,552 cases). The FIRST run was
+RED: tests/hud_update_drive.test.ts pins Hud.update()'s drive list by call name
+and the review round's rest-badge extraction changed it, which no per-unit suite
+reads. tsc EXIT 0, census RESULT PASS exit 0 captured without a pipe, ci:changed
+EXIT 0 after the last commit, pg arm proven by contrast (3 skipped unset, 3
+passed set), hud.ts 18716 against a ceiling lowered from 18728. Drift PREDICTED
+files 0 / cases +10 / expected-fail -2, MEASURED files +1 / cases +33 /
+expected-fail -2, and attributed to the line: the prediction counted it()
+DECLARATIONS (+27 net) where hud_perf_budget and masterwrought_budget expand
+theirs. Full table in phase-19d-qa.md.
+
 ### CARRIED for the maintainer, not taken unilaterally
 - **The golden equality arm couples this branch to upstream content.** The one id
   the D175 re-mint added, reins_rickshaw_mount, is RELEASE-owned, so a future

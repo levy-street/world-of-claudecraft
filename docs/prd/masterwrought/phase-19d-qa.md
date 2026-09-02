@@ -1,6 +1,20 @@
 # Phase 19D QA (tooling and guards: the fourth execution wave of the rulings gate)
 
-VERDICT_LINE_PENDING
+VERDICT: **PASS-WITH-FINDINGS.** Twelve units, one commit each, zero
+escalations, the pg-armed gate green at `6afc7054b7` (all 12 steps, full-suite
+fallback). The qualifier is the wave's own content: the load-bearing rule here
+was that every change must fail TOWARD MORE tests, and THREE of the wave's own
+changes failed it on first draft. The census Path column granted the exemption
+to almost any malformed string, and still granted it to a traversal path after
+the first fix; the compass extraction landed bare-named, outside every painter
+gate and with no test, so an empty relabel body passed green; and D155's escape
+walk gated with the reverse-walk convention while walking forward, waving a
+7 yd wall through. None changed a shipped verdict, all three are fixed and
+mutation-proved, and each was found by a different reader than the one who
+wrote it. Seventy-one instruction defects, five of them falsified premises that
+changed the work. Four arms went to the maintainer in session; D175's overrules
+its source row's recommendation and says so. LOCAL ONLY: no push, no PR, no
+teardown.
 
 Scope: the twelve units of `phase-19d-tooling-and-guards.md` (D027 D029 D129
 D130 D131 D132 D141 D152 D155 D164 D172 D175), their fresh domain reviews, the
@@ -124,7 +138,72 @@ Findings worth carrying past the packet, beyond the three above:
   symptoms cannot happen. Both are now scoped to epoch-CHANGING deploys, where
   the real event is every stale tab hard-disconnected and needing a reload.
 
-## VALIDATION_PENDING
+## Validation
+
+At the wave tip `6afc7054b7`, porcelain clean before and after.
+
+- **`node scripts/gate_select.mjs`, pg-armed: PASS, all 12 steps, `GATE_EXIT=0`.**
+  Judged by the real `GATE_EXIT=` line, never the task's own exit code (the
+  runner's trailing echo makes that meaningless). Full-suite fallback:
+  **3669 test files passed / 1 skipped (3670)** and **54,515 passed / 9 expected
+  fail / 28 skipped (54,552)**.
+- **THE FIRST GATE RUN WAS RED**, and the failure is the wave's real lesson about
+  scope. `tests/hud_update_drive.test.ts` pins `Hud.update()`'s drive list BY
+  CALL NAME, and the review round's rest-badge extraction changed what that
+  method calls. Every per-unit suite was green through it, because none of them
+  reads that registry. Fixed by moving the row (same band, same edge-latch gate),
+  then a sweep of every suite referencing any symbol or file the round touched,
+  rather than trusting the scoped runs a second time.
+- **`npx tsc --noEmit`: EXIT 0**, no diagnostics.
+- **Symbol census: `RESULT: PASS`, exit 0, captured WITHOUT a pipe.** The five
+  golden_composition names now print as INFO rather than as "GONE from merged",
+  which is the defect D130 exists to fix, exercised end to end on every run.
+- **`npm run ci:changed`: EXIT 0**, after the LAST commit. It was RED once
+  mid-wave, on format diffs in the fifteen capture-rig seeds the marker edit
+  pushed past the line bound; reflowed by the formatter over the wave's touched
+  files only.
+- **THE PG ARM IS PROVEN, not assumed.** `tests/account_wealth_db.pg.test.ts`
+  reads 3 SKIPPED with `TEST_DATABASE_URL` unset and 3 PASSED with it set, run
+  both ways against the same runner. `DATABASE_URL` is deliberately NOT exported:
+  a populated one defeats `characterization.test.ts`'s cold-cache degrade, which
+  cost 19C a false red.
+- **Guard suites green**: architecture, monolith budget (hud.ts 18716 against a
+  ceiling LOWERED 18728 to 18716), IWorld parity, the S3 i18n guard, painter
+  host, hud perf budget, and the language fan-out registry and its behavioral
+  twin.
+- **Every new pin mutated and watched fail ALONE**, reverted from a disk copy,
+  never `git checkout`: D155's control and roster arm, D131's marker strip and
+  its reader and predicate, D130's filter, its defect arm, its parser and the
+  traversal normalization, D141's carve-out entry, D172's two prune arithmetic
+  halves, D129's memo clear, its sentinel, its compass relabel and its
+  double-classification, and D175's golden equality arm.
+
+### Drift: PREDICTED, then MEASURED, then attributed to the line
+
+Predicted before the run: test files net 0, cases +10, expected-fail -2.
+Measured against the 19C close (3669 files, 54,519 cases, 11 expected fail):
+**files +1, cases +33, expected-fail -2.**
+
+The case prediction was LOW by 23, and the reason is worth recording: it counted
+`it()` DECLARATIONS (+27 net), and declarations are not cases where a suite
+expands them. Attributed exactly, by running the wave's own changed files at
+both revisions:
+
+| Source | Cases |
+|---|---|
+| `capture_graphics_seed.test.ts` (new) | +5 |
+| `compass_strip_painter.test.ts` (new) | +4 |
+| `ci_shard_weight_carry.test.ts` | +11 |
+| `merge_audit_symbol_census.test.ts` | +6 |
+| `hud_perf_budget.test.ts` (two painters registered, per-painter arms) | +6 |
+| `masterwrought_budget.test.ts` | +2 |
+| `placement_integrity.test.ts` | +2 |
+| `language_fanout_registry.test.ts` | +1 |
+| `stale_client_rollout.test.ts` (deleted) | -4 |
+| **Total** | **+33** |
+
+Which is the measured figure exactly, with nothing left over. Expected-fail -2 is
+D141's two dev-bis flips. Files +1 is two new suites less one deleted.
 
 ## CARRIED for the maintainer, not taken unilaterally
 
