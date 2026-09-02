@@ -24,10 +24,10 @@ vi.mock('../src/render/render_dev_flags', () => ({
   renderLayerDisabled: (name: string) => disabledLayers.has(name),
 }));
 
-function rendererStub(): THREE.WebGLRenderer {
+function rendererStub(width = 1280, height = 720): THREE.WebGLRenderer {
   return {
     capabilities: { isWebGL2: true },
-    getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
+    getDrawingBufferSize: (out: THREE.Vector2) => out.set(width, height),
     getPixelRatio: () => 1,
   } as unknown as THREE.WebGLRenderer;
 }
@@ -254,6 +254,77 @@ describe('live post pipeline', () => {
 
     expect(post.grade.fxaa).toBe(false);
     expect(post.supportsDynamicResolution).toBe(true);
+  });
+
+  it('keeps ultra AO full-res at 1080p and drops it to half-res at 4K', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { AO_FULL_RES_MAX_PIXELS } = await import('../src/render/post_pixel_budget_core');
+    expect(1920 * 1080).toBeLessThanOrEqual(AO_FULL_RES_MAX_PIXELS);
+    expect(3840 * 2160).toBeGreaterThan(AO_FULL_RES_MAX_PIXELS);
+
+    const readHalfRes = (width: number, height: number): boolean => {
+      const post = buildComposer(
+        rendererStub(width, height),
+        new THREE.Scene(),
+        new THREE.PerspectiveCamera(),
+        width,
+        height,
+      );
+      const ao = post.ao as unknown as { configuration: { halfRes: boolean; aoSamples: number } };
+      return ao.configuration.halfRes;
+    };
+
+    // The tier request is unchanged in both cases; only the resolved value moves.
+    expect(gfxSettings.aoFullRes).toBe(true);
+    expect(readHalfRes(1920, 1080)).toBe(false);
+    expect(readHalfRes(3840, 2160)).toBe(true);
+    expect(gfxSettings.aoFullRes).toBe(true);
+  });
+
+  it('leaves the high tier half-res whatever the panel is', async () => {
+    gfxSettings.aoFullRes = false;
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    for (const [width, height] of [
+      [1920, 1080],
+      [3840, 2160],
+    ]) {
+      const post = buildComposer(
+        rendererStub(width, height),
+        new THREE.Scene(),
+        new THREE.PerspectiveCamera(),
+        width,
+        height,
+      );
+      const ao = post.ao as unknown as { configuration: { halfRes: boolean } };
+      expect(ao.configuration.halfRes).toBe(true);
+    }
+  });
+
+  it('re-resolves the AO arm when a resize crosses the pixel budget', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(1920, 1080),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1920,
+      1080,
+    );
+    const ao = post.ao as unknown as { configuration: { halfRes: boolean } };
+    expect(ao.configuration.halfRes).toBe(false);
+
+    post.setSize(3840, 2160, 1);
+    expect(ao.configuration.halfRes).toBe(true);
+
+    post.setSize(1920, 1080, 1);
+    expect(ao.configuration.halfRes).toBe(false);
+
+    // The pixel count, not the CSS size, is what the budget reads: a 1080p
+    // window on a 2x display is a 4K drawing buffer.
+    post.setSize(1920, 1080, 2);
+    expect(ao.configuration.halfRes).toBe(true);
   });
 
   it('keeps high half-resolution AO depth available to every AO stage', async () => {
