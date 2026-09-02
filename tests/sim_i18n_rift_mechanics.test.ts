@@ -27,7 +27,7 @@ import { Sim } from '../src/sim/sim';
 import type { Entity, MobTemplate } from '../src/sim/types';
 import { castDisplayName } from '../src/ui/cast_display_name';
 import { setLanguage, type TranslationKey, t } from '../src/ui/i18n';
-import { localizeSimAuraName } from '../src/ui/sim_i18n';
+import { DICT, localizeSimAuraName, simDictProvidedKeys } from '../src/ui/sim_i18n';
 
 /** Every MobTemplate field a rift template names today, with the player surface
  *  that name reaches. A field missing from this table (or from EXEMPT_FIELDS)
@@ -234,5 +234,41 @@ describe('the rift matcher exemptions are earned', () => {
       mob.auras.some((a) => a.name === 'Siphon') || p.auras.some((a) => a.name === 'Siphon'),
       'lifeleech.name became an aura',
     ).toBe(false);
+  });
+});
+
+// Masterwrought Phase 19F, ruling qr-19-rift-mechanic-names-translate-or-not:
+// the rift names are TRANSLATED EVERYWHERE, the precedent the 16 rift cast ids
+// already shipped (their non-Latin fills landed with the v0.32.0 release fill).
+// The five non-Latin fills rode the ruling's own change; the 15 Latin locales
+// reach the Phase 20 fill through the status registry, which since D148 reads
+// per-locale SOURCE presence, so they are deliberately NOT pinned here (they
+// are pending rows, the release tier's job). The English-dialect rule keeps
+// en_CA out of both halves.
+describe('rift mechanic names are filled in the five non-Latin sim blocks', () => {
+  const NON_LATIN = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+  const dense = DICT as unknown as Record<string, Record<string, string>>;
+  const riftKeys = Object.keys(dense.en).filter((k) => /^(aura|mechanic)\.rift/.test(k));
+
+  it('every rift name key carries a real translation in each of the five, from its own block', () => {
+    // Non-vacuity: the set is the live baseEnTable rift block, never a
+    // hand-copied list, and it must still be the whole kit (52 at the ruling).
+    expect(riftKeys.length).toBeGreaterThanOrEqual(52);
+    const gaps: string[] = [];
+    for (const lang of NON_LATIN) {
+      const provided = simDictProvidedKeys(lang);
+      for (const key of riftKeys) {
+        // Present in the locale's OWN source (the honest registry reads this),
+        // not merely present in the assembled DICT, which the English spread
+        // makes true of every key.
+        if (!provided.has(key)) gaps.push(`${lang} ${key}: not in the locale's own block`);
+        // And really translated: a pasted English value would be present and
+        // still ship English to that player.
+        else if (dense[lang][key] === dense.en[key]) gaps.push(`${lang} ${key}: English`);
+        else if (/[a-z]{4,}/.test(dense[lang][key]))
+          gaps.push(`${lang} ${key}: wordy Latin text in a non-Latin value (${dense[lang][key]})`);
+      }
+    }
+    expect(gaps).toEqual([]);
   });
 });
