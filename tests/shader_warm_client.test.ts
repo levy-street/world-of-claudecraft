@@ -14,6 +14,7 @@ import {
   holdShaderPrograms,
   noteShaderWarmFrameMs,
   noteShaderWarmHold,
+  noteShaderWarmSettingChanged,
   resetShaderWarmForTest,
   SHADER_WARM_READY_DEADLINE_MS,
   setShaderWarmStoredSettingSource,
@@ -24,6 +25,7 @@ import {
   warmShaderPrograms,
 } from '../src/render/shader_warm_client';
 import {
+  SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_HOLD_WINDOW,
   SHADER_WARM_TIMEOUT_BREAKER,
@@ -662,6 +664,282 @@ describe('the breaker on held gates that keep expiring', () => {
       heldWarm: 1,
       heldTimedOut: SHADER_WARM_TIMEOUT_BREAKER,
     });
+  });
+});
+
+describe('the cannot-serve rule: giving up on the worker own evidence', () => {
+  // The RTX 4070 laptop's numbers: links about 560 ms each, the AIMD window
+  // open to four, and a boot burst that queues dozens of programs behind the
+  // hold that has waited longest. The two rules above only learn any of that
+  // once holds have paid whole caps; this one reads it off the worker.
+  const LINK_MS = 560;
+  const HOLD_CAP_MS = 5_000;
+
+  /** `count` distinct programs, the way a gate piece's materials arrive. */
+  function programs(count: number) {
+    return Array.from({ length: count }, (_, index) => ({
+      vertex: `void main() { float u${index}; }`,
+      fragment: 'void main() {}',
+      index0Attribute: 'position',
+    }));
+  }
+
+  function windowOfFour(worker: FakeWorker): void {
+    worker.emit({
+      kind: 'stats',
+      pending: 28,
+      inFlight: 4,
+      windowLinks: 4,
+      state: 'steady',
+      warmed: 0,
+      failed: 0,
+      retained: 0,
+      cancelled: 0,
+      backoffCount: 0,
+      maxWindowObserved: 4,
+      etalonMsPerKchar: null,
+      soloSamples: 2,
+    });
+  }
+
+  it('retires once the queue ahead of the oldest hold outruns its remaining cap', async () => {
+    let clock = 0;
+    const { worker, ready, context } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+
+    // One gate piece, 32 programs, holding its link under the gates' own cap.
+    const hold = holdShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+
+    // Two links in: not enough evidence to condemn the worker, even though
+    // the arithmetic already says the hold is lost.
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS - 1; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+      expect(shaderWarmSnapshot().worker).toBe('ready');
+    }
+
+    // The third settle is the first with a mean to stand on: 29 unsettled
+    // requests at 560 ms, four at a time, is 4060 ms of service for a hold
+    // with 3320 ms of its cap left.
+    clock += LINK_MS;
+    worker().emit({
+      kind: 'warmed',
+      id: SHADER_WARM_EVIDENCE_LINKS,
+      linkMs: LINK_MS,
+    });
+
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'cannot-serve:hold-cap',
+      warmed: SHADER_WARM_EVIDENCE_LINKS,
+      held: 0,
+      // The whole point: nothing paid a cap to learn this.
+      heldTimedOut: 0,
+    });
+    expect(worker().terminations).toBe(1);
+    // The hold gives up now rather than at its cap: the three the worker did
+    // link stay warm, everything else fails, so the piece links cold.
+    const outcomes = await hold.settled;
+    expect(outcomes.slice(0, SHADER_WARM_EVIDENCE_LINKS)).toEqual(
+      Array.from({ length: SHADER_WARM_EVIDENCE_LINKS }, () => 'warmed'),
+    );
+    expect(outcomes.slice(SHADER_WARM_EVIDENCE_LINKS)).toEqual(
+      Array.from({ length: 32 - SHADER_WARM_EVIDENCE_LINKS }, () => 'failed'),
+    );
+    expect(shaderWarmDecide(context, GPU_WORK_PRIORITY.VISIBLE_PREWARM, false)).toEqual({
+      hold: false,
+      bypass: 'unavailable',
+    });
+  });
+
+  it('keeps a worker whose links are ten times shorter, on the same queue', () => {
+    // The RTX 3060 desktop shape. Nothing here is a millisecond bound: the
+    // same arithmetic that condemned the laptop leaves this one alone.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    holdShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+
+    for (let link = 1; link <= 8; link++) {
+      clock += 50;
+      worker().emit({ kind: 'warmed', id: link, linkMs: 50 });
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready', warmed: 8, refusal: null });
+    expect(worker().terminations).toBe(0);
+  });
+
+  it('keeps a worker whose queue fits the hold cap, at the very same wall', () => {
+    // Four programs at 560 ms over a window of four is one link's wall: the
+    // hold is served, so a slow worker that is not overloaded is kept.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    holdShaderPrograms(programs(4), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready', warmed: 3 });
+  });
+
+  it('judges the oldest hold, and forgets a hold that gave up', () => {
+    // A request nobody holds a link for (warmShaderPrograms) is not a hold and
+    // never condemns the worker: the rule is about a reveal waiting, not about
+    // background warming.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    warmShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+
+    // A hold that abandons its request stops being measured with it.
+    const abandoned = holdShaderPrograms(
+      programs(48).slice(32),
+      GPU_WORK_PRIORITY.VISIBLE_PREWARM,
+      HOLD_CAP_MS,
+    );
+    abandoned.abandon();
+    clock += LINK_MS;
+    worker().emit({ kind: 'warmed', id: 4, linkMs: LINK_MS });
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready', refusal: null });
+  });
+
+  it('does not charge a live view for the cosmetic backlog the worker serves after it', () => {
+    // The worker takes priority first and arrival second, so a live view that
+    // arrives behind a whole catalog is served BEFORE it. Counting the queue
+    // by id alone charged this hold for 32 links it never waits on and
+    // retired a worker that was about to serve it in one window.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    warmShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM);
+    holdShaderPrograms(programs(36).slice(32), GPU_WORK_PRIORITY.LIVE_VIEW, HOLD_CAP_MS);
+
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    // Four programs of its own, four at a time: one link's wall against
+    // 3320 ms of cap left.
+    expect(shaderWarmSnapshot()).toMatchObject({ worker: 'ready', refusal: null });
+    expect(worker().terminations).toBe(0);
+  });
+
+  it('charges a cosmetic hold for the live views that arrive after it', () => {
+    // The mirror, and why the id compare is not merely conservative: these
+    // requests arrive LATER than the hold's own and the worker still serves
+    // every one of them first, so this hold really is lost.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    holdShaderPrograms(programs(4), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+    warmShaderPrograms(programs(36).slice(4), GPU_WORK_PRIORITY.LIVE_VIEW);
+
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'cannot-serve:hold-cap',
+      heldTimedOut: 0,
+    });
+  });
+
+  it('judges nothing until the worker first stats message says how wide its window is', () => {
+    // The window is the divisor, and the verdict is final: reading a worker
+    // that links four at a time as one at a time condemns it four times too
+    // fast, over the few hundred milliseconds before its first poll lands.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    holdShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      clock += LINK_MS;
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'ready',
+      refusal: null,
+      warmed: SHADER_WARM_EVIDENCE_LINKS,
+    });
+
+    // The message lands, and the next thing the client learns is judged.
+    windowOfFour(worker());
+    clock += LINK_MS;
+    worker().emit({ kind: 'warmed', id: SHADER_WARM_EVIDENCE_LINKS + 1, linkMs: LINK_MS });
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'cannot-serve:hold-cap',
+    });
+  });
+
+  it('reads the rule at a hold note too, before the two expiry rules', () => {
+    // The holds a gate notes are the other moment the client learns anything:
+    // one expiry is not the expired-share rule's four, and the wedged rule
+    // needs three in a row, but the worker's own wall already says the next
+    // hold cannot be served either.
+    let clock = 0;
+    const { worker, ready } = start({ now: () => clock });
+    ready();
+    windowOfFour(worker());
+    holdShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+    for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+      worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+    }
+    // The settles above all landed on the same instant, so nothing has waited
+    // yet; the hold note is where the wait is read.
+    expect(shaderWarmSnapshot().worker).toBe('ready');
+
+    clock += 2_000;
+    noteShaderWarmHold(true, false, 400);
+    expect(shaderWarmSnapshot()).toMatchObject({
+      worker: 'dead',
+      refusal: 'cannot-serve:hold-cap',
+      held: 1,
+      heldTimedOut: 0,
+    });
+  });
+
+  it('stays retired across the player switching the row off and back on', () => {
+    // Same stickiness as the other causes: the reason is a property of this
+    // renderer's worker, not of the setting.
+    let clock = 0;
+    let stored = 'all';
+    setShaderWarmStoredSettingSource(() => stored);
+    try {
+      const { worker, ready } = start({ search: '', now: () => clock });
+      ready();
+      windowOfFour(worker());
+      holdShaderPrograms(programs(32), GPU_WORK_PRIORITY.VISIBLE_PREWARM, HOLD_CAP_MS);
+      for (let link = 1; link <= SHADER_WARM_EVIDENCE_LINKS; link++) {
+        clock += LINK_MS;
+        worker().emit({ kind: 'warmed', id: link, linkMs: LINK_MS });
+      }
+      expect(shaderWarmSnapshot().refusal).toBe('cannot-serve:hold-cap');
+
+      stored = 'off';
+      noteShaderWarmSettingChanged();
+      stored = 'all';
+      noteShaderWarmSettingChanged();
+      expect(shaderWarmSnapshot()).toMatchObject({
+        worker: 'dead',
+        refusal: 'cannot-serve:hold-cap',
+      });
+    } finally {
+      setShaderWarmStoredSettingSource(() => null);
+    }
   });
 });
 

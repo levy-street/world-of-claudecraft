@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { shaderWarmToken } from '../server/perf_report_entry_blocks';
 import { loadSpan, resetLoadProfile } from '../src/game/load_profiler';
 import type { PerfMonitor, PerfSnapshot } from '../src/game/perf';
 import { jitteredPerfReportDelay } from '../src/game/perf_report_schedule';
 import { perfReporterInternalsForTest, startPerfReporter } from '../src/game/perf_reporter';
+import { SHADER_WARM_BEACON_TEXT_MAX } from '../src/game/perf_shader_warm_core';
 import { Settings } from '../src/game/settings';
 import { POST_REVEAL_LINK_WINDOW_MS } from '../src/render/post_reveal_links_core';
 import { shaderWarmAuditSnapshot } from '../src/render/shader_warm_audit';
@@ -1912,18 +1914,18 @@ describe('perf reporter world-entry blocks', () => {
     expect(serialized).not.toContain('shader-warm-audit-sentinel-key');
   });
 
-  it('never ships the shader warm worker readout either, for the same reason', () => {
-    // Same rule as the audit above, and the same failure mode: the payload
-    // is built field by field, so a new PerfSnapshot block must not reach
-    // the beacon by simply existing. This one names the adapter and carries
-    // per-gate counts from the machine.
+  /** A snapshot whose shader warm block is a live worker, with the machine
+   *  identifiers the beacon must leave behind. */
+  function withShaderWarm(overrides: Partial<PerfSnapshot['shaderWarm']> = {}): PerfSnapshot {
     const snap = snapshot();
     snap.shaderWarm = {
       ...shaderWarmSnapshot(),
+      setting: 'auto',
       mode: 'all',
+      backend: 'd3d11',
       armed: true,
       worker: 'ready',
-      refusal: 'shader-warm-client-sentinel-refusal',
+      refusal: null,
       adapter: 'shader-warm-client-sentinel-adapter',
       asked: 12,
       sent: 9,
@@ -1947,14 +1949,92 @@ describe('perf reporter world-entry blocks', () => {
         etalonMsPerKchar: 8.5,
         soloSamples: 3,
       },
+      ...overrides,
     };
-    const body = perfReporterInternalsForTest.payloadFromSnapshot(snap, new Settings(), 's', 1)!;
-    expect(Object.keys(body)).not.toContain('shaderWarm');
-    expect(Object.keys(body.rawSummary as Record<string, unknown>)).not.toContain('shaderWarm');
-    const serialized = JSON.stringify(body);
-    expect(serialized).not.toContain('shaderWarm');
-    expect(serialized).not.toContain('shader-warm-client-sentinel-adapter');
-    expect(serialized).not.toContain('shader-warm-client-sentinel-refusal');
+    return snap;
+  }
+
+  it('ships the shader warm worker block, projected and bounded, never the adapter', () => {
+    // The fleet needs two answers the local readout can only give one machine
+    // at a time: did the worker run on this backend, and what retired it when
+    // it did not. Everything else in that snapshot (the adapter it names, the
+    // per-gate counts and timings) stays on the machine.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      withShaderWarm(),
+      new Settings(),
+      's',
+      1,
+    )!;
+    expect((body.rawSummary as { shaderWarm?: unknown }).shaderWarm).toEqual({
+      active: true,
+      worker: 'ready',
+      refusal: null,
+      mode: 'all',
+      setting: 'auto',
+      backend: 'd3d11',
+      warmed: 8,
+      held: 4,
+      heldTimedOut: 1,
+    });
+    // The two typed fields the server stores as columns.
+    expect(body.shaderWarmWorkerActive).toBe(true);
+    expect(body.shaderWarmRefusal).toBe('');
+    expect(JSON.stringify(body)).not.toContain('shader-warm-client-sentinel-adapter');
+  });
+
+  it('follows the worker state: a retired worker is not an active one', () => {
+    // The mode stays `all` on a session whose worker was retired at second
+    // four; reading the mode as if it were the worker is what would make the
+    // fleet numbers say the opposite of the truth.
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      withShaderWarm({ worker: 'dead', refusal: 'cannot-serve:hold-cap' }),
+      new Settings(),
+      's',
+      1,
+    )!;
+    expect((body.rawSummary as { shaderWarm?: { active?: boolean } }).shaderWarm?.active).toBe(
+      false,
+    );
+    expect(body.shaderWarmWorkerActive).toBe(false);
+    expect(body.shaderWarmRefusal).toBe('cannot-serve:hold-cap');
+  });
+
+  it('ships a whole extension-drift refusal, the longest cause the client mints', () => {
+    // The client's own bound and the server's token bound are the same
+    // number for this reason: the refusal that names WHICH extension drifted
+    // is 50 characters at its longest, and a client that cut it would hand
+    // the server a token it then drops on charset.
+    const longest = 'extension-drift:webgl_compressed_texture_s3tc_srgb';
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      withShaderWarm({ worker: 'dead', refusal: longest }),
+      new Settings(),
+      's',
+      1,
+    )!;
+    expect(longest.length).toBeLessThanOrEqual(SHADER_WARM_BEACON_TEXT_MAX);
+    expect(body.shaderWarmRefusal).toBe(longest);
+    expect(shaderWarmToken(longest)).toBe(longest);
+  });
+
+  it('bounds every string and every count in the block', () => {
+    const body = perfReporterInternalsForTest.payloadFromSnapshot(
+      withShaderWarm({
+        worker: 'refused',
+        refusal: `extension-drift:${'x'.repeat(200)}`,
+        warmed: -3,
+        held: Number.NaN,
+        heldTimedOut: 2.7,
+      }),
+      new Settings(),
+      's',
+      1,
+    )!;
+    const block = (body.rawSummary as { shaderWarm: Record<string, unknown> }).shaderWarm;
+    expect((block.refusal as string).length).toBe(SHADER_WARM_BEACON_TEXT_MAX);
+    expect(body.shaderWarmRefusal).toBe(block.refusal);
+    expect(block.warmed).toBe(0);
+    expect(block.held).toBe(0);
+    expect(block.heldTimedOut).toBe(2);
   });
 
   describe('over a real send', () => {

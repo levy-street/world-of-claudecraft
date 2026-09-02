@@ -38,7 +38,11 @@ import {
   postRevealLinksSnapshot as snapshotLinkWindow,
 } from './post_reveal_links_core';
 import { sweepProgramKeyLedger } from './program_key_ledger';
-import { armShaderWarmAudit, sweepShaderWarmAudit } from './shader_warm_audit';
+import {
+  armShaderWarmAudit,
+  noteShaderWarmAuditOutOfBand,
+  sweepShaderWarmAudit,
+} from './shader_warm_audit';
 import { armShaderWarm } from './shader_warm_client';
 
 interface ProgramInfoHost {
@@ -99,6 +103,21 @@ export function armLiveProgramWatch(webgl: ProgramInfoHost): void {
   if (webgl.info.programs) {
     armPostRevealLinkWindow(linkWindow, clock(), webgl.info.programs.length);
   }
+}
+
+/**
+ * An out-of-band render burst brackets itself (the scene census): `begin`
+ * before its first render, `end` once it is over. The programs minted between
+ * the two are its own, charged to the burst instead of to the gates, and the
+ * ones already waiting at the begin keep the class they earned
+ * (shader_warm_audit.ts). The escape watch needs no such call, since the
+ * absorb below adopts anything minted between two draws as prep.
+ */
+export function noteOutOfBandPrograms(
+  webgl: ProgramListHost,
+  phase: 'begin' | 'end' = 'end',
+): void {
+  noteShaderWarmAuditOutOfBand(webgl, phase);
 }
 
 /** Right before the frame's render: everything minted since the last draw is

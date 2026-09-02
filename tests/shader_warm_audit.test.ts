@@ -14,16 +14,19 @@ import {
 import {
   absorbLivePrograms,
   armLiveProgramWatch,
+  noteOutOfBandPrograms,
   recordNewLivePrograms,
   resetLiveProgramWatchForTest,
 } from '../src/render/live_program_watch';
 import { THREE_PROGRAM_KEY_PARAMETERS } from '../src/render/program_key_ledger_core';
 import type { DryProgramSource } from '../src/render/program_sources';
+import { captureSceneCensus, type SceneCensusHost } from '../src/render/scene_census_core';
 import {
   armShaderWarmAudit,
   disposeShaderWarmAudit,
   expectRootProgramSources,
   type MintedProgramEntry,
+  noteShaderWarmAuditOutOfBand,
   resetShaderWarmAuditForTest,
   SHADER_WARM_AUDIT_SWEEP_QUOTA,
   shaderWarmAuditEnabled,
@@ -492,6 +495,144 @@ describe('sweepShaderWarmAudit', () => {
     programs.push(minted(3, 'escape', 'v', 'f'));
     recordNewLivePrograms(host);
     expect(shaderWarmAuditSnapshot()).toMatchObject({ matched: 1, unexpected: 1, pending: 0 });
+  });
+});
+
+describe('an out-of-band burst', () => {
+  it('is charged the mints it forced, and the live escapes keep their own class', () => {
+    resetShaderWarmAuditForTest('?perf');
+    const programs: MintedProgramEntry[] = [];
+    const host = glHost(programs);
+    armShaderWarmAudit(host);
+    // A live frame's escape, seen by the sweep that rides its present.
+    programs.push(minted(1, 'escape', 'v', 'f'));
+    sweepShaderWarmAudit(host);
+    // Then the census burst, inside ONE call: whatever is still unseen when
+    // it discards its draws was minted by the burst.
+    programs.push(minted(2, 'census-a', 'v', 'f'), minted(3, 'census-b', 'v', 'f'));
+    expect(noteShaderWarmAuditOutOfBand(host)).toBe(2);
+    sweepShaderWarmAudit(host);
+    const snapshot = shaderWarmAuditSnapshot();
+    expect(snapshot).toMatchObject({ unexpected: 1, outOfBand: 2 });
+    // The tally the tester reads never carries the burst's rows.
+    expect(snapshot.unexpectedByName.map((row) => row.count)).toEqual([1]);
+    expect(snapshot.unexpectedSamples.map((sample) => sample.cacheKey)).toEqual(['escape']);
+    expect(snapshot.outOfBandSamples.map((sample) => sample.cacheKey)).toEqual([
+      'census-a',
+      'census-b',
+    ]);
+    // The burst is over: the next frame's mints are live again.
+    programs.push(minted(4, 'after', 'v', 'f'));
+    sweepShaderWarmAudit(host);
+    expect(shaderWarmAuditSnapshot()).toMatchObject({ unexpected: 2, outOfBand: 2 });
+  });
+
+  it('keeps its attribution through the sweeps the quota spreads the burst over', () => {
+    // The classing is deferred by the quota, so the parked mint has to carry
+    // WHERE it came from; reading the flag at classing time would charge the
+    // burst's tail to whatever the renderer was doing frames later.
+    resetShaderWarmAuditForTest('?perf');
+    const programs: MintedProgramEntry[] = [];
+    const host = glHost(programs);
+    armShaderWarmAudit(host);
+    const burst = SHADER_WARM_AUDIT_SWEEP_QUOTA + 4;
+    for (let i = 0; i < burst; i++) programs.push(minted(i + 1, `k${i}`, 'v', 'f'));
+    noteShaderWarmAuditOutOfBand(host);
+    expect(sweepShaderWarmAudit(host)).toBe(SHADER_WARM_AUDIT_SWEEP_QUOTA);
+    expect(sweepShaderWarmAudit(host)).toBe(burst - SHADER_WARM_AUDIT_SWEEP_QUOTA);
+    expect(shaderWarmAuditSnapshot()).toMatchObject({ outOfBand: burst, unexpected: 0 });
+  });
+
+  it('does nothing without the perf flags, or without a program list', () => {
+    resetShaderWarmAuditForTest('');
+    expect(noteShaderWarmAuditOutOfBand(glHost([minted(1, 'k', 'v', 'f')]))).toBe(0);
+    resetShaderWarmAuditForTest('?perf');
+    expect(noteShaderWarmAuditOutOfBand({ info: null })).toBe(0);
+  });
+
+  it('is what the scene census raises: its links never reach `unexpected`', () => {
+    // The census drives the signal through the same host hook the draw-stats
+    // discard rides, so a capture taken under ?diagnostics reads the gates,
+    // not the census's bucket-visibility diffs.
+    resetShaderWarmAuditForTest('?perf');
+    const programs: MintedProgramEntry[] = [];
+    const gl = glHost(programs);
+    armShaderWarmAudit(gl);
+    let id = 0;
+    const host: SceneCensusHost = {
+      children: () => [{ category: 'foliage', visible: true, setVisible: () => {} }],
+      // Every census render draws a stand-in the live frame never draws, and
+      // the driver mints its program.
+      render: () => {
+        id++;
+        programs.push(minted(id, `census-${id}`, 'v', 'f'));
+      },
+      counters: () => ({ calls: 1, triangles: 1, points: 0, lines: 0 }),
+      resetCounters: () => {},
+      countersAutoReset: () => false,
+      setCountersAutoReset: () => {},
+      programCount: () => programs.length,
+      textureCount: () => 0,
+      geometryCount: () => 0,
+      shadowsEnabled: () => false,
+      shadowAutoUpdate: () => false,
+      setShadowAutoUpdate: () => {},
+      beginOutOfBand: () => noteOutOfBandPrograms(gl, 'begin'),
+      discardOutOfBand: () => noteOutOfBandPrograms(gl, 'end'),
+    };
+    const report = captureSceneCensus(host, {
+      atMs: 0,
+      tier: 'high',
+      playerPosition: { x: 0, y: 0, z: 0 },
+      cameraPosition: { x: 0, y: 0, z: 0 },
+    });
+    expect(report.renders).toBeGreaterThan(1);
+    expect(sweepShaderWarmAudit(gl, Number.POSITIVE_INFINITY)).toBe(id);
+    expect(shaderWarmAuditSnapshot()).toMatchObject({ outOfBand: id, unexpected: 0 });
+  });
+
+  it('keeps a mint from BEFORE the census out of the census, escape and all', () => {
+    // The census runs in its own task, not inside a frame, so a gate's
+    // compileAsync prologue can mint between the last present and the
+    // census's first render. Charging the burst at its END alone swallowed
+    // exactly that program: it read as out-of-band and silently left
+    // `unexpected`, the one number the audit exists to report.
+    resetShaderWarmAuditForTest('?perf');
+    const programs: MintedProgramEntry[] = [];
+    const gl = glHost(programs);
+    armShaderWarmAudit(gl);
+    // A live escape, minted after the last sweep and before the census.
+    programs.push(minted(1, 'gate-escape', 'v', 'f'));
+    let id = 1;
+    const host: SceneCensusHost = {
+      children: () => [{ category: 'foliage', visible: true, setVisible: () => {} }],
+      render: () => {
+        id++;
+        programs.push(minted(id, `census-${id}`, 'v', 'f'));
+      },
+      counters: () => ({ calls: 1, triangles: 1, points: 0, lines: 0 }),
+      resetCounters: () => {},
+      countersAutoReset: () => false,
+      setCountersAutoReset: () => {},
+      programCount: () => programs.length,
+      textureCount: () => 0,
+      geometryCount: () => 0,
+      shadowsEnabled: () => false,
+      shadowAutoUpdate: () => false,
+      setShadowAutoUpdate: () => {},
+      beginOutOfBand: () => noteOutOfBandPrograms(gl, 'begin'),
+      discardOutOfBand: () => noteOutOfBandPrograms(gl, 'end'),
+    };
+    captureSceneCensus(host, {
+      atMs: 0,
+      tier: 'high',
+      playerPosition: { x: 0, y: 0, z: 0 },
+      cameraPosition: { x: 0, y: 0, z: 0 },
+    });
+    expect(sweepShaderWarmAudit(gl, Number.POSITIVE_INFINITY)).toBe(id);
+    const snapshot = shaderWarmAuditSnapshot();
+    expect(snapshot).toMatchObject({ unexpected: 1, outOfBand: id - 1 });
+    expect(snapshot.unexpectedSamples.map((sample) => sample.cacheKey)).toEqual(['gate-escape']);
   });
 });
 

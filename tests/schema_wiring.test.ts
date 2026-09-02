@@ -821,6 +821,39 @@ describe('ensureSchema wires every schema module at boot', () => {
     expect(bootCreates).toEqual([]);
   });
 
+  it('applies the client-perf schema module and its shader warm-up columns as guarded boot DDL', async () => {
+    // The fleet readout for the warm-up worker: a boolean the perf reports can
+    // be FILTERED on, plus the client's short cause token. Both must be
+    // additive and idempotent, since the block is re-applied at every boot.
+    await ensureSchema();
+    const first = h.calls.join('\n');
+    // The whole table's DDL lives in client_perf_reports_schema.ts now, so this
+    // also proves ensureSchema still applies that module (an unwired module
+    // would leave a fresh database with no client_perf_reports table at all).
+    expect(first).toContain('CREATE TABLE IF NOT EXISTS client_perf_reports (');
+    expect(first.indexOf('CREATE TABLE IF NOT EXISTS client_perf_reports (')).toBeLessThan(
+      first.indexOf('ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS crowd_bucket'),
+    );
+    expect(first).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_worker_active BOOLEAN NOT NULL DEFAULT FALSE',
+    );
+    expect(first).toContain(
+      "ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_refusal TEXT NOT NULL DEFAULT ''",
+    );
+    // Never a rewrite of the existing rows' meaning: no DROP, no NOT NULL
+    // added without a default, no type change on a shipped column.
+    expect(first).not.toContain('ALTER TABLE client_perf_reports DROP COLUMN');
+    expect(first).not.toContain('ALTER TABLE client_perf_reports ALTER COLUMN');
+
+    h.calls.length = 0;
+    await ensureSchema();
+    // A second boot issues the SAME guarded statements, so a restart on a
+    // database that already has the columns is a no-op.
+    expect(h.calls.join('\n')).toContain(
+      'ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS shader_warm_worker_active BOOLEAN NOT NULL DEFAULT FALSE',
+    );
+  });
+
   it('drops an INVALID metrics-index carcass before rebuilding it (a killed CONCURRENTLY build self-heals)', async () => {
     // A CREATE INDEX CONCURRENTLY killed mid-build (a deploy-watchdog restart,
     // a crash) strands an INVALID index that IF NOT EXISTS treats as existing

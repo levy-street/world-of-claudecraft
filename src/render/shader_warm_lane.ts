@@ -60,6 +60,13 @@ export interface HoldOutcome {
 export interface RootWarmRequest {
   warm: Promise<boolean>;
   abandon(): void;
+  /** When the cap clock this request is bounded by started, on the lane's own
+   *  clock. The request is made INSIDE a queue unit and the hold begins when
+   *  that unit's promise settles, so a lane that let the two drift would tell
+   *  the client a cap it does not own (shader_warm_client.ts, the
+   *  cannot-serve rule). Absent on a caller's own stand-in: the hold then
+   *  starts its clock itself. */
+  startedAtMs?: number;
 }
 
 function defaultSchedule(callback: () => void, ms: number): () => void {
@@ -70,14 +77,22 @@ function defaultSchedule(callback: () => void, ms: number): () => void {
 const defaultNow = (): number => performance.now();
 
 /** Wait for a warm, bounded by the cap; a late warm after the cap is ignored,
- *  and the request behind it is abandoned (the root links cold now). */
+ *  and the request behind it is abandoned (the root links cold now).
+ *
+ *  The cap clock starts where the REQUEST was made, not where this hold was
+ *  entered: the assembly rides a serial queue whose unit can settle well after
+ *  it ran, and the client was told the request's instant, so a clock started
+ *  here would leave the two pricing different windows and the client's
+ *  cannot-serve rule reading a cap that had already run down. */
 export function holdForWarm(
   request: RootWarmRequest,
   holdCapMs: number,
   now: () => number = defaultNow,
   schedule: (callback: () => void, ms: number) => () => void = defaultSchedule,
 ): Promise<HoldOutcome> {
-  const startedAt = now();
+  const enteredAt = now();
+  const startedAt = request.startedAtMs ?? enteredAt;
+  const remainingMs = Math.max(0, holdCapMs - (enteredAt - startedAt));
   return new Promise<HoldOutcome>((resolve) => {
     let done = false;
     let cancelCap: () => void = () => {};
@@ -90,7 +105,7 @@ export function holdForWarm(
     cancelCap = schedule(() => {
       request.abandon();
       finish(false, true);
-    }, holdCapMs);
+    }, remainingMs);
     request.warm.then(
       (isWarm) => finish(isWarm, false),
       () => finish(false, false),
@@ -111,20 +126,26 @@ export function requestRootWarm(
   priority: number,
   includeOffscreenVariant = false,
   now: () => number = defaultNow,
+  holdCapMs: number = SHADER_WARM_LANE_HOLD_CAP_MS,
 ): RootWarmRequest | null {
   if (!decideRootWarm(arms, root, priority, includeOffscreenVariant)) return null;
-  return requestDecidedRootWarm(arms, root, priority, includeOffscreenVariant, now);
+  return requestDecidedRootWarm(arms, root, priority, includeOffscreenVariant, now, holdCapMs);
 }
 
 /** The request once the policy said hold: the one place that assembles. A
  *  dry assembly that throws (no patch, a renderer on its way out) is the
- *  worker being unavailable to this root; an empty one is nothing to warm. */
+ *  worker being unavailable to this root; an empty one is nothing to warm.
+ *  The cap goes in with the request, and so does the instant it starts at:
+ *  the client judges the worker against the bound this lane will actually
+ *  give up at, over the window this lane actually owns
+ *  (shader_warm_client.ts). */
 function requestDecidedRootWarm(
   arms: CompileArmHost,
   root: THREE.Object3D,
   priority: number,
   includeOffscreenVariant: boolean,
   now: () => number,
+  holdCapMs: number,
 ): RootWarmRequest | null {
   const started = now();
   let sources: ReturnType<typeof collectRootProgramSources> | null = null;
@@ -143,13 +164,15 @@ function requestDecidedRootWarm(
     noteShaderWarmBypass('nothing-to-warm');
     return null;
   }
-  const hold = holdShaderPrograms(sources, priority);
+  const startedAtMs = now();
+  const hold = holdShaderPrograms(sources, priority, holdCapMs, startedAtMs);
   return {
     warm: hold.settled.then(
       (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
       () => false,
     ),
     abandon: hold.abandon,
+    startedAtMs,
   };
 }
 
@@ -184,6 +207,7 @@ export async function warmRootBeforeLink(
   // The policy first, on the caller's frame: a bypassed root costs no unit.
   if (!decideRootWarm(arms, root, options.priority, includeOffscreenVariant)) return null;
   const now = options.now ?? defaultNow;
+  const holdCapMs = options.holdCapMs ?? SHADER_WARM_LANE_HOLD_CAP_MS;
   const request: { warm: RootWarmRequest | null } = { warm: null };
   try {
     await options.run(
@@ -194,6 +218,7 @@ export async function warmRootBeforeLink(
           options.priority,
           includeOffscreenVariant,
           now,
+          holdCapMs,
         );
       },
       options.priority,
@@ -206,12 +231,7 @@ export async function warmRootBeforeLink(
     request.warm = null;
   }
   if (!request.warm) return null;
-  return holdRootWarm(
-    request.warm,
-    options.holdCapMs ?? SHADER_WARM_LANE_HOLD_CAP_MS,
-    now,
-    options.schedule,
-  );
+  return holdRootWarm(request.warm, holdCapMs, now, options.schedule);
 }
 
 /** The policy read, with the audit announcement on a bypass (the same

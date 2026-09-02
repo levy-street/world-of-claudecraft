@@ -1,6 +1,6 @@
 // The shader warm audit's bookkeeping (src/render/shader_warm_audit_core.ts):
-// the source hash, the announcements, and the three classes a minted program
-// falls in (matched, drifted, unexpected), plus the pending count.
+// the source hash, the announcements, and the classes a minted program falls
+// in (matched, drifted, unexpected, out-of-band), plus the pending count.
 
 import { describe, expect, it } from 'vitest';
 import {
@@ -420,6 +420,70 @@ describe('mints before the reveal', () => {
       'drifted',
     );
     expect(shaderWarmAuditSummary(audit).drifted).toBe(1);
+  });
+});
+
+describe('mints an out-of-band burst forced', () => {
+  it('are counted and sampled apart, and never tallied as unexpected', () => {
+    // The scene census (?diagnostics) draws every bucket once with the others
+    // hidden, under a lighting hash no live frame has: the programs that
+    // lands in the driver are the burst's, not a producer that bypassed the
+    // gates, and the tester reading `unexpected` must not see them.
+    const audit = createShaderWarmAudit();
+    const key = threeKey({ custom: HAZE_HOOK });
+    const minted = { cacheKey: key, name: '', hash: 'h', fragment: HAZE_FRAGMENT };
+    expect(observeMintedProgram(audit, minted, true, true)).toBe('out-of-band');
+    const burst = shaderWarmAuditSummary(audit);
+    expect(burst).toMatchObject({
+      outOfBand: 1,
+      unexpected: 0,
+      unexpectedByName: [],
+      unexpectedSamples: [],
+    });
+    // Sampled the way an unexpected mint is: the whole key plus what the
+    // program itself says, so the producer stays greppable.
+    expect(burst.outOfBandSamples).toEqual([
+      {
+        cacheKey: key,
+        name: '',
+        label: '',
+        attribution: describeMintedProgram(key, HAZE_FRAGMENT),
+      },
+    ]);
+    expect(burst.outOfBandSamples[0].attribution?.uniforms).toContain('tDiffuse');
+
+    // The same mint outside the burst is exactly what it was before: an
+    // unexpected link, tallied by its identity.
+    expect(observeMintedProgram(audit, minted)).toBe('unexpected');
+    expect(shaderWarmAuditSummary(audit)).toMatchObject({ outOfBand: 1, unexpected: 1 });
+    expect(shaderWarmAuditSummary(audit).unexpectedByName[0].count).toBe(1);
+  });
+
+  it('settle no announcement: the gate keeps waiting for its own link', () => {
+    // three's program cache means the gate's link never mints a second time,
+    // so the announcement stays pending. Better a pending row than a `matched`
+    // one the gates never earned.
+    const audit = createShaderWarmAudit();
+    expectProgramSource(audit, { cacheKey: 'k', name: 'n', hash: 'h' }, 'kit', 0);
+    expect(observeMintedProgram(audit, { cacheKey: 'k', name: 'n', hash: 'h' }, true, true)).toBe(
+      'out-of-band',
+    );
+    expect(shaderWarmAuditSummary(audit)).toMatchObject({
+      outOfBand: 1,
+      matched: 0,
+      drifted: 0,
+      pending: 1,
+    });
+  });
+
+  it('bounds its samples the way the unexpected ones are bounded', () => {
+    const audit = createShaderWarmAudit();
+    for (let i = 0; i < SHADER_WARM_AUDIT_SAMPLE_LIMIT + 5; i++) {
+      observeMintedProgram(audit, { cacheKey: `k${i}`, name: 'n', hash: 'h' }, true, true);
+    }
+    const summary = shaderWarmAuditSummary(audit);
+    expect(summary.outOfBand).toBe(SHADER_WARM_AUDIT_SAMPLE_LIMIT + 5);
+    expect(summary.outOfBandSamples.length).toBe(SHADER_WARM_AUDIT_SAMPLE_LIMIT);
   });
 });
 

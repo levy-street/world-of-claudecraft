@@ -1,7 +1,8 @@
-// Ingest bounds for the two world-entry blocks the client beacon carries in
+// Ingest bounds for the world-entry blocks the client beacon carries in
 // rawSummary (JSONB, no DDL): the post-curtain program window
-// (src/render/post_reveal_links_core.ts) and the boot phase durations
-// (src/game/perf_boot_phases_core.ts). Same treatment as the longtask and
+// (src/render/post_reveal_links_core.ts), the boot phase durations
+// (src/game/perf_boot_phases_core.ts), and the shader warm-up end state
+// (src/render/shader_warm_client.ts). Same treatment as the longtask and
 // GPU-queue blocks in perf_report.ts: a fixed key set with a numeric bound per
 // field, so a hostile payload cannot plant an absurd number or a list where
 // the admin raw-report reader expects a handful of ints. Host-agnostic on
@@ -100,5 +101,61 @@ export function sanitizeBootPhases(value: unknown): BootPhasesBlock | undefined 
     prepareZoneMs: boundedIntOrNull(value.prepareZoneMs, PHASE_MS_MAX),
     prepareNeighborsMs: boundedIntOrNull(value.prepareNeighborsMs, PHASE_MS_MAX),
     prewarmInitialMs: boundedIntOrNull(value.prewarmInitialMs, PHASE_MS_MAX),
+  };
+}
+
+// One lowercase cause token: the vocabulary the shader warm-up client mints
+// ('ready-timeout', 'hold-timeouts:expired-share', 'extension-drift:<name>',
+// ...). The beacon is public, so the token is bounded in length and restricted
+// to the token charset; anything else is dropped whole rather than stored
+// half-sanitized. Lowercasing comes first on purpose: an extension name
+// arrives in the driver's own casing, and rejecting it on case would throw
+// away the only field that says WHICH extension drifted. The charset is read
+// over the WHOLE value before the cut, so a long hostile string cannot pass by
+// having a clean first line's worth; the bound then only trims a real token
+// that ran long. It fits the longest one the client can mint, an
+// extension-drift naming the longest WebGL extension name (50 characters for
+// 'extension-drift:webgl_compressed_texture_s3tc_srgb'), so the one field that
+// says which extension drifted arrives whole.
+const SHADER_WARM_TOKEN_MAX = 64;
+const SHADER_WARM_TOKEN_RE = /^[a-z0-9:_-]+$/;
+
+export function shaderWarmToken(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  const token = value.trim().toLowerCase();
+  return SHADER_WARM_TOKEN_RE.test(token) ? token.slice(0, SHADER_WARM_TOKEN_MAX) : '';
+}
+
+export interface ShaderWarmBlock {
+  active: boolean;
+  worker: string;
+  refusal: string;
+  mode: string;
+  setting: string;
+  backend: string;
+  warmed: number;
+  held: number;
+  heldTimedOut: number;
+}
+
+/** Undefined without a `mode` token: the client resolves a mode ('off',
+ *  'reveal', 'all') before anything else in this block exists, so a block
+ *  without one is not a warm-up readout. */
+export function sanitizeShaderWarm(value: unknown): ShaderWarmBlock | undefined {
+  if (!isRecord(value)) return undefined;
+  const mode = shaderWarmToken(value.mode);
+  if (!mode) return undefined;
+  return {
+    active: value.active === true,
+    worker: shaderWarmToken(value.worker),
+    refusal: shaderWarmToken(value.refusal),
+    mode,
+    setting: shaderWarmToken(value.setting),
+    backend: shaderWarmToken(value.backend),
+    // Program and gate counts, bounded like the post-reveal program counts:
+    // a session cannot warm or hold more than a page can hold programs.
+    warmed: boundedInt(value.warmed, PROGRAMS_MAX),
+    held: boundedInt(value.held, PROGRAMS_MAX),
+    heldTimedOut: boundedInt(value.heldTimedOut, PROGRAMS_MAX),
   };
 }

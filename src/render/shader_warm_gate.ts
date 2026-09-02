@@ -130,7 +130,7 @@ export function runPiecesWarmed(
       }
       noteShaderWarmAssembly(now() - started);
       if (sources.length > 0) {
-        hold = holdShaderPrograms(sources, priority);
+        hold = holdShaderPrograms(sources, priority, holdCapMs);
         warm = hold.settled.then(
           (outcomes) => outcomes.every((outcome) => outcome === 'warmed'),
           () => false,

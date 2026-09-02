@@ -2,7 +2,7 @@
 // ahead of its link (the sources it dry-assembled at creation), and how each
 // program the driver later minted relates to that announcement.
 //
-// Three classes, all decisive for the worker design that rests on them:
+// The classes, all decisive for the worker design that rests on them:
 // - matched: minted under an announced key with the announced GLSL. The
 //   dry assembly described the link exactly; a worker warming it would have
 //   turned this link into a cache hit.
@@ -17,6 +17,10 @@
 //   ungated attach). Counted by shader name, and by the key's own attribution
 //   where the material carries no name, so the producer families show either
 //   way.
+// - out-of-band: minted while the renderer was running a burst no live frame
+//   pays for (the scene census, whose bucket-visibility diffs draw the scene
+//   under a lighting hash the live frame never has). Counted and sampled
+//   apart from `unexpected`, because the burst, not a producer, asked for it.
 // An announced key the driver never minted stays pending: a gate still in
 // flight, or a state drift whose twin is an unexpected mint.
 //
@@ -59,7 +63,7 @@ export interface ShaderWarmAuditExpectation extends ShaderWarmAuditSource {
   matched: number;
 }
 
-export type ShaderWarmAuditVerdict = 'matched' | 'drifted' | 'unexpected';
+export type ShaderWarmAuditVerdict = 'matched' | 'drifted' | 'unexpected' | 'out-of-band';
 
 export interface ShaderWarmAuditDrift {
   cacheKey: string;
@@ -141,6 +145,9 @@ export interface ShaderWarmAudit {
   unexpectedByName: Map<string, number>;
   /** The first unexpected mints, whole keys, for the field diff. */
   unexpectedSamples: ShaderWarmAuditKeySample[];
+  /** Mints an out-of-band burst forced, never part of `unexpected`. */
+  outOfBand: number;
+  outOfBandSamples: ShaderWarmAuditKeySample[];
   /** Mints before the reveal, counted apart (the curtain hides them). */
   matchedBeforeReveal: number;
   unexpectedBeforeReveal: number;
@@ -154,12 +161,14 @@ export interface ShaderWarmAuditSummary {
   drifted: number;
   driftedNameOnly: number;
   unexpected: number;
+  outOfBand: number;
   dropped: number;
   matchedBeforeReveal: number;
   unexpectedBeforeReveal: number;
   drifts: ShaderWarmAuditDrift[];
   unexpectedByName: Array<{ name: string; count: number }>;
   unexpectedSamples: ShaderWarmAuditKeySample[];
+  outOfBandSamples: ShaderWarmAuditKeySample[];
   /** The first announced keys no mint has matched, whole keys. */
   pendingSamples: ShaderWarmAuditKeySample[];
 }
@@ -172,9 +181,11 @@ export function createShaderWarmAudit(): ShaderWarmAudit {
     drifted: 0,
     driftedNameOnly: 0,
     unexpected: 0,
+    outOfBand: 0,
     drifts: [],
     unexpectedByName: new Map(),
     unexpectedSamples: [],
+    outOfBandSamples: [],
     matchedBeforeReveal: 0,
     unexpectedBeforeReveal: 0,
   };
@@ -356,12 +367,29 @@ export function expectProgramSource(
 /** Class one program the driver minted. A mint before the reveal (`live`
  *  false) is the boot lane's or an entry gate's: it still settles its
  *  announcement, but it is counted apart, since nothing waits on a worker
- *  under the curtain and the boot lane announces nothing by design. */
+ *  under the curtain and the boot lane announces nothing by design. A mint an
+ *  out-of-band burst forced settles nothing at all: it is neither a gate's hit
+ *  nor a producer's escape, and an announced key such a burst happened to mint
+ *  stays pending, since three's program cache means the gate's own link never
+ *  mints it a second time. */
 export function observeMintedProgram(
   audit: ShaderWarmAudit,
   minted: ShaderWarmAuditSource,
   live = true,
+  outOfBand = false,
 ): ShaderWarmAuditVerdict {
+  if (outOfBand) {
+    audit.outOfBand++;
+    if (audit.outOfBandSamples.length < SHADER_WARM_AUDIT_SAMPLE_LIMIT) {
+      audit.outOfBandSamples.push({
+        cacheKey: minted.cacheKey,
+        name: minted.name,
+        label: '',
+        attribution: describeMintedProgram(minted.cacheKey, minted.fragment),
+      });
+    }
+    return 'out-of-band';
+  }
   const expectation = audit.expected.get(minted.cacheKey);
   if (!expectation) {
     if (!live) {
@@ -434,6 +462,7 @@ export function shaderWarmAuditSummary(audit: ShaderWarmAudit): ShaderWarmAuditS
     matched: audit.matched,
     drifted: audit.drifted,
     unexpected: audit.unexpected,
+    outOfBand: audit.outOfBand,
     dropped: audit.dropped,
     driftedNameOnly: audit.driftedNameOnly,
     matchedBeforeReveal: audit.matchedBeforeReveal,
@@ -441,6 +470,7 @@ export function shaderWarmAuditSummary(audit: ShaderWarmAudit): ShaderWarmAuditS
     drifts: audit.drifts.slice(),
     unexpectedByName,
     unexpectedSamples: audit.unexpectedSamples.slice(),
+    outOfBandSamples: audit.outOfBandSamples.slice(),
     pendingSamples,
   };
 }

@@ -438,6 +438,56 @@ describe('warmRootBeforeLink holds', () => {
     expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldTimedOut: 1 });
   });
 
+  it('starts the cap clock at the request, not where the queue settled the unit', async () => {
+    // The assembly rides a serial queue, and the unit's promise can settle
+    // well after the request went out. The client was told the request's
+    // instant (holdShaderPrograms' startedAtMs), so a hold that started a
+    // clock of its own here would leave the client pricing a cap that had
+    // already run down, and its cannot-serve rule giving up on a worker still
+    // inside the window this lane really owns.
+    const worker = armedLane(false);
+    const { arms } = armsRig({ sources: { zone: [dry('ka')] } });
+    let releaseUnit: () => void = () => {};
+    const run: WarmLaneRun = (work) =>
+      Promise.resolve()
+        .then(work)
+        .then(
+          () =>
+            new Promise<void>((resolve) => {
+              releaseUnit = resolve;
+            }),
+        );
+    let clock = 1_000;
+    let armedCapMs = -1;
+
+    const held = warmRootBeforeLink(arms, rootNamed('zone'), {
+      priority: COSMETIC,
+      label: 'zone-prepare-warm:zone',
+      run,
+      holdCapMs: 5_000,
+      now: () => clock,
+      schedule: (_callback, ms) => {
+        armedCapMs = ms;
+        return () => {};
+      },
+    });
+    for (let tick = 0; tick < 4; tick++) await Promise.resolve();
+    // The unit ran (the worker has the request), and the queue settles it
+    // 400 ms later.
+    expect(worker.askedIds()).toEqual([1]);
+    clock = 1_400;
+    releaseUnit();
+    for (let tick = 0; tick < 4; tick++) await Promise.resolve();
+
+    // The cap bounds what is LEFT of the window the request opened, ...
+    expect(armedCapMs).toBe(4_600);
+    clock = 1_900;
+    worker.emit({ kind: 'warmed', id: 1, linkMs: 5 });
+    // ... and the wait the readout carries is the wait the client judges.
+    expect(await held).toEqual({ warm: true, timedOut: false, holdMs: 900 });
+    expect(shaderWarmSnapshot()).toMatchObject({ held: 1, heldWarm: 1 });
+  });
+
   it('asks for the offscreen variant too when the caller compiles it', async () => {
     // The zone prewarm links the offscreen variant, so warming only the
     // canvas one would write a key its link never asks for.

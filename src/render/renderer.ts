@@ -635,6 +635,7 @@ import {
   type SceneCensusChild,
   type SceneCensusHost,
   type SceneCensusReport,
+  sceneCensusChild,
 } from './scene_census_core';
 import { type FlamePerceptualState, updateSceneryFlame } from './scenery_flame';
 import { downscaleDims } from './screenshot';
@@ -4474,8 +4475,8 @@ export class Renderer {
    * calls and triangles via bucket-visibility diffs through the real pipeline
    * (composer and shadow passes included), plus the shadow pass share via a
    * frozen-shadow render. On demand only (the ?perf overlay census button and
-   * the capture harness); the burst is excluded from the live draw-stats
-   * delta via discardOutOfBandDraws.
+   * the capture harness); the burst is bracketed out of the live draw-stats
+   * delta AND of the gates' shader warm audit, whose links it is charged for.
    */
   captureSceneCensus(): SceneCensusReport {
     const info = this.webgl.info;
@@ -4484,18 +4485,7 @@ export class Renderer {
       // Lights stay untouched: hiding one changes the lighting state hash and
       // recompiles programs mid-census, which would poison the diffs.
       if ((child as { isLight?: boolean }).isLight) continue;
-      children.push({
-        category:
-          typeof child.userData.renderCategory === 'string'
-            ? (child.userData.renderCategory as string)
-            : 'unknown',
-        get visible() {
-          return child.visible;
-        },
-        setVisible(visible: boolean) {
-          child.visible = visible;
-        },
-      });
+      children.push(sceneCensusChild(child));
     }
     const host: SceneCensusHost = {
       children: () => children,
@@ -4522,7 +4512,11 @@ export class Renderer {
       setShadowAutoUpdate: (autoUpdate: boolean) => {
         this.webgl.shadowMap.autoUpdate = autoUpdate;
       },
-      discardOutOfBand: () => this.discardOutOfBandDraws(),
+      beginOutOfBand: () => liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'begin'),
+      discardOutOfBand: () => {
+        liveProgramWatch.noteOutOfBandPrograms(this.webgl, 'end');
+        this.discardOutOfBandDraws();
+      },
     };
     const p = this.sim.player;
     try {

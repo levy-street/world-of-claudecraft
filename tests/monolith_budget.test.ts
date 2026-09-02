@@ -358,7 +358,11 @@ const MONOLITHS: MonolithRow[] = [
     // Lowered again after the battleground view drive (the per-frame ward-state
     // push, and the release of a copy the session is done with) moved into
     // src/render/battleground_views.ts beside the build it belongs to.
-    ceiling: 13125,
+    // Lowered again after the scene census's child adapter (the renderCategory
+    // read and the visibility accessors) moved to sceneCensusChild in
+    // src/render/scene_census_core.ts, which paid for the census burst's new
+    // shader-warm-audit hook. Exact count.
+    ceiling: 13117,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -699,7 +703,15 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 5145,
+    // Lowered 5145 -> 5095 when the two shader-warm perf-report columns needed
+    // room: rather than raise the ceiling for four unavoidable lines (an insert
+    // list, a row-type field), the whole client_perf_reports DDL moved to
+    // client_perf_reports_schema.ts, a dependency-free CLIENT_PERF_REPORTS_SCHEMA
+    // ensureSchema applies after SCHEMA (the admin_guilds_schema.ts shape, which
+    // is also what keeps a db.ts -> schema -> db.ts cycle impossible). Exact
+    // count, zero slack. The next candidate behind the same seam is the table's
+    // accessors (insert, prune, row type).
+    ceiling: 5095,
     seam: 'a domain <domain>_db.ts module with its own *_SCHEMA (server/CLAUDE.md)',
   },
   {

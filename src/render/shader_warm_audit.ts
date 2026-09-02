@@ -9,8 +9,9 @@
 // hands every piece's representative here before the queue sees the piece),
 // through the same arms the link will use (program_sources.ts). The
 // observation rides the live-program watch's own readouts
-// (live_program_watch.ts), so the renderer gains no call site: every program
-// three minted since the last readout has its shader sources read back
+// (live_program_watch.ts), so the renderer gains no per-frame call site (its
+// one hook is the out-of-band burst below, the census's): every program three
+// minted since the last readout has its shader sources read back
 // (`getShaderSource` returns the string the page handed `shaderSource`, held
 // on the shader wrapper in Chromium, Firefox and WebKit alike, so it does not
 // wait on a link in flight) and hashed against the announcement under its
@@ -89,7 +90,9 @@ export interface ShaderWarmAuditSelfCost {
  * sweeps is never seen, so `matched` and `unexpected` undercount by what
  * such churn hides; the observation quota carries a burst over later sweeps
  * rather than dropping it, and `backlogDropped` says when even that was not
- * enough.
+ * enough. And a capture taken under `?diagnostics` runs the scene census: its
+ * links are charged to `outOfBand`, so `unexpected` still reads as the gates'
+ * own escapes.
  */
 export interface ShaderWarmAuditSnapshot extends ShaderWarmAuditSummary {
   enabled: boolean;
@@ -107,6 +110,13 @@ export interface ShaderWarmAuditSnapshot extends ShaderWarmAuditSummary {
   /** Minted programs waiting for a later sweep's quota. */
   backlog: number;
   backlogDropped: number;
+}
+
+/** A parked mint and what the renderer was doing when it appeared. */
+interface ParkedProgram {
+  program: MintedProgramEntry;
+  /** Minted inside an out-of-band burst (the scene census). */
+  outOfBand: boolean;
 }
 
 const LINKED_LABEL_LIMIT = 512;
@@ -133,7 +143,7 @@ const state = {
   /** three mints program ids monotonically, so everything at or below this
    *  id has been seen (classed, or parked in the backlog). */
   maxId: -1,
-  backlog: [] as MintedProgramEntry[],
+  backlog: [] as ParkedProgram[],
   backlogDropped: 0,
   /** The arms host of the LATEST announcement, so a renderer rebuilt after a
    *  graphics change is the one the re-check runs against. */
@@ -270,7 +280,8 @@ function sourceOf(gl: ShaderSourceGl, shader: unknown): string {
  *  computed only when the plain hash disagrees with an announcement: that is
  *  the one branch that consults it, and two more whole-string passes per
  *  program would otherwise ride every frame that minted one. */
-function classMintedProgram(gl: ShaderSourceGl, program: MintedProgramEntry): void {
+function classMintedProgram(gl: ShaderSourceGl, parked: ParkedProgram): void {
+  const program = parked.program;
   const cacheKey = program.cacheKey ?? '';
   const vertex = sourceOf(gl, program.vertexShader);
   const fragment = sourceOf(gl, program.fragmentShader);
@@ -289,7 +300,58 @@ function classMintedProgram(gl: ShaderSourceGl, program: MintedProgramEntry): vo
     // `describeMintedProgram`). Nothing keeps the string.
     { cacheKey, name: program.name ?? '', hash, hashSansName, fragment },
     state.armed,
+    parked.outOfBand,
   );
+}
+
+/** Park every program minted since the last readout, oldest first, and
+ *  advance the mark. Returns how many were parked. */
+function parkNewPrograms(programs: readonly MintedProgramEntry[], outOfBand: boolean): number {
+  let maxId = state.maxId;
+  let parked = 0;
+  for (const program of programs) {
+    const id = typeof program.id === 'number' ? program.id : -1;
+    if (id <= state.maxId) continue;
+    if (id > maxId) maxId = id;
+    if (state.backlog.length >= BACKLOG_LIMIT) {
+      state.backlogDropped++;
+      continue;
+    }
+    state.backlog.push({ program, outOfBand });
+    parked++;
+  }
+  state.maxId = maxId;
+  return parked;
+}
+
+/**
+ * An out-of-band burst BRACKET: `begin` before its first render, `end` once
+ * it is over. What is unseen at the begin was minted before the burst and
+ * keeps its own class; what is unseen at the end is the burst's own, not a
+ * gate's escape.
+ *
+ * Both ends are needed because the burst runs in its own task, not inside a
+ * frame: a gate's compileAsync prologue that minted programs between the last
+ * present and the census's start would otherwise be found unseen at the end
+ * and charged to the census, which is exactly the escape the audit exists to
+ * name. The signal is the one the draw-stats exclusion already rides (the
+ * census host's `discardOutOfBand`, `renderer.discardOutOfBandDraws`),
+ * extended to the audit at the same hooks. Only the census comes here, never
+ * the prewarm passes that share the draw-stats seam: their links ARE the
+ * announced ones the audit exists to match. Returns how many mints this end
+ * of the bracket parked.
+ */
+export function noteShaderWarmAuditOutOfBand(
+  webgl: ShaderWarmAuditHost,
+  phase: 'begin' | 'end' = 'end',
+): number {
+  if (!state.enabled) return 0;
+  const programs = webgl.info?.programs;
+  if (!programs) return 0;
+  const started = now();
+  const parked = parkNewPrograms(programs, phase === 'end');
+  state.selfCostMs.sweepMs += now() - started;
+  return parked;
 }
 
 /**
@@ -309,15 +371,7 @@ export function sweepShaderWarmAudit(
   const programs = webgl.info?.programs;
   if (!programs) return 0;
   const started = now();
-  let maxId = state.maxId;
-  for (const program of programs) {
-    const id = typeof program.id === 'number' ? program.id : -1;
-    if (id <= state.maxId) continue;
-    if (id > maxId) maxId = id;
-    if (state.backlog.length < BACKLOG_LIMIT) state.backlog.push(program);
-    else state.backlogDropped++;
-  }
-  state.maxId = maxId;
+  parkNewPrograms(programs, false);
   let classed = 0;
   if (state.backlog.length > 0) {
     const gl = webgl.getContext?.() as ShaderSourceGl | undefined;

@@ -690,11 +690,25 @@ GPU work signs. Each rule names its seam and its guard.
   must never keep the shader object it was handed), posts them to the worker, and
   holds the gate's link piece until the worker answers or `SHADER_WARM_LANE_HOLD_CAP_MS`
   passes (`shader_warm_lane.ts`; a hold that expires abandons its request so the worker
-  drops what nobody else waits for; two breaker rules retire it for the session:
+  drops what nobody else waits for; three breaker rules retire it for the session:
   `SHADER_WARM_TIMEOUT_BREAKER` expiries in a row during which the worker settled NOTHING
   (wedged), or `SHADER_WARM_EXPIRED_SHARE_BREAKER` of the last `SHADER_WARM_HOLD_WINDOW`
   holds expired whatever it answered meanwhile (too slow for the demand); a slow worker
-  that keeps most holds served is kept). The worker paces its links with the AIMD budget
+  that keeps most holds served is kept). The third rule fires FIRST, on the worker's own
+  evidence and before any hold has paid: once it has settled `SHADER_WARM_EVIDENCE_LINKS`
+  links AND its first stats message has landed (the window is the divisor, and the
+  verdict is final), the queue ahead of the OLDEST outstanding hold, at the mean wall
+  this worker's links have actually cost, spread over the window that message reported,
+  is measured against what is left of the cap that hold's caller passed in
+  (`shaderWarmCannotServe`, refusal `cannot-serve:hold-cap`). Ahead is the worker's own
+  order, PRIORITY first and arrival only within one priority, so a live view held behind
+  a catalog's backlog is not charged for what the worker serves after it; the caller
+  also stamps when its cap clock started (`holdShaderPrograms`' `startedAtMs`), since a
+  lane asks inside a queue unit whose promise settles later. It is relative by
+  construction and carries no machine constant, the caller owning the cap and the worker
+  supplying the wall: on the laptop whose links cost about half a second it retires
+  seconds early with nothing expired, and where links are ten times shorter it never
+  fires at all. The worker paces its links with the AIMD budget
   under a RELATIVE judge (`shader_warm_settle_judge_core.ts`): a settle is read against
   what this driver costs for a link of COMPARABLE size it has to itself, per thousand
   GLSL characters, never against a millisecond bound (the absolute 150/400 ms bounds
@@ -713,8 +727,18 @@ GPU work signs. Each rule names its seam and its guard.
   and on `pagehide`. The audit (`shader_warm_audit.ts`) names every program the game
   context linked without a warm request (`unexpected`), so a new producer that
   bypasses the gates shows up by key; `perfStats().shaderWarm` and
-  `perfStats().shaderWarmAudit` are the readout, local only (nothing of it rides the
-  perf beacon). The cast-VFX gate (`cast_vfx_readiness_core.ts`,
+  `perfStats().shaderWarmAudit` are the local readout, and of the worker's half only the
+  bounded projection `shaderWarmBeaconSummary` builds (`src/game/perf_shader_warm_core.ts`:
+  worker state, refusal, mode, setting, backend and three counts) rides the perf beacon,
+  as `rawSummary.shaderWarm` plus the typed `shaderWarmWorkerActive` and
+  `shaderWarmRefusal` fields; the audit and the adapter string ride none of it.
+  A capture taken under `?diagnostics` also runs the scene census, whose
+  bucket-visibility diffs link programs no live frame asks for: those are charged to
+  `outOfBand` at the same host hooks that discard the burst's draws
+  (`renderer.captureSceneCensus`, which BRACKETS the burst: the census runs in its own
+  task, so without a begin the prologue of a gate that minted between the last present
+  and the census is charged to it), so read `unexpected` as the gates' own escapes.
+  The cast-VFX gate (`cast_vfx_readiness_core.ts`,
   `cast_vfx_prewarm.ts`) is the same idea one level up: the ability-VFX painter
   draws no cast until every cast program is linked (linked means the settle
   record of `linked_program_readiness.ts`, which each cast unit writes once its

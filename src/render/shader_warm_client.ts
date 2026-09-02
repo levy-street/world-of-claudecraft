@@ -10,9 +10,12 @@
 // module workers, OffscreenCanvas or the extension set are missing, the
 // client reports unavailable and every gate keeps its path. A worker that
 // dies (module load failure, OOM kill, lost context), never answers ready,
-// or lets gates time out repeatedly is retired and the policy falls back to
-// the pre-worker path for the rest of the renderer's life: no gate waits on
-// a worker that has stopped delivering.
+// lets gates time out repeatedly, or (the rule that fires first, before any
+// hold has paid) cannot serve its oldest hold inside what is left of that
+// hold's own cap at the wall its links have actually been costing, is
+// retired and the policy falls back to the pre-worker path for the rest of
+// the renderer's life: no gate waits on a worker that has stopped
+// delivering.
 //
 // The worker's context is one more WebGL context in the GPU process (the
 // cap is about sixteen, context_release.ts); it lives in the worker, so the
@@ -25,6 +28,7 @@ import { type GpuBackendClass, readGpuBackend } from './gpu_backend_class_core';
 import { enableRendererExtensions } from './renderer_extensions';
 import {
   createShaderWarmHoldRing,
+  createShaderWarmOutstandingHolds,
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
@@ -41,6 +45,7 @@ import {
   type ShaderWarmRequestStats,
   type ShaderWarmRequests,
   type ShaderWarmSetting,
+  shaderWarmCannotServe,
   shaderWarmDecision,
   shaderWarmModeFor,
 } from './shader_warm_client_core';
@@ -159,6 +164,8 @@ const state = {
   lastWarmedAtMs: Number.NEGATIVE_INFINITY,
   /** The last few holds, for the breaker's expired-share rule. */
   holds: createShaderWarmHoldRing(),
+  /** The holds still waiting, for the cannot-serve rule. */
+  outstanding: createShaderWarmOutstandingHolds(),
   /** Why the worker was retired FOR CAUSE, if it was. Sticky across a setting
    *  round trip; only a renderer swap clears it (retireAndForgetWorker). */
   retiredCause: null as { worker: 'dead' | 'refused'; reason: string | null } | null,
@@ -258,10 +265,12 @@ function onWorkerMessage(event: MessageEvent<ShaderWarmWorkerMessage>): void {
       state.lastWarmedAtMs = (state.now ?? defaultNow)();
       // A link time counts only for a request that was waiting for it.
       if (state.requests.settle(message.id, 'warmed')) state.requests.noteLink(message.linkMs);
+      if (retireIfCannotServe()) break;
       syncWorkerPause();
       break;
     case 'failed':
       state.requests.settle(message.id, 'failed', message.reason === 'cancelled');
+      if (retireIfCannotServe()) break;
       syncWorkerPause();
       break;
     case 'lost':
@@ -307,6 +316,7 @@ function retireWorker(): void {
   const worker = state.worker;
   state.worker = null;
   state.queuedUntilReady = [];
+  state.outstanding.clear();
   state.cancelReadyDeadline?.();
   state.cancelReadyDeadline = null;
   state.workerPaused = false;
@@ -440,10 +450,25 @@ export function warmShaderPrograms(
 /** The same request, with the hold's way out: a hold that expires abandons
  *  its ids, and the worker drops the ones nobody else waits for rather than
  *  spend a window slot linking a program the main thread just linked cold
- *  (the worker's link of it would be a cache hit, and still a slot). */
+ *  (the worker's link of it would be a cache hit, and still a slot).
+ *
+ *  `capMs` is the caller's own hold cap (the gates' and the lanes' half
+ *  watchdog): the client never imports it, it is told, and it is what the
+ *  cannot-serve rule measures the worker against. A request with no cap
+ *  (warmShaderPrograms, which nothing holds a link for) is not a hold and
+ *  never reaches that rule.
+ *
+ *  `startedAtMs` is when the CALLER's cap clock started, for a caller whose
+ *  request and cap do not begin on the same instant (the lanes ask inside a
+ *  queue unit and start their cap when that unit's promise settles): read
+ *  from the request instead, the rule would price a cap that had already run
+ *  down and give up on a worker that was still inside it. Absent, the request
+ *  instant is the cap's. */
 export function holdShaderPrograms(
   sources: readonly ShaderWarmRequestSource[],
   priority: number,
+  capMs?: number,
+  startedAtMs?: number,
 ): ShaderWarmHold {
   const { ids, toSend, toPromote } = state.requests.request(sources, priority);
   if (toSend.length > 0) {
@@ -468,9 +493,24 @@ export function holdShaderPrograms(
     }
   }
   const requests = state.requests;
+  const settled = requests.whenSettled(ids);
+  const outstanding =
+    capMs !== undefined && Number.isFinite(capMs) && capMs > 0 && ids.length > 0
+      ? state.outstanding.open({
+          startedAtMs:
+            startedAtMs !== undefined && Number.isFinite(startedAtMs)
+              ? startedAtMs
+              : (state.now ?? defaultNow)(),
+          capMs,
+          priority,
+          highestId: Math.max(...ids),
+        })
+      : null;
+  if (outstanding) settled.then(() => state.outstanding.close(outstanding));
   return {
-    settled: requests.whenSettled(ids),
+    settled,
     abandon: () => {
+      if (outstanding) state.outstanding.close(outstanding);
       // The book this request was written in: a renderer swap starts a new
       // one, and an abandon after that has nothing to drop.
       if (requests !== state.requests) return;
@@ -487,6 +527,46 @@ export function holdShaderPrograms(
   };
 }
 
+/** The breaker's third rule, read on every settle and every hold note: can
+ *  this worker still serve the hold that has waited longest, inside what is
+ *  left of the cap that hold's caller owns? The queue ahead of it, at the
+ *  mean wall this worker's links have actually cost, spread over the links it
+ *  runs at once, against the remaining cap. Ahead is by the worker's own
+ *  order, PRIORITY first and arrival second: a live view held behind a
+ *  catalog's backlog is served before all of it and is not charged for it,
+ *  and a cosmetic prewarm behind a burst of live views is. It is the FIRST
+ *  rule to fire, because the other two only speak once holds have paid whole
+ *  caps: on the RTX 4070 laptop (about 560 ms a link) this retires seconds
+ *  earlier with no hold expired, while on a machine whose links are ten times
+ *  shorter the same arithmetic never trips.
+ *
+ *  Nothing is judged before the worker's first stats message: the window is
+ *  the divisor, and reading a worker that links four at a time as one at a
+ *  time condemns it four times too fast, on a verdict that is final. That
+ *  message comes on the worker's own poll, so it is also a few hundred
+ *  milliseconds stale once it lands. Returns true when it retired the
+ *  worker. */
+function retireIfCannotServe(): boolean {
+  if (state.workerState !== 'ready') return false;
+  const stats = state.workerStats;
+  if (!stats) return false;
+  const oldest = state.outstanding.oldest();
+  if (!oldest) return false;
+  const links = state.requests.stats().links;
+  const cannotServe = shaderWarmCannotServe({
+    linkCount: links.count,
+    linkSumMs: links.sumMs,
+    windowLinks: stats.windowLinks,
+    aheadOfOldest: state.requests.unsettledAhead(oldest.priority, oldest.highestId),
+    capMs: oldest.capMs,
+    waitedMs: (state.now ?? defaultNow)() - oldest.startedAtMs,
+  });
+  if (!cannotServe) return false;
+  retireForCause('dead', 'cannot-serve:hold-cap');
+  retireWorker();
+  return true;
+}
+
 /** A held gate ended its hold. Consecutive expiries during which the worker
  *  settled NOTHING trip the breaker: the worker is retired and every later
  *  gate takes the unavailable bypass. An expiry the worker answered other
@@ -499,6 +579,9 @@ export function noteShaderWarmHold(warm: boolean, timedOut: boolean, holdMs: num
   const holdStartedAtMs = (state.now ?? defaultNow)() - Math.max(0, holdMs);
   const progressed = state.lastWarmedAtMs >= holdStartedAtMs;
   state.consecutiveTimeouts = timedOut && !progressed ? state.consecutiveTimeouts + 1 : 0;
+  // The cannot-serve rule first: what it sees, the two rules below only learn
+  // once the holds it is about have paid their caps.
+  if (retireIfCannotServe()) return;
   // Two rules: a worker that answered nothing through three expiries in a
   // row is wedged; one that keeps answering someone while half the recent
   // holds still expire is too slow for the demand, and either costs the
@@ -562,6 +645,7 @@ function retireAndForgetWorker(): void {
   state.consecutiveTimeouts = 0;
   state.lastWarmedAtMs = Number.NEGATIVE_INFINITY;
   state.holds = createShaderWarmHoldRing();
+  state.outstanding = createShaderWarmOutstandingHolds();
   state.requests = createShaderWarmRequests();
 }
 

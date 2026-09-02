@@ -13,6 +13,7 @@ import {
   sampleTransitions,
 } from './perf_prewarm_lists_core';
 import { jitteredPerfReportDelay } from './perf_report_schedule';
+import { shaderWarmBeaconSummary } from './perf_shader_warm_core';
 import type { Settings } from './settings';
 import type { WorldTelemetry } from './world_telemetry';
 
@@ -568,6 +569,11 @@ function payloadFromSnapshot(
   const suggestionIds = analyzePerfSuggestions(snapshot, location.search, { desktopShell }).map(
     (suggestion) => suggestion.id,
   );
+  // The shader warm worker, projected and bounded (perf_shader_warm_core.ts).
+  // The rest of that snapshot (the adapter, the per-gate counts, the audit
+  // beside it) stays local: this is the fleet's answer to "did the worker run
+  // on this backend, and what retired it when it did not".
+  const shaderWarm = shaderWarmBeaconSummary(snapshot.shaderWarm);
   return {
     schemaVersion: PERF_REPORT_SCHEMA_VERSION,
     releaseVersion: __APP_VERSION__,
@@ -578,6 +584,11 @@ function payloadFromSnapshot(
     graphicsConfigVersion: renderer.graphicsConfigVersion,
     gfxTier: renderer.tier,
     autoGovernor: renderer.autoGovernor,
+    // Two typed fields beside the block below, because the server stores them
+    // as columns a fleet query groups by; the empty string is "nothing
+    // refused it", which a NOT NULL column can hold and a null cannot.
+    shaderWarmWorkerActive: shaderWarm.active,
+    shaderWarmRefusal: shaderWarm.refusal ?? '',
     targetFps: renderer.budget.targetFps,
     renderScale: renderer.renderScale,
     effectiveRenderScale: renderer.effectiveRenderScale,
@@ -648,6 +659,7 @@ function payloadFromSnapshot(
       // The boot phases behind the curtain, from the load profile that only
       // window.__loadProfile and a console line carried until now.
       bootPhases,
+      shaderWarm,
       assets: {
         preload: snapshot.assets.preload,
         byType: snapshot.assets.byType,

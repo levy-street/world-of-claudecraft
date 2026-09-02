@@ -76,7 +76,9 @@ export interface PerfSnapshot {
   // raw to one taken without.
   shaderWarmAudit: ShaderWarmAuditSnapshot;
   // The shader warm worker's readout (src/render/shader_warm_client.ts):
-  // what the gates asked, held, bypassed and got. Local-only, like the audit.
+  // what the gates asked, held, bypassed and got. Local, except the eight
+  // fields the beacon projects out of it (src/game/perf_shader_warm_core.ts):
+  // the adapter, the bypass counts and the timings stay on the machine.
   shaderWarm: ShaderWarmSnapshot;
   input: {
     intents: number;

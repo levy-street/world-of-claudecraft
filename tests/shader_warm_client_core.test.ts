@@ -8,12 +8,14 @@ import { describe, expect, it } from 'vitest';
 import { programSourceHash } from '../src/render/shader_warm_audit_core';
 import {
   createShaderWarmHoldRing,
+  createShaderWarmOutstandingHolds,
   createShaderWarmPauseState,
   createShaderWarmRequests,
   noteShaderWarmFrame,
   readShaderWarmQuery,
   readShaderWarmReadyDeadline,
   readShaderWarmSetting,
+  SHADER_WARM_EVIDENCE_LINKS,
   SHADER_WARM_EXPIRED_SHARE_BREAKER,
   SHADER_WARM_FRAME_PERIOD_MS,
   SHADER_WARM_HOLD_WINDOW,
@@ -22,8 +24,10 @@ import {
   SHADER_WARM_SETTINGS,
   SHADER_WARM_TIMEOUT_BREAKER,
   type ShaderWarmBypass,
+  type ShaderWarmCannotServeInputs,
   type ShaderWarmPolicyInputs,
   type ShaderWarmRequestSource,
+  shaderWarmCannotServe,
   shaderWarmDecision,
   shaderWarmModeFor,
 } from '../src/render/shader_warm_client_core';
@@ -563,5 +567,153 @@ describe('readShaderWarmReadyDeadline', () => {
     expect(readShaderWarmReadyDeadline('?shaderwarmready=-5', 3_000)).toBe(3_000);
     expect(readShaderWarmReadyDeadline('?shaderwarmready=abc', 3_000)).toBe(3_000);
     expect(readShaderWarmReadyDeadline('?shaderwarmready=Infinity', 3_000)).toBe(3_000);
+  });
+});
+
+describe("the cannot-serve rule (the worker measured against the caller's cap)", () => {
+  // The RTX 4070 laptop capture: links about 560 ms each, the window open to
+  // four, and the boot burst leaves dozens of programs queued ahead of the
+  // hold that has waited longest.
+  const LAPTOP: ShaderWarmCannotServeInputs = {
+    linkCount: 5,
+    linkSumMs: 5 * 560,
+    windowLinks: 4,
+    aheadOfOldest: 32,
+    capMs: 5_000,
+    waitedMs: 2_000,
+  };
+
+  it('retires when the queue ahead of the oldest hold outruns its remaining cap', () => {
+    // 32 links at 560 ms, four at a time, is 4480 ms of service for a hold
+    // with 3000 ms of its cap left: that hold is already lost, and so is
+    // every hold behind it.
+    expect(shaderWarmCannotServe(LAPTOP)).toBe(true);
+  });
+
+  it('keeps a worker whose links are ten times shorter, same queue', () => {
+    // The RTX 3060 desktop shape: 32 x 50 ms over four is 400 ms, well inside
+    // the same remaining cap. The rule is relative to the worker's own wall,
+    // so no machine constant decides it.
+    expect(shaderWarmCannotServe({ ...LAPTOP, linkSumMs: 5 * 50 })).toBe(false);
+  });
+
+  it('keeps a worker whose queue fits the remaining cap, at the same wall', () => {
+    // Four links at 560 ms over a window of four is one link's wall.
+    expect(shaderWarmCannotServe({ ...LAPTOP, aheadOfOldest: 4 })).toBe(false);
+  });
+
+  it('says nothing before three links: no evidence is not evidence of slowness', () => {
+    for (let count = 0; count < SHADER_WARM_EVIDENCE_LINKS; count++) {
+      expect(shaderWarmCannotServe({ ...LAPTOP, linkCount: count, linkSumMs: count * 560 })).toBe(
+        false,
+      );
+    }
+    expect(
+      shaderWarmCannotServe({
+        ...LAPTOP,
+        linkCount: SHADER_WARM_EVIDENCE_LINKS,
+        linkSumMs: SHADER_WARM_EVIDENCE_LINKS * 560,
+      }),
+    ).toBe(true);
+  });
+
+  it('reads a missing window as one link at a time, the honest worst case', () => {
+    // Before the worker's first stats message there is no window to read, and
+    // the fallback never claims more parallelism than was observed: six links
+    // at 560 ms is 3360 ms one at a time (past the 3000 ms left) and 840 ms
+    // four at a time.
+    const six = { ...LAPTOP, aheadOfOldest: 6 };
+    expect(shaderWarmCannotServe({ ...six, windowLinks: 1 })).toBe(true);
+    expect(shaderWarmCannotServe({ ...six, windowLinks: Number.NaN })).toBe(true);
+    expect(shaderWarmCannotServe({ ...six, windowLinks: 0 })).toBe(true);
+    expect(shaderWarmCannotServe(six)).toBe(false);
+  });
+
+  it('never fires on an empty queue, or on a hold that has already outrun its cap alone', () => {
+    // Nothing ahead is nothing to wait for, whatever the wall.
+    expect(shaderWarmCannotServe({ ...LAPTOP, aheadOfOldest: 0 })).toBe(false);
+    // A hold past its own cap is the caller's business (it gives up itself);
+    // this rule still answers on the queue, not on the overrun.
+    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: 6_000 })).toBe(true);
+  });
+
+  it('answers false on garbage rather than retiring a working worker', () => {
+    expect(shaderWarmCannotServe({ ...LAPTOP, linkSumMs: Number.NaN })).toBe(false);
+    expect(shaderWarmCannotServe({ ...LAPTOP, linkSumMs: 0 })).toBe(false);
+    expect(shaderWarmCannotServe({ ...LAPTOP, capMs: Number.NaN })).toBe(false);
+    expect(shaderWarmCannotServe({ ...LAPTOP, waitedMs: Number.POSITIVE_INFINITY })).toBe(false);
+    expect(shaderWarmCannotServe({ ...LAPTOP, aheadOfOldest: Number.NaN })).toBe(false);
+  });
+});
+
+describe('the outstanding holds book', () => {
+  it('answers the hold that started earliest, and forgets a closed one', () => {
+    const holds = createShaderWarmOutstandingHolds();
+    const first = holds.open({ startedAtMs: 100, capMs: 5_000, priority: 20, highestId: 4 });
+    const second = holds.open({ startedAtMs: 40, capMs: 5_000, priority: 20, highestId: 9 });
+    expect(holds.size()).toBe(2);
+    // Earliest by clock, not by the order the calls arrived.
+    expect(holds.oldest()).toBe(second);
+    holds.close(second);
+    expect(holds.oldest()).toBe(first);
+    holds.close(first);
+    expect(holds.oldest()).toBeNull();
+    // Closing twice, or closing what was never opened, is a no-op.
+    holds.close(first);
+    expect(holds.size()).toBe(0);
+  });
+
+  it('drops everything at once when the worker goes', () => {
+    const holds = createShaderWarmOutstandingHolds();
+    holds.open({ startedAtMs: 1, capMs: 5_000, priority: 20, highestId: 1 });
+    holds.open({ startedAtMs: 2, capMs: 5_000, priority: 20, highestId: 2 });
+    holds.clear();
+    expect(holds.size()).toBe(0);
+    expect(holds.oldest()).toBeNull();
+  });
+});
+
+describe('the requests the worker has yet to reach', () => {
+  it('counts the unsettled requests of one priority up to an id, the queue ahead of a hold', () => {
+    const requests = createShaderWarmRequests();
+    requests.request([source('a'), source('b'), source('c'), source('d')], 20);
+    expect(requests.unsettledAhead(20, 3)).toBe(3);
+    expect(requests.unsettledAhead(20, 4)).toBe(4);
+
+    // A settled one is behind the worker, not ahead of the hold.
+    requests.settle(2, 'warmed');
+    expect(requests.unsettledAhead(20, 4)).toBe(3);
+    // And a request the worker has not been asked for yet is not counted.
+    expect(requests.unsettledAhead(20, 1)).toBe(1);
+  });
+
+  it('reads the worker order: priority first, arrival only within one priority', () => {
+    // The worker inserts a new request ahead of every pending one of LOWER
+    // priority (shader_warm_worker_core.ts), so an id compare alone charges a
+    // live view for a backlog the worker serves after it.
+    const requests = createShaderWarmRequests();
+    const backlog = requests.request([source('a'), source('b'), source('c')], 20);
+    const live = requests.request([source('d')], 30);
+    const liveId = live.ids[0];
+
+    // The live hold is served first: only its own request is ahead of it.
+    expect(requests.unsettledAhead(30, liveId)).toBe(1);
+    // The cosmetic hold behind it IS charged for the live view, whatever the
+    // ids say, plus its own arrivals.
+    expect(requests.unsettledAhead(20, backlog.ids[2])).toBe(4);
+    // A later cosmetic arrival is behind the earlier ones and not counted.
+    const later = requests.request([source('e')], 20);
+    expect(requests.unsettledAhead(20, backlog.ids[0])).toBe(2);
+    expect(requests.unsettledAhead(20, later.ids[0])).toBe(5);
+  });
+
+  it('forgets a request nobody waits for any more', () => {
+    // An abandoned request is on its way to the worker's cancel; charging a
+    // hold for it would retire a worker over links that will never run.
+    const requests = createShaderWarmRequests();
+    const asked = requests.request([source('a'), source('b')], 20);
+    expect(requests.unsettledAhead(20, asked.ids[1])).toBe(2);
+    requests.abandon([asked.ids[0]]);
+    expect(requests.unsettledAhead(20, asked.ids[1])).toBe(1);
   });
 });

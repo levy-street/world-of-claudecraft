@@ -56,6 +56,106 @@ export const SHADER_WARM_TIMEOUT_BREAKER = 3;
 export const SHADER_WARM_HOLD_WINDOW = 8;
 export const SHADER_WARM_EXPIRED_SHARE_BREAKER = 4;
 
+/** The breaker's third rule, and the only one that fires before a hold has
+ *  paid anything: once the worker has settled this many links, its OWN
+ *  measured wall says whether the oldest outstanding hold can still be served
+ *  inside what is left of the cap its caller owns. Three links is the least
+ *  evidence that is not one outlier, and it is what the calibrated comparison
+ *  of the RTX 4070 capture retired on (about 3.6 s in, no hold expired, a
+ *  third of the hold time the expired-share rule reached by 7 s); where the
+ *  links are ten times shorter (the RTX 3060 desktop) the same arithmetic
+ *  never fires. */
+export const SHADER_WARM_EVIDENCE_LINKS = 3;
+
+/** The floor a window reading gets: one link at a time. The rule itself does
+ *  not run before the worker's first stats message (shader_warm_client.ts),
+ *  so this only catches a message whose window reads as nothing. */
+export const SHADER_WARM_WINDOW_FALLBACK = 1;
+
+/** One hold the client is still waiting on, in the order it opened: when its
+ *  caller's cap clock started, the cap itself, the priority it asked at and
+ *  the highest request id it asked for. The last two together are what the
+ *  worker has to get through first: it serves by PRIORITY and only then by
+ *  arrival, so a hold is behind everything above its priority plus the
+ *  requests at its own that arrived no later than its last one. */
+export interface ShaderWarmOutstandingHold {
+  startedAtMs: number;
+  capMs: number;
+  priority: number;
+  highestId: number;
+}
+
+export interface ShaderWarmOutstandingHolds {
+  open(hold: ShaderWarmOutstandingHold): ShaderWarmOutstandingHold;
+  close(hold: ShaderWarmOutstandingHold): void;
+  /** The hold that started earliest among those still waiting. */
+  oldest(): ShaderWarmOutstandingHold | null;
+  size(): number;
+  clear(): void;
+}
+
+export function createShaderWarmOutstandingHolds(): ShaderWarmOutstandingHolds {
+  let open: ShaderWarmOutstandingHold[] = [];
+  return {
+    open(hold) {
+      open.push(hold);
+      return hold;
+    },
+    close(hold) {
+      const at = open.indexOf(hold);
+      if (at >= 0) open.splice(at, 1);
+    },
+    oldest() {
+      let oldest: ShaderWarmOutstandingHold | null = null;
+      for (const hold of open) {
+        if (!oldest || hold.startedAtMs < oldest.startedAtMs) oldest = hold;
+      }
+      return oldest;
+    },
+    size: () => open.length,
+    clear() {
+      open = [];
+    },
+  };
+}
+
+export interface ShaderWarmCannotServeInputs {
+  /** The worker's own links this session, and their summed wall. */
+  linkCount: number;
+  linkSumMs: number;
+  /** The window from the worker's last stats message, which can be a few
+   *  hundred milliseconds stale (the worker reports on its own poll); a
+   *  window that reads as nothing floors at one link at a time. */
+  windowLinks: number;
+  /** Unsettled requests the worker serves before the oldest hold's last one. */
+  aheadOfOldest: number;
+  /** The oldest outstanding hold's cap, and how long it has waited. */
+  capMs: number;
+  waitedMs: number;
+}
+
+/** Whether the worker CANNOT serve the oldest hold inside what is left of its
+ *  cap, on the worker's own evidence: the queue ahead of that hold, at the
+ *  mean wall this worker has actually paid per link, spread over the links it
+ *  runs at once, against the cap the caller already owns. Nothing here is a
+ *  millisecond bound: the same arithmetic that retires a worker whose links
+ *  cost half a second keeps one whose links cost fifty. */
+export function shaderWarmCannotServe(inputs: ShaderWarmCannotServeInputs): boolean {
+  const linkCount = Math.floor(inputs.linkCount);
+  if (!Number.isFinite(linkCount) || linkCount < SHADER_WARM_EVIDENCE_LINKS) return false;
+  if (!Number.isFinite(inputs.linkSumMs) || inputs.linkSumMs <= 0) return false;
+  const ahead = Math.floor(inputs.aheadOfOldest);
+  if (!Number.isFinite(ahead) || ahead <= 0) return false;
+  if (!Number.isFinite(inputs.capMs) || !Number.isFinite(inputs.waitedMs)) return false;
+  const meanLinkMs = inputs.linkSumMs / linkCount;
+  const window = Math.max(
+    SHADER_WARM_WINDOW_FALLBACK,
+    Number.isFinite(inputs.windowLinks) ? Math.floor(inputs.windowLinks) : 0,
+  );
+  const remainingMs = inputs.capMs - inputs.waitedMs;
+  return (ahead * meanLinkMs) / window > remainingMs;
+}
+
 /** The last few holds, expired or not, for the breaker's second rule. */
 export interface ShaderWarmHoldRing {
   note(expired: boolean): void;
@@ -259,6 +359,13 @@ export interface ShaderWarmRequests {
   failAll(): void;
   /** Requests sent and not settled: someone is waiting on each of them. */
   pendingCount(): number;
+  /** Of those, the ones the worker serves before a hold's last request: it
+   *  takes priority first and arrival second, so everything ABOVE
+   *  `priority` counts whenever it arrived, and at `priority` itself only
+   *  what arrived no later than `highestId`. Requests nobody is interested in
+   *  any more (a hold that gave up) are on their way out and count for
+   *  nobody. */
+  unsettledAhead(priority: number, highestId: number): number;
   noteHeld(warm: boolean, timedOut: boolean, holdMs: number): void;
   noteBypass(bypass: ShaderWarmBypass): void;
   noteAssembly(ms: number): void;
@@ -384,6 +491,16 @@ export function createShaderWarmRequests(): ShaderWarmRequests {
       }
     },
     pendingCount: () => unsettled,
+    unsettledAhead(priority, highestId) {
+      let ahead = 0;
+      for (const entry of byId.values()) {
+        if (entry.outcome !== null || entry.interest === 0) continue;
+        if (entry.priority > priority || (entry.priority === priority && entry.id <= highestId)) {
+          ahead++;
+        }
+      }
+      return ahead;
+    },
     noteHeld(warm, timedOut, holdMs) {
       stats.held++;
       if (warm) stats.heldWarm++;

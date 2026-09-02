@@ -1971,3 +1971,177 @@ describe('world-entry raw summary blocks', () => {
     expect(raw.bootPhases).toMatchObject({ entryMs: 9000, prewarmInitialMs: 4000 });
   });
 });
+
+describe('shader warm-up report fields', () => {
+  it('stores the worker state as a coerced boolean and a bounded refusal token', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-refused',
+          shaderWarmWorkerActive: 0,
+          shaderWarmRefusal: 'HOLD-TIMEOUTS:expired-share',
+        },
+        { remoteAddress: '203.0.113.90' },
+      ),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.shaderWarmWorkerActive).toBe(false);
+    expect(stored.shaderWarmRefusal).toBe('hold-timeouts:expired-share');
+  });
+
+  it('defaults to inactive with no refusal when the client sends neither', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq({ sessionId: 'shader-warm-absent' }, { remoteAddress: '203.0.113.91' }),
+      res,
+    );
+
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    expect(stored.shaderWarmWorkerActive).toBe(false);
+    expect(stored.shaderWarmRefusal).toBe('');
+  });
+
+  it('rejects a refusal outside the token charset or over its bound', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-hostile',
+          shaderWarmWorkerActive: 'truthy',
+          shaderWarmRefusal: "'; DROP TABLE client_perf_reports; --",
+        },
+        { remoteAddress: '203.0.113.92' },
+      ),
+      res,
+    );
+
+    const stored = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0];
+    // A truthy non-boolean coerces like autoGovernor does; a refusal that is
+    // not one token is dropped whole rather than stored half-sanitized.
+    expect(stored.shaderWarmWorkerActive).toBe(true);
+    expect(stored.shaderWarmRefusal).toBe('');
+
+    await handlePerfReport(
+      fakeReq(
+        { sessionId: 'shader-warm-long', shaderWarmRefusal: 'a'.repeat(200) },
+        { remoteAddress: '203.0.113.93' },
+      ),
+      res,
+    );
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].shaderWarmRefusal).toHaveLength(
+      64,
+    );
+
+    // The bound exists for the one refusal that carries a name, and it fits
+    // the longest of them whole: the fleet column has to say WHICH extension
+    // drifted, not the first 40 characters of its name.
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-drift',
+          shaderWarmRefusal: 'extension-drift:webgl_compressed_texture_s3tc_srgb',
+        },
+        { remoteAddress: '203.0.113.94' },
+      ),
+      res,
+    );
+    expect(vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].shaderWarmRefusal).toBe(
+      'extension-drift:webgl_compressed_texture_s3tc_srgb',
+    );
+  });
+
+  it('bounds the raw-summary shaderWarm block and drops a malformed one', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-block',
+          rawSummary: {
+            seconds: 30,
+            shaderWarm: {
+              active: true,
+              worker: 'ready',
+              refusal: '',
+              mode: 'all',
+              setting: 'auto',
+              backend: 'd3d11',
+              warmed: 1e9,
+              held: 42.7,
+              heldTimedOut: -1,
+              planted: 'x'.repeat(200),
+            },
+          },
+        },
+        { remoteAddress: '203.0.113.94' },
+      ),
+      res,
+    );
+
+    expect(res.statusCode).toBe(200);
+    const raw = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect(raw.shaderWarm).toEqual({
+      active: true,
+      worker: 'ready',
+      refusal: '',
+      mode: 'all',
+      setting: 'auto',
+      backend: 'd3d11',
+      warmed: 100_000,
+      held: 42,
+      heldTimedOut: 0,
+    });
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-block-malformed',
+          rawSummary: { seconds: 30, shaderWarm: { active: true, warmed: 12 } },
+        },
+        { remoteAddress: '203.0.113.95' },
+      ),
+      res,
+    );
+    const malformed = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect('shaderWarm' in malformed).toBe(false);
+  });
+
+  it('carries the block across truncation into the compact path', async () => {
+    const res = fakeRes();
+
+    await handlePerfReport(
+      fakeReq(
+        {
+          sessionId: 'shader-warm-block-large',
+          rawSummary: {
+            seconds: 30,
+            shaderWarm: { active: false, mode: 'off', refusal: 'ready-timeout', held: 7 },
+            oversized: 'x'.repeat(40_000),
+          },
+        },
+        { remoteAddress: '203.0.113.96' },
+      ),
+      res,
+    );
+
+    const raw = vi.mocked(insertClientPerfReport).mock.calls.at(-1)![0].rawSummary as Record<
+      string,
+      unknown
+    >;
+    expect(raw.truncated).toBe(true);
+    expect(raw.shaderWarm).toMatchObject({ mode: 'off', refusal: 'ready-timeout', held: 7 });
+  });
+});
