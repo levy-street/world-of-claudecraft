@@ -406,9 +406,9 @@ closed-by-X.
    release, or they ship after D11. prog_farming_100 and (transitively)
    feat_book_complete stay parked on the same ruling under the (bs) waiver.
 
-2. THE MAINTAINER READS OWED (detail at each ledger letter): (a) the
-   PENDING_ART allowlist sign-off; (w) the structural affinity exemption
-   (standing since Phase 4, now 27 materials); (al) the art-suite guard
+2. THE MAINTAINER READS OWED (detail at each ledger letter): (w) the
+   structural affinity exemption (standing since Phase 4, now 27
+   materials); (al) the art-suite guard
    extensions plus the sharpened bundle-hash renderer/content split; (ap)
    the farmNowMs facet member; (be) the
    simplified-mode gathering rows; (bg) the intro grant fence, its
@@ -529,7 +529,7 @@ closed-by-X.
 |---|---|---|---|
 | D11/(bo) tier 3/4 seed bootstrap; must cover the three (ca) dormant recipes (porridge, braised greens, harvest feast) | P9 QA / P11 / P12 | maintainer | CLOSED 2026-08-21 by masterwrought Phase 11e (GATE 1 discharged). All eight tier 3 and 4 seeds are vendor-stocked at farmer_hollis and farmer_verbena with positive buyValues (32 / 64, DECISION D). All three (ca) dormant recipes are reagent-reachable and proven so end to end in tests/farming_gate1_faucet.test.ts, which buys, plants and harvests through the real commands rather than reading this row. prog_farming_100 and feat_book_complete are earnable; the docs/design/deeds.md dormancy waiver is closed; the (bo) honesty arm self-cleared and was INVERTED, so it now fails if the faucet is ever removed. |
 | (bs) dormant-deed waiver (prog_farming_100, feat_book_complete) plus the D12 cadence read | P10 | maintainer | CLOSED 2026-09-01 by ruling qr-19-farming-100-dormancy-waiver (Phase 19, under qr-19-best-for-project), both halves. The waiver record is RATIFIED: docs/design/deeds.md already carries the CLOSED 2026-08-21 stamp, both counters stock their tier's seeds, prog_farming_100 and feat_book_complete are earnable, and the honesty arm was INVERTED rather than deleted. The D12 cadence read is TAKEN, not deferred: 1/90 per harvest times a survival of 0.85 at the tier gate rising to 1.00 a band above it is one golden per 90 to 106 harvests, about 14 to 17 across the reference climb of 1500 harvests over 74.00 days, one roughly every 4.4 to 5.2 days. Confirms the D12 premise: rare on the wall clock by design under R19. Full derivation on the (bs) block. |
-| (a) PENDING_ART allowlist sign-off (gather_farming, self-clearing) | P1 | maintainer | open ruling-owed |
+| (a) PENDING_ART allowlist sign-off (gather_farming, self-clearing) | P1 | maintainer | RATIFIED 2026-09-01 by qr-19-pending-art-allowlist-signoff (self-clears when the art wave lands) |
 | (w) structural affinity exemption, 27 materials (standing since Phase 4) | P4 / P5 | maintainer | open ruling-owed |
 | (al) art-suite guard extensions plus the bundle-hash renderer/content split | P6 / P6 QA | maintainer | PARTLY CLOSED 2026-09-01 by Phase 19 ruling qr-19-art-suite-guard-extensions: the guard-extensions half is RATIFIED as shipped. The ART-SUBJECT rule and the bookkeepingOnly receipt-free refresh stand exactly as written, each policed in both directions and each self-clearing when the art wave lands; refusing them is blocked behind that same parked art wave and by the seventeenth-absorb rule (never a raised release literal, never a gutted arm), and the release has since adopted the same mechanism on its own content side (IGNIVAR_ART_PENDING_ITEM_IDS). Ratification BINDS the standing obligations: both CLIs re-run after every absorb and every sim-content phase, manifest and verdict conflicts resolved by re-running on the merged tree, the same ART-SUBJECT split for any future release seal, and the three literals (catalogCount 1125, liveItemCount 1140, pendingArtCount 81) re-minted at every content move. The row's other half, the bundle-hash renderer/content split, is answered under qr-19-portrait-bundle-hash-split (D029) and folds into this cell in the same edit. |
 | (ap) farmNowMs facet member (re-argued KEEP at P7 QA) | P7 | maintainer | CLOSED 2026-09-01 by Phase 19 ruling qr-19-farmnowms-facet-member: KEEP ratified as shipped, together with the two acceptances the Phase 7 QA recorded under it (online, a fast client wall clock can paint the stage4 looks-ready mesh before the authority flips status, and the harvest then refuses not_ready; withered surfaces online only when the heavy-gated fplot re-diffs). Nothing moves: no code, no pin, no golden, and the member stays an untagged read with no wire field. Unwinding it would force either a Date.now read the CLOCK-BASE CONTRACT forbids on the offline and headless hosts or an unscoped nowMs seam, and capping the fraction path at stage3 stays rejected because it would put a host-dependent branch into a pure render core and lag the ready mesh for every online player. |
@@ -2739,6 +2739,20 @@ question does not arise (farming has no station).
   two-key guide count prose (the phase file letters this (e)). THIS ledger's
   lettering is canonical; the phase file's five-letter block differs and
   points here (harmonized in Phase 1 QA, 2026-08-08).
+  RULED (qr-19-pending-art-allowlist-signoff, 2026-09-01, under
+  qr-19-best-for-project), on (a): RATIFIED. What is signed is not that
+  the profession icon is optional, but that the allowlist is the
+  sanctioned park until the maintainer's art wave draws it, and that the
+  guard retires itself the moment it does: the E2 arm is INVERTED for a
+  pending id (tests/profession_icons.test.ts:285-295), so the day
+  gather_farming.webp lands and the generated registry picks it up, that
+  assertion FAILS and the id must be struck from PENDING_ART_IDS. The
+  debt therefore cannot be forgotten, and the only alternative (commit
+  the art now) is blocked in-packet by the same profession_icons E2 rule
+  that puts committed WebP behind the maintainer's master SHA, so it
+  collapses into the art wave qr-19-art-batch-ledger already scheduled.
+  No code, no pin, no generated artifact and no test moves under this
+  ruling, and R5 is untouched.
   Phase 2: (h) FARM_CROP_IDS pre-declares ONE crop id, 'wheat' (packet-locked via
   the intro quest): the load-side allowlist and the end-to-end round trip need a
   real id to prove a surviving row; the growth phase owns the catalog and nothing
