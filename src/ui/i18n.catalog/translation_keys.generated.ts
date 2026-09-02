@@ -6836,6 +6836,7 @@ export type TranslationKeyFlat =
   | 'guide.professions.endgameBody'
   | 'guide.professions.endgameHeading'
   | 'guide.professions.endgameMaterialsBody'
+  | 'guide.professions.endgameMaterialsBodyAnyRaid'
   | 'guide.professions.endgamePatternsBody'
   | 'guide.professions.focusBody'
   | 'guide.professions.focusBodyTiers'

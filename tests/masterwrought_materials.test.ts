@@ -977,8 +977,8 @@ describe('sundered essence: the extraction', () => {
     expect(ITEMS.sigil_anvil_helmet.kind).toBe('tool');
     expect(ITEMS.lastflame_core.kind).toBe('junk');
     // A Crucible GEAR epic stays admitted: the allowlist changes nothing for
-    // gear, and whether the Crucible gear tier should feed essence at all is
-    // the maintainer's (Phase 19 decision table row 16).
+    // gear, and the Crucible gear tier feeds essence like every raid gear epic
+    // (ruled qr-19-crucible-gear-sundering-admission, 2026-09-02, Phase 19F).
     expect(ITEMS.grovespring_helmet.kind).toBe('armor');
     expect(isSunderable(ITEMS.grovespring_helmet)).toBe(true);
     // The whole-catalog sweep: every sunderable id is gear, no exceptions,

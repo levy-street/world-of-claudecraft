@@ -160,7 +160,7 @@ function overviewHtml(): string {
         <h2>${esc(t('guide.professions.endgameHeading'))}</h2>
         ${paras('guide.professions.endgameBody')}
         ${paras('guide.professions.endgamePatternsBody')}
-        ${paras('guide.professions.endgameMaterialsBody')}
+        ${paras('guide.professions.endgameMaterialsBodyAnyRaid')}
       </section>
       <section class="guide-block" id="prof-perfecting">
         <h2>${esc(t('guide.professions.perfectingHeading'))}</h2>

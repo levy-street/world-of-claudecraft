@@ -23191,6 +23191,22 @@ implies), recorded as a maintainer read, a one-byte design call if an
 encounter ever applies one to players.
 RULED (qr-19-encounter-owned-aura-wire, 2026-09-01): kept server-internal; the
 full ruling record is in the Phase 18 STEP 0 RECORDED-NOT-ACTED list of this file.
+RULED (qr-19-crucible-gear-sundering-admission, 2026-09-02, under qr-19-best-for-project):
+option 4 with option 1 folded. The non-gear closure (the fifteen sigils and the lastflame core
+refused by the gear allowlist, pinned) is RATIFIED, and the Crucible GEAR tier stays ADMITTED to
+sundering the way every raid gear epic is: the widening moves no number the packet derived
+(attempts stay ember-gated at one per week; the rank derivation's premise "2 would out-pace a
+weekly raider's spare epics" is relaxed, not broken), and its real second-order effect is a
+storage read (the essence is soulbound, noDiscard, sellValue 0, stackSize 20, not a Material,
+behind a structural-zero market bucket). The one player-facing sentence that read as a
+restriction the predicate never made is reworded as a NEW key,
+guide.professions.endgameMaterialsBodyAnyRaid ('breaks a raid-won piece of epic gear, from any
+raid and either difficulty, into exactly one essence'), with guide.professions.endgameMaterialsBody
+retired in scripts/i18n_retired_keys.mjs and the successor's five non-Latin fills carried
+in-change (the retired key's overlay rows are untouched); the 15 Latin rows land pending for the
+Phase 20 fill. The sundering.ts docblock and the materials suite's comment carry the ruling id,
+and the two guide pins ('exactly one essence', 'one per week per character') hold on the
+successor. Phase 19F.
 The open decisions are rows 12 to 16
 of the Phase 19 decision table (phase-19-rulings-gate.md): re-measure R5 on
 the merged world (which also decides whether the Ignivar raid joins the

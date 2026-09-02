@@ -59,10 +59,10 @@ export const SUNDERED_ESSENCE_YIELD = 1;
  *  kind 'tool', and the lastflame core, kind 'junk'), so the guard is now the
  *  explicit GEAR allowlist the doctrine always meant: classic-era
  *  disenchanting never took recipes, tokens, or materials, only gear, and
- *  sundering follows that line. Whether the Crucible GEAR epics should feed
- *  essence at all (the tier scope of R1's "of the tier") is the maintainer's
- *  call, Phase 19 decision table row 16; until ruled they remain admitted the
- *  way every raid gear epic is. */
+ *  sundering follows that line. The Crucible GEAR epics feed essence the way
+ *  every raid gear epic does: RULED qr-19-crucible-gear-sundering-admission
+ *  (2026-09-02, Phase 19F), the status quo ratified, so R1's "of the tier"
+ *  means any raid tier on either difficulty, and the guide prose says so. */
 const SUNDERABLE_GEAR_KINDS: ReadonlySet<ItemDef['kind']> = new Set([
   'weapon',
   'armor',

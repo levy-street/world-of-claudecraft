@@ -144,6 +144,13 @@ export const RETIRED_KEYS = [
   'guide.profPages.craftProse.cooking.identityBody',
   'guide.profPages.ench.enchantsNoteOffhand',
   'guide.profPages.farm.tableBody',
+  // Phase 19F (2026-09-02, ruling qr-19-crucible-gear-sundering-admission),
+  // the same convention: the endgame materials prose said sundering breaks a
+  // raid-won epic 'of the tier', a restriction the predicate never made (any
+  // raid tier, normal or heroic, feeds the essence); the successor
+  // endgameMaterialsBodyAnyRaid says what the predicate does, and its five
+  // non-Latin fills rode the same change.
+  'guide.professions.endgameMaterialsBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);
