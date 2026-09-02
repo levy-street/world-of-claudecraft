@@ -10,8 +10,10 @@ import * as THREE from 'three';
 import { hollowWillowSpots } from '../sim/fen_willows';
 import { loadGltf } from './assets/loader';
 import { registerDeferredPreload } from './assets/preload';
+import { GFX } from './gfx';
 import { type WaterFloraPlacement, waterFloraRegions } from './water_flora_core';
 import { reusePackedOrmSample } from './water_flora_shader_core';
+import { thinLeanDressing } from './zone_dressing_lod_core';
 
 export interface WaterFloraView {
   group: THREE.Group;
@@ -132,7 +134,11 @@ export function buildWaterFlora(seed: number): WaterFloraView {
   group.name = 'water-flora';
   const cullGroups: THREE.Group[] = [];
 
-  const instanceProp = (parent: THREE.Group, key: FloraKey, spots: WaterFloraPlacement[]): void => {
+  const instanceProp = (
+    parent: THREE.Group,
+    key: FloraKey,
+    spots: readonly WaterFloraPlacement[],
+  ): void => {
     const scene = floraScenes[key];
     if (!scene || spots.length === 0) return;
     let parts = partsCache.get(key);
@@ -170,10 +176,14 @@ export function buildWaterFlora(seed: number): WaterFloraView {
     cullGroups.push(regionGroup);
   };
 
+  // The rafts and reeds are pure dressing (no collider, nothing to act on) and
+  // each copy is a 6,000 triangle Tripo model, so a lean session draws an
+  // evenly thinned band of them. The hollow willows below never thin: their
+  // trunks are the sim's own colliders.
   for (const region of waterFloraRegions(seed)) {
     addRegion(`water-flora:${region.zoneId}`, (regionGroup) => {
-      instanceProp(regionGroup, 'lilies', region.lilies);
-      instanceProp(regionGroup, 'reeds', region.reeds);
+      instanceProp(regionGroup, 'lilies', thinLeanDressing(region.lilies, GFX.leanFoliage));
+      instanceProp(regionGroup, 'reeds', thinLeanDressing(region.reeds, GFX.leanFoliage));
     });
   }
 
