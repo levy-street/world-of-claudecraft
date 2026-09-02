@@ -22733,6 +22733,18 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as wiki-craft-gain-cl
   spam path is DEARER in materials than the intended path for 8 of the 10
   crafts. The real arbitrage is staying one or two tiers under the band.
   The record states both; the row itself is left for the maintainer.
+  RULED (qr-19-qr-gray-row-wording-false, 2026-09-02, under qr-19-best-for-project):
+  row 128 is AMENDED IN PLACE with a dated line (farming/state.md, the doctrine form,
+  never rewritten), brainstorm.md's future-tier bullet carries the same dated
+  amendment so the revisit is aimed at the per-point arbitrage, and section 12.2's
+  own "cheap path" label (the definition line, the column header's two uses, and the
+  two prose uses) is renamed to the floor-spam name section 12.3 already uses, with a
+  dated rename note, closing the contradiction inside the authority document. The
+  amendment keeps the two eights apart: LONGER on all ten crafts, DEARER on eight.
+  The two historical phase specs that repeat "the cheapest below-band spam path"
+  (implementation-plan.md, phase-15-power-verification.md) are left as history
+  (option B not taken), and rider F, a committed three-path walk on the r5_envelope_probe precedent, was offered and NOT taken (the amended numbers are the measured ones section 12.3 already records). Docs only: no code, no test, no wiki regen,
+  tierProgressMultiplier untouched, the R5 surface untouched.
 
 ### PINS ADDED OR MOVED
 Moved by the tunes: the sunspun_vestments rating row and the armour and

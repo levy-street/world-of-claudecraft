@@ -1841,6 +1841,25 @@ daily gate anywhere in professions is out of ruling and STOPS.
      lands in brainstorm.md's future-tier block. WHY recorded rather than fixed: the fix
      is a pacing redesign, not a tune, and every pacing model in this packet was derived
      against the shipped multiplier.
+     AMENDED IN PLACE 2026-09-02 (qr-19-qr-gray-row-wording-false, under
+     qr-19-best-for-project): the sentence above, "the cheapest path to any craft skill
+     number is always bulk-spamming low recipes rather than crafting the band's real
+     content", is measurably FALSE as written and is superseded by the measured read in
+     docs/design/power-verification.md sections 12.2 and 12.3. Floor spam (the
+     lowest-skillReq recipe that still pays) is LONGER than the intended path on all ten
+     crafts (375 crafts against 125 on eight of them, 375 against alchemy's 150, and 225
+     against enchanting's 150, whose roster has no tier-0 row at all so both of its
+     columns start at skill 25), and DEARER in reagent value on eight of the ten (only
+     leatherworking and inscription come out cheaper; alchemy and enchanting are among
+     the eight). Those are two different sets and must not be read as one claim. The
+     genuinely cheapest path in materials is the lowest reagent cost per skill point,
+     which sits one or two tiers UNDER the band rather than at the floor and beats the
+     intended path on nine of ten crafts at 0.66 to 0.88 of the cost (enchanting ties).
+     The OBSERVATION half (below-band crafts gain at half and quarter rate, the
+     tierProgressMultiplier ladder) and the DECIDED half (no gain-curve change in this
+     packet, because the 11e, 11f and 11i pacing models were derived against the shipped
+     multiplier) both stand untouched; only the premise sentence is corrected, and the
+     future-tier revisit aims at the per-point arbitrage, not the floor.
 129. qr-12-CADENCE. THE PERFECTING CADENCE GETS AN ACCEPTANCE CRITERION, closing the one
      unbounded design number the review found. Phase 12's rank and attempt counts are
      DERIVED (never pasted) against this target: the reference endgame character (one

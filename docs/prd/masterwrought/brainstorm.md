@@ -76,6 +76,13 @@ recipes today). v1 is pure stats and bounded utility: no new proc effects anywhe
   crafts gaining at half and quarter rate make the cheapest path to any skill number a
   bulk spam of low recipes; Phase 15 records the measurement, and any change to
   tierProgressMultiplier is a future-tier pacing redesign, never an in-packet tune.
+  AMENDED 2026-09-02 (qr-19-qr-gray-row-wording-false, under qr-19-best-for-project):
+  the "cheapest path" premise above is false as measured (power-verification.md section
+  12.3): floor spam is LONGER on all ten crafts and DEARER in reagent value on eight, so
+  the lever this revisit should aim at is the lowest reagent cost per skill point, which
+  sits one or two tiers under the band and beats the intended path on nine of ten crafts
+  at 0.66 to 0.88 of the cost. The gain-rate observation and the future-tier scope of any
+  tierProgressMultiplier change are unchanged.
 - A gathering-wide APEX-TIER EXPANSION beyond what this packet ships (recorded at Phase
   11j, which completed the tier-5 tool family and so drew the boundary): new node and
   water tiers above the world's current deepest, the tier-6 tool rung the wield table has

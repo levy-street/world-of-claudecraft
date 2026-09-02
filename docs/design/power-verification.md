@@ -1094,9 +1094,12 @@ So a tier-`r` recipe stops paying at skill `25 * (r + 3)`: a tier-0 recipe dies 
 
 Character's craft is its active archetype (ceiling unbounded). `oncePerDay` rows
 excluded from both paths. Intended = the band-matched recipe at every step.
-Cheap = the lowest-`skillReq` recipe that still yields anything.
+Floor spam = the lowest-`skillReq` recipe that still yields anything. (RENAMED
+2026-09-02 under qr-19-qr-gray-row-wording-false: this path was labelled "cheap" here
+while section 12.3 measures it DEARER than the intended path on eight of the ten crafts,
+so 12.2 now carries the floor-spam name 12.3 uses; the numbers are unchanged.)
 
-| craft | intended | cheap path | ratio | the cheap recipe (skillReq, reagent value) |
+| craft | intended | floor spam | ratio | the floor recipe (skillReq, reagent value) |
 |---|---|---|---|---|
 | engineering | 125 | 375 | 3.00 | `recipe_cogwheel_blank` (0, 26c) |
 | alchemy | 150 | 375 | 2.50 | `recipe_growth_tonic` (0, 11c) |
@@ -1115,7 +1118,7 @@ Two rows do not read 125 / 375 / 3.00 and both reasons are structural.
 to 100 leg runs at the 0.5 multiplier and costs 50 crafts rather than 25.
 **Enchanting's** two columns BOTH start at skill 25, because its lowest
 `skillReq` is 25 and nothing on its roster is craftable at skill 0 at all; from
-that start the cheap path is 25 + 50 + 100 on `gatherers_cache` then 50 on
+that start the floor-spam path is 25 + 50 + 100 on `gatherers_cache` then 50 on
 `recipe_lucent_reagent`, which is 225.
 
 The CRAFT-COUNT columns are worked by hand below, so they reproduce from this
@@ -1131,7 +1134,7 @@ every leg: 25 crafts of
 of `recipe_silvered_carp_supper` (50 to 75), 25 of
 `recipe_highwatch_barley_porridge` (75 to 100), 25 of
 `recipe_evergarden_braised_greens` (100 to 125). Total 125 crafts, 8075 copper of
-reagents. Cheap path, staying on the lowest recipe that still pays: jerky at 1.0
+reagents. Floor-spam path, staying on the lowest recipe that still pays: jerky at 1.0
 for 25 crafts, at 0.5 for 50, at 0.25 for 100 (it dies at 75), then the eel at
 0.25 for 100, then the carp supper at 0.25 for 100. Total 375 crafts.
 
