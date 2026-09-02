@@ -452,13 +452,23 @@ function requireRecipe(id: string): ProfessionRecipeRecord {
  *  excluded because it is not a consumable row at all; it rides masterwrought
  *  R17's separate gathering-tool carve-out and takes a fine twin at count 4.
  *  Neither exclusion can widen quietly: both are structural, and the floor
- *  below fails if the derived set ever shrinks. */
+ *  below fails if the derived set ever shrinks.
+ *
+ *  CRAFT-AGNOSTIC since masterwrought Phase 19G (D171,
+ *  qr-19-scroll-elixir-15c-parity). This used to filter on cooking-or-alchemy,
+ *  which was the whole produce-consuming set when Phase 11g wrote it; the D171
+ *  repair put a crop on an INSCRIPTION row (recipe_sunpetal_scroll takes the
+ *  serpent elixir's gourd), and a craft filter would have exempted that placement
+ *  from the rule silently. "Consumable" is now stated as what it is, a slotless
+ *  output that is not a gathering tool, so a crop on any craft's consumable row
+ *  is governed by existing. The hoe exclusion is the gathering-tool clause. */
 function accentGovernedRows(): ProfessionRecipeRecord[] {
   const farmOwnIds = new Set(FARM_RECIPES.map((r) => r.id));
   return ALL_RECIPES.filter(
     (r) =>
-      (r.professionId === 'cooking' || r.professionId === 'alchemy') &&
       !farmOwnIds.has(r.id) &&
+      ITEMS[r.resultItemId]?.slot === undefined &&
+      ITEMS[r.resultItemId]?.use?.type !== 'gatherTool' &&
       r.reagents.some((g) => PRODUCE_IDS.has(g.itemId)),
   );
 }
@@ -528,6 +538,39 @@ describe('masterwrought R17 RULE 2: the accent rule', () => {
         .map((g) => [g.itemId, g.count]);
       expect(actual, `${row.id} produce entries`).toEqual(row.produce.map(([id, n]) => [id, n]));
     }
+  });
+
+  it('the sweep is craft-agnostic: the rung-50 scroll row (D171) is governed, and clears both readings', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity): the
+    // parity repair put the serpent elixir's frost_gourd on
+    // recipe_sunpetal_scroll, the first crop on a row outside cooking and
+    // alchemy. The sweep used to filter on those two crafts, so this placement
+    // would have been exempt from RULE 2 without anyone deciding it should be.
+    // TOUCHED_ROWS is the literal of the nine rows Phase 11g touched and does
+    // NOT gain the scroll (that table pins 11g's diff, not the rule's reach);
+    // the reach is pinned here instead, by membership and by the verdict.
+    const rows = accentGovernedRows();
+    const ids = rows.map((r) => r.id);
+    expect(ids, 'the scroll row is governed').toContain('recipe_sunpetal_scroll');
+    expect(
+      new Set(rows.map((r) => r.professionId)),
+      'exactly the crafts whose consumable rows consume produce today',
+    ).toEqual(new Set(['cooking', 'alchemy', 'inscription']));
+    const scroll = requireRecipe('recipe_sunpetal_scroll');
+    const verdict = accentVerdict(nonProduceBill(scroll), 'frost_gourd', 1);
+    // The count half: the crop at 1 sits strictly under the essence at 2.
+    expect(verdict.largestCount).toBe(2);
+    expect(verdict.countOk).toBe(true);
+    // The value half: the gourd's 15 sits under the herb's 160, the dominant
+    // non-produce contribution on the bill (sunpetal_herb buyValue 160).
+    expect(verdict.value).toBe(15);
+    expect(verdict.dominant).toBe(160);
+    expect(verdict.valueOk).toBe(true);
+    expect(verdict.capOk).toBe(true);
+    // The positive control, so the membership is a claim about the RULE and
+    // not about a row that happens to pass: at count 2 the same row fails the
+    // count half, which is what a craft-exempt row could never do.
+    expect(accentVerdict(nonProduceBill(scroll), 'frost_gourd', 2).countOk).toBe(false);
   });
 
   it('the accent rule governs a real, non-empty set of rows', () => {

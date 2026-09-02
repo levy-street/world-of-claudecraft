@@ -143,3 +143,21 @@ or because a fill's provenance is not something the worklist can say:
   sentence before 19F re-keyed the note) are superseded or left as-is per their rulings
   (qr-19-prog-first-harvest-thirteen-catches, qr-19-rarebody-reword-landmine); nothing to
   fill for them.
+
+### Hand-carried fill entries from Phase 19G (2026-09-02)
+
+- **One more retire-and-re-key successor whose 15 Latin rows the registry carries as
+  pending:** `guide.profPages.craftProse.inscription.materialsBodyFrostGourd` (D171, ruling
+  qr-19-scroll-elixir-15c-parity). The predecessor
+  `guide.profPages.craftProse.inscription.materialsBody` told players the double scroll batch
+  is 'priced even with the Elixir of the Serpent', false by 15 copper since Phase 11g; the
+  repair put the elixir's gourd on the scroll and the successor names it. Its five non-Latin
+  fills rode the same change, machine-authored under the i18n-locale-fill conventions,
+  fact-checked against the live sim before filling, and FLAGGED for the maintainer's
+  re-judgement at STEP 1 in phase-19g-qa.md; the predecessor KEEPS its five reviewed rows
+  (stale on the one clause the repair made true) and never reaches the worklist. The fifteen
+  Latin locales render ENGLISH on the inscription page until this fill lands, the same trade
+  19F took. The English and every fill are pinned per clause by 'the inscription materials
+  prose states the live scroll bill and its parity with the serpent elixir' and 'the
+  inscription materials fills name the gourd, the serpent elixir and the parity in their
+  own locale' in tests/guide.test.ts.

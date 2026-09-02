@@ -117,9 +117,25 @@ describe('craftIdsForMaterialItem', () => {
     // three below did.
     //
     // Order is CRAFT_RING, not first-seen, which is why alchemy leads.
+    //
+    // MASTERWROUGHT PHASE 19G (D171, qr-19-scroll-elixir-15c-parity) ADDED A
+    // THIRD CRAFT TO THE GOURD: recipe_sunpetal_scroll takes the serpent
+    // elixir's frost_gourd to restore the two routes' exact input parity, so the
+    // Frost Gourd tooltip now reads "Used by Alchemy, Cooking, and Inscription.",
+    // inscription last by ring order. The Fine Frost Gourd does NOT follow: a
+    // fine twin is farming's own record (fineProduceItemId), not a
+    // material_grades grade, so baseMaterialFor knows nothing of it and it
+    // keeps its own direct consumer only (the soup, "Used by Cooking."). The
+    // first crop on a row outside cooking and alchemy, and the only one: the
+    // sweep below keeps every other crop off inscription.
     expect(craftIdsForMaterialItem('vale_wheat')).toEqual(['alchemy', 'cooking']);
     expect(craftIdsForMaterialItem('bog_beet')).toEqual(['alchemy', 'cooking']);
-    expect(craftIdsForMaterialItem('frost_gourd')).toEqual(['alchemy', 'cooking']);
+    expect(craftIdsForMaterialItem('frost_gourd')).toEqual(['alchemy', 'cooking', 'inscription']);
+    expect(craftIdsForMaterialItem('fine_frost_gourd')).toEqual(['cooking']);
+    const inscriptionCrops = Object.values(FARM_CROPS)
+      .map((crop) => crop.produceItemId)
+      .filter((id) => craftIdsForMaterialItem(id).includes('inscription'));
+    expect(inscriptionCrops, 'exactly one base crop feeds inscription').toEqual(['frost_gourd']);
     expect(craftIdsForMaterialItem('highland_barley')).toEqual(['alchemy', 'cooking']);
     expect(craftIdsForMaterialItem('gilded_sunmelon')).toEqual(['alchemy', 'cooking']);
     // The negative half, and it is what makes the five above a real claim

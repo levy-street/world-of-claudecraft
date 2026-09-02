@@ -12974,6 +12974,11 @@ export const GUIDE_PROF_CRAFTS: GuideProfCraft[] = [
             "count": 1
           },
           {
+            "itemId": "frost_gourd",
+            "name": "Frost Gourd",
+            "count": 1
+          },
+          {
             "itemId": "arcane_essence",
             "name": "Chime Essence",
             "count": 2

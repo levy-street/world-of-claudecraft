@@ -156,6 +156,47 @@ describe('THE ECONOMY INVARIANT', () => {
     expect(checked).toBeGreaterThan(0);
   });
 
+  it('the rung-50 scroll and the serpent elixir bill at exact input parity (229 each, through the shipped unit-value rule)', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity). The
+    // Phase 06 QA ruling priced recipe_sunpetal_scroll at EXACT input parity
+    // with recipe_elixir_of_the_serpent because the two grant a byte-identical
+    // buff (tests/inscription_scroll_exclusivity.test.ts pins the payload), and
+    // the ruling lived only in a comment, so Phase 11g's frost_gourd on the
+    // elixir drifted it by 15 copper with nothing red. The pin the ledger asked
+    // for lives HERE, beside the rule it is computed through, and it records
+    // the NUMBERS and the equality (the maintainer's value (c)): a one-sided
+    // insertion, a both-sided drift, and a reagent re-price all red and come
+    // back to the maintainer instead of passing as a float. Rung 50 alone: the
+    // rung-25 (90 against 106) and rung-0 (26 against 36) pairs are recorded
+    // as drifted in docs/prd/masterwrought/state.md and deliberately unpinned,
+    // because pinning an unruled band's numbers would ratify its drift.
+    const scroll = ALL_RECIPES.find((r) => r.id === 'recipe_sunpetal_scroll');
+    const elixir = ALL_RECIPES.find((r) => r.id === 'recipe_elixir_of_the_serpent');
+    expect(scroll, 'recipe_sunpetal_scroll').toBeDefined();
+    expect(elixir, 'recipe_elixir_of_the_serpent').toBeDefined();
+    if (!scroll || !elixir) return;
+    // The numbers, each welded to the literal the ruling restored.
+    expect(inputValue(scroll), 'the scroll bill').toBe(229);
+    expect(inputValue(elixir), 'the elixir bill').toBe(229);
+    // The equality, stated on its own so a drift names both sides.
+    expect(inputValue(scroll), 'scroll against elixir').toBe(inputValue(elixir));
+    // Per-batch parity is per-unit parity: both rows batch two.
+    expect(scroll.resultCount).toBe(2);
+    expect(elixir.resultCount).toBe(2);
+    // The carrier is the SAME crop at the SAME count on both bills (the repair
+    // mirrors the elixir's own produce line), at the unit value the arithmetic
+    // rests on: 15 under the shipped rule (a sellValue material, no buyValue).
+    const gourd = (recipe: ProfessionRecipeRecord) =>
+      recipe.reagents.find((g) => g.itemId === 'frost_gourd')?.count;
+    expect(gourd(scroll), 'the scroll carries the gourd').toBe(1);
+    expect(gourd(elixir), 'the elixir carries the gourd').toBe(1);
+    expect(reagentUnitValue('frost_gourd')).toBe(15);
+    // Positive control on the rule itself: a buyValue material prices at its
+    // buyValue, not its sellValue, so the 229 above is on the rule's basis.
+    expect(reagentUnitValue('glass_vial')).toBe(12);
+    expect(ITEMS.glass_vial.sellValue).toBe(3);
+  });
+
   // --- the discount-aware vendor-loop arm --------------------------------
   // The listed-count arm above prices the NAIVE craft. A specialized crafter
   // (skill at the craft's perk threshold, automatic for anyone deep in a

@@ -10632,6 +10632,29 @@ The comment now states the truth and names the three options; no pin was added,
 because pinning today's numbers would cement the drift as intended and pinning
 the parity would red on a decision that file does not own. Whoever picks an
 option should pin it in the same change.
+RULED (qr-19-scroll-elixir-15c-parity, 2026-09-02, Phase 19G, under qr-19-best-for-project):
+the parity is RESTORED ON THE SCROLL, for rung 50 alone. recipe_sunpetal_scroll takes the
+serpent elixir's own frost_gourd at count 1 (the maintainer's value (a), taken in session
+on a corrected menu: every tier-3 crop lands unit value 15 under the shipped rule, so the
+gourd is not the only exact reagent but the one that mirrors the elixir's produce line),
+so both bills price at 229 through the shipped reagentUnitValue rule. Band scope (b): rung
+50 ALONE; the rung-25 pair (recipe_goldleaf_scroll 90 against recipe_venomfire_elixir 106
+since 11g's bog_beet) and the rung-0 pair (26 against 36 since 11g's vale_wheat) stay
+recorded here as drifted and are NOT repaired (the all-bands arm edits an input to
+power-verification section 12.2 and is the R5 escalation, refused while R5 is frozen). The
+pin (c) records the NUMBERS and the equality: 'the rung-50 scroll and the serpent elixir
+bill at exact input parity (229 each, through the shipped unit-value rule)' in
+tests/recipe_economy.test.ts, beside the rule it is computed through, mutation-proved. The
+second half rode the same change: the two false clauses in the recipes.ts comment (four
+pristine_venom_gland sinks, not one; the rung-25 pair not at parity) corrected, the
+standing note in tests/inscription_catalog.test.ts rewritten into this ruling with its byte
+literal re-cut, the player copy retired and re-keyed (guide.profPages.craftProse.inscription
+.materialsBody to materialsBodyFrostGourd, five fresh non-Latin fills flagged in
+phase-19g-qa.md, fifteen Latin rows pending for Phase 20), the accent sweep in
+tests/provisioning_supply_line.test.ts made craft-agnostic so the first crop on an
+inscription row is governed (it clears both readings: 1 under the essence's 2, 15 under the
+herb's 160), craftIdsForMaterialItem('frost_gourd') pinned to alchemy, cooking and
+inscription, and the wiki regenerated. Full record: the Phase 19G ledger in this file.
 
 ### The obtainability cost of deviations 1 and 2, weighed at the review round
 

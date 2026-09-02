@@ -2119,15 +2119,28 @@ export const INSCRIPTION_RECIPES: ProfessionRecipeRecord[] = [
     professionId: 'inscription',
     resultItemId: 'sunpetal_scroll',
     resultCount: 2,
-    // Input 214 vs output 40 (two scrolls, the serpent-elixir batch shape).
-    // Priced at EXACT parity with recipe_elixir_of_the_serpent (214, also x2)
-    // per the Phase 06 QA ruling: the two routes grant a byte-identical buff,
-    // and a cheaper scroll would compete with pristine_venom_gland's only
-    // crafting sink. The rung-25 pair already ships this parity (90 = 90).
-    // The dust 4th line stays inside the craft's ink register (the rung-0
-    // recipes grind dust) and mirrors the grimoire's own 4-line rung-50 shape.
+    // Input 229 vs output 40 (two scrolls, the serpent-elixir batch shape).
+    // Priced at EXACT parity with recipe_elixir_of_the_serpent (229, also x2)
+    // per the Phase 06 QA ruling, RESTORED at masterwrought Phase 19G (ruling
+    // qr-19-scroll-elixir-15c-parity, 2026-09-02): the two routes grant a
+    // byte-identical buff, so neither may undercut the other. Phase 11g put a
+    // frost_gourd on the elixir as its rung-50 produce consumer (214 to 229)
+    // and this scroll stayed at 214, so the same gourd rides here now, the
+    // only reagent family that lands 15 exactly (the ink register cannot).
+    // The parity is PINNED in tests/recipe_economy.test.ts ('the rung-50
+    // scroll and the serpent elixir bill at exact input parity'); the byte
+    // bill is pinned in tests/inscription_catalog.test.ts.
+    // Two claims the ruling once rested on are stated as they are today:
+    // pristine_venom_gland has FOUR crafting sinks (the serpent elixir and
+    // the three apex flasks), and the rung-25 pair does NOT ship parity
+    // (recipe_goldleaf_scroll 90 against recipe_venomfire_elixir 106 since
+    // 11g's bog_beet); the rung-0 pair is 26 against 36 for the same reason.
+    // Both stay recorded, not repaired: the ruling covers rung 50 alone.
+    // The dust 5th line stays inside the craft's ink register (the rung-0
+    // recipes grind dust) and mirrors the grimoire's own rung-50 shape.
     reagents: [
       { itemId: 'sunpetal_herb', count: 1 },
+      { itemId: 'frost_gourd', count: 1 },
       { itemId: 'arcane_essence', count: 2 },
       { itemId: 'glass_vial', count: 1 },
       { itemId: 'arcane_dust', count: 1 },

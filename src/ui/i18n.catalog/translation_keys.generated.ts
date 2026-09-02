@@ -6576,6 +6576,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.craftProse.inscription.ladderBody'
   | 'guide.profPages.craftProse.inscription.ladderHeading'
   | 'guide.profPages.craftProse.inscription.materialsBody'
+  | 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd'
   | 'guide.profPages.craftProse.inscription.materialsHeading'
   | 'guide.profPages.craftProse.inscription.routeBody'
   | 'guide.profPages.craftProse.inscription.routeHeading'

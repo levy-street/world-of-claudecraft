@@ -5,6 +5,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
+import { RETIRED_KEYS } from '../scripts/i18n_retired_keys.mjs';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 import { patternChannelSets, recipeAcquisitionChannel } from '../scripts/wiki/vendor_channel.mjs';
 // The English the /c/ public sheet resolves a mark id to. Imported here so the
@@ -4471,6 +4472,230 @@ describe('Guide professions pages and routes', () => {
     expect(
       t('guide.profPages.gainFmt' as never, { reduced: '75', minimal: '100', zero: '125' }),
     ).toBe('75 / 100 / 125');
+  });
+
+  it('the inscription materials prose states the live scroll bill and its parity with the serpent elixir (D171)', () => {
+    // Masterwrought Phase 19G, D171 (qr-19-scroll-elixir-15c-parity). The
+    // predecessor key told players the double scroll batch is 'priced even
+    // with the Elixir of the Serpent', false by 15 copper from Phase 11g until
+    // the scroll took the elixir's gourd, and no arm read it: the farming
+    // dormancy arm above is the only guard over hand-authored guide.* prose.
+    // PER CLAUSE, derived from the live bills through the same unit-value rule
+    // tests/recipe_economy.test.ts prices with, so a re-tune that moves either
+    // bill, a count word, or the parity itself reds here rather than rotting
+    // in the prose. The successor differs from the predecessor in exactly the
+    // two clauses the repair made true; that narrowness is pinned too.
+    setLanguage('en');
+    const key = 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd';
+    const body = t(key);
+    const recipe = (id: string) => {
+      const r = ALL_RECIPES.find((x) => x.id === id);
+      expect(r, `${id} exists`).toBeDefined();
+      return r as NonNullable<typeof r>;
+    };
+    const count = (r: ReturnType<typeof recipe>, id: string) =>
+      r.reagents.find((g) => g.itemId === id)?.count ?? 0;
+    const unit = (id: string) => {
+      const d = ITEMS[id];
+      return typeof d.buyValue === 'number' && d.buyValue > 0 ? d.buyValue : d.sellValue;
+    };
+    const bill = (r: ReturnType<typeof recipe>) =>
+      r.reagents.reduce((sum, g) => sum + g.count * unit(g.itemId), 0);
+    const scroll = recipe('recipe_sunpetal_scroll');
+    const elixir = recipe('recipe_elixir_of_the_serpent');
+    const grimoire = recipe('recipe_sunpetal_grimoire');
+    const goldleafScroll = recipe('recipe_goldleaf_scroll');
+    // The scroll clause runs from its head to the end of its sentence, so a
+    // count that belongs to the grimoire clause cannot satisfy it.
+    const head = body.indexOf('the double scroll batch');
+    expect(head, 'the scroll clause exists').toBeGreaterThan(-1);
+    const clause = body.slice(head, body.indexOf('. ', head));
+    // 'a second essence': exactly one more essence than the rung-25 scroll.
+    expect(count(scroll, 'arcane_essence')).toBe(count(goldleafScroll, 'arcane_essence') + 1);
+    expect(clause).toContain('takes a second essence');
+    // 'that pinch of dust': exactly one, bound back in from paragraph one.
+    expect(count(scroll, 'arcane_dust')).toBe(1);
+    expect(clause).toContain('with that pinch of dust');
+    expect(body).toContain('the sunpetal scroll binds a pinch of dust back in');
+    // 'a Frost Gourd off the Highwatch terraces': exactly one, by the shipped
+    // name, a tier-3 crop (the Highwatch beds), the cooking prose's phrase.
+    expect(count(scroll, 'frost_gourd')).toBe(1);
+    expect(FARM_CROPS.frost_gourd.tier).toBe(3);
+    expect(clause).toContain(`and a ${ITEMS.frost_gourd.name} off the Highwatch terraces`);
+    expect(clause).not.toContain('Frost Gourds');
+    // The parity clause is TRUE on the live bills, and names the elixir by its
+    // shipped name; the two bills are equal through the shipped rule.
+    expect(bill(scroll), 'the scroll bill').toBe(bill(elixir));
+    expect(clause).toContain(`which prices it even with the ${ITEMS.elixir_of_the_serpent.name}`);
+    // The grimoire clause: two goldleaf besides its sunpetal.
+    expect(count(grimoire, 'goldleaf_herb')).toBe(2);
+    expect(count(grimoire, 'sunpetal_herb')).toBeGreaterThan(0);
+    expect(body).toContain('the rare grimoire takes two goldleaf besides its sunpetal');
+    // The closing sentence: no counter stocks the herbs, the dust or the
+    // gourd, and the vial is bought. Derived from the live vendor rosters.
+    const stocked = new Set(Object.values(NPCS).flatMap((n) => n.vendorItems ?? []));
+    for (const id of [
+      'silverleaf_herb',
+      'goldleaf_herb',
+      'sunpetal_herb',
+      'arcane_dust',
+      'frost_gourd',
+    ]) {
+      expect(stocked.has(id), `${id} is sold by no counter`).toBe(false);
+    }
+    expect(stocked.has('glass_vial'), 'the vial is bought for coin').toBe(true);
+    expect(ITEMS.glass_vial.buyValue).toBe(12);
+    expect(body).toContain('No counter sells the herbs, the dust or the gourd');
+    expect(body).toContain('a garden bed');
+    expect(body).toContain('only the vial is bought for coin');
+    // NARROWNESS: the successor keeps the predecessor's first paragraph byte
+    // for byte, and the predecessor is retired rather than reworded in place.
+    const predecessor = guideStrings.profPages.craftProse.inscription.materialsBody;
+    expect(body.split('\n\n')[0]).toBe(predecessor.split('\n\n')[0]);
+    expect(body).not.toBe(predecessor);
+    expect(RETIRED_KEYS).toContain('guide.profPages.craftProse.inscription.materialsBody');
+  });
+
+  it('the inscription materials fills name the gourd, the serpent elixir and the parity in their own locale', async () => {
+    // Masterwrought Phase 19G, D171: the successor's five non-Latin fills are
+    // machine-authored and flagged for the maintainer's read, and a stale
+    // count or a lost clause in a fill is the defect class the re-key exists
+    // to fix. PER CLAUSE (the 19F lesson): each fill is cut at its own scroll
+    // clause, and that clause must carry the shipped gourd name in the
+    // locale's count-of-one form bound to it, the terrace phrase, the shipped
+    // elixir name (stems for Russian, which declines it) and the locale's
+    // parity word; the closing sentence must list the gourd among the never
+    // sold and the garden bed among the sources; and paragraph one is byte
+    // for byte the predecessor's (the narrowness of the re-key). The fifteen
+    // Latin locales render English until the Phase 20 fill and are not walked.
+    const filled = ['zh_CN', 'zh_TW', 'ja_JP', 'ko_KR', 'ru_RU'] as const;
+    type Filled = (typeof filled)[number];
+    const NEEDLES: Record<
+      Filled,
+      {
+        head: string;
+        gourdOne: string;
+        gourdTwo: RegExp;
+        terrace: string;
+        elixir: string[];
+        parity: string;
+        neverSold: string;
+        garden: string;
+      }
+    > = {
+      ja_JP: {
+        head: '二枚一組の巻物',
+        gourdOne: '霜瓜ひとつ',
+        gourdTwo: /霜瓜(ふたつ|二つ|2)/,
+        terrace: 'Highwatchのテラス',
+        elixir: ['蛇のエリクサー'],
+        parity: '同じ費えに揃え',
+        neverSold: '霜瓜も店では買えません',
+        garden: '畑から収穫',
+      },
+      ko_KR: {
+        head: '두 장짜리 두루마리 묶음',
+        gourdOne: '서리 박 하나',
+        gourdTwo: /서리 박 (둘|두 개|두 통)/,
+        terrace: 'Highwatch 단구',
+        elixir: ['뱀의 비약'],
+        parity: '값을 나란히',
+        neverSold: '박도 상점에서는 팔지 않는다',
+        garden: '밭에서 거두',
+      },
+      ru_RU: {
+        head: 'двойная связка свитков',
+        gourdOne: 'Морозную тыкву',
+        gourdTwo: /дв[еа] [Мм]орозн/,
+        terrace: 'террас Highwatch',
+        elixir: ['Эликсиром змея', 'Эликсир', 'зме'],
+        parity: 'вровень',
+        neverSold: 'ни тыкву не продает',
+        garden: 'с грядки',
+      },
+      zh_CN: {
+        head: '双份的卷轴',
+        gourdOne: '一个出自Highwatch梯田的霜瓜',
+        gourdTwo: /(两|二|2)个.{0,12}霜瓜/,
+        terrace: 'Highwatch梯田',
+        elixir: ['巨蛇药剂'],
+        parity: '持平',
+        neverSold: '尘与霜瓜都无处花钱购买',
+        garden: '田畦',
+      },
+      zh_TW: {
+        head: '雙份的卷軸',
+        gourdOne: '一顆來自Highwatch梯田的霜瓜',
+        gourdTwo: /(兩|二|2)顆.{0,12}霜瓜/,
+        terrace: 'Highwatch梯田',
+        elixir: ['巨蛇藥劑'],
+        parity: '持平',
+        neverSold: '塵與霜瓜都無處花錢購買',
+        garden: '田畦',
+      },
+    };
+    const key = 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd';
+    const predecessorKey = 'guide.profPages.craftProse.inscription.materialsBody';
+    try {
+      for (const lang of filled) {
+        await ensureLocaleLoaded(lang);
+        setLanguage(lang);
+        const body = t(key);
+        const n = NEEDLES[lang];
+        expect(body, `${lang} carries a fill`).not.toBe(
+          guideStrings.profPages.craftProse.inscription.materialsBodyFrostGourd,
+        );
+        // Narrowness: paragraph one is the predecessor's, byte for byte.
+        expect(body.split('\n\n')[0], `${lang} keeps the predecessor's first paragraph`).toBe(
+          t(predecessorKey as never).split('\n\n')[0],
+        );
+        // The table cannot drift from the shipped names: the count-of-one form
+        // contains the locale's Frost Gourd, and the elixir needles its name.
+        const gourdName = t('entities.items.frost_gourd.name' as never);
+        const elixirName = t('entities.items.elixir_of_the_serpent.name' as never);
+        if (lang === 'ru_RU') {
+          // Declined in the clause (accusative), so weld by the two stems of
+          // the shipped nominative instead of the whole name.
+          for (const stem of ['Морозн', 'тыкв']) {
+            expect(gourdName, `ru_RU shipped gourd name carries ${stem}`).toContain(stem);
+            expect(n.gourdOne, `ru_RU gourd form carries ${stem}`).toContain(stem);
+          }
+        } else {
+          expect(n.gourdOne, `${lang} gourd form carries the shipped name`).toContain(gourdName);
+        }
+        // The first elixir needle is the form the clause must carry; every
+        // needle after it is a stem of the SHIPPED name (Russian declines the
+        // head noun, so the clause form and the shipped form differ), and the
+        // sole needle of the other locales is the shipped name itself.
+        for (const stem of n.elixir.slice(1))
+          expect(elixirName, `${lang} elixir stem ${stem} is of the shipped name`).toContain(stem);
+        if (n.elixir.length === 1) expect(n.elixir[0]).toBe(elixirName);
+        // The scroll clause: from its head to the never-sold sentence.
+        const head = body.indexOf(n.head);
+        expect(head, `${lang} names the double scroll batch`).toBeGreaterThan(-1);
+        const tail = body.indexOf(n.neverSold, head);
+        expect(tail, `${lang} closes with the never-sold sentence`).toBeGreaterThan(head);
+        const clause = body.slice(head, tail);
+        // ONE gourd, in the locale's own bound form, exactly once, off the
+        // Highwatch terraces; no count-of-two form anywhere in the clause.
+        expect(clause.split(n.gourdOne).length - 1, `${lang} binds one gourd`).toBe(1);
+        expect(clause, `${lang} names the terraces`).toContain(n.terrace);
+        expect(clause, `${lang} never doubles the gourd`).not.toMatch(n.gourdTwo);
+        expect(clause, `${lang} does not name the fine twin`).not.toContain(
+          t('entities.items.fine_frost_gourd.name' as never),
+        );
+        // The parity with the shipped elixir, in this clause and not elsewhere.
+        for (const form of n.elixir)
+          expect(clause, `${lang} names the serpent elixir (${form})`).toContain(form);
+        expect(clause, `${lang} states the parity`).toContain(n.parity);
+        // The closing sentence: the gourd among the never sold, the garden bed
+        // among the sources.
+        const closing = body.slice(tail);
+        expect(closing, `${lang} sources the garden bed`).toContain(n.garden);
+      }
+    } finally {
+      setLanguage('en');
+    }
   });
 
   it('the engineering materials fills name every rod and fish in their own locale', async () => {

@@ -12171,6 +12171,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.inscription.materialsHeading': '草药、墨与盛墨的瓶',
   'guide.profPages.craftProse.inscription.materialsBody':
     '这张书案靠草药学与分解台运转。润光叶出自Eastbrook Vale的一级草丛，金叶出自Mirefen Marsh，阳瓣出自Thornpeak Heights，每个配方都把草药研成颜料，再用一个玻璃瓶来盛（药坊大师处12铜一个）。墨水的魔法那一半来自分解台：润光叶档用铃音之尘，金叶档与阳瓣档要铃音精华，而阳瓣卷轴还把一撮尘掺回墨里，所以铭文师不是附魔师最稳定的顾客，就是自己养成了分解的习惯。\n\n阳瓣档的两个配方都各有讲究：那部精良魔典除阳瓣外还要两株金叶，掺进去为泥金彩绘打底；双份的卷轴则多取一份精华，配上那撮尘，造价与它所映照的巨蛇药剂持平。草药与尘都无处花钱购买：它们来自世界本身，或来自另一位玩家；只有瓶子用钱能买。',
+  'guide.profPages.craftProse.inscription.materialsBodyFrostGourd':
+    '这张书案靠草药学与分解台运转。润光叶出自Eastbrook Vale的一级草丛，金叶出自Mirefen Marsh，阳瓣出自Thornpeak Heights，每个配方都把草药研成颜料，再用一个玻璃瓶来盛（药坊大师处12铜一个）。墨水的魔法那一半来自分解台：润光叶档用铃音之尘，金叶档与阳瓣档要铃音精华，而阳瓣卷轴还把一撮尘掺回墨里，所以铭文师不是附魔师最稳定的顾客，就是自己养成了分解的习惯。\n\n阳瓣档的两个配方都各有讲究：那部精良魔典除阳瓣外还要两株金叶，掺进去为泥金彩绘打底；双份的卷轴则多取一份精华，配上那撮尘，再加一个出自Highwatch梯田的霜瓜，如此一来，造价便与它所映照的巨蛇药剂持平。草药、尘与霜瓜都无处花钱购买：它们来自世界本身，来自田畦，或来自另一位玩家；只有瓶子用钱能买。',
   'guide.profPages.craftProse.inscription.ladderHeading': '在蒸馏器旁学艺',
   'guide.profPages.craftProse.inscription.ladderBody':
     '铭文没有自己的工位：整套目录都在高望药坊制作，与炼金术共用同一张工作台，韦兰炼金术士也在那里授艺。梯子是三档六个训练师配方：润光叶档（启蒙书与卷轴）技能0免费，金叶档（书册与卷轴）技能25每个25银，阳瓣档（魔典与卷轴）技能50每个1金，你在该行业的档位一达到配方档位便可学习。50档的卷轴每次出两卷。\n\n这里没有野外配方，也还没有组合件：每一个可传授的档位都是绑定药坊的训练师手艺，而它们之上那一档拾得配方同样绑定药坊，却无处购买，所以这门手艺就在炼金师们站立的地方学、也在那里练。',

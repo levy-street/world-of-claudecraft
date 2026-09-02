@@ -96,28 +96,27 @@ const REAGENTS_BY_RECIPE: Record<string, Record<string, number>> = {
     goldleaf_herb: 2,
   },
   // Re-priced at the Phase 06 QA ruling to EXACT input parity with
-  // recipe_elixir_of_the_serpent (214, both resultCount 2): same buff, same
-  // cost, so neither route undercuts the other. The two outputs really are the
-  // same buff, checked rather than assumed: sunpetal_scroll and
-  // elixir_of_the_serpent both carry aura 'Might of the Serpent', buff_sta 12
-  // for 900s, sellValue 20, quality rare, at resultCount 2. Only `kind` differs.
+  // recipe_elixir_of_the_serpent (both resultCount 2): same buff, same cost,
+  // so neither route undercuts the other. The two outputs really are the same
+  // buff, pinned toStrictEqual in tests/inscription_scroll_exclusivity.test.ts.
   //
-  // THE PARITY IS BROKEN AS OF MASTERWROUGHT PHASE 11g, and it is recorded here
-  // rather than quietly re-pinned because restoring it is a maintainer call, not
-  // this file's. 11g put a frost_gourd on the elixir as its rung-50 alchemy
-  // produce consumer, taking that bill from 214 to 229, so this scroll is now
-  // 15 copper (7 percent) CHEAPER than the elixir for a byte-identical buff.
-  // The inscription route therefore undercuts the alchemy one, which is exactly
-  // what the Phase 06 ruling priced against.
-  //
-  // NOTHING REDS, and that is the more useful half of this note: the ruling was
-  // recorded ONLY as prose, with no assertion behind it, so a 15-copper drift
-  // introduced by a different packet passed every gate in the tree. No pin is
-  // added here now because pinning the CURRENT numbers would cement the drift as
-  // intended, and pinning the parity would red on a decision this file does not
-  // own. The options are to re-price the scroll, to move the elixir's produce,
-  // or to accept a 7 percent split; whoever picks one should pin it afterwards.
-  recipe_sunpetal_scroll: { sunpetal_herb: 1, arcane_essence: 2, glass_vial: 1, arcane_dust: 1 },
+  // THE PARITY BROKE AT MASTERWROUGHT PHASE 11g (a frost_gourd on the elixir,
+  // 214 to 229, this scroll left at 214) and passed every gate, because the
+  // ruling lived only in this comment. RULED at Phase 19G
+  // (qr-19-scroll-elixir-15c-parity, 2026-09-02): the parity is RESTORED on
+  // the scroll with the same gourd, the one reagent family that lands 15
+  // exactly (the ink register cannot), for rung 50 alone; the rung-25 and
+  // rung-0 pairs stay recorded as drifted, not repaired. The NUMBERS and the
+  // equality are pinned where reagentUnitValue lives: 'the rung-50 scroll and
+  // the serpent elixir bill at exact input parity' in
+  // tests/recipe_economy.test.ts. This literal keeps the byte bill.
+  recipe_sunpetal_scroll: {
+    sunpetal_herb: 1,
+    frost_gourd: 1,
+    arcane_essence: 2,
+    glass_vial: 1,
+    arcane_dust: 1,
+  },
   // Phase 13: the promotion writ's bill ("Input 553 (buyValue basis) vs
   // output 50" at the recipe), the consumed-capstone idiom.
   recipe_deed_of_making: {

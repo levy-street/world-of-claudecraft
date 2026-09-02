@@ -440,11 +440,14 @@ export function craftDetailHtml(c: GuideProfCraft): string {
           'materials',
           'prof-materials',
           // Engineering's materials body was retired and re-keyed at Phase 19F
-          // (its rod count was wrong: three recipes, not two); the heading key
-          // is unchanged.
+          // (its rod count was wrong: three recipes, not two); inscription's at
+          // Phase 19G (its scroll-elixir parity claim was false until the
+          // scroll took the gourd, D171). The heading keys are unchanged.
           c.id === 'engineering'
             ? 'guide.profPages.craftProse.engineering.materialsBodyThreeRods'
-            : undefined,
+            : c.id === 'inscription'
+              ? 'guide.profPages.craftProse.inscription.materialsBodyFrostGourd'
+              : undefined,
         ) +
         proseSection(c.id, 'ladder', 'prof-ladder');
   const postSections =

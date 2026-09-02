@@ -167,6 +167,14 @@ export const RETIRED_KEYS = [
   // five non-Latin fills had omitted the flavor names and the deed sentence
   // since they were written).
   'guide.profPages.rareBody',
+  // Phase 19G (2026-09-02, ruling qr-19-scroll-elixir-15c-parity): the
+  // inscription materials prose told players the double scroll batch is
+  // 'priced even with the Elixir of the Serpent', false by 15 copper since
+  // Phase 11g put a gourd on the elixir alone; the repair puts the same gourd
+  // on the scroll, the successor materialsBodyFrostGourd names it, and its
+  // five non-Latin fills rode the same change (the old key's five reviewed
+  // rows are kept here, stale on the one clause the repair made true).
+  'guide.profPages.craftProse.inscription.materialsBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

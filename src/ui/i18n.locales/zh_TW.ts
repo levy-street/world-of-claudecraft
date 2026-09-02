@@ -12173,6 +12173,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.craftProse.inscription.materialsHeading': '藥草、墨水與盛墨的瓶子',
   'guide.profPages.craftProse.inscription.materialsBody':
     '這張書案靠藥草學與分解檯運轉。潤光葉出自Eastbrook Vale的一級草叢，金葉出自Mirefen Marsh，陽瓣出自Thornpeak Heights，每個配方都連同一個玻璃瓶（藥坊大師處12銅一個）研磨成顏料。墨水中魔法的那一半來自分解檯：潤光葉檔用鈴音之塵，金葉檔與陽瓣檔要鈴音精華，而陽瓣卷軸還把一撮塵摻回墨裡，所以銘文師不是附魔師的穩定顧客，就是自己養成了分解的習慣。\n\n陽瓣檔的兩個配方各有講究：精良魔典除陽瓣外還要兩株金葉，揉入其中為泥金彩飾定形；雙份的卷軸則多取一份精華，配上那撮塵，造價與它所映照的巨蛇藥劑持平。藥草與塵都無處花錢購買：它們來自世界本身，或來自另一位玩家；只有瓶子用錢能買。',
+  'guide.profPages.craftProse.inscription.materialsBodyFrostGourd':
+    '這張書案靠藥草學與分解檯運轉。潤光葉出自Eastbrook Vale的一級草叢，金葉出自Mirefen Marsh，陽瓣出自Thornpeak Heights，每個配方都連同一個玻璃瓶（藥坊大師處12銅一個）研磨成顏料。墨水中魔法的那一半來自分解檯：潤光葉檔用鈴音之塵，金葉檔與陽瓣檔要鈴音精華，而陽瓣卷軸還把一撮塵摻回墨裡，所以銘文師不是附魔師的穩定顧客，就是自己養成了分解的習慣。\n\n陽瓣檔的兩個配方各有講究：精良魔典除陽瓣外還要兩株金葉，揉入其中為泥金彩飾定形；雙份的卷軸則多取一份精華，配上那撮塵，再添一顆來自Highwatch梯田的霜瓜，正是這顆瓜讓卷軸的造價與其所映照的巨蛇藥劑持平。藥草、塵與霜瓜都無處花錢購買：它們來自世界本身、一方田畦，或來自另一位玩家；只有瓶子用錢能買。',
   'guide.profPages.craftProse.inscription.ladderHeading': '在蒸餾器旁學藝',
   'guide.profPages.craftProse.inscription.ladderBody':
     '銘文學沒有自己的工位：整套目錄都在Highwatch藥坊製作，與鍊金術共用同一張工作檯，Alchemist Verane也在那裡授藝。梯子是三檔六個訓練師配方：潤光葉檔（入門書與卷軸）技能0免費，金葉檔（書冊與卷軸）技能25每個25銀，陽瓣檔（魔典與卷軸）技能50每個1金，你在該行業的檔位一達到配方檔位便可學習。50檔的卷軸每次出品兩卷。\n\n這裡沒有野外配方，也還沒有組合件：每一個要拜師的檔位都是綁定藥坊的訓練師手藝，而它們之上那個習自尋獲圖樣的檔位同樣綁定藥坊，卻無處可買，所以這門手藝就在鍊金師們站立的地方學、也在那裡練。',
