@@ -3,7 +3,7 @@ import { isDisenchantable } from '../../../src/sim/professions/enchanting';
 import { itemFromRaid, itemFromHeroicRaid } from '../../../src/sim/item_level';
 const all = Object.values(ITEMS) as any[];
 const gt = all.filter((d) => d.use?.type === 'gatherTool');
-const byQ: Record<string, string[]> = {}; for (const d of gt) (byQ[d.quality ?? 'none'] ??= []).push(`${d.id}(t${d.tier ?? d.toolTier ?? '?'})`);
+const byQ: Record<string, string[]> = {}; for (const d of gt) (byQ[d.quality ?? 'none'] ??= []).push(`${d.id}(t${d.use?.tier ?? '?'})`);
 console.log('gatherTool defs by quality:', JSON.stringify(byQ));
 const ep = all.filter((d) => isDisenchantable(d) && (d.quality === 'epic' || d.quality === 'legendary'));
 const raid = ep.filter((d) => itemFromRaid(d.id) || itemFromHeroicRaid(d.id));

@@ -73,8 +73,8 @@ interface ScanResult {
  * that actually ships, two writers naming one node in one module. It does NOT
  * catch an element reached through two different expressions (`d.more` here,
  * `this.moreEl` there) or written from two modules, and it walks src/ui only
- * (UI_ROOT), which is lossless today because nothing outside src/ui imports
- * painter_host. That limit is stated rather than hidden, because a guard read as
+ * (UI_ROOT), which is lossless today because no module under src outside src/ui
+ * imports painter_host. That limit is stated rather than hidden, because a guard read as
  * complete when it is not is worse than no guard.
  */
 function scanSingleSlotCollisions(root: string): ScanResult {
@@ -296,16 +296,24 @@ describe('the detector itself, driven over a fixture tree', () => {
 // way on one Vite process and one tree, the merge tip 2ebe95e731, Chrome 152 headless,
 // macOS 26.5.2, Node v26.5.0): hudHotDomWrites before 1052 and 1072 desktop, 575 and
 // 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. The differences are
-// FRAME-COUNT-DRIVEN, not jitter: the first four per-step samples are identical across
-// all four runs, the count is still climbing at about five writes per frame through the
-// tail (the headless mode renders 39 to 100 frames against the headed golden's 1,400
+// FRAME-COUNT-DRIVEN, not jitter (the per-step series is in the committed summary):
+// the eight per-step series agree at every step except where one run rendered
+// markedly fewer frames at that step (before-run2 desktop at the fourth step, 20
+// frames against 33 to 39; before-run1 mobile at the second, 9 against 21 to 24),
+// the count is still climbing through the look step at about five writes per frame
+// (the headless mode renders 39 to 100 frames against the headed golden's 1,400
 // plus, so the world never reaches the steady state where this metric becomes the
-// run-length-independent anchor the baseline defines), and at matched frame counts the
-// two shapes read byte-identical. That bounds the scan's admitted blind spot: a hidden
-// hot per-frame cross-kind site would add roughly 80 to 200 writes over that window,
-// and the whole spread across the four runs is 27. A reduction smaller than that
-// window would be invisible here. Both tours exited 1 on the same two pre-existing
-// console lines (character asset not preloaded), with zero budget or FCT failures.
+// run-length-independent anchor the baseline defines), and at matched frame counts
+// the two shapes read byte-identical (the look step: seven frames and +37 writes on
+// both before-run1 and after-run1). Mobile's two before runs read identical, so no
+// band was ever measured there; the attribution, not a band, is the explanation on
+// both viewports. That bounds the scan's admitted blind spot: a hidden hot per-frame
+// cross-kind site would add roughly 80 to 200 writes over that window, and the whole
+// spread across the four runs is 27. A reduction smaller than that window would be
+// invisible here. Every tour exited 1 on pre-existing console lines (character asset
+// not preloaded: two on desktop, one on mobile), with zero budget or FCT failures;
+// the after runs served the four-slot shape (the Vite log records the painter_host
+// reload between the before and after runs and the reload of the revert after).
 // THESE ARTIFACTS MUST NEVER BE FED TO ARM 3: three of the four desktop captures sit
 // at or above the committed anchor 1062 (before-run2 read 1072 on UNMODIFIED code),
 // and they are frame-floor-ineligible anyway; a golden update, if the shape ever lands
@@ -315,7 +323,8 @@ describe('the detector itself, driven over a fixture tree', () => {
 // bigger (a four-slot record; only a per-element Map would add an allocation). Retained
 // per entry, Node v26 without pointer compression, 200,000 entries in an array,
 // GC-fenced heapUsed delta, median of five, shared value strings (the harness is the
-// committed d128-slot-entry-heap-probe.mjs): 72 bytes for the two-field entry, 88 for
+// committed d128-slot-entry-heap-probe.mjs, run with node --expose-gc): 72 bytes for
+// the two-field entry, 88 for
 // the four-slot record, 216 for a Map, so +16 bytes per routed element in Node and
 // about +8 in Chrome, whose V8 runs pointer compression; the absolutes include the
 // array slot and the value string and exclude the WeakMap entry, so the delta is the

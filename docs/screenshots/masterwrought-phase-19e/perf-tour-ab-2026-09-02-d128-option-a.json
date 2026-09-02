@@ -1,5 +1,17 @@
 {
- "_purpose": "Committed evidence for Phase 19E D128 (qr-19-single-slot-writer-slot-key): the same-machine, same-Vite-tree before/after of the single-slot elision cache under Option A (four independent slots per element). Both sides: scripts/perf_tour.mjs headless swiftshader (the default mode, NOT PERF_GPU=1), PERF_VIEWPORT=both, two runs each; before = the merge tip 2ebe95e731 unmodified, after = the same tree with the Option A prototype applied to src/ui/painter_host.ts (reverted from a disk copy afterwards; the prototype never landed). hudHotDomWrites is the run-length-independent anchor; the headless mode agreed with the HEADED golden anchor (1054 worst healthy, 1062 committed) to within two writes on before-run1 but shows a 20-write run-to-run band on desktop, so it can say whether a reduction EXISTS and cannot re-mint the golden. The full tour JSONs these rows are extracted from are session artifacts (about 3 MB each), not committed. Every run exited 1 on the same two pre-existing console lines (character asset not preloaded), with zero budget or FCT-burst failures.",
+ "_purpose": "Committed evidence for Phase 19E D128 (qr-19-single-slot-writer-slot-key): the same-machine, same-Vite-tree before/after of the single-slot elision cache under Option A (four independent slots per element). Both sides: scripts/perf_tour.mjs headless swiftshader (the default mode, NOT PERF_GPU=1), PERF_VIEWPORT=both, two runs each; before = the merge tip 2ebe95e731 unmodified, after = the same tree with d128-option-a-prototype.patch applied to src/ui/painter_host.ts (reverted from a disk copy afterwards; the prototype never landed). hudHotDomWrites is compared as a PER-STEP SERIES (the perStep rows), because in this mode the tour renders 39 to 100 frames against the headed golden's 1,400 plus and the count is still climbing through the look step, so it never reaches the steady state where the metric is the run-length-independent anchor tests/hud_perf_budget.baseline.md defines: the eight series agree at every step except where a run rendered markedly fewer frames at that step, and at matched frame counts the two shapes read byte-identical. THESE ARTIFACTS MUST NEVER BE FED TO ARM 3 (three of the four desktop captures sit at or above the committed anchor 1062, before-run2 on unmodified code, and all are below the tourMinFrames floor) and must not be reused for any GPU-preparation claim (prewarm completed 23 of 33 manifest entries on desktop with the budget nearly exhausted and 3 of 33 on mobile; KHR_parallel_shader_compile is unsupported under swiftshader). The full tour JSONs these rows are extracted from are session artifacts (about 3 MB each), not committed. Every run exited 1 on pre-existing console lines (character asset not preloaded: two on desktop, one on mobile), with zero budget or FCT-burst failures.",
+ "_provenance": {
+  "captureTree": "2ebe95e731 (tree 055ec9a1563a7c63ec23b6488288027689843b43)",
+  "browser": "Google Chrome 152 (HeadlessChrome/152.0.0.0), headless, ANGLE swiftshader",
+  "os": "macOS 26.5.2 (arm64), Apple M4 Max",
+  "node": "v26.5.0",
+  "vite": "one process on :5173 for both sides; its log records the src/ui/painter_host.ts page reload at 07:50:18 between the last before run and the first after run, and the reload of the revert at 07:55:31",
+  "commands": [
+   "PERF_VIEWPORT=both PERF_OUT=<file> node scripts/perf_tour.mjs (twice per side)",
+   "node --expose-gc docs/screenshots/masterwrought-phase-19e/d128-slot-entry-heap-probe.mjs",
+   "npx vitest run tests/painter_single_slot_collision_guard.test.ts tests/painter_host.test.ts tests/painter_slot_collision.test.ts tests/hud_perf_budget.test.ts (under the prototype: 195 cases, 188 passed, 3 failed, 4 skipped)"
+  ]
+ },
  "before-run1": {
   "generatedAt": "2026-09-02T12:44:09.597Z",
   "gpuMode": "swiftshader-headless",
@@ -44,7 +56,85 @@
     "budgetFailures": [],
     "fctBurstFailures": []
    }
-  ]
+  ],
+  "perStep": {
+   "desktop": [
+    {
+     "step": "spawn",
+     "frames": 8,
+     "hotDomWrites": 980,
+     "hotDomSkippedWrites": 40563
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 14,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 45736
+    },
+    {
+     "step": "forward",
+     "frames": 28,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 57806
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 33,
+     "hotDomWrites": 1010,
+     "hotDomSkippedWrites": 62128
+    },
+    {
+     "step": "look",
+     "frames": 40,
+     "hotDomWrites": 1047,
+     "hotDomSkippedWrites": 68204
+    },
+    {
+     "step": "map-open-close",
+     "frames": 41,
+     "hotDomWrites": 1052,
+     "hotDomSkippedWrites": 69071
+    }
+   ],
+   "mobile": [
+    {
+     "step": "spawn",
+     "frames": 7,
+     "hotDomWrites": 501,
+     "hotDomSkippedWrites": 4836
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 9,
+     "hotDomWrites": 516,
+     "hotDomSkippedWrites": 5644
+    },
+    {
+     "step": "forward",
+     "frames": 72,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 30908
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 79,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 33715
+    },
+    {
+     "step": "look",
+     "frames": 85,
+     "hotDomWrites": 570,
+     "hotDomSkippedWrites": 36151
+    },
+    {
+     "step": "map-open-close",
+     "frames": 92,
+     "hotDomWrites": 575,
+     "hotDomSkippedWrites": 38990
+    }
+   ]
+  }
  },
  "before-run2": {
   "generatedAt": "2026-09-02T12:46:02.035Z",
@@ -90,7 +180,85 @@
     "budgetFailures": [],
     "fctBurstFailures": []
    }
-  ]
+  ],
+  "perStep": {
+   "desktop": [
+    {
+     "step": "spawn",
+     "frames": 6,
+     "hotDomWrites": 980,
+     "hotDomSkippedWrites": 45725
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 13,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 51760
+    },
+    {
+     "step": "forward",
+     "frames": 17,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 55210
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 20,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 57809
+    },
+    {
+     "step": "look",
+     "frames": 28,
+     "hotDomWrites": 1057,
+     "hotDomSkippedWrites": 64759
+    },
+    {
+     "step": "map-open-close",
+     "frames": 39,
+     "hotDomWrites": 1072,
+     "hotDomSkippedWrites": 74267
+    }
+   ],
+   "mobile": [
+    {
+     "step": "spawn",
+     "frames": 13,
+     "hotDomWrites": 501,
+     "hotDomSkippedWrites": 7246
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 24,
+     "hotDomWrites": 526,
+     "hotDomSkippedWrites": 11656
+    },
+    {
+     "step": "forward",
+     "frames": 82,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 34917
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 89,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 37731
+    },
+    {
+     "step": "look",
+     "frames": 93,
+     "hotDomWrites": 570,
+     "hotDomSkippedWrites": 39367
+    },
+    {
+     "step": "map-open-close",
+     "frames": 99,
+     "hotDomWrites": 575,
+     "hotDomSkippedWrites": 41798
+    }
+   ]
+  }
  },
  "after-run1": {
   "generatedAt": "2026-09-02T12:50:44.215Z",
@@ -136,7 +304,85 @@
     "budgetFailures": [],
     "fctBurstFailures": []
    }
-  ]
+  ],
+  "perStep": {
+   "desktop": [
+    {
+     "step": "spawn",
+     "frames": 6,
+     "hotDomWrites": 980,
+     "hotDomSkippedWrites": 36236
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 12,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 41410
+    },
+    {
+     "step": "forward",
+     "frames": 37,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 62959
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 39,
+     "hotDomWrites": 1010,
+     "hotDomSkippedWrites": 64688
+    },
+    {
+     "step": "look",
+     "frames": 46,
+     "hotDomWrites": 1047,
+     "hotDomSkippedWrites": 70766
+    },
+    {
+     "step": "map-open-close",
+     "frames": 52,
+     "hotDomWrites": 1062,
+     "hotDomSkippedWrites": 75954
+    }
+   ],
+   "mobile": [
+    {
+     "step": "spawn",
+     "frames": 16,
+     "hotDomWrites": 501,
+     "hotDomSkippedWrites": 8458
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 22,
+     "hotDomWrites": 526,
+     "hotDomSkippedWrites": 10863
+    },
+    {
+     "step": "forward",
+     "frames": 76,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 32520
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 80,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 34127
+    },
+    {
+     "step": "look",
+     "frames": 88,
+     "hotDomWrites": 580,
+     "hotDomSkippedWrites": 37383
+    },
+    {
+     "step": "map-open-close",
+     "frames": 92,
+     "hotDomWrites": 585,
+     "hotDomSkippedWrites": 39007
+    }
+   ]
+  }
  },
  "after-run2": {
   "generatedAt": "2026-09-02T12:52:36.920Z",
@@ -182,6 +428,84 @@
     "budgetFailures": [],
     "fctBurstFailures": []
    }
-  ]
+  ],
+  "perStep": {
+   "desktop": [
+    {
+     "step": "spawn",
+     "frames": 6,
+     "hotDomWrites": 980,
+     "hotDomSkippedWrites": 42285
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 11,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 46598
+    },
+    {
+     "step": "forward",
+     "frames": 30,
+     "hotDomWrites": 1005,
+     "hotDomSkippedWrites": 62979
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 35,
+     "hotDomWrites": 1010,
+     "hotDomSkippedWrites": 67301
+    },
+    {
+     "step": "look",
+     "frames": 44,
+     "hotDomWrites": 1067,
+     "hotDomSkippedWrites": 75113
+    },
+    {
+     "step": "map-open-close",
+     "frames": 59,
+     "hotDomWrites": 1079,
+     "hotDomSkippedWrites": 88073
+    }
+   ],
+   "mobile": [
+    {
+     "step": "spawn",
+     "frames": 11,
+     "hotDomWrites": 501,
+     "hotDomSkippedWrites": 6443
+    },
+    {
+     "step": "town-nameplates",
+     "frames": 21,
+     "hotDomWrites": 526,
+     "hotDomSkippedWrites": 10453
+    },
+    {
+     "step": "forward",
+     "frames": 78,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 33307
+    },
+    {
+     "step": "forward-strafe",
+     "frames": 85,
+     "hotDomWrites": 531,
+     "hotDomSkippedWrites": 36126
+    },
+    {
+     "step": "look",
+     "frames": 91,
+     "hotDomWrites": 577,
+     "hotDomSkippedWrites": 38583
+    },
+    {
+     "step": "map-open-close",
+     "frames": 100,
+     "hotDomWrites": 589,
+     "hotDomSkippedWrites": 42226
+    }
+   ]
+  }
  }
 }

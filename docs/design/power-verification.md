@@ -1252,7 +1252,7 @@ RE-OPENED (qr-18-REOPEN, 2026-08-31): actioned by Phase 18 as tooltip-screenshot
   the binding lane), and raising it is precisely the move R5 forbids. Recorded
   as a judged risk to the `lucent_reagent` sink for a future demand pass, not
   tuned here.
-  (RULED 2026-09-02, qr-19-disenchant-ratio-outlier, under qr-19-best-for-project:
+  (RULED (qr-19-disenchant-ratio-outlier, 2026-09-02, under qr-19-best-for-project):
   ACCEPTED on the record with this note standing; the commissioned shard
   supply-and-demand read lives in docs/prd/masterwrought/state.md, THE SINKS
   section of the Phase 11m ledger, and counts reagent rows rather than spend,

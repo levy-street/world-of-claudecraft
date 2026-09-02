@@ -77,19 +77,24 @@
 // spread mix), which is 84 us per celebration at 1,000 players with 200 in-zone
 // (3.5x the 24 us stringify term above), 471 us at the 5,000-player realm cap
 // with 200 in-zone (20x that term), and 165 us with all 5,000 in the celebration
-// zone. Those are FIXTURE-SHAPED figures with the home zone at index 0: a
-// celebration in a late-index zone (farshore_isle and proving_shore, where an
-// influx population stands, sit at 13 and 14) costs every in-zone recipient up to
-// fifteen iterations instead of one, so read the cap figure as carrying an upper
-// band near 1.8x, about 850 us. The leading per-celebration cost, but a
+// zone. Those are FIXTURE-SHAPED figures: the home zone sits at index 0 and the
+// non-home players are spread uniformly (a mean of about 8.5 iterations each). The
+// lever is where the NON-recipients stand: with every overworld player in the two
+// influx zones appended last (farshore_isle 13, proving_shore 14) the walk is
+// 4,500 x 15 iterations, about 850 us, an upper band near 1.8x on the cap figure;
+// moving the 200 recipients alone from index 0 to 14 adds only about 8 percent.
+// The leading per-celebration cost, but a
 // per-celebration spike rather than a per-tick one: 0.94% of one 50 ms tick per
 // celebration at the cap (1.7% at the band), 0.17% at 1,000 players.
 // THE CADENCE, corrected: the derivation above prices gatherRareEvent as the
 // widest tenant, and it is not (see the dated amendment there). masterworkZone
 // fires on every masterwork proc and crafting is bounded only by players and cast
-// time, so a hundred continuously crafting players (0.75 procs per second) put
-// about 350 us per second through this walk at the cap, roughly 0.035% of one
-// core; the node-only line (8 us per second) is a floor, not the rate. Two axes
+// time, so a hundred continuously crafting players put about 350 us per second
+// through this walk at the cap, roughly 0.035% of one core, at the 3% base chance
+// on 4 s casts (0.75 procs per second); the same hundred at the 15% cap on 1.5 s
+// casts proc ten a second, the case priced below at about 0.5% of the budget, so
+// the craft-driven rate is a band and 0.75 is its floor. The node-only line (8 us
+// per second) sits under both. Two axes
 // the record must name: the per-second cost is SUPERLINEAR in realm size (rate
 // times roster), and the 5,000 cap is the code default, which MAX_PLAYERS_PER_REALM
 // overrides (0 disables it). The cost is not observable in production today
@@ -404,7 +409,7 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
     return { visits, calls: counted.mock.calls.map(([x, z]) => [x, z] as const) };
   }
 
-  it('through the shared prologue: one celebrant lookup, then every roster entry once and one zoneAt per overworld player, at every width', () => {
+  it('shared prologue: celebrant first, every roster entry once, one zoneAt per overworld player', () => {
     for (const recipients of [1, 12, 64]) {
       const world = fakeWorld(recipients);
       // A ghost roster entry (a player whose entity is gone) is still visited and
@@ -452,7 +457,7 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
     }
   });
 
-  it('through the direct entry (the gather tenant): no prologue, every roster entry once, one zoneAt per overworld player', () => {
+  it('direct entry (the gather tenant): no prologue, then the same walk', () => {
     const world = fakeWorld(12);
     const roster = world.ctx.players.size;
     const { visits, calls } = countedWalk(world, () =>
@@ -474,7 +479,10 @@ describe('the scan premise: one celebration walks the whole roster, one zoneAt p
     // A fifth tenant joins the scan at its own cadence and ages the realm-rate
     // record above, so it lands here first. Source text, comment-stripped, over
     // every sim file: the direct callers of emitToZonePlayers and the producers on
-    // announceZoneCelebration, definitions excluded.
+    // announceZoneCelebration, definitions excluded. Three limits, stated: the root
+    // is src/sim (a server-side caller would escape; none exists), an aliased call
+    // escapes, and it is one hop deep (a new caller of announceMasterworkZone is a
+    // new cadence source it does not see).
     const root = resolve(process.cwd(), 'src/sim');
     const direct = /(?<!function )\bemitToZonePlayers\(/g;
     const prologue = /(?<!function )\bannounceZoneCelebration\(/g;

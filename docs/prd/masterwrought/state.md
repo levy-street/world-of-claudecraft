@@ -18484,14 +18484,20 @@ no new shard consumer lands below the apex band, and all four reservations in
 recipes.ts stand exactly as written and unamended (the jewelcrafting hub header,
 the inscription header, the INTERMEDIATE_RECIPES header, and the trophy-exclusion
 "reserved for the apex band" note). D047's commissioned measurement is this read
-(a dated pointer sits on its row). D034's accept-on-record stands ON ITS ARM (the
-record, with the future-demand-pass note standing; a dated pointer sits on its
-row and on both of its records): a reagent-row census counts listed rows, not
+(a dated pointer sits on its row). D034's accept-on-record stands ON ITS ARM, the
+arm its own row recommends and the umbrella ruling qr-19-best-for-project takes,
+not a ruling this read makes (the record, with the future-demand-pass note
+standing; a dated pointer sits on its row and on both of its records): a reagent-row census counts listed rows, not
 player spend, so it neither confirms nor refutes the substitution risk D034
 prices, and a scarce shard supply is exactly what would sharpen substitution
 toward the higher-value sinks. WHAT RE-OPENS THIS READ: a new shard consumer, a
 change to the disenchant rung map or the rare-plus yield, or the Crucible
-cadence moving again. No code moved. Derivation harness: the scratch censuses
+cadence moving again. Two stale comments met and not fixed here (a docs-only
+unit): enchants.ts's header undercounts the shard sinks (it omits the Lucent
+rows) and calls the Lucent tier "rather than another shard sink" while the table
+bills four Lucent rows; CARRIED. (This block was REWRITTEN at the review round
+from its first draft, which said 35 epic tool defs, a three-to-five band, the raid
+arm as the supply, and that the number refuted D034's risk.) No code moved. Derivation harness: the scratch censuses
 committed as docs/screenshots/masterwrought-phase-19e/d062-disenchant-census.ts
 and d062-disenchant-census-2.ts with their outputs (the Phase 19E QA record,
 phase-19e-qa.md, restates the figures), re-runnable with npx tsx from the two
@@ -25896,10 +25902,12 @@ carry that argument in its record.
   ARE FIXTURE-SHAPED, not worst-case: the home zone sits at index 0 and the
   non-home players are spread uniformly, while a live population stands in the
   level-20 band (indices 8 to 12) and the two influx zones appended last
-  (farshore_isle 13, proving_shore 14), and a celebration in a late-index zone
-  costs every in-zone recipient up to fifteen iterations instead of one; read the
-  cap figure as carrying an upper band near 1.8x, about 850 us, with the capital at
-  index 0 the offsetting cheap case. Against the record's terms: the scan is about
+  (farshore_isle 13, proving_shore 14); the lever is where the NON-recipients
+  stand, since they are 4,300 of the 4,500 overworld players at the cap shape: with
+  every overworld player in the two influx zones the walk is 4,500 times 15
+  iterations, about 850 us, an upper band near 1.8x on the cap figure, while moving
+  the 200 recipients alone from index 0 to 14 adds only about 8 percent; the capital
+  at index 0 is the offsetting cheap case. Against the record's terms: the scan is about
   20 times the 24 us stringify term the splice was weighed against at the cap (3.5
   times at 1,000 players) and is the leading per-celebration cost, but a
   per-celebration spike, never a per-tick one: 0.94 percent of ONE 50 ms tick per
@@ -25912,9 +25920,12 @@ carry that argument in its record.
   through this walk) is a FLOOR; masterworkZone fires on every masterwork proc (3
   percent base to a 15 percent cap on 1.5 to 5 s casts) and is bounded only by how
   many players are crafting: a hundred continuous crafters, 2 percent of a capped
-  realm, proc about 0.75 a second, sixty times the node line, which is about 350 us
-  per second through this walk at the cap, roughly 0.035 percent of one core. The
-  header is amended in place, dated; the earlier line about ZONES holding 15 where
+  realm, proc about 0.75 a second at the 3 percent base chance on 4 s casts, sixty
+  times the node line, which is about 350 us per second through this walk at the
+  cap, roughly 0.035 percent of one core; the same hundred at the 15 percent cap on
+  1.5 s casts proc ten a second, the case priced above at about 0.5 percent, so the
+  craft-driven rate is a BAND and 0.75 is its floor. The header is amended in place,
+  dated; the earlier line about ZONES holding 15 where
   the derivation says twenty stands (conservative). THREE AXES THE RECORD NAMES SO
   THE ACCEPTANCE CANNOT AGE SILENTLY: (1) the per-second cost is SUPERLINEAR in
   realm size, since the celebration rate grows with player count and each
@@ -25947,7 +25958,12 @@ carry that argument in its record.
   prologue and the direct-entry path, at widths 1, 12 and 64), the zone count, and
   the tenant set, mutation-proved against a rect test and a bucket, so an index, a
   bucket, a rect test, a sixteenth zone or a fifth tenant re-opens the measurement
-  here first.
+  here first. (This block was REWRITTEN at the review round from its first draft,
+  which priced the node-only line as the cadence, described the bench as running on
+  the committed fixture rather than a scaled variant, put ten celebrations a second
+  at 1 percent, and ran the walk's 27 ns and zoneAt's 103 ns together as one
+  quantity; the fresh read then restated the 0.75 rate as a band's floor and the
+  1.8x lever as the non-recipients' zone.)
 - CHARACTER_BLOB_WARN_BYTES (131,072) sits BELOW the legitimate worst case,
   not the roughly 3.2x above it the standing comment argued. The blob-size
   comment repair (aa184248da above) inverted the recorded relation by
