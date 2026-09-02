@@ -121,7 +121,6 @@ await page.screenshot({ path: 'tmp/tutorial-island-arrival.png' });
 // displaces to (FERRY_BELL_TOWN_LANDING), never copied here: the coordinates
 // have moved once already, and a second copy would just go stale again.
 const returned = await page.evaluate(async () => {
-  const { FERRY_BELL_TOWN_LANDING } = await import('/src/sim/interactions/ferry_bell.ts');
   const sim = window.__game.sim;
   const p = sim.entities.get(sim.playerId);
   const bell = [...sim.entities.values()].find(
@@ -131,6 +130,9 @@ const returned = await page.evaluate(async () => {
   p.pos.x = bell.pos.x + 1;
   p.pos.z = bell.pos.z;
   sim.pickUpObject(bell.id);
+  // Imported after the bell lookup, so a missing bell still reports itself
+  // rather than surfacing as a dev-server import failure.
+  const { FERRY_BELL_TOWN_LANDING } = await import('/src/sim/interactions/ferry_bell.ts');
   return { pos: { ...p.pos }, landing: { ...FERRY_BELL_TOWN_LANDING } };
 });
 console.log('after bell:', returned);
