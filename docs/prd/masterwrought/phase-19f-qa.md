@@ -138,7 +138,8 @@ including one edit round three had meant to make and had not; round seven
 replacement fresh read of round two, the tools note's third re-key; round nine
 (b0a171ff45) the fresh read of round seven; round ten (5e6d6b5453) the fresh
 reads of rounds eight and nine; round eleven (e58bff734a) the one cosmetic nit
-the round-ten read returned. Every round was read fresh; the last read returned
+the round-ten read returned. Every round but the last (a whitespace refill, read
+inside the close-out span) was read fresh; the last read returned
 nothing else.
 
 Findings that moved a record or the code, chief among them:
@@ -178,7 +179,8 @@ Findings that moved a record or the code, chief among them:
 - the fenced-starter arm had dropped the sentence's own qualifiers (land only,
   the price); it derives both now and carries a positive control;
 - the recorded Latin-side regression of the engineering re-key counted eleven
-  locales; tr_TR never carried the row, so it is ten plus five.
+  locales; tr_TR carried no row at the retire tip (its Turkish row was stripped
+  at 6e93deadc1), so it is ten plus five.
 
 One refutation the fourth round recorded wrongly and the fifth corrected: the
 per-locale identity anchor the coverage audit asked for cannot see a row moved
@@ -236,7 +238,6 @@ and that class is a fill-quality defect for the maintainer's read.
   fill channels as '36 overlay fills'; 633e6c233a's body names three extras
   rows and not the exports row it also carries; the D148 commit carried one
   D144 record line; the Phase 20 hand-carry for D149 landed in D148's commit.
-
 - The softer 'the table below' left in the tools note's node-trades Marks
   sentence, true of each page's own table; a maintainer's call, no fourth
   re-key (the round-eight read).
@@ -251,13 +252,21 @@ and that class is a fill-quality defect for the maintainer's read.
   with its inventory twin in `scripts/lib/gate_task_cache.mjs`, a gate-integrity
   surface (the gate-integrity reviewer's own finding, pinned by
   `tests/gate_task_cache.test.ts`).
-- D174's contract named content-obligations-reviewer and
-  frontend-seam-reviewer beside qa-checklist; the ratify arm moved one ledger
-  file and no content record or presentation surface, so only qa-checklist was
-  dispatched. Recorded as a deviation from the contract, with that reason.
+- The locale arm's head refinement: a rod's own full name repeated inside its
+  clause moves the head and reds, and the last head is not refined (the
+  round-seven read); the Russian stem 'часов' would also match the word for
+  hours, never a needle today.
+- D085's AMENDED block sits inside an already-split JUDGED sentence of the 11o
+  ledger, a pre-existing shape the record made longer (the round-one read).
 
 Not taken, by the phase's own rule: 19E's seven carried items, 19D's four,
 19C's three, 19B's four; R5 stays frozen; every judged list binds.
+
+## Deviations from the contracts, recorded
+
+- D174's contract named content-obligations-reviewer and frontend-seam-reviewer
+  beside qa-checklist; the ratify arm moved one ledger file and no content
+  record or presentation surface, so only qa-checklist was dispatched.
 
 ## Validation
 
@@ -269,7 +278,8 @@ marker file and judged by the real GATE_EXIT=0 line: PASS, all 12 steps green,
 mode full (a broad change set: 2148 paths against origin/release/v0.42.0), 8
 workers, 12 minutes; the malware scan PASS (7930 files, 442 flags, 0 high after
 priors); the real-browser suite 38 files, 332 passed. tsc 0 at every one of the
-24 commits; npm run ci:changed exit 0 after the LAST code commit and again after
+the 24 commits before the close-out record (c52b275854..e58bff734a) and at each
+record commit after it; npm run ci:changed exit 0 after the LAST code commit and again after
 the close-out; the census RESULT: PASS captured without a pipe at every commit
 (one pre-existing WARN: the rename row for the branch-authored
 toolsNoteThreeRods matches no missing name, by construction); the guard suites

@@ -27128,7 +27128,8 @@ owed, eleven fix rounds that applied every finding (two coverage audits and a
 sim review among them), and nine fresh reads over them.
 
 STEP 0, the sync check: origin/release/v0.42.0 had not moved since the 19E
-close (2ebe95e731 remains the tip merged), so no merge and no audit; recorded as
+close (its tip da6458493f is still the second parent of the 19E sync merge
+2ebe95e731), so no merge and no audit; recorded as
 the no-op the phase asked for.
 
 STEP 1: ONE HUNDRED corrections to the wave's own instructions, amended in
@@ -27183,7 +27184,7 @@ content-obligations, gate-integrity, qa-checklist as each contract named; D174's
 docs-only ratify arm ran qa-checklist alone, a recorded deviation) plus the
 frontend-seam review D085's amendment owed. Round one (a0ecd5344b) applied D085,
 D144 and D150; round two (31084b67ef) applied every remaining finding, blocking,
-should-fix and nit alike; Round three (9488022093) applied the frontend-seam
+should-fix and nit alike; round three (9488022093) applied the frontend-seam
 review D085's amendment owed and the items round two had recorded; round four
 (92aa815b6d) the coverage audit of the round-two pins; round five (41f650418d)
 the sim reviewer's belt finding on the gather-events refactor and the coverage
@@ -27193,20 +27194,24 @@ round seven (911d70f424) the fresh read of rounds five and six; round eight
 (64b866e420) the replacement fresh read of round two, the tools note's third
 re-key; round nine (b0a171ff45) the fresh read of round seven; round ten
 (5e6d6b5453) the fresh reads of rounds eight and nine; round eleven (e58bff734a)
-the one cosmetic nit the round-ten read returned. Every round was read fresh;
+the one cosmetic nit the round-ten read returned. Every round but the last (a
+whitespace refill, read inside the close-out span) was read fresh;
 the last read returned nothing else. The findings that moved
 the code or a record are listed in phase-19f-qa.md; the machine-authored fill
 sets are FLAGGED there for the maintainer's read.
 
 ### Carried for the maintainer, not taken
-The list is in phase-19f-qa.md (localizeSystemText extraction, the
+The full list is in phase-19f-qa.md: the localizeSystemText extraction, the
 error.sunderTarget emit, the gathering tool table's English names, the five
-*_EXTRA sim tables outside the registry and the absent copied-English guard,
-the en_CA dead rows, the two arena carriers, the farm tableBodyOneMeal
-off-glossary fills, the three-member generated flavor record, D103's 'new'
-rows, the hardcoded five-locale lists, the col_golden_harvest deed name in
-every locale). 19E's seven carried items, 19D's four, 19C's three and 19B's
-four remain the maintainer's and were not taken here; R5 stays frozen.
+*_EXTRA sim tables outside the registry and the absent copied-English guard, the
+en_CA dead rows, the two arena carriers, the farm tableBodyOneMeal off-glossary
+fills, the three-member generated flavor record, D103's 'new' rows, the
+hardcoded five-locale lists, the softer 'table below' phrase, the Russian
+binding window, the pet over-provision class, the turbo input, the census WARN,
+the registry stderr line and the commit-message imprecisions; the
+col_golden_harvest deed name sits in the flagged table beside the fills. 19E's
+seven carried items, 19D's four, 19C's three and 19B's four remain the
+maintainer's and were not taken here; R5 stays frozen.
 
 ### JUDGED, and not re-raised
 - The ten units, their rulings, and every reviewer and fresh-read finding are
