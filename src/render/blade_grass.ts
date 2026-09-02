@@ -6,6 +6,7 @@ import {
   type DenseSlotState,
   deactivateDenseSlot,
 } from './blade_grass_dense_core';
+import { insidePoolDisc, poolDiscCenter, poolDiscLimitSq } from './blade_grass_pool_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -226,6 +227,13 @@ export function buildBladeGrass(
   const movedColor = new THREE.Color();
   let dirtyLo = POOL;
   let dirtyHi = -1;
+  // The grid is square but the fade is a disc, so the corners are placed,
+  // uploaded and vertex-shaded only to be collapsed to zero scale in the
+  // shader. Rejecting them at placement is invisible by construction (see
+  // blade_grass_pool_core.ts) and drops about a fifth of the pool.
+  const discLimitSq = poolDiscLimitSq(RADIUS, CELL);
+  let discCenterX = 0;
+  let discCenterZ = 0;
 
   const markDirty = (dense: number): void => {
     if (dense < dirtyLo) dirtyLo = dense;
@@ -242,7 +250,11 @@ export function buildBladeGrass(
     const r1 = hash(ci, cj, 1);
     const x = ci * CELL + (r1 - 0.5) * CELL * 1.3;
     const z = cj * CELL + (hash(ci, cj, 2) - 0.5) * CELL * 1.3;
-    let ok = Math.abs(x) <= WORLD_MAX_X - 16 && z >= WORLD_MIN_Z + 16 && z <= WORLD_MAX_Z - 16;
+    let ok =
+      insidePoolDisc(x, z, discCenterX, discCenterZ, discLimitSq) &&
+      Math.abs(x) <= WORLD_MAX_X - 16 &&
+      z >= WORLD_MIN_Z + 16 &&
+      z <= WORLD_MAX_Z - 16;
     if (ok) {
       // same soil-noise gate as the card tufts: dense on lush patches,
       // bare between them (squared for hard patch edges)
@@ -314,6 +326,8 @@ export function buildBladeGrass(
   const colCi = new Int32Array(GRID_W);
 
   const scanTargetBlock = (baseI: number, baseJ: number, initialBudget: number): boolean => {
+    discCenterX = poolDiscCenter(baseI, GRID_W, CELL);
+    discCenterZ = poolDiscCenter(baseJ, GRID_W, CELL);
     for (let gi = 0; gi < GRID_W; gi++) {
       // world cell owned by slot (gi, gj): the unique cell in the target
       // block congruent to (gi, gj) mod GRID_W

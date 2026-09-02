@@ -30,6 +30,7 @@ import {
   type DenseSlotState,
   deactivateDenseSlot,
 } from './blade_grass_dense_core';
+import { insidePoolDisc, poolDiscCenter, poolDiscLimitSq } from './blade_grass_pool_core';
 import { GRASS_BIOME_DENSITY } from './foliage';
 import { insideGrassHubExclusion } from './foliage_core';
 import { patchConstantUpNormalVertexShader } from './foliage_shader_core';
@@ -179,6 +180,12 @@ export function buildBladeGrassBand(
   const movedColor = new THREE.Color();
   let dirtyLo = POOL;
   let dirtyHi = -1;
+  // The carpet's disc rejection, at the band's radius: the square grid's
+  // corners fade to zero scale in the shader whatever uBandFar says, so they
+  // are placed and vertex-shaded for nothing (blade_grass_pool_core.ts).
+  const discLimitSq = poolDiscLimitSq(RADIUS, CELL);
+  let discCenterX = 0;
+  let discCenterZ = 0;
 
   const markDirty = (dense: number): void => {
     if (dense < dirtyLo) dirtyLo = dense;
@@ -198,7 +205,11 @@ export function buildBladeGrassBand(
     const r1 = hash(ci, cj, 1);
     const x = ci * CELL + (r1 - 0.5) * CELL * 1.3;
     const z = cj * CELL + (hash(ci, cj, 2) - 0.5) * CELL * 1.3;
-    let ok = Math.abs(x) <= WORLD_MAX_X - 16 && z >= WORLD_MIN_Z + 16 && z <= WORLD_MAX_Z - 16;
+    let ok =
+      insidePoolDisc(x, z, discCenterX, discCenterZ, discLimitSq) &&
+      Math.abs(x) <= WORLD_MAX_X - 16 &&
+      z >= WORLD_MIN_Z + 16 &&
+      z <= WORLD_MAX_Z - 16;
     if (ok) {
       const lush = groundLushnessAt(x, z, seed);
       const biomeDensity = GRASS_BIOME_DENSITY[zoneBiomeAt(x, z)] ?? 1;
@@ -245,6 +256,8 @@ export function buildBladeGrassBand(
   const colCi = new Int32Array(GRID_W);
 
   const scanTargetBlock = (baseI: number, baseJ: number, initialBudget: number): boolean => {
+    discCenterX = poolDiscCenter(baseI, GRID_W, CELL);
+    discCenterZ = poolDiscCenter(baseJ, GRID_W, CELL);
     for (let gi = 0; gi < GRID_W; gi++) {
       colCi[gi] = baseI + ((((gi - baseI) % GRID_W) + GRID_W) % GRID_W);
     }

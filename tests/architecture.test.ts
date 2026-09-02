@@ -610,6 +610,7 @@ const RENDER_PURE_CORES = [
   'src/render/battleground_lantern_fx_core.ts',
   'src/render/battleground_rune_vfx_core.ts',
   'src/render/blade_grass_dense_core.ts',
+  'src/render/blade_grass_pool_core.ts',
   'src/render/blob_shadow_core.ts',
   'src/render/camera_boom_core.ts',
   'src/render/compile_gate.ts',
