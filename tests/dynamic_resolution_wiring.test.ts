@@ -16,8 +16,27 @@ describe('dynamic resolution renderer wiring', () => {
     expect(allocation).toContain('dynamicResolutionAllocationScale(');
     expect(allocation).toContain('this.webgl.setPixelRatio(ratio);');
     expect(allocation).toContain('this.webgl.setSize(this.viewport.width, this.viewport.height');
-    expect(allocation).toContain('this.post.setSize(this.viewport.width, this.viewport.height');
+    expect(allocation).toContain('this.post?.setSize(this.viewport.width, this.viewport.height');
     expect(allocation).toContain('this.applyRenderRegion();');
+    // Storage is reallocated only when the drawing-buffer extent actually
+    // moves, and the live region is re-applied either way.
+    expect(allocation).toContain(
+      'if (this.resizeGate.shouldAllocate(this.viewport.width, this.viewport.height, ratio)) {',
+    );
+    expect(allocation.indexOf('this.applyRenderRegion();')).toBeGreaterThan(
+      allocation.indexOf('this.resizeGate.shouldAllocate('),
+    );
+    // Method-body indentation, so the region re-apply sits OUTSIDE the guard: a
+    // pass that reallocates nothing must still re-apply the live region.
+    expect(allocation).toContain('\n    this.applyRenderRegion();');
+    expect(allocation).not.toContain('\n      this.applyRenderRegion();');
+    for (const guarded of [
+      '\n      this.webgl.setPixelRatio(ratio);',
+      '\n      this.webgl.setSize(this.viewport.width, this.viewport.height, false);',
+      '\n      this.post?.setSize(this.viewport.width, this.viewport.height, ratio);',
+    ]) {
+      expect(allocation).toContain(guarded);
+    }
 
     const automaticStep = methodSource(
       'private applyRenderBudgetState(state: RenderBudgetState): void',
@@ -33,6 +52,34 @@ describe('dynamic resolution renderer wiring', () => {
     expect(liveRegion).toContain('post.setRenderRegion(rect);');
     expect(liveRegion).not.toContain('.setSize(');
     expect(liveRegion).not.toContain('.setPixelRatio(');
+  });
+
+  it('routes every viewport-resize source through the one coalesced frame pass', () => {
+    // A drag emits a burst; each event books at most one pass on the next
+    // animation frame instead of reallocating the whole post chain in place.
+    expect(renderer).toContain(
+      'private readonly resizeGate = createResizeCoalescer(() => this.resizeViewport());',
+    );
+    expect(renderer).toMatch(
+      /private readonly onViewportResize = \(\): void =>\s+this\.resizeGate\.request\(\(run\) => requestAnimationFrame\(run\)\);/,
+    );
+    // Every listener and the DPR watch share that one entry point: none of them
+    // may call resizeViewport straight.
+    for (const source of [
+      "window.addEventListener('resize', this.onViewportResize)",
+      "window.visualViewport?.addEventListener('resize', this.onViewportResize)",
+      "window.visualViewport?.addEventListener('scroll', this.onViewportResize)",
+      "document.addEventListener('fullscreenchange', this.onViewportResize)",
+      'watchDevicePixelRatio(this.onViewportResize)',
+    ]) {
+      expect(renderer).toContain(source);
+    }
+    expect(renderer).not.toContain('if (!this.shutdownStarted) this.resizeViewport();');
+    // The pass itself is what refuses to run after teardown, since a queued
+    // frame outlives the listeners the shutdown removes.
+    expect(methodSource('private resizeViewport(measured = this.measureViewport()): void')).toMatch(
+      /\{\s+if \(this\.shutdownStarted\) return;/,
+    );
   });
 
   it('locks unsupported paths and opens only the pure governor range', () => {
