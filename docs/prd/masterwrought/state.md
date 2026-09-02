@@ -13138,8 +13138,9 @@ is RETIRED AND RE-KEYED, the 11i mechanism. guide.profPages.toolsNoteThreeRods i
 'publishes the tool-gate thresholds through placeholders in EVERY locale', reads the first
 'toolsNote' row of each resolved slice, so a kept old key would have been the row it read) and
 its successor guide.profPages.toolsNoteFiveLadders (itself re-keyed at the review round to
-toolsNoteFourStarters and then to toolsNoteFishingPageMarks, the AMENDED block below) carries the same English; the five non-Latin
-overlay rows are REPLACED by fresh full translations of the current note in the same change
+toolsNoteFourStarters and then to toolsNoteFishingPageMarks, the AMENDED block below) carries the
+same English; the five non-Latin overlay rows are REPLACED by fresh full translations of the current
+note in the same change
 (ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill conventions and
 flagged for the maintainer's read in phase-19f-qa.md), and the Latin locales' rows (15 today, every
 LOCALE outside the five non-Latin ones) land pending for the Phase 20 fill. The three
@@ -13160,11 +13161,11 @@ the delve name in each locale's shipped casing), the three pins re-pointed, a fo
 added to 'the shared tools note is TRUE of farming, not only of the node trades' that derives the
 fenced-starter count from ITEMS, and the every-locale placeholder pin now reads the exact key and
 asserts exactly one toolsNote row per slice. The a60aa9a4d7 shape claim above stays true of both
-re-keys. RE-KEYED A THIRD TIME 2026-09-02 at the fresh read of the same round: the note renders
-on five gathering pages and said 'the fishing table below carries their Marks prices', true on the fishing
-page alone; the successor guide.profPages.toolsNoteFishingPageMarks says 'the fishing page's tool table',
-the five fills carry the same phrase (the only edit to them), toolsNoteFourStarters was deleted outright,
-and a clause arm pins the phrase.
+re-keys. RE-KEYED A THIRD TIME 2026-09-02 at the fresh read of the same round: the note renders on
+five gathering pages and said 'the fishing table below carries their Marks prices', true on the
+fishing page alone; the successor guide.profPages.toolsNoteFishingPageMarks says 'the fishing page's
+tool table', the five fills carry the same phrase (the only edit to them), toolsNoteFourStarters was
+deleted outright, and a clause arm pins the phrase.
 Phase 19F; the render site src/guide/pages/professions_gathering.ts re-points, nothing else moves.
 
 **FOUR RECORDS THIS PHASE LEFT WRONG.** The ledger's BEFORE-column

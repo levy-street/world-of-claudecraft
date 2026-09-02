@@ -2844,7 +2844,9 @@ describe('Guide professions gathering accuracy', () => {
     //
     // ANCHORED ON CLAUSES THAT EXIST ONLY IN THE CORRECTED TEXT, the rule the
     // Phase 11g arm above records: an anchor the old wording also carried lets
-    // a revert stay green. Apostrophe-free, since the page escapes to &#39;.
+    // a revert stay green. Anchors are read off t(), not the rendered page, so
+    // the possessive in the sixth clause below is safe; the page escapes it to
+    // &#39; and the older anchors stay apostrophe-free by habit.
     setLanguage('en');
     const en = t('guide.profPages.toolsNoteFishingPageMarks', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
@@ -4525,8 +4527,10 @@ describe('Guide professions pages and routes', () => {
     // numeral in ja and ko (a within-clause swap of two counts reds).
     // Russian stems match at a word start only (JS \b is ASCII-only, so the
     // boundary is spelled out): 'кои' cannot ride 'покои', 'карп' cannot ride
-    // 'Карпаты'.
+    // 'Прикарпатье'. A numeral is bounded on the right as well, so 'два' cannot
+    // ride 'двадцать'; a stem is not, since the prose declines it.
     const ruAt = (stem: string) => `(?:^|[^а-яё])${stem}`;
+    const ruWord = (word: string) => `${ruAt(word)}(?![а-яё])`;
     const hasRu = (clause: string, stem: string) => new RegExp(ruAt(stem)).test(clause);
     const bound = (lang: Filled, clause: string, numeral: string, form: string) => {
       const n = fold(numeral);
@@ -4535,7 +4539,7 @@ describe('Guide professions pages and routes', () => {
       if (lang === 'ko_KR') return clause.includes(`${form} ${n}`);
       // Russian: the stem within forty characters after ANY occurrence of the
       // numeral word, at a word start on both sides.
-      return new RegExp(`${ruAt(n)}[\\s\\S]{0,40}${ruAt(form)}`).test(clause);
+      return new RegExp(`${ruWord(n)}[\\s\\S]{0,40}${ruAt(form)}`).test(clause);
     };
     const priorStemOf = (lang: Filled, id: string, localName: string) =>
       lang === 'ru_RU'
