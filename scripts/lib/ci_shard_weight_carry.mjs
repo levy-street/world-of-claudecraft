@@ -389,6 +389,48 @@ export function parseCarryLocalArgs(tokens) {
 }
 
 /**
+ * Drop every weight row whose file no longer exists, MOVING THE ATTRIBUTION
+ * WITH IT. Pure and injectable (`exists` is passed in) so the arithmetic that
+ * makes it safe is testable without a tree walk.
+ *
+ * WHY IT EXISTS. Retiring a test file leaves its weight row naming a path that
+ * is gone, and `tests/ci_shard_partition.test.ts` reds on exactly that (an
+ * absent-file row silently skews the pack it lands in). The full harvest cannot
+ * discharge it, because that needs a green all-green FULL-MODE CI run, so
+ * before this the only local answer was to hand-edit a generated table, which
+ * the repo forbids.
+ *
+ * THE ARITHMETIC IS THE WHOLE POINT. `carriedDefects` holds the table to
+ * `harvestedFiles + carried == rows`, so dropping a HARVESTED row must
+ * decrement `harvestedFiles` while dropping a CARRIED one is paid by deleting
+ * its `carried` entry. Getting that backwards writes a table its own pin
+ * refuses, which is why the caller re-runs `carriedDefects` before writing.
+ *
+ * @param {Record<string, any>} table
+ * @param {(file: string) => boolean} exists
+ */
+export function pruneMissingRows(table, exists) {
+  const provenance = table.__provenance ?? {};
+  const gone = tableRows(table).filter((file) => !exists(file));
+  if (gone.length === 0) return { table, gone: [] };
+  const goneSet = new Set(gone);
+  const goneCarried = gone.filter((file) => Boolean(provenance.carried?.[file])).length;
+  const out = { __provenance: { ...provenance } };
+  if (out.__provenance.carried) {
+    out.__provenance.carried = { ...out.__provenance.carried };
+    for (const file of gone) delete out.__provenance.carried[file];
+  }
+  for (const file of tableRows(table)) {
+    if (!goneSet.has(file)) out[file] = table[file];
+  }
+  if (typeof provenance.harvestedFiles === 'number') {
+    out.__provenance.harvestedFiles = provenance.harvestedFiles - (gone.length - goneCarried);
+  }
+  out.__provenance.files = tableRows(out).length;
+  return { table: out, gone };
+}
+
+/**
  * Serialize a table the way both writers commit it: two-space JSON with a
  * trailing newline. `JSON.parse(serializeWeightTable(t))` deep-equals `t`.
  *

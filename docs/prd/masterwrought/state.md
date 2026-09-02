@@ -9894,6 +9894,29 @@ deployed bundle predates the unknown-item guards and THROWS in its loot popup
 on an id it cannot resolve. DECISION E's dungeon channel adds two
 (pattern_highwatch_gourd_soup, pattern_highwatch_barley_porridge) to all five
 heroic five-man tables.
+RULED (qr-19-stale-client-deploy-window, 2026-09-01, under
+qr-19-best-for-project): the R34 apparatus is RETIRED, as CLOSED BY
+CIRCUMSTANCE rather than reversed. tests/stale_client_rollout.test.ts and its
+snapshot are deleted, and DEPLOY.md's release-specific caveat is rewritten to
+state the WS epoch gate instead of a loot-table exclusion. The window's whole
+premise was that a stale bundle can be HANDED an id it cannot resolve;
+ONLINE_WORLD_LAYOUT_VERSION now reads 26 and server/ws_auth.ts refuses a
+mismatched first frame with incompatibleWorldLayout before any world work, so
+a stale bundle receives no snapshot, event, loot list or trade offer at all.
+VERIFIED rather than assumed, at the deployed commit 9d7a1a021: all 22 ITEMS[
+sites in its src/ui/hud.ts are null-safe, and exactly ONE reachable throw
+survives, the trade panel's itemIcon(item) at hud.ts:14193, whose
+itemIcon(item: ItemDef) dereferences item.quality and item.id unguarded. That
+throw is real and it is what the caveat was about; it is now behind the
+handshake. Two OFFLINE-reachable arms are NOT closed by the gate and are kept
+in the runbook: a stale tab that harvests a fine grade sees an invisible bag
+cell and a raw id in its profession line. R34 is annotated as superseded by
+circumstance in docs/design/professions-tuning-packet-review.md, not reversed:
+the guards it chose still ship, and a version floor arrived anyway for wire
+reasons. The deleted suite's shard-weight row is pruned by a new
+--prune-missing mode on scripts/ci_shard_weights_harvest.mjs rather than by
+hand, because the generated table's own pin reds on a row naming an absent
+file and no green full CI run is available to a local-only wave.
 
 Both precedents (the four reins, the Wildheart six) were OWNER decisions
 recorded in DEPLOY.md. This session did not make one. The ids are admitted into

@@ -28,6 +28,7 @@ import {
   modes,
   parseCarryLocalArgs,
   parseCarryLocalCli,
+  pruneMissingRows,
   serializeWeightTable,
   tableRows,
   unionCarried,
@@ -40,6 +41,7 @@ const entryIo = vi.hoisted(() => ({
   spawnSync: vi.fn(),
   readFileSync: vi.fn(),
   writeFileSync: vi.fn(),
+  existsSync: vi.fn(() => true),
   walkShardTestFiles: vi.fn(),
 }));
 
@@ -48,6 +50,7 @@ vi.mock('node:child_process', () => ({
   spawnSync: entryIo.spawnSync,
 }));
 vi.mock('node:fs', () => ({
+  existsSync: entryIo.existsSync,
   readFileSync: entryIo.readFileSync,
   writeFileSync: entryIo.writeFileSync,
 }));
@@ -877,5 +880,85 @@ describe('the harvest entry: the local-carry modes (an injected spawner)', () =>
     expect(exitCode).toBe(1);
     expect(out).toContain('is not <path>=<ms>');
     expect(entryIo.writeFileSync).not.toHaveBeenCalled();
+  });
+});
+
+describe('pruneMissingRows: dropping a retired row without hand-editing the table', () => {
+  // The mode exists because retiring a test file leaves a weight row naming a
+  // path that is gone, tests/ci_shard_partition.test.ts reds on exactly that,
+  // and the full harvest that would fix it needs a green FULL-MODE CI run. The
+  // arithmetic below is what makes the write safe, so it is pinned here rather
+  // than only exercised through the entry.
+  const table = () => ({
+    __provenance: {
+      run: '1',
+      files: 3,
+      harvestedFiles: 2,
+      carried: {
+        'tests/c.test.ts': {
+          ms: 5,
+          method: 'local-median',
+          measured: '2026-09-01',
+          reason: 'a stated reason',
+          runs: [4, 5, 6],
+        },
+      },
+    },
+    'tests/a.test.ts': 10,
+    'tests/b.test.ts': 20,
+    'tests/c.test.ts': 5,
+  });
+
+  it('is a no-op when every row still names a file that exists', () => {
+    const input = table();
+    const { table: out, gone } = pruneMissingRows(input, () => true);
+    expect(gone).toEqual([]);
+    expect(out).toBe(input);
+  });
+
+  it('drops a HARVESTED row and decrements harvestedFiles with it', () => {
+    const { table: out, gone } = pruneMissingRows(table(), (file) => file !== 'tests/b.test.ts');
+    expect(gone).toEqual(['tests/b.test.ts']);
+    expect(tableRows(out)).toEqual(['tests/a.test.ts', 'tests/c.test.ts']);
+    const prov = (out as { __provenance: { files: number; harvestedFiles: number } }).__provenance;
+    expect(prov.files).toBe(2);
+    // The row was harvested, so the harvested half pays for it.
+    expect(prov.harvestedFiles).toBe(1);
+    expect(carriedDefects(out, { fallbackMs: 41, requireMap: true })).toEqual([]);
+  });
+
+  it('drops a CARRIED row by deleting its attribution, leaving harvestedFiles alone', () => {
+    const { table: out, gone } = pruneMissingRows(table(), (file) => file !== 'tests/c.test.ts');
+    expect(gone).toEqual(['tests/c.test.ts']);
+    const prov = (
+      out as { __provenance: { files: number; harvestedFiles: number; carried: object } }
+    ).__provenance;
+    expect(prov.files).toBe(2);
+    // NOT decremented: the carried map paid for this one.
+    expect(prov.harvestedFiles).toBe(2);
+    expect(Object.keys(prov.carried)).toEqual([]);
+    expect(carriedDefects(out, { fallbackMs: 41, requireMap: true })).toEqual([]);
+  });
+
+  it('leaves the input table untouched (the caller re-checks before writing)', () => {
+    const input = table();
+    const snapshot = JSON.stringify(input);
+    pruneMissingRows(input, (file) => file !== 'tests/b.test.ts');
+    expect(JSON.stringify(input)).toBe(snapshot);
+  });
+
+  it('a prune that moved the WRONG attribution would fail the table contract', () => {
+    // The negative control for the arithmetic above: hand-build the result the
+    // naive prune produces (rows dropped, attribution left alone) and show
+    // carriedDefects refuses it. Without this, the two arms above would pass
+    // against a function that never touched harvestedFiles at all.
+    const naive = table() as Record<string, unknown> & {
+      __provenance: { files: number; harvestedFiles: number };
+    };
+    delete naive['tests/b.test.ts'];
+    naive.__provenance = { ...naive.__provenance, files: 2 };
+    const defects = carriedDefects(naive, { fallbackMs: 41, requireMap: true });
+    expect(defects.length).toBeGreaterThan(0);
+    expect(defects.join(' ')).toContain('harvestedFiles');
   });
 });

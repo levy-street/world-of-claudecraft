@@ -425,11 +425,15 @@ For off-box safety, sync the directory to S3 occasionally:
     enters any dungeon, delve, or arena after the deploy is teleported to
     coordinates its renderer draws as a black, collider-less void, with the
     exit object invisible, until relog (login is protected: a saved
-    inside-instance position ejects to the door). The release left the
-    fail-closed layout gate at ONLINE_WORLD_LAYOUT_VERSION 3 through both
-    changes, so stale bundles are still admitted at reconnect; bumping it
-    is the one-line mechanical answer if the maintainer resolves the
-    surfaced forced-refresh question toward refusing stale sessions.
+    inside-instance position ejects to the door). CORRECTED 2026-09-01
+    (qr-19-stale-client-deploy-window): the two sentences that stood here
+    said the fail-closed layout gate was still at
+    ONLINE_WORLD_LAYOUT_VERSION 3 and that stale bundles were therefore
+    still admitted at reconnect, with a bump as the pending answer. Both
+    are false on this branch: the gate reads 26 and the world socket
+    refuses a mismatched first frame outright, so the stale sessions this
+    bullet describes cannot reconnect at all and the surfaced
+    forced-refresh question is answered for the ONLINE path.
   - NEW client on OLD server (the bounded direction): every gather node the
     release relocated is unusable, because the client shows it where the old
     server does not have it. Among the zones the deployed server HAS, the
@@ -464,70 +468,51 @@ For off-box safety, sync the directory to S3 occasionally:
     masterwork and deed card kinds (and the expansion's vale_cup kind), so
     restart the bot with the server or those cards post as empty embeds
     Discord rejects until it picks up the new build.)
-  Release-specific caveat for the professions tuning deploy: the guards above
-  describe bundles built from this release onward. The bundle DEPLOYED TODAY
-  predates them, and its trade window throws while rendering an offer that
-  stages ANY item id the bundle predates (the packet's fine-grade materials
-  and rods, and equally the expansion's whole tradeable catalog: rift
-  essence and gems, the new-zone gear, none of it soulbound), freezing that
-  trade panel for the stale session until the page reloads. The sibling
-  loot-window throw is unreachable through the PACKET's ids as long as
-  they remain gathering, recipe, vendor, and delve-shop
-  content only, out of every mob and chest loot table, so keep them out
-  until clients have rolled; it is NOT unreachable for the merged release as
-  a whole, because the v0.32.0 expansion put four mount reins into the
-  heroic loot of five encounters the deployed bundle already knows (the
-  Morthen, Vael, Ysolei, and Korzul heroic finales plus the Nythraxis raid),
-  so a solo or free-for-all heroic clear that drops one freezes a stale
-  session's corpse loot window the same way, and the v0.34.0 sync widened
-  the same arm: the release's Heroic Wildheart Basin loot pass (Zulgar) put
-  six more epic ids into heroic boss loot that a stale bundle
-  does not know. The reins odds are the mount drop rates (0.5 and 0.1
-  percent) while the Wildheart ids drop at ordinary heroic rates, the party
-  need/greed path is already guarded at the base, and the frozen id set
-  (reins exceptions plus the Wildheart additions) is pinned by the
-  deploy-window test's snapshot. The v0.36.0 class-overhauls integration
-  admits one more id on the same recorded arm (owner decision 2026-08-08):
-  heroic_duskwhisper, the generated heroic variant of the rogue re-band's
-  Duskwhisper dagger on the Fanglord Beastmaster's heroic table, at an
-  ordinary heroic drop rate; a stale bundle renders it through the
-  unknown-item fallback exactly like the Wildheart six. The v0.41.0 Crucible
-  raid widens the same arm with its Ignivar and Varkhul Heroic-only sigils,
-  shields, and weapons. This content is reachable in production: a raid group
-  can enter through the live Forge-Lift and select Heroic, so a stale client
-  can receive one of those ids. The 2026-08-31 Emberward correction moved
-  varkhul_emberward from Varkhul's Normal table into the Heroic shield group
-  at the same 3 percent rate. That narrows its exposure but does not make the
-  stale-client path unreachable; the frozen snapshot deliberately admits the
-  move alongside the other Crucible append ids. Rift-run loot is a second
-  release-content arm on the same window (the run builders push the rift
-  catalog onto boss corpse lists at runtime, outside every content-table
-  sweep); it requires a stale tab to get inside a rift at all, and whether
-  the old bundle's generic object interaction reaches a rift portal has not
-  been verified
-  either way. Both arms are inputs to the surfaced
-  forced-refresh-at-deploy question. Two more
-  deployed-bundle arms need no loot table at all, because the
-  fine grades are minted by HARVESTING with an outclassing tool: a stale tab
-  that gathers one sees it land in an INVISIBLE bag cell (and bank cell after
-  a deposit) that still consumes capacity, and the profession chat line names
-  the raw id. Cosmetic and self-healing on reload, but they will read as
-  "my ore vanished" in reports, so expect them for as long as stale tabs
-  live. Stale sessions are ended by the pre-deploy restart countdown, but a
-  reconnect rides the same stale page: only a page reload picks up the new
-  bundle.
-  The caveats above were measured against 9d7a1a021, the commit deployed
-  today; the branch has since merged the true v0.32.0 tip (0b427afca, 685
-  commits past the measured base), re-synced repeatedly through
-  release/v0.33.0 (last at 2ae71a7fbf), and then merged release/v0.34.0
-  (94f5ac63d8, at merge 706bec2d21), which together are what the
-  merged-branch numbers above describe. If the live server moves before
-  this branch deploys, re-run the compatibility diff against the commit
+  Release-specific caveat for the professions tuning deploy, REWRITTEN
+  2026-09-01 under ruling qr-19-stale-client-deploy-window. What this
+  paragraph used to describe was a LOOT-TABLE EXCLUSION: keep new ids out of
+  mob and chest tables until clients have rolled, because a stale bundle that
+  is handed an id it cannot resolve freezes the panel rendering it. That
+  window is CLOSED, and by a different mechanism than the exclusion:
+  ONLINE_WORLD_LAYOUT_VERSION now reads 26 (src/world_api.ts), and the world
+  socket is FAIL-CLOSED on it. A client whose first frame does not carry
+  `auth-world-26` is refused at the handshake with `incompatibleWorldLayout`
+  before any world work runs (server/ws_auth.ts), so a stale bundle never
+  receives a snapshot, an event, a loot list or a trade offer at all. It
+  cannot be handed an unknown id, which makes every surface the old window
+  covered unreachable rather than merely rare. The epoch bump arrived for
+  wire-shape reasons, not for this, so the closure is by circumstance.
+  Verified rather than asserted, against 9d7a1a021, the commit deployed when
+  the window was measured: all 22 `ITEMS[` sites in its `src/ui/hud.ts` are
+  null-safe and degrade to the raw id or a `[?]`, and exactly ONE reachable
+  throw survives, the trade panel's `itemIcon(item)` at hud.ts:14193, whose
+  `itemIcon(item: ItemDef)` dereferences `item.quality` and `item.id` with no
+  guard. That is the throw this caveat was written about; it is now behind the
+  handshake. `src/ui/market_view.ts` drops unknown listings and
+  `src/ui/mailbox_window.ts` skips them, so those two degrade on their own.
+  WHAT STILL HOLDS at a deploy, and needs no loot rule: two deployed-bundle
+  arms need no loot table at all, because the fine grades are minted by
+  HARVESTING with an outclassing tool. A stale tab that gathers one sees it
+  land in an INVISIBLE bag cell (and bank cell after a deposit) that still
+  consumes capacity, and the profession chat line names the raw id. Cosmetic
+  and self-healing on reload, but they will read as "my ore vanished" in
+  reports. Those arms are OFFLINE-reachable, which is why the epoch gate does
+  not close them. Stale sessions are ended by the pre-deploy restart
+  countdown, but a reconnect rides the same stale page: only a page reload
+  picks up the new bundle.
+  The measurements above were taken against 9d7a1a021, the commit deployed
+  when the window was open; the branch has since merged the true v0.32.0 tip
+  (0b427afca, 685 commits past the measured base), re-synced repeatedly
+  through release/v0.33.0 (last at 2ae71a7fbf), and then merged
+  release/v0.34.0 (94f5ac63d8, at merge 706bec2d21). If the live server moves
+  before this branch deploys, re-run the compatibility diff against the commit
   actually deployed before trusting any "N new X" claim.
-  The loot-table exclusion is enforced by
-  `tests/stale_client_rollout.test.ts` for the deploy window (delete that
-  pin once clients have rolled). Per-surface analysis for the professions
-  tuning release: the stale-client compatibility phase of
+  There is no longer a guard file behind this paragraph.
+  `tests/stale_client_rollout.test.ts` and its snapshot froze the
+  HEROIC_BOSS_LOOT id set for the deploy window and were RETIRED in the same
+  change as this rewrite: a guard whose premise is closed is a guard that
+  fails for the wrong reason later. Per-surface analysis of the window as it
+  stood: the stale-client compatibility phase of
   `docs/design/professions-tuning-packet-review.md`.
 - **Bank ledger audit**: `node scripts/bank_audit.mjs` (reads `DATABASE_URL` from the
   environment) replays the append-only `bank_ledger` against live character bank state

@@ -36,7 +36,7 @@
 // is kept: the partition should plan for the expensive occurrence.
 
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { MEASURED_FALLBACK_MS } from './ci_shard_partition.mjs';
 import {
@@ -45,6 +45,7 @@ import {
   missingWeightFiles,
   parseCarryLocalArgs,
   parseCarryLocalCli,
+  pruneMissingRows,
   serializeWeightTable,
   tableRows,
 } from './lib/ci_shard_weight_carry.mjs';
@@ -90,6 +91,43 @@ if (process.argv[2] === '--carry-local') {
   // process.exitCode, not process.exit: the gate convention. An immediate
   // process.exit can truncate the audit lines above on a piped stdout.
   process.exitCode = 0;
+} else if (process.argv[2] === '--prune-missing') {
+  // The DELETION counterpart of --carry-local-missing, added 2026-09-01 under
+  // masterwrought ruling qr-19-stale-client-deploy-window. Retiring a test file
+  // leaves its weight row naming a path that no longer exists, and
+  // tests/ci_shard_partition.test.ts reds on exactly that ('every row must name
+  // a file that exists on disk': an absent-file row silently skews the pack it
+  // lands in). The full harvest cannot discharge it, because that needs a green
+  // all-green FULL-MODE CI run, so before this mode the only way to drop the row
+  // was to hand-edit a generated table, which the repo forbids. This walks the
+  // committed rows, drops the ones whose file is gone, drops their __provenance
+  // carried entries with them, and re-derives __provenance.files, all through
+  // the same serializeWeightTable the other modes write with.
+  //
+  // Deliberately NOT a measurement: it only removes, so it can never invent a
+  // weight, and it refuses to write a table that fails carriedDefects.
+  const table = JSON.parse(readFileSync(target, 'utf8'));
+  const before = table.__provenance ?? {};
+  const { table: out, gone } = pruneMissingRows(table, (file) => existsSync(resolve(ROOT, file)));
+  if (gone.length === 0) {
+    console.log('[prune-missing] every measured row names a file that exists; nothing to do');
+    process.exitCode = 0;
+  } else {
+    const defects = carriedDefects(out, { fallbackMs: MEASURED_FALLBACK_MS, requireMap: true });
+    if (defects.length > 0) {
+      console.error('[prune-missing] refusing to write; the result fails its own contract:');
+      for (const d of defects) console.error(`  ${d}`);
+      process.exit(1);
+    }
+    writeFileSync(target, serializeWeightTable(out));
+    for (const file of gone) console.log(`[prune-missing] dropped ${file} (no longer on disk)`);
+    console.log(
+      `[prune-missing] wrote ${tableRows(out).length} rows to ${target} ` +
+        `(__provenance.files ${before.files} -> ${out.__provenance.files}, ` +
+        `harvestedFiles ${before.harvestedFiles} -> ${out.__provenance.harvestedFiles})`,
+    );
+    process.exitCode = 0;
+  }
 } else if (process.argv[2] === '--carry-local-missing') {
   // The phase-close step. Enumerates every walked test file the table does not
   // measure, runs each `runs` times, and reads each duration from the SAME
@@ -193,6 +231,7 @@ if (process.argv[2] === '--carry-local') {
     console.error(
       '       node scripts/ci_shard_weights_harvest.mjs --carry-local-missing [--runs N]',
     );
+    console.error('       node scripts/ci_shard_weights_harvest.mjs --prune-missing');
     process.exit(1);
   }
 

@@ -2,8 +2,8 @@
   "__provenance": {
     "run": "32621561241",
     "harvested": "2026-08-23",
-    "files": 3651,
-    "harvestedFiles": 2939,
+    "files": 3650,
+    "harvestedFiles": 2938,
     "carried": {
       "tests/ability_avoidance.test.ts": {
         "ms": 892,
@@ -8133,7 +8133,6 @@
   "tests/stack_size_tooltip_view.test.ts": 52,
   "tests/staff_db.test.ts": 16,
   "tests/stale_chrome_focus.test.ts": 7,
-  "tests/stale_client_rollout.test.ts": 17,
   "tests/stance_bar_view.test.ts": 8,
   "tests/stance_control_controller.test.ts": 24,
   "tests/stance_radial_core.test.ts": 6,
