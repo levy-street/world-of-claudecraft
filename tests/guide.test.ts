@@ -2821,7 +2821,8 @@ describe('Guide professions gathering accuracy', () => {
 
   it('the shared tools note is TRUE of farming, not only of the node trades', () => {
     // THE ONLY GUARD OVER THIS HAND-AUTHORED PROSE, added at the masterwrought
-    // Phase 11j QA. professions_gathering.ts renders toolsNoteThreeRods above
+    // Phase 11j QA. professions_gathering.ts renders toolsNoteFiveLadders
+    // (re-keyed from toolsNoteThreeRods at Phase 19F, D161) above
     // the tool table on EVERY gathering page, farming included, and the note
     // described the node trades as if they were all of them. On the farming
     // page it sat directly above a table showing five hoe rungs while saying
@@ -2835,7 +2836,7 @@ describe('Guide professions gathering accuracy', () => {
     // Phase 11g arm above records: an anchor the old wording also carried lets
     // a revert stay green. Apostrophe-free, since the page escapes to &#39;.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteThreeRods', {
+    const en = t('guide.profPages.toolsNoteFiveLadders', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -2902,7 +2903,7 @@ describe('Guide professions gathering accuracy', () => {
     // frozen numbers, and nothing else would notice, because the value would
     // still be present and translated.
     setLanguage('en');
-    const en = t('guide.profPages.toolsNoteThreeRods', {
+    const en = t('guide.profPages.toolsNoteFiveLadders', {
       tier2Prof: String(TIER2_TOOL_GATE_PROFICIENCY),
       tier3Prof: String(TIER3_TOOL_GATE_PROFICIENCY),
     });
@@ -4238,7 +4239,7 @@ describe('Guide professions pages and routes', () => {
     // still says TRUTHFULLY about the LAND trades, whose tier 4 and 5 tools
     // really do open no ground. The assertion fired on a true sentence, which is
     // what absence pins do: they cannot tell which subject a phrase is about.
-    const tools = prose('guide.profPages.toolsNoteThreeRods', {
+    const tools = prose('guide.profPages.toolsNoteFiveLadders', {
       tier2Prof: '40',
       tier3Prof: '70',
     });

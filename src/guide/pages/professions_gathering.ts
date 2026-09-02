@@ -86,7 +86,7 @@ function toolsSection(g: GuideProfGathering): string {
   if (!g.tools.length) return '';
   return `<section class="guide-block" id="prof-tools">
       <h2>${esc(t('guide.profPages.toolsHeading'))}</h2>
-      ${paras('guide.profPages.toolsNoteThreeRods', {
+      ${paras('guide.profPages.toolsNoteFiveLadders', {
         // Fed from the live gate constants, the sibling sections' idiom
         // (rhythmBody takes the cast curve, nodesNote the respawn), so a
         // retune moves the prose in all 19 languages instead of leaving a

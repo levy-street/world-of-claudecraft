@@ -6810,7 +6810,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.toolUnavailable'
   | 'guide.profPages.toolVendor'
   | 'guide.profPages.toolsHeading'
-  | 'guide.profPages.toolsNoteThreeRods'
+  | 'guide.profPages.toolsNoteFiveLadders'
   | 'guide.profPages.trainingBody'
   | 'guide.profPages.trainingHeading'
   | 'guide.profPages.wieldNone'

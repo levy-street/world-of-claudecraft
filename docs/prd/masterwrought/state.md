@@ -13115,6 +13115,19 @@ translated row translated, so `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN` and `zh_TW`
 still carry the old claims on that key. The overlays are the maintainer's at
 release and are deliberately untouched; the fifteen Latin locales were pending
 and were re-English-filled by the regen.
+RULED (qr-19-toolsnote-stale-nonlatin-fills, 2026-09-02, under qr-19-best-for-project): the key
+is RETIRED AND RE-KEYED, the 11i mechanism. guide.profPages.toolsNoteThreeRods is deleted outright
+(the a60aa9a4d7 shape, no RETIRED_KEYS row: the every-locale placeholder pin in tests/guide.test.ts,
+'publishes the tool-gate thresholds through placeholders in EVERY locale', reads the first
+'toolsNote' row of each resolved slice, so a kept old key would have been the row it read) and
+its successor guide.profPages.toolsNoteFiveLadders carries the same English; the five non-Latin
+overlay rows are REPLACED by fresh full translations of the current note in the same change
+(ja_JP, ko_KR, ru_RU, zh_CN, zh_TW; machine-authored under the i18n-locale-fill conventions and
+flagged for the maintainer's read in phase-19f-qa.md), and the 15 Latin rows land pending for
+the Phase 20 fill. The three tests/guide.test.ts pins ('the shared tools note is TRUE of
+farming, not only of the node trades', 'publishes the tool-gate thresholds through placeholders
+in EVERY locale', 'resolves the new professions keys in English') re-point to the successor.
+Phase 19F; the render site src/guide/pages/professions_gathering.ts re-points, nothing else moves.
 
 **FOUR RECORDS THIS PHASE LEFT WRONG.** The ledger's BEFORE-column
 reconciliation contradicted itself two sentences apart and overwrote a settled
@@ -13359,6 +13372,8 @@ acquisition channel), and the shipped-id golden policy. This audit adds:
      `guide.profPages.toolsNoteThreeRods` in `ja_JP`, `ko_KR`, `ru_RU`, `zh_CN`
      and `zh_TW`. No gate can see a stale reword. Either re-fill at release or
      rule that the key is re-keyed instead.
+RULED (qr-19-toolsnote-stale-nonlatin-fills, 2026-09-02): re-keyed; the full record sits after the
+11j QA ledger's 'AND THE EXPOSURE IS RECORDED' paragraph in this file.
 
 ### THE HANDOFF TO 11k
 
