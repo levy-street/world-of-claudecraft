@@ -134,10 +134,10 @@ describe('the CSS filter is the low-tier fallback only', () => {
 
   it('arms the canvas filter and its transition only on the css-stamped arm', () => {
     expect(css).toContain(
-      "#game-canvas[data-spirit-grade='css'] {\n    transition: filter 0.6s ease;",
+      '#game-canvas[data-spirit-grade="css"] {\n    transition: filter 0.6s ease;',
     );
     expect(css).toContain(
-      "body.spirit-mode #game-canvas[data-spirit-grade='css'] {\n    filter: grayscale(1) brightness(0.88);",
+      'body.spirit-mode #game-canvas[data-spirit-grade="css"] {\n    filter: grayscale(1) brightness(0.88);',
     );
   });
 

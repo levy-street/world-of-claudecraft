@@ -10,15 +10,15 @@ import {
   NameplateCanvasSurface,
 } from '../src/render/nameplate_canvas';
 import {
-  NAMEPLATE_IMAGE_CACHE_LIMIT,
-  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
-} from '../src/render/nameplate_image_cache';
-import {
   NAMEPLATE_HERALDRY_EXTRA_LIFT,
   NAMEPLATE_HERALDRY_PLAQUE_PAD_X,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
   NAMEPLATE_HERALDRY_WELL_FILL,
 } from '../src/render/nameplate_heraldry_core';
+import {
+  NAMEPLATE_IMAGE_CACHE_LIMIT,
+  NAMEPLATE_IMAGE_RETRY_BASE_FRAMES,
+} from '../src/render/nameplate_image_cache';
 import {
   BORDER_ACCENT_SLUGS,
   type BorderMotifKind,
