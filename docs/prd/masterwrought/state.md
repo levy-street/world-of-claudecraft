@@ -26822,3 +26822,116 @@ theirs. Full table in phase-19d-qa.md.
   SETTLED. This ledger records them; it does not reopen them.
 - The three items 19C carried and the four 19B carried remain the maintainer's
   and were not taken here.
+
+## Phase 19E ledger (2026-09-02, the measurement wave of the rulings gate)
+
+STATUS: **COMPLETE, 4 of 4 units executed, ZERO escalations.** One commit per
+unit, every ruling written where its open record actually stands (the qr-19
+pattern), the bench FIRST in every unit and the shape ruled on the figure it
+returned. Then fourteen fresh typed reviewers, a fix round that applied every
+finding, and a fresh read of that round.
+
+STEP 0, the eleventh sync: origin/release/v0.42.0 (six commits, the Crucible
+loot re-cut plus the crab-summon scope fix) merged as 2ebe95e731, zero
+conflicts, no patches or lockfile move, no content id minted; the nine-lane
+merge audit read all six branch-owned overlaps against both parents and found
+every hunk intact, one premise moved under this wave (the Crucible gear-epic
+inflow the D062 read depends on, stated in the read), and one branch comment
+the release's mechanism made conditionally false (the Nythraxis draw-order
+contract, amended as the sync rider 61fef0d42f). The merge commit's body was
+added after the audit's critic caught a bare title.
+
+### What moved, stated as narrowly as it is true
+- **D062** (qr-19-disenchant-ratio-outlier): a READ, no code. Demand 12 / 21
+  shard, 41 / 86 essence, 42 / 155 dust over the reagent rows, plus the
+  tool-effect recharge at two to five shards per epic-rung recharge (six epic
+  gather tools reach that rung); supply one route, one shard per epic or
+  legendary disenchant; sundering a competing spend of the input, not a
+  source; the raid inflow after the sync a lower bound beside 179 non-raid
+  disenchantable epic-plus defs. Supply-limited, not starved: the outlier
+  stands, all four recipes.ts reservations unamended, D047 and D034 answered by
+  the same figure with dated pointers on their rows and records.
+- **D128** (qr-19-single-slot-writer-slot-key): MEASURED, then ROUTED OUT by
+  the maintainer on the number. An Option A prototype through the painter
+  battery (195 cases: exactly the three predicted pins red) and two headless
+  tours each way (1052 / 1072 and 575 / 575 before, 1062 / 1079 and 585 / 589
+  after, frame-count-driven, byte-identical at matched frame counts): zero
+  live writes removed, about +8 bytes per routed element in the browser. The
+  ruling sits at the guard test's recommendation block; the follow-up row and
+  the prototype patch carry the implementation half.
+- **D138** (qr-19-qr-gray-row-wording-false): docs only, A with C folded, rider
+  F offered and declined. Row 128 amended in place with LONGER-on-ten and
+  DEARER-on-eight kept apart; the brainstorm mirror, the Phase 15 read, section
+  12.2's label (four sites, five tokens) and dated notes on the two historical
+  specs.
+- **D139** (qr-19-zone-celebration-fanout-shape): the splice refusal ratified;
+  the scan MEASURED (about 100 ns per non-home player, 471 us per celebration
+  at the 5,000 cap with 200 in-zone, fixture-shaped with an upper band near
+  850 us) and ACCEPTED on record (Option 1), no production code; the suite pins
+  the walk shape as its parts, the zone count and the tenant set, each
+  mutation-proved.
+
+### The wave's own instructions were wrong in thirty-five places
+34 candidates from a four-lane verifier workflow with a 34-lane refutation pass
+and a critic, two refuted, three added by the critic, one by the executor:
+**35** (19A 16, 19B 51, 19C 11, 19D 71), every one amended IN PLACE and dated
+in phase-19e-measurement.md with a dated clause on each source row. Four
+changed the work: sundering is not a shard source; the recharge is a shard sink
+the reagent census cannot see; hud.ts sits AT its ceiling (18716 / 18716); the
+suite already carried the fourth tenant. The D138 sources had drifted +66, +17
+and a NON-UNIFORM +1287 to +1324 (two Phase 19 blocks inserted into one
+record). Carried past the wave: the D128 row prescribed a headless capture for a
+golden minted headed.
+
+### The reviews, and the numbers they moved
+Fourteen fresh reviewers, ZERO blocking, every should-fix and nit applied in
+one round (aa9c3d98be) and re-read fresh. Five findings changed a recorded
+number: masterworkZone, not gatherRareEvent, is the dominant celebration
+cadence (both records had it wrong; the Phase 18 header is amended in place);
+six epic gather tools, not 35 epic tool defs, reach the recharge rung, and the
+band is two to five; the raid inflow is a lower bound; the D128 tour deltas
+are frame-count-driven and the headless mode never reaches the anchor's steady
+state, so those artifacts must never feed ARM 3; and one of the wave's own
+Step 1 corrections had moved a correct address one line up. Every harness and
+output is committed under docs/screenshots/masterwrought-phase-19e/.
+
+### Four arms were put to the maintainer in session, none guessed
+D128's route-out reading, D139's shape (Option 1) and its bench home (scratch
+harness, premises pinned), and D138's rider F (declined).
+
+### Validation
+gate_select PASS all 12 steps pg-armed at 31538b1bc0, GATE_EXIT=0, mode full,
+full-suite fallback 3670/1 (3671 files) and 54,533/9/28 (54,570 cases), browser
+332/332; tsc EXIT 0 at every commit, census RESULT PASS captured without a pipe,
+ci:changed EXIT 0 at the fix-round tip and after the last commit, the pg arm
+proven by contrast (3 skipped unset, 3 passed set). Drift PREDICTED +1 file /
++15 cases before the reviews, re-derived to +18 after the review rounds grew the
+fan-out suite from 9 to 12 cases, MEASURED +1 / +18 / 0 / 0, prediction-exact
+(the sync's five suites +14, the fan-out suite +4). Every new pin mutation-proved
+red alone; every measurement re-runs from the committed evidence. Full table in
+phase-19e-qa.md.
+
+### CARRIED for the maintainer, not taken unilaterally
+- **A production signal for the celebration scan.** Option 1 lands no code, so
+  the accepted cost folds into the sim phase of server/tick_profiler.ts with no
+  celebration counter or PERF_TICK_LOG token; its withdrawal condition cannot
+  be seen on a live realm today.
+- **The realm-cap axis is pinned to the code default.** MAX_PLAYERS_PER_REALM
+  overrides it (0 disables), and the per-second cost is superlinear in realm
+  size; a realm deployed above 5,000 invalidates the D139 figure with nothing
+  going red.
+- **ARM 3 never checks an artifact's gpuMode.** Self-limiting today (a headless
+  artifact cannot clear tourMinFrames) and never armed by the gate or CI; one
+  assertion in loadArtifact would make it explicit.
+- **Two stale code comments** met by the D062 read and not fixed in a docs-only
+  unit: enchants.ts's header undercounts the shard sinks (it omits the four
+  Lucent rows) and calls the Lucent tier "rather than another shard sink".
+- **D047 and D034 have no units of their own.** Both are answered by the D062
+  read with dated pointers on their rows and records; if the maintainer wants
+  them as rows in a later wave, the pointers are where to start.
+
+### JUDGED, and not re-raised
+- The four units, their rulings, and every reviewer and fresh-read finding are
+  SETTLED. This ledger records them; it does not reopen them.
+- The three items 19D carried, the three 19C carried and the four 19B carried
+  remain the maintainer's and were not taken here.
