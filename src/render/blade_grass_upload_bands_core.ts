@@ -8,14 +8,20 @@
 // nearly the whole prefix, and the pool re-uploaded almost all of its matrix
 // and colour bytes on every crossing.
 //
-// The fix is a coarse block index over the dense prefix. BLOCK SIZE IS THE
-// GRID WIDTH, derived from the pool's own geometry: the pool is GRID_W x
-// GRID_W slots, a Z-axis crossing re-places one contiguous run of GRID_W
-// slots, and an X-axis crossing re-places GRID_W slots spaced GRID_W apart,
-// so a block of GRID_W dense indices holds a single entry of the strided set
-// and a whole row of the contiguous one. That makes the block count GRID_W as
-// well, and each crossing dirties a handful of instances per touched block
-// instead of the span between the lowest and highest of them.
+// The fix is a coarse block index over the dense prefix. BLOCK SIZE IS A
+// QUARTER OF THE GRID WIDTH, derived from the pool's own geometry and its
+// density gate: a crossing re-places one slot LINE, about GRID_W instances,
+// into a prefix of about GRID_W squared times the meadow's coverage, so its
+// marks land about `coverage * GRID_W` apart. A block below that spacing holds
+// one mark and uploads one instance; a block at or above it holds two and
+// uploads the span between them. The coverage floor is the density gate's own
+// 0.44 (placeSlot's `0.44 + 1.7 * lush * lush`), so a quarter row is under the
+// spacing for any ground the meadow can produce. Measured on the replay in
+// tests/blade_grass_upload_bands_core.test.ts, an X crossing of the ultra
+// carpet: a full row uploads 17.4 percent of the prefix, a half row 0.74, a
+// quarter row 0.74 at full coverage and 0.84 at the sparse end where the half
+// row costs 5.4, and an eighth row buys nothing further. The range COUNT is
+// bounded by the marks, not by the block count, so the finer index is free.
 //
 // Registered in RENDER_PURE_CORES (tests/architecture.test.ts); tested by
 // tests/blade_grass_upload_bands_core.test.ts.
@@ -68,26 +74,32 @@ export function createUploadRangeScratch(bands: UploadBands): Int32Array {
  * One range per dirty block, tightened to that block's own lowest and highest
  * touched index. Three merges adjacent ranges itself before it issues the
  * bufferSubData calls (WebGLAttributes), so neighbouring blocks cost one call.
- * Past half the blocks the ranges no longer buy anything: the gaps between
- * them are smaller than the ranges themselves and each one is another driver
- * call, so a majority-dirty pass (a teleport backfill) collapses to the single
- * spanning range the pool used to submit unconditionally.
+ *
+ * The fallback is decided on BYTES, not on how many blocks are dirty: once the
+ * ranges would carry more than half of the span they sit in, splitting them
+ * saves less than a factor of two in bytes and every extra range is another
+ * driver call, so the pass collapses to the single spanning range the pool used
+ * to submit unconditionally. A block-count rule was wrong here: a crossing
+ * marks one instance in each of many blocks, which is the case the ranges exist
+ * for, and counting blocks collapsed exactly then.
  */
 export function collectUploadRanges(bands: UploadBands, out: Int32Array): number {
-  let dirty = 0;
+  let covered = 0;
   let spanLo = -1;
   let spanHi = -1;
   for (let b = 0; b < bands.blocks; b++) {
     const lo = bands.lo[b];
     if (lo < 0) continue;
-    dirty++;
+    const hi = bands.hi[b];
+    covered += hi - lo + 1;
     if (spanLo < 0) spanLo = lo;
-    spanHi = bands.hi[b];
+    spanHi = hi;
   }
-  if (dirty === 0) return 0;
-  if (dirty * 2 > bands.blocks) {
+  if (spanLo < 0) return 0;
+  const span = spanHi - spanLo + 1;
+  if (covered * 2 > span) {
     out[0] = spanLo;
-    out[1] = spanHi - spanLo + 1;
+    out[1] = span;
     return 1;
   }
   let n = 0;
