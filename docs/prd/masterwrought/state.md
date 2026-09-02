@@ -27119,6 +27119,89 @@ phase-19e-qa.md.
 
 ## Phase 19F ledger (2026-09-02, the English i18n completeness wave of the rulings gate)
 
+STATUS: **COMPLETE, 10 of 10 units executed, ONE escalation (D149, ruled in
+session).** One commit per unit, every ruling written where its open record
+actually stands (the qr-19 pattern; D148 through D150 on their gate rows, D169
+and D149 in this ledger because no open record of theirs lived in this file),
+then twenty fresh typed reviewers plus the one review D085's amendment owed,
+ten fix rounds that applied every finding (two coverage audits and a sim
+review among them), and a fresh read after each.
+
+STEP 0, the sync check: origin/release/v0.42.0 had not moved since the 19E
+close (2ebe95e731 remains the tip merged), so no merge and no audit; recorded as
+the no-op the phase asked for.
+
+STEP 1: ONE HUNDRED corrections to the wave's own instructions, amended in
+place and dated before execution, four changing the work (D148's backlog was
+4,569 sim rows, not 7,971; D149's premise was false and the row was escalated;
+D161 could only be deleted outright, never retired, because the every-locale
+placeholder pin read the first toolsNote row; D074's deferral arm was dead).
+Three arms went to the maintainer in session (D148's scanner fix, D169's crop
+windfall wording 'a golden harvest from a garden bed', D174's ratify arm) and
+D074's status quo; D149's option 1 came from the escalation.
+
+### What moved, stated as narrowly as it is true
+- **D070** (qr-19-flask-tooltip-spellgnaw-exception): the judged omission
+  stands; docs, plus one comment beside the key at the review round.
+- **D074** (qr-19-growth-timer-prose-clause): the status quo, a test pin only.
+- **D085** (qr-19-materialsbody-onramp-bill-omission): the altitude ratified,
+  then the prose re-keyed for a separate defect the review found (two rod
+  recipes of three): craftProse.engineering.materialsBodyThreeRods, fresh
+  fills, a pin deriving the count and bills from ROD_RECIPES.
+- **D144** (qr-19-crucible-gear-sundering-admission): option 4 with 1 folded;
+  endgameMaterialsBodyAnyRaid, five fills (four re-filled for the gear noun),
+  comments and docs aligned to isSunderable.
+- **D148** (qr-19-sim-scope-pending-is-unreachable): the scanner reads
+  per-locale source presence (simDictProvidedKeys); 4,569 sim rows pending,
+  Phase 20's package 9,951 to 14,520 rows (14,275 after D149); two source-text
+  arms weld the export to the DICT literal and to the locale blocks' literal
+  rows (eight dead duplicate BASE_NEW rows removed on the way); the worklist
+  routes sim dialogue and lore to humanRequired; the skill's sim paragraph
+  rewritten.
+- **D149** (qr-19-rift-mechanic-names-translate-or-not): option 1; 52 names
+  filled in the five non-Latin blocks, thirteen retuned at the review round,
+  the 16 dead BRAND_ALLOW cast entries removed; 780 Latin rows to Phase 20.
+- **D150** (the Drowned Temple deploy-window alias): pinned through the
+  Hud.prototype harness with a bundle-only read, horizon release/v0.42.0, the
+  arena three-dot twin pinned.
+- **D161** (qr-19-toolsnote-stale-nonlatin-fills): re-keyed twice, to
+  toolsNoteFiveLadders and then, when the review found the English itself
+  false (three fenced starters of four), misleading (the allotment farmer is at
+  Eastbrook) and incomplete (the rods' Marks route), to toolsNoteFourStarters
+  with fresh fills, then a third time to toolsNoteFishingPageMarks for a
+  'table below' true on one page of five; the exact-key placeholder pin and
+  clause arms deriving the fenced set from ITEMS and pinning the phrase.
+- **D169** (qr-19-rarebody-reword-landmine): rareBodyFourFlavors with the
+  maintainer's wording; a pin derives the four flavors and deeds from the sim.
+- **D174** (qr-19-prog-first-harvest-thirteen-catches): ratified as shipped,
+  the guide gatherDeeds lines accepted with the desc, the rationale corrected.
+
+### Reviews and the fix rounds
+Twenty fresh typed reviewers (per-unit cross-platform-sync, frontend-seam,
+content-obligations, gate-integrity, qa-checklist as each contract named)
+plus the frontend-seam review D085's amendment owed. Round one (a0ecd5344b)
+applied D085, D144 and D150; round two (31084b67ef) applied every remaining
+finding, blocking, should-fix and nit alike; Round seven (911d70f424) applied the fresh read of rounds five and six; round eight (64b866e420) the replacement fresh read of round two, the tools note's third re-key; round nine (b0a171ff45) the fresh read of round seven; round ten (5e6d6b5453) the fresh reads of rounds eight and nine; round eleven (e58bff734a) the one cosmetic nit the round-ten read returned. Every round was read fresh; the last read returned nothing else.. The findings that moved
+the code or a record are listed in phase-19f-qa.md; the machine-authored fill
+sets are FLAGGED there for the maintainer's read.
+
+### Carried for the maintainer, not taken
+The list is in phase-19f-qa.md (localizeSystemText extraction, the
+error.sunderTarget emit, the gathering tool table's English names, the five
+*_EXTRA sim tables outside the registry and the absent copied-English guard,
+the en_CA dead rows, the two arena carriers, the farm tableBodyOneMeal
+off-glossary fills, the three-member generated flavor record, D103's 'new'
+rows, the hardcoded five-locale lists, the col_golden_harvest deed name in
+every locale). 19E's five carried items, 19D's three, 19C's three and 19B's
+four remain the maintainer's and were not taken here; R5 stays frozen.
+
+### JUDGED, and not re-raised
+- The ten units, their rulings, and every reviewer and fresh-read finding are
+  SETTLED. This ledger records them; it does not reopen them.
+- Refused with the reason recorded (phase-19f-qa.md): stripping the ru_RU
+  overlays' native em dashes; re-tying the ja_JP and ko_KR Rime / Rimebite
+  stems.
+
 RULED (qr-19-rift-mechanic-names-translate-or-not, 2026-09-02, under qr-19-best-for-project): option
 1, the 52 rift mechanic names (29 aura.rift*, 23 mechanic.rift*, derived from RIFT_MOBS) are
 TRANSLATED EVERYWHERE, the precedent the 16 rift cast ids already shipped. The row's premise was
