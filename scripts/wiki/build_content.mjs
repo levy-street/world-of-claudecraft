@@ -94,6 +94,12 @@ const entrySource = `
     GATHER_RARE_EVENT_CHANCE, GATHER_RARE_EVENT_YIELD_MULT, gatherRareEventFlavor,
   } from './src/sim/professions/gather_events.ts';
   export {
+    FARM_PLANT_CAST_SEC, FARM_HARVEST_LIFE_FLOOR, FARM_KEEP_CHANCE_BASE,
+    FARM_KEEP_CHANCE_SKILL_SCALE, FARM_FINE_CHANCE_BASE, FARM_FINE_CHANCE_SKILL_SCALE,
+    FARM_FINE_CHANCE_EFFECT_BONUS, FARM_TONIC_BONUS_CHANCE, FARM_TONIC_BONUS_PICKS,
+    FARM_EFFECT_BONUS_PICK_CAP, FARMING_GAIN_SCHEDULE, farmingTeachingCeilingFor,
+  } from './src/sim/professions/farming.ts';
+  export {
     MASTERWORK_BASE_CHANCE, MASTERWORK_PER_TIER_ABOVE_CHANCE, MASTERWORK_SIGNED_CHANCE,
     MASTERWORK_SPECIALIZATION_CHANCE, MASTERWORK_CHANCE_CAP,
   } from './src/sim/professions/masterwork.ts';
@@ -210,6 +216,18 @@ const {
   GATHER_RARE_EVENT_CHANCE,
   GATHER_RARE_EVENT_YIELD_MULT,
   gatherRareEventFlavor,
+  FARM_PLANT_CAST_SEC,
+  FARM_HARVEST_LIFE_FLOOR,
+  FARM_KEEP_CHANCE_BASE,
+  FARM_KEEP_CHANCE_SKILL_SCALE,
+  FARM_FINE_CHANCE_BASE,
+  FARM_FINE_CHANCE_SKILL_SCALE,
+  FARM_FINE_CHANCE_EFFECT_BONUS,
+  FARM_TONIC_BONUS_CHANCE,
+  FARM_TONIC_BONUS_PICKS,
+  FARM_EFFECT_BONUS_PICK_CAP,
+  FARMING_GAIN_SCHEDULE,
+  farmingTeachingCeilingFor,
   MASTERWORK_BASE_CHANCE,
   MASTERWORK_PER_TIER_ABOVE_CHANCE,
   MASTERWORK_SIGNED_CHANCE,
@@ -1144,6 +1162,33 @@ const profCurve = {
   specimenChancePct: pct(
     (CORPSE_HARVEST_RARITY_BASELINE * signedShare) / MATERIAL_RARITY_MAX_PROFICIENCY,
   ),
+  // Farming's own rhythm, gain and yield numbers. Emitted because the farming
+  // page may not borrow the node paragraphs above: farming pays a deterministic
+  // gain schedule rather than the node curve, harvests instantly rather than on
+  // a cast, and mints a crop's plain and fine grades rather than the
+  // common-to-legendary material ladder (the wiki completeness audit, 2026-09-03).
+  // Every number is DERIVED from src/sim/professions/farming.ts here so the prose
+  // and its pins cannot drift from the model.
+  farm: {
+    plantCastSec: FARM_PLANT_CAST_SEC,
+    lifeFloor: FARM_HARVEST_LIFE_FLOOR,
+    keepChancePctAtZero: pct(FARM_KEEP_CHANCE_BASE),
+    keepChancePctAtCap: pct(FARM_KEEP_CHANCE_BASE + FARM_KEEP_CHANCE_SKILL_SCALE),
+    finePctAtZero: pct(FARM_FINE_CHANCE_BASE),
+    finePctAtCap: pct(FARM_FINE_CHANCE_BASE + FARM_FINE_CHANCE_SKILL_SCALE),
+    fineEffectBonusPct: pct(FARM_FINE_CHANCE_EFFECT_BONUS),
+    tonicChancePct: pct(FARM_TONIC_BONUS_CHANCE),
+    tonicBonusPicks: FARM_TONIC_BONUS_PICKS,
+    effectBonusPickCap: FARM_EFFECT_BONUS_PICK_CAP,
+    gainSchedule: FARMING_GAIN_SCHEDULE.map((row) => ({
+      belowProficiency: row.belowProficiency,
+      gain: row.gain,
+    })),
+    teachingCeilingByCropTier: [1, 2, 3, 4].map((tier) => ({
+      tier,
+      ceiling: farmingTeachingCeilingFor(tier),
+    })),
+  },
 };
 
 // Enchanting: disenchant yields, the typed rare+ secondaries, the enchant
@@ -1613,6 +1658,20 @@ export interface GuideProfCurve {
   bands: number[];
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
+  farm: {
+    plantCastSec: number;
+    lifeFloor: number;
+    keepChancePctAtZero: number;
+    keepChancePctAtCap: number;
+    finePctAtZero: number;
+    finePctAtCap: number;
+    fineEffectBonusPct: number;
+    tonicChancePct: number;
+    tonicBonusPicks: number;
+    effectBonusPickCap: number;
+    gainSchedule: { belowProficiency: number; gain: number }[];
+    teachingCeilingByCropTier: { tier: number; ceiling: number }[];
+  };
 }
 
 export interface GuideProfEnchanting {

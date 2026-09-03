@@ -100,6 +100,20 @@ import {
   TIMBER_WEAPON_TYPES,
 } from '../src/sim/professions/disenchant_reagents';
 import { DISENCHANT_MATERIAL_BY_QUALITY } from '../src/sim/professions/enchanting';
+import {
+  FARM_EFFECT_BONUS_PICK_CAP,
+  FARM_FINE_CHANCE_BASE,
+  FARM_FINE_CHANCE_EFFECT_BONUS,
+  FARM_FINE_CHANCE_SKILL_SCALE,
+  FARM_HARVEST_LIFE_FLOOR,
+  FARM_KEEP_CHANCE_BASE,
+  FARM_KEEP_CHANCE_SKILL_SCALE,
+  FARM_PLANT_CAST_SEC,
+  FARM_TONIC_BONUS_CHANCE,
+  FARM_TONIC_BONUS_PICKS,
+  FARMING_GAIN_SCHEDULE,
+  farmingTeachingCeilingFor,
+} from '../src/sim/professions/farming';
 import { FISHING_GAIN_SCHEDULE } from '../src/sim/professions/fishing';
 import { FISHING_CATCH_BAND_THRESHOLDS } from '../src/sim/professions/fishing_bands';
 import {
@@ -149,6 +163,7 @@ import { esc } from '../src/ui/esc';
 import { WELLFED_STAT_KEYS } from '../src/ui/hud/professions/wellfed_stat_keys';
 import {
   ensureLocaleLoaded,
+  formatNumber,
   type SupportedLanguage,
   setLanguage,
   supportedLanguages,
@@ -2489,6 +2504,96 @@ describe('Guide professions gathering accuracy', () => {
   // while the nodes side stays guarded off forever (farming has no
   // GATHER_NODES by design, fishing-shaped on land), and a synthetic toolless
   // record keeps the guard's absent side exercised.
+  it("the farming page states farming's own rhythm, gain and yield model, never the node trades'", () => {
+    // The wiki completeness audit (2026-09-03). The page used to render
+    // guide.profPages.rhythmBody, gainBody and yieldsBody, which describe the
+    // NODE model: a gather cast, the node gain curve scored against a node's
+    // tier, and the common-to-legendary material ladder with its unit counts
+    // and signed instances. Farming uses none of the three, so eight of that
+    // lane's findings were rated changes-the-page against this one reuse. The
+    // three shared keys are untouched and still render on mining, logging and
+    // herbalism, where they are true; farming renders its own. Every number
+    // below is DERIVED from src/sim/professions/farming.ts, so a retune moves
+    // the page and this pin together instead of rotting the prose.
+    setLanguage('en');
+    const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');
+    expect(farming).toBeDefined();
+    const html = gatheringDetailHtml(farming as (typeof GUIDE_PROF_GATHERING)[number]);
+    const mining = GUIDE_PROF_GATHERING.find((g) => g.id === 'mining');
+    expect(mining).toBeDefined();
+    const miningHtml = gatheringDetailHtml(mining as (typeof GUIDE_PROF_GATHERING)[number]);
+
+    // NEGATIVE, the whole point: not one clause of the node model reaches the
+    // farming page, while every one of them still reaches a node page.
+    const nodeOnly = [
+      'A harvest is a short visible cast',
+      'every harvest pays a small slice of character XP',
+      'a node at or above your gain tier teaches a full point per harvest',
+      'the common grade disappears entirely',
+      'a common roll yields 1 unit',
+      'signed instance stamped Gathered by you',
+    ];
+    for (const clause of nodeOnly) {
+      expect(html, `the farming page must not carry the node clause "${clause}"`).not.toContain(
+        clause,
+      );
+      expect(miningHtml, `a node page must still carry "${clause}"`).toContain(clause);
+    }
+
+    // The rhythm: planting is the live cast constant, harvesting is instant,
+    // and nothing is refused for bag room (harvestCrop guards on dead, bed,
+    // range, plot and readiness only).
+    expect(html).toContain(`${formatNumber(FARM_PLANT_CAST_SEC)} seconds flat at every rung`);
+    expect(html).toContain('Pulling a ripe crop is instant');
+    expect(html).toContain('no bag check to refuse it');
+    expect(html).toContain('it grants no character XP at all');
+
+    // The gain model: the four schedule rows and the two teaching ceilings a
+    // crop tier sets, every figure read from the live schedule.
+    const [r1, r2, r3, r4] = FARMING_GAIN_SCHEDULE;
+    expect(html).toContain(
+      `${formatNumber(r1.gain)} proficiency a harvest below ${formatNumber(r1.belowProficiency)}`,
+    );
+    expect(html).toContain(`${formatNumber(r2.gain)} below ${formatNumber(r2.belowProficiency)}`);
+    expect(html).toContain(`${formatNumber(r3.gain)} below ${formatNumber(r3.belowProficiency)}`);
+    expect(html).toContain(`${formatNumber(r4.gain)} the rest of the way`);
+    expect(html).toContain('never a skill-up roll');
+    expect(html).toContain(
+      `A tier 1 crop teaches to ${formatNumber(farmingTeachingCeilingFor(1))}`,
+    );
+    expect(html).toContain(`a tier 2 crop to ${formatNumber(farmingTeachingCeilingFor(2))}`);
+    // Tier 3 and 4 both teach to the cap, which is why the prose groups them.
+    expect(farmingTeachingCeilingFor(3)).toBe(farmingTeachingCeilingFor(4));
+    expect(farmingTeachingCeilingFor(3)).toBe((farming as { maxSkill: number }).maxSkill);
+
+    // The yield model: lives, the keep chance at both ends, the fine twin as
+    // an UPGRADE, and the two things that add picks at the plain grade.
+    const pct = (n: number) => formatNumber(Math.round(n * 100));
+    expect(html).toContain(`a floor of ${formatNumber(FARM_HARVEST_LIFE_FLOOR)} lives`);
+    expect(html).toContain(`${pct(FARM_KEEP_CHANCE_BASE)} percent at a fresh counter`);
+    expect(html).toContain(
+      `${pct(FARM_KEEP_CHANCE_BASE + FARM_KEEP_CHANCE_SKILL_SCALE)} percent at the cap`,
+    );
+    expect(html).toContain(`${pct(FARM_FINE_CHANCE_BASE)} percent chance at a fresh counter`);
+    expect(html).toContain(
+      `${pct(FARM_FINE_CHANCE_BASE + FARM_FINE_CHANCE_SKILL_SCALE)} percent at the cap`,
+    );
+    expect(html).toContain('a fine pick upgrades a pick and never adds one');
+    expect(html).toContain('There is no common-to-legendary ladder on a bed');
+    expect(html).toContain(
+      `pays ${formatNumber(FARM_TONIC_BONUS_PICKS)} more picks on a ${pct(FARM_TONIC_BONUS_CHANCE)} percent chance`,
+    );
+    expect(html).toContain(
+      `a slotted quantity effect adds ${formatNumber(FARM_EFFECT_BONUS_PICK_CAP)}`,
+    );
+    expect(html).toContain(
+      `adding ${pct(FARM_FINE_CHANCE_EFFECT_BONUS)} percentage points to every fine roll`,
+    );
+    // The charm cap is farming's own, and it is what makes the sentence true:
+    // if it ever equalled the catalog bonus the clause would be a lie.
+    expect(FARM_EFFECT_BONUS_PICK_CAP).toBeLessThan(FARM_TONIC_BONUS_PICKS);
+  });
+
   it('renders farming with its tool ladder, no node prose, and length-guards empty tables', () => {
     setLanguage('en');
     const farming = GUIDE_PROF_GATHERING.find((g) => g.id === 'farming');

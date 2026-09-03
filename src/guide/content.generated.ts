@@ -264,6 +264,20 @@ export interface GuideProfCurve {
   bands: number[];
   rareEvent: { oneIn: number; yieldMult: number; flavors: { ore: string; wood: string; herb: string } };
   specimenChancePct: number;
+  farm: {
+    plantCastSec: number;
+    lifeFloor: number;
+    keepChancePctAtZero: number;
+    keepChancePctAtCap: number;
+    finePctAtZero: number;
+    finePctAtCap: number;
+    fineEffectBonusPct: number;
+    tonicChancePct: number;
+    tonicBonusPicks: number;
+    effectBonusPickCap: number;
+    gainSchedule: { belowProficiency: number; gain: number }[];
+    teachingCeilingByCropTier: { tier: number; ceiling: number }[];
+  };
 }
 
 export interface GuideProfEnchanting {
@@ -16768,7 +16782,55 @@ export const GUIDE_PROF_CURVE: GuideProfCurve = {
       "herb": "moonlit_bloom"
     }
   },
-  "specimenChancePct": 16
+  "specimenChancePct": 16,
+  "farm": {
+    "plantCastSec": 2,
+    "lifeFloor": 3,
+    "keepChancePctAtZero": 15,
+    "keepChancePctAtCap": 50,
+    "finePctAtZero": 2,
+    "finePctAtCap": 10,
+    "fineEffectBonusPct": 10,
+    "tonicChancePct": 50,
+    "tonicBonusPicks": 2,
+    "effectBonusPickCap": 1,
+    "gainSchedule": [
+      {
+        "belowProficiency": 25,
+        "gain": 0.25
+      },
+      {
+        "belowProficiency": 50,
+        "gain": 0.125
+      },
+      {
+        "belowProficiency": 75,
+        "gain": 0.0625
+      },
+      {
+        "belowProficiency": 100,
+        "gain": 0.03125
+      }
+    ],
+    "teachingCeilingByCropTier": [
+      {
+        "tier": 1,
+        "ceiling": 50
+      },
+      {
+        "tier": 2,
+        "ceiling": 75
+      },
+      {
+        "tier": 3,
+        "ceiling": 100
+      },
+      {
+        "tier": 4,
+        "ceiling": 100
+      }
+    ]
+  }
 };
 
 export const GUIDE_PROF_ENCHANTING: GuideProfEnchanting = {

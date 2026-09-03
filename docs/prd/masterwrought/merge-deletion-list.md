@@ -2139,3 +2139,21 @@ its origin so the census reads PASS again.
 | Class | Name | Path | Phase | Ruling | Reason |
 |---|---|---|---|---|---|
 | exports | `gateMountSwapOnCompile` |  | 20 | the maintainer's mount sync merge 9ba72f3cb7 (2026-09-03, 'merge: integrate v0.42.0 mount updates'), recorded by the Phase 20 wiki completeness audit at STEP 0 | the mount lifecycle's compile-gate helper, written in the merge itself while resolving the v0.42.0 mount updates against the branch's shared mount lifecycle host (48898ce309): holds one mount root behind its compile gate and lets only the callback whose root is still the live visual clear the pending flag, so an older, non-cancellable gate callback cannot reveal a replacement root (the merge body's 'harden mount swaps and compile-gate presentation against semantic merge races'). Exercised by tests/mount_lifecycle.test.ts, which imports it by name. No Path: src/render is inside census scope (src/render/mount_lifecycle.ts) |
+
+## Explained extras (2026-09-03, the Phase 20 wiki completeness audit, unit 1)
+
+The farming page's own rhythm, gain and yield prose. The page had been rendering the node
+trades' three shared bodies, every one of which states a model farming does not use, which
+the audit rated changes-the-page eight times over. The three shared keys are untouched and
+still serve mining, logging and herbalism; these six are what the farming page renders
+instead, and their numbers interpolate from GUIDE_PROF_CURVE.farm, generated from
+src/sim/professions/farming.ts.
+
+| Class | Name | Path | Phase | Ruling | Reason |
+|---|---|---|---|---|---|
+| i18n key | `profPages.farm.rhythmHeading` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | the heading over farming's own rhythm prose, rendered by farmRhythmSections in src/guide/pages/professions_gathering.ts in place of the node trades' rhythmHeading (src/ui/i18n.catalog/guide.ts) |
+| i18n key | `profPages.farm.rhythmBody` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | farming's rhythm: planting is the FARM_PLANT_CAST_SEC cast, harvesting is instant with no bag gate, and a harvest grants no character XP. The shared profPages.rhythmBody says the opposite on all three counts and is true only of the node trades, which still render it (src/ui/i18n.catalog/guide.ts) |
+| i18n key | `profPages.farm.gainHeading` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | the heading over farming's own gain prose (src/ui/i18n.catalog/guide.ts) |
+| i18n key | `profPages.farm.gainBody` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | farming's gain: the deterministic FARMING_GAIN_SCHEDULE keyed to the farmer's own counter, with farmingTeachingCeilingFor setting how far a crop tier teaches. The shared profPages.gainBody describes the node curve scored against a node's tier, which farming never uses (src/ui/i18n.catalog/guide.ts) |
+| i18n key | `profPages.farm.yieldsHeading` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | the heading over farming's own yields prose (src/ui/i18n.catalog/guide.ts) |
+| i18n key | `profPages.farm.yieldsBody` | | 20 | the wiki completeness audit (2026-09-03), the farming shared-section cluster | farming's yields: picks off a floor of lives, the fine twin as an upgrade rather than an addition, and the tonic and charm adding picks at the plain grade. The shared profPages.yieldsBody publishes the common-to-legendary material ladder with its unit counts and signed instances, none of which a bed mints (src/ui/i18n.catalog/guide.ts) |

@@ -174,6 +174,53 @@ function yieldsSection(): string {
     </section>`;
 }
 
+// Farming's own rhythm, gain and yields, rendered in place of the three node
+// paragraphs above (the wiki completeness audit, 2026-09-03). The node prose
+// describes a gather cast, the node gain curve and the common-to-legendary
+// material ladder, and farming uses none of the three: it harvests instantly,
+// pays FARMING_GAIN_SCHEDULE, and mints a crop's plain and fine grades. Every
+// value comes from GUIDE_PROF_CURVE.farm, generated from the farming module, so
+// a retune moves the page instead of rotting it.
+function farmRhythmSections(g: GuideProfGathering): string {
+  const f = GUIDE_PROF_CURVE.farm;
+  const sched = f.gainSchedule;
+  const ceil = (tier: number) =>
+    formatNumber(f.teachingCeilingByCropTier.find((r) => r.tier === tier)?.ceiling ?? 0);
+  return `<section class="guide-block" id="prof-rhythm">
+      <h2>${esc(t('guide.profPages.farm.rhythmHeading'))}</h2>
+      ${paras('guide.profPages.farm.rhythmBody', { plant: formatNumber(f.plantCastSec) })}
+    </section>
+    <section class="guide-block" id="prof-gain">
+      <h2>${esc(t('guide.profPages.farm.gainHeading'))}</h2>
+      ${paras('guide.profPages.farm.gainBody', {
+        g1: formatNumber(sched[0].gain),
+        p1: formatNumber(sched[0].belowProficiency),
+        g2: formatNumber(sched[1].gain),
+        p2: formatNumber(sched[1].belowProficiency),
+        g3: formatNumber(sched[2].gain),
+        p3: formatNumber(sched[2].belowProficiency),
+        g4: formatNumber(sched[3].gain),
+        cap: formatNumber(g.maxSkill),
+        c1: ceil(1),
+        c2: ceil(2),
+      })}
+    </section>
+    <section class="guide-block" id="prof-yields">
+      <h2>${esc(t('guide.profPages.farm.yieldsHeading'))}</h2>
+      ${paras('guide.profPages.farm.yieldsBody', {
+        floor: formatNumber(f.lifeFloor),
+        keep0: formatNumber(f.keepChancePctAtZero),
+        keepCap: formatNumber(f.keepChancePctAtCap),
+        fine0: formatNumber(f.finePctAtZero),
+        fineCap: formatNumber(f.finePctAtCap),
+        tonicPicks: formatNumber(f.tonicBonusPicks),
+        tonicPct: formatNumber(f.tonicChancePct),
+        effectCap: formatNumber(f.effectBonusPickCap),
+        fineBonus: formatNumber(f.fineEffectBonusPct),
+      })}
+    </section>`;
+}
+
 function rareSection(): string {
   const rare = GUIDE_PROF_CURVE.rareEvent;
   return `<section class="guide-block" id="prof-rare">
@@ -355,7 +402,7 @@ export function gatheringDetailHtml(g: GuideProfGathering): string {
         <div class="guide-fact"><dt>${esc(t('guide.profPages.capLabel'))}</dt><dd>${esc(formatNumber(g.maxSkill))}</dd></div>
       </dl>
       ${isFarming ? farmingSection() : ''}
-      ${isFishing ? fishingSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
+      ${isFishing ? fishingSections(g) : isFarming ? farmRhythmSections(g) : rhythmSection(g) + nodesSection(g) + yieldsSection()}
       ${toolsSection(g)}
       ${isFishing ? '' : toolEffectsSection()}
       ${bandsSection(g)}
