@@ -1,4 +1,8 @@
 import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+import type {
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+} from '../sim/nythraxis_grave_eruption';
 import type { ResolvedAbility } from '../sim/sim';
 import type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
 import type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
@@ -10,6 +14,10 @@ import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type { WorldInteractionOutcome } from './interaction';
 
 export type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+export type {
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+} from '../sim/nythraxis_grave_eruption';
 export type { ActiveVarkhulAnvilMeteorWarning } from '../sim/varkhul_anvil_meteors';
 export type { ActiveVarkhulAssembly } from '../sim/varkhul_assembly';
 export type {
@@ -56,6 +64,10 @@ export interface IWorldCombat {
   /** Server-authored persistent traps currently visible to this world view. */
   activeFrostRings: ActiveFrostRing[];
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
+  /** Nythraxis Grave Eruption warning rings (the meteor-warning shape) and the
+   *  Grave Flame patches they leave behind, reconnect-safe from the snapshot. */
+  activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[];
+  activeNythraxisGraveFlames: ActiveNythraxisGraveFlame[];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
   activeVarkhulAnvilMeteors: ActiveVarkhulAnvilMeteorWarning[];
   activeVarkhulAssemblies: ActiveVarkhulAssembly[];

@@ -7187,6 +7187,107 @@ describe('Ignivar meteor snapshot parity', () => {
   });
 });
 
+describe('Nythraxis Grave Eruption snapshot parity', () => {
+  it('rebuilds warning rings and flame patches after reconnect and clears them when absent', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      nythraxisEruptions: [{ id: '77:ge:41:0', x: 3, z: 5, r: 3, dur: 2.5, rem: 1.4, lead: 0.75 }],
+      nythraxisFlames: [{ id: '77:gf:3', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 7 }],
+    });
+    expect(client.activeNythraxisGraveEruptions).toEqual([
+      {
+        id: '77:ge:41:0',
+        x: 3,
+        z: 5,
+        radius: 3,
+        duration: 2.5,
+        remaining: 1.4,
+        warningLead: 0.75,
+      },
+    ]);
+    expect(client.activeNythraxisGraveFlames).toEqual([
+      { id: '77:gf:3', sourceId: 77, x: 8, z: 9, radius: 3, duration: 12, remaining: 7 },
+    ]);
+
+    (client as any).applySnapshot({ t: 'snap', ents: [] });
+    expect(client.activeNythraxisGraveEruptions).toEqual([]);
+    expect(client.activeNythraxisGraveFlames).toEqual([]);
+  });
+
+  it('rejects malformed rows and clamps remaining time to duration', () => {
+    const client = bareClient(1);
+    (client as any).applySnapshot({
+      t: 'snap',
+      ents: [],
+      nythraxisEruptions: [
+        null,
+        'primitive-row',
+        { id: 'valid', x: 3, z: 5, r: 3, dur: 2.5, rem: 9, lead: 0 },
+        { id: 'expired', x: 3, z: 5, r: 3, dur: 2.5, rem: 0, lead: 0.75 },
+        { id: 'bad-lead', x: 3, z: 5, r: 3, dur: 2.5, rem: 1, lead: 2.5 },
+        { id: 77, x: 3, z: 5, r: 3, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-coordinate', x: Number.NaN, z: 5, r: 3, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-radius', x: 3, z: 5, r: 0, dur: 2.5, rem: 1, lead: 0.75 },
+        { id: 'bad-duration', x: 3, z: 5, r: 3, dur: 0, rem: 1, lead: 0.75 },
+      ],
+      nythraxisFlames: [
+        null,
+        { id: 'valid', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 30 },
+        { id: 'expired', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 0 },
+        { id: 'bad-source', src: '77', x: 8, z: 9, r: 3, dur: 12, rem: 7 },
+        { id: 'bad-coordinate', src: 77, x: 8, z: Number.POSITIVE_INFINITY, r: 3, dur: 12, rem: 7 },
+        { id: 'bad-radius', src: 77, x: 8, z: 9, r: 0, dur: 12, rem: 7 },
+        { id: 'bad-duration', src: 77, x: 8, z: 9, r: 3, dur: 0, rem: 7 },
+      ],
+    });
+
+    expect(client.activeNythraxisGraveEruptions).toEqual([
+      { id: 'valid', x: 3, z: 5, radius: 3, duration: 2.5, remaining: 2.5, warningLead: 0 },
+    ]);
+    expect(client.activeNythraxisGraveFlames).toEqual([
+      { id: 'valid', sourceId: 77, x: 8, z: 9, radius: 3, duration: 12, remaining: 12 },
+    ]);
+  });
+
+  it('interest-scopes rings and flames with stable ids and authoritative lifetime', () => {
+    const server = new GameServer();
+    const fc = fakeWs();
+    const session = joinServer(server, fc, 1, 'Gravewire', 'priest');
+    const player = server.sim.entities.get(session.pid)!;
+    const boss = createMob(
+      9903,
+      MOBS.nythraxis_scourge_of_thornpeak,
+      MOBS.nythraxis_scourge_of_thornpeak.maxLevel,
+      { x: player.pos.x + 4, y: player.pos.y, z: player.pos.z },
+    );
+    boss.nythraxis = {
+      eruptionCastKey: 41,
+      eruptionImpactRemaining: 1.4,
+      eruptionPoints: [
+        { x: player.pos.x + 5, z: player.pos.z },
+        { x: player.pos.x + 100, z: player.pos.z },
+      ],
+      graveFlames: [
+        { seq: 3, x: player.pos.x - 6, z: player.pos.z, remaining: 7, tickTimer: 0.4 },
+        { seq: 4, x: player.pos.x + 100, z: player.pos.z, remaining: 7, tickTimer: 0.4 },
+      ],
+    } as unknown as NonNullable<typeof boss.nythraxis>;
+    server.sim.entities.set(boss.id, boss);
+
+    broadcast(server);
+
+    const snap = lastSnap(fc.sent);
+    expect(snap.nythraxisEruptions).toEqual([
+      expect.objectContaining({ id: `${boss.id}:ge:41:0`, r: 3, dur: 2.5, rem: 1.4, lead: 0.75 }),
+    ]);
+    expect(snap.nythraxisFlames).toEqual([
+      expect.objectContaining({ id: `${boss.id}:gf:3`, src: boss.id, r: 3, dur: 12, rem: 7 }),
+    ]);
+  });
+});
+
 describe('Varkhul Forgestorm snapshot parity', () => {
   it('rebuilds active warnings after reconnect, clamps lifetime, and rejects malformed rows', () => {
     const client = bareClient(1);

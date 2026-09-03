@@ -1,12 +1,16 @@
 // Per-viewer ground-telegraph snapshot fragments: the anonymous ground-AoE
 // warnings (frost rings, Ignivar meteor warnings, temporal hourglasses,
-// consecrations) plus the Varkhul encounter block, concatenated in the exact
-// order the snapshot frame carries them. The broadcast loop builds one realm
-// projection per pass (each sim readout is read exactly once); this module
-// then filters and serializes it once per viewer without growing the
+// consecrations) plus the Varkhul and Nythraxis encounter blocks, concatenated
+// in the exact order the snapshot frame carries them. The broadcast loop builds
+// one realm projection per pass (each sim readout is read exactly once); this
+// module then filters and serializes it once per viewer without growing the
 // GameServer coordinator.
 
 import type { ActiveIgnivarMeteorWarning } from '../src/sim/ignivar_meteors';
+import type {
+  ActiveNythraxisGraveEruption,
+  ActiveNythraxisGraveFlame,
+} from '../src/sim/nythraxis_grave_eruption';
 import type { ActiveVarkhulAnvilMeteorWarning } from '../src/sim/varkhul_anvil_meteors';
 import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import type {
@@ -19,6 +23,7 @@ import type {
   ActiveFrostRing,
   ActiveTemporalHourglass,
 } from '../src/world_api';
+import { type NythraxisEncounterWireWorld, nythraxisEncounterWireJson } from './nythraxis_wire';
 import { type VarkhulEncounterWireWorld, varkhulEncounterWireJson } from './varkhul_wire';
 
 function round2(value: number): number {
@@ -31,11 +36,13 @@ export interface GroundTelegraphWireWorld {
   activeTemporalHourglasses: readonly ActiveTemporalHourglass[];
   activeConsecrations: readonly ActiveConsecration[];
   varkhulEncounter: VarkhulEncounterWireWorld;
+  nythraxisEncounter: NythraxisEncounterWireWorld;
   // The open-world ground-AoE horizon; consecrations always scope to it, even
   // inside the battleground band.
   interestQueryRadius: number;
   // The world-event router's delivery radius; the Ignivar meteor warnings and
-  // the Varkhul encounter block ride it (see the meteor filter below).
+  // the Varkhul and Nythraxis encounter blocks ride it (see the meteor filter
+  // below).
   eventRadius: number;
 }
 
@@ -52,6 +59,8 @@ export interface GroundTelegraphWorldSource {
   activeVarkhulCinderOrbProjectiles: readonly ActiveVarkhulCinderOrbProjectile[];
   activeVarkhulAnvilMeteors: readonly ActiveVarkhulAnvilMeteorWarning[];
   activeVarkhulAssemblies: readonly ActiveVarkhulAssembly[];
+  activeNythraxisGraveEruptions: readonly ActiveNythraxisGraveEruption[];
+  activeNythraxisGraveFlames: readonly ActiveNythraxisGraveFlame[];
 }
 
 // Build the once-per-broadcast realm projection shared by every viewer in the
@@ -72,6 +81,10 @@ export function groundTelegraphWorld(
       activeVarkhulCinderOrbProjectiles: sim.activeVarkhulCinderOrbProjectiles,
       activeVarkhulAnvilMeteors: sim.activeVarkhulAnvilMeteors,
       activeVarkhulAssemblies: sim.activeVarkhulAssemblies,
+    },
+    nythraxisEncounter: {
+      activeNythraxisGraveEruptions: sim.activeNythraxisGraveEruptions,
+      activeNythraxisGraveFlames: sim.activeNythraxisGraveFlames,
     },
     interestQueryRadius,
     eventRadius,
@@ -148,11 +161,18 @@ export function groundTelegraphWireJson(
     );
   const consecrationsJson =
     consecrations.length > 0 ? `,"consecrations":[${consecrations.join(',')}]` : '';
+  // Appended after the pre-existing families so their key order is untouched.
+  const nythraxisEncounterJson = nythraxisEncounterWireJson(
+    world.nythraxisEncounter,
+    anchorPos,
+    world.eventRadius,
+  );
   return (
     frostRingsJson +
     ignivarMeteorsJson +
     varkhulEncounterJson +
     temporalHourglassesJson +
-    consecrationsJson
+    consecrationsJson +
+    nythraxisEncounterJson
   );
 }
