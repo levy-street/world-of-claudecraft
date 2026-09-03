@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
+import { NYTHRAXIS_IMPALED_AURA_ID } from '../src/sim/nythraxis_bone_spike';
 import {
   BATTLE_RUNE_AURA_ID,
   CARRIED_FLAG_AURA_ID,
@@ -77,6 +78,17 @@ describe('aura icons reuse image-based ability art', () => {
 
   it('keeps a readable attack-power-percent safety fallback', () => {
     expect(hasAuraRecipe('aura_buff_ap_pct')).toBe(true);
+  });
+
+  it("the Nythraxis Impaled stun carries the spike's own recipe", () => {
+    // An encounter-owned stun with no ability record and no painted art: without
+    // this row the resolver collapses it to the aura_stun sunburst.
+    expect(hasAuraRecipe(NYTHRAXIS_IMPALED_AURA_ID), 'Impaled needs its identity recipe').toBe(
+      true,
+    );
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_IMPALED_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_stun')),
+    );
   });
 
   it('keeps painted modifier timers meaningful before their WebPs decode', () => {

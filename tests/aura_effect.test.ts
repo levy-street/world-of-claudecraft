@@ -18,6 +18,17 @@ import {
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../src/sim/encounters/varkhul';
 import {
+  NYTHRAXIS_IMPALED_AURA_ID,
+  NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
+  NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
+} from '../src/sim/nythraxis_bone_spike';
+import {
+  NYTHRAXIS_DREAD_CURSE_AURA_ID,
+  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP,
+  NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
+  NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
+} from '../src/sim/nythraxis_dread_curse';
+import {
   VARKHUL_SHARED_PYRE_AURA_ID,
   VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
   VARKHUL_SHARED_PYRE_TOTAL_DAMAGE_HEROIC,
@@ -130,6 +141,56 @@ describe('auraEffectDescriptor', () => {
     expect(hudChromeStrings.auraEffect.makersBrand).toBe(
       'For {duration} sec, each stack increases damage taken from Varkhul by {pct}%. Stacks up to {max} times. Tanks should swap at {swap} stacks.',
     );
+  });
+
+  it('teaches Dread Curse from the live aura value on both tiers', () => {
+    // Normal: one stack, value = 1 x 0.35.
+    expect(
+      desc({
+        id: NYTHRAXIS_DREAD_CURSE_AURA_ID,
+        kind: 'vuln_source',
+        value: NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
+        stacks: 1,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisDreadCurse',
+      nums: { perStack: 35, duration: 30, stacks: 1, max: 3, pct: 35, hit: 25, every: 10, swap: 2 },
+    });
+    // Heroic at the swap point: value = 2 x 0.45, read back as 45% per stack.
+    expect(
+      desc({
+        id: NYTHRAXIS_DREAD_CURSE_AURA_ID,
+        kind: 'vuln_source',
+        value: 2 * NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
+        stacks: 2,
+      })?.nums,
+    ).toMatchObject({ perStack: 45, pct: 90, stacks: 2, swap: 2 });
+    // A mirror that has not carried the value yet falls back to the normal bonus.
+    expect(
+      desc({ id: NYTHRAXIS_DREAD_CURSE_AURA_ID, kind: 'vuln_source', value: 0, stacks: 2 })?.nums,
+    ).toMatchObject({ perStack: 35, pct: 70, stacks: 2 });
+    expect(NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL).toBe(0.35);
+    expect(NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC).toBe(0.45);
+    expect(NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP).toBe(0.25);
+    expect(hudChromeStrings.auraEffect.nythraxisDreadCurse).toBe(
+      'Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.',
+    );
+  });
+
+  it('explains Impaled as the spike drain instead of the generic stun line', () => {
+    expect(desc({ id: NYTHRAXIS_IMPALED_AURA_ID, kind: 'stun', value: 0, value2: 77 })).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisImpaled',
+      nums: { normal: 8, heroic: 10, interval: 1 },
+    });
+    expect(NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL).toBe(0.08);
+    expect(NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC).toBe(0.1);
+    expect(hudChromeStrings.auraEffect.nythraxisImpaled).toBe(
+      'Impaled on a Bone Spike: you cannot act and lose {normal}% of your maximum health every {interval} sec ({heroic}% on Heroic) until the raid destroys the spike.',
+    );
+    // Any other stun keeps the generic restriction line.
+    expect(desc({ id: 'mob_charge_stun', kind: 'stun', value: 0 })).toEqual({
+      key: 'hudChrome.auraEffect.stun',
+    });
   });
 
   it('does not describe the Cinder placement mark as a zero-percent vulnerability', () => {

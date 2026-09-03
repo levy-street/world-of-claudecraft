@@ -1,0 +1,193 @@
+import { readFileSync } from 'node:fs';
+import { describe, expect, it, vi } from 'vitest';
+
+import { finderActivity } from '../src/sim/content/dungeon_finder';
+import { NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS } from '../src/sim/nythraxis_dread_curse';
+import type { SimEvent } from '../src/sim/types';
+import {
+  dispatchNythraxisCalloutSfx,
+  dispatchRaidCalloutSfx,
+  nythraxisCalloutCue,
+  nythraxisCalloutSfxPlan,
+} from '../src/ui/combat_sfx';
+import { setLanguage, type TranslationKey, t } from '../src/ui/i18n';
+import { hudChromeStrings } from '../src/ui/i18n.catalog/hud_chrome';
+import { type NythraxisCallout, nythraxisCalloutKey } from '../src/ui/nythraxis_callout';
+import { raidCalloutKey } from '../src/ui/raid_callout';
+import { localizeSimAuraName } from '../src/ui/sim_i18n';
+
+type NythraxisCalloutEvent = Extract<SimEvent, { type: 'nythraxisCallout' }>;
+
+const CALLS: readonly NythraxisCallout[] = [
+  'impaled',
+  'youAreImpaled',
+  'spikeBroken',
+  'dreadCurseSwap',
+];
+
+const hudSource = () => readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
+
+describe('Nythraxis encounter callouts', () => {
+  it('maps every structured authority event to a catalogued top-banner key', () => {
+    expect(CALLS.map((call) => nythraxisCalloutKey(call))).toEqual([
+      'hudChrome.nythraxisCallout.impaled',
+      'hudChrome.nythraxisCallout.youAreImpaled',
+      'hudChrome.nythraxisCallout.spikeBroken',
+      'hudChrome.nythraxisCallout.dreadCurseSwap',
+    ]);
+  });
+
+  it('has an English catalog row behind every call and renders it through t()', () => {
+    setLanguage('en');
+    expect(Object.keys(hudChromeStrings.nythraxisCallout).sort()).toEqual([...CALLS].sort());
+    expect(t(nythraxisCalloutKey('impaled') as TranslationKey)).toBe(
+      'Bone Spikes! Free the impaled!',
+    );
+    expect(t(nythraxisCalloutKey('youAreImpaled') as TranslationKey)).toBe(
+      'You are impaled! Hold on!',
+    );
+    expect(t(nythraxisCalloutKey('spikeBroken') as TranslationKey)).toBe('Spike shattered!');
+    expect(t(nythraxisCalloutKey('dreadCurseSwap') as TranslationKey)).toBe(
+      'Dread Curse: swap tanks!',
+    );
+  });
+
+  it('routes both raid callout families through the one banner-key selector', () => {
+    expect(raidCalloutKey({ type: 'nythraxisCallout', sourceId: 1, call: 'spikeBroken' })).toBe(
+      'hudChrome.nythraxisCallout.spikeBroken',
+    );
+    expect(raidCalloutKey({ type: 'varkhulCallout', sourceId: 1, call: 'heat90' })).toBe(
+      'hudChrome.varkhulCallout.heat90',
+    );
+  });
+
+  it('announces the aria-hidden top banner through the combat live region too', () => {
+    const hud = hudSource();
+    const arm = hud.slice(hud.indexOf("case 'nythraxisCallout': {"), hud.indexOf("case 'chat':"));
+    expect(arm).toContain('raidCalloutKey(ev)');
+    expect(arm).toContain('this.questBanner.show(text);');
+    expect(arm).toContain('this.combatAnnouncer.push(text, performance.now());');
+  });
+
+  it('gives every warning a sampled cue and plays it from the boss position', () => {
+    expect(nythraxisCalloutCue('impaled')).toBe('impact_bone');
+    expect(nythraxisCalloutCue('youAreImpaled')).toBe('impact_bone');
+    expect(nythraxisCalloutCue('spikeBroken')).toBe('ui_achievement');
+    expect(nythraxisCalloutCue('dreadCurseSwap')).toBe('impact_shadow');
+
+    const event = {
+      type: 'nythraxisCallout',
+      pid: 1,
+      sourceId: 42,
+      call: 'dreadCurseSwap',
+    } as const satisfies NythraxisCalloutEvent;
+    const entityOf = (entityId: number) =>
+      entityId === 42 ? { pos: { x: 4, y: 5, z: 6 } } : undefined;
+    expect(nythraxisCalloutSfxPlan(event, entityOf)).toEqual({
+      cue: 'impact_shadow',
+      x: 4,
+      y: 5,
+      z: 6,
+      gain: 0.9,
+      cooldown: 0.08,
+      jitter: false,
+    });
+    expect(nythraxisCalloutSfxPlan(event, () => undefined)).toBeNull();
+
+    const sink = vi.fn();
+    expect(dispatchNythraxisCalloutSfx(event, entityOf, sink)).toBe(true);
+    expect(sink).toHaveBeenCalledWith(expect.objectContaining({ cue: 'impact_shadow', x: 4 }));
+    expect(dispatchNythraxisCalloutSfx(event, () => undefined, sink)).toBe(false);
+    expect(sink).toHaveBeenCalledOnce();
+  });
+
+  it('shares the HUD arm with the Varkhul callouts through the raid dispatcher', () => {
+    const play = vi.fn();
+    const entityOf = (entityId: number) =>
+      entityId === 7 ? { pos: { x: 1, y: 2, z: 3 } } : undefined;
+    expect(
+      dispatchRaidCalloutSfx(
+        { type: 'nythraxisCallout', sourceId: 7, call: 'impaled' },
+        entityOf,
+        play,
+      ),
+    ).toBe(true);
+    expect(play).toHaveBeenLastCalledWith('impact_bone', 1, 2, 3, 0.9, {
+      cooldown: 0.08,
+      jitter: false,
+    });
+    expect(
+      dispatchRaidCalloutSfx(
+        { type: 'varkhulCallout', sourceId: 7, call: 'worldfireClosing' },
+        entityOf,
+        play,
+      ),
+    ).toBe(true);
+    expect(play).toHaveBeenLastCalledWith('rift_lava_tick', 1, 2, 3, 0.9, {
+      cooldown: 0.08,
+      jitter: false,
+    });
+    expect(
+      dispatchRaidCalloutSfx(
+        { type: 'nythraxisCallout', sourceId: 8, call: 'impaled' },
+        entityOf,
+        play,
+      ),
+    ).toBe(false);
+    expect(play).toHaveBeenCalledTimes(2);
+
+    const hud = hudSource();
+    expect(hud).toContain("case 'nythraxisCallout'");
+    expect(hud).toContain('dispatchRaidCalloutSfx(');
+  });
+});
+
+describe('Nythraxis sim English is matched client-side', () => {
+  it.each([
+    'Gravebreaker',
+    'Soul Rend',
+    'Deathless Rage',
+    'Deathless Rage Interrupted',
+    'Soul Ward',
+    'Final Stand',
+    'Dread Curse',
+    'Bone Spike',
+    'Impaled',
+    'Grave Eruption',
+    'Grave Flame',
+    "Malric's Mending",
+    'Royal Cleave',
+  ])('recognizes the cast or aura name %s', (name) => {
+    setLanguage('en');
+    // A null here means the buff frame and combat log would fall back to the raw
+    // English string in every locale (the localizeSimAuraName contract).
+    expect(localizeSimAuraName(name)).toBe(name);
+  });
+});
+
+describe('Nythraxis dungeon finder blurbs', () => {
+  it('spells the Dread Curse swap point from the encounter constant', () => {
+    expect(hudChromeStrings.finder.mech.dread_curse).toContain(
+      `swap at ${NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS} stacks`,
+    );
+    expect(hudChromeStrings.finder.mech.dread_curse).not.toMatch(/heroic only/i);
+  });
+
+  it('has a blurb for every mechanic key both raid previews list', () => {
+    setLanguage('en');
+    const keys = new Set<string>();
+    for (const id of ['nythraxis_boss_arena_normal', 'nythraxis_boss_arena_heroic']) {
+      for (const encounter of finderActivity(id)?.encounters ?? []) {
+        for (const mechanic of encounter.mechanics) keys.add(mechanic);
+      }
+    }
+    for (const mechanic of ['bone_spike', 'grave_eruption', 'deathless_court', 'dread_curse']) {
+      expect(keys.has(mechanic), mechanic).toBe(true);
+    }
+    for (const mechanic of keys) {
+      const text = t(`hudChrome.finder.mech.${mechanic}` as TranslationKey);
+      expect(text, mechanic).toMatch(/\S/);
+    }
+    expect(hudChromeStrings.finder.mech.deathless_court).toMatch(/heroic only/i);
+  });
+});

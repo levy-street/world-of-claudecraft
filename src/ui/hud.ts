@@ -207,7 +207,7 @@ import {
   auraApplyCue,
   castCueForAbility,
   consumeHealCue,
-  dispatchVarkhulCalloutSfx,
+  dispatchRaidCalloutSfx,
   groundTickAbilityCue,
   impactCueForDamage,
   mobVoiceActionForDamage,
@@ -714,6 +714,7 @@ import {
 } from './quest_item_tooltip_view';
 import { questProgressEventText } from './quest_progress_text';
 import { RaidBossGuideWindow, raidBossGuideContextFallback } from './raid_boss_guide_window';
+import { raidCalloutKey } from './raid_callout';
 import { lockoutParts, lockoutShape } from './raid_lockout';
 import { type RaidLockoutI18n, raidLockoutPanelHtml } from './raid_lockout_view';
 import {
@@ -813,7 +814,6 @@ import { crestIdForEntity } from './unit_portrait';
 import { UnitPortraitPainter } from './unit_portrait_painter';
 import { knownItemIconHtml } from './unknown_item_icon';
 import { unstuckFeedback } from './unstuck_feedback';
-import { varkhulCalloutKey } from './varkhul_callout';
 import { visibleVendorStock } from './vendor_stock_gate_core';
 import { nextVoicedYell, type VoicedYellState, voicedYellGain } from './voice_events';
 import { onWalletUiChange, walletConnectionView } from './wallet_balance';
@@ -11227,15 +11227,12 @@ export class Hud {
         sfx.unloop(`cast:${ev.entityId}`, 0.2);
         this.castLoopIds.delete(ev.entityId);
         return;
-      case 'varkhulCallout': {
-        dispatchVarkhulCalloutSfx(
+      case 'varkhulCallout':
+      case 'nythraxisCallout': {
+        dispatchRaidCalloutSfx(
           ev,
           (entityId) => sim.entities.get(entityId),
-          (plan) =>
-            this.combat(plan.cue, plan.x, plan.y, plan.z, plan.gain, {
-              cooldown: plan.cooldown,
-              jitter: plan.jitter,
-            }),
+          (cue, x, y, z, gain, opts) => this.combat(cue, x, y, z, gain, opts),
         );
         return;
       }
@@ -12726,8 +12723,9 @@ export class Hud {
           }
           this.questDialog.refresh();
           break;
-        case 'varkhulCallout': {
-          const text = t(varkhulCalloutKey(ev.call));
+        case 'varkhulCallout':
+        case 'nythraxisCallout': {
+          const text = t(raidCalloutKey(ev));
           this.questBanner.show(text);
           this.combatAnnouncer.push(text, performance.now());
           break;

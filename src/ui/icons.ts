@@ -2586,6 +2586,48 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
   raid_varkhul_forge_legion: r('steel', 'ember', ['helm', { p: 'mace', ...BR }]),
   raid_varkhul_masterpiece_unbound: r('fury', 'blood', ['mace', 'flame'], ['glow']),
   raid_varkhul_worldfire: r('fire', 'blood', ['sunburst', 'flame'], ['glow', 'drips']),
+  // Nythraxis encounter-journal icons (same UI-owned convention): bone and shadow
+  // on a crypt palette, each mechanic keyed by its own primitive so the journal
+  // rows read apart at a glance.
+  raid_nythraxis_gravebreaker: r('shadow', 'bone', ['mace', { p: 'skull', ...BR }], ['motion']),
+  raid_nythraxis_dread_curse: r(
+    'shadow',
+    'shadowPurple',
+    ['skull', { p: 'sigil_rune', ...BR }],
+    ['glow'],
+  ),
+  raid_nythraxis_bone_spike: r(
+    'blood',
+    'bone',
+    ['bone', { p: 'droplet', ...BR, pal: 'blood' }],
+    ['crack'],
+  ),
+  raid_nythraxis_grave_eruption: r(
+    'earth',
+    'shadowPurple',
+    ['hand', { p: 'flame', ...BR }],
+    ['crack'],
+  ),
+  raid_nythraxis_raise_fallen: r('shadow', 'bone', ['helm', { p: 'skull', ...BR }], ['arcs']),
+  raid_nythraxis_soul_rend: r(
+    'shadow',
+    'shadowPurple',
+    ['heart', { p: 'claw_slash', ...BR }],
+    ['drips'],
+  ),
+  raid_nythraxis_deathless_rage: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
+  raid_nythraxis_deathless_court: r(
+    'shadow',
+    'silverWhite',
+    ['ascension_seal', { p: 'skull', ...BR }],
+    ['arcs'],
+  ),
+  raid_nythraxis_final_stand: r(
+    'fury',
+    'blood',
+    ['skull', { p: 'lightning', ...BR }],
+    ['glow', 'drips'],
+  ),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
   pet_growl: r('fury', 'gold', ['roar'], ['arcs']),
@@ -3686,6 +3728,11 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // and composed synchronously on the frame path the first time anyone saw it.
   // A blood brand-sigil watched by a bone eye: branded, and seen.
   cheater_mark: r('shadow', 'blood', ['sigil_rune', { p: 'eye', ...BR, pal: 'bone' }], ['glow']),
+  // Nythraxis's Impaled (src/sim/nythraxis_bone_spike.ts): an encounter-owned
+  // stun with no ability record and no painted art, so without this row the
+  // resolver collapsed it to the aura_stun sunburst and the pinned raider could
+  // not tell the spike from an ordinary daze. A bloodied bone, the spike itself.
+  nythraxis_impaled: r('blood', 'bone', ['bone', { p: 'droplet', ...BR, pal: 'blood' }], ['crack']),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).

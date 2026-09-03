@@ -29,6 +29,15 @@ export const RAID_BOSS_GUIDE_MODEL_SPECS: Readonly<
     height: 3,
     yaw: 0,
   },
+  // The in-world skel_golem rig (src/render/characters/manifest.ts): its base GLB
+  // carries the shared Idle clip; the bespoke Golem_Slam lives in a sidecar the
+  // turntable never needs.
+  nythraxis: {
+    url: 'models/chars/enemies/skeleton_golem.glb',
+    idle: 'Idle',
+    height: 3.4,
+    yaw: 0,
+  },
 });
 
 export interface RaidBossGuideModelViewer {
