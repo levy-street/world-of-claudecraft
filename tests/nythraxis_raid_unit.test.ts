@@ -609,7 +609,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -686,7 +685,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -754,7 +752,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -827,7 +824,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -878,7 +874,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -932,7 +927,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -972,7 +966,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1106,7 +1099,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1166,7 +1158,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1219,7 +1210,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1269,7 +1259,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1336,7 +1325,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1405,7 +1393,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1457,7 +1444,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1506,7 +1492,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1618,7 +1603,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1749,7 +1733,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -1843,7 +1826,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2101,7 +2083,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2145,7 +2126,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2202,7 +2182,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2255,7 +2234,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2310,7 +2288,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2354,7 +2331,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2405,7 +2381,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2451,7 +2426,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2503,7 +2477,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
@@ -2546,7 +2519,6 @@ describe('Nythraxis raid encounter', () => {
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
       wardChannels: [],
-      finalStand: false,
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };

@@ -25,6 +25,7 @@ import {
   nythraxisGraveFlameTickMaxHp,
   pointInNythraxisGraveCircle,
 } from '../src/sim/nythraxis_grave_eruption';
+import { igniteNythraxisSoulfire, NYTHRAXIS_SOULFIRE_CAP } from '../src/sim/nythraxis_soulfire';
 
 const ORIGIN = { x: 0, z: 96 };
 
@@ -51,6 +52,8 @@ describe('Nythraxis Grave Eruption', () => {
     expect(NYTHRAXIS_GRAVE_ERUPTION_RADIUS).toBe(3);
     expect(NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS).toBe(2.5);
     expect(NYTHRAXIS_GRAVE_ERUPTION_REVEAL_DELAY_SECONDS).toBe(0.75);
+    expect(NYTHRAXIS_SOULFIRE_CAP).toBe(12);
+    expect(NYTHRAXIS_GRAVE_FLAME_CAP).toBe(24);
   });
 
   it('places a circle under every ordered target when they fit, deterministically', () => {
@@ -137,8 +140,9 @@ describe('Nythraxis Grave Eruption', () => {
         { x: 3, z: 4 },
       ],
       graveFlames: [
-        { seq: 4, x: 5, z: 6, remaining: 20, tickTimer: 0.5 },
-        { seq: 5, x: 7, z: 8, remaining: 0, tickTimer: 0.5 },
+        { seq: 4, kind: 'grave' as const, radius: 3, x: 5, z: 6, remaining: 20, tickTimer: 0.5 },
+        { seq: 5, kind: 'grave' as const, radius: 3, x: 7, z: 8, remaining: 0, tickTimer: 0.5 },
+        { seq: 6, kind: 'soul' as const, radius: 4, x: 9, z: 10, remaining: 7, tickTimer: 0.5 },
       ],
     };
     expect(activeNythraxisGraveEruptions(9, state)).toEqual([
@@ -162,21 +166,78 @@ describe('Nythraxis Grave Eruption', () => {
       },
     ]);
     expect(activeNythraxisGraveEruptions(9, { ...state, eruptionImpactRemaining: 0 })).toEqual([]);
-    // A flame past its duration clamps to the duration; an expired one is dropped.
+    // A flame past its duration clamps to the duration; an expired one is dropped;
+    // a Soulfire pool carries its own kind, radius, and 15 s duration.
     expect(activeNythraxisGraveFlames(9, state, 'normal')).toEqual([
       {
         id: nythraxisGraveFlameId(9, 4),
         sourceId: 9,
+        kind: 'grave',
         x: 5,
         z: 6,
         radius: 3,
         duration: 12,
         remaining: 12,
       },
+      {
+        id: nythraxisGraveFlameId(9, 6),
+        sourceId: 9,
+        kind: 'soul',
+        x: 9,
+        z: 10,
+        radius: 4,
+        duration: 15,
+        remaining: 7,
+      },
     ]);
     expect(activeNythraxisGraveFlames(9, state, 'heroic')[0]).toMatchObject({
       duration: 18,
       remaining: 18,
     });
+    expect(activeNythraxisGraveFlames(9, state, 'heroic')[1]).toMatchObject({
+      kind: 'soul',
+      duration: 15,
+    });
+  });
+
+  it('caps Grave Flame and Soulfire separately in the shared list', () => {
+    const flames: NythraxisGraveFlame[] = [];
+    let seq = igniteNythraxisGraveFlames(
+      flames,
+      Array.from({ length: NYTHRAXIS_GRAVE_FLAME_CAP }, (_, i) => ({ x: i, z: 0 })),
+      0,
+      12,
+    );
+    seq = igniteNythraxisSoulfire(
+      flames,
+      Array.from({ length: NYTHRAXIS_SOULFIRE_CAP + 2 }, (_, i) => ({ x: 100 + i, z: 0 })),
+      [],
+      seq,
+    );
+    expect(flames.filter((f) => f.kind === 'grave')).toHaveLength(NYTHRAXIS_GRAVE_FLAME_CAP);
+    expect(flames.filter((f) => f.kind === 'soul')).toHaveLength(NYTHRAXIS_SOULFIRE_CAP);
+    // The two oldest Soulfire pools left, never a Grave Flame.
+    expect(flames.filter((f) => f.kind === 'soul')[0].x).toBe(102);
+    // Another Grave Flame wave evicts only Grave Flame.
+    igniteNythraxisGraveFlames(flames, [{ x: 50, z: 0 }], seq, 12);
+    expect(flames.filter((f) => f.kind === 'grave')).toHaveLength(NYTHRAXIS_GRAVE_FLAME_CAP);
+    expect(flames.filter((f) => f.kind === 'soul')).toHaveLength(NYTHRAXIS_SOULFIRE_CAP);
+  });
+
+  it('never leaves Soulfire beside a wardstone', () => {
+    const flames: NythraxisGraveFlame[] = [];
+    const ward = { x: 40, z: 79 };
+    igniteNythraxisSoulfire(
+      flames,
+      [
+        { x: 40, z: 79 },
+        { x: 45, z: 79 },
+        { x: 46.5, z: 79 },
+      ],
+      [ward],
+      0,
+    );
+    expect(flames.map((f) => f.x)).toEqual([46.5]);
+    expect(flames[0]).toMatchObject({ kind: 'soul', radius: 4, remaining: 15 });
   });
 });

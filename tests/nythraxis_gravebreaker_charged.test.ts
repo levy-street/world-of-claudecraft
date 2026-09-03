@@ -139,7 +139,6 @@ function isolatedState(gravebreakerTimer: number): NonNullable<Entity['nythraxis
     boneSpikeTimer: 999,
     eruptionTimer: 999,
     wardChannels: [],
-    finalStand: false,
     deathSpoken: false,
   };
 }

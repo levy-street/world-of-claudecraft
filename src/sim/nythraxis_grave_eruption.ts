@@ -12,6 +12,7 @@
 //
 // `src/sim`-pure: no rng stream, no wall clock, no DOM.
 
+import { NYTHRAXIS_SOULFIRE_SECONDS } from './nythraxis_soulfire';
 import { hash2 } from './rng';
 import type { DungeonDifficulty } from './types';
 
@@ -24,9 +25,17 @@ export interface NythraxisGraveTarget extends NythraxisGravePoint {
   id: number;
 }
 
-/** A live Grave Flame patch on the encounter state. */
+/** Which fire a patch is: Grave Flame (an eruption's residue) or Soulfire (a
+ *  Soul Rend detonation's pool, nythraxis_soulfire.ts). Both ride this one
+ *  list so the driver's flame tick, the readout, the wire, and the renderer
+ *  carry both; only palette, radius, duration, and tick differ by kind. */
+export type NythraxisFlameKind = 'grave' | 'soul';
+
+/** A live burning patch on the encounter state. */
 export interface NythraxisGraveFlame extends NythraxisGravePoint {
   seq: number;
+  kind: NythraxisFlameKind;
+  radius: number;
   remaining: number;
   tickTimer: number;
 }
@@ -51,6 +60,7 @@ export interface ActiveNythraxisGraveEruption extends NythraxisGravePoint {
 export interface ActiveNythraxisGraveFlame extends NythraxisGravePoint {
   id: string;
   sourceId: number;
+  kind: NythraxisFlameKind;
   radius: number;
   duration: number;
   remaining: number;
@@ -142,22 +152,31 @@ export function activeNythraxisGraveEruptions(
   }));
 }
 
-/** Projects the burning patches into reconnect-safe presentation rows. */
+/** How long a patch of this kind burns from ignition. */
+export function nythraxisFlameSeconds(
+  kind: NythraxisFlameKind,
+  difficulty: DungeonDifficulty,
+): number {
+  return kind === 'soul' ? NYTHRAXIS_SOULFIRE_SECONDS : nythraxisGraveFlameSeconds(difficulty);
+}
+
+/** Projects every burning patch (Grave Flame and Soulfire) into reconnect-safe rows. */
 export function activeNythraxisGraveFlames(
   bossId: number,
   state: NythraxisGraveEruptionState,
   difficulty: DungeonDifficulty,
 ): ActiveNythraxisGraveFlame[] {
-  const duration = nythraxisGraveFlameSeconds(difficulty);
   const flames: ActiveNythraxisGraveFlame[] = [];
   for (const flame of state.graveFlames) {
     if (flame.remaining <= 0) continue;
+    const duration = nythraxisFlameSeconds(flame.kind, difficulty);
     flames.push({
       id: nythraxisGraveFlameId(bossId, flame.seq),
       sourceId: bossId,
+      kind: flame.kind,
       x: flame.x,
       z: flame.z,
-      radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
+      radius: flame.radius,
       duration,
       remaining: Math.min(flame.remaining, duration),
     });
@@ -290,19 +309,29 @@ export function nythraxisGraveEruptionPattern(
   return placed;
 }
 
-/** True when a point is inside the exact circular footprint (ring or flame). */
-export function pointInNythraxisGraveCircle(
+/** True when a point is inside a circle of `radius` (edge inclusive). */
+export function pointInNythraxisCircle(
   circle: NythraxisGravePoint,
+  radius: number,
   point: NythraxisGravePoint,
 ): boolean {
   const dx = point.x - circle.x;
   const dz = point.z - circle.z;
-  return dx * dx + dz * dz <= NYTHRAXIS_GRAVE_ERUPTION_RADIUS ** 2 + Number.EPSILON * 16;
+  return dx * dx + dz * dz <= radius * radius + Number.EPSILON * 16;
+}
+
+/** True when a point is inside the exact eruption footprint (the warning ring). */
+export function pointInNythraxisGraveCircle(
+  circle: NythraxisGravePoint,
+  point: NythraxisGravePoint,
+): boolean {
+  return pointInNythraxisCircle(circle, NYTHRAXIS_GRAVE_ERUPTION_RADIUS, point);
 }
 
 /**
- * Append the patches an impact leaves behind, expiring the oldest past the cap.
- * Returns the next sequence number.
+ * Append the Grave Flame patches an impact leaves behind, expiring the oldest
+ * Grave Flame past the cap while leaving any Soulfire pools in the same list
+ * untouched. Returns the next sequence number.
  */
 export function igniteNythraxisGraveFlames(
   flames: NythraxisGraveFlame[],
@@ -314,12 +343,23 @@ export function igniteNythraxisGraveFlames(
   for (const point of points) {
     flames.push({
       seq: next++,
+      kind: 'grave',
+      radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
       x: point.x,
       z: point.z,
       remaining: duration,
       tickTimer: NYTHRAXIS_GRAVE_FLAME_TICK_SECONDS,
     });
   }
-  while (flames.length > NYTHRAXIS_GRAVE_FLAME_CAP) flames.shift();
+  let graveCount = 0;
+  for (const flame of flames) if (flame.kind === 'grave') graveCount++;
+  for (let i = 0; i < flames.length && graveCount > NYTHRAXIS_GRAVE_FLAME_CAP; ) {
+    if (flames[i].kind === 'grave') {
+      flames.splice(i, 1);
+      graveCount--;
+    } else {
+      i++;
+    }
+  }
   return next;
 }

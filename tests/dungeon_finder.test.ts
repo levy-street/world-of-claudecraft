@@ -185,7 +185,15 @@ describe('finder catalogue metadata', () => {
     const heroic = finderActivity('nythraxis_boss_arena_heroic');
     const normalMechanics = normal?.encounters.flatMap((e) => e.mechanics) ?? [];
     const heroicMechanics = heroic?.encounters.flatMap((e) => e.mechanics) ?? [];
-    for (const m of ['dread_curse', 'bone_spike', 'grave_eruption', 'wardstones']) {
+    for (const m of [
+      'dread_curse',
+      'bone_spike',
+      'grave_eruption',
+      'wardstones',
+      'kings_wrath',
+      'bone_storm',
+      'crown_endures',
+    ]) {
       expect(normalMechanics, m).toContain(m);
       expect(heroicMechanics, m).toContain(m);
     }

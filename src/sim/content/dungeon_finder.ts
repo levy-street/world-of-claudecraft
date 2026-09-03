@@ -152,10 +152,16 @@ const NYTHRAXIS_RAID_MECHANICS = [
   'dread_curse',
   'bone_spike',
   'grave_eruption',
+  'binding_sigil',
   'raise_fallen',
   'soul_rend',
+  'soulfire',
+  'gravefire',
   'deathless_rage',
   'wardstones',
+  'kings_wrath',
+  'bone_storm',
+  'crown_endures',
 ] as const;
 
 const NYTHRAXIS_RAID_ENCOUNTERS: readonly FinderEncounter[] = [

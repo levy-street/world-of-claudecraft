@@ -451,13 +451,17 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
     isVarkhul ||
     (isNythraxis && mob.nythraxis && mob.nythraxis.phase !== 'dead')
   ) {
+    // Bone Storm joins the script-locked windows: the encounter driver moves
+    // him itself (encounters/nythraxis.ts updateNythraxisBoneStorm), so the
+    // chase and swing below must not fight it.
     const nythraxisScriptLocked =
       isNythraxis &&
       mob.nythraxis &&
       (mob.nythraxis.phase === 'transition' ||
         mob.nythraxis.deathlessCastRemaining > 0 ||
         mob.nythraxis.deathlessStunRemaining > 0 ||
-        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0);
+        (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0 ||
+        (mob.nythraxis.boneStorm ?? null) !== null);
     if (isNythraxis) {
       ctx.updateNythraxisEncounter(mob);
       if (
@@ -466,7 +470,8 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
           (mob.nythraxis.phase === 'transition' ||
             mob.nythraxis.deathlessCastRemaining > 0 ||
             mob.nythraxis.deathlessStunRemaining > 0 ||
-            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0))
+            (mob.nythraxis.heroicSummonChannelRemaining ?? 0) > 0 ||
+            (mob.nythraxis.boneStorm ?? null) !== null))
       )
         return;
     } else if (isIgnivar) {

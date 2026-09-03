@@ -5145,7 +5145,7 @@ export interface NythraxisBoneSpike {
 }
 
 export interface NythraxisEncounterState {
-  phase: 1 | 'transition' | 2 | 'dead';
+  phase: 1 | 'transition' | 2 | 3 | 'dead';
   introSpoken: boolean;
   transitionStarted: boolean;
   transitionTimer: number;
@@ -5184,10 +5184,62 @@ export interface NythraxisEncounterState {
   eruptionCastKey?: number;
   eruptionImpactRemaining?: number;
   eruptionPoints?: { x: number; z: number }[];
-  graveFlames?: { seq: number; x: number; z: number; remaining: number; tickTimer: number }[];
+  // Every burning patch, Grave Flame and Soulfire alike (kind tells them
+  // apart; nythraxis_soulfire.ts pushes the Soul Rend pools into this list).
+  graveFlames?: {
+    seq: number;
+    kind: 'grave' | 'soul';
+    radius: number;
+    x: number;
+    z: number;
+    remaining: number;
+    tickTimer: number;
+  }[];
   graveFlameSeq?: number;
+  // Gravefire: the cadence and the live traveling lines (nythraxis_gravefire.ts).
+  gravefireTimer?: number;
+  gravefires?: {
+    seq: number;
+    x: number;
+    z: number;
+    dirX: number;
+    dirZ: number;
+    elapsed: number;
+    tickTimer: number;
+  }[];
+  gravefireSeq?: number;
+  // Binding Sigil: the cadence, the live sigil (null between casts), and the
+  // gap timer that keeps the body-owning majors (Deathless Rage, the sigil
+  // drag) from overlapping (nythraxis_binding_sigil.ts).
+  sigilTimer?: number;
+  sigil?: {
+    castKey: number;
+    x: number;
+    z: number;
+    remaining: number;
+    ascensionTimer: number;
+    ascensionStacks: number;
+  } | null;
+  majorGapTimer?: number;
+  // The Crown Endures: seconds since the first encounter tick (the clock runs
+  // through the transition) and the enrage stack the boss carries once it has
+  // run out (nythraxis_enrage_clock.ts).
+  enrageElapsed?: number;
+  enrageStacks?: number;
+  // Bone Storm (phase 3): the cadence and the live storm, null between storms
+  // (nythraxis_bone_storm.ts).
+  boneStormTimer?: number;
+  boneStorm?: {
+    castKey: number;
+    elapsed: number;
+    chargeIndex: number;
+    chargeTargetId: number | null;
+    slammed: boolean;
+    whirlTickTimer: number;
+    spikeCast: boolean;
+    chargedIds: number[];
+  } | null;
   wardChannels: NythraxisWardChannel[];
-  finalStand: boolean;
   deathSpoken: boolean;
   // Players seen alive inside the arena during this pull. Session-only attempt
   // roster used for raid-wipe recovery, so a remote group member cannot farm
@@ -5767,7 +5819,23 @@ export type SimEvent = { pid?: number } & (
   | {
       type: 'nythraxisCallout';
       sourceId: number;
-      call: 'impaled' | 'youAreImpaled' | 'spikeBroken' | 'dreadCurseSwap';
+      call:
+        | 'impaled'
+        | 'youAreImpaled'
+        | 'spikeBroken'
+        | 'dreadCurseSwap'
+        | 'sigilAppears'
+        | 'sigilBound'
+        | 'sigilUnbound'
+        | 'gravefireTarget'
+        | 'kingsWrath'
+        | 'boneStormBegins'
+        | 'boneStormCharge'
+        | 'boneStormEnds'
+        | 'crownEndures60'
+        | 'crownEndures30'
+        | 'crownEndures10'
+        | 'crownEndures';
     }
   | {
       type: 'aura';

@@ -1979,6 +1979,12 @@ export class Sim {
   get activeNythraxisGraveFlames(): nythraxisReadouts.ActiveNythraxisGraveFlame[] {
     return nythraxisReadouts.collectActiveNythraxisGraveFlames(this.ctx);
   }
+  get activeNythraxisGravefires(): nythraxisReadouts.ActiveNythraxisGravefire[] {
+    return nythraxisReadouts.collectActiveNythraxisGravefires(this.ctx);
+  }
+  get activeNythraxisBindingSigils(): nythraxisReadouts.ActiveNythraxisBindingSigil[] {
+    return nythraxisReadouts.collectActiveNythraxisBindingSigils(this.ctx);
+  }
   get activeVarkhulForgestormWarnings(): raidReadouts.ActiveVarkhulForgestormWarning[] {
     return raidReadouts.collectActiveVarkhulForgestormWarnings(this.ctx);
   }
