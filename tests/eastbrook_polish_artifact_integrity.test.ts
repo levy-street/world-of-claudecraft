@@ -1034,10 +1034,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the Nythraxis mechanics redo (the grave flame visual hookup
+// and the meteor landing burst extraction moved the renderer integration
+// leaf). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a5c2116d1b9087ee0a1471a4e3bcaf8e81edb88c09b4ef6de792305b778ba94c';
+  '6312ae962823ae4a548fa03b2e98c7c7e79f58974f826f6902e1c7edb83782a9';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '988b123a3a3f657756ce1898a0cf077aad5c9728917c92d7685ac2debf4d7f6f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2193,7 +2196,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('eca473321cb438c8ecdd9bfadf949fcf23f0b38fd1830590822d878950ce6a55');
+      // Re-minted for the Nythraxis mechanics redo (renderer.ts gained the grave
+      // flame hookup and lost the inline meteor burst): the composite first,
+      // then this seal. No capture was retaken.
+    ).toBe('724b6789e19d226ad7b5c9c04d632ff59bae093623e101380e8c9d54d3d3ccfe');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

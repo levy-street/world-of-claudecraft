@@ -301,9 +301,11 @@ describe('isHarvestableCorpse', () => {
     // yields nothing either. Plus the seven Ignivar raid templates (the
     // derelict mech, Varkhul, the three crucible automatons, the herald and
     // the Heart of the End): all elemental-family forge constructs, and a
-    // construct corpse carries no skinnable or butcherable components.)
+    // construct corpse carries no skinnable or butcherable components. Plus the
+    // Nythraxis Bone Spike from the mechanics redo: a pillar of bone the raid
+    // shatters to free an impaled raider, not a corpse anyone butchers.)
     const untagged = Object.values(MOBS).filter((m) => !m.componentTags?.length);
-    expect(untagged).toHaveLength(194);
+    expect(untagged).toHaveLength(195);
     for (const m of untagged) expect(isHarvestableCorpse(m.componentTags)).toBe(false);
     // The three literals above are the load-bearing ones; this sum states that
     // they partition MOBS, so a template that fell out of all three would read

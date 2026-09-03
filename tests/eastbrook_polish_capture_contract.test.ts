@@ -348,8 +348,11 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the Nythraxis mechanics redo (the grave flame visual hookup
+// and the meteor landing burst extraction moved the renderer integration
+// leaf). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '988b123a3a3f657756ce1898a0cf077aad5c9728917c92d7685ac2debf4d7f6f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

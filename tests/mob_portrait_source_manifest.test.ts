@@ -83,13 +83,14 @@ describe('mob portrait source manifest', () => {
   it('covers every live mob and records each render dependency with a content hash', () => {
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as PortraitSourceManifest;
     const liveIds = Object.keys(MOBS).sort();
-    // 242: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
+    // 243: the 233 the v0.39.0 base carried, minus vale_cup_ball (retired with
     // the Vale Cup by the New Eastbrook program), plus the Proving Shore
     // tutorial island's training_effigy, shore_scuttler, and mister_crabs
     // tide-pool miniboss, plus the seven Ignivar raid enemies (the herald,
     // the ember sentinel, cinder artificer, crucible warden, heart of the
-    // end, Varkhul the Forgefather, and the derelict mech bomber).
-    expect(liveIds).toHaveLength(242);
+    // end, Varkhul the Forgefather, and the derelict mech bomber), plus the
+    // Nythraxis Bone Spike the mechanics redo raises under impaled raiders.
+    expect(liveIds).toHaveLength(243);
     expect(manifest.portraitCount).toBe(liveIds.length);
     expect(manifest.portraits.map((portrait) => portrait.id)).toEqual(liveIds);
     expect(manifest.schemaVersion).toBe(2);
