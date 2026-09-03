@@ -28,12 +28,18 @@ export interface GpuAdapterInfoLike {
   vendor?: unknown;
   architecture?: unknown;
   device?: unknown;
+  /**
+   * Spec flag: the browser answered with its CPU fallback, not a real GPU.
+   * This is where it lives NOW. It was removed from GPUAdapter and moved onto
+   * the info, so the shipping shape carries it here and nowhere else.
+   */
+  isFallbackAdapter?: unknown;
 }
 
 export interface GpuAdapterLike {
   info?: GpuAdapterInfoLike;
   requestAdapterInfo?: () => unknown;
-  /** Spec flag: the browser answered with its CPU fallback, not a real GPU. */
+  /** The same flag's OLD home, kept for browsers that still carry it here. */
   isFallbackAdapter?: unknown;
 }
 
@@ -128,8 +134,12 @@ export async function probeGpuHighPerformanceAdapter(
       // keys it 'software'. Reported, that reads on the server as "this
       // machine renders WebGL in software", which is the OPPOSITE of what it
       // means: WebGL may be on real hardware and WebGPU simply had no hardware
-      // adapter to offer. Absent evidence is the honest answer, so this arm
-      // joins the other null ones.
+      // adapter to offer. Absent evidence is the honest answer, so both arms
+      // below join the other null ones.
+      //
+      // The flag's OLD home, on the adapter itself. Checked first because it
+      // needs no info fetch, but it is empty on a current browser: the
+      // property was removed from GPUAdapter and moved onto GPUAdapterInfo.
       if (adapter.isFallbackAdapter) return null;
       // adapter.info is the current shape; requestAdapterInfo() is the older
       // one still shipping in browsers this probe must not throw on.
@@ -138,6 +148,13 @@ export async function probeGpuHighPerformanceAdapter(
         (typeof adapter.requestAdapterInfo === 'function'
           ? await adapter.requestAdapterInfo()
           : null);
+      // The flag's CURRENT home, and the only one a shipping Chrome fills. Its
+      // fallback answers {vendor: 'google', architecture: 'swiftshader'},
+      // which would otherwise sail through as the 'software' key this whole
+      // block exists to keep out of the adapter column.
+      if (info && typeof info === 'object' && (info as GpuAdapterInfoLike).isFallbackAdapter) {
+        return null;
+      }
       return describeGpuAdapterInfo(info);
     })().catch(() => null);
     return await Promise.race([described, timedOut]);

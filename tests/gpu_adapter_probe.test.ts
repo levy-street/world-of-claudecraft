@@ -47,13 +47,45 @@ describe('probeGpuHighPerformanceAdapter failure arms', () => {
     ).resolves.toBe(null);
   });
 
-  it('answers null for the CPU fallback adapter, whatever it calls itself', async () => {
+  it('answers null for the CPU fallback adapter, on BOTH homes of the flag', async () => {
     // A fallback adapter is the browser's software implementation. Its
     // description names a rasterizer, which the server's parser keys
     // 'software', and stored beside the WebGL model that reads as "this
     // machine renders in software" when it means the opposite: WebGPU had no
     // hardware adapter to offer, and WebGL may be on a real GPU. No evidence
     // is the honest answer, so this joins the other null arms.
+
+    // The SHIPPING shape, and the one that matters: the flag was removed from
+    // GPUAdapter and moved onto GPUAdapterInfo, so a current Chrome carries
+    // NOTHING on the adapter and answers this info for a fallback. An
+    // adapter-level check alone is a no-op here, and 'google swiftshader'
+    // sails through to the server as the 'software' key.
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({
+          info: {
+            vendor: 'google',
+            architecture: 'swiftshader',
+            device: '',
+            description: '',
+            isFallbackAdapter: true,
+          },
+        })),
+      }),
+    ).resolves.toBe(null);
+    // The same flag reached through the legacy requestAdapterInfo() call.
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({
+          requestAdapterInfo: async () => ({
+            description: 'Google SwiftShader',
+            isFallbackAdapter: true,
+          }),
+        })),
+      }),
+    ).resolves.toBe(null);
+    // The flag's OLD home, on the adapter itself, for the browsers that still
+    // carry it there and never populate the info copy.
     await expect(
       probeGpuHighPerformanceAdapter({
         gpu: fakeGpu(async () => ({
@@ -62,7 +94,6 @@ describe('probeGpuHighPerformanceAdapter failure arms', () => {
         })),
       }),
     ).resolves.toBe(null);
-    // The legacy call shape too: the flag is on the adapter, not on the info.
     await expect(
       probeGpuHighPerformanceAdapter({
         gpu: fakeGpu(async () => ({
@@ -71,11 +102,22 @@ describe('probeGpuHighPerformanceAdapter failure arms', () => {
         })),
       }),
     ).resolves.toBe(null);
-    // A hardware adapter is unaffected: the flag is false or absent there.
+    // A hardware adapter is unaffected, with the flag false in either home or
+    // absent from both.
     await expect(
       probeGpuHighPerformanceAdapter({
         gpu: fakeGpu(async () => ({ isFallbackAdapter: false, ...ADAPTER_4070 })),
       }),
+    ).resolves.toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({
+          info: { ...ADAPTER_4070.info, isFallbackAdapter: false },
+        })),
+      }),
+    ).resolves.toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+    await expect(
+      probeGpuHighPerformanceAdapter({ gpu: fakeGpu(async () => ADAPTER_4070) }),
     ).resolves.toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
   });
 
