@@ -656,10 +656,12 @@ export class RenderBudgetGovernor {
 
     // The post shed takes the resolution rung's place on the composer tiers,
     // where the region path is off (post_plan_core.ts: every full-frame pass
-    // costs the chain its dynamic resolution) and resolution steps are inert:
-    // one rung per over-budget step, only once the density buckets sit at
-    // their floors or the frame is severely over, so a fight sheds grass and
-    // lights before it loses its edge AA, its bloom and its occlusion.
+    // costs the chain its dynamic resolution) and a resolution step is
+    // DEFERRED rather than applied: it only reaches the allocation scale at
+    // the next applyResolution (a resize or a display change). One rung per
+    // over-budget step, only once the density buckets sit at their floors or
+    // the frame is severely over, so a fight sheds grass and lights before it
+    // loses its edge AA, its bloom and its occlusion.
     const vfxDone = this.levels.vfx <= this.caps.minVfxLevel + 0.001;
     const lastResort = severeFramePressure || (environmentFloored && lightingDone && vfxDone);
     if (lastResort && this.pinnedPostLevel == null && this.stepPostShed(-1)) changed = true;

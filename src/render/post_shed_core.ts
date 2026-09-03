@@ -28,9 +28,15 @@
  *      the AO program, which the scheduler contract forbids mid-fight.
  *
  * Every rung is a pass ENABLE flag or a one-time target clear on a pass the
- * chain already built and compiled at boot: no rung selects a new shader
- * program in a live frame (the FXAA grade twin compiles under the
- * `post.initial-frame` prewarm) and none reallocates a render target.
+ * chain already built and compiled at boot, and none reallocates a render
+ * target. The one program the full chain never runs, the FXAA grade twin,
+ * links under the `post.initial-frame` prewarm, and the painter refuses the
+ * `smaa-to-fxaa` rung (keeping the SMAA tail) until that prewarm has run,
+ * so no rung links a program in a live frame on any profile, including the
+ * constrained ones whose boot manifest drops the entry. The AA swap is the
+ * most visible rung and is damped only by the governor's own cooldowns and
+ * recover dwell: an oscillating session alternates SMAA and FXAA edges at
+ * that cadence, by design the same cadence every other bucket steps at.
  *
  * Fairness (docs/design/graphics-settings-fairness.md): edge anti-aliasing,
  * bloom and ambient occlusion filter or shade the DISPLAY-SPACE image after

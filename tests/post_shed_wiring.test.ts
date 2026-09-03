@@ -87,7 +87,12 @@ describe('post shed pipeline wiring', () => {
     expect(postSource).toMatch(
       /composer\.setSizeAndPixelRatio\(width, height, pixelRatio\);\s*shed\.reclear\(\);/,
     );
-    expect(postSource).toContain('shed.prewarm(() => composer.render());');
+    // The prewarm draws the twin alone against the composer's own buffers,
+    // never a second composer frame, and the composer teardown latches the painter.
+    expect(postSource).toContain(
+      'shed.prewarm(() => gradeFxaaTwin?.render(webgl, composer.writeBuffer, composer.readBuffer));',
+    );
+    expect(postSource).toMatch(/disposed = true;\s*shed\.dispose\(\);/);
   });
 
   it('skips every occlusion quad while in passthrough, and only those', () => {
@@ -133,7 +138,7 @@ describe('post shed fairness and scheduler guards', () => {
       '.visible',
       'castShadow',
       'compile(',
-      'dispose(',
+      '.dispose(',
       'defines',
     ]) {
       expect(code, forbidden).not.toContain(forbidden);

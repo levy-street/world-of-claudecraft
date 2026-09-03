@@ -43,6 +43,12 @@ function rendererStub(clears: RecordedClear[]): THREE.WebGLRenderer {
     capabilities: { isWebGL2: true },
     getDrawingBufferSize: (out: THREE.Vector2) => out.set(1280, 720),
     getPixelRatio: () => 1,
+    // What OutputGradePass.render reads when the twin prewarm draws it once.
+    outputColorSpace: THREE.SRGBColorSpace,
+    toneMapping: THREE.ACESFilmicToneMapping,
+    toneMappingExposure: 1,
+    autoClear: true,
+    render: () => {},
     getRenderTarget: () => currentTarget,
     setRenderTarget: (target: THREE.WebGLRenderTarget | null) => {
       currentTarget = target;
@@ -73,11 +79,14 @@ interface AoInternals {
   occlusionTarget: THREE.WebGLRenderTarget;
 }
 
-async function insaneChain(clears: RecordedClear[]) {
+async function insaneChain(clears: RecordedClear[], opts: { prewarm?: boolean } = {}) {
   vi.stubGlobal('Image', class {});
   const { buildComposer } = await import('../src/render/post');
   const webgl = rendererStub(clears);
   const post = buildComposer(webgl, new THREE.Scene(), new THREE.PerspectiveCamera(), 1280, 720);
+  // The presentation prewarm links the twin before any live frame; every
+  // rung test below runs after it unless it is the prewarm it tests.
+  if (opts.prewarm !== false) post.prewarmShed();
   const passes = post.composer.passes;
   return {
     post,
@@ -117,6 +126,45 @@ describe('post shed painter over the live chain', () => {
     expect(bloom.activeMips).toBe(5);
     // The core plans the full mip count as a literal; the live pass agrees.
     expect(bloom.nMips).toBe(POST_SHED_BLOOM_MIPS_FULL);
+    expect(ao.occlusionPassthrough).toBe(false);
+    expect(clears).toEqual([]);
+    expect(post.shedRung()).toBe('full');
+  });
+
+  it('refuses the SMAA rung until the twin is linked, keeping the SMAA tail, and still sheds the rest', async () => {
+    const clears: RecordedClear[] = [];
+    const { post, grade, gradeFxaa, smaa, bloom, ao } = await insaneChain(clears, {
+      prewarm: false,
+    });
+    post.setShedLevel(0.75);
+    // No program could be linked in this frame, so the tail stays.
+    expect(smaa.enabled).toBe(true);
+    expect(grade.enabled).toBe(true);
+    expect(gradeFxaa.enabled).toBe(false);
+    expect(post.shedRung()).toBe('full');
+    post.setShedLevel(0);
+    expect(smaa.enabled).toBe(true);
+    expect(gradeFxaa.enabled).toBe(false);
+    expect((bloom as unknown as { enabled: boolean }).enabled).toBe(false);
+    expect(ao.occlusionPassthrough).toBe(true);
+    expect(post.shedRung()).toBe('ao-off');
+    // Once the prewarm links the twin, the standing level takes it.
+    post.prewarmShed();
+    expect(smaa.enabled).toBe(false);
+    expect(gradeFxaa.enabled).toBe(true);
+    expect(grade.enabled).toBe(false);
+  });
+
+  it('after dispose, a late level, reclear or prewarm touches neither a pass nor WebGL', async () => {
+    const clears: RecordedClear[] = [];
+    const { post, gradeFxaa, smaa, bloom, ao } = await insaneChain(clears);
+    post.dispose();
+    post.setShedLevel(0);
+    post.setSize(1600, 900, 1);
+    post.prewarmShed();
+    expect(smaa.enabled).toBe(true);
+    expect(gradeFxaa.enabled).toBe(false);
+    expect((bloom as unknown as { enabled: boolean }).enabled).toBe(true);
     expect(ao.occlusionPassthrough).toBe(false);
     expect(clears).toEqual([]);
     expect(post.shedRung()).toBe('full');
@@ -225,7 +273,8 @@ describe('post shed painter over the live chain', () => {
     post.setShedLevel(0);
     expect(clears.length).toBeGreaterThan(0);
     expect(state()).toEqual(before);
-    expect(before).toEqual({ target: null, hex: 0x102030, alpha: 0.5 });
+    expect(before.hex).toBe(0x102030);
+    expect(before.alpha).toBe(0.5);
   });
 
   it('a chain without SMAA has no twin, and its first rung moves nothing', async () => {
@@ -271,6 +320,7 @@ describe('post shed painter over the live chain', () => {
       passes as unknown as ConstructorParameters<typeof PostShed>[1],
       { smaa: true, bloom: false, ao: false },
     );
+    shed.prewarm(() => {});
     shed.apply(0);
     expect(passes.smaa.enabled).toBe(false);
     expect(passes.gradeFxaa.enabled).toBe(true);
@@ -324,7 +374,7 @@ describe('post shed painter: the twin prewarm', () => {
     };
   }
 
-  it('renders once on the smaa-to-fxaa rung, then restores the level in force', () => {
+  it('draws the twin exactly once, with every pass flag untouched, then admits the SMAA rung', () => {
     const passes = fakePasses();
     const shed = new PostShed(
       {} as unknown as THREE.WebGLRenderer,
@@ -332,19 +382,23 @@ describe('post shed painter: the twin prewarm', () => {
       { smaa: true, bloom: false, ao: false },
     );
     const seen: boolean[][] = [];
-    shed.prewarm(() => {
+    const renderTwin = () => {
       seen.push([passes.smaa.enabled, passes.grade.enabled, passes.gradeFxaa.enabled]);
-    });
-    expect(seen).toEqual([[false, false, true]]);
-    expect([passes.smaa.enabled, passes.grade.enabled, passes.gradeFxaa.enabled]).toEqual([
-      true,
-      true,
-      false,
-    ]);
+    };
+    shed.prewarm(renderTwin);
+    shed.prewarm(renderTwin);
+    expect(seen).toEqual([[true, true, false]]);
     expect(shed.rung()).toBe('full');
+    shed.apply(0.75);
+    expect([passes.smaa.enabled, passes.grade.enabled, passes.gradeFxaa.enabled]).toEqual([
+      false,
+      false,
+      true,
+    ]);
+    expect(shed.rung()).toBe('smaa-to-fxaa');
   });
 
-  it('restores the level even when the render throws, and skips a chain with no twin', () => {
+  it('a draw that throws leaves the twin unlinked (the SMAA rung stays refused), and a chain with no twin draws nothing', () => {
     const passes = fakePasses();
     const shed = new PostShed(
       {} as unknown as THREE.WebGLRenderer,
@@ -356,6 +410,7 @@ describe('post shed painter: the twin prewarm', () => {
         throw new Error('context lost');
       }),
     ).toThrow('context lost');
+    shed.apply(0.75);
     expect(passes.smaa.enabled).toBe(true);
     expect(passes.gradeFxaa.enabled).toBe(false);
 

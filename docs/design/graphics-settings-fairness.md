@@ -383,7 +383,9 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   flags and its one-time clear (bloom to transparent black, AO to white), that holding a rung
   re-clears nothing, that restoring re-enables every pass with no clear, that a resize re-runs
   the clears the rung relies on, that every clear restores the render target and clear colour
-  it found, and that the twin prewarm restores the level in force even when the render throws.
+  it found, that the SMAA rung is refused (the tail keeps running) until the twin's one prewarm
+  draw has linked it and that a draw that throws leaves it refused, and that a disposed painter
+  touches neither a pass nor WebGL on a late level, resize or prewarm.
   The wiring scan pins the renderer's one application path (no pass flag or target write of
   its own), the twin's boot compile under the presentation prewarm, the perfStats/overlay/fleet
   readouts, that the painter compiles nothing, resizes nothing and hides nothing, and that the

@@ -142,8 +142,9 @@ export interface PostPipeline {
   /** Which sheddable passes this chain built: the static input of the
    *  governor's `post` floor. */
   readonly shedChain: PostShedChain;
-  /** Compile the FXAA grade twin by rendering the chain once on the first
-   *  rung; run under the presentation prewarm, scene hidden. */
+  /** Link the FXAA grade twin with one draw of that pass alone; run under
+   *  the presentation prewarm, scene hidden. Until it has run, the
+   *  `smaa-to-fxaa` rung keeps the SMAA tail instead of linking live. */
   prewarmShed(): void;
 }
 
@@ -341,11 +342,15 @@ export function buildComposer(
       return shed.rung();
     },
     prewarmShed(): void {
-      shed.prewarm(() => composer.render());
+      // One draw of the twin alone against the composer's own buffers: the
+      // whole chain has just rendered under the same prewarm, so this adds
+      // one fullscreen quad, not a second composer frame.
+      shed.prewarm(() => gradeFxaaTwin?.render(webgl, composer.writeBuffer, composer.readBuffer));
     },
     dispose(): void {
       if (disposed) return;
       disposed = true;
+      shed.dispose();
       for (const pass of composer.passes) pass.dispose();
       composer.dispose();
     },

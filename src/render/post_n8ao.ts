@@ -234,11 +234,14 @@ const passthroughQuads = new WeakSet<N8AOFullScreenTriangle>();
 /**
  * The `ao-off` rung of the post shed (post_shed_core.ts): the occlusion
  * quads (depth downsample, evaluate, both denoise iterations) draw nothing
- * while the pass is in passthrough. The package's render() still binds their
- * targets and writes their uniforms, which is a few state changes and no
- * draw; the composite still runs, reading the AO target post_shed.ts cleared
- * to white once, so the beauty passes through unoccluded. Nothing here
- * changes a program or a target size.
+ * while the pass is in passthrough. What the rung sheds is the GPU draws;
+ * the package's render() still binds their targets and writes their
+ * uniforms (with the per-frame matrix and vector allocations it makes for
+ * them, unchanged by the shed), and the composite still runs, reading the
+ * AO target post_shed.ts cleared to white once (its depth-aware upsample
+ * falls back to the plain sample on a zero weight sum, so a stale
+ * downsampled depth cannot darken it), so the beauty passes through
+ * unoccluded. Nothing here changes a program or a target size.
  */
 function skipWhilePassthrough(
   quad: N8AOFullScreenTriangle | null | undefined,

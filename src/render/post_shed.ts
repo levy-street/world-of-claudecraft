@@ -4,7 +4,6 @@ import type { PreparedBloomPass } from './post_bloom';
 import type { StaticOpaqueN8AOPass } from './post_n8ao';
 import type { OutputGradePass } from './post_output_grade';
 import {
-  POST_SHED_STEP,
   type PostShedChain,
   type PostShedPlan,
   type PostShedRung,
@@ -39,19 +38,25 @@ import {
 export interface PostShedPasses {
   readonly smaa: Pass | null;
   readonly grade: OutputGradePass;
-  /** The boot-compiled output grade with the fused FXAA arm, or null when
-   *  the chain has no SMAA to trade it for. */
+  /** The output grade with the fused FXAA arm, linked by `prewarm`, or null
+   *  when the chain has no SMAA to trade it for. */
   readonly gradeFxaa: OutputGradePass | null;
   readonly bloom: PreparedBloomPass | null;
   readonly ao: StaticOpaqueN8AOPass | null;
 }
 
-const clearColor = new Color();
-const previousClearColor = new Color();
-
 export class PostShed {
   private level = 1;
   private plan: PostShedPlan;
+  /** The FXAA grade twin has been drawn once under the prewarm, so its
+   *  program is linked. Until then the `smaa-to-fxaa` rung is refused (the
+   *  SMAA tail keeps running) rather than linking a program in the shed
+   *  frame: a constrained profile drops `post.initial-frame`, and a live
+   *  frame can in principle precede it. */
+  private twinReady = false;
+  private disposed = false;
+  private readonly clearColor = new Color();
+  private readonly previousClearColor = new Color();
 
   constructor(
     private readonly webgl: WebGLRenderer,
@@ -63,7 +68,14 @@ export class PostShed {
 
   /** The deepest rung applied that changes this chain, `full` at level 1. */
   rung(): PostShedRung | 'full' {
-    return postShedRungLabel(this.level, this.chain);
+    return postShedRungLabel(this.level, this.effectiveChain());
+  }
+
+  /** The chain as this painter may shed it now: SMAA is only tradable once
+   *  the twin's program is linked. */
+  private effectiveChain(): PostShedChain {
+    if (this.twinReady || !this.chain.smaa) return this.chain;
+    return { smaa: false, bloom: this.chain.bloom, ao: this.chain.ao };
   }
 
   currentLevel(): number {
@@ -74,9 +86,10 @@ export class PostShed {
    *  Called on every budget application (once per presented frame), so an
    *  unchanged level returns before planning anything. */
   apply(level: number): boolean {
-    if (level === this.level) return false;
+    if (this.disposed || level === this.level) return false;
     const previous = this.plan;
-    const next = postShedPlan(this.chain, level);
+    const chain = this.effectiveChain();
+    const next = postShedPlan(chain, level);
     this.level = level;
     this.plan = next;
     if (
@@ -92,7 +105,6 @@ export class PostShed {
     // a pass the chain disowns (the `?postshed=off` kill switch builds every
     // pass and declares none) is never touched, whatever the plan says.
     const { smaa, grade, gradeFxaa, bloom, ao } = this.passes;
-    const chain = this.chain;
     if (smaa && chain.smaa) smaa.enabled = next.smaa;
     if (gradeFxaa && chain.smaa) {
       grade.enabled = !next.gradeFxaa;
@@ -116,6 +128,7 @@ export class PostShed {
   /** After a composer resize: the skipped targets were reallocated, so the
    *  clears the current plan relies on are run again. */
   reclear(): void {
+    if (this.disposed) return;
     const { bloom, ao } = this.passes;
     if (bloom && this.chain.bloom) {
       if (!this.plan.bloom) this.clearBloomComposite(bloom);
@@ -126,22 +139,28 @@ export class PostShed {
   }
 
   /**
-   * Compile the one program the shed can reach that the full chain never
-   * runs, the FXAA grade twin, by rendering the chain once on the
-   * `smaa-to-fxaa` rung; `render` is the caller's composer render (the
-   * presentation prewarm runs it with the scene hidden). The level in force
-   * before the call is restored after it. A chain without the twin has
-   * nothing to compile and renders nothing here.
+   * Link the one program the shed can reach that the full chain never runs,
+   * the FXAA grade twin: `renderTwin` draws that single pass once (post.ts
+   * runs it against the composer's own buffers, under the presentation
+   * prewarm's hidden scene), and only after it returns is the
+   * `smaa-to-fxaa` rung admitted. A chain without the twin has nothing to
+   * link and draws nothing here.
    */
-  prewarm(render: () => void): void {
-    if (!this.passes.gradeFxaa) return;
+  prewarm(renderTwin: () => void): void {
+    if (this.disposed || this.twinReady || !this.passes.gradeFxaa) return;
+    renderTwin();
+    this.twinReady = true;
+    // A level already standing on the SMAA rung (a pin, or a shed that
+    // preceded the prewarm) takes the twin now that it is linked.
     const level = this.level;
-    this.apply(1 - POST_SHED_STEP);
-    try {
-      render();
-    } finally {
-      this.apply(level);
-    }
+    this.level = Number.NaN;
+    this.apply(level);
+  }
+
+  /** Terminal: every later call is a no-op, so a late budget application on
+   *  a torn-down composer never touches WebGL. Idempotent. */
+  dispose(): void {
+    this.disposed = true;
   }
 
   private clearBloomComposite(bloom: PreparedBloomPass): void {
@@ -161,14 +180,14 @@ export class PostShed {
   private clearTarget(target: WebGLRenderTarget, hex: number, alpha: number): void {
     const webgl = this.webgl;
     const previousTarget = webgl.getRenderTarget();
-    webgl.getClearColor(previousClearColor);
+    webgl.getClearColor(this.previousClearColor);
     const previousAlpha = webgl.getClearAlpha();
     try {
-      webgl.setClearColor(clearColor.setHex(hex), alpha);
+      webgl.setClearColor(this.clearColor.setHex(hex), alpha);
       webgl.setRenderTarget(target);
       webgl.clear(true, false, false);
     } finally {
-      webgl.setClearColor(previousClearColor, previousAlpha);
+      webgl.setClearColor(this.previousClearColor, previousAlpha);
       webgl.setRenderTarget(previousTarget);
     }
   }
