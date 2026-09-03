@@ -502,9 +502,11 @@ describe('v0.36 placeholder-art completion evidence', () => {
     expect(credits).toContain('replaces eighteen stale portraits');
 
     const brief = readFileSync(path.join(repoRoot, 'docs/achievements/icon-brief.md'), 'utf8');
-    expect(brief).toContain('every live deed now has committed painted art');
+    expect(brief).toContain('every live deed then had committed painted art');
     expect(brief).toMatch(/The final 30-crested\s*>\s*completion wave/);
     expect(brief).toContain('placeholder-art-completion-2026-08-09/README.md');
     expect(brief).toContain('placeholder-art-completion-2026-08-09/accepted-art.json');
+    expect(brief).toContain('leaving 10 inherited release-base rows');
+    expect(brief).toContain('masterwrought-art-completion-2026-09-02/accepted-art.json');
   });
 });

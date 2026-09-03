@@ -1,17 +1,21 @@
 # Icon brief: new deeds (2026-07-09)
 
-> Completed 2026-08-10: every live deed now has committed painted art. The final 30-crested
+> Completed 2026-08-10: every live deed then had committed painted art. The final 30-crested
 > completion wave is recorded in `placeholder-art-completion-2026-08-09/README.md` and
 > `placeholder-art-completion-2026-08-09/accepted-art.json`. The nine later Reliquary crests are
 > recorded in `release-art-audit-v036-2026-08-10/reliquary-deed-art.md`.
-> `DEED_ART_PENDING` is empty. AMENDED 2026-09-01 (qr-19-art-batch-ledger): it is not, and has not been since the walk-in castle pair. It holds 20 rows in `src/ui/icons.ts` today, so the completion sentence above is true only of the wave it names; every one of the 20 is briefed in the dated sections below and awaits the maintainer's post-merge art wave on his master SHA.
+> Later content reopened `DEED_ART_PENDING` to 20 rows. Updated 2026-09-02: the
+> Masterwrought art completion painted its 10 rows, leaving 10 inherited release-base rows in
+> `src/ui/icons.ts`: the two walk-in castles, two bank sockets, Proving Shore graduation, and
+> five Crucible deeds. The completed Masterwrought set and its provenance are recorded in
+> `masterwrought-art-completion-2026-09-02/accepted-art.json`.
 
 Ready to send. One line per new deed, same format as the v1 brief; icon files
-are named exactly by deed id at 512x512 RGBA like the existing set. The original
-six transcribed ids used their procedural category crests while commissioning
-was in progress; every live id now resolves to accepted painted art. The two
-deferred salvage ids are listed at the end, marked, so the whole batch can be
-commissioned in one sitting when their deeds transcribe.
+are named exactly by deed id at 512x512 RGBA like the existing set. The 10 rows
+named above still use their procedural category crests while commissioning is
+in progress; every Masterwrought deed resolves to accepted painted art. The two
+deferred salvage ids are listed at the end, marked, so they can be commissioned
+when their deeds transcribe.
 
 Progression:
 
