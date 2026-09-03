@@ -352,7 +352,7 @@ interface AttributionTargetFixture {
 // and the meteor landing burst extraction moved the renderer integration
 // leaf). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '988b123a3a3f657756ce1898a0cf077aad5c9728917c92d7685ac2debf4d7f6f';
+  '5ddf3eacabaddecac0ed32f2f22fe60ba27c23ad1a3596f4c19f37d5e14ef98f';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

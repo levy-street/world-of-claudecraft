@@ -1038,9 +1038,9 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // and the meteor landing burst extraction moved the renderer integration
 // leaf). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '6312ae962823ae4a548fa03b2e98c7c7e79f58974f826f6902e1c7edb83782a9';
+  'd4f68b98beba92343c53e89c14d025c3242bc56eeb9dd457cbdb2b1a3026f4c5';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '988b123a3a3f657756ce1898a0cf077aad5c9728917c92d7685ac2debf4d7f6f';
+  '5ddf3eacabaddecac0ed32f2f22fe60ba27c23ad1a3596f4c19f37d5e14ef98f';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2199,7 +2199,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // Re-minted for the Nythraxis mechanics redo (renderer.ts gained the grave
       // flame hookup and lost the inline meteor burst): the composite first,
       // then this seal. No capture was retaken.
-    ).toBe('724b6789e19d226ad7b5c9c04d632ff59bae093623e101380e8c9d54d3d3ccfe');
+    ).toBe('509e850c28a25c439a0ce63dab1664b508ae22818520a315ebd1bdf43414accc');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

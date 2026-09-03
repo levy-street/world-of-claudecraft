@@ -23,13 +23,19 @@ function heroicBoss(sim: Sim, pid: number): { boss: Entity; st: NonNullable<Enti
 }
 
 // Drop the boss into phase 2 with an imminent, uncontested Deathless Rage, then
-// tick until it lands and the summon channel resolves.
+// tick until it lands and the summon channel resolves. The Rage is a
+// body-owning major, so the other majors and the 6 s gap after the last one
+// (the court summon included) are parked too: this suite is about the court,
+// not the scheduler (tests/nythraxis_sigil_gravefire.test.ts owns that).
 function forcePillarCast(sim: Sim, st: NonNullable<Entity['nythraxis']>): void {
   st.phase = 2;
   st.deathlessTimer = 0;
   st.soulRendTimer = 100;
   st.soulRendMarks = [];
   st.soulRendLockout = 0;
+  st.sigilTimer = 999;
+  st.sigil = null;
+  st.majorGapTimer = 0;
   for (let i = 0; i < 20 * 16; i++) sim.tick();
 }
 
