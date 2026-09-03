@@ -348,8 +348,11 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the compositor-surfaces batch (renderer.ts only: the opaque
+// world context, the nameplate surface-ratio and cadence wiring, the spirit
+// grade hookup and the build-diag extraction). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '562a6a58b34de5bef516cf8e14ac69b1b2e6d2ea659ed229c5c65d87593f3610';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

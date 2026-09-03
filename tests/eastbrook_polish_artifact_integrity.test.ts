@@ -1034,10 +1034,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the compositor-surfaces batch (renderer.ts only: the opaque
+// world context, the nameplate surface-ratio and cadence wiring, the spirit
+// grade hookup and the build-diag extraction). No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'a5c2116d1b9087ee0a1471a4e3bcaf8e81edb88c09b4ef6de792305b778ba94c';
+  'a53dccd07e1fa05a7827fa2cdf24e364364f3fc782c42b4657542b7052dbafac';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '562a6a58b34de5bef516cf8e14ac69b1b2e6d2ea659ed229c5c65d87593f3610';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2193,7 +2196,10 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-    ).toBe('eca473321cb438c8ecdd9bfadf949fcf23f0b38fd1830590822d878950ce6a55');
+      // Re-minted for the compositor-surfaces batch: the composite follows the
+      // renderer.ts edits, then this seal follows the swept evidence bytes. No
+      // capture was retaken.
+    ).toBe('783bcb7db5e1f1a942bce2bef46320e9102bb8dd81fffc3755f89c2d9c74c990');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

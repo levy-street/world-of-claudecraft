@@ -767,7 +767,11 @@ const MONOLITHS: MonolithRow[] = [
     // (+70, one line under the old pin on its own tree) and this branch's
     // pledge nameplate line (+13) compound in the merged file. Exact count,
     // zero slack.
-    ceiling: 864,
+    // Lowered 864 -> 842 after the badge/raid-marker/emote image cache moved to
+    // src/render/nameplate_image_cache.ts (the ratchet's own rule: an extraction
+    // lowers the ceiling), which paid for the layer hide/show and style-revision
+    // surface controls the repaint gate needs.
+    ceiling: 842,
     seam: 'the pure src/render/nameplate_heraldry_core.ts geometry module',
   },
   {

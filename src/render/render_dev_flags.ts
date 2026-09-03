@@ -35,6 +35,11 @@
 //                  ?prep=legacy is the A/B that says so without a rebuild, and
 //                  the same flag is what a rollback ships as the default.
 
+//   ?canvasalpha=on - restore three's own world-context attributes (alpha: true,
+//                     the translucent surface every build before this shipped).
+//                     The world canvas is opaque by default now; this is the A/B
+//                     arm for measuring the compositor difference on one build.
+
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
 
@@ -61,4 +66,14 @@ const gpuPrep = ((): GpuPrepMode => {
 /** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
 export function gpuPrepMode(): GpuPrepMode {
   return gpuPrep;
+}
+
+const canvasAlpha = ((): boolean => {
+  if (typeof location === 'undefined') return false;
+  return new URLSearchParams(location.search).get('canvasalpha') === 'on';
+})();
+
+/** True under `?canvasalpha=on`: keep the legacy TRANSLUCENT world context. */
+export function worldCanvasAlphaRequested(): boolean {
+  return canvasAlpha;
 }

@@ -221,16 +221,28 @@
     height: var(--app-vh);
     display: block;
     z-index: 0;
-    transition: filter 0.6s ease;
   }
   /* Ghost (spirit) mode: drain the world to greyscale, the classic WoW death look.
      Applied to the 3D canvas only so the HUD / resurrect prompt stay legible. Toggled
-     by the HUD (body.spirit-mode) whenever the local player is a released spirit. */
-  body.spirit-mode #game-canvas {
+     by the HUD (body.spirit-mode) whenever the local player is a released spirit.
+
+     The rule below is the LOW-TIER FALLBACK ONLY. A CSS filter on the world canvas
+     promotes it into its own render surface and adds a full-screen filter pass for
+     the whole corpse run, so every tier that HAS a post chain (composer and the
+     grade-only medium chain) folds the same drain into the output grade pass
+     instead, on the same 0.6s ease (src/render/post_output_grade.ts and
+     src/render/spirit_grade.ts). Low has no post chain, so it keeps this. The
+     renderer stamps data-spirit-grade on the canvas ("shader" or "css"), which is
+     what arms exactly one of the two arms; before the world boots the canvas
+     carries no stamp and neither arm is live. */
+  #game-canvas[data-spirit-grade="css"] {
+    transition: filter 0.6s ease;
+  }
+  body.spirit-mode #game-canvas[data-spirit-grade="css"] {
     filter: grayscale(1) brightness(0.88);
   }
   @media (prefers-reduced-motion: reduce) {
-    #game-canvas {
+    #game-canvas[data-spirit-grade="css"] {
       transition: none;
     }
   }
