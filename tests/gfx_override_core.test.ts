@@ -171,13 +171,17 @@ describe('gfx override application', () => {
     // this one moves a VALUE too: medium and the Advanced grade-only mix are
     // the profiles the new AA policy grants it to, and low/high/ultra/insane
     // move only by the serialized key name.
+    // Regenerated across the board for the `post` bucket band and baseline
+    // (the post-processing shed, post_shed_core.ts): every profile gains the
+    // band record in bucketBands and its baseline of 1 in bucketBaselines;
+    // no pre-existing value moves.
     expect(hashes).toEqual({
-      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
-      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
-      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
-      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
-      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
+      low: 'a3a35baf0495a5d1ebb4d699d30ae853f744b2111a9bccc8b2b88d9df9db5f9e',
+      medium: '890969b22bfee7808be99c2de07304541e0c0d433b45f767de3f1dfada4dc000',
+      high: '9dbbe8714e0405ae144569f458a116a171170b20b6111e6404d471408b6fed48',
+      ultra: '72fa7d57b1b32f22b70793ede650b60b8d45499adf4c0024a732092f4e2620b7',
+      insane: '21eb304b041eb902f1081841201846d766db19b1387a53442be275fedaa0c649',
+      advanced: 'f68c4e3918fc012a744f8755659d4e602846ed06fb813a2e87e28f6746fcf281',
     });
   });
 

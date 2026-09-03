@@ -15,6 +15,7 @@ const insaneInput: PostPlanInput = {
   n8aoDisabled: false,
   smaaDisabled: false,
   fxaaDisabled: false,
+  postShedDisabled: false,
   isWebGL2: true,
   msaaSamples: 0,
 };

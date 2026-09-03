@@ -250,6 +250,7 @@ function rendererPrewarmBudgetVariantSummary(
         vfx: variant.levels.vfx,
         lighting: variant.levels.lighting,
         resolution: variant.levels.resolution,
+        post: variant.levels.post,
       },
       elapsedMs: variant.elapsedMs,
       syncMs: variant.syncMs,

@@ -589,7 +589,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode } from './render_dev_flags';
+import { gpuPrepMode, postShedLevelPin, renderLayerDisabled } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -2084,6 +2084,8 @@ export class Renderer {
       tier: GFX.tier,
       budget: GFX.budget,
       enabled: GFX.autoGovernor,
+      postShed: renderLayerDisabled('postshed') ? null : GFX,
+      pinnedPostLevel: postShedLevelPin(),
     });
     this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
@@ -4281,7 +4283,8 @@ export class Renderer {
         Math.abs(state.levels.foliage - previousLevels.foliage) >= 0.001 ||
         Math.abs(state.levels.vfx - previousLevels.vfx) >= 0.001 ||
         Math.abs(state.levels.lighting - previousLevels.lighting) >= 0.001 ||
-        Math.abs(state.levels.resolution - previousLevels.resolution) >= 0.001
+        Math.abs(state.levels.resolution - previousLevels.resolution) >= 0.001 ||
+        Math.abs(state.levels.post - previousLevels.post) >= 0.001
       : true;
     if (levelsChanged) {
       const nextLevels = { ...state.levels };
@@ -4308,6 +4311,7 @@ export class Renderer {
     this.necromancyArmyPortalFx.setQuality(state.levels.vfx);
     this.abyssalRiftFx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
+    this.post?.setShedLevel(state.levels.post);
     if (
       Math.abs(previousScale - this.effectiveRenderScale) >= 0.001 &&
       this.post?.supportsDynamicResolution
@@ -4324,6 +4328,7 @@ export class Renderer {
       foliage: state.levels.foliage,
       vfx: state.levels.vfx,
       lighting: state.levels.lighting,
+      post: state.levels.post,
       characters: 1,
       weapons: 1,
       worldStreaming: this.lowGfx ? GFX.bucketBaselines.worldStreaming : 1,
@@ -4367,6 +4372,7 @@ export class Renderer {
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
       shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      postShedRung: this.post?.shedRung() ?? 'full',
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
@@ -5627,7 +5633,10 @@ export class Renderer {
     const post = this.post;
     if (!post) return false;
     try {
-      withSceneHiddenForPresentationPrewarm(this.scene, () => post.render());
+      withSceneHiddenForPresentationPrewarm(this.scene, () => {
+        post.render();
+        post.prewarmShed();
+      });
       return true;
     } finally {
       this.discardOutOfBandDraws();

@@ -229,6 +229,30 @@ function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefin
   noClearQuads.add(quad);
 }
 
+const passthroughQuads = new WeakSet<N8AOFullScreenTriangle>();
+
+/**
+ * The `ao-off` rung of the post shed (post_shed_core.ts): the occlusion
+ * quads (depth downsample, evaluate, both denoise iterations) draw nothing
+ * while the pass is in passthrough. The package's render() still binds their
+ * targets and writes their uniforms, which is a few state changes and no
+ * draw; the composite still runs, reading the AO target post_shed.ts cleared
+ * to white once, so the beauty passes through unoccluded. Nothing here
+ * changes a program or a target size.
+ */
+function skipWhilePassthrough(
+  quad: N8AOFullScreenTriangle | null | undefined,
+  pass: { readonly occlusionPassthrough: boolean },
+): void {
+  if (!quad || passthroughQuads.has(quad)) return;
+  const render = quad.render.bind(quad);
+  quad.render = (renderer): void => {
+    if (pass.occlusionPassthrough) return;
+    render(renderer);
+  };
+  passthroughQuads.add(quad);
+}
+
 /**
  * The shipped static-frame path never enables N8AO temporal accumulation.
  * Its frame-zero accumulation draw is only an RGBA8 to RGBA16F copy with
@@ -237,6 +261,18 @@ function suppressFullCoverageClear(quad: N8AOFullScreenTriangle | null | undefin
  */
 export class StaticOpaqueN8AOPass extends N8AOPass {
   private resourcesDisposed = false;
+  /** The post shed's `ao-off` rung (post_shed_core.ts): while true the
+   *  occlusion quads skip their draws and the composite reads the AO target
+   *  post_shed.ts cleared to white. Written by post_shed.ts only. */
+  occlusionPassthrough = false;
+
+  /** The target the composite samples its occlusion from: the one target
+   *  the shed clears to white for the passthrough. The two denoise
+   *  iterations swap the internal pair an even number of times per frame,
+   *  so this is the same target at composite time as at construction. */
+  get occlusionTarget(): WebGLRenderTarget {
+    return (this as unknown as N8AOStaticFrameInternals).accumulationRenderTarget;
+  }
 
   constructor(scene: Scene, camera: Camera, width: number, height: number) {
     super(scene, camera, width, height);
@@ -263,6 +299,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     const state = this as unknown as N8AOStaticFrameInternals;
     if (state.effectShaderQuad) specializeStaticEvaluation(state.effectShaderQuad.material);
     suppressFullCoverageClear(state.effectShaderQuad);
+    skipWhilePassthrough(state.effectShaderQuad, this);
   }
 
   override configureDenoisePass(depthBufferType?: number, ortho?: boolean): void {
@@ -271,6 +308,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     const state = this as unknown as N8AOStaticFrameInternals;
     if (state.poissonBlurQuad) specializeStaticDenoise(state.poissonBlurQuad.material);
     suppressFullCoverageClear(state.poissonBlurQuad);
+    skipWhilePassthrough(state.poissonBlurQuad, this);
   }
 
   override configureEffectCompositer(depthBufferType?: number, ortho?: boolean): void {
@@ -285,6 +323,7 @@ export class StaticOpaqueN8AOPass extends N8AOPass {
     const state = this as unknown as N8AOStaticFrameInternals;
     if (state.depthDownsampleTarget) state.depthDownsampleTarget.depthBuffer = false;
     suppressFullCoverageClear(state.depthDownsampleQuad);
+    skipWhilePassthrough(state.depthDownsampleQuad, this);
   }
 
   override dispose(): void {

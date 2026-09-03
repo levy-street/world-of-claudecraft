@@ -13,6 +13,7 @@ import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
 import type { GpuPrepBudgetSnapshot } from './gpu_prep_budget_core';
 import type { GpuPrepEventsSnapshot } from './gpu_prep_events';
+import type { PostShedRung } from './post_shed_core';
 import type { RendererPrewarmStats } from './prewarm_compile_lifecycle';
 import type { RenderBudgetState } from './render_budget';
 import type { RenderDiagnosticsSnapshot } from './render_diagnostics';
@@ -88,6 +89,11 @@ export interface RendererPerfStats {
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
+  /** The deepest post-shed rung in force (post_shed_core.ts), `full` for
+   *  the tier's whole chain: what the pipeline actually applied for
+   *  `renderBudget.levels.post`, surfaced beside the cadence so a capture
+   *  can tell a shed sample from a full one. */
+  postShedRung: PostShedRung | 'full';
   pixelRatio: number;
   width: number;
   height: number;

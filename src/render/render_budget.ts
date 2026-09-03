@@ -1,4 +1,5 @@
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
+import { POST_SHED_STEP, type PostShedChain, postShedFloor } from './post_shed_core';
 
 export type RenderBudgetMode = 'disabled' | 'stable' | 'degrading' | 'recovering';
 export type RenderBudgetReason =
@@ -19,6 +20,12 @@ export interface RenderBudgetLevels {
   vfx: number;
   lighting: number;
   resolution: number;
+  /** Post-processing shed (post_shed_core.ts): 1 = the tier's full chain,
+   *  each 0.25 step applies one more rung (SMAA to the fused FXAA grade,
+   *  bloom tail mips, bloom off, AO passthrough). Stepped by the same
+   *  degrade/recover machinery and cooldowns as the buckets above; floored
+   *  at the deepest rung the session's chain carries. */
+  post: number;
 }
 
 export interface RenderBudgetCaps {
@@ -71,6 +78,16 @@ export interface RenderBudgetGovernorOptions {
   tier: GfxTier;
   budget: GfxRuntimeBudget;
   enabled: boolean;
+  /** Which sheddable post passes the session built (the static `GFX`
+   *  smaa/bloom/ao flags): floors the `post` level at the deepest rung that
+   *  can change something, beside the tier band's own floor. `null` (the
+   *  `?postshed=off` kill switch) pins the level at 1; absent, the band
+   *  alone decides. */
+  postShed?: Readonly<PostShedChain> | null;
+  /** The `?postshed=<0..1>` dev pin (render_dev_flags.ts): holds the `post`
+   *  level exactly here, with or without an enabled governor, and keeps the
+   *  ladder's own steps off it. */
+  pinnedPostLevel?: number | null;
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
@@ -160,6 +177,7 @@ function copyLevels(levels: RenderBudgetLevels): RenderBudgetLevels {
     vfx: round2(levels.vfx),
     lighting: round2(levels.lighting),
     resolution: round2(levels.resolution),
+    post: round2(levels.post),
   };
 }
 
@@ -193,6 +211,11 @@ export function renderBudgetShaderPrewarmLevels(
         round2(current.lighting - URGENT_LIGHTING_STEP),
       ),
       resolution: current.resolution,
+      // The post shed's one extra program (the FXAA grade twin) compiles
+      // under the presentation prewarm (post.ts prewarmShed), and every
+      // other rung is a pass toggle, so the scene-program walk leaves the
+      // level untouched, same as resolution above.
+      post: current.post,
     };
     if (
       next.grass === current.grass &&
@@ -244,7 +267,16 @@ export class RenderBudgetGovernor {
   private stallHoldSeconds = 0;
   private stableSeconds = 0;
   private cooldownSeconds = 0;
-  private levels: RenderBudgetLevels = { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 };
+  private levels: RenderBudgetLevels = {
+    grass: 1,
+    foliage: 1,
+    vfx: 1,
+    lighting: 1,
+    resolution: 1,
+    post: 1,
+  };
+  private readonly postFloor: number;
+  private readonly pinnedPostLevel: number | null;
 
   constructor(options: RenderBudgetGovernorOptions) {
     this.tier = options.tier;
@@ -252,6 +284,11 @@ export class RenderBudgetGovernor {
     this.enabled = options.enabled;
     this.caps = CAPS_BY_TIER[options.tier];
     this.bands = GFX_BUCKET_BANDS[options.tier];
+    this.postFloor =
+      options.postShed === undefined
+        ? this.bands.post.min
+        : Math.max(this.bands.post.min, postShedFloor(options.postShed));
+    this.pinnedPostLevel = options.pinnedPostLevel ?? null;
     this.mode = options.enabled ? 'stable' : 'disabled';
     this.reason = options.enabled ? 'startup' : 'disabled';
   }
@@ -265,8 +302,9 @@ export class RenderBudgetGovernor {
           vfx: this.bands.vfx.baseline,
           lighting: this.bands.lighting.baseline,
           resolution: round2(scale),
+          post: this.bands.post.baseline,
         }
-      : { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: round2(scale) };
+      : { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: round2(scale), post: 1 };
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;
     this.externalFrameCap = false;
@@ -283,6 +321,9 @@ export class RenderBudgetGovernor {
   }
 
   state(out?: RenderBudgetState): RenderBudgetState {
+    // The dev pin is the one write that ignores the ladder, so it is
+    // asserted on every readout rather than at each return of update().
+    if (this.pinnedPostLevel != null) this.levels.post = this.pinnedPostLevel;
     const state =
       out ??
       ({
@@ -320,6 +361,7 @@ export class RenderBudgetGovernor {
     state.levels.vfx = round2(this.levels.vfx);
     state.levels.lighting = round2(this.levels.lighting);
     state.levels.resolution = round2(this.levels.resolution);
+    state.levels.post = round2(this.levels.post);
     state.caps.targetCalls = this.caps.targetCalls;
     state.caps.urgentCalls = this.caps.urgentCalls;
     state.caps.targetTriangles = this.caps.targetTriangles;
@@ -579,12 +621,24 @@ export class RenderBudgetGovernor {
       changed = true;
     }
 
-    const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
+    // The post shed takes the resolution rung's place on the composer tiers,
+    // where the region path is off (post_plan_core.ts: every full-frame pass
+    // costs the chain its dynamic resolution) and resolution steps are inert:
+    // one rung per over-budget step, only once the density buckets sit at
+    // their floors or the frame is severely over, so a fight sheds grass and
+    // lights before it loses its edge AA, its bloom and its occlusion.
     const vfxDone = this.levels.vfx <= this.caps.minVfxLevel + 0.001;
+    const lastResort = severeFramePressure || (environmentFloored && lightingDone && vfxDone);
     if (
-      (severeFramePressure || (environmentFloored && lightingDone && vfxDone)) &&
-      this.reduceLevel('resolution', minRenderScale, resolutionStep)
+      lastResort &&
+      this.pinnedPostLevel == null &&
+      this.reduceLevel('post', this.postFloor, POST_SHED_STEP)
     ) {
+      changed = true;
+    }
+
+    const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
+    if (lastResort && this.reduceLevel('resolution', minRenderScale, resolutionStep)) {
       changed = true;
     }
     return changed;
@@ -598,6 +652,15 @@ export class RenderBudgetGovernor {
     if (this.raiseLevel('lighting', this.bands.lighting.baseline, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.baseline, 0.08)) return true;
     if (this.raiseLevel('foliage', this.bands.foliage.baseline, 0.08)) return true;
+    // Shed last, so restored after the density buckets and before render
+    // scale: each rung back is a whole pass returning, so it waits for the
+    // cheaper restores to prove their headroom first.
+    if (
+      this.pinnedPostLevel == null &&
+      this.raiseLevel('post', this.bands.post.baseline, POST_SHED_STEP)
+    ) {
+      return true;
+    }
     if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
     if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;
