@@ -1927,6 +1927,7 @@ export class Renderer {
     // fresh session's first beginFrame re-baselines safely. Pre-existing on
     // the release branch (not a phase 6 regression); r185 even preserves
     // autoReset onto the new object, so only this rebind is needed.
+    syncSpriteQuadPointRange(this.webgl.getContext());
     if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
   };
@@ -5432,7 +5433,7 @@ export class Renderer {
     const swapMaterials = (): void => {
       root.traverse((obj) => {
         const mesh = obj as THREE.Mesh;
-        if (!mesh.isMesh || !mesh.material) return;
+        if (!mesh.isMesh || !mesh.material || mesh.userData.weaponVfxMesh) return;
         const material = mesh.material;
         swaps.push({ mesh, material });
         mesh.material = Array.isArray(material)

@@ -32,6 +32,7 @@ import {
   buildSpriteCloudObject,
   spriteQuadsEnabled,
 } from './sprite_quad_cloud';
+import { WEAPON_CLOUD_DEPTH_FLOOR } from './sprite_quad_core';
 import {
   WEAPON_EMISSIVE_IDLE_CACHE_MAX,
   WeaponEmissiveDerivationCache,
@@ -2317,8 +2318,8 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
 // ---------------------------------------------------------------------------
 // Particle / mesh effect builders. Each returns { node, mats?, update? }.
 // Point sizes are world units converted in-shader via uScale (device px per
-// world unit at distance 1), so sizes hold up at any zoom. The sprite clouds
-// draw as instanced quads, or THREE.Points under `?spritequads=off`.
+// world unit at distance 1), so sizes hold up at any zoom; the clouds draw as
+// instanced quads, or THREE.Points under `?spritequads=off`.
 // ---------------------------------------------------------------------------
 
 type VfxMaterial = THREE.Material & { uniforms?: Record<string, THREE.IUniform> };
@@ -2343,7 +2344,7 @@ const POINT_COMMON = {
   blending: THREE.AdditiveBlending,
 };
 
-function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
+function makeMotes(b: THREE.Box3, c: WeaponVfxMotes, quads: boolean): VfxPart {
   const total = c.count + (c.heroCount ?? 0);
   const center = resolvePoint(b, c.at);
   const pos = new Float32Array(total * 3);
@@ -2372,7 +2373,6 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
     aBob[i] = (c.bob ?? 0.03) * rand(0.5, 1.5);
     aEcc[i] = rand(0.82, 1);
   }
-  const quads = spriteQuadsEnabled();
   const geo = buildSpriteCloudGeometry(
     { position: pos, aRad, aPhase, aSpeed, aTiltX, aTiltZ, aSize, aMix, aSeed, aBob, aEcc },
     { position: 3 },
@@ -2407,7 +2407,7 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
         vMix = aMix;
         vTw = 0.7 + 0.3 * sin(uTime * (1.5 + aSeed * 2.5) + aSeed * 40.0);
         vec4 mv = modelViewMatrix * vec4(position + p, 1.0);
-        float pointSize = aSize * uScale / max(0.15, -mv.z);`,
+        float pointSize = aSize * uScale / max(${WEAPON_CLOUD_DEPTH_FLOOR}, -mv.z);`,
       fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColorA; uniform vec3 uColorB;
       uniform float uOpacity;
@@ -2423,7 +2423,7 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
   return { node: buildSpriteCloudObject(geo, mat), mats: [mat] };
 }
 
-function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
+function makeDrift(b: THREE.Box3, c: WeaponVfxDrift, quads: boolean): VfxPart {
   const a0 = resolvePoint(b, c.line[0]);
   const a1 = resolvePoint(b, c.line[1]);
   const n = c.count;
@@ -2449,7 +2449,6 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
     aSeed[i] = Math.random();
     aSwirl[i] = (c.swirl ?? 0.05) * rand(0.5, 1.5);
   }
-  const quads = spriteQuadsEnabled();
   const geo = buildSpriteCloudGeometry(
     { position: pos, aVel, aLife, aPhase, aSize, aSeed, aSwirl },
     { position: 3, aVel: 3 },
@@ -2482,7 +2481,7 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
         vSeed = aSeed;
         float size = aSize * (1.0 + uGrow * ft);
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
-        float pointSize = size * uScale / max(0.15, -mv.z);`,
+        float pointSize = size * uScale / max(${WEAPON_CLOUD_DEPTH_FLOOR}, -mv.z);`,
       fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColorA; uniform vec3 uColorB;
       uniform float uOpacity;
@@ -2498,7 +2497,7 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
   return { node: buildSpriteCloudObject(geo, mat), mats: [mat] };
 }
 
-function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles): VfxPart | null {
+function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles, quads: boolean) {
   const yMin = b.min.y + (b.max.y - b.min.y) * (c.surface.yMinF ?? 0);
   const pts = surfacePoints(root, c.surface.count, yMin);
   if (!pts.length) return null;
@@ -2513,7 +2512,6 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
     aSize[i] = rand(c.size[0], c.size[1]);
     aRate[i] = rand(c.rate[0], c.rate[1]);
   }
-  const quads = spriteQuadsEnabled();
   const geo = buildSpriteCloudGeometry(
     { position: pos, aSeed, aSize, aRate },
     { position: 3 },
@@ -2541,7 +2539,7 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
         float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        float pointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);`,
+        float pointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(${WEAPON_CLOUD_DEPTH_FLOOR}, -mv.z);`,
       fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColor; uniform float uOpacity;
       varying float vI;
@@ -2847,6 +2845,7 @@ function makeBackdrop(tier: WeaponVfxTier): VfxScenePart {
 export interface WeaponVfxCreateOptions {
   /** Showcase mode: mount the ground light pool under the weapon. */
   grounded?: boolean;
+  spriteQuads?: boolean;
   /** Build the sky dome. Defaults to `grounded`: only a caller that mounts
    *  `sceneExtras` in a scene has anything to draw it into. */
   backdrop?: boolean;
@@ -2890,6 +2889,7 @@ export function createWeaponVfx(
     grounded = true,
     backdrop: withBackdrop = grounded,
     budgetedLight = false,
+    spriteQuads = spriteQuadsEnabled(),
   }: WeaponVfxCreateOptions = {},
 ): WeaponVfxHandle {
   const tier = TIERS[spec.tier];
@@ -2994,9 +2994,9 @@ export function createWeaponVfx(
   // 4. Spec'd particle components.
   for (const c of spec.fx ?? []) {
     let part: VfxPart | null = null;
-    if (c.kind === 'motes') part = makeMotes(b, c);
-    else if (c.kind === 'drift') part = makeDrift(b, c);
-    else if (c.kind === 'twinkles') part = makeTwinkles(weaponRoot, b, c);
+    if (c.kind === 'motes') part = makeMotes(b, c, spriteQuads);
+    else if (c.kind === 'drift') part = makeDrift(b, c, spriteQuads);
+    else if (c.kind === 'twinkles') part = makeTwinkles(weaponRoot, b, c, spriteQuads);
     else if (c.kind === 'aurora') part = makeAurora(b, c);
     else if (c.kind === 'coreSprite') part = makeCoreSprite(b, c);
     if (part) {

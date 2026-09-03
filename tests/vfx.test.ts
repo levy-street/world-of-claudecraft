@@ -13,6 +13,10 @@ vi.mock('../src/render/assets/preload', () => ({
 }));
 
 import { spriteCloudCount, spriteQuadPointRange } from '../src/render/sprite_quad_cloud';
+import {
+  POOLED_CLOUD_DEPTH_FLOOR,
+  POOLED_CLOUD_MAX_POINT_PX,
+} from '../src/render/sprite_quad_core';
 import { Vfx } from '../src/render/vfx';
 
 interface VfxProbe {
@@ -419,6 +423,11 @@ describe('pooled VFX cloud', () => {
     expect(points.material.vertexShader).toContain(
       'float halfExtent = spritePx * (-mv.z) / (2.0 * uScale);',
     );
+    // the shipped formula is the core's: floor and cap come from its constants
+    expect(points.material.vertexShader).toContain(
+      `float pointSize = clamp(aSize * uScale / max(${POOLED_CLOUD_DEPTH_FLOOR.toFixed(1)}, -mv.z), 0.0, ${POOLED_CLOUD_MAX_POINT_PX.toFixed(1)});`,
+    );
+    expect(points.material.vertexShader).toContain('max(1.0, -mv.z), 0.0, 110.0)');
     expect(points.material.fragmentShader).toContain('#define SPRITE_COORD vSpriteCoord');
     expect(points.material.blending).toBe(THREE.AdditiveBlending);
     expect(points.material.depthWrite).toBe(false);
@@ -433,6 +442,33 @@ describe('pooled VFX cloud', () => {
     // the vertex draw range stays whole: the quad's six indices are what the instances draw
     expect(points.geometry.drawRange.count).toBe(Number.POSITIVE_INFINITY);
     expect(probe.drawBuffer.updateRanges).toEqual([{ start: 0, count: 22 }]);
+  });
+
+  it('restores the THREE.Points arm on request, over the same packed buffer', () => {
+    installCanvasStub();
+    const vfx = new Vfx(new THREE.Scene(), () => null, undefined, false);
+    const probe = vfx as unknown as VfxProbe;
+    const { points } = probe;
+    expect((points as unknown as THREE.Points).isPoints).toBe(true);
+    expect(points.geometry).not.toBeInstanceOf(THREE.InstancedBufferGeometry);
+    expect(probe.drawBuffer).not.toBeInstanceOf(THREE.InstancedInterleavedBuffer);
+    expect(points.geometry.getAttribute('aCorner')).toBeUndefined();
+    expect(points.material.uniforms.uPointRange).toBeUndefined();
+    expect(points.material.vertexShader).toContain('gl_PointSize = pointSize;');
+    expect(points.material.vertexShader).toContain('max(1.0, -mv.z), 0.0, 110.0)');
+    expect(points.material.fragmentShader).toContain('#define SPRITE_COORD gl_PointCoord');
+    expect(points.renderOrder).toBe(5);
+    expect(points.userData.renderCategory).toBe('vfx');
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.updateMatrixWorld();
+    probe.spawn(0, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    probe.spawn(1, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    vfx.prepareDraw(camera);
+    expect(points.geometry.drawRange).toEqual({ start: 0, count: 2 });
+    expect(spriteCloudCount(points.geometry)).toBe(2);
+    expect(probe.drawBuffer.updateRanges).toEqual([{ start: 0, count: 22 }]);
+    vfx.clear();
+    expect(points.geometry.drawRange.count).toBe(0);
   });
 
   it('keeps settled idle frames upload-free and rearms prewarm after context restore', () => {

@@ -25,6 +25,7 @@ import {
   spriteCloudCount,
   spriteQuadsEnabled,
 } from './sprite_quad_cloud';
+import { POOLED_CLOUD_DEPTH_FLOOR, POOLED_CLOUD_MAX_POINT_PX } from './sprite_quad_core';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,
@@ -395,6 +396,8 @@ export class Vfx {
     // beam end). Hosts without one fall back to the plain anchor, reading the
     // local offset as zero: the beam still draws, from the caster's center.
     offsetAnchor?: VfxOffsetAnchorResolver,
+    // The sprite arm, overridable so a test drives both (sprite_quad_cloud.ts).
+    spriteQuads: boolean = spriteQuadsEnabled(),
   ) {
     this.pos = new Float32Array(CAPACITY * 3);
     this.vel = new Float32Array(CAPACITY * 3);
@@ -409,7 +412,7 @@ export class Vfx {
     this.activeSlots = new Int32Array(CAPACITY);
     this.activeSlotFlags = new Uint8Array(CAPACITY);
     this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
-    const quads = spriteQuadsEnabled();
+    const quads = spriteQuads;
     this.drawBuffer = buildSpriteCloudInterleavedBuffer(this.drawData, DRAW_STRIDE, quads);
     const geo = buildSpriteCloudInterleavedGeometry(this.drawBuffer, DRAW_LAYOUT, quads);
     // Keep the historical static geometry bound. Camera-aware point culling is
@@ -448,7 +451,7 @@ export class Vfx {
           vRotCs = vec2(cos(aRot), sin(aRot));
           vRadiusSq = aRadiusSq;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
-          float pointSize = clamp(aSize * uScale / max(1.0, -mv.z), 0.0, 110.0);`,
+          float pointSize = clamp(aSize * uScale / max(${POOLED_CLOUD_DEPTH_FLOOR.toFixed(1)}, -mv.z), 0.0, ${POOLED_CLOUD_MAX_POINT_PX.toFixed(1)});`,
         fragmentShader: `
         uniform sampler2D uAtlas;
         varying vec3 vColor;

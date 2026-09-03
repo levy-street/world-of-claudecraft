@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { spriteQuadPointRange } from '../src/render/sprite_quad_cloud';
+import { WEAPON_CLOUD_DEPTH_FLOOR } from '../src/render/sprite_quad_core';
 import { createWeaponVfx, WEAPON_VFX } from '../src/render/weapon_vfx';
 
 // The weapon-skin sprite clouds (motes, drift, twinkles) draw as instanced
@@ -105,13 +106,43 @@ describe('weapon-skin sprite clouds', () => {
       expect(cloud.material.depthWrite).toBe(false);
       expect(cloud.material.transparent).toBe(true);
       expect(cloud.material.vertexShader).not.toContain('gl_PointSize');
+      // the shipped depth floor is the core's constant
+      expect(cloud.material.vertexShader).toContain(`max(${WEAPON_CLOUD_DEPTH_FLOOR}, -mv.z)`);
       expect(cloud.material.vertexShader).toContain('max(0.15, -mv.z)');
+      // never a shadow caster, never tinted or ghosted: the VFX-node tag
+      expect(cloud.castShadow).toBe(false);
+      expect(cloud.userData.weaponVfxMesh).toBe(true);
       expect(cloud.material.vertexShader).toContain(
         'float halfExtent = spritePx * (-mv.z) / (2.0 * uScale);',
       );
       expect(cloud.material.fragmentShader).not.toContain('gl_PointCoord');
       expect(cloud.material.fragmentShader).toContain('texture2D(uMap, SPRITE_COORD)');
     }
+    handle.dispose();
+  });
+
+  it('restore THREE.Points for every cloud kind on request', () => {
+    const handle = createWeaponVfx(weaponStub(), spec, {
+      grounded: false,
+      backdrop: false,
+      spriteQuads: false,
+    });
+    const clouds = spriteClouds(handle.group);
+    expect(clouds.length).toBeGreaterThanOrEqual(3);
+    for (const cloud of clouds) {
+      expect((cloud as unknown as THREE.Points).isPoints).toBe(true);
+      expect(cloud.geometry).not.toBeInstanceOf(THREE.InstancedBufferGeometry);
+      expect(cloud.geometry.getAttribute('position')).toBeInstanceOf(THREE.BufferAttribute);
+      expect(cloud.geometry.getAttribute('position').itemSize).toBe(3);
+      expect(cloud.geometry.getAttribute('aCorner')).toBeUndefined();
+      expect(cloud.material.uniforms.uPointRange).toBeUndefined();
+      expect(cloud.material.vertexShader).toContain('gl_PointSize = pointSize;');
+      expect(cloud.material.vertexShader).toContain('max(0.15, -mv.z)');
+      expect(cloud.material.fragmentShader).toContain('#define SPRITE_COORD gl_PointCoord');
+      expect(cloud.userData.weaponVfxMesh).toBe(true);
+    }
+    const drift = clouds.find((cloud) => cloud.geometry.getAttribute('aVel'));
+    expect(drift?.geometry.getAttribute('aVel').itemSize).toBe(3);
     handle.dispose();
   });
 

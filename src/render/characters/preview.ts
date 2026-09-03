@@ -10,6 +10,7 @@ import {
   runLinkedProgramTouchLane,
 } from '../linked_program_touch_lane';
 import { shaderDebugRequested } from '../shader_debug_flag';
+import { syncSpriteQuadPointRange } from '../sprite_quad_cloud';
 import {
   collectPrewarmTextures,
   uploadTexturesInSlices,
@@ -157,6 +158,7 @@ export class CharacterPreview {
       preserveDrawingBuffer: policy.preserveDrawingBuffer,
     });
     this.renderer.debug.checkShaderErrors = shaderDebugRequested();
+    syncSpriteQuadPointRange(this.renderer.getContext());
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, policy.pixelRatioCap));
     const initialWidth = this.container.clientWidth;
     const initialHeight = this.container.clientHeight;

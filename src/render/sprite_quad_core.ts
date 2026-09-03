@@ -18,8 +18,14 @@
 // square of that half extent, centred on the point and parallel to the image
 // plane, projects to the same axis-aligned window square as the point sprite
 // (all four corners share the centre's depth, so the projection is linear
-// and the depth test sees the same z). The GLSL twin of this arithmetic lives
-// in sprite_quad_cloud.ts; the constants below are what both read.
+// and the depth test sees the same z). PERSPECTIVE ONLY: the half extent
+// re-multiplies by the depth the projection divides out, so under an
+// orthographic camera the quad would grow with distance. Every camera that
+// draws a cloud today is perspective (the world camera, the armory and
+// character previews, the portrait and editor thumbnail rigs); an
+// orthographic host needs its own arm without the depth factor. The GLSL
+// twin of this arithmetic lives in sprite_quad_cloud.ts; the constants
+// below are what both read, and the hosts' shader text interpolates them.
 
 export interface PointSizeRange {
   readonly min: number;
@@ -76,7 +82,8 @@ export function rasterizedPointSize(pointSize: number, range: PointSizeRange): n
 }
 
 /** View-space half extent of the camera-facing quad that covers the same
- *  window pixels as a point of `pixelSize` at `viewDepth`. */
+ *  window pixels as a point of `pixelSize` at `viewDepth`, under a
+ *  perspective projection (see the header). */
 export function spriteQuadHalfExtent(
   pixelSize: number,
   viewDepth: number,

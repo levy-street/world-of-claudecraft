@@ -106,8 +106,9 @@ function drawCountFor(
 }
 
 /** Instances a mesh draws: an InstancedMesh's count, an instanced geometry's
- *  (the sprite-quad clouds draw one quad per particle), else one. */
-function meshInstanceCount(
+ *  (the sprite-quad clouds draw one quad per particle), else one. Shared with
+ *  the footprint census in renderer_diagnostics.ts so the two agree. */
+export function meshInstanceCount(
   renderable: RenderableDiagnosticObject,
   geometry?: THREE.BufferGeometry,
 ): number {

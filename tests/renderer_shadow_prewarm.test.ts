@@ -72,6 +72,36 @@ afterEach(() => {
 });
 
 describe('Renderer.compileShadowPrograms', () => {
+  it('leaves VFX-tagged meshes (the sprite clouds) out of the depth swap', async () => {
+    live.dynamicShadows = true;
+    const calls: CompileCall[] = [];
+    const { renderer } = harness((root) => {
+      const materialsAtCompile = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
+      root.traverse((obj) => {
+        const mesh = obj as THREE.Mesh;
+        if (mesh.isMesh) materialsAtCompile.set(mesh, mesh.material);
+      });
+      calls.push({ root, materialsAtCompile });
+      return Promise.resolve(root);
+    });
+    const root = new THREE.Group();
+    const caster = skinnedCaster(0, new THREE.MeshStandardMaterial({ name: 'mod_skin' }));
+    const cloudMaterial = new THREE.ShaderMaterial();
+    const cloud = new THREE.Mesh(new THREE.InstancedBufferGeometry(), cloudMaterial);
+    cloud.castShadow = false;
+    cloud.userData.weaponVfxMesh = true;
+    root.add(caster, cloud);
+
+    await renderer.compileShadowPrograms(root);
+
+    expect(calls).toHaveLength(1);
+    const swapped = calls[0].materialsAtCompile;
+    expect((swapped.get(caster) as THREE.MeshDepthMaterial).isMeshDepthMaterial).toBe(true);
+    // the cloud kept its own material through the compile: no depth twin minted
+    expect(swapped.get(cloud)).toBe(cloudMaterial);
+    expect(cloud.material).toBe(cloudMaterial);
+  });
+
   it('swaps one distinct default-packed depth material per caster shape, then restores', async () => {
     live.dynamicShadows = true;
     const calls: CompileCall[] = [];

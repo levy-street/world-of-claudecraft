@@ -148,9 +148,10 @@ cadence logic of its own. Narrow helpers:
   leaves `vec4 mv` and `float pointSize`) and reads `SPRITE_COORD` in the
   fragment, and gets both arms for free: `?spritequads=off` restores
   `THREE.Points` for an A/B. Pixel parity between the arms is pinned by
-  `tests/sprite_quad_core.test.ts`; the still-`Points` users (`weather.ts`,
-  `ability_vfx/overlay_sprites.ts`, the `PointsMaterial` motes in the bespoke
-  spell visuals) are the backlog.
+  `tests/sprite_quad_core.test.ts`; every remaining `new THREE.Points` under
+  `src/render` (grep it: the precipitation, the overlay sprites, the
+  `PointsMaterial` motes of the bespoke spell visuals and zone dressings) is
+  the backlog.
 - **Per-ability class VFX have two sanctioned landing spots.** Default: a
   declarative spec in a class-owned `*_vfx_specs.ts` module (exemplars:
   `destruction_vfx_specs.ts`, `necromancy_vfx_specs.ts`,

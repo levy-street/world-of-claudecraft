@@ -29,6 +29,15 @@ import {
 // volume, so a sprite half over the screen edge used to pop; the quad is
 // clipped geometrically and stays. That is the only pixel the two arms differ
 // on, and it is the better one.
+//
+// Two facts the quad arm rests on. Three latches a geometry's instance cap
+// (`_maxInstanceCount`) from the instanced buffer's count on its FIRST bind,
+// so the pooled cloud's buffer is allocated at full capacity before its first
+// submit and a cloud must never swap in a shorter array. And the point range
+// uniform is PAGE-WIDE: every context on one page runs on the same GPU and
+// reports the same ALIASED_POINT_SIZE_RANGE, so the last renderer to sync it
+// wins harmlessly; a context that never syncs draws against the D3D11
+// fallback.
 
 /** Name of the per-vertex quad-corner attribute on the quad arm. */
 export const SPRITE_QUAD_CORNER_ATTRIBUTE = 'aCorner';
@@ -114,33 +123,30 @@ export function spriteCloudFragmentShader(shader: SpriteCloudShader, quads: bool
     : `#define SPRITE_COORD gl_PointCoord\n${shader.fragmentShader}`;
 }
 
-export interface SpriteCloudMaterialOptions extends SpriteCloudShader {
+/** The host's shader parts plus every ShaderMaterial parameter except the
+ *  shaders themselves, which the builder composes. */
+export interface SpriteCloudMaterialOptions
+  extends SpriteCloudShader,
+    Omit<THREE.ShaderMaterialParameters, 'vertexShader' | 'fragmentShader' | 'uniforms'> {
   uniforms: Record<string, THREE.IUniform>;
-  transparent?: boolean;
-  depthWrite?: boolean;
-  depthTest?: boolean;
-  blending?: THREE.Blending;
 }
 
 /** The cloud's ShaderMaterial for the chosen arm. The quad arm adds the shared
- *  point-range uniform; every other flag passes through untouched. */
+ *  point-range uniform; every other parameter (blending, depth flags, side,
+ *  alpha test, ...) passes through to three untouched, so the two arms can
+ *  never diverge on a draw-state input. */
 export function buildSpriteCloudMaterial(
   options: SpriteCloudMaterialOptions,
   quads: boolean,
 ): THREE.ShaderMaterial {
-  const uniforms = quads
-    ? { ...options.uniforms, [SPRITE_QUAD_RANGE_UNIFORM]: spriteQuadPointRange }
-    : options.uniforms;
-  const material = new THREE.ShaderMaterial({
-    uniforms,
-    vertexShader: spriteCloudVertexShader(options, quads),
-    fragmentShader: spriteCloudFragmentShader(options, quads),
+  const { vertexHeader, vertexBody, fragmentShader, uniforms, ...parameters } = options;
+  const shader = { vertexHeader, vertexBody, fragmentShader };
+  return new THREE.ShaderMaterial({
+    ...parameters,
+    uniforms: quads ? { ...uniforms, [SPRITE_QUAD_RANGE_UNIFORM]: spriteQuadPointRange } : uniforms,
+    vertexShader: spriteCloudVertexShader(shader, quads),
+    fragmentShader: spriteCloudFragmentShader(shader, quads),
   });
-  if (options.transparent !== undefined) material.transparent = options.transparent;
-  if (options.depthWrite !== undefined) material.depthWrite = options.depthWrite;
-  if (options.depthTest !== undefined) material.depthTest = options.depthTest;
-  if (options.blending !== undefined) material.blending = options.blending;
-  return material;
 }
 
 /** The quad's own per-vertex data: four corners and two triangles. */
@@ -162,6 +168,20 @@ export function buildSpriteCloudGeometry(
   itemSizes: Readonly<Record<string, number>>,
   quads: boolean,
 ): THREE.BufferGeometry {
+  let count = -1;
+  for (const [name, array] of Object.entries(attributes)) {
+    const itemSize = itemSizes[name] ?? 1;
+    if (array.length % itemSize !== 0) {
+      throw new Error(
+        `sprite cloud attribute ${name}: ${array.length} floats is not a multiple of ${itemSize}`,
+      );
+    }
+    const particles = array.length / itemSize;
+    if (count >= 0 && particles !== count) {
+      throw new Error(`sprite cloud attribute ${name}: ${particles} particles, expected ${count}`);
+    }
+    count = particles;
+  }
   if (!quads) {
     const geometry = new THREE.BufferGeometry();
     for (const [name, array] of Object.entries(attributes)) {
@@ -170,14 +190,11 @@ export function buildSpriteCloudGeometry(
     return geometry;
   }
   const geometry = new THREE.InstancedBufferGeometry();
-  let count = Number.POSITIVE_INFINITY;
   for (const [name, array] of Object.entries(attributes)) {
-    const itemSize = itemSizes[name] ?? 1;
-    geometry.setAttribute(name, new THREE.InstancedBufferAttribute(array, itemSize));
-    count = Math.min(count, Math.floor(array.length / itemSize));
+    geometry.setAttribute(name, new THREE.InstancedBufferAttribute(array, itemSizes[name] ?? 1));
   }
   attachQuadCorners(geometry);
-  geometry.instanceCount = Number.isFinite(count) ? count : 0;
+  geometry.instanceCount = Math.max(0, count);
   return geometry;
 }
 
@@ -218,7 +235,11 @@ export function buildSpriteCloudInterleavedGeometry(
   return geometry;
 }
 
-/** The scene object for the arm the geometry was built for. */
+/** The scene object for the arm the geometry was built for. A cloud is never
+ *  picked (three's Mesh.raycast would test one triangle spanned by particle
+ *  centres) and never a shadow caster or a tint target: it carries the
+ *  `weaponVfxMesh` tag the character sweeps and the shadow-program prewarm
+ *  already honour for VFX nodes, so a cloud hung anywhere is skipped. */
 export function buildSpriteCloudObject(
   geometry: THREE.BufferGeometry,
   material: THREE.ShaderMaterial,
@@ -230,6 +251,10 @@ export function buildSpriteCloudObject(
       ? new THREE.Mesh(geometry, material)
       : new THREE.Points(geometry, material);
   object.frustumCulled = false;
+  object.castShadow = false;
+  object.receiveShadow = false;
+  object.raycast = () => {};
+  object.userData.weaponVfxMesh = true;
   return object;
 }
 

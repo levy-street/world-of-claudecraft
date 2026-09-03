@@ -94,6 +94,19 @@ describe('sprite cloud material', () => {
     }
   });
 
+  it('forwards every other ShaderMaterial parameter on both arms', () => {
+    for (const quads of [false, true]) {
+      const material = buildSpriteCloudMaterial(
+        { ...options, side: THREE.DoubleSide, alphaTest: 0.25, toneMapped: false },
+        quads,
+      );
+      expect(material.side).toBe(THREE.DoubleSide);
+      expect(material.alphaTest).toBe(0.25);
+      expect(material.toneMapped).toBe(false);
+      expect(material.uniforms.uMap).toBe(options.uniforms.uMap);
+    }
+  });
+
   it('only the quad arm carries the shared point range uniform, by reference', () => {
     expect(buildSpriteCloudMaterial(options, false).uniforms[SPRITE_QUAD_RANGE_UNIFORM]).toBe(
       undefined,
@@ -146,6 +159,38 @@ describe('static sprite cloud geometry', () => {
     expect(
       buildSpriteCloudObject(geometry, buildSpriteCloudMaterial(options, false)),
     ).toBeInstanceOf(THREE.Points);
+  });
+
+  it('refuses attribute arrays that disagree on the particle count', () => {
+    for (const quads of [false, true]) {
+      expect(() =>
+        buildSpriteCloudGeometry(
+          { position: new Float32Array(9), aSize: new Float32Array(4) },
+          itemSizes,
+          quads,
+        ),
+      ).toThrow(/aSize: 4 particles, expected 3/);
+      expect(() =>
+        buildSpriteCloudGeometry({ position: new Float32Array(8) }, itemSizes, quads),
+      ).toThrow(/position: 8 floats is not a multiple of 3/);
+    }
+  });
+
+  it('never picks, never casts and carries the VFX-node tag on both arms', () => {
+    for (const quads of [false, true]) {
+      const object = buildSpriteCloudObject(
+        buildSpriteCloudGeometry(attributes, itemSizes, quads),
+        buildSpriteCloudMaterial(options, quads),
+      );
+      expect(object.castShadow).toBe(false);
+      expect(object.receiveShadow).toBe(false);
+      expect(object.userData.weaponVfxMesh).toBe(true);
+      const hits: THREE.Intersection[] = [];
+      const ray = new THREE.Raycaster(new THREE.Vector3(0, 0, 5), new THREE.Vector3(0, 0, -1));
+      ray.params.Points = { threshold: 100 };
+      ray.intersectObject(object, false, hits);
+      expect(hits).toEqual([]);
+    }
   });
 
   it('the quad arm instances every particle attribute over one indexed quad', () => {

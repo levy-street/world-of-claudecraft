@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { meshInstanceCount } from './render_diagnostics';
 import type { FeatureFootprint } from './zone_feature_visibility_core';
 
 type RenderDiagnosticsCategory = string;
@@ -219,8 +220,7 @@ export function collectRenderDiagnostics(
         let triangles = 0;
         let pointCount = 0;
         if (hasMesh) {
-          const instanceCount = renderable.isInstancedMesh ? Math.max(0, renderable.count ?? 0) : 1;
-          triangles = triangleCountFor(geometry) * instanceCount;
+          triangles = triangleCountFor(geometry) * meshInstanceCount(renderable, geometry);
         } else if (hasSprite) {
           triangles = 2;
         } else if (hasPoints) {
