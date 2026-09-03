@@ -280,10 +280,9 @@ async function runInteriorEncounterPrewarm(
           },
         ]
       : []),
-    // The Grave Eruption telegraph and the Grave Flame patch: actionable floor
-    // telegraphs built lazily by the per-frame encounter sync, so without this
-    // the first eruption of a session linked the grave palette (and the
-    // instanced shard burst) inside a live combat frame.
+    // Nythraxis's eruption, flame patches, Gravefire strip, and Binding Sigil:
+    // actionable floor visuals built lazily by per-frame encounter sync, so
+    // their first appearance must not link programs inside live combat.
     ...(spec.nythraxisGraveVisuals
       ? [
           () => {

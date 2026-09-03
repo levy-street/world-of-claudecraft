@@ -1,13 +1,16 @@
-// Grave Flame patches: the sim's `activeNythraxisGraveFlames` rows become green
-// ground-fire decals, one per row, tier-independent, disposed when a row goes.
+// Grave Flame and Soulfire rows become palette-specific ground-fire decals,
+// one per row, tier-independent, disposed when a row goes.
 import { readFileSync } from 'node:fs';
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
+import { abilityVfxFullSpecFor } from '../src/render/ability_vfx/encounter_specs';
 import { INTERIOR_ENCOUNTER_PREWARM } from '../src/render/interior_encounter_prewarm';
 import {
   NYTHRAXIS_GRAVE_FLAME_GROUND_LIFT,
   NYTHRAXIS_GRAVE_FLAME_PALETTE,
   NYTHRAXIS_GRAVE_FLAME_TONGUES,
+  NYTHRAXIS_SOUL_FLAME_PALETTE,
+  nythraxisFlamePalette,
   nythraxisGraveFlamePlanInto,
   nythraxisGraveFlamePulseInto,
   nythraxisGraveFlameTonguePoseInto,
@@ -27,11 +30,13 @@ import {
   type ActiveNythraxisGraveFlame,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
 } from '../src/sim/nythraxis_grave_eruption';
+import { NYTHRAXIS_SOULFIRE_CAST_ID } from '../src/sim/nythraxis_soulfire';
 import { codeWithoutLineComments } from './helpers/code_without_line_comments';
 
 const FLAME: ActiveNythraxisGraveFlame = {
   id: '42:gf:3',
   sourceId: 42,
+  kind: 'grave',
   x: 7,
   z: -5,
   radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
@@ -94,6 +99,47 @@ describe('Nythraxis Grave Flame rendering', () => {
     );
   });
 
+  it('keys Grave Flame and Soulfire materials on the authoritative row kind', () => {
+    expect(nythraxisFlamePalette('grave')).toBe(NYTHRAXIS_GRAVE_FLAME_PALETTE);
+    expect(nythraxisFlamePalette('soul')).toBe(NYTHRAXIS_SOUL_FLAME_PALETTE);
+    const grave = buildNythraxisGraveFlamePatch(FLAME, 0);
+    const soul = buildNythraxisGraveFlamePatch(
+      { ...FLAME, id: '42:sf:1', kind: 'soul', radius: 4 },
+      0,
+    );
+    const graveRim = grave.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
+    const soulFill = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FILL_NAME) as THREE.Mesh;
+    const soulRim = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
+    const soulEmbers = soul.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME) as THREE.Mesh;
+    const soulTongues = soul.getObjectByName(
+      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
+    ) as THREE.InstancedMesh;
+    expect((graveRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      NYTHRAXIS_GRAVE_FLAME_PALETTE.rim,
+    );
+    expect((soulRim.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      NYTHRAXIS_SOUL_FLAME_PALETTE.rim,
+    );
+    expect((soulFill.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      NYTHRAXIS_SOUL_FLAME_PALETTE.fill,
+    );
+    expect((soulEmbers.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      NYTHRAXIS_SOUL_FLAME_PALETTE.ember,
+    );
+    expect((soulTongues.material as THREE.MeshBasicMaterial).color.getHex()).toBe(
+      NYTHRAXIS_SOUL_FLAME_PALETTE.tongue,
+    );
+    expect(maxRadiusOf(graveRim)).toBeCloseTo(3, 5);
+    expect(maxRadiusOf(soulRim)).toBeCloseTo(4, 5);
+    expect(soul.userData.kind).toBe('soul');
+    expect(abilityVfxFullSpecFor(NYTHRAXIS_SOULFIRE_CAST_ID)).toMatchObject({
+      archetype: 'dot',
+      palette: 'blood',
+      filler: true,
+      tint: '#ff6a4a',
+    });
+  });
+
   it('frustum-culls tongues with a reusable conservative patch bound', () => {
     const patch = buildNythraxisGraveFlamePatch(FLAME, 3);
     const tongues = patch.getObjectByName(
@@ -140,14 +186,23 @@ describe('Nythraxis Grave Flame rendering', () => {
     visuals.sync([FLAME, { ...FLAME, id: '42:gf:4', x: 12 }]);
     const first = scene.children.find((c) => c.userData.flameId === FLAME.id) as THREE.Group;
     const rim = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_RIM_NAME) as THREE.Mesh;
-    const rimDispose = vi.spyOn(rim.material as THREE.Material, 'dispose');
-    const rimGeometryDispose = vi.spyOn(rim.geometry, 'dispose');
+    const fill = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_FILL_NAME) as THREE.Mesh;
+    const embers = first.getObjectByName(NYTHRAXIS_GRAVE_FLAME_EMBERS_NAME) as THREE.Mesh;
+    const tongues = first.getObjectByName(
+      NYTHRAXIS_GRAVE_FLAME_TONGUES_NAME,
+    ) as THREE.InstancedMesh;
+    const materialDisposes = [fill, rim, embers, tongues].map((mesh) =>
+      vi.spyOn(mesh.material as THREE.Material, 'dispose'),
+    );
+    const geometryDisposes = [fill, rim, embers].map((mesh) => vi.spyOn(mesh.geometry, 'dispose'));
+    const tonguesDispose = vi.spyOn(tongues, 'dispose');
     expect(scene.children).toHaveLength(2);
     visuals.sync([{ ...FLAME, id: '42:gf:4', x: 12 }]);
     expect(scene.children).toHaveLength(1);
     expect(scene.children[0].userData.flameId).toBe('42:gf:4');
-    expect(rimDispose).toHaveBeenCalledOnce();
-    expect(rimGeometryDispose).toHaveBeenCalledOnce();
+    for (const dispose of materialDisposes) expect(dispose).toHaveBeenCalledOnce();
+    for (const dispose of geometryDisposes) expect(dispose).toHaveBeenCalledOnce();
+    expect(tonguesDispose).toHaveBeenCalledOnce();
     visuals.dispose();
     expect(scene.children).toHaveLength(0);
     // An empty sync after dispose is a no-op, not a rebuild.
@@ -194,13 +249,16 @@ describe('Nythraxis Grave Flame rendering', () => {
   it('is wired at both renderer frame paths and torn down with the renderer', () => {
     const renderer = readSource('../src/render/renderer.ts');
     expect(
-      renderer.match(/this\.nythraxisGraveFlameVisuals\?\.syncWorld\(this\.sim\);/g),
+      renderer.match(/this\.nythraxisMechanicVisuals\?\.syncWorld\(this\.sim\);/g),
     ).toHaveLength(2);
     expect(
-      renderer.match(/this\.nythraxisGraveFlameVisuals\?\.update\(dt, this\.reducedMotion\(\)\);/g),
+      renderer.match(/this\.nythraxisMechanicVisuals\?\.update\(dt, this\.reducedMotion\(\)\);/g),
     ).toHaveLength(2);
-    expect(renderer).toContain('new NythraxisGraveFlameVisuals(this.scene');
-    expect(renderer.match(/this\.nythraxisGraveFlameVisuals\?\.dispose\(\)/g)).toHaveLength(2);
+    expect(renderer).toContain('new NythraxisMechanicVisuals(this.scene');
+    expect(renderer.match(/this\.nythraxisMechanicVisuals\?\.dispose\(\)/g)).toHaveLength(2);
+    const facade = readSource('../src/render/nythraxis_mechanic_visuals.ts');
+    expect(facade).toContain('this.flames.syncWorld(world)');
+    expect(facade).toContain('this.flames.dispose()');
   });
 
   it('has its prewarm home at the crypt attach, staging the patch and the eruption', () => {

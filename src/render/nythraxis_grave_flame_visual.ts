@@ -1,5 +1,5 @@
-// Nythraxis Grave Flame: the green ground fire a Grave Eruption leaves burning
-// on its circle. The encounter snapshot (`activeNythraxisGraveFlames`) owns
+// Nythraxis Grave Flame and Soulfire: green eruption residue and blood-red Soul
+// Rend residue. The encounter snapshot (`activeNythraxisGraveFlames`) owns
 // position, radius and remaining time; this painter only turns those rows into
 // persistent danger patches, one per row, disposed the frame a row vanishes.
 // It has no graphics-tier input on purpose: standing in a patch is gameplay,
@@ -7,13 +7,14 @@
 // Forgestorm and cinder-fire painters follow). Pose and opacity math lives in
 // nythraxis_grave_core.ts.
 //
-// Prewarm: the grave palette is reachable only inside the Nythraxis crypt, so
+// Prewarm: these palettes are reachable only inside the Nythraxis crypt, so
 // its programs warm at that interior's attach (interior_encounter_prewarm.ts,
 // `nythraxisGraveVisuals`) through buildNythraxisGravePrewarmVisual below,
 // never in the boot manifest. No module-scope material cache here either: each
 // patch owns its materials and disposes them with the patch.
 
 import * as THREE from 'three';
+import { NYTHRAXIS_SIGIL_CAST_ID } from '../sim/nythraxis_binding_sigil';
 import {
   type ActiveNythraxisGraveFlame,
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
@@ -21,17 +22,19 @@ import {
 } from '../sim/nythraxis_grave_eruption';
 import { MageGroundFx, METEOR_FLAME_GEOMETRY_HALF_HEIGHT } from './mage_ground_fx';
 import {
-  NYTHRAXIS_GRAVE_FLAME_PALETTE,
   NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
   NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS,
   NYTHRAXIS_GRAVE_FLAME_TONGUES,
   type NythraxisGraveFlamePlan,
   type NythraxisGraveFlamePulse,
   type NythraxisGraveFlameTonguePose,
+  nythraxisFlamePalette,
   nythraxisGraveFlamePlanInto,
   nythraxisGraveFlamePulseInto,
   nythraxisGraveFlameTonguePoseInto,
 } from './nythraxis_grave_core';
+import { buildNythraxisGravefirePrewarmVisual } from './nythraxis_gravefire_visual';
+import { buildNythraxisBindingSigilPrewarmVisual } from './nythraxis_sigil_visual';
 
 export const NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME = 'nythraxis-grave-flame';
 export const NYTHRAXIS_GRAVE_FLAME_FILL_NAME = 'nythraxis-grave-flame-fill';
@@ -131,6 +134,7 @@ export function buildNythraxisGraveFlamePatch(
 ): THREE.Group {
   const plan: NythraxisGraveFlamePlan = { id: '', sourceId: 0, x: 0, y: 0, z: 0, radius: 0 };
   nythraxisGraveFlamePlanInto(plan, row, groundY);
+  const palette = nythraxisFlamePalette(row.kind);
   const group = new THREE.Group();
   group.name = NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME;
   group.position.set(plan.x, plan.y, plan.z);
@@ -139,12 +143,9 @@ export function buildNythraxisGraveFlamePatch(
   group.userData.flameId = plan.id;
   group.userData.sourceId = plan.sourceId;
   group.userData.radius = plan.radius;
+  group.userData.kind = row.kind;
 
-  const fillMaterial = graveMaterial(
-    NYTHRAXIS_GRAVE_FLAME_PALETTE.fill,
-    0.34,
-    THREE.NormalBlending,
-  );
+  const fillMaterial = graveMaterial(palette.fill, 0.34, THREE.NormalBlending);
   const fill = new THREE.Mesh(
     new THREE.CircleGeometry(
       plan.radius * NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
@@ -156,7 +157,7 @@ export function buildNythraxisGraveFlamePatch(
   fill.renderOrder = 10;
   group.add(fill);
 
-  const rimMaterial = graveMaterial(NYTHRAXIS_GRAVE_FLAME_PALETTE.rim, 0.9);
+  const rimMaterial = graveMaterial(palette.rim, 0.9);
   const rim = new THREE.Mesh(
     new THREE.RingGeometry(
       plan.radius * NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
@@ -170,7 +171,7 @@ export function buildNythraxisGraveFlamePatch(
   rim.renderOrder = 11;
   group.add(rim);
 
-  const emberMaterial = graveMaterial(NYTHRAXIS_GRAVE_FLAME_PALETTE.ember, 0.32);
+  const emberMaterial = graveMaterial(palette.ember, 0.32);
   const embers = new THREE.Mesh(
     new THREE.RingGeometry(plan.radius * 0.42, plan.radius * 0.5, EMBER_SEGMENTS).rotateX(
       -Math.PI / 2,
@@ -182,7 +183,7 @@ export function buildNythraxisGraveFlamePatch(
   embers.renderOrder = 12;
   group.add(embers);
 
-  const tongueMaterial = graveMaterial(NYTHRAXIS_GRAVE_FLAME_PALETTE.tongue, 0.6);
+  const tongueMaterial = graveMaterial(palette.tongue, 0.6);
   const tongues = new THREE.InstancedMesh(
     TONGUE_GEOMETRY,
     tongueMaterial,
@@ -347,6 +348,7 @@ export function buildNythraxisGravePrewarmVisual(): THREE.Group {
     {
       id: 'prewarm-grave-flame',
       sourceId: 0,
+      kind: 'grave',
       x: 0,
       z: 0,
       radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
@@ -356,6 +358,12 @@ export function buildNythraxisGravePrewarmVisual(): THREE.Group {
     0,
   );
   root.add(patch);
+  const gravefire = buildNythraxisGravefirePrewarmVisual();
+  gravefire.position.set(0, 0, 8);
+  root.add(gravefire);
+  const sigil = buildNythraxisBindingSigilPrewarmVisual();
+  sigil.position.x = -8;
+  root.add(sigil);
 
   const staging = new THREE.Scene();
   const fx = new MageGroundFx(
@@ -375,6 +383,14 @@ export function buildNythraxisGravePrewarmVisual(): THREE.Group {
     persistentId,
   });
   fx.impactMeteor(persistentId, 8, 0);
+  fx.spawnRune({
+    x: -8,
+    z: 0,
+    radius: 4,
+    duration: 15,
+    school: 'arcane',
+    ability: NYTHRAXIS_SIGIL_CAST_ID,
+  });
   for (const child of [...staging.children]) root.add(child);
   root.traverse((child) => {
     child.visible = true;

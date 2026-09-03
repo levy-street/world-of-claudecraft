@@ -451,7 +451,7 @@ import {
   wildGlowAmount,
 } from './night_lighting_core';
 import { buildEastbrookNoticeboard } from './noticeboard';
-import { NythraxisGraveFlameVisuals } from './nythraxis_grave_flame_visual';
+import { NythraxisMechanicVisuals } from './nythraxis_mechanic_visuals';
 import { installOccluderFadeGate } from './occluder_fade_gate';
 import { buildGhostVariantPrewarmGroup } from './occluder_ghost_prewarm';
 import {
@@ -1833,7 +1833,7 @@ export class Renderer {
   private frozenOrbFx!: FrozenOrbFx;
   private mageGroundFx!: MageGroundFx;
   private varkhulForgestormVisuals?: VarkhulForgestormVisuals;
-  private nythraxisGraveFlameVisuals?: NythraxisGraveFlameVisuals;
+  private nythraxisMechanicVisuals?: NythraxisMechanicVisuals;
   private warlockMeteorFx!: WarlockMeteorFx;
   private necromancyGroundFx!: NecromancyGroundFx;
   private necromancyArmyPortalFx!: NecromancyArmyPortalFx;
@@ -2860,7 +2860,7 @@ export class Renderer {
     this.varkhulForgestormVisuals = new VarkhulForgestormVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
-    this.nythraxisGraveFlameVisuals = new NythraxisGraveFlameVisuals(this.scene, (x, z) =>
+    this.nythraxisMechanicVisuals = new NythraxisMechanicVisuals(this.scene, (x, z) =>
       groundHeight(x, z, this.sim.cfg.seed),
     );
     this.warlockMeteorFx = new WarlockMeteorFx(
@@ -3246,8 +3246,8 @@ export class Renderer {
     bestEffort(() => this.travelSpeedFx?.dispose());
     bestEffort(() => this.varkhulForgestormVisuals?.dispose());
     this.varkhulForgestormVisuals = undefined;
-    bestEffort(() => this.nythraxisGraveFlameVisuals?.dispose());
-    this.nythraxisGraveFlameVisuals = undefined;
+    bestEffort(() => this.nythraxisMechanicVisuals?.dispose());
+    this.nythraxisMechanicVisuals = undefined;
     // Renderer-owned (not a module singleton): the graphics-rebuild teardown
     // comes through HERE (shutdown -> disposeRendererResources), so the blob
     // pool, texture and material release with the rest of the GPU state.
@@ -4944,8 +4944,8 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
-    this.nythraxisGraveFlameVisuals?.syncWorld(this.sim);
-    this.nythraxisGraveFlameVisuals?.update(dt, this.reducedMotion());
+    this.nythraxisMechanicVisuals?.syncWorld(this.sim);
+    this.nythraxisMechanicVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // The meteor fx registers and releases budget lights AFTER the pass (a
     // landing frees the visible fall light), which would dip the pinned
@@ -12027,8 +12027,8 @@ export class Renderer {
     this.mageGroundFx.update(dt);
     this.varkhulForgestormVisuals?.syncWorld(this.sim);
     this.varkhulForgestormVisuals?.update(dt, this.reducedMotion());
-    this.nythraxisGraveFlameVisuals?.syncWorld(this.sim);
-    this.nythraxisGraveFlameVisuals?.update(dt, this.reducedMotion());
+    this.nythraxisMechanicVisuals?.syncWorld(this.sim);
+    this.nythraxisMechanicVisuals?.update(dt, this.reducedMotion());
     this.warlockMeteorFx.update(dt, this.reducedMotion());
     // Same post-fx budget recovery as the prewarm frame path: a landing or
     // expiry must not dip the pinned visible count for the frame it lands on.
@@ -12578,7 +12578,7 @@ export class Renderer {
     this.nameplatePainter.dispose();
     this.travelSpeedFx.dispose();
     this.varkhulForgestormVisuals?.dispose();
-    this.nythraxisGraveFlameVisuals?.dispose();
+    this.nythraxisMechanicVisuals?.dispose();
     this.blobShadows?.dispose();
   }
 

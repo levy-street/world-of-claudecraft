@@ -16,9 +16,9 @@ export interface InteriorEncounterPrewarmSpec {
   soulRendLivePlayerVisuals: boolean;
   varkhulVisuals?: boolean;
   ignivarVisuals?: boolean;
-  /** The Grave Eruption telegraph and Grave Flame patch materials
-   *  (nythraxis_grave_flame_visual.ts): actionable floor telegraphs only the
-   *  crypt can reach, so they warm here, never in the boot manifest. */
+  /** Nythraxis's Grave Eruption, Grave Flame, Gravefire, and Binding Sigil
+   *  floor materials: crypt-only actionable telegraphs warm here, never in
+   *  the boot manifest. */
   nythraxisGraveVisuals?: boolean;
 }
 

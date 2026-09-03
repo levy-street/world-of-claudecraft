@@ -43,6 +43,26 @@ export const NYTHRAXIS_GRAVE_FLAME_PALETTE = {
   tongue: 0x8cff6a,
 } as const;
 
+/** Soul Rend's residue: blood-red fire, kept distinct from Grave Flame. */
+export const NYTHRAXIS_SOUL_FLAME_PALETTE = {
+  fill: 0x2a0608,
+  rim: 0xff4a3a,
+  ember: 0x7a1a24,
+  tongue: 0xff6a4a,
+} as const;
+
+export interface NythraxisFlamePalette {
+  readonly fill: number;
+  readonly rim: number;
+  readonly ember: number;
+  readonly tongue: number;
+}
+
+/** Palette selection stays on the authoritative row kind. */
+export function nythraxisFlamePalette(kind: 'grave' | 'soul'): NythraxisFlamePalette {
+  return kind === 'soul' ? NYTHRAXIS_SOUL_FLAME_PALETTE : NYTHRAXIS_GRAVE_FLAME_PALETTE;
+}
+
 /** True for the spellfxAt / warning-row ability the eruption authors. */
 export function isNythraxisGraveEruption(ability: string | undefined): boolean {
   return ability === NYTHRAXIS_GRAVE_ERUPTION_CAST_ID;

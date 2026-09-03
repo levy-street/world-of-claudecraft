@@ -5,6 +5,10 @@
 // injected time.
 import { describe, expect, it } from 'vitest';
 import {
+  abilityVfxFullSpecFor,
+  abilityVfxSpecFor,
+} from '../src/render/ability_vfx/encounter_specs';
+import {
   ABILITY_VFX_ACCENT_CAP,
   ABILITY_VFX_CASTER_CAP,
   ABILITY_VFX_GLOBAL_CAP,
@@ -23,6 +27,13 @@ import {
 } from '../src/render/ability_vfx_core';
 import { ABILITY_VFX_SPECS } from '../src/render/ability_vfx_specs';
 import { ABILITIES } from '../src/sim/data';
+import {
+  NYTHRAXIS_BONE_SLAM_CAST_ID,
+  NYTHRAXIS_BONE_STORM_CAST_ID,
+  NYTHRAXIS_BONE_STORM_RADIUS,
+} from '../src/sim/nythraxis_bone_storm';
+import { NYTHRAXIS_CROWN_ENDURES_CAST_ID } from '../src/sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_KINGS_WRATH_AURA_NAME } from '../src/sim/nythraxis_kings_wrath';
 
 // Pet-management commands with authored visuals but no ABILITIES record.
 const NON_ABILITY_SPEC_IDS = new Set(['feed_pet', 'abandon_pet']);
@@ -43,6 +54,72 @@ describe('ABILITY_VFX_SPECS table', () => {
       expect(value, `${id}: color out of range`).toBeLessThanOrEqual(0xffffff);
       expect(value, `${id}: cached parse drifted`).toBe(abilityVfxColor(spec));
     }
+  });
+});
+
+describe('Nythraxis phase three encounter VFX specs', () => {
+  it('makes Bone Storm a large physical bone nova centered on the caster', () => {
+    expect(abilityVfxSpecFor(NYTHRAXIS_BONE_STORM_CAST_ID)).toMatchObject({
+      p: 'physical',
+      a: 'nova',
+    });
+    expect(abilityVfxFullSpecFor(NYTHRAXIS_BONE_STORM_CAST_ID)).toMatchObject({
+      archetype: 'nova',
+      palette: 'physical',
+      power: 1.9,
+      motifs: ['bladestorm', 'orbitals'],
+      motifAt: 'caster',
+      motifR: NYTHRAXIS_BONE_STORM_RADIUS,
+      nova: { radius: NYTHRAXIS_BONE_STORM_RADIUS },
+      tint: '#d8ccb8',
+      rim: '#fff5df',
+    });
+  });
+
+  it('makes Bone Slam a nine-yard physical nova with debris', () => {
+    expect(abilityVfxSpecFor(NYTHRAXIS_BONE_SLAM_CAST_ID)).toMatchObject({
+      p: 'physical',
+      a: 'nova',
+    });
+    expect(abilityVfxFullSpecFor(NYTHRAXIS_BONE_SLAM_CAST_ID)).toMatchObject({
+      archetype: 'nova',
+      palette: 'physical',
+      nova: { radius: 9 },
+      impact: { debris: true },
+    });
+    expect(NYTHRAXIS_BONE_STORM_RADIUS).toBe(9);
+  });
+
+  it("makes King's Wrath a screen-filling shadow nova", () => {
+    expect(abilityVfxSpecFor(NYTHRAXIS_KINGS_WRATH_AURA_NAME)).toMatchObject({
+      p: 'shadow',
+      a: 'nova',
+    });
+    expect(abilityVfxFullSpecFor(NYTHRAXIS_KINGS_WRATH_AURA_NAME)).toMatchObject({
+      archetype: 'nova',
+      palette: 'shadow',
+      screenFx: true,
+    });
+  });
+
+  it('makes The Crown Endures the largest phase three shadow nova', () => {
+    const crown = abilityVfxFullSpecFor(NYTHRAXIS_CROWN_ENDURES_CAST_ID);
+    const wrath = abilityVfxFullSpecFor(NYTHRAXIS_KINGS_WRATH_AURA_NAME);
+    const storm = abilityVfxFullSpecFor(NYTHRAXIS_BONE_STORM_CAST_ID);
+    expect(abilityVfxSpecFor(NYTHRAXIS_CROWN_ENDURES_CAST_ID)).toMatchObject({
+      p: 'shadow',
+      a: 'nova',
+    });
+    expect(crown).toMatchObject({
+      archetype: 'nova',
+      palette: 'shadow',
+      screenFx: true,
+      nova: { radius: 18 },
+    });
+    expect(crown?.power).toBeGreaterThan(wrath?.power ?? 0);
+    expect(crown?.power).toBeGreaterThan(storm?.power ?? 0);
+    expect(crown?.nova?.radius).toBeGreaterThan(wrath?.nova?.radius ?? 0);
+    expect(crown?.nova?.radius).toBeGreaterThan(storm?.nova?.radius ?? 0);
   });
 });
 

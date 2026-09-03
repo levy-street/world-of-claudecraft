@@ -37,6 +37,7 @@ import {
   nythraxisGraveShardPoseInto,
   nythraxisGraveShardRise,
 } from './nythraxis_grave_core';
+import { isNythraxisBindingSigil, NYTHRAXIS_SIGIL_PALETTE } from './nythraxis_sigil_core';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -139,6 +140,8 @@ export interface RuneCircleSpawn {
    *  rides this same visual and passes the mechanic's real school, so a fire
    *  boss doesn't wind up behind a violet ring that doesn't read as danger. */
   school?: string;
+  /** Encounter identity for an authored palette layered over the school. */
+  ability?: string;
 }
 
 export interface SnowZoneSpawn {
@@ -1161,8 +1164,14 @@ export class MageGroundFx {
   spawnRune(opts: RuneCircleSpawn): void {
     if (this.disposed) return;
     const school = opts.school ?? 'arcane';
+    const bindingSigil = isNythraxisBindingSigil(opts.ability);
+    const paletteKey = bindingSigil ? 'binding-sigil' : school;
     const schoolColor = capRingLightness(
-      new THREE.Color(SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
+      new THREE.Color(
+        bindingSigil
+          ? NYTHRAXIS_SIGIL_PALETTE.rim
+          : (SCHOOL_COLORS[school] ?? SCHOOL_COLORS.arcane),
+      ),
     );
     const group = new THREE.Group();
     group.name = 'mage-rune-power';
@@ -1181,7 +1190,7 @@ export class MageGroundFx {
       ['mage-rune-power-outer-ring', opts.radius, 0.75],
       ['mage-rune-power-inner-ring', opts.radius * 0.55, 0.45],
     ] as const) {
-      const kind = `${name}:${school}`;
+      const kind = `${name}:${paletteKey}`;
       const mat = this.acquireMaterial(
         kind,
         opacity,
@@ -1206,7 +1215,7 @@ export class MageGroundFx {
       baseOpacities.push(opacity);
     }
     // Four spokes so the circle reads as an inscribed rune, not a plain ring.
-    const spokeKind = `mage-rune-power-spoke:${school}`;
+    const spokeKind = `mage-rune-power-spoke:${paletteKey}`;
     for (let i = 0; i < 4; i++) {
       const mat = this.acquireMaterial(
         spokeKind,
@@ -1240,7 +1249,7 @@ export class MageGroundFx {
     // A soft filled glow at the center plus a ring of orbiting motes: the
     // inscription reads as living magic, not a chalk outline (owner playtest).
     const glowGeo = this.createTerrainDisc(opts.x, opts.z, opts.radius * 0.5, 32);
-    const glowKind = `mage-rune-power-glow:${school}`;
+    const glowKind = `mage-rune-power-glow:${paletteKey}`;
     const glowMat = this.acquireMaterial(
       glowKind,
       0.18,
@@ -1268,7 +1277,7 @@ export class MageGroundFx {
     orbit.position.set(opts.x, this.groundY(opts.x, opts.z), opts.z);
     const moteGeo = new THREE.SphereGeometry(0.12, 8, 6);
     ownedGeometries.push(moteGeo);
-    const moteKind = `mage-rune-power-mote:${school}`;
+    const moteKind = `mage-rune-power-mote:${paletteKey}`;
     for (let i = 0; i < 6; i++) {
       const moteMat = this.acquireMaterial(
         moteKind,
@@ -1861,6 +1870,7 @@ export function handleMageGroundSpellfxEvent(
       radius: ev.radius ?? 8,
       duration: ev.duration ?? 15,
       school: ev.school,
+      ability: ev.ability,
     });
     return true;
   }
