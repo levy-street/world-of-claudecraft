@@ -281,8 +281,12 @@ export function syncMountTransitionFx(
   // idle -> summoning edge (mountCastKey set): play the arm-raise call pose for
   // ~the transition window. A dismount (mountCastKey === '') gets no pose; its
   // effect is the completion glow below.
-  if (x.mountCasting && !v.wasMountCasting && x.mountCastKey !== '' && x.poseAllowed) {
-    x.playCallPose(x.mountCastRemaining);
+  if (x.mountCasting && !v.wasMountCasting && x.mountCastKey !== '') {
+    // Start decoding the authored movement set at the CAST edge, not after the
+    // mount appears. Presentation shedding may suppress the cosmetic call pose,
+    // but it must not also throw away the only useful preload window.
+    x.preloadEngine(x.mountCastKey);
+    if (x.poseAllowed) x.playCallPose(x.mountCastRemaining);
   }
   // mountKey change = summon completed, dismount completed, or a live swap: fire
   // the shimmer at the rider. Tracked separately from mountVisualKey, which lags
@@ -304,8 +308,9 @@ export function syncMountTransitionFx(
     // or dismount), and a swap would carry the old moving state into the new
     // mount, skipping its windup.
     x.engineReset();
-    // Warm the new mount's engine clips right away (not e.g. lazily on the first
-    // movement frame): a cold first ride otherwise plays the windup through
+    // Warm the new mount's movement clips right away too (the cast-edge call
+    // above may not have run for a live swap): a cold first ride otherwise
+    // plays the windup through
     // playAt's cold path (silently dropped past a 0.12s fetch/decode window) and
     // the loop's cold path (a fallback fade-in instead of the immediate splice),
     // reading as ~0.9s of silence then a swell. A no-op for an ordinary mount.

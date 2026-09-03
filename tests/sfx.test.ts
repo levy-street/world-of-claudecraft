@@ -942,18 +942,23 @@ describe('necromancy audio', () => {
 
 describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () => {
   const KEY = 'mech_bird';
+  const RUN_KEY = `mount_run_${KEY}`;
   const IDLE_KEY = `mount_idle_${KEY}`;
   const JUMP_KEY = `mount_jump_${KEY}`;
   const LAND_KEY = `mount_land_${KEY}`;
   const IDLE_BUF = { duration: 9.9 };
   const JUMP_BUF = { duration: 0.67 };
+  const LAND_BUF = { duration: 0.74 };
   const GENERIC_JUMP_BUF = { duration: 0.5 };
+  const GENERIC_LAND_BUF = { duration: 0.55 };
 
   beforeEach(() => {
     const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
     buffers.set(IDLE_KEY, IDLE_BUF);
     buffers.set(JUMP_KEY, JUMP_BUF);
+    buffers.set(LAND_KEY, LAND_BUF);
     buffers.set('move_jump', GENERIC_JUMP_BUF);
+    buffers.set('move_land', GENERIC_LAND_BUF);
     (sfx as unknown as { mountIdles: Set<number> }).mountIdles.clear();
     (sfx as unknown as { loops: Map<string, unknown> }).loops.clear();
   });
@@ -998,6 +1003,16 @@ describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () =
     expect(loops.has('mountIdle:1')).toBe(false);
   });
 
+  it('preloads exactly the Mech Bird run, idle, jump, and land takes', () => {
+    const preload = vi.spyOn(sfx, 'preload').mockImplementation(() => {});
+
+    sfx.preloadMountEngine(KEY);
+
+    expect(preload.mock.calls.map(([key]) => key).sort()).toEqual(
+      [RUN_KEY, IDLE_KEY, JUMP_KEY, LAND_KEY].sort(),
+    );
+  });
+
   it('movement prefers the mount jump take while riding, and falls back for other mounts', () => {
     sfx.movement('jump', 0, 0, 0, false, KEY);
     expect(lastSource().buffer).toBe(JUMP_BUF);
@@ -1005,5 +1020,17 @@ describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () =
     expect(lastSource().buffer).toBe(GENERIC_JUMP_BUF);
     sfx.movement('jump', 0, 0, 0, false); // on foot: generic cue
     expect(lastSource().buffer).toBe(GENERIC_JUMP_BUF);
+  });
+
+  it('plays exactly the custom landing take while riding the Mech Bird', () => {
+    const before = sources.length;
+
+    sfx.movement('land', 0, 0, 0, false, KEY);
+
+    expect(sources).toHaveLength(before + 1);
+    expect(lastSource().buffer).toBe(LAND_BUF);
+
+    sfx.movement('land', 0, 0, 0, false, 'valorsteed');
+    expect(lastSource().buffer).toBe(GENERIC_LAND_BUF);
   });
 });

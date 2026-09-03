@@ -486,6 +486,17 @@ describe('mob subfamily scanning', () => {
   });
 });
 
+describe('Mech Bird jump and landing asset binding', () => {
+  it('ships byte-distinct launch and impact recordings', () => {
+    const jump = readFileSync(path.join(realSfxDir, 'mount_jump_mech_bird.mp3'));
+    const land = readFileSync(path.join(realSfxDir, 'mount_land_mech_bird.mp3'));
+    const jumpHash = createHash('sha256').update(jump).digest('hex');
+    const landHash = createHash('sha256').update(land).digest('hex');
+
+    expect(landHash).not.toBe(jumpHash);
+  });
+});
+
 // Pins the exact asset-to-ability binding this PR restored, so a future
 // re-swap (Meteor's landing recording and Flamestrike's cast recording were
 // mixed up once already, see the fix commit's history) gets caught by CI

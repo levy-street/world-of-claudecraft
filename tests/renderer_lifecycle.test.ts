@@ -198,6 +198,78 @@ describe('Renderer lifecycle wiring', () => {
     );
   });
 
+  it('starts warming the summon target on the cast edge even when its call pose is gated', () => {
+    const summonEdge = sliceIn(
+      mountLifecycleSource,
+      "if (x.mountCasting && !v.wasMountCasting && x.mountCastKey !== '') {",
+      '\n  }',
+    );
+    const preloadAt = summonEdge.indexOf('x.preloadEngine(x.mountCastKey)');
+    const poseGateAt = summonEdge.indexOf('x.poseAllowed');
+
+    expect(preloadAt).toBeGreaterThan(-1);
+    expect(poseGateAt).toBeGreaterThan(preloadAt);
+  });
+
+  it('runs mount transition reset and prewarm before spatial movement audio', () => {
+    const transitionAt = source.indexOf('v.wasMountCasting = syncMountTransitionFx(v, {');
+    const movementAudioAt = source.indexOf(
+      '// --- spatial movement audio (self + others) --------------------------',
+    );
+
+    expect(transitionAt).toBeGreaterThan(-1);
+    expect(movementAudioAt).toBeGreaterThan(transitionAt);
+    const transitionBlock = source.slice(transitionAt, movementAudioAt);
+    expect(transitionBlock).toContain('mountCastKey: e.mountCastKey');
+    expect(transitionBlock).toContain('engineReset: () => this.audioSink?.mountEngineReset(e.id)');
+    expect(transitionBlock).toContain(
+      'preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key)',
+    );
+  });
+
+  it('pins the mount gait cadence and all three stride-accumulator callers', () => {
+    expect(source).toContain('const MOUNT_STRIDE_RUN = 5.8;');
+    expect(source).toContain('strideHit(v, loco.speed, dt, SWIM_STRIDE)');
+    expect(source).toContain('strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN)');
+    expect(source).toContain(
+      'strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK)',
+    );
+  });
+
+  it('forwards the mount key into run, jump, and landing dispatch', () => {
+    const audioBlock = slice(
+      '// --- spatial movement audio (self + others) --------------------------',
+      "// Capture the flight's peak fall speed before the landing reset",
+    );
+    const mountedStart = audioBlock.indexOf('logicallyMounted && moving && !airborne');
+    const airborneStart = audioBlock.indexOf('logicallyMounted && airborne', mountedStart);
+    const stoppedStart = audioBlock.indexOf(
+      'logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)',
+      airborneStart,
+    );
+    const onFootStart = audioBlock.indexOf('moving && !airborne', stoppedStart);
+    expect(mountedStart).toBeGreaterThan(-1);
+    expect(airborneStart).toBeGreaterThan(mountedStart);
+    expect(stoppedStart).toBeGreaterThan(airborneStart);
+    expect(onFootStart).toBeGreaterThan(stoppedStart);
+    const mountedMoving = audioBlock.slice(mountedStart, airborneStart);
+    const mountedStopped = audioBlock.slice(stoppedStart, onFootStart);
+
+    expect(mountedMoving).toContain('sink.mountIdle(ax, ay, az, e.mountKey, false, e.id)');
+    expect(mountedMoving).toContain('sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)');
+    expect(mountedMoving).toContain(
+      'sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf)',
+    );
+    expect(mountedStopped).toContain('sink.mountEngine(ax, ay, az, e.mountKey, false, e.id)');
+    expect(mountedStopped).toContain('sink.mountIdle(ax, ay, az, e.mountKey, true, e.id)');
+    expect(audioBlock).toContain(
+      "sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined)",
+    );
+    expect(audioBlock).toContain(
+      "sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined)",
+    );
+  });
+
   it("preloads an already-mounted entity's engine clips at view creation", () => {
     // The edge above only fires on a CHANGE, and lastMountKey is seeded from
     // the entity's current mountKey when the view is born, so a remote rider
@@ -226,7 +298,9 @@ describe('Renderer lifecycle wiring', () => {
     expect(airborneBranch).toBeGreaterThan(-1);
     expect(notMovingBranch).toBeGreaterThan(airborneBranch);
     const airborneBranchBody = audioBlock.slice(airborneBranch, notMovingBranch);
+    expect(airborneBranchBody).toContain('sink.mountIdle(ax, ay, az, e.mountKey, false, e.id)');
     expect(airborneBranchBody).not.toContain('sink.mountEngine(');
+    expect(airborneBranchBody).not.toContain('sink.mountEngineReset(');
   });
 
   it('tears down a still-active engine-mount loop when the rider exits the move-audio range gate', () => {

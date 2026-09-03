@@ -11034,6 +11034,24 @@ export class Renderer {
       // Facts about the ENTITY that override what its displayed motion implies
       // (battle-stance engagement, ice-slide suppression): anim_state_entity_core.
       applyEntityAnimOverrides(st, e, visuallyDead);
+      // Reset and prewarm mount audio BEFORE this frame can dispatch movement
+      // cues. A completed summon or live swap must not start the new idle/run
+      // voice only to have the transition edge immediately tear it down below.
+      if (e.kind === 'player') {
+        v.wasMountCasting = syncMountTransitionFx(v, {
+          mountCasting: e.mountCastRemaining > 0,
+          mountCastKey: e.mountCastKey,
+          mountCastRemaining: e.mountCastRemaining,
+          mountKey: e.mountKey,
+          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
+          present: runCharacterPresentation,
+          playCallPose: (secs: number) => active.playCallPose(secs),
+          summonGlow: () => this.vfx.mountSummonGlow(e.id),
+          engineReset: () => this.audioSink?.mountEngineReset(e.id),
+          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
+          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
+        });
+      }
       // --- spatial movement audio (self + others) --------------------------
       // All gated by audibility (squared distance) so far entities cost nothing.
       const sink = this.audioSink;
@@ -11090,6 +11108,9 @@ export class Renderer {
           // little bump in the road. Skipping the poll entirely leaves the
           // state machine (and any active loop) exactly where it was; the
           // next grounded frame picks the state back up on its own branch.
+          // The standstill hum is a separate loop, however, and must stop at
+          // takeoff rather than remain spatialized at the launch point.
+          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id);
         } else if (logicallyMounted && !visuallyDead && !(st.sitting && !riderMounted)) {
           // Not moving while mounted (grounded and stopped): still poll an
           // engine mount every frame so the winddown fires on the stop edge;
@@ -11390,22 +11411,6 @@ export class Renderer {
         } else if (!emoteId) {
           v.lastOverheadEmoteKey = null;
         }
-      }
-
-      if (e.kind === 'player') {
-        v.wasMountCasting = syncMountTransitionFx(v, {
-          mountCasting: e.mountCastRemaining > 0,
-          mountCastKey: e.mountCastKey,
-          mountCastRemaining: e.mountCastRemaining,
-          mountKey: e.mountKey,
-          poseAllowed: !visuallyDead && !swimming && runCharacterPresentation,
-          present: runCharacterPresentation,
-          playCallPose: (secs: number) => active.playCallPose(secs),
-          summonGlow: () => this.vfx.mountSummonGlow(e.id),
-          engineReset: () => this.audioSink?.mountEngineReset(e.id),
-          preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key),
-          summonCall: () => this.audioSink?.mountSummon(ax, ay, az, e.mountKey, isSelf),
-        });
       }
 
       // per-ability windup orb + buff-orbit bands (spec-driven; no-op for

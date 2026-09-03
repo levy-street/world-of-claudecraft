@@ -1103,20 +1103,19 @@ class Sfx {
     this.unloop(`mountEngine:${entityId}`, 0.1);
   }
 
-  /** Warm the three engine clips (windup/loop/winddown) for a mountKey ahead
-   *  of the first time they are actually needed. Called from the mountKey
-   *  transition edge in renderer.ts (the same edge that calls
-   *  mountEngineReset), so a fresh mount or a swap has its buffers already
-   *  decoded, or at least in flight, by the time movement first calls
-   *  mountEngine. Without this, a cold first ride can still hit playAt's/
-   *  loop()'s cold paths (dropped one-shot, or a fallback fade-in) if the
-   *  rider starts moving before the fetch+decode finishes; this preload just
-   *  makes that window much smaller in practice. A no-op for a mount with no
-   *  engine take set.*/
+  /** Warm a mount's authored movement clips ahead of first use. Called from
+   *  the summon-cast and mountKey transition edges in renderer.ts, so a fresh
+   *  mount or a swap has its buffers decoded, or at least in flight, before
+   *  movement dispatch. Without this, a cold first ride can still hit
+   *  playAt's/loop()'s cold paths (dropped one-shot, or a fallback fade-in)
+   *  while fetch+decode runs. A no-op for an ordinary mount with no custom
+   *  movement takes. */
   preloadMountEngine(mountKey: string): void {
-    // The idle hum and the mount-aware jump/land takes ride the same warm-up
-    // edge: a mount can ship those without an engine take set (the Mech Bird),
-    // so they preload before the engine-set early return.
+    // The per-stride gait beat, idle hum, and mount-aware jump/land takes ride
+    // the same warm-up edge: a mount can ship them without an engine take set
+    // (the Mech Bird), so they preload before the engine-set early return.
+    const runKey = `mount_run_${mountKey}`;
+    if (runKey in SFX_CLIPS) this.preload(runKey);
     const idleKey = this.idleClipKey(mountKey);
     if (idleKey) this.preload(idleKey);
     for (const kind of ['jump', 'land'] as const) {

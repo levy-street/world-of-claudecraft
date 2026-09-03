@@ -24,6 +24,13 @@ describe('strideHit', () => {
     expect(strideHit(view, 4.5, 0.05, 0.95)).toBe(true); // 1.02 crosses
   });
 
+  it('fires on exact threshold equality', () => {
+    const view = { stepAccum: 0.75 };
+
+    expect(strideHit(view, 5, 0.05, 1)).toBe(true);
+    expect(view.stepAccum).toBe(0);
+  });
+
   it('never fires while stationary regardless of accumulated frames', () => {
     const view = { stepAccum: 0.5 };
     for (let i = 0; i < 100; i++) expect(strideHit(view, 0, 0.05, 0.95)).toBe(false);
