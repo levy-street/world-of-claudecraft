@@ -1246,10 +1246,12 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // resolved renderer sha256 is 36b780c6, matching neither ours (ed29e747) nor
 // the release (9b4d40e5); every other provenance input remains byte-identical.
 // The four evidence JSONs were swept again, with no capture retaken.
+// Re-minted at Masterwrought closeout after the Mech Bird transition/audio
+// sequencing fix moved renderer.ts to 7c10f934. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '4029bda533a2b51a94c048e5f7eb36c8de1a0d32deef6b2f066adda5a6f2a093';
+  'ede800c533550a61c65e775fbde3f4a2530da735f50a2c80ebea38f6890c57a2';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'e6213886daf59e8b7bec208a3a3c0c8bbbe6187712439df92bc3204df45adb2d';
+  'eb47c467789a899e8a3bdbd1fd477006f0f4a15a257bd12d6d633d6dfa7ed541';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2531,7 +2533,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // moved beyond both parents. Parent values were ours de96fa4e and the
       // release 69c8bd5d; this seal was recomputed LAST from the swept files.
       // No capture was retaken.
-    ).toBe('d7f5cd3baa905b78002719b629c92295ad495218eca5e58660a136202f012314');
+      // Re-minted at Masterwrought closeout after the Mech Bird audio ordering
+      // fix changed renderer.ts. This seal was recomputed LAST; no recapture.
+    ).toBe('765f05911f2a179ae9739af3164899eb4edf802f5c2db1cc0fa0def943b878aa');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

@@ -560,8 +560,10 @@ interface AttributionTargetFixture {
 // resolved renderer sha256 is 36b780c6, matching neither ours (ed29e747) nor
 // the release (9b4d40e5); every other provenance input remains byte-identical.
 // The four evidence JSONs were swept again, with no capture retaken.
+// Re-minted at Masterwrought closeout after the Mech Bird transition/audio
+// sequencing fix moved renderer.ts to 7c10f934. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'e6213886daf59e8b7bec208a3a3c0c8bbbe6187712439df92bc3204df45adb2d';
+  'eb47c467789a899e8a3bdbd1fd477006f0f4a15a257bd12d6d633d6dfa7ed541';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
