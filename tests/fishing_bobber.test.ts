@@ -68,4 +68,37 @@ describe('FishingBobberVisual water feedback', () => {
     visual.update(0.1, sim.entities, SEED);
     expect(strengths).toEqual([0.65, 0.38, 0.35]);
   });
+
+  it('copies the live rendered bobber point without recomputing its anchor', () => {
+    const sim = new Sim({ seed: SEED, playerClass: 'mage' });
+    const player = sim.player;
+    const spot = fishingShoreSpot();
+    player.pos.x = spot.x;
+    player.pos.y = groundHeight(spot.x, spot.z, SEED);
+    player.pos.z = spot.z;
+    player.facing = spot.facing;
+    player.castingAbility = FISHING_CAST_ID;
+    const scene = new THREE.Scene();
+    const visual = new FishingBobberVisual(scene);
+    const out = { x: -1, y: -1, z: -1 };
+
+    expect(visual.worldPointInto(player.id, out)).toBe(false);
+    expect(out).toEqual({ x: -1, y: -1, z: -1 });
+    visual.update(0.01, sim.entities, SEED);
+    const rendered = scene.children[0];
+    expect(visual.worldPointInto(player.id, out)).toBe(true);
+    expect(out).toEqual({
+      x: rendered.position.x,
+      y: rendered.position.y,
+      z: rendered.position.z,
+    });
+
+    visual.bite(player.id);
+    visual.update(0.1, sim.entities, SEED);
+    expect(visual.worldPointInto(player.id, out)).toBe(true);
+    expect(out.y).toBe(rendered.position.y);
+    player.castingAbility = null;
+    visual.update(0.1, sim.entities, SEED);
+    expect(visual.worldPointInto(player.id, out)).toBe(false);
+  });
 });

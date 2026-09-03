@@ -28,6 +28,38 @@ function bgFlagEntityTeam(color: number): BgTeam | null {
   return null;
 }
 
+export interface BgFlagInteractionCandidate {
+  interactionKind: 'bgFlag';
+  anchor: { kind: 'entity'; entityId: number };
+  team: BgTeam;
+  eligible: true;
+}
+
+function resolveGrabbableFlag(
+  match: Pick<BgMatchInfo, 'myTeam' | 'flags'>,
+  playerPos: Entity['pos'],
+  entities: ReadonlyMap<number, Entity>,
+): BgFlagInteractionCandidate | null {
+  let best: BgFlagInteractionCandidate | null = null;
+  let bestDistance = BG_PICKUP_RADIUS + 1;
+  for (const entity of entities.values()) {
+    if (entity.kind !== 'object' || entity.templateId !== 'bg_flag') continue;
+    const team = bgFlagEntityTeam(entity.color);
+    if (team === null || team === match.myTeam) continue;
+    if (match.flags[team]?.state === 'carried') continue;
+    const distance = dist2d(playerPos, entity.pos);
+    if (distance > BG_PICKUP_RADIUS || distance >= bestDistance) continue;
+    best = {
+      interactionKind: 'bgFlag',
+      anchor: { kind: 'entity', entityId: entity.id },
+      team,
+      eligible: true,
+    };
+    bestDistance = distance;
+  }
+  return best;
+}
+
 /** True while an enemy flag sits within pickup reach and is not already
  *  carried. Own-team flags never count: bgFlagAction only ever grabs the
  *  other side's flag. */
@@ -36,14 +68,18 @@ export function bgFlagGrabbableNearby(
   playerPos: Entity['pos'],
   entities: ReadonlyMap<number, Entity>,
 ): boolean {
-  for (const entity of entities.values()) {
-    if (entity.kind !== 'object' || entity.templateId !== 'bg_flag') continue;
-    const team = bgFlagEntityTeam(entity.color);
-    if (team === null || team === match.myTeam) continue;
-    if (match.flags[team]?.state === 'carried') continue;
-    if (dist2d(playerPos, entity.pos) <= BG_PICKUP_RADIUS) return true;
-  }
-  return false;
+  return resolveGrabbableFlag(match, playerPos, entities) !== null;
+}
+
+/** Resolve the live enemy-flag winner for both dispatch composition and its world prompt. */
+export function resolveBgFlagInteraction(
+  bgInfo: { match: Pick<BgMatchInfo, 'myTeam' | 'flags' | 'state'> | null } | null,
+  player: Pick<Entity, 'pos' | 'dead'>,
+  entities: ReadonlyMap<number, Entity>,
+): BgFlagInteractionCandidate | null {
+  const match = bgInfo?.match;
+  if (match?.state !== 'active' || player.dead) return null;
+  return resolveGrabbableFlag(match, player.pos, entities);
 }
 
 /** Whether the bare Interact key means the flag press right now: only inside
@@ -58,8 +94,5 @@ export function shouldRouteInteractToBgFlag(
   player: Pick<Entity, 'pos' | 'dead'>,
   entities: ReadonlyMap<number, Entity>,
 ): boolean {
-  const match = bgInfo?.match;
-  return (
-    match?.state === 'active' && !player.dead && bgFlagGrabbableNearby(match, player.pos, entities)
-  );
+  return resolveBgFlagInteraction(bgInfo, player, entities) !== null;
 }

@@ -26,6 +26,11 @@ import { localizeSimAuraName } from '../ui/sim_i18n';
 import { type IWorld, OVERHEAD_EMOTES } from '../world_api';
 
 import { castBarState } from './cast_bar';
+import {
+  type ControllerWorldPromptLabelAnchor,
+  ControllerWorldPromptPainter,
+} from './controller_world_prompt_painter';
+import type { ControllerWorldPromptFrame } from './controller_world_prompt_view';
 import { anyCharacterRigDrawing, entityHasNoBody } from './entity_gate_stand_in_core';
 import { mobDisplayName, npcDisplayName, objectDisplayName } from './entity_labels';
 import {
@@ -117,9 +122,17 @@ export class NameplatePainter {
   private readonly showPlayerNameplates: () => boolean;
   private readonly isHostilePlayer: (e: Entity) => boolean;
   private readonly surface: NameplateCanvasSurface;
+  private readonly controllerPromptPainter: ControllerWorldPromptPainter;
   private readonly states = new Map<number, NameplateCanvasState>();
   private readonly tmpV = new THREE.Vector3();
   private readonly tmpV2 = new THREE.Vector3();
+  private readonly controllerPromptWorldPoint = new THREE.Vector3();
+  private readonly controllerPromptLabel: ControllerWorldPromptLabelAnchor = {
+    state: createNameplateCanvasState(),
+    heraldryLift: 0,
+    screenX: 0,
+    screenY: 0,
+  };
   private readonly plan: NameplatePlan = newNameplatePlan();
   private readonly anchorScratch: Array<NameplateAnchor & NameplatePickCandidate> = [];
   private anchorCount = 0;
@@ -160,9 +173,10 @@ export class NameplatePainter {
     this.showPlayerNameplates = deps.showPlayerNameplates;
     this.isHostilePlayer = deps.isHostilePlayer;
     this.surface = new NameplateCanvasSurface(deps.layer);
+    this.controllerPromptPainter = new ControllerWorldPromptPainter(this.camera, this.surface);
   }
 
-  update(fullPass: boolean): void {
+  update(fullPass: boolean, controllerPrompt: ControllerWorldPromptFrame | null = null): void {
     const world = this.world;
     const player = world.player;
     const { width, height } = this.getViewport();
@@ -273,6 +287,7 @@ export class NameplatePainter {
       const state = this.states.get(anchor.id);
       if (state) this.surface.drawEmote(state, anchor.sx, anchor.sy);
     }
+    this.paintControllerPrompt(controllerPrompt, width, height);
   }
 
   remove(id: number): void {
@@ -293,6 +308,45 @@ export class NameplatePainter {
     this.anchorCount = 0;
     this.states.clear();
     this.surface.dispose();
+  }
+
+  private paintControllerPrompt(
+    frame: ControllerWorldPromptFrame | null,
+    viewportWidth: number,
+    viewportHeight: number,
+  ): void {
+    const action = frame?.action;
+    let label: ControllerWorldPromptLabelAnchor | null = null;
+    let fallbackWorldPoint: THREE.Vector3 | null = null;
+    if (action?.anchor.kind === 'entity') {
+      const id = action.anchor.entityId;
+      for (let i = 0; i < this.anchorCount; i++) {
+        const anchor = this.anchorScratch[i];
+        if (anchor.id !== id) continue;
+        const state = this.states.get(id);
+        if (state?.name) {
+          this.controllerPromptLabel.state = state;
+          this.controllerPromptLabel.heraldryLift = nameplateHeraldryLift(state.border);
+          this.controllerPromptLabel.screenX = anchor.sx;
+          this.controllerPromptLabel.screenY = anchor.sy;
+          label = this.controllerPromptLabel;
+        }
+        break;
+      }
+      const entity = this.world.entities.get(id);
+      const view = this.views.get(id);
+      if (entity && view) {
+        fallbackWorldPoint = this.controllerPromptWorldPoint.copy(view.group.position);
+        fallbackWorldPoint.y += (view.height + view.mountLift) * entity.scale + 0.35;
+      }
+    }
+    this.controllerPromptPainter.paint(
+      frame,
+      label,
+      fallbackWorldPoint,
+      viewportWidth,
+      viewportHeight,
+    );
   }
 
   private updateDynamicState(

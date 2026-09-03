@@ -307,7 +307,7 @@ import {
 } from './fire_light_registry';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
 import { buildFish, type FishView } from './fish';
-import { FishingBobberVisual } from './fishing_bobber';
+import { FishingBobberVisual, type FishingBobberWorldPoint } from './fishing_bobber';
 import { applyFogScenePreset, resolveFogScene } from './fog_scene_state';
 import {
   buildFoliage,
@@ -429,6 +429,7 @@ import {
   isProjectedNameplateAnchorVisible,
   nameplateScreenTransform,
 } from './nameplate_projection';
+import { type ControllerWorldPromptSource, NameplateUpdateCore } from './nameplate_update_core';
 import { NecromancyArmyPortalFx, spawnArmyPortalBurstEvent } from './necromancy_army_portal_fx';
 import { NecromancyGroundFx } from './necromancy_ground_fx';
 import { NeedleOfFateVfx } from './needle_of_fate_vfx';
@@ -1900,7 +1901,7 @@ export class Renderer {
   private godRayZoneScale = 1;
   private viewport = { width: 1, height: 1 };
   private viewportPollTimer = 0;
-  private nameplateTimer = 0;
+  private nameplateUpdate = new NameplateUpdateCore();
   private glVendor = '';
   private glRenderer = '';
   private contextLostCount = 0;
@@ -3469,7 +3470,12 @@ export class Renderer {
   setPlayerAuraRings(rings: readonly PlayerAuraRingInput[]): void {
     this.playerAuraRings.setRings(rings);
   }
-
+  setControllerWorldPromptSource(source: ControllerWorldPromptSource | null): void {
+    this.nameplateUpdate.setControllerWorldPromptSource(source);
+  }
+  localFishingBobberWorldPointInto(out: FishingBobberWorldPoint): boolean {
+    return this.fishingBobbers.worldPointInto(this.sim.player.id, out);
+  }
   zoneIdAt(x: number, z: number): string | null {
     return x > DUNGEON_X_THRESHOLD ? null : zoneAt(x, z).id;
   }
@@ -5005,7 +5011,7 @@ export class Renderer {
     }
     this.updateCelestialSprites();
     this.updateGodRays();
-    this.nameplatePainter.update(true);
+    this.nameplatePainter.update(true, this.nameplateUpdate.controllerWorldPrompt());
     this.updateChatBubbles();
   }
 
@@ -12295,22 +12301,11 @@ export class Renderer {
     this.updateGodRays();
     worldStart = this.markRendererWorldPhase(worldPhaseMs, 'godRays', worldStart);
     phaseStart = this.markRendererPhase(framePhaseMs, 'world', phaseStart);
-
-    this.nameplateTimer += dt;
-    // Static-preset tiered cadence: the nameplate refresh interval follows
-    // the player's chosen graphics tier (the data-fx-level the preset applier
-    // stamps), NEVER the FPS governor (the two-controller rule). The
-    // LOW tier runs 1/15s, richer tiers 1/24s. The axis is the PRESET, not the device:
-    // the weak-GPU cost ceiling (the PR901 lesson) is restored through the device-aware
-    // first-run default (resolveDefaultGraphicsPreset in gfx.ts), which lands a
-    // recognized-weak or software GPU on the LOW preset (its 1/15s ceiling) while a
-    // mid/unknown device defaults to medium (1/24s). An explicit player preset wins.
     const nameplateInterval = nameplateIntervalSec(
       coerceFxTier(document.documentElement.dataset.fxLevel),
     );
-    const fullNameplatePass = this.nameplateTimer >= nameplateInterval;
-    if (fullNameplatePass) this.nameplateTimer = 0;
-    this.nameplatePainter.update(fullNameplatePass);
+    const fullNameplatePass = this.nameplateUpdate.advance(dt, nameplateInterval);
+    this.nameplatePainter.update(fullNameplatePass, this.nameplateUpdate.controllerWorldPrompt());
     this.updateChatBubbles();
     phaseStart = this.markRendererPhase(framePhaseMs, 'nameplates', phaseStart);
     this.updateTravelSpeedFx(p, selfPos, dt);

@@ -243,6 +243,11 @@ extracted domain stay flat `src/ui/` modules. Its test is a Vitest in `tests/<na
 driving the pure core directly. Bug fixes are test-first (root `CLAUDE.md` and the
 `extract-and-test` skill own that workflow).
 
+`launcher_hint_controller.ts` owns the side-rail Cycle Interface hint. It resolves the
+live remapped binding and controller label family, while CSS input ownership keeps it
+out of keyboard/mouse and touch layouts and the controller coordinator suppresses it
+during virtual-mouse mode.
+
 ### Authoring a new HUD component (the recipe)
 One recipe for a new window/panel or a per-frame frame/bar, and for migrating one out of
 `hud.ts` (the merge-conflict tax this pays down). Migrate one at a time, on the rule of three;

@@ -4039,6 +4039,41 @@
     gap: 2px;
     z-index: 19;
   }
+  .launcher-cycle-hint {
+    position: absolute;
+    right: calc(100% + var(--spacing-sm));
+    bottom: 0;
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--panel-bg);
+    color: var(--color-accent);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .launcher-cycle-hint[hidden] {
+    display: none;
+  }
+  body.pad-active:not(.mobile-touch) .launcher-cycle-hint:not([hidden]) {
+    display: flex;
+  }
+  .launcher-cycle-hint .tut-keycap {
+    font-size: 12px;
+    padding: 4px 7px 3px;
+  }
+  @media (forced-colors: active) {
+    .launcher-cycle-hint {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
   .side-buttons-col {
     display: flex;
     flex-direction: column;
@@ -11742,6 +11777,46 @@
     outline-offset: 2px;
     box-shadow: 0 0 10px rgba(255, 209, 0, 0.45);
     border-radius: 4px;
+  }
+
+  body.pad-active:not(.mobile-touch) [data-pad-focus-confirm-label]::after,
+  body.pad-active:not(.mobile-touch) [data-pad-subcommands-label]::after {
+    position: absolute;
+    top: 50%;
+    right: calc(100% + var(--spacing-sm));
+    min-width: 24px;
+    padding: 4px 6px;
+    transform: translateY(-50%);
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius-md);
+    background: var(--panel-bg);
+    color: var(--color-accent);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 22;
+  }
+  body.pad-active:not(.mobile-touch) [data-pad-focus-static] {
+    position: relative;
+  }
+  body.pad-active:not(.mobile-touch) [data-pad-focus-confirm-label]::after {
+    content: attr(data-pad-focus-confirm-label);
+  }
+  body.pad-active:not(.mobile-touch) [data-pad-subcommands-label]::after {
+    content: attr(data-pad-subcommands-label);
+    right: auto;
+    left: calc(100% + var(--spacing-sm));
+  }
+  @media (forced-colors: active) {
+    body.pad-active:not(.mobile-touch) [data-pad-focus-confirm-label]::after,
+    body.pad-active:not(.mobile-touch) [data-pad-subcommands-label]::after {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
   }
 
   /* The pad's pointer: a mouse-cursor graphic anchored to whatever the d-pad has

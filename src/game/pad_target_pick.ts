@@ -51,6 +51,16 @@ export interface PadTargetPick {
   autoTarget(action: NonNullable<CrossHotbarAction>): void;
 }
 
+/** Resolve which NPC a pad interact press means, without changing target state. */
+export function resolvePadPreferredNpcId(world: PadTargetPickWorld): number | null {
+  const targeted = world.player.targetId ?? null;
+  const current = targeted !== null ? world.entities.get(targeted) : undefined;
+  if (current?.kind === 'npc' && dist2d(world.player.pos, current.pos) <= INTERACT_RANGE) {
+    return targeted;
+  }
+  return nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null;
+}
+
 // A cell stores the BASE ability id while an aura can transform what the button
 // actually casts, so the press is judged on the resolved definition the cross
 // hotbar already paints. The class-specific resolvers layered on top of this one
@@ -66,12 +76,7 @@ export function createPadTargetPick(deps: PadTargetPickDeps): PadTargetPick {
   return {
     interact(): void {
       const targeted = world.player.targetId ?? null;
-      const current = targeted !== null ? world.entities.get(targeted) : undefined;
-      const inReach = (e: Entity) => dist2d(world.player.pos, e.pos) <= INTERACT_RANGE;
-      const prefer =
-        current?.kind === 'npc' && inReach(current)
-          ? targeted
-          : (nearbyNpcs(world.entities.values(), world.player.pos, INTERACT_RANGE)[0]?.id ?? null);
+      const prefer = resolvePadPreferredNpcId(world);
       if (prefer !== null && prefer !== targeted) world.targetEntity(prefer);
       interactKey(prefer);
     },

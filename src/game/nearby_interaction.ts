@@ -10,8 +10,10 @@ import {
 import { corpseLootAvailability, localPartyMemberIds } from './corpse_loot_availability';
 import { decideEscortPress, handleEscortPress } from './escort_interact';
 import {
+  decideGatherNodeAction,
   type GatherEffectConfirmGate,
   type GatherNodeToolGate,
+  type GatherNodeVerdict,
   handleGatherNodeInteract,
 } from './gather_node_interact';
 import type { InteractionOutcome } from './interaction_autorun';
@@ -51,7 +53,296 @@ export interface NearbyInteractionHud {
   requestSpiritHealerResurrect(): void;
 }
 
-type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
+export type NearbyGatherNode = Pick<GatherNodeDef, 'id' | 'pos' | 'type' | 'tier'>;
+
+export type NearbyInteractionAnchor =
+  | { kind: 'entity'; entityId: number }
+  | { kind: 'gatherNode'; nodeId: string };
+
+export type NearbyInteractionNameDiscriminator =
+  | {
+      kind: 'entity';
+      entityKind: Entity['kind'];
+      templateId: string;
+      objectItemId: string | null;
+      dungeonId: string | null;
+      sourceName: string;
+    }
+  | { kind: 'gatherNode'; nodeType: GatherNodeDef['type']; nodeTier: number };
+
+interface NearbyEntityInteractionCandidate {
+  anchor: Extract<NearbyInteractionAnchor, { kind: 'entity' }>;
+  name: Extract<NearbyInteractionNameDiscriminator, { kind: 'entity' }>;
+  eligible: true;
+}
+
+export type NearbyInteractionCandidate =
+  | (NearbyEntityInteractionCandidate & {
+      interactionKind: 'corpse';
+      harvestable: boolean;
+      hasLoot: boolean;
+    })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'delve' })
+  | (NearbyEntityInteractionCandidate & {
+      interactionKind: 'dungeonEnter';
+      dungeonId: string;
+    })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'dungeonExit' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'mailbox' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'objectPickup' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'spiritHealer' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'delveBoard' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'npc' })
+  | (NearbyEntityInteractionCandidate & { interactionKind: 'escort' })
+  | {
+      interactionKind: 'gather';
+      anchor: Extract<NearbyInteractionAnchor, { kind: 'gatherNode' }>;
+      name: Extract<NearbyInteractionNameDiscriminator, { kind: 'gatherNode' }>;
+      eligible: boolean;
+      verdict: GatherNodeVerdict;
+      nodePos: NearbyGatherNode['pos'];
+      toolGate?: GatherNodeToolGate;
+    }
+  | {
+      interactionKind: 'escortAway';
+      anchor: null;
+      name: null;
+      eligible: false;
+    };
+
+export interface NearbyInteractionTexts {
+  tooFar: string;
+  notReady: string;
+  escortAway: string;
+  nothing: string;
+}
+
+function entityCandidate(
+  entity: Entity,
+): Pick<NearbyEntityInteractionCandidate, 'anchor' | 'name' | 'eligible'> {
+  return {
+    anchor: { kind: 'entity', entityId: entity.id },
+    name: {
+      kind: 'entity',
+      entityKind: entity.kind,
+      templateId: entity.templateId,
+      objectItemId: entity.objectItemId ?? null,
+      dungeonId: entity.dungeonId ?? null,
+      sourceName: entity.name,
+    },
+    eligible: true,
+  };
+}
+
+/** Resolve the exact winner of the general world-interaction ladder without dispatching it. */
+export function resolveNearbyInteraction(
+  world: NearbyInteractionWorld,
+  gatherNodes: readonly NearbyGatherNode[],
+  nodeToolGateFor: ((node: NearbyGatherNode) => GatherNodeToolGate) | null,
+  harvestStateReliable = true,
+  preferNpcId?: number | null,
+): NearbyInteractionCandidate | null {
+  const player = world.player;
+  const playerId = world.playerId ?? player.id;
+  const partyIds = localPartyMemberIds(world.partyInfo);
+  let bestCorpse: Entity | null = null;
+  let bestCorpseDistance = INTERACT_RANGE;
+  let bestObject: Entity | null = null;
+  let bestObjectDistance = INTERACT_RANGE;
+  let bestNpc: Entity | null = null;
+  let bestNpcDistance = INTERACT_RANGE + 1;
+  let bestDelve: Entity | null = null;
+  let bestDelveDistance = INTERACT_RANGE + 1;
+  let bestNode: NearbyGatherNode | null = null;
+  let bestNodeDistance = INTERACT_RANGE;
+
+  if (!player.dead) {
+    for (const node of gatherNodes) {
+      const distance = Math.hypot(player.pos.x - node.pos.x, player.pos.z - node.pos.z);
+      if (distance < bestNodeDistance) {
+        bestNode = node;
+        bestNodeDistance = distance;
+      }
+    }
+  }
+
+  for (const entity of world.entities.values()) {
+    const distance = dist2d(player.pos, entity.pos);
+    if (
+      !player.dead &&
+      entity.kind === 'mob' &&
+      entity.dead &&
+      entity.lootable &&
+      corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).canOpen &&
+      distance < bestCorpseDistance
+    ) {
+      bestCorpse = entity;
+      bestCorpseDistance = distance;
+    }
+    if (!player.dead && entity.kind === 'object' && entity.templateId?.startsWith('delve_')) {
+      if (distance < bestDelveDistance) {
+        bestDelve = entity;
+        bestDelveDistance = distance;
+      }
+    } else if (
+      !player.dead &&
+      entity.kind === 'object' &&
+      entity.lootable &&
+      !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
+      !isObjectOpenedByViewer(entity, world.questLog) &&
+      distance <= objectInteractionRange(entity) &&
+      distance < bestObjectDistance
+    ) {
+      bestObject = entity;
+      bestObjectDistance = distance;
+    }
+    const promoted =
+      preferNpcId !== undefined &&
+      preferNpcId !== null &&
+      entity.id === preferNpcId &&
+      distance <= INTERACT_RANGE;
+    if (entity.kind === 'npc' && (promoted || distance < bestNpcDistance)) {
+      const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
+      const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
+      if (isGhostHealer || isLivingNpc) {
+        bestNpc = entity;
+        bestNpcDistance = promoted ? -1 : distance;
+      }
+    }
+  }
+
+  if (bestCorpse) {
+    const availability = corpseLootAvailability(
+      bestCorpse,
+      playerId,
+      harvestStateReliable,
+      partyIds,
+    );
+    return {
+      interactionKind: 'corpse',
+      ...entityCandidate(bestCorpse),
+      harvestable: availability.harvestable,
+      hasLoot: availability.hasLoot,
+    };
+  }
+  if (bestDelve) return { interactionKind: 'delve', ...entityCandidate(bestDelve) };
+  if (bestObject) {
+    const base = entityCandidate(bestObject);
+    if (bestObject.templateId === 'dungeon_door' && bestObject.dungeonId) {
+      return {
+        interactionKind: 'dungeonEnter',
+        ...base,
+        dungeonId: bestObject.dungeonId,
+      };
+    }
+    if (bestObject.templateId === 'dungeon_exit') {
+      return { interactionKind: 'dungeonExit', ...base };
+    }
+    if (bestObject.templateId === 'mailbox') return { interactionKind: 'mailbox', ...base };
+    return { interactionKind: 'objectPickup', ...base };
+  }
+  if (bestNpc) {
+    const base = entityCandidate(bestNpc);
+    if (bestNpc.templateId === 'spirit_healer') {
+      return { interactionKind: 'spiritHealer', ...base };
+    }
+    if (bestNpc.templateId === 'brother_halven' || bestNpc.templateId === 'brother_halven_marsh') {
+      return { interactionKind: 'delveBoard', ...base };
+    }
+    return { interactionKind: 'npc', ...base };
+  }
+
+  const escort = player.dead
+    ? ({ kind: 'none' } as const)
+    : decideEscortPress(player.pos, world.entities, world.questLog);
+  if (escort.kind === 'start') {
+    const escortee = world.entities.get(escort.entityId);
+    if (escortee) return { interactionKind: 'escort', ...entityCandidate(escortee) };
+  }
+  if (bestNode) {
+    const toolGate = nodeToolGateFor?.(bestNode);
+    const verdict = decideGatherNodeAction(
+      player.pos,
+      bestNode.pos,
+      world.nodeHarvestableByMe(bestNode.id),
+      toolGate,
+    );
+    return {
+      interactionKind: 'gather',
+      anchor: { kind: 'gatherNode', nodeId: bestNode.id },
+      name: { kind: 'gatherNode', nodeType: bestNode.type, nodeTier: bestNode.tier },
+      eligible: verdict === 'harvest',
+      verdict,
+      nodePos: bestNode.pos,
+      ...(toolGate ? { toolGate } : {}),
+    };
+  }
+  if (escort.kind === 'away') {
+    return { interactionKind: 'escortAway', anchor: null, name: null, eligible: false };
+  }
+  return null;
+}
+
+/** Dispatch a previously resolved winner. The world remains authoritative for every command. */
+export function dispatchNearbyInteraction(
+  candidate: NearbyInteractionCandidate | null,
+  world: NearbyInteractionWorld,
+  hud: NearbyInteractionHud,
+  texts: NearbyInteractionTexts,
+  effectConfirm?: GatherEffectConfirmGate,
+): InteractionOutcome {
+  if (!candidate) {
+    hud.showError(texts.nothing);
+    return false;
+  }
+  switch (candidate.interactionKind) {
+    case 'corpse':
+      if (candidate.harvestable) world.harvestCorpse(candidate.anchor.entityId);
+      if (candidate.hasLoot) return world.lootCorpse(candidate.anchor.entityId);
+      return candidate.harvestable;
+    case 'delve':
+      return world.delveInteract(candidate.anchor.entityId);
+    case 'dungeonEnter':
+      return world.enterDungeon(candidate.dungeonId);
+    case 'dungeonExit':
+      return world.leaveDungeon();
+    case 'mailbox':
+      hud.openMailbox();
+      return true;
+    case 'objectPickup':
+      return world.pickUpObject(candidate.anchor.entityId);
+    case 'spiritHealer':
+      hud.requestSpiritHealerResurrect();
+      return true;
+    case 'delveBoard':
+      hud.openDelveBoard(candidate.anchor.entityId);
+      return true;
+    case 'npc':
+      hud.openQuestDialog(candidate.anchor.entityId);
+      return true;
+    case 'escort':
+      return handleEscortPress(
+        world,
+        hud,
+        { kind: 'start', entityId: candidate.anchor.entityId },
+        texts.escortAway,
+      );
+    case 'gather':
+      return handleGatherNodeInteract(
+        world,
+        hud,
+        world.player.pos,
+        candidate.anchor.nodeId,
+        candidate.nodePos,
+        texts.tooFar,
+        texts.notReady,
+        candidate.toolGate,
+        effectConfirm,
+      );
+    case 'escortAway':
+      return handleEscortPress(world, hud, { kind: 'away' }, texts.escortAway);
+  }
+}
 
 /** Find and dispatch one eligible nearby interaction in stable priority order.
  *  `nodeToolGateFor` (Professions 2.0) resolves the tool-tier access
@@ -79,160 +370,23 @@ export function tryNearbyInteraction(
   // promotes an npc the scan would already have accepted, so no rule is bypassed.
   preferNpcId?: number | null,
 ): InteractionOutcome {
-  const player = world.player;
-  const playerId = world.playerId ?? player.id;
-  const partyIds = localPartyMemberIds(world.partyInfo);
-  let bestCorpse: number | null = null;
-  let bestCorpseDistance = INTERACT_RANGE;
-  let bestObject: number | null = null;
-  let bestObjectDistance = INTERACT_RANGE;
-  let bestNpc: number | null = null;
-  let bestNpcDistance = INTERACT_RANGE + 1;
-  let bestDelve: number | null = null;
-  let bestDelveDistance = INTERACT_RANGE + 1;
-  let bestNode: NearbyGatherNode | null = null;
-  let bestNodeDistance = INTERACT_RANGE;
-
-  if (!player.dead) {
-    for (const node of gatherNodes) {
-      const distance = dist2d(player.pos, {
-        x: node.pos.x,
-        y: player.pos.y,
-        z: node.pos.z,
-      });
-      if (distance < bestNodeDistance) {
-        bestNode = node;
-        bestNodeDistance = distance;
-      }
-    }
-  }
-
-  for (const entity of world.entities.values()) {
-    const distance = dist2d(player.pos, entity.pos);
-    if (
-      !player.dead &&
-      entity.kind === 'mob' &&
-      entity.dead &&
-      entity.lootable &&
-      corpseLootAvailability(entity, playerId, harvestStateReliable, partyIds).canOpen &&
-      distance < bestCorpseDistance
-    ) {
-      bestCorpse = entity.id;
-      bestCorpseDistance = distance;
-    }
-    if (!player.dead && entity.kind === 'object' && entity.templateId?.startsWith('delve_')) {
-      if (distance < bestDelveDistance) {
-        bestDelve = entity.id;
-        bestDelveDistance = distance;
-      }
-    } else if (
-      !player.dead &&
-      entity.kind === 'object' &&
-      entity.lootable &&
-      // Nothing the viewer cannot see may win the press. An off-quest quest
-      // collectable is withheld from the scene entirely (the renderer's gate), so
-      // selecting it here would spend the interact on an invisible object and let
-      // it outrank a visible NPC or node standing further away. The same rule
-      // covers an interact-objective object this player already credited (an
-      // opened castaway crate): the renderer hides it for them, so the press
-      // must not target it either.
-      !isQuestGatedGroundObjectHidden(entity, world.questLog) &&
-      !isObjectOpenedByViewer(entity, world.questLog)
-    ) {
-      if (distance <= objectInteractionRange(entity) && distance < bestObjectDistance) {
-        bestObject = entity.id;
-        bestObjectDistance = distance;
-      }
-    }
-    // The promotion jumps the nearest-wins order, so it carries a strict reach check
-    // of its own; the scan keeps the reach its sentinel has always given it.
-    const promoted =
-      preferNpcId !== undefined &&
-      preferNpcId !== null &&
-      entity.id === preferNpcId &&
-      distance <= INTERACT_RANGE;
-    if (entity.kind === 'npc' && (promoted || distance < bestNpcDistance)) {
-      const isGhostHealer = entity.templateId === 'spirit_healer' && player.ghost;
-      const isLivingNpc = entity.templateId !== 'spirit_healer' && !player.dead;
-      if (isGhostHealer || isLivingNpc) {
-        bestNpc = entity.id;
-        // Out of reach of anything else, so a nearer npc later in the sweep cannot
-        // take the pick back off the one the player actually selected.
-        bestNpcDistance = promoted ? -1 : distance;
-      }
-    }
-  }
-
-  if (bestCorpse !== null) {
-    const corpse = world.entities.get(bestCorpse);
-    if (!corpse) return false;
-    // Unified press: harvest first, then loot, as two separate
-    // commands (processed in receipt order in the same server tick batch).
-    // Each half is gated on the availability predicate so a claimed or
-    // emptied half is never dispatched (no denial-toast spam); the server
-    // still revalidates both authoritatively.
-    const availability = corpseLootAvailability(corpse, playerId, harvestStateReliable, partyIds);
-    if (availability.harvestable) world.harvestCorpse(bestCorpse);
-    if (availability.hasLoot) return world.lootCorpse(bestCorpse);
-    return availability.harvestable;
-  }
-  if (bestDelve !== null) {
-    return world.delveInteract(bestDelve);
-  }
-  if (bestObject !== null) {
-    const object = world.entities.get(bestObject);
-    if (!object) return false;
-    if (object.templateId === 'dungeon_door' && object.dungeonId) {
-      return world.enterDungeon(object.dungeonId);
-    } else if (object.templateId === 'dungeon_exit') {
-      return world.leaveDungeon();
-    } else if (object.templateId === 'mailbox') {
-      hud.openMailbox();
-      return true;
-    } else {
-      return world.pickUpObject(bestObject);
-    }
-  }
-  if (bestNpc !== null) {
-    const npc = world.entities.get(bestNpc);
-    if (npc?.kind !== 'npc') return false;
-    if (npc.templateId === 'spirit_healer') {
-      // The scan only picks a spirit healer for a ghost; route the revive
-      // through the HUD's confirm gate rather than sending the command
-      // directly (it applies The Keeper's Toll).
-      hud.requestSpiritHealerResurrect();
-    } else if (npc.templateId === 'brother_halven' || npc.templateId === 'brother_halven_marsh') {
-      hud.openDelveBoard(bestNpc);
-    } else {
-      hud.openQuestDialog(bestNpc);
-    }
-    return true;
-  }
-  // STARTING an escort sits below the npc arm (an escortee is mob-kind, so the
-  // two can never compete) and above gather nodes: an escortee standing in
-  // front of you beats the node you happen to be over. Corpses still win, so
-  // looting the ambush wave is never swallowed.
-  const escort = player.dead
-    ? ({ kind: 'none' } as const)
-    : decideEscortPress(player.pos, world.entities, world.questLog);
-  if (escort.kind === 'start') return handleEscortPress(world, hud, escort, escortAwayText);
-  if (bestNode !== null) {
-    return handleGatherNodeInteract(
-      world,
-      hud,
-      player.pos,
-      bestNode.id,
-      bestNode.pos,
-      tooFarText,
-      notReadyText,
-      nodeToolGateFor?.(bestNode),
-      effectConfirm,
-    );
-  }
-  // The away line is a LAST resort that only replaces the generic
-  // nothing-to-interact message: an absent escortee must never eat a press that
-  // some other arm above could have used (a node underfoot at an empty post).
-  if (escort.kind === 'away') return handleEscortPress(world, hud, escort, escortAwayText);
-  hud.showError(nothingToInteractText);
-  return false;
+  const candidate = resolveNearbyInteraction(
+    world,
+    gatherNodes,
+    nodeToolGateFor,
+    harvestStateReliable,
+    preferNpcId,
+  );
+  return dispatchNearbyInteraction(
+    candidate,
+    world,
+    hud,
+    {
+      tooFar: tooFarText,
+      notReady: notReadyText,
+      escortAway: escortAwayText,
+      nothing: nothingToInteractText,
+    },
+    effectConfirm,
+  );
 }

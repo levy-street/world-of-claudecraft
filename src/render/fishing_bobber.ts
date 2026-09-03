@@ -29,6 +29,12 @@ interface BobberInstance {
   sinkT: number;
 }
 
+export interface FishingBobberWorldPoint {
+  x: number;
+  y: number;
+  z: number;
+}
+
 let sharedBodyGeo: THREE.SphereGeometry | null = null;
 let sharedTipGeo: THREE.SphereGeometry | null = null;
 
@@ -61,6 +67,15 @@ export class FishingBobberVisual {
       inst.splashT = 0;
       this.onSplash?.(inst.group.position.x, inst.group.position.z, 0.34, 0.65);
     }
+  }
+
+  worldPointInto(entityId: number, out: FishingBobberWorldPoint): boolean {
+    const inst = this.instances.get(entityId);
+    if (!inst?.group.visible || inst.sinkT > 0) return false;
+    out.x = inst.group.position.x;
+    out.y = inst.group.position.y;
+    out.z = inst.group.position.z;
+    return true;
   }
 
   update(dt: number, entities: ReadonlyMap<number, Entity>, seed: number): void {

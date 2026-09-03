@@ -10,7 +10,11 @@
 // enemy flag is actually reachable, so the Interact key can fall through to
 // the ordinary nearby-interaction scan otherwise.
 import { describe, expect, it } from 'vitest';
-import { bgFlagGrabbableNearby, shouldRouteInteractToBgFlag } from '../src/game/bg_flag_interact';
+import {
+  bgFlagGrabbableNearby,
+  resolveBgFlagInteraction,
+  shouldRouteInteractToBgFlag,
+} from '../src/game/bg_flag_interact';
 import { BG_PICKUP_RADIUS, BG_TEAM_COLORS } from '../src/sim/battleground_layout';
 import type { Entity } from '../src/sim/types';
 import type { BgMatchInfo } from '../src/world_api/battleground';
@@ -227,5 +231,35 @@ describe('shouldRouteInteractToBgFlag', () => {
         entities(enemyFlag),
       ),
     ).toBe(false);
+  });
+});
+
+describe('resolveBgFlagInteraction', () => {
+  it('returns the reachable enemy flag anchor for a world-space prompt', () => {
+    const enemyFlag = flagEntity(1, 2, 0);
+
+    expect(
+      resolveBgFlagInteraction(
+        { match: { ...match(), state: 'active' } },
+        { pos: { x: 0, y: 0, z: 0 }, dead: false },
+        entities(enemyFlag),
+      ),
+    ).toEqual({
+      interactionKind: 'bgFlag',
+      anchor: { kind: 'entity', entityId: 101 },
+      team: 1,
+      eligible: true,
+    });
+  });
+
+  it('returns null for blocked flag states', () => {
+    const enemyFlag = flagEntity(1, 0, 0);
+    expect(
+      resolveBgFlagInteraction(
+        { match: { ...match(), state: 'countdown' } },
+        { pos: { x: 0, y: 0, z: 0 }, dead: false },
+        entities(enemyFlag),
+      ),
+    ).toBeNull();
   });
 });

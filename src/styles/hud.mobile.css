@@ -2479,6 +2479,15 @@
   body.mobile-touch:not(.xhb-mode) #side-buttons {
     display: none;
   }
+
+  body.mobile-touch .launcher-cycle-hint {
+    display: none !important;
+  }
+
+  body.mobile-touch [data-pad-focus-confirm-label]::after,
+  body.mobile-touch [data-pad-subcommands-label]::after {
+    display: none !important;
+  }
   /* The desktop rail is bottom-anchored and grows upward; on a landscape phone
      that runs it straight into the minimap cluster claiming the top-right
      corner (confirmed live: the two overlapped by ~65px at the standard

@@ -4,12 +4,12 @@
 //
 // Scope matters more than the geometry here. Navigating every focusable element in
 // the document would wander out of the open window and into the side rail, so the
-// search starts at the top-most open dialog/panel and only falls back to the whole
-// document when none is open.
+// search starts at the top-most open dialog/panel and keeps launcher navigation
+// inside its semantic root when no window is open.
 
 import { type NavDirection, type NavRect, nextFocusIndex } from '../ui/dpad_nav_core';
 import { FOCUSABLE_SELECTOR } from '../ui/focus_manager';
-import { PAD_ACTIVE_CLASS } from './input_hint_mode';
+import { PAD_ACTIVE_CLASS, registerInputHandoff } from './input_hint_mode';
 
 // The roots a pad player can be navigating, most specific first.
 const WINDOW_SELECTOR = '[role="dialog"], .window.panel';
@@ -17,6 +17,9 @@ const WINDOW_SELECTOR = '[role="dialog"], .window.panel';
 // window, these must not put the pad into pointer mode: the ghost prompt appears
 // while the player is still walking back to their body.
 const STANDALONE_SELECTOR = '[data-pad-nav-root]';
+const LAUNCHER_SELECTOR = '[data-pad-launcher-root]';
+const LAUNCHER_ENTRY_COLUMN_SELECTOR = '[data-pad-launcher-entry-column]';
+const LAUNCHER_ENTRY_SELECTOR = '[data-pad-launcher-entry]';
 
 function isVisible(el: HTMLElement): boolean {
   const rect = el.getBoundingClientRect();
@@ -45,6 +48,7 @@ let spanWindows = false;
  */
 export function followDomFocus(): boolean {
   if (typeof document === 'undefined') return false;
+  if (!marked || !padOwnsInput()) return false;
   const active = document.activeElement as HTMLElement | null;
   if (!active || active === marked || active === document.body) return false;
   // Only something the navigation could have reached itself: a window that focuses
@@ -68,10 +72,13 @@ export function hasPadFocus(): boolean {
  */
 export function cycleHudFocus(): boolean {
   if (typeof document === 'undefined') return false;
-  const els = focusables(activeRoot() ?? document);
+  const root = activeRoot() ?? activeLauncherRoot();
+  if (!root) return false;
+  const els = focusables(root);
   if (els.length === 0) return false;
   const at = marked ? els.indexOf(marked) : -1;
-  const next = els[(at + 1) % els.length];
+  const next = at >= 0 ? els[(at + 1) % els.length] : (launcherEntry(root) ?? firstMeaningful(els));
+  if (!next) return false;
   next.focus();
   markPadFocus(next);
   return true;
@@ -88,7 +95,19 @@ function activeRoot(): HTMLElement | null {
   const open = [...document.querySelectorAll<HTMLElement>(WINDOW_SELECTOR)].filter(isVisible);
   // Last in document order is the most recently mounted, which is the one on top.
   if (open.length > 0) return open[open.length - 1];
-  return activeStandaloneRoot();
+  const standalone = activeStandaloneRoot();
+  if (standalone) return standalone;
+  const launcher = activeLauncherRoot();
+  return marked && launcher && focusables(launcher).includes(marked) ? launcher : null;
+}
+
+function activeLauncherRoot(): HTMLElement | null {
+  if (typeof document === 'undefined' || typeof document.querySelectorAll !== 'function')
+    return null;
+  const launchers = [...document.querySelectorAll<HTMLElement>(LAUNCHER_SELECTOR)].filter(
+    isVisible,
+  );
+  return launchers.length > 0 ? launchers[launchers.length - 1] : null;
 }
 
 function activeStandaloneRoot(): HTMLElement | null {
@@ -120,6 +139,22 @@ function focusables(root: HTMLElement | Document): HTMLElement[] {
 function firstMeaningful(els: readonly HTMLElement[]): HTMLElement | null {
   if (els.length === 0) return null;
   return els.find((el) => !el.hasAttribute('data-close')) ?? els[0];
+}
+
+function launcherEntry(root: HTMLElement): HTMLElement | null {
+  if (!root.hasAttribute('data-pad-launcher-root')) return null;
+  const explicit = [...root.querySelectorAll<HTMLElement>(LAUNCHER_ENTRY_SELECTOR)].find(
+    (el) => !el.hasAttribute('disabled') && isVisible(el),
+  );
+  if (explicit) return explicit;
+  const column = [...root.querySelectorAll<HTMLElement>(LAUNCHER_ENTRY_COLUMN_SELECTOR)].find(
+    isVisible,
+  );
+  return column ? firstMeaningful(focusables(column)) : null;
+}
+
+function padOwnsInput(): boolean {
+  return document.body?.classList?.contains?.(PAD_ACTIVE_CLASS) === true;
 }
 
 function toRect(el: HTMLElement): NavRect {
@@ -181,7 +216,12 @@ let cursorEl: HTMLElement | null = null;
 // and never free-moving. It is not the OS pointer, which a page cannot move.
 function ensureCursor(): HTMLElement | null {
   if (cursorEl) return cursorEl;
-  if (typeof document === 'undefined') return null;
+  if (
+    typeof document === 'undefined' ||
+    typeof document.createElement !== 'function' ||
+    typeof document.body?.appendChild !== 'function'
+  )
+    return null;
   const el = document.createElement('div');
   el.id = CURSOR_ID;
   el.setAttribute('aria-hidden', 'true');
@@ -196,19 +236,6 @@ function ensureCursor(): HTMLElement | null {
 // pointer down: whichever device the player just used is the one that shows.
 const PAD_NAV_CLASS = 'pad-nav';
 let padNavActive = false;
-let pointerWatchAttached = false;
-
-function watchForRealPointer(): void {
-  if (pointerWatchAttached || typeof window === 'undefined') return;
-  pointerWatchAttached = true;
-  window.addEventListener(
-    'mousemove',
-    () => {
-      if (padNavActive) setPadCursorMode(false);
-    },
-    { passive: true },
-  );
-}
 
 function setPadCursorMode(on: boolean): void {
   if (padNavActive === on) return;
@@ -229,7 +256,6 @@ function markPadFocus(el: HTMLElement): void {
   }
   const cursor = ensureCursor();
   if (!cursor) return;
-  watchForRealPointer();
   setPadCursorMode(true);
   // Park the arrow's TIP just inside the selection's bottom-right corner. The
   // art points up and left (hotspot 7,2 in cursors.ts), so sitting at the
@@ -273,12 +299,24 @@ export function restorePadFocus(): boolean {
  * sitting on: the selection looked gone and was not.
  */
 export function clearPadFocus(): void {
+  releasePadFocus(true);
+}
+
+function releasePadFocus(blur: boolean): void {
   if (marked) {
     marked.classList?.remove(PAD_FOCUS_CLASS);
-    marked.blur?.();
+    if (blur) marked.blur?.();
   }
   marked = null;
   setPadCursorMode(false);
+}
+
+/** Give keyboard, pointer, mouse, or touch control back without changing the
+ * browser's focus target. Native focus remains useful to that input family. */
+export function handoffPadFocus(): void {
+  releasePadFocus(false);
+  lastRoot = null;
+  lastStandaloneRoot = null;
 }
 
 /**
@@ -321,6 +359,10 @@ export function focusFirstInWindow(): boolean {
  */
 export function syncWindowFocus(): boolean {
   if (typeof document === 'undefined') return false;
+  if (!padOwnsInput()) {
+    lastRoot = null;
+    return false;
+  }
   const root = activeRoot();
   const rootChanged = root !== lastRoot;
   lastRoot = root;
@@ -408,7 +450,7 @@ export function syncStandalonePadFocus(): boolean {
 export function pressDpadFocus(): boolean {
   if (typeof document === 'undefined') return false;
   const active = document.activeElement as HTMLElement | null;
-  if (!active || active === document.body) return false;
+  if (!marked || active !== marked || active === document.body) return false;
   const root = activeRoot() ?? document;
   // Only press something the navigation itself could have reached: an unrelated
   // element holding focus (a chat input) must not be clicked by the A button.
@@ -416,3 +458,5 @@ export function pressDpadFocus(): boolean {
   active.click();
   return true;
 }
+
+registerInputHandoff(handoffPadFocus);

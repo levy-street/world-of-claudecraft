@@ -1,6 +1,10 @@
 import { borderAccent, borderMotifPrimitives } from '../ui/deed_border_view';
 import { TextSpriteCache, type TextSpriteStyle } from '../ui/text_sprite_cache';
 import {
+  ControllerWorldPromptCanvasPainter,
+  roundedCanvasRect,
+} from './controller_world_prompt_canvas';
+import {
   createNameplateHeraldry,
   NAMEPLATE_HERALDRY_TITLE_STEP,
   NAMEPLATE_HERALDRY_WELL_ALPHA,
@@ -286,30 +290,9 @@ class NameplateImageCache {
   }
 }
 
-function roundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  width: number,
-  height: number,
-  radius: number,
-): void {
-  const r = Math.min(radius, width / 2, height / 2);
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + width - r, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + r);
-  ctx.lineTo(x + width, y + height - r);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - r, y + height);
-  ctx.lineTo(x + r, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - r);
-  ctx.lineTo(x, y + r);
-  ctx.quadraticCurveTo(x, y, x + r, y);
-  ctx.closePath();
-}
-
 export class NameplateCanvasSurface {
   readonly canvas: HTMLCanvasElement;
+  readonly controllerPrompt: ControllerWorldPromptCanvasPainter;
   private readonly ctx: CanvasRenderingContext2D;
   private readonly text = new TextSpriteCache(
     NAMEPLATE_TEXT_SPRITE_LIMIT,
@@ -357,6 +340,13 @@ export class NameplateCanvasSurface {
       typeof window !== 'undefined' && typeof window.matchMedia === 'function'
         ? window.matchMedia('(forced-colors: active)')
         : null;
+    this.controllerPrompt = new ControllerWorldPromptCanvasPainter(
+      ctx,
+      this.text,
+      this.forcedColorsMql,
+      this.nameStyle,
+      this.targetNameStyle,
+    );
     parent.appendChild(canvas);
     if (document.fonts) {
       void document.fonts.ready.then(() => this.text.clear());
@@ -511,7 +501,7 @@ export class NameplateCanvasSurface {
     ctx.globalAlpha = state.opacity;
     ctx.shadowColor = this.forcedColorsActive() ? 'transparent' : '#ffd65a66';
     ctx.shadowBlur = this.forcedColorsActive() ? 0 : 12;
-    roundedRect(ctx, x, y, width, 42, 21);
+    roundedCanvasRect(ctx, x, y, width, 42, 21);
     ctx.fillStyle = this.forcedColorsActive() ? 'Canvas' : '#20160d';
     ctx.fill();
     ctx.shadowBlur = 0;
@@ -725,16 +715,16 @@ export class NameplateCanvasSurface {
       ctx.shadowColor = forcedColors ? 'CanvasText' : '#c0392b';
       ctx.shadowBlur = 8;
       ctx.fillStyle = forcedColors ? 'Canvas' : '#2a0000';
-      roundedRect(ctx, x, y, width, 4, 2);
+      roundedCanvasRect(ctx, x, y, width, 4, 2);
       ctx.fill();
       ctx.restore();
     }
-    roundedRect(ctx, x, y, width, 4, 2);
+    roundedCanvasRect(ctx, x, y, width, 4, 2);
     ctx.fillStyle = forcedColors ? 'Canvas' : '#2a0000';
     ctx.fill();
     const fill = Math.max(0, Math.min(1, state.hpFill));
     if (fill > 0) {
-      roundedRect(ctx, x, y, width * fill, 4, 2);
+      roundedCanvasRect(ctx, x, y, width * fill, 4, 2);
       ctx.fillStyle = forcedColors
         ? 'Highlight'
         : state.threat
@@ -760,7 +750,7 @@ export class NameplateCanvasSurface {
             : state.hostile
               ? '#2e0000'
               : '#00000088';
-    roundedRect(ctx, x, y, width, 4, 2);
+    roundedCanvasRect(ctx, x, y, width, 4, 2);
     ctx.stroke();
   }
 
@@ -769,18 +759,18 @@ export class NameplateCanvasSurface {
     const forcedColors = this.forcedColorsActive();
     const width = NAMEPLATE_BASE_WIDTH;
     const x = centerX - width / 2;
-    roundedRect(ctx, x, y, width, 8, 2);
+    roundedCanvasRect(ctx, x, y, width, 8, 2);
     ctx.fillStyle = forcedColors ? 'Canvas' : '#1a1205';
     ctx.fill();
     const fill = Math.max(0, Math.min(1, state.castFill));
     if (fill > 0) {
-      roundedRect(ctx, x + 1, y + 1, Math.max(1, (width - 2) * fill), 6, 1);
+      roundedCanvasRect(ctx, x + 1, y + 1, Math.max(1, (width - 2) * fill), 6, 1);
       ctx.fillStyle = forcedColors ? 'Highlight' : state.castChannel ? '#48a4e8' : '#e4ac2c';
       ctx.fill();
     }
     ctx.lineWidth = 1;
     ctx.strokeStyle = forcedColors ? 'CanvasText' : '#000';
-    roundedRect(ctx, x, y, width, 8, 2);
+    roundedCanvasRect(ctx, x, y, width, 8, 2);
     ctx.stroke();
     this.text.draw(
       this.ctx,
