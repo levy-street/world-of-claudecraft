@@ -1,4 +1,12 @@
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
+import {
+  createTerrainDetailShedState,
+  resetTerrainDetailShed,
+  type TerrainDetailGfxRequest,
+  type TerrainDetailShedState,
+  terrainDetailShedApplies,
+  updateTerrainDetailShed,
+} from './terrain_detail_shed_core';
 
 export type RenderBudgetMode = 'disabled' | 'stable' | 'degrading' | 'recovering';
 export type RenderBudgetReason =
@@ -19,6 +27,13 @@ export interface RenderBudgetLevels {
   vfx: number;
   lighting: number;
   resolution: number;
+  /** Terrain-detail shed (terrain_detail_shed_core.ts): 1 = the tier's own
+   *  terrainRelief/surfaceDetailTaps/surfaceDetailClampK request, 0 = high's
+   *  own profile, the floor every tier already ships. Dwell-hysteresis
+   *  timed rather than instant-stepped like the buckets above (see
+   *  RenderBudgetGovernor.update): a chunk-edge relief pop is far more
+   *  visible than one frame of a lighter grass carpet. */
+  detail: number;
 }
 
 export interface RenderBudgetCaps {
@@ -71,6 +86,14 @@ export interface RenderBudgetGovernorOptions {
   tier: GfxTier;
   budget: GfxRuntimeBudget;
   enabled: boolean;
+  /** The session's own static terrain-detail request (the three `GFX` knobs,
+   *  snapshotted here): the shed is admitted when it sits above the floor
+   *  (an Advanced session on tier high may dial relief 3 and 4 taps) or when
+   *  the tier's `detail` band is governable. Absent, the band alone decides. */
+  terrainDetail?: Readonly<TerrainDetailGfxRequest>;
+  /** A dev A/B pin for the terrain-detail shed: skips its hysteresis and
+   *  holds the level exactly here, with or without an enabled governor. */
+  pinnedDetailLevel?: number | null;
 }
 
 const CAPS_BY_TIER: Record<GfxTier, RenderBudgetCaps> = {
@@ -160,6 +183,7 @@ function copyLevels(levels: RenderBudgetLevels): RenderBudgetLevels {
     vfx: round2(levels.vfx),
     lighting: round2(levels.lighting),
     resolution: round2(levels.resolution),
+    detail: round2(levels.detail),
   };
 }
 
@@ -193,6 +217,10 @@ export function renderBudgetShaderPrewarmLevels(
         round2(current.lighting - URGENT_LIGHTING_STEP),
       ),
       resolution: current.resolution,
+      // Live uniforms, not a define: the terrain-detail shed never selects a
+      // shader program either (see terrain_detail_shed_core.ts), so the
+      // prewarm walk leaves it untouched, same as resolution above.
+      detail: current.detail,
     };
     if (
       next.grass === current.grass &&
@@ -244,7 +272,17 @@ export class RenderBudgetGovernor {
   private stallHoldSeconds = 0;
   private stableSeconds = 0;
   private cooldownSeconds = 0;
-  private levels: RenderBudgetLevels = { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 };
+  private levels: RenderBudgetLevels = {
+    grass: 1,
+    foliage: 1,
+    vfx: 1,
+    lighting: 1,
+    resolution: 1,
+    detail: 1,
+  };
+  private readonly detailShed: TerrainDetailShedState = createTerrainDetailShedState();
+  private readonly detailShedApplies: boolean;
+  private readonly pinnedDetailLevel: number | null;
 
   constructor(options: RenderBudgetGovernorOptions) {
     this.tier = options.tier;
@@ -252,6 +290,10 @@ export class RenderBudgetGovernor {
     this.enabled = options.enabled;
     this.caps = CAPS_BY_TIER[options.tier];
     this.bands = GFX_BUCKET_BANDS[options.tier];
+    this.detailShedApplies =
+      this.bands.detail.governable ||
+      (options.terrainDetail !== undefined && terrainDetailShedApplies(options.terrainDetail));
+    this.pinnedDetailLevel = options.pinnedDetailLevel ?? null;
     this.mode = options.enabled ? 'stable' : 'disabled';
     this.reason = options.enabled ? 'startup' : 'disabled';
   }
@@ -265,8 +307,10 @@ export class RenderBudgetGovernor {
           vfx: this.bands.vfx.baseline,
           lighting: this.bands.lighting.baseline,
           resolution: round2(scale),
+          detail: this.bands.detail.baseline,
         }
-      : { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: round2(scale) };
+      : { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: round2(scale), detail: 1 };
+    resetTerrainDetailShed(this.detailShed);
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;
     this.externalFrameCap = false;
@@ -320,6 +364,7 @@ export class RenderBudgetGovernor {
     state.levels.vfx = round2(this.levels.vfx);
     state.levels.lighting = round2(this.levels.lighting);
     state.levels.resolution = round2(this.levels.resolution);
+    state.levels.detail = round2(this.levels.detail);
     state.caps.targetCalls = this.caps.targetCalls;
     state.caps.urgentCalls = this.caps.urgentCalls;
     state.caps.targetTriangles = this.caps.targetTriangles;
@@ -352,6 +397,7 @@ export class RenderBudgetGovernor {
       this.reason = 'disabled';
       this.pressure = 0;
       this.externalFrameCap = false;
+      this.updateDetailShed(sample.dt, 0);
       return this.state(out);
     }
 
@@ -404,6 +450,12 @@ export class RenderBudgetGovernor {
       grassPressure,
       this.stallPressure,
     );
+
+    // Terrain-detail shed: dwell-hysteresis timed (shadow_cadence_core.ts's
+    // shape, not the instant per-frame steps below), so it runs independently
+    // of the degrade/recover branches and answers only to THIS frame's
+    // pressure reading.
+    this.updateDetailShed(sample.dt, this.pressure);
 
     const submitStall = rawSubmitMs >= SUBMIT_STALL_MS;
     if (submitStall) {
@@ -514,6 +566,17 @@ export class RenderBudgetGovernor {
     this.mode = 'stable';
     this.reason = this.externalFrameCap ? 'frame-cap' : 'stable';
     return this.state(out);
+  }
+
+  /** Runs on every update, the disabled branch included, so the dev pin holds
+   *  with the governor off and a disabled governor resets the level through
+   *  the core. A session admitted by neither its band nor its own request
+   *  (the high/medium/low table profiles, which sit at the floor) never
+   *  touches the level unless pinned: it stays at the band baseline. */
+  private updateDetailShed(dt: number, pressure: number): void {
+    if (!this.detailShedApplies && this.pinnedDetailLevel == null) return;
+    updateTerrainDetailShed(this.detailShed, dt, pressure, this.enabled, this.pinnedDetailLevel);
+    this.levels.detail = this.detailShed.level;
   }
 
   private reduceLevel(key: keyof RenderBudgetLevels, floor: number, step: number): boolean {

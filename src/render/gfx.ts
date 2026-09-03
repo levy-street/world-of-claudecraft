@@ -85,6 +85,7 @@ export const GFX_BUCKET_IDS = [
   'weapons',
   'worldStreaming',
   'ui',
+  'detail',
 ] as const;
 
 export type GfxBucketId = (typeof GFX_BUCKET_IDS)[number];
@@ -509,6 +510,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: false,
     },
+    detail: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0,
+      cost: 'gpu',
+      governable: false,
+    },
   },
   medium: {
     resolution: {
@@ -605,6 +614,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       max: 1.0,
       roi: 0.86,
       cost: 'cpu',
+      governable: false,
+    },
+    detail: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0,
+      cost: 'gpu',
       governable: false,
     },
   },
@@ -705,6 +722,19 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: false,
     },
+    // Terrain-detail shed (terrain_detail_shed_core.ts): the high TABLE
+    // profile sits at the floor (relief 1, 0 taps), so its band is not
+    // governable. An Advanced session resolves to this tier too, and its
+    // raised dials are admitted by the governor from its own request
+    // (RenderBudgetGovernorOptions.terrainDetail), never by this band.
+    detail: {
+      min: 1.0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0,
+      cost: 'gpu',
+      governable: false,
+    },
   },
   ultra: {
     resolution: {
@@ -802,6 +832,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       roi: 0.86,
       cost: 'cpu',
       governable: false,
+    },
+    detail: {
+      min: 0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.92,
+      cost: 'gpu',
+      governable: true,
     },
   },
   // Insane: everything-on. Same bands as ultra (all baselines already sit at
@@ -905,6 +943,14 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
       cost: 'cpu',
       governable: false,
     },
+    detail: {
+      min: 0,
+      baseline: 1.0,
+      max: 1.0,
+      roi: 0.92,
+      cost: 'gpu',
+      governable: true,
+    },
   },
 };
 
@@ -922,6 +968,7 @@ function bucketBaselines(bands: GfxBucketBands): GfxBucketLevels {
     weapons: bands.weapons.baseline,
     worldStreaming: bands.worldStreaming.baseline,
     ui: bands.ui.baseline,
+    detail: bands.detail.baseline,
   };
 }
 
@@ -1960,6 +2007,16 @@ export const sharedUniforms = {
    *  Radius 0 (a tier with no carpet) leaves the paint everywhere. Written by
    *  the renderer each frame beside uTime. */
   uCarpetRing: { value: new THREE.Vector3(0, 0, 0) },
+  /** Live terrain-detail shed (terrain_detail_shed_core.ts): the governed
+   *  0..1 level mapped onto the tier's own terrainRelief / surfaceDetailTaps
+   *  / surfaceDetailClampK request, written by the renderer through
+   *  applyTerrainDetailShed on every budget-state application. Defaults are
+   *  the ladder maxima (relief 3, 4 taps, the tier's full clamp share) so an
+   *  un-updated reference (a secondary GL context, a test) never shows less
+   *  detail than the material compiled for. */
+  uReliefSteps: { value: 3 },
+  uWornDetailTaps: { value: 4 },
+  uWornDetailClampK: { value: 1 },
 };
 
 // The one sun. Everything that needs the sun's position/direction (key light,

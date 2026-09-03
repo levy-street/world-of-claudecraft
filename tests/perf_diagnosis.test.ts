@@ -78,7 +78,7 @@ function baseSnapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 20,
         cooldownSeconds: 0,
-        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 },
+        levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1, detail: 1 },
         caps: {
           targetCalls: 620,
           urgentCalls: 860,
