@@ -292,6 +292,18 @@ describe('coverage: each scenario fires its subsystem', () => {
     expect(auras.some((e) => e.name === 'Deathless Rage Interrupted')).toBe(true);
     // Final Stand enrage aura.
     expect(auras.some((e) => e.name === 'Final Stand')).toBe(true);
+    // The mechanics redo: Dread Curse landed on the tank, two raiders were
+    // impaled and freed when their spikes died, and the eruption burst then burned.
+    expect(n.spikeIds.length).toBe(2);
+    expect(auras.some((e) => e.name === 'Dread Curse')).toBe(true);
+    expect(auras.filter((e) => e.name === 'Impaled').length).toBe(2);
+    const callouts = ev.filter((e) => e.type === 'nythraxisCallout') as Array<{ call: string }>;
+    expect(callouts.some((e) => e.call === 'youAreImpaled')).toBe(true);
+    expect(callouts.some((e) => e.call === 'spikeBroken')).toBe(true);
+    const damage = ev.filter((e) => e.type === 'damage') as Array<{ ability: string | null }>;
+    expect(damage.some((e) => e.ability === 'Bone Spike')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Grave Eruption')).toBe(true);
+    expect(damage.some((e) => e.ability === 'Grave Flame')).toBe(true);
     // Kill: raid lockout granted to the tank + the death-dialogue first line emitted.
     const boss = sim.entities.get(n.bossId);
     expect(boss.dead).toBe(true);

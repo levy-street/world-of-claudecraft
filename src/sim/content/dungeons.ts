@@ -1050,6 +1050,36 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     scale: 1.12,
     color: 0x776f83,
   },
+  // Bone Spike: the stationary pillar Nythraxis impales a raider on
+  // (src/sim/nythraxis_bone_spike.ts). It never moves, aggroes, or swings; the
+  // impaled raider drains until the raid kills it, so its health IS the
+  // mechanic's timer (about four seconds of two DPS on normal after the arena's
+  // 2.0x, 1.5x that on heroic via healthMultiplierByMob). xpMult 0: shattering a
+  // spike is the counterplay, never a kill worth experience.
+  nythraxis_bone_spike: {
+    id: 'nythraxis_bone_spike',
+    name: 'Bone Spike',
+    minLevel: 20,
+    maxLevel: 20,
+    family: 'undead',
+    elite: true,
+    ccImmune: true,
+    slowImmune: true,
+    ignoreTaunt: true,
+    quietMechanics: true,
+    xpMult: 0,
+    hpBase: 500 / 2.3,
+    hpPerLevel: 0,
+    dmgBase: 0,
+    dmgPerLevel: 0,
+    attackSpeed: 2.6,
+    armorPerLevel: 0,
+    moveSpeed: 0,
+    aggroRadius: 0,
+    loot: [],
+    scale: 1,
+    color: 0xd9d2b8,
+  },
   // Brother Aldric is now a dynamically-spawned NPC (see NPCS.brother_aldric_raid
   // in zone3.ts and spawnNythraxisAldric in sim.ts), not a mob.
   nythraxis_scourge_of_thornpeak: {

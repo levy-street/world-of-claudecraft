@@ -56,6 +56,7 @@ import {
 } from '../encounters/varkhul';
 import { isEscortNpcTemplate } from '../escort';
 import { unlockIgnivarRaidGate } from '../ignivar_raid_progression';
+import { NYTHRAXIS_BONE_SPIKE_ID, pinNythraxisBoneSpike } from '../nythraxis_bone_spike';
 import { PLAYER_BODY_RADIUS, PLAYER_SWIM_DEPTH } from '../pathfind';
 import { holdPetCorpseForBgWave } from '../pet/pet_corpse_hold';
 import { noteMatchPetUnravelled } from '../pet/pet_match_return';
@@ -344,6 +345,13 @@ export function updateMob(ctx: SimContext, mob: Entity): void {
 
   if (mob.templateId === IGNIVAR_APOCALYPSE_ADD_ID) {
     updateIgnivarApocalypseAdd(mob);
+    return;
+  }
+
+  // A Bone Spike never walks, aggroes, or swings: the encounter frees its
+  // victim when it dies (encounters/nythraxis.ts onBossDeath).
+  if (mob.templateId === NYTHRAXIS_BONE_SPIKE_ID) {
+    pinNythraxisBoneSpike(mob);
     return;
   }
 

@@ -34,6 +34,45 @@ import { createMob, createNpc } from '../entity';
 import { applyDungeonMobTuning, mobTemplateForDungeonDifficulty } from '../instances/difficulty';
 import { heroicLockoutId, instanceLockoutMetas } from '../instances/dungeons';
 import {
+  isNythraxisImpaled,
+  NYTHRAXIS_BONE_SPIKE_CAST_ID,
+  NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
+  NYTHRAXIS_BONE_SPIKE_ID,
+  NYTHRAXIS_IMPALED_AURA_ID,
+  NYTHRAXIS_IMPALED_AURA_NAME,
+  NYTHRAXIS_IMPALED_TICK_SECONDS,
+  nythraxisBoneSpikeCadence,
+  nythraxisBoneSpikeCandidates,
+  nythraxisBoneSpikeVictims,
+  nythraxisImpaledAuraFor,
+  nythraxisImpaledTickMaxHp,
+  pinNythraxisBoneSpike,
+} from '../nythraxis_bone_spike';
+import {
+  castNythraxisDreadCurse,
+  NYTHRAXIS_DREAD_CURSE_AURA_ID,
+  NYTHRAXIS_DREAD_CURSE_EVERY,
+} from '../nythraxis_dread_curse';
+import {
+  igniteNythraxisGraveFlames,
+  NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
+  NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS,
+  NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
+  NYTHRAXIS_GRAVE_ERUPTION_REVEAL_DELAY_SECONDS,
+  NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS,
+  NYTHRAXIS_GRAVE_FLAME_CAST_ID,
+  NYTHRAXIS_GRAVE_FLAME_TICK_SECONDS,
+  nythraxisGraveEruptionCadence,
+  nythraxisGraveEruptionCount,
+  nythraxisGraveEruptionDamageMaxHp,
+  nythraxisGraveEruptionId,
+  nythraxisGraveEruptionPattern,
+  nythraxisGraveEruptionTargetOrder,
+  nythraxisGraveFlameSeconds,
+  nythraxisGraveFlameTickMaxHp,
+  pointInNythraxisGraveCircle,
+} from '../nythraxis_grave_eruption';
+import {
   hasInteractObjectCredit,
   interactObjectCreditKey,
   recordInteractObjectCredit,
@@ -46,12 +85,14 @@ import {
   angleTo,
   armorReduction,
   DT,
+  type DungeonDifficulty,
   dist2d,
   type Entity,
   INTERACT_RANGE,
   NYTHRAXIS_ADD_ID,
   NYTHRAXIS_BOSS_ID,
   NYTHRAXIS_ROOM_RADIUS,
+  type NythraxisBoneSpike,
   normAngle,
   OBJECT_RESPAWN,
   questObjectiveRequired,
@@ -59,6 +100,42 @@ import {
   type Vec3,
   YELL_RANGE,
 } from '../types';
+
+type NythraxisCallout = Extract<SimEvent, { type: 'nythraxisCallout' }>['call'];
+
+type NythraxisState = NonNullable<Entity['nythraxis']>;
+type NythraxisMechanicField =
+  | 'dreadCurseTimer'
+  | 'boneSpikeTimer'
+  | 'boneSpikes'
+  | 'eruptionTimer'
+  | 'eruptionCastKey'
+  | 'eruptionImpactRemaining'
+  | 'eruptionPoints'
+  | 'graveFlames'
+  | 'graveFlameSeq';
+type NythraxisMechanicState = NythraxisState &
+  Required<Pick<NythraxisState, NythraxisMechanicField>>;
+
+/**
+ * The redo's mechanic fields are optional on the type (tests build state
+ * literals by hand); this backfills any missing one with its pull-start
+ * default IN PLACE and returns the same object narrowed, so every reader below
+ * sees a complete state. initNythraxisEncounter sets all of them explicitly.
+ */
+export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicState {
+  st.dreadCurseTimer ??= NYTHRAXIS_DREAD_CURSE_EVERY;
+  st.boneSpikeTimer ??= NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS;
+  st.boneSpikes ??= [];
+  st.eruptionTimer ??= NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS;
+  st.eruptionCastKey ??= 0;
+  st.eruptionImpactRemaining ??= 0;
+  st.eruptionPoints ??= [];
+  st.graveFlames ??= [];
+  st.graveFlameSeq ??= 0;
+  return st as NythraxisMechanicState;
+}
+
 import { summonQuestMob } from './quest_summon';
 
 const NYTHRAXIS_RELIC_SUMMONS: Record<string, string> = {
@@ -77,25 +154,25 @@ const NYTHRAXIS_WARDSTONE_ITEM_ID = 'bastion_ward_stone';
 // encounter. The three arena wards form a wide forward triangle (~54yd out), so
 // this must comfortably exceed that; far above any cross-instance false match.
 const NYTHRAXIS_WARDSTONE_RANGE = 100;
-const NYTHRAXIS_GRAVEBREAKER_EVERY = 12;
-const NYTHRAXIS_GRAVEBREAKER_RANGE = 11;
-const NYTHRAXIS_GRAVEBREAKER_HALF_ARC = Math.PI / 3;
-const NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT = 1.5;
+export const NYTHRAXIS_GRAVEBREAKER_EVERY = 12;
+export const NYTHRAXIS_GRAVEBREAKER_RANGE = 11;
+export const NYTHRAXIS_GRAVEBREAKER_HALF_ARC = Math.PI / 3;
+export const NYTHRAXIS_GRAVEBREAKER_SPLASH_MULT = 1.5;
 const NYTHRAXIS_OPENER_SECOND_YELL_DELAY = 4;
 const NYTHRAXIS_DIALOGUE_LINE_SECONDS = 2.6;
 // Raise Fallen add-wave cadence, both difficulties (heroic scales the ADDS,
 // not the cadence). Was 45s; tightened to 30s so the waves stay pressure the
 // raid must answer all fight.
-const NYTHRAXIS_RAISE_FALLEN_EVERY = 30;
-const NYTHRAXIS_PHASE_TWO_HP = 0.7;
+export const NYTHRAXIS_RAISE_FALLEN_EVERY = 30;
+export const NYTHRAXIS_PHASE_TWO_HP = 0.7;
 const NYTHRAXIS_SOUL_REND_EVERY = 30;
-const NYTHRAXIS_SOUL_REND_DURATION = 8;
-const NYTHRAXIS_SOUL_REND_STACK_RANGE = 5;
+export const NYTHRAXIS_SOUL_REND_DURATION = 8;
+export const NYTHRAXIS_SOUL_REND_STACK_RANGE = 5;
 // Soul Rend mark counts. Heroic doubles the marked players (6 of the raid must
 // collapse onto the stack point inside 8s); the extra rng picks draw ONLY on a
 // heroic claim, so the normal trace and the parity golden are unchanged.
-const NYTHRAXIS_SOUL_REND_MARKS = 3;
-const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
+export const NYTHRAXIS_SOUL_REND_MARKS = 3;
+export const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
 // Heroic non-compliance punishers. Soul Rend deals maxHp x mult / stacked, so
 // on heroic an unstacked mark takes 150% of max hp (a guaranteed kill through
 // any topped-off health bar) and even a pair splitting takes 75% each.
@@ -107,9 +184,9 @@ const NYTHRAXIS_SOUL_REND_MARKS_HEROIC = 6;
 // hit back under 100%. Deathless Rage also suppresses the matching Veilbound
 // Mark reduction around its final heroic hit, because that source-side fold
 // applies before dealDamage reaches the alreadyFinal-guarded folds.
-const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
-const NYTHRAXIS_DEATHLESS_PCT = 0.82;
-const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
+export const NYTHRAXIS_SOUL_REND_HEROIC_MULT = 1.5;
+export const NYTHRAXIS_DEATHLESS_PCT = 0.82;
+export const NYTHRAXIS_DEATHLESS_PCT_HEROIC = 1.15;
 const VEILBOUND_MARK_ID = 'veilbound_mark';
 
 // Whether this boss's claimed instance is heroic (the arena instance is found
@@ -118,20 +195,16 @@ function isHeroicNythraxis(ctx: SimContext, boss: Entity): boolean {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   return inst?.difficulty === 'heroic';
 }
-const NYTHRAXIS_DEATHLESS_EVERY = 45;
-const NYTHRAXIS_DEATHLESS_CAST = 10;
-const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
-const NYTHRAXIS_DEATHLESS_STUN = 5;
+export const NYTHRAXIS_DEATHLESS_EVERY = 45;
+export const NYTHRAXIS_DEATHLESS_CAST = 10;
+export const NYTHRAXIS_DEATHLESS_CHANNEL = 5;
+export const NYTHRAXIS_DEATHLESS_STUN = 5;
 const NYTHRAXIS_HEROIC_SUMMON_CHANNEL = 3;
-const NYTHRAXIS_DREAD_CURSE_EVERY = 15;
-const NYTHRAXIS_DREAD_CURSE_DURATION = 45;
-const NYTHRAXIS_DREAD_CURSE_PER_STACK = 0.1;
-const NYTHRAXIS_DREAD_CURSE_MAX_STACKS = 10;
 const NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT = 15;
 const NYTHRAXIS_PHASE_TWO_SETTLE_DELAY = 5;
 const NYTHRAXIS_TRANSITION_DURATION = 21;
 const NYTHRAXIS_TRANSITION_CONTROL_GRACE = 0.5;
-const NYTHRAXIS_FINAL_STAND_HP = 0.05;
+export const NYTHRAXIS_FINAL_STAND_HP = 0.05;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
 // of the boss spawn: appears 50yd out, walks up to 30yd out (between door + boss).
@@ -234,6 +307,8 @@ export function onBossDeath(ctx: SimContext, mob: Entity): void {
   if (mob.templateId !== NYTHRAXIS_BOSS_ID || !mob.nythraxis) return;
   if (mob.nythraxis.deathSpoken) return;
   clearNythraxisTransitionControl(ctx, mob);
+  shatterNythraxisBoneSpikes(ctx, mob);
+  clearNythraxisGraveHazards(mob);
   mob.nythraxis.deathSpoken = true;
   mob.nythraxis.phase = 'dead';
   nythraxisDialogueSet(ctx, mob, [
@@ -269,6 +344,15 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       deathlessTimer: NYTHRAXIS_DEATHLESS_EVERY,
       deathlessCastRemaining: 0,
       deathlessStunRemaining: 0,
+      dreadCurseTimer: NYTHRAXIS_DREAD_CURSE_EVERY,
+      boneSpikeTimer: NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
+      boneSpikes: [],
+      eruptionTimer: NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS,
+      eruptionCastKey: 0,
+      eruptionImpactRemaining: 0,
+      eruptionPoints: [],
+      graveFlames: [],
+      graveFlameSeq: 0,
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
@@ -279,12 +363,15 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
 }
 
 export function resetNythraxisEncounter(ctx: SimContext, boss: Entity): void {
+  shatterNythraxisBoneSpikes(ctx, boss);
+  clearNythraxisGraveHazards(boss);
   for (const p of playersInNythraxisRoom(ctx, boss)) {
     p.auras = p.auras.filter(
       (a) =>
         a.id !== 'nythraxis_soul_rend' &&
         a.id !== 'nythraxis_transition_stun' &&
-        a.id !== 'nythraxis_dread_curse',
+        a.id !== NYTHRAXIS_DREAD_CURSE_AURA_ID &&
+        a.id !== NYTHRAXIS_IMPALED_AURA_ID,
     );
     clearNythraxisWardChannelCast(p);
   }
@@ -369,7 +456,13 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     return;
   }
   if (st.phase === 'dead') return;
-  if (st.phase === 1 || st.phase === 2) updateNythraxisDreadCurse(ctx, boss, st);
+  // Live hazards keep running through every script-locked window below (a
+  // Deathless Rage cast, its stun, the court summon): a spike keeps draining
+  // until it is shattered and a burning patch keeps burning. Only NEW casts
+  // hold, which is what makes the Rage window the raid's calm window.
+  updateNythraxisBoneSpikes(ctx, boss, st);
+  updateNythraxisGraveHazards(ctx, boss, st, room);
+  updateNythraxisDreadCurse(ctx, boss, st);
 
   const hpFrac = boss.hp / Math.max(1, boss.maxHp);
   if (st.phase === 1 && hpFrac <= NYTHRAXIS_PHASE_TWO_HP) {
@@ -430,6 +523,8 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   }
 
   updateNythraxisGravebreaker(ctx, boss, st);
+  updateNythraxisBoneSpikeCast(ctx, boss, st, room);
+  updateNythraxisGraveEruptionCast(ctx, boss, st, room);
   if (st.phase === 1) updateNythraxisRaiseFallen(ctx, boss, st);
   if (st.phase === 2) {
     st.soulRendTimer -= DT;
@@ -643,41 +738,443 @@ export function grantNythraxisLockout(ctx: SimContext, boss: Entity): void {
   deedsMod.onNythraxisKillForDeeds(ctx, boss, roomMetas);
 }
 
+function nythraxisDifficulty(ctx: SimContext, boss: Entity): DungeonDifficulty {
+  return isHeroicNythraxis(ctx, boss) ? 'heroic' : 'normal';
+}
+
+function nythraxisClaimedInstance(ctx: SimContext, boss: Entity) {
+  return ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
+}
+
+function isNythraxisWardChanneler(st: NonNullable<Entity['nythraxis']>, pid: number): boolean {
+  return st.wardChannels.some((c) => c.playerId === pid && !c.complete);
+}
+
+// ----- structured raid warnings -------------------------------------------------
+
+/**
+ * The text-free center-screen callout (the Varkhul callout's sibling): one
+ * pid-routed event per living-or-dead raider in the room, or a single personal
+ * one when `onlyPid` is given. The client owns the localized copy.
+ */
+export function emitNythraxisCallout(
+  ctx: SimContext,
+  boss: Entity,
+  call: NythraxisCallout,
+  onlyPid?: number,
+  excludePids?: ReadonlySet<number>,
+): void {
+  if (onlyPid !== undefined) {
+    ctx.emit({ type: 'nythraxisCallout', pid: onlyPid, sourceId: boss.id, call });
+    return;
+  }
+  for (const meta of ctx.players.values()) {
+    if (excludePids?.has(meta.entityId)) continue;
+    const p = ctx.entities.get(meta.entityId);
+    if (!p || dist2d(p.pos, boss.spawnPos) > NYTHRAXIS_ROOM_RADIUS) continue;
+    ctx.emit({ type: 'nythraxisCallout', pid: meta.entityId, sourceId: boss.id, call });
+  }
+}
+
+// ----- Dread Curse: the tank swap (both difficulties) --------------------------
+
 export function updateNythraxisDreadCurse(
   ctx: SimContext,
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
-  if (!isHeroicNythraxis(ctx, boss)) return;
+  const ms = nythraxisMechanicState(st);
   const target = boss.aggroTargetId !== null ? ctx.entities.get(boss.aggroTargetId) : null;
   if (!target || target.dead || target.kind !== 'player') return;
-  if (st.dreadCurseTargetId !== target.id) {
-    st.dreadCurseTargetId = target.id;
-    st.dreadCurseStacks = 0;
+  ms.dreadCurseTimer -= DT;
+  if (ms.dreadCurseTimer > 0) return;
+  const outcome = castNythraxisDreadCurse(ctx, boss, target, nythraxisDifficulty(ctx, boss));
+  if (outcome === 'outOfReach') {
+    // Out of melee reach (kited, knocked, mid-drag): hold, re-check shortly.
+    ms.dreadCurseTimer = 1;
+    return;
   }
-  st.dreadCurseTimer = (st.dreadCurseTimer ?? NYTHRAXIS_DREAD_CURSE_EVERY) - DT;
-  if (st.dreadCurseTimer > 0) return;
-  st.dreadCurseTimer = NYTHRAXIS_DREAD_CURSE_EVERY;
-  st.dreadCurseStacks = Math.min(NYTHRAXIS_DREAD_CURSE_MAX_STACKS, (st.dreadCurseStacks ?? 0) + 1);
-  const value = Math.min(1, st.dreadCurseStacks * NYTHRAXIS_DREAD_CURSE_PER_STACK);
-  ctx.applyAura(target, {
-    id: 'nythraxis_dread_curse',
-    name: 'Dread Curse',
-    kind: 'vulnerability',
-    remaining: NYTHRAXIS_DREAD_CURSE_DURATION,
-    duration: NYTHRAXIS_DREAD_CURSE_DURATION,
-    value,
-    stacks: st.dreadCurseStacks,
-    sourceId: boss.id,
-    school: 'shadow',
-  });
+  ms.dreadCurseTimer = NYTHRAXIS_DREAD_CURSE_EVERY;
+  if (outcome === 'swapCall') emitNythraxisCallout(ctx, boss, 'dreadCurseSwap');
+}
+
+// ----- Bone Spike: impale raiders, the raid shatters the spikes ------------------
+
+export function updateNythraxisBoneSpikeCast(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[],
+): void {
+  const ms = nythraxisMechanicState(st);
+  ms.boneSpikeTimer -= DT;
+  if (ms.boneSpikeTimer > 0) return;
+  const difficulty = nythraxisDifficulty(ctx, boss);
+  const victims = castNythraxisBoneSpike(ctx, boss, st, room, difficulty);
+  // Nobody eligible (everyone but the aggro holder is marked, impaled, or
+  // dead): retry shortly instead of skipping a whole cycle, the Soul Rend hold.
+  ms.boneSpikeTimer = victims.length === 0 ? 3 : nythraxisBoneSpikeCadence(difficulty);
+}
+
+/**
+ * Impale NYTHRAXIS_BONE_SPIKE_VICTIMS raiders: one shared-stream rng.int per
+ * victim (the Soul Rend pick idiom), a stationary spike mob at each victim's
+ * feet, the unbreakable impale aura pointing at it, and the callouts. Returns
+ * the victims so tests can pin the roster.
+ */
+export function castNythraxisBoneSpike(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[],
+  difficulty: DungeonDifficulty,
+): Entity[] {
+  const ms = nythraxisMechanicState(st);
+  const marked = new Set(st.soulRendMarks.map((mark) => mark.playerId));
+  const candidates = nythraxisBoneSpikeCandidates(room, boss.id, boss.aggroTargetId, marked);
+  const victims: Entity[] = [];
+  const count = nythraxisBoneSpikeVictims(difficulty);
+  while (victims.length < count && candidates.length > 0) {
+    const idx = ctx.rng.int(0, candidates.length - 1);
+    victims.push(candidates.splice(idx, 1)[0]);
+  }
+  if (victims.length === 0) return victims;
+  const template = MOBS[NYTHRAXIS_BONE_SPIKE_ID];
+  if (!template) return [];
+  const inst = nythraxisClaimedInstance(ctx, boss);
+  const dungeonId = inst?.dungeonId ?? '';
+  const spawnTemplate = mobTemplateForDungeonDifficulty(template, dungeonId, difficulty);
+  nythraxisSay(ctx, boss, 'nythraxis', 'Bone and marrow, rise!');
+  const victimIds = new Set<number>();
+  for (const victim of victims) {
+    const spike = createMob(
+      ctx.nextId++,
+      spawnTemplate,
+      spawnTemplate.maxLevel,
+      ctx.groundPos(victim.pos.x, victim.pos.z),
+    );
+    applyDungeonMobTuning(spike, dungeonId, difficulty);
+    spike.spawnPos = { ...spike.pos };
+    spike.facing = victim.facing;
+    spike.prevFacing = victim.facing;
+    spike.tappedById = boss.tappedById;
+    spike.lootable = false;
+    spike.loot = null;
+    pinNythraxisBoneSpike(spike);
+    ctx.addEntity(spike);
+    boss.summonedIds.push(spike.id);
+    inst?.mobIds.push(spike.id);
+    ms.boneSpikes.push({
+      spikeId: spike.id,
+      playerId: victim.id,
+      tickTimer: NYTHRAXIS_IMPALED_TICK_SECONDS,
+    });
+    ctx.applyAura(victim, nythraxisImpaledAuraFor(boss.id, spike.id));
+    ctx.emit({
+      type: 'spellfx',
+      sourceId: boss.id,
+      targetId: victim.id,
+      school: 'shadow',
+      fx: 'nova',
+    });
+    emitNythraxisCallout(ctx, boss, 'youAreImpaled', victim.id);
+    victimIds.add(victim.id);
+  }
+  emitNythraxisCallout(ctx, boss, 'impaled', undefined, victimIds);
+  return victims;
+}
+
+/**
+ * Drop a spike (alive or corpse) and forget it everywhere the spawn recorded
+ * it, so a long pull never accumulates spike corpses in the entity map, the
+ * grid, the boss's summon list, or the instance roster.
+ */
+function crumbleNythraxisBoneSpike(ctx: SimContext, boss: Entity, spikeId: number): void {
+  if (ctx.entities.has(spikeId)) {
+    for (const meta of ctx.players.values()) {
+      const e = ctx.entities.get(meta.entityId);
+      if (e?.targetId === spikeId) e.targetId = null;
+    }
+    ctx.dropEntity(spikeId);
+  }
+  boss.summonedIds = boss.summonedIds.filter((id) => id !== spikeId);
+  const inst = nythraxisClaimedInstance(ctx, boss);
+  if (inst) inst.mobIds = inst.mobIds.filter((id) => id !== spikeId);
+}
+
+/**
+ * Drain every impaled raider once a second and free the ones whose spike has
+ * died. A spike whose victim is gone (dead, left, aura stripped) crumbles: it
+ * has nothing left to hold. The impale aura is unbreakable control, which
+ * death cleanup deliberately KEEPS (resurrection.ts aurasSurvivingDeath), so a
+ * victim who dies impaled is freed here explicitly; otherwise the corpse would
+ * resurrect still pinned.
+ */
+export function updateNythraxisBoneSpikes(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+): void {
+  const ms = nythraxisMechanicState(st);
+  if (ms.boneSpikes.length === 0) return;
+  const tickFrac = nythraxisImpaledTickMaxHp(nythraxisDifficulty(ctx, boss));
+  const kept: NythraxisBoneSpike[] = [];
+  for (const pair of ms.boneSpikes) {
+    const spike = ctx.entities.get(pair.spikeId);
+    const victim = ctx.entities.get(pair.playerId);
+    if (!spike || spike.dead || spike.kind !== 'mob') {
+      if (victim) freeNythraxisImpaled(ctx, boss, victim, true);
+      crumbleNythraxisBoneSpike(ctx, boss, pair.spikeId);
+      continue;
+    }
+    if (
+      !victim ||
+      victim.dead ||
+      victim.kind !== 'player' ||
+      !isNythraxisImpaled(victim, boss.id)
+    ) {
+      if (victim) freeNythraxisImpaled(ctx, boss, victim, false);
+      crumbleNythraxisBoneSpike(ctx, boss, pair.spikeId);
+      continue;
+    }
+    pair.tickTimer -= DT;
+    if (pair.tickTimer <= 0) {
+      pair.tickTimer += NYTHRAXIS_IMPALED_TICK_SECONDS;
+      // alreadyFinal, like every max-hp fraction the newer raids deal (Ignivar's
+      // Forge Strike, Varkhul's Maker's Brand): the percentage IS the mechanic,
+      // so a damage-done debuff on the boss does not shrink it.
+      ctx.dealDamage(
+        boss,
+        victim,
+        Math.ceil(victim.maxHp * tickFrac),
+        false,
+        'shadow',
+        NYTHRAXIS_BONE_SPIKE_CAST_ID,
+        'hit',
+        true,
+        undefined,
+        false,
+        false,
+        true,
+      );
+    }
+    kept.push(pair);
+  }
+  ms.boneSpikes = kept;
+}
+
+function freeNythraxisImpaled(
+  ctx: SimContext,
+  boss: Entity,
+  victim: Entity,
+  announce: boolean,
+): void {
+  const held = victim.auras.some(
+    (a) => a.id === NYTHRAXIS_IMPALED_AURA_ID && a.sourceId === boss.id,
+  );
+  if (!held) return;
+  victim.auras = victim.auras.filter(
+    (a) => !(a.id === NYTHRAXIS_IMPALED_AURA_ID && a.sourceId === boss.id),
+  );
+  ctx.emit({ type: 'aura', targetId: victim.id, name: NYTHRAXIS_IMPALED_AURA_NAME, gained: false });
   ctx.emit({
     type: 'spellfx',
     sourceId: boss.id,
-    targetId: target.id,
-    school: 'shadow',
-    fx: 'projectile',
+    targetId: victim.id,
+    school: 'physical',
+    fx: 'nova',
   });
+  if (announce) emitNythraxisCallout(ctx, boss, 'spikeBroken');
+}
+
+/**
+ * Free every impaled raider and crumble every spike (transition, reset, kill).
+ * Ends with an entity-wide sweep of this boss's impale aura, dead bodies
+ * included, the same belt-and-braces clearNythraxisTransitionControl applies:
+ * the aura is unbreakable control, so nothing else will ever remove it.
+ */
+export function shatterNythraxisBoneSpikes(ctx: SimContext, boss: Entity): void {
+  if (boss.nythraxis) {
+    const ms = nythraxisMechanicState(boss.nythraxis);
+    for (const pair of ms.boneSpikes) {
+      const victim = ctx.entities.get(pair.playerId);
+      if (victim) freeNythraxisImpaled(ctx, boss, victim, false);
+      crumbleNythraxisBoneSpike(ctx, boss, pair.spikeId);
+    }
+    ms.boneSpikes = [];
+  }
+  for (const entity of ctx.entities.values()) {
+    if (entity.kind === 'player') freeNythraxisImpaled(ctx, boss, entity, false);
+  }
+}
+
+// ----- Grave Eruption and Grave Flame: the floor the raid must keep moving off --
+
+export function updateNythraxisGraveEruptionCast(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[],
+): void {
+  const ms = nythraxisMechanicState(st);
+  ms.eruptionTimer -= DT;
+  if (ms.eruptionTimer > 0 || ms.eruptionPoints.length > 0) return;
+  startNythraxisGraveEruption(ctx, boss, st, room);
+}
+
+/**
+ * Telegraph the next eruption: hash-placed under distinct raiders who can
+ * still move (never an impaled raider or a wardstone channeler; the aggro
+ * holder sorts last), no shared rng spent. The warning rows ride the snapshot
+ * through activeNythraxisGraveEruptions; the events carry the same ids.
+ */
+export function startNythraxisGraveEruption(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[],
+): void {
+  const ms = nythraxisMechanicState(st);
+  const difficulty = nythraxisDifficulty(ctx, boss);
+  const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id) >>> 0;
+  const count = nythraxisGraveEruptionCount(difficulty);
+  const eligible = room.filter(
+    (p) => !p.dead && !isNythraxisImpaled(p, boss.id) && !isNythraxisWardChanneler(st, p.id),
+  );
+  const targets = nythraxisGraveEruptionTargetOrder(
+    castKey,
+    eligible.map((p) => ({ id: p.id, x: p.pos.x, z: p.pos.z })),
+    boss.aggroTargetId,
+    count,
+  );
+  ms.eruptionCastKey = castKey;
+  ms.eruptionPoints = nythraxisGraveEruptionPattern(
+    castKey,
+    { x: boss.spawnPos.x, z: boss.spawnPos.z },
+    count,
+    targets,
+  );
+  ms.eruptionImpactRemaining = NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS;
+  ms.eruptionTimer = nythraxisGraveEruptionCadence(difficulty);
+  ms.eruptionPoints.forEach((point, index) => {
+    ctx.emit({
+      type: 'spellfxAt',
+      x: point.x,
+      z: point.z,
+      school: 'shadow',
+      fx: 'meteorFall',
+      ability: NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
+      radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
+      duration: NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS,
+      warningLead: NYTHRAXIS_GRAVE_ERUPTION_REVEAL_DELAY_SECONDS,
+      persistentId: nythraxisGraveEruptionId(boss.id, castKey, index),
+      sourceId: boss.id,
+    });
+  });
+}
+
+/** The armed eruption lands, then its circles keep burning as Grave Flame. */
+export function updateNythraxisGraveHazards(
+  ctx: SimContext,
+  boss: Entity,
+  st: NonNullable<Entity['nythraxis']>,
+  room: readonly Entity[] = playersInNythraxisRoom(ctx, boss),
+): void {
+  const ms = nythraxisMechanicState(st);
+  const difficulty = nythraxisDifficulty(ctx, boss);
+  if (ms.eruptionImpactRemaining > 0) {
+    ms.eruptionImpactRemaining = Math.max(0, ms.eruptionImpactRemaining - DT);
+    if (ms.eruptionImpactRemaining <= 1e-6)
+      resolveNythraxisGraveEruption(ctx, boss, ms, difficulty, room);
+  }
+  if (ms.graveFlames.length === 0) return;
+  const tickFrac = nythraxisGraveFlameTickMaxHp(difficulty);
+  const kept: typeof ms.graveFlames = [];
+  for (const flame of ms.graveFlames) {
+    flame.remaining -= DT;
+    if (flame.remaining <= 0) continue;
+    flame.tickTimer -= DT;
+    if (flame.tickTimer <= 0) {
+      flame.tickTimer += NYTHRAXIS_GRAVE_FLAME_TICK_SECONDS;
+      for (const p of room) {
+        if (p.dead || !pointInNythraxisGraveCircle(flame, p.pos)) continue;
+        ctx.dealDamage(
+          boss,
+          p,
+          Math.ceil(p.maxHp * tickFrac),
+          false,
+          'shadow',
+          NYTHRAXIS_GRAVE_FLAME_CAST_ID,
+          'hit',
+          true,
+          undefined,
+          false,
+          false,
+          true,
+        );
+      }
+    }
+    kept.push(flame);
+  }
+  ms.graveFlames = kept;
+}
+
+function resolveNythraxisGraveEruption(
+  ctx: SimContext,
+  boss: Entity,
+  st: NythraxisMechanicState,
+  difficulty: DungeonDifficulty,
+  room: readonly Entity[],
+): void {
+  const damage = nythraxisGraveEruptionDamageMaxHp(difficulty);
+  for (const p of room) {
+    if (p.dead) continue;
+    if (!st.eruptionPoints.some((circle) => pointInNythraxisGraveCircle(circle, p.pos))) continue;
+    ctx.dealDamage(
+      boss,
+      p,
+      Math.ceil(p.maxHp * damage),
+      false,
+      'shadow',
+      NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
+      'hit',
+      true,
+      undefined,
+      false,
+      false,
+      true,
+    );
+  }
+  st.eruptionPoints.forEach((point, index) => {
+    ctx.emit({
+      type: 'spellfxAt',
+      x: point.x,
+      z: point.z,
+      school: 'shadow',
+      fx: 'meteorImpact',
+      ability: NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
+      radius: NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
+      persistentId: nythraxisGraveEruptionId(boss.id, st.eruptionCastKey, index),
+      sourceId: boss.id,
+    });
+  });
+  st.graveFlameSeq = igniteNythraxisGraveFlames(
+    st.graveFlames,
+    st.eruptionPoints,
+    st.graveFlameSeq,
+    nythraxisGraveFlameSeconds(difficulty),
+  );
+  st.eruptionPoints = [];
+  st.eruptionImpactRemaining = 0;
+}
+
+/** Drop every armed eruption and burning patch (transition, reset, kill). */
+export function clearNythraxisGraveHazards(boss: Entity): void {
+  if (!boss.nythraxis) return;
+  const ms = nythraxisMechanicState(boss.nythraxis);
+  ms.eruptionPoints = [];
+  ms.eruptionImpactRemaining = 0;
+  ms.graveFlames = [];
 }
 
 // ----- phase-one mechanics --------------------------------------------------------
@@ -906,6 +1403,9 @@ export function startNythraxisTransition(
   st.transitionReleased = false;
   st.soulRendMarks = [];
   st.deathlessCastRemaining = 0;
+  // The stomp shatters every spike and snuffs the floor: phase 2 opens clean.
+  shatterNythraxisBoneSpikes(ctx, boss);
+  clearNythraxisGraveHazards(boss);
   boss.castingAbility = null;
   boss.castRemaining = 0;
   boss.castTotal = 0;
@@ -1066,7 +1566,12 @@ export function castNythraxisSoulRend(
   boss: Entity,
   st: NonNullable<Entity['nythraxis']>,
 ): void {
-  const candidates = playersInNythraxisRoom(ctx, boss).filter((p) => p.id !== boss.aggroTargetId);
+  // Never the aggro holder, and never an impaled raider: one personal mechanic
+  // per raider (the Bone Spike pick skips live Soul Rend marks the same way),
+  // and an impaled body cannot reach the stack point.
+  const candidates = playersInNythraxisRoom(ctx, boss).filter(
+    (p) => p.id !== boss.aggroTargetId && !isNythraxisImpaled(p, boss.id),
+  );
   if (candidates.length === 0) {
     st.soulRendTimer = 3;
     return;

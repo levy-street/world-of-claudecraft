@@ -554,28 +554,53 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(boss.auras.some((a) => a.id === 'nythraxis_deathless_stun')).toBe(true);
   });
 
-  it('heroic Dread Curse stacks on the active tank and resets on a tank swap', () => {
-    const { ctx, boss, tank, dps } = setup({ difficulty: 'heroic' });
+  it('Dread Curse stacks on the aggro holder on BOTH difficulties and survives a tank swap', () => {
+    for (const difficulty of ['normal', 'heroic'] as const) {
+      const { sim, ctx, boss, tank, dps } = setup({ difficulty });
+      const st = nythraxis.initNythraxisEncounter(boss);
+      st.phase = 1;
+      const perStack = difficulty === 'heroic' ? 0.45 : 0.35;
+      st.dreadCurseTimer = 0.01;
+      nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+      let curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
+      expect(curse?.stacks, difficulty).toBe(1);
+      expect(curse?.value, difficulty).toBeCloseTo(perStack);
+      expect(curse?.kind, difficulty).toBe('vuln_source');
+      expect(curse?.encounterOwned, difficulty).toBe(true);
+      expect(st.dreadCurseTimer, difficulty).toBe(10);
+
+      st.dreadCurseTimer = 0.01;
+      nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+      curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
+      expect(curse?.stacks, difficulty).toBe(2);
+      expect(curse?.value, difficulty).toBeCloseTo(perStack * 2);
+      // The second stack is the swap point: the raid gets the callout once.
+      const swapCalls = (sim.events as Array<{ type: string; call?: string }>).filter(
+        (e) => e.type === 'nythraxisCallout' && e.call === 'dreadCurseSwap',
+      );
+      expect(swapCalls.length, difficulty).toBeGreaterThan(0);
+
+      // The swap: the new tank starts at zero while the old tank KEEPS his
+      // stacks (they expire on their own), which is what forces the rotation.
+      boss.aggroTargetId = dps[0].id;
+      teleport(sim, dps[0], boss.pos.x, boss.pos.z - 4, boss.pos.y);
+      st.dreadCurseTimer = 0.01;
+      nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
+      const swapped = dps[0].auras.find((a) => a.id === 'nythraxis_dread_curse');
+      expect(swapped?.stacks, difficulty).toBe(1);
+      expect(tank.auras.find((a) => a.id === 'nythraxis_dread_curse')?.stacks, difficulty).toBe(2);
+    }
+  });
+
+  it('Dread Curse holds while the aggro holder is out of melee reach', () => {
+    const { sim, ctx, boss, tank } = setup();
     const st = nythraxis.initNythraxisEncounter(boss);
     st.phase = 1;
+    teleport(sim, tank, boss.pos.x, boss.pos.z - 30, boss.pos.y);
     st.dreadCurseTimer = 0.01;
     nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
-    let curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
-    expect(curse?.stacks).toBe(1);
-    expect(curse?.value).toBeCloseTo(0.1);
-
-    st.dreadCurseTimer = 0.01;
-    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
-    curse = tank.auras.find((a) => a.id === 'nythraxis_dread_curse');
-    expect(curse?.stacks).toBe(2);
-    expect(curse?.value).toBeCloseTo(0.2);
-
-    boss.aggroTargetId = dps[0].id;
-    st.dreadCurseTimer = 0.01;
-    nythraxis.updateNythraxisDreadCurse(ctx, boss, st);
-    const swapped = dps[0].auras.find((a) => a.id === 'nythraxis_dread_curse');
-    expect(swapped?.stacks).toBe(1);
-    expect(swapped?.value).toBeCloseTo(0.1);
+    expect(tank.auras.some((a) => a.id === 'nythraxis_dread_curse')).toBe(false);
+    expect(st.dreadCurseTimer).toBe(1);
   });
 
   it('heroic wardstone interrupt leads to a three second add summon channel', () => {

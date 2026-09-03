@@ -435,6 +435,10 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
     // and its respawn gate (only after the previous court dies) self-limits.
     healthMultiplierByMob: {
       nythraxis_skeleton_warrior: 2.22,
+      // Bone Spikes are a DPS target-switch check, not a health sponge: 1.5x
+      // their normal pool (1,500 vs 1,000) so three spikes still shatter inside
+      // the impale drain window when the raid splits onto them.
+      nythraxis_bone_spike: 3.0,
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',

@@ -133,6 +133,11 @@ function isolatedState(gravebreakerTimer: number): NonNullable<Entity['nythraxis
     deathlessTimer: 999,
     deathlessCastRemaining: 0,
     deathlessStunRemaining: 0,
+    // The mechanics redo (Dread Curse on both difficulties, Bone Spike, Grave
+    // Eruption) is parked too: this suite isolates the charged Gravebreaker.
+    dreadCurseTimer: 999,
+    boneSpikeTimer: 999,
+    eruptionTimer: 999,
     wardChannels: [],
     finalStand: false,
     deathSpoken: false,

@@ -6,6 +6,7 @@ import { isBlocked } from '../src/sim/colliders';
 import { BUILTIN_WORLD, DUNGEONS, ITEMS, instanceOrigin, MOBS } from '../src/sim/data';
 import { NYTHRAXIS_LAYOUT } from '../src/sim/dungeon_layout';
 import {
+  initNythraxisEncounter,
   nythraxisGravebreakerOnMobSwing,
   resetNythraxisEncounter,
 } from '../src/sim/encounters/nythraxis';
@@ -126,6 +127,22 @@ function engage(boss: Entity, tank: Entity) {
   boss.aiState = 'attack';
   boss.aggroTargetId = tank.id;
   boss.threat.set(tank.id, 1000);
+}
+
+// The mechanics redo added Dread Curse on both difficulties, Bone Spike, and
+// Grave Eruption (src/sim/encounters/nythraxis.ts). These legacy scenarios run
+// a lone tank whom the percentage mechanics would impale or burn down mid
+// measurement, so every test that is not about them parks their cadences.
+// Their own coverage lives in tests/nythraxis_bone_spike.test.ts,
+// tests/nythraxis_grave_eruption.test.ts, and tests/nythraxis_encounter.test.ts.
+const QUIET_REDO_MECHANICS = {
+  dreadCurseTimer: 999,
+  boneSpikeTimer: 999,
+  eruptionTimer: 999,
+} as const;
+
+function quietRedoMechanics(boss: Entity): void {
+  Object.assign(initNythraxisEncounter(boss), QUIET_REDO_MECHANICS);
 }
 
 function tickSeconds(sim: Sim, seconds: number) {
@@ -527,6 +544,7 @@ describe('Nythraxis raid encounter', () => {
     // swing while the opening dialogue is still in scope.
     teleport(sim, tankPid, boss.pos.x, boss.pos.z + 2);
     engage(boss, tank);
+    quietRedoMechanics(boss);
 
     const events = collectEventsForSeconds(sim, 18);
     const bossYells = events
@@ -593,6 +611,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     const events = collectEventsForSeconds(sim, 66);
@@ -669,6 +688,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.drainEvents();
@@ -736,6 +756,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.drainEvents();
@@ -808,6 +829,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.drainEvents();
@@ -858,6 +880,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.drainEvents();
@@ -911,6 +934,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     const events = sim.tick();
@@ -950,6 +974,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     const events = sim.tick();
@@ -1016,6 +1041,7 @@ describe('Nythraxis raid encounter', () => {
     boss.swingTimer = 0;
     teleport(sim, tankPid, boss.pos.x, boss.pos.z - 6);
     engage(boss, tank);
+    quietRedoMechanics(boss);
     boss.aiState = 'attack';
 
     const hitTimes: number[] = [];
@@ -1082,6 +1108,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     const hitTimes: number[] = [];
@@ -1141,6 +1168,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.tick();
@@ -1193,6 +1221,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1242,6 +1271,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1308,6 +1338,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1376,6 +1407,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1427,6 +1459,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1475,6 +1508,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1586,6 +1620,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1716,6 +1751,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
@@ -1809,6 +1845,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     const adds = [...sim.entities.values()].filter(
@@ -1911,6 +1948,7 @@ describe('Nythraxis raid encounter', () => {
     boss.swingTimer = 999;
     teleport(sim, tankPid, origin.x, origin.z + 36);
     engage(boss, tank);
+    quietRedoMechanics(boss);
 
     tickSeconds(sim, 28);
     expect(
@@ -2065,6 +2103,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.tick();
@@ -2108,6 +2147,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     for (const pid of pids) {
@@ -2164,6 +2204,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.tick();
@@ -2216,6 +2257,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     sim.tick();
@@ -2270,6 +2312,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
 
     const events = sim.tick();
@@ -2313,6 +2356,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
     expect(boss.castingAbility).toBe('nythraxis_deathless_rage');
@@ -2363,6 +2407,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
 
@@ -2408,6 +2453,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
 
@@ -2459,6 +2505,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
 
@@ -2501,6 +2548,7 @@ describe('Nythraxis raid encounter', () => {
       wardChannels: [],
       finalStand: false,
       deathSpoken: false,
+      ...QUIET_REDO_MECHANICS,
     };
     sim.tick();
 

@@ -144,31 +144,35 @@ const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
   },
 ];
 
+// Every Nythraxis mechanic runs on both difficulties (heroic raises counts and
+// damage, see src/sim/encounters/nythraxis.ts); the heroic tier's one addition
+// is the court (Aldren, Malric, Voss) that rises after Deathless Rage.
+const NYTHRAXIS_RAID_MECHANICS = [
+  'gravebreaker',
+  'dread_curse',
+  'bone_spike',
+  'grave_eruption',
+  'raise_fallen',
+  'soul_rend',
+  'deathless_rage',
+  'wardstones',
+] as const;
+
 const NYTHRAXIS_RAID_ENCOUNTERS: readonly FinderEncounter[] = [
   {
     mobId: 'nythraxis_scourge_of_thornpeak',
     final: true,
-    mechanics: ['gravebreaker', 'raise_fallen', 'soul_rend', 'deathless_rage', 'wardstones'],
+    mechanics: [...NYTHRAXIS_RAID_MECHANICS],
   },
 ];
 
-// The heroic tier adds Dread Curse (a stacking tank-swap vulnerability, see
-// src/sim/encounters/nythraxis.ts updateNythraxisDreadCurse) on top of the
-// normal-tier mechanics above. Its own array, not a mutation of the shared
-// normal-tier list, so the normal-tier preview never carries a heroic-only
-// mechanic.
+// Its own array, not a mutation of the normal-tier list, so a heroic-only
+// entry (the court) never leaks into the normal-tier preview.
 const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   {
     mobId: 'nythraxis_scourge_of_thornpeak',
     final: true,
-    mechanics: [
-      'gravebreaker',
-      'raise_fallen',
-      'soul_rend',
-      'deathless_rage',
-      'wardstones',
-      'dread_curse',
-    ],
+    mechanics: [...NYTHRAXIS_RAID_MECHANICS, 'deathless_court'],
   },
 ];
 

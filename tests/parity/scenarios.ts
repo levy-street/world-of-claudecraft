@@ -48,6 +48,8 @@ import { enterDungeon } from '../../src/sim/instances/dungeons';
 import { solveLockActions } from '../../src/sim/lockpick';
 import type { PendingLootRoll } from '../../src/sim/loot/loot_roll';
 import { RIFT_MECHANIC_SPACING_SEC } from '../../src/sim/mob/mechanic_spacing';
+import { NYTHRAXIS_BONE_SPIKE_ID } from '../../src/sim/nythraxis_bone_spike';
+import { NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS } from '../../src/sim/nythraxis_grave_eruption';
 import { PLAYER_BODY_RADIUS } from '../../src/sim/pathfind';
 import { startFishing } from '../../src/sim/professions/fishing';
 import { gatherCastDurationSec, gatherNodeById } from '../../src/sim/professions/gathering';
@@ -3215,6 +3217,9 @@ function nythraxisFullPull(): Scenario {
       'Soul Rend rng.int marks pick + mark-expiry damage',
       'Deathless Rage interrupt via tryStartNythraxisWardChannel (object-click channel) + boss self-stun',
       'Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue',
+      'Dread Curse tank-swap stack (castNythraxisDreadCurse: max-hp hit + vuln_source stack)',
+      'Bone Spike rng.int victim picks + spike spawns + impale drain + free on spike death',
+      'Grave Eruption hash-placed warning + impact damage + Grave Flame residue tick',
       'class:warrior',
     ],
     sampleEvery: 10,
@@ -3300,11 +3305,20 @@ function nythraxisFullPull(): Scenario {
       boss.threat.set(tank.id, 1000);
       step(1); // init the encounter (intro yells)
       rec.snapshot('engage');
+      // The mechanics redo (Dread Curse on both difficulties, Bone Spike, Grave
+      // Eruption) runs on its own cadences from the pull. Park them here and fire
+      // each ONCE under explicit control below, so the legacy steps keep their
+      // exact ordering: an impaled mage could never channel a wardstone, and a
+      // stray eruption mid-resolve would fork the recorded stream.
+      const nyx = () => boss.nythraxis as NythraxisEncounterState;
+      nyx().dreadCurseTimer = 999;
+      nyx().boneSpikeTimer = 999;
+      nyx().eruptionTimer = 999;
 
       // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
-      (boss.nythraxis as NythraxisEncounterState).gravebreakerTimer = DT; // arm the charge next tick...
+      nyx().gravebreakerTimer = DT; // arm the charge next tick...
       step(20 * 2); // ...and release it on the next LANDED swing (front-cone splash)
-      (boss.nythraxis as NythraxisEncounterState).raiseFallenTimer = DT; // fire the add wave next tick
+      nyx().raiseFallenTimer = DT; // fire the add wave next tick
       step(1);
       const adds = [...sim.entities.values()].filter(
         (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_ADD_ID && !e.dead,
@@ -3312,6 +3326,31 @@ function nythraxisFullPull(): Scenario {
       rec.track(...adds.map((a) => a.id));
       rec.notes.addIds = adds.map((a) => a.id);
       rec.snapshot('phase1-adds');
+
+      // ----- Redo mechanics, each fired once: Dread Curse, Bone Spike, Grave Eruption -----
+      nyx().dreadCurseTimer = DT;
+      step(1); // castNythraxisDreadCurse -> 25% hit + the first vuln_source stack on the tank
+      nyx().boneSpikeTimer = DT;
+      step(1); // castNythraxisBoneSpike -> two rng.int picks, two spikes, two impales
+      const spikes = [...sim.entities.values()].filter(
+        (e: AnyEntity) => e.kind === 'mob' && e.templateId === NYTHRAXIS_BONE_SPIKE_ID && !e.dead,
+      ) as AnyEntity[];
+      rec.track(...spikes.map((s) => s.id));
+      rec.notes.spikeIds = spikes.map((s) => s.id);
+      step(20 * 1); // one impale drain tick on each victim
+      rec.snapshot('bone-spike');
+      for (const spike of spikes)
+        sim.dealDamage(tank, spike, spike.hp + 1, false, 'physical', null, 'hit', true);
+      step(1); // updateNythraxisBoneSpikes -> victims freed, spikeBroken callouts
+      nyx().eruptionTimer = DT;
+      step(1); // startNythraxisGraveEruption -> hash-placed warning rings (no shared rng)
+      step(Math.round(NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS / DT) + 1); // impact -> Grave Flame
+      step(20 * 1); // one Grave Flame tick under whoever stayed put (everyone did)
+      rec.snapshot('grave-eruption');
+      // Re-park the redo cadences for the rest of the pull.
+      nyx().dreadCurseTimer = 999;
+      nyx().boneSpikeTimer = 999;
+      nyx().eruptionTimer = 999;
 
       // ----- Transition at 70%: room War Stomp stun + Aldric + wardstones lit -----
       boss.hp = Math.floor(boss.maxHp * 0.69);

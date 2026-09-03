@@ -5136,6 +5136,14 @@ export interface NythraxisDialogueCue {
   text: string;
 }
 
+/** One live Bone Spike: the spike mob and the raider it holds. */
+export interface NythraxisBoneSpike {
+  spikeId: number;
+  playerId: number;
+  // Seconds until the next impale drain tick.
+  tickTimer: number;
+}
+
 export interface NythraxisEncounterState {
   phase: 1 | 'transition' | 2 | 'dead';
   introSpoken: boolean;
@@ -5159,9 +5167,25 @@ export interface NythraxisEncounterState {
   deathlessCastRemaining: number;
   deathlessStunRemaining: number;
   heroicSummonChannelRemaining?: number;
+  // The mechanic-redo fields below are optional on the TYPE only so the many
+  // hand-built state literals in tests stay valid; initNythraxisEncounter sets
+  // every one, and the driver backfills a missing field with its default
+  // (encounters/nythraxis.ts nythraxisMechanicState) before reading it.
+  // Dread Curse (the tank swap, both difficulties): only the cadence lives
+  // here; the stacks live on the victim's aura (nythraxis_dread_curse.ts).
   dreadCurseTimer?: number;
-  dreadCurseTargetId?: number | null;
-  dreadCurseStacks?: number;
+  // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
+  boneSpikeTimer?: number;
+  boneSpikes?: NythraxisBoneSpike[];
+  // Grave Eruption: the cadence, the live warning window, and the burning
+  // patches it left behind (nythraxis_grave_eruption.ts). eruptionCastKey is
+  // the stable id root the warning rows and their impact events share.
+  eruptionTimer?: number;
+  eruptionCastKey?: number;
+  eruptionImpactRemaining?: number;
+  eruptionPoints?: { x: number; z: number }[];
+  graveFlames?: { seq: number; x: number; z: number; remaining: number; tickTimer: number }[];
+  graveFlameSeq?: number;
   wardChannels: NythraxisWardChannel[];
   finalStand: boolean;
   deathSpoken: boolean;
@@ -5737,6 +5761,13 @@ export type SimEvent = { pid?: number } & (
         | 'worldfireBegins'
         | 'worldfireClosing'
         | 'worldfireConsumed';
+    }
+  // Text-free structured Nythraxis raid warning (the Varkhul callout's
+  // sibling): the sim ships the enum, the client renders localized copy.
+  | {
+      type: 'nythraxisCallout';
+      sourceId: number;
+      call: 'impaled' | 'youAreImpaled' | 'spikeBroken' | 'dreadCurseSwap';
     }
   | {
       type: 'aura';
