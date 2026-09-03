@@ -998,6 +998,51 @@ export const TARGETS = [
     },
   },
   {
+    key: 'cosmetics-window',
+    label: 'Cosmetics window: account mount skins, weapon skins, and mech chromas',
+    when: ['ui/hud/cosmetics/cosmetics', 'i18n.catalog/cosmetics', 'sim/content/mount_skins'],
+    variants: [
+      { key: 'desktop', beforeLoad: lowGraphicsSeed },
+      { key: 'mobile', mobile: true, beforeLoad: lowGraphicsSeed },
+    ],
+    async capture(page) {
+      const opened = await page.evaluate(() => {
+        const game = window.__game;
+        if (!game?.hud || !game?.sim) return { ok: false, reason: 'offline world is unavailable' };
+        const sim = game.sim;
+        // An owned mount (so the "needs a ride" hint stays away), the whole mount
+        // skin catalog owned with one worn, a couple of Armory skins, and one mech
+        // chroma: every tab has something to show. Offline-only seams.
+        sim.addItem('reins_valorsteed', 1);
+        sim.accountCosmetics = {
+          ...sim.accountCosmetics,
+          mountSkinIds: ['mech_bird', 'chimeglass_tortoise'],
+          weaponSkinIds: ['ice_fang_sword', 'glaciersplit_axe'],
+          mechChromaIds: ['amber_crimson', 'onyx_gold'],
+        };
+        sim.changeMountSkin('mech_bird');
+        return { ok: true };
+      });
+      if (!opened.ok) return { skip: opened.reason };
+      // The first-spawn greeting (#tutorial-greeting, Ferryman Odo) is a
+      // window on top of the spawn: close it the way a player does, then open.
+      await page.evaluate(() => {
+        const greeting = document.getElementById('tutorial-greeting');
+        if (greeting instanceof HTMLElement && getComputedStyle(greeting).display !== 'none') {
+          [...greeting.querySelectorAll('button')].at(-1)?.click();
+        }
+      });
+      await wait(400);
+      await page.evaluate(() => {
+        window.__game?.hud?.toggleCosmetics?.();
+      });
+      await wait(400);
+      const ready = await pollForSize(page, '#cosmetics-window');
+      if (!ready) return { skip: 'the cosmetics window never became visible' };
+      return { clip: '#cosmetics-window' };
+    },
+  },
+  {
     key: 'event-calendar',
     label: 'Event Calendar window: recurring system-event rows',
     when: ['ui/calendar_view.ts', 'ui/calendar_window.ts'],

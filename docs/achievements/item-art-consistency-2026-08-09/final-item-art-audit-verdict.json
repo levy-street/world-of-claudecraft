@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1044,
-    "liveItemDefinitions": 1059,
+    "itemArtFilesReviewed": 1042,
+    "liveItemDefinitions": 1057,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 11,
       "junk": 83,
-      "mount": 13,
+      "mount": 11,
       "potion": 13,
       "quest": 102,
       "tool": 60,
@@ -385,6 +385,19 @@
           "public/ui/items/mapping.json"
         ],
         "note": "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged. Joined the 2026-08-09 record at the release/v0.42.0 sync of PR #3439 (which carries the troll of PR #3399), on top of the release side's 2026-08-12 through 2026-08-30 additions."
+      },
+      {
+        "reviewedAt": "2026-09-04",
+        "branch": "feature/cosmetics-window",
+        "reviewer": "owner",
+        "removedIds": [
+          "reins_chimeglass_tortoise",
+          "reins_mech_bird"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Mount skins conversion (PR: cosmetics window): reins_mech_bird and reins_chimeglass_tortoise retired as items; their icons moved to public/ui/store/mount_skins/<skin id>.webp unchanged. No new art reviewed; counts and passIds shrink by two."
       }
     ]
   },
@@ -427,7 +440,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1044,
+    "passCount": 1042,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1110,11 +1123,9 @@
       "reedwoven_trousers",
       "reinforced_pauldrons",
       "reins_aether_hover_cycle",
-      "reins_chimeglass_tortoise",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
       "reins_lanternback_troll",
-      "reins_mech_bird",
       "reins_rickshaw_mount",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
@@ -1478,7 +1489,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1044 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17."
+    "summary": "All 1042 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17. On 2026-09-04 the Cluckwork Mech Bird and Chimeglass Tortoise reins icons left the shipping item set: both mounts became account mount skins (src/sim/content/mount_skins.ts) with no reins item, and their two reviewed renders moved unchanged to public/ui/store/mount_skins as store art outside this audit."
   },
   "nonVisualContentWatch": [
     {
@@ -1635,8 +1646,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "e3eb0b0083df930521d024db4503d3799d647061ae9048c8bcacdb029ca6697e",
-      "bytes": 569296
+      "sha256": "0f161d15614f566547cc85e5c398cb925c3bb461fc3b28d9a5b4c9e836094864",
+      "bytes": 568223
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1650,7 +1661,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "5d9fb20e96cd7f431ce129880f4e5a222345cf86f92f8672e39ecb1bc9b70371",
+    "sheetSetSha256": "3963065ca57fee4ce67137e368f19cbd1fbd2b1e0f4dc6537c60b8f914bca958",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2870,64 +2881,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "367d807731102e76bc8ba9f12b6e7b809c3923f1781528c3e9ce316c6559900f",
-        "bytes": 479514,
+        "sha256": "f4956ac66ca4eb8aaca8f25d9d630a0ad58393d2042f856e4c08ba30c58a8282",
+        "bytes": 411674,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "71e2cc67109d731bb9b89fc14e2d63ff0b580bcc443d1783a91f6b43a6cd6ebf",
-        "bytes": 87402,
+        "sha256": "06c8a6ff45b568ec4f40b7c1e305f6dc3caa8cc341b98283e56583ec24d6d2b0",
+        "bytes": 75365,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "aa0286d4ce904c09061e60dff9aad895b50d4ab04e99b1fad3f52e3a84617036",
-        "bytes": 60445,
+        "sha256": "5be745c048446ac2bfb1c8636ad1b4a052c4882e85865f67b1d87329fac97c34",
+        "bytes": 52091,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "a86c66476d8850ab5eb9cab6457b04e46eefb2a9af70ba52187b8ede60f43c1f",
-        "bytes": 47914,
+        "sha256": "6bc0a743690e9f495d487c629633cb1d4c9de1980fbe5117343704af6adc7f19",
+        "bytes": 41568,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "5826b0411b777e0adf2ccd1ef972eb216c7859d259a0083e8b8e836da94fb7fa",
-        "bytes": 46620,
+        "sha256": "17de6e0858c5ee956bbf4bb1e0084b09d78e8aae0991b47d8cffd96fdd5c92c5",
+        "bytes": 39884,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "83b57de59c5fdf5f14f5d047007ac85b066c39b83785281db33a4808500b99c6",
-        "bytes": 146153,
+        "sha256": "1113e01b8b4bd62e48f86f75cfbed6d44c7197f37185e1c1016c414c6ff59cd1",
+        "bytes": 125141,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "b9cf30045456a0118464ef4d35eb0a3cd629291f6a77665effbd218681303b9b",
-        "bytes": 267318,
+        "sha256": "6254321a38a01facf3a1b5ebba4877373b70d6a6060e2a025dfcc0c6d74e2fcf",
+        "bytes": 228392,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "fac5e4bc43748c13bc784cc35fec82ab61ec92c100cfc61097e0c6eef9f17add",
-        "bytes": 504420,
+        "sha256": "d0124d85e4585e3bc8c064aad6bece2f7d5093a478223797fd078d43a9d33179",
+        "bytes": 432762,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -3381,6 +3392,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "017938ae50f70349630c15ffe2466b2f8ad4acf4ecf32022fddb0c27c8d7285d"
+    "shippingCatalogSha256": "7c8c463db67845065dfd570a81ceb6d83e7bdb28c09af629bb362dd3169b1aa7"
   }
 }

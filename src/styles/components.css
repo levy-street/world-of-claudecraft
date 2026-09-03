@@ -9516,6 +9516,9 @@
     max-height: calc(var(--app-vh, 100vh) * 0.82 / var(--window-scale) - 24px);
     flex-direction: column;
   }
+  #cosmetics-window.open {
+    display: flex;
+  }
   #cosmetics-window .panel-title {
     flex: none;
     display: flex;
