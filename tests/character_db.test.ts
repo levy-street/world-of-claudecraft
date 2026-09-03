@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // db.ts builds a pg Pool and requires DATABASE_URL at import time; stub both so
@@ -1736,5 +1737,25 @@ describe('account mount skin cosmetics', () => {
     expect(sql).toMatch(/LEFT JOIN account_weapon_cosmetics/);
     // Empty ids are dropped before they reach the union.
     expect(params).toEqual([7, ['mech_bird']]);
+  });
+});
+
+// The account cosmetics persistence module is re-exported by db.ts and imports
+// `pool` back from it (a deliberate cycle). That is safe only while `pool` is
+// read inside function bodies at call time: a module-scope read would hit the
+// hoisted re-export's temporal dead zone and break boot. Pin the shape.
+describe('account_cosmetics_db.ts import cycle discipline', () => {
+  it('reads pool only inside function bodies, never at module scope', () => {
+    const source = readFileSync(
+      new URL('../server/account_cosmetics_db.ts', import.meta.url),
+      'utf8',
+    );
+    expect(source).toContain("import { pool } from './db';");
+    const moduleScopeReads = source
+      .split('\n')
+      .filter(
+        (line) => /^(export\s+)?(const|let|var)\b.*\bpool\b/.test(line) || /^pool\./.test(line),
+      );
+    expect(moduleScopeReads).toEqual([]);
   });
 });

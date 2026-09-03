@@ -475,6 +475,10 @@ export async function handleClaudiumApi(
     // authoritative grant ledger and mirror only this exact owned skin. A transient
     // store failure leaves the game mirror untouched; the next store open heals it.
     if (result.granted || result.reason === 'already_granted') {
+      // The raw store, not the filtered view: `itemId` already passed the
+      // family allowlist above and `kind` is pinned, so the only row this can
+      // match is a real skin, and both mirrors re-filter through their own
+      // registry before anything lands.
       const store = await claudiumStore(accountId);
       const ownsRequested = store.items.some(
         (item) => item.kind === kind && item.itemId === itemId && item.owned,

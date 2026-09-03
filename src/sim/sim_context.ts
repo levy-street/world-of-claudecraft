@@ -121,7 +121,10 @@ export interface SimContextPrimitives {
   // The session's account cosmetics view (offline: the Sim's own mirror; the
   // server seeds the primary session's). Writable so a sibling module can
   // grant into it (dev_commands' /dev mountskins); replaced whole, never
-  // mutated in place, so consumers can diff by identity.
+  // mutated in place, so consumers can diff by identity. On the SERVER this is
+  // one realm-wide field, never per-account state: no server-side ownership
+  // decision may read it (the session's own accountCosmetics is the authority),
+  // or a dev grant on a dev-enabled realm would become a cross-account cheat.
   accountCosmetics: AccountCosmetics;
   /** Static crafting stations owned by this Sim's authored world bundle. */
   readonly stationPlacements: readonly StationDef[];
