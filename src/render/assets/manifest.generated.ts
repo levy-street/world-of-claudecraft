@@ -1057,6 +1057,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/mushroom_glow_cluster.glb": "/media/models/props/mushroom_glow_cluster.db1980cf6d57.glb",
   "models/props/mushroom_red.glb": "/media/models/props/mushroom_red.19e8e69c9304.glb",
   "models/props/mushroom_tan.glb": "/media/models/props/mushroom_tan.b90661fb9c17.glb",
+  "models/props/nythraxis_bone_spike.glb": "/media/models/props/nythraxis_bone_spike.c4285511c3f6.glb",
   "models/props/obsidian_fang.glb": "/media/models/props/obsidian_fang.437e1e4d7467.glb",
   "models/props/ore_rocks.glb": "/media/models/props/ore_rocks.ecc1b1c488c9.glb",
   "models/props/pixie_mushroom_house.glb": "/media/models/props/pixie_mushroom_house.61a4652852b4.glb",
