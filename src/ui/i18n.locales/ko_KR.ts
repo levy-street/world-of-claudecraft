@@ -12594,7 +12594,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.farm.bedsHeading': '밭 일구기',
   'guide.profPages.farm.bedsBody':
     '순서는 짧다. 밭 곁의 농부에게서 씨앗과 퇴비를 산다. Eastbrook의 Jessica는 골짜기 두 종을, Fenbridge의 농부는 습지 두 종을, Highwatch 단구의 Hollis는 산악 작물을, Verbena는 Evergarden 화단의 작물을 갖추고 있다. 높은 단의 수확도 제 씨앗을 한두 알씩 되돌려 주고, 어떤 씨앗이든 World Market에서 오가며, 산악과 화단의 씨앗은 이제 최종 콘텐츠에서도 떨어지고 영웅 보급관의 상점에도 놓이니, 밭 곁의 농부는 유일한 입구가 아니라 첫 입구다. 가방에 괭이를 넣고 씨를 심고, 원한다면 승산을 높여라. 상점의 퇴비와 심을 때 농작물로 치르는 농부의 관리는 둘 다 작물이 무사히 자랄 확률을 올리고, 연금술사의 성장 토닉은 수확이 늘어날 기회를 주며, 숙련이 작물의 단보다 한 구간 위로 오르면 그 작물은 다시는 실패하지 않는다. 그다음은 자리를 뜨면 된다. 로그아웃 중에도 밭은 계속 자라고, 익은 작물은 놔둔 만큼 기다리며, 수확 일지(Shift+K, 또는 전문 기술 창의 농사 행)가 심어 둔 모든 밭을 타이머와 함께 보여 준다.\n\n실패한 작물은 농작물 대신 시든 껍질을 남기고, 어느 농부든 껍질을 퇴비로 바꿔 주니 나쁜 한 철이 다음 철의 보험을 사 주는 셈이다. 거둔 것은 주방을 먹여 살린다. 농작물은 주방에서 요리가 되고, Cook Marlow의 밀과 쌀 의뢰는 Vale Wheat와 Marsh Rice를 다른 모든 작업 의뢰와 같은 시계로 사들인다.',
-  'guide.profPages.farm.bedsBodyThirdCraft':
+  'guide.profPages.farm.bedsBodyScribeBuyer':
     '필경대도 밭에서 사 가니, 필경사의 50 단 태양꽃잎 두루마리는 Highwatch 단구에서 나는 서리 박 하나를 쓰는데, 뱀의 비약이 쓰는 바로 그 박이라 그 강화 효과로 가는 두 길의 값을 나란히 맞춰 준다.',
   'guide.profPages.fish.startHeading': '시작하기',
   'guide.profPages.fish.koiHeading': '윤슬 코이',

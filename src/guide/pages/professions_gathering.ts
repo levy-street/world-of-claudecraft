@@ -334,7 +334,7 @@ function farmingSection(): string {
   return `<section class="guide-block" id="prof-farm-beds">
       <h2>${esc(t('guide.profPages.farm.bedsHeading'))}</h2>
       ${paras('guide.profPages.farm.bedsBody')}
-      ${paras('guide.profPages.farm.bedsBodyThirdCraft')}
+      ${paras('guide.profPages.farm.bedsBodyScribeBuyer')}
     </section>
     <section class="guide-block" id="prof-farm-table">
       <h2>${esc(t('guide.profPages.farm.tableHeading'))}</h2>

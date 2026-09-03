@@ -165,7 +165,7 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   inscription materials fills name the gourd, the serpent elixir and the parity in their
   own locale' in tests/guide.test.ts.
 - **One NEW sibling paragraph whose 15 Latin rows the registry carries as pending:**
-  `guide.profPages.farm.bedsBodyThirdCraft` (the D171 review round, frontend-seam-reviewer):
+  `guide.profPages.farm.bedsBodyScribeBuyer` (the D171 review round, frontend-seam-reviewer):
   the farm page's beds prose names two crafts that buy produce (cooking through the kitchens
   and Marlow's ladder, alchemy through the elixirs) and the parity repair made the scribe a
   buyer too; the shipped `guide.profPages.farm.bedsBody` and its reviewed fills stay untouched

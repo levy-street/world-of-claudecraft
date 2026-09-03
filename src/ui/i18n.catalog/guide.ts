@@ -3146,7 +3146,7 @@ export const guideStrings = {
       // from the live tables. It names the scribe and no ordinal: the hoe
       // ladder (engineering) takes fine produce as a tool reagent too, so 'a
       // third craft' would have been a count the page never defines.
-      bedsBodyThirdCraft:
+      bedsBodyScribeBuyer:
         "The scribe's desk buys from the beds too: the rung-50 Sunpetal Scroll takes a Frost Gourd off the Highwatch terraces, the same gourd the Elixir of the Serpent takes, which prices the two routes to that buff even.",
       // The table half of the loop, the later phases' shipments (the
       // golden-harvest celebration, the well-fed dishes, the shared feast),

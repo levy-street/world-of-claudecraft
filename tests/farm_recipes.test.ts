@@ -140,7 +140,8 @@ const BASE_PRODUCE = Object.values(FARM_CROPS).map((c) => c.produceItemId);
 // The economy rule, re-derived here rather than imported, on purpose: this
 // suite must red on a REAGENT retune (a produce price moving) as well as on a
 // recipe edit, and it must not silently inherit a future relaxation of the
-// shared helper in tests/recipe_economy.test.ts.
+// shared helper in tests/helpers/reagent_unit_value.ts (which names this suite
+// as one of its two deliberate exceptions).
 function reagentUnitValue(itemId: string): number {
   const def = ITEMS[itemId];
   if (!def) throw new Error(`farm dish reagent ${itemId} has no ItemDef`);

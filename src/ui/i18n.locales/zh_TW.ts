@@ -12049,7 +12049,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.profPages.farm.bedsHeading': '打理田畦',
   'guide.profPages.farm.bedsBody':
     '流程很短。向田畦旁的農夫購買種子和堆肥：Eastbrook的Jessica備有谷地的兩種，Fenbridge的農夫備有沼澤的兩種，Highwatch梯田的Hollis備有山地作物，Verbena備有Evergarden花圃的作物。高階收成還會返還一兩粒自己的種子，任何種子也都在World Market上流轉，而山地與花圃的種子如今還會從終局內容中掉落，也在英雄軍需官的櫃檯上出售，所以田畦旁的農夫是入門的途徑，而不是唯一的途徑。行囊裡帶著鋤頭播種，願意的話再壓一壓勝算：櫃檯的堆肥和播種時用農產品支付的農夫看護都會提高作物成活的機率，鍊金術士的生長滋補劑讓收成有機會更豐，而一旦你的熟練比作物所在階高出整整一檔，那種作物就再也不會失敗。然後走開就好。你下線時田畦照樣生長，成熟的作物你放多久它等多久，收成日誌（Shift+K，或專業視窗的耕作一行）列出你種下的每一畦及其計時。\n\n失敗的作物留下枯萎的穀殼而非農產品，任何農夫都會用穀殼換堆肥，於是壞年景買下了下一季的保險。收上來的東西供養廚房：農產品在廚房烹成菜餚，Cook Marlow的小麥和稻米工單按與其他任何工單相同的鐘點，用銅幣收走你的Vale Wheat和Marsh Rice。',
-  'guide.profPages.farm.bedsBodyThirdCraft':
+  'guide.profPages.farm.bedsBodyScribeBuyer':
     '銘文師的書案也向田畦採買：50檔的陽瓣卷軸要取一顆來自Highwatch梯田的霜瓜，正是巨蛇藥劑也要用的同一顆瓜，於是通往那個增益的兩條路造價持平。',
   'guide.profPages.fish.startHeading': '入門',
   'guide.profPages.fish.koiHeading': '日輝錦鯉',

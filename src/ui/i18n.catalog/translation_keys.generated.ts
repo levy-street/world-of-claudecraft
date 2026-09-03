@@ -6715,7 +6715,7 @@ export type TranslationKeyFlat =
   | 'guide.profPages.faq.q9'
   | 'guide.profPages.faq.title'
   | 'guide.profPages.farm.bedsBody'
-  | 'guide.profPages.farm.bedsBodyThirdCraft'
+  | 'guide.profPages.farm.bedsBodyScribeBuyer'
   | 'guide.profPages.farm.bedsHeading'
   | 'guide.profPages.farm.tableBody'
   | 'guide.profPages.farm.tableBodyOneMeal'
