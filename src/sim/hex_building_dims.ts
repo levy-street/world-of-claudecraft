@@ -12,7 +12,7 @@
 // does not occupy while also clipping into it along the axes.
 //
 // The three colourways (hex_ green, hexr_ red, hexb_ blue) are the same meshes,
-// so one table serves Dawnhold, the Last Keep and the Ashen Bulwark. Values are
+// so one table serves Dawnhold and the Last Keep. Values are
 // the model's own bounding footprint at scale 1, measured off the shipped GLBs.
 // Pure leaf: no rng, no SimContext, no imports.
 

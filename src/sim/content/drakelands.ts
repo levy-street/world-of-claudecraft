@@ -6,7 +6,6 @@
 // pass (southPassX). Terrain shape: the EMBER_* tables in world.ts (coast
 // lobes, the desert gradient, volcano cones).
 
-import { BULWARK_BUILDINGS } from '../bulwark_layout';
 import type {
   CampDef,
   GroundObjectDef,
@@ -1010,9 +1009,6 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   // palisade, road-camp tents, and hub campfire are all out, with the
   // NPCs, spawn, quests, and functional graveyard holding the ground.
   // The Last Keep's bailey furnishings went the same way with its castle.
-  // The Ashen Bulwark's yard buildings are not part of either site and
-  // stay authored in bulwark_layout.ts.
-  decorProps: [...BULWARK_BUILDINGS],
   // Scout Yerrin's far-dune camp is hers, not Wyrmwatch's: it stays.
   tents: [
     { x: 497, z: 2097, rot: -2.2, scale: 1 }, // Scout Yerrin's ridge camp above the wargate

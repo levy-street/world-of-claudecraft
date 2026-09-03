@@ -8,7 +8,6 @@
 // and on any slope one edge lifts clear of the dirt and the whole plant
 // reads as floating. Pure leaf: deterministic, memoized, no SimContext.
 
-import { bulwarkClear } from './bulwark_layout';
 import {
   EMBER_FLAT_POOLS,
   EMBER_LAVA_LINKS,
@@ -49,7 +48,6 @@ export function emberScatterClear(x: number, z: number): boolean {
   if (Math.hypot(x - WYRMWATCH_CHURCHYARD.x, z - WYRMWATCH_CHURCHYARD.z) < WYRMWATCH_CHURCHYARD.r)
     return false;
   if (!keepSiteClear(x, z)) return false; // the Last Keep's build site
-  if (!bulwarkClear(x, z)) return false; // the Ashen Bulwark's headland pad
   for (const pool of EMBER_LAVA_POOLS) {
     if (Math.hypot(x - pool.x, z - pool.z) < pool.r * 1.5 + 6) return false;
   }

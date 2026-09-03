@@ -1,6 +1,5 @@
 import { bgFieldHeightLocal } from './battleground_field';
 import { BORDER_EDGES } from './border_edges';
-import { bulwarkPadTarget, bulwarkPadWeight } from './bulwark_layout';
 import { EMBER_BAYS, EMBER_LAND_LOBES, forgefatherScatterExcluded } from './content/ember_coast';
 import { STABLE_FLAT, STABLE_PADDOCK } from './content/mounts';
 import { PALMREACH_PROPS } from './content/palmreach';
@@ -2547,14 +2546,6 @@ function applyKeepSitePad(x: number, z: number, h: number): number {
   return h + (KEEP_SITE.pad.h - h) * w;
 }
 
-// The Ashen Bulwark's graded grounds on the Drakelands west headland (the
-// castle pad idiom at barracks scale; the plan lives in bulwark_layout.ts).
-function applyBulwarkPad(x: number, z: number, h: number): number {
-  const w = bulwarkPadWeight(x, z);
-  if (w <= 0) return h;
-  return h + (bulwarkPadTarget() - h) * w;
-}
-
 // (The Last Spring's authored shore bank retired with the castle pad: the
 // steep face it graded was the hollow the pad's own pool yield opened, and
 // the natural apron the pool keeps without a pad behind it never had one.
@@ -3945,7 +3936,6 @@ function applyTerrainPads(x: number, z: number, seed: number, h0: number): numbe
   // Dawnhold Castle's garden pad, same late application.
   h = applyDawnholdPad(x, z, h);
   // the Drakelands' headland barracks, graded the same way
-  h = applyBulwarkPad(x, z, h);
   // Level pads under the Evergarden's modeled flower beds, applied over the
   // FINISHED height (the garden seam reshapes the lawn per position, so an
   // early flatten would drift apart again): each bed ensemble sits flush on
@@ -5026,9 +5016,6 @@ function decorationAt(seed: number, gx: number, gz: number): Decoration | null {
     // do the Forgefather fortress's courts and stair flights
     if (keepSitePadWeight(gx, gz) > 0) return null;
     if (forgefatherScatterExcluded(gx, gz)) return null;
-    // ...nor the Ashen Bulwark's headland pad (a boulder in the drill yard
-    // is also a stray collider standing in the muster lane)
-    if (bulwarkPadWeight(gx, gz) > 0) return null;
     for (const pool of EMBER_FLAT_POOLS) {
       if (Math.hypot(gx - pool.x, gz - pool.z) < pool.r * 1.6 + 4) return null;
     }
