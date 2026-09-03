@@ -391,8 +391,10 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   `tests/render_budget.test.ts` pins the governor integration: one rung per over-budget step
   in the pinned order, the chain held until every density bucket is floored (except under
   severe frame pressure), restored after the density buckets and before render scale, the
-  grade-only tiers held at 1 under the same pressure, the own-chain floor, the `?postshed=off`
-  kill switch and the `?postshed=` pin with the governor on or off.
+  grade-only tiers held at 1 under the same pressure, the ladder walking only the rungs the
+  session's OWN chain carries (a chain with only AO steps 1 to 0 in one step, spending no
+  cooldown on a dead rung; a governor handed no chain holds 1 until the built pipeline hands
+  it one), the `?postshed=off` kill switch and the `?postshed=` pin with the governor on or off.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed

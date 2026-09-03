@@ -728,10 +728,10 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     },
     // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
     // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
-    // band floor is the tier's; the governor also floors the level at the
-    // deepest rung the session's OWN chain carries (RenderBudgetGovernorOptions
-    // .postShed), so an Advanced mix with bloom or AO dialed off never walks
-    // a rung that can change nothing.
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
     post: {
       min: 0,
       baseline: 1.0,
@@ -840,10 +840,10 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     },
     // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
     // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
-    // band floor is the tier's; the governor also floors the level at the
-    // deepest rung the session's OWN chain carries (RenderBudgetGovernorOptions
-    // .postShed), so an Advanced mix with bloom or AO dialed off never walks
-    // a rung that can change nothing.
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
     post: {
       min: 0,
       baseline: 1.0,
@@ -956,10 +956,10 @@ export const GFX_BUCKET_BANDS: Record<GfxTier, GfxBucketBands> = {
     },
     // Post shed (post_shed_core.ts): the composer chain's four rungs (SMAA to
     // the fused FXAA grade, bloom tail mips, bloom off, AO passthrough). The
-    // band floor is the tier's; the governor also floors the level at the
-    // deepest rung the session's OWN chain carries (RenderBudgetGovernorOptions
-    // .postShed), so an Advanced mix with bloom or AO dialed off never walks
-    // a rung that can change nothing.
+    // band floor is the tier's; the governor ladders only over the rungs the
+    // session's OWN built chain carries (RenderBudgetGovernor.setPostShedChain,
+    // fed from PostPipeline.shedChain), so an Advanced mix with bloom or AO
+    // dialed off never walks a rung that can change nothing.
     post: {
       min: 0,
       baseline: 1.0,

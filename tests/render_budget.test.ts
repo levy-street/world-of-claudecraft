@@ -677,6 +677,35 @@ describe('render budget governor: the post shed level', () => {
     expect(state.levels.post).toBe(1);
   });
 
+  it('a chain carrying only AO ladders 1 to 0 in ONE step: no cooldown is spent on a dead rung', () => {
+    const governor = governorFor('ultra', { postShed: { smaa: false, bloom: false, ao: true } });
+    const seen: number[] = [governor.state().levels.post];
+    let state = governor.state();
+    for (let i = 0; i < 60; i++) {
+      state = governor.update(heavy());
+      if (seen[seen.length - 1] !== state.levels.post) seen.push(state.levels.post);
+    }
+    expect(seen).toEqual([1, 0]);
+    for (let i = 0; i < 400; i++) state = governor.update(calm());
+    expect(state.levels.post).toBe(1);
+  });
+
+  it('a governor handed no chain at all holds 1: the shed is admitted only by the built pipeline', () => {
+    const governor = new RenderBudgetGovernor({
+      tier: 'ultra',
+      budget: GFX_BUDGETS.ultra,
+      enabled: true,
+    });
+    governor.reset(1, 0.65, 1);
+    let state = governor.update(sample({ dt: 1 }));
+    for (let i = 0; i < 100; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(1);
+    // The renderer hands the chain over once the composer exists.
+    governor.setPostShedChain({ smaa: true, bloom: true, ao: true });
+    for (let i = 0; i < 60; i++) state = governor.update(heavy());
+    expect(state.levels.post).toBe(0);
+  });
+
   it('the ?postshed=off kill switch (a null chain) pins the level at 1 on every tier', () => {
     for (const tier of ['high', 'ultra', 'insane'] as const) {
       const governor = governorFor(tier, { postShed: null });

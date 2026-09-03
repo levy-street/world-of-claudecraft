@@ -61,9 +61,9 @@ export class PostShed {
     this.plan = postShedPlan(chain, 1);
   }
 
-  /** The deepest rung applied, `full` at level 1. */
+  /** The deepest rung applied that changes this chain, `full` at level 1. */
   rung(): PostShedRung | 'full' {
-    return postShedRungLabel(this.level);
+    return postShedRungLabel(this.level, this.chain);
   }
 
   currentLevel(): number {
@@ -88,13 +88,17 @@ export class PostShed {
     ) {
       return false;
     }
+    // Each write is gated on the CHAIN, not only on the pass being present:
+    // a pass the chain disowns (the `?postshed=off` kill switch builds every
+    // pass and declares none) is never touched, whatever the plan says.
     const { smaa, grade, gradeFxaa, bloom, ao } = this.passes;
-    if (smaa) smaa.enabled = next.smaa;
-    if (gradeFxaa) {
+    const chain = this.chain;
+    if (smaa && chain.smaa) smaa.enabled = next.smaa;
+    if (gradeFxaa && chain.smaa) {
       grade.enabled = !next.gradeFxaa;
       gradeFxaa.enabled = next.gradeFxaa;
     }
-    if (bloom) {
+    if (bloom && chain.bloom) {
       bloom.enabled = next.bloom;
       bloom.activeMips = next.bloomMips;
       if (!next.bloom && previous.bloom) this.clearBloomComposite(bloom);
@@ -102,7 +106,7 @@ export class PostShed {
         this.clearBloomTailMips(bloom, next.bloomMips);
       }
     }
-    if (ao) {
+    if (ao && chain.ao) {
       ao.occlusionPassthrough = !next.ao;
       if (!next.ao && previous.ao) this.clearOcclusionWhite(ao);
     }
@@ -113,12 +117,12 @@ export class PostShed {
    *  clears the current plan relies on are run again. */
   reclear(): void {
     const { bloom, ao } = this.passes;
-    if (bloom) {
+    if (bloom && this.chain.bloom) {
       if (!this.plan.bloom) this.clearBloomComposite(bloom);
       else if (this.plan.bloomMips < bloom.nMips)
         this.clearBloomTailMips(bloom, this.plan.bloomMips);
     }
-    if (ao && !this.plan.ao) this.clearOcclusionWhite(ao);
+    if (ao && this.chain.ao && !this.plan.ao) this.clearOcclusionWhite(ao);
   }
 
   /**

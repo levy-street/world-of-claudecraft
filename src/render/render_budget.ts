@@ -1,5 +1,10 @@
 import { GFX_BUCKET_BANDS, type GfxBucketBands, type GfxRuntimeBudget, type GfxTier } from './gfx';
-import { POST_SHED_STEP, type PostShedChain, postShedFloor } from './post_shed_core';
+import {
+  type PostShedChain,
+  postShedFloor,
+  postShedStepDown,
+  postShedStepUp,
+} from './post_shed_core';
 
 export type RenderBudgetMode = 'disabled' | 'stable' | 'degrading' | 'recovering';
 export type RenderBudgetReason =
@@ -78,11 +83,13 @@ export interface RenderBudgetGovernorOptions {
   tier: GfxTier;
   budget: GfxRuntimeBudget;
   enabled: boolean;
-  /** Which sheddable post passes the session built (the static `GFX`
-   *  smaa/bloom/ao flags): floors the `post` level at the deepest rung that
-   *  can change something, beside the tier band's own floor. `null` (the
-   *  `?postshed=off` kill switch) pins the level at 1; absent, the band
-   *  alone decides. */
+  /** Which sheddable post passes the session built (`PostPipeline.shedChain`,
+   *  the plan's own static answer, so `?smaa=off`, `?n8ao=off` and the
+   *  grade-only mixes agree with the painter): the level ladders over
+   *  exactly the rungs that change this chain, floored beside the tier band.
+   *  Absent or `null` (no composer, the `?postshed=off` kill switch), the
+   *  level holds 1. The renderer builds the composer after the governor, so
+   *  it hands the chain over through `setPostShedChain`. */
   postShed?: Readonly<PostShedChain> | null;
   /** The `?postshed=<0..1>` dev pin (render_dev_flags.ts): holds the `post`
    *  level exactly here, with or without an enabled governor, and keeps the
@@ -275,7 +282,7 @@ export class RenderBudgetGovernor {
     resolution: 1,
     post: 1,
   };
-  private readonly postFloor: number;
+  private postShedChain: Readonly<PostShedChain> | null;
   private readonly pinnedPostLevel: number | null;
 
   constructor(options: RenderBudgetGovernorOptions) {
@@ -284,13 +291,24 @@ export class RenderBudgetGovernor {
     this.enabled = options.enabled;
     this.caps = CAPS_BY_TIER[options.tier];
     this.bands = GFX_BUCKET_BANDS[options.tier];
-    this.postFloor =
-      options.postShed === undefined
-        ? this.bands.post.min
-        : Math.max(this.bands.post.min, postShedFloor(options.postShed));
+    this.postShedChain = this.governablePostShedChain(options.postShed ?? null);
     this.pinnedPostLevel = options.pinnedPostLevel ?? null;
     this.mode = options.enabled ? 'stable' : 'disabled';
     this.reason = options.enabled ? 'startup' : 'disabled';
+  }
+
+  /** The composer is built after the governor: hand it the chain the
+   *  pipeline actually built. A chain the tier band does not admit (the
+   *  grade-only tiers) or that carries no sheddable pass holds the level at 1. */
+  setPostShedChain(chain: Readonly<PostShedChain> | null): void {
+    this.postShedChain = this.governablePostShedChain(chain);
+  }
+
+  private governablePostShedChain(
+    chain: Readonly<PostShedChain> | null,
+  ): Readonly<PostShedChain> | null {
+    if (!chain || !this.bands.post.governable) return null;
+    return postShedFloor(chain) < this.bands.post.min ? null : chain;
   }
 
   reset(renderScale: number, minRenderScale: number, maxRenderScale: number): RenderBudgetState {
@@ -305,6 +323,9 @@ export class RenderBudgetGovernor {
           post: this.bands.post.baseline,
         }
       : { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: round2(scale), post: 1 };
+    // The dev pin is the one write that ignores the ladder; both ladder arms
+    // are gated on it, so asserting it here holds it for the session.
+    if (this.pinnedPostLevel != null) this.levels.post = this.pinnedPostLevel;
     this.frameMsEma = 16.7;
     this.submitMsEma = 0;
     this.externalFrameCap = false;
@@ -321,9 +342,6 @@ export class RenderBudgetGovernor {
   }
 
   state(out?: RenderBudgetState): RenderBudgetState {
-    // The dev pin is the one write that ignores the ladder, so it is
-    // asserted on every readout rather than at each return of update().
-    if (this.pinnedPostLevel != null) this.levels.post = this.pinnedPostLevel;
     const state =
       out ??
       ({
@@ -558,6 +576,21 @@ export class RenderBudgetGovernor {
     return this.state(out);
   }
 
+  /** One rung of the post ladder in either direction, over the rungs the
+   *  session's chain actually carries (post_shed_core.ts postShedLadder), so
+   *  a step never arms a cooldown for a pass that was never built. */
+  private stepPostShed(direction: -1 | 1): boolean {
+    const chain = this.postShedChain;
+    if (!chain) return false;
+    const next =
+      direction < 0
+        ? postShedStepDown(chain, this.levels.post)
+        : Math.min(this.bands.post.baseline, postShedStepUp(chain, this.levels.post));
+    if (Math.abs(next - this.levels.post) < 0.001) return false;
+    this.levels.post = round2(next);
+    return true;
+  }
+
   private reduceLevel(key: keyof RenderBudgetLevels, floor: number, step: number): boolean {
     if (this.levels[key] <= floor + 0.001) return false;
     this.levels[key] = Math.max(floor, round2(this.levels[key] - step));
@@ -629,13 +662,7 @@ export class RenderBudgetGovernor {
     // lights before it loses its edge AA, its bloom and its occlusion.
     const vfxDone = this.levels.vfx <= this.caps.minVfxLevel + 0.001;
     const lastResort = severeFramePressure || (environmentFloored && lightingDone && vfxDone);
-    if (
-      lastResort &&
-      this.pinnedPostLevel == null &&
-      this.reduceLevel('post', this.postFloor, POST_SHED_STEP)
-    ) {
-      changed = true;
-    }
+    if (lastResort && this.pinnedPostLevel == null && this.stepPostShed(-1)) changed = true;
 
     const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
     if (lastResort && this.reduceLevel('resolution', minRenderScale, resolutionStep)) {
@@ -655,12 +682,7 @@ export class RenderBudgetGovernor {
     // Shed last, so restored after the density buckets and before render
     // scale: each rung back is a whole pass returning, so it waits for the
     // cheaper restores to prove their headroom first.
-    if (
-      this.pinnedPostLevel == null &&
-      this.raiseLevel('post', this.bands.post.baseline, POST_SHED_STEP)
-    ) {
-      return true;
-    }
+    if (this.pinnedPostLevel == null && this.stepPostShed(1)) return true;
     if (this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) return true;
     if (!allowAboveBaseline) return false;
     if (this.raiseLevel('foliage', this.bands.foliage.max, 0.08)) return true;

@@ -58,6 +58,10 @@ export const POST_SHED_STEP = 0.25;
  *  work) more than fill rate. */
 export const POST_SHED_BLOOM_MIPS = 3;
 
+/** UnrealBloom's own mip count, the `bloomMips` of an unshed plan. The
+ *  painter pins the live pass's `nMips` to it (tests/post_shed.test.ts). */
+export const POST_SHED_BLOOM_MIPS_FULL = 5;
+
 /** Which post passes the built chain carries: the static inputs of the
  *  floor. Structural, so the governor can hand it `GFX` directly. */
 export interface PostShedChain {
@@ -95,10 +99,49 @@ export function postShedRungsApplied(level: number): readonly PostShedRung[] {
   return POST_SHED_RUNGS.slice(0, postShedRungCount(level));
 }
 
-/** The deepest rung a level applies, or `full` for the tier's whole chain. */
-export function postShedRungLabel(level: number): PostShedRung | 'full' {
-  const count = postShedRungCount(level);
-  return count === 0 ? 'full' : POST_SHED_RUNGS[count - 1];
+/** The deepest rung a level applies, or `full` for the tier's whole chain.
+ *  With a chain, the deepest rung that actually CHANGES that chain (a rung
+ *  whose pass was never built is not reported), so a readout never names a
+ *  pass the session does not have. */
+export function postShedRungLabel(level: number, chain?: PostShedChain): PostShedRung | 'full' {
+  for (let i = postShedRungCount(level); i > 0; i--) {
+    const rung = POST_SHED_RUNGS[i - 1];
+    if (!chain || postShedRungApplies(rung, chain)) return rung;
+  }
+  return 'full';
+}
+
+/**
+ * The levels the governor may stand on for a chain, descending from 1: one
+ * entry per rung that changes something. A rung whose pass the chain lacks
+ * is not a level (stepping onto it would arm a cooldown and shed nothing),
+ * so a chain carrying only AO ladders 1 -> 0 in one step.
+ */
+export function postShedLadder(chain: PostShedChain | null): readonly number[] {
+  const ladder = [1];
+  if (!chain) return ladder;
+  for (let i = 0; i < POST_SHED_RUNGS.length; i++) {
+    if (postShedRungApplies(POST_SHED_RUNGS[i], chain)) {
+      ladder.push(Math.round((1 - (i + 1) * POST_SHED_STEP) * 100) / 100);
+    }
+  }
+  return ladder;
+}
+
+/** The next ladder level below `level`, or `level` itself at the floor. */
+export function postShedStepDown(chain: PostShedChain | null, level: number): number {
+  const ladder = postShedLadder(chain);
+  for (const entry of ladder) if (entry < level - 0.001) return entry;
+  return level;
+}
+
+/** The next ladder level above `level`, or `level` itself at 1. */
+export function postShedStepUp(chain: PostShedChain | null, level: number): number {
+  const ladder = postShedLadder(chain);
+  for (let i = ladder.length - 1; i >= 0; i--) {
+    if (ladder[i] > level + 0.001) return ladder[i];
+  }
+  return level;
 }
 
 /** Whether the chain carries the pass a rung sheds. A rung whose pass is
@@ -149,7 +192,7 @@ export function postShedPlan(chain: PostShedChain, level: number): PostShedPlan 
     smaa: chain.smaa && rungs < 1,
     gradeFxaa: chain.smaa && rungs >= 1,
     bloom,
-    bloomMips: bloom && rungs >= 2 ? POST_SHED_BLOOM_MIPS : 5,
+    bloomMips: bloom && rungs >= 2 ? POST_SHED_BLOOM_MIPS : POST_SHED_BLOOM_MIPS_FULL,
     ao: chain.ao && rungs < 4,
   };
 }

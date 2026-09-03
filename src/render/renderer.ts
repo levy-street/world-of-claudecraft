@@ -589,7 +589,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode, postShedLevelPin, renderLayerDisabled } from './render_dev_flags';
+import { gpuPrepMode, postShedLevelPin } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -2084,7 +2084,6 @@ export class Renderer {
       tier: GFX.tier,
       budget: GFX.budget,
       enabled: GFX.autoGovernor,
-      postShed: renderLayerDisabled('postshed') ? null : GFX,
       pinnedPostLevel: postShedLevelPin(),
     });
     this.renderBudgetState = this.renderBudgetGovernor.reset(
@@ -3136,6 +3135,7 @@ export class Renderer {
         this.viewport.height,
         { gradeOnly: !GFX.composer },
       );
+    this.renderBudgetGovernor.setPostShedChain(this.post?.shedChain ?? null);
 
     bd('weather-post');
     window.addEventListener('resize', this.onViewportResize);

@@ -17,20 +17,30 @@ const bloomSource = read('src', 'render', 'post_bloom.ts');
 const shedSource = read('src', 'render', 'post_shed.ts');
 const budgetSource = read('src', 'render', 'render_budget.ts');
 
+// The method's own body: from its signature to the first line that closes a
+// two-space-indented member, so a pin cannot pass or fail on a neighbour.
 function methodBody(source: string, search: string): string {
   const start = source.indexOf(search);
   expect(start, `should still define ${search}`).toBeGreaterThan(-1);
-  return source.slice(start, start + 4000);
+  const end = source.indexOf('\n  }\n', start);
+  expect(end, `should still close ${search}`).toBeGreaterThan(start);
+  return source.slice(start, end + 4);
 }
 
 const stripComments = (source: string) =>
   source.replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
 
 describe('post shed renderer wiring', () => {
-  it('hands the governor the static chain, the kill switch and the dev pin', () => {
+  it('hands the governor the dev pin, and the chain the pipeline ACTUALLY built', () => {
     expect(rendererSource).toMatch(
-      /new RenderBudgetGovernor\(\{[^}]*postShed: renderLayerDisabled\('postshed'\) \? null : GFX,[^}]*pinnedPostLevel: postShedLevelPin\(\),[^}]*\}\)/,
+      /new RenderBudgetGovernor\(\{[^}]*pinnedPostLevel: postShedLevelPin\(\),[^}]*\}\)/,
     );
+    // One source of truth: the plan's chain (which honours gradeOnly,
+    // ?smaa=off, ?n8ao=off and ?postshed=off), never GFX read a second time.
+    expect(rendererSource).toContain(
+      'this.renderBudgetGovernor.setPostShedChain(this.post?.shedChain ?? null);',
+    );
+    expect(rendererSource).not.toMatch(/postShed: (GFX|renderLayerDisabled)/);
   });
 
   it('applies the level through the pipeline in the one budget-application path', () => {
@@ -130,10 +140,17 @@ describe('post shed fairness and scheduler guards', () => {
     }
   });
 
-  it('the governor steps the level with its own ladder machinery, never a timer of its own', () => {
+  it('the governor steps the level inside degrade/recover over the chain ladder, never a timer of its own', () => {
     const code = stripComments(budgetSource);
-    expect(code).toContain("this.reduceLevel('post', this.postFloor, POST_SHED_STEP)");
-    expect(code).toContain("this.raiseLevel('post', this.bands.post.baseline, POST_SHED_STEP)");
-    expect(code).not.toMatch(/post(Shed)?(Enter|Exit|Dwell|Calm|Over)Seconds/);
+    const degrade = methodBody(code, 'private degrade(');
+    const recover = methodBody(code, 'private recover(');
+    expect(degrade).toContain('this.stepPostShed(-1)');
+    expect(recover).toContain('this.stepPostShed(1)');
+    const step = methodBody(code, 'private stepPostShed(');
+    expect(step).toContain('postShedStepDown(chain, this.levels.post)');
+    expect(step).toContain('postShedStepUp(chain, this.levels.post)');
+    // No clock of its own: the only time inputs in the file are the sample's dt
+    // the existing ladder already consumes.
+    expect(code).not.toMatch(/performance\.now|Date\.now|setTimeout/);
   });
 });

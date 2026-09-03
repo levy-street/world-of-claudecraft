@@ -7,11 +7,14 @@ import {
   POST_SHED_STEP,
   postShedFloor,
   postShedGovernable,
+  postShedLadder,
   postShedPlan,
   postShedRungApplies,
   postShedRungCount,
   postShedRungLabel,
   postShedRungsApplied,
+  postShedStepDown,
+  postShedStepUp,
 } from '../src/render/post_shed_core';
 
 const FULL_CHAIN = { smaa: true, bloom: true, ao: true } as const;
@@ -66,6 +69,41 @@ describe('post shed core: the static floor is a pure function of the chain', () 
     // AO alone still walks to the last rung.
     expect(postShedFloor({ smaa: false, bloom: false, ao: true })).toBe(0);
     expect(postShedFloor({ smaa: true, bloom: true, ao: false })).toBe(0.25);
+  });
+
+  it('ladders only over the rungs that change the chain, so a partial chain skips its dead rungs', () => {
+    expect(postShedLadder(FULL_CHAIN)).toEqual([1, 0.75, 0.5, 0.25, 0]);
+    expect(postShedLadder({ smaa: false, bloom: false, ao: true })).toEqual([1, 0]);
+    expect(postShedLadder({ smaa: true, bloom: false, ao: true })).toEqual([1, 0.75, 0]);
+    expect(postShedLadder({ smaa: false, bloom: true, ao: false })).toEqual([1, 0.5, 0.25]);
+    expect(postShedLadder({ smaa: false, bloom: false, ao: false })).toEqual([1]);
+    expect(postShedLadder(null)).toEqual([1]);
+  });
+
+  it('steps down and up along that ladder and holds at its ends', () => {
+    const aoOnly = { smaa: false, bloom: false, ao: true };
+    expect(postShedStepDown(aoOnly, 1)).toBe(0);
+    expect(postShedStepDown(aoOnly, 0)).toBe(0);
+    expect(postShedStepUp(aoOnly, 0)).toBe(1);
+    expect(postShedStepUp(aoOnly, 1)).toBe(1);
+    const smaaAo = { smaa: true, bloom: false, ao: true };
+    expect(postShedStepDown(smaaAo, 1)).toBe(0.75);
+    expect(postShedStepDown(smaaAo, 0.75)).toBe(0);
+    expect(postShedStepUp(smaaAo, 0)).toBe(0.75);
+    expect(postShedStepUp(smaaAo, 0.75)).toBe(1);
+    expect(postShedStepDown(FULL_CHAIN, 0.5)).toBe(0.25);
+    expect(postShedStepUp(FULL_CHAIN, 0.5)).toBe(0.75);
+    expect(postShedStepDown(null, 1)).toBe(1);
+    expect(postShedStepDown({ smaa: false, bloom: false, ao: false }, 1)).toBe(1);
+  });
+
+  it('labels a level by the deepest rung that changes the chain, so a readout never names a missing pass', () => {
+    const aoOnly = { smaa: false, bloom: false, ao: true };
+    expect(postShedRungLabel(0.75, aoOnly)).toBe('full');
+    expect(postShedRungLabel(0.25, aoOnly)).toBe('full');
+    expect(postShedRungLabel(0, aoOnly)).toBe('ao-off');
+    expect(postShedRungLabel(0.25, { smaa: true, bloom: false, ao: true })).toBe('smaa-to-fxaa');
+    expect(postShedRungLabel(0, { smaa: false, bloom: false, ao: false })).toBe('full');
   });
 
   it('maps each rung to exactly the pass it sheds', () => {

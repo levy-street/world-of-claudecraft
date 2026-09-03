@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { PostShed } from '../src/render/post_shed';
+import { POST_SHED_BLOOM_MIPS_FULL } from '../src/render/post_shed_core';
 
 // The live chain is built through buildComposer under the same mocks
 // tests/post_pipeline.test.ts uses (real three passes and targets, no GL);
@@ -114,6 +115,8 @@ describe('post shed painter over the live chain', () => {
     expect(grade.enabled).toBe(true);
     expect(gradeFxaa.enabled).toBe(false);
     expect(bloom.activeMips).toBe(5);
+    // The core plans the full mip count as a literal; the live pass agrees.
+    expect(bloom.nMips).toBe(POST_SHED_BLOOM_MIPS_FULL);
     expect(ao.occlusionPassthrough).toBe(false);
     expect(clears).toEqual([]);
     expect(post.shedRung()).toBe('full');
@@ -247,8 +250,35 @@ describe('post shed painter over the live chain', () => {
     post.setShedLevel(0.75);
     expect(flags()).toEqual([true, true, true, true]);
     expect(clears).toEqual([]);
+    // The readout names no pass the chain never built.
+    expect(post.shedRung()).toBe('full');
     post.setShedLevel(0.5);
     expect(clears).toHaveLength(2);
+    expect(post.shedRung()).toBe('bloom-mips');
+  });
+
+  it('never touches a pass its chain disowns, even when handed one', () => {
+    const passes = {
+      smaa: { enabled: true },
+      grade: { enabled: true },
+      gradeFxaa: { enabled: false },
+      bloom: { enabled: true, activeMips: 5, nMips: 5 },
+      ao: { occlusionPassthrough: false },
+    };
+    const clears: RecordedClear[] = [];
+    const shed = new PostShed(
+      rendererStub(clears),
+      passes as unknown as ConstructorParameters<typeof PostShed>[1],
+      { smaa: true, bloom: false, ao: false },
+    );
+    shed.apply(0);
+    expect(passes.smaa.enabled).toBe(false);
+    expect(passes.gradeFxaa.enabled).toBe(true);
+    expect(passes.bloom).toEqual({ enabled: true, activeMips: 5, nMips: 5 });
+    expect(passes.ao.occlusionPassthrough).toBe(false);
+    expect(clears).toEqual([]);
+    shed.reclear();
+    expect(clears).toEqual([]);
   });
 
   it('the ?postshed=off kill switch builds no twin and reports an empty chain', async () => {
