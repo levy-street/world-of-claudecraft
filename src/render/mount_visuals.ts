@@ -427,9 +427,11 @@ export function mountVisualSpecFor(
   mountKey: string,
   mountSkinId: string | null | undefined,
 ): MountVisualSpec | null {
-  if (!mountKey) return null;
+  // Only a catalog mount can be skinned: an unknown or empty key is not a ride,
+  // whatever the save says is worn.
+  if (!mountKey || !(mountKey in MOUNTS)) return null;
   if (mountSkinId && isMountSkinId(mountSkinId)) return MOUNT_SKIN_VISUAL_SPECS[mountSkinId];
-  return mountVisualSpec(mountKey);
+  return MOUNT_VISUAL_SPECS[mountKey as MountKey];
 }
 
 /** World-unit rider lift for what the mount presents as ('' or unknown: 0). */
