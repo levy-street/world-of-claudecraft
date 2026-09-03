@@ -28,22 +28,9 @@
           "opaquePixels": 1572516,
           "visiblePixels": 1572516,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            1253,
-            1253
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 1253, 1253],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "normalizedSourcePath": "tmp/imagegen/masterwrought-art-2026-09-02/professions/gather_farming_512.png",
@@ -65,22 +52,9 @@
           "opaquePixels": 91914,
           "visiblePixels": 96228,
           "coverage": 0.367081,
-          "alphaBounds": [
-            43,
-            32,
-            467,
-            479
-          ],
-          "padding": [
-            43,
-            32,
-            44,
-            32
-          ],
-          "centerOffset": [
-            -0.5,
-            0
-          ]
+          "alphaBounds": [43, 32, 467, 479],
+          "padding": [43, 32, 44, 32],
+          "centerOffset": [-0.5, 0]
         }
       },
       "runtimeUrl": "/ui/professions/gather_farming.webp",
@@ -102,22 +76,9 @@
           "opaquePixels": 5186,
           "visiblePixels": 6222,
           "coverage": 0.379761,
-          "alphaBounds": [
-            10,
-            7,
-            117,
-            120
-          ],
-          "padding": [
-            10,
-            7,
-            10,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [10, 7, 117, 120],
+          "padding": [10, 7, 10, 7],
+          "centerOffset": [0, 0]
         }
       },
       "exactPrompt": "Use case: exact icon composite edit for a transparent Farming profession emblem.\n\nCreate one unified centered emblem on a perfectly uniform flat #FF00FF exterior. Combine:\n- Image 1: authoritative exact FARM HOE geometry. Preserve its simple one-sided broad rectangular blade at a right angle to the long wooden handle. This is the identity-critical silhouette.\n- Image 2: authoritative cultivated tilled-soil bed, bold furrows, central two-leaf green sprout, thick contour, and emblem composition.\n\nFinal emblem: the Image 1-style long-handled garden hoe leans diagonally behind a compact low oval bed of dark loam with two bold furrows and one crisp two-leaf young sprout. The hoe has exactly ONE broad flat rectangular soil-cutting blade perpendicular to the handle, with no metal extension or point on the opposite side. Do not make a pickaxe, mattock, axe, shovel, spade, trowel, double-headed tool, or blade aligned with the handle.\n\nComposition: complete unified silhouette, roughly 72% canvas fill with generous safe margin; legible in a 64px circular crop; head, sprout, and furrows remain distinct at 22px. Premium hand-painted classic dark-fantasy MMORPG icon, tactile worn iron, wood, moist loam, and leaf, near-black outer contour, warm top-left highlights, cool lower-right shadows, restrained pale-gold rim.\n\nExterior must be perfectly uniform #FF00FF, with no exterior texture, shadow, vignette, gradient, noise, haze, glow, or reflection. No magenta inside the emblem.\n\nNo wheat, seed sack, extra plants, multiple sprouts, text, letters, numbers, runes, pseudo-writing, frame, medallion, watermark, checkerboard, transparency, landscape, barn, character, hand, or crop.",
@@ -174,22 +135,9 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "exactPrompt": "Use case: production status-effect icon. Asset type: opaque square classic fantasy MMORPG aura icon. Primary request: paint the shared Well Fed buff identity (well_fed) for World of ClaudeCraft. Reference roles: Image 1 is authoritative only for the rustic farm-harvest food palette, compact grouping, and hand-painted material separation. Image 2 is authoritative only for feast abundance and tiny-size food readability. Image 3 is authoritative only for the existing aura family's deep high-contrast vignette, restrained magical edge light, and compact 128px presentation. Do not copy any reference object exactly. Subject: one cohesive, abundant but simple hearth meal: a shallow dark stoneware bowl/platter holding a golden roast portion, one small bread wedge, and a few bright green garden vegetables, with three broad curls of warm nourishing steam rising as one unified silhouette. The food must read as sustaining fullness and vitality, not a specific recipe, poison, empty dish, or restaurant spread. Composition: centered three-quarter overhead hero object, complete silhouette, about 72 percent fill, thick clear food masses and steam readable at 22px, safe margins, strong circular-crop read. Opaque full-square deep umber-charcoal painted vignette with subtle hearth warmth and contact shadow. Style: premium hand-painted classic dark-fantasy MMORPG status art; crisp food and steam focal edges, tactile roast, bread, greens, stoneware; warm top-left amber key, cool deep lower-right shadow; restrained healthful green-gold highlights. No broad neon aura or flat vector look. Constraints: one unified meal only; no person, hand, table scene, cutlery, loose ingredient pile, text, letters, numbers, labels, runes, pseudo-writing, UI border, rarity frame, circular frame, watermark, signature, checkerboard, transparency, split sheet, collage, crop, skull, potion, or empty bowl.",

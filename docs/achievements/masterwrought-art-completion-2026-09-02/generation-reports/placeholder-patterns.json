@@ -12,7 +12,15 @@
     "fullyOpaque": true
   },
   "commonReview": {
-    "sizes": ["1254px master", "128px", "40px", "28px", "22px", "28px grayscale", "64px circular crop"],
+    "sizes": [
+      "1254px master",
+      "128px",
+      "40px",
+      "28px",
+      "22px",
+      "28px grayscale",
+      "64px circular crop"
+    ],
     "result": "accepted",
     "notes": "Every asset is a distinct physical parchment or schematic with one large result-specific pictorial motif. No readable text, pseudo-writing, runes, UI frame, transparency, watermark, or cropped identity-bearing feature remains."
   },
@@ -27,10 +35,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/ironhusk_flask.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, cord, leather wear, lighting, and composition only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "tangible fantasy vessel and restrained glow only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/ironhusk_flask.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, cord, leather wear, lighting, and composition only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "tangible fantasy vessel and restrained glow only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -55,10 +72,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/warboar_flask.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, leather, wear, volume, and composition only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "tangible vessel, restrained glow, and focal material only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/warboar_flask.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, leather, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "tangible vessel, restrained glow, and focal material only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -83,10 +109,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/runewater_flask.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "glass highlights, contained energy, and focal material only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/runewater_flask.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, straps, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "glass highlights, contained energy, and focal material only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -111,10 +146,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/stonepot_stew.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation and small-size readability only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/stonepot_stew.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, straps, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food separation and small-size readability only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -134,7 +178,10 @@
       "mode": "style-transfer with targeted precise-object-edit retry",
       "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-8dbf711d-7d0f-4fc4-b388-8e85fd265cb1.png",
       "rejectedGeneratorOriginals": [
-        {"path": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-06030908-7112-4d87-9fb0-e910b0de29f9.png", "reason": "seal contained a second flame-like motif"}
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-06030908-7112-4d87-9fb0-e910b0de29f9.png",
+          "reason": "seal contained a second flame-like motif"
+        }
       ],
       "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_warspice_skewers.png",
       "sha256": "35d3070fd9bf8756d0f8ae7fe57034e8f11988e650815ec7310984faab4c2aae",
@@ -142,10 +189,19 @@
       "dimensions": "1254x1254",
       "retries": 1,
       "orderedReferences": [
-        {"path": "public/ui/items/warspice_skewers.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation, warm glaze, and small-size readability only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/warspice_skewers.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, straps, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food separation, warm glaze, and small-size readability only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -177,10 +233,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/sageleaf_chowder.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation and small-size readability only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/sageleaf_chowder.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, straps, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "food separation and small-size readability only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global material, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -205,10 +270,19 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/grand_cauldron.webp", "role": "live-result identity only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "tangible vessel, contained glow, and focal material only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global metal, value, lighting, and centered-mass style only"}
+        { "path": "public/ui/items/grand_cauldron.webp", "role": "live-result identity only" },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "parchment-like soft goods, straps, wear, volume, and composition only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "tangible vessel, contained glow, and focal material only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "global metal, value, lighting, and centered-mass style only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -228,7 +302,10 @@
       "mode": "style-transfer with targeted precise-object-edit retry",
       "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-b5018f0c-6c94-43e7-9d62-d99ffce08a95.png",
       "rejectedGeneratorOriginals": [
-        {"path": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-0d3ec50d-905d-4ef6-8a13-2d5c9c17964c.png", "reason": "seal carried a generic four-point star instead of the result-specific maker motif"}
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-0d3ec50d-905d-4ef6-8a13-2d5c9c17964c.png",
+          "reason": "seal carried a generic four-point star instead of the result-specific maker motif"
+        }
       ],
       "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_warhewn_signet.png",
       "sha256": "3ee6910081308fc9138ea2625989a6a42d2f5d5c6f7787d0cc8e53def3fa9766",
@@ -236,9 +313,18 @@
       "dimensions": "1254x1254",
       "retries": 1,
       "orderedReferences": [
-        {"path": "public/ui/items/warhewn_signet.webp", "role": "live-result identity only: heavy dark ring, rectangular signet face, ember crossed-tool motif"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, cord, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged dark metal, controlled edge highlights, centered mass, and cool shadow only"}
+        {
+          "path": "public/ui/items/warhewn_signet.webp",
+          "role": "live-result identity only: heavy dark ring, rectangular signet face, ember crossed-tool motif"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, cord, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "forged dark metal, controlled edge highlights, centered mass, and cool shadow only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -270,9 +356,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/prismglass_loop.webp", "role": "live-result identity only: pale segmented loop and pointed faceted prismglass crown"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, ribbon, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "crisp glass rim light, restrained internal cool color, and dark painted ground only"}
+        {
+          "path": "public/ui/items/prismglass_loop.webp",
+          "role": "live-result identity only: pale segmented loop and pointed faceted prismglass crown"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, ribbon, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "crisp glass rim light, restrained internal cool color, and dark painted ground only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -297,9 +392,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/gyrelens_array.webp", "role": "live-result identity only: articulated row of three differently sized brass-ringed blue lenses"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "crisp glass rim light, contained cool luminance, and dark painted ground only"}
+        {
+          "path": "public/ui/items/gyrelens_array.webp",
+          "role": "live-result identity only: articulated row of three differently sized brass-ringed blue lenses"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "crisp glass rim light, contained cool luminance, and dark painted ground only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -324,9 +428,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/masters_field_forge.webp", "role": "live-result identity only: compact portable forge, anvil top, ember chamber, folding legs"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "hard tool silhouette, forged metal, wear, and restrained magical polish only"}
+        {
+          "path": "public/ui/items/masters_field_forge.webp",
+          "role": "live-result identity only: compact portable forge, anvil top, ember chamber, folding legs"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "hard tool silhouette, forged metal, wear, and restrained magical polish only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -351,9 +464,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/makers_charm.webp", "role": "live-result identity only: hanging oval brass frame, violet central lens, upright maker needle"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "contained violet luminance, crisp rim highlights, and dark painted ground only"}
+        {
+          "path": "public/ui/items/makers_charm.webp",
+          "role": "live-result identity only: hanging oval brass frame, violet central lens, upright maker needle"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "contained violet luminance, crisp rim highlights, and dark painted ground only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -378,9 +500,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/voidbound_grimoire.webp", "role": "live-result identity only: closed obsidian-purple grimoire, metal corners, central violet void aperture"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/cinderweave_raiment.webp", "role": "deep violet-black values, controlled magical accent, and peripheral brushwork only"}
+        {
+          "path": "public/ui/items/voidbound_grimoire.webp",
+          "role": "live-result identity only: closed obsidian-purple grimoire, metal corners, central violet void aperture"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "deep violet-black values, controlled magical accent, and peripheral brushwork only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",
@@ -405,9 +536,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/laden_hearth.webp", "role": "live-result identity only: portable brick-and-iron hearth, flame, roast-spit bar, stocked food cues"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "appetizing food grouping, warm separation, and tiny-size readability only"}
+        {
+          "path": "public/ui/items/laden_hearth.webp",
+          "role": "live-result identity only: portable brick-and-iron hearth, flame, roast-spit bar, stocked food cues"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "appetizing food grouping, warm separation, and tiny-size readability only"
+        }
       ],
       "promptLines": [
         "Use case: style-transfer",

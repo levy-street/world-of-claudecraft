@@ -316,8 +316,8 @@ async function assertSupplementalPin(
 describe('Masterwrought art completion evidence', () => {
   it('byte-seals the root manifest so its target and evidence oracles cannot drift together', () => {
     const bytes = readFileSync(path.join(repoRoot, manifestPath));
-    expect(bytes.length).toBe(498_548);
-    expect(hash(bytes)).toBe('6577e12a29220f5f12bb4a6d9cd9cd35e05f2915658fb26cb9dcd3ee2416e835');
+    expect(bytes.length).toBe(459_411);
+    expect(hash(bytes)).toBe('724ca1376055b9e9ea1997f90fd0040df902eff3f8f9255a8db32f4032e3c587');
   });
 
   it('pins the exact 176-target scope and the 81 added to 84 replaced item split', () => {

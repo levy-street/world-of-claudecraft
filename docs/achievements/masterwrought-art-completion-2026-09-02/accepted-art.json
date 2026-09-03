@@ -431,14 +431,14 @@
     {
       "id": "supersession-before",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/supersession-before.json",
-      "acceptedSha256": "752ba89b475474492a9c5c82bfbefb0a33dc0d4bf09d7a3b6d34468355df4c3b",
-      "acceptedBytes": 96182
+      "acceptedSha256": "e36dafe4beac00e3c712ea0486c134635646672fe57ab4e11eb7c1ca0d026d78",
+      "acceptedBytes": 95798
     },
     {
       "id": "root-special",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json",
-      "acceptedSha256": "e7e21b2bbae8ee287b8b6ce3997a31c72c211675f22cdb29e6610b20340ef386",
-      "acceptedBytes": 10134
+      "acceptedSha256": "691ca0f1ec42eac87fefe4dd28e9f65df3e1e58fa9449ada7fba69a1508ac52a",
+      "acceptedBytes": 9510
     },
     {
       "id": "accepted-aura-art",
@@ -538,8 +538,8 @@
     {
       "id": "profession-new",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/profession-new.json",
-      "acceptedSha256": "ff2fb1c062a5e0b745947c6236a24896461323400260af25d014f35846de7451",
-      "acceptedBytes": 66622,
+      "acceptedSha256": "e90000fedda000903800bda004306f9575bc4a4442ccf772a4bc1478340c263f",
+      "acceptedBytes": 68290,
       "role": "Exact generation lineage and review for one disjoint part of the 165-item wave.",
       "itemIds": [
         "clockreel_fishing_rod",
@@ -565,8 +565,8 @@
     {
       "id": "placeholder-material-gear",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/placeholder-material-gear.json",
-      "acceptedSha256": "132fc8f48dbfca165820c9e227453b08f2c83e3edf343ac74664d1d050721028",
-      "acceptedBytes": 166721,
+      "acceptedSha256": "6db339336a087b4c170456f270e5b481aca5deef77483c177bcc304baf796213",
+      "acceptedBytes": 166709,
       "role": "Exact generation lineage and review for one disjoint part of the 165-item wave.",
       "itemIds": [
         "barksong_handguards",
@@ -653,8 +653,8 @@
     {
       "id": "placeholder-patterns",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/placeholder-patterns.json",
-      "acceptedSha256": "8d27df27e6fcba0c3fc7cea5d6886b8714db7193c37f0d2383b1d91d7684fc77",
-      "acceptedBytes": 62638,
+      "acceptedSha256": "c6bae0265689fd8ac4671353af644ed499af9d17a922522839e251a190a3ebaa",
+      "acceptedBytes": 64020,
       "role": "Exact generation lineage and review for one disjoint part of the 165-item wave.",
       "itemIds": [
         "pattern_grand_cauldron",
@@ -676,8 +676,8 @@
     {
       "id": "all-items-qa",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/all-items-qa.json",
-      "acceptedSha256": "0aeb09ba931bb1244abda491bc5fa147fca96134c4f60641b79b0408abbec102",
-      "acceptedBytes": 12963,
+      "acceptedSha256": "95ff7b136d9386168f4eeeef0714c7a263c4d11ffada6db3461dcbce45ed3b95",
+      "acceptedBytes": 12859,
       "role": "Independent machine and small-size visual review of the complete 165-item wave."
     },
     {
@@ -731,32 +731,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -797,32 +779,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -863,32 +827,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -929,32 +875,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -995,32 +923,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1061,32 +971,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1127,32 +1019,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1193,32 +1067,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1259,32 +1115,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1325,32 +1163,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1391,32 +1211,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1457,32 +1259,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1523,32 +1307,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1589,32 +1355,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1655,32 +1403,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1721,32 +1451,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1787,32 +1499,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1853,32 +1547,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1919,32 +1595,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -1985,32 +1643,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2051,32 +1691,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2117,32 +1739,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2183,32 +1787,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2249,32 +1835,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2315,32 +1883,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2381,32 +1931,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2447,32 +1979,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2513,32 +2027,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2579,32 +2075,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2645,32 +2123,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2711,32 +2171,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2777,32 +2219,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2843,32 +2267,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2909,32 +2315,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -2975,32 +2363,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3041,32 +2411,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3107,32 +2459,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3173,32 +2507,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3239,32 +2555,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3305,32 +2603,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3371,32 +2651,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3437,32 +2699,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3503,32 +2747,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3569,32 +2795,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3635,32 +2843,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3701,32 +2891,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3767,32 +2939,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3833,32 +2987,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3899,32 +3035,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -3965,32 +3083,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4031,32 +3131,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4097,32 +3179,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4163,32 +3227,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4229,32 +3275,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4295,32 +3323,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4361,32 +3371,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4427,32 +3419,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4493,32 +3467,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4559,32 +3515,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4625,32 +3563,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4691,32 +3611,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4757,32 +3659,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4823,32 +3707,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4889,32 +3755,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -4955,32 +3803,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5021,32 +3851,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5087,32 +3899,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5153,32 +3947,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5219,32 +3995,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5285,32 +4043,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5351,32 +4091,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5417,32 +4139,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5483,32 +4187,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5549,32 +4235,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5615,32 +4283,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5681,32 +4331,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5747,32 +4379,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5813,32 +4427,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5879,32 +4475,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -5945,32 +4523,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6011,32 +4571,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6077,32 +4619,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6143,32 +4667,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6209,32 +4715,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6275,32 +4763,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6341,32 +4811,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6407,32 +4859,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6473,32 +4907,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6539,32 +4955,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6605,32 +5003,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6671,32 +5051,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6737,32 +5099,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6803,32 +5147,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6869,32 +5195,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -6935,32 +5243,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7001,32 +5291,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7067,32 +5339,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7133,32 +5387,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7199,32 +5435,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7265,32 +5483,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7331,32 +5531,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7397,32 +5579,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7463,32 +5627,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7529,32 +5675,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7595,32 +5723,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7661,32 +5771,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7727,32 +5819,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7793,32 +5867,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7859,32 +5915,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7925,32 +5963,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -7991,32 +6011,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8057,32 +6059,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8123,32 +6107,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8189,32 +6155,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8255,32 +6203,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8321,32 +6251,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8387,32 +6299,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8453,32 +6347,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8519,32 +6395,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8585,32 +6443,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8651,32 +6491,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8717,32 +6539,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8783,32 +6587,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8849,32 +6635,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8915,32 +6683,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -8981,32 +6731,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9047,32 +6779,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9113,32 +6827,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9179,32 +6875,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9245,32 +6923,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9311,32 +6971,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9377,32 +7019,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9443,32 +7067,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9509,32 +7115,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9575,32 +7163,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9641,32 +7211,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9707,32 +7259,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9773,32 +7307,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9839,32 +7355,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9905,32 +7403,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -9971,32 +7451,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10037,32 +7499,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10103,32 +7547,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10169,32 +7595,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10235,32 +7643,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10301,32 +7691,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10367,32 +7739,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10433,32 +7787,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10499,32 +7835,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10565,32 +7883,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10631,32 +7931,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10697,32 +7979,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10763,32 +8027,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10829,32 +8075,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10895,32 +8123,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -10961,32 +8171,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11027,32 +8219,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11093,32 +8267,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11159,32 +8315,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11225,32 +8363,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11291,32 +8411,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11357,32 +8459,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11423,32 +8507,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11489,32 +8555,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11555,32 +8603,14 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          0,
-          0,
-          127,
-          127
-        ],
+        "alphaBounds": [0, 0, 127, 127],
         "visiblePixels": 16384
       },
       "source": {
@@ -11621,32 +8651,14 @@
           "opaquePixels": 5661,
           "visiblePixels": 6706,
           "coverage": 0.409302,
-          "alphaBounds": [
-            7,
-            12,
-            119,
-            114
-          ],
-          "padding": [
-            7,
-            12,
-            8,
-            13
-          ],
-          "centerOffset": [
-            -0.5,
-            -0.5
-          ]
+          "alphaBounds": [7, 12, 119, 114],
+          "padding": [7, 12, 8, 13],
+          "centerOffset": [-0.5, -0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          7,
-          12,
-          119,
-          114
-        ],
+        "alphaBounds": [7, 12, 119, 114],
         "visiblePixels": 6706
       },
       "source": {
@@ -11668,22 +8680,9 @@
           "opaquePixels": 100730,
           "visiblePixels": 104293,
           "coverage": 0.397846,
-          "alphaBounds": [
-            32,
-            52,
-            479,
-            459
-          ],
-          "padding": [
-            32,
-            52,
-            32,
-            52
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [32, 52, 479, 459],
+          "padding": [32, 52, 32, 52],
+          "centerOffset": [0, 0]
         }
       }
     },
@@ -11713,32 +8712,14 @@
           "opaquePixels": 6896,
           "visiblePixels": 8949,
           "coverage": 0.546204,
-          "alphaBounds": [
-            8,
-            8,
-            119,
-            120
-          ],
-          "padding": [
-            8,
-            8,
-            8,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0.5
-          ]
+          "alphaBounds": [8, 8, 119, 120],
+          "padding": [8, 8, 8, 7],
+          "centerOffset": [0, 0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          8,
-          8,
-          119,
-          120
-        ],
+        "alphaBounds": [8, 8, 119, 120],
         "visiblePixels": 8949
       },
       "source": {
@@ -11760,22 +8741,9 @@
           "opaquePixels": 123326,
           "visiblePixels": 138739,
           "coverage": 0.529247,
-          "alphaBounds": [
-            33,
-            32,
-            478,
-            479
-          ],
-          "padding": [
-            33,
-            32,
-            33,
-            32
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [33, 32, 478, 479],
+          "padding": [33, 32, 33, 32],
+          "centerOffset": [0, 0]
         }
       }
     },
@@ -11805,32 +8773,14 @@
           "opaquePixels": 4905,
           "visiblePixels": 5980,
           "coverage": 0.36499,
-          "alphaBounds": [
-            25,
-            8,
-            102,
-            120
-          ],
-          "padding": [
-            25,
-            8,
-            25,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0.5
-          ]
+          "alphaBounds": [25, 8, 102, 120],
+          "padding": [25, 8, 25, 7],
+          "centerOffset": [0, 0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          25,
-          8,
-          102,
-          120
-        ],
+        "alphaBounds": [25, 8, 102, 120],
         "visiblePixels": 5980
       },
       "source": {
@@ -11852,22 +8802,9 @@
           "opaquePixels": 86896,
           "visiblePixels": 92754,
           "coverage": 0.353828,
-          "alphaBounds": [
-            103,
-            32,
-            408,
-            479
-          ],
-          "padding": [
-            103,
-            32,
-            103,
-            32
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [103, 32, 408, 479],
+          "padding": [103, 32, 103, 32],
+          "centerOffset": [0, 0]
         }
       }
     },
@@ -11897,32 +8834,14 @@
           "opaquePixels": 8540,
           "visiblePixels": 9737,
           "coverage": 0.594299,
-          "alphaBounds": [
-            8,
-            10,
-            119,
-            117
-          ],
-          "padding": [
-            8,
-            10,
-            8,
-            10
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [8, 10, 119, 117],
+          "padding": [8, 10, 8, 10],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          8,
-          10,
-          119,
-          117
-        ],
+        "alphaBounds": [8, 10, 119, 117],
         "visiblePixels": 9737
       },
       "source": {
@@ -11944,22 +8863,9 @@
           "opaquePixels": 146720,
           "visiblePixels": 152854,
           "coverage": 0.583092,
-          "alphaBounds": [
-            32,
-            41,
-            479,
-            469
-          ],
-          "padding": [
-            32,
-            41,
-            32,
-            42
-          ],
-          "centerOffset": [
-            0,
-            -0.5
-          ]
+          "alphaBounds": [32, 41, 479, 469],
+          "padding": [32, 41, 32, 42],
+          "centerOffset": [0, -0.5]
         }
       }
     },
@@ -11989,32 +8895,14 @@
           "opaquePixels": 4727,
           "visiblePixels": 6111,
           "coverage": 0.372986,
-          "alphaBounds": [
-            10,
-            8,
-            117,
-            120
-          ],
-          "padding": [
-            10,
-            8,
-            10,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0.5
-          ]
+          "alphaBounds": [10, 8, 117, 120],
+          "padding": [10, 8, 10, 7],
+          "centerOffset": [0, 0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          10,
-          8,
-          117,
-          120
-        ],
+        "alphaBounds": [10, 8, 117, 120],
         "visiblePixels": 6111
       },
       "source": {
@@ -12036,22 +8924,9 @@
           "opaquePixels": 88057,
           "visiblePixels": 93781,
           "coverage": 0.357746,
-          "alphaBounds": [
-            40,
-            32,
-            470,
-            479
-          ],
-          "padding": [
-            40,
-            32,
-            41,
-            32
-          ],
-          "centerOffset": [
-            -0.5,
-            0
-          ]
+          "alphaBounds": [40, 32, 470, 479],
+          "padding": [40, 32, 41, 32],
+          "centerOffset": [-0.5, 0]
         }
       }
     },
@@ -12081,32 +8956,14 @@
           "opaquePixels": 6774,
           "visiblePixels": 7814,
           "coverage": 0.476929,
-          "alphaBounds": [
-            8,
-            16,
-            119,
-            111
-          ],
-          "padding": [
-            8,
-            16,
-            8,
-            16
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [8, 16, 119, 111],
+          "padding": [8, 16, 8, 16],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          8,
-          16,
-          119,
-          111
-        ],
+        "alphaBounds": [8, 16, 119, 111],
         "visiblePixels": 7814
       },
       "source": {
@@ -12128,22 +8985,9 @@
           "opaquePixels": 116495,
           "visiblePixels": 122728,
           "coverage": 0.46817,
-          "alphaBounds": [
-            32,
-            64,
-            479,
-            446
-          ],
-          "padding": [
-            32,
-            64,
-            32,
-            65
-          ],
-          "centerOffset": [
-            0,
-            -0.5
-          ]
+          "alphaBounds": [32, 64, 479, 446],
+          "padding": [32, 64, 32, 65],
+          "centerOffset": [0, -0.5]
         }
       }
     },
@@ -12173,32 +9017,14 @@
           "opaquePixels": 5723,
           "visiblePixels": 6971,
           "coverage": 0.425476,
-          "alphaBounds": [
-            15,
-            8,
-            112,
-            120
-          ],
-          "padding": [
-            15,
-            8,
-            15,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0.5
-          ]
+          "alphaBounds": [15, 8, 112, 120],
+          "padding": [15, 8, 15, 7],
+          "centerOffset": [0, 0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          15,
-          8,
-          112,
-          120
-        ],
+        "alphaBounds": [15, 8, 112, 120],
         "visiblePixels": 6971
       },
       "source": {
@@ -12220,22 +9046,9 @@
           "opaquePixels": 102107,
           "visiblePixels": 108627,
           "coverage": 0.414379,
-          "alphaBounds": [
-            62,
-            32,
-            448,
-            479
-          ],
-          "padding": [
-            62,
-            32,
-            63,
-            32
-          ],
-          "centerOffset": [
-            -0.5,
-            0
-          ]
+          "alphaBounds": [62, 32, 448, 479],
+          "padding": [62, 32, 63, 32],
+          "centerOffset": [-0.5, 0]
         }
       }
     },
@@ -12265,32 +9078,14 @@
           "opaquePixels": 5829,
           "visiblePixels": 7679,
           "coverage": 0.468689,
-          "alphaBounds": [
-            8,
-            10,
-            120,
-            117
-          ],
-          "padding": [
-            8,
-            10,
-            7,
-            10
-          ],
-          "centerOffset": [
-            0.5,
-            0
-          ]
+          "alphaBounds": [8, 10, 120, 117],
+          "padding": [8, 10, 7, 10],
+          "centerOffset": [0.5, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          8,
-          10,
-          120,
-          117
-        ],
+        "alphaBounds": [8, 10, 120, 117],
         "visiblePixels": 7679
       },
       "source": {
@@ -12312,22 +9107,9 @@
           "opaquePixels": 107786,
           "visiblePixels": 117853,
           "coverage": 0.449574,
-          "alphaBounds": [
-            32,
-            41,
-            479,
-            470
-          ],
-          "padding": [
-            32,
-            41,
-            32,
-            41
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [32, 41, 479, 470],
+          "padding": [32, 41, 32, 41],
+          "centerOffset": [0, 0]
         }
       }
     },
@@ -12357,32 +9139,14 @@
           "opaquePixels": 7728,
           "visiblePixels": 9050,
           "coverage": 0.552368,
-          "alphaBounds": [
-            7,
-            11,
-            119,
-            115
-          ],
-          "padding": [
-            7,
-            11,
-            8,
-            12
-          ],
-          "centerOffset": [
-            -0.5,
-            -0.5
-          ]
+          "alphaBounds": [7, 11, 119, 115],
+          "padding": [7, 11, 8, 12],
+          "centerOffset": [-0.5, -0.5]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          7,
-          11,
-          119,
-          115
-        ],
+        "alphaBounds": [7, 11, 119, 115],
         "visiblePixels": 9050
       },
       "source": {
@@ -12404,22 +9168,9 @@
           "opaquePixels": 136828,
           "visiblePixels": 141139,
           "coverage": 0.538403,
-          "alphaBounds": [
-            32,
-            47,
-            479,
-            463
-          ],
-          "padding": [
-            32,
-            47,
-            32,
-            48
-          ],
-          "centerOffset": [
-            0,
-            -0.5
-          ]
+          "alphaBounds": [32, 47, 479, 463],
+          "padding": [32, 47, 32, 48],
+          "centerOffset": [0, -0.5]
         }
       }
     },
@@ -12449,32 +9200,14 @@
           "opaquePixels": 4958,
           "visiblePixels": 5985,
           "coverage": 0.365295,
-          "alphaBounds": [
-            17,
-            7,
-            110,
-            120
-          ],
-          "padding": [
-            17,
-            7,
-            17,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [17, 7, 110, 120],
+          "padding": [17, 7, 17, 7],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          17,
-          7,
-          110,
-          120
-        ],
+        "alphaBounds": [17, 7, 110, 120],
         "visiblePixels": 5985
       },
       "source": {
@@ -12496,22 +9229,9 @@
           "opaquePixels": 89647,
           "visiblePixels": 92919,
           "coverage": 0.354458,
-          "alphaBounds": [
-            70,
-            32,
-            441,
-            479
-          ],
-          "padding": [
-            70,
-            32,
-            70,
-            32
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [70, 32, 441, 479],
+          "padding": [70, 32, 70, 32],
+          "centerOffset": [0, 0]
         }
       }
     },
@@ -12541,32 +9261,14 @@
           "opaquePixels": 6900,
           "visiblePixels": 8056,
           "coverage": 0.491699,
-          "alphaBounds": [
-            8,
-            8,
-            119,
-            119
-          ],
-          "padding": [
-            8,
-            8,
-            8,
-            8
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [8, 8, 119, 119],
+          "padding": [8, 8, 8, 8],
+          "centerOffset": [0, 0]
         }
       },
       "geometry": {
         "alphaThreshold": 8,
-        "alphaBounds": [
-          8,
-          8,
-          119,
-          119
-        ],
+        "alphaBounds": [8, 8, 119, 119],
         "visiblePixels": 8056
       },
       "source": {
@@ -12588,22 +9290,9 @@
           "opaquePixels": 121915,
           "visiblePixels": 125901,
           "coverage": 0.480274,
-          "alphaBounds": [
-            32,
-            33,
-            479,
-            478
-          ],
-          "padding": [
-            32,
-            33,
-            32,
-            33
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [32, 33, 479, 478],
+          "padding": [32, 33, 32, 33],
+          "centerOffset": [0, 0]
         }
       }
     }
@@ -12807,9 +9496,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -12857,9 +9544,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -13057,9 +9742,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -13103,9 +9786,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -13179,9 +9860,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -13379,9 +10058,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -13459,9 +10136,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -14409,9 +11084,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -14519,9 +11192,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -14719,9 +11390,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -14765,9 +11434,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -14901,9 +11568,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -14947,9 +11612,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase06-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase06-art/README.md"],
           "itemIds": [
             "goldleaf_folio",
             "goldleaf_scroll",
@@ -15143,9 +11806,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -15253,9 +11914,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -15393,9 +12052,7 @@
           "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
           "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
           "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
-          "provenanceRecords": [
-            "docs/achievements/masterwrought-phase09-art/README.md"
-          ],
+          "provenanceRecords": ["docs/achievements/masterwrought-phase09-art/README.md"],
           "itemIds": [
             "duskforged_warblade",
             "ridgebreaker",
@@ -15499,22 +12156,9 @@
           "opaquePixels": 5186,
           "visiblePixels": 6222,
           "coverage": 0.379761,
-          "alphaBounds": [
-            10,
-            7,
-            117,
-            120
-          ],
-          "padding": [
-            10,
-            7,
-            10,
-            7
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [10, 7, 117, 120],
+          "padding": [10, 7, 10, 7],
+          "centerOffset": [0, 0]
         }
       },
       "generationReport": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json"
@@ -15541,22 +12185,9 @@
           "opaquePixels": 16384,
           "visiblePixels": 16384,
           "coverage": 1,
-          "alphaBounds": [
-            0,
-            0,
-            127,
-            127
-          ],
-          "padding": [
-            0,
-            0,
-            0,
-            0
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [0, 0, 127, 127],
+          "padding": [0, 0, 0, 0],
+          "centerOffset": [0, 0]
         }
       },
       "generationReport": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json"
@@ -15583,22 +12214,9 @@
           "opaquePixels": 1485,
           "visiblePixels": 1897,
           "coverage": 0.463135,
-          "alphaBounds": [
-            2,
-            11,
-            61,
-            52
-          ],
-          "padding": [
-            2,
-            11,
-            2,
-            11
-          ],
-          "centerOffset": [
-            0,
-            0
-          ]
+          "alphaBounds": [2, 11, 61, 52],
+          "padding": [2, 11, 2, 11],
+          "centerOffset": [0, 0]
         }
       },
       "generationReport": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"
@@ -15625,22 +12243,9 @@
           "opaquePixels": 8973,
           "visiblePixels": 9851,
           "coverage": 0.601257,
-          "alphaBounds": [
-            5,
-            5,
-            121,
-            122
-          ],
-          "padding": [
-            5,
-            5,
-            6,
-            5
-          ],
-          "centerOffset": [
-            -0.5,
-            0
-          ]
+          "alphaBounds": [5, 5, 121, 122],
+          "padding": [5, 5, 6, 5],
+          "centerOffset": [-0.5, 0]
         }
       },
       "generationReport": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"
@@ -15667,22 +12272,9 @@
           "opaquePixels": 6129,
           "visiblePixels": 7287,
           "coverage": 0.444763,
-          "alphaBounds": [
-            5,
-            5,
-            121,
-            122
-          ],
-          "padding": [
-            5,
-            5,
-            6,
-            5
-          ],
-          "centerOffset": [
-            -0.5,
-            0
-          ]
+          "alphaBounds": [5, 5, 121, 122],
+          "padding": [5, 5, 6, 5],
+          "centerOffset": [-0.5, 0]
         }
       },
       "generationReport": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/special-ui-deeds.json"

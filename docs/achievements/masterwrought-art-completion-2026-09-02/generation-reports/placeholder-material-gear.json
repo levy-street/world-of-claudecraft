@@ -8,9 +8,7 @@
     "requestedCount": 38,
     "acceptedCount": 38,
     "retriedCount": 0,
-    "reusedAcceptedCandidateIds": [
-      "wyrmfall_core"
-    ],
+    "reusedAcceptedCandidateIds": ["wyrmfall_core"],
     "outputDirectory": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-material-gear"
   },
   "generationPolicy": {

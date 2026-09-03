@@ -296,50 +296,37 @@
   "watchNotes": [
     {
       "severity": "non-blocking",
-      "ids": [
-        "evergarden_hoe"
-      ],
+      "ids": ["evergarden_hoe"],
       "observation": "Its leaf-like angled blade can read closer to a scythe or adze than a hoe at 22px and in the circular crop.",
       "acceptanceBasis": "The long handled working-tool silhouette, head attachment, palette tier, and comparison with the hoe ladder preserve the intended identity."
     },
     {
       "severity": "non-blocking",
-      "ids": [
-        "skysilver_hoe"
-      ],
+      "ids": ["skysilver_hoe"],
       "observation": "Its pointed angled blade can read closer to a pick or scythe than the flatter heads of the lower-tier hoes at 22px.",
       "acceptanceBasis": "The complete handle, blade socket, gathering-tool presentation, and family progression still make it usable as the Skysilver hoe."
     },
     {
       "severity": "non-blocking",
-      "ids": [
-        "clockreel_fishing_rod"
-      ],
+      "ids": ["clockreel_fishing_rod"],
       "observation": "The thin rod shaft loses contrast in the 22px grayscale view and both extremities sit tight against the 64px circular crop.",
       "acceptanceBasis": "The prominent clockwork reel, fishing guides, line, and complete square-canvas silhouette retain the fishing-rod read."
     },
     {
       "severity": "non-blocking",
-      "ids": [
-        "prismglass_setting"
-      ],
+      "ids": ["prismglass_setting"],
       "observation": "At 22px its circular clawed silhouette can initially read as a compass, small shield, or portal.",
       "acceptanceBasis": "At shipping scale the retaining claws, thick faceted centerpiece, and jewelry-metal construction resolve it as an unfinished setting, with no compass needle, cardinal lettering, or UI marks."
     },
     {
       "severity": "non-blocking",
-      "ids": [
-        "sunspun_handwraps"
-      ],
+      "ids": ["sunspun_handwraps"],
       "observation": "The upright paired silhouette can read as mittens or short boots at 22px.",
       "acceptanceBasis": "Visible thumbs, layered wrapping bands, wrist cuffs, and the Sunspun set language resolve the hand-slot identity at 128px and in normal tooltip context."
     },
     {
       "severity": "non-blocking",
-      "ids": [
-        "fine_frost_gourd",
-        "fine_gilded_sunmelon"
-      ],
+      "ids": ["fine_frost_gourd", "fine_gilded_sunmelon"],
       "observation": "Both Fine variants deliberately change silhouette substantially from their base crop, so their smallest-size family relationship relies more heavily on palette and material.",
       "acceptanceBasis": "Frost Gourd keeps the powdery ivory-blue rind and squash construction; Gilded Sunmelon keeps golden rind, vine, and melon surface. The generation briefs explicitly require structural rather than overlay-only Fine differentiation."
     }

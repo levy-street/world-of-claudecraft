@@ -13,7 +13,15 @@
     "fullyOpaque": true
   },
   "commonReview": {
-    "sizes": ["1254px master", "128px", "40px", "28px", "22px", "28px grayscale", "64px circular crop"],
+    "sizes": [
+      "1254px master",
+      "128px",
+      "40px",
+      "28px",
+      "22px",
+      "28px grayscale",
+      "64px circular crop"
+    ],
     "result": "accepted",
     "notes": "All subjects retain identity-bearing silhouettes at tiny sizes and circular crop. No text, pseudo-writing, transparency, baked frame, watermark, or unintended repeated painting was observed. Feast roles, fish species, cooked-versus-raw state, pattern motifs, tool construction, engineering tier, and guild-writ identity remain distinct."
   },
@@ -27,9 +35,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "complete tool silhouette, tactile hard materials, restrained magical polish, and top-left lighting only"},
-        {"path": "public/ui/items/kingsbane_last_oath.webp", "role": "long diagonal composition and safe tip padding only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-metal values and warm-to-cool lighting only"}
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "complete tool silhouette, tactile hard materials, restrained magical polish, and top-left lighting only"
+        },
+        {
+          "path": "public/ui/items/kingsbane_last_oath.webp",
+          "role": "long diagonal composition and safe tip padding only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "forged-metal values and warm-to-cool lighting only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -53,9 +70,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "warm top-left lighting, cool shadow, and strong centered mass only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "subdued dark-ground material contrast only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "warm top-left lighting, cool shadow, and strong centered mass only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "subdued dark-ground material contrast only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -79,9 +105,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-steel values, warm top-left lighting, cool shadow, and strong mass only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "subdued dark-ground material contrast only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "forged-steel values, warm top-left lighting, cool shadow, and strong mass only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "subdued dark-ground material contrast only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -105,9 +140,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "contained magical luminance and crisp wet highlights only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "warm top-left lighting, cool shadow, and strong centered mass only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "contained magical luminance and crisp wet highlights only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "warm top-left lighting, cool shadow, and strong centered mass only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -131,9 +175,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "contained warm highlights against a dark ground only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile organic surfaces and subdued vignette values only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "contained warm highlights against a dark ground only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile organic surfaces and subdued vignette values only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -157,9 +210,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "contained warm highlights against a dark ground only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile hard-edged surface values and readable circular mass only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "contained warm highlights against a dark ground only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "tactile hard-edged surface values and readable circular mass only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -183,9 +245,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "corresponding food-family palette and tiny-scale separation only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable centered mass and cool deep shadow only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "corresponding food-family palette and tiny-scale separation only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "readable centered mass and cool deep shadow only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -209,9 +280,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "corresponding food-family palette and tiny-scale separation only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-steel values, readable centered mass, and cool deep shadow only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "corresponding food-family palette and tiny-scale separation only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "forged-steel values, readable centered mass, and cool deep shadow only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -235,9 +315,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
-        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "complete functional tool construction, hard materials, and restrained magical polish only"},
-        {"path": "public/ui/items/kingsbane_last_oath.webp", "role": "long diagonal silhouette and safe tip padding only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"
+        },
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "complete functional tool construction, hard materials, and restrained magical polish only"
+        },
+        {
+          "path": "public/ui/items/kingsbane_last_oath.webp",
+          "role": "long diagonal silhouette and safe tip padding only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -261,9 +350,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile iron material and top-left lighting only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "compact three-quarter container volume only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "tactile iron material and top-left lighting only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "compact three-quarter container volume only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -288,9 +386,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile dark iron and top-left edge light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember glow only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "tactile dark iron and top-left edge light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "restrained contained ember glow only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -315,9 +422,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "compact three-quarter container volume, cloth, and leather only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "ceramic or glass rim light and restrained internal color glow only"}
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "compact three-quarter container volume, cloth, and leather only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "ceramic or glass rim light and restrained internal color glow only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -342,9 +458,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "worn iron material and controlled cool shadow only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "readable visual language of a compact multi-serving food arrangement only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile cloth, leather, compact volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "worn iron material and controlled cool shadow only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "readable visual language of a compact multi-serving food arrangement only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -368,9 +493,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember color and dark painted ground only"},
-        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "readable visual language of a compact multi-serving food arrangement only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile cloth, leather, compact volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "restrained contained ember color and dark painted ground only"
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "readable visual language of a compact multi-serving food arrangement only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -394,9 +528,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained violet color and dark painted ground only"},
-        {"path": "public/ui/items/cinderweave_raiment.webp", "role": "deep violet cloth values and soft peripheral brushwork only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile cloth, leather, compact volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "restrained contained violet color and dark painted ground only"
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "deep violet cloth values and soft peripheral brushwork only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -420,9 +563,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable circular mass, tactile metal, and top-left key light only"},
-        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "worn hard-tool material and crisp silhouette only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "warm leather-brown reflected color and compact three-quarter volume only"}
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "readable circular mass, tactile metal, and top-left key light only"
+        },
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "worn hard-tool material and crisp silhouette only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "warm leather-brown reflected color and compact three-quarter volume only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -447,9 +599,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/firebottle.webp", "role": "glass rim light, contained blue color, and dark painted ground only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable circular mass, tactile metal, and top-left key light only"},
-        {"path": "public/ui/items/linen_pouch.webp", "role": "compact leather-wrapped detail and three-quarter volume only"}
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "glass rim light, contained blue color, and dark painted ground only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "readable circular mass, tactile metal, and top-left key light only"
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "compact leather-wrapped detail and three-quarter volume only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
@@ -474,9 +635,18 @@
       "dimensions": "1254x1254",
       "retries": 0,
       "orderedReferences": [
-        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
-        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "dark forged-metal edge treatment and controlled cool shadow only"},
-        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember-orange accent against a dark ground only"}
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "dark forged-metal edge treatment and controlled cool shadow only"
+        },
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "restrained contained ember-orange accent against a dark ground only"
+        }
       ],
       "promptLines": [
         "Use case: stylized-concept",
