@@ -3,7 +3,7 @@
 import * as THREE from 'three';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { attachMountGlows, disposeMountGlows, updateMountGlows } from '../src/render/mount_glow';
-import { MOUNT_LENS_COLOR, MOUNT_VISUAL_SPECS } from '../src/render/mount_visuals';
+import { MOUNT_LENS_COLOR, MOUNT_VISUAL_SPECS, mountGlowBreath } from '../src/render/mount_visuals';
 
 function rigWith(...boneNames: string[]): THREE.Object3D {
   const root = new THREE.Object3D();
@@ -47,6 +47,26 @@ describe('mount glow billboards', () => {
     expect(glows).not.toBeNull();
     if (!glows || !lens) throw new Error('the test rig carries the Chimeglass lens bone');
 
+    expect(spec.glows).toEqual([
+      {
+        bone: 'lens',
+        offset: [-0.0954, 0.0345, -0.0057],
+        radius: 0.105,
+        color: MOUNT_LENS_COLOR,
+        opacity: 0.85,
+        pulse: 0.28,
+        pulseHz: 0.32,
+      },
+      {
+        bone: 'lens',
+        offset: [0.0733, 0.037, -0.0089],
+        radius: 0.105,
+        color: MOUNT_LENS_COLOR,
+        opacity: 0.85,
+        pulse: 0.28,
+        pulseHz: 0.32,
+      },
+    ]);
     expect(glows.sprites).toHaveLength(2);
     expect(glows.peaks).toEqual([0.85, 0.85]);
     expect(glows.pulses).toEqual([0.28, 0.28]);
@@ -74,5 +94,28 @@ describe('mount glow billboards', () => {
     expect(lens.children).toHaveLength(0);
     expect(glows).toEqual({ sprites: [], peaks: [], pulses: [], rates: [], sizes: [] });
     for (const dispose of disposals) expect(dispose).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the two lens breaths deterministic, quarter-phased, and inside literal bounds', () => {
+    expect(mountGlowBreath(0, 0, 0.28, 0.32)).toBeCloseTo(0.86, 12);
+    expect(mountGlowBreath(0, 1, 0.28, 0.32)).toBe(1);
+    expect(mountGlowBreath(0.78125, 0, 0.28, 0.32)).toBe(1);
+    expect(mountGlowBreath(2.34375, 0, 0.28, 0.32)).toBeCloseTo(0.72, 12);
+
+    const firstPass: number[] = [];
+    const secondPass: number[] = [];
+    for (let i = 0; i <= 256; i++) {
+      const time = i / 64;
+      firstPass.push(mountGlowBreath(time, i % 2, 0.28, 0.32));
+      secondPass.push(mountGlowBreath(time, i % 2, 0.28, 0.32));
+    }
+    expect(secondPass).toEqual(firstPass);
+    expect(Math.min(...firstPass)).toBeGreaterThanOrEqual(0.72);
+    expect(Math.max(...firstPass)).toBeLessThanOrEqual(1);
+  });
+
+  it('holds steady for zero breath depth and independently for zero rate', () => {
+    expect(mountGlowBreath(137, 0, 0, 0.32)).toBe(1);
+    expect(mountGlowBreath(137, 0, 0.28, 0)).toBe(1);
   });
 });

@@ -24,6 +24,7 @@ vi.mock('../src/render/mount_glow', () => ({
 import type { CharacterVisual } from '../src/render/characters';
 import { attachMountGlows, disposeMountGlows, type MountGlows } from '../src/render/mount_glow';
 import {
+  disposeMountView,
   gateMountSwapOnCompile,
   type MountViewState,
   placeRider,
@@ -206,6 +207,54 @@ describe('mount compile ownership', () => {
     expect(disposeMountGlows).toHaveBeenCalledWith(glows);
     expect(v.mountGlows).toBeNull();
   });
+
+  it('disposes the old glow before attaching the replacement mount glow', () => {
+    const { v } = rig();
+    v.mountVisual = null;
+    v.mountVisualKey = '';
+    const first: MountGlows = { sprites: [], peaks: [], pulses: [], rates: [], sizes: [] };
+    const second: MountGlows = { sprites: [], peaks: [], pulses: [], rates: [], sizes: [] };
+    vi.mocked(attachMountGlows).mockReset().mockReturnValueOnce(first).mockReturnValueOnce(second);
+    vi.mocked(disposeMountGlows).mockClear();
+    const host = {
+      reconcileViewLights: vi.fn(),
+      gateSwapFlagOnCompile: (_root: THREE.Object3D, done: () => void): void => done(),
+      recordBuild: vi.fn(),
+    };
+
+    syncMountVisual(v, tortoise(), host);
+    const firstRoot = mountRoot(v);
+    const replacement = { ...horse(), glows: tortoise().glows };
+    syncMountVisual(v, replacement, host);
+    const replacementRoot = mountRoot(v);
+
+    expect(replacementRoot).not.toBe(firstRoot);
+    expect(disposeMountGlows).toHaveBeenCalledOnce();
+    expect(disposeMountGlows).toHaveBeenCalledWith(first);
+    expect(attachMountGlows).toHaveBeenNthCalledWith(2, replacementRoot, replacement);
+    expect(v.mountGlows).toBe(second);
+    expect(vi.mocked(disposeMountGlows).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(attachMountGlows).mock.invocationCallOrder[1],
+    );
+  });
+
+  it('disposes a live glow when its whole entity view is removed', () => {
+    const { v } = rig();
+    const glows: MountGlows = { sprites: [], peaks: [], pulses: [], rates: [], sizes: [] };
+    const dispose = vi.fn();
+    v.mountGlows = glows;
+    v.mountVisual = { root: mountRoot(v), dispose } as unknown as CharacterVisual;
+    vi.mocked(disposeMountGlows).mockClear();
+
+    disposeMountView(v);
+
+    expect(disposeMountGlows).toHaveBeenCalledOnce();
+    expect(disposeMountGlows).toHaveBeenCalledWith(glows);
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(v.mountGlows).toBeNull();
+    expect(v.mountVisual).toBeNull();
+    expect(v.mountVisualKey).toBe('');
+  });
 });
 
 describe('mount transition effects', () => {
@@ -228,7 +277,7 @@ describe('mount transition effects', () => {
     };
   }
 
-  it('plays the call pose once on a summon-cast edge, never for a dismount cast', () => {
+  it('preloads and plays the call pose once on a summon-cast edge', () => {
     const state = { lastMountKey: '', wasMountCasting: false };
     const summon = transitionInputs({
       mountCasting: true,
@@ -239,13 +288,52 @@ describe('mount transition effects', () => {
     state.wasMountCasting = syncMountTransitionFx(state, summon);
     expect(summon.playCallPose).toHaveBeenCalledOnce();
     expect(summon.playCallPose).toHaveBeenCalledWith(2.75);
+    expect(summon.preloadEngine).toHaveBeenCalledOnce();
+    expect(summon.preloadEngine).toHaveBeenCalledWith('mech_bird');
     state.wasMountCasting = syncMountTransitionFx(state, summon);
     expect(summon.playCallPose).toHaveBeenCalledOnce();
+    expect(summon.preloadEngine).toHaveBeenCalledOnce();
+  });
 
-    state.wasMountCasting = false;
-    const dismount = transitionInputs({ mountCasting: true, mountCastKey: '' });
-    syncMountTransitionFx(state, dismount);
-    expect(dismount.playCallPose).not.toHaveBeenCalled();
+  it('preloads a summon when the current body cannot play the optional call pose', () => {
+    const state = { lastMountKey: '', wasMountCasting: false };
+    const summon = transitionInputs({
+      mountCasting: true,
+      mountCastKey: 'mech_bird',
+      mountCastRemaining: 2.75,
+      poseAllowed: false,
+    });
+
+    expect(syncMountTransitionFx(state, summon)).toBe(true);
+    expect(summon.playCallPose).not.toHaveBeenCalled();
+    expect(summon.preloadEngine).toHaveBeenCalledOnce();
+    expect(summon.preloadEngine).toHaveBeenCalledWith('mech_bird');
+  });
+
+  it.each([
+    ['no active cast', false, 'mech_bird', false],
+    ['dismount cast', true, '', false],
+    ['already-latched summon cast', true, 'mech_bird', true],
+  ] as const)(
+    'does not fire summon-start work for %s',
+    (_label, mountCasting, mountCastKey, wasMountCasting) => {
+      const state = { lastMountKey: '', wasMountCasting };
+      const input = transitionInputs({ mountCasting, mountCastKey });
+
+      syncMountTransitionFx(state, input);
+
+      expect(input.playCallPose).not.toHaveBeenCalled();
+      expect(input.preloadEngine).not.toHaveBeenCalled();
+    },
+  );
+
+  it('returns a false latch on the first frame after casting ends', () => {
+    const state = { lastMountKey: '', wasMountCasting: true };
+    const input = transitionInputs({ mountCasting: false, mountCastKey: 'mech_bird' });
+
+    expect(syncMountTransitionFx(state, input)).toBe(false);
+    expect(input.playCallPose).not.toHaveBeenCalled();
+    expect(input.preloadEngine).not.toHaveBeenCalled();
   });
 
   it('fires appearance, swap, and dismount effects exactly on mount-key edges', () => {

@@ -43,6 +43,36 @@ describe('character presentation sleep wiring', () => {
     expect(offscreenBlock).toContain('this.endStowGesture();');
   });
 
+  it('wires touchdown into a landing one-shot that yields immediately to movement', () => {
+    const start = characterVisual.indexOf(
+      'update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {',
+    );
+    const end = characterVisual.indexOf('\n  /**', start + 1);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const update = characterVisual.slice(start, end);
+
+    const edgeAt = update.indexOf(
+      'shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))',
+    );
+    const latchAt = update.indexOf('this.currentOneShotIsLanding = true;', edgeAt);
+    const stateAt = update.indexOf('const desired = this.desiredBase(s);', latchAt);
+    const cancelAt = update.indexOf('MOVING_STATES.has(desired)', stateAt);
+    const handoffAt = update.indexOf(
+      'this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);',
+      cancelAt,
+    );
+
+    expect(edgeAt).toBeGreaterThan(-1);
+    expect(update.slice(edgeAt, latchAt)).toContain('this.playOneShot(landClip, 1);');
+    expect(latchAt).toBeGreaterThan(edgeAt);
+    expect(stateAt).toBeGreaterThan(latchAt);
+    expect(cancelAt).toBeGreaterThan(stateAt);
+    expect(update.slice(cancelAt, handoffAt)).toContain('this.currentIsOneShot = false;');
+    expect(update.slice(cancelAt, handoffAt)).toContain('this.currentOneShotIsLanding = false;');
+    expect(handoffAt).toBeGreaterThan(cancelAt);
+  });
+
   it('persists the Recklessness latch across camera re-entry and clears it on aura end', () => {
     expect(renderer).toContain('const nextRecklessSkullsLatch = nextRecklessnessSkullsLatch(');
     expect(renderer).toContain(

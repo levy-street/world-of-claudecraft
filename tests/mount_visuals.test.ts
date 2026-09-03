@@ -95,44 +95,114 @@ describe('mount visual specs cover the sim catalog', () => {
       restoreGfx();
     }
   });
+
+  it('pins the Cluckwork Mech Bird rig, gait aliases, and rider placement', () => {
+    expect(MOUNT_VISUAL_SPECS.mech_bird).toEqual({
+      visualKey: 'mount_mech_bird',
+      seat: 2.05,
+      seatFwd: 0,
+      rigged: true,
+      bobAmp: 0,
+      bobHz: 0,
+      bobIdle: false,
+      bobShape: 'hop',
+      fx: null,
+      lamps: [],
+      seatBone: null,
+      glows: [],
+      ride: null,
+      jumpTips: false,
+    });
+    expect(VISUALS.mount_mech_bird).toMatchObject({
+      url: 'models/mounts/mech_bird.glb',
+      height: 3.4,
+      walkRef: 5.2,
+      runRef: 12.25,
+      lazyPreload: true,
+    });
+    expect(VISUALS.mount_mech_bird.clips).toEqual({
+      idle: 'Idle',
+      walk: 'Run',
+      run: 'Run',
+      attack: [],
+      death: 'Idle',
+      jump: 'Jump',
+    });
+
+    const bytes = readFileSync(path.join(__dirname, '..', 'public', 'models/mounts/mech_bird.glb'));
+    const jsonLength = bytes.readUInt32LE(12);
+    const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+      animations?: { name?: string }[];
+    };
+    expect((json.animations ?? []).map((animation) => animation.name).sort()).toEqual([
+      'Idle',
+      'Jump',
+      'Run',
+    ]);
+  });
 });
 
 interface RidePoseHarness {
   rideBlend: number;
+  climbOn: boolean;
+  climbBlend: number;
   setRidePose(spec: MountRideSpec | null): void;
   applyRidePose(dt: number): void;
 }
 
+function ridePoseHarness(): {
+  visual: RidePoseHarness;
+  bones: Map<string, THREE.Object3D>;
+} {
+  const model = new THREE.Group();
+  const bones = new Map<string, THREE.Object3D>();
+  for (const name of [
+    'upperlegl',
+    'upperlegr',
+    'lowerlegl',
+    'lowerlegr',
+    'footl',
+    'footr',
+    'hips',
+  ]) {
+    const bone = new THREE.Object3D();
+    bone.name = name;
+    bones.set(name, bone);
+    model.add(bone);
+  }
+  const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
+  Object.assign(visual, {
+    model,
+    rideSpec: null,
+    rideBlend: 0,
+    climbOn: false,
+    climbBlend: 0,
+    climbLegBones: undefined,
+    climbShinBones: undefined,
+    rideFootBones: undefined,
+    rideHipBone: undefined,
+  });
+  return { visual, bones };
+}
+
+function boneNamed(bones: Map<string, THREE.Object3D>, name: string): THREE.Object3D {
+  const bone = bones.get(name);
+  if (!bone) throw new Error(`the ride-pose test rig is missing ${name}`);
+  return bone;
+}
+
+function expectQuaternion(
+  actual: THREE.Quaternion,
+  expected: readonly [number, number, number, number],
+): void {
+  for (const [index, component] of actual.toArray().entries()) {
+    expect(component).toBeCloseTo(expected[index], 12);
+  }
+}
+
 describe('Chimeglass rider straddle', () => {
-  it('drives the production CharacterVisual pose onto both leg chains and hips', () => {
-    const model = new THREE.Group();
-    const bones = new Map<string, THREE.Object3D>();
-    for (const name of [
-      'upperlegl',
-      'upperlegr',
-      'lowerlegl',
-      'lowerlegr',
-      'footl',
-      'footr',
-      'hips',
-    ]) {
-      const bone = new THREE.Object3D();
-      bone.name = name;
-      bones.set(name, bone);
-      model.add(bone);
-    }
-    const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
-    Object.assign(visual, {
-      model,
-      rideSpec: null,
-      rideBlend: 0,
-      climbOn: false,
-      climbBlend: 0,
-      climbLegBones: undefined,
-      climbShinBones: undefined,
-      rideFootBones: undefined,
-      rideHipBone: undefined,
-    });
+  it('drives the literal authored pose onto both leg chains and hips', () => {
+    const { visual, bones } = ridePoseHarness();
     const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
     expect(ride).toEqual({ spread: 0.68, thigh: 0.8, knee: 0.6, ankle: -0.45, hips: -0.18 });
     if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
@@ -140,53 +210,78 @@ describe('Chimeglass rider straddle', () => {
     visual.setRidePose(ride);
     visual.applyRidePose(0.125);
 
-    const axisX = new THREE.Vector3(1, 0, 0);
-    const axisZ = new THREE.Vector3(0, 0, 1);
-    const rest = new THREE.Quaternion().setFromAxisAngle(axisX, Math.PI);
-    for (const [index, suffix] of ['l', 'r'].entries()) {
-      const side = index === 0 ? 1 : -1;
-      const thigh = new THREE.Quaternion()
-        .setFromAxisAngle(axisZ, side * ride.spread)
-        .multiply(new THREE.Quaternion().setFromAxisAngle(axisX, -ride.thigh))
-        .multiply(rest);
-      expect(bones.get(`upperleg${suffix}`)?.quaternion.angleTo(thigh)).toBeLessThan(1e-8);
-      const shin = new THREE.Quaternion().setFromAxisAngle(axisX, ride.knee);
-      expect(bones.get(`lowerleg${suffix}`)?.quaternion.angleTo(shin)).toBeLessThan(1e-8);
-      const foot = new THREE.Quaternion().setFromAxisAngle(axisX, ride.ankle ?? 0);
-      expect(bones.get(`foot${suffix}`)?.quaternion.angleTo(foot)).toBeLessThan(1e-8);
-    }
-    expect(bones.get('hips')?.rotation.x).toBeCloseTo(-0.18, 9);
+    expectQuaternion(
+      boneNamed(bones, 'upperlegl').quaternion,
+      [0.8683345493323961, 0.30716195257435025, 0.12986599060280818, 0.3671259590537949],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'upperlegr').quaternion,
+      [0.8683345493323961, -0.30716195257435025, -0.12986599060280818, 0.3671259590537949],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'lowerlegl').quaternion,
+      [0.29552020666133955, 0, 0, 0.955336489125606],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'lowerlegr').quaternion,
+      [0.29552020666133955, 0, 0, 0.955336489125606],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'footl').quaternion,
+      [-0.22310636213174545, 0, 0, 0.9747941070689433],
+    );
+    expectQuaternion(
+      boneNamed(bones, 'footr').quaternion,
+      [-0.22310636213174545, 0, 0, 0.9747941070689433],
+    );
+    expect(boneNamed(bones, 'hips').rotation.x).toBeCloseTo(-0.18, 12);
   });
 
-  it('yields the legs to climbing and unwinds the ride layer when the mount clears', () => {
-    const thigh = new THREE.Object3D();
-    thigh.name = 'upperlegl';
-    const model = new THREE.Group();
-    model.add(thigh);
-    const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
-    Object.assign(visual, {
-      model,
-      rideSpec: null,
-      rideBlend: 0,
-      climbOn: true,
-      climbBlend: 0,
-      climbLegBones: undefined,
-      climbShinBones: undefined,
-      rideFootBones: undefined,
-      rideHipBone: undefined,
-    });
+  it('yields the legs while the character is actively climbing', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.climbOn = true;
+    visual.climbBlend = 0;
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(boneNamed(bones, 'upperlegl').quaternion.equals(new THREE.Quaternion())).toBe(true);
+  });
+
+  it('yields the legs while a previous climb pose is still blending out', () => {
+    const { visual, bones } = ridePoseHarness();
+    const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.climbOn = false;
+    visual.climbBlend = 0.25;
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(boneNamed(bones, 'upperlegl').quaternion.equals(new THREE.Quaternion())).toBe(true);
+  });
+
+  it('hands the legs back to the unposed mixer frame when the mount clears', () => {
+    const { visual, bones } = ridePoseHarness();
     const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
     if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
 
     visual.setRidePose(ride);
     visual.applyRidePose(0.125);
-    expect(visual.rideBlend).toBe(0);
-    expect(thigh.quaternion.equals(new THREE.Quaternion())).toBe(true);
+    const thigh = boneNamed(bones, 'upperlegl');
+    expect(thigh.quaternion.equals(new THREE.Quaternion())).toBe(false);
 
-    Object.assign(visual, { climbOn: false, rideBlend: 1 });
+    // The animation mixer writes its unmounted pose before the post-mixer ride
+    // layer runs. Clearing the ride spec must leave that fresh pose untouched,
+    // not force identity or reapply the stale straddle.
+    const mixerPose = new THREE.Quaternion().setFromEuler(new THREE.Euler(0.14, -0.2, 0.07));
+    thigh.quaternion.copy(mixerPose);
     visual.setRidePose(null);
     visual.applyRidePose(0.125);
     expect(visual.rideBlend).toBe(0);
+    expect(thigh.quaternion.angleTo(mixerPose)).toBeLessThan(1e-12);
   });
 });
 

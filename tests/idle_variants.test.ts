@@ -9,6 +9,10 @@ import {
 } from '../src/render/characters/visual';
 
 const repoRoot = path.resolve(__dirname, '..');
+const characterVisualSource = readFileSync(
+  new URL('../src/render/characters/visual.ts', import.meta.url),
+  'utf8',
+);
 
 /** Clip name -> duration (seconds), read straight out of a GLB's accessors. */
 function clipDurations(glbRelative: string): Map<string, number> {
@@ -112,6 +116,46 @@ describe('idle-breaker clips', () => {
       jump: 'Jump',
       land: 'Land',
     });
+  });
+
+  it('registers every scheduled idle clip in the CharacterVisual action map', () => {
+    const start = characterVisualSource.indexOf('function clipNamesOf(def: VisualDef): string[] {');
+    const end = characterVisualSource.indexOf('\nfunction firstLoadedEmoteClip(', start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const actionMap = characterVisualSource.slice(start, end);
+
+    expect(characterVisualSource).toContain(
+      'for (const name of [...clipNamesOf(prep.def), ...SKIN_ATTACK_CLIP_NAMES]) {',
+    );
+    expect(actionMap).toContain('...(c.idleVariants ?? []),');
+    expect(actionMap).toContain('c.idleBeat?.clip,');
+  });
+
+  it('drives both schedulers from update and hands an interrupted fidget to locomotion', () => {
+    const start = characterVisualSource.indexOf(
+      'update(dt: number, s: AnimState, animate: boolean, reducedMotion = false): void {',
+    );
+    const end = characterVisualSource.indexOf('\n  /**', start + 1);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const update = characterVisualSource.slice(start, end);
+
+    const cancelAt = update.indexOf(
+      "this.currentIsOneShot && this.currentOneShotIsIdleVariant && desired !== 'idle'",
+    );
+    const beatAt = update.indexOf('this.tickIdleBeat(dt, desired);');
+    const variantAt = update.indexOf('this.tickIdleVariant(dt, desired);');
+    const gaitAt = update.indexOf('// foot-speed matching on locomotion cycles');
+    expect(cancelAt).toBeGreaterThan(-1);
+    expect(update.slice(cancelAt, beatAt)).toContain('this.currentIsOneShot = false;');
+    expect(update.slice(cancelAt, beatAt)).toContain('this.currentOneShotIsIdleVariant = false;');
+    expect(update.slice(cancelAt, beatAt)).toContain(
+      'this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);',
+    );
+    expect(beatAt).toBeGreaterThan(cancelAt);
+    expect(variantAt).toBeGreaterThan(beatAt);
+    expect(gaitAt).toBeGreaterThan(variantAt);
   });
 
   it('fires a fidget on the authored 5-second beat, clear of the previous one', () => {
