@@ -278,11 +278,12 @@ describe('live post pipeline', () => {
     for (const target of targets) expect(target.texture.type).toBe(THREE.UnsignedByteType);
   });
 
-  it('keeps ultra AO full-res at 1080p and drops it to half-res at 4K', async () => {
+  it('keeps ultra AO full-res at 1080p and drops it to half-res from 1440p up', async () => {
     vi.stubGlobal('Image', class {});
     const { buildComposer } = await import('../src/render/post');
     const { AO_FULL_RES_MAX_PIXELS } = await import('../src/render/post_pixel_budget_core');
     expect(1920 * 1080).toBeLessThanOrEqual(AO_FULL_RES_MAX_PIXELS);
+    expect(2560 * 1440).toBeGreaterThan(AO_FULL_RES_MAX_PIXELS);
     expect(3840 * 2160).toBeGreaterThan(AO_FULL_RES_MAX_PIXELS);
 
     const readHalfRes = (width: number, height: number): boolean => {
@@ -300,6 +301,8 @@ describe('live post pipeline', () => {
     // The tier request is unchanged in both cases; only the resolved value moves.
     expect(gfxSettings.aoFullRes).toBe(true);
     expect(readHalfRes(1920, 1080)).toBe(false);
+    expect(readHalfRes(2560, 1440)).toBe(true);
+    expect(readHalfRes(3440, 1440)).toBe(true);
     expect(readHalfRes(3840, 2160)).toBe(true);
     expect(gfxSettings.aoFullRes).toBe(true);
   });
@@ -351,7 +354,7 @@ describe('live post pipeline', () => {
     const ao = post.ao as unknown as { configuration: { halfRes: boolean } };
     expect(ao.configuration.halfRes).toBe(false);
 
-    post.setSize(3840, 2160, 1);
+    post.setSize(2560, 1440, 1);
     expect(ao.configuration.halfRes).toBe(true);
 
     // The live chain after the flip must match the plan for the arm it flipped
@@ -364,14 +367,14 @@ describe('live post pipeline', () => {
     expect(halfResPlan.renderTargets.map((target) => target.id)).toContain('n8ao-depth-downsample');
     expect(aoInternals.depthDownsampleTarget).toBeTruthy();
     expect(halfResPlan.renderTargets.find((target) => target.id === 'n8ao-ao-a')?.scale).toBe(0.5);
-    expect(aoInternals.writeTargetInternal.width).toBe(3840 / 2);
-    expect(aoInternals.writeTargetInternal.height).toBe(2160 / 2);
+    expect(aoInternals.writeTargetInternal.width).toBe(2560 / 2);
+    expect(aoInternals.writeTargetInternal.height).toBe(1440 / 2);
 
     post.setSize(1920, 1080, 1);
     expect(ao.configuration.halfRes).toBe(false);
 
     // The pixel count, not the CSS size, is what the budget reads: a 1080p
-    // window on a 2x display is a 4K drawing buffer.
+    // window on a 2x display is a 4K drawing buffer, well past the cut.
     post.setSize(1920, 1080, 2);
     expect(ao.configuration.halfRes).toBe(true);
   });

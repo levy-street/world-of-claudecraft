@@ -2,100 +2,76 @@
 //
 // N8AO's full-res Medium mode is the single most expensive item in the ultra
 // post chain, and its cost is linear in drawing-buffer pixels. On the 1920x1080
-// panel the tier was tuned against that is fine; on the 1440p and 4K panels
-// Windows players render at DPR 1 (3.7 to 8.3 Mpx, where the DPR cap never
-// binds) the same pass costs two to four times as much for the same look at a
-// smaller angular size. So `aoFullRes` cannot be a tier constant alone: the
-// tier states the REQUEST and this core resolves the effective value against
-// the live pixel count, the same shape as the region governor (a renderer
-// decision, never a HUD-visible graphics knob).
+// panel the tier was tuned against that is fine; above it the same pass costs
+// twice to four times as much for the same look at a smaller angular size,
+// because Windows clients render at DPR 1 to 1.7 where the DPR cap rarely
+// binds. So `aoFullRes` cannot be a tier constant alone: the tier states the
+// REQUEST and this core resolves the effective value against the live pixel
+// count, the same shape as the region governor (a renderer decision, never a
+// HUD-visible graphics knob).
 //
-// Derivation. Both AO arms are counted in texture taps per OUTPUT pixel, read
-// off the shaders this repo actually compiles: n8ao 2.0.0 AFTER
-// StaticOpaqueN8AOPass specializes them (post_n8ao.ts), which is two taps
-// cheaper than upstream on the full-res arm and one on the half-res arm. Its
-// specializeStaticEvaluation deletes the evaluate pass's `sceneDiffuse` fetch
-// on both arms, and folds computeNormal's centre `texelFetch(sceneDepth)` into
-// the depth the caller already sampled on the full-res arm.
+// The measurement. GPU timer queries per render call on a Windows 11 desktop
+// (RTX 3060, ANGLE D3D11, 2005x1440 drawing buffer = 2.89 Mpx, ultra, vsync
+// off), against a GPU frame of 9.3 to 11.3 ms:
 //
-//   full-res Medium (aoSamples 16, denoiseSamples 8, 2 denoise iterations)
-//     evaluate    depth + computeNormal(8) + blue noise + 16 samples
-//     denoise x2  AO + depth + blue noise + 2 taps per denoise sample
-//     composite   beauty + depth + AO
-//   half-res Low (aoSamples 16, denoiseSamples 4, halfRes + depthAwareUpsampling)
-//     downsample  4 depth taps + computeNormal(9), at quarter pixel count
-//     evaluate    depth + packed normal + blue noise + 16 samples, at quarter
-//                 pixel count
-//     denoise x2  as above with 4 denoise samples, at quarter pixel count
-//     composite   beauty + depth + computeNormal(9) + a 3x3 depth-aware
-//                 upsample window, 2 taps per neighbour, at FULL pixel count
+//   full-res Medium   3.10 ms   evaluate 1.70, two denoise passes 0.63 each,
+//                               composite 0.14
+//   half-res Low      0.50 ms   the arm the high tier already runs, with the
+//                               depth-aware upsample in its composite
+//   rest of the post chain 1.20 ms
 //
-// The half-res arm is not a quarter of the full-res arm: it moves the sampling
-// down but buys back a full-res bilateral upsample in the composite. What it
-// saves is the difference between the two per-pixel tap rates.
+// So full-res AO is 27 to 33 percent of the whole GPU frame on that host, and
+// the arm swap gives 2.6 ms of it back. The half-res arm is far cheaper than
+// its shader work suggests: it moves evaluate and both denoise passes to a
+// quarter of the pixels and buys back only a full-rate 3x3 depth-aware upsample
+// in the composite, and the measurement prices that upsample near nothing. An
+// earlier revision of this file placed the cut from a tap count instead, which
+// put the half-res arm at 0.63 of the full-res one; the measurement puts it at
+// 0.16, which is the whole reason the cut moves here. A tap is not a
+// millisecond.
 //
-// The budget itself: the whole full-res chain at 1920x1080 is the cost the tier
-// already accepts on the reference panel, so full-res AO stays selected while
-// the UPGRADE it buys over the half-res arm stays within that one accepted
-// chain. Above that point the upgrade alone costs more than the entire pass did
-// on the panel it was tuned for, and the half-res arm takes over.
+// The budget: full-res AO stays selected while the UPGRADE it buys over the
+// half-res arm stays within what the whole full-res pass costs at the 1920x1080
+// reference panel, which is the cost the tier already accepts there. Above that
+// point the upgrade alone costs more than the entire pass did on the panel it
+// was tuned for, and the half-res arm takes over.
 //
-// The cut lands at about 5.67 Mpx: 1080p, 1440p and 3440x1440 ultrawide keep
-// full-res AO, 4K and wider do not. Be plain about what that number is: a
-// POLICY cut derived from a tap count, not a measured crossover. A tap is not a
-// millisecond (a dependent projected textureLod and a coherent texelFetch each
-// count one here, and no ALU or bandwidth is priced), so the number says where
-// this repo has decided full-res AO stops being worth its share, not where the
-// two arms cost the same on any particular GPU. The audit that opened this work
-// put the crossover at 1440p-class, 3.7 Mpx, from sample counts alone; counting
-// every tap leaves every common panel on the same side of the line either way.
+// The cut lands at about 2.47 Mpx, the 1080p class: 1920x1080 (2.07 Mpx) and
+// 1920x1200 (2.30 Mpx) keep full-res AO, and every panel above that class takes
+// the half-res arm, including the ones Windows high-plus players actually sit
+// at: 2560x1440 (3.69 Mpx), 3440x1440 (4.95 Mpx) and 3840x2160 (8.29 Mpx). Be
+// plain about what that number is: a POLICY cut, placed from one measured host.
+// The ratio between the two arms moves with the driver and the GPU, so the
+// number says where this repo has decided full-res AO stops being worth its
+// share of the frame, not where the two arms cost the same everywhere.
 //
 // Hysteresis. Crossing the cut makes n8ao rebuild and relink its evaluate,
 // denoise and compositer materials, so the arm must not chatter at the boundary.
 // The band is one render-scale slider step wide, measured in pixels: that slider
 // is the finest-grained control a player has over the pixel count, so a band
-// that wide means no single step of it can flip the arm and step back.
+// that wide means no single step of it can flip the arm and step back. Around
+// the new cut the band reaches 2.74 Mpx, which still leaves every 1440p-class
+// panel on the half-res arm even when it walks in from below.
 
-/** n8ao setQualityMode('Medium'): the ultra tier's full-res request. */
-const AO_SAMPLES_MEDIUM = 16;
-const DENOISE_SAMPLES_MEDIUM = 8;
-/** n8ao setQualityMode('Low'): the half-res arm, as the high tier already runs it. */
-const AO_SAMPLES_LOW = 16;
-const DENOISE_SAMPLES_LOW = 4;
-/** n8ao runs the poisson denoise twice on both arms. */
-const DENOISE_ITERATIONS = 2;
-/** computeNormal(): the 9 depth texelFetches that reconstruct a normal. */
-const NORMAL_RECONSTRUCTION_TAPS = 9;
-/** The 3x3 window the HALFRES composite walks, 2 taps per neighbour. */
-const UPSAMPLE_WINDOW_TAPS = 9 * 2;
-/** Half-res buffers hold a quarter of the output pixels. */
-const HALF_RES_PIXEL_FRACTION = 0.25;
+/** One megapixel, the unit the measured per-pixel costs are quoted in. */
+const MEGAPIXEL = 1_000_000;
 
-function denoiseTaps(samples: number): number {
-  // AO + depth + blue noise, then an AO and a depth tap per denoise sample.
-  return DENOISE_ITERATIONS * (3 + 2 * samples);
-}
+/** The drawing buffer the arms were timed at (2005x1440 on the 3060 host). */
+const AO_MEASURED_PIXELS = 2005 * 1440;
 
-/** Texture taps per output pixel for the full-res Medium arm. */
-export const AO_FULL_RES_TAPS_PER_PIXEL =
-  // evaluate: depth and blue noise (the beauty fetch is specialized away), a
-  // normal reconstruction whose centre tap the caller already holds, and the
-  // AO samples
-  2 +
-  (NORMAL_RECONSTRUCTION_TAPS - 1) +
-  AO_SAMPLES_MEDIUM +
-  denoiseTaps(DENOISE_SAMPLES_MEDIUM) +
-  // composite: beauty, depth, AO
-  3;
+/** Full-res Medium: evaluate, two denoise passes, composite. */
+const AO_FULL_RES_MEASURED_MS = 1.7 + 2 * 0.63 + 0.14;
 
-/** Texture taps per output pixel for the half-res Low arm. */
-export const AO_HALF_RES_TAPS_PER_PIXEL =
-  HALF_RES_PIXEL_FRACTION *
-    // depth + normal downsample, then evaluate (depth, packed normal, blue
-    // noise, samples) and denoise on the half-res grid
-    (4 + NORMAL_RECONSTRUCTION_TAPS + (3 + AO_SAMPLES_LOW) + denoiseTaps(DENOISE_SAMPLES_LOW)) +
-  // composite: beauty, depth, a reconstructed normal, and the upsample window
-  (2 + NORMAL_RECONSTRUCTION_TAPS + UPSAMPLE_WINDOW_TAPS);
+/** Half-res Low, the arm the high tier already runs, on the same frames. */
+const AO_HALF_RES_MEASURED_MS = 0.5;
+
+/** Milliseconds per megapixel of output for the full-res Medium arm. */
+export const AO_FULL_RES_MS_PER_MEGAPIXEL =
+  AO_FULL_RES_MEASURED_MS / (AO_MEASURED_PIXELS / MEGAPIXEL);
+
+/** Milliseconds per megapixel of output for the half-res Low arm. */
+export const AO_HALF_RES_MS_PER_MEGAPIXEL =
+  AO_HALF_RES_MEASURED_MS / (AO_MEASURED_PIXELS / MEGAPIXEL);
 
 /** The panel the ultra tier's AO cost was tuned against. */
 export const AO_REFERENCE_PIXELS = 1920 * 1080;
@@ -112,12 +88,12 @@ export const AO_ARM_HYSTERESIS = 1 / (1 - RENDER_SCALE_STEP) ** 2;
 
 /**
  * The largest drawing buffer that still gets full-res AO: the point where the
- * upgrade from the half-res arm costs more than the whole full-res chain does
- * at the 1920x1080 reference panel.
+ * upgrade from the half-res arm costs more than the whole full-res pass does at
+ * the 1920x1080 reference panel.
  */
 export const AO_FULL_RES_MAX_PIXELS = Math.floor(
-  (AO_FULL_RES_TAPS_PER_PIXEL * AO_REFERENCE_PIXELS) /
-    (AO_FULL_RES_TAPS_PER_PIXEL - AO_HALF_RES_TAPS_PER_PIXEL),
+  (AO_FULL_RES_MS_PER_MEGAPIXEL * AO_REFERENCE_PIXELS) /
+    (AO_FULL_RES_MS_PER_MEGAPIXEL - AO_HALF_RES_MS_PER_MEGAPIXEL),
 );
 
 /** The buffer a full-res arm has to exceed before it gives up its arm. */
