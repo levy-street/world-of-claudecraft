@@ -126,7 +126,10 @@ Sibling families (one line each; extraction targets, never re-grow `visual.ts`):
   `stow_transition.ts`, `skin_attack.ts`, `weapon_skin_materials.ts`, and
   `weapon_attack_style_core.ts`, a CROSS-SUBSYSTEM seam
   (`ability_vfx/painter.ts` imports `attackAbilityId` from it).
-- Perf cores: `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
+- Perf cores: `neutral_morph_merge.ts` (body-neutral composed bodies drop their
+  body-slider morph attributes before the part merge, so the nine body regions
+  become one draw and one skeleton instead of nine of each; see Modular bodies),
+  `skeleton_update_cache.ts`/`skeleton_update_core.ts` (skeleton
   palette update elision), `skin_gpu_layout.ts` (bone-texture compaction
   without changing weights, matrices, draws, or shader math),
   `skinned_sort_spheres.ts` (static sort spheres so three never brute-forces
@@ -323,9 +326,20 @@ per part.
   `setModularLookProvider` claims every player entity and composes peers from
   server truth; a character with no authored look still keeps the fixed
   `player_<class>` rig. Three consequences the code used to assume away:
-  - The unmerged morph parts (head, eyes, ears, lashes, brows, body regions) are
-    now a per-CROWD draw cost, not a one-character one. The far LOD is what
-    bounds it, and the band pulls in as the crowd grows (`crowd_lod.ts`).
+  - The unmerged morph parts (head, eyes, ears, lashes, brows, mouth, earrings)
+    are now a per-CROWD draw cost, not a one-character one, and every one of
+    them is its own Skeleton too (the GLB gives each part its own skin), so a
+    near composed body is one palette update and bone-texture upload PER PART
+    per pose tick, doubled by the shadow pass. The far LOD is what bounds it,
+    and the band pulls in as the crowd grows (`crowd_lod.ts`). The nine
+    body-region parts used to sit in that set for their body-slider morphs;
+    `neutral_morph_merge.ts` strips those morphs for a body-neutral look (the
+    in-game creator never exposes the body sliders, so that is every legitimate
+    look) so `mergeSkinnedParts` folds the regions into the one skin-detail
+    draw, and the variant key carries the neutral/live distinction so an
+    authored body still composes exactly as before
+    (`tests/neutral_morph_merge.test.ts` pins the draw and skeleton counts
+    against the shipped GLB).
   - `prepareVisual`'s far bake measures `DEFAULT_LOOK`, so it is wrong for a
     composed body. Composed bodies bake their own (`modularFarBake`), keyed by
     part set and minted on the first crossing into the far band; the colours are

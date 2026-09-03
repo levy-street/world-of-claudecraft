@@ -78,6 +78,11 @@ import {
   wearsFaceDecal,
 } from './modular';
 import {
+  bodyNeutral,
+  disposeOrphanedGeometries,
+  stripNeutralBodyMorphs,
+} from './neutral_morph_merge';
+import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,
 } from './paladin_bastion_sweep_clip';
@@ -1018,9 +1023,13 @@ const MODULAR_VARIANT_CACHE_MAX = 96;
  *  cannot bound, and the signal that a release site was missed. */
 const MODULAR_VARIANT_WARN_AT = 128;
 
-/** The cache key for a composed part set: the GLB plus the picked node names. */
-function modularVariantKey(url: string, names: readonly string[]): string {
-  return `${url}|${names.join(',')}`;
+/** The cache key for a composed part set: the GLB plus the picked node names,
+ *  plus whether the body-slider morphs were folded away (neutral_morph_merge):
+ *  a body-neutral look and a body-authored look pick the same nodes but need
+ *  different geometry (merged regions vs live morph parts), so they must never
+ *  share an entry. */
+function modularVariantKey(url: string, names: readonly string[], app: ModularAppearance): string {
+  return `${url}|${names.join(',')}${bodyNeutral(app) ? '' : '|body:live'}`;
 }
 
 /** Every BufferGeometry the parsed GLB owns, memoized against the PARSED SCENE.
@@ -1135,8 +1144,12 @@ export function modularCacheStats(): { variants: number; live: number; recolors:
   return { variants: modularVariantCache.size, live, recolors: recolorCache.size };
 }
 
-function modularVariant(url: string, names: readonly string[]): ModularVariant {
-  const key = modularVariantKey(url, names);
+function modularVariant(
+  url: string,
+  names: readonly string[],
+  app: ModularAppearance,
+): ModularVariant {
+  const key = modularVariantKey(url, names, app);
   const hit = modularVariantCache.get(key);
   if (hit) {
     // re-insert so the eviction sweep above reads insertion order as recency
@@ -1167,7 +1180,16 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
     if (o !== root && o.type === 'Group' && o.children.length === 0) empty.push(o);
   });
   for (const o of empty) o.removeFromParent();
+  // A body-neutral look (every legitimate one: the creator never exposes the
+  // body sliders) drops the body regions' slider morphs first, so the merge
+  // below folds torso, arms, legs, hands and feet into the one skin-detail
+  // draw instead of refusing nine morph-carrying parts, each on its own
+  // Skeleton. The face parts keep their morphs. The copies the strip mints
+  // and the merge then leaves behind are freed here; any it leaves mounted
+  // are the variant's own (variantOwnedGeometries) and go on eviction.
+  const minted = bodyNeutral(app) ? stripNeutralBodyMorphs(root) : [];
   mergeSkinnedParts(root);
+  disposeOrphanedGeometries(root, minted);
   primeSkinnedSortSpheres(root);
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
@@ -1468,7 +1490,7 @@ export function attachDeferredFaceDecals(
 export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.SkinnedMesh | null {
   let root: THREE.Object3D;
   try {
-    root = modularVariant(def.url, modularPartNames(look.app, look.worn)).root;
+    root = modularVariant(def.url, modularPartNames(look.app, look.worn), look.app).root;
   } catch {
     return null;
   }
@@ -1508,7 +1530,9 @@ export function assembleModular(
   const names = modularPartNames(look.app, look.worn);
   // Nested inside the visual's `view-part:assemble` span; the variant step is
   // the cache miss (whole-GLB clone + part merge) or a map hit.
-  const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
+  const variant = timeBuildSpan('view-part:assemble:variant', () =>
+    modularVariant(def.url, names, look.app),
+  );
   const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
   // A skipDecals compose records no decal sample: the kind's EMA prices a real
   // decal step, and the far bake's throwaway would only add zeros to it.
@@ -1550,7 +1574,7 @@ export function assembleModular(
   // dispose ever running, which made the entry permanently unevictable: the
   // precise failure the cap exists to prevent. Down here, a throw anywhere in
   // assembly means no ref was ever taken, so there is nothing to leak.
-  root.userData.modularVariantKey = modularVariantKey(def.url, names);
+  root.userData.modularVariantKey = modularVariantKey(def.url, names, look.app);
   variant.refs++;
   return root;
 }
@@ -2454,7 +2478,7 @@ export function peekModularFarBake(key: string, look: ModularLook): ModularFarBa
   const def = VISUALS[key];
   if (!def?.modular) return null;
   const entry = modularVariantCache.get(
-    modularVariantKey(def.url, modularPartNames(look.app, look.worn)),
+    modularVariantKey(def.url, modularPartNames(look.app, look.worn), look.app),
   );
   return entry?.far ?? null;
 }
@@ -2504,7 +2528,7 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
   const prep = prepareVisual(key);
   const def = prep.def;
   if (!def.modular) return null;
-  const variant = modularVariant(def.url, modularPartNames(look.app, look.worn));
+  const variant = modularVariant(def.url, modularPartNames(look.app, look.worn), look.app);
   if (variant.far) return variant.far;
 
   // Pose a throwaway composed clone mid-idle and bake it, exactly as

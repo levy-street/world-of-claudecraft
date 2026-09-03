@@ -20,7 +20,9 @@
 // Env: CROWD_BATCHES=10,20,35,50 (cumulative crowd sizes), CROWD_W/H, CROWD_DPR,
 //      CROWD_SETTLE_MS, GAME_URL, SERVER_URL, BROWSER_PATH, CROWD_MIN_FPS (per-sample
 //      fps floor, unset = no floor), CROWD_JSON_OUT (evidence JSON path),
-//      CROWD_BASE_SHA and CROWD_HEAD_SHA (the compared revisions recorded in evidence).
+//      CROWD_BASE_SHA and CROWD_HEAD_SHA (the compared revisions recorded in evidence),
+//      CROWD_APPEARANCE=1 (bots carry an authored look, so the crowd is composed
+//      modular bodies like real players rather than the fixed class rigs).
 //
 // This is a GATE, not just a probe (scripts/lib/bench_gate.mjs): every crowd batch
 // must join EXACTLY (actual sockets, bots.length, never attempts; partial joins fail,
@@ -36,6 +38,7 @@ import { BROWSER_PATH } from './browser_path.mjs';
 import { evaluateCrowdRun, parseCeilingEnv } from './lib/bench_gate.mjs';
 import { assertLoopbackUrl } from './lib/loopback_guard.mjs';
 import { worldAuthMessage } from './lib/world_auth.mjs';
+import { gearedArrivalAppearance } from './profiler/geared_arrival_fixture.mjs';
 
 // Stream every sampled row to a file immediately, so a kill/timeout (the render
 // client + dozens of bots can outrun a foreground budget) never loses results.
@@ -145,9 +148,24 @@ class Bot {
     this.token = reg.body.token;
     if (!this.token)
       throw new Error(`register failed for ${this.i}: ${JSON.stringify(reg.body).slice(0, 100)}`);
+    // CROWD_APPEARANCE=1: give every bot an authored look, so the crowd is
+    // COMPOSED modular bodies (what real players are: 83% of the active roster
+    // carries an appearance) instead of the fixed class rigs. Body sliders are
+    // zeroed to match production, where they are authoring-only.
+    const appearance =
+      process.env.CROWD_APPEARANCE === '1'
+        ? {
+            ...gearedArrivalAppearance(this.i),
+            body: { shoulders: 0, chest: 0, hips: 0, hands: 0, elbows: 0, knees: 0, feet: 0 },
+          }
+        : undefined;
     const char = await api(
       '/api/characters',
-      { name: this.name, class: this.cls },
+      {
+        name: this.name,
+        class: this.cls,
+        ...(appearance ? { appearance, helmHidden: this.i % 2 === 0 } : {}),
+      },
       this.token,
       xff,
     );
@@ -315,6 +333,10 @@ async function sample(page, label) {
       entityCount: g.world.entities.size,
       tier: rr.tier,
       scale: rr.effectiveRenderScale,
+      gl: rr.glRenderer,
+      lookPieces: rr.lookPieces ?? null,
+      gpuQueue: rr.gpuQueue ?? null,
+      createdViews: rr.renderDiagnostics?.createdViews ?? null,
     };
   }, label);
 }
@@ -338,6 +360,12 @@ async function main() {
       '--enable-gpu',
       '--disable-gpu-vsync',
       '--disable-frame-rate-limit',
+      // A headed window that another window covers is "occluded" to Chromium,
+      // which then throttles its rAF like a background tab: the bench read 11
+      // fps solo on an idle scene until these were added. Never let the
+      // desktop's window stacking decide the sample.
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding',
     ],
   });
   const bots = [];
@@ -377,6 +405,19 @@ async function main() {
     const page = await browser.newPage();
     await page.setViewport({ width: W, height: H, deviceScaleFactor: DPR });
     page.on('pageerror', (e) => console.log('  [pageerror]', String(e).slice(0, 120)));
+    // Console errors and warnings, deduped by text: a per-frame fail-soft path
+    // (a view build that keeps throwing, a compile gate refusing) shows up
+    // here and nowhere else in the sample rows.
+    const seenConsole = new Map();
+    page.on('console', (m) => {
+      const type = m.type();
+      if (type !== 'error' && type !== 'warning') return;
+      const text = m.text().slice(0, 160);
+      const n = (seenConsole.get(text) ?? 0) + 1;
+      seenConsole.set(text, n);
+      if (n === 1 || n === 10 || n === 100 || n === 1000)
+        console.log(`  [console.${type} x${n}]`, text);
+    });
     console.log('entering world (render client)...');
     await enterWorld(page);
     if (process.env.CROWD_AT) {
