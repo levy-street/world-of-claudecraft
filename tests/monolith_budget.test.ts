@@ -273,7 +273,15 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Raised 18905 -> 18926 (+21) for the Loot Explorer window: the field/ctor,
+    // the toggle method, the close-switch case, and the two minimap wiring
+    // lines are thin-consumer wiring to the fully extracted domain module
+    // (src/ui/hud/loot_explorer/); everything with substance (the index
+    // builder, filters, encounter grouping, the painter) lives there. Same
+    // shape as every prior window wiring (Reliquary, Deeds, Professions), and
+    // no clean branch-owned extraction exists for a brand-new window's own
+    // wiring. Maintainer decision, exact count: any further growth reds again.
+    ceiling: 18926,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -978,6 +978,7 @@ export const zh_TW: EnTranslations = {
       "mounts": "坐騎",
       "professions": "專業",
       "reliquary": "聖物庫",
+      "lootExplorer": "戰利品瀏覽器",
       "nameplates": "名條",
       "haptics": "觸覺回饋",
       "hapticsOff": "觸覺回饋已關閉",
@@ -4601,6 +4602,43 @@ export const zh_TW: EnTranslations = {
       "listingStatusCancelled": "已取消",
       "listingStatusSuspended": "已凍結",
       "listingStatusUnsold": "未售出"
+    },
+    "lootExplorer": {
+      "title": "戰利品瀏覽器",
+      "close": "關閉戰利品瀏覽器",
+      "searchPlaceholder": "搜尋物品...",
+      "searchAria": "搜尋物品",
+      "filterCategoryAria": "來源",
+      "filterClassAria": "職業",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "品質",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "依來源",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "地城",
+        "delve": "秘探",
+        "open_world": "開放世界",
+        "rift": "Rift",
+        "vendor": "商人",
+        "quest_reward": "任務獎勵",
+        "quest_objective": "任務目標",
+        "ground_object": "世界物件",
+        "starting_equipment": "初始裝備"
+      },
+      "difficulty": {
+        "normal": "普通",
+        "heroic": "英雄"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% 掉落機率",
+      "guaranteed": "必得",
+      "gatedByQuest": "任務進行中：{quest}",
+      "empty": "沒有符合這些篩選條件的戰利品。",
+      "resultCount": "{count} 個結果"
     }
   },
   "gatherEvent": {

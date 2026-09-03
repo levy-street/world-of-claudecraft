@@ -978,6 +978,7 @@ export const ru_RU: EnTranslations = {
       "mounts": "Транспорт",
       "professions": "Профессии",
       "reliquary": "Реликварий",
+      "lootExplorer": "Обозреватель добычи",
       "nameplates": "Имена",
       "haptics": "Вибрация",
       "hapticsOff": "Вибрация выкл.",
@@ -4601,6 +4602,43 @@ export const ru_RU: EnTranslations = {
       "listingStatusCancelled": "Отменён",
       "listingStatusSuspended": "Приостановлен",
       "listingStatusUnsold": "Не продан"
+    },
+    "lootExplorer": {
+      "title": "Обозреватель добычи",
+      "close": "Закрыть обозреватель добычи",
+      "searchPlaceholder": "Поиск предметов...",
+      "searchAria": "Поиск предметов",
+      "filterCategoryAria": "Источник",
+      "filterClassAria": "Класс",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "Качество",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "По источникам",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "Подземелье",
+        "delve": "Вылазка",
+        "open_world": "Открытый мир",
+        "rift": "Rift",
+        "vendor": "Торговец",
+        "quest_reward": "Награда за задание",
+        "quest_objective": "Цель задания",
+        "ground_object": "Мировой объект",
+        "starting_equipment": "Начальное снаряжение"
+      },
+      "difficulty": {
+        "normal": "Обычная",
+        "heroic": "Героическая"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "Шанс {pct}%",
+      "guaranteed": "Гарантированно",
+      "gatedByQuest": "Во время задания: {quest}",
+      "empty": "Нет добычи, соответствующей этим фильтрам.",
+      "resultCount": "Результатов: {count}"
     }
   },
   "gatherEvent": {

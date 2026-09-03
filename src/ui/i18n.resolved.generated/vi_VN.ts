@@ -978,6 +978,7 @@ export const vi_VN: EnTranslations = {
       "mounts": "Thú Cưỡi",
       "professions": "Nghề nghiệp",
       "reliquary": "Kỳ Trân Các",
+      "lootExplorer": "Loot Explorer",
       "nameplates": "Tên",
       "haptics": "Phản Hồi Rung",
       "hapticsOff": "Tắt Phản Hồi Rung",
@@ -4601,6 +4602,43 @@ export const vi_VN: EnTranslations = {
       "listingStatusCancelled": "Đã Hủy",
       "listingStatusSuspended": "Đã Tạm Khóa",
       "listingStatusUnsold": "Chưa Bán Được"
+    },
+    "lootExplorer": {
+      "title": "Loot Explorer",
+      "close": "Close Loot Explorer",
+      "searchPlaceholder": "Search items...",
+      "searchAria": "Search items",
+      "filterCategoryAria": "Source",
+      "filterClassAria": "Class",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "Quality",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "By Encounter",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "Dungeon",
+        "delve": "Delve",
+        "open_world": "Open World",
+        "rift": "Rift",
+        "vendor": "Vendor",
+        "quest_reward": "Quest Reward",
+        "quest_objective": "Quest Objective",
+        "ground_object": "World Object",
+        "starting_equipment": "Starting Equipment"
+      },
+      "difficulty": {
+        "normal": "Normal",
+        "heroic": "Heroic"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% chance",
+      "guaranteed": "Guaranteed",
+      "gatedByQuest": "While questing: {quest}",
+      "empty": "No loot matches these filters.",
+      "resultCount": "{count} results"
     }
   },
   "gatherEvent": {

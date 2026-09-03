@@ -5545,6 +5545,7 @@
   body.mobile-touch #quest-dialog,
   body.mobile-touch #spellbook,
   body.mobile-touch #bar-editor,
+  body.mobile-touch #loot-explorer-window,
   body.mobile-touch #options-menu,
   body.mobile-touch #options-menu.kb-wide,
   body.mobile-touch #options-menu.gfx-wide,
@@ -5557,13 +5558,16 @@
   /* Wider size group: quest-log/vendor/train/quest-dialog carry longer scrollable
      lists (quest text, vendor stock, the training ladder) so they claim more of
      the viewport width. The train window also scrolls internally here: it is a
-     standalone centered card (never the vendor's split-screen bags pairing). */
+     standalone centered card (never the vendor's split-screen bags pairing).
+     Loot Explorer joins it for the same reason: its toolbar (search plus four
+     filter selects) needs the same room as the vendor stock grid. */
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window,
   body.mobile-touch #quest-log-window,
   body.mobile-touch #vendor-window,
   body.mobile-touch #warfare-window,
-  body.mobile-touch #quest-dialog {
+  body.mobile-touch #quest-dialog,
+  body.mobile-touch #loot-explorer-window {
     width: clamp(320px, 76vw, 680px);
     max-width: calc(100vw - 20px);
   }
@@ -5608,6 +5612,17 @@
       12px -
       max(10px, env(safe-area-inset-bottom))
     );
+  }
+  /* Loot Explorer scrolls as one unit (toolbar included), the train/unbind
+     shape: it has no split-screen pairing to keep visible underneath. */
+  body.mobile-touch #loot-explorer-window {
+    max-height: calc(
+      var(--app-vh) /
+      var(--window-scale, 1) -
+      12px -
+      max(10px, env(safe-area-inset-bottom))
+    );
+    overflow-y: auto;
   }
   body.mobile-touch #train-window,
   body.mobile-touch #unbind-window {

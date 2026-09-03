@@ -326,6 +326,15 @@ export const BIND_ACTIONS: BindAction[] = [
     kind: 'edge',
     defaults: ['Shift+KeyX'],
   },
+  // Loot Explorer parks on Shift+O: bare KeyO is free, and Shift+O keeps the
+  // shifted-letter-row convention every other collection/catalog window uses.
+  {
+    id: 'lootExplorer',
+    label: 'Loot Explorer',
+    category: 'Interface',
+    kind: 'edge',
+    defaults: ['Shift+KeyO'],
+  },
   {
     id: 'chat',
     label: 'Open Chat',

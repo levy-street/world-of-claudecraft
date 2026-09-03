@@ -17923,3 +17923,187 @@
   line-height: 1.25;
   font-weight: 600;
 }
+
+/* ---------- Loot Explorer ---------- */
+/* Cold window (src/ui/hud/loot_explorer/loot_explorer_window.ts): a
+     searchable, filterable catalog of every item and where to get it. Reuses
+     the shared .item-icon quality frame above and the .soc-tabs/.soc-tab
+     WAI-ARIA strip look under its own class names (the reliquary-search
+     precedent for the search field). Rows and encounter cards share one
+     card look (border/radius/fill); the 16px search font is the iOS
+     anti-zoom floor (.reliquary-search / .deed-search), not a taste call. */
+#loot-explorer-window {
+  width: min(90vw, 760px);
+  height: min(85vh, 760px);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+.loot-explorer-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding: 4px 0 8px;
+  flex: none;
+}
+.loot-explorer-search,
+.loot-explorer-filter {
+  font-family: var(--ui-font);
+  padding: 3px 6px;
+  border-radius: 4px;
+  border: 1px solid #5a4a2e;
+  background: #14110b;
+  color: inherit;
+}
+.loot-explorer-search {
+  flex: 1 1 180px;
+  min-width: 120px;
+  font-size: 16px;
+}
+.loot-explorer-filter {
+  flex: 1 1 120px;
+  min-width: 100px;
+  font-size: 13px;
+}
+.loot-explorer-search:focus-visible,
+.loot-explorer-filter:focus-visible,
+.loot-explorer-tab:focus-visible,
+.loot-explorer-row:focus-visible,
+.loot-explorer-drop:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 1px;
+}
+body.mobile-touch .loot-explorer-search,
+body.mobile-touch .loot-explorer-filter {
+  min-height: 40px;
+}
+.loot-explorer-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 8px;
+  flex: none;
+}
+.loot-explorer-tab {
+  flex: 1;
+  padding: 7px 0;
+  font-size: 13px;
+  font-family: var(--title-font);
+  color: var(--color-text-muted);
+  cursor: var(--cursor-point);
+  background: #1a1410;
+  border: 1px solid var(--color-border-showcase);
+  border-radius: 4px;
+  text-align: center;
+}
+.loot-explorer-tab:hover {
+  color: var(--gold);
+}
+.loot-explorer-tab.on {
+  color: var(--gold);
+  border-color: #6f5a2a;
+  background: linear-gradient(#2a2436, #161220);
+}
+.loot-explorer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.loot-explorer-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+.loot-explorer-row,
+.loot-explorer-encounter {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--color-border-showcase);
+  background: #14110b;
+}
+.loot-explorer-row {
+  display: flex;
+  gap: 8px;
+}
+.loot-explorer-row-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.loot-explorer-item-name {
+  font-family: var(--title-font);
+  font-size: 13px;
+  font-weight: 600;
+}
+.loot-explorer-sources {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.loot-explorer-source {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.loot-explorer-source-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.loot-explorer-source-detail {
+  flex: none;
+  color: var(--gold-dim);
+}
+.loot-explorer-encounter-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--title-font);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.loot-explorer-cat-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: #2a2436;
+  color: var(--gold-dim);
+  flex: none;
+}
+.loot-explorer-diff {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+.loot-explorer-drop-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.loot-explorer-drop {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  background: #1a1410;
+  font-size: 11px;
+  max-width: 220px;
+}
+.loot-explorer-drop span:first-of-type {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

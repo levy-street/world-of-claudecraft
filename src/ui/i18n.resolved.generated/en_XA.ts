@@ -978,6 +978,7 @@ export const en_XA: EnTranslations = {
       "mounts": "[Ɱóúñţš]",
       "professions": "[Þŕóƒéššíóñš]",
       "reliquary": "[Ŕéļíɋúáŕý]",
+      "lootExplorer": "[Ļóóţ Éẋþļóŕéŕ]",
       "nameplates": "[Ñáɱéš]",
       "haptics": "[Ĥáþţíçš]",
       "hapticsOff": "[Ĥáþţíçš Óƒƒ]",
@@ -4601,6 +4602,43 @@ export const en_XA: EnTranslations = {
       "listingStatusCancelled": "[Çáñçéļļéð]",
       "listingStatusSuspended": "[Šúšþéñðéð]",
       "listingStatusUnsold": "[Úñšóļð]"
+    },
+    "lootExplorer": {
+      "title": "[Ļóóţ Éẋþļóŕéŕ]",
+      "close": "[Çļóšé Ļóóţ Éẋþļóŕéŕ]",
+      "searchPlaceholder": "[Šéáŕçĥ íţéɱš...]",
+      "searchAria": "[Šéáŕçĥ íţéɱš]",
+      "filterCategoryAria": "[Šóúŕçé]",
+      "filterClassAria": "[Çļášš]",
+      "filterStatAria": "[Šţáţ]",
+      "filterQualityAria": "[Ɋúáļíţý]",
+      "filterAll": "[Áļļ]",
+      "tabItems": "[Ɓý Íţéɱ]",
+      "tabEncounters": "[Ɓý Éñçóúñţéŕ]",
+      "category": {
+        "raid": "[Ŕáíð]",
+        "dungeon": "[Ðúñĝéóñ]",
+        "delve": "[Ðéļʋé]",
+        "open_world": "[Óþéñ Ŵóŕļð]",
+        "rift": "[Ŕíƒţ]",
+        "vendor": "[Ʋéñðóŕ]",
+        "quest_reward": "[Ɋúéšţ Ŕéŵáŕð]",
+        "quest_objective": "[Ɋúéšţ Óƀĵéçţíʋé]",
+        "ground_object": "[Ŵóŕļð Óƀĵéçţ]",
+        "starting_equipment": "[Šţáŕţíñĝ Éɋúíþɱéñţ]"
+      },
+      "difficulty": {
+        "normal": "[Ñóŕɱáļ]",
+        "heroic": "[Ĥéŕóíç]"
+      },
+      "riftRankLabel": "[Ŕíƒţ Ŕáñķ {rank}]",
+      "source": "[{category}: {name}]",
+      "sourceWithContext": "[{category}: {name} ({context})]",
+      "chance": "[{pct}% çĥáñçé]",
+      "guaranteed": "[Ĝúáŕáñţééð]",
+      "gatedByQuest": "[Ŵĥíļé ɋúéšţíñĝ: {quest}]",
+      "empty": "[Ñó ļóóţ ɱáţçĥéš ţĥéšé ƒíļţéŕš.]",
+      "resultCount": "[{count} ŕéšúļţš]"
     }
   },
   "gatherEvent": {

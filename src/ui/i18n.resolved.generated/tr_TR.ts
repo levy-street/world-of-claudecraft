@@ -978,6 +978,7 @@ export const tr_TR: EnTranslations = {
       "mounts": "Binekler",
       "professions": "Meslekler",
       "reliquary": "Yadigârlık",
+      "lootExplorer": "Loot Explorer",
       "nameplates": "İsimler",
       "haptics": "Dokunsal Geri Bildirim",
       "hapticsOff": "Dokunsal Kapalı",
@@ -4601,6 +4602,43 @@ export const tr_TR: EnTranslations = {
       "listingStatusCancelled": "İptal edildi",
       "listingStatusSuspended": "Askıya alındı",
       "listingStatusUnsold": "Satılmadı"
+    },
+    "lootExplorer": {
+      "title": "Loot Explorer",
+      "close": "Close Loot Explorer",
+      "searchPlaceholder": "Search items...",
+      "searchAria": "Search items",
+      "filterCategoryAria": "Source",
+      "filterClassAria": "Class",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "Quality",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "By Encounter",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "Dungeon",
+        "delve": "Delve",
+        "open_world": "Open World",
+        "rift": "Rift",
+        "vendor": "Vendor",
+        "quest_reward": "Quest Reward",
+        "quest_objective": "Quest Objective",
+        "ground_object": "World Object",
+        "starting_equipment": "Starting Equipment"
+      },
+      "difficulty": {
+        "normal": "Normal",
+        "heroic": "Heroic"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "{pct}% chance",
+      "guaranteed": "Guaranteed",
+      "gatedByQuest": "While questing: {quest}",
+      "empty": "No loot matches these filters.",
+      "resultCount": "{count} results"
     }
   },
   "gatherEvent": {

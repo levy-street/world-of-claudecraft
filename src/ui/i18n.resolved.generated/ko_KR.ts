@@ -978,6 +978,7 @@ export const ko_KR: EnTranslations = {
       "mounts": "탈것",
       "professions": "전문 기술",
       "reliquary": "성물고",
+      "lootExplorer": "전리품 탐색기",
       "nameplates": "이름표",
       "haptics": "진동",
       "hapticsOff": "진동 꺼짐",
@@ -4601,6 +4602,43 @@ export const ko_KR: EnTranslations = {
       "listingStatusCancelled": "취소됨",
       "listingStatusSuspended": "정지됨",
       "listingStatusUnsold": "유찰"
+    },
+    "lootExplorer": {
+      "title": "전리품 탐색기",
+      "close": "전리품 탐색기 닫기",
+      "searchPlaceholder": "아이템 검색...",
+      "searchAria": "아이템 검색",
+      "filterCategoryAria": "출처",
+      "filterClassAria": "직업",
+      "filterStatAria": "Stat",
+      "filterQualityAria": "품질",
+      "filterAll": "All",
+      "tabItems": "By Item",
+      "tabEncounters": "출처별",
+      "category": {
+        "raid": "Raid",
+        "dungeon": "던전",
+        "delve": "탐굴",
+        "open_world": "오픈 월드",
+        "rift": "Rift",
+        "vendor": "상인",
+        "quest_reward": "퀘스트 보상",
+        "quest_objective": "퀘스트 목표",
+        "ground_object": "월드 오브젝트",
+        "starting_equipment": "초기 장비"
+      },
+      "difficulty": {
+        "normal": "일반",
+        "heroic": "영웅"
+      },
+      "riftRankLabel": "Rift Rank {rank}",
+      "source": "{category}: {name}",
+      "sourceWithContext": "{category}: {name} ({context})",
+      "chance": "드롭 확률 {pct}%",
+      "guaranteed": "확정",
+      "gatedByQuest": "퀘스트 진행 중: {quest}",
+      "empty": "이 필터와 일치하는 전리품이 없습니다.",
+      "resultCount": "결과 {count}개"
     }
   },
   "gatherEvent": {
