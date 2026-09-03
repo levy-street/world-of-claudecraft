@@ -156,3 +156,26 @@ these read with it.
 7. STEP 0 reads: `TURBO_FORCE=1 npm run i18n:gen` and `npm run wiki:content` are zero-diff
    at the launch tip; the registry reads 14,455 pending rows, the figure the Phase 20 doc's
    maintainer's-word section records.
+8. STEP 2, the execution shape, amended mid-lane after two infrastructure failures (both
+   recorded here because they changed how the audit ran, never what it checks):
+   - The first fan-out died whole: 144 agents, every one refused at spawn by an
+     authentication expiry, zero tokens spent and no findings lost. Relaunched after a
+     single probe agent proved spawning worked again.
+   - The second died on the account's rolling session limit: 755 agents spawned, 17
+     returned, and the one-shot retry around every agent turned a single outage into a
+     doubled spawn count. Every completed agent's result was harvested from the run
+     journals (7 lanes with both lenses, 3 with one, 277 findings), so the work that
+     finished was kept.
+   - The audit therefore runs as SEPARATE bounded workflows: find batches of about ten
+     lanes, then refute batches, harvesting to disk between them, so a limit costs one
+     batch rather than the lane. The retry is dropped from the find batches, where a
+     harvest-and-rerun of the named missing lanes is both cheaper and exact.
+9. STEP 2, 'one adversarial refuter per FALSE or INCOMPLETE finding': amended to one
+   refuter per SMALL SAME-LANE GROUP, four findings for a FALSE and eight for an
+   INCOMPLETE or UNVERIFIABLE, with every finding judged independently and returning its
+   own verdict, evidence, corrected verdict and severity. The measured finding rate (277
+   over the first ten lanes, 1,234 projected over 48) puts one agent per finding beyond
+   what the session limit will pass, and the findings-per-key mean of 1.6 means per-key
+   batching saves nothing. Grouping by lane shares the table lookups the refuters would
+   each repeat, not their verdicts; a group of four is still four independent
+   re-derivations against the live tree.
