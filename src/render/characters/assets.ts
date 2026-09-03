@@ -26,6 +26,7 @@ import { applySurfaceDetail, riggedWornFamilyFor } from '../worn_stone';
 import { type ArmorDyeSpec, attachArmorDye } from './armor_dye';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
+import { coalesceFarBakeGroups, farBakeGroupRanges } from './far_bake_groups_core';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import { pruneHeldPropIdles, registerHeldPropIdle } from './held_prop_idle';
 import { composedLookReady } from './look_pieces';
@@ -77,6 +78,7 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
+import { modularMergePartition, modularNameFacts } from './modular_name_facts_core';
 import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,
@@ -86,6 +88,7 @@ import {
   PALADIN_TEMPLARS_VERDICT_CLIP,
 } from './paladin_templars_verdict_clip';
 import { animatedNodeNames, mergeSkinnedParts } from './rig_merge';
+import { shareRigSkeleton } from './rig_shared_skeleton';
 import { attachSharedDepthMaterials, clearSharedDepthMaterials } from './shadow_depth_materials';
 import { characterMeshCastsShadow } from './shadow_policy';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
@@ -957,6 +960,9 @@ function optimizedScene(url: string): THREE.Object3D {
   }
   const root = cloneSkinned(source.scene);
   mergeSkinnedParts(root, animatedNodeNames(clips));
+  // After the merge, so only what the merge could not fold is rebaked, and
+  // before the palette pass, which reads the (now single) skeleton.
+  shareRigSkeleton(root);
   optimizeSkinGpuLayout(root);
   primeSkinnedSortSpheres(root);
   optimizedSceneCache.set(url, root);
@@ -1027,10 +1033,10 @@ function modularVariantKey(url: string, names: readonly string[]): string {
  *
  *  This is the set a variant must NOT dispose. A variant root is a
  *  SkeletonUtils clone, which SHARES geometry with its source, and
- *  mergeSkinnedParts only mints new geometry for the buckets it can prove safe:
- *  it refuses anything carrying morph targets (head, eyes, ears, lashes, brows,
- *  mouth) and skips buckets of one. Every one of those meshes is still pointing
- *  at the parsed scene's buffers, which every other variant and every future
+ *  the merge and the shared-skeleton rebind only mint new geometry for what
+ *  they can prove safe: a bucket of one never merges, and the canonical part of
+ *  the rebind (the head) is never rebaked. Every such mesh is still pointing at
+ *  the parsed scene's buffers, which every other variant and every future
  *  compose also point at, and nothing re-creates them. Disposing one would be
  *  the recolorCache bug in a worse place.
  *
@@ -1167,7 +1173,17 @@ function modularVariant(url: string, names: readonly string[]): ModularVariant {
     if (o !== root && o.type === 'Group' && o.children.length === 0) empty.push(o);
   });
   for (const o of empty) o.removeFromParent();
-  mergeSkinnedParts(root);
+  // Merged by material, and never across a node-name fact a later pass reads
+  // (the lipstick, jewel and band rules): a merged mesh has one name of its
+  // own, and the head is its own partition so it never merges at all.
+  mergeSkinnedParts(root, undefined, {
+    partitionKey: (mesh) => modularMergePartition(mesh.name),
+  });
+  // One Skeleton and one bone texture for the whole composed body. The HEAD is
+  // the canonical part on purpose: its geometry is the identity the decal cuts
+  // are cached against (see modularHeadFor), so it is the one buffer a rebake
+  // must leave alone.
+  shareRigSkeleton(root, { preferCanonical: isComposedHead });
   primeSkinnedSortSpheres(root);
   // Sweep BEFORE inserting, never after. The new entry is born at refs 0 and
   // the caller only retains it once this returns, so a sweep run after the
@@ -1335,6 +1351,17 @@ function recolored(
   return mat;
 }
 
+/** The composed head, by node name and without knowing the look's gender.
+ *
+ *  It is the canonical bind space of a composed rig (`shareRigSkeleton`) for
+ *  one reason: the canonical part is the one whose geometry is NOT rebaked,
+ *  and the head's buffer is identity elsewhere (the stubble and makeup decal
+ *  cuts are cached per head-geometry uuid, and `modularHeadFor` promises that
+ *  buffer is the parsed asset's own, shared by every variant of the GLB). */
+function isComposedHead(mesh: THREE.Object3D): boolean {
+  return modularNameFacts(mesh.name).head;
+}
+
 /** The head a look's decals ride, inside a composed clone (or null when the
  *  part set has no such node). */
 function headOf(root: THREE.Object3D, look: ModularLook): THREE.SkinnedMesh | null {
@@ -1461,9 +1488,13 @@ export function attachDeferredFaceDecals(
  * miss itself). Reading the variant is what any compose of this look does
  * first, so a miss here (about 3 ms once per part set) is the compose's own
  * cost paid early, not extra work; every later read is a map hit plus a walk.
- * The head is an unmerged, morph-carrying part, so its geometry is the parsed
- * scene's own buffer, shared by every variant of the same GLB and stable to
- * key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ * The head is never merged (it is its own partition, see
+ * modular_name_facts_core.ts) and never rebaked (it is the canonical bind space
+ * of the shared skeleton, see rig_shared_skeleton.ts), so its geometry is the
+ * parsed scene's own buffer, shared by every variant of the same GLB and stable
+ * to key a decal cut on (stubble.ts / makeup.ts cache per head geometry uuid).
+ * Both of those are deliberate and both are pinned; neither is an accident of
+ * what the merge happens to refuse.
  */
 export function modularHeadFor(def: VisualDef, look: ModularLook): THREE.SkinnedMesh | null {
   let root: THREE.Object3D;
@@ -1484,14 +1515,14 @@ export function recolorMesh(mesh: THREE.Mesh, look: ModularLook): void {
   // skin-atlas swap (SKINS/skinTexture), which must never repaint the
   // colour-picked skin and hair.
   if (mats.some((m) => m && isArmorMaterial(m.name))) mesh.userData.bodyMesh = true;
-  // The mouth part is the one place `mod_skin` must not be the skin tone,
-  // that primitive is the lips. GLTFLoader suffixes a multi-primitive mesh
-  // (`M_Mouth_neutral_1`), so match on the node's stem rather than equality.
-  const onMouth = mesh.name.includes('_Mouth_');
-  // GLTFLoader suffixes multi-primitive meshes, so match the stem
-  const onJewel = mesh.name.startsWith('E2_');
-  // ...and a hair band is the E2_ subset that must ignore the earring slot
-  const onBand = mesh.name.startsWith('E2_band_');
+  // The mouth part is the one place `mod_skin` must not be the skin tone (that
+  // primitive is the lips), jewellery is only jewellery by its node name, and a
+  // hair band is the E2_ subset that ignores the earring slot. All three are
+  // NODE-NAME facts, so they live in modular_name_facts_core.ts, which is also
+  // where the merge reads them: a merged mesh has one name, and folding two
+  // parts these rules read differently would change what this sweep does to
+  // them.
+  const { mouth: onMouth, jewel: onJewel, band: onBand } = modularNameFacts(mesh.name);
   mesh.material = Array.isArray(mesh.material)
     ? mesh.material.map((m) => recolored(m, look, onMouth, onJewel, onBand))
     : recolored(mesh.material, look, onMouth, onJewel, onBand);
@@ -1509,7 +1540,14 @@ export function assembleModular(
   // Nested inside the visual's `view-part:assemble` span; the variant step is
   // the cache miss (whole-GLB clone + part merge) or a map hit.
   const variant = timeBuildSpan('view-part:assemble:variant', () => modularVariant(def.url, names));
-  const root = timeBuildSpan('view-part:assemble:parts', () => cloneSkinned(variant.root));
+  const root = timeBuildSpan('view-part:assemble:parts', () => {
+    const clone = cloneSkinned(variant.root);
+    // SkeletonUtils gives every mesh a Skeleton of its own, re-splitting what
+    // the cached variant unified. The clone's inverses are the variant's own
+    // array by reference, so this is a rebind with no geometry work.
+    shareRigSkeleton(clone, { preferCanonical: isComposedHead });
+    return clone;
+  });
   // A skipDecals compose records no decal sample: the kind's EMA prices a real
   // decal step, and the far bake's throwaway would only add zeros to it.
   if (!opts?.skipDecals) {
@@ -1620,6 +1658,7 @@ export function assembleModel(
     return assembleModular(def, look ?? DEFAULT_LOOK, weaponItemId, offhandItemId, opts);
   }
   const root = cloneSkinned(optimizedScene(def.url));
+  shareRigSkeleton(root);
   // tag the character's own meshes (body + accessories share one texture atlas)
   // so a skin override hits them but not the separate weapons attached below
   root.traverse((o) => {
@@ -2442,6 +2481,11 @@ export interface ModularFarBake {
   /** One entry per geometry group: whether that group is the character's own
    *  body, the distinction applyMaterials uses to gate the skin override. */
   isBody: boolean[];
+  /** One entry per geometry group: the index, in the `composedFarMeshes` walk,
+   *  of the source mesh it draws. That walk is the one assembleModular captured
+   *  `userData.farMaterials` from, so this is how a character resolves a group
+   *  against its OWN materials once several meshes share a group. */
+  slots: number[];
 }
 
 /** An already-minted far bake for this key + look, or null (WITHOUT baking).
@@ -2536,7 +2580,11 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
     .makeTranslation(0, prep.yOffset, 0)
     .multiply(new THREE.Matrix4().makeRotationY(def.yaw ?? 0))
     .multiply(new THREE.Matrix4().makeScale(prep.normScale, prep.normScale, prep.normScale));
-  const { geo, isBody } = bakeStaticPose(norm, composedFarMeshes(temp));
+  const { geo, isBody, slots } = bakeStaticPose(
+    norm,
+    composedFarMeshes(temp),
+    composedFarBakeGroupKey,
+  );
   // Pin the entry across the handover. Giving the throwaway's ref back can drop
   // this variant to zero live clones, and a release at zero sweeps: without the
   // pin the sweep could evict the very entry the bake is about to be written to,
@@ -2545,7 +2593,7 @@ export function modularFarBake(key: string, look: ModularLook): ModularFarBake |
   // unpin below leaves the entry idle for the next sweep to judge normally.
   variant.refs++;
   releaseModularVariant(temp);
-  variant.far = geo ? { geo, isBody } : null;
+  variant.far = geo ? { geo, isBody, slots } : null;
   variant.refs--;
   return variant.far;
 }
@@ -2603,19 +2651,33 @@ export function composedFarMeshes(root: THREE.Object3D): THREE.Mesh[] {
   return farBakeMeshes(root).filter((mesh) => !mesh.userData.weaponMesh);
 }
 
-/** This composed body's far-LOD material slots, in bake-group order (captured by
- *  assembleModular). Padded to `count` so a mismatch can never leave a group
- *  without a material rather than mis-colouring one, and loud about it in dev:
- *  the pad is a fail-soft, and a length that does not match means the two walks
- *  have drifted and everything past the drift is drawing the wrong colour. */
-export function farSourceMaterials(root: THREE.Object3D, count: number): THREE.Material[] {
-  const slots = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
-  if (import.meta.env?.DEV && slots.length > 0 && slots.length !== count) {
+/** This composed body's far-LOD materials, one per bake GROUP.
+ *
+ *  `groupSlots` is the bake's slot map: group g draws the source mesh at index
+ *  `groupSlots[g]` of the composed walk, which is the index this body captured
+ *  its material under (assembleModular, off the SAME `composedFarMeshes` walk).
+ *  The indirection is what lets `bakeStaticPose` coalesce several source meshes
+ *  into one group without breaking that alignment.
+ *
+ *  Padded with a fallback so a mismatch can never leave a group without a
+ *  material rather than mis-colouring one, and loud about it in dev: the pad is
+ *  a fail-soft, and an out-of-range slot means the two walks have drifted and
+ *  everything past the drift is drawing the wrong colour. */
+export function farSourceMaterials(
+  root: THREE.Object3D,
+  groupSlots: readonly number[],
+): THREE.Material[] {
+  const captured = (root.userData.farMaterials as THREE.Material[] | undefined) ?? [];
+  if (
+    import.meta.env?.DEV &&
+    captured.length > 0 &&
+    groupSlots.some((slot) => slot < 0 || slot >= captured.length)
+  ) {
     console.warn(
-      `[modular] far bake wants ${count} material slots, the composed body captured ${slots.length}; the two far walks have drifted`,
+      `[modular] far bake reads slots up to ${Math.max(...groupSlots)}, the composed body captured ${captured.length}; the two far walks have drifted`,
     );
   }
-  return Array.from({ length: count }, (_, i) => slots[i] ?? FAR_MATERIAL_FALLBACK);
+  return groupSlots.map((slot) => captured[slot] ?? FAR_MATERIAL_FALLBACK);
 }
 
 const FAR_MATERIAL_FALLBACK = new THREE.MeshStandardMaterial();
@@ -2630,12 +2692,57 @@ function meshChainVisible(o: THREE.Object3D, stopAt: THREE.Object3D): boolean {
   return true;
 }
 
+/** What a baked source mesh's far material is a function of, so two meshes that
+ *  answer the same string can share ONE geometry group.
+ *
+ *  The default is the pair `tintedFarMaterials` reads: the source material and
+ *  the body flag that gates the skin/emissive override. A composed bake adds
+ *  the node-name partition, because a composed group's material is not read off
+ *  this walk at all: it is looked up per character, per slot, through
+ *  `farSourceMaterials`, and that lookup is `recolored(source, look, name
+ *  facts)`. Two slots therefore resolve alike for EVERY look exactly when their
+ *  source material and their name facts agree, which is what this key states.
+ *  (The temp's material identity already implies the source's: the recolour
+ *  cache keys on the source uuid.) */
+function farBakeGroupKey(mesh: THREE.Mesh): string {
+  const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
+  return `${mat?.uuid ?? 'none'}|${mesh.userData.bodyMesh ? 1 : 0}`;
+}
+
+/** The composed arm of the key above. */
+function composedFarBakeGroupKey(mesh: THREE.Mesh): string {
+  return `${farBakeGroupKey(mesh)}|${modularMergePartition(mesh.name)}`;
+}
+
+/** Exported for the test rather than for a caller: both keys decide what shares
+ *  a far-LOD draw, and getting either wrong paints a distant body in another
+ *  slot's colours, silently. */
+export const farBakeGroupKeysForTest = { farBakeGroupKey, composedFarBakeGroupKey };
+
+export interface StaticPoseBake {
+  geo: THREE.BufferGeometry | null;
+  /** One entry per GROUP: the source material of the mesh that group draws. */
+  mats: THREE.Material[];
+  /** One entry per GROUP: the body flag gating the skin/emissive override. */
+  isBody: boolean[];
+  /** One entry per GROUP: the index, in the `meshes` walk, of the source mesh
+   *  the group draws. The identity map before coalescing, and the indirection a
+   *  composed body resolves its per-character materials through. */
+  slots: number[];
+}
+
 /** Bake every visible mesh of a posed clone into one static BufferGeometry
- *  (skinned verts via applyBoneTransform), normalized into world units. */
+ *  (skinned verts via applyBoneTransform), normalized into world units.
+ *
+ *  Meshes whose `groupKey` agrees share ONE group, so the "single-draw far
+ *  mesh" the crowd LOD counts on really is close to one draw instead of a group
+ *  per source primitive. Groups keep the order of their FIRST member, so the
+ *  slot map stays readable and a bake is deterministic. */
 function bakeStaticPose(
   norm: THREE.Matrix4,
   meshes: THREE.Mesh[],
-): { geo: THREE.BufferGeometry | null; mats: THREE.Material[]; isBody: boolean[] } {
+  groupKey: (mesh: THREE.Mesh) => string = farBakeGroupKey,
+): StaticPoseBake {
   const geos: THREE.BufferGeometry[] = [];
   const mats: THREE.Material[] = [];
   const isBody: boolean[] = [];
@@ -2645,7 +2752,7 @@ function bakeStaticPose(
   // The caller passes the walk, so which filter a bake belongs to is decided at
   // the one place that also knows where its materials come from: the composed
   // bake is handed composedFarMeshes, the same list assembleModular captured its
-  // slots from, and group N here is slot N there.
+  // slots from, and group N here names slot `slots[N]` there.
   for (const mesh of meshes) {
     const srcGeo = mesh.geometry;
     const srcPos = srcGeo.getAttribute('position') as THREE.BufferAttribute;
@@ -2682,14 +2789,34 @@ function bakeStaticPose(
     isBody.push(!!mesh.userData.bodyMesh);
   }
 
-  if (geos.length === 0) return { geo: null, mats: [], isBody: [] };
+  if (geos.length === 0) return { geo: null, mats: [], isBody: [], slots: [] };
   // uv presence must agree for merging — drop uvs entirely if any geo lacks them
   const allHaveUv = geos.every((g) => g.getAttribute('uv'));
   if (!allHaveUv) for (const g of geos) g.deleteAttribute('uv');
-  const geo = geos.length === 1 ? geos[0] : mergeGeometries(geos, true);
-  if (geos.length === 1) {
-    geo.clearGroups();
-    geo.addGroup(0, geo.index ? geo.index.count : geo.getAttribute('position').count, 0);
+
+  // One group per distinct key, fed to the merge in grouped order so each
+  // group's members land CONTIGUOUSLY (one addGroup can only cover a run).
+  const grouping = coalesceFarBakeGroups(meshes.map(groupKey));
+  const geo =
+    grouping.mergeOrder.length === 1
+      ? geos[grouping.mergeOrder[0]]
+      : mergeGeometries(
+          grouping.mergeOrder.map((i) => geos[i]),
+          true,
+        );
+  if (!geo) return { geo: null, mats: [], isBody: [], slots: [] };
+  // mergeGeometries emitted one group per INPUT (and a single geometry keeps
+  // whatever groups it arrived with); rewrite them as one group per coalesced
+  // run, whose material index is the run's own index.
+  const counts = geos.map((g) => (g.index ? g.index.count : g.getAttribute('position').count));
+  geo.clearGroups();
+  for (const range of farBakeGroupRanges(grouping, counts)) {
+    geo.addGroup(range.start, range.count, range.materialIndex);
   }
-  return { geo, mats, isBody };
+  return {
+    geo,
+    mats: grouping.slots.map((i) => mats[i]),
+    isBody: grouping.slots.map((i) => isBody[i]),
+    slots: [...grouping.slots],
+  };
 }
