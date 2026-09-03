@@ -12,17 +12,20 @@ import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import {
+  bodyNeutral,
   classArmorSet,
   DEFAULT_APPEARANCE,
   fullSet,
   MODULAR_WARRIOR_KEY,
   type ModularAppearance,
+  modularBuildSignature,
+  modularGeometryKey,
   modularPartNames,
   NEUTRAL_BODY,
+  NEUTRAL_FACE,
   normalizeAppearance,
 } from '../src/render/characters/modular';
 import {
-  bodyNeutral,
   disposeOrphanedGeometries,
   isBodySliderTarget,
   stripNeutralBodyMorphs,
@@ -117,6 +120,24 @@ describe('bodyNeutral', () => {
       false,
     );
     expect(bodyNeutral({ ...DEFAULT_APPEARANCE, body: { ...NEUTRAL_BODY, feet: -1 } })).toBe(false);
+  });
+
+  it('reaches the geometry key and the build signature, so a body slider crossing neutral rebuilds', () => {
+    // The in-place slider path runs exactly when the build signature is
+    // unchanged, and it writes influences by name onto whatever targets the
+    // body carries. A body-neutral variant has none for the body regions, so
+    // the neutral/live bit must fork the key the signature is composed from.
+    const neutral = { ...DEFAULT_APPEARANCE, body: { ...NEUTRAL_BODY } };
+    const authored = { ...DEFAULT_APPEARANCE, body: { ...NEUTRAL_BODY, shoulders: 0.2 } };
+    expect(modularGeometryKey(authored)).not.toBe(modularGeometryKey(neutral));
+    expect(modularBuildSignature(authored)).not.toBe(modularBuildSignature(neutral));
+    // ...while the VALUE of an authored slider stays out of both, like the face
+    const authoredMore = { ...DEFAULT_APPEARANCE, body: { ...NEUTRAL_BODY, shoulders: 0.6 } };
+    expect(modularGeometryKey(authoredMore)).toBe(modularGeometryKey(authored));
+    expect(modularBuildSignature(authoredMore)).toBe(modularBuildSignature(authored));
+    // ...and a face slider alone still shares the neutral body's geometry
+    const shaped = { ...neutral, face: { ...NEUTRAL_FACE, jaw: 1 } };
+    expect(modularGeometryKey(shaped)).toBe(modularGeometryKey(neutral));
   });
 
   it('names exactly the body slider targets', () => {
@@ -250,6 +271,41 @@ function census(root: THREE.Object3D): {
   return { draws: meshes.length, skeletons: skeletons.size, byMaterial, morphed };
 }
 
+/** The nine body-region part nodes per gender, the ONLY parts the strip may
+ *  touch (BODY_BY_SLOT in modular.ts names them by armour slot; spelled out
+ *  here so the pin does not read its expectation off the table under test). */
+const BODY_REGIONS = {
+  male: [
+    'M_ArmL',
+    'M_ArmR',
+    'M_FootL',
+    'M_FootR',
+    'M_HandL',
+    'M_HandR',
+    'M_LegL',
+    'M_LegR',
+    'M_Torso',
+  ],
+  female: [
+    'F_ArmL',
+    'F_ArmR',
+    'F_FootL',
+    'F_FootR',
+    'F_HandL',
+    'F_HandR',
+    'F_LegL',
+    'F_LegR',
+    'F_Torso',
+  ],
+} as const;
+
+/** The parts that carried morphs as shipped and no longer do after the strip
+ *  and merge: exactly the set the strip took, sorted for a stable comparison. */
+function stripped(before: ReturnType<typeof census>, after: ReturnType<typeof census>): string[] {
+  const kept = new Set(after.morphed);
+  return before.morphed.filter((name) => !kept.has(name)).sort();
+}
+
 describe('the shipped modular GLB', () => {
   let scene: THREE.Group;
   beforeAll(async () => {
@@ -274,10 +330,12 @@ describe('the shipped modular GLB', () => {
     expect(after.byMaterial.mod_skin_detail).toBe(1);
     expect(after.draws).toBe(before.draws - 8);
     expect(after.skeletons).toBe(before.skeletons - 8);
+    // WHICH parts lost their morphs, not just how many: exactly the nine body
+    // regions, so a GLB that hands the merge the wrong nine cannot pass
+    expect(stripped(before, after)).toEqual(BODY_REGIONS.male);
     // every face part still carries its morphs: the head's 17, the eye's 8...
     expect(after.morphed).toContain('M_Head');
     expect(after.morphed).toContain('M_Eye_almond');
-    expect(after.morphed).not.toContain('M_Torso');
     // the merged body carries the union of the regions' vertices, nothing lost
     const body = skinnedMeshes(merged).find((m) => m.name === 'M_ArmL_bodymerged');
     expect(body).toBeDefined();
@@ -289,6 +347,9 @@ describe('the shipped modular GLB', () => {
 
   it('does the same for the female body under a helmless kit', () => {
     const app = normalizeAppearance({ ...DEFAULT_APPEARANCE, gender: 'female', hair: 'layered' });
+    const asShipped = composeParts(scene, app, 'druid');
+    mergeSkinnedParts(asShipped);
+    const before = census(asShipped);
     const root = composeParts(scene, app, 'druid');
     const minted = stripNeutralBodyMorphs(root);
     expect(minted).toHaveLength(9);
@@ -296,6 +357,7 @@ describe('the shipped modular GLB', () => {
     disposeOrphanedGeometries(root, minted);
     const after = census(root);
     expect(after.byMaterial.mod_skin_detail).toBe(1);
+    expect(stripped(before, after)).toEqual(BODY_REGIONS.female);
     expect(after.morphed).toContain('F_Head');
     expect(after.morphed).toContain('F_Ear_round');
   });

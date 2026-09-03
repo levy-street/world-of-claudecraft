@@ -336,8 +336,10 @@ per part.
     `neutral_morph_merge.ts` strips those morphs for a body-neutral look (the
     in-game creator never exposes the body sliders, so that is every legitimate
     look) so `mergeSkinnedParts` folds the regions into the one skin-detail
-    draw, and the variant key carries the neutral/live distinction so an
-    authored body still composes exactly as before
+    draw, and `modularGeometryKey` (so the build signature, and the variant
+    key assets.ts derives) carries the neutral/live distinction so an
+    authored body still composes exactly as before and a body slider crossing
+    neutral reads as a rebuild, never an in-place write onto stripped targets
     (`tests/neutral_morph_merge.test.ts` pins the draw and skeleton counts
     against the shipped GLB).
   - `prepareVisual`'s far bake measures `DEFAULT_LOOK`, so it is wrong for a

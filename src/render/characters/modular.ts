@@ -1747,10 +1747,32 @@ export function modularPartNames(app: ModularAppearance, worn: ArmorLoadout = {}
   return out;
 }
 
+/** Whether a look leaves every body slider at neutral. The production norm:
+ *  the in-game creator never exposes the body sliders (they are Fit Studio
+ *  authoring data), so this is true for every legitimate look, and it is what
+ *  lets the compose fold the body-region morph parts into the merged body
+ *  (neutral_morph_merge.ts). A missing `body` (a look saved before the sliders
+ *  existed) is neutral. */
+export function bodyNeutral(app: ModularAppearance): boolean {
+  const body = app.body;
+  if (!body) return true;
+  for (const key of BODY_SLIDERS) if ((body[key] ?? 0) !== 0) return false;
+  return true;
+}
+
 /** Stable cache key for a composed variant: geometry depends only on the part
- *  set, never on the colours (those are material-level). */
+ *  set, never on the colours (those are material-level), plus ONE bit for the
+ *  body sliders. A body-neutral look composes with its body-region morph parts
+ *  folded into the merged body, a body-authored look keeps them as live morph
+ *  parts, and those are different geometry, so the bit lives here rather than
+ *  only in assets.ts's variant key: the build signature is composed from this
+ *  key, and the in-place slider path (applyModularSliderMorphs) runs exactly
+ *  when the signature is unchanged, so a body slider crossing neutral must
+ *  read as a rebuild, never as a write onto stripped targets. The face sliders
+ *  stay OUT: their morphs are per-instance influences over shared geometry. */
 export function modularGeometryKey(app: ModularAppearance, worn: ArmorLoadout = {}): string {
-  return modularPartNames(app, worn).join(',');
+  const names = modularPartNames(app, worn).join(',');
+  return bodyNeutral(app) ? names : `${names}|body:live`;
 }
 
 /** Every morph target a face or body SLIDER can drive, both halves of each
@@ -1763,10 +1785,12 @@ export const MORPH_SLIDER_TARGETS: readonly string[] = [
 
 /** The part of the look a REBUILD depends on: geometry, decals, materials.
  *
- *  Everything the slider morphs do not cover, which is why they are excluded:
- *  three copies morphTargetInfluences per instance, so a slider moves on the
- *  live body (CharacterVisual.applyModularSliders) instead of disposing it and
- *  cloning a new one per 5% step of a drag.
+ *  Everything the slider morphs do not cover, which is why their VALUES are
+ *  excluded: three copies morphTargetInfluences per instance, so a slider
+ *  moves on the live body (CharacterVisual.applyModularSliders) instead of
+ *  disposing it and cloning a new one per 5% step of a drag. The one exception
+ *  rides in through modularGeometryKey: whether the body sliders are neutral
+ *  at all, because that changes which geometry the body is built from.
  *
  *  The decal styles belong HERE and not in the geometry key: they add no part,
  *  so buzz and bald compose the same cached variant, but they are absolutely a
@@ -1814,7 +1838,8 @@ export function modularSignature(app: ModularAppearance, worn: ArmorLoadout = {}
     // geometry is shared across face shapes (morphs are per-instance), so the
     // face belongs in the SIGNATURE but never in modularGeometryKey
     FACE_SLIDERS.map((k) => (app.face?.[k] ?? 0).toFixed(2)).join(','),
-    // the body sliders are morphs too, same rule
+    // the body sliders are morphs too, same rule for their values (the
+    // neutral/live bit already reached the geometry key above)
     BODY_SLIDERS.map((k) => (app.body?.[k] ?? 0).toFixed(2)).join(','),
   ].join('|');
 }

@@ -52,6 +52,7 @@ import { meshProgramShapeKey } from './material_program_shape_core';
 import {
   armorMaterialSet,
   bandMaterialSpec,
+  bodyNeutral,
   DEFAULT_LOOK,
   earringMaterialSpec,
   eyeColor,
@@ -77,11 +78,7 @@ import {
   stubbleDecals,
   wearsFaceDecal,
 } from './modular';
-import {
-  bodyNeutral,
-  disposeOrphanedGeometries,
-  stripNeutralBodyMorphs,
-} from './neutral_morph_merge';
+import { disposeOrphanedGeometries, stripNeutralBodyMorphs } from './neutral_morph_merge';
 import {
   createPaladinBastionSweepClip,
   PALADIN_BASTION_SWEEP_CLIP,

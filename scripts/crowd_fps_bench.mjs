@@ -334,9 +334,7 @@ async function sample(page, label) {
       tier: rr.tier,
       scale: rr.effectiveRenderScale,
       gl: rr.glRenderer,
-      lookPieces: rr.lookPieces ?? null,
-      gpuQueue: rr.gpuQueue ?? null,
-      createdViews: rr.renderDiagnostics?.createdViews ?? null,
+      createdViews: rr.createdViews ?? null,
     };
   }, label);
 }

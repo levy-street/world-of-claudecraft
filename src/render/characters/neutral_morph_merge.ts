@@ -22,23 +22,38 @@
 //
 // Only the parts whose EVERY target is a body-slider target are touched: the
 // face parts keep their live morphs (the face sliders are real per-instance
-// input), and a look that does set a body slider skips this entirely (its
-// variant is cached under its own key, see assets.ts modularVariant), so the
-// authoring path is preserved bit for bit.
-import type * as THREE from 'three';
-import { BODY_SLIDERS, type ModularAppearance } from './modular';
-
-/** Whether a look leaves every body slider at neutral (the production norm). */
-export function bodyNeutral(app: ModularAppearance): boolean {
-  const body = app.body;
-  if (!body) return true;
-  for (const key of BODY_SLIDERS) if ((body[key] ?? 0) !== 0) return false;
-  return true;
-}
+// input), and a look that does set a body slider skips this entirely. That
+// look composes under its own cache key (modular.ts modularGeometryKey carries
+// the neutral/live bit, and assets.ts modularVariantKey forks on the same
+// predicate), so the authoring path is preserved bit for bit.
+import * as THREE from 'three';
 
 /** A morph target name a body slider drives (`body_shoulders_up`, ...). */
 export function isBodySliderTarget(name: string): boolean {
   return name.startsWith('body_');
+}
+
+/** A morph-free copy of `src`: clones of its index and every vertex attribute,
+ *  with its groups, draw range, bounds and userData carried across, and none
+ *  of its morph attributes. Built attribute by attribute rather than through
+ *  `BufferGeometry.clone()`, which would deep-copy every morph delta one
+ *  statement before they were discarded. The attributes are CLONES, never the
+ *  source objects: a stripped part the merge cannot bucket stays mounted and is
+ *  disposed on eviction, and a shared attribute would take the parsed GLB's GL
+ *  buffer with it. */
+function morphFreeCopy(src: THREE.BufferGeometry): THREE.BufferGeometry {
+  const bare = new THREE.BufferGeometry();
+  bare.name = src.name;
+  if (src.index) bare.setIndex(src.index.clone());
+  for (const [name, attribute] of Object.entries(src.attributes)) {
+    bare.setAttribute(name, attribute.clone());
+  }
+  for (const group of src.groups) bare.addGroup(group.start, group.count, group.materialIndex);
+  bare.setDrawRange(src.drawRange.start, src.drawRange.count);
+  if (src.boundingBox) bare.boundingBox = src.boundingBox.clone();
+  if (src.boundingSphere) bare.boundingSphere = src.boundingSphere.clone();
+  bare.userData = { ...src.userData };
+  return bare;
 }
 
 /**
@@ -62,9 +77,7 @@ export function stripNeutralBodyMorphs(root: THREE.Object3D): THREE.BufferGeomet
     if (!targets || Object.keys(targets).length === 0) return;
     const names = Object.keys(sm.morphTargetDictionary ?? {});
     if (names.length === 0 || !names.every(isBodySliderTarget)) return;
-    const bare = sm.geometry.clone();
-    bare.morphAttributes = {};
-    bare.morphTargetsRelative = false;
+    const bare = morphFreeCopy(sm.geometry);
     sm.geometry = bare;
     sm.morphTargetInfluences = undefined;
     sm.morphTargetDictionary = undefined;
