@@ -3202,7 +3202,7 @@ function dungeonRaidLockout(): Scenario {
 //  - phase 2 Soul Rend (rng.int marks pick) -> mark expiry damage
 //  - Deathless Rage cast -> three players channel the wardstones (tryStartNythraxisWardChannel
 //    via the object click) -> the interrupt + boss self-stun
-//  - the 5% Final Stand enrage
+//  - The King's Wrath at 30%, a Bone Storm, and The Crown Endures enrage
 //  - the kill: grantNythraxisLockout (raidLockouts set) + the onBossDeath death dialogue
 // The two encounter rng draws (Gravebreaker rng.range, Soul Rend rng.int) ride the
 // shared stream, so the draw-order digest pins them at their global positions.
@@ -3210,13 +3210,13 @@ function nythraxisFullPull(): Scenario {
   return {
     name: 'nythraxis_full_pull',
     coverage: [
-      'updateNythraxisEncounter full pull (phase 1 -> transition -> phase 2 -> final stand -> death)',
+      'updateNythraxisEncounter full pull (phase 1 -> transition -> phase 2 -> phase 3 -> enrage -> death)',
       'Gravebreaker rng.range weapon draw + front-cone Gravebreaker damage',
       'Raise Fallen add wave (spawnNythraxisAdds) in phase one',
       'transition: nythraxis_transition_stun room stun + Aldric spawn/walk-in + wardstones lit',
       'Soul Rend rng.int marks pick + mark-expiry damage',
       'Deathless Rage interrupt via tryStartNythraxisWardChannel (object-click channel) + boss self-stun',
-      'Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue',
+      'The Crown Endures enrage + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue',
       'Dread Curse tank-swap stack (castNythraxisDreadCurse: max-hp hit + vuln_source stack)',
       'Bone Spike rng.int victim picks + spike spawns + impale drain + free on spike death',
       'Grave Eruption hash-placed warning + impact damage + Grave Flame residue tick',
@@ -3311,9 +3311,14 @@ function nythraxisFullPull(): Scenario {
       // exact ordering: an impaled mage could never channel a wardstone, and a
       // stray eruption mid-resolve would fork the recorded stream.
       const nyx = () => boss.nythraxis as NythraxisEncounterState;
-      nyx().dreadCurseTimer = 999;
-      nyx().boneSpikeTimer = 999;
-      nyx().eruptionTimer = 999;
+      const parkRedoCadences = () => {
+        nyx().dreadCurseTimer = 999;
+        nyx().boneSpikeTimer = 999;
+        nyx().eruptionTimer = 999;
+        nyx().sigilTimer = 999;
+        nyx().gravefireTimer = 999;
+      };
+      parkRedoCadences();
 
       // ----- Phase 1: Gravebreaker (charged auto-attack) + a forced Raise Fallen add wave -----
       nyx().gravebreakerTimer = DT; // arm the charge next tick...
@@ -3348,9 +3353,7 @@ function nythraxisFullPull(): Scenario {
       step(20 * 1); // one Grave Flame tick under whoever stayed put (everyone did)
       rec.snapshot('grave-eruption');
       // Re-park the redo cadences for the rest of the pull.
-      nyx().dreadCurseTimer = 999;
-      nyx().boneSpikeTimer = 999;
-      nyx().eruptionTimer = 999;
+      parkRedoCadences();
 
       // ----- Transition at 70%: room War Stomp stun + Aldric + wardstones lit -----
       boss.hp = Math.floor(boss.maxHp * 0.69);
@@ -3409,14 +3412,55 @@ function nythraxisFullPull(): Scenario {
       rec.snapshot('deathless-interrupt');
       step(20 * 6); // the 5s self-stun expires
 
-      // ----- Final Stand at 5% -----
-      boss.hp = Math.floor(boss.maxHp * 0.04);
-      step(1); // finalStand -> enrage + Final Stand haste aura
-      rec.snapshot('finalstand');
+      // ----- Slice 2, each fired once: Gravefire, then the Binding Sigil (bound) -----
+      // The Soul Rend detonation above already left Soulfire under the stacked
+      // mages, who have been standing in it since (the Soulfire ticks are in
+      // the trace). Gravefire: the one rng.int target pick, then the line runs
+      // at the mages 20 yd out and burns whoever it reaches.
+      nyx().majorGapTimer = 0;
+      nyx().gravefireTimer = DT;
+      step(1); // castNythraxisGravefire -> rng.int pick, line ignites at the boss's feet
+      step(20 * 4); // the head passes the mages; their first Gravefire ticks land
+      rec.snapshot('gravefire');
+      // Binding Sigil: hash-placed (no shared rng), Ascension climbs two stacks,
+      // then the tank "drags" him onto it (the parity fixture teleports the boss)
+      // and he is Bound: purge, stun, the burn window.
+      nyx().sigilTimer = DT;
+      step(1); // startNythraxisSigil -> sigilAppears callouts
+      step(20 * 4); // two Deathless Ascension stacks
+      const sigil = nyx().sigil;
+      if (sigil) floorTeleport(boss, sigil.x, sigil.z, boss.pos.y);
+      step(1); // resolveNythraxisSigilBound -> Bound + stun, sigilBound callouts
+      rec.snapshot('sigil-bound');
+      step(20 * 5); // the Bound stun expires, the gap after the major runs out
+      parkRedoCadences();
+
+      // ----- Phase 3: The King's Wrath at 30% (no major in flight) -----
+      boss.hp = Math.floor(boss.maxHp * 0.29);
+      step(1); // startNythraxisKingsWrath -> Wrath aura, kingsWrath callouts
+      rec.snapshot('kings-wrath');
+      parkRedoCadences();
+
+      // Bone Storm: hash-ranked charges (no shared rng), the whirl tick, a slam
+      // on arrival with its Gravefire line, the mid-storm Bone Spike (two rng.int
+      // victim picks), then the top-threat pickup when it ends.
+      nyx().boneStormTimer = DT;
+      step(1); // startNythraxisBoneStorm -> boneStormBegins + boneStormCharge callouts
+      step(20 * 7); // charges, slams, the 6 s spike
+      rec.snapshot('bone-storm');
+      step(20 * 6); // the storm ends: pickup, Gravebreaker re-arm, the major gap
+      parkRedoCadences();
+      nyx().boneStormTimer = 999;
+
+      // The Crown Endures: the clock runs out (no rng), warn callouts already
+      // crossed, the enrage auras land.
+      nyx().enrageElapsed = 420 - DT;
+      step(1); // crownEndures callouts + The Crown Endures auras
+      rec.snapshot('crown-endures');
 
       // ----- Kill: grantNythraxisLockout + onBossDeath death dialogue -----
       // Clear the dialogue lock so the (non-critical) death line is not suppressed by
-      // the still-active Final Stand callout.
+      // the still-active enrage yell.
       (boss.nythraxis as NythraxisEncounterState).dialogueBusyUntil = 0;
       sim.dealDamage(tank, boss, boss.hp, false, 'physical', null, 'hit', true);
       step(1); // updateMob dead-branch -> onBossDeath schedules the death dialogue

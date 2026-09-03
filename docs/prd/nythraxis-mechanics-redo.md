@@ -435,13 +435,19 @@ is built in three internal slices, each a group of commits on the same branch,
 each gated with `node scripts/gate_select.mjs` and `/qa` before the next
 begins; only the finished branch opens a PR:
 
-1. **Core loop** (committed): Dread Curse swap on both difficulties, Bone Spike
-   with the impale look, Grave Eruption and Grave Flame, the callout channel,
-   the Raid Boss Guide entry, finder blurbs, `sim_i18n` rows.
+1. **Core loop**: Dread Curse swap on both difficulties, Bone Spike with the
+   impale look, Grave Eruption and Grave Flame, the callout channel, the Raid
+   Boss Guide entry, finder blurbs, `sim_i18n` rows.
 2. **Pressure**: Binding Sigil, Gravefire, Soulfire, the major-cast scheduler
    and the calm-window rules.
 3. **Phase 3**: the 30% phase, Bone Storm, The Crown Endures, Final Stand
-   removal, matrix bot responses, the tuning pass.
+   removal.
+
+Deferred past this PR (owner decision, 2026-09-03: play it first, then tune):
+the matrix bot dodge responses and the tuning pass in section 8, and the
+Monte Carlo re-run for melee versus ranged. Every number in section 5 is a
+placeholder until then. The gate and the reviewer pass run ONCE, on the
+finished branch, not per slice.
 
 One wire epoch bump (25 to 26) covers every new readout, since they are all
 additive and land before anything ships, and the `nythraxis_full_pull` parity
