@@ -85,7 +85,8 @@ visual key, no copy, no price); names and flavor lines are `hudChrome.mounts.nam
 catalog uses `kind: "skin"`, the same SKU family as the weapon skins, and `server/claudium.ts`
 admits a `skin` id only when it is carried by exactly one of the two registries
 (`isKnownWeaponSkinId` or `isMountSkinId`; the registries are disjoint by construction). The
-retired `kind: "item"` reins rows (`reins_mech_bird`) are not products and are filtered out.
+retired `kind: "item"` reins rows (`reins_mech_bird`; `reins_chimeglass_tortoise` and
+`reins_rickshaw_mount` never had one) are not products and are filtered out.
 
 | Service `itemId` | Sold as | Game registry rarity |
 |---|---|---|

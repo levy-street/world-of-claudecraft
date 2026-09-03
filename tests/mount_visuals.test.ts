@@ -12,11 +12,13 @@ import {
   MOUNT_LENS_COLOR,
   MOUNT_SKIN_VISUAL_SPECS,
   MOUNT_VISUAL_SPECS,
+  type MountVisualSpec,
   mountBobY,
   mountLampFlicker,
   mountSeatLift,
   mountVisualSpec,
 } from '../src/render/mount_visuals';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
 
 describe('mount visual specs cover the sim catalog', () => {
@@ -242,8 +244,14 @@ describe('procedural bob math', () => {
   });
 
   it('only the Lanternback and the Chimeglass carry lamps, on their own terms', () => {
-    for (const key of MOUNT_KEYS) {
-      const lamps = MOUNT_VISUAL_SPECS[key].lamps;
+    // Catalog mounts and mount SKINS alike: a skin is drawn by the same lamp
+    // path, so a new skin shipping stray lamps fails here too.
+    const specs: [string, MountVisualSpec][] = [
+      ...MOUNT_KEYS.map((key): [string, MountVisualSpec] => [key, MOUNT_VISUAL_SPECS[key]]),
+      ...MOUNT_SKIN_IDS.map((id): [string, MountVisualSpec] => [id, MOUNT_SKIN_VISUAL_SPECS[id]]),
+    ];
+    for (const [key, spec] of specs) {
+      const lamps = spec.lamps;
       if (key === 'lanternback_troll') {
         expect(lamps.map((l) => l.bone)).toEqual(['lantern_l', 'lantern_r']);
         // Both chains are identical, so both lamps share one measured offset
@@ -258,7 +266,7 @@ describe('procedural bob math', () => {
           expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
           expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
         }
-      } else if ((key as string) === 'chimeglass_tortoise') {
+      } else if (key === 'chimeglass_tortoise') {
         // ONE light for the pair of lenses, hung off the single spectacle bone
         // so it tracks his head. Two would be the two nearest dynamic lights on
         // screen by construction (the camera rides this mount) and would evict
