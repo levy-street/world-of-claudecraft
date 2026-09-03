@@ -174,6 +174,41 @@ these read with it.
     scribe, the scroll, one gourd, the elixir and the parity in their own locale' (both in
     tests/guide.test.ts).
 
+### The maintainer's word at STEP 1 (2026-09-03, in session: "Let's do all as recommended + the wiki work")
+
+Recorded so the fill session reads the word rather than the recommendation. The nine
+decisions of docs/prd/masterwrought/phase-20-fill-package.md, RULED as recommended:
+
+1. The fill is confirmed; it edits the overlays, the sim DICT blocks, the admin overlays, the
+   deed chunks and the reliquary chunks.
+2. The humanRequired half of the registry (5,844 rows at the post-sync measure) is filled under
+   the same word.
+3. The eighteen flagged machine-authored sets STAND as written; their recorded register nits
+   are fixed inside the register pass, not by re-cutting whole paragraphs.
+4. guide.profPages.craftProse.cooking.routeBody: the five non-Latin rows are replaced in full.
+5. Class C (the release-inherited stale rows) and class L (the English ability names in the nine
+   Latin overlays) are FILLED in this pass, recorded in the PR body as inherited debt closed.
+6. English rewords taken: farm.bedsBody's 'by default' qualifier, the commission FAQ q5 and a5
+   (D108), the inscription materialsHeading. CARRIED as a maintainer item: the older crafts'
+   routeBody closing-register unification (style, not fact; about 140 fills for no falsehood).
+7. The eight retired reworded keys are RETIRED in this pass: the English row and every overlay
+   row deleted, the RETIRED_KEYS row and the guide-coverage allowlist line removed, a census
+   deletion-list row per key, the regen in the same commit.
+8. ru_RU guide prose renders craft names in Cyrillic, matching the HUD's profession labels.
+9. The four renamed talent titles are re-cut in the fifteen Latin locales to the new names.
+
+Plus the sequencing decision: THE WIKI COMPLETENESS AUDIT RUNS FIRST, as its own session
+(docs/prd/masterwrought/phase-20-wiki-audit.md), because every prose correction it lands mints
+a new key with pending rows, and an audit after the fill would re-open the staleness the fill
+closes. STEP 2 of this phase starts only after that lane's close, and starts by regenerating the
+worklist and re-running the commit-walk staleness audit, since the lane moves both.
+
+Two facts the fill session inherits from the art-completion session that ran beside STEP 1:
+the tree at 71f32d2e3c carries that pass (37 commits, the Mech Bird mount release sync among
+them, every regen fresh), and the registry re-measured there reads 14,455 pending rows over
+951 keys (auto 8,611, human 5,844); the MediaWiki seed is stale by about 3,300 lines at that
+tip and its recommit stays this phase's.
+
 ### Hand-carried fill entries from Phase 19F (2026-09-02)
 
 Written at Phase 19F execution because the registry could not carry them before that wave,
