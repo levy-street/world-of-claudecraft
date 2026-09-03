@@ -6278,6 +6278,21 @@
   /* ---------- mobile Reliquary (standalone window) ---------- */
   /* Full-bleed safe-area panel, horizontal shelf chips, 40px targets. The
      body column collapses the desktop rail into a chip row (deeds idiom). */
+  body.mobile-touch #cosmetics-window {
+    position: fixed;
+    left: max(10px, env(safe-area-inset-left));
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    width: auto;
+    transform: none;
+    max-width: none;
+    max-height: none;
+    z-index: 95;
+  }
+  body.mobile-touch #cosmetics-window .cos-grid {
+    grid-template-columns: 1fr;
+  }
   body.mobile-touch #reliquary-window {
     position: fixed;
     left: max(10px, env(safe-area-inset-left));

@@ -1960,6 +1960,9 @@ async function startGame(
           case 'reliquary':
             hud.toggleReliquary();
             break;
+          case 'cosmetics':
+            hud.toggleCosmetics();
+            break;
           case 'sheathe': {
             // Cosmetic sheathe toggle (Z). The world owns the rule (dead-gate,
             // combat auto-unsheathe); play the cue only when the state moved.
@@ -2297,6 +2300,9 @@ async function startGame(
         break;
       case 'reliquary':
         hud.toggleReliquary();
+        break;
+      case 'cosmetics':
+        hud.toggleCosmetics();
         break;
       case 'crafting':
         // The controller panel has always OFFERED this bind (it lists every

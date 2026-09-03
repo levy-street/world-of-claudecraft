@@ -8,6 +8,7 @@
 // own module (no per-locale blocks) so new chrome keys are an English-only add.
 
 import { armoryCollectionStrings, armorySkinStrings } from './armory';
+import { cosmeticsStrings } from './cosmetics';
 
 export const hudChromeStrings = {
   warlock: {
@@ -5853,6 +5854,8 @@ export const hudChromeStrings = {
   // deed_i18n.ts, never through these keys.
   // The Reliquary: cold collection trophy window (Overview + shelf chrome in
   // Phase 4; page grids and Illumination celebration land later).
+  // The Cosmetics window (src/ui/hud/cosmetics/): English lives in cosmetics.ts.
+  cosmetics: cosmeticsStrings,
   reliquary: {
     title: 'The Reliquary',
     close: 'Close The Reliquary',

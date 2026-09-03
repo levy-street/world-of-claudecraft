@@ -4166,6 +4166,32 @@ export const zh_CN: EnTranslations = {
         "dread_curse": "恐惧诅咒（仅英雄难度，累加坦克轮换减益）"
       }
     },
+    "cosmetics": {
+      "title": "外观",
+      "close": "关闭外观",
+      "tabsLabel": "外观分区",
+      "tabMounts": "坐骑",
+      "tabSkins": "皮肤",
+      "tabMech": "机甲",
+      "legend": "账号：所有角色共享。角色：仅此角色。",
+      "scopeAccount": "账号",
+      "scopeCharacter": "角色",
+      "wear": "穿戴",
+      "takeOff": "取下",
+      "worn": "已穿戴",
+      "apply": "应用",
+      "detach": "解除",
+      "applied": "已应用",
+      "owned": "已拥有",
+      "storeOnly": "可在 WOC 商店购买",
+      "cardAria": "{name}，{rarity}",
+      "mountsIntro": "坐骑皮肤会覆盖在此角色骑乘的任何坐骑上，绝不改变速度。",
+      "mountsNoMount": "先拥有一匹坐骑：皮肤需要可骑乘的对象。",
+      "skinsEmpty": "尚未拥有武器皮肤。请访问 WOC 商店。",
+      "skinsApplyHint": "装备一件{type}后即可应用此皮肤。",
+      "mechIntro": "战斗机甲会替换此角色的身体。一次只能穿戴一种配色。",
+      "mechEmpty": "尚未拥有战斗机甲配色。"
+    },
     "reliquary": {
       "title": "圣物库",
       "close": "关闭圣物库",

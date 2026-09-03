@@ -4166,6 +4166,32 @@ export const ko_KR: EnTranslations = {
         "dread_curse": "공포의 저주(영웅 전용, 누적되는 탱커 교대 디버프)"
       }
     },
+    "cosmetics": {
+      "title": "외형",
+      "close": "외형 닫기",
+      "tabsLabel": "외형 구역",
+      "tabMounts": "탈것",
+      "tabSkins": "스킨",
+      "tabMech": "메카",
+      "legend": "계정: 모든 캐릭터가 공유. 캐릭터: 이 캐릭터만.",
+      "scopeAccount": "계정",
+      "scopeCharacter": "캐릭터",
+      "wear": "착용",
+      "takeOff": "벗기",
+      "worn": "착용 중",
+      "apply": "적용",
+      "detach": "해제",
+      "applied": "적용됨",
+      "owned": "보유 중",
+      "storeOnly": "WOC 상점에서 구매 가능",
+      "cardAria": "{name}, {rarity}",
+      "mountsIntro": "탈것 스킨은 이 캐릭터가 타는 어떤 탈것 위에도 덧입혀집니다. 속도는 바뀌지 않습니다.",
+      "mountsNoMount": "먼저 탈것을 얻으세요. 스킨에는 탈 대상이 필요합니다.",
+      "skinsEmpty": "아직 보유한 무기 스킨이 없습니다. WOC 상점을 방문하세요.",
+      "skinsApplyHint": "{type}을(를) 장착하면 이 스킨을 적용할 수 있습니다.",
+      "mechIntro": "전투 메카는 이 캐릭터의 몸을 대체합니다. 한 번에 하나의 크로마만 착용합니다.",
+      "mechEmpty": "아직 보유한 전투 메카 크로마가 없습니다."
+    },
     "reliquary": {
       "title": "성물고",
       "close": "성물고 닫기",

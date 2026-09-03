@@ -248,6 +248,7 @@ const BIND_ACTION_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
   deeds: 'hudChrome.deeds.title',
   professions: 'hudChrome.professions.title',
   reliquary: 'hudChrome.reliquary.title',
+  cosmetics: 'hudChrome.cosmetics.title',
 };
 
 /**
