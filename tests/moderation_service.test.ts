@@ -519,15 +519,16 @@ describe('ModerationService', () => {
     expect(context.recordAction).not.toHaveBeenCalled();
   });
 
-  it('guards malformed, missing, self, admin, and offline targets', () => {
+  it('guards malformed, missing, self, own-account, and offline targets', () => {
     const actor = admin(1, 11);
-    const otherAdmin = admin(2, 22);
-    const context = setup({ actor, sessions: [otherAdmin] });
+    // A second character of the actor's own account, online at the same time.
+    const ownAlt = { ...admin(2, 11), name: 'OwnAlt' };
+    const context = setup({ actor, sessions: [ownAlt] });
 
     context.service.handleChatCommand(actor, '/spectate');
     context.service.handleChatCommand(actor, '/spectate Missing');
     context.service.handleChatCommand(actor, `/spectate ${actor.name}`);
-    context.service.handleChatCommand(actor, `/spectate ${otherAdmin.name}`);
+    context.service.handleChatCommand(actor, `/spectate ${ownAlt.name}`);
     context.service.handleChatCommand(actor, '/kick test');
     context.service.handleChatCommand(actor, '/kill "Missing" test');
 
@@ -539,7 +540,51 @@ describe('ModerationService', () => {
       'Enclose the character name in double quotes.',
       "No online player named 'Missing'.",
     ]);
+    expect(context.recordAction).not.toHaveBeenCalled();
     expect(context.spectated).toEqual([]);
     expect(context.kicked).toEqual([]);
+  });
+
+  it('lets staff spectate other staff while the sanction commands still refuse them', async () => {
+    const actor = admin(1, 11);
+    const otherAdmin = admin(2, 22);
+    const context = setup({ actor, sessions: [otherAdmin] });
+
+    expect(context.service.handleChatCommand(actor, `/spectate ${otherAdmin.name}`)).toBe(true);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.recordAction).toHaveBeenCalledTimes(1);
+    expect(context.recordAction).toHaveBeenCalledWith({
+      action: 'spectate',
+      accountId: 22,
+      adminAccountId: 11,
+      reason: 'Spectated via in-game moderator command',
+    });
+    expect(context.spectated).toEqual([{ moderator: actor, target: otherAdmin }]);
+    expect(context.notices).toEqual([]);
+
+    context.service.handleChatCommand(actor, `/kick "${otherAdmin.name}" test`);
+    context.service.handleChatCommand(actor, `/kill "${otherAdmin.name}" test`);
+    context.service.handleChatCommand(actor, `/mute "${otherAdmin.name}" 5 test`);
+    context.service.handleChatCommand(actor, `/ban "${otherAdmin.name}" test`);
+    context.service.handleChatCommand(actor, `/suspend "${otherAdmin.name}" 5 test`);
+    context.service.handleChatCommand(actor, `/forcerename "${otherAdmin.name}" test`);
+    context.service.handleChatCommand(actor, `/jail "${otherAdmin.name}" 5 test`);
+    context.service.handleChatCommand(actor, `/unjail "${otherAdmin.name}"`);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(context.notices.map((notice) => notice.text)).toEqual(
+      Array(8).fill("You can't moderate that player."),
+    );
+    expect(context.recordAction).toHaveBeenCalledTimes(1);
+    expect(context.mute).not.toHaveBeenCalled();
+    expect(context.ban).not.toHaveBeenCalled();
+    expect(context.suspend).not.toHaveBeenCalled();
+    expect(context.forceRename).not.toHaveBeenCalled();
+    expect(context.kicked).toEqual([]);
+    expect(context.killed).toEqual([]);
+    expect(context.jailed).toEqual([]);
   });
 });
