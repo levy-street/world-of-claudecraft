@@ -177,7 +177,12 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   maintainer's re-judgement in phase-19g-qa.md; pinned by 'the farm beds prose names the
   scribe as a produce buyer, and every craft that buys produce is accounted for (D171)' in
   tests/guide.test.ts (the buying crafts derived from the live tables, the hoe ladder pinned as
-  the excluded tool buyer) and per locale beside it. CARRIED (the ja_JP verifier, confirmed
+  the excluded tool buyer) and per locale beside it. OBLIGATION AT THE RE-JUDGEMENT: both farm
+  arms and both inscription arms pin the English and every fill as SHAPE anchors (whole
+  literals, exact narrowness transforms, a gourd-mention count, a closing clause), so a
+  maintainer who re-cuts a fill re-cuts its anchor in tests/guide.test.ts in the same change
+  (the arms' comments say which fields); the derived checks beside them then say which fact
+  the new text must keep true. CARRIED (the ja_JP verifier, confirmed
   for all five by the round-one frontend read): the shipped `guide.profPages.farm.bedsBody`
   fills in ALL FIVE non-Latin locales render a pre-11g English (the kitchens as the only
   buyer; no Marlow's ladder, no elixirs, no terrace crops in the raid plates and apex flasks,

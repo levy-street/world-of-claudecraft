@@ -2550,6 +2550,12 @@ describe('Guide professions gathering accuracy', () => {
     expect(scribeAt, 'the scribe paragraph renders after bedsBody').toBeGreaterThan(
       html.indexOf('and on the Heroic Quartermaster'),
     );
+    // ...and inside the beds section: before the table section's own anchor
+    // (the round-three read: a lower bound alone lets it drift to a later
+    // section of the same page).
+    expect(scribeAt, 'the scribe paragraph renders before the table section').toBeLessThan(
+      html.indexOf('leans on the mountain and parterre crops'),
+    );
     // farm.bedsBody. THE SECTION THAT ACTUALLY WENT STALE, and until the 11e QA
     // the only section with no anchor tying it to the faucet: its two anchors
     // were Jessica alone, who has stocked the Vale pair since the growth engine
@@ -4587,10 +4593,10 @@ describe('Guide professions pages and routes', () => {
     expect(predecessor, 'the predecessor stays in the catalog, retired').toBeDefined();
     // Exactly two paragraphs, so a third one cannot ride past the transform
     // (the round-two coverage read's blocking mutant).
-    expect(body.split('\n\n'), 'the successor is two paragraphs').toHaveLength(2);
-    expect(predecessor.split('\n\n'), 'the predecessor is two paragraphs').toHaveLength(2);
-    const [succOne, succTwo] = body.split('\n\n');
-    const [predOne, predTwo] = predecessor.split('\n\n');
+    expect(body.split(/\n\s*\n/), 'the successor is two paragraphs').toHaveLength(2);
+    expect(predecessor.split(/\n\s*\n/), 'the predecessor is two paragraphs').toHaveLength(2);
+    const [succOne, succTwo] = body.split(/\n\s*\n/);
+    const [predOne, predTwo] = predecessor.split(/\n\s*\n/);
     expect(succOne).toBe(predOne);
     expect(
       succTwo
@@ -4867,9 +4873,9 @@ describe('Guide professions pages and routes', () => {
         // back to the predecessor's text), so a false count at the head of the
         // paragraph or a sentence slipped into the closing reds here (the
         // round-one coverage read's two green mutants).
-        expect(body.split('\n\n'), `${lang} successor is two paragraphs`).toHaveLength(2);
-        const [succOne, succTwo] = body.split('\n\n');
-        const [predOne, predTwo] = (t(predecessorKey as never) as string).split('\n\n');
+        expect(body.split(/\n\s*\n/), `${lang} successor is two paragraphs`).toHaveLength(2);
+        const [succOne, succTwo] = body.split(/\n\s*\n/);
+        const [predOne, predTwo] = (t(predecessorKey as never) as string).split(/\n\s*\n/);
         expect(succOne, `${lang} keeps the predecessor's first paragraph`).toBe(predOne);
         let undone = succTwo;
         for (const [from, to] of n.undo) {
@@ -4930,7 +4936,7 @@ describe('Guide professions pages and routes', () => {
               `${lang} numeral token for ${countKey} is non-empty`,
             ).toBeGreaterThan(0);
             for (const [k, f] of allForms) {
-              if (k === Number(countKey) || n.idioms.includes(f)) continue;
+              if (k === Number(countKey)) continue;
               expect(
                 f,
                 `${lang} token '${tok}' (count ${countKey}) is not inside '${f}' (count ${k})`,
@@ -4990,6 +4996,14 @@ describe('Guide professions pages and routes', () => {
           `${lang} names the gourd ${n.gourdMentions} time(s) in the scroll clause`,
         ).toBe(n.gourdMentions);
         expect(clause, `${lang} names the terraces`).toContain(n.terrace);
+        // The fine twin's shipped name contains the base name in every locale
+        // (welded here), so a fill naming the twin would carry a longer token
+        // than the base and this negative can see it; a locale whose twin
+        // name were a substring of the base would red the weld first.
+        expect(
+          fold(t('entities.items.fine_frost_gourd.name' as never)),
+          `${lang} fine twin name contains the base name`,
+        ).toContain(fold(t('entities.items.frost_gourd.name' as never)));
         expect(body, `${lang} does not name the fine twin`).not.toContain(
           t('entities.items.fine_frost_gourd.name' as never),
         );
@@ -5247,6 +5261,14 @@ describe('Guide professions pages and routes', () => {
         expect(once(body, n.elixir), `${lang} names the elixir once`).toBe(1);
         expect(body, `${lang} states the parity`).toContain(n.parity);
         expect(body, `${lang} carries no ordinal`).not.toMatch(n.ordinal);
+        // The fine twin's shipped name contains the base name in every locale
+        // (welded here), so a fill naming the twin would carry a longer token
+        // than the base and this negative can see it; a locale whose twin
+        // name were a substring of the base would red the weld first.
+        expect(
+          fold(t('entities.items.fine_frost_gourd.name' as never)),
+          `${lang} fine twin name contains the base name`,
+        ).toContain(fold(t('entities.items.frost_gourd.name' as never)));
         expect(body, `${lang} does not name the fine twin`).not.toContain(
           t('entities.items.fine_frost_gourd.name' as never),
         );
