@@ -27322,8 +27322,8 @@ produce line. Four values went to the maintainer in session: D168's
 disposition ('Escalate whole'), and D171's (a) reagent (frost_gourd count 1),
 (b) band scope (rung 50 alone; the all-bands arm is the R5 escalation and was
 not taken) and (c) pin shape (the numbers and the equality). The review
-rounds added thirty-eight more corrections to the contract, every one dated
-and attributed (D171 thirty in all, D168 twenty-six).
+rounds added thirty-nine more corrections to the contract, every one dated
+and attributed (D171 thirty-two in all, D168 twenty-six).
 
 ### What moved, stated as narrowly as it is true
 - **D171** (qr-19-scroll-elixir-15c-parity, da5f89c51e; the rounds
@@ -27337,7 +27337,7 @@ and attributed (D171 thirty in all, D168 twenty-six).
   ruling; the parity pin 'the rung-50 scroll and the serpent elixir bill at
   exact input parity (229 each, through the shipped unit-value rule)' in
   tests/recipe_economy.test.ts, beside the rule, which now lives once in
-  tests/helpers/reagent_unit_value.ts (four suites import it; the two that
+  tests/helpers/reagent_unit_value.ts (five suites import it; the two that
   restate it on purpose are named in it); the accent sweep in
   tests/provisioning_supply_line.test.ts made craft-agnostic (a slotless,
   non-gathering-tool output that consumes produce, whatever its craft) with a
@@ -27425,8 +27425,8 @@ tests/i18n_resolved_equivalence.test.ts); I18N_RELEASE_TIER never set. DRIFT
 predicted before the gate and re-derived from the diff itself (eight it
 declarations added, none removed, no new suite): files 3670/1 = 3671,
 unchanged; cases +8 over the 19F close (54,542/9/28 = 54,579), so 54,550/9/28
-= 54,587. Measured: Test Files 3670 passed | 1 skipped (3671); Tests 54,550 passed | 9 expected fail | 28 skipped (54,587). Prediction exact in both.. Every new pin mutated and watched fail
-alone (fifty-five mutants across eight suites, two invalid first passes
+= 54,587. Measured: Test Files 3670 passed | 1 skipped (3671); Tests 54,550 passed | 9 expected fail | 28 skipped (54,587). Prediction exact in both. Every new pin mutated and watched fail
+alone (sixty-two mutants across six suites, two invalid first passes
 recorded and re-run), the failing test name and counts in phase-19g-qa.md.
 
 ### JUDGED, and not re-raised

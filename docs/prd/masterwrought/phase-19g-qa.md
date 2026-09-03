@@ -10,7 +10,7 @@ rounds that repaired them were themselves read fresh until a read returned nothi
 nit; D168's reads found the recorded recipe for the eventual harvest wrong in eleven places
 (two arms red, not one; the coverage drift ran code-down, not docs-down; a retired
 acceptance list with no replacement) and then the record's own bookkeeping wrong in
-another dozen. Every finding was applied or refused with its reason; the maintainer's
+another eight. Every finding was applied or refused with its reason; the maintainer's
 values were taken in session on a corrected menu, never guessed.
 LOCAL ONLY: no push, no PR, no teardown.
 
@@ -40,7 +40,7 @@ accent-rule widening lands on the derived sweep, never the 11g literal table; bo
 live in phase-19-new-rows.md, so their ANSWERED and ESCALATED clauses sit there (the D169
 shape), not in the gate table the prompt named; D168's counts were 3650 and 2938, not 3651
 and 2939, and its handoff-row anchor was pipe-flattened. The review rounds added
-thirty-eight more, every one dated on the contract (D171 thirty in all, D168 twenty-six).
+thirty-nine more, every one dated on the contract (D171 thirty-two in all, D168 twenty-six).
 
 ## The maintainer's word, taken in session 2026-09-02
 
@@ -62,7 +62,7 @@ thirty-eight more, every one dated on the contract (D171 thirty in all, D168 twe
   not repaired; the tier-3 crops named as the only reagent family at 15, the tusk
   excepted); the inscription catalog literal re-cut and its standing note rewritten into the
   ruling; the parity pin in tests/recipe_economy.test.ts beside the rule, which now lives
-  once in tests/helpers/reagent_unit_value.ts (four suites import it; the two that restate
+  once in tests/helpers/reagent_unit_value.ts (five suites import it; the two that restate
   it on purpose are named in it); the accent sweep made craft-agnostic with a membership
   arm for the scroll row, its exclusion set pinned to the hoe ladder, its floor raised 17 to
   21; the affinity pin at three crafts (the fine twin stays cooking) and the tooltip's
@@ -250,7 +250,7 @@ Not taken, by the phase's own rule: 19F's twenty carried items, 19E's seven, 19D
 
 node scripts/gate_select.mjs on the committed code tip b039514caa, pg-armed with TEST_DATABASE_URL only (DATABASE_URL never exported; the arming proved by contrast first: tests/account_wealth_db.pg.test.ts 3 skipped unarmed, 3 passed armed; the porcelain clean at launch), launched in the background with a done marker and judged by the real GATE_EXIT=0 line: PASS, all 12 steps green, mode full (a broad change set: 2150 paths against origin/release/v0.42.0), 8 workers, 12 minutes (19:32:13 to 19:44:55); the malware scan PASS (7931 files, 442 flags, 0 high after priors); the real-browser suite 38 files, 332 passed.
 
-tsc 0 at every one of the fourteen commits (4da6b08401 through b039514caa); npm run
+tsc 0 at every one of the eleven commits (4da6b08401 through b039514caa); npm run
 ci:changed exit 0 after the last code commit and after the close-out; the census RESULT:
 PASS captured without a pipe at every commit; the guard suites green throughout
 (architecture, monolith, world_api parity, the S3 guard tests/localization_fixes.test.ts,
@@ -265,11 +265,11 @@ replaced the retired key's fifteen).
 PREDICTED before the gate and re-derived after every round from the diff itself (eight `it`
 declarations added, none removed, no new suite): files 3670 passed / 1 skipped = 3671
 (unchanged); cases +8 over the 19F close of 54,542 / 9 / 28 = 54,579, so 54,550 / 9 / 28 =
-54,587. MEASURED at the gate: Test Files 3670 passed | 1 skipped (3671); Tests 54,550 passed | 9 expected fail | 28 skipped (54,587). Prediction exact in both..
+54,587. MEASURED at the gate: Test Files 3670 passed | 1 skipped (3671); Tests 54,550 passed | 9 expected fail | 28 skipped (54,587). Prediction exact in both.
 
 ## Every new pin, mutated and watched fail alone
 
-Fifty-five mutants across eight suites, each applied ALONE and restored from a disk copy
+Sixty-two mutants across six suites, each applied ALONE and restored from a disk copy
 (never git checkout), restoration proven by cmp; the two invalid first passes above are
 recorded in place. The full table, by round, with the failing test name and the counts:
 
@@ -345,7 +345,6 @@ Restoration proven by cmp against the five disk copies: 0 0 0 0 0. RECORDED TRAP
 | 'the farm beds prose names the scribe as a produce buyer, and every craft that buys produce is accounted for (D171)' (tests/guide.test.ts) | en slice: the ordinal restored ('A third craft buys from the beds too') | 1 failed | 1 passed |
 | same, the carve-out pinned | recipes.ts: vale_wheat on recipe_sootscale_mantle (an armorcrafting gear row buys produce) | 1 failed (['alchemy','armorcrafting',...] vs the four) | 1 passed |
 | 'renders farming with its tool ladder, no node prose, and length-guards empty tables' (tests/guide.test.ts), the render anchor | professions_gathering.ts: the sibling paras() call deleted (the first run used a wrong -t filter and ran nothing, 129 skipped; re-run with the arm's title) | 1 failed ('... to contain takes a Frost Gourd off the Highwatch...') | 1 passed |
-| 'the accent rule governs a real, non-empty set of rows' (tests/provisioning_supply_line.test.ts), the floor at 21 | recipes.ts: the scroll gourd removed (the set falls to 20) | 1 failed ('expected 20 to be greater than or equal to 21') | 1 passed |
 
 ## Round 3 (the round-two reads applied: paragraph counts, whole-fill pins, weld-table constraints, the render order, the key rename), each mutant alone, restored (0 x6)
 | pin (test name) | mutation | mutated run | restored run |
@@ -366,4 +365,4 @@ Restoration proven by cmp against the five disk copies: 0 0 0 0 0. RECORDED TRAP
 | the weld-table constraints, the substring guard without the idiom escape | tests/guide.test.ts: the zh_CN goldleaf form re-keyed to count 1 and listed as an idiom (the reader's green mutant) | 1 failed ("zh_CN token '两' (count 2) is not inside '两株金叶' (count 1)") | 1 passed |
 | the English inscription arm, the paragraph count on the renderer's splitter | en slice: a third paragraph joined by newline-space-newline | 1 failed ('the successor is two paragraphs: ... got 3') | 1 passed |
 | the page arm's render-order pin, the upper bound | professions_gathering.ts: the sibling paragraph moved into the table section | 1 failed ('the scribe paragraph renders before the table section: expected 4857 < 3956') | 1 passed |
-
+| the fine-twin weld in both five-locale arms (the close-out reader: a new pin with no mutant) | ja_JP slice: the shipped fine twin name 上質な霜瓜 to 上質なウリ (no longer contains the base name) | 2 failed ('ja_JP fine twin name contains the base name: expected 上質なウリ to contain 霜瓜', one per arm) / 127 skipped | 129 passed |

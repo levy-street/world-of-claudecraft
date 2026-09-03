@@ -2553,6 +2553,9 @@ describe('Guide professions gathering accuracy', () => {
     // ...and inside the beds section: before the table section's own anchor
     // (the round-three read: a lower bound alone lets it drift to a later
     // section of the same page).
+    // The anchor also sits on the RETIRED farm.tableBody row of the catalog; the
+    // page renders only the live tableBodyOneMeal, so indexOf binds the live
+    // one (the close-out read).
     expect(scribeAt, 'the scribe paragraph renders before the table section').toBeLessThan(
       html.indexOf('leans on the mountain and parterre crops'),
     );
