@@ -9,10 +9,12 @@
 // and are composed here).
 
 import type { ActiveIgnivarMeteorWarning } from '../sim/ignivar_meteors';
+import type { ActiveNythraxisBindingSigil } from '../sim/nythraxis_binding_sigil';
 import type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
 } from '../sim/nythraxis_grave_eruption';
+import type { ActiveNythraxisGravefire } from '../sim/nythraxis_gravefire';
 import type { ActiveVarkhulForgestormWarning } from '../sim/varkhul_forgestorm';
 import type {
   ActiveConsecration,
@@ -126,8 +128,8 @@ export function decodeNythraxisGraveEruptions(value: unknown): ActiveNythraxisGr
   });
 }
 
-// The Grave Flame patch an eruption leaves behind (`nythraxisFlames`): a
-// timed ground circle attributed to its boss through `src`.
+// Grave Flame and Soulfire patches share `nythraxisFlames`: timed ground
+// circles attributed to their boss through `src` and distinguished by `k`.
 export function decodeNythraxisGraveFlames(value: unknown): ActiveNythraxisGraveFlame[] {
   if (!Array.isArray(value)) return [];
   return value.flatMap((value: unknown): ActiveNythraxisGraveFlame[] => {
@@ -135,6 +137,7 @@ export function decodeNythraxisGraveFlames(value: unknown): ActiveNythraxisGrave
     const flame = value as Record<string, unknown>;
     if (
       typeof flame.id !== 'string' ||
+      (flame.k !== 'grave' && flame.k !== 'soul') ||
       ![flame.src, flame.x, flame.z, flame.r, flame.dur, flame.rem].every(
         (entry) => typeof entry === 'number' && Number.isFinite(entry),
       ) ||
@@ -148,11 +151,81 @@ export function decodeNythraxisGraveFlames(value: unknown): ActiveNythraxisGrave
       {
         id: flame.id,
         sourceId: flame.src as number,
+        kind: flame.k,
         x: flame.x as number,
         z: flame.z as number,
         radius: flame.r as number,
         duration: flame.dur as number,
         remaining: Math.min(flame.rem as number, flame.dur as number),
+      },
+    ];
+  });
+}
+
+export function decodeNythraxisGravefires(value: unknown): ActiveNythraxisGravefire[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((value: unknown): ActiveNythraxisGravefire[] => {
+    if (!value || typeof value !== 'object') return [];
+    const fire = value as Record<string, unknown>;
+    if (
+      typeof fire.id !== 'string' ||
+      ![fire.src, fire.x, fire.z, fire.dx, fire.dz, fire.tail, fire.head, fire.hw, fire.rem].every(
+        (entry) => typeof entry === 'number' && Number.isFinite(entry),
+      ) ||
+      (fire.tail as number) < 0 ||
+      // A just-lit line is a zero-length window at the origin (tail = head =
+      // 0, the extent the sim carries from ignition); only an inverted window
+      // is malformed.
+      (fire.head as number) < (fire.tail as number) ||
+      (fire.hw as number) <= 0 ||
+      (fire.rem as number) <= 0
+    ) {
+      return [];
+    }
+    const directionLength = Math.hypot(fire.dx as number, fire.dz as number);
+    if (directionLength < 0.99 || directionLength > 1.01) return [];
+    return [
+      {
+        id: fire.id,
+        sourceId: fire.src as number,
+        x: fire.x as number,
+        z: fire.z as number,
+        dirX: fire.dx as number,
+        dirZ: fire.dz as number,
+        tail: fire.tail as number,
+        head: fire.head as number,
+        halfWidth: fire.hw as number,
+        remaining: fire.rem as number,
+      },
+    ];
+  });
+}
+
+export function decodeNythraxisBindingSigils(value: unknown): ActiveNythraxisBindingSigil[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((value: unknown): ActiveNythraxisBindingSigil[] => {
+    if (!value || typeof value !== 'object') return [];
+    const sigil = value as Record<string, unknown>;
+    if (
+      typeof sigil.id !== 'string' ||
+      ![sigil.src, sigil.x, sigil.z, sigil.r, sigil.dur, sigil.rem].every(
+        (entry) => typeof entry === 'number' && Number.isFinite(entry),
+      ) ||
+      (sigil.r as number) <= 0 ||
+      (sigil.dur as number) <= 0 ||
+      (sigil.rem as number) <= 0
+    ) {
+      return [];
+    }
+    return [
+      {
+        id: sigil.id,
+        sourceId: sigil.src as number,
+        x: sigil.x as number,
+        z: sigil.z as number,
+        radius: sigil.r as number,
+        duration: sigil.dur as number,
+        remaining: Math.min(sigil.rem as number, sigil.dur as number),
       },
     ];
   });
@@ -263,6 +336,8 @@ export interface GroundTelegraphSnapshotSink {
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[];
   activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[];
   activeNythraxisGraveFlames: ActiveNythraxisGraveFlame[];
+  activeNythraxisGravefires: ActiveNythraxisGravefire[];
+  activeNythraxisBindingSigils: ActiveNythraxisBindingSigil[];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[];
   activeVarkhulCinderFires: ActiveVarkhulCinderFire[];
   activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[];
@@ -285,6 +360,8 @@ export function applyGroundTelegraphSnapshot(
   sink.activeIgnivarMeteors = decodeIgnivarMeteors(snap.ignivarMeteors);
   sink.activeNythraxisGraveEruptions = decodeNythraxisGraveEruptions(snap.nythraxisEruptions);
   sink.activeNythraxisGraveFlames = decodeNythraxisGraveFlames(snap.nythraxisFlames);
+  sink.activeNythraxisGravefires = decodeNythraxisGravefires(snap.nythraxisGravefires);
+  sink.activeNythraxisBindingSigils = decodeNythraxisBindingSigils(snap.nythraxisSigils);
   sink.activeVarkhulForgestormWarnings = decodeVarkhulForgestormWarnings(snap.varkhulForgestorm);
   sink.activeVarkhulCinderFires = decodeVarkhulCinderFires(snap.varkhulCinderFires);
   sink.activeVarkhulCinderOrbProjectiles = decodeVarkhulCinderOrbProjectiles(

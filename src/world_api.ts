@@ -180,6 +180,7 @@ export type {
 // Grave Flame patches as two server-authored snapshot families,
 // `nythraxisEruptions` (the meteor row shape) and `nythraxisFlames`, encoded by
 // server/nythraxis_wire.ts and decoded by src/net/ground_telegraph_wire.ts, plus
+// Binding Sigil and Gravefire snapshot families and the Grave Flame kind field,
 // the `nythraxisCallout` event and the Bone Spike mob. The keys are additive,
 // so an epoch-25 client would still connect, ignore them, and stand in rings
 // and fire it cannot see (the hazard entries 21 and 25 fenced). A bump moves
@@ -239,8 +240,10 @@ export type {
   ActiveConsecration,
   ActiveFrostRing,
   ActiveIgnivarMeteorWarning,
+  ActiveNythraxisBindingSigil,
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
+  ActiveNythraxisGravefire,
   ActiveTemporalHourglass,
   ActiveVarkhulAnvilMeteorWarning,
   ActiveVarkhulAssembly,

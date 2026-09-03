@@ -7,10 +7,12 @@
 // GameServer coordinator.
 
 import type { ActiveIgnivarMeteorWarning } from '../src/sim/ignivar_meteors';
+import type { ActiveNythraxisBindingSigil } from '../src/sim/nythraxis_binding_sigil';
 import type {
   ActiveNythraxisGraveEruption,
   ActiveNythraxisGraveFlame,
 } from '../src/sim/nythraxis_grave_eruption';
+import type { ActiveNythraxisGravefire } from '../src/sim/nythraxis_gravefire';
 import type { ActiveVarkhulAnvilMeteorWarning } from '../src/sim/varkhul_anvil_meteors';
 import type { ActiveVarkhulAssembly } from '../src/sim/varkhul_assembly';
 import type {
@@ -61,6 +63,8 @@ export interface GroundTelegraphWorldSource {
   activeVarkhulAssemblies: readonly ActiveVarkhulAssembly[];
   activeNythraxisGraveEruptions: readonly ActiveNythraxisGraveEruption[];
   activeNythraxisGraveFlames: readonly ActiveNythraxisGraveFlame[];
+  activeNythraxisGravefires: readonly ActiveNythraxisGravefire[];
+  activeNythraxisBindingSigils: readonly ActiveNythraxisBindingSigil[];
 }
 
 // Build the once-per-broadcast realm projection shared by every viewer in the
@@ -85,6 +89,8 @@ export function groundTelegraphWorld(
     nythraxisEncounter: {
       activeNythraxisGraveEruptions: sim.activeNythraxisGraveEruptions,
       activeNythraxisGraveFlames: sim.activeNythraxisGraveFlames,
+      activeNythraxisGravefires: sim.activeNythraxisGravefires,
+      activeNythraxisBindingSigils: sim.activeNythraxisBindingSigils,
     },
     interestQueryRadius,
     eventRadius,

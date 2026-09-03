@@ -7194,7 +7194,22 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
       t: 'snap',
       ents: [],
       nythraxisEruptions: [{ id: '77:ge:41:0', x: 3, z: 5, r: 3, dur: 2.5, rem: 1.4, lead: 0.75 }],
-      nythraxisFlames: [{ id: '77:gf:3', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 7 }],
+      nythraxisFlames: [{ id: '77:gf:3', src: 77, k: 'grave', x: 8, z: 9, r: 3, dur: 12, rem: 7 }],
+      nythraxisGravefires: [
+        {
+          id: '77:gfl:5',
+          src: 77,
+          x: 10,
+          z: 11,
+          dx: 0.6,
+          dz: 0.8,
+          tail: 2,
+          head: 20,
+          hw: 1.5,
+          rem: 4,
+        },
+      ],
+      nythraxisSigils: [{ id: '77:sig:8', src: 77, x: 12, z: 13, r: 4, dur: 15, rem: 11 }],
     });
     expect(client.activeNythraxisGraveEruptions).toEqual([
       {
@@ -7208,12 +7223,40 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
       },
     ]);
     expect(client.activeNythraxisGraveFlames).toEqual([
-      { id: '77:gf:3', sourceId: 77, x: 8, z: 9, radius: 3, duration: 12, remaining: 7 },
+      {
+        id: '77:gf:3',
+        sourceId: 77,
+        kind: 'grave',
+        x: 8,
+        z: 9,
+        radius: 3,
+        duration: 12,
+        remaining: 7,
+      },
+    ]);
+    expect(client.activeNythraxisGravefires).toEqual([
+      {
+        id: '77:gfl:5',
+        sourceId: 77,
+        x: 10,
+        z: 11,
+        dirX: 0.6,
+        dirZ: 0.8,
+        tail: 2,
+        head: 20,
+        halfWidth: 1.5,
+        remaining: 4,
+      },
+    ]);
+    expect(client.activeNythraxisBindingSigils).toEqual([
+      { id: '77:sig:8', sourceId: 77, x: 12, z: 13, radius: 4, duration: 15, remaining: 11 },
     ]);
 
     (client as any).applySnapshot({ t: 'snap', ents: [] });
     expect(client.activeNythraxisGraveEruptions).toEqual([]);
     expect(client.activeNythraxisGraveFlames).toEqual([]);
+    expect(client.activeNythraxisGravefires).toEqual([]);
+    expect(client.activeNythraxisBindingSigils).toEqual([]);
   });
 
   it('rejects malformed rows and clamps remaining time to duration', () => {
@@ -7234,12 +7277,52 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
       ],
       nythraxisFlames: [
         null,
-        { id: 'valid', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 30 },
-        { id: 'expired', src: 77, x: 8, z: 9, r: 3, dur: 12, rem: 0 },
-        { id: 'bad-source', src: '77', x: 8, z: 9, r: 3, dur: 12, rem: 7 },
-        { id: 'bad-coordinate', src: 77, x: 8, z: Number.POSITIVE_INFINITY, r: 3, dur: 12, rem: 7 },
-        { id: 'bad-radius', src: 77, x: 8, z: 9, r: 0, dur: 12, rem: 7 },
-        { id: 'bad-duration', src: 77, x: 8, z: 9, r: 3, dur: 0, rem: 7 },
+        { id: 'valid', src: 77, k: 'soul', x: 8, z: 9, r: 4, dur: 15, rem: 30 },
+        { id: 'expired', src: 77, k: 'grave', x: 8, z: 9, r: 3, dur: 12, rem: 0 },
+        { id: 'bad-kind', src: 77, k: 'ember', x: 8, z: 9, r: 3, dur: 12, rem: 7 },
+        { id: 'bad-source', src: '77', k: 'grave', x: 8, z: 9, r: 3, dur: 12, rem: 7 },
+        {
+          id: 'bad-coordinate',
+          src: 77,
+          k: 'grave',
+          x: 8,
+          z: Number.POSITIVE_INFINITY,
+          r: 3,
+          dur: 12,
+          rem: 7,
+        },
+        { id: 'bad-radius', src: 77, k: 'grave', x: 8, z: 9, r: 0, dur: 12, rem: 7 },
+        { id: 'bad-duration', src: 77, k: 'grave', x: 8, z: 9, r: 3, dur: 0, rem: 7 },
+      ],
+      nythraxisGravefires: [
+        {
+          id: 'valid-line',
+          src: 77,
+          x: 10,
+          z: 11,
+          dx: 0,
+          dz: 1,
+          tail: 0,
+          head: 12,
+          hw: 1.5,
+          rem: 20,
+        },
+        {
+          id: 'bad-line',
+          src: 77,
+          x: 10,
+          z: 11,
+          dx: 1,
+          dz: 1,
+          tail: 0,
+          head: 12,
+          hw: 1.5,
+          rem: 20,
+        },
+      ],
+      nythraxisSigils: [
+        { id: 'valid-sigil', src: 77, x: 12, z: 13, r: 4, dur: 15, rem: 30 },
+        { id: 'bad-sigil', src: 77, x: 12, z: 13, r: 0, dur: 15, rem: 10 },
       ],
     });
 
@@ -7247,7 +7330,33 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
       { id: 'valid', x: 3, z: 5, radius: 3, duration: 2.5, remaining: 2.5, warningLead: 0 },
     ]);
     expect(client.activeNythraxisGraveFlames).toEqual([
-      { id: 'valid', sourceId: 77, x: 8, z: 9, radius: 3, duration: 12, remaining: 12 },
+      {
+        id: 'valid',
+        sourceId: 77,
+        kind: 'soul',
+        x: 8,
+        z: 9,
+        radius: 4,
+        duration: 15,
+        remaining: 15,
+      },
+    ]);
+    expect(client.activeNythraxisGravefires).toEqual([
+      {
+        id: 'valid-line',
+        sourceId: 77,
+        x: 10,
+        z: 11,
+        dirX: 0,
+        dirZ: 1,
+        tail: 0,
+        head: 12,
+        halfWidth: 1.5,
+        remaining: 20,
+      },
+    ]);
+    expect(client.activeNythraxisBindingSigils).toEqual([
+      { id: 'valid-sigil', sourceId: 77, x: 12, z: 13, radius: 4, duration: 15, remaining: 15 },
     ]);
   });
 
@@ -7270,9 +7379,44 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
         { x: player.pos.x + 100, z: player.pos.z },
       ],
       graveFlames: [
-        { seq: 3, x: player.pos.x - 6, z: player.pos.z, remaining: 7, tickTimer: 0.4 },
-        { seq: 4, x: player.pos.x + 100, z: player.pos.z, remaining: 7, tickTimer: 0.4 },
+        {
+          seq: 3,
+          kind: 'grave',
+          x: player.pos.x - 6,
+          z: player.pos.z,
+          radius: 3,
+          remaining: 7,
+          tickTimer: 0.4,
+        },
+        {
+          seq: 4,
+          kind: 'soul',
+          x: player.pos.x + 100,
+          z: player.pos.z,
+          radius: 4,
+          remaining: 7,
+          tickTimer: 0.4,
+        },
       ],
+      gravefires: [
+        {
+          seq: 5,
+          x: player.pos.x - 8,
+          z: player.pos.z,
+          dirX: 0.6,
+          dirZ: 0.8,
+          elapsed: 1,
+          tickTimer: 0.4,
+        },
+      ],
+      sigil: {
+        castKey: 8,
+        x: player.pos.x + 9,
+        z: player.pos.z,
+        remaining: 11,
+        ascensionTimer: 1,
+        ascensionStacks: 2,
+      },
     } as unknown as NonNullable<typeof boss.nythraxis>;
     server.sim.entities.set(boss.id, boss);
 
@@ -7283,7 +7427,66 @@ describe('Nythraxis Grave Eruption snapshot parity', () => {
       expect.objectContaining({ id: `${boss.id}:ge:41:0`, r: 3, dur: 2.5, rem: 1.4, lead: 0.75 }),
     ]);
     expect(snap.nythraxisFlames).toEqual([
-      expect.objectContaining({ id: `${boss.id}:gf:3`, src: boss.id, r: 3, dur: 12, rem: 7 }),
+      expect.objectContaining({
+        id: `${boss.id}:gf:3`,
+        src: boss.id,
+        k: 'grave',
+        r: 3,
+        dur: 12,
+        rem: 7,
+      }),
+    ]);
+    expect(snap.nythraxisGravefires).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:gfl:5`,
+        src: boss.id,
+        dx: 0.6,
+        dz: 0.8,
+        tail: 0,
+        head: 12,
+        hw: 1.5,
+        rem: 8.33,
+      }),
+    ]);
+    expect(snap.nythraxisSigils).toEqual([
+      expect.objectContaining({
+        id: `${boss.id}:sig:8`,
+        src: boss.id,
+        r: 4,
+        dur: 15,
+        rem: 11,
+      }),
+    ]);
+    expect(Object.keys(snap.nythraxisFlames[0])).toEqual([
+      'id',
+      'src',
+      'k',
+      'x',
+      'z',
+      'r',
+      'dur',
+      'rem',
+    ]);
+    expect(Object.keys(snap.nythraxisGravefires[0])).toEqual([
+      'id',
+      'src',
+      'x',
+      'z',
+      'dx',
+      'dz',
+      'tail',
+      'head',
+      'hw',
+      'rem',
+    ]);
+    expect(Object.keys(snap.nythraxisSigils[0])).toEqual([
+      'id',
+      'src',
+      'x',
+      'z',
+      'r',
+      'dur',
+      'rem',
     ]);
   });
 });

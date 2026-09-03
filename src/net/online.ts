@@ -98,8 +98,10 @@ import {
   type ActiveConsecration,
   type ActiveFrostRing,
   type ActiveIgnivarMeteorWarning,
+  type ActiveNythraxisBindingSigil,
   type ActiveNythraxisGraveEruption,
   type ActiveNythraxisGraveFlame,
+  type ActiveNythraxisGravefire,
   type ActiveTemporalHourglass,
   type ActiveVarkhulAnvilMeteorWarning,
   type ActiveVarkhulAssembly,
@@ -1919,6 +1921,8 @@ export class ClientWorld extends ReconWireState implements IWorld {
   activeIgnivarMeteors: ActiveIgnivarMeteorWarning[] = [];
   activeNythraxisGraveEruptions: ActiveNythraxisGraveEruption[] = [];
   activeNythraxisGraveFlames: ActiveNythraxisGraveFlame[] = [];
+  activeNythraxisGravefires: ActiveNythraxisGravefire[] = [];
+  activeNythraxisBindingSigils: ActiveNythraxisBindingSigil[] = [];
   activeVarkhulForgestormWarnings: ActiveVarkhulForgestormWarning[] = [];
   activeVarkhulCinderFires: ActiveVarkhulCinderFire[] = [];
   activeVarkhulCinderOrbProjectiles: ActiveVarkhulCinderOrbProjectile[] = [];
