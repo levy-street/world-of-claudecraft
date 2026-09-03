@@ -370,6 +370,11 @@ import {
   abilityRequirementKeys,
 } from './hud/action_bar/ability_requirement_keys';
 import {
+  type ActionBarBindBannerHandle,
+  createActionBarBindBanner,
+  placeActionBarBindBanner,
+} from './hud/action_bar/action_bar_bind_banner';
+import {
   type ActionBarBindState,
   actionBarBindEnter,
   actionBarBindResolveCapture,
@@ -1313,9 +1318,9 @@ export class Hud {
   // of per-slot rebind rows), it lets a slot click on the live action bar select
   // itself for rebinding instead of casting; the next physical keypress captures
   // through the same Input.captureNextKey seam every other rebind flow uses, so
-  // it never fires the ability. Exited via the banner's Done button.
+  // it never fires the ability. Exited via the banner's Done button or Escape.
   private actionBarBind: ActionBarBindState | null = null;
-  private actionBarBindBannerEl: HTMLElement | null = null;
+  private actionBarBindBanner: ActionBarBindBannerHandle | null = null;
   private playerCastBarInput: CastBarPaintInput | null = null;
   private targetCastBarInput: CastBarPaintInput | null = null;
   // The mobile action ring: a SECOND createActionBarView instance over a 6-slot
@@ -8183,17 +8188,15 @@ export class Hud {
     if (!this.actionBarBind) return;
     this.cancelPendingActionBarBindCapture();
     this.actionBarBind = null;
-    this.actionBarBindBannerEl?.remove();
-    this.actionBarBindBannerEl = null;
+    this.actionBarBindBanner?.remove();
+    this.actionBarBindBanner = null;
     this.syncActionBarBindSlotClasses();
   }
 
   // A slot is selected (a capture is armed via Input.captureNextKey) and the
   // player clicks Done or Reset with the MOUSE instead of pressing a key: the
-  // armed callback is left dangling (captureNextKey is one-shot, cleared only
-  // by an actual keydown). Clear it so the player's very next real keypress
-  // after leaving/resetting the mode is not silently swallowed by that stale
-  // callback instead of driving normal gameplay.
+  // one-shot callback is left dangling. Clear it so the player's very next real
+  // keypress after leaving/resetting the mode is not swallowed by it.
   private cancelPendingActionBarBindCapture(): void {
     if (this.actionBarBind?.selectedSlot == null) return;
     this.optionsHooks?.captureKey(null);
@@ -8231,8 +8234,12 @@ export class Hud {
     // so an armed slot capture left in place while the confirm is up would bind
     // the slot to whatever key the player presses (Escape only cancels the
     // capture, it does not dismiss the dialog). Cancel it up front, not only in
-    // the OK callback below.
+    // the OK callback below. The selection goes with it (a Cancel must not leave
+    // a slot ringed as "capturing" with no capture armed).
     this.cancelPendingActionBarBindCapture();
+    this.actionBarBind = actionBarBindEnter();
+    this.syncActionBarBindSlotClasses();
+    this.refreshActionBarBindBannerStatus();
     this.confirmDialog(
       t('hudChrome.actionBar.resetConfirmTitle'),
       t('hudChrome.actionBar.resetConfirmBody'),
@@ -8256,52 +8263,36 @@ export class Hud {
     document.body.classList.toggle('actionbar-bind-active', this.actionBarBind !== null);
   }
 
+  // A HUD-root element placed against the LIVE bar (see action_bar_bind_banner.ts).
   private buildActionBarBindBanner(): void {
-    this.actionBarBindBannerEl?.remove();
-    const el = document.createElement('div');
-    el.id = 'actionbar-bind-banner';
-    el.setAttribute('role', 'status');
-    const hint = document.createElement('div');
-    hint.className = 'actionbar-bind-hint';
-    hint.textContent = t('hudChrome.actionBar.bannerHint');
-    const status = document.createElement('div');
-    status.className = 'actionbar-bind-status';
-    const actions = document.createElement('div');
-    actions.className = 'actionbar-bind-actions';
-    const resetBtn = document.createElement('button');
-    resetBtn.type = 'button';
-    resetBtn.className = 'btn';
-    resetBtn.textContent = t('hudChrome.actionBar.reset');
-    resetBtn.addEventListener('click', () => {
-      audio.click();
-      this.confirmActionBarBindReset();
+    this.actionBarBindBanner?.remove();
+    const banner = createActionBarBindBanner({
+      onReset: () => {
+        audio.click();
+        this.confirmActionBarBindReset();
+      },
+      onDone: () => {
+        audio.click();
+        this.endActionBarKeybindMode();
+      },
     });
-    const doneBtn = document.createElement('button');
-    doneBtn.type = 'button';
-    doneBtn.className = 'btn';
-    doneBtn.textContent = t('hudChrome.actionBar.done');
-    doneBtn.addEventListener('click', () => {
-      audio.click();
-      this.endActionBarKeybindMode();
-    });
-    actions.append(resetBtn, doneBtn);
-    el.append(hint, status, actions);
-    $('#actionbar-stack')?.appendChild(el);
-    this.actionBarBindBannerEl = el;
+    const uiRoot = $('#ui');
+    uiRoot.appendChild(banner.el);
+    placeActionBarBindBanner(banner.el, $('#actionbar'), uiRoot, getUiScale());
+    this.actionBarBindBanner = banner;
     this.refreshActionBarBindBannerStatus();
   }
 
   private refreshActionBarBindBannerStatus(): void {
-    if (!this.actionBarBindBannerEl || !this.actionBarBind) return;
-    const el = this.actionBarBindBannerEl.querySelector<HTMLElement>('.actionbar-bind-status');
-    if (!el) return;
+    if (!this.actionBarBindBanner || !this.actionBarBind) return;
     const status = actionBarBindStatus(this.actionBarBind);
-    el.textContent =
+    this.actionBarBindBanner.setStatus(
       status === 'capturing'
         ? t('hudChrome.actionBar.bannerCapturing')
         : status === 'bound'
           ? t('hudChrome.actionBar.boundToKey', { key: this.actionBarBind.lastBoundKeyLabel ?? '' })
-          : '';
+          : '',
+    );
   }
 
   private buildXpTicks(): void {
@@ -18804,9 +18795,17 @@ export class Hud {
       return true;
     }
     const top = this.topmostOpenWindow();
-    if (!top) return false;
-    this.closeManagedWindow(top);
-    return true;
+    if (top) {
+      this.closeManagedWindow(top);
+      return true;
+    }
+    // Nothing else open: Escape leaves the on-bar key-binding mode (a pending
+    // capture never reaches here; Input.onKeyDown cancels it first).
+    if (this.actionBarBind) {
+      this.endActionBarKeybindMode();
+      return true;
+    }
+    return false;
   }
 }
 

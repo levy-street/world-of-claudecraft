@@ -273,7 +273,9 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Lowered after moving the on-bar key-binding banner DOM into
+    // src/ui/hud/action_bar/action_bar_bind_banner.ts (exact count, zero slack).
+    ceiling: 18904,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

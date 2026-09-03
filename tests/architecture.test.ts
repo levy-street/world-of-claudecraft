@@ -2252,6 +2252,7 @@ const UI_DOM_MODULES = [
   'src/ui/bank_window.ts',
   'src/ui/breath_bar.ts',
   'src/ui/calendar_window.ts',
+  'src/ui/hud/action_bar/action_bar_bind_banner.ts',
   'src/ui/hud/action_bar/bar_editor/bar_editor_window.ts',
   'src/ui/hud/action_bar/consumable_seat_controller.ts',
   'src/ui/hud/action_bar/mobile_action_ring_controller.ts',

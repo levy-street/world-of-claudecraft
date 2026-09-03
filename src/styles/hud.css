@@ -4221,14 +4221,15 @@
   }
 
   /* On-bar action-bar key-binding mode (issue #1238): a plain banner (no window
-     chrome) anchored above the visible action bar(s) via #actionbar-stack's own
-     position: relative. Built/removed by hud.ts on enter/exit. */
+     chrome) that is a #ui-root child, placed by hud.ts against the LIVE primary
+     bar (inline left/top in HUD author px). Never anchored to #actionbar-stack:
+     a bar moved with Interface Unlock is reparented to #ui and painted over a
+     stack-anchored banner, so its slots ate every Done / Reset click and re-armed
+     a capture instead. Sits in the always-above tier (90+, over the 20..89
+     window band and the detached frames at 20) so no frame can cover its exit.
+     Built/removed by hud.ts on enter/exit. */
   #actionbar-bind-banner {
     position: absolute;
-    left: 50%;
-    bottom: 100%;
-    transform: translateX(-50%);
-    margin-bottom: 8px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -4243,7 +4244,7 @@
     color: var(--color-text-light);
     font-family: var(--ui-font);
     text-align: center;
-    z-index: 25;
+    z-index: 90;
   }
   .actionbar-bind-hint {
     font-size: 13px;
