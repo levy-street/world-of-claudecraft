@@ -27246,7 +27246,8 @@ passed armed; zero pg suites skipped in the gate), launched in the background
 with a marker file and judged by the real GATE_EXIT=0 line: PASS, all 12 steps
 green, mode full, 8 workers, 12 minutes; the malware scan 7930 files, 442 flags,
 0 high; the real-browser suite 38 files, 332 passed. tsc 0 at every commit; npm
-run ci:changed exit 0 after the last code commit and after every record commit;
+run ci:changed exit 0 after the last code commit b039514caa (the gate ran there;
+every commit after it is a record) and after every record commit;
 the census RESULT: PASS captured without a pipe at every commit; the guard
 suites green throughout (architecture, monolith, world_api parity, the S3 guard
 tests/localization_fixes.test.ts, tests/i18n_completeness.test.ts,

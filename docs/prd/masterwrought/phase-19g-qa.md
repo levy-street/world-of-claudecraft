@@ -251,7 +251,8 @@ Not taken, by the phase's own rule: 19F's twenty carried items, 19E's seven, 19D
 node scripts/gate_select.mjs on the committed code tip b039514caa, pg-armed with TEST_DATABASE_URL only (DATABASE_URL never exported; the arming proved by contrast first: tests/account_wealth_db.pg.test.ts 3 skipped unarmed, 3 passed armed; the porcelain clean at launch), launched in the background with a done marker and judged by the real GATE_EXIT=0 line: PASS, all 12 steps green, mode full (a broad change set: 2150 paths against origin/release/v0.42.0), 8 workers, 12 minutes (19:32:13 to 19:44:55); the malware scan PASS (7931 files, 442 flags, 0 high after priors); the real-browser suite 38 files, 332 passed.
 
 tsc 0 at every one of the eleven commits (4da6b08401 through b039514caa); npm run
-ci:changed exit 0 after the last code commit and after the close-out; the census RESULT:
+ci:changed exit 0 after the last code commit b039514caa (the gate ran there; every
+commit after it is a record, the phase convention) and after the close-out; the census RESULT:
 PASS captured without a pipe at every commit; the guard suites green throughout
 (architecture, monolith, world_api parity, the S3 guard tests/localization_fixes.test.ts,
 tests/i18n_completeness.test.ts, tests/guide.test.ts, tests/guide_key_coverage.test.ts,
