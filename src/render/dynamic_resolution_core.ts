@@ -30,9 +30,13 @@ function positive(value: number, fallback: number): number {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
 
-function clampedRenderScale(value: number, fallback: number): number {
+/** The Render Quality range every scale input here is clamped to. */
+export const MIN_RENDER_SCALE = 0.5;
+
+/** Clamp a scale into the Render Quality range, `fallback` for a non-finite value. */
+export function clampedRenderScale(value: number, fallback: number): number {
   const finite = Number.isFinite(value) ? value : fallback;
-  return Math.min(1, Math.max(0.5, finite));
+  return Math.min(1, Math.max(MIN_RENDER_SCALE, finite));
 }
 
 function devicePixels(value: number): number {

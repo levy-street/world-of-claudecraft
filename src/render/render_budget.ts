@@ -357,7 +357,14 @@ export class RenderBudgetGovernor {
     const rawSubmitMs = Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
     // A reallocation's settling window is the cooldown the step that caused it
-    // armed: no new timer, and a window that ends with the governor's own.
+    // armed: no new timer, and a window that ends with the governor's own. A
+    // reallocation that arrives with no cooldown standing (the manual Render
+    // Quality path lands behind reset()'s short one) is a step in its own
+    // right and takes the standard one, so the window never collapses to the
+    // single frame the back-pressure has not reached yet.
+    if (sample.reallocated === true) {
+      this.cooldownSeconds = Math.max(this.cooldownSeconds, this.budget.cooldownSeconds);
+    }
     this.reallocationSettling =
       sample.reallocated === true || (this.reallocationSettling && this.cooldownSeconds > 0);
     const stallSubmitMs = this.reallocationSettling ? 0 : rawSubmitMs;

@@ -23,7 +23,10 @@
  * ladder is a pure function of the static preset (`GFX_BUDGETS[tier]`,
  * `minRenderScaleDesktop` / `minRenderScaleMobile`), the same floor the medium
  * region path already honours. This core imports nothing and reads no tier,
- * preset, device profile or governor state.
+ * preset, device profile or governor state. The per-frame entry is
+ * `resolutionAllocationScale` (allocation-free arithmetic); `resolutionRungLadder`
+ * builds the whole ladder as an array and exists for readouts and the guard
+ * tests, never for a frame path.
  */
 
 /** Nominal spacing between two rungs of the allocation ladder. */

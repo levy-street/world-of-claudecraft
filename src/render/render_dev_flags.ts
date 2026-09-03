@@ -47,6 +47,8 @@
 //                  The same parameter's `off` value is the layer kill switch
 //                  above. Clamped to the Render Quality slider's 0.5..1 range.
 
+import { clampedRenderScale } from './dynamic_resolution_core';
+
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
 
@@ -81,7 +83,7 @@ const dynamicResolutionPinValue = ((): number | null => {
   if (raw === null || raw.trim() === '') return null;
   const parsed = Number(raw);
   if (!Number.isFinite(parsed)) return null;
-  return Math.min(1, Math.max(0.5, parsed));
+  return clampedRenderScale(parsed, 1);
 })();
 
 /** The `?dynres=<0..1>` dev pin, clamped to 0.5..1, or null when absent, `off`,

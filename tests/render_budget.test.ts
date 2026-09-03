@@ -759,6 +759,25 @@ describe('render budget governor: the resolution lever where a step reallocates'
     expect(state.recentSubmitStalls).toBe(0);
   });
 
+  it('arms the standard cooldown for a reallocation that arrives with none standing', () => {
+    // The window must cover the back-pressure frames, which land two to six
+    // frames after the reallocating one, not only the reallocated sample.
+    const governor = flooredUltra();
+    let state = governor.state();
+    const calm = () => calmField({ frameMs: 10, totalMs: 9, submitMs: 5 });
+    for (let frame = 0; frame < 60; frame++) state = governor.update(calm());
+    expect(state.cooldownSeconds).toBe(0);
+    state = governor.update({ ...calm(), reallocated: true });
+    // Armed on that update and already ticking down by its dt.
+    expect(state.cooldownSeconds).toBeCloseTo(GFX_BUDGETS.ultra.cooldownSeconds - 1 / 60, 2);
+    for (let frame = 0; frame < 6; frame++) {
+      state = governor.update({ ...calm(), frameMs: 90, totalMs: 90, submitMs: 180 });
+    }
+    expect(state.recentSubmitStalls).toBe(0);
+    expect(state.stallHoldSeconds).toBe(0);
+    expect(state.levels.resolution).toBe(1);
+  });
+
   it('closes the settling window with the cooldown, so a real stall after it still counts', () => {
     const governor = flooredUltra();
     const calm = () => calmField({ frameMs: 10, totalMs: 9, submitMs: 5 });

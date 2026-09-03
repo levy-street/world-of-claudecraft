@@ -116,8 +116,12 @@ COSMETIC (may be tiered down on lower presets):
   STATIC preset: `GFX_BUDGETS[tier].minRenderScaleDesktop` (high 0.7, ultra and insane
   0.78) or `minRenderScaleMobile` (high 0.6, ultra and insane 0.68), the same floors the
   medium region path already honoured, so two players on the same preset share the same
-  worst case and a preset can never be pushed below it. Pinned by
-  `tests/resolution_rung_fairness.test.ts`.
+  worst case and the governor can never push a preset below it. (The `?dynres=<0..1>` dev
+  pin, like the `?n8ao=off` family, lets a player LOWER their own scale past the floor for a
+  bench; self-lowering carries no information advantage.) A rung also moves the cosmetic
+  pixel height the foliage and scenery-flame perceptual LOD read (`renderPixelHeight`),
+  exactly as the medium region and the Render Quality slider already do; nothing actionable
+  rides that value. Pinned by `tests/resolution_rung_fairness.test.ts`.
 - Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
   tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
   into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
