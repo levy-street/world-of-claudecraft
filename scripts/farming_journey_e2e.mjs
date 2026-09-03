@@ -41,6 +41,7 @@ const shotsFlag = process.argv.indexOf('--shots');
 const SHOTS_DIR = shotsFlag >= 0 ? process.argv[shotsFlag + 1] : null;
 const VARIANT = MOBILE ? 'mobile' : 'desktop';
 const PAGE_URL = process.env.JOURNEY_URL || 'http://127.0.0.1:5188/';
+const TRACKER_SELECTOR = MOBILE ? '#quest-strip' : '#quest-tracker';
 const VIEW = MOBILE
   ? { width: 844, height: 390, isMobile: true, hasTouch: true }
   : { width: 1600, height: 900 };
@@ -194,6 +195,31 @@ async function main() {
         .then(() => true)
         .catch(() => false);
 
+    const waitForTrackerText = (text, present = true) =>
+      page
+        .waitForFunction(
+          (selector, expected, shouldBePresent) => {
+            const root = document.querySelector(selector);
+            const activeMatch =
+              root !== null &&
+              !root.classList.contains('empty') &&
+              (root.textContent || '').includes(expected);
+            return activeMatch === shouldBePresent;
+          },
+          { timeout: 10000, polling: 200 },
+          TRACKER_SELECTOR,
+          text,
+          present,
+        )
+        .then(() => true)
+        .catch(() => false);
+
+    const readTrackerText = () =>
+      page.evaluate(
+        (selector) => document.querySelector(selector)?.textContent?.trim() ?? '',
+        TRACKER_SELECTOR,
+      );
+
     // The quest-row click can race a repaint: the row click and the
     // detail-button probe live in ONE evaluate, retried until the button is
     // both found and clicked.
@@ -228,14 +254,7 @@ async function main() {
     if (!(await driveQuestRowTo('Accept')))
       fail('the First Furrow row / Accept button was never clickable');
     ok('clicked the q_farm_intro gossip row, then Accept');
-    const tracked = await page
-      .waitForFunction(
-        () =>
-          (document.getElementById('quest-tracker')?.textContent || '').includes('First Furrow'),
-        { timeout: 10000, polling: 200 },
-      )
-      .then(() => true)
-      .catch(() => false);
+    const tracked = await waitForTrackerText('First Furrow');
     if (!tracked) fail('First Furrow never appeared in the quest tracker after Accept');
     ok('First Furrow is tracked (quest tracker shows the quest)');
     await page.keyboard.press('Escape');
@@ -285,18 +304,9 @@ async function main() {
       .catch(() => false);
     if (!sheetClosed) fail('the plant sheet never closed after Plant (no farmPlanted)');
     ok('Plant clicked through the sheet DOM; the sheet closed on farmPlanted');
-    const plantedTracker = await page
-      .waitForFunction(
-        () =>
-          /Vale Wheat planted/.test(document.getElementById('quest-tracker')?.textContent || ''),
-        { timeout: 10000, polling: 200 },
-      )
-      .then(() => true)
-      .catch(() => false);
+    const plantedTracker = await waitForTrackerText('Vale Wheat planted');
     if (!plantedTracker) fail('the tracker never showed the planted objective');
-    const trackerText1 = await page.evaluate(
-      () => document.getElementById('quest-tracker')?.textContent?.trim() ?? '',
-    );
+    const trackerText1 = await readTrackerText();
     ok(`tracker shows the plant objective: "${trackerText1.replace(/\s+/g, ' ')}"`);
 
     // ---- /dev farmgrow (the one sanctioned dev command) -------------------
@@ -326,14 +336,7 @@ async function main() {
     });
     await shot('harvest-toast');
     ok(`interact press harvested the ready plot: "${harvestLine.replace(/\s+/g, ' ').trim()}"`);
-    const harvestedTracker = await page
-      .waitForFunction(
-        () =>
-          /Vale Wheat harvested/.test(document.getElementById('quest-tracker')?.textContent || ''),
-        { timeout: 10000, polling: 200 },
-      )
-      .then(() => true)
-      .catch(() => false);
+    const harvestedTracker = await waitForTrackerText('Vale Wheat harvested');
     if (!harvestedTracker) fail('the tracker never showed the harvest objective complete');
     ok('tracker shows the harvest objective');
 
@@ -369,14 +372,7 @@ async function main() {
       `turn-in paid the quest reward: xp +${after.xp - before.xp} (${before.xp} -> ${after.xp}), ` +
         `copper +${after.copper - before.copper} (${before.copper} -> ${after.copper}), level ${after.level}`,
     );
-    const gone = await page
-      .waitForFunction(
-        () =>
-          !(document.getElementById('quest-tracker')?.textContent || '').includes('First Furrow'),
-        { timeout: 10000, polling: 200 },
-      )
-      .then(() => true)
-      .catch(() => false);
+    const gone = await waitForTrackerText('First Furrow', false);
     if (!gone) fail('First Furrow still in the tracker after completion');
     ok('First Furrow left the tracker: q_farm_intro is COMPLETE through the client');
     console.log(`JOURNEY PASS (${VARIANT})`);

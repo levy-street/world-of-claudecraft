@@ -204,4 +204,12 @@ describe('the journey script stays layer-honest', () => {
     expect(script).toContain('mobile-interact');
     expect(script).toContain('KeyF');
   });
+
+  it('reads the quest surface selected for desktop or touch', () => {
+    expect(script).toContain(
+      "const TRACKER_SELECTOR = MOBILE ? '#quest-strip' : '#quest-tracker';",
+    );
+    expect(script).not.toContain("document.getElementById('quest-tracker')");
+    expect(script).toContain("!root.classList.contains('empty')");
+  });
 });
