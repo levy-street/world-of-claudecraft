@@ -348,8 +348,15 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
+// Re-minted for the post-chain pixel budget: the renderer's coalesced
+// viewport-resize pass moves the runtimeRender.renderer leaf. No capture
+// was retaken.
+// Re-minted again for the review answers on the same branch (the viewport
+// poll now books the coalesced pass). No capture was retaken.
+// Re-minted for the coalesced-resize flush point (the frame drains the gate
+// before it draws). No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '89c8a62f400d63c10f85c61eac2c93f2f0a43d1e822679027d03bbed6ee82d0d';
+  '44df800fb52fcbbd8dc5fa08f2624f13df9fbc81312e4627886f4d79c78ad7e8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

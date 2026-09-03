@@ -2,7 +2,6 @@ import type { N8AOPass } from 'n8ao';
 import * as THREE from 'three';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js';
 import type { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import type { DynamicResolutionRect } from './dynamic_resolution_core';
 import { GFX, sharedUniforms } from './gfx';
@@ -10,10 +9,14 @@ import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
+import { resolveAoFullRes } from './post_pixel_budget_core';
 import { postPipelinePlan } from './post_plan_core';
+import { ByteTargetSMAAPass } from './post_smaa';
 import { renderLayerDisabled } from './render_dev_flags';
 
-// Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
+// Post chain: N8AO (high: half-res Low; ultra+insane: full-res Medium while the
+// drawing buffer fits the pixel budget in post_pixel_budget_core.ts, half-res
+// Low above it)
 // -> UnrealBloom -> OutputGradePass (OutputPass ACES tonemap + sRGB followed
 // by the display-space lift/gamma/gain, saturation, vignette, and grain)
 // -> ScreenFx -> SMAA (high and above). Medium uses the region-safe
@@ -126,6 +129,25 @@ export interface PostPipeline {
   updateScreenFx(dt: number): void;
 }
 
+// The two AO arms. Medium is 16 samples plus two 8-sample denoise passes at
+// full resolution (ultra and insane, and the Advanced Effects dial's top
+// level); Low is the high tier's half-res arm, whose depth-aware upsample keeps
+// it ~1ms-class on real GPUs (and survivable under a forced-high SwiftShader
+// probe). Shared by the builder and by setSize, which re-applies it whenever a
+// resize moves the drawing buffer across the pixel budget: n8ao rebuilds its
+// half-res targets and compositer on the halfRes write, so this runs only on an
+// actual arm change, never on every resize.
+function applyAoResolution(ao: N8AOPass, fullRes: boolean): void {
+  if (fullRes) {
+    ao.setQualityMode('Medium');
+    ao.configuration.halfRes = false;
+    return;
+  }
+  ao.setQualityMode('Low');
+  ao.configuration.halfRes = true;
+  ao.configuration.depthAwareUpsampling = true;
+}
+
 export function buildComposer(
   webgl: THREE.WebGLRenderer,
   scene: THREE.Scene,
@@ -141,10 +163,14 @@ export function buildComposer(
   // daylight tier shipping without it.
   const gradeOnly = opts?.gradeOnly === true;
   const size = webgl.getDrawingBufferSize(new THREE.Vector2());
+  // GFX.aoFullRes is the TIER's request; what the live drawing buffer can
+  // afford is a renderer decision, resolved here so GFX stays static and the
+  // HUD tier knobs keep reading the preset (the two-controller rule).
+  let aoFullRes = resolveAoFullRes(GFX.aoFullRes, size.x * size.y);
   const plan = postPipelinePlan({
     gradeOnly,
     ao: GFX.ao,
-    aoFullRes: GFX.aoFullRes,
+    aoFullRes,
     bloom: GFX.bloom,
     smaa: GFX.smaa,
     fxaa: GFX.fxaa,
@@ -190,16 +216,7 @@ export function buildComposer(
     // costs 2 extra scene renders plus repeated full-scene traversals. AO over
     // transparent surfaces showed no visible difference in A/B shots.
     ao.configuration.transparencyAware = false;
-    if (plan.scene.aoQuality === 'Medium') {
-      // ultra and insane (and the Advanced Effects dial's top level)
-      ao.setQualityMode('Medium');
-    } else {
-      // high tier: half-res + depth-aware upsample keeps it ~1ms-class on
-      // real GPUs (and survivable under a forced-high SwiftShader probe)
-      ao.setQualityMode('Low');
-      ao.configuration.halfRes = true;
-      ao.configuration.depthAwareUpsampling = true;
-    }
+    applyAoResolution(ao, plan.scene.aoQuality === 'Medium');
     composer.addPass(ao);
   } else {
     composer.addPass(new RenderPass(scene, camera));
@@ -257,7 +274,7 @@ export function buildComposer(
   // edge pass.
   // ?smaa=off is the dev-only perf-attribution kill switch. It keeps the
   // post-AA cost attributable while comparing the revised tier policy.
-  if (plan.composerPasses.includes('smaa')) composer.addPass(new SMAAPass());
+  if (plan.composerPasses.includes('smaa')) composer.addPass(new ByteTargetSMAAPass());
 
   return {
     composer,
@@ -267,6 +284,19 @@ export function buildComposer(
     supportsDynamicResolution: plan.supportsDynamicResolution,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
+      // A resize or a render-scale change can move the buffer across the pixel
+      // budget; re-resolve here so the AO arm follows the extent it draws at.
+      // The arm in force goes in too: crossing rebuilds and relinks n8ao, so the
+      // budget's hysteresis band holds it through a boundary wobble.
+      const resolved = resolveAoFullRes(
+        GFX.aoFullRes,
+        Math.floor(width * pixelRatio) * Math.floor(height * pixelRatio),
+        aoFullRes,
+      );
+      if (ao && resolved !== aoFullRes) {
+        aoFullRes = resolved;
+        applyAoResolution(ao, resolved);
+      }
       // The ripple projection maps world points to clip space, so it needs the
       // logical aspect, not the drawing-buffer extent.
       aspect = width / Math.max(1, height);

@@ -210,7 +210,10 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   }
 
   if (useSmaa) {
-    renderTargets.push(target('smaa-edges', 1, 'rgba16f'), target('smaa-weights', 1, 'rgba16f'));
+    // ByteTargetSMAAPass re-types three's HalfFloat intermediates: edges is a
+    // 2-channel mask and weights are 4 blend weights, both defined on [0,1] and
+    // both 8-bit in the reference SMAA implementation.
+    renderTargets.push(target('smaa-edges', 1, 'rgba8'), target('smaa-weights', 1, 'rgba8'));
     fullscreenStages.push(
       stage('smaa-edges', 1, [composerReadTarget], 'smaa-edges'),
       stage('smaa-weights', 1, ['smaa-edges'], 'smaa-weights'),
