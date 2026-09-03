@@ -68,8 +68,10 @@ export interface CastVfxReadinessDeps<M> {
    *  the driver: a per-frame consult must not issue a GPU-process round
    *  trip). A HANDLE rather than a boolean because the record answers per
    *  PROGRAM while the question is asked per material, and a material's
-   *  current program can change before the gate opens. */
-  linked: (material: M) => unknown;
+   *  current program can change before the gate opens. Typed as a handle or
+   *  null, never `unknown`: a host written the boolean way would compile and
+   *  its `false` would read as a proof. */
+  linked: (material: M) => object | null;
 }
 
 export interface CastVfxReadinessSnapshot {
@@ -125,8 +127,7 @@ export function createCastVfxReadiness<M>(deps: CastVfxReadinessDeps<M>): CastVf
     // record read, never a driver query, so the walk stays a live frame's
     // work; the whole-gate latch below is what ends it.
     for (const material of materials) {
-      const program = deps.linked(material);
-      if (program === null || program === undefined) unlinked++;
+      if (deps.linked(material) === null) unlinked++;
     }
     pending = unlinked;
     ready = unlinked === 0;

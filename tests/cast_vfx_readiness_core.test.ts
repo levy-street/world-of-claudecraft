@@ -204,3 +204,20 @@ describe('the deadline the scene gate runs on', () => {
     expect(CAST_VFX_READY_DEADLINE_MS).toBe(30_000);
   });
 });
+
+describe('the linked answer is a handle, never a boolean', () => {
+  it('refuses a host written the boolean way at the type level, so false cannot read as a proof', () => {
+    // tsc is the pin: a boolean-returning host must not compile (a `false`
+    // would otherwise be a non-null value the core reads as linked).
+    const build = () =>
+      createCastVfxReadiness<Mat>({
+        now: () => 0,
+        deadlineMs: DEADLINE_MS,
+        materials: () => [],
+        staged: () => true,
+        // @ts-expect-error a boolean is not a proof: the host returns the proved program or null
+        linked: () => false,
+      });
+    expect(typeof build).toBe('function');
+  });
+});
