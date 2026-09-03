@@ -281,6 +281,10 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'cheater_mark.invalid_duration': 'error.cheaterMarkDurationInvalid',
   'cheater_mark.not_marked': 'error.cheaterMarkNotMarked',
   'cheater_mark.admin_target': 'error.cheaterMarkAdminTarget',
+  // The admin-panel kick emits stable codes the same way (server/admin_kick_api.ts).
+  'kick.reason_required': 'error.moderationReasonRequired',
+  'kick.target_offline': 'error.kickTargetOffline',
+  'kick.admin_target': 'error.kickAdminTarget',
   'a links object is required': 'error.streamerLinksRequired',
   'failed to update account flair': 'error.accountFlairFailed',
   'a valid daily rewards date is required': 'error.dailyRewardDayRequired',

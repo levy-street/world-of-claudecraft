@@ -4752,6 +4752,11 @@ export const vi_VN: EnTranslations = {
       "invalid_duration": "Nhập thời hạn đánh dấu ít nhất một giây.",
       "not_marked": "Tài khoản đó chưa bị đánh dấu."
     },
+    "kick": {
+      "reason_required": "A reason is required.",
+      "admin_target": "Operator accounts cannot be kicked.",
+      "target_offline": "That player is no longer online on this realm."
+    },
     "woc_market": {
       "invalid_input": "Dữ liệu nhập không hợp lệ.",
       "disabled": "Sàn Giao Dịch $WOC không khả dụng trên thế giới này.",
@@ -8587,6 +8592,7 @@ export const vi_VN: EnTranslations = {
     "realmFull": "Thế giới này đang đầy người chơi. Vui lòng thử lại sau vài phút.",
     "tooManyConnections": "Có quá nhiều kết nối đến thế giới này từ mạng của bạn. Vui lòng đóng bớt cửa sổ trò chơi hoặc thử lại sau vài phút.",
     "messageRateExceeded": "Bạn đã bị ngắt kết nối do gửi thao tác quá nhanh. Vui lòng đợi một lát rồi đăng nhập lại.",
+    "kickedByModerator": "A moderator has disconnected you: {reason}",
     "tips": {
       "classes": "Mẹo: mỗi lớp trong 9 lớp nhân vật có lối chơi khác nhau. Hãy thử vài lớp trước khi quyết định gắn bó.",
       "talents": "Mẹo: bạn có thể đặt lại tài năng bất cứ lúc nào ngoài chiến đấu, nên lựa chọn ban đầu không bao giờ là cái bẫy.",

@@ -4752,6 +4752,11 @@ export const en: EnTranslations = {
       "invalid_duration": "Enter a mark duration of at least one second.",
       "not_marked": "That account is not marked."
     },
+    "kick": {
+      "reason_required": "A reason is required.",
+      "admin_target": "Operator accounts cannot be kicked.",
+      "target_offline": "That player is no longer online on this realm."
+    },
     "woc_market": {
       "invalid_input": "Invalid input.",
       "disabled": "The $WOC Exchange is not available on this realm.",
@@ -8587,6 +8592,7 @@ export const en: EnTranslations = {
     "realmFull": "This world is full right now. Please try again in a few minutes.",
     "tooManyConnections": "Too many connections to this world are coming from your network. Please close extra game windows or try again in a few minutes.",
     "messageRateExceeded": "You were disconnected for sending actions too quickly. Please wait a moment and log back in.",
+    "kickedByModerator": "A moderator has disconnected you: {reason}",
     "tips": {
       "classes": "Tip: each of the 9 classes plays differently. Try a few before committing to one.",
       "talents": "Tip: you can reset your talents any time you are out of combat, so an early pick is never a trap.",

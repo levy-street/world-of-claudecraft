@@ -4752,6 +4752,11 @@ export const tr_TR: EnTranslations = {
       "invalid_duration": "En az bir saniyelik bir işaret süresi gir.",
       "not_marked": "Bu hesap işaretli değil."
     },
+    "kick": {
+      "reason_required": "A reason is required.",
+      "admin_target": "Operator accounts cannot be kicked.",
+      "target_offline": "That player is no longer online on this realm."
+    },
     "woc_market": {
       "invalid_input": "Geçersiz girdi.",
       "disabled": "$WOC Borsası bu dünyada kullanılamıyor.",
@@ -8587,6 +8592,7 @@ export const tr_TR: EnTranslations = {
     "realmFull": "Bu dünya şu an dolu. Lütfen birkaç dakika sonra tekrar dene.",
     "tooManyConnections": "Ağından bu dünyaya çok fazla bağlantı geliyor. Lütfen fazladan oyun pencerelerini kapat ya da birkaç dakika sonra tekrar dene.",
     "messageRateExceeded": "Eylemleri çok hızlı gönderdiğiniz için bağlantınız kesildi. Lütfen biraz bekleyip tekrar giriş yapın.",
+    "kickedByModerator": "A moderator has disconnected you: {reason}",
     "tips": {
       "classes": "İpucu: 9 sınıfın her biri farklı oynanır. Birine bağlanmadan önce birkaçını dene.",
       "talents": "İpucu: savaş dışında olduğun sürece yeteneklerini istediğin zaman sıfırlayabilirsin, bu yüzden erken bir seçim asla tuzak değildir.",

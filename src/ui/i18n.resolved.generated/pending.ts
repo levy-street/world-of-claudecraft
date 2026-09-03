@@ -10,6 +10,9 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -20,9 +23,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "es_ES": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -33,9 +40,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "fr_FR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -46,9 +57,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "fr_CA": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -59,10 +74,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -73,9 +92,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "de_DE": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -86,13 +109,17 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "zh_CN": [],
   "zh_TW": [],
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -103,10 +130,14 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -117,9 +148,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "nl_NL": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -130,9 +165,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "pl_PL": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -143,9 +182,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "id_ID": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -156,9 +199,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "tr_TR": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -169,9 +216,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "sv_SE": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -182,9 +233,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "vi_VN": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -195,9 +250,13 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ],
   "da_DK": [
+    "apiError.kick.admin_target",
+    "apiError.kick.reason_required",
+    "apiError.kick.target_offline",
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
     "hudChrome.mounts.desc_chimeglass_tortoise",
@@ -208,6 +267,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_mech_bird",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
-    "hudChrome.wocStore.mountsTitle"
+    "hudChrome.wocStore.mountsTitle",
+    "loading.kickedByModerator"
   ]
 };

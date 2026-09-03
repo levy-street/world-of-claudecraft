@@ -4752,6 +4752,11 @@ export const nl_NL: EnTranslations = {
       "invalid_duration": "Voer een markeringsduur van minstens één seconde in.",
       "not_marked": "Dat account is niet gemarkeerd."
     },
+    "kick": {
+      "reason_required": "A reason is required.",
+      "admin_target": "Operator accounts cannot be kicked.",
+      "target_offline": "That player is no longer online on this realm."
+    },
     "woc_market": {
       "invalid_input": "Ongeldige invoer.",
       "disabled": "De $WOC-beurs is niet beschikbaar op deze wereld.",
@@ -8587,6 +8592,7 @@ export const nl_NL: EnTranslations = {
     "realmFull": "Deze wereld is op dit moment vol. Probeer het over een paar minuten opnieuw.",
     "tooManyConnections": "Er komen te veel verbindingen naar deze wereld vanuit jouw netwerk. Sluit extra spelvensters of probeer het over een paar minuten opnieuw.",
     "messageRateExceeded": "De verbinding is verbroken omdat je te snel acties verstuurde. Wacht even en log opnieuw in.",
+    "kickedByModerator": "A moderator has disconnected you: {reason}",
     "tips": {
       "classes": "Tip: elk van de 9 klassen speelt anders. Probeer er een paar voordat je er een kiest.",
       "talents": "Tip: je kunt je talenten buiten gevechten altijd herstellen, dus een vroege keuze is nooit een valstrik.",
