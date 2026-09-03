@@ -9,10 +9,11 @@
 // entry for why).
 
 import * as THREE from 'three';
+import { isMountSkinId, MOUNT_SKIN_IDS, type MountSkinId } from '../sim/content/mount_skins';
 import { DEFAULT_MOUNT, type MountKey } from '../sim/content/mounts';
 import { type CharacterVisual, createMountVisual } from './characters';
 import { mountAssetsReady, preloadMountAssets } from './characters/assets';
-import { MOUNT_VISUAL_SPECS } from './mount_visuals';
+import { MOUNT_SKIN_VISUAL_SPECS, MOUNT_VISUAL_SPECS, type MountVisualSpec } from './mount_visuals';
 import { setRenderCategory } from './renderer_diagnostics';
 
 /**
@@ -53,13 +54,38 @@ function raceTimeout<T>(promise: Promise<T>, ms: number): Promise<T | 'timeout'>
  *  post-reveal resume lane for content most sessions never draw. Validated
  *  against MOUNT_VISUAL_SPECS (typed Record<MountKey, ...>), so an owned key
  *  the specs do not carry is dropped rather than thrown. */
-export function mountPrewarmKeys(owned: readonly MountKey[] = []): MountKey[] {
-  const wanted = new Set<MountKey>([DEFAULT_MOUNT, ...owned]);
-  return (Object.keys(MOUNT_VISUAL_SPECS) as MountKey[]).filter((key) => wanted.has(key));
+export function mountPrewarmKeys(
+  owned: readonly MountKey[] = [],
+  ownedSkins: readonly string[] = [],
+): MountPrewarmKey[] {
+  const wanted = new Set<string>([DEFAULT_MOUNT, ...owned, ...ownedSkins]);
+  const mounts = (Object.keys(MOUNT_VISUAL_SPECS) as MountKey[]).filter((key) => wanted.has(key));
+  // Owned mount SKINS warm too, after the catalog mounts and in skin-catalog
+  // order: a worn skin is the look most sessions actually draw first, and its
+  // GLB is as lazy as any mount's.
+  const skins = MOUNT_SKIN_IDS.filter((id) => wanted.has(id));
+  return [...mounts, ...skins];
 }
 
-function createReadyMountPrewarmVisual(key: MountKey): CharacterVisual | null {
-  const { visualKey } = MOUNT_VISUAL_SPECS[key];
+/** The renderer's one-call form: the mounts this session owns plus the
+ *  account's mount skins (src/sim/content/mount_skins.ts). */
+export function mountPrewarmKeysFor(world: {
+  ownedMounts(): readonly MountKey[];
+  accountCosmetics: { mountSkinIds: readonly string[] };
+}): MountPrewarmKey[] {
+  return mountPrewarmKeys(world.ownedMounts(), world.accountCosmetics.mountSkinIds);
+}
+
+/** A catalog mount key or a mount skin id: both name one lazy mount visual. */
+export type MountPrewarmKey = MountKey | MountSkinId;
+
+/** The visual spec a prewarm key names: a skin's or a catalog mount's. */
+export function mountPrewarmSpec(key: MountPrewarmKey): MountVisualSpec {
+  return isMountSkinId(key) ? MOUNT_SKIN_VISUAL_SPECS[key] : MOUNT_VISUAL_SPECS[key];
+}
+
+function createReadyMountPrewarmVisual(key: MountPrewarmKey): CharacterVisual | null {
+  const { visualKey } = mountPrewarmSpec(key);
   if (!mountAssetsReady(visualKey)) return null;
   const visual = createMountVisual(visualKey);
   visual.root.name = `prewarm-mount:${key}`;
@@ -76,8 +102,10 @@ function createReadyMountPrewarmVisual(key: MountKey): CharacterVisual | null {
  * idle pass retries it, exactly like every other lazy character asset miss
  * in this renderer (never a synchronous throw on the render path).
  */
-export async function buildMountPrewarmVisual(key: MountKey): Promise<CharacterVisual | null> {
-  const { visualKey } = MOUNT_VISUAL_SPECS[key];
+export async function buildMountPrewarmVisual(
+  key: MountPrewarmKey,
+): Promise<CharacterVisual | null> {
+  const { visualKey } = mountPrewarmSpec(key);
   if (!mountAssetsReady(visualKey)) {
     await raceTimeout(
       preloadMountAssets(visualKey).catch(() => undefined),
@@ -110,7 +138,7 @@ export interface MountPrewarmStageResult {
 export async function stageMountPrewarmVisual(
   scene: THREE.Scene,
   group: THREE.Group | null,
-  key: MountKey,
+  key: MountPrewarmKey,
 ): Promise<MountPrewarmStageResult | null> {
   const visual = await buildMountPrewarmVisual(key);
   return stageReadyMountPrewarmVisual(scene, group, visual);
@@ -139,7 +167,7 @@ function stageReadyMountPrewarmVisual(
 export function stageResidentMountPrewarmVisual(
   scene: THREE.Scene,
   group: THREE.Group | null,
-  key: MountKey,
+  key: MountPrewarmKey,
 ): MountPrewarmStageResult | null {
   return stageReadyMountPrewarmVisual(scene, group, createReadyMountPrewarmVisual(key));
 }

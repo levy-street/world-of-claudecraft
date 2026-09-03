@@ -354,8 +354,11 @@ interface AttributionTargetFixture {
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
+// Re-minted for the mount-skin render seam (renderer.ts resolves the worn skin
+// through mountVisualSpecFor and keys mount audio off the presentation key).
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '3ca703a7f228ab4f1cf2a150058b315c2485f12f4f937be1eb02f3a07303df71';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

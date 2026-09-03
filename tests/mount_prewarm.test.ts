@@ -9,7 +9,6 @@
 import * as THREE from 'three';
 import { describe, expect, it, vi } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
-import { MOUNT_VISUAL_SPECS } from '../src/render/mount_visuals';
 import { DEFAULT_MOUNT, MOUNT_KEYS } from '../src/sim/content/mounts';
 
 function stubGltf(): { scene: THREE.Group; animations: THREE.AnimationClip[] } {
@@ -75,13 +74,13 @@ describe('buildMountPrewarmVisual', () => {
     // has not already warmed: the failure is isolated to the one fetch this
     // test actually exercises, never the module's own boot.
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
-    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+    const { mountPrewarmSpec, buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
     const key = mountPrewarmKeys(MOUNT_KEYS).find(
-      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+      (candidate) => !mountAssetsReady(mountPrewarmSpec(candidate).visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
-    const failingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    const failingUrl = VISUALS[mountPrewarmSpec(key).visualKey]?.url;
     expect(failingUrl).toBeTruthy();
     loadGltf.mockImplementation((url: string) =>
       url === failingUrl ? Promise.reject(new Error('network down')) : Promise.resolve(stubGltf()),
@@ -92,13 +91,13 @@ describe('buildMountPrewarmVisual', () => {
 
   it('times out a stalled lazy fetch without waiting forever', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
-    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+    const { mountPrewarmSpec, buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
     const key = mountPrewarmKeys(MOUNT_KEYS).find(
-      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+      (candidate) => !mountAssetsReady(mountPrewarmSpec(candidate).visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
-    const stalledUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    const stalledUrl = VISUALS[mountPrewarmSpec(key).visualKey]?.url;
     expect(stalledUrl).toBeTruthy();
     loadGltf.mockImplementation((url: string) =>
       url === stalledUrl ? new Promise(() => undefined) : Promise.resolve(stubGltf()),
@@ -117,13 +116,13 @@ describe('buildMountPrewarmVisual', () => {
 
   it('evicts a rejected fetch so a later sighting of the same mount can retry', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
-    const { buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+    const { mountPrewarmSpec, buildMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
     const key = mountPrewarmKeys(MOUNT_KEYS).find(
-      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+      (candidate) => !mountAssetsReady(mountPrewarmSpec(candidate).visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
-    const failingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    const failingUrl = VISUALS[mountPrewarmSpec(key).visualKey]?.url;
     expect(failingUrl).toBeTruthy();
     loadGltf.mockImplementation((url: string) =>
       url === failingUrl ? Promise.reject(new Error('network down')) : Promise.resolve(stubGltf()),
@@ -164,13 +163,13 @@ describe('stageMountPrewarmVisual', () => {
 
   it('returns null and leaves the group untouched when the mount asset never arrives', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
-    const { stageMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
+    const { mountPrewarmSpec, stageMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
       await importMountPrewarm(loadGltf);
     const key = mountPrewarmKeys(MOUNT_KEYS).find(
-      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+      (candidate) => !mountAssetsReady(mountPrewarmSpec(candidate).visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
-    const failingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    const failingUrl = VISUALS[mountPrewarmSpec(key).visualKey]?.url;
     expect(failingUrl).toBeTruthy();
     loadGltf.mockImplementation((url: string) =>
       url === failingUrl ? Promise.reject(new Error('network down')) : Promise.resolve(stubGltf()),
@@ -183,13 +182,17 @@ describe('stageMountPrewarmVisual', () => {
 
   it('resident-only staging never starts a missing mount fetch', async () => {
     const loadGltf = vi.fn((_url: string) => Promise.resolve(stubGltf()));
-    const { stageResidentMountPrewarmVisual, mountPrewarmKeys, mountAssetsReady } =
-      await importMountPrewarm(loadGltf);
+    const {
+      mountPrewarmSpec,
+      stageResidentMountPrewarmVisual,
+      mountPrewarmKeys,
+      mountAssetsReady,
+    } = await importMountPrewarm(loadGltf);
     const key = mountPrewarmKeys(MOUNT_KEYS).find(
-      (candidate) => !mountAssetsReady(MOUNT_VISUAL_SPECS[candidate].visualKey),
+      (candidate) => !mountAssetsReady(mountPrewarmSpec(candidate).visualKey),
     );
     if (!key) throw new Error('every mount asset is already resident after charactersReady()');
-    const missingUrl = VISUALS[MOUNT_VISUAL_SPECS[key].visualKey]?.url;
+    const missingUrl = VISUALS[mountPrewarmSpec(key).visualKey]?.url;
     expect(missingUrl).toBeTruthy();
     loadGltf.mockClear();
     loadGltf.mockImplementation((url: string) =>

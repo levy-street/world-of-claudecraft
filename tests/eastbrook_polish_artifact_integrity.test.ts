@@ -1040,12 +1040,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
+// Re-minted for the mount-skin render seam (renderer.ts resolves the worn skin
+// through mountVisualSpecFor and keys mount audio off the presentation key).
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'acdad02b012824b6a0588fa8330eb7cc20fcd0112d9f159a04ab1062752869ab';
+  '655397c19fe56ec3f8433ad9289a0f0d216476d70247baa4175b3f6ee63838a7';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the mount-skin render seam (renderer.ts resolves the worn skin
+// through mountVisualSpecFor and keys mount audio off the presentation key).
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '3ca703a7f228ab4f1cf2a150058b315c2485f12f4f937be1eb02f3a07303df71';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2199,9 +2205,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-      // Re-minted for the Drakelands entrance merge into the raid branch: the
-      // composite first, then this seal. No capture was retaken.
-    ).toBe('69c8bd5d29f52927682340a17af5935bdc33585a5b0599daa4c2682c04a3211f');
+      // Re-minted for the mount-skin render seam: the composite first, then this
+      // seal. No capture was retaken.
+    ).toBe('f1a634a43098eeb24d98418f01a72a6d9e6e3a8370d135d7a7006ca8b85824a0');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

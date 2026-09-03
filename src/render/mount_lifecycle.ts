@@ -242,6 +242,11 @@ export interface MountTransitionInputs {
   mountCastKey: string;
   mountCastRemaining: number;
   mountKey: string;
+  /** What the mount PRESENTS as (mountPresentationKey, src/sim/content/mount_skins.ts):
+   *  the worn skin's id or the mount key. Every sound keys off this while the
+   *  summon EDGE stays on mountKey, so a live skin swap rebuilds the visual
+   *  without replaying the call. */
+  mountLook: string;
   /** The rider is in a state that can play the call pose at all. */
   poseAllowed: boolean;
   /** This entity is being presented this frame (not shed by the LOD/budget). */
@@ -298,7 +303,7 @@ export function syncMountTransitionFx(
     // playAt's cold path (silently dropped past a 0.12s fetch/decode window) and
     // the loop's cold path (a fallback fade-in instead of the immediate splice),
     // reading as ~0.9s of silence then a swell. A no-op for an ordinary mount.
-    if (x.mountKey !== '') x.preloadEngine(x.mountKey);
+    if (x.mountKey !== '') x.preloadEngine(x.mountLook);
   }
   return x.mountCasting;
 }
