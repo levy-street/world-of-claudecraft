@@ -343,6 +343,10 @@ non-commercial. For commercial use, arrange your own licence with the author.
 | Ignivar Ashcaller creature model + animations (`public/models/creatures/ignivar_ashcaller.glb`) | World of ClaudeCraft contributor handoff | Contributor-provided `Ignivar_Ashcaller.zip` (SHA-256 `aa7aac6ddd2eedefdaec7e0c645558701236e60081f74f45a1e4cf088711eda9`), optimized locally with meshopt and KTX2 for shipping | Project asset | With the project only |
 | Generated prop model (varkhul_grand_forge) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 | Generated prop model (nythraxis_bone_spike) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (nythraxis_soulfire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (nythraxis_gravefire) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (nythraxis_binding_cage) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
+| Generated prop model (nythraxis_grave_flame) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset | With the project only |
 Assets were optimized for shipping (animation clip pruning, meshopt compression,
 texture resizing) via `scripts/assets/build_assets.mjs`; raw packs are not
 committed.

@@ -16,10 +16,8 @@ import {
   NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../sim/nythraxis_gravefire';
 import { METEOR_FLAME_GEOMETRY_HALF_HEIGHT } from './mage_ground_fx';
-import {
-  NYTHRAXIS_FLAME_TONGUE_GEOMETRY,
-  NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT,
-} from './nythraxis_flame_tongue';
+import { NythraxisFireInstances, nythraxisPropAsset } from './nythraxis_fire_assets';
+import { NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT } from './nythraxis_flame_tongue';
 import {
   NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH,
   NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION,
@@ -65,8 +63,7 @@ interface GravefireVisual {
   glowMaterial: THREE.MeshBasicMaterial;
   edgeMaterial: THREE.MeshBasicMaterial;
   headMaterial: THREE.MeshBasicMaterial;
-  tongues: THREE.InstancedMesh;
-  tongueMaterial: THREE.MeshBasicMaterial;
+  fire: NythraxisFireInstances;
   sampledHeights: Float32Array;
   sampled: Uint8Array;
   plan: NythraxisGravefirePlan;
@@ -272,19 +269,39 @@ const TONGUE_POSE: NythraxisGravefireTonguePose = {
 };
 const TONGUE_DUMMY = new THREE.Object3D();
 
+/** The fire for one line: the modelled Gravefire tongue when loaded, else the procedural quad. */
+function newGravefireFire(): NythraxisFireInstances {
+  return new NythraxisFireInstances(
+    'gravefire',
+    nythraxisGravefireTongueCount(),
+    {
+      color: NYTHRAXIS_GRAVEFIRE_PALETTE.tongue,
+      opacity: NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY.tongue,
+      unitHeight: NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT,
+    },
+    NYTHRAXIS_GRAVEFIRE_TONGUES_NAME,
+    15,
+  );
+}
+
 /** Re-pose every tongue instance for the current window and phase. */
 function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
-  const { plan, tongues } = visual;
+  const { plan, fire } = visual;
   const crossX = -visual.dirZ;
   const crossZ = visual.dirX;
-  for (let index = 0; index < tongues.count; index++) {
+  // The modelled tongue is a run of flame along its own X axis with its foot at
+  // y 0: lay it along the line, keeping the hashed yaw as a small jitter so the
+  // run never tiles. The procedural quad is centred and faces any way.
+  const heading = Math.atan2(-visual.dirZ, visual.dirX);
+  const halfHeight = fire.usesAsset ? 0 : METEOR_FLAME_GEOMETRY_HALF_HEIGHT;
+  for (let index = 0; index < fire.count; index++) {
     const pose = nythraxisGravefireTonguePoseInto(
       TONGUE_POSE,
       index,
       plan,
       visual.phase,
       reducedMotion,
-      METEOR_FLAME_GEOMETRY_HALF_HEIGHT,
+      halfHeight,
     );
     if (!pose.visible) {
       TONGUE_DUMMY.position.set(0, -1000, 0);
@@ -296,19 +313,29 @@ function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
         heightAtDistance(visual, pose.along) + NYTHRAXIS_GRAVEFIRE_GROUND_LIFT + pose.y,
         visual.z + visual.dirZ * pose.along + crossZ * pose.across,
       );
-      TONGUE_DUMMY.rotation.set(0, pose.yaw, 0);
+      TONGUE_DUMMY.rotation.set(
+        0,
+        fire.usesAsset ? heading + (pose.yaw - Math.PI) * 0.12 : pose.yaw,
+        0,
+      );
       TONGUE_DUMMY.scale.set(pose.width, pose.height, pose.width);
     }
     TONGUE_DUMMY.updateMatrix();
-    tongues.setMatrixAt(index, TONGUE_DUMMY.matrix);
+    fire.setMatrixAt(index, TONGUE_DUMMY.matrix);
   }
-  tongues.instanceMatrix.needsUpdate = true;
+  fire.commit();
   const sphere = visual.mesh.geometry.boundingSphere;
-  if (sphere) {
-    if (!tongues.boundingSphere) tongues.boundingSphere = new THREE.Sphere();
-    tongues.boundingSphere.center.copy(sphere.center);
-    tongues.boundingSphere.radius = sphere.radius + NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT;
-  }
+  if (sphere) fire.setBoundingSphere(sphere.center, sphere.radius + fire.unitHeight);
+}
+
+/** Once the model has loaded, a line still drawing the procedural quad swaps over. */
+function upgradeFire(visual: GravefireVisual, reducedMotion: boolean): void {
+  if (visual.fire.usesAsset || !nythraxisPropAsset('gravefire')) return;
+  visual.fire.dispose();
+  visual.fire = newGravefireFire();
+  visual.fire.addTo(visual.group);
+  visual.group.userData.fire = visual.fire;
+  poseTongues(visual, reducedMotion);
 }
 
 function visualFromGroup(
@@ -324,8 +351,7 @@ function visualFromGroup(
     glowMaterial: group.userData.glowMaterial as THREE.MeshBasicMaterial,
     edgeMaterial: group.userData.edgeMaterial as THREE.MeshBasicMaterial,
     headMaterial: group.userData.headMaterial as THREE.MeshBasicMaterial,
-    tongues: group.userData.tongues as THREE.InstancedMesh,
-    tongueMaterial: group.userData.tongueMaterial as THREE.MeshBasicMaterial,
+    fire: group.userData.fire as NythraxisFireInstances,
     sampledHeights: new Float32Array(NYTHRAXIS_GRAVEFIRE_LENGTH + 1),
     sampled: new Uint8Array(NYTHRAXIS_GRAVEFIRE_LENGTH + 1),
     plan: {
@@ -385,17 +411,8 @@ export function buildNythraxisGravefireStrip(
   mesh.userData.actionable = true;
   group.add(mesh);
 
-  const tongueMaterial = stripMaterial(palette.tongue, opacity.tongue, THREE.AdditiveBlending);
-  const tongues = new THREE.InstancedMesh(
-    NYTHRAXIS_FLAME_TONGUE_GEOMETRY,
-    tongueMaterial,
-    nythraxisGravefireTongueCount(),
-  );
-  tongues.name = NYTHRAXIS_GRAVEFIRE_TONGUES_NAME;
-  tongues.renderOrder = 15;
-  tongues.userData.renderCategory = 'ui3d';
-  tongues.frustumCulled = true;
-  group.add(tongues);
+  const fire = newGravefireFire();
+  fire.addTo(group);
 
   group.userData.mesh = mesh;
   group.userData.positions = positions;
@@ -403,8 +420,7 @@ export function buildNythraxisGravefireStrip(
   group.userData.glowMaterial = glowMaterial;
   group.userData.edgeMaterial = edgeMaterial;
   group.userData.headMaterial = headMaterial;
-  group.userData.tongues = tongues;
-  group.userData.tongueMaterial = tongueMaterial;
+  group.userData.fire = fire;
   const visual = visualFromGroup(group, groundY, row);
   group.userData.visual = visual;
   rewriteStrip(visual);
@@ -444,10 +460,9 @@ function disposeVisual(visual: GravefireVisual): void {
   visual.glowMaterial.dispose();
   visual.edgeMaterial.dispose();
   visual.headMaterial.dispose();
-  // The tongue geometry is module-shared: dispose the instance buffer and the
-  // material, never the geometry.
-  visual.tongues.dispose();
-  visual.tongueMaterial.dispose();
+  // The tongue geometry (procedural or the prepared model) is shared: the fire
+  // helper disposes its instance buffers and material clones, never geometry.
+  visual.fire.dispose();
   visual.group.removeFromParent();
 }
 
@@ -469,6 +484,7 @@ export class NythraxisGravefireVisuals {
       this.activeIds.add(row.id);
       const existing = this.visuals.get(row.id);
       if (existing) {
+        upgradeFire(existing, this.reducedMotion);
         // A moved window re-poses the tongues at once so the fire never lags
         // behind the footprint that burns.
         if (applyRow(existing, row)) poseTongues(existing, this.reducedMotion);
@@ -498,7 +514,7 @@ export class NythraxisGravefireVisuals {
       visual.edgeMaterial.opacity = pulse.edge;
       visual.glowMaterial.opacity = pulse.glow;
       visual.headMaterial.opacity = pulse.head;
-      visual.tongueMaterial.opacity = pulse.tongue;
+      visual.fire.setOpacity(pulse.tongue);
       // The tongues flicker at 20 Hz, not every frame: continuous to the eye,
       // bounded on the CPU (the patch painter's cadence).
       visual.tongueElapsed += step;
