@@ -40,8 +40,12 @@
 
 import { MOB_GLOW_RANGE, mobGlowStrength } from './night_lighting_core';
 
-/** Total uniform slots the terrain shader loops over. */
-export const NIGHT_LIGHT_SLOTS = 40;
+/** Total uniform slots the terrain shader loops over. Raised from 40 with
+ *  the Last Keep rebuild: the owner's keep carries twenty placed lamps in
+ *  one stretch, and at 26 static slots the busiest window went over budget
+ *  (farthest lamps stood over dark ground). The shader still loops only
+ *  the live count, so empty country costs what it did before. */
+export const NIGHT_LIGHT_SLOTS = 48;
 /** Slots reserved for moving bodies (the player and nearby characters). The
  *  disc layer this replaces pooled MOB_GLOW_POOL discs; a field slot only
  *  matters within a body light's short reach, so a camera-local camp is

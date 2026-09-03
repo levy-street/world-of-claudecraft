@@ -169,7 +169,6 @@ const EXTERIOR_KIT: readonly IgnivarEnvPropKey[] = [
  *  scripts/assets/build_drakelands_kit.mjs; a future drop registers in
  *  IGNIVAR_ENV_PROP_URLS (plus its native dims) and then joins this list. */
 const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
-  'alchemist',
   'barracks',
   'building_1',
   'building_2',
@@ -182,10 +181,7 @@ const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
   'fence',
   'gravestone_2',
   'gravestone_3',
-  'horse_bell',
   'horse_head',
-  'house_1',
-  'market_stall',
   'notice_board',
   'shield_rack',
   'signpost',
@@ -193,7 +189,6 @@ const CUSTOM_KIT: readonly IgnivarEnvPropKey[] = [
   'tavern_sign',
   'weapon_rack',
   'well_pump',
-  'wooden_cart',
 ];
 
 type AssetKit = 'interior' | 'exterior' | 'custom';

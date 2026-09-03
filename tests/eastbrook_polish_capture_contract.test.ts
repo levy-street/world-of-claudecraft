@@ -330,7 +330,7 @@ interface AttributionTargetFixture {
 // door-portal arm moved the renderer integration leaf). No capture was
 // retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'c37108d64b0fb18ed78673ef9d1e5d6a03ed81f48b833715fe61e3ea868f8752';
+  '7c377573a1dee468afb0313efddaeac8f8aefa29bcc2135bcf124a87f64cc4c3';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

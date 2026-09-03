@@ -440,17 +440,18 @@ describe('the real world lamp network is deterministic and finite', () => {
 
   it('carries the authored fortress lamps as their own off-road class', () => {
     const authored = realSites().filter((site) => site.authored);
-    // The Forgefather fortress pass: every authored site is the owner's
-    // verbatim placement (drakelands brazier fixtures on the isle), and
-    // the shipped list is the network PLUS exactly this set, so a lamp can
-    // never slip its class and dodge the road invariants above.
-    expect(authored.length).toBe(13);
+    // The Forgefather fortress passes: every authored site is the owner's
+    // verbatim placement (drakelands brazier fixtures across the rebuilt
+    // keep grounds and the isle), and the shipped list is the network PLUS
+    // exactly this set, so a lamp can never slip its class and dodge the
+    // road invariants above.
+    expect(authored.length).toBe(20);
     for (const site of authored) {
       expect(site.style).toBe('drakelands_brazier');
       expect(site.areaId).toBe('drakelands');
-      expect(site.x).toBeGreaterThan(476);
+      expect(site.x).toBeGreaterThan(420);
       expect(site.x).toBeLessThan(544);
-      expect(site.z).toBeGreaterThan(2168);
+      expect(site.z).toBeGreaterThan(2130);
       expect(site.z).toBeLessThan(2280);
     }
     expect(networkSites().length + authored.length).toBe(realSites().length);

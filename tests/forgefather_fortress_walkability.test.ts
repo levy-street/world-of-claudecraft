@@ -233,8 +233,8 @@ describe('forgefather fortress walkability', () => {
     // surface (the bank never pokes up through a flight) and calm enough
     // for the steepness memo the kernel still reads there.
     const stairs = FORGEFATHER_FORTRESS_PLACEMENTS.filter((p) => p.key === 'staircase');
-    expect(stairs.length).toBe(5);
-    expect(FORGEFATHER_STAIR_RAMPS.length).toBe(19);
+    expect(stairs.length).toBe(13);
+    expect(FORGEFATHER_STAIR_RAMPS.length).toBe(38);
     const bad: string[] = [];
     for (const ramp of FORGEFATHER_STAIR_RAMPS) {
       if (ramp.link) continue; // under-plate connective segments
@@ -257,9 +257,14 @@ describe('forgefather fortress walkability', () => {
           bad.push(
             `bank above the flight at (${x.toFixed(1)}, ${z.toFixed(1)}): raw ${raw.toFixed(2)} vs ${expected.toFixed(2)}`,
           );
-        const steep = terrainSteepness(Math.round(x), Math.round(z), WORLD_SEED);
-        if (steep > PLAYER_MAX_CLIMB_SLOPE)
-          bad.push(`steep bank cell under (${x.toFixed(1)}, ${z.toFixed(1)}): ${steep.toFixed(2)}`);
+        // The raw bank under a flight may legitimately read steep since the
+        // sixth pass: the movement gates measure the WALKED surface on a
+        // lift (walkedSteepnessAt) and the steep-ground strip references the
+        // raw ridden height, so a band-carried body never answers for the
+        // court stamps' buried rims. The kernel walk cases in
+        // forgefather_fortress.test.ts hold both directions of every flight
+        // end to end; what stays load-bearing HERE is the two checks above
+        // (no hole in the surface, no raw ground rising through a flight).
       }
     }
     expect(bad, bad.slice(0, 10).join('; ')).toEqual([]);

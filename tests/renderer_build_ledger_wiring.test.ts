@@ -108,7 +108,8 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
     // every timedBuild call names a feature builder; a bare builder call
     // beside them would be an untimed zone step
     const timed = source.match(/this\.timedBuild\('(build\w+)', (build\w+)\)/g) ?? [];
-    expect(timed.length).toBeGreaterThanOrEqual(12);
+    // eleven since the Ashen Bulwark's builder retired with its barracks
+    expect(timed.length).toBeGreaterThanOrEqual(11);
     for (const call of timed) {
       const [, name, fn] = /this\.timedBuild\('(build\w+)', (build\w+)\)/.exec(call) ?? [];
       expect(name).toBe(fn);

@@ -381,18 +381,18 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // swap (the keep castle out, the sites traded, Wyrmwatch stripped): the
     // reshaped world moves every shared-stream index downstream.
     const hunts: { nodeId: string; deedId: string; itemId: string; hitAt: number }[] = [
-      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 86 },
+      { nodeId: 'ore_eastbrook_1', deedId: 'col_pristine_vein', itemId: 'copper_ore', hitAt: 151 },
       {
         nodeId: 'wood_eastbrook_1',
         deedId: 'col_ancient_heartwood',
         itemId: 'ironbark_log',
-        hitAt: 235,
+        hitAt: 0,
       },
       {
         nodeId: 'herb_eastbrook_1',
         deedId: 'col_moonlit_bloom',
         itemId: 'silverleaf_herb',
-        hitAt: 112,
+        hitAt: 160,
       },
     ];
     for (const hunt of hunts) {
@@ -462,8 +462,10 @@ describe('scripted playthrough (one sim, live sites only)', () => {
     // and its spirit healer retired, the market stalls and four town NPCs
     // moved): the specimen landed on attempt index 5 there. Re-hunted for
     // the Drakelands site swap (same cause as the beat 11 to 14 hunts): the
-    // specimen now lands on attempt index 3.
-    expect(hitAt).toBe(3);
+    // specimen now lands on attempt index 3. Re-hunted for the keep-side
+    // graveyard's move to the owner's churchyard (the rebuild epic's Pale
+    // Keeper seat, same shared-stream cause): it lands on index 7.
+    expect(hitAt).toBe(7);
     const specimen = meta.inventory.find((s) => s.itemId === 'pristine_hide');
     expect(specimen?.instance?.signer).toBe(meta.name);
     expect(meta.deedStats.visited.has('gather_event:perfect_specimen')).toBe(true);

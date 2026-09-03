@@ -37,11 +37,14 @@ const PRIORITY: Readonly<Record<PaladinSpec, readonly string[]>> = {
 // (docs/design/drakelands-improvements/plan.md: the keep castle removed to
 // flat land, the troll sites traded, Wyrmwatch stripped), which forks the
 // shared stream again: protection 41.7 to 40.15, retribution 52.45 to
-// 55.75; holy unmoved. The wide 35-65s design band still holds.
+// 55.75; holy unmoved. The keep-side graveyard's move to the owner's
+// churchyard (the rebuild epic's Pale Keeper seat) forks it once more:
+// retribution 55.75 to 59.2; holy and protection unmoved. The wide
+// 35-65s design band still holds.
 const EXPECTED_SECONDS: Readonly<Record<PaladinSpec, number>> = {
   holy: 41.25,
   protection: 40.15,
-  retribution: 55.75,
+  retribution: 59.2,
 };
 
 function addDummy(sim: Sim): Entity {
