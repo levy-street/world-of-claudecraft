@@ -232,10 +232,13 @@ const PROP_KEY_COUNT = Object.keys(IGNIVAR_ENV_PROP_URLS).length;
  *  texture detail survives; the night lamp wash multiplies on top. */
 function applyDrakelandsKitWarmth(mat: THREE.Material): void {
   const m = mat as THREE.MeshStandardMaterial;
-  if (m.color) m.color.multiply(new THREE.Color(1.0, 0.87, 0.78));
+  // Brighten, not just tint: the kit's source textures run dark, so the
+  // grade lifts the whole albedo (warm-biased) and keeps a real ember
+  // floor for night reads beside the lamp wash.
+  if (m.color) m.color.multiply(new THREE.Color(1.4, 1.24, 1.1));
   if ('emissive' in m) {
-    m.emissive = new THREE.Color(0x2a0f08);
-    m.emissiveIntensity = 0.35;
+    m.emissive = new THREE.Color(0x462314);
+    m.emissiveIntensity = 0.5;
   }
 }
 

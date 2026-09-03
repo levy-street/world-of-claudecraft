@@ -1002,7 +1002,10 @@ export const DRAKELANDS_PROPS: ZonePropsDef = {
   graveyards: [
     { x: 354, z: 2092 },
     { x: 300, z: 2176 },
-    { x: 452, z: 2112 },
+    // moved to the owner's rebuilt churchyard south of the keep chapel
+    // (the placed church, building_1 hall, and gravestones), so the Pale
+    // Keeper stands its yard instead of open dune
+    { x: 451, z: 2134 },
   ],
   // Wyrmwatch stands STRIPPED for the owner's placer rebuild (the
   // drakelands-improvements epic): the buildings, well, stalls, crates,

@@ -13,8 +13,8 @@
     "Final Stand enrage at 5% + grantNythraxisLockout (raidLockouts) + onBossDeath death dialogue",
     "class:warrior"
   ],
-  "draws": 6051,
-  "drawDigest": "d8aeae6e",
+  "draws": 6058,
+  "drawDigest": "9b2e13a7",
   "frames": [
     {
       "tick": 0,
@@ -6907,8 +6907,8 @@
       "state": "a878c99a",
       "events": "13fded47",
       "rng": {
-        "draws": 3507,
-        "digest": "e0789e2a"
+        "draws": 3509,
+        "digest": "e8965566"
       }
     },
     {
@@ -6918,8 +6918,8 @@
       "state": "5a860d24",
       "events": "13fded47",
       "rng": {
-        "draws": 3601,
-        "digest": "803e15eb"
+        "draws": 3605,
+        "digest": "12d8b360"
       }
     },
     {
@@ -6929,8 +6929,8 @@
       "state": "559d9f70",
       "events": "13fded47",
       "rng": {
-        "draws": 3667,
-        "digest": "4573f2eb"
+        "draws": 3670,
+        "digest": "b4437299"
       }
     },
     {
@@ -6940,8 +6940,8 @@
       "state": "242c1453",
       "events": "13fded47",
       "rng": {
-        "draws": 3751,
-        "digest": "98527568"
+        "draws": 3758,
+        "digest": "9c70947e"
       }
     },
     {
@@ -6951,8 +6951,8 @@
       "state": "6578b550",
       "events": "0cc96f9d",
       "rng": {
-        "draws": 3855,
-        "digest": "3f63fefe"
+        "draws": 3862,
+        "digest": "53817032"
       }
     },
     {
@@ -6962,8 +6962,8 @@
       "state": "b235dc62",
       "events": "13fded47",
       "rng": {
-        "draws": 3955,
-        "digest": "47b6b15e"
+        "draws": 3965,
+        "digest": "681a51aa"
       }
     },
     {
@@ -6973,8 +6973,8 @@
       "state": "d9587a94",
       "events": "13fded47",
       "rng": {
-        "draws": 4027,
-        "digest": "8b1ad171"
+        "draws": 4038,
+        "digest": "598b2061"
       }
     },
     {
@@ -6984,8 +6984,8 @@
       "state": "413ce60b",
       "events": "13fded47",
       "rng": {
-        "draws": 4118,
-        "digest": "f3701604"
+        "draws": 4121,
+        "digest": "3ca73551"
       }
     },
     {
@@ -6995,8 +6995,8 @@
       "state": "65914461",
       "events": "13fded47",
       "rng": {
-        "draws": 4208,
-        "digest": "a2b62556"
+        "draws": 4213,
+        "digest": "8940d0f9"
       }
     },
     {
@@ -7006,8 +7006,8 @@
       "state": "ab726010",
       "events": "a2dbc044",
       "rng": {
-        "draws": 4289,
-        "digest": "5e1b3888"
+        "draws": 4292,
+        "digest": "4a867de7"
       }
     },
     {
@@ -7017,8 +7017,8 @@
       "state": "9d89dc41",
       "events": "741638a5",
       "rng": {
-        "draws": 4369,
-        "digest": "c7ae8b8f"
+        "draws": 4371,
+        "digest": "9c8a8958"
       }
     },
     {
@@ -7028,8 +7028,8 @@
       "state": "b20a7d06",
       "events": "741638a5",
       "rng": {
-        "draws": 4426,
-        "digest": "2d090eae"
+        "draws": 4435,
+        "digest": "878c2501"
       },
       "label": "deathless-interrupt",
       "players": [
@@ -8216,8 +8216,8 @@
       "state": "fe8f9999",
       "events": "741638a5",
       "rng": {
-        "draws": 4462,
-        "digest": "d85bf35c"
+        "draws": 4477,
+        "digest": "3c0c5a75"
       }
     },
     {
@@ -8227,8 +8227,8 @@
       "state": "d9bb8260",
       "events": "741638a5",
       "rng": {
-        "draws": 4551,
-        "digest": "8a7bea1b"
+        "draws": 4583,
+        "digest": "271e7e38"
       }
     },
     {
@@ -8238,8 +8238,8 @@
       "state": "ad7c84ee",
       "events": "741638a5",
       "rng": {
-        "draws": 4640,
-        "digest": "001edbce"
+        "draws": 4682,
+        "digest": "94e90166"
       }
     },
     {
@@ -8249,8 +8249,8 @@
       "state": "627e01bf",
       "events": "741638a5",
       "rng": {
-        "draws": 4743,
-        "digest": "7a7df1c9"
+        "draws": 4778,
+        "digest": "fb89e8cd"
       }
     },
     {
@@ -8260,8 +8260,8 @@
       "state": "509b417f",
       "events": "741638a5",
       "rng": {
-        "draws": 4819,
-        "digest": "80dbd8c1"
+        "draws": 4860,
+        "digest": "7234940e"
       }
     },
     {
@@ -8271,8 +8271,8 @@
       "state": "201d91fe",
       "events": "741638a5",
       "rng": {
-        "draws": 4898,
-        "digest": "60260eab"
+        "draws": 4938,
+        "digest": "f86c49e4"
       }
     },
     {
@@ -8282,8 +8282,8 @@
       "state": "658e7a84",
       "events": "741638a5",
       "rng": {
-        "draws": 4981,
-        "digest": "bfff59b8"
+        "draws": 5016,
+        "digest": "79857723"
       }
     },
     {
@@ -8293,8 +8293,8 @@
       "state": "dff215e3",
       "events": "741638a5",
       "rng": {
-        "draws": 5060,
-        "digest": "8947d0fc"
+        "draws": 5096,
+        "digest": "a149521c"
       }
     },
     {
@@ -8304,52 +8304,52 @@
       "state": "c26e7e7f",
       "events": "f048d2f4",
       "rng": {
-        "draws": 5164,
-        "digest": "6be29f73"
+        "draws": 5198,
+        "digest": "a93aa105"
       }
     },
     {
       "tick": 600,
       "time": 30,
       "nextId": 1011,
-      "state": "3302c594",
-      "events": "ed203ea5",
+      "state": "abb603f7",
+      "events": "272e2650",
       "rng": {
-        "draws": 5256,
-        "digest": "9a3e9881"
+        "draws": 5296,
+        "digest": "ec04a333"
       }
     },
     {
       "tick": 610,
       "time": 30.5,
       "nextId": 1011,
-      "state": "b468e198",
+      "state": "b0a2beee",
       "events": "741638a5",
       "rng": {
-        "draws": 5345,
-        "digest": "0c25f86a"
+        "draws": 5402,
+        "digest": "9df50f35"
       }
     },
     {
       "tick": 620,
       "time": 31,
       "nextId": 1011,
-      "state": "917767fd",
+      "state": "e83734b7",
       "events": "741638a5",
       "rng": {
-        "draws": 5429,
-        "digest": "4d01798d"
+        "draws": 5489,
+        "digest": "7cf78354"
       }
     },
     {
       "tick": 627,
       "time": 31.35,
       "nextId": 1011,
-      "state": "46902360",
-      "events": "06ca0ac3",
+      "state": "fd4fb294",
+      "events": "a8796444",
       "rng": {
-        "draws": 5490,
-        "digest": "2e23976b"
+        "draws": 5550,
+        "digest": "436f6f51"
       },
       "label": "finalstand",
       "players": [
@@ -8370,7 +8370,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 6276,
-            "damageTaken": 17755,
+            "damageTaken": 19238,
             "kills": 2,
             "xpGained": 166
           },
@@ -8879,20 +8879,11 @@
               "remaining": 3568.65,
               "school": "physical",
               "sourceId": 998
-            },
-            {
-              "duration": 10,
-              "id": "revenge_free",
-              "kind": "revenge_free",
-              "name": "Revenge!",
-              "remaining": 8.45,
-              "school": "physical",
-              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
           "blockValue": 6,
-          "combatTimer": 12.15,
+          "combatTimer": 1.55,
           "comboUntil": -1,
           "critChance": 0.0695,
           "detonateTimer": "Infinity",
@@ -9149,7 +9140,7 @@
               "value": 1.45
             }
           ],
-          "combatTimer": 13.1,
+          "combatTimer": 1.55,
           "comboUntil": -1,
           "critChance": 0.05,
           "detonateTimer": "Infinity",
@@ -9177,11 +9168,10 @@
               1002
             ],
             "deathlessTimer": 43.05,
-            "dialogueBusyUntil": 36.55,
+            "dialogueBusyUntil": 32.4,
             "dialogueToken": 6,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": 2,
@@ -9544,11 +9534,11 @@
       "tick": 628,
       "time": 31.4,
       "nextId": 1011,
-      "state": "3cf73c66",
+      "state": "edfcf187",
       "events": "ca816b2b",
       "rng": {
-        "draws": 5502,
-        "digest": "2cf358f3"
+        "draws": 5563,
+        "digest": "ac9b206d"
       },
       "label": "death",
       "players": [
@@ -9569,7 +9559,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 17755,
+            "damageTaken": 19238,
             "kills": 3,
             "xpGained": 249
           },
@@ -10183,15 +10173,6 @@
               "remaining": 3568.6,
               "school": "physical",
               "sourceId": 998
-            },
-            {
-              "duration": 10,
-              "id": "revenge_free",
-              "kind": "revenge_free",
-              "name": "Revenge!",
-              "remaining": 8.4,
-              "school": "physical",
-              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -10459,19 +10440,19 @@
           },
           "level": 20,
           "loot": {
-            "copper": 185022,
+            "copper": 116100,
             "items": [
-              {
-                "count": 1,
-                "itemId": "stormcallers_crown"
-              },
               {
                 "count": 1,
                 "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "bonewrought_bulwark"
+              },
+              {
+                "count": 1,
+                "itemId": "wraithfire_orb"
               },
               {
                 "count": 1,
@@ -10505,8 +10486,7 @@
             "dialogueBusyUntil": 36.6,
             "dialogueToken": 7,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": "dead",
@@ -10865,77 +10845,77 @@
       "tick": 630,
       "time": 31.5,
       "nextId": 1011,
-      "state": "da472f21",
+      "state": "98d743d9",
       "events": "741638a5",
       "rng": {
-        "draws": 5526,
-        "digest": "5c7a17fd"
+        "draws": 5579,
+        "digest": "449aae4e"
       }
     },
     {
       "tick": 640,
       "time": 32,
       "nextId": 1011,
-      "state": "d527867d",
+      "state": "c480bf31",
       "events": "741638a5",
       "rng": {
-        "draws": 5631,
-        "digest": "7edb9315"
+        "draws": 5652,
+        "digest": "5dbf3511"
       }
     },
     {
       "tick": 650,
       "time": 32.5,
       "nextId": 1011,
-      "state": "61c0f5b4",
+      "state": "f9b6d5f9",
       "events": "741638a5",
       "rng": {
-        "draws": 5698,
-        "digest": "ed1bf06f"
+        "draws": 5713,
+        "digest": "0e9f8a42"
       }
     },
     {
       "tick": 660,
       "time": 33,
       "nextId": 1011,
-      "state": "99dafdf6",
+      "state": "504d8451",
       "events": "741638a5",
       "rng": {
-        "draws": 5795,
-        "digest": "0d5c09d6"
+        "draws": 5798,
+        "digest": "7dce1585"
       }
     },
     {
       "tick": 670,
       "time": 33.5,
       "nextId": 1011,
-      "state": "d4802393",
+      "state": "6d08e7c9",
       "events": "741638a5",
       "rng": {
-        "draws": 5879,
-        "digest": "0582aa98"
+        "draws": 5886,
+        "digest": "de4e907c"
       }
     },
     {
       "tick": 680,
       "time": 34,
       "nextId": 1011,
-      "state": "59d1aa63",
+      "state": "d6eb58f1",
       "events": "741638a5",
       "rng": {
-        "draws": 5983,
-        "digest": "7b9e29fb"
+        "draws": 5997,
+        "digest": "810c8017"
       }
     },
     {
       "tick": 688,
       "time": 34.4,
       "nextId": 1011,
-      "state": "bc0f7581",
+      "state": "a335c23b",
       "events": "09b18fee",
       "rng": {
-        "draws": 6051,
-        "digest": "d8aeae6e"
+        "draws": 6058,
+        "digest": "9b2e13a7"
       },
       "label": "final",
       "players": [
@@ -10956,7 +10936,7 @@
           "companionUpgrades": {},
           "counters": {
             "damageDealt": 11076,
-            "damageTaken": 17755,
+            "damageTaken": 19238,
             "kills": 3,
             "xpGained": 249
           },
@@ -11570,15 +11550,6 @@
               "remaining": 3565.6,
               "school": "physical",
               "sourceId": 998
-            },
-            {
-              "duration": 10,
-              "id": "revenge_free",
-              "kind": "revenge_free",
-              "name": "Revenge!",
-              "remaining": 5.4,
-              "school": "physical",
-              "sourceId": 998
             }
           ],
           "blockChance": 0.05,
@@ -11846,19 +11817,19 @@
           },
           "level": 20,
           "loot": {
-            "copper": 185022,
+            "copper": 116100,
             "items": [
-              {
-                "count": 1,
-                "itemId": "stormcallers_crown"
-              },
               {
                 "count": 1,
                 "itemId": "crownforged_dreadhelm"
               },
               {
                 "count": 1,
-                "itemId": "soulflame_cowl"
+                "itemId": "bonewrought_bulwark"
+              },
+              {
+                "count": 1,
+                "itemId": "wraithfire_orb"
               },
               {
                 "count": 1,
@@ -11892,8 +11863,7 @@
             "dialogueBusyUntil": 36.6,
             "dialogueToken": 7,
             "finalStand": true,
-            "gravebreakerCasts": 2,
-            "gravebreakerCharged": true,
+            "gravebreakerCasts": 3,
             "gravebreakerTimer": 8.95,
             "introSpoken": true,
             "phase": "dead",
