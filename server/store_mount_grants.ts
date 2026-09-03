@@ -32,6 +32,7 @@ export function materializeStoreMountGrants(
       const def = ITEMS[itemId];
       if (def?.kind !== 'mount' || !def.mount || owned.has(def.mount)) continue;
       sim.addItem(itemId, 1, live.pid);
+      owned.add(def.mount);
     }
   }
 }

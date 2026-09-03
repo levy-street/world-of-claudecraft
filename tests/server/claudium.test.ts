@@ -462,6 +462,89 @@ describe('Claudium spend entitlement mirroring', () => {
     });
   });
 
+  it('reconciles an owned store mount when a replay reports granted false', async () => {
+    spendMock.mockResolvedValue({
+      granted: false,
+      balance: 800,
+      costClaudium: 1200,
+      reason: 'already_granted',
+    });
+    storeMock.mockResolvedValue({
+      available: true,
+      items: [
+        {
+          itemId: 'reins_mech_bird',
+          name: 'Ignition Key: Cluckwork Mech Bird',
+          kind: 'item',
+          costClaudium: 1200,
+          owned: true,
+        },
+      ],
+    });
+    const res = new FakeRes();
+
+    await handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/spend',
+        body: {
+          itemId: 'reins_mech_bird',
+          kind: 'item',
+          expectedCostClaudium: 1200,
+          idempotencyKey: 'mount-replay-key',
+        },
+      }),
+      res as never,
+      7,
+    );
+
+    expect(responseJson(res)).toEqual({
+      granted: false,
+      balance: 800,
+      costClaudium: 1200,
+      reason: 'already_granted',
+    });
+    expect(storeMock).toHaveBeenCalledWith(7);
+    expect(grantStoreMounts).toHaveBeenCalledWith(7, ['reins_mech_bird']);
+    expect(grantWeaponSkins).not.toHaveBeenCalled();
+  });
+
+  it('does not reconcile an owned mount id under the wrong authoritative kind', async () => {
+    spendMock.mockResolvedValue({ granted: true, balance: 800, costClaudium: 1200, reason: null });
+    storeMock.mockResolvedValue({
+      available: true,
+      items: [
+        {
+          itemId: 'reins_mech_bird',
+          name: 'Ignition Key: Cluckwork Mech Bird',
+          kind: 'skin',
+          costClaudium: 1200,
+          owned: true,
+        },
+      ],
+    });
+    const res = new FakeRes();
+
+    await handleClaudiumApi(
+      makeReq({
+        method: 'POST',
+        url: '/api/claudium/spend',
+        body: {
+          itemId: 'reins_mech_bird',
+          kind: 'item',
+          expectedCostClaudium: 1200,
+          idempotencyKey: 'mount-kind-key',
+        },
+      }),
+      res as never,
+      7,
+    );
+
+    expect(storeMock).toHaveBeenCalledWith(7);
+    expect(grantStoreMounts).not.toHaveBeenCalled();
+    expect(grantWeaponSkins).not.toHaveBeenCalled();
+  });
+
   it('never mirrors a mount the authoritative store does not confirm as owned (anti-forge)', () => {
     spendMock.mockResolvedValue({
       granted: true,
