@@ -768,9 +768,9 @@ describe('deedUnlocked through GameServer.detectActivity', () => {
     if (quested.kind !== 'quest') throw new Error('prog_callused_hands is no longer a quest deed');
     (
       server as unknown as {
-        applyAccountQuestLockouts(pid: number, c: unknown): void;
+        cosmetics: { applyQuestLockouts(pid: number, c: unknown): void };
       }
-    ).applyAccountQuestLockouts(session.pid, {
+    ).cosmetics.applyQuestLockouts(session.pid, {
       completedQuestIds: [quested.questId],
       mechChromaIds: [],
     });

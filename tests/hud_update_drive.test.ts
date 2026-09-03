@@ -1262,6 +1262,18 @@ const HUD_UPDATE_DRIVES: readonly DriveRow[] = [
     why: 'the Book of Deeds window',
   },
   {
+    call: 'this.cosmeticsWindow.refreshIfChanged',
+    band: 'slow',
+    gate: 'this.cosmeticsWindow.isOpen',
+    surface: 'window',
+    guard: {
+      kind: 'module',
+      module: 'hud/cosmetics/cosmetics_window.ts',
+      proof: 'const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
+    },
+    why: 'the Cosmetics window',
+  },
+  {
     call: 'this.reliquaryWindow.refreshIfChanged',
     band: 'slow',
     gate: 'this.reliquaryWindow.isOpen',
@@ -1680,7 +1692,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // window 44 -> 46: the crucible vendor's out-of-range close (the third
       // #vendor-window tenant, on the heroic vendor's exact row shape).
       // Both deltas apply on the merged tree.
-    ).toEqual({ window: 46, chrome: 84, none: 17 });
+    ).toEqual({ window: 47, chrome: 84, none: 17 });
     const windows = HUD_UPDATE_DRIVES.filter((r) => r.surface === 'window');
     expect(windows.map((r) => r.call)).toContain('this.spellbookWindow.tickOpen');
     expect(windows.map((r) => r.call)).toContain('this.refreshOpenTownFocusIfChanged');
@@ -1699,7 +1711,8 @@ describe('Hud.update() drives exactly the registered set, on the registered band
       // Store ladder-signature row (phase 15) land beside the release's
       // woc_market_window and trade-window rows, less the Vale Cup window,
       // briefing and betting module guards the retirement takes with it.
-      module: 24,
+      // The Cosmetics window (cold, signature-gated on the slow band) adds one.
+      module: 25,
       // Phase 20's refreshCharSheetIfChanged and its siblings. Their latches are
       // HUD fields (lastCharSheetSig et al) because the cold char_window painter
       // holds no signature of its own to diff. The release's trade row left this
@@ -1748,6 +1761,7 @@ describe('Hud.update() drives exactly the registered set, on the registered band
         'dungeon_finder_proposal_popup.ts: if (view.sig !== this.lastSig) {',
         'dungeon_finder_window.ts: if (sig === this.lastSig) {',
         'hud/battleground/battleground_proposal_popup.ts: if (view.sig !== this.lastSig) {',
+        'hud/cosmetics/cosmetics_window.ts: const sig = cosmeticsSig(this.snapshot()); if (sig === this.lastSig) return;',
         'hud.ts: if (craftCastActivitySig(session) !== this.lastCraftingCastSig) {',
         'hud.ts: if (craftingReagentSig(this.sim.inventory, this.sim.player.name, this.sim.craftVaultStock) === this.lastCraftingReagentSig) return;',
         'hud.ts: if (sig !== this.lastLootSettingsSig) {',

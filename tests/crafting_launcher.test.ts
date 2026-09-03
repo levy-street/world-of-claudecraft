@@ -14,6 +14,7 @@ import { hydrateIcons } from '../src/ui/ui_icons';
 const read = (rel: string): string => readFileSync(join(__dirname, rel), 'utf8');
 
 const hud = read('../src/ui/hud.ts');
+const sideButtons = read('../src/ui/hud/menu/side_buttons.ts');
 const mainSrc = read('../src/main.ts');
 const mobileControlsSrc = read('../src/game/mobile_controls.ts');
 const keybindsSrc = read('../src/game/keybinds.ts');
@@ -42,7 +43,7 @@ describe('desktop micro-menu launcher', () => {
     expect(hud).toContain(
       "$('#mm-crafting').addEventListener('click', () => this.toggleCrafting());",
     );
-    expect(hud).toContain("['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],");
+    expect(sideButtons).toContain("['#mm-crafting', 'crafting', 'hudChrome.crafting.title'],");
   });
 });
 

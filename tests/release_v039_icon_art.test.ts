@@ -38,7 +38,7 @@ const ACCEPTED_ART_SHA256 = '3d8cb36726050e3a708720b650744005f4ce23d3ac49c032376
 const SECOND_PASS_RECORD =
   'docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-art.json';
 const SECOND_PASS_RECORD_SHA256 =
-  '70c60f346c819b637a9780dd7625ec027ffbe4420650203f47197d7005cbd282';
+  'f675f2439b8b83b59f47f168eca58d6d88c73457ba7fc33ef46d5a2e431fe95f';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -331,7 +331,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // Eastbrook program's Sowfield demolition, plus the release arm's
         // two new abilities riding the v0.40.0 sync merge.
         abilities: { live: 402, painted: 402 },
-        hotbarItems: { live: 76, painted: 76 },
+        hotbarItems: { live: 74, painted: 74 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -427,7 +427,7 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
-    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(76);
+    expect(liveHotbarItemIds, 'production isHotbarItemId inventory').toHaveLength(74);
     expect(
       liveHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every production-eligible hotbar item resolves to committed painted art',
