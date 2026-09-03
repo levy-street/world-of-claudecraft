@@ -28,7 +28,7 @@
 
 import type { MountRarity } from './mounts';
 
-export type MountSkinId = 'mech_bird' | 'chimeglass_tortoise';
+export type MountSkinId = 'mech_bird' | 'chimeglass_tortoise' | 'rickshaw_mount';
 
 export interface MountSkinDef {
   /** Store SKU / economy-service item id (kind 'skin'). */
@@ -62,6 +62,20 @@ export const MOUNT_SKINS: Record<MountSkinId, MountSkinDef> = {
     name: 'Tolliver the Chimeglass',
     rarity: 'epic',
     visualKey: 'mount_chimeglass_tortoise',
+    season: 1,
+  },
+  // The Bonebound Rickshaw: a rattling bone-cart with a skeleton puller (its
+  // own rig, skel_rickshaw_puller, composed at runtime by
+  // src/render/rickshaw_mount.ts off this visualKey) and wheels that roll
+  // from real ground travel. It shipped as a developer-only catalog mount
+  // first, so the id keeps that catalog key: the GLB, the puller hook, the
+  // rolling loop and the summon cue (mount_loop_ / mount_summon_rickshaw_mount)
+  // are all keyed by it, and the store SKU follows the id.
+  rickshaw_mount: {
+    id: 'rickshaw_mount',
+    name: 'Bonebound Rickshaw',
+    rarity: 'epic',
+    visualKey: 'mount_rickshaw_mount',
     season: 1,
   },
 };

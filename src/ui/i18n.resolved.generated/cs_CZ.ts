@@ -13244,9 +13244,6 @@ export const cs_CZ: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lampářovo jho: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Spoutané otěže: Kostipoutaná rikša"
-      },
       "reins_drakemaw_raptor": {
         "name": "Otěže raptora z Dračí tlamy"
       },

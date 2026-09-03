@@ -13244,9 +13244,6 @@ export const pt_BR: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Canga do acendedor de lampiões: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Rédeas vinculadas: Riquixá de Ossos Vinculados"
-      },
       "reins_drakemaw_raptor": {
         "name": "Rédeas do Raptor de Drakemaw"
       },

@@ -13244,9 +13244,6 @@ export const ko_KR: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "점등인의 멍에: 그룸볼"
       },
-      "reins_rickshaw_mount": {
-        "name": "결속된 고삐: 뼈에 묶인 인력거"
-      },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
       },

@@ -21,8 +21,8 @@ import { MOUNT_KEYS, MOUNTS } from '../src/sim/content/mounts';
 // catalog row. These pins keep the family disjoint from the mount catalog and
 // the render specs in lockstep with the sim content.
 describe('mount skin catalog', () => {
-  it('ships exactly the two converted mounts, in store order', () => {
-    expect(MOUNT_SKIN_IDS).toEqual(['mech_bird', 'chimeglass_tortoise']);
+  it('ships exactly the three converted mounts, in store order', () => {
+    expect(MOUNT_SKIN_IDS).toEqual(['mech_bird', 'chimeglass_tortoise', 'rickshaw_mount']);
     expect(MOUNT_SKINS.mech_bird).toEqual({
       id: 'mech_bird',
       name: 'Cluckwork Mech Bird',
@@ -32,6 +32,15 @@ describe('mount skin catalog', () => {
     });
     expect(MOUNT_SKINS.chimeglass_tortoise.rarity).toBe('epic');
     expect(MOUNT_SKINS.chimeglass_tortoise.visualKey).toBe('mount_chimeglass_tortoise');
+    // The rickshaw keeps its catalog key as its id: the GLB, the puller hook and
+    // the loop/summon cues are keyed by it (see the record's comment).
+    expect(MOUNT_SKINS.rickshaw_mount).toEqual({
+      id: 'rickshaw_mount',
+      name: 'Bonebound Rickshaw',
+      rarity: 'epic',
+      visualKey: 'mount_rickshaw_mount',
+      season: 1,
+    });
   });
 
   it('is disjoint from the mount catalog: a skin id is never a MountKey', () => {

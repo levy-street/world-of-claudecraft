@@ -397,8 +397,10 @@ describe('Reliquary Conqueror catalog structure', () => {
     // epics, 16 wing epics, 3 + 5 heroic-only weapons and shields), on top of
     // the batch's own page: 340 + 1 + 45, plus the two developer mount slots
     // (Lanternback Troll, Chimeglass Tortoise): 388, plus the Cluckwork Mech
-    // Bird store mount on Horizons: 389.
-    expect(full).toEqual({ owned: 387, total: 387 });
+    // Bird store mount on Horizons: 389; then the Mech Bird, the Chimeglass
+    // Tortoise and the Bonebound Rickshaw left the shelf as account mount
+    // skins (not relics): 386.
+    expect(full).toEqual({ owned: 386, total: 386 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -410,7 +412,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     // Rickshaw's new mount slot and the 41 Crucible raid relics; marks are
     // character-scoped, so this trails the overview by the 29 account-scoped
     // weapon skins).
-    expect(character).toEqual({ owned: 358, total: 358 });
+    expect(character).toEqual({ owned: 357, total: 357 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -441,7 +443,7 @@ describe('Reliquary Conqueror catalog structure', () => {
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(422);
+    ).toBe(421);
     // Distinct mark ids: the 10 shipped before Phase 21 plus the 19
     // rare-slain proofs of conquerors_rares_of_the_realm.
     expect(
@@ -2529,16 +2531,11 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker, lanternback_troll and rickshaw_mount:
-  // DEVELOPER_MOUNTS, dev-grant only, deliberately absent from
+  // terrorspark_groundshaker and lanternback_troll: DEVELOPER_MOUNTS,
+  // dev-grant only, deliberately absent from
   // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
   // def comments in content/mounts.ts).
-  horizons_mounts: [
-    'drakemaw_raptor',
-    'lanternback_troll',
-    'rickshaw_mount',
-    'terrorspark_groundshaker',
-  ],
+  horizons_mounts: ['drakemaw_raptor', 'lanternback_troll', 'terrorspark_groundshaker'],
   // masterwork:engineering: unearnable, QA ruling 2026-08-07. Every live
   // engineering recipe produces a slotless, statless tool, masterworkBonusStats
   // returns null for all of them, so the masterwork proc can never fire and
@@ -3518,7 +3515,6 @@ describe('Reliquary source hint coverage', () => {
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
       'drakemaw_raptor',
       'lanternback_troll',
-      'rickshaw_mount',
       'terrorspark_groundshaker',
     ]);
     // masterwork:engineering pended by the QA ruling 2026-08-07: no

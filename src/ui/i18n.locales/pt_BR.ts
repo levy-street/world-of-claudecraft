@@ -13883,7 +13883,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Revestimento de erva-moura",
   "guide.settingsPage.ifShowReliquaryTracker": "Se o rastreador do Relicário (suas páginas fixadas e seu progresso) está no seu HUD. A janela do Relicário tem um botão de olho correspondente e fixar uma página ativa o rastreador novamente.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Rédeas vinculadas: Riquixá de Ossos Vinculados',
   'hudChrome.itemMenu.sell': 'Vender',
   'hudChrome.itemMenu.sellAll': 'Vender tudo ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

@@ -13244,9 +13244,6 @@ export const tr_TR: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Fenerci Boyunduruğu: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Bağlı Dizginler: Kemikbağlı Çekçek"
-      },
       "reins_drakemaw_raptor": {
         "name": "Ejder Ağzı Raptoru'nun Dizginleri"
       },

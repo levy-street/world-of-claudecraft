@@ -13244,9 +13244,6 @@ export const it_IT: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Giogo del lampionaio: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Redini vincolate: Risciò Vincolato alle Ossa"
-      },
       "reins_drakemaw_raptor": {
         "name": "Redini del Raptor di Drakemaw"
       },

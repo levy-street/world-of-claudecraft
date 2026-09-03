@@ -95,10 +95,12 @@ describe('CosmeticsWindow', () => {
     expect(el.querySelector('.cos-tab.on')?.getAttribute('data-tab')).toBe('mounts');
     expect(card(el, 'mech_bird')).toBeTruthy();
     expect(card(el, 'chimeglass_tortoise')).toBeTruthy();
+    expect(card(el, 'rickshaw_mount')).toBeTruthy();
     expect(action(el, 'wear-mount', 'mech_bird')).toBeTruthy();
     // Unowned: no action button at all, the store state instead.
     expect(card(el, 'chimeglass_tortoise').querySelector('.cos-action')).toBeNull();
     expect(card(el, 'chimeglass_tortoise').querySelector('.cos-state.store')).toBeTruthy();
+    expect(card(el, 'rickshaw_mount').querySelector('.cos-action')).toBeNull();
     // Scope badges are on every card.
     expect(card(el, 'mech_bird').querySelector('.cos-scope-account')).toBeTruthy();
   });

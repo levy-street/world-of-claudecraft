@@ -13732,7 +13732,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Natskygge belægning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-trackeren (dine fastgjorte sider og deres fremskridt) sidder på din HUD. Reliquary-vinduet har en matchende øjenknap, og fastgørelse af en side tænder trackeren igen.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Bundne tøjler: Knogebundet Rickshaw',
   'hudChrome.itemMenu.sell': 'Sælg',
   'hudChrome.itemMenu.sellAll': 'Sælg alle ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

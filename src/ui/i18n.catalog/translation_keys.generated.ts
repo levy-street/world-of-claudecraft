@@ -2946,7 +2946,6 @@ export type TranslationKeyFlat =
   | 'entities.items.reins_drakemaw_raptor.name'
   | 'entities.items.reins_grag_bear.name'
   | 'entities.items.reins_lanternback_troll.name'
-  | 'entities.items.reins_rickshaw_mount.name'
   | 'entities.items.reins_shadowjump_toad.name'
   | 'entities.items.reins_stalkglider_snail.name'
   | 'entities.items.reins_stormfeather_griffin.name'

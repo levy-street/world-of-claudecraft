@@ -13244,9 +13244,6 @@ export const ja_JP: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "点灯人の軛：グルンボル"
       },
-      "reins_rickshaw_mount": {
-        "name": "縛りの手綱：骨縛りの人力車"
-      },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
       },

@@ -13244,9 +13244,6 @@ export const sv_SE: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lykttändarens ok: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Bundna tyglar: Benbunden Rickshaw"
-      },
       "reins_drakemaw_raptor": {
         "name": "Tyglar till Drakgapsraptorn"
       },

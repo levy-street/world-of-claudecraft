@@ -13244,9 +13244,6 @@ export const en_XA: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "[Ļáɱþļíĝĥţéŕ'š Ýóķé: Ĝŕúɱƀóļ]"
       },
-      "reins_rickshaw_mount": {
-        "name": "[Ɓóúñð Ŕéíñš: Ɓóñéƀóúñð Ŕíçķšĥáŵ]"
-      },
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
       },

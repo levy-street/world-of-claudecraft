@@ -13244,9 +13244,6 @@ export const pl_PL: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Jarzmo latarnika: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Spętane lejce: Spętana Kośćmi Riksza"
-      },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
       },

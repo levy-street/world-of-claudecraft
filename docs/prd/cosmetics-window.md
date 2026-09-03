@@ -38,10 +38,11 @@ this character wears, and mount SKINS are the model every paid mount uses from n
   fourth. The service catalog (`catalogs/claudium_catalog.season1.json` in the companion
   repo) needs a matching row before Buy lights up; until then the store card renders
   unavailable, the documented two-registry contract in `docs/claudium-store.md`.
-- The Cluckwork Mech Bird and Tolliver the Chimeglass convert from catalog mounts to the
-  first two skins. Their reins items, catalog rows, Reliquary slots, and the kind `item`
-  store grant path are retired; their GLBs, visual specs (`MOUNT_SKIN_VISUAL_SPECS` in
-  `src/render/mount_visuals.ts`), clips, lamps, and audio cues stay, now keyed by skin id.
+- The Cluckwork Mech Bird, Tolliver the Chimeglass and the Bonebound Rickshaw convert from
+  catalog mounts to the first three skins. Their reins items, catalog rows, Reliquary
+  slots, and the kind `item` store grant path are retired; their GLBs, visual specs
+  (`MOUNT_SKIN_VISUAL_SPECS` in `src/render/mount_visuals.ts`), clips, lamps, the
+  rickshaw's puller hook, and audio cues stay, now keyed by skin id.
 - The renderer resolves the look through one call, `mountVisualSpecFor(mountKey,
   mountSkinId)`, and every mount sound through `mountPresentationKey`. A new skin is a
   VISUALS entry, a `MOUNT_SKIN_VISUAL_SPECS` row, a `MOUNT_SKINS` record, its name and
@@ -69,11 +70,13 @@ closed union of the three tabs so the future tab is a deliberate addition.
 ### Not in scope
 
 - A Reliquary shelf for mount skins. Account cosmetics do not score Curator rank
-  (`docs/design/reliquary.md`), so the two converted mounts simply leave the mount shelf.
+  (`docs/design/reliquary.md`), so the converted mounts simply leave the mount shelf.
 - Per-mount skin bindings (a skin that only applies to one base mount). One worn skin
   applies to any ridden mount.
-- The three further store mounts named for v0.42.0. Each lands as a mount skin through
-  the recipe above.
+- The two further store mounts named for v0.42.0 that are still in review (the Goblin
+  Rocket Sled and the Rallycart RXT, PR #3534). Each lands as a mount skin through the
+  recipe above once its mount PR merges. The Bonebound Rickshaw, already on the release
+  branch, converted in this change.
 
 ## Acceptance
 

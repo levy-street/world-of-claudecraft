@@ -13244,9 +13244,6 @@ export const vi_VN: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Ách của Người Thắp Đèn: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Dây cương ràng buộc: Xe kéo Buộc Xương"
-      },
       "reins_drakemaw_raptor": {
         "name": "Dây Cương Cuồng Long Drakemaw"
       },

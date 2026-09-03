@@ -13244,9 +13244,6 @@ export const id_ID: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Kuk Penyala Lentera: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Kendali Terikat: Becak Terikat Tulang"
-      },
       "reins_drakemaw_raptor": {
         "name": "Tali Kekang Raptor Drakemaw"
       },

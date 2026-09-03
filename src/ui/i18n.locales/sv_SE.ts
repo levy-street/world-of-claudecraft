@@ -13754,7 +13754,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Nightshade beläggning",
   "guide.settingsPage.ifShowReliquaryTracker": "Om Reliquary-spåraren (dina fästa sidor och deras framsteg) sitter på din HUD. Reliquary-fönstret har en matchande ögonknapp, och genom att fästa en sida slås spåraren på igen.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Bundna tyglar: Benbunden Rickshaw',
   'hudChrome.itemMenu.sell': 'Sälj',
   'hudChrome.itemMenu.sellAll': 'Sälj alla ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

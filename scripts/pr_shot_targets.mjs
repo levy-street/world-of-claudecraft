@@ -1016,7 +1016,7 @@ export const TARGETS = [
         sim.addItem('reins_valorsteed', 1);
         sim.accountCosmetics = {
           ...sim.accountCosmetics,
-          mountSkinIds: ['mech_bird', 'chimeglass_tortoise'],
+          mountSkinIds: ['mech_bird', 'chimeglass_tortoise', 'rickshaw_mount'],
           weaponSkinIds: ['ice_fang_sword', 'glaciersplit_axe'],
           mechChromaIds: ['amber_crimson', 'onyx_gold'],
         };

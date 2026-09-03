@@ -13670,7 +13670,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Nátěr Nightshade",
   "guide.settingsPage.ifShowReliquaryTracker": "Zda je sledovač relikviářů (vaše připnuté stránky a jejich průběh) umístěn na vašem HUD. Okno Relikviář má odpovídající tlačítko oka a připnutím stránky se sledovač opět zapne.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Spoutané otěže: Kostipoutaná rikša',
   'hudChrome.itemMenu.sell': 'Prodat',
   'hudChrome.itemMenu.sellAll': 'Prodat vše ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

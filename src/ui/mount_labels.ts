@@ -22,7 +22,6 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   drakemaw_raptor: 'hudChrome.mounts.name_drakemaw_raptor',
   lanternback_troll: 'hudChrome.mounts.name_lanternback_troll',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
-  rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
 };
 
 export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
@@ -36,7 +35,6 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   drakemaw_raptor: 'hudChrome.mounts.desc_drakemaw_raptor',
   lanternback_troll: 'hudChrome.mounts.desc_lanternback_troll',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
-  rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
 };
 
 /** The localized mount name, falling back to the catalog's English label and
@@ -52,17 +50,20 @@ export function mountDisplayName(key: string): string {
   return (MOUNTS as Record<string, { name: string }>)[key]?.name ?? key;
 }
 
-// Mount SKIN labels (src/sim/content/mount_skins.ts). The two skins that used
-// to be catalog mounts keep the hudChrome.mounts.name_*/desc_* keys they
-// shipped with, so no locale row moves; a brand-new skin adds its pair here.
+// Mount SKIN labels (src/sim/content/mount_skins.ts). The skins that used to
+// be catalog mounts (the Mech Bird, the Chimeglass Tortoise, the Bonebound
+// Rickshaw) keep the hudChrome.mounts.name_*/desc_* keys they shipped with, so
+// no locale row moves; a brand-new skin adds its pair here.
 export const MOUNT_SKIN_NAME_KEYS: Record<MountSkinId, TranslationKey> = {
   mech_bird: 'hudChrome.mounts.name_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
+  rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
 };
 
 export const MOUNT_SKIN_DESC_KEYS: Record<MountSkinId, TranslationKey> = {
   mech_bird: 'hudChrome.mounts.desc_mech_bird',
   chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
+  rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
 };
 
 /** The localized mount-skin name, falling back to the catalog's English label

@@ -39,9 +39,10 @@ whatever mount they actually own and ride, drawn by the renderer through
 `mountVisualSpecFor(mountKey, mountSkinId)` and heard through `mountPresentationKey`.
 The ridden mount keeps its `MountKey`, its reins item, and every gameplay number; the
 skin has no speed tier, no reins, no Reliquary slot, and no `MountKey`. The Cluckwork
-Mech Bird and Tolliver the Chimeglass shipped as catalog mounts first and were converted
-in v0.42.0, which is why their GLBs, clips and audio cues are keyed by what are now skin
-ids. Authoring a skin reuses pieces 1, 2 (as a `MOUNT_SKIN_VISUAL_SPECS` row), 5 and 8 of
+Mech Bird, Tolliver the Chimeglass and the Bonebound Rickshaw shipped as catalog mounts
+first and were converted in v0.42.0, which is why their GLBs, clips, audio cues and (for
+the rickshaw) the puller hook are keyed by what are now skin ids. Authoring a skin reuses
+pieces 1, 2 (as a `MOUNT_SKIN_VISUAL_SPECS` row), 5 and 8 of
 the list above and skips 3, 4, 6 and 7, then adds a `MOUNT_SKINS` record, the
 `MOUNT_SKIN_NAME_KEYS`/`MOUNT_SKIN_DESC_KEYS` pair in `src/ui/mount_labels.ts`, and a
 matching kind `skin` row in the economy service catalog (`docs/claudium-store.md`). The

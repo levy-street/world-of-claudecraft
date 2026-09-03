@@ -10789,7 +10789,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
   'entities.items.reins_lanternback_troll.name':
     '點燈人之軛：格倫博',
-  'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',
   'entities.items.dawnhold_posy.name': '晨曦堡花園小花束',

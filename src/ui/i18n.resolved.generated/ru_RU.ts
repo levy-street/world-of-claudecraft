@@ -13244,9 +13244,6 @@ export const ru_RU: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Ярмо фонарщика: Грумбол"
       },
-      "reins_rickshaw_mount": {
-        "name": "Связанные поводья: Костяная рикша"
-      },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
       },

@@ -11295,7 +11295,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.items.reins_lanternback_troll.name':
     '점등인의 멍에: 그룸볼',
-  'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
   'entities.dungeons.dawnhold_castle.name': '던홀드 성',

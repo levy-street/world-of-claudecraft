@@ -13816,7 +13816,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   "entities.abilities.nightshade_coating.name": "Powłoka Nocnego Cienia",
   "guide.settingsPage.ifShowReliquaryTracker": "Czy moduł śledzenia Relikwiarza (przypięte strony i ich postęp) znajduje się na Twoim HUD-ie. Okno Relikwiarza ma pasujący przycisk oka, a przypięcie strony powoduje ponowne włączenie modułu śledzącego.",
   // v0.41 release i18n fill.
-  'entities.items.reins_rickshaw_mount.name': 'Spętane lejce: Spętana Kośćmi Riksza',
   'hudChrome.itemMenu.sell': 'Sprzedaj',
   'hudChrome.itemMenu.sellAll': 'Sprzedaj wszystko ({count})',
   'hudChrome.mounts.desc_rickshaw_mount':

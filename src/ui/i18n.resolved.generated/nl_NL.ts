@@ -13244,9 +13244,6 @@ export const nl_NL: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Juk van de lantaarnopsteker: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Gebonden teugels: Beengebonden Riksja"
-      },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
       },

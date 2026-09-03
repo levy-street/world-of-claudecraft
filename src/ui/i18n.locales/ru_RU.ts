@@ -11517,7 +11517,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'Ключ зажигания Страхоискра',
   'entities.items.reins_lanternback_troll.name':
     'Ярмо фонарщика: Грумбол',
-  'entities.items.reins_rickshaw_mount.name': 'Связанные поводья: Костяная рикша',
   'entities.dungeons.the_last_keep.leaveText': 'Вы затворяете дверь оплота и возвращаетесь под ветер Земель Драконов.',
   'entities.dungeons.dawnhold_castle.name': 'Замок Рассвета',
   'entities.items.dawnhold_posy.name': 'Букетик из сада Замка Рассвета',

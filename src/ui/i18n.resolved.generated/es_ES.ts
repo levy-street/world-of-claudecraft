@@ -13244,9 +13244,6 @@ export const es_ES: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Yugo del farolero: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Riendas vinculadas: Rickshaw Atahuesos"
-      },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
       },

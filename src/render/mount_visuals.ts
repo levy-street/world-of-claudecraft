@@ -298,41 +298,6 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
     // weight onto it.
     { bone: 'chair', offset: [0, 0.918, 0.25] },
   ),
-  // Bonebound Rickshaw: ships no baked clips (its wheels roll procedurally from
-  // rickshaw_mount.ts's spinMountWheels), so the body gets a light procedural jostle
-  // instead of a gait cycle. seat/seatFwd are the authored bench-seat socket
-  // at the cart's own RICKSHAW_SCALE (2.0).
-  // 2026-08-09: this `seat` value (1.94) was stale, still reflecting the
-  // ORIGINAL pre-cushion socket (local Y 0.97), never updated when the socket
-  // itself moved to local Y 1.12 for the tufted seat cushion (see
-  // model.js's RICKSHAW_SOCKET_DEFINITIONS, "raised from v1's 0.97 to sit on
-  // top of the new seat cushion"). A live look confirmed exactly this: rider
-  // sitting low enough to clip into the cushion. Corrected to 1.12 * 2 = 2.24
-  // to match the socket that's actually been shipping.
-  // `rigged` stays false rather than true, even though this mount is now
-  // procedurally animated (the wheels) rather than fully static, so it still
-  // gets the procedural bob other clipless mounts get. What the flag buys
-  // elsewhere is the convention that a rigged mount's clips carry ALL its
-  // motion, and this one cannot follow that: the renderer applies the
-  // procedural bob to the rider and, because the puller rig is parented
-  // inside the mount, to the puller too. Baking a body bob into clips would
-  // bob the cart WITHOUT the puller, swinging the shaft harness collar +-0.05
-  // against a belt overlap with only 0.034 of margin, and the harness would
-  // visibly come off his waist every cycle.
-  // jumpTips: a two-wheeled cart with no suspension and no legs. It tips
-  // nose-up off a jump and rights itself before landing; the puller rides that
-  // rotation with it, keeping the shafts in its hands.
-  rickshaw_mount: spec(
-    'mount_rickshaw_mount',
-    2.24,
-    false,
-    { amp: 0.05, hz: 2.4 },
-    -0.3,
-    null,
-    [],
-    null,
-    { jumpTips: true },
-  ),
 };
 
 /** Spec for an entity's active mountKey, or null when dismounted/unknown. */
@@ -416,6 +381,42 @@ export const MOUNT_SKIN_VISUAL_SPECS: Record<MountSkinId, MountVisualSpec> = {
       // where they did before the pelvis moved.
       ride: { spread: 0.68, thigh: 0.8, knee: 0.6, ankle: -0.45, hips: -0.18 },
     },
+  ),
+  // The Bonebound Rickshaw (a mount skin since v0.42.0; the id keeps its old
+  // catalog key): ships no baked clips (its wheels roll procedurally from
+  // rickshaw_mount.ts's spinMountWheels), so the body gets a light procedural jostle
+  // instead of a gait cycle. seat/seatFwd are the authored bench-seat socket
+  // at the cart's own RICKSHAW_SCALE (2.0).
+  // 2026-08-09: this `seat` value (1.94) was stale, still reflecting the
+  // ORIGINAL pre-cushion socket (local Y 0.97), never updated when the socket
+  // itself moved to local Y 1.12 for the tufted seat cushion (see
+  // model.js's RICKSHAW_SOCKET_DEFINITIONS, "raised from v1's 0.97 to sit on
+  // top of the new seat cushion"). A live look confirmed exactly this: rider
+  // sitting low enough to clip into the cushion. Corrected to 1.12 * 2 = 2.24
+  // to match the socket that's actually been shipping.
+  // `rigged` stays false rather than true, even though this mount is now
+  // procedurally animated (the wheels) rather than fully static, so it still
+  // gets the procedural bob other clipless mounts get. What the flag buys
+  // elsewhere is the convention that a rigged mount's clips carry ALL its
+  // motion, and this one cannot follow that: the renderer applies the
+  // procedural bob to the rider and, because the puller rig is parented
+  // inside the mount, to the puller too. Baking a body bob into clips would
+  // bob the cart WITHOUT the puller, swinging the shaft harness collar +-0.05
+  // against a belt overlap with only 0.034 of margin, and the harness would
+  // visibly come off his waist every cycle.
+  // jumpTips: a two-wheeled cart with no suspension and no legs. It tips
+  // nose-up off a jump and rights itself before landing; the puller rides that
+  // rotation with it, keeping the shafts in its hands.
+  rickshaw_mount: spec(
+    'mount_rickshaw_mount',
+    2.24,
+    false,
+    { amp: 0.05, hz: 2.4 },
+    -0.3,
+    null,
+    [],
+    null,
+    { jumpTips: true },
   ),
 };
 

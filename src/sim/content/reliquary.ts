@@ -268,7 +268,6 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'drakemaw_raptor',
   'lanternback_troll',
   'terrorspark_groundshaker',
-  'rickshaw_mount',
 ] as const;
 
 // Per-mount sources. A mount is owned through its reins ItemDef (kind 'mount',
@@ -284,12 +283,12 @@ export const RELIQUARY_HORIZON_MOUNTS = [
 // def in content/zone3.ts), so a quest hint there would name a door that hands
 // out nothing.
 //
-// drakemaw_raptor, lanternback_troll, terrorspark_groundshaker and
-// rickshaw_mount are absent, and that absence IS the answer: no live table
-// awards any of them (drakemaw_raptor has no acquisition path; the other three
-// are DEVELOPER_MOUNTS, dev-grant only). They are the catalog's four
+// drakemaw_raptor, lanternback_troll and terrorspark_groundshaker are
+// absent, and that absence IS the answer: no live table awards any of them
+// (drakemaw_raptor has no acquisition path; the other two are
+// DEVELOPER_MOUNTS, dev-grant only). They are the catalog's three
 // SOURCE_PENDING_RULING mounts; masterwork:engineering on the professions
-// shelf is the fifth pending slot (QA ruling 2026-08-07).
+// shelf is the fourth pending slot (QA ruling 2026-08-07).
 //
 // Mount SKINS (content/mount_skins.ts) are account cosmetics, not mounts, and
 // are deliberately absent from this shelf on the same terms as the account
@@ -1336,12 +1335,12 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
     name: 'Mounts',
     desc: 'Rideable mounts from the stable, heroic reins, Rift epics, and rarer saddles. Ownership follows the live reins seam (bags and bank).',
     clearSource: { kind: 'none' },
-    // Seven of the eleven mounts name every door that awards their reins (see
+    // Seven of the ten mounts name every door that awards their reins (see
     // MOUNT_SOURCES above): the four heroic reins each drop from two or three
     // HEROIC_BOSS_LOOT bosses AND from their Rift rank's ladder, the two epic
     // reins are Rift-only, and valorsteed is Marla's counter. The page-wide
-    // pending ruling that used to cover all nine is executed; the four that
-    // remain (drakemaw_raptor and the three DEVELOPER_MOUNTS) are content gaps,
+    // pending ruling that used to cover all nine is executed; the three that
+    // remain (drakemaw_raptor and the two DEVELOPER_MOUNTS) are content gaps,
     // not vocabulary gaps, and stay hand-listed in SOURCE_PENDING_RULING.
     relics: mounts(...mountEntries(RELIQUARY_HORIZON_MOUNTS)),
   },

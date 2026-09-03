@@ -13244,9 +13244,6 @@ export const de_DE: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Joch des Laternenanzünders: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Gebundene Zügel: Knochengebundene Rikscha"
-      },
       "reins_drakemaw_raptor": {
         "name": "Zügel des Drakenrachen-Raptors"
       },

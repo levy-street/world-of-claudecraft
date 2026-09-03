@@ -13244,9 +13244,6 @@ export const fr_CA: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Joug de l’allumeur de réverbères : Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Rênes liées : Rickshaw d'os liés"
-      },
       "reins_drakemaw_raptor": {
         "name": "Rênes du Raptor du Drakemaw"
       },

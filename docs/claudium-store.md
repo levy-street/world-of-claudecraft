@@ -91,6 +91,7 @@ retired `kind: "item"` reins rows (`reins_mech_bird`) are not products and are f
 |---|---|---|
 | `mech_bird` | Cluckwork Mech Bird | rare |
 | `chimeglass_tortoise` | Tolliver the Chimeglass | epic |
+| `rickshaw_mount` | Bonebound Rickshaw | epic |
 
 Ownership is a per-account entitlement in `account_mount_cosmetics` (its own rollback-safe row,
 mirrored from the service's grant ledger on purchase and on every store open, exactly like

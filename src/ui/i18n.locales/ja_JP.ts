@@ -11313,7 +11313,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.items.reins_lanternback_troll.name':
     '点灯人の軛：グルンボル',
-  'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
   'entities.items.dawnhold_posy.name': 'ドーンホールド庭園の小さな花束',

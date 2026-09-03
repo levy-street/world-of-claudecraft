@@ -13244,9 +13244,6 @@ export const da_DK: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lygtetænderens åg: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Bundne tøjler: Knogebundet Rickshaw"
-      },
       "reins_drakemaw_raptor": {
         "name": "Tøjler til Dragegabets Raptor"
       },

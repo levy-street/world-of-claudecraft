@@ -13244,9 +13244,6 @@ export const zh_CN: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "点灯人之轭：格伦博"
       },
-      "reins_rickshaw_mount": {
-        "name": "白骨人力车缚绳"
-      },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
       },

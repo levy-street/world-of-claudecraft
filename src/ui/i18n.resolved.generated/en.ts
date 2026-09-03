@@ -13244,9 +13244,6 @@ export const en: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Lamplighter's Yoke: Grumbol"
       },
-      "reins_rickshaw_mount": {
-        "name": "Bound Reins: Bonebound Rickshaw"
-      },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
       },

@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1042,
-    "liveItemDefinitions": 1057,
+    "itemArtFilesReviewed": 1041,
+    "liveItemDefinitions": 1056,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 11,
       "junk": 83,
-      "mount": 11,
+      "mount": 10,
       "potion": 13,
       "quest": 102,
       "tool": 60,
@@ -398,6 +398,18 @@
           "public/ui/items/mapping.json"
         ],
         "note": "Mount skins conversion (PR: cosmetics window): reins_mech_bird and reins_chimeglass_tortoise retired as items; their icons moved to public/ui/store/mount_skins/<skin id>.webp unchanged. No new art reviewed; counts and passIds shrink by two."
+      },
+      {
+        "reviewedAt": "2026-09-04",
+        "branch": "feature/cosmetics-window",
+        "reviewer": "owner",
+        "removedIds": [
+          "reins_rickshaw_mount"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "Mount skins conversion, second wave (PR: cosmetics window): reins_rickshaw_mount retired as an item; its icon moved to public/ui/store/mount_skins/rickshaw_mount.webp unchanged. No new art reviewed; counts and passIds shrink by one."
       }
     ]
   },
@@ -440,7 +452,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1042,
+    "passCount": 1041,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1126,7 +1138,6 @@
       "reins_drakemaw_raptor",
       "reins_grag_bear",
       "reins_lanternback_troll",
-      "reins_rickshaw_mount",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
       "reins_stormfeather_griffin",
@@ -1489,7 +1500,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1042 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17. On 2026-09-04 the Cluckwork Mech Bird and Chimeglass Tortoise reins icons left the shipping item set: both mounts became account mount skins (src/sim/content/mount_skins.ts) with no reins item, and their two reviewed renders moved unchanged to public/ui/store/mount_skins as store art outside this audit."
+    "summary": "All 1041 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17. On 2026-09-04 the Cluckwork Mech Bird and Chimeglass Tortoise reins icons left the shipping item set: both mounts became account mount skins (src/sim/content/mount_skins.ts) with no reins item, and their two reviewed renders moved unchanged to public/ui/store/mount_skins as store art outside this audit. On 2026-09-04 the Bonebound Rickshaw reins icon left the shipping item set the same way: the rickshaw became an account mount skin (id rickshaw_mount) with no reins item, and its reviewed render moved unchanged to public/ui/store/mount_skins as store art outside this audit."
   },
   "nonVisualContentWatch": [
     {
@@ -1646,8 +1657,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "0f161d15614f566547cc85e5c398cb925c3bb461fc3b28d9a5b4c9e836094864",
-      "bytes": 568223
+      "sha256": "90478b196f9d76e03d4c807bf6873c43bba9596bddacba72ab5e88ba92e7881a",
+      "bytes": 567688
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1661,7 +1672,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "3963065ca57fee4ce67137e368f19cbd1fbd2b1e0f4dc6537c60b8f914bca958",
+    "sheetSetSha256": "6ecbc68d6345ec50082353d6961651f1163e0527fcddba57f974429d79ac7e77",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2881,66 +2892,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "f4956ac66ca4eb8aaca8f25d9d630a0ad58393d2042f856e4c08ba30c58a8282",
-        "bytes": 411674,
+        "sha256": "52aa4263eea0a30856aff93dc16ad0dec47be01e1fb070e53cc01ba36399df49",
+        "bytes": 374810,
         "width": 1600,
-        "height": 376,
+        "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "06c8a6ff45b568ec4f40b7c1e305f6dc3caa8cc341b98283e56583ec24d6d2b0",
-        "bytes": 75365,
+        "sha256": "a39d1b9772151bbcab7bb25cebff40f97809eb951347bc2684b6d858649ce664",
+        "bytes": 67274,
         "width": 1600,
-        "height": 288,
+        "height": 166,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "5be745c048446ac2bfb1c8636ad1b4a052c4882e85865f67b1d87329fac97c34",
-        "bytes": 52091,
+        "sha256": "a1db1c8fd00e1950bfd9d6fb8022dd89cfb26ae2e16a8067cf5e1be3fea11a41",
+        "bytes": 45893,
         "width": 1600,
-        "height": 376,
+        "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "6bc0a743690e9f495d487c629633cb1d4c9de1980fbe5117343704af6adc7f19",
-        "bytes": 41568,
+        "sha256": "388ed1325eee867a01e0f41f7e6ecf8b362d6d03850b9561b7822674ede01fd5",
+        "bytes": 36676,
         "width": 1600,
-        "height": 376,
+        "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "17de6e0858c5ee956bbf4bb1e0084b09d78e8aae0991b47d8cffd96fdd5c92c5",
-        "bytes": 39884,
+        "sha256": "4f4d272d5c194c032f631a672d30ee0aa0f1a7c7d77eec03a3264967bcc4ecdf",
+        "bytes": 34685,
         "width": 1600,
-        "height": 376,
+        "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "1113e01b8b4bd62e48f86f75cfbed6d44c7197f37185e1c1016c414c6ff59cd1",
-        "bytes": 125141,
+        "sha256": "4fa4fde3795ce8655e32a7de2b1fe66e06300ec57e4529884d64ff0d036bb24b",
+        "bytes": 113434,
         "width": 1600,
-        "height": 376,
+        "height": 210,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "6254321a38a01facf3a1b5ebba4877373b70d6a6060e2a025dfcc0c6d74e2fcf",
-        "bytes": 228392,
+        "sha256": "e382a9a7c606846a2f5b85d15d6e141425bedd06a12644d4eb852f2a7c0b4bdb",
+        "bytes": 205918,
         "width": 1800,
-        "height": 480,
+        "height": 262,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "d0124d85e4585e3bc8c064aad6bece2f7d5093a478223797fd078d43a9d33179",
-        "bytes": 432762,
+        "sha256": "ac0f6644cacf49bddab77f22097cde7345549e0d7ef06a1ce7d4c66b1d264c1c",
+        "bytes": 393148,
         "width": 1800,
-        "height": 452,
+        "height": 248,
         "format": "png"
       },
       {
@@ -3392,6 +3403,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "7c8c463db67845065dfd570a81ceb6d83e7bdb28c09af629bb362dd3169b1aa7"
+    "shippingCatalogSha256": "7e64fb41386b58529e7e7e38afa41ba1cb2fc241a800d29c241cdee1fad04d85"
   }
 }
