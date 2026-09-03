@@ -370,6 +370,25 @@ describe('mount running audio', () => {
     expect(lastSource().playbackRate.value).not.toBeCloseTo(first, 3);
   });
 
+  it('keeps the fallback footfall at the authored mount-stride mix', () => {
+    const playAt = vi.spyOn(sfx, 'playAt');
+    sfx.mountRun(2, 3, 4, 'chimeglass_tortoise', 'wood', true);
+    nowT += 0.5;
+    sfx.mountRun(2, 3, 4, 'chimeglass_tortoise', 'wood', true);
+
+    expect(playAt).toHaveBeenCalledTimes(2);
+    const calls = playAt.mock.calls;
+    expect(calls.map(([key, x, y, z]) => [key, x, y, z])).toEqual([
+      ['foot_wood', 2, 3, 4],
+      ['foot_wood', 2, 3, 4],
+    ]);
+    const options = calls.map((call) => call[4]);
+    for (const opts of options) {
+      expect(opts).toMatchObject({ gain: 0.5, cooldown: 0.05, release: 0.44 });
+    }
+    expect(options.map((opts) => opts?.rate).sort()).toEqual([1.06 * 0.97, 1.06 * 1.04].sort());
+  });
+
   it('does not play a per-stride one-shot for a mount with a continuous loop', () => {
     // mount_loop_rickshaw_mount is a real SFX_CLIPS entry (checked by
     // mountRun itself), so no mock setup is needed here.

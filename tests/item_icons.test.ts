@@ -281,6 +281,7 @@ type Mapping = {
     name: string;
     sourcePack: string;
     sourceFile?: string;
+    confidence?: string;
     license?: string;
   }[];
   generatedBatches?: {
@@ -760,6 +761,48 @@ describe('item webp icons', () => {
       provenanceRecords: [BANK_STORAGE_PAINTED_BAG_MANIFEST],
     });
     expect(replacementBatch[0].itemIds).toEqual(BANK_STORAGE_PAINTED_BAG_IDS);
+  });
+
+  it('F0) pins the authored mount-icon sources and Mech Bird render batch', () => {
+    const m = mapping();
+    expect(m.entries.find(({ itemId }) => itemId === 'reins_lanternback_troll')).toEqual({
+      itemId: 'reins_lanternback_troll',
+      name: "Lamplighter's Yoke: Grumbol",
+      sourcePack: 'woc_owner_supplied_art',
+      sourceFile: 'troll icon 2.png (owner-supplied painted master, 624x624)',
+      confidence: 'high',
+      license: 'World of ClaudeCraft original art (project-owned, created for this game)',
+    });
+    expect(m.entries.find(({ itemId }) => itemId === 'reins_chimeglass_tortoise')).toEqual({
+      itemId: 'reins_chimeglass_tortoise',
+      name: "Roadwarden's Bellstrap: Tolliver",
+      sourcePack: 'project-authored',
+      sourceFile:
+        'three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)',
+      confidence: 'high',
+      license: 'World of ClaudeCraft original art (project-owned, created for this game)',
+    });
+
+    expect(
+      (m.generatedBatches ?? []).find(
+        ({ batchId }) => batchId === 'mech-bird-mount-icon-2026-08-17',
+      ),
+    ).toEqual({
+      batchId: 'mech-bird-mount-icon-2026-08-17',
+      source:
+        'Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)',
+      owner: 'World of ClaudeCraft',
+      license: 'World of ClaudeCraft project-generated art, project asset, rights reserved',
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      styleReference:
+        'Generated under item-icon contract woc-item-icon-v1, Mount collectible family row: three-quarter mount bust with tack. Source model is the shipped public/models/mounts/mech_bird.glb posed on its Idle clip head-turn hold, rendered opaque on a dark umber vignette with a top-left warm key.',
+      commonPrompt:
+        'Three-quarter bust portrait of the Cluckwork Mech Bird mount with saddle and grab handle visible, opaque dark atmospheric vignette ground, top-left warm key light, cool deep shadow, painted brushwork finish, no writing, frame, transparency, or crop.',
+      itemIds: ['reins_mech_bird'],
+    });
   });
 
   it('F1) pins the canonical item-art style contract and its approved visual anchors', () => {

@@ -1,11 +1,35 @@
 import * as THREE from 'three';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('../src/render/characters', async () => {
+  const MockThree = await import('three');
+  return {
+    createMountVisual: () => ({
+      root: new MockThree.Group(),
+      dispose: () => {},
+    }),
+  };
+});
+
+vi.mock('../src/render/characters/assets', () => ({
+  mountAssetsReady: () => true,
+  preloadMountAssets: () => Promise.resolve(),
+}));
+
+vi.mock('../src/render/mount_glow', () => ({
+  attachMountGlows: vi.fn(() => null),
+  disposeMountGlows: vi.fn(),
+}));
+
 import type { CharacterVisual } from '../src/render/characters';
+import { attachMountGlows, disposeMountGlows, type MountGlows } from '../src/render/mount_glow';
 import {
   gateMountSwapOnCompile,
   type MountViewState,
   placeRider,
   seatRiderOnBone,
+  syncMountTransitionFx,
+  syncMountVisual,
 } from '../src/render/mount_lifecycle';
 import { type MountVisualSpec, mountVisualSpec } from '../src/render/mount_visuals';
 import { MOUNT_KEYS } from '../src/sim/content/mounts';
@@ -24,6 +48,16 @@ const troll = (): MountVisualSpec => {
 const horse = (): MountVisualSpec => {
   const spec = mountVisualSpec('valorsteed');
   if (!spec || spec.seatBone) throw new Error('the horse is a fixed-lift saddle');
+  return spec;
+};
+const bear = (): MountVisualSpec => {
+  const spec = mountVisualSpec('grag_bear');
+  if (!spec) throw new Error('the bear has a mount visual spec');
+  return spec;
+};
+const tortoise = (): MountVisualSpec => {
+  const spec = mountVisualSpec('chimeglass_tortoise');
+  if (!spec) throw new Error('the tortoise has a mount visual spec');
   return spec;
 };
 
@@ -120,6 +154,131 @@ describe('mount compile ownership', () => {
     expect(v.mountCompilePending, 'the old gate must not reveal the replacement').toBe(true);
     callbacks[1]();
     expect(v.mountCompilePending, 'the replacement gate owns the reveal').toBe(false);
+  });
+
+  it('keeps the production sync path owned by the replacement mount gate', () => {
+    const { v } = rig();
+    v.mountVisual = null;
+    v.mountVisualKey = '';
+    const callbacks: Array<() => void> = [];
+    const host = {
+      reconcileViewLights: vi.fn(),
+      gateSwapFlagOnCompile: (_root: THREE.Object3D, done: () => void): void => {
+        callbacks.push(done);
+      },
+      recordBuild: vi.fn(),
+    };
+
+    syncMountVisual(v, horse(), host);
+    const firstRoot = mountRoot(v);
+    syncMountVisual(v, bear(), host);
+    const replacementRoot = mountRoot(v);
+
+    expect(replacementRoot).not.toBe(firstRoot);
+    expect(callbacks).toHaveLength(2);
+    callbacks[0]();
+    expect(v.mountCompilePending, 'the stale production callback must not reveal the bear').toBe(
+      true,
+    );
+    callbacks[1]();
+    expect(v.mountCompilePending, 'the bear callback owns the production reveal').toBe(false);
+  });
+
+  it('attaches and disposes the shipped glow through the production lifecycle', () => {
+    const { v } = rig();
+    v.mountVisual = null;
+    v.mountVisualKey = '';
+    const glows: MountGlows = { sprites: [], peaks: [], pulses: [], rates: [], sizes: [] };
+    vi.mocked(attachMountGlows).mockReset().mockReturnValueOnce(glows);
+    vi.mocked(disposeMountGlows).mockClear();
+    const host = {
+      reconcileViewLights: vi.fn(),
+      gateSwapFlagOnCompile: (_root: THREE.Object3D, done: () => void): void => done(),
+      recordBuild: vi.fn(),
+    };
+    const spec = tortoise();
+
+    syncMountVisual(v, spec, host);
+    expect(attachMountGlows).toHaveBeenCalledWith(mountRoot(v), spec);
+    expect(v.mountGlows).toBe(glows);
+
+    syncMountVisual(v, null, host);
+    expect(disposeMountGlows).toHaveBeenCalledWith(glows);
+    expect(v.mountGlows).toBeNull();
+  });
+});
+
+describe('mount transition effects', () => {
+  function transitionInputs(
+    overrides: Partial<Parameters<typeof syncMountTransitionFx>[1]> = {},
+  ): Parameters<typeof syncMountTransitionFx>[1] {
+    return {
+      mountCasting: false,
+      mountCastKey: '',
+      mountCastRemaining: 0,
+      mountKey: '',
+      poseAllowed: true,
+      present: true,
+      playCallPose: vi.fn(),
+      summonGlow: vi.fn(),
+      summonCall: vi.fn(),
+      engineReset: vi.fn(),
+      preloadEngine: vi.fn(),
+      ...overrides,
+    };
+  }
+
+  it('plays the call pose once on a summon-cast edge, never for a dismount cast', () => {
+    const state = { lastMountKey: '', wasMountCasting: false };
+    const summon = transitionInputs({
+      mountCasting: true,
+      mountCastKey: 'mech_bird',
+      mountCastRemaining: 2.75,
+    });
+
+    state.wasMountCasting = syncMountTransitionFx(state, summon);
+    expect(summon.playCallPose).toHaveBeenCalledOnce();
+    expect(summon.playCallPose).toHaveBeenCalledWith(2.75);
+    state.wasMountCasting = syncMountTransitionFx(state, summon);
+    expect(summon.playCallPose).toHaveBeenCalledOnce();
+
+    state.wasMountCasting = false;
+    const dismount = transitionInputs({ mountCasting: true, mountCastKey: '' });
+    syncMountTransitionFx(state, dismount);
+    expect(dismount.playCallPose).not.toHaveBeenCalled();
+  });
+
+  it('fires appearance, swap, and dismount effects exactly on mount-key edges', () => {
+    const state = { lastMountKey: '', wasMountCasting: false };
+    const summon = transitionInputs({ mountKey: 'mech_bird' });
+    syncMountTransitionFx(state, summon);
+    expect(state.lastMountKey).toBe('mech_bird');
+    expect(summon.summonGlow).toHaveBeenCalledOnce();
+    expect(summon.summonCall).toHaveBeenCalledOnce();
+    expect(summon.engineReset).toHaveBeenCalledOnce();
+    expect(summon.preloadEngine).toHaveBeenCalledWith('mech_bird');
+
+    syncMountTransitionFx(state, summon);
+    expect(summon.summonGlow).toHaveBeenCalledOnce();
+    expect(summon.summonCall).toHaveBeenCalledOnce();
+    expect(summon.engineReset).toHaveBeenCalledOnce();
+    expect(summon.preloadEngine).toHaveBeenCalledOnce();
+
+    const swap = transitionInputs({ mountKey: 'grag_bear', present: false });
+    syncMountTransitionFx(state, swap);
+    expect(state.lastMountKey).toBe('grag_bear');
+    expect(swap.summonGlow).not.toHaveBeenCalled();
+    expect(swap.summonCall).toHaveBeenCalledOnce();
+    expect(swap.engineReset).toHaveBeenCalledOnce();
+    expect(swap.preloadEngine).toHaveBeenCalledWith('grag_bear');
+
+    const dismount = transitionInputs({ mountKey: '' });
+    syncMountTransitionFx(state, dismount);
+    expect(state.lastMountKey).toBe('');
+    expect(dismount.summonGlow).toHaveBeenCalledOnce();
+    expect(dismount.summonCall).not.toHaveBeenCalled();
+    expect(dismount.engineReset).toHaveBeenCalledOnce();
+    expect(dismount.preloadEngine).not.toHaveBeenCalled();
   });
 });
 

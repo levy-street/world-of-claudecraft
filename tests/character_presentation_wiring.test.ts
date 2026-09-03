@@ -82,6 +82,7 @@ describe('character presentation sleep wiring', () => {
     expect(setup).toContain(
       'v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);',
     );
+    expect(setup).toContain('if (!(runCharacterPresentation && mountPresented)) {');
     expect(setup).toContain(
       'placeRider(v, v.visual.root, mountPresented ? mountSpec : null, v.mountLift, 0);',
     );
@@ -94,6 +95,13 @@ describe('character presentation sleep wiring', () => {
     const presentation = renderer.slice(presentationStart, presentationEnd);
     expect(presentation).toContain('if (mountPresented) {\n            applyMountJumpAttitude(');
     expect(presentation).toContain('seatRiderOnBone(');
+    expect(presentation).toContain('if (v.mountGlows) updateMountGlows(v.mountGlows, this.time);');
+  });
+
+  it('reuses one mount host and stows weapons only while a mount is actually presented', () => {
+    expect(renderer).toContain('private readonly mountHost: MountViewHost = {');
+    expect(renderer.match(/syncMountVisual\(v, mountSpec, this\.mountHost\)/g)).toHaveLength(1);
+    expect(renderer).toContain('const stowed = e.weaponStowed || swimming || v.mountLift > 0;');
   });
 });
 

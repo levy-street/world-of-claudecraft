@@ -63,6 +63,7 @@ import { GATHER_NODES } from '../src/sim/content/gather_nodes';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import { HEROIC_VENDOR_STOCK } from '../src/sim/content/heroic_vendor';
 import { FISHING_TABLES_BY_BAND } from '../src/sim/content/items';
+import { MOUNTS } from '../src/sim/content/mounts';
 import {
   CRAFT_GOLD_SINK_COPPER_PER_BUDGET,
   CRAFT_RING,
@@ -1037,6 +1038,25 @@ describe('Guide Reliquary spoiler-safe catalog', () => {
     // are checked too, so a generator edit scoped to one family cannot hide.
     expect(nonSlain.some((id) => id.startsWith('masterwork:'))).toBe(true);
     expect(nonSlain.some((id) => id.startsWith('gather_event:'))).toBe(true);
+  });
+
+  it('every generated mount name equals the live MOUNTS source name', () => {
+    let checked = 0;
+    for (const guidePage of GUIDE_RELIQUARY) {
+      const live = RELIQUARY_PAGES.find((page) => page.id === guidePage.id);
+      expect(live, `live page for ${guidePage.id}`).toBeDefined();
+      if (!live) continue;
+      expect(guidePage.relics.length, `${guidePage.id} relic count`).toBe(live.relics.length);
+      for (let i = 0; i < live.relics.length; i++) {
+        const relic = live.relics[i];
+        if (relic.kind !== 'mount') continue;
+        const expected = (MOUNTS as Record<string, { name: string }>)[relic.mountId]?.name;
+        expect(expected, `${relic.mountId} has a live mount definition`).toBeDefined();
+        expect(guidePage.relics[i]?.name, `${guidePage.id}:${relic.mountId}`).toBe(expected);
+        checked += 1;
+      }
+    }
+    expect(checked).toBe(Object.keys(MOUNTS).length);
   });
 
   it('pins the reliquary route wiring to literals', () => {

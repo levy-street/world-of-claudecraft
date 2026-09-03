@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { describe, expect, it } from 'vitest';
 import { tintedMaterial } from '../src/render/characters/assets';
 import { VISUALS } from '../src/render/characters/manifest';
+import { CharacterVisual } from '../src/render/characters/visual';
 import { gfxInternalsForTest } from '../src/render/gfx';
 import {
   MOUNT_LAMP_COLOR,
@@ -11,6 +12,7 @@ import {
   MOUNT_LAMP_INTENSITY,
   MOUNT_LENS_COLOR,
   MOUNT_VISUAL_SPECS,
+  type MountRideSpec,
   mountBobY,
   mountLampFlicker,
   mountSeatLift,
@@ -54,6 +56,30 @@ describe('mount visual specs cover the sim catalog', () => {
     expect(mountSeatLift('')).toBe(0);
   });
 
+  it('names only seat, lamp, and glow bones present in the shipping GLBs', () => {
+    const expected = {
+      lanternback_troll: ['chair', 'lantern_l', 'lantern_r'],
+      chimeglass_tortoise: ['lens', 'saddle'],
+    } as const;
+    for (const [key, expectedBones] of Object.entries(expected)) {
+      const spec = MOUNT_VISUAL_SPECS[key as keyof typeof expected];
+      const requested = new Set([
+        ...(spec.seatBone ? [spec.seatBone.bone] : []),
+        ...spec.lamps.map((lamp) => lamp.bone),
+        ...spec.glows.map((glow) => glow.bone),
+      ]);
+      expect([...requested].sort(), `${key} runtime sockets`).toEqual([...expectedBones].sort());
+
+      const bytes = readFileSync(path.join(__dirname, '..', 'public', VISUALS[spec.visualKey].url));
+      const jsonLength = bytes.readUInt32LE(12);
+      const json = JSON.parse(bytes.subarray(20, 20 + jsonLength).toString('utf8')) as {
+        nodes?: { name?: string }[];
+      };
+      const shipped = new Set((json.nodes ?? []).map((node) => node.name).filter(Boolean));
+      for (const bone of requested) expect(shipped.has(bone), `${key} missing ${bone}`).toBe(true);
+    }
+  });
+
   it('preserves authored vertex colors when Low converts mount materials to Lambert', () => {
     const restoreGfx = gfxInternalsForTest.overrideSettings({ standardMaterials: false });
     try {
@@ -68,6 +94,99 @@ describe('mount visual specs cover the sim catalog', () => {
     } finally {
       restoreGfx();
     }
+  });
+});
+
+interface RidePoseHarness {
+  rideBlend: number;
+  setRidePose(spec: MountRideSpec | null): void;
+  applyRidePose(dt: number): void;
+}
+
+describe('Chimeglass rider straddle', () => {
+  it('drives the production CharacterVisual pose onto both leg chains and hips', () => {
+    const model = new THREE.Group();
+    const bones = new Map<string, THREE.Object3D>();
+    for (const name of [
+      'upperlegl',
+      'upperlegr',
+      'lowerlegl',
+      'lowerlegr',
+      'footl',
+      'footr',
+      'hips',
+    ]) {
+      const bone = new THREE.Object3D();
+      bone.name = name;
+      bones.set(name, bone);
+      model.add(bone);
+    }
+    const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
+    Object.assign(visual, {
+      model,
+      rideSpec: null,
+      rideBlend: 0,
+      climbOn: false,
+      climbBlend: 0,
+      climbLegBones: undefined,
+      climbShinBones: undefined,
+      rideFootBones: undefined,
+      rideHipBone: undefined,
+    });
+    const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
+    expect(ride).toEqual({ spread: 0.68, thigh: 0.8, knee: 0.6, ankle: -0.45, hips: -0.18 });
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+
+    const axisX = new THREE.Vector3(1, 0, 0);
+    const axisZ = new THREE.Vector3(0, 0, 1);
+    const rest = new THREE.Quaternion().setFromAxisAngle(axisX, Math.PI);
+    for (const [index, suffix] of ['l', 'r'].entries()) {
+      const side = index === 0 ? 1 : -1;
+      const thigh = new THREE.Quaternion()
+        .setFromAxisAngle(axisZ, side * ride.spread)
+        .multiply(new THREE.Quaternion().setFromAxisAngle(axisX, -ride.thigh))
+        .multiply(rest);
+      expect(bones.get(`upperleg${suffix}`)?.quaternion.angleTo(thigh)).toBeLessThan(1e-8);
+      const shin = new THREE.Quaternion().setFromAxisAngle(axisX, ride.knee);
+      expect(bones.get(`lowerleg${suffix}`)?.quaternion.angleTo(shin)).toBeLessThan(1e-8);
+      const foot = new THREE.Quaternion().setFromAxisAngle(axisX, ride.ankle ?? 0);
+      expect(bones.get(`foot${suffix}`)?.quaternion.angleTo(foot)).toBeLessThan(1e-8);
+    }
+    expect(bones.get('hips')?.rotation.x).toBeCloseTo(-0.18, 9);
+  });
+
+  it('yields the legs to climbing and unwinds the ride layer when the mount clears', () => {
+    const thigh = new THREE.Object3D();
+    thigh.name = 'upperlegl';
+    const model = new THREE.Group();
+    model.add(thigh);
+    const visual = Object.create(CharacterVisual.prototype) as RidePoseHarness;
+    Object.assign(visual, {
+      model,
+      rideSpec: null,
+      rideBlend: 0,
+      climbOn: true,
+      climbBlend: 0,
+      climbLegBones: undefined,
+      climbShinBones: undefined,
+      rideFootBones: undefined,
+      rideHipBone: undefined,
+    });
+    const ride = MOUNT_VISUAL_SPECS.chimeglass_tortoise.ride;
+    if (!ride) throw new Error('the Chimeglass Tortoise has a straddle pose');
+
+    visual.setRidePose(ride);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
+    expect(thigh.quaternion.equals(new THREE.Quaternion())).toBe(true);
+
+    Object.assign(visual, { climbOn: false, rideBlend: 1 });
+    visual.setRidePose(null);
+    visual.applyRidePose(0.125);
+    expect(visual.rideBlend).toBe(0);
   });
 });
 

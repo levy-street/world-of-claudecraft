@@ -15,8 +15,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { InvSlot } from '../src/sim/types';
 import { BagsWindow, type BagsWindowDeps } from '../src/ui/bags_window';
+import { wireChromeFocus } from '../src/ui/chrome_focus_wiring';
 import { ItemDragState } from '../src/ui/item_drag_state';
-import { panelKeyGuardStops } from '../src/ui/panel_key_guard';
 import type { IWorld } from '../src/world_api';
 
 const REINS = 'reins_valorsteed';
@@ -98,6 +98,10 @@ function reinsRow(root: HTMLElement): HTMLElement {
   return row as HTMLElement;
 }
 
+function wireBagsPanel(panel: HTMLElement): void {
+  wireChromeFocus((selector) => (selector === '#bags' ? panel : document.createElement('div')));
+}
+
 /** Dispatch a real bubbling keydown from `row` and report what the game saw. */
 function pressKey(row: HTMLElement, key: string, code: string) {
   let reachedWindow = false;
@@ -112,16 +116,28 @@ function pressKey(row: HTMLElement, key: string, code: string) {
 }
 
 describe('space over a focused bag row', () => {
-  it('cancels the row activation so the reins are not re-used', () => {
-    const { root, useItem } = harness([{ itemId: REINS, count: 1 }]);
-    const row = reinsRow(root);
-    row.focus();
-    expect(document.activeElement, 'the row holds focus, as after a summon').toBe(row);
+  it.each([
+    ['modern key', ' ', ''],
+    ['legacy key', 'Spacebar', ''],
+    ['physical code', 'Unidentified', 'Space'],
+  ])(
+    'passes the %s Space input through the real panel wiring without re-using reins',
+    (_label, key, code) => {
+      const { root, useItem } = harness([{ itemId: REINS, count: 1 }]);
+      const panel = document.createElement('div');
+      panel.append(root);
+      document.body.append(panel);
+      wireBagsPanel(panel);
+      const row = reinsRow(root);
+      row.focus();
+      expect(document.activeElement, 'the row holds focus, as after a summon').toBe(row);
 
-    const seen = pressKey(row, ' ', 'Space');
-    expect(seen.defaultPrevented, 'Space must not natively activate the row').toBe(true);
-    expect(useItem, 'Space must never re-use the reins').not.toHaveBeenCalled();
-  });
+      const seen = pressKey(row, key, code);
+      expect(seen.defaultPrevented, 'Space must not natively activate the row').toBe(true);
+      expect(seen.reachedWindow, "Space must bubble to Input's window keydown to jump").toBe(true);
+      expect(useItem, 'Space must never re-use the reins').not.toHaveBeenCalled();
+    },
+  );
 
   it('still lets Space reach the game so the mount jumps', () => {
     const { root } = harness([{ itemId: REINS, count: 1 }]);
@@ -134,11 +150,16 @@ describe('space over a focused bag row', () => {
 
   it('leaves Enter activation alone for keyboard players', () => {
     const { root } = harness([{ itemId: REINS, count: 1 }]);
+    const panel = document.createElement('div');
+    panel.append(root);
+    document.body.append(panel);
+    wireBagsPanel(panel);
     const row = reinsRow(root);
     row.focus();
 
     const seen = pressKey(row, 'Enter', 'Enter');
     expect(seen.defaultPrevented, 'Enter still activates the row natively').toBe(false);
+    expect(seen.reachedWindow, 'the panel guard keeps Enter out of the game keybinds').toBe(false);
   });
 
   it('marks the row so the HUD panel guard can let Space past', () => {
@@ -154,10 +175,7 @@ describe('space over a focused bag row', () => {
     const panel = document.createElement('div');
     panel.append(root);
     document.body.append(panel);
-    // Byte-for-byte the listener hud.ts installs on each non-modal panel.
-    panel.addEventListener('keydown', (e) => {
-      if (panelKeyGuardStops(e.target as HTMLElement, e.key, e.code)) e.stopPropagation();
-    });
+    wireBagsPanel(panel);
 
     const row = reinsRow(root);
     row.focus();
@@ -173,9 +191,7 @@ describe('space over a focused bag row', () => {
     const close = document.createElement('button');
     panel.append(close);
     document.body.append(panel);
-    panel.addEventListener('keydown', (e) => {
-      if (panelKeyGuardStops(e.target as HTMLElement, e.key, e.code)) e.stopPropagation();
-    });
+    wireBagsPanel(panel);
 
     close.focus();
     expect(pressKey(close, ' ', 'Space').reachedWindow, 'close button keeps the old guard').toBe(
