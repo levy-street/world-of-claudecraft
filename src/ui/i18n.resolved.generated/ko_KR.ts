@@ -570,9 +570,10 @@ export const ko_KR: EnTranslations = {
       "tabsLabel": "WOC 상점 구역",
       "storeTab": "상점",
       "rewardsTab": "일일 보상",
-      "mountsEyebrow": "계정 탈것",
+      "mountsEyebrow": "계정 탈것 스킨",
       "mountsTitle": "기계 마구간",
       "mountBuyAria": "{item} 구매",
+      "mountSkinType": "탈것 스킨",
       "loading": "WOC 상점 불러오는 중…",
       "error": "현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.",
       "balance": "Claudium 잔액",
@@ -13243,17 +13244,11 @@ export const ko_KR: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "점등인의 멍에: 그룸볼"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "길지기의 종끈: 톨리버"
-      },
       "reins_rickshaw_mount": {
         "name": "결속된 고삐: 뼈에 묶인 인력거"
       },
       "reins_drakemaw_raptor": {
         "name": "화산구 랩터의 고삐"
-      },
-      "reins_mech_bird": {
-        "name": "태엽 기계새 시동 열쇠"
       },
       "rimefang": {
         "name": "서리엄니"

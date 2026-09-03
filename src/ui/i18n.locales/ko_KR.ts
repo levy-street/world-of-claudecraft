@@ -335,7 +335,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
   'hudChrome.wocStore.storeTab': '상점',
   'hudChrome.wocStore.rewardsTab': '일일 보상',
-  'hudChrome.wocStore.mountsEyebrow': '계정 탈것',
+  'hudChrome.wocStore.mountsEyebrow': '계정 탈것 스킨',
   'hudChrome.wocStore.mountsTitle': '기계 마구간',
   'hudChrome.wocStore.mountBuyAria': '{item} 구매',
   'hudChrome.wocStore.loading': 'WOC 상점 불러오는 중…',
@@ -9007,7 +9007,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
-  'entities.items.reins_mech_bird.name': '태엽 기계새 시동 열쇠',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -11296,8 +11295,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
   'entities.items.reins_lanternback_troll.name':
     '점등인의 멍에: 그룸볼',
-  'entities.items.reins_chimeglass_tortoise.name':
-    '길지기의 종끈: 톨리버',
   'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',
@@ -14645,6 +14642,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.wand_of_quenched_sparks.name': '꺼진 불꽃의 마법봉',
   'crucibleShop.balanceEntry': '{name} x{count}',
   // The Cosmetics window (src/ui/hud/cosmetics/): non-Latin fills for every key.
+  'hudChrome.wocStore.mountSkinType': '탈것 스킨',
   'hudChrome.cosmetics.title': '외형',
   'hudChrome.cosmetics.close': '외형 닫기',
   'hudChrome.cosmetics.tabsLabel': '외형 구역',

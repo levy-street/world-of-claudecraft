@@ -32,7 +32,6 @@ import {
   normalizeSelectedMount,
   TRAINING_MOUNT_KEY,
 } from '../src/sim/content/mounts';
-import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../src/sim/data';
 import { createMob } from '../src/sim/entity';
 import { guildBankPipeRefusal } from '../src/sim/guild_bank';
@@ -278,25 +277,9 @@ describe('mount reins items (the collection: owning the item is owning the mount
         entries.filter((l) => l.itemId === itemId).map((l) => ({ bossId, ...l })),
       );
 
-      // STORE MOUNT (owner ask, 2026-08-17): the Cluckwork Mech Bird sells for
-      // Claudium (content/store_mounts.ts; the spend route materializes the
-      // soulbound reins). It takes NO in-world path despite its rare tier: the
-      // heroic sweep above plus every rift pool stays empty of it, pinned so
-      // the store remains its only door and never quietly gains a drop twin.
-      if (isStoreMountItemId(itemId)) {
-        expect(heroicEntries, `${itemId} (store) must not be heroic-reachable`).toEqual([]);
-        for (const [pool, name] of [
-          [RIFT_EPIC_MOUNT_REINS, 'rift S'],
-          [RIFT_BLUE_MOUNT_REINS, 'rift blue'],
-          [RIFT_GREEN_MOUNT_REINS, 'rift green'],
-        ] as const) {
-          expect(
-            pool as readonly string[],
-            `${itemId} is store-only: not in ${name}`,
-          ).not.toContain(itemId);
-        }
-        continue;
-      }
+      // There is no store MOUNT any more: a paid mount is a mount SKIN
+      // (content/mount_skins.ts), an account cosmetic with no reins item, so
+      // every catalog reins below has an in-world story or is dev-only.
 
       if (rarity === 'epic') {
         // Rift S clears are the sole source, EXCEPT a mount held sourceless on

@@ -570,9 +570,10 @@ export const es_ES: EnTranslations = {
       "tabsLabel": "Secciones de la tienda WOC",
       "storeTab": "Tienda",
       "rewardsTab": "Recompensas diarias",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "Cargando la tienda WOC...",
       "error": "La tienda WOC no está disponible en este momento. Vuelve a intentarlo dentro de poco.",
       "balance": "Saldo de Claudium",
@@ -13243,17 +13244,11 @@ export const es_ES: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Yugo del farolero: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
       "reins_rickshaw_mount": {
         "name": "Riendas vinculadas: Rickshaw Atahuesos"
       },
       "reins_drakemaw_raptor": {
         "name": "Riendas del Raptor de Drakemaw"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Colmillo de Escarcha"

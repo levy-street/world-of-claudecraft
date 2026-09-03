@@ -538,7 +538,7 @@ export class DailyRewardsWindow {
       mainhandItemId: player.mainhandItemId,
       skinCatalog: player.skinCatalog,
     });
-    this.storeSpend.mounts.rebuild(this.storeBalance, this.storeItems, world.ownedMounts());
+    this.storeSpend.mounts.rebuild(this.storeBalance, this.storeItems, world.accountCosmetics);
   }
 
   /** Live account-cosmetics change (another session's grant/apply, or a server

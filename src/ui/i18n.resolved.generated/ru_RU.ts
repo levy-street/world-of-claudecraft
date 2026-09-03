@@ -570,9 +570,10 @@ export const ru_RU: EnTranslations = {
       "tabsLabel": "Разделы магазина WOC",
       "storeTab": "Магазин",
       "rewardsTab": "Ежедневные награды",
-      "mountsEyebrow": "Маунты аккаунта",
+      "mountsEyebrow": "Облики ездовых животных аккаунта",
       "mountsTitle": "Механическая конюшня",
       "mountBuyAria": "Купить: {item}",
+      "mountSkinType": "Облик ездового животного",
       "loading": "Загрузка магазина WOC…",
       "error": "Магазин WOC сейчас недоступен. Повторите попытку позже.",
       "balance": "Баланс Claudium",
@@ -13243,17 +13244,11 @@ export const ru_RU: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Ярмо фонарщика: Грумбол"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Колокольный ремень путеблюстителя: Толливер"
-      },
       "reins_rickshaw_mount": {
         "name": "Связанные поводья: Костяная рикша"
       },
       "reins_drakemaw_raptor": {
         "name": "Поводья раптора Дрейкмо"
-      },
-      "reins_mech_bird": {
-        "name": "Ключ зажигания механоптицы"
       },
       "rimefang": {
         "name": "Инеевый клык"

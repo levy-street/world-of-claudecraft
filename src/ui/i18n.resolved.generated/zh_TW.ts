@@ -570,9 +570,10 @@ export const zh_TW: EnTranslations = {
       "tabsLabel": "WOC 商店分區",
       "storeTab": "商店",
       "rewardsTab": "每日獎勵",
-      "mountsEyebrow": "帳號坐騎",
+      "mountsEyebrow": "帳號坐騎造型",
       "mountsTitle": "機械馬廄",
       "mountBuyAria": "購買{item}",
+      "mountSkinType": "坐騎造型",
       "loading": "正在載入 WOC 商店…",
       "error": "WOC 商店目前無法使用，請稍後再試。",
       "balance": "Claudium 餘額",
@@ -13243,17 +13244,11 @@ export const zh_TW: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "點燈人之軛：格倫博"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "守道人的鈴帶：托利弗"
-      },
       "reins_rickshaw_mount": {
         "name": "白骨人力車縛繩"
       },
       "reins_drakemaw_raptor": {
         "name": "龍喉迅猛龍的韁繩"
-      },
-      "reins_mech_bird": {
-        "name": "發條機械鳥點火鑰匙"
       },
       "rimefang": {
         "name": "霜牙"

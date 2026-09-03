@@ -570,9 +570,10 @@ export const nl_NL: EnTranslations = {
       "tabsLabel": "Onderdelen van de WOC-winkel",
       "storeTab": "Winkel",
       "rewardsTab": "Dagelijkse beloningen",
-      "mountsEyebrow": "Account Mounts",
+      "mountsEyebrow": "Account Mount Skins",
       "mountsTitle": "Machine Stable",
       "mountBuyAria": "Purchase {item}",
+      "mountSkinType": "Mount skin",
       "loading": "WOC-winkel laden...",
       "error": "De WOC Store is momenteel niet beschikbaar. Probeer het binnenkort opnieuw.",
       "balance": "Claudium-saldo",
@@ -13243,17 +13244,11 @@ export const nl_NL: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "Juk van de lantaarnopsteker: Grumbol"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "Roadwarden's Bellstrap: Tolliver"
-      },
       "reins_rickshaw_mount": {
         "name": "Gebonden teugels: Beengebonden Riksja"
       },
       "reins_drakemaw_raptor": {
         "name": "Teugels van de Drakenmuil-Raptor"
-      },
-      "reins_mech_bird": {
-        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rijptand"

@@ -570,9 +570,10 @@ export const zh_CN: EnTranslations = {
       "tabsLabel": "WOC 商店分区",
       "storeTab": "商店",
       "rewardsTab": "每日奖励",
-      "mountsEyebrow": "账号坐骑",
+      "mountsEyebrow": "账号坐骑皮肤",
       "mountsTitle": "机械马厩",
       "mountBuyAria": "购买{item}",
+      "mountSkinType": "坐骑皮肤",
       "loading": "正在加载 WOC 商店…",
       "error": "WOC 商店暂时不可用，请稍后再试。",
       "balance": "Claudium 余额",
@@ -13243,17 +13244,11 @@ export const zh_CN: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "点灯人之轭：格伦博"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "守道人的铃带：托利弗"
-      },
       "reins_rickshaw_mount": {
         "name": "白骨人力车缚绳"
       },
       "reins_drakemaw_raptor": {
         "name": "龙喉迅猛龙的缰绳"
-      },
-      "reins_mech_bird": {
-        "name": "发条机械鸟点火钥匙"
       },
       "rimefang": {
         "name": "霜牙"

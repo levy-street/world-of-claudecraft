@@ -8,18 +8,18 @@
 // stale store surface.
 
 import { describe, expect, it, vi } from 'vitest';
-import { STORE_MOUNT_ITEM_IDS } from '../src/sim/content/store_mounts';
+import { MOUNT_SKIN_IDS } from '../src/sim/content/mount_skins';
 import type { StoreSpendResult } from '../src/ui/claudium_purchase_bridge';
 import { t } from '../src/ui/i18n';
 import { storeMountName } from '../src/ui/store_mount_card_view';
 import { StoreMountPurchase, type StoreMountPurchaseDeps } from '../src/ui/store_mount_purchase';
 import type { WocStoreItemInput } from '../src/ui/woc_store_view';
 
-const REINS = STORE_MOUNT_ITEM_IDS[0];
+const REINS = MOUNT_SKIN_IDS[0];
 const NAME = storeMountName(REINS);
 
 function service(over: Partial<WocStoreItemInput> = {}): WocStoreItemInput {
-  return { itemId: REINS, name: 'x', kind: 'item', costClaudium: 1200, owned: false, ...over };
+  return { itemId: REINS, name: 'x', kind: 'skin', costClaudium: 1200, owned: false, ...over };
 }
 
 function result(over: Partial<StoreSpendResult> = {}): StoreSpendResult {
@@ -60,12 +60,12 @@ function harness(
     setPriceChanged: vi.fn(),
     setError: vi.fn(),
     refreshStore: vi.fn(async () => {
-      controller.rebuild(next.balance, next.items, next.owned);
+      controller.rebuild(next.balance, next.items, { mountSkinIds: next.owned });
     }),
     rebuildAndPaint: vi.fn(),
   };
   const controller = new StoreMountPurchase(deps as unknown as StoreMountPurchaseDeps);
-  controller.rebuild(balance, items, owned);
+  controller.rebuild(balance, items, { mountSkinIds: owned });
   return { controller, deps: deps as unknown as Harness['deps'], next, surface };
 }
 

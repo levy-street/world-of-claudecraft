@@ -330,7 +330,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
   'hudChrome.wocStore.storeTab': '商店',
   'hudChrome.wocStore.rewardsTab': '每日奖励',
-  'hudChrome.wocStore.mountsEyebrow': '账号坐骑',
+  'hudChrome.wocStore.mountsEyebrow': '账号坐骑皮肤',
   'hudChrome.wocStore.mountsTitle': '机械马厩',
   'hudChrome.wocStore.mountBuyAria': '购买{item}',
   'hudChrome.wocStore.loading': '正在加载 WOC 商店…',
@@ -8651,7 +8651,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
-  'entities.items.reins_mech_bird.name': '发条机械鸟点火钥匙',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -10788,8 +10787,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': '惊雷撼地者点火钥匙',
   'entities.items.reins_lanternback_troll.name':
     '点灯人之轭：格伦博',
-  'entities.items.reins_chimeglass_tortoise.name':
-    '守道人的铃带：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力车缚绳',
   'entities.dungeons.the_last_keep.leaveText': '你带上堡门，重新走进龙裔荒原的寒风中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',
@@ -14331,6 +14328,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.wand_of_quenched_sparks.name': '熄火花魔杖',
   'crucibleShop.balanceEntry': '{name} x{count}',
   // The Cosmetics window (src/ui/hud/cosmetics/): non-Latin fills for every key.
+  'hudChrome.wocStore.mountSkinType': '坐骑皮肤',
   'hudChrome.cosmetics.title': '外观',
   'hudChrome.cosmetics.close': '关闭外观',
   'hudChrome.cosmetics.tabsLabel': '外观分区',

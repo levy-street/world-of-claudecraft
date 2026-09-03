@@ -330,7 +330,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
   'hudChrome.wocStore.storeTab': 'ストア',
   'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
-  'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
+  'hudChrome.wocStore.mountsEyebrow': 'アカウントのマウントスキン',
   'hudChrome.wocStore.mountsTitle': '機械の厩舎',
   'hudChrome.wocStore.mountBuyAria': '{item}を購入',
   'hudChrome.wocStore.loading': 'WOCストアを読み込み中…',
@@ -9025,7 +9025,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
   'entities.items.reins_drakemaw_raptor.name': '火口のラプトルの手綱',
   'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
-  'entities.items.reins_mech_bird.name': 'ゼンマイ・メカバードの始動キー',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -11314,8 +11313,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_terrorspark_groundshaker.name': 'テラースパークの始動キー',
   'entities.items.reins_lanternback_troll.name':
     '点灯人の軛：グルンボル',
-  'entities.items.reins_chimeglass_tortoise.name':
-    '道守の鈴帯：トリヴァー',
   'entities.items.reins_rickshaw_mount.name': '縛りの手綱：骨縛りの人力車',
   'entities.dungeons.the_last_keep.leaveText': '砦の扉を閉め、ドレイクランドの風の中へ戻った。',
   'entities.dungeons.dawnhold_castle.name': 'ドーンホールド城',
@@ -14640,6 +14637,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.wand_of_quenched_sparks.name': '消えた火花のワンド',
   'crucibleShop.balanceEntry': '{name} x{count}',
   // The Cosmetics window (src/ui/hud/cosmetics/): non-Latin fills for every key.
+  'hudChrome.wocStore.mountSkinType': 'マウントスキン',
   'hudChrome.cosmetics.title': 'コスメティック',
   'hudChrome.cosmetics.close': 'コスメティックを閉じる',
   'hudChrome.cosmetics.tabsLabel': 'コスメティックの区分',

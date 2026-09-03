@@ -2434,10 +2434,8 @@ const ITEM_ENTITY_IDS = [
   'artisans_eye',
   'reins_terrorspark_groundshaker',
   'reins_lanternback_troll',
-  'reins_chimeglass_tortoise',
   'reins_rickshaw_mount',
   'reins_drakemaw_raptor',
-  'reins_mech_bird',
   'rimefang',
   'marrowpoint',
   'duskwhisper',
@@ -2770,7 +2768,6 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Terrorspark Groundshaker',
   reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
-  reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.
@@ -2778,8 +2775,6 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   murloc_hut: 'Mudfin Hut',
   // Dragonkin brood rebuild (PR #2811), same English-appended treatment.
   reins_drakemaw_raptor: 'Reins of the Drakemaw Raptor',
-  // The store mount (PR: mech-bird-mount), same English-appended treatment.
-  reins_mech_bird: 'Ignition Key: Cluckwork Mech Bird',
   restless_skull: 'Restless Skull',
   vanguard_bone: 'Vanguard Bone',
   // Hunter quivers, the class's first held-offhand ladder; same English-appended

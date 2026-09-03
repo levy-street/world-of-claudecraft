@@ -570,9 +570,10 @@ export const ja_JP: EnTranslations = {
       "tabsLabel": "WOCストアのセクション",
       "storeTab": "ストア",
       "rewardsTab": "デイリー報酬",
-      "mountsEyebrow": "アカウント共有マウント",
+      "mountsEyebrow": "アカウントのマウントスキン",
       "mountsTitle": "機械の厩舎",
       "mountBuyAria": "{item}を購入",
+      "mountSkinType": "マウントスキン",
       "loading": "WOCストアを読み込み中…",
       "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
       "balance": "Claudium残高",
@@ -13243,17 +13244,11 @@ export const ja_JP: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "点灯人の軛：グルンボル"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "道守の鈴帯：トリヴァー"
-      },
       "reins_rickshaw_mount": {
         "name": "縛りの手綱：骨縛りの人力車"
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
-      },
-      "reins_mech_bird": {
-        "name": "ゼンマイ・メカバードの始動キー"
       },
       "rimefang": {
         "name": "霜牙"

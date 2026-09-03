@@ -570,9 +570,10 @@ export const en_XA: EnTranslations = {
       "tabsLabel": "[ŴÓÇ Šţóŕé šéçţíóñš]",
       "storeTab": "[Šţóŕé]",
       "rewardsTab": "[Ðáíļý Ŕéŵáŕðš]",
-      "mountsEyebrow": "[Áççóúñţ Ɱóúñţš]",
+      "mountsEyebrow": "[Áççóúñţ Ɱóúñţ Šķíñš]",
       "mountsTitle": "[Ɱáçĥíñé Šţáƀļé]",
       "mountBuyAria": "[Þúŕçĥášé {item}]",
+      "mountSkinType": "[Ɱóúñţ šķíñ]",
       "loading": "[Ļóáðíñĝ ŴÓÇ Šţóŕé...]",
       "error": "[Ţĥé ŴÓÇ Šţóŕé íš úñáʋáíļáƀļé ŕíĝĥţ ñóŵ. Þļéášé ţŕý áĝáíñ šĥóŕţļý.]",
       "balance": "[Çļáúðíúɱ Ɓáļáñçé]",
@@ -13243,17 +13244,11 @@ export const en_XA: EnTranslations = {
       "reins_lanternback_troll": {
         "name": "[Ļáɱþļíĝĥţéŕ'š Ýóķé: Ĝŕúɱƀóļ]"
       },
-      "reins_chimeglass_tortoise": {
-        "name": "[Ŕóáðŵáŕðéñ'š Ɓéļļšţŕáþ: Ţóļļíʋéŕ]"
-      },
       "reins_rickshaw_mount": {
         "name": "[Ɓóúñð Ŕéíñš: Ɓóñéƀóúñð Ŕíçķšĥáŵ]"
       },
       "reins_drakemaw_raptor": {
         "name": "[Ŕéíñš óƒ ţĥé Ðŕáķéɱáŵ Ŕáþţóŕ]"
-      },
-      "reins_mech_bird": {
-        "name": "[Íĝñíţíóñ Ķéý: Çļúçķŵóŕķ Ɱéçĥ Ɓíŕð]"
       },
       "rimefang": {
         "name": "[Ŕíɱéƒáñĝ]"

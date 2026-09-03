@@ -170,9 +170,10 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // the literal anchors them. Literal: update when catalog content lands
     // (311 base + the Bonebound Rickshaw's horizons_mounts slot + the 40
     // Crucible raid relics and the raid's flawless title; Forgebreaker left
-    // the pages for its crafting chain; then the Lanternback Troll and the
-    // Chimeglass Tortoise's two developer mount slots).
-    expect(catalogTotal).toBe(360);
+    // the pages for its crafting chain; then the Lanternback Troll's developer
+    // mount slot; the Chimeglass Tortoise and the Cluckwork Mech Bird left the
+    // shelf when they became account mount skins, which are not relics).
+    expect(catalogTotal).toBe(358);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {
