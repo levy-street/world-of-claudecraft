@@ -43,6 +43,7 @@ function sample(over: Partial<MetricsSample> = {}): MetricsSample {
     textures: 50,
     programs: 20,
     renderScale: 1,
+    drawingBuffer: null,
     gpu: 'Test GPU',
     memoryUsedMb: 400,
     memoryLimitMb: 2048,
@@ -220,6 +221,46 @@ describe('buildPerfOverlayView', () => {
       (r) => r.key === 'memory',
     )!;
     expect(row.value).toEqual({ kind: 'memPair', usedMb: 400, limitMb: 2048 });
+  });
+
+  it('prints the render scale with its drawing buffer when the renderer reports one', () => {
+    const rowOf = (over: Parameters<typeof sample>[0]) =>
+      buildPerfOverlayView(sample(over), viewCfg({ metrics: allMetrics() })).rows.find(
+        (r) => r.key === 'renderScale',
+      )!;
+    // A DPR 1 4K panel on ultra: the pixel budget bounded the buffer at 1440p-plus.
+    expect(
+      rowOf({
+        renderScale: 1,
+        drawingBuffer: { width: 2795, height: 1572, budgetBound: true },
+      }).value,
+    ).toEqual({ kind: 'scaleBuffer', v: 1, width: 2795, height: 1572, budgetBound: true });
+    // A 1080p panel: the same row, DPR-bound, so the budget flag stays off.
+    expect(
+      rowOf({
+        renderScale: 0.75,
+        drawingBuffer: { width: 1440, height: 810, budgetBound: false },
+      }).value,
+    ).toEqual({ kind: 'scaleBuffer', v: 0.75, width: 1440, height: 810, budgetBound: false });
+    // The 4K session at 50 percent Render Quality: the base ratio is still
+    // budget-bound, but the buffer is not at the budget, so no "max".
+    expect(
+      rowOf({
+        renderScale: 0.5,
+        drawingBuffer: { width: 1398, height: 786, budgetBound: true },
+      }).value,
+    ).toEqual({ kind: 'scaleBuffer', v: 0.5, width: 1398, height: 786, budgetBound: false });
+    // No buffer readout (an older renderer stat shape): the plain percent survives.
+    expect(rowOf({ renderScale: 0.9, drawingBuffer: null }).value).toEqual({
+      kind: 'percent',
+      v: 0.9,
+    });
+    expect(
+      buildPerfOverlayView(
+        sample({ renderScale: null, drawingBuffer: { width: 1, height: 1, budgetBound: false } }),
+        viewCfg({ metrics: allMetrics() }),
+      ).rows.find((r) => r.key === 'renderScale'),
+    ).toBeUndefined();
   });
 });
 

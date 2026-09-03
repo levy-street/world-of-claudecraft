@@ -2162,6 +2162,11 @@ export const hudChromeStrings = {
       mb: '{value} MB',
       memPair: '{used} / {limit} MB',
       hz: '{value} Hz',
+      // The Render Scale row with the drawing buffer it produced, in device
+      // pixels; the second form marks a buffer sitting AT the tier's pixel
+      // budget (gfx_aa_policy_core.ts), the lever a 1440p-plus or 4K panel hits.
+      scaleBuffer: '{scale} ({width}x{height})',
+      scaleBufferBudget: '{scale} ({width}x{height} max)',
     },
     // Inline status badges shown when the relevant condition is active.
     badges: {

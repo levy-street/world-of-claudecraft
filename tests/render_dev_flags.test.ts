@@ -67,3 +67,18 @@ describe('render dev flags: the GPU-preparation mode switch', () => {
     expect(renderLayerDisabled('n8ao')).toBe(true);
   });
 });
+
+describe('render dev flags: the drawing-buffer pixel budget switch', () => {
+  it('keeps the budget on by default and in a headless host', async () => {
+    expect((await loadFlags('')).pixelBudgetDisabled()).toBe(false);
+    expect((await loadFlags(null)).pixelBudgetDisabled()).toBe(false);
+  });
+
+  it('disables the budget only under the exact ?pixelbudget=off token', async () => {
+    expect((await loadFlags('?pixelbudget=off')).pixelBudgetDisabled()).toBe(true);
+    expect((await loadFlags('?gfx=ultra&pixelbudget=off')).pixelBudgetDisabled()).toBe(true);
+    for (const search of ['?pixelbudget=0', '?pixelbudget=', '?pixelbudget=OFF', '?budget=off']) {
+      expect((await loadFlags(search)).pixelBudgetDisabled(), search).toBe(false);
+    }
+  });
+});

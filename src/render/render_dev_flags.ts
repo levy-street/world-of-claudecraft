@@ -25,6 +25,12 @@
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
+//   pixelbudget - the per-tier drawing-buffer pixel budget
+//                 (gfx_aa_policy_core.ts maxDrawingBufferPixels); off restores
+//                 the DPR-under-cap allocation alone, so a 1440p-plus or 4K
+//                 panel at DPR 1 rasterizes its full native area again. The
+//                 before/after for the budget on one machine; read through
+//                 pixelBudgetDisabled(), never the layer accessor.
 
 // Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
@@ -61,4 +67,10 @@ const gpuPrep = ((): GpuPrepMode => {
 /** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
 export function gpuPrepMode(): GpuPrepMode {
   return gpuPrep;
+}
+
+/** True under `?pixelbudget=off`: allocate the drawing buffer at min(dpr, cap) with
+ *  no absolute pixel budget (dev only, the A/B for drawing_buffer_budget_core.ts). */
+export function pixelBudgetDisabled(): boolean {
+  return disabled.has('pixelbudget');
 }

@@ -1734,7 +1734,9 @@ export const ru_RU: EnTranslations = {
         "ms": "{value} мс",
         "mb": "{value} МБ",
         "memPair": "{used} / {limit} МБ",
-        "hz": "{value} Гц"
+        "hz": "{value} Гц",
+        "scaleBuffer": "{scale} ({width}x{height})",
+        "scaleBufferBudget": "{scale} ({width}x{height} max)"
       },
       "badges": {
         "backgrounded": "В фоне",

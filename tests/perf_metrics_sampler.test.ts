@@ -160,6 +160,22 @@ describe('createMetricsSampler', () => {
     expect(sample.backgrounded).toBe(true);
   });
 
+  it('carries the drawing-buffer readout through, and nulls it when unreported', () => {
+    const reported = createMetricsSampler(
+      makeDeps({
+        renderer: fakeRenderer({
+          drawingBuffer: { width: 2795, height: 1572, budgetBound: true },
+        }),
+      }),
+    )();
+    expect(reported.drawingBuffer).toEqual({ width: 2795, height: 1572, budgetBound: true });
+    expect(createMetricsSampler(makeDeps())().drawingBuffer).toBeNull();
+    expect(
+      createMetricsSampler(makeDeps({ renderer: fakeRenderer({ drawingBuffer: null }) }))()
+        .drawingBuffer,
+    ).toBeNull();
+  });
+
   it('nulls renderScale + gpu when the renderer omits them', () => {
     const sample = createMetricsSampler(
       makeDeps({

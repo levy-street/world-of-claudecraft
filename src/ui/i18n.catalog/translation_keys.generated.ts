@@ -10169,6 +10169,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.perf.units.mb'
   | 'hudChrome.perf.units.memPair'
   | 'hudChrome.perf.units.ms'
+  | 'hudChrome.perf.units.scaleBuffer'
+  | 'hudChrome.perf.units.scaleBufferBudget'
   | 'hudChrome.petFeed.disabledFullHp'
   | 'hudChrome.petFeed.disabledNoFood'
   | 'hudChrome.playerCard.showWalletBadge'

@@ -1734,7 +1734,9 @@ export const zh_TW: EnTranslations = {
         "ms": "{value} ms",
         "mb": "{value} MB",
         "memPair": "{used} / {limit} MB",
-        "hz": "{value} Hz"
+        "hz": "{value} Hz",
+        "scaleBuffer": "{scale} ({width}x{height})",
+        "scaleBufferBudget": "{scale} ({width}x{height} max)"
       },
       "badges": {
         "backgrounded": "背景執行中",

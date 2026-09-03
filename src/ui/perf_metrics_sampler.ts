@@ -18,6 +18,8 @@ export interface SamplerRenderer {
     textures: number | null;
     programs: number | null;
     effectiveRenderScale?: number | null;
+    /** The allocated drawing buffer and whether the tier's pixel budget settled it. */
+    drawingBuffer?: { width: number; height: number; budgetBound: boolean } | null;
     glRenderer?: string | null;
   };
 }
@@ -120,6 +122,13 @@ export function createMetricsSampler(deps: SamplerDeps): () => MetricsSample {
       textures: r.textures,
       programs: r.programs,
       renderScale: typeof r.effectiveRenderScale === 'number' ? r.effectiveRenderScale : null,
+      drawingBuffer: r.drawingBuffer
+        ? {
+            width: r.drawingBuffer.width,
+            height: r.drawingBuffer.height,
+            budgetBound: r.drawingBuffer.budgetBound,
+          }
+        : null,
       gpu: r.glRenderer || null,
       memoryUsedMb: mem ? mem.usedMb : null,
       memoryLimitMb: mem ? mem.limitMb : null,

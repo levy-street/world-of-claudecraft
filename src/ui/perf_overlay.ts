@@ -313,6 +313,17 @@ function formatValue(v: PerfValue): string {
       return formatNumber(v.v, { notation: 'compact', maximumFractionDigits: 1 });
     case 'percent':
       return formatNumber(v.v, { style: 'percent', maximumFractionDigits: 0 });
+    case 'scaleBuffer':
+      return t(
+        v.budgetBound
+          ? 'hudChrome.perf.units.scaleBufferBudget'
+          : 'hudChrome.perf.units.scaleBuffer',
+        {
+          scale: formatNumber(v.v, { style: 'percent', maximumFractionDigits: 0 }),
+          width: formatNumber(v.width, { useGrouping: false }),
+          height: formatNumber(v.height, { useGrouping: false }),
+        },
+      );
     case 'ms':
       return t('hudChrome.perf.units.ms', {
         value: formatNumber(v.v, {

@@ -615,6 +615,16 @@ function payloadFromSnapshot(
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
+      // The allocated WebGL buffer and whether the tier's pixel budget settled
+      // it: with the budget, `viewport x dpr` no longer reconstructs the pixels
+      // a session rasterizes (a DPR 1 4K client renders 2796x1573), so the
+      // fleet reads the allocation itself. Four bounded scalars, no DDL.
+      rendererDrawingBuffer: {
+        width: renderer.drawingBuffer.width,
+        height: renderer.drawingBuffer.height,
+        maxPixels: renderer.drawingBuffer.maxPixels,
+        budgetBound: renderer.drawingBuffer.budgetBound,
+      },
       rendererDiagnostics: renderer.renderDiagnostics,
       // The summary above is the whole prewarm payload. The live stats object
       // used to ride along beside it as `rendererPrewarm`, from before the

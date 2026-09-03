@@ -1734,7 +1734,9 @@ export const fr_FR: EnTranslations = {
         "ms": "{value} ms",
         "mb": "{value} Mo",
         "memPair": "{used} / {limit} Mo",
-        "hz": "{value} Hz"
+        "hz": "{value} Hz",
+        "scaleBuffer": "{scale} ({width}x{height})",
+        "scaleBufferBudget": "{scale} ({width}x{height} max)"
       },
       "badges": {
         "backgrounded": "En arrière-plan",

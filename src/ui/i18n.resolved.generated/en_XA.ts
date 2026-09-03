@@ -1734,7 +1734,9 @@ export const en_XA: EnTranslations = {
         "ms": "[{value} ɱš]",
         "mb": "[{value} ⱮƁ]",
         "memPair": "[{used} / {limit} ⱮƁ]",
-        "hz": "[{value} Ĥž]"
+        "hz": "[{value} Ĥž]",
+        "scaleBuffer": "[{scale} ({width}ẋ{height})]",
+        "scaleBufferBudget": "[{scale} ({width}ẋ{height} ɱáẋ)]"
       },
       "badges": {
         "backgrounded": "[Ɓáçķĝŕóúñðéð]",

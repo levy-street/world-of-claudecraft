@@ -548,6 +548,13 @@ function snapshot(): PerfSnapshot {
         },
       },
       pixelRatio: 1.5,
+      drawingBuffer: {
+        width: 2880,
+        height: 1620,
+        maxPixels: 4_400_000,
+        bound: 'cap',
+        budgetBound: false,
+      },
       width: 1440,
       height: 900,
       calls: 500,
@@ -702,6 +709,14 @@ describe('perf reporter payload', () => {
       (body.rawSummary as { rendererQualityBuckets?: { levels?: { weapons?: number } } })
         .rendererQualityBuckets?.levels?.weapons,
     ).toBe(1);
+    // The allocated drawing buffer rides rawSummary: with the pixel budget,
+    // viewport x dpr no longer says what a session rasterizes.
+    expect((body.rawSummary as { rendererDrawingBuffer?: unknown }).rendererDrawingBuffer).toEqual({
+      width: 2880,
+      height: 1620,
+      maxPixels: 4_400_000,
+      budgetBound: false,
+    });
     expect(
       (body.rawSummary as { rendererPrewarmSummary?: { manifestPlanned?: number } })
         .rendererPrewarmSummary?.manifestPlanned,

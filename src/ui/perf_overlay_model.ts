@@ -72,6 +72,9 @@ export interface MetricsSample {
   textures: number | null;
   programs: number | null;
   renderScale: number | null; // 0..1 effective render scale
+  /** The allocated drawing buffer in device pixels, and whether the tier's
+   *  pixel budget (not the DPR or its cap) settled it; null when unreported. */
+  drawingBuffer: { width: number; height: number; budgetBound: boolean } | null;
   gpu: string | null;
   // browser / world
   memoryUsedMb: number | null;
@@ -93,6 +96,9 @@ export type PerfValue =
   | { kind: 'int'; v: number }
   | { kind: 'compact'; v: number }
   | { kind: 'percent'; v: number } // 0..1
+  // The render scale with the buffer it produced: "75% (2560x1440)", flagged
+  // when the pixel budget is what bounded it.
+  | { kind: 'scaleBuffer'; v: number; width: number; height: number; budgetBound: boolean }
   | { kind: 'hz'; v: number; digits?: number }
   | { kind: 'memPair'; usedMb: number; limitMb: number | null }
   | { kind: 'text'; text: string };
@@ -387,7 +393,21 @@ export const METRIC_REGISTRY: readonly MetricDef[] = [
     labelKey: 'hudChrome.perf.labels.renderScale',
     group: 'renderer',
     defaultOn: false,
-    read: (s) => (s.renderScale == null ? null : { kind: 'percent', v: s.renderScale }),
+    // "max" marks a buffer sitting AT the tier's pixel budget: the base
+    // ratio is budget-bound AND no scale below it (the manual slider or the
+    // medium governor) is currently shrinking the frame.
+    read: (s) =>
+      s.renderScale == null
+        ? null
+        : s.drawingBuffer
+          ? {
+              kind: 'scaleBuffer',
+              v: s.renderScale,
+              width: s.drawingBuffer.width,
+              height: s.drawingBuffer.height,
+              budgetBound: s.drawingBuffer.budgetBound && s.renderScale >= 0.999,
+            }
+          : { kind: 'percent', v: s.renderScale },
     severity: () => NONE,
   },
   {

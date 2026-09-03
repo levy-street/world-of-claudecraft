@@ -245,7 +245,7 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
-import { resolveDrawingBufferRatio } from './drawing_buffer_ratio';
+import { drawingBufferPerfStats, resolveDrawingBufferRatio } from './drawing_buffer_ratio';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import {
   dynamicResolutionAllocationScale,
@@ -3350,8 +3350,7 @@ export class Renderer {
     return measureCanvasViewport(this.webgl.domElement);
   }
 
-  /** DPR under the tier's cap AND its drawing-buffer pixel budget, before the
-   *  Render Quality slider (drawing_buffer_budget_core.ts). */
+  /** DPR under the tier's cap and pixel budget, before the Render Quality slider. */
   private basePixelRatio(): number {
     return resolveDrawingBufferRatio(this.viewport).ratio;
   }
@@ -4363,6 +4362,7 @@ export class Renderer {
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,
+      drawingBuffer: drawingBufferPerfStats(this.webgl.domElement, this.viewport),
       // Composer tiers serve the accumulated per-frame delta (the live counter is
       // monotonic there, so it already includes the off-screen water-simulation
       // passes); other profiles keep the live post-frame read, where three's

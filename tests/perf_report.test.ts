@@ -594,6 +594,42 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('keeps the allocated drawing buffer when a public raw summary is truncated', async () => {
+    // With the pixel budget, viewport x dpr no longer says what a session
+    // rasterizes: the four-scalar block must survive the compact path too.
+    const res = fakeRes();
+    await handlePerfReport(
+      fakeReq({
+        sessionId: 'public-large-drawing-buffer',
+        rawSummary: {
+          seconds: 30,
+          rendererDrawingBuffer: {
+            width: 2796,
+            height: 1573,
+            maxPixels: 4_400_000,
+            budgetBound: true,
+          },
+          oversized: 'x'.repeat(40_000),
+        },
+      }),
+      res,
+    );
+    expect(res.statusCode).toBe(200);
+    expect(insertClientPerfReport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rawSummary: expect.objectContaining({
+          truncated: true,
+          rendererDrawingBuffer: {
+            width: 2796,
+            height: 1573,
+            maxPixels: 4_400_000,
+            budgetBound: true,
+          },
+        }),
+      }),
+    );
+  });
+
   it('bounds the client-supplied prewarm entry-id lists instead of copying them verbatim', async () => {
     const res = fakeRes();
 

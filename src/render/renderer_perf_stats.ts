@@ -8,6 +8,7 @@ import type { BiomeId } from '../sim/types';
 import type { BackgroundGpuQueueStats } from './background_gpu_queue';
 import type { BuildLedgerSnapshot } from './build_ledger_core';
 import type { LookPiecesStats } from './characters/look_pieces';
+import type { DrawingBufferPerfStats } from './drawing_buffer_ratio';
 import type { EntryDetailHorizonSnapshot } from './entry_detail_horizon';
 import type { FoliagePerfStats } from './foliage';
 import type { GfxBucketBands, GfxBucketLevels, GfxRuntimeBudget } from './gfx';
@@ -88,9 +89,12 @@ export interface RendererPerfStats {
   effectiveRenderScale: number;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
+  /** The effective device pixels per CSS pixel the buffer is allocated at. */
   pixelRatio: number;
   width: number;
   height: number;
+  /** The allocated buffer and the lever that settled it (drawing_buffer_ratio.ts). */
+  drawingBuffer: DrawingBufferPerfStats;
   calls: number;
   triangles: number;
   geometries: number;

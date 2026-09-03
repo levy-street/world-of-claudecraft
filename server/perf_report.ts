@@ -701,6 +701,9 @@ function compactRawSummary(value: Record<string, unknown>): Record<string, unkno
     'rendererFoliage',
     'rendererBudget',
     'rendererQualityBuckets',
+    // The allocated drawing buffer (four scalars): the only field that says
+    // what a budgeted session rasterizes, since viewport x dpr no longer does.
+    'rendererDrawingBuffer',
     'input',
     'hud',
     'netPipeline',

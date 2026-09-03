@@ -18,6 +18,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -31,6 +33,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -44,6 +48,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -57,6 +63,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -71,6 +79,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -84,14 +94,28 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget"
+  ],
+  "zh_TW": [
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget"
+  ],
+  "ko_KR": [
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget"
+  ],
+  "ja_JP": [
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget"
+  ],
   "pt_BR": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
@@ -101,11 +125,16 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget"
+  ],
   "cs_CZ": [
     "entities.items.reins_chimeglass_tortoise.name",
     "entities.items.reins_mech_bird.name",
@@ -115,6 +144,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -128,6 +159,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -141,6 +174,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -154,6 +189,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -167,6 +204,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -180,6 +219,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -193,6 +234,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"
@@ -206,6 +249,8 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.mounts.name_chimeglass_tortoise",
     "hudChrome.mounts.name_lanternback_troll",
     "hudChrome.mounts.name_mech_bird",
+    "hudChrome.perf.units.scaleBuffer",
+    "hudChrome.perf.units.scaleBufferBudget",
     "hudChrome.wocStore.mountBuyAria",
     "hudChrome.wocStore.mountsEyebrow",
     "hudChrome.wocStore.mountsTitle"

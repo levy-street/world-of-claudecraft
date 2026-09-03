@@ -93,6 +93,13 @@ function baseSnapshot(): PerfSnapshot {
         },
       },
       pixelRatio: 1.5,
+      drawingBuffer: {
+        width: 2880,
+        height: 1620,
+        maxPixels: 4_400_000,
+        bound: 'cap',
+        budgetBound: false,
+      },
       width: 1440,
       height: 900,
       calls: 300,

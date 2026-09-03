@@ -19,7 +19,10 @@ function fakeStyle(): any {
   const store: Record<string, string> = {};
   return new Proxy(store, {
     get(target, prop: string) {
-      if (prop === 'setProperty') return (n: string, v: string) => { target[n] = v; };
+      if (prop === 'setProperty')
+        return (n: string, v: string) => {
+          target[n] = v;
+        };
       return target[prop] ?? '';
     },
     set(target, prop: string, value: string) {
@@ -51,7 +54,9 @@ function fakeEl(tag: string, clientWidth: number): any {
     appendChild() {},
     remove() {},
     addEventListener() {},
-    getBoundingClientRect() { return { left: 0, top: 0, width: clientWidth, height: 40 }; },
+    getBoundingClientRect() {
+      return { left: 0, top: 0, width: clientWidth, height: 40 };
+    },
     getContext() {
       // A no-op 2D context: every method is a stub, every prop a sink.
       return new Proxy({}, { get: () => () => {} });
@@ -62,7 +67,12 @@ function fakeEl(tag: string, clientWidth: number): any {
 const WIDE = 320;
 
 function makeOverlay() {
-  (globalThis as any).window = { innerWidth: 1280, innerHeight: 720, devicePixelRatio: 2, addEventListener() {} };
+  (globalThis as any).window = {
+    innerWidth: 1280,
+    innerHeight: 720,
+    devicePixelRatio: 2,
+    addEventListener() {},
+  };
   (globalThis as any).document = { createElement: (tag: string) => fakeEl(tag, WIDE) };
   const host = fakeEl('div', WIDE);
   const overlay = new PerfOverlay(host);
@@ -110,5 +120,46 @@ describe('PerfOverlay graph sizing', () => {
     // dpr clamped to 2; backing pixels = measured CSS width * dpr.
     expect(canvas.width).toBe(WIDE * 2);
     expect(canvas.height).toBe(26 * 2);
+  });
+});
+
+describe('PerfOverlay render-scale row text', () => {
+  afterEach(() => {
+    delete (globalThis as any).window;
+    delete (globalThis as any).document;
+  });
+
+  const rowText = (overlay: PerfOverlay) =>
+    ((overlay as any).rowEls.get('renderScale') as { value: { textContent: string } }).value
+      .textContent;
+
+  it('prints the scale with its drawing buffer, and names the budget when it bound', () => {
+    const { overlay } = makeOverlay();
+    overlay.render({
+      rows: [
+        {
+          key: 'renderScale',
+          labelKey: 'hudChrome.perf.labels.renderScale',
+          value: { kind: 'scaleBuffer', v: 1, width: 2795, height: 1572, budgetBound: true },
+          severity: 'none',
+        },
+      ],
+      badges: [],
+      graph: null,
+    });
+    expect(rowText(overlay)).toBe('100% (2795x1572 max)');
+    overlay.render({
+      rows: [
+        {
+          key: 'renderScale',
+          labelKey: 'hudChrome.perf.labels.renderScale',
+          value: { kind: 'scaleBuffer', v: 0.75, width: 1440, height: 810, budgetBound: false },
+          severity: 'none',
+        },
+      ],
+      badges: [],
+      graph: null,
+    });
+    expect(rowText(overlay)).toBe('75% (1440x810)');
   });
 });
