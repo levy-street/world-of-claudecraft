@@ -143,10 +143,15 @@ describe('dynamic resolution governor range under the dev pin', () => {
       minRenderScale: 0.6,
       maxRenderScale: 0.6,
     });
-    // Clamped to the manual range, like every other scale input here.
+    // Clamped to the manual range, like every other scale input here, and
+    // never above the manual ceiling.
     expect(dynamicResolutionGovernorRange(true, 1, 0.68, 1, 0.1)).toEqual({
       minRenderScale: 0.5,
       maxRenderScale: 0.5,
+    });
+    expect(dynamicResolutionGovernorRange(true, 0.8, 0.68, 0.8, 1)).toEqual({
+      minRenderScale: 0.8,
+      maxRenderScale: 0.8,
     });
     // A null pin leaves the shipped ranges untouched.
     expect(dynamicResolutionGovernorRange(true, 0.9, 0.6, 0.9, null)).toEqual(

@@ -587,13 +587,33 @@ describe('render budget governor: the resolution lever where a step reallocates'
     expect(state.levels.vfx).toBe(0.86);
   });
 
-  it('sheds resolution under sustained submit pressure alone at the floored ladder', () => {
+  it('never sheds resolution on submit pressure alone: CPU-side draw cost is not pixels', () => {
     const governor = flooredUltra();
     let state = governor.state();
     for (let frame = 0; frame < 60 * 60; frame++) {
       state = governor.update(ultraTown({ frameMs: 20, totalMs: 19, submitMs: 19 }));
     }
-    expect(state.levels.resolution).toBe(0.78);
+    expect(state.levels.vfx).toBe(state.caps.minVfxLevel);
+    expect(state.levels.resolution).toBe(1);
+  });
+
+  it('counts every reallocation and the worst submit reading inside its settling window', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    const calm = () => calmField({ frameMs: 10, totalMs: 9, submitMs: 5 });
+    for (let frame = 0; frame < 60; frame++) state = governor.update(calm());
+    expect(state.reallocations).toBe(0);
+    expect(state.reallocationSettleMs).toBe(0);
+    state = governor.update({ ...calm(), reallocated: true, submitMs: 40 });
+    state = governor.update({ ...calm(), submitMs: 180 });
+    state = governor.update({ ...calm(), submitMs: 90 });
+    expect(state.reallocations).toBe(1);
+    expect(state.reallocationSettleMs).toBe(180);
+    expect(state.recentSubmitStalls).toBe(0);
+    for (let frame = 0; frame < 60 * 2; frame++) state = governor.update(calm());
+    state = governor.update({ ...calm(), reallocated: true });
+    expect(state.reallocations).toBe(2);
+    expect(governor.reset(1, 0.78, 1).reallocations).toBe(0);
   });
 
   it('reaches resolution only once the ladder has nothing left to shed under sustained cost', () => {

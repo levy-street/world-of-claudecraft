@@ -81,7 +81,9 @@ export function dynamicResolutionGovernorRange(
   pin: number | null = null,
 ): DynamicResolutionGovernorRange {
   if (pin != null && Number.isFinite(pin)) {
-    const pinned = clampedRenderScale(pin, 1);
+    // Below the tier floor is a bench lowering its own scale; above the
+    // manual and tier ceiling is never allowed.
+    const pinned = Math.min(clampedRenderScale(maxRenderScale, 1), clampedRenderScale(pin, 1));
     return { minRenderScale: pinned, maxRenderScale: pinned };
   }
   const effective = clampedRenderScale(effectiveRenderScale, 1);

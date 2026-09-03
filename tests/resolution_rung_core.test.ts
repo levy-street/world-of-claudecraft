@@ -57,6 +57,15 @@ describe('resolution rung ladder', () => {
     expect(resolutionRungFor(0.5, 0.6, 0.78)).toBe(0.6);
   });
 
+  it('holds a band narrower than half a step: a storm for a few percent cannot pay for itself', () => {
+    // The Render Quality slider at 0.8 on ultra (floor 0.78).
+    expect(resolutionRungCount(0.8, 0.78)).toBe(0);
+    expect(resolutionRungLadder(0.8, 0.78)).toEqual([0.8]);
+    expect(resolutionRungTransition(0.8, 0.5, 0.8, 0.78)).toBe(0.8);
+    // Half a step and up gets its one rung.
+    expect(resolutionRungLadder(0.85, 0.78)).toEqual([0.85, 0.78]);
+  });
+
   it('keeps a narrow band as one rung rather than none', () => {
     // 0.9 to 0.78 is 1.2 steps: one rung, so a lowered slider still has a lever.
     expect(resolutionRungLadder(0.9, 0.78)).toEqual([0.9, 0.78]);
@@ -82,7 +91,39 @@ describe('resolution rung hysteresis', () => {
       held = resolutionRungTransition(held, level, 1, 0.78);
       walk.push(held);
     }
-    expect(walk).toEqual([1, 0.78, 0.78, 0.78, 0.78, 0.89, 0.89, 0.89, 1]);
+    expect(walk).toEqual([1, 0.89, 0.78, 0.78, 0.78, 0.89, 0.89, 0.89, 1]);
+  });
+
+  it('walks one rung per step whatever the level did, on every tier ladder', () => {
+    // The real GFX_BUDGETS drop steps (ultra 0.08, insane 0.06, urgent 0.12
+    // and 0.1) are not divisors of the 0.11 ultra stride: without the clamp
+    // the middle rung would be skipped on the way down.
+    for (const [tier, step] of [
+      ['ultra', GFX_BUDGETS.ultra.dropStep],
+      ['ultra', GFX_BUDGETS.ultra.urgentDropStep],
+      ['insane', GFX_BUDGETS.insane.dropStep],
+      ['high', GFX_BUDGETS.high.dropStep],
+    ] as const) {
+      for (const floor of [
+        GFX_BUDGETS[tier].minRenderScaleDesktop,
+        GFX_BUDGETS[tier].minRenderScaleMobile,
+      ]) {
+        const ladder = resolutionRungLadder(1, floor);
+        const visited = [1];
+        let held = 1;
+        let level = 1;
+        while (held > floor + 0.0005) {
+          level = Math.max(floor, Math.round((level - step) * 100) / 100);
+          const next = resolutionRungTransition(held, level, 1, floor);
+          if (next !== held) visited.push(next);
+          held = next;
+        }
+        expect(visited, `${tier} floor ${floor} step ${step}`).toEqual(ladder);
+        // A level that jumps straight to the floor still climbs down one rung at a time.
+        expect(resolutionRungTransition(1, floor, 1, floor)).toBe(ladder[1]);
+        expect(resolutionRungTransition(floor, 1, 1, floor)).toBe(ladder[ladder.length - 2]);
+      }
+    }
   });
 
   it('holds an off-ladder scale until the level leaves its band', () => {
@@ -178,15 +219,29 @@ describe('resolution rung hysteresis', () => {
 describe('resolution allocation scale', () => {
   it('walks the rungs on the allocation path and clamps the level elsewhere', () => {
     const base = { pin: null, previous: 1, level: 0.84, ceiling: 1, floor: 0.78 };
-    expect(resolutionAllocationScale({ ...base, mode: 'allocation' })).toBe(0.78);
+    expect(resolutionAllocationScale({ ...base, mode: 'allocation' })).toBe(0.89);
+    expect(
+      resolutionAllocationScale({ ...base, mode: 'allocation', previous: 0.89, level: 0.78 }),
+    ).toBe(0.78);
     expect(resolutionAllocationScale({ ...base, mode: 'region' })).toBe(0.84);
     expect(resolutionAllocationScale({ ...base, mode: 'locked' })).toBe(0.84);
     expect(resolutionAllocationScale({ ...base, mode: 'region', level: 0.5 })).toBe(0.78);
     expect(resolutionAllocationScale({ ...base, mode: 'region', level: 1.5 })).toBe(1);
   });
 
-  it('honours the dev pin exactly on every path, bypassing the ladder and the floor', () => {
+  it('honours the dev pin exactly on every path, below the floor but never above the ceiling', () => {
     for (const mode of ['allocation', 'region', 'locked'] as const) {
+      // The Render Quality slider (and the tier cap) at 0.8: the pin cannot allocate above it.
+      expect(
+        resolutionAllocationScale({
+          mode,
+          pin: 1,
+          previous: 0.8,
+          level: 0.8,
+          ceiling: 0.8,
+          floor: 0.78,
+        }),
+      ).toBe(0.8);
       expect(
         resolutionAllocationScale({
           mode,

@@ -103,9 +103,10 @@ COSMETIC (may be tiered down on lower presets):
     screen-fx pass and SMAA all sample full-frame texels), so there the lever REALLOCATES
     the drawing buffer and every post target at a coarse rung
     (`src/render/resolution_rung_core.ts`): rungs about 0.1 apart between the Render
-    Quality ceiling and the tier floor, moved only when the governor's level crosses a
-    whole rung, at the governor's own cooldowns. The frame that reallocates is withheld
-    from the governor's readings so its one-off cost cannot shed a second rung.
+    Quality ceiling and the tier floor, moved one rung at a time and only when the governor's
+    level crosses a whole rung, at the governor's own cooldowns. The frame that reallocates is
+    handed to the governor, which settles its swap back-pressure under the cooldown instead
+    of reading it as a stall, so a one-off cost cannot shed a second rung.
   Both are GOVERNOR-driven sheds like the shadow cadence above (a perf-governor output, not
   a UI tier knob), and both are cosmetic: a softer 3D image carries the same entities, at
   the same positions, at the same time. What is NOT scaled is everything a player reads
@@ -118,7 +119,8 @@ COSMETIC (may be tiered down on lower presets):
   medium region path already honoured, so two players on the same preset share the same
   worst case and the governor can never push a preset below it. (The `?dynres=<0..1>` dev
   pin, like the `?n8ao=off` family, lets a player LOWER their own scale past the floor for a
-  bench; self-lowering carries no information advantage.) A rung also moves the cosmetic
+  bench; self-lowering carries no information advantage. It never allocates ABOVE the Render
+  Quality ceiling or the tier cap, which a memory-constrained profile relies on.) A rung also moves the cosmetic
   pixel height the foliage and scenery-flame perceptual LOD read (`renderPixelHeight`),
   exactly as the medium region and the Render Quality slider already do; nothing actionable
   rides that value. Pinned by `tests/resolution_rung_fairness.test.ts`.

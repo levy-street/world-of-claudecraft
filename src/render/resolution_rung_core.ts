@@ -52,11 +52,13 @@ function round3(value: number): number {
   return Math.round(value * 1000) / 1000;
 }
 
-/** Rungs below the ceiling: the count that spaces them nearest to the step. */
+/** Rungs below the ceiling: the count that spaces them nearest to the step. A
+ *  band narrower than half a step has none: a reallocation storm that buys a
+ *  few percent of the fragments cannot pay for itself, so the lever holds. */
 export function resolutionRungCount(ceiling: number, floor: number): number {
   const top = finite(ceiling, 1);
   const bottom = finite(floor, top);
-  if (bottom >= top - RESOLUTION_RUNG_EPSILON) return 0;
+  if (bottom >= top - RESOLUTION_RUNG_STEP / 2) return 0;
   return Math.max(1, Math.round((top - bottom) / RESOLUTION_RUNG_STEP));
 }
 
@@ -99,7 +101,11 @@ export function resolutionRungFor(level: number, ceiling: number, floor: number)
  * scale to shed, and the first rung strictly above it to climb; between the
  * two the previous allocation stands, so a scale that does not sit on the
  * ladder (the mobile opening scale, a manual ceiling changed under the
- * governor) is kept until the level leaves its band.
+ * governor) is kept until the level leaves its band. One rung per step in
+ * either direction, whatever the level did: the ladder is walked rung by
+ * rung (a tier whose drop step is not a divisor of the stride would
+ * otherwise skip its middle rung), so the allocation may lag the level by
+ * up to one rung for one governor step.
  */
 export function resolutionRungTransition(
   previous: number,
@@ -121,11 +127,11 @@ export function resolutionRungTransition(
     belowIndex <= count &&
     value <= resolutionRungAt(belowIndex, top, bottom) + RESOLUTION_RUNG_EPSILON
   ) {
-    return resolutionRungFor(value, top, bottom);
+    return resolutionRungAt(belowIndex, top, bottom);
   }
   const aboveIndex = Math.max(0, heldIndex - 1);
   if (value >= resolutionRungAt(aboveIndex, top, bottom) - RESOLUTION_RUNG_EPSILON) {
-    return resolutionRungFor(value, top, bottom);
+    return resolutionRungAt(aboveIndex, top, bottom);
   }
   return held;
 }
@@ -146,15 +152,18 @@ export interface ResolutionAllocationInput {
 
 /**
  * The effective render scale one governor step leaves in force. On the region
- * path and under a pin it is the level itself (clamped to the governor's
- * range); on the allocation path it walks the rung ladder. A locked lever
- * never moves (its governor range is collapsed), so the clamp is exact there.
+ * path it is the level itself (clamped to the governor's range); on the
+ * allocation path it walks the rung ladder; under a pin it is the pin,
+ * allowed below the tier floor (a bench lowering its own scale) but never
+ * above the ceiling (the Render Quality slider and the tier's own cap, which a
+ * memory-constrained profile relies on). A locked lever never moves (its
+ * governor range is collapsed), so the clamp is exact there.
  */
 export function resolutionAllocationScale(input: ResolutionAllocationInput): number {
-  if (input.pin != null && Number.isFinite(input.pin)) {
-    return Math.min(1, Math.max(0.5, input.pin));
-  }
   const top = finite(input.ceiling, 1);
+  if (input.pin != null && Number.isFinite(input.pin)) {
+    return Math.min(top, Math.max(0.5, input.pin));
+  }
   const bottom = Math.min(top, finite(input.floor, top));
   if (input.mode === 'allocation') {
     return resolutionRungTransition(input.previous, input.level, top, bottom);

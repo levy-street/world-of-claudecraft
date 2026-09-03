@@ -1404,10 +1404,11 @@ export class Renderer {
     minRenderScale: 1,
     maxRenderScale: 1,
   };
-  // Set by a drawing-buffer reallocation (the composer tiers' resolution rung)
-  // and handed to the governor on the next sample, which then settles the
-  // reallocation's swap back-pressure under its own cooldown instead of
-  // reading it as a stall (render_budget.ts `reallocated`).
+  // Set by every drawing-buffer reallocation (applyResolution: a resolution
+  // rung, the Render Quality slider, a resize, a display change) and handed to
+  // the governor on the next sample, which then settles the reallocation's swap
+  // back-pressure under its own cooldown instead of reading it as a stall
+  // (render_budget.ts `reallocated`).
   private reallocationPending = false;
   // Last frame-budget pressure (render_budget.ts), fed to the character LOD plan
   // so the animated far band is the first extra cost surrendered on a machine
@@ -3423,7 +3424,9 @@ export class Renderer {
 
   // Allocate at the manual resolution ceiling. Automatic changes on the supported
   // grade-only path update only the live region below, never target storage.
+  // Every caller pays the same target storm, so every one settles it in the governor.
   private applyResolution(): void {
+    this.reallocationPending = true;
     const basePixelRatio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap);
     const allocationScale = dynamicResolutionAllocationScale(
       this.post?.supportsDynamicResolution === true,
@@ -4313,10 +4316,7 @@ export class Renderer {
     if (Math.abs(previousScale - this.effectiveRenderScale) < 0.001) return;
     // The region path moves a viewport; every other path reallocates at the rung.
     if (this.post?.supportsDynamicResolution) this.applyRenderRegion();
-    else {
-      this.reallocationPending = true;
-      this.applyResolution();
-    }
+    else this.applyResolution();
   }
 
   private graphicsBucketLevels(state = this.renderBudgetGovernor.state()): GfxBucketLevels {

@@ -48,6 +48,14 @@ export interface RenderBudgetState {
   stallHoldSeconds: number;
   stableSeconds: number;
   cooldownSeconds: number;
+  /** Drawing-buffer reallocations the resolution lever paid this session (the
+   *  composer tiers' rung steps, plus the manual and resize paths that take
+   *  the same allocating method), and the worst raw submit reading seen inside
+   *  a reallocation's settling window: the transition's cost as the main
+   *  thread saw it, kept beside the stall counters that deliberately ignore
+   *  it, so the fleet report can attribute the hitch class this lever adds. */
+  reallocations: number;
+  reallocationSettleMs: number;
   levels: RenderBudgetLevels;
   caps: RenderBudgetCaps;
 }
@@ -260,6 +268,8 @@ export class RenderBudgetGovernor {
   private stableSeconds = 0;
   private cooldownSeconds = 0;
   private reallocationSettling = false;
+  private reallocations = 0;
+  private reallocationSettleMs = 0;
   private levels: RenderBudgetLevels = { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 };
 
   constructor(options: RenderBudgetGovernorOptions) {
@@ -293,6 +303,8 @@ export class RenderBudgetGovernor {
     this.stableSeconds = 0;
     this.cooldownSeconds = this.enabled ? 0.5 : 0;
     this.reallocationSettling = false;
+    this.reallocations = 0;
+    this.reallocationSettleMs = 0;
     this.pressure = 0;
     this.mode = this.enabled ? 'stable' : 'disabled';
     this.reason = this.enabled ? 'startup' : 'disabled';
@@ -316,6 +328,8 @@ export class RenderBudgetGovernor {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
+        reallocations: 0,
+        reallocationSettleMs: 0,
         levels: copyLevels(this.levels),
         caps: copyCaps(this.caps),
       } satisfies RenderBudgetState);
@@ -332,6 +346,8 @@ export class RenderBudgetGovernor {
     state.stallHoldSeconds = round2(this.stallHoldSeconds);
     state.stableSeconds = round2(this.stableSeconds);
     state.cooldownSeconds = round2(this.cooldownSeconds);
+    state.reallocations = this.reallocations;
+    state.reallocationSettleMs = round2(this.reallocationSettleMs);
     state.levels.grass = round2(this.levels.grass);
     state.levels.foliage = round2(this.levels.foliage);
     state.levels.vfx = round2(this.levels.vfx);
@@ -364,9 +380,13 @@ export class RenderBudgetGovernor {
     // single frame the back-pressure has not reached yet.
     if (sample.reallocated === true) {
       this.cooldownSeconds = Math.max(this.cooldownSeconds, this.budget.cooldownSeconds);
+      this.reallocations++;
     }
     this.reallocationSettling =
       sample.reallocated === true || (this.reallocationSettling && this.cooldownSeconds > 0);
+    if (this.reallocationSettling) {
+      this.reallocationSettleMs = Math.max(this.reallocationSettleMs, rawSubmitMs);
+    }
     const stallSubmitMs = this.reallocationSettling ? 0 : rawSubmitMs;
     const frameCost = Math.max(frameMs, totalMs);
     this.frameMsEma += (frameCost - this.frameMsEma) * 0.08;
@@ -406,10 +426,11 @@ export class RenderBudgetGovernor {
       positiveRatio(this.submitMsEma, Math.max(8, this.budget.dropFrameMs * 0.58)),
       positiveRatio(submitMs, Math.max(8, this.budget.dropFrameMs * 0.58)),
     );
-    const sustainedPressure = Math.max(
-      this.externalFrameCap ? 0 : positiveRatio(this.frameMsEma, this.budget.dropFrameMs),
-      positiveRatio(this.submitMsEma, Math.max(8, this.budget.dropFrameMs * 0.58)),
-    );
+    // The frame EMA alone: the submit EMA also carries CPU-side draw cost
+    // (validation, many small draws), which fewer pixels cannot reduce.
+    const sustainedPressure = this.externalFrameCap
+      ? 0
+      : positiveRatio(this.frameMsEma, this.budget.dropFrameMs);
     const drawPressure = Math.max(
       positiveRatio(sample.calls, this.caps.targetCalls),
       positiveRatio(sample.triangles, this.caps.targetTriangles),
@@ -631,8 +652,8 @@ export class RenderBudgetGovernor {
     // Where a resolution step reallocates the drawing buffer (the composer
     // tiers, resolution_rung_core.ts) it is the last resort in the literal
     // sense: it fires only on a degrade call that could shed nothing else,
-    // under SUSTAINED fragment cost (the frame and submit EMAs, never one
-    // sample), and never inside a submit-stall hold or a reallocation's own
+    // under SUSTAINED frame cost (the frame EMA, never one sample nor the
+    // submit EMA), and never inside a submit-stall hold or a reallocation's own
     // settling window. Fewer pixels do not
     // reduce draws or triangles, so draw pressure never reaches it (every
     // ultra town is over its draw caps by construction, with every density

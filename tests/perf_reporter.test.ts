@@ -534,6 +534,8 @@ function snapshot(): PerfSnapshot {
         stallHoldSeconds: 0,
         stableSeconds: 0,
         cooldownSeconds: 0,
+        reallocations: 0,
+        reallocationSettleMs: 0,
         levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
         caps: {
           targetCalls: 330,
@@ -1155,6 +1157,8 @@ describe('perf reporter payload', () => {
               stallHoldSeconds: 0,
               stableSeconds: 0,
               cooldownSeconds: 0,
+              reallocations: 0,
+              reallocationSettleMs: 0,
               levels: { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 0.9 },
               caps: {
                 targetCalls: 330,

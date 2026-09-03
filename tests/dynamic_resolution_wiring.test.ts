@@ -13,6 +13,8 @@ function methodSource(signature: string): string {
 describe('dynamic resolution renderer wiring', () => {
   it('allocates at the manual ceiling on the region path and at the rung elsewhere', () => {
     const allocation = methodSource('private applyResolution(): void');
+    // Every reallocation, whoever asks for it, is handed to the governor.
+    expect(allocation).toContain('this.reallocationPending = true;');
     expect(allocation).toContain('dynamicResolutionAllocationScale(');
     expect(allocation).toContain('this.webgl.setPixelRatio(ratio);');
     expect(allocation).toContain('this.webgl.setSize(this.viewport.width, this.viewport.height');
@@ -41,7 +43,7 @@ describe('dynamic resolution renderer wiring', () => {
     // The region path moves a viewport; the allocation path reallocates
     // through the ONE allocating method and marks the frame that pays it.
     expect(automaticStep).toMatch(
-      /if \(this\.post\?\.supportsDynamicResolution\) this\.applyRenderRegion\(\);\s+else \{\s+this\.reallocationPending = true;\s+this\.applyResolution\(\);\s+\}/,
+      /if \(this\.post\?\.supportsDynamicResolution\) this\.applyRenderRegion\(\);\s+else this\.applyResolution\(\);/,
     );
     expect(automaticStep).not.toContain('.setSize(');
     expect(automaticStep).not.toContain('.setPixelRatio(');
