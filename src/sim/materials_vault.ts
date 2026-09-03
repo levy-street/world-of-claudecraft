@@ -490,7 +490,7 @@ export function vaultWithdraw(
   // class) and already caps its answer at the requested count.
   const moved = countFit(meta.inventory, carriedPools, itemId, want);
   if (moved <= 0) {
-    bagsFullError(ctx, meta.entityId);
+    bagsFullError(ctx, meta.entityId, itemId);
     return;
   }
   // Atomic, like the deposit: the take and the grant commit together.

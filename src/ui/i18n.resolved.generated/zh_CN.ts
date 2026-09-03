@@ -2490,7 +2490,9 @@ export const zh_CN: EnTranslations = {
       "unequipHint": "点击移除此背包",
       "poolGeneral": "通用：{used}/{total}",
       "poolMaterials": "材料：{used}/{total}",
-      "capacityPoolsAria": "背包格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。"
+      "capacityPoolsAria": "背包格已用：{used}/{total}。通用物品：{generalUsed}/{generalTotal}。材料：{materialsUsed}/{materialsTotal}。",
+      "capacityPools": "物品 {generalUsed}/{generalTotal}，材料 {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "仅限材料"
     },
     "raidConvert": {
       "toPartyDone": "你的团队已转换回队伍。",

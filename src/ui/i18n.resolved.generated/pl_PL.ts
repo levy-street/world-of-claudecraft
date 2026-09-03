@@ -2490,7 +2490,9 @@ export const pl_PL: EnTranslations = {
       "unequipHint": "Kliknij, aby zdjąć tę torbę",
       "poolGeneral": "Ogólne: {used} z {total}",
       "poolMaterials": "Materiały: {used} z {total}",
-      "capacityPoolsAria": "Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}."
+      "capacityPoolsAria": "Zajęte miejsca w torbie: {used} z {total}. Przedmioty ogólne: {generalUsed} z {generalTotal}. Materiały: {materialsUsed} z {materialsTotal}.",
+      "capacityPools": "Items {generalUsed}/{generalTotal}, Materials {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Materials only"
     },
     "raidConvert": {
       "toPartyDone": "Twój rajd został z powrotem przekształcony w drużynę.",

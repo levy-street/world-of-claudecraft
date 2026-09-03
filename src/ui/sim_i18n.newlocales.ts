@@ -267,6 +267,7 @@ export const BASE_NEW = {
     'error.bankQuestItem': 'Úkolové předměty nelze ukládat do banky.',
     'error.bankFull': 'Tvoje banka je plná.',
     'error.bankOnlyMaterialsSpace': 'Do zbývajícího místa v tvé bance se vejdou jen materiály.',
+    'error.bagsOnlyMaterialsSpace': 'Do zbývajícího místa v tvých taškách se vejdou jen materiály.',
     'error.bankCannotAfford': 'Nemůžeš si dovolit toto rozšíření banky.',
     'error.bankMaxSlots': 'Tvou banku už nelze dál rozšířit.',
     'error.bankTooFar': 'Jsi příliš daleko od bankéře.',
@@ -565,6 +566,8 @@ export const BASE_NEW = {
     'error.bankQuestItem': 'Du kan ikke opbevare opgavegenstande i banken.',
     'error.bankFull': 'Din bank er fuld.',
     'error.bankOnlyMaterialsSpace': 'Kun materialer passer i den plads, der er tilbage i din bank.',
+    'error.bagsOnlyMaterialsSpace':
+      'Kun materialer passer i den plads, der er tilbage i dine tasker.',
     'error.bankCannotAfford': 'Du har ikke råd til den bankudvidelse.',
     'error.bankMaxSlots': 'Din bank kan ikke udvides yderligere.',
     'error.bankTooFar': 'Du er for langt fra skatmesteren.',
@@ -869,6 +872,7 @@ export const BASE_NEW = {
     'error.bankQuestItem': 'Kamu tidak bisa menyimpan barang misi di bank.',
     'error.bankFull': 'Bankmu penuh.',
     'error.bankOnlyMaterialsSpace': 'Hanya material yang muat di sisa ruang bankmu.',
+    'error.bagsOnlyMaterialsSpace': 'Hanya material yang muat di sisa ruang tasmu.',
     'error.bankCannotAfford': 'Kamu tidak mampu membayar perluasan bank itu.',
     'error.bankMaxSlots': 'Bankmu tidak dapat diperluas lagi.',
     'error.bankTooFar': 'Kamu terlalu jauh dari bankir.',
@@ -1173,6 +1177,8 @@ export const BASE_NEW = {
     'error.bankFull': 'Je bank is vol.',
     'error.bankOnlyMaterialsSpace':
       'In de ruimte die in je bank over is, passen alleen materialen.',
+    'error.bagsOnlyMaterialsSpace':
+      'In de ruimte die in je tassen over is, passen alleen materialen.',
     'error.bankCannotAfford': 'Je kunt je die bankuitbreiding niet veroorloven.',
     'error.bankMaxSlots': 'Je bank kan niet verder worden uitgebreid.',
     'error.bankTooFar': 'Je bent te ver van de bankier.',
@@ -1475,6 +1481,8 @@ export const BASE_NEW = {
     'error.bankFull': 'Twój bank jest pełny.',
     'error.bankOnlyMaterialsSpace':
       'W miejscu, które zostało w twoim banku, zmieszczą się tylko materiały.',
+    'error.bagsOnlyMaterialsSpace':
+      'W miejscu, które zostało w twoich torbach, zmieszczą się tylko materiały.',
     'error.bankCannotAfford': 'Nie stać cię na to rozszerzenie banku.',
     'error.bankMaxSlots': 'Twojego banku nie da się już bardziej rozszerzyć.',
     'error.bankTooFar': 'Jesteś zbyt daleko od bankiera.',
@@ -1773,6 +1781,8 @@ export const BASE_NEW = {
     'error.bankQuestItem': 'Du kan inte förvara uppdragsföremål i banken.',
     'error.bankFull': 'Din bank är full.',
     'error.bankOnlyMaterialsSpace': 'Endast material får plats i utrymmet som är kvar i din bank.',
+    'error.bagsOnlyMaterialsSpace':
+      'Endast material får plats i utrymmet som är kvar i dina väskor.',
     'error.bankCannotAfford': 'Du har inte råd med den bankutökningen.',
     'error.bankMaxSlots': 'Din bank kan inte utökas mer.',
     'error.bankTooFar': 'Du är för långt från bankiren.',
@@ -2067,6 +2077,7 @@ export const BASE_NEW = {
     'error.bankQuestItem': 'Görev eşyalarını bankada saklayamazsın.',
     'error.bankFull': 'Bankan dolu.',
     'error.bankOnlyMaterialsSpace': 'Bankanda kalan alana yalnızca malzemeler sığar.',
+    'error.bagsOnlyMaterialsSpace': 'Çantalarında kalan alana yalnızca malzemeler sığar.',
     'error.bankCannotAfford': 'Bu banka genişletmesini karşılayamazsın.',
     'error.bankMaxSlots': 'Bankan daha fazla genişletilemez.',
     'error.bankTooFar': 'Bankacıdan çok uzaktasın.',
@@ -2368,6 +2379,8 @@ export const BASE_NEW = {
     'error.bankFull': 'Ngân hàng của bạn đã đầy.',
     'error.bankOnlyMaterialsSpace':
       'Chỉ nguyên liệu mới vừa với chỗ trống còn lại trong ngân hàng của bạn.',
+    'error.bagsOnlyMaterialsSpace':
+      'Chỉ nguyên liệu mới vừa với chỗ trống còn lại trong túi của bạn.',
     'error.bankCannotAfford': 'Bạn không đủ tiền cho lần mở rộng ngân hàng đó.',
     'error.bankMaxSlots': 'Ngân hàng của bạn không thể mở rộng thêm nữa.',
     'error.bankTooFar': 'Bạn đang ở quá xa nhân viên ngân hàng.',

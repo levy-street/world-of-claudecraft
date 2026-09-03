@@ -2490,7 +2490,9 @@ export const ru_RU: EnTranslations = {
       "unequipHint": "Нажмите, чтобы снять эту сумку",
       "poolGeneral": "Общие: {used} из {total}",
       "poolMaterials": "Материалы: {used} из {total}",
-      "capacityPoolsAria": "Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}."
+      "capacityPoolsAria": "Занято ячеек сумок: {used} из {total}. Общие предметы: {generalUsed} из {generalTotal}. Материалы: {materialsUsed} из {materialsTotal}.",
+      "capacityPools": "Предметы {generalUsed}/{generalTotal}, материалы {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Только материалы"
     },
     "raidConvert": {
       "toPartyDone": "Ваш рейд снова преобразован в группу.",

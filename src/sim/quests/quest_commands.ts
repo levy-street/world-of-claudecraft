@@ -386,7 +386,7 @@ export function turnInQuest(ctx: SimContext, questId: string, pid?: number): voi
       }
     }
     if (countFit(scratch, bagPools(meta.bags), rewardItem, 1) < 1) {
-      bagsFullError(ctx, meta.entityId);
+      bagsFullError(ctx, meta.entityId, rewardItem);
       return;
     }
   }

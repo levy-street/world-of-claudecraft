@@ -704,6 +704,23 @@ export function carriedPools(
   };
 }
 
+/** How many of the grid's empty squares only a MATERIAL may take (issue
+ *  #3795): the empties past the general pool's headroom. Exactly `generalFree`
+ *  plain empty squares remain, which is precisely what a non-material pickup
+ *  can use, so the painted split can never disagree with the sim's refusal
+ *  (bag_pools.ts freePoolSlots). Zero without a materials pool, and never more
+ *  than the empties on screen (the tolerated over-capacity state). */
+export function materialsOnlyEmptyCells(
+  bags: readonly (string | null)[],
+  inventory: readonly InvSlot[],
+  emptyCells: number,
+): number {
+  const split = carriedPools(bags, inventory);
+  if (!split.showMaterials) return 0;
+  const generalFree = Math.max(0, split.general.capacity - split.general.used);
+  return Math.max(0, Math.min(emptyCells, emptyCells - generalFree));
+}
+
 export function buildBagBar(
   bags: readonly (string | null)[],
   used: number,

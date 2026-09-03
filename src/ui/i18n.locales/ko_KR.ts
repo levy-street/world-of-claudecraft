@@ -6236,6 +6236,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolGeneral': '일반: {total}칸 중 {used}칸',
   'hudChrome.bags.poolMaterials': '재료: {total}칸 중 {used}칸',
   'hudChrome.bags.capacityPoolsAria': '사용 중인 가방 칸: {total}칸 중 {used}칸. 일반 아이템: {generalTotal}칸 중 {generalUsed}칸. 재료: {materialsTotal}칸 중 {materialsUsed}칸.',
+  'hudChrome.bags.capacityPools': '아이템 {generalUsed}/{generalTotal}, 재료 {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': '재료 전용',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': '브라우저에서 무료로 즐기는 클래식 스타일 MMO입니다.',

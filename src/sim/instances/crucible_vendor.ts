@@ -65,7 +65,7 @@ export function buyCrucibleVendorItem(ctx: SimContext, itemId: string, pid?: num
   }
   // Check space BEFORE the debit so a full-bags refusal never eats the sigil.
   if (!ctx.canAddItem(itemId, 1, meta.entityId)) {
-    bagsFullError(ctx, meta.entityId);
+    bagsFullError(ctx, meta.entityId, itemId);
     return;
   }
   ctx.removeItem(entry.sigilId, 1, meta.entityId);

@@ -6256,6 +6256,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.bags.poolGeneral': '一般: {total}個中{used}個',
   'hudChrome.bags.poolMaterials': '素材: {total}個中{used}個',
   'hudChrome.bags.capacityPoolsAria': '使用中のバッグスロット: {total}個中{used}個。一般アイテム: {generalTotal}個中{generalUsed}個。素材: {materialsTotal}個中{materialsUsed}個。',
+  'hudChrome.bags.capacityPools': 'アイテム {generalUsed}/{generalTotal}、素材 {materialsUsed}/{materialsTotal}',
+  'hudChrome.bags.emptyMaterialsOnly': '素材専用',
   'guide.brand': 'World of ClaudeCraft',
   'guide.brandShort': 'ClaudeCraft',
   'guide.tagline': 'ブラウザで無料で遊べる、クラシックスタイルのMMO。',

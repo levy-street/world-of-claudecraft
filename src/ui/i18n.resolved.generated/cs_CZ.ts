@@ -2490,7 +2490,9 @@ export const cs_CZ: EnTranslations = {
       "unequipHint": "Klikni pro odebrání tohoto batohu",
       "poolGeneral": "Obecné: {used} z {total}",
       "poolMaterials": "Materiály: {used} z {total}",
-      "capacityPoolsAria": "Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}."
+      "capacityPoolsAria": "Použité sloty batohu: {used} z {total}. Obecné předměty: {generalUsed} z {generalTotal}. Materiály: {materialsUsed} z {materialsTotal}.",
+      "capacityPools": "Items {generalUsed}/{generalTotal}, Materials {materialsUsed}/{materialsTotal}",
+      "emptyMaterialsOnly": "Materials only"
     },
     "raidConvert": {
       "toPartyDone": "Tvůj raid byl převeden zpět na skupinu.",
