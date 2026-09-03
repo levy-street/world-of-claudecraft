@@ -718,6 +718,7 @@ const RENDER_PURE_CORES = [
   'src/render/self_render_position_core.ts',
   'src/render/shadow_pass_gate_core.ts',
   'src/render/shore_water_gate_core.ts',
+  'src/render/sprite_quad_core.ts',
   'src/render/terrain_region_core.ts',
   'src/render/texture_prep_core.ts',
   'src/render/terrain_splat_presence_core.ts',
