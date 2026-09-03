@@ -226,6 +226,19 @@ function canonicalGeometry(source: THREE.Object3D): {
 
 const PROP_KEY_COUNT = Object.keys(IGNIVAR_ENV_PROP_URLS).length;
 
+/** The soft red grade the drakelands rebuild kit wears so it sits in the
+ *  fortress kit's baked ember palette: dim the cool channels a touch and
+ *  give shade a faint ember floor. Values chosen conservative so daylight
+ *  texture detail survives; the night lamp wash multiplies on top. */
+function applyDrakelandsKitWarmth(mat: THREE.Material): void {
+  const m = mat as THREE.MeshStandardMaterial;
+  if (m.color) m.color.multiply(new THREE.Color(1.0, 0.87, 0.78));
+  if ('emissive' in m) {
+    m.emissive = new THREE.Color(0x2a0f08);
+    m.emissiveIntensity = 0.35;
+  }
+}
+
 export function prepareIgnivarEnvProps(): Promise<void> {
   // The in-flight task must win over the fast path: templates fill one by
   // one, so a size check alone would report complete after the FIRST asset
@@ -244,6 +257,14 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // Tall props, chains, and the door towers grade into the roof
           // black with the walls (inert outside the Halls scene state).
           addRoofDarkness(baked.material);
+          // The fortress kit's pieces arrive with the owner's warm ember
+          // shading baked into their textures; the drakelands rebuild kit
+          // was baked texture-faithful (build_drakelands_kit.mjs), so
+          // beside the fortress walls its pieces read flat and cold. Grade
+          // them at load to match: a soft red multiply plus a faint ember
+          // emissive floor so shadowed faces keep the same warm read.
+          // Keyed off the kit directory so a future drop joins by path.
+          if (url.startsWith('/models/drakelands_kit/')) applyDrakelandsKitWarmth(baked.material);
           // The lift machinery moves in the vertex shader (single baked
           // meshes on the shared uTime clock): the spool turns whole in its
           // static mount (the owner's winch remake) and the beam's sheave

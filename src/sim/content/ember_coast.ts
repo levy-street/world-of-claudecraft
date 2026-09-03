@@ -205,8 +205,18 @@ export const FORGEFATHER_STAIR_RAMPS: readonly StairRampBand[] = [
   { axis: 'z', b0: 440.11, b1: 447.59, a0: 2189.9, a1: 2182.9, h0: -1.13, h1: 2.0 },
   { axis: 'z', b0: 440.11, b1: 447.59, a0: 2182.9, a1: 2181.9, h0: 2.0, h1: 2.0 },
   // the west plaza stair (the fourth pass): the paved plaza plates (2.3) up
-  // to the west gate bridge decks (3.4) inside the triple-gate mouth
+  // to the west gate bridge decks (3.4) inside the triple-gate mouth. The
+  // level run continues INTO the deck span (the plate cropped around it) so
+  // the walked surface never cliffs at the hand-off: a band ending AT the
+  // plate edge leaves raw ground right past its end, and the exact-gradient
+  // steepness read at that seam walled the climb (the sixth-pass fix).
   { axis: 'z', b0: 439.07, b1: 444.83, a0: 2160.15, a1: 2155.35, h0: 2.3, h1: 3.4 },
+  { axis: 'z', b0: 439.07, b1: 444.83, a0: 2155.35, a1: 2154, h0: 3.4, h1: 3.4 },
+  // the outer yard stair (the sixth pass): the south plaza pavers (2.3) up
+  // through the fence-flanked gate onto the training yard bridge decks
+  // (3.26); the level run continues into the deck span for the seam rule
+  { axis: 'z', b0: 471.44, b1: 477.96, a0: 2141.15, a1: 2146.9, h0: 2.3, h1: 3.26 },
+  { axis: 'z', b0: 471.44, b1: 477.96, a0: 2146.9, a1: 2148.15, h0: 3.26, h1: 3.26 },
   // the training yard stair (the fifth pass): the yard bridge decks (3.26)
   // up between the drum posts to the keep court decks (5.76), the closing
   // link tapering to the court's stamped raw ground

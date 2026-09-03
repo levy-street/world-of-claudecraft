@@ -556,6 +556,19 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'building_base', x: 517.55, y: 6.1, z: 2214.25, ry: 90 * DEG, scale: 9 },
   { key: 'tower_pillar', x: 516.15, y: 2.6, z: 2209.2, ry: 225 * DEG, scale: 5 },
   { key: 'tower_pillar', x: 522.15, y: 2.1, z: 2217.2, ry: 225 * DEG, scale: 5 },
+  // ---------------------------------------------------------------------
+  // The sixth placer pass (2026-09-03): the summit walk pillars by the
+  // volcano tower, the training yard chapel raised on its hall, two
+  // churchyard graves on the south lawn, and the Wyrmwatch well.
+  // ---------------------------------------------------------------------
+  { key: 'tower_pillar', x: 506.5, y: 13.55, z: 2242.4, ry: 270 * DEG, scale: 4 },
+  { key: 'tower_pillar', x: 506.5, y: 13.05, z: 2240.4, ry: 270 * DEG, scale: 4 },
+  { key: 'tower_pillar', x: 498.5, y: 7.3, z: 2241.9, ry: 90 * DEG, scale: 9 },
+  { key: 'building_1', x: 451.9, y: 2, z: 2146, ry: 180 * DEG, scale: 12 },
+  { key: 'church', x: 451.65, y: 6.75, z: 2146, ry: 90 * DEG, scale: 12 },
+  { key: 'gravestone_3', x: 457.4, y: 1.75, z: 2136.5, ry: 240 * DEG, scale: 5 },
+  { key: 'gravestone_2', x: 443.9, y: 1.5, z: 2140.25, ry: 150 * DEG, scale: 4 },
+  { key: 'well_pump', x: 403.7, y: 4.3, z: 1898.9, ry: 45 * DEG, scale: 4 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as

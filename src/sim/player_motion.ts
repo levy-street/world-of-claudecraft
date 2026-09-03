@@ -200,9 +200,14 @@ export function swimSurfaceY(x: number, z: number, seed: number): number {
 
 /** Swimmable depth at a point, sampling the terrain ONCE (the mount water-walls
  *  ask about a destination they have no height for yet). */
-function isDeepFor(x: number, z: number, seed: number): boolean {
-  const ground = groundHeight(x, z, seed);
-  return ground < waterLevelAt(x, z, seed) - SWIM_DEPTH;
+function isDeepFor(x: number, z: number, seed: number, feetY: number): boolean {
+  const wl = waterLevelAt(x, z, seed);
+  if (groundHeight(x, z, seed) >= wl - SWIM_DEPTH) return false;
+  // A standable deck within a step of the hooves is dry footing, not deep
+  // water: the strait bridge crosses the deep channel on plates well above
+  // the waterline, and gating the ride on the DROWNED seabed under them
+  // walled every mounted crossing at the bridge mouth.
+  return floorHeightAt(seed, x, z, BODY_RADIUS, feetY + MAX_STEP_HEIGHT) < wl - SWIM_DEPTH;
 }
 
 const SWIM_DEPTH = PLAYER_SWIM_DEPTH; // ground this far under the water line = deep water
@@ -482,7 +487,7 @@ export function stepPlayerMotion(deps: PlayerMotionDeps, p: Entity, inp: MoveInp
       // into the water; horizontal velocity dies with it while airborne,
       // matching the steep-wall airborne gate.
       const mountBlockedByWater =
-        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed);
+        !!p.mountKey && !swimming && isDeepFor(moveOut.x, moveOut.z, deps.seed, p.pos.y);
       if (mountBlockedByWater) {
         if (!p.onGround) {
           p.vx = 0;
@@ -602,7 +607,7 @@ function stepInstancedRegion(
     // from land. Reset the candidate to the current pose (and kill horizontal
     // velocity when airborne, matching the steep-wall airborne gate) so the body
     // stops at the shore instead of clipping into the water.
-    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed)) {
+    if (p.mountKey && !swimming && isDeepFor(nx, nz, deps.seed, p.pos.y)) {
       nx = p.pos.x;
       nz = p.pos.z;
       if (!p.onGround) {
@@ -952,7 +957,7 @@ function standoffPass(
       // for this tick rather than silently dismounting them into the pit.
       const standSteep = rideSteepnessAt(standX, standZ, deps.seed);
       if (
-        !(p.mountKey && isDeepFor(standX, standZ, deps.seed)) &&
+        !(p.mountKey && isDeepFor(standX, standZ, deps.seed, p.pos.y)) &&
         (standSteep <= MAX_CLIMB_SLOPE ||
           standSteep <= rideSteepnessAt(p.pos.x, p.pos.z, deps.seed))
       ) {

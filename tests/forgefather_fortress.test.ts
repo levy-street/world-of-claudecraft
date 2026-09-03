@@ -29,7 +29,7 @@ const GROUND_STAND_TOLERANCE = 2.5;
 
 describe('forgefather fortress bake', () => {
   it('every placement resolves a registered prop', () => {
-    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(494);
+    expect(FORGEFATHER_FORTRESS_PLACEMENTS.length).toBe(502);
     for (const placement of FORGEFATHER_FORTRESS_PLACEMENTS)
       expect(IGNIVAR_PROP_NATIVE[placement.key], placement.key).toBeDefined();
   });
