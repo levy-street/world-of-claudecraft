@@ -2174,6 +2174,8 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Getijgesmede hengel',
   'entities.items.gatherers_cache.name': 'Buidel van de Verzamelaar',
   'entities.items.artisans_eye.name': 'Oog van de Ambachtsman',
+  'entities.items.reins_lanternback_troll.name':
+    'Juk van de lantaarnopsteker: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extreem',
   'hud.options.surfaceDetail': 'Oppervlaktedetail',
   'hud.options.surfaceDetailBasic': 'Basis',

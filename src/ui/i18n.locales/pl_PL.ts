@@ -2167,6 +2167,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Wędka kuta przypływem',
   'entities.items.gatherers_cache.name': 'Skrytka Zbieracza',
   'entities.items.artisans_eye.name': 'Oko Rzemieślnika',
+  'entities.items.reins_lanternback_troll.name':
+    'Jarzmo latarnika: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstremalne',
   'hud.options.surfaceDetail': 'Szczegóły powierzchni',
   'hud.options.surfaceDetailBasic': 'Podstawowe',

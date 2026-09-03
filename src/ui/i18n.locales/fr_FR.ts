@@ -2201,6 +2201,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Canne ouvragée par la marée',
   'entities.items.gatherers_cache.name': 'Cache du collecteur',
   'entities.items.artisans_eye.name': "Œil de l'artisan",
+  'entities.items.reins_lanternback_troll.name':
+    'Joug de l’allumeur de réverbères : Grumbol',
   'hudChrome.auraOverlay.allOff': 'Tout désactiver',
   'hudChrome.auraOverlay.allOn': 'Tout activer',
   'hudChrome.auraOverlay.arcs': 'Croissants latéraux',

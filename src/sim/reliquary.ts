@@ -1429,15 +1429,16 @@ export const RELIQUARY_ILLUMINATION_DEED_PAGES: Readonly<Record<string, string>>
  * never a score (the pinned doctrine), and no completion read may depend on
  * how many copies the world handed over.
  *
- * col_reliquary_complete is unearnable in production while TWO catalogued
+ * col_reliquary_complete is unearnable in production while FIVE catalogued
  * slots stay owner-pended: the SOURCE_PENDING_RULING mounts
  * (reins_drakemaw_raptor has no acquisition path in content;
- * reins_terrorspark_groundshaker is dev-grant only). The
- * masterwork:engineering mark was the third until masterwrought Phase 11o
- * (2026-08-25): the stats-bearing copperlens_ocular met the 13b ruling's own
- * un-pend condition, so that mark is earnable and hinted now. The mounts are
- * owner decisions outside this packet; the capstone becomes earnable with NO
- * code change here once they both land.
+ * reins_terrorspark_groundshaker,
+ * reins_lanternback_troll, reins_chimeglass_tortoise and reins_rickshaw_mount
+ * are dev-grant only). The masterwork:engineering mark was the sixth until
+ * masterwrought Phase 11o (2026-08-25): the stats-bearing copperlens_ocular met
+ * the 13b ruling's own un-pend condition, so that mark is earnable and hinted
+ * now. The mounts are owner decisions outside this packet; the capstone
+ * becomes earnable with NO code change here once they all land.
  * Tests may still reach owned === total by granting marks and reins directly.
  * The deed carries feat: true so this pending window can never dead-end
  * feat_book_complete (see the record's comment in content/deeds.ts).

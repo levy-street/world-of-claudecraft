@@ -106,13 +106,13 @@ const build = await buildItemArtAudit({
     // Masterwrought's completion wave adds 81 newly painted identities and
     // replaces 84 interim project-owned placeholders. The replacements do
     // not grow the catalog; the new identities take the shipping census from
-    // 1,125 to 1,206.
-    catalogCount: 1206,
+    // 1,127 to 1,208 after the two v0.42 mount reins join the reviewed base.
+    catalogCount: 1208,
     // The art-subject universe is every live definition minus the explicit
-    // pending-art ledger. This wave clears that ledger, so all 1,221 live
+    // pending-art ledger. This wave clears that ledger, so all 1,223 live
     // definitions are painted (16 Heroic weapons intentionally alias base
     // paintings; the implicit backpack is the one non-definition catalog id).
-    liveItemCount: 1221,
+    liveItemCount: 1223,
     pendingArtCount: 0,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,

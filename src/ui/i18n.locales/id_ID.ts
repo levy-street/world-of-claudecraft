@@ -2156,6 +2156,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Joran tempaan pasang',
   'entities.items.gatherers_cache.name': 'Simpanan Sang Pengumpul',
   'entities.items.artisans_eye.name': 'Mata Sang Perajin',
+  'entities.items.reins_lanternback_troll.name':
+    'Kuk Penyala Lentera: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Detail Permukaan',
   'hud.options.surfaceDetailBasic': 'Dasar',

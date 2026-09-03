@@ -934,9 +934,26 @@ class Sfx {
     else this.playAt(key, x, y, z, { gain: 1, rate: 1, release: 0.6 });
   }
 
-  /** One custom stride for a running mount. This is part of the world SFX mix,
-   *  independent of the optional on-foot footstep toggle. */
-  mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+  /** One stride for a running mount. This is part of the world SFX mix,
+   *  independent of the optional on-foot footstep toggle, for both branches
+   *  below: a mount is world audio whether or not it borrows a footfall clip,
+   *  and the footstep setting silences the player's own steps by default.
+   *
+   *  A mount with no `mount_run_<key>` clip of its own falls back to the plain
+   *  surface footfall (foot_<surface>) at the running-step gain and pitch,
+   *  alternating left/right the way footstep() does so consecutive strides are
+   *  not one sample retriggered. The release stays the mount's, though:
+   *  footstep()'s tighter 0.17s exists to keep two copies from overlapping at
+   *  the player's ~0.22s stride gap, and a mount's ~0.46s gap has no such
+   *  overlap to avoid, so cutting there would just throw the sample away. */
+  mountRun(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    surface: string,
+    _self: boolean,
+  ): void {
     // A mount with a continuous loop does not also get per-stride one-shots.
     // The rickshaw shipped both for a while and they stacked: a 0.6s stride cue
     // retriggering every 5.8 units of travel is one hit every ~0.46s at mounted
@@ -945,11 +962,23 @@ class Sfx {
     // allowlist, so any mount that later gains a loop drops its strides for
     // free, and every mount without one is untouched.
     if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
-    const key = `mount_run_${mountKey}`;
-    if (!(key in SFX_CLIPS)) return;
+    const custom = `mount_run_${mountKey}`;
+    if (custom in SFX_CLIPS) {
+      this.playAt(custom, x, y, z, {
+        gain: 0.85,
+        rate: 1,
+        cooldown: 0.05,
+        release: 0.44,
+      });
+      return;
+    }
+    const key = FOOTSTEP_CUES[surface];
+    if (!key) return;
+    this.footTick = (this.footTick + 1) & 1;
+    const foot = this.footTick === 0 ? 0.97 : 1.04; // left/right
     this.playAt(key, x, y, z, {
-      gain: 0.85,
-      rate: 1,
+      gain: 0.5,
+      rate: 1.06 * foot,
       cooldown: 0.05,
       release: 0.44,
     });

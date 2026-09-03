@@ -1233,10 +1233,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // and after biome left the file unchanged. The four polish evidence JSONs were
 // swept by the tool in the same run and are committed with these pins. No
 // capture was retaken; ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT is untouched.
+// Re-minted at the next release/v0.42.0 sync (tip 178dfd46db): the release's
+// mount-lifecycle and rickshaw hooks moved renderer.ts against this branch's
+// Masterwrought farm integration. The final renderer sha256 is ed29e747 after
+// the semantic merge audit's mount compile-gate fixes,
+// matching neither ours (8e5722cb) nor the release (72d8b7ce); every other
+// provenance input is byte-identical between the parents. The tool swept the
+// four evidence JSONs over the resolved renderer, with no capture retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '1ce078c449d921deef96b98efa2773ac4b8f7e30d79084769b11f28fca061d3e';
+  '858b2bf21c9438996456796a13286d51695d655a5cc40f7292142dc6e7af9629';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '0228ced2c09a5fe015effdc6f50f382098d7905c2a263e3f9a05a88e3949a089';
+  '6e3cb1b4edeaea28701d257ffa2ff9ae3781af78b02e4981942e03e40f72c85a';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2510,7 +2517,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // literal below was recomputed LAST per REMINT_COMMAND over the fully
       // resolved tree, after the composite and after every renderer.ts byte was
       // final. No capture was retaken.
-    ).toBe('18756e0a7dc5ccfe513fd7c5da4d2b37df39749f37afc0ca27044f2eea2ab46d');
+      // Re-minted at the next release/v0.42.0 sync after the merged renderer
+      // moved beyond both parents. Parent values were ours 18756e0a and the
+      // release b77851df; this seal was recomputed LAST from the swept files.
+      // No capture was retaken.
+    ).toBe('de96fa4ef2a9f3cd568546b7cd65811b66df95484fe94f8c66fff77e018a6f96');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

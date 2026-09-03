@@ -133,11 +133,19 @@ describe('the ledger producers and the arrival mark are wired in the renderer (s
     expect(create).toContain(
       'this.buildLedger.record(`view:${kind}`, performance.now() - started, started);',
     );
+    // The lazy mount build lives in mount_lifecycle.ts (syncMountVisual) and
+    // reaches the ledger through the renderer's one MountViewHost.
     expect(source).toContain(
-      "this.buildLedger.record('view:mount', performance.now() - mountStarted, mountStarted);",
+      "recordBuild: (ms, startedAt) => this.buildLedger.record('view:mount', ms, startedAt),",
     );
-    expect(source).toContain(
-      'const mountStarted = performance.now();\n          v.mountVisual = createMountVisual(mountSpec.visualKey);',
+    const lifecycle = readFileSync(
+      new URL('../src/render/mount_lifecycle.ts', import.meta.url),
+      'utf8',
+    );
+    expect(lifecycle).toContain(
+      'const started = performance.now();\n' +
+        '  v.mountVisual = createMountVisual(spec.visualKey);\n' +
+        '  host.recordBuild(performance.now() - started, started);',
     );
   });
 

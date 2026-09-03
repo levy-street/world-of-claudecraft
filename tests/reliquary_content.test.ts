@@ -434,10 +434,11 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the farming phase's ledgered cell deferral. The release/v0.42.0 merge
     // adds one relic more, the Bonebound Rickshaw's horizons_mounts slot (the
     // release's own chain read 386 = 340 + 1 + 45): 393, MEASURED on the
-    // merged tree. Moving Emberward from Varkhul's normal page to its heroic
-    // page in the same release re-slots a relic already catalogued, so it
-    // moves neither this pair nor the character pair below.
-    expect(full).toEqual({ owned: 393, total: 393 });
+    // merged tree. Lanternback Troll and Chimeglass Tortoise add the final two
+    // mount relics: 395. Moving Emberward from Varkhul's normal page to its
+    // heroic page in the same release re-slots a relic already catalogued, so
+    // it moves neither this pair nor the character pair below.
+    expect(full).toEqual({ owned: 395, total: 395 });
     const character = catalogCharacterCompletion({
       itemsDiscovered: allOwned,
       marks: allOwned,
@@ -455,8 +456,9 @@ describe('Reliquary Conqueror catalog structure', () => {
     // golden-harvest MARK, which is character-scoped like every other mark.
     // 364 with the release/v0.42.0 Bonebound Rickshaw: a MOUNT is
     // character-scoped too, so it moves this pair by the same one as the
-    // overview (only the weapon skins are account-scoped).
-    expect(character).toEqual({ owned: 364, total: 364 });
+    // overview (only the weapon skins are account-scoped). Lanternback Troll
+    // and Chimeglass Tortoise add two more character-scoped slots: 366.
+    expect(character).toEqual({ owned: 366, total: 366 });
   });
 
   it('pins the final measured catalog shape: total slots and distinct marks', () => {
@@ -477,7 +479,8 @@ describe('Reliquary Conqueror catalog structure', () => {
     // the release/v0.41.0 merge paged (wayfarers_backpack on Spoils,
     // necromancers_reagent_satchel on Gravewyrm Sanctum): 383, and the
     // Bonebound Rickshaw slot the release/v0.42.0 merge added to
-    // horizons_mounts: 384 total.
+    // horizons_mounts: 384 total. Lanternback Troll and Chimeglass Tortoise
+    // add the next two mount slots: 386 before later catalog growth.
     // Slots, not unique relics: the seven excludeFromCompletion slots (four
     // vault, three bands) count here while adding zero to every completion
     // pair, and every duplicate ITEM slot counts again here where the overview
@@ -493,12 +496,13 @@ describe('Reliquary Conqueror catalog structure', () => {
     // maintainer pulled Forgebreaker to route it through crafting. The
     // masterwrought Phase 18 golden-harvest field note is the one slot after
     // that: 427, and the release/v0.42.0 Bonebound Rickshaw mount slot the
-    // next: 428. Moving Emberward from Varkhul's normal page to its heroic
+    // next: 428. Lanternback Troll and Chimeglass Tortoise bring the merged
+    // total to 430. Moving Emberward from Varkhul's normal page to its heroic
     // page in the same release re-slots it and keeps this total fixed.
     expect(
       slots,
       `slot total moved; per page: ${RELIQUARY_PAGES.map((p) => `${p.id}=${p.relics.length}`).join(', ')}`,
-    ).toBe(428);
+    ).toBe(430);
     // Distinct mark ids: the 10 shipped before Phase 21, the 19 rare-slain
     // proofs of conquerors_rares_of_the_realm, the two craft masterwork
     // marks (masterwork:jewelcrafting, masterwork:inscription), and the
@@ -2818,7 +2822,7 @@ const RELIC_SLOTS = RELIQUARY_PAGES.flatMap((page) =>
  * row here in the same change.
  */
 const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
-  // The three gaps are CONTENT gaps, not vocabulary gaps: no live table awards
+  // The five gaps are CONTENT gaps, not vocabulary gaps: no live table awards
   // any of them, so there is no door to name. Every other slot the catalog
   // used to leave pending turned out to be a several-doors slot rather than a
   // no-answer slot, and Phase 13b authored all of them (a relic lists every
@@ -2827,12 +2831,17 @@ const SOURCE_PENDING_RULING: Readonly<Record<string, readonly string[]>> = {
   // drakemaw_raptor: NO acquisition path exists anywhere in content, see the
   // def comment in content/drakelands.ts. Owner call recorded 2026-08-04: the
   // slot stays listed and sourceless until the mount gets a route.
-  // terrorspark_groundshaker: dev-grant only, deliberately absent from vendors,
-  // quests, mob loot, heroic loot, and the rift reins pools.
-  // rickshaw_mount: same shape as terrorspark_groundshaker, dev-grant only,
-  // no player-facing acquisition path yet (see the def comment in
-  // content/mounts.ts).
-  horizons_mounts: ['drakemaw_raptor', 'terrorspark_groundshaker', 'rickshaw_mount'],
+  // terrorspark_groundshaker, lanternback_troll, chimeglass_tortoise and
+  // rickshaw_mount: DEVELOPER_MOUNTS, dev-grant only, deliberately absent from
+  // vendors, quests, mob loot, heroic loot, and the rift reins pools (see the
+  // def comments in content/mounts.ts).
+  horizons_mounts: [
+    'chimeglass_tortoise',
+    'drakemaw_raptor',
+    'lanternback_troll',
+    'rickshaw_mount',
+    'terrorspark_groundshaker',
+  ],
   // masterwork:engineering rode here as unearnable (QA ruling 2026-08-07,
   // R1 suppression on the craft's only stats-bearing output) until
   // masterwrought Phase 11o (2026-08-25) shipped copperlens_ocular, a
@@ -3866,7 +3875,7 @@ describe('Reliquary source hint coverage', () => {
     ).toBe(true);
   });
 
-  it('the surviving pending rows are the three mounts content awards no route at all', () => {
+  it('the surviving pending rows are the five mounts content awards no route at all', () => {
     // The page-wide Horizons rulings are EXECUTED: mounts and skins are no
     // longer derived from the catalog lists (the derivation era ended when the
     // rulings landed), so the identity pins to RELIQUARY_HORIZON_MOUNTS and
@@ -3877,9 +3886,11 @@ describe('Reliquary source hint coverage', () => {
     // 11o's stats-bearing ocular un-pended it; see the pending-table comment.)
     expect(Object.keys(SOURCE_PENDING_RULING)).toEqual(['horizons_mounts']);
     expect(SOURCE_PENDING_RULING.horizons_mounts).toEqual([
+      'chimeglass_tortoise',
       'drakemaw_raptor',
-      'terrorspark_groundshaker',
+      'lanternback_troll',
       'rickshaw_mount',
+      'terrorspark_groundshaker',
     ]);
     // All are still live catalog slots, so the exclusion cannot outlive them.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -4273,11 +4284,11 @@ describe('Reliquary source hint coverage', () => {
     expect(delveOnly.counts.vendor).toBeGreaterThanOrEqual(1);
   });
 
-  it('the two pending mounts really have ZERO live award routes (the row is justified)', () => {
+  it('the five pending mounts really have ZERO live award routes (the row is justified)', () => {
     // The surviving SOURCE_PENDING_RULING row's whole claim is "no live table
-    // awards either mount", and the acknowledgment sweep can never check it
+    // awards any pending mount", and the acknowledgment sweep can never check it
     // (it short-circuits on un-hinted relics). This is the inverse sweep: the
-    // day content gives either mount ANY route, this reds and forces the hint
+    // day content gives any pending mount a route, this reds and forces the hint
     // plus the pending-row deletion in the same change, so the window can
     // never keep painting a blank silhouette content has learned to answer.
     for (const mountId of SOURCE_PENDING_RULING.horizons_mounts) {
@@ -4312,7 +4323,7 @@ describe('Reliquary source hint coverage', () => {
       if (reliquaryRelicSource(page, relic).length === 0) continue;
       watchedAwardIds.add(awardIdForSlot(relic, slotId));
     }
-    // The two PENDING mounts' reins ride along: their whole pending claim is
+    // The five PENDING mounts' reins ride along: their whole pending claim is
     // "no route anywhere", and the nine-family inverse sweep above cannot see
     // these three excluded surfaces, so a pending reins entering one must red
     // HERE rather than leave the silhouette blank while content can answer.

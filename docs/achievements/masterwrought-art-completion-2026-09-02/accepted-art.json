@@ -18,9 +18,9 @@
     "supersessions": 85,
     "supplementalUiAssets": 5,
     "generationReports": 8,
-    "historicalItemPaintings": 1125,
-    "retainedHistoricalItemPaintings": 1041,
-    "currentItemPaintings": 1206
+    "historicalItemPaintings": 1127,
+    "retainedHistoricalItemPaintings": 1043,
+    "currentItemPaintings": 1208
   },
   "contracts": {
     "item": {
@@ -62,12 +62,12 @@
     }
   },
   "historicalCurrentUnion": {
-    "historicalCount": 1125,
+    "historicalCount": 1127,
     "replacedHistoricalCount": 84,
-    "retainedHistoricalCount": 1041,
+    "retainedHistoricalCount": 1043,
     "currentBatchCount": 165,
-    "currentCount": 1206,
-    "equation": "1125 - 84 + 165 = 1206"
+    "currentCount": 1208,
+    "equation": "1127 - 84 + 165 = 1208"
   },
   "targetSets": {
     "items": [
@@ -449,8 +449,8 @@
     {
       "id": "final-item-art-audit-verdict",
       "path": "docs/achievements/masterwrought-art-completion-2026-09-02/final-item-art-audit-verdict.json",
-      "acceptedSha256": "88a9e22d8c69fbf64a8179f72b21e4fdfec5b922ae7d72aae0bd45c16d961980",
-      "acceptedBytes": 111366
+      "acceptedSha256": "7ef54b4fe557f55d0664960abceefa661933144402e4e3d9ba8d6093f7e9b92d",
+      "acceptedBytes": 113501
     }
   ],
   "generationReports": [

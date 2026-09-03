@@ -2186,6 +2186,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Vara forjada pela maré',
   'entities.items.gatherers_cache.name': 'Alforje do Coletor',
   'entities.items.artisans_eye.name': 'Olhar do Artesão',
+  'entities.items.reins_lanternback_troll.name':
+    'Canga do acendedor de lampiões: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Desativar tudo',
   'hudChrome.auraOverlay.allOn': 'Ativar tudo',
   'hudChrome.auraOverlay.arcs': 'Meias-luas laterais',

@@ -20,6 +20,8 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'lanternback_troll'
+  | 'chimeglass_tortoise'
   | 'terrorspark_groundshaker'
   | 'rickshaw_mount';
 
@@ -80,9 +82,11 @@ export const MOUNTS: Record<MountKey, MountDef> = {
     moveSpeedPct: 0.75,
   },
   // Epic tier (80%): the hover-cycle and the gobbler come from Rift S clears.
-  // The Dreadspark Groundshaker is developer-only for now and has no
-  // player-facing acquisition, and stays LAST in the catalog (the tests pin the
-  // developer mount as the tail, so a new player-facing mount lands above it).
+  // The Dreadspark Groundshaker, the Lanternback Troll, the Chimeglass
+  // Tortoise and the Bonebound Rickshaw are developer-only for now and have no
+  // player-facing acquisition. The tank and the rickshaw stay LAST in the
+  // catalog (the tests pin the rickshaw as the tail, so a new player-facing
+  // mount lands above them); see DEVELOPER_MOUNTS below for the shared gate.
   aether_hover_cycle: {
     key: 'aether_hover_cycle',
     name: 'Aether-Jouster Hover-Cycle',
@@ -101,6 +105,26 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   drakemaw_raptor: {
     key: 'drakemaw_raptor',
     name: 'Drakemaw Raptor',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // A hill troll broken to the saddle by lamplighters: he carries an iron
+  // throne strapped across his shoulders with a storm lantern hung off each
+  // arm of it, so the rider travels lit. Developer-only for now.
+  lanternback_troll: {
+    key: 'lanternback_troll',
+    name: 'Grumbol the Lanternback',
+    rarity: 'epic',
+    moveSpeedPct: 0.8,
+  },
+  // A salt-flat tortoise who has outwalked three caravan generations. The
+  // tinkers who adopted him ground his spectacles from storm-glass and hung a
+  // bronze bell at his throat so the road could hear him coming. He takes the
+  // flat epic 80% like the rest of his tier: speed is set by rarity here, and
+  // the joke that he is slow lives in his gait and his lore, not in his stats.
+  chimeglass_tortoise: {
+    key: 'chimeglass_tortoise',
+    name: 'Tolliver the Chimeglass',
     rarity: 'epic',
     moveSpeedPct: 0.8,
   },
@@ -129,6 +153,25 @@ export const MOUNTS: Record<MountKey, MountDef> = {
 
 /** Catalog order: rarity tier, then declaration order. */
 export const MOUNT_KEYS = Object.keys(MOUNTS) as readonly MountKey[];
+
+/** Mounts with NO player-facing acquisition path: absent from vendors, quests,
+ *  creature loot, heroic loot, and Rift reward pools, reachable only through
+ *  `/dev mounts` or `/dev give <reins>`. Their reins stay SOULBOUND, unlike
+ *  every player mount, because a tradable dev grant is an economy leak. This is
+ *  the single source of truth: the catalog, the item table, and the acquisition
+ *  tests all read it, so a fourth place can never disagree about which mounts
+ *  are still under development. */
+export const DEVELOPER_MOUNTS: readonly MountKey[] = [
+  'lanternback_troll',
+  'chimeglass_tortoise',
+  'terrorspark_groundshaker',
+  'rickshaw_mount',
+];
+
+/** True while a mount has no player-facing acquisition path (see DEVELOPER_MOUNTS). */
+export function isDeveloperMount(key: string): boolean {
+  return (DEVELOPER_MOUNTS as readonly string[]).includes(key);
+}
 
 /** The horse: the default stable pick and the fallback for every unknown/legacy
  *  persisted value. It is no longer free (a fresh player owns nothing): owning

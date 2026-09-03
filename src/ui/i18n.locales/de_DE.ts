@@ -2194,6 +2194,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Gezeitengeschmiedete Angelrute',
   'entities.items.gatherers_cache.name': 'Hort des Sammlers',
   'entities.items.artisans_eye.name': 'Auge des Handwerkers',
+  'entities.items.reins_lanternback_troll.name':
+    'Joch des Laternenanzünders: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Alle aus',
   'hudChrome.auraOverlay.allOn': 'Alle an',
   'hudChrome.auraOverlay.arcs': 'Seitliche Halbmonde',

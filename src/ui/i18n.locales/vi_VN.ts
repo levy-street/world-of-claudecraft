@@ -2063,6 +2063,8 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Cần câu triều luyện',
   'entities.items.gatherers_cache.name': 'Túi Trữ Của Thợ Thu Thập',
   'entities.items.artisans_eye.name': 'Con Mắt Nghệ Nhân',
+  'entities.items.reins_lanternback_troll.name':
+    'Ách của Người Thắp Đèn: Grumbol',
   'hud.options.graphicsPresetInsane': 'Cực Đại',
   'hud.options.surfaceDetail': 'Chi Tiết Bề Mặt',
   'hud.options.surfaceDetailBasic': 'Cơ Bản',

@@ -189,6 +189,10 @@ describe('buildManifest', () => {
     // "9 mount cues" was stale before either branch touched it; the release
     // re-derived it to 13 and that count is what the merged catalog holds,
     // all three re-measured from scripts/sfx/sfx_prompts.mjs on the merged tree.
+    // There are 13 mount cues across 12 catalog mounts, not one per mount: the
+    // rickshaw carries summon and loop cues but no stride, while the
+    // Lanternback Troll and Chimeglass Tortoise deliberately borrow the
+    // player's surface footfall through Sfx.mountRun's fallback branch.
     const keys = new Set(SFX.map((entry) => entry.key));
     expect(keys.size).toBe(278);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(72);

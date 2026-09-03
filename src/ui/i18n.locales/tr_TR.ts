@@ -2158,6 +2158,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Gelgit Dövmeli Olta',
   'entities.items.gatherers_cache.name': 'Toplayıcının Zulası',
   'entities.items.artisans_eye.name': 'Zanaatkârın Gözü',
+  'entities.items.reins_lanternback_troll.name':
+    'Fenerci Boyunduruğu: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Yüzey Detayı',
   'hud.options.surfaceDetailBasic': 'Temel',

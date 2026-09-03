@@ -129,9 +129,12 @@ which already computes interpolated position, `loco.speed/moving`, `swimming`,
   dock decks→wood → dungeon→stone → snow if weather is snowing. Suppressed while airborne /
   swimming / dead and gated by `d2 < SFX_RANGE_SQ`.
 - **Mount running:** the same distance accumulator fires a mount-specific
-  `sink.mountRun(x,y,z, mountKey, self)` gait beat while a grounded mount runs.
-  Mount walking stays quiet. These cues use the normal SFX mix and remain audible
-  when the optional on-foot footstep setting is disabled.
+  `sink.mountRun(x,y,z, mountKey, surface, self)` gait beat while a grounded mount
+  runs. Mount walking stays quiet. These cues use the normal SFX mix and remain
+  audible when the optional on-foot footstep setting is disabled. A mount with no
+  `mount_run_<key>` in the catalog (the Lanternback Troll and the Chimeglass
+  Tortoise) falls back to the plain `foot_<surface>` cue at running-step gain and
+  pitch: hence the `surface` argument, which the custom-cue branch ignores.
 - **Jump / land / splash / swim:** per-view edge detection on `airborne` and
   `swimming` transitions fires `sink.movement('jump'|'land'|'splash'|'swim', …)`.
 - **Listener:** after the camera is positioned (~L1583), `sink.setListener(camPos,

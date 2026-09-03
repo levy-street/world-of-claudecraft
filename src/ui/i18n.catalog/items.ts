@@ -2509,6 +2509,8 @@ const ITEM_ENTITY_IDS = [
   'gatherers_cache',
   'artisans_eye',
   'reins_terrorspark_groundshaker',
+  'reins_lanternback_troll',
+  'reins_chimeglass_tortoise',
   'reins_rickshaw_mount',
   'reins_drakemaw_raptor',
   'rimefang',
@@ -3051,6 +3053,8 @@ const APPENDED_ITEM_NAMES: Partial<Record<ItemEntityId, string>> = {
   gatherers_cache: "Gatherer's Cache",
   artisans_eye: "Artisan's Eye",
   reins_terrorspark_groundshaker: 'Ignition Key: Dreadspark Groundshaker',
+  reins_lanternback_troll: "Lamplighter's Yoke: Grumbol",
+  reins_chimeglass_tortoise: "Roadwarden's Bellstrap: Tolliver",
   reins_rickshaw_mount: 'Bound Reins: Bonebound Rickshaw',
   // Quest-dedupe pass (zones 1 to 3): English-appended until the release fill
   // folds them into the per-locale arrays.

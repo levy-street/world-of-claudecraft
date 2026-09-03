@@ -122,6 +122,11 @@ export function applyMountJumpAttitude(
   // Carry the separately-rooted rider around the same vehicle origin, or a
   // nose-up cart leaves them sitting level and off the seat.
   const seat = mountRiderPivot(seatLift, spec.seatFwd, pitch);
+  // A live mount swap reuses this root. Bone-seated mounts write lateral
+  // position and a full quaternion, so clear both before the fixed-saddle
+  // attitude lands; seatRiderOnBone may overwrite the clean pose afterward.
+  riderRoot.position.x = 0;
+  riderRoot.quaternion.identity();
   riderRoot.rotation.x = rotationX;
   riderRoot.position.y = seat.y;
   riderRoot.position.z = seat.z;

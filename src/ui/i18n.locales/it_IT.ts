@@ -2191,6 +2191,8 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Canna forgiata dalla marea',
   'entities.items.gatherers_cache.name': 'Riserva del Raccoglitore',
   'entities.items.artisans_eye.name': 'Occhio dell’Artigiano',
+  'entities.items.reins_lanternback_troll.name':
+    'Giogo del lampionaio: Grumbol',
   'hudChrome.auraOverlay.allOff': 'Disattiva tutto',
   'hudChrome.auraOverlay.allOn': 'Attiva tutto',
   'hudChrome.auraOverlay.arcs': 'Mezzelune laterali',

@@ -69,8 +69,10 @@ const SECOND_PASS_RECORD_SHA256 =
   // production inventories" case below computes artSubjectHotbarItemIds from the
   // live ITEMS inventory and independently asserts 76, and it read 76 against
   // the un-merged 73 record before the fix. The seal is `shasum -a 256` of the
-  // merged file. No capture or asset was retaken.
-  '70c60f346c819b637a9780dd7625ec027ffbe4420650203f47197d7005cbd282';
+  // merged file. The final v0.42 union adds the Lanternback Troll and
+  // Chimeglass Tortoise reins, advancing the historical census to 78 / 78.
+  // No capture or asset was retaken.
+  '80ade4c30638dad834084290a0734279c20b6b4ccbbe1eb5247a6e18f466abf0';
 const EVIDENCE = {
   'icon-art-before-after-desktop.png': {
     sha256: '61d19fb321f2b30eb3749e0966f26efea0fa4df53edae4b253cfd70edb82cd7a',
@@ -369,12 +371,13 @@ describe('release v0.39 icon-art second-pass lineage', () => {
         // The hotbar census stays at this branch's 75 (the release's own arm
         // read 72 without the three role foods).
         abilities: { live: 402, painted: 402 },
-        // 76 at the v0.42.0 sync: the release's one new hotbar item, the
+        // 76 at the first v0.42.0 sync: the release's one new hotbar item, the
         // Bonebound Rickshaw reins (reins_rickshaw_mount, kind 'mount'), joins
         // the census and ships committed painted art, so painted moves with
         // live (the release's own arm read 72 to 73, without the three role
         // foods).
-        hotbarItems: { live: 76, painted: 76 },
+        // The final union adds the two painted mount reins from PR #3439.
+        hotbarItems: { live: 78, painted: 78 },
         fixedActions: { painted: 11 },
         mobAuraRouting: { paintedFamilies: 44, exactRuntimeIds: 89 },
         fiesta: { augments: 20, powerups: 4, painted: 24 },
@@ -471,12 +474,12 @@ describe('release v0.39 icon-art second-pass lineage', () => {
     expect(new Set(liveHotbarItemIds).size, 'live hotbar item ids remain unique').toBe(
       liveHotbarItemIds.length,
     );
-    // The 76 identities already in the prior art-subject census plus the 20
+    // The 78 identities in the final historical census plus the 20
     // formerly parked farming, food, rod, and hoe hotbar items.
     expect(
       artSubjectHotbarItemIds,
       'production isHotbarItemId art-subject inventory (live minus ITEM_ART_PENDING)',
-    ).toHaveLength(96);
+    ).toHaveLength(98);
     expect(pendingHotbarItemIds, 'ITEM_ART_PENDING hotbar items').toHaveLength(0);
     expect(
       pendingHotbarItemIds.filter((id) => shippingImageExists(`/ui/items/${id}.webp`)),
@@ -486,6 +489,6 @@ describe('release v0.39 icon-art second-pass lineage', () => {
       artSubjectHotbarItemIds.filter((id) => !paintedHotbarItemIds.has(id)),
       'every art-subject hotbar item resolves to committed painted art',
     ).toEqual([]);
-    expect(aggregate.runtimeClosure.hotbarItems).toEqual({ live: 76, painted: 76 });
+    expect(aggregate.runtimeClosure.hotbarItems).toEqual({ live: 78, painted: 78 });
   });
 });

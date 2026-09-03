@@ -783,8 +783,16 @@ const MONOLITHS: MonolithRow[] = [
     // the compile gate's shadow arm moved to src/render/shadow_depth_compile.ts
     // (a thin wrapper stays), which paid for the farm gate closure, the gate
     // label parameter, the zone-prewarm host weld and the single-sited farm
-    // drive. Exact count, zero slack.
-    ceiling: 13023,
+    // drive.
+    // Re-pinned at the release/v0.42.0 sync of the Chimeglass Tortoise PR
+    // (#3439, carrying the Lanternback Troll of #3399): the rideable-mount
+    // lifecycle (build, live swap, teardown, rider seating, carried lamps
+    // and glows, the summon/dismount FX) moved to src/render/mount_lifecycle.ts,
+    // and the release arm's rickshaw hooks moved with it. Composed with the
+    // Masterwrought extraction above, the merged file measures 12992 lines
+    // after the compile-gate stand-in fix found by the semantic merge audit.
+    // Exact merged count, zero headroom.
+    ceiling: 12992,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

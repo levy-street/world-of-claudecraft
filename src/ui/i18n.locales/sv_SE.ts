@@ -2160,6 +2160,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Tidvattensmitt spö',
   'entities.items.gatherers_cache.name': 'Samlarens gömma',
   'entities.items.artisans_eye.name': 'Hantverkarens öga',
+  'entities.items.reins_lanternback_troll.name':
+    'Lykttändarens ok: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extrem',
   'hud.options.surfaceDetail': 'Ytdetaljer',
   'hud.options.surfaceDetailBasic': 'Grundläggande',

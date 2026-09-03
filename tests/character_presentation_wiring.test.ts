@@ -66,6 +66,35 @@ describe('character presentation sleep wiring', () => {
     );
     expect(renderer.slice(abilityStart)).toContain('if (runCharacterPresentation) {');
   });
+
+  it('keeps the rider on foot until the mount compile gate presents the rig', () => {
+    const mountStart = renderer.indexOf('// rideable mount under the player');
+    const mountEnd = renderer.indexOf('// distant rigs swap', mountStart);
+    expect(mountStart).toBeGreaterThan(-1);
+    expect(mountEnd).toBeGreaterThan(mountStart);
+    const setup = renderer.slice(mountStart, mountEnd);
+
+    expect(setup).toContain(
+      'const mountPresented = mountShown && !!v.mountVisual && !v.mountCompilePending;',
+    );
+    expect(setup).toContain('v.mountVisual.root.visible = mountPresented;');
+    expect(setup).toContain('v.mountLift = mountPresented && mountSpec ? mountSpec.seat : 0;');
+    expect(setup).toContain(
+      'v.visual.setRidePose(mountPresented && mountSpec ? mountSpec.ride : null);',
+    );
+    expect(setup).toContain(
+      'placeRider(v, v.visual.root, mountPresented ? mountSpec : null, v.mountLift, 0);',
+    );
+
+    const presentationStart = renderer.indexOf(
+      'if (v.mountVisual && mountSpec && mountShown) {',
+      mountEnd,
+    );
+    const presentationEnd = renderer.indexOf('// per-ability windup orb', presentationStart);
+    const presentation = renderer.slice(presentationStart, presentationEnd);
+    expect(presentation).toContain('if (mountPresented) {\n            applyMountJumpAttitude(');
+    expect(presentation).toContain('seatRiderOnBone(');
+  });
 });
 
 // The recompose arm has no coverage that would run the composed body's

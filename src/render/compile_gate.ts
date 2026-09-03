@@ -293,7 +293,8 @@ export class SerialGateLane {
  * as it resolves, revealing the newer target before its own compile is done:
  * exactly the freeze this gate exists to prevent. Passing the raw setter
  * (`current => null`) instead of this guard is only safe when the field is
- * dedicated to a single target, as mountCompilePending/visualCompilePending are.
+ * dedicated to a single target, as visualCompilePending is. Boolean ownership
+ * fields such as mountCompilePending need an external current-root guard.
  */
 export function settlePendingSwap<T>(current: T | null, owner: T): T | null {
   return current === owner ? null : current;

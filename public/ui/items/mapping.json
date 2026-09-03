@@ -386,6 +386,22 @@
       "sourceFile": "reins_rickshaw_mount.png master (OpenAI image generation, user-directed prompt following docs/design/item-icon-art-style.md woc-item-icon-v1, cart-only three-quarter mount portrait, puller omitted to avoid misrepresenting the actual skel_rickshaw_puller rig)",
       "confidence": "high",
       "license": "World of ClaudeCraft project-generated art, project asset, rights reserved"
+    },
+    {
+      "itemId": "reins_lanternback_troll",
+      "name": "Lamplighter's Yoke: Grumbol",
+      "sourcePack": "woc_owner_supplied_art",
+      "sourceFile": "troll icon 2.png (owner-supplied painted master, 624x624)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
+      "itemId": "reins_chimeglass_tortoise",
+      "name": "Roadwarden's Bellstrap: Tolliver",
+      "sourcePack": "project-authored",
+      "sourceFile": "three-quarter head render of the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) by scripts/render_mount_icons.mjs, background keyed and downscaled to the 128px opaque woc-item-icon-v1 shipping format (re-rendered 2026-08-16 with the lens-glow pass)",
+      "confidence": "high",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     }
   ],
   "generatedBatches": [

@@ -547,8 +547,15 @@ interface AttributionTargetFixture {
 // and after biome left the file unchanged. The four polish evidence JSONs were
 // swept by the tool in the same run and are committed with these pins. No
 // capture was retaken; ACCEPTED_POLISH_V2_TOWN_SOURCE_FINGERPRINT is untouched.
+// Re-minted at the next release/v0.42.0 sync (tip 178dfd46db): the release's
+// mount-lifecycle and rickshaw hooks moved renderer.ts against this branch's
+// Masterwrought farm integration. The final renderer sha256 is ed29e747 after
+// the semantic merge audit's mount compile-gate fixes,
+// matching neither ours (8e5722cb) nor the release (72d8b7ce); every other
+// provenance input is byte-identical between the parents. The tool swept the
+// four evidence JSONs over the resolved renderer, with no capture retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '0228ced2c09a5fe015effdc6f50f382098d7905c2a263e3f9a05a88e3949a089';
+  '6e3cb1b4edeaea28701d257ffa2ff9ae3781af78b02e4981942e03e40f72c85a';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

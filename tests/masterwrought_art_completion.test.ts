@@ -317,7 +317,7 @@ describe('Masterwrought art completion evidence', () => {
   it('byte-seals the root manifest so its target and evidence oracles cannot drift together', () => {
     const bytes = readFileSync(path.join(repoRoot, manifestPath));
     expect(bytes.length).toBe(459_411);
-    expect(hash(bytes)).toBe('724ca1376055b9e9ea1997f90fd0040df902eff3f8f9255a8db32f4032e3c587');
+    expect(hash(bytes)).toBe('51ed3426f1c165d4b3fb25cd47e3e7ce4378b12691060f4adccbe75002844d31');
   });
 
   it('pins the exact 176-target scope and the 81 added to 84 replaced item split', () => {
@@ -340,9 +340,9 @@ describe('Masterwrought art completion evidence', () => {
       supersessions: 85,
       supplementalUiAssets: 5,
       generationReports: 8,
-      historicalItemPaintings: 1125,
-      retainedHistoricalItemPaintings: 1041,
-      currentItemPaintings: 1206,
+      historicalItemPaintings: 1127,
+      retainedHistoricalItemPaintings: 1043,
+      currentItemPaintings: 1208,
     });
 
     expect(value.targetSets.items).toHaveLength(165);
@@ -626,7 +626,7 @@ describe('Masterwrought art completion evidence', () => {
     }
   });
 
-  it('proves the historical to current 1206-item union and the mapping batch equality', () => {
+  it('proves the historical to current 1208-item union and the mapping batch equality', () => {
     const value = manifest();
     const mapping = readJson<ItemMapping>('public/ui/items/mapping.json');
     const currentBatch = mapping.generatedBatches.find(({ batchId: id }) => id === batchId);
@@ -637,20 +637,20 @@ describe('Masterwrought art completion evidence', () => {
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
     expect(duplicateValues(currentOwnerIds)).toEqual([]);
-    expect(currentOwnerIds).toHaveLength(1206);
+    expect(currentOwnerIds).toHaveLength(1208);
     const retainedHistoricalIds = currentOwnerIds.filter(
       (id) => !value.targetSets.items.includes(id),
     );
-    expect(retainedHistoricalIds).toHaveLength(1041);
-    expect(retainedHistoricalIds.length + value.targetSets.replacedItems.length).toBe(1125);
-    expect(retainedHistoricalIds.length + value.targetSets.items.length).toBe(1206);
+    expect(retainedHistoricalIds).toHaveLength(1043);
+    expect(retainedHistoricalIds.length + value.targetSets.replacedItems.length).toBe(1127);
+    expect(retainedHistoricalIds.length + value.targetSets.items.length).toBe(1208);
     expect(value.historicalCurrentUnion).toEqual({
-      historicalCount: 1125,
+      historicalCount: 1127,
       replacedHistoricalCount: 84,
-      retainedHistoricalCount: 1041,
+      retainedHistoricalCount: 1043,
       currentBatchCount: 165,
-      currentCount: 1206,
-      equation: '1125 - 84 + 165 = 1206',
+      currentCount: 1208,
+      equation: '1127 - 84 + 165 = 1208',
     });
   });
 

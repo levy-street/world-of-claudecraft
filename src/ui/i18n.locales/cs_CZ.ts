@@ -2167,6 +2167,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.tidewrought_fishing_rod.name': 'Prut kovaný přílivem',
   'entities.items.gatherers_cache.name': 'Sběračova skrýš',
   'entities.items.artisans_eye.name': 'Řemeslníkovo oko',
+  'entities.items.reins_lanternback_troll.name':
+    'Lampářovo jho: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extrémní',
   'hud.options.surfaceDetail': 'Detail povrchů',
   'hud.options.surfaceDetailBasic': 'Základní',
