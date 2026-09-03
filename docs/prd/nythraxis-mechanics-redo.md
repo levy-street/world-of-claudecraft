@@ -464,10 +464,11 @@ golden is regenerated once more at the end rather than per slice.
 
 ## 12. Owner adjustments before the first playtest (2026-09-04)
 
-- The arena is a compact hall, about 50 yd wide by 52 deep (`NYTHRAXIS_LAYOUT`),
-  down from 460 by 145; the boss dais keeps its local position, the wardstones
-  move in to 25 to 30 yd, the sigil band is 10 to 24 yd, eruptions land within
-  32 yd of the spawn, the adds and the court spawn just behind the dais.
+- The arena is one hall, about 100 yd wide by 100 deep (`NYTHRAXIS_LAYOUT`),
+  down from 460 by 145 (a first cut at 50 by 52 played too tight); the boss dais
+  keeps its local position with 20 yd behind it, the wardstones sit 34 to 38 yd
+  out, the sigil band is 12 to 30 yd, eruptions land within 50 yd of the spawn,
+  the adds and the court spawn behind the dais.
 - Heroic floor fire never goes out on its own: Grave Flame and Soulfire patches
   burn until the transition or a reset clears them (the caps still evict the
   oldest), so the raid has to keep moving.

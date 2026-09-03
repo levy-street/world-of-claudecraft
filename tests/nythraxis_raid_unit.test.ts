@@ -221,8 +221,8 @@ describe('Nythraxis raid encounter', () => {
     expect(dungeon.interior).toBe('nythraxis');
     expect(dungeon.suggestedPlayers).toBe(10);
     expect(dungeon.spawns).toEqual([{ mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 }]);
-    // A compact hall: about 50 yd wide by 52 deep around the boss dais at z 96.
-    expect(NYTHRAXIS_LAYOUT).toMatchObject({ zMin: 52, zMax: 104, wallX: 26, floorHalfX: 25 });
+    // One hall, about 100 yd wide by 100 deep, the boss dais at z 96 with 20 yd behind it.
+    expect(NYTHRAXIS_LAYOUT).toMatchObject({ zMin: 16, zMax: 116, wallX: 51, floorHalfX: 50 });
     expect(MOBS.nythraxis_scourge_of_thornpeak.boss).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.ccImmune).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.moveSpeed).toBe(10.5);
@@ -296,14 +296,14 @@ describe('Nythraxis raid encounter', () => {
         .map((w) => ({ x: Math.round(w.pos.x - origin.x), z: Math.round(w.pos.z - origin.z) }))
         .sort((a, b) => a.x - b.x),
     ).toEqual([
-      { x: -16, z: 76 },
-      { x: 0, z: 66 },
-      { x: 16, z: 76 },
+      { x: -30, z: 74 },
+      { x: 0, z: 62 },
+      { x: 30, z: 74 },
     ]);
     expect(pillars).toHaveLength(0);
     expect(isBlocked(sim.cfg.seed, origin.x + 0, origin.z + 96)).toBe(false);
     expect(isBlocked(sim.cfg.seed, origin.x + 10, origin.z + 82)).toBe(false);
-    expect(isBlocked(sim.cfg.seed, origin.x + 26, origin.z + 82)).toBe(true);
+    expect(isBlocked(sim.cfg.seed, origin.x + 51, origin.z + 82)).toBe(true);
     expect(dungeonDaisHasRaisedPlatform('nythraxis')).toBe(false);
     expect(dungeonDaisHasRaisedPlatform('crypt')).toBe(true);
   });

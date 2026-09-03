@@ -89,7 +89,7 @@ export const NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_HEROIC = 0.09;
 export const NYTHRAXIS_GRAVE_FLAME_CAP = 24;
 // How far from the boss spawn an eruption may land: the raid fights inside this
 // band of the crypt hall, and the arena walls sit far beyond it.
-export const NYTHRAXIS_GRAVE_ERUPTION_MAX_RANGE = 32;
+export const NYTHRAXIS_GRAVE_ERUPTION_MAX_RANGE = 50;
 export const NYTHRAXIS_GRAVE_ERUPTION_MIN_SEPARATION = 5;
 
 const ERUPTION_CANDIDATES = 32;

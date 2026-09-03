@@ -32,23 +32,23 @@ import { DT, type DungeonDifficulty, type Entity, NYTHRAXIS_BOSS_ID } from './ty
 export const NYTHRAXIS_ARENA_ID = 'nythraxis_boss_arena';
 const NYTHRAXIS_DEV_BOT_COUNT = 9;
 
-// Instance-local spots inside the compact hall (NYTHRAXIS_LAYOUT: x within
-// +/-25, z 52 to 104; the boss dais at (0, 96); wardstones at (0, 66) and
-// (+/-16, 76)). Every spot is at least 6 yd from a wardstone (the sigil and
-// Soulfire clearance) and 24 yd from the boss spawn, outside his 22 yd aggro
-// radius, so forming the raid never pulls; spread so a Grave Eruption, a
-// Gravefire line, and a Bone Storm charge each have real targets across the
-// front half of the floor.
+// Instance-local spots inside the hall (NYTHRAXIS_LAYOUT: x within +/-50,
+// z 16 to 116; the boss dais at (0, 96); wardstones at (0, 62) and (+/-30,
+// 74)). Every spot is at least 6 yd from a wardstone (the sigil and Soulfire
+// clearance) and 30 yd from the boss spawn, outside his 22 yd aggro radius, so
+// forming the raid never pulls; spread so a Grave Eruption, a Gravefire line,
+// and a Bone Storm charge each have real targets across the front half of the
+// floor.
 export const NYTHRAXIS_DEV_FORMATION = [
-  { x: -18, z: 58 },
-  { x: 18, z: 58 },
-  { x: -8, z: 56 },
-  { x: 8, z: 56 },
-  { x: -21, z: 68 },
-  { x: 21, z: 68 },
-  { x: -10, z: 72 },
-  { x: 10, z: 72 },
-  { x: 0, z: 59 },
+  { x: -40, z: 40 },
+  { x: 40, z: 40 },
+  { x: -20, z: 34 },
+  { x: 20, z: 34 },
+  { x: -42, z: 60 },
+  { x: 42, z: 60 },
+  { x: -22, z: 66 },
+  { x: 22, z: 66 },
+  { x: 0, z: 48 },
 ] as const;
 
 export type NythraxisDevRaidResult =

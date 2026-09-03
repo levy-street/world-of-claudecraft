@@ -58,7 +58,7 @@ describe('Nythraxis Binding Sigil', () => {
       false,
       true,
     ]);
-    expect([NYTHRAXIS_SIGIL_MIN_DIST, NYTHRAXIS_SIGIL_MAX_DIST]).toEqual([10, 24]);
+    expect([NYTHRAXIS_SIGIL_MIN_DIST, NYTHRAXIS_SIGIL_MAX_DIST]).toEqual([12, 30]);
     expect(NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE).toBe(6);
   });
 

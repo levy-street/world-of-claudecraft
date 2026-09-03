@@ -96,7 +96,7 @@ describe('/dev nythraxisraid', () => {
         expect(local.z).toBeGreaterThanOrEqual(NYTHRAXIS_LAYOUT.zMin + 2);
         expect(local.z).toBeLessThanOrEqual(NYTHRAXIS_LAYOUT.zMax - 2);
         for (const ward of wards) expect(flat(bot.pos, ward.pos)).toBeGreaterThanOrEqual(6);
-        expect(flat(bot.pos, boss.spawnPos)).toBeGreaterThanOrEqual(24);
+        expect(flat(bot.pos, boss.spawnPos)).toBeGreaterThanOrEqual(30);
       }
       // Forming the raid never pulls him.
       for (let i = 0; i < 40; i++) sim.tick();

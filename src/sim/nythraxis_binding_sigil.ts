@@ -54,9 +54,8 @@ export const NYTHRAXIS_UNBOUND_CAST_ID = 'Unbound';
 export const NYTHRAXIS_SIGIL_FIRST_SECONDS = 30;
 export const NYTHRAXIS_SIGIL_EVERY_NORMAL = 45;
 export const NYTHRAXIS_SIGIL_EVERY_HEROIC = 40;
-// The hall is about 50 yd wide (NYTHRAXIS_LAYOUT), so the band stays inside it.
-export const NYTHRAXIS_SIGIL_MIN_DIST = 10;
-export const NYTHRAXIS_SIGIL_MAX_DIST = 24;
+export const NYTHRAXIS_SIGIL_MIN_DIST = 12;
+export const NYTHRAXIS_SIGIL_MAX_DIST = 30;
 export const NYTHRAXIS_SIGIL_RADIUS_NORMAL = 4;
 export const NYTHRAXIS_SIGIL_RADIUS_HEROIC = 3;
 export const NYTHRAXIS_SIGIL_BIND_SECONDS_NORMAL = 15;

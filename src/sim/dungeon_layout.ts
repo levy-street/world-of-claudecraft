@@ -237,35 +237,42 @@ export const SANCTUM_LAYOUT: DungeonLayout = (() => {
   };
 })();
 
-// Nythraxis' Abandoned Crypt raid room: one compact fighting hall, about 50 yd
-// wide by 52 deep (owner decision 2026-09-04: the old 460 by 145 hall let the
-// raid stand still; the redo's floor hazards, the sigil drag, and Bone Storm
-// want a floor the raid has to share). The boss dais keeps its local position
-// (0, 96) so the encounter's spawn-relative geometry is unchanged; the four
-// pillars hug the side walls so the central floor stays open for the drag and
-// the charges, and the tombs sit in the wall line.
+// Nythraxis' Abandoned Crypt raid room: one fighting hall, about 100 yd wide
+// by 100 deep (owner decision 2026-09-04, twice the first compact cut: the old
+// 460 by 145 hall let the raid stand still; the redo's floor hazards, the sigil
+// drag, and Bone Storm want a floor the raid has to share but can still run
+// across). The boss dais keeps its local position (0, 96) with 20 yd behind
+// it so the encounter's spawn-relative geometry is unchanged; six pillars sit
+// well off the centre line so the middle stays open for the drag and the
+// charges, and the tombs sit in the wall line.
 export const NYTHRAXIS_LAYOUT: DungeonLayout = {
-  zMin: 52,
-  zMax: 104,
-  sideWallZ: 78,
-  sideWallHd: 26,
-  wallX: 26,
-  endWallHw: 27,
-  floorHalfX: 25,
+  zMin: 16,
+  zMax: 116,
+  sideWallZ: 66,
+  sideWallHd: 50,
+  wallX: 51,
+  endWallHw: 52,
+  floorHalfX: 50,
   pillars: [
-    { x: -20, z: 64 },
-    { x: 20, z: 64 },
-    { x: -20, z: 84 },
-    { x: 20, z: 84 },
+    { x: -32, z: 40 },
+    { x: 32, z: 40 },
+    { x: -32, z: 62 },
+    { x: 32, z: 62 },
+    { x: -32, z: 84 },
+    { x: 32, z: 84 },
   ],
   tombs: [
-    { x: -23.5, z: 70 },
-    { x: 23.5, z: 70 },
-    { x: -23.5, z: 90 },
-    { x: 23.5, z: 90 },
+    { x: -48.5, z: 30 },
+    { x: 48.5, z: 30 },
+    { x: -48.5, z: 50 },
+    { x: 48.5, z: 50 },
+    { x: -48.5, z: 70 },
+    { x: 48.5, z: 70 },
+    { x: -48.5, z: 90 },
+    { x: 48.5, z: 90 },
   ],
   stubs: [],
-  dais: { x: 0, z: 96, r: 7 },
+  dais: { x: 0, z: 96, r: 10 },
 };
 
 // The Drowned Temple (interior 'temple'): a two-part flooded temple — a long

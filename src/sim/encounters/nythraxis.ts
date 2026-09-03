@@ -323,8 +323,8 @@ const NYTHRAXIS_TRANSITION_CONTROL_GRACE = 0.5;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
 // of the boss spawn: appears 50yd out, walks up to 30yd out (between door + boss).
-const NYTHRAXIS_ALDRIC_SPAWN_DIST = 40;
-const NYTHRAXIS_ALDRIC_WALK_DIST = 20;
+const NYTHRAXIS_ALDRIC_SPAWN_DIST = 50;
+const NYTHRAXIS_ALDRIC_WALK_DIST = 30;
 const NYTHRAXIS_PARTY_INTERACT_RANGE = 30;
 const NYTHRAXIS_VISION_LINE_DELAY = 5;
 const NYTHRAXIS_HEROIC_ADD_IDS = [
@@ -2155,11 +2155,11 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
   if (!template) return;
   // Raise the guards from BEHIND the boss (toward the back wall), so they rise
   // up behind him and march out around him, not between the boss and the raid.
-  // Just behind him on the dais: the back wall is 8 yd behind the spawn now.
-  const back = boss.spawnPos.z + 5;
+  // Behind the dais; the back wall is 20 yd behind the spawn.
+  const back = boss.spawnPos.z + 12;
   const spawnPoints = [
-    ctx.groundPos(boss.spawnPos.x - 10, back),
-    ctx.groundPos(boss.spawnPos.x + 10, back),
+    ctx.groundPos(boss.spawnPos.x - 12, back),
+    ctx.groundPos(boss.spawnPos.x + 12, back),
   ];
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   // Add waves inherit the claimed instance's difficulty exactly like
@@ -2235,10 +2235,9 @@ export function updateNythraxisHeroicSummon(
 export function spawnNythraxisHeroicAdds(ctx: SimContext, boss: Entity): void {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   const spawnPoints = [
-    // Close behind him: the hall's back wall is 8 yd behind the spawn.
-    ctx.groundPos(boss.pos.x - 8, boss.pos.z + 4),
-    ctx.groundPos(boss.pos.x, boss.pos.z + 6),
-    ctx.groundPos(boss.pos.x + 8, boss.pos.z + 4),
+    ctx.groundPos(boss.pos.x - 8, boss.pos.z + 8),
+    ctx.groundPos(boss.pos.x, boss.pos.z + 10),
+    ctx.groundPos(boss.pos.x + 8, boss.pos.z + 8),
   ];
   const victimId = boss.aggroTargetId ?? threatEntries(boss, 1)[0]?.[0] ?? null;
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;

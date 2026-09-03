@@ -2637,11 +2637,11 @@ describe('dungeons: heroic Nythraxis raid arena', () => {
   it('the empty-instance reaper never frees the arena while raiders stand in its far corner', () => {
     const { sim, raiders, inst } = raidSetup('normal');
     const origin = instanceOriginOf(inst);
-    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) is a compact hall now (about 50 by
-    // 52 yd); its far front corner is a real, in-fight position that must stay
-    // inside instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out.
-    const tombX = origin.x + 24;
-    const tombZ = origin.z + 54;
+    // NYTHRAXIS_LAYOUT (dungeon_layout.ts) is one hall about 100 by 100 yd; its
+    // far front corner is a real, in-fight position that must stay inside
+    // instanceClaimContains's NYTHRAXIS_ROOM_RADIUS carve-out.
+    const tombX = origin.x + 48;
+    const tombZ = origin.z + 18;
     raiders.forEach((pid) => {
       teleport(sim, sim.entities.get(pid) as AnyEntity, tombX, tombZ);
     });
