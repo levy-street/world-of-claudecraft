@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "8ea2685a9e9353414429498a89799b2f3285842eeced178636db515657ee40d5",
+  "rendererFingerprint": "493ebe02c6912c089d40f1d6bb98c13399783366ec972446d1ee9929d37a1668",
   "renderer": {
     "trackedFiles": [
       {
@@ -28,7 +28,7 @@
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
       "bytes": 4560752,
-      "sha256": "6e81cefe8287945ff22a7c1c5788d19f1a64e91ff0e57280fbf8a571ff1cf20c",
+      "sha256": "7bdfee4985e1891392bbfcf3837ad03d350c1674eedfdcead8d32ff878b5786f",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -4418,8 +4418,8 @@
         "model": {
           "url": "models/props/nythraxis_bone_spike.glb",
           "path": "public/models/props/nythraxis_bone_spike.glb",
-          "bytes": 97928,
-          "sha256": "c4285511c3f6c3d5734c07dcc6154bb5cfe48cc0f27d7c9ae369376c3a92b252"
+          "bytes": 258956,
+          "sha256": "54cef7af378d2f101639533bcf395eb82c9dfa117d078a03ff19b088fe694dc3"
         },
         "idle": "Idle",
         "height": 1.6,
@@ -4436,11 +4436,11 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "a8c696ea2f1e4b3ed609430121873f6bc662d195d98f9c5a5895fad522ebf3df",
+      "sourceFingerprint": "1d6b88ce88132c5390d1983eb9a917bbc882489c5d3790de50e866987b528f5a",
       "output": {
         "path": "public/ui/mobs/nythraxis_bone_spike.webp",
-        "bytes": 1500,
-        "sha256": "6a03e654cce402261101fcd9b1a9b5a5911c48776895e9ff73197b2bf9f47faa"
+        "bytes": 1504,
+        "sha256": "c008e9692d97478f981866c792ba62a3a145dbc3a096eeb3d12a357440e5e7cc"
       }
     },
     {

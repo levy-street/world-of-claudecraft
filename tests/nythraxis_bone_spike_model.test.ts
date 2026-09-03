@@ -47,7 +47,12 @@ describe('Nythraxis Bone Spike model', () => {
   it('is a bounded, clip-less, upright prop at the authored size', async () => {
     await MeshoptDecoder.ready;
     const bytes = readFileSync(ASSET_PATH);
-    expect(bytes.byteLength).toBeLessThan(200_000);
+    // The Tripo export was 98 KB with WebP textures; the repo's GLB rule
+    // (tests/glb_texture_compression.test.ts) requires KTX2, whose mip chains
+    // cost disk for GPU-native decode, so the shipped file is about 259 KB.
+    // Still a quarter of the median shipped prop; the bound keeps a texture
+    // regression (a 2K atlas, a fourth map) from slipping in unnoticed.
+    expect(bytes.byteLength).toBeLessThan(300_000);
     const document = await new NodeIO()
       .registerExtensions(ALL_EXTENSIONS)
       .registerDependencies({ 'meshopt.decoder': MeshoptDecoder })
