@@ -70,9 +70,35 @@ The current companion service catalog publishes these tier prices for the game r
 
 Do not copy the retired placeholder `purple_*`, `redskull_*`, or `emberfang_sword` rows into the
 weapon storefront. Keep product IDs in lockstep across both registries. Update Claudium costs only
-in the companion service catalog. The initial category is `weapons`. Future `outfits` or `mounts`
-require an explicit game registry, allowlist, and UI update plus matching service rows; adding a
-service-only row does not make a new category purchasable.
+in the companion service catalog. The shipped cosmetic categories are `weapons` and `mounts` (the
+mount skins below). A future `outfits` category requires an explicit game registry, allowlist, and
+UI update plus matching service rows; adding a service-only row does not make a new category
+purchasable.
+
+## Mount skin products
+
+A mount the store sells is a MOUNT SKIN, never a mount item: an account-wide look worn over
+whatever mount the character already rides, so real money buys neither a reins item nor a speed
+tier. The game mechanical registry is `src/sim/content/mount_skins.ts` (ids, rarity, the render
+visual key, no copy, no price); names and flavor lines are `hudChrome.mounts.name_<id>` and
+`desc_<id>` keys wired through `src/ui/mount_labels.ts`. Every mount skin row in the service
+catalog uses `kind: "skin"`, the same SKU family as the weapon skins, and `server/claudium.ts`
+admits a `skin` id only when it is carried by exactly one of the two registries
+(`isKnownWeaponSkinId` or `isMountSkinId`; the registries are disjoint by construction). The
+retired `kind: "item"` reins rows (`reins_mech_bird`) are not products and are filtered out.
+
+| Service `itemId` | Sold as | Game registry rarity |
+|---|---|---|
+| `mech_bird` | Cluckwork Mech Bird | rare |
+| `chimeglass_tortoise` | Tolliver the Chimeglass | epic |
+
+Ownership is a per-account entitlement in `account_mount_cosmetics` (its own rollback-safe row,
+mirrored from the service's grant ledger on purchase and on every store open, exactly like
+`account_weapon_cosmetics`). Wearing a skin is per character, from the Cosmetics window, through
+the `change_mount_skin` command that the server gates on that ownership; a saved worn skin the
+account does not own comes off at join. A product is purchasable only when the same `itemId`
+exists in both registries and the service returns a positive cost; until the service rows above
+exist the store card renders unavailable.
 
 ## Bank storage products
 

@@ -14,6 +14,7 @@ import { wireParkedMana } from '../src/sim/combat/form_auto_unshift';
 import { rewindHealAmount } from '../src/sim/combat/rewind';
 import { DEEDS } from '../src/sim/content/deeds';
 import { isFinderListingTag, isFinderRole } from '../src/sim/content/dungeon_finder';
+import { isMountSkinId } from '../src/sim/content/mount_skins';
 import { RELIQUARY_PAGES_BY_ID } from '../src/sim/content/reliquary';
 import { MECH_CHROMAS, mechChromaSkinIndex } from '../src/sim/content/skins';
 import { withWeaponSkinApplied } from '../src/sim/content/weapon_skin_rules';
@@ -187,6 +188,7 @@ import {
   closePlaySession,
   GUILD_BANK_ROW_MAX_BYTES,
   grantAccountMechChroma,
+  grantAccountMountSkins,
   grantAccountWeaponSkins,
   heartbeatCharacterLeases,
   insertChatLogs,
@@ -306,6 +308,7 @@ import {
   type ModerationHost,
   ModerationService,
 } from './moderation_service';
+import { wornMountSkinAllowed } from './mount_skin_reconcile';
 import { MovementInputTimelineTickStats } from './movement_input_timeline_stats';
 import {
   applyMovementInputFrame,
@@ -3569,6 +3572,30 @@ export class GameServer {
       .catch((err) => console.error('failed to grant account weapon skins:', err));
   }
 
+  /**
+   * Mirror mount-skin ownership (src/sim/content/mount_skins.ts) into the
+   * rollback-safe account_mount_cosmetics row and push it to any live session on
+   * the account, the exact shape of grantWeaponSkinsToAccount: the economy
+   * service's grant ledger stays the purchase source of truth. Injected into the
+   * Claudium routes via configureClaudiumRuntime (server/claudium.ts). Ownership
+   * only: wearing the skin is the character's own change_mount_skin.
+   */
+  grantMountSkinsToAccount(accountId: number, skinIds: string[]): void {
+    const known = skinIds.filter(isMountSkinId);
+    if (known.length === 0) return;
+    const current = this.accountCosmeticsByAccount.get(accountId);
+    if (current && known.every((id) => current.mountSkinIds.includes(id))) return;
+    if (current) {
+      this.updateLiveAccountCosmetics(accountId, {
+        ...current,
+        mountSkinIds: [...new Set([...current.mountSkinIds, ...known])],
+      });
+    }
+    void grantAccountMountSkins(accountId, known)
+      .then((cosmetics) => this.updateLiveAccountCosmetics(accountId, cosmetics))
+      .catch((err) => console.error('failed to grant account mount skins:', err));
+  }
+
   /** Take a mech chroma off the acting character's own current appearance. The
    *  account-wide unlock (accountCosmetics.mechChromaIds) is permanent, exactly
    *  like an owned Season 1 Armory weapon skin: this never revokes it, so any
@@ -3772,6 +3799,12 @@ export class GameServer {
     // Seed the account-wide weapon-skin loadout onto the fresh sim entity so the
     // applied skin shows from the first snapshot (owned skins only).
     this.sim.setWeaponSkinLoadout(pid, this.ownedWeaponSkinLoadout(accountCosmetics));
+    // The worn mount skin rides the character save, ownership rides the
+    // account: a saved skin the account does not own comes off here (never
+    // healed into ownership; server/mount_skin_reconcile.ts).
+    if (!wornMountSkinAllowed(accountCosmetics, this.sim.meta(pid)?.mountSkinId)) {
+      this.sim.setMountSkin(pid, null);
+    }
     const sessionIp = meta.ip ?? '';
     const initialLevel = this.sim.entities.get(pid)?.level ?? state?.level ?? 1;
     const botTrackingContext = this.botDetector.createTrackingContext(

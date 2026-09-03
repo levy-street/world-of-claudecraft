@@ -31,6 +31,23 @@ A mount is at minimum:
    `VisualDef` in `src/render/characters/manifest.ts`, composed at runtime, see the
    puller section below, this is where the rickshaw's worst bug lived.
 
+## Mount SKINS are not mounts (the paid-look rule)
+
+A mount the store sells is never a mount. It is a MOUNT SKIN
+(`src/sim/content/mount_skins.ts`): an account-wide cosmetic the character wears OVER
+whatever mount they actually own and ride, drawn by the renderer through
+`mountVisualSpecFor(mountKey, mountSkinId)` and heard through `mountPresentationKey`.
+The ridden mount keeps its `MountKey`, its reins item, and every gameplay number; the
+skin has no speed tier, no reins, no Reliquary slot, and no `MountKey`. The Cluckwork
+Mech Bird and Tolliver the Chimeglass shipped as catalog mounts first and were converted
+in v0.42.0, which is why their GLBs, clips and audio cues are keyed by what are now skin
+ids. Authoring a skin reuses pieces 1, 2 (as a `MOUNT_SKIN_VISUAL_SPECS` row), 5 and 8 of
+the list above and skips 3, 4, 6 and 7, then adds a `MOUNT_SKINS` record, the
+`MOUNT_SKIN_NAME_KEYS`/`MOUNT_SKIN_DESC_KEYS` pair in `src/ui/mount_labels.ts`, and a
+matching kind `skin` row in the economy service catalog (`docs/claudium-store.md`). The
+Cosmetics window (`src/ui/hud/cosmetics/`) is where a player wears it; the store only
+sells it. See `docs/prd/cosmetics-window.md`.
+
 ## The puller: give it its OWN VisualDef, never repoint a shared one
 
 If your mount has a pulling/carrying NPC-shaped rig (like the rickshaw's skeleton),

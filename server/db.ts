@@ -514,6 +514,18 @@ WHERE cosmetics ? 'weaponSkinIds' OR cosmetics ? 'weaponSkinLoadout'
 -- startup would let a rolled-back binary resurrect a stale, previously-cleared
 -- loadout. Once the dedicated row exists it is the sole authority.
 ON CONFLICT (account_id) DO NOTHING;
+-- Mount skin ownership (src/sim/content/mount_skins.ts): the same rollback-safe
+-- paid-state shape as account_weapon_cosmetics, its own row so an older binary
+-- that rewrites accounts.cosmetics wholesale can never erase a purchase. No
+-- backfill: nothing ever stored a mount skin in the JSON document. The WORN skin
+-- is character state (characters.state mountSkinId), never kept here.
+CREATE TABLE IF NOT EXISTS account_mount_cosmetics (
+  account_id INT PRIMARY KEY REFERENCES accounts(id) ON DELETE CASCADE,
+  skin_ids JSONB NOT NULL DEFAULT '[]'::jsonb,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT account_mount_cosmetics_skin_ids_array
+    CHECK (jsonb_typeof(skin_ids) = 'array')
+);
 -- Operator-set account flair (cosmetic, no gameplay effect): the "AI-operated
 -- account" mark that prefixes the character name with [AI], and an official
 -- streamer's platform links. Both are written ONLY from the admin dashboard
@@ -1648,6 +1660,7 @@ interface AccountCosmeticsRow {
   cosmetics?: unknown;
   weapon_skin_ids?: unknown;
   weapon_skin_loadout?: unknown;
+  mount_skin_ids?: unknown;
 }
 
 function normalizeAccountCosmeticsRow(row: AccountCosmeticsRow | undefined): AccountCosmetics {
@@ -1662,6 +1675,10 @@ function normalizeAccountCosmeticsRow(row: AccountCosmeticsRow | undefined): Acc
       row?.weapon_skin_loadout === null || row?.weapon_skin_loadout === undefined
         ? base.weaponSkinLoadout
         : stringRecord(row.weapon_skin_loadout),
+    mountSkinIds:
+      row?.mount_skin_ids === null || row?.mount_skin_ids === undefined
+        ? base.mountSkinIds
+        : uniqueStrings(row.mount_skin_ids),
   };
 }
 
@@ -1669,9 +1686,11 @@ export async function loadAccountCosmetics(accountId: number): Promise<AccountCo
   const res = await pool.query(
     `SELECT a.cosmetics,
             awc.skin_ids AS weapon_skin_ids,
-            awc.loadout AS weapon_skin_loadout
+            awc.loadout AS weapon_skin_loadout,
+            amc.skin_ids AS mount_skin_ids
        FROM accounts a
        LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = a.id
+       LEFT JOIN account_mount_cosmetics amc ON amc.account_id = a.id
       WHERE a.id = $1`,
     [accountId],
   );
@@ -1722,9 +1741,11 @@ async function addAccountCosmeticId(
      )
      SELECT updated.cosmetics,
             awc.skin_ids AS weapon_skin_ids,
-            awc.loadout AS weapon_skin_loadout
+            awc.loadout AS weapon_skin_loadout,
+            amc.skin_ids AS mount_skin_ids
        FROM updated
-       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id`,
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = updated.id
+       LEFT JOIN account_mount_cosmetics amc ON amc.account_id = updated.id`,
     [accountId, key, value],
   );
   return normalizeAccountCosmeticsRow(res.rows[0]);
@@ -1765,9 +1786,11 @@ export async function grantAccountWeaponSkins(
      )
      SELECT a.cosmetics,
             upserted.skin_ids AS weapon_skin_ids,
-            upserted.loadout AS weapon_skin_loadout
+            upserted.loadout AS weapon_skin_loadout,
+            amc.skin_ids AS mount_skin_ids
        FROM upserted
-       JOIN accounts a ON a.id = upserted.account_id`,
+       JOIN accounts a ON a.id = upserted.account_id
+       LEFT JOIN account_mount_cosmetics amc ON amc.account_id = a.id`,
     [accountId, skinIds.filter((id) => id)],
   );
   return normalizeAccountCosmeticsRow(res.rows[0]);
@@ -1790,10 +1813,45 @@ export async function setAccountWeaponSkinLoadout(
      )
      SELECT a.cosmetics,
             upserted.skin_ids AS weapon_skin_ids,
-            upserted.loadout AS weapon_skin_loadout
+            upserted.loadout AS weapon_skin_loadout,
+            amc.skin_ids AS mount_skin_ids
        FROM upserted
-       JOIN accounts a ON a.id = upserted.account_id`,
+       JOIN accounts a ON a.id = upserted.account_id
+       LEFT JOIN account_mount_cosmetics amc ON amc.account_id = a.id`,
     [accountId, JSON.stringify(cleanLoadout)],
+  );
+  return normalizeAccountCosmeticsRow(res.rows[0]);
+}
+
+/** Additive union of owned mount skins in the rollback-safe paid-entitlement
+ *  row (src/sim/content/mount_skins.ts); the caller filters ids through the
+ *  registry first. Returns the whole refreshed account cosmetics view. */
+export async function grantAccountMountSkins(
+  accountId: number,
+  skinIds: string[],
+): Promise<AccountCosmetics> {
+  const res = await pool.query(
+    `WITH upserted AS (
+       INSERT INTO account_mount_cosmetics AS amc (account_id, skin_ids)
+       VALUES ($1, to_jsonb($2::text[]))
+       ON CONFLICT (account_id) DO UPDATE SET
+         skin_ids = (
+           SELECT COALESCE(jsonb_agg(to_jsonb(v) ORDER BY v), '[]'::jsonb)
+             FROM (
+               SELECT DISTINCT value AS v
+                 FROM jsonb_array_elements_text(amc.skin_ids || EXCLUDED.skin_ids)
+             ) merged),
+         updated_at = now()
+       RETURNING account_id, skin_ids
+     )
+     SELECT a.cosmetics,
+            awc.skin_ids AS weapon_skin_ids,
+            awc.loadout AS weapon_skin_loadout,
+            upserted.skin_ids AS mount_skin_ids
+       FROM upserted
+       JOIN accounts a ON a.id = upserted.account_id
+       LEFT JOIN account_weapon_cosmetics awc ON awc.account_id = a.id`,
+    [accountId, skinIds.filter((id) => id)],
   );
   return normalizeAccountCosmeticsRow(res.rows[0]);
 }
