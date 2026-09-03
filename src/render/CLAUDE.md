@@ -124,6 +124,20 @@ cadence logic of its own. Narrow helpers:
   ternaries. The renderer MUST call `initGfxTier(webgl)` right after creating
   the `WebGLRenderer` and before building scene content (software GL defaults
   to `low`; `?gfx=<tier>` / `?lowgfx` force a tier).
+- **Resolution has two levers and one base ratio.** `gfx_aa_policy_core.ts` owns
+  both the relative `pixelRatioCap` (binds where the panel DPR exceeds it) and the
+  absolute per-tier `maxDrawingBufferPixels` (binds on a DPR 1 1440p-plus or 4K
+  panel); `drawing_buffer_budget_core.ts` folds them into ONE base ratio,
+  `min(dpr, cap, sqrt(budget / css area))` under a legibility floor, and the
+  renderer reads it only through `basePixelRatio()` (`drawing_buffer_ratio.ts`).
+  The Render Quality slider multiplies on top; the dynamic-resolution region
+  (`dynamic_resolution_core.ts`) opens below it. Inside `renderer.ts` never
+  re-read `window.devicePixelRatio` for a target size (pinned by
+  `tests/dynamic_resolution_wiring.test.ts`). The secondary contexts
+  (`characters/preview.ts`, `armory_preview.ts`, panel-sized under their own
+  `preview_policy.ts` cap) and the CSS-space 2D overlays (`nameplate_painter.ts`,
+  `travel_speed_fx_painter.ts`) read the display DPR on purpose: the budget bounds
+  the scene buffer, never a surface a player reads text off.
 - **`surfaceMat(opts)`** is the material factory: it dedupes by
   `(color|maps|flags)` so hundreds of boxes share a few programs. Use it instead
   of `new MeshStandardMaterial`; `MeshLambertMaterial` is auto-substituted on low.

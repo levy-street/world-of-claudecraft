@@ -31,6 +31,7 @@ const EXPECTED_LOW_OVERRIDES = {
   cliffScree: 'cliffScree:0',
   canopyDetail: 'canopyDetail:0',
   pixelRatioCap: 'pixelRatioCap:1.48',
+  maxDrawingBufferPixels: 'maxDrawingBufferPixels:2400000',
   grassRadius: 'grassRadius:72',
   grassStep: 'grassStep:2.05',
   leanFoliage: 'leanFoliage:1',

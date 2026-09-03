@@ -18,6 +18,7 @@ export const GFX_OVERRIDE_VALUE_KINDS = {
   cliffScree: 'boolean',
   canopyDetail: 'boolean',
   pixelRatioCap: 'number',
+  maxDrawingBufferPixels: 'number',
   grassRadius: 'number',
   grassStep: 'number',
   leanFoliage: 'boolean',

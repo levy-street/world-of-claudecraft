@@ -358,7 +358,11 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
-    ceiling: 13214,
+    // Lowered 13214 -> 13195 by the drawing-buffer pixel budget: measureViewport
+    // moved to src/render/viewport_measure.ts, and the three min(dpr, cap) sites
+    // collapsed onto one basePixelRatio() over drawing_buffer_ratio.ts. Exact
+    // count, zero slack.
+    ceiling: 13195,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {

@@ -103,6 +103,25 @@ COSMETIC (may be tiered down on lower presets):
   device policy (`gfxAaPolicy`) plus the Anti-Aliasing dial, never of the frame-budget
   governor, so it cannot vary between two players standing in the same spot.
 
+- The drawing-buffer resolution: the per-tier DPR cap (`pixelRatioCap`) and, since the pixel
+  budget landed, the per-tier absolute `maxDrawingBufferPixels` (both in
+  `src/render/gfx_aa_policy_core.ts`, folded into one base ratio by
+  `src/render/drawing_buffer_budget_core.ts`, the Render Quality slider multiplying below it).
+  The lever is SHARPNESS of the 3D scene buffer and nothing else: the frame is upscaled to
+  the panel, every HUD element, the nameplate canvas and the pointer mapping are CSS-space at
+  the display DPR and never see the smaller buffer, so text stays legible and nothing a player
+  acts on changes size, position or timing. What follows the smaller buffer is exactly what
+  already follows the slider through `renderPixelHeight`: point-sprite VFX keep their
+  CSS-space size and the pixel-height-keyed scenery LOD (far-field grass density, scenery
+  flame refresh; `perceptual_lod_core.ts` keeps gameplay visibility out of that key) reads
+  the smaller extent. The 0.5 floor on the base ratio is the legibility bound for the few
+  in-buffer text surfaces (chat bubbles, floating combat text sized off the ratio): a panel
+  the budget would push below half resolution runs over budget instead. The budget is a
+  STATIC policy of the tier (a pure function of tier and device profile, never of the
+  frame-budget governor), so two players in the same spot on the same preset see the same
+  buffer; a 4K or 5K panel above the top tier's budget has no in-game opt-out by design
+  (the cap never had one either), the developer override being `?gfxo=maxDrawingBufferPixels:<n>`.
+
 The test for any new tier knob: if a knob hides or delays something a player READS AND REACTS
 TO, it is not allowed. If it only reduces visual richness or redraw smoothness, it is fine.
 
@@ -318,6 +337,12 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   EXACT shed count once the low-tier buff cap bites, the shed count excludes a debuff that
   rendered past the cap (only dropped buffs count), a painter built with no `overflowEl` never
   touches one, and the count clears again once the buff count drops back under the cap.
+- `tests/drawing_buffer_budget_core.test.ts` and `tests/gfx_aa_policy_core.test.ts`: the
+  per-tier pixel budgets are literal-pinned against display classes, the base ratio never
+  exceeds the DPR and never drops below the 0.5 legibility floor on any panel, a 1080p panel
+  is untouched on every tier, and `tests/dynamic_resolution_wiring.test.ts` pins that the
+  renderer takes every base ratio from that core (no raw DPR read) while
+  `tests/drawing_buffer_ratio.test.ts` pins the consumer free of any governor import.
 - `tests/ui_tier_knobs.test.ts`: the LOW shed constants are literal-pinned; a `Hud.fxTier()`
   source-scan proves the knobs read the static `data-fx-level` stamp and never the FPS
   governor; a source-scan pins that party frames are not tiered.

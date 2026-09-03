@@ -245,6 +245,7 @@ import { buildDoorBody, buildRiftGateBody, buildRiftPuzzleProp } from './door_po
 import { watchDevicePixelRatio } from './dpr_watch';
 import { DrainChannelStopLatch, drainChannelVisualPlan } from './drain_channel_visual_core';
 import { createLogicalFrameDrawStats, type LogicalFrameDrawStats } from './draw_stats_core';
+import { resolveDrawingBufferRatio } from './drawing_buffer_ratio';
 import { DungeonInteriors, dungeonDaisHasRaisedPlatform, ensureDungeonAssets } from './dungeon';
 import {
   dynamicResolutionAllocationScale,
@@ -721,6 +722,7 @@ import {
   type ViewCreateBudgetState,
 } from './view_create_budget_core';
 import { ViewCreateRetryGate } from './view_create_retry';
+import { measureCanvasViewport } from './viewport_measure';
 import {
   routeWarlockMeteorSpellfxAt,
   WarlockMeteorFx,
@@ -2092,7 +2094,7 @@ export class Renderer {
     );
     const LOW_GFX = this.lowGfx;
     this.viewport = this.measureViewport();
-    this.webgl.setPixelRatio(Math.min(window.devicePixelRatio, GFX.pixelRatioCap));
+    this.webgl.setPixelRatio(this.basePixelRatio());
     this.webgl.setSize(this.viewport.width, this.viewport.height, false);
     this.renderPixelHeight = this.webgl.domElement.height;
     // Three's default checkShaderErrors=true queries getShader/ProgramInfoLog
@@ -3345,22 +3347,13 @@ export class Renderer {
   }
 
   private measureViewport(): { width: number; height: number } {
-    const rect = this.webgl.domElement.getBoundingClientRect();
-    const stableMobileGameViewport =
-      document.body.classList.contains('game-active') &&
-      document.body.classList.contains('mobile-touch');
-    const vv = stableMobileGameViewport ? null : window.visualViewport;
-    const width = Math.round(
-      stableMobileGameViewport
-        ? rect.width || window.innerWidth
-        : (vv?.width ?? (rect.width || window.innerWidth)),
-    );
-    const height = Math.round(
-      stableMobileGameViewport
-        ? rect.height || window.innerHeight
-        : (vv?.height ?? (rect.height || window.innerHeight)),
-    );
-    return { width: Math.max(1, width), height: Math.max(1, height) };
+    return measureCanvasViewport(this.webgl.domElement);
+  }
+
+  /** DPR under the tier's cap AND its drawing-buffer pixel budget, before the
+   *  Render Quality slider (drawing_buffer_budget_core.ts). */
+  private basePixelRatio(): number {
+    return resolveDrawingBufferRatio(this.viewport).ratio;
   }
 
   private captureGlIdentity(): void {
@@ -3413,8 +3406,8 @@ export class Renderer {
   /**
    * A display change the page cannot observe on its own (the window moved to
    * another monitor, or its scale factor changed). resizeViewport re-measures
-   * and applyResolution re-reads window.devicePixelRatio live, so this is the
-   * whole fix.
+   * and applyResolution re-reads the live device pixel ratio through
+   * basePixelRatio, so this is the whole fix.
    */
   noteDisplayChanged(): void {
     if (!this.shutdownStarted) this.resizeViewport();
@@ -3423,7 +3416,7 @@ export class Renderer {
   // Allocate at the manual resolution ceiling. Automatic changes on the supported
   // grade-only path update only the live region below, never target storage.
   private applyResolution(): void {
-    const basePixelRatio = Math.min(window.devicePixelRatio, GFX.pixelRatioCap);
+    const basePixelRatio = this.basePixelRatio();
     const allocationScale = dynamicResolutionAllocationScale(
       this.post?.supportsDynamicResolution === true,
       this.renderScale,
@@ -3446,7 +3439,7 @@ export class Renderer {
       const rect = dynamicResolutionRect({
         logicalWidth: this.viewport.width,
         logicalHeight: this.viewport.height,
-        pixelRatio: Math.min(window.devicePixelRatio, GFX.pixelRatioCap),
+        pixelRatio: this.basePixelRatio(),
         renderScale: this.effectiveRenderScale,
         maxRenderScale: this.renderBudgetMaxScale(),
         minRenderScale: Math.max(MIN_DYNAMIC_RENDER_SCALE, this.renderBudgetMinScale()),

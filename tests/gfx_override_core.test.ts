@@ -28,6 +28,7 @@ const settings = {
   cliffScree: true,
   canopyDetail: true,
   pixelRatioCap: 2.5,
+  maxDrawingBufferPixels: 4_400_000,
   grassRadius: 82,
   grassStep: 1.8,
   leanFoliage: false,
@@ -61,6 +62,7 @@ describe('gfx override parsing', () => {
           'cliffScree:0',
           'canopyDetail:0',
           'pixelRatioCap:1.48',
+          'maxDrawingBufferPixels:2400000',
           'grassRadius:80',
           'grassStep:2.05',
           'leanFoliage:1',
@@ -90,6 +92,7 @@ describe('gfx override parsing', () => {
       cliffScree: false,
       canopyDetail: false,
       pixelRatioCap: 1.48,
+      maxDrawingBufferPixels: 2_400_000,
       grassRadius: 80,
       grassStep: 2.05,
       leanFoliage: true,
@@ -171,13 +174,18 @@ describe('gfx override application', () => {
     // this one moves a VALUE too: medium and the Advanced grade-only mix are
     // the profiles the new AA policy grants it to, and low/high/ultra/insane
     // move only by the serialized key name.
+    // Regenerated across the board for the `maxDrawingBufferPixels` field (the
+    // absolute drawing-buffer pixel budget beside pixelRatioCap; see
+    // gfx_aa_policy_core.ts). A VALUE on every row: the 1080p class on low and
+    // medium, the 1440p class on high and the Advanced mix, 1440p-plus on
+    // ultra and insane.
     expect(hashes).toEqual({
-      low: '49e537a97a367badeb8f9cbeb408bbb0832e886e164349eb682a0b3a128f2dcb',
-      medium: '7f724620474ca3dc4f4ffc18653a5b07ed02de35984fb65375bbd38b7d79644e',
-      high: 'eb82ae69bed246784b6db51df29edfcb928931d8174ed633c2a3eda5706bb9d1',
-      ultra: '08c271575220f6f332b4730a04a9e77be13ee1b9624eda37056f8d2660ea6c0f',
-      insane: 'f3399ea1e9439ea52e873be3decb7dc8ccbb77f04dcb28db2da2359c885d5ca0',
-      advanced: '5674b855481ede62fb55fbe0f8074d991227487bc152f6f0e8676ff94b0947e6',
+      low: 'c65a6b7a24319cba471ac813fd1298a8a13e4acf395256a1de91b8d243b96c6e',
+      medium: '3e143ee97bf2e38363008cae760ab73da7334e83257dce68629fdf577d0ad602',
+      high: '8124ae68385a9794a871401d1fe7befc47187897a83c1e659dd7bc23393814d2',
+      ultra: '7256c30b9e0c5289cd9c211fe41a3321769cef24d8beabdb9fa96a9ec7036db8',
+      insane: 'ca910bbdbfcd367cf3bab2c28e34d2f3c6000fb6d8146cc9077d77eb7b952923',
+      advanced: '32be4070dd4243089d34825e574667f1bc39ad8449c22fb1fe2fec8d7fc79e22',
     });
   });
 

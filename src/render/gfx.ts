@@ -171,6 +171,12 @@ export interface GfxSettings {
   readonly msaaSamples: number;
   /** devicePixelRatio is capped here because unbounded supersampling is a fill-rate cost */
   readonly pixelRatioCap: number;
+  /**
+   * Absolute drawing-buffer ceiling in device pixels per frame, the lever the
+   * relative cap above lacks on a DPR 1 panel: the base ratio is
+   * min(dpr, pixelRatioCap, sqrt(this / css area)) (drawing_buffer_budget_core.ts).
+   */
+  readonly maxDrawingBufferPixels: number;
   /** Directional sun shadow pass. Disabled where its duplicate scene draw is unsafe. */
   readonly dynamicShadows: boolean;
   readonly shadowMap: number;
@@ -1036,6 +1042,7 @@ function settingsFor(tier: GfxTier, hints?: Partial<GfxRuntimeHints>): GfxSettin
     ao: !iosMemoryProfile && gfxTierAtLeast(tier, 'high'),
     msaaSamples: aaPolicy.msaaSamples,
     pixelRatioCap: aaPolicy.pixelRatioCap,
+    maxDrawingBufferPixels: aaPolicy.maxDrawingBufferPixels,
     // Shadows are cosmetic and duplicate the visible scene draw. Both constrained browsers and
     // the stricter iOS WebKit residency profile remove that duplicate pass.
     dynamicShadows: tier !== 'low' && !constrainedMemory,

@@ -13,6 +13,7 @@ function methodSource(signature: string): string {
 describe('dynamic resolution renderer wiring', () => {
   it('allocates at the manual ceiling and changes only the live region automatically', () => {
     const allocation = methodSource('private applyResolution(): void');
+    expect(allocation).toContain('const basePixelRatio = this.basePixelRatio();');
     expect(allocation).toContain('dynamicResolutionAllocationScale(');
     expect(allocation).toContain('this.webgl.setPixelRatio(ratio);');
     expect(allocation).toContain('this.webgl.setSize(this.viewport.width, this.viewport.height');
@@ -31,6 +32,7 @@ describe('dynamic resolution renderer wiring', () => {
 
     const liveRegion = methodSource('private applyRenderRegion(): void');
     expect(liveRegion).toContain('post.setRenderRegion(rect);');
+    expect(liveRegion).toContain('pixelRatio: this.basePixelRatio(),');
     expect(liveRegion).not.toContain('.setSize(');
     expect(liveRegion).not.toContain('.setPixelRatio(');
   });
@@ -65,5 +67,16 @@ describe('dynamic resolution renderer wiring', () => {
     expect(renderer).toContain('-(clientY / this.viewport.height) * 2 + 1');
     expect(renderer).toContain('(this.tmpV.x * 0.5 + 0.5) * this.viewport.width');
     expect(renderer).toContain('(-this.tmpV.y * 0.5 + 0.5) * this.viewport.height');
+  });
+
+  it('takes every base pixel ratio from the budgeted core, never a raw DPR-under-cap read', () => {
+    // The boot setPixelRatio, applyResolution and the region rect all share one
+    // base ratio (drawing_buffer_ratio.ts over drawing_buffer_budget_core.ts), so
+    // the DPR cap and the pixel budget cannot drift apart between the three sites.
+    expect(renderer).toContain('this.webgl.setPixelRatio(this.basePixelRatio());');
+    expect(renderer).not.toContain('Math.min(window.devicePixelRatio, GFX.pixelRatioCap)');
+    expect(renderer.match(/window\.devicePixelRatio/g)).toBeNull();
+    const base = methodSource('private basePixelRatio(): number');
+    expect(base).toContain('resolveDrawingBufferRatio(this.viewport).ratio');
   });
 });

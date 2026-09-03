@@ -23,6 +23,7 @@ import {
   surfaceMat,
   tierFromHints,
 } from '../src/render/gfx';
+import { gfxAaPolicy } from '../src/render/gfx_aa_policy_core';
 import { tsFilesUnder } from './helpers/ts_files_under';
 
 const desktop: GfxRuntimeHints = {
@@ -194,6 +195,24 @@ describe('graphics tier resolution', () => {
     expect(GFX_BUDGETS.ultra.urgentFrameMs).toBe(44);
     expect(GFX_BUDGETS.insane.dropFrameMs).toBe(30);
     expect(GFX_BUDGETS.insane.urgentFrameMs).toBe(44);
+  });
+
+  it('carries the per-tier drawing-buffer pixel budget beside the DPR cap', () => {
+    // The budget is the AA policy's, byte for byte, on every tier and memory
+    // profile: gfx.ts never re-derives it (drawing_buffer_budget_core.ts folds
+    // it into the base ratio the renderer allocates at).
+    for (const tier of ['low', 'medium', 'high', 'ultra', 'insane'] as const) {
+      const settings = gfxInternalsForTest.settingsFor(tier, desktop);
+      const policy = gfxAaPolicy(tier);
+      expect(settings.maxDrawingBufferPixels, tier).toBe(policy.maxDrawingBufferPixels);
+      expect(settings.pixelRatioCap, tier).toBe(policy.pixelRatioCap);
+      expect(Number.isFinite(settings.maxDrawingBufferPixels), tier).toBe(true);
+    }
+    const ios = gfxInternalsForTest.settingsFor('ultra', { ...desktop, platform: 'ios' });
+    expect(ios.pixelRatioCap).toBe(1.25);
+    expect(ios.maxDrawingBufferPixels).toBe(
+      gfxAaPolicy('ultra', { iosMemoryProfile: true }).maxDrawingBufferPixels,
+    );
   });
 
   it('defines tunable bucket bands for every quality tier', () => {
