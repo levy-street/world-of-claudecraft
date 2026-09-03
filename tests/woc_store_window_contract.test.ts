@@ -84,6 +84,7 @@ const storeFocusPolicy = readSource('../src/ui/store_focus_policy.ts');
 const storeDecisionPrompt = readSource('../src/ui/store_decision_prompt.ts');
 const storeSurfaceRuntime = readSource('../src/ui/store_surface_runtime.ts');
 const storeArmoryPurchase = readSource('../src/ui/store_armory_purchase.ts');
+const storeSpendControllers = readSource('../src/ui/store_spend_controllers.ts');
 const dailyRewardsChrome = readSource('../src/ui/daily_rewards_chrome_view.ts');
 const claudiumWindow = readSource('../src/ui/claudium_window.ts');
 const hud = readSource('../src/ui/hud.ts');
@@ -652,9 +653,13 @@ describe('WOC Store window contract', () => {
     expect(skinPurchase).toContain('result = await this.deps.spend(row.skin.id, cost)');
     expect(skinPurchase).not.toContain('idempotencyKey');
     expect(skinPurchase).not.toContain('charterIntents');
+    // The window's one spend seam carries (itemId, kind, cost) and nothing else;
+    // the grant-family factory is where 'skin' is chosen, still with no key.
     expect(storeWindow).toContain(
-      "spend: async (itemId, cost) => this.deps.spendStoreItem?.(itemId, 'skin', cost)",
+      'spend: async (itemId, kind, cost) => this.deps.spendStoreItem?.(itemId, kind, cost)',
     );
+    expect(storeSpendControllers).toContain("spend: (itemId, cost) => spend(itemId, 'skin', cost)");
+    expect(storeSpendControllers).not.toContain('idempotencyKey');
   });
 
   it('carries keyboard focus across its own rebuild through the shared seam', () => {

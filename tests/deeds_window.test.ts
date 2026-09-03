@@ -1121,6 +1121,8 @@ describe('chrome keys and CSS floors', () => {
 });
 
 describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
+  const buttonEl = (): HTMLElement => document.createElement('button');
+
   it('adds the Book of Deeds window to the guard array, keeping the shared guard body', () => {
     // The Book is a non-modal overlay, so canUseGameKeys() stays true while a
     // Book button has focus: without the guard, Space jumps the character and
@@ -1150,7 +1152,13 @@ describe('non-modal Enter/Space activation guard (WCAG 2.1.1)', () => {
     // Bound the slice at the function's closing brace so the negative below never
     // polices whatever follows the guard in the module.
     const guardBody = guardSrc.slice(bodyStart, guardSrc.indexOf('\n}\n', bodyStart) + 3);
-    expect(guardBody).toContain("tagName !== 'BUTTON'");
+    // The decision itself is the pure src/ui/panel_key_guard.ts rule (only a
+    // focused BUTTON, only Enter/Space, and the one bag item row Space must
+    // pass through to reach the jump); the guard body delegates to it.
+    expect(guardBody).toContain('panelKeyGuardStops(');
+    const rule = stripLineComments(read('../src/ui/panel_key_guard.ts'));
+    expect(rule).toContain("tagName !== 'BUTTON'");
+    expect(rule).not.toContain('preventDefault');
     expect(guardBody).toContain('ke.stopPropagation()');
     expect(guardBody).not.toContain('preventDefault');
   });

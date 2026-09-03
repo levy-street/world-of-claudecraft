@@ -335,6 +335,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
   'hudChrome.wocStore.storeTab': '상점',
   'hudChrome.wocStore.rewardsTab': '일일 보상',
+  'hudChrome.wocStore.mountsEyebrow': '계정 탈것',
+  'hudChrome.wocStore.mountsTitle': '기계 마구간',
+  'hudChrome.wocStore.mountBuyAria': '{item} 구매',
   'hudChrome.wocStore.loading': 'WOC 상점 불러오는 중…',
   'hudChrome.wocStore.error': '현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.',
   'hudChrome.wocStore.balance': 'Claudium 잔액',
@@ -9004,6 +9007,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
+  'entities.items.reins_mech_bird.name': '태엽 기계새 시동 열쇠',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -10476,8 +10480,17 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '그림자 도약 두꺼비 카마카게',
   'hudChrome.mounts.name_stormfeather_griffin': '하늘닿이 폭풍깃',
   'hudChrome.mounts.name_drakemaw_raptor': '화산구 랩터',
+  'hudChrome.mounts.name_lanternback_troll': '등불지기 그룸볼',
+  'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
+  'hudChrome.mounts.name_mech_bird': '태엽 기계새',
+  'hudChrome.mounts.desc_mech_bird':
+    '수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.',
+  'hudChrome.mounts.desc_lanternback_troll':
+    '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
+  'hudChrome.mounts.desc_chimeglass_tortoise':
+    '소금 평원의 육지거북. 대상 세 세대를 앞질러 걸었다. 그를 거둔 땜장이들이 폭풍유리를 갈아 안경을 만들고 목에 청동 종을 달아, 길은 그를 보기 전에 먼저 듣는다.',
   'hudChrome.mounts.name_thunderstrut_gobbler': '천둥활보 대왕 칠면조',
   'hudChrome.mounts.name_terrorspark_groundshaker': '대지를 뒤흔드는 테러스파크',
   'hudChrome.mounts.name_rickshaw_mount': '뼈에 묶인 인력거',
@@ -11281,6 +11294,10 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '마지막 요새의 인장',
   'entities.dungeons.the_last_keep.enterText': '마지막 요새의 차갑고 고요한 회랑에 발을 들입니다.',
   'entities.items.reins_terrorspark_groundshaker.name': '테러스파크 시동 열쇠',
+  'entities.items.reins_lanternback_troll.name':
+    '점등인의 멍에: 그룸볼',
+  'entities.items.reins_chimeglass_tortoise.name':
+    '길지기의 종끈: 톨리버',
   'entities.items.reins_rickshaw_mount.name': '결속된 고삐: 뼈에 묶인 인력거',
   'entities.dungeons.the_last_keep.leaveText':
     '요새의 문을 닫고 드레이크랜드의 바람 속으로 돌아갑니다.',

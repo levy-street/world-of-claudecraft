@@ -12,6 +12,7 @@ import type { OverheadEmoteId } from '../../world_api';
 import { recordBuildSpan, timeBuildSpan } from '../build_spans';
 import { GFX } from '../gfx';
 import { cloneMaterialWithHooks } from '../material_clone_hooks';
+import type { MountRideSpec } from '../mount_visuals';
 import {
   createWeaponVfx,
   DEFAULT_TUNING,
@@ -157,6 +158,22 @@ const BOW_PIN_BLEND_S = 0.12; // engage/disengage fade for the orientation pins
 
 const FADE = 0.22;
 const ONESHOT_FADE = 0.1;
+/** Idle-breaker cadence (seconds): a floor plus a per-fire jitter, so several
+ *  copies of the same rig standing together never fidget in lockstep.
+ *
+ *  Deliberately tight: the fidgets are the whole point of this rig, so they run
+ *  on a 5-second beat rather than the sparse 20-to-45s one this shipped with.
+ *  The variants themselves run 3.7 to 4.3 seconds, so a standing mount is
+ *  almost always mid-fidget: that is the intended read here, not an accident,
+ *  and raising the floor back above the longest clip is a one-line change. */
+const IDLE_VARIANT_MIN = 5;
+const IDLE_VARIANT_JITTER = 0;
+/** Exported for tests/idle_variants.test.ts, which pins the cadence against the
+ *  actual clip lengths in the shipped GLBs. */
+export const idleVariantCadenceForTest = {
+  min: IDLE_VARIANT_MIN,
+  jitter: IDLE_VARIANT_JITTER,
+} as const;
 // Z-key sheathe gesture: the 1H chop's WINDUP raises the hand over the shoulder
 // toward the back (grabbing/planting the hilt). The held-prop swap lands at the
 // windup peak, where update() also cuts the clip so the downswing never plays.
@@ -206,6 +223,39 @@ const CLIMB_BODY_PITCH = 0.3;
 const CLIMB_BODY_DUCK = -0.18;
 /** Blend in/out rate for the whole climb pose (1/s). */
 const CLIMB_BLEND_RATE = 14;
+
+/** Ride (straddle) pose bones. The foot chain is only needed here, so it is not
+ *  folded into the climb's arrays. Names are the three.js-sanitized KayKit
+ *  Rig_Medium ones (the GLB spells them `upperleg.l`; the loader drops the dot). */
+/** Base states in which the body is TRAVELLING. A touchdown one-shot yields to
+ *  any of them (see the landing cancel in update): finishing a recovery pose
+ *  while sliding forward reads as a freeze, whatever the clip is doing. */
+const MOVING_STATES: ReadonlySet<BaseState> = new Set<BaseState>([
+  'walk',
+  'walkBack',
+  'run',
+  'wade',
+  'swim',
+  'swimSurface',
+]);
+
+const RIDE_FOOT_BONES = ['footl', 'footr'] as const;
+const RIDE_HIP_BONE = 'hips';
+/** Blend in/out rate for the straddle (1/s): a mount summon should settle the
+ *  rider's legs over the same beat the mount fades in on, not snap them. */
+const RIDE_BLEND_RATE = 8;
+const AXIS_X = /* @__PURE__ */ new THREE.Vector3(1, 0, 0);
+const AXIS_Z = /* @__PURE__ */ new THREE.Vector3(0, 0, 1);
+/** The leg bones' rest orientation: a half turn about X, which is what points
+ *  their local +Y (down the limb) at the model's DOWN. Every ride-pose thigh
+ *  target is built off it. */
+const RIDE_LEG_REST = /* @__PURE__ */ new THREE.Quaternion().setFromAxisAngle(
+  new THREE.Vector3(1, 0, 0),
+  Math.PI,
+);
+// Scratch, so the per-frame pose allocates nothing.
+const rideQuat = /* @__PURE__ */ new THREE.Quaternion();
+const rideSwing = /* @__PURE__ */ new THREE.Quaternion();
 /** Fallback local clock for the pose envelope, used only when no sim phase
  *  arrives (an older server); normally the pose tracks the climb's real,
  *  height-scaled progress via setClimbing's phase. */
@@ -628,6 +678,15 @@ export class CharacterVisual {
   private baseState: BaseState = 'idle';
   private current: THREE.AnimationAction | null = null;
   private currentIsOneShot = false;
+  /** Seconds until the next idle-breaker; -1 means "rearm on the next idle". */
+  private idleVariantIn = -1;
+  /** The live one-shot is an idle-breaker, so leaving idle must cancel it. */
+  private currentOneShotIsIdleVariant = false;
+  /** Countdown to the next ClipMap.idleBeat fire; -1 = rearm on the idle edge. */
+  private idleBeatIn = -1;
+  /** True while the live one-shot is the TOUCHDOWN clip, so a body that lands
+   *  already travelling can drop it instead of sliding through it. */
+  private currentOneShotIsLanding = false;
   private currentOneShotIsEmote = false;
   /** the running one-shot is a cast-exit play-out (a recovery tail): it
    *  yields to any real body state the moment one appears, because holding it
@@ -692,6 +751,14 @@ export class CharacterVisual {
   private climbHeadBone: THREE.Object3D | null | undefined;
   /** True while the climb's baked clips own the mixer (restore on release). */
   private climbClipsActive = false;
+  // Straddle pose, for mounts whose spec asks for one (mount_visuals.ts
+  // MountRideSpec). `spec` is the target the renderer sets each frame and
+  // `blend` chases 0/1 off it, so dismounting unwinds the legs instead of
+  // dropping them.
+  private rideSpec: MountRideSpec | null = null;
+  private rideBlend = 0;
+  private rideFootBones: (THREE.Object3D | null)[] | undefined;
+  private rideHipBone: THREE.Object3D | null | undefined;
   private spinAngle = 0;
   private spinOnceTimer = 0;
 
@@ -966,8 +1033,10 @@ export class CharacterVisual {
     if (
       landClip &&
       shouldPlayLanding(this.wasAirborne, s.airborne, s.dead, !!this.action(landClip))
-    )
+    ) {
       this.playOneShot(landClip, 1);
+      this.currentOneShotIsLanding = true;
+    }
     this.wasAirborne = s.airborne;
 
     this.castingAbility = s.casting ? (s.castingAbility ?? null) : null;
@@ -979,6 +1048,29 @@ export class CharacterVisual {
       if (this.currentOneShotIsEmote && this.shouldInterruptEmote(s)) {
         this.currentIsOneShot = false;
         this.currentOneShotIsEmote = false;
+        this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (this.currentIsOneShot && this.currentOneShotIsIdleVariant && desired !== 'idle') {
+        // An idle-breaker must die the instant the rig stops standing still.
+        // It is a one-shot, so without this it suppresses BOTH the fade to
+        // walk/run below and the foot-speed matching further down: the mount
+        // would skate across the ground, mid-fidget, for the rest of a clip
+        // that can run four seconds.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsIdleVariant = false;
+        this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
+      } else if (
+        this.currentIsOneShot &&
+        this.currentOneShotIsLanding &&
+        MOVING_STATES.has(desired)
+      ) {
+        // Same trap as the idle-breaker above, one state over: a touchdown
+        // one-shot is still a one-shot, so it suppresses the fade to walk/run
+        // AND the foot-speed match beneath it. Landing at speed therefore held
+        // the recovery pose and skated forward for the whole clip. A body that
+        // touches down already travelling has no business finishing a recovery
+        // it never stood still for, so the clip yields to the gait at once.
+        this.currentIsOneShot = false;
+        this.currentOneShotIsLanding = false;
         this.fadeTo(this.baseAction(), this.baseTransitionFade(desired), false);
       } else if (this.currentOneShotIsCastExit && this.shouldInterruptEmote(s)) {
         // The recovery tail outlived the sim's stand-still window (the clip
@@ -1006,6 +1098,8 @@ export class CharacterVisual {
         this.fadeTo(this.baseAction(), 0.15, false);
       }
       if (desired === 'cast') this.castClipAbility = this.castingAbility;
+      this.tickIdleBeat(dt, desired);
+      this.tickIdleVariant(dt, desired);
       // foot-speed matching on locomotion cycles
       if (!this.currentIsOneShot && this.current) {
         const timeScale = locomotionTimeScale(this.baseState, s, this.def.walkRef, this.def.runRef);
@@ -1184,6 +1278,8 @@ export class CharacterVisual {
       this.applyStowArmLift(dt);
       // Same rule for the climb's overhead reach.
       this.applyClimbPose();
+      // ...and for the straddle a mount asks its rider to hold.
+      this.applyRidePose(dt);
       const verdictTime =
         this.templarsVerdictAction &&
         this.current === this.templarsVerdictAction &&
@@ -1448,6 +1544,95 @@ export class CharacterVisual {
     if (on && !this.climbOn) this.climbPhase = clamped ?? 0;
     this.climbOn = on;
     this.climbTarget = on ? clamped : null;
+  }
+
+  /**
+   * Sit this body astride a mount, or hand it back its own legs.
+   *
+   * The renderer passes the active mount's MountRideSpec while the mount is
+   * shown and null the rest of the time, and the pose is applied after the
+   * mixer in the same slot as the ledge climb. Mounts without a ride spec keep
+   * the plain seated loop, the Lanternback's rider is in a CHAIR, where a
+   * straddle would be wrong.
+   */
+  setRidePose(spec: MountRideSpec | null): void {
+    this.rideSpec = spec;
+  }
+
+  /**
+   * Fold the legs around the mount's barrel.
+   *
+   * Runs AFTER the mixer, in the same slot as applyClimbPose, and bails while
+   * the climb owns the body, nothing can be climbing a ledge and riding at
+   * once, and the two would otherwise both write the thigh.
+   *
+   * Unlike every other pose layer here this one OVERRIDES the legs (a slerp
+   * from the clip's pose toward an absolute target) rather than adding to
+   * them. The base underneath is the floor-sit loop, whose thighs are folded
+   * to 99 degrees forward and 105 degrees out with the shins tucked across
+   * each other, additive offsets on top of a cross-legged pose land wherever
+   * that pose happens to be, and the legs of a rider gripping a mount should
+   * be still anyway. The base keeps everything else: the hips' HEIGHT (which
+   * is what puts his weight on the saddle), the breathing, the arms.
+   *
+   * Bone frames, read out of the shipped rig rather than guessed: each leg
+   * bone's local +Y runs DOWN the limb, the pelvis frame is the model frame
+   * (+Z forward, proved by the toe bone sitting forward of the ankle), and the
+   * legs' rest orientation is a half turn about X. So the target for a thigh
+   * is qZ(spread) * qX(-flex) * qRest, the knee is a plain hinge about the
+   * thigh's own X, and the left leg (which hangs at model +X) opens on
+   * POSITIVE z with the right mirrored.
+   */
+  private applyRidePose(dt: number): void {
+    const spec = this.rideSpec;
+    const target = spec && !this.climbOn && this.climbBlend <= 0 ? 1 : 0;
+    this.rideBlend += (target - this.rideBlend) * Math.min(1, dt * RIDE_BLEND_RATE);
+    if (this.rideBlend < 1e-3) {
+      this.rideBlend = 0;
+      return;
+    }
+    if (!spec) return;
+    if (this.climbLegBones === undefined) {
+      this.climbLegBones = CLIMB_LEG_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.climbShinBones === undefined) {
+      this.climbShinBones = CLIMB_SHIN_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.rideFootBones === undefined) {
+      this.rideFootBones = RIDE_FOOT_BONES.map((n) => this.model.getObjectByName(n) ?? null);
+    }
+    if (this.rideHipBone === undefined) {
+      this.rideHipBone = this.model.getObjectByName(RIDE_HIP_BONE) ?? null;
+    }
+    const k = this.rideBlend;
+    for (let i = 0; i < this.climbLegBones.length; i++) {
+      const side = i === 0 ? 1 : -1;
+      const thigh = this.climbLegBones[i];
+      if (thigh) {
+        rideQuat
+          .setFromAxisAngle(AXIS_Z, side * spec.spread)
+          .multiply(rideSwing.setFromAxisAngle(AXIS_X, -spec.thigh))
+          .multiply(RIDE_LEG_REST);
+        thigh.quaternion.slerp(rideQuat, k);
+      }
+      const shin = this.climbShinBones[i];
+      if (shin) shin.quaternion.slerp(rideQuat.setFromAxisAngle(AXIS_X, spec.knee), k);
+      const foot = this.rideFootBones[i];
+      if (foot && spec.ankle !== undefined) {
+        foot.quaternion.slerp(rideQuat.setFromAxisAngle(AXIS_X, spec.ankle), k);
+      }
+    }
+    // The pelvis is an override too (the seated lounge leans it back); the
+    // chest stays additive so the torso keeps breathing on top.
+    if (this.rideHipBone && spec.hips !== undefined) {
+      this.rideHipBone.rotation.x += (spec.hips - this.rideHipBone.rotation.x) * k;
+    }
+    if (spec.lean) {
+      if (this.climbTorsoBone === undefined) {
+        this.climbTorsoBone = this.model.getObjectByName(CLIMB_TORSO_BONE) ?? null;
+      }
+      if (this.climbTorsoBone) this.climbTorsoBone.rotation.x += spec.lean * k;
+    }
   }
 
   /** Ease the extra arm raise in toward the swap moment and back out after it;
@@ -3421,6 +3606,79 @@ export class CharacterVisual {
     return false;
   }
 
+  /**
+   * Idle-breakers: while a rig with `idleVariants` is standing still, play one
+   * of them now and then instead of looping the breathing idle forever.
+   *
+   * They go through playOneShot, so onFinished crossfades the rig back to the
+   * base idle and nothing here has to unwind the pose. The timer only runs
+   * while genuinely idle; the moment the rig leaves idle the caller above
+   * CANCELS a fidget already in flight, because a one-shot left running would
+   * suppress the walk/run fade and the foot-speed match behind it.
+   *
+   * The interval is jittered per fire rather than fixed: a paddock of
+   * tortoises all rearing on the same beat is worse than none of them rearing
+   * at all. It is also deliberately long relative to the clips (which run 3.7
+   * to 4.3 seconds) so the rig reads as occasionally restless rather than
+   * twitchy.
+   */
+  private tickIdleVariant(dt: number, desired: BaseState): void {
+    const variants = this.def.clips.idleVariants;
+    if (!variants || variants.length === 0) return;
+    if (desired !== 'idle') {
+      this.idleVariantIn = -1; // rearm on the next idle edge
+      return;
+    }
+    if (this.idleVariantIn < 0) {
+      this.idleVariantIn = IDLE_VARIANT_MIN + Math.random() * IDLE_VARIANT_JITTER;
+      return;
+    }
+    this.idleVariantIn -= dt;
+    if (this.idleVariantIn > 0) return;
+    // Due, but something else is playing (very often the idle BEAT, which is a
+    // one-shot too). Hold the draw rather than rearming: rearming here let the
+    // beat reset this clock on every fire and the pool would never come up.
+    if (this.currentIsOneShot) return;
+    this.idleVariantIn = IDLE_VARIANT_MIN + Math.random() * IDLE_VARIANT_JITTER;
+    const pick = variants[Math.floor(Math.random() * variants.length)];
+    if (!this.action(pick)) return;
+    this.playOneShot(pick, 1);
+    this.currentOneShotIsIdleVariant = true;
+  }
+
+  /**
+   * The signature idle on its own clock (ClipMap.idleBeat).
+   *
+   * Separate from the fidget pool because the pool is a single shared timer
+   * feeding a random pick, so a clip's real cadence there is the draw interval
+   * times the pool size, fine for "occasionally restless", useless for "every
+   * twenty seconds". This keeps its own countdown and fires only that clip.
+   *
+   * It reuses the idle-variant latch, so it inherits the cancel that kills a
+   * fidget the instant the rig stops standing still; without that a one-shot
+   * left running suppresses the walk/run fade and the rig skates.
+   */
+  private tickIdleBeat(dt: number, desired: BaseState): void {
+    const beat = this.def.clips.idleBeat;
+    if (!beat) return;
+    if (desired !== 'idle') {
+      this.idleBeatIn = -1; // rearm on the next idle edge
+      return;
+    }
+    const arm = () => beat.everySec + Math.random() * (beat.jitterSec ?? 0);
+    if (this.idleBeatIn < 0) {
+      this.idleBeatIn = arm();
+      return;
+    }
+    this.idleBeatIn -= dt;
+    if (this.idleBeatIn > 0) return;
+    if (this.currentIsOneShot) return; // wait for the floor, keep the clock at 0
+    this.idleBeatIn = arm();
+    if (!this.action(beat.clip)) return;
+    this.playOneShot(beat.clip, 1);
+    this.currentOneShotIsIdleVariant = true;
+  }
+
   private playOneShot(
     name: string,
     timeScale: number,
@@ -3449,6 +3707,10 @@ export class CharacterVisual {
     this.current = a;
     this.currentIsOneShot = true;
     this.currentOneShotIsEmote = emoteId !== null;
+    // Cleared for EVERY one-shot; tickIdleVariant re-sets it straight after
+    // its own call, so the latch can never outlive the clip that set it.
+    this.currentOneShotIsIdleVariant = false;
+    this.currentOneShotIsLanding = false;
     this.currentOneShotIsCastExit = false;
   }
 
@@ -3463,6 +3725,8 @@ export class CharacterVisual {
     if (a === this.current) {
       this.currentIsOneShot = false;
       this.currentOneShotIsEmote = false;
+      this.currentOneShotIsIdleVariant = false;
+      this.currentOneShotIsLanding = false;
       this.currentOneShotIsCastExit = false;
       this.fadeTo(this.baseAction(), 0.18, false);
     }
@@ -3597,6 +3861,14 @@ function clipNamesOf(def: VisualDef): string[] {
     c.walkBack,
     c.flourish,
     c.stow,
+    // The idle-breakers and the idle beat were MISSING here, which is the only
+    // place actions get built (visual.ts constructor). A clip absent from this
+    // list loads fine and passes the clipmap gate, that gate checks the GLB,
+    // not the action map, but `this.action(name)` returns null forever, so
+    // tickIdleVariant/tickIdleBeat bail on every fire and the rig simply never
+    // fidgets. Silent: no throw, no warning, just a clip that is never seen.
+    ...(c.idleVariants ?? []),
+    c.idleBeat?.clip,
     ...Object.values(c.emote ?? {}).flatMap((spec) => spec.clips),
   ].filter((n): n is string => !!n);
 }

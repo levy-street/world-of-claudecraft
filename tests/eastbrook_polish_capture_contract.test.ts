@@ -348,11 +348,14 @@ interface AttributionTargetFixture {
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
-// Re-minted for the Nythraxis mechanics redo (the grave flame visual hookup
-// and the meteor landing burst extraction moved the renderer integration
-// leaf). No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '5ddf3eacabaddecac0ed32f2f22fe60ba27c23ad1a3596f4c19f37d5e14ef98f';
+  '8ae24529f62c56634b8f16c8f5d85e8964f44d41bcbcbe43b9a3700ab4859c41';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

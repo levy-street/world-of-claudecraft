@@ -2219,6 +2219,8 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Hantverkarens öga',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Tändningsnyckel: Skräckgnista, markskakaren',
+  'entities.items.reins_lanternback_troll.name':
+    'Lykttändarens ok: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extrem',
   'hud.options.surfaceDetail': 'Ytdetaljer',
   'hud.options.surfaceDetailBasic': 'Grundläggande',

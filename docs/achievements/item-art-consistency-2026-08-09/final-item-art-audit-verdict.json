@@ -5,8 +5,8 @@
     "baselineCommit": "aee195551b5aef628eb7a72192117d7e3079818e",
     "branch": "feature/placeholder-art-completion-v036",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1041,
-    "liveItemDefinitions": 1056,
+    "itemArtFilesReviewed": 1044,
+    "liveItemDefinitions": 1059,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -304,7 +304,7 @@
       "food": 21,
       "held_offhand": 11,
       "junk": 83,
-      "mount": 10,
+      "mount": 13,
       "potion": 13,
       "quest": 102,
       "tool": 60,
@@ -361,6 +361,30 @@
           "public/ui/items/mapping.json"
         ],
         "note": "Seven project-owned programmatic SVG placeholder bag icons were superseded by distinct OpenAI-generated paintings under woc-item-icon-v1. The replacements passed the deterministic icon and complete item-art machine audits and were visually reviewed as a family at the 512px masters and every canonical runtime, grayscale, circular-crop, multiview, and identity sheet size on 2026-08-26; all earlier item-art reviews stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/troll-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_lanternback_troll"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Lanternback Troll mount reins icon. The owner supplied the painted 624x624 master and directed its use for this item; it was downscaled to the 128px opaque woc-item-icon-v1 shipping format with no other change, and owner-reviewed pass on 2026-08-15. The 2026-08-09 campaign review of the prior 817 files and the 2026-08-10 review of the five class-overhaul integration additions both stand unchanged."
+      },
+      {
+        "reviewedAt": "2026-08-15",
+        "branch": "feature/turtle-mount",
+        "reviewer": "owner",
+        "addedIds": [
+          "reins_chimeglass_tortoise"
+        ],
+        "provenance": [
+          "public/ui/items/mapping.json"
+        ],
+        "note": "The Chimeglass Tortoise mount reins icon. Rendered from the shipped mount model (public/models/mounts/chimeglass_tortoise.glb) as a three-quarter head study, background keyed and flattened to the 128px opaque woc-item-icon-v1 shipping format, and owner-reviewed pass on 2026-08-15. Re-rendered on 2026-08-16 alongside the mount's lens-glow pass, which restyled the glowing lens pair the icon frames: same three-quarter head study, same shipping format, 3062 to 3784 bytes, owner-reviewed pass again on 2026-08-16. The 2026-08-09 campaign review of the prior 817 files, the 2026-08-10 review of the five class-overhaul integration additions, and the 2026-08-15 Lanternback Troll review all stand unchanged. Joined the 2026-08-09 record at the release/v0.42.0 sync of PR #3439 (which carries the troll of PR #3399), on top of the release side's 2026-08-12 through 2026-08-30 additions."
       }
     ]
   },
@@ -403,7 +427,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1041,
+    "passCount": 1044,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -1086,8 +1110,11 @@
       "reedwoven_trousers",
       "reinforced_pauldrons",
       "reins_aether_hover_cycle",
+      "reins_chimeglass_tortoise",
       "reins_drakemaw_raptor",
       "reins_grag_bear",
+      "reins_lanternback_troll",
+      "reins_mech_bird",
       "reins_rickshaw_mount",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
@@ -1451,7 +1478,7 @@
     "watch": [],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1041 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21."
+    "summary": "All 1044 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review, plus the seven bank-storage painted bags (implementation-agent reviewed and passed on 2026-08-26, joined at the v0.41.0 base sync), All 830 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Lanternback Troll mount reins icon (owner-supplied painted master, downscaled to the shipping format) owner-reviewed and passed on 2026-08-15 and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) owner-reviewed and passed on 2026-08-16, both joining this record at the release/v0.42.0 sync of PR #3439, plus the Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) added for owner review on 2026-08-17."
   },
   "nonVisualContentWatch": [
     {
@@ -1608,8 +1635,8 @@
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "de2dae43730ac6011269ba1564534a23f1cfcd2d721b66f6b1a2fa74228515ee",
-      "bytes": 567686
+      "sha256": "e3eb0b0083df930521d024db4503d3799d647061ae9048c8bcacdb029ca6697e",
+      "bytes": 569296
     },
     "rendererFingerprint": "d80ff4868f979e1717e106c889b7d6505841caf8d4cf887776ecb60848b1b2b7",
     "sheetCount": 216,
@@ -1623,7 +1650,7 @@
       "small-multiview": 27,
       "identity": 27
     },
-    "sheetSetSha256": "7139cd731c87e514144b9d60551c6c1b19dfcd008236f68502e4a0ea3b4b8327",
+    "sheetSetSha256": "5d9fb20e96cd7f431ce129880f4e5a222345cf86f92f8672e39ecb1bc9b70371",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2843,66 +2870,66 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "1ec39db4883b10488e3ad14f6a8370f8c5c40487c77bdecbbf028f0212ac3b3c",
-        "bytes": 355260,
+        "sha256": "367d807731102e76bc8ba9f12b6e7b809c3923f1781528c3e9ce316c6559900f",
+        "bytes": 479514,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "7ceaf4427b8f142a95826b17e5b4326117f3da0c81f2086d2bc9897ae975be79",
-        "bytes": 66225,
+        "sha256": "71e2cc67109d731bb9b89fc14e2d63ff0b580bcc443d1783a91f6b43a6cd6ebf",
+        "bytes": 87402,
         "width": 1600,
-        "height": 166,
+        "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "bed7740b17277a5a49349ce73fe6e3eeacdd83bbc2884117c9f59f66b394483f",
-        "bytes": 46041,
+        "sha256": "aa0286d4ce904c09061e60dff9aad895b50d4ab04e99b1fad3f52e3a84617036",
+        "bytes": 60445,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "58ea3af08805cfd43d95b8d6fa7ed392890c33ac1278a135d2ae17998094451d",
-        "bytes": 36646,
+        "sha256": "a86c66476d8850ab5eb9cab6457b04e46eefb2a9af70ba52187b8ede60f43c1f",
+        "bytes": 47914,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "d96e3e5b53abadfed726f26d605cd79cea86220069c00686d6c2bc507335c365",
-        "bytes": 34436,
+        "sha256": "5826b0411b777e0adf2ccd1ef972eb216c7859d259a0083e8b8e836da94fb7fa",
+        "bytes": 46620,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "41394faa9342454d566817bde9a89a0ded55d443b13a76e891c3d8c7a6ad11d2",
-        "bytes": 111010,
+        "sha256": "83b57de59c5fdf5f14f5d047007ac85b066c39b83785281db33a4808500b99c6",
+        "bytes": 146153,
         "width": 1600,
-        "height": 210,
+        "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "1c95fa878af241f18304a458f349d49c9c0d42778f4e4586865b6415fb31ec21",
-        "bytes": 201118,
+        "sha256": "b9cf30045456a0118464ef4d35eb0a3cd629291f6a77665effbd218681303b9b",
+        "bytes": 267318,
         "width": 1800,
-        "height": 262,
+        "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "d0975118b05175e39ab1405ca49ff4b06ac63a133d32157bb1c489605c6c4b58",
-        "bytes": 374071,
+        "sha256": "fac5e4bc43748c13bc784cc35fec82ab61ec92c100cfc61097e0c6eef9f17add",
+        "bytes": 504420,
         "width": 1800,
-        "height": 248,
+        "height": 452,
         "format": "png"
       },
       {
@@ -3354,6 +3381,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "f4d9c8f07e37a13c944b5ea4cf70da045f42f1154784b1da6605ff1c237c4924"
+    "shippingCatalogSha256": "017938ae50f70349630c15ffe2466b2f8ad4acf4ecf32022fddb0c27c8d7285d"
   }
 }

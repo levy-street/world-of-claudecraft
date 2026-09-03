@@ -2220,6 +2220,8 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Zanaatkârın Gözü',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Kontak Anahtarı: Dehşetkıvılcım, Yer Sarsan',
+  'entities.items.reins_lanternback_troll.name':
+    'Fenerci Boyunduruğu: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Yüzey Detayı',
   'hud.options.surfaceDetailBasic': 'Temel',

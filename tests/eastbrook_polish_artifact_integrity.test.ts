@@ -1034,13 +1034,18 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the Drakelands entrance merge into the raid branch (PRs 3689
 // plus 3734: both arms had re-minted, the merged renderer and evidence inputs
 // land together). No capture was retaken.
-// Re-minted for the Nythraxis mechanics redo (the grave flame visual hookup
-// and the meteor landing burst extraction moved the renderer integration
-// leaf). No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'd4f68b98beba92343c53e89c14d025c3242bc56eeb9dd457cbdb2b1a3026f4c5';
+  'f8d1df1d60bb2bc3fa8020cc8bf23da5f42bc99dc315dd80a718886a9673b509';
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '5ddf3eacabaddecac0ed32f2f22fe60ba27c23ad1a3596f4c19f37d5e14ef98f';
+  '8ae24529f62c56634b8f16c8f5d85e8964f44d41bcbcbe43b9a3700ab4859c41';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2196,10 +2201,7 @@ describe('Eastbrook polish performance and contact evidence', () => {
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
       // Re-minted for the Drakelands entrance merge into the raid branch: the
       // composite first, then this seal. No capture was retaken.
-      // Re-minted for the Nythraxis mechanics redo (renderer.ts gained the grave
-      // flame hookup and lost the inline meteor burst): the composite first,
-      // then this seal. No capture was retaken.
-    ).toBe('509e850c28a25c439a0ce63dab1664b508ae22818520a315ebd1bdf43414accc');
+    ).toBe('c39e61b97e0da13f673b46cfa1a956c77229edf10978aa60550486bba365c7da');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

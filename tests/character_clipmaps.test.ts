@@ -165,6 +165,8 @@ function requiredClipNames(clips: ClipMap): string[] {
     clips.flourish,
     clips.stow,
     ...clips.attack,
+    ...(clips.idleVariants ?? []),
+    clips.idleBeat?.clip,
     ...(clips.hit ?? []),
     ...Object.values(clips.attackByAbility ?? {}),
     ...Object.values(clips.castByAbility ?? {}),
@@ -212,6 +214,8 @@ const COVERED_CLIP_FIELDS = new Set<keyof ClipMap>([
   'castPlayOut',
   'attackByHand',
   'emote',
+  'idleVariants',
+  'idleBeat',
 ]);
 
 /**

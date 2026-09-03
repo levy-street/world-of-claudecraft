@@ -939,9 +939,26 @@ class Sfx {
     else this.playAt(key, x, y, z, { gain: 1, rate: 1, release: 0.6 });
   }
 
-  /** One custom stride for a running mount. This is part of the world SFX mix,
-   *  independent of the optional on-foot footstep toggle. */
-  mountRun(x: number, y: number, z: number, mountKey: string, _self: boolean): void {
+  /** One stride for a running mount. This is part of the world SFX mix,
+   *  independent of the optional on-foot footstep toggle, for both branches
+   *  below: a mount is world audio whether or not it borrows a footfall clip,
+   *  and the footstep setting silences the player's own steps by default.
+   *
+   *  A mount with no `mount_run_<key>` clip of its own falls back to the plain
+   *  surface footfall (foot_<surface>) at the running-step gain and pitch,
+   *  alternating left/right the way footstep() does so consecutive strides are
+   *  not one sample retriggered. The release stays the mount's, though:
+   *  footstep()'s tighter 0.17s exists to keep two copies from overlapping at
+   *  the player's ~0.22s stride gap, and a mount's ~0.46s gap has no such
+   *  overlap to avoid, so cutting there would just throw the sample away. */
+  mountRun(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    surface: string,
+    _self: boolean,
+  ): void {
     // A mount with a continuous loop does not also get per-stride one-shots.
     // The rickshaw shipped both for a while and they stacked: a 0.6s stride cue
     // retriggering every 5.8 units of travel is one hit every ~0.46s at mounted
@@ -950,11 +967,23 @@ class Sfx {
     // allowlist, so any mount that later gains a loop drops its strides for
     // free, and every mount without one is untouched.
     if (`mount_loop_${mountKey}` in SFX_CLIPS) return;
-    const key = `mount_run_${mountKey}`;
-    if (!(key in SFX_CLIPS)) return;
+    const custom = `mount_run_${mountKey}`;
+    if (custom in SFX_CLIPS) {
+      this.playAt(custom, x, y, z, {
+        gain: 0.85,
+        rate: 1,
+        cooldown: 0.05,
+        release: 0.44,
+      });
+      return;
+    }
+    const key = FOOTSTEP_CUES[surface];
+    if (!key) return;
+    this.footTick = (this.footTick + 1) & 1;
+    const foot = this.footTick === 0 ? 0.97 : 1.04; // left/right
     this.playAt(key, x, y, z, {
-      gain: 0.85,
-      rate: 1,
+      gain: 0.5,
+      rate: 1.06 * foot,
       cooldown: 0.05,
       release: 0.44,
     });
@@ -1029,9 +1058,52 @@ class Sfx {
     return true;
   }
 
-  /** Drop an entity's engine-mount state and silence its loop, e.g. on
-   *  dismount or when its view is removed (interest culled, disconnect). */
+  /** The standstill powered-on hum for a mount with a dedicated idle take
+   *  (mount_idle_<mountKey>, e.g. the Mech Bird): the renderer calls this with
+   *  active=true every grounded stopped frame and active=false from the moving
+   *  branch, keyed per entity like mountEngine. Detection is the key existing
+   *  in SFX_CLIPS, so it is data-driven the same way the engine take set is:
+   *  a mount with no idle take no-ops here. */
+  mountIdle(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    active: boolean,
+    entityId: number,
+  ): void {
+    const key = this.idleClipKey(mountKey);
+    if (key === null) return;
+    // The loop id is built only on the arm that spends it: the moving branch
+    // polls this every frame, and for a rider already off the hum that must
+    // stay a Set miss with no string allocation.
+    if (active) {
+      this.mountIdles.add(entityId);
+      this.loop(`mountIdle:${entityId}`, key, 0.55, x, y, z);
+    } else if (this.mountIdles.delete(entityId)) {
+      this.unloop(`mountIdle:${entityId}`, 0.25);
+    }
+  }
+  private mountIdles = new Set<number>();
+
+  /** Resolve (and cache) the idle-hum clip key for a mountKey, or null when
+   *  this mount ships no standstill take. Memoized like engineClipKeys: the
+   *  common case is polled every stopped frame. */
+  private idleClipKey(mountKey: string): string | null {
+    const cached = this.idleClipKeyCache.get(mountKey);
+    if (cached !== undefined) return cached;
+    const key = `mount_idle_${mountKey}`;
+    const resolved = key in SFX_CLIPS ? key : null;
+    this.idleClipKeyCache.set(mountKey, resolved);
+    return resolved;
+  }
+  private idleClipKeyCache = new Map<string, string | null>();
+
+  /** Drop an entity's per-mount loops (engine phase + idle hum) and state,
+   *  e.g. on dismount, death while mounted, the 42yd audio-gate exit, or when
+   *  its view is removed (interest culled, disconnect). */
   mountEngineReset(entityId: number): void {
+    if (this.mountIdles.delete(entityId)) this.unloop(`mountIdle:${entityId}`, 0.1);
     if (!this.mountEngines.delete(entityId)) return;
     this.unloop(`mountEngine:${entityId}`, 0.1);
   }
@@ -1047,6 +1119,15 @@ class Sfx {
    *  makes that window much smaller in practice. A no-op for a mount with no
    *  engine take set.*/
   preloadMountEngine(mountKey: string): void {
+    // The idle hum and the mount-aware jump/land takes ride the same warm-up
+    // edge: a mount can ship those without an engine take set (the Mech Bird),
+    // so they preload before the engine-set early return.
+    const idleKey = this.idleClipKey(mountKey);
+    if (idleKey) this.preload(idleKey);
+    for (const kind of ['jump', 'land'] as const) {
+      const mkey = `mount_${kind}_${mountKey}`;
+      if (mkey in SFX_CLIPS) this.preload(mkey);
+    }
     const keys = this.engineClipKeys(mountKey);
     if (!keys) return;
     this.preload(keys.startKey);
@@ -1093,14 +1174,25 @@ class Sfx {
     this.unloop(`mountloop_${id}`, MOUNT_LOOP_FADE);
   }
 
-  /** Jump / land / water-entry / swim-stroke. */
+  /** Jump / land / water-entry / swim-stroke. A mounted rider passes its
+   *  mountKey: a mount shipping its own take (mount_jump_<key> /
+   *  mount_land_<key>, e.g. the Mech Bird's servo launch and landing clank)
+   *  replaces the generic cue; every other mount falls through unchanged. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
     _self: boolean,
+    mountKey?: string,
   ): void {
+    if (mountKey && (kind === 'jump' || kind === 'land')) {
+      const mkey = `mount_${kind}_${mountKey}`;
+      if (mkey in SFX_CLIPS) {
+        this.playAt(mkey, x, y, z, { gain: 0.8, cooldown: 0.08 });
+        return;
+      }
+    }
     const key =
       kind === 'jump'
         ? 'move_jump'

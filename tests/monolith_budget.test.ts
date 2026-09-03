@@ -351,7 +351,14 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
-    ceiling: 13249,
+    // Re-pinned at the release/v0.42.0 sync of the Chimeglass Tortoise PR
+    // (#3439, carrying the Lanternback Troll of #3399): the rideable-mount
+    // lifecycle (build, live swap, teardown, rider seating, carried lamps
+    // and glows, the summon/dismount FX) moved to src/render/mount_lifecycle.ts,
+    // and the release arm's rickshaw hooks moved with it, so the merged file
+    // lands below both prior pins. Measured on the merged tree. Exact merged
+    // count, zero headroom.
+    ceiling: 13214,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
@@ -896,7 +903,12 @@ const MONOLITHS: MonolithRow[] = [
     // the full guarded skin purchase flow moved to store_armory_purchase.ts.
     // The new Store-owned modal itself lives in store_decision_prompt.ts, while
     // the cold shell markup moved to daily_rewards_chrome_view.ts.
-    ceiling: 1264,
+    // LOWERED 1264 -> 1262 by the Cluckwork Mech Bird store mount (PR #3464): the
+    // Machine Stable strip landed as src/ui/store_mount_card_view.ts (markup) +
+    // src/ui/store_mount_purchase.ts (the spend controller), the store body's
+    // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
+    // controllers now build over one seam object (store_spend_controllers.ts).
+    ceiling: 1262,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {
