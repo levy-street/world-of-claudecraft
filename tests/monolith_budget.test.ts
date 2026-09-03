@@ -351,6 +351,10 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned at the PR 3685 base sync (release v0.41.0 through the raid
     // branch): both arms edited the renderer and the union lands at the count
     // below. Measured on the merged tree. Exact merged count, zero headroom.
+    // The outdoor hemisphere fill constants moved out to
+    // src/render/outdoor_light_rig_core.ts and the per-frame terrain fill
+    // uniform write moved in (a thin consumer of that core): net zero, still
+    // the exact count, zero headroom.
     ceiling: 13249,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },

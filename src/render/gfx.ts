@@ -1919,6 +1919,7 @@ export function initGfxTier(webgl: THREE.WebGLRenderer): GfxTier {
 
 export const gfxInternalsForTest = {
   settingsFor,
+  sharedUniforms: () => sharedUniforms,
   runtimeHints,
   stableFingerprintValue,
   mobilePlatformFromNavigator,
@@ -1949,6 +1950,11 @@ export const sharedUniforms = {
   uTime: { value: 0 },
   uRimBoost: { value: 1 },
   uRimColor: { value: new THREE.Color(RIM_GLOW_DEFAULT_COLOR) },
+  /** Hemisphere-irradiance multiplier for the Lambert terrain under the
+   *  standard-materials rig (outdoor_light_rig_core.ts terrainFillBoostTarget):
+   *  the renderer eases it each frame, 1 whenever an interior rig owns the
+   *  lights or on the Lambert tier. */
+  uTerrainFillBoost: { value: 1 },
   /** The raid rooms' world-height black ramp (roof_darkness_core.ts):
    *  strength 0 everywhere except the ignivar states, which the interior
    *  light rig raises to 1 on settle. */
