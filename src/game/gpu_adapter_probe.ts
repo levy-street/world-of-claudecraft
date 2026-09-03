@@ -57,10 +57,14 @@ export interface GpuAdapterProbe {
 /**
  * The adapter's own words, clamped.
  *
- * `description` is the one human-readable field, but Chrome leaves it empty on
- * some platforms, so the vendor/architecture/device triple is the fallback:
- * "nvidia ampere" still identifies the part well enough for the server's
- * bucketing, where an empty string would identify nothing.
+ * `description` is the one human-readable field, but on Chrome it is the
+ * EXCEPTION rather than the rule: Chrome populates `device` and `description`
+ * only behind its WebGPUDeveloperFeatures runtime flag, so a normal page reads
+ * `vendor` and `architecture` and nothing else. The joined triple is therefore
+ * the ordinary answer, not a fallback: "nvidia ampere", "apple metal-3",
+ * "intel gen-12lp". It reaches VENDOR granularity, which is why the server
+ * compares this column against the WebGL model at vendor granularity too
+ * (server/admin_db.ts); an empty string would identify nothing at all.
  */
 export function describeGpuAdapterInfo(info: unknown): string | null {
   if (!info || typeof info !== 'object') return null;

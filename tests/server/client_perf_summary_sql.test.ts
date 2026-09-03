@@ -28,6 +28,7 @@ import type {
   ClientPerfSummaryRow,
 } from '../../server/client_perf_summary_shape';
 import { ensureSchema, pool } from '../../server/db';
+import { GL_MODEL_OTHER } from '../../server/gpu_model_bucket';
 
 // ---------------------------------------------------------------------------
 // Layer 1: always-run statement-count + text + mapping pins (mocked pool).
@@ -130,13 +131,29 @@ describe('clientPerfSummary SQL shape (mocked pool)', () => {
     // client-influenced. Move either predicate to the outer SELECT and the
     // server still sorts every junk group to return the same 100 rows.
     expect(modelSql).toContain('HAVING count(*) >= 5');
-    // All three mismatch arms, each guarding a different way the list lies:
-    // adapter-less rows taking the slots, agreeing rows taking them, and a
-    // report with an adapter but NO renderer string reading as a mismatch
-    // against nothing.
+    // Every mismatch arm, each guarding a different way the list lies:
+    // adapter-less rows taking the slots, a report with an adapter but NO
+    // renderer string reading as a mismatch against nothing, an UNPARSED
+    // renderer ('other') reading as a disagreement when it is an absence of
+    // evidence, and agreeing rows taking the slots.
+    //
+    // The comparison is on the leading VENDOR segment of the two family keys,
+    // never the whole key: Chrome hands a normal page {vendor, architecture}
+    // and leaves device and description empty, so gpu_hp_adapter is usually
+    // vendor-level ('apple') beside a model-level gl_model ('apple-m4-pro'),
+    // and a whole-key comparison files every single-GPU Chrome client as a
+    // mismatch. tests/server/gpu_model_bucket.test.ts pins the vendor segment
+    // this leans on.
+    expect(modelSql).toContain(`gpu_hp_adapter NOT IN ('', '${GL_MODEL_OTHER}')`);
+    expect(modelSql).toContain(`gl_model NOT IN ('', '${GL_MODEL_OTHER}')`);
     expect(modelSql).toContain(
-      "(gpu_hp_adapter <> '' AND gl_model <> '' AND gpu_hp_adapter <> gl_model)",
+      "split_part(gpu_hp_adapter, '-', 1) <> split_part(gl_model, '-', 1)",
     );
+    // The whole-key comparison is the defect this replaced; it must not return.
+    expect(modelSql).not.toContain('gpu_hp_adapter <> gl_model');
+    // 'other' is the only key excluded on top of the empty string: 'software'
+    // beside a real adapter is the most actionable mismatch there is.
+    expect(modelSql).not.toContain('software');
     // Scoped to the triple set: the pair set must keep every model, mismatch
     // or not, because it is the denominator the mismatch list is read against.
     expect(modelSql).toContain('GROUPING(gpu_hp_adapter) = 1');

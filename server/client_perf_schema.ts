@@ -90,8 +90,11 @@ ALTER TABLE client_perf_reports ADD COLUMN IF NOT EXISTS suggestion_ids TEXT[] N
 -- wire field always had), gl_model and gl_laptop are its parsed family key and
 -- form-factor verdict (server/gpu_model_bucket.ts), and gpu_hp_adapter is the
 -- SAME family key parsed from the client's WebGPU high-performance adapter
--- description, so a row where it disagrees with gl_model is a laptop rendering
--- on its iGPU while a discrete part sits idle. gl_model and gpu_hp_adapter are
+-- description, so a row whose VENDOR segment disagrees with gl_model's is a
+-- laptop rendering on its iGPU while a discrete part sits idle. Vendor and not
+-- the whole key because the adapter text a normal Chrome page can read is
+-- {vendor, architecture} only, so gpu_hp_adapter is usually vendor-level even
+-- when gl_model is not. gl_model and gpu_hp_adapter are
 -- TEXT NOT NULL DEFAULT '' because they are GROUPED columns in the admin
 -- summary, which reads '' as "no data" for pre-column and no-evidence rows
 -- alike; gl_laptop is nullable because "cannot tell" is its common answer.

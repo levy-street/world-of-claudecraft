@@ -178,6 +178,82 @@ describe('glModel', () => {
   });
 });
 
+// The contract the admin summary's high-performance-adapter mismatch rests on
+// (server/admin_db.ts): the LEADING segment of a key is the vendor, and the
+// predicate compares only that segment because a browser's WebGPU adapter info
+// usually reaches no further. Chrome fills GPUAdapterInfo.device and
+// .description only behind its WebGPUDeveloperFeatures runtime flag, so a
+// normal page's adapter text is the {vendor, architecture} pair below and the
+// same parser answers a vendor-only key for it.
+describe('the vendor segment the mismatch predicate compares', () => {
+  const vendorOf = (renderer: string): string => glModel(renderer).split('-')[0];
+
+  it('keys every recognised family on a closed vendor vocabulary', () => {
+    const corpus = [
+      NVIDIA_4070_LAPTOP,
+      NVIDIA_3060_DESKTOP,
+      NVIDIA_3090_GL,
+      NVIDIA_3060_VULKAN,
+      'ANGLE (NVIDIA, NVIDIA Quadro P2000 (0x00001C30), D3D11)',
+      INTEL_IRIS_XE,
+      INTEL_UHD_630,
+      'ANGLE (Intel, Intel(R) Arc(TM) A770 Graphics, D3D11)',
+      AMD_IGPU,
+      AMD_6700_XT,
+      AMD_7700S,
+      APPLE_M4_PRO,
+      'ANGLE (Apple, Apple GPU, Unspecified Version)',
+      MALI,
+      ADRENO,
+      MICROSOFT_BASIC,
+      'Brave',
+      '',
+    ];
+    const vendors = new Set(corpus.map(vendorOf));
+    // Exact, not a superset check: a new family pattern that mints a key on
+    // some other leading word would silently change what the SQL compares.
+    expect([...vendors].sort()).toEqual([
+      'amd',
+      'apple',
+      'arm',
+      'intel',
+      'nvidia',
+      GL_MODEL_OTHER,
+      'qualcomm',
+      GL_MODEL_SOFTWARE,
+    ]);
+  });
+
+  it('agrees with the vendor-only key a default Chrome adapter produces', () => {
+    // These four are what describeGpuAdapterInfo joins on a default Chrome for
+    // a SINGLE-GPU machine: vendor plus architecture, device and description
+    // empty. Compared whole, each of them disagrees with its own machine's
+    // WebGL model and would be filed as a mismatch; compared on the vendor
+    // segment, none of them is.
+    const singleGpuMachines: [string, string][] = [
+      [APPLE_M4_PRO, 'apple metal-3'],
+      [NVIDIA_4070_LAPTOP, 'nvidia ampere'],
+      [INTEL_IRIS_XE, 'intel gen-12lp'],
+      [AMD_6700_XT, 'amd rdna-2'],
+    ];
+    for (const [renderer, adapter] of singleGpuMachines) {
+      expect(glModel(adapter)).not.toBe(glModel(renderer));
+      expect(vendorOf(adapter)).toBe(vendorOf(renderer));
+    }
+  });
+
+  it('still separates the hybrid the column exists to find', () => {
+    // The iGPU renders the page while a discrete part answers the WebGPU
+    // high-performance hint: different vendors, so the row is a real mismatch.
+    expect(vendorOf('nvidia ampere')).not.toBe(vendorOf(INTEL_IRIS_XE));
+    expect(vendorOf('nvidia ada-lovelace')).not.toBe(vendorOf(AMD_IGPU));
+    // A CPU rasterizer beside a real adapter is a mismatch too, and the most
+    // actionable one there is, so 'software' is not excluded from the list.
+    expect(vendorOf(MICROSOFT_BASIC)).toBe(GL_MODEL_SOFTWARE);
+    expect(vendorOf(MICROSOFT_BASIC)).not.toBe(vendorOf('nvidia ampere'));
+  });
+});
+
 describe('glLaptop', () => {
   it('is true only on a vendor-written mobile marker or a mobile SKU suffix', () => {
     expect(glLaptop(NVIDIA_4070_LAPTOP)).toBe(true);

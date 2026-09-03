@@ -510,6 +510,9 @@ describe('perf report ingestion', () => {
           glRenderer: 'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11)',
           // The mismatch this column exists to find: the page renders on the
           // iGPU while the high-performance adapter names a discrete part.
+          // This is the adapter text a browser that fills description hands
+          // over (Chrome behind WebGPUDeveloperFeatures, and the shape the
+          // spec allows); the default-Chrome shape is the next test.
           gpuHpAdapter: 'NVIDIA NVIDIA GeForce RTX 4070 Laptop GPU',
           rawSummary: {},
         },
@@ -535,6 +538,56 @@ describe('perf report ingestion', () => {
     );
   });
 
+  it('stores the vendor-only key a DEFAULT Chrome adapter yields, beside a model-level renderer', async () => {
+    // What a normal page actually reads. Chrome populates GPUAdapterInfo.device
+    // and .description only behind its WebGPUDeveloperFeatures runtime flag, so
+    // describeGpuAdapterInfo joins vendor and architecture and nothing else:
+    // "apple metal-3" beside a WebGL string that parses to 'apple-m4-pro'. The
+    // two keys are DIFFERENT on a machine with ONE GPU, which is why the
+    // summary compares their leading vendor segment and not the whole key
+    // (server/admin_db.ts, pinned in tests/server/client_perf_summary_sql.test.ts).
+    const singleGpuMachines: [string, string, string, string][] = [
+      [
+        'chrome-adapter-apple',
+        'ANGLE (Apple, ANGLE Metal Renderer: Apple M4 Pro, Unspecified Version)',
+        'apple metal-3',
+        'apple',
+      ],
+      [
+        'chrome-adapter-nvidia',
+        'ANGLE (NVIDIA, NVIDIA GeForce RTX 4070 (0x00002786) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+        'nvidia ampere',
+        'nvidia',
+      ],
+      [
+        'chrome-adapter-intel',
+        'ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x000046A6) Direct3D11)',
+        'intel gen-12lp',
+        'intel',
+      ],
+      [
+        'chrome-adapter-amd',
+        'ANGLE (AMD, AMD Radeon RX 6700 XT (0x000073DF) Direct3D11 vs_5_0 ps_5_0, D3D11)',
+        'amd rdna-2',
+        'amd',
+      ],
+    ];
+    for (const [sessionId, glRenderer, gpuHpAdapter, vendor] of singleGpuMachines) {
+      await handlePerfReport(
+        fakeReq(
+          { sessionId, glRenderer, gpuHpAdapter, rawSummary: {} },
+          { remoteAddress: '203.0.113.96' },
+        ),
+        fakeRes(),
+      );
+      const row = vi.mocked(insertClientPerfReport).mock.calls.at(-1)?.[0];
+      // Vendor-only on the adapter side, model-level on the renderer side.
+      expect(row?.gpuHpAdapter).toBe(vendor);
+      expect(row?.glModel).not.toBe(vendor);
+      expect(row?.glModel.split('-')[0]).toBe(vendor);
+    }
+  });
+
   it('strips control characters so a NUL-bearing beacon still inserts', async () => {
     // Postgres REJECTS U+0000 in a text parameter, so one NUL anywhere in a
     // renderer or vendor string used to fail the whole INSERT and lose the
@@ -548,7 +601,13 @@ describe('perf report ingestion', () => {
           glRenderer: 'ANGLE (NVIDIA,' + '\u0000' + ' NVIDIA GeForce RTX 3060 (0x00002504))',
           glVendor: 'NVIDIA' + '\u007f' + 'Corporation',
           gpuHpAdapter: 'NVIDIA' + '\u0007' + ' GeForce RTX 3060',
-          rawSummary: {},
+          // raw_summary is jsonb, and jsonb rejects the NUL escape exactly as a
+          // text parameter rejects the character: a beacon controls both the
+          // KEYS and the values here, and no field clamp above sees either.
+          rawSummary: {
+            ['zone\u0000name']: 'eastbrook\u0000town',
+            nested: ['a\u0000b', { deep: 'c\u0000d' }],
+          },
         },
         { remoteAddress: '203.0.113.95' },
       ),
@@ -573,6 +632,12 @@ describe('perf report ingestion', () => {
     expect(row?.glVendor).toBe('NVIDIACorporation');
     expect(row?.glModel).toBe('nvidia-rtx-3060');
     expect(row?.gpuHpAdapter).toBe('nvidia-rtx-3060');
+    // The jsonb blob too, keys included, at every depth.
+    expect(JSON.stringify(row?.rawSummary)).not.toContain('\\u0000');
+    expect(row?.rawSummary).toEqual({
+      zonename: 'eastbrooktown',
+      nested: ['ab', { deep: 'cd' }],
+    });
   });
 
   it('stores empty model dimensions when the client sends no renderer string at all', async () => {

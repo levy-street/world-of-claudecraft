@@ -20,6 +20,11 @@ import {
   saveWorldState,
 } from './db';
 import type { GeneralChatRateLimit } from './general_chat_quota_db';
+// Interpolated into the GPU model statement's HAVING, on the same grounds as
+// PERF_SUMMARY_MIN_GROUP_SAMPLES above: a module-level `const` string export,
+// so an ESM importer cannot rebind it and the SQL text can never carry
+// anything but the pinned key.
+import { GL_MODEL_OTHER } from './gpu_model_bucket';
 import { REALM } from './realm';
 
 // Read-side queries for the admin dashboard. All inputs are parameterized;
@@ -615,14 +620,30 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
     // a structural bound (surviving groups are at most window rows over the
     // floor) instead of a data-dependent one.
     //
-    // The mismatch predicate is what byHpMismatch is NAMED for, and all three
-    // of its arms matter: without gpu_hp_adapter <> '' the adapter-less
-    // majority (every client with no WebGPU) takes the rank slots, without
-    // gpu_hp_adapter <> gl_model the AGREEING rows do (on a real fleet, most of
-    // them), and without gl_model <> '' every report that carries an adapter
-    // but no renderer string reads as a mismatch against nothing. Rank first
-    // and filter after, or drop any arm, and the list comes back empty,
-    // truncated, or false while still looking like a complete answer.
+    // The mismatch predicate is what byHpMismatch is NAMED for, and every arm
+    // guards a different way the list would lie: without the empty-string arms
+    // the adapter-less majority (every client with no WebGPU) takes the rank
+    // slots and a report carrying an adapter but NO renderer string reads as a
+    // mismatch against nothing, without the 'other' arms an unparsed renderer
+    // (a fingerprint-resistant browser reports one) reads as a disagreement
+    // when it is really an absence of evidence, and without the vendor
+    // comparison the AGREEING rows take the slots (on a real fleet, most of
+    // them). Rank first and filter after, or drop any arm, and the list comes
+    // back empty, truncated, or false while still looking like a complete
+    // answer.
+    //
+    // The comparison is at VENDOR granularity, the leading segment of the
+    // family key both sides carry, because that is the only granularity both
+    // sides can actually reach. Chrome populates GPUAdapterInfo.device and
+    // .description only behind its WebGPUDeveloperFeatures runtime flag, so a
+    // normal page's adapter is {vendor, architecture} and gpu_hp_adapter lands
+    // as the vendor-only key ('apple', 'nvidia') beside a model-level gl_model
+    // ('apple-m4-pro', 'nvidia-rtx-4070'). Comparing the whole keys filed every
+    // single-GPU Chrome client with a recognised WebGL model as a mismatch.
+    // Vendor granularity still catches the case the column exists for: an Intel
+    // or AMD iGPU rendering the page while a discrete NVIDIA part sits idle.
+    // 'software' is deliberately NOT excluded: a CPU rasterizer beside a real
+    // adapter is the most actionable mismatch there is.
     //
     // A rarer-than-the-floor mismatch is deliberately not counted here: this is
     // the fleet-level dimension, and single-report forensics ride clientPerfRaw,
@@ -646,7 +667,9 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
          GROUP BY GROUPING SETS ((os_family, gl_model), (os_family, gl_model, gpu_hp_adapter))
         HAVING count(*) >= ${PERF_SUMMARY_MIN_GROUP_SAMPLES}
            AND (GROUPING(gpu_hp_adapter) = 1
-                OR (gpu_hp_adapter <> '' AND gl_model <> '' AND gpu_hp_adapter <> gl_model))
+                OR (gpu_hp_adapter NOT IN ('', '${GL_MODEL_OTHER}')
+                    AND gl_model NOT IN ('', '${GL_MODEL_OTHER}')
+                    AND split_part(gpu_hp_adapter, '-', 1) <> split_part(gl_model, '-', 1)))
        ),
        ranked AS (
          SELECT

@@ -204,14 +204,24 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // a filter moved after the window function, a mismatch arm dropped, or a
     // floor that quietly swallows the whole list.
     const adminDb = await import('../server/admin_db');
-    // Clear the sample floor for the mismatch group, and seed two groups that
-    // must NOT appear: one below the floor, one whose adapter AGREES.
+    // The keys carry a test-only vendor segment ('rt...') so this suite's rows
+    // can never be confused with a real fleet key, but their SHAPE is the real
+    // one the predicate reads: vendor first, model after.
+    //
+    // Clear the sample floor for the mismatch group, and seed the groups that
+    // must NOT appear: one below the floor, one whose adapter agrees outright,
+    // one in the DEFAULT-CHROME shape (a vendor-only adapter beside a
+    // model-level renderer, which is a single-GPU machine and the false
+    // positive a whole-key comparison produced), and one whose renderer could
+    // not be parsed at all.
     const rows: [string, string, string, string][] = [];
     for (let i = 0; i < PERF_SUMMARY_MIN_GROUP_SAMPLES; i++) {
-      rows.push([`${MARKER}-hp-${i}`, 'macos', 'roundtrip-model', 'roundtrip-hp-adapter']);
-      rows.push([`${MARKER}-agree-${i}`, 'macos', 'roundtrip-agree', 'roundtrip-agree']);
+      rows.push([`${MARKER}-hp-${i}`, 'macos', 'rtintel-iris-xe', 'rtnvidia']);
+      rows.push([`${MARKER}-agree-${i}`, 'macos', 'rtagree', 'rtagree']);
+      rows.push([`${MARKER}-chrome-${i}`, 'macos', 'rtapple-m4-pro', 'rtapple']);
+      rows.push([`${MARKER}-unparsed-${i}`, 'macos', 'other', 'rtnvidia']);
     }
-    rows.push([`${MARKER}-rare`, 'macos', 'roundtrip-rare', 'roundtrip-rare-adapter']);
+    rows.push([`${MARKER}-rare`, 'macos', 'rtrare-model', 'rtnvidia']);
     for (const [session, os, model, adapter] of rows) {
       await db.pool.query(
         `INSERT INTO client_perf_reports (session_id, os_family, gl_model, gpu_hp_adapter)
@@ -222,16 +232,23 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
 
     const summary = await adminDb.clientPerfSummary(24);
     const model = summary.byModel.find(
-      (b) => b.osFamily === 'macos' && b.glModel === 'roundtrip-model',
+      (b) => b.osFamily === 'macos' && b.glModel === 'rtintel-iris-xe',
     );
     expect(model?.sampleCount).toBeGreaterThanOrEqual(PERF_SUMMARY_MIN_GROUP_SAMPLES);
     const mismatch = summary.byHpMismatch.find(
-      (b) => b.glModel === 'roundtrip-model' && b.gpuHpAdapter === 'roundtrip-hp-adapter',
+      (b) => b.glModel === 'rtintel-iris-xe' && b.gpuHpAdapter === 'rtnvidia',
     );
     expect(mismatch?.sampleCount).toBeGreaterThanOrEqual(PERF_SUMMARY_MIN_GROUP_SAMPLES);
     // A group that AGREES is not a mismatch, however high its volume: without
-    // the gpu_hp_adapter <> gl_model arm it would outrank every real one.
-    expect(summary.byHpMismatch.some((b) => b.glModel === 'roundtrip-agree')).toBe(false);
+    // the vendor-comparison arm it would outrank every real one.
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'rtagree')).toBe(false);
+    // The default-Chrome shape: adapter 'rtapple' beside model 'rtapple-m4-pro'
+    // is ONE GPU, and a whole-key comparison filed every such client here. The
+    // row is still counted in byModel, which is the denominator.
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'rtapple-m4-pro')).toBe(false);
+    expect(summary.byModel.some((b) => b.glModel === 'rtapple-m4-pro')).toBe(true);
+    // An unparsed renderer is an absence of evidence, not a disagreement.
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'other')).toBe(false);
     // The legacy and no-evidence rows carry gpu_hp_adapter = '' and never reach
     // the list; nor does a row with an adapter but NO renderer string, which
     // without the gl_model <> '' arm would read as a mismatch against nothing.
@@ -240,8 +257,8 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
     // Below the floor, so it is aggregated away rather than sorted: this is the
     // bound that keeps a wide spread of client-derived keys from making the
     // server materialize hundreds of thousands of groups to return 100 rows.
-    expect(summary.byHpMismatch.some((b) => b.glModel === 'roundtrip-rare')).toBe(false);
-    expect(summary.byModel.some((b) => b.glModel === 'roundtrip-rare')).toBe(false);
+    expect(summary.byHpMismatch.some((b) => b.glModel === 'rtrare-model')).toBe(false);
+    expect(summary.byModel.some((b) => b.glModel === 'rtrare-model')).toBe(false);
   });
 
   it('leaves an existing pre-phase row on the column defaults the mapper folds', async () => {
@@ -268,6 +285,46 @@ describeDb('client perf report insert roundtrip (real Postgres)', () => {
       gl_laptop: null,
       gpu_hp_adapter: '',
     });
+  });
+
+  it('proves the NUL rule the ingest sanitizer exists for, on the text column AND on jsonb', async () => {
+    // Postgres itself, not a mock. The failure this guards is not a lost field
+    // but a lost REPORT: one NUL anywhere in a beacon aborts the whole INSERT.
+    // Both arms are checked because the second one is easy to miss: raw_summary
+    // is jsonb, which rejects the escaped form with its own message.
+    const nul = String.fromCharCode(0);
+    await expect(
+      db.pool.query(
+        'INSERT INTO client_perf_reports (session_id, gl_renderer_raw) VALUES ($1, $2)',
+        [`${MARKER}-nul-text`, `ANGLE${nul}(NVIDIA)`],
+      ),
+    ).rejects.toThrow();
+    await expect(
+      db.pool.query('INSERT INTO client_perf_reports (session_id, raw_summary) VALUES ($1, $2)', [
+        `${MARKER}-nul-json`,
+        JSON.stringify({ [`zone${nul}`]: `east${nul}brook` }),
+      ]),
+    ).rejects.toThrow();
+
+    // What the ingest puts between a beacon and that failure
+    // (server/perf_report_text.ts, wired into textIn and rawSummary).
+    const text = await import('../server/perf_report_text');
+    await db.pool.query(
+      'INSERT INTO client_perf_reports (session_id, gl_renderer_raw, raw_summary) VALUES ($1, $2, $3)',
+      [
+        `${MARKER}-nul-clean`,
+        text.stripControlChars(`ANGLE${nul}(NVIDIA)`),
+        JSON.stringify(
+          text.stripJsonControlChars({ [`zone${nul}`]: `east${nul}brook`, seconds: 30 }),
+        ),
+      ],
+    );
+    const res = await db.pool.query(
+      'SELECT gl_renderer_raw, raw_summary FROM client_perf_reports WHERE session_id = $1',
+      [`${MARKER}-nul-clean`],
+    );
+    expect(res.rows[0].gl_renderer_raw).toBe('ANGLE(NVIDIA)');
+    expect(res.rows[0].raw_summary).toEqual({ zone: 'eastbrook', seconds: 30 });
   });
 
   it('built the worst-10s concurrent index and it is valid', async () => {

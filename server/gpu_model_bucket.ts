@@ -135,6 +135,13 @@ function amdModel(clean: string): string {
  * ('nvidia', 'intel', 'amd', 'apple'), which still segments the fleet usefully;
  * anything else, including an empty string and the randomised strings a
  * fingerprint-resistant browser reports, is GL_MODEL_OTHER.
+ *
+ * The LEADING segment is always the vendor, and that is a contract, not an
+ * accident of the current patterns: the admin summary's high-performance
+ * adapter mismatch compares exactly that segment (server/admin_db.ts), because
+ * a browser's WebGPU adapter info usually reaches vendor granularity and no
+ * further. tests/server/gpu_model_bucket.test.ts pins the vendor vocabulary
+ * against a corpus, so a new family pattern cannot quietly widen it.
  */
 export function glModel(renderer: string): string {
   const clean = cleanRenderer(renderer);

@@ -9,6 +9,7 @@ import { glLaptop, glModel } from './gpu_model_bucket';
 import { clientPerfMetricsSink } from './http/client_perf_metrics';
 import type { RateLimitOutcome } from './http/types';
 import { json, readBody } from './http_util';
+import { stripControlChars, stripJsonControlChars } from './perf_report_text';
 import { rateLimitNow, requestIp, windowedRateLimitOutcome } from './ratelimit';
 import { REALM } from './realm';
 
@@ -129,33 +130,6 @@ function nullableNumberIn(value: unknown, min: number, max: number): number | nu
   const n = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(n)) return null;
   return Math.min(max, Math.max(min, n));
-}
-
-// C0 controls plus DEL. None of them is legitimate in any field this ingest
-// stores, and U+0000 specifically is REJECTED by Postgres in a text parameter:
-// one NUL anywhere in a beacon's renderer or vendor string fails the whole
-// insert, losing the entire report rather than one field. Stripped rather than
-// rejected, on the same principle as every other clamp here (a beacon is never
-// refused over its diagnostics).
-// Written as a code scan rather than a regex literal: a character class over
-// this range is itself a lint error, and the fast path (the overwhelming
-// majority of reports carry none) costs one pass with no allocation.
-function stripControlChars(text: string): string {
-  let hasControl = false;
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i);
-    if (code < 0x20 || code === 0x7f) {
-      hasControl = true;
-      break;
-    }
-  }
-  if (!hasControl) return text;
-  let out = '';
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i);
-    if (code >= 0x20 && code !== 0x7f) out += text[i];
-  }
-  return out;
 }
 
 function textIn(value: unknown, max: number, fallback = ''): string {
@@ -749,7 +723,11 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
   try {
     const text = JSON.stringify(value);
-    const parsed = JSON.parse(text) as Record<string, unknown>;
+    // Before any other sanitizer, and over the WHOLE parsed value rather than
+    // the fields below: raw_summary is jsonb, which rejects a NUL escape the
+    // same way a text parameter rejects the character, and this object
+    // round-trips client-shaped keys and values that no field clamp here sees.
+    const parsed = stripJsonControlChars(JSON.parse(text) as Record<string, unknown>);
     if (!devTraceAllowed) delete parsed.devTrace;
     const browser = sanitizeBrowserSummary(parsed.browser);
     if (browser) parsed.browser = browser;
@@ -825,7 +803,9 @@ export async function handlePerfReport(
   const glRenderer = textIn(body.glRenderer, 160);
   // The client's WebGPU high-performance adapter description
   // (src/game/gpu_adapter_probe.ts), '' from a client that has none: an absent
-  // navigator.gpu, a refused adapter, or a client older than the probe.
+  // navigator.gpu, a refused adapter, or a client older than the probe. On
+  // Chrome this is the vendor/architecture pair ("nvidia ampere"), not a model
+  // name, so the key parsed off it below is usually vendor-level.
   const gpuHpAdapter = textIn(body.gpuHpAdapter, 160);
   const releaseVersion = textIn(body.releaseVersion, 40);
   const buildId = textIn(body.buildId, 40);
@@ -889,7 +869,10 @@ export async function handlePerfReport(
     // stored as received now, and gpu_model_bucket.ts parses the family key and
     // form-factor verdict off it server-side (the client is never trusted to
     // bucket). An absent renderer stores '' rather than the 'other' key, so a
-    // grouped read tells "no evidence" apart from "unrecognised GPU".
+    // grouped read tells "no evidence" apart from "unrecognised GPU". The
+    // adapter runs through the SAME parser so both columns speak one key
+    // vocabulary; the summary compares them on their vendor segment, which is
+    // as far as the adapter text a browser hands a normal page can reach.
     glRendererRaw: glRenderer,
     glModel: glRenderer ? glModel(glRenderer) : '',
     glLaptop: glLaptop(glRenderer),

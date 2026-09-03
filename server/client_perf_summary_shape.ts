@@ -32,12 +32,17 @@ export interface PerfModelBucket extends PerfAggregate {
 }
 
 // byHpMismatch adds the WebGPU high-performance adapter's family, and holds ONLY
-// the rows where it differs from glModel: the page is rendering on one GPU while
-// the machine offers another. The statement filters both the adapter-less rows
-// and the agreeing ones out before ranking, so the list means what its name
-// says and its cap can never truncate the signal in favour of agreement. An
-// empty list therefore means "no mismatch reported", and the agreeing
-// population is not counted here at all (byModel is the denominator).
+// the rows whose VENDOR differs from glModel's: the page is rendering on one
+// vendor's GPU while the machine offers another's. Vendor granularity rather
+// than the whole key because that is as far as a browser's adapter info
+// reliably goes (Chrome hands a normal page {vendor, architecture} and leaves
+// device and description empty), so a model-level comparison would call every
+// single-GPU Chrome client a mismatch; the reason is spelled out at the
+// statement in server/admin_db.ts. The statement filters the adapter-less rows,
+// the unparsed ones, and the agreeing ones out before ranking, so the list
+// means what its name says and its cap can never truncate the signal in favour
+// of agreement. An empty list therefore means "no mismatch reported", and the
+// agreeing population is not counted here at all (byModel is the denominator).
 export interface PerfHpAdapterBucket extends PerfModelBucket {
   gpuHpAdapter: string;
 }
