@@ -1756,11 +1756,11 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // honest statement of it is that it was never a measurement of THIS
     // fixture: the 38.9 KB recipe armed level, quests, recipes, nodes, beds,
     // skills and 140 instanced container slots, and nothing else. It predates
-    // the Book of Deeds (deedStats alone measures 30,145 here, the largest
-    // single term), the Reliquary, the Materials Vault, the raid lockouts, the
-    // loadout list and the bank purchase ladder, and it counted 140 instanced
-    // slots where the legal ceiling is now 268 (80 carried, 176 bank, 12
-    // buyback). The measurement is 3.66x that carry, and the carry is
+    // the Book of Deeds (deedStats alone measured 30,145 in that baseline, the
+    // largest single term), the Reliquary, the Materials Vault, the raid
+    // lockouts, the loadout list and the bank purchase ladder, and it counted
+    // 140 instanced slots where the legal ceiling is now 268 (80 carried, 176
+    // bank, 12 buyback). The measurement is 3.66x that carry, and the carry is
     // superseded, not adjusted.
     //
     // The SECOND prediction was derived for this run and written before it:
@@ -1805,16 +1805,23 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
       'means re-measure and re-base, and the band is re-measured ONCE MORE at the ' +
       'phase close after the LAST content unit lands. The close measurement is the ' +
       'one the QA twin freezes.';
-    // RE-BASED at the Phase 18 QA close, the measurement the twin freezes:
-    // 151,584 bytes, up 59 from the 151,525 the sweep measured. The mover is the
-    // tenth release sync (release/v0.42.0), whose content the fixture now walks;
-    // no packet unit added a field to the blob in the QA round, and the shape is
-    // unchanged (the same containers at the same ceilings, still a fixed point).
-    // Re-measured and re-based per the rule above, never widened: the floor is
-    // the measurement minus 380 and the edge the measurement plus one, so the
-    // band keeps the exact 381-byte width it has always had.
-    expect(bytes, reMint).toBeGreaterThan(151203);
-    expect(bytes, reMint).toBeLessThan(151585);
+    // RE-BASED at the Phase 18 QA close, the measurement the twin froze:
+    // 151,584 bytes, up 59 from the 151,525 the sweep measured. The mover was
+    // the tenth release sync (release/v0.42.0), whose content the fixture
+    // walked; no packet unit added a field to the blob in the QA round, and the
+    // shape remained unchanged (the same containers at the same ceilings,
+    // still a fixed point).
+    //
+    // RE-BASED again after the two v0.42.0 mount integrations: 151,656 bytes,
+    // exactly +72. The one moving top-level key is deedStats: its closed-world
+    // itemsDiscovered set gained `reins_mech_bird` (18 serialized bytes),
+    // `reins_lanternback_troll` (26), and `reins_chimeglass_tortoise` (28).
+    // Those three `"<id>",` terms sum to the measured delta; no persisted shape
+    // or legal ceiling moved. Re-measured and re-based per the rule above,
+    // never widened: the floor is measurement minus 380 and the edge is
+    // measurement plus one, so the band remains exactly 381 bytes wide.
+    expect(bytes, reMint).toBeGreaterThan(151275);
+    expect(bytes, reMint).toBeLessThan(151657);
 
     // WHAT THE MEASUREMENT SAYS ABOUT THE WARN THRESHOLD, now that D122 has
     // ruled. The OLD 131,072 sat BELOW the measured legal worst case (about
@@ -1822,7 +1829,7 @@ describe('the whole-character maximal blob (Phase 18 U-MEASURE)', () => {
     // autosave. qr-19-character-blob-warn-threshold (Phase 19) re-minted
     // CHARACTER_BLOB_WARN_BYTES to 163,840 (160 KiB), the smallest 32-KiB step
     // above the measured worst case, so the threshold now sits ABOVE it and a
-    // legal maximal character no longer trips it (measured worst case 151,584 <
+    // legal maximal character no longer trips it (measured worst case 151,656 <
     // 163,840 warn). This arm pins that relation and reds BY DESIGN on any future
     // re-mint that drops the threshold back under the worst case, which is the
     // contract: the threshold and this measurement are re-read together

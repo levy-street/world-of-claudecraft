@@ -53,13 +53,13 @@
 // Masterwrought Phase 18 measured a maximal character through the real
 // Sim.serializeCharacter path, settled to a fixed point across two further real
 // loads with every container at its LEGAL ceiling:
-//   maximal character, merged tree: 151,584 bytes measured at the phase close
+//   maximal character, merged tree: 151,656 bytes after the v0.42.0 mount syncs
 //   (pinned with its band and its full derivation in
 //   tests/professions_blob_growth.test.ts, the whole-character arm).
 // That is 3.66x the 41.4 KB carry. The old fixture is why: it armed level,
 // quests, recipes, nodes, beds, skills and 140 instanced container slots and
-// nothing else, so it predates the Book of Deeds (deedStats alone measures
-// 30,145 in the new fixture, the largest single term), the Reliquary, the
+// nothing else, so it predates the Book of Deeds (deedStats alone now measures
+// 30,217 in the live fixture, the largest single term), the Reliquary, the
 // Materials Vault, the raid lockouts, the loadout list and the bank purchase
 // ladder, and it counted 140 instanced slots where the legal ceiling is now 268
 // (80 carried, 176 bank, 12 buyback).
@@ -72,7 +72,7 @@
 // RE-MINTED to 163,840 (160 KiB) by qr-19-character-blob-warn-threshold (Phase
 // 19, under qr-19-best-for-project). The value is DERIVED, not guessed: it is the
 // smallest 32-KiB-aligned step strictly above the measured legal worst case
-// (151,584 bytes, the phase-close figure the professions_blob_growth
+// (151,656 bytes, the post-release-sync figure the professions_blob_growth
 // whole-character arm freezes), and it keeps a full 32-KiB step below the 262,144
 // (256 KiB) guild-bank scale named below. A maxed character therefore no longer
 // trips the line on every save, while a character past 160 KiB is still worth a

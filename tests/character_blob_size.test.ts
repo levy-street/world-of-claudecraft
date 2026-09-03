@@ -104,7 +104,7 @@ describe('characterBlobSizeWarning: the pure decision', () => {
   it('pins the warn threshold to its literal value', () => {
     // The number itself, not the constant compared against itself. 163,840 is
     // 160 KiB, the smallest 32-KiB step above the measured legal worst case
-    // (151,584 bytes, frozen by the professions_blob_growth whole-character arm)
+    // (151,656 bytes, frozen by the professions_blob_growth whole-character arm)
     // and one 32-KiB step below the 262,144-byte guild-bank row scale; re-minted
     // from 131,072 by qr-19-character-blob-warn-threshold. See the derivation in
     // server/character_blob_size.ts. Moving it means re-measuring.
