@@ -33,6 +33,8 @@ export interface GpuAdapterInfoLike {
 export interface GpuAdapterLike {
   info?: GpuAdapterInfoLike;
   requestAdapterInfo?: () => unknown;
+  /** Spec flag: the browser answered with its CPU fallback, not a real GPU. */
+  isFallbackAdapter?: unknown;
 }
 
 export interface GpuLike {
@@ -121,6 +123,14 @@ export async function probeGpuHighPerformanceAdapter(
         | null
         | undefined;
       if (!adapter) return null;
+      // A fallback adapter is the browser's CPU implementation, so its
+      // description names a rasterizer (SwiftShader) and the server's parser
+      // keys it 'software'. Reported, that reads on the server as "this
+      // machine renders WebGL in software", which is the OPPOSITE of what it
+      // means: WebGL may be on real hardware and WebGPU simply had no hardware
+      // adapter to offer. Absent evidence is the honest answer, so this arm
+      // joins the other null ones.
+      if (adapter.isFallbackAdapter) return null;
       // adapter.info is the current shape; requestAdapterInfo() is the older
       // one still shipping in browsers this probe must not throw on.
       const info =

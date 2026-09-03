@@ -642,8 +642,14 @@ export async function clientPerfSummary(hoursInput = 24): Promise<PerfSummary> {
     // single-GPU Chrome client with a recognised WebGL model as a mismatch.
     // Vendor granularity still catches the case the column exists for: an Intel
     // or AMD iGPU rendering the page while a discrete NVIDIA part sits idle.
-    // 'software' is deliberately NOT excluded: a CPU rasterizer beside a real
-    // adapter is the most actionable mismatch there is.
+    // 'software' is deliberately NOT excluded, but a reader must know WHICH
+    // side it came from. On gl_model it is the actionable case, the page
+    // rendering WebGL on a CPU rasterizer while a real adapter exists. On
+    // gpu_hp_adapter it would mean the opposite (WebGPU had no hardware
+    // adapter to offer, saying nothing about WebGL), so the client probe drops
+    // a fallback adapter rather than describing it
+    // (src/game/gpu_adapter_probe.ts, GPUAdapter.isFallbackAdapter) and the
+    // key should not reach that column from a browser that sets the flag.
     //
     // A rarer-than-the-floor mismatch is deliberately not counted here: this is
     // the fleet-level dimension, and single-report forensics ride clientPerfRaw,

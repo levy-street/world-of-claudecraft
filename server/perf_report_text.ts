@@ -66,8 +66,20 @@ export function stripJsonControlChars<T>(value: T): T {
       continue;
     }
     const record = node as Record<string, unknown>;
-    for (const key of Object.keys(record)) {
-      const raw: unknown = record[key];
+    // Object.entries, never Object.keys plus a live record[key] read. The
+    // rename below can move a child under a key that comes LATER in the same
+    // snapshot (a dirty `a` plus U+0001 holding the child, followed by a plain
+    // `a`), and a live read would then see the just-moved child and push it a
+    // second time. Every level would be visited once more than the level above
+    // it, which is quadratic in nesting depth on a PUBLIC beacon: a 3640-level
+    // chain at the body cap took hundreds of milliseconds of synchronous work
+    // on the process that runs the 20 Hz world loop. Reading the pre-walk value
+    // makes each node's contents enumerated exactly once.
+    //
+    // A collision itself is fine and stays last-writer-wins: two distinct
+    // client keys that strip to the same key are one key by then, and which
+    // value survives is not information the ingest owes anyone.
+    for (const [key, raw] of Object.entries(record)) {
       const entry = typeof raw === 'string' ? stripControlChars(raw) : raw;
       if (entry && typeof entry === 'object') stack.push(entry as object);
       const cleanKey = stripControlChars(key);

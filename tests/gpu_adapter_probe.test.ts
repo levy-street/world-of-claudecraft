@@ -47,6 +47,38 @@ describe('probeGpuHighPerformanceAdapter failure arms', () => {
     ).resolves.toBe(null);
   });
 
+  it('answers null for the CPU fallback adapter, whatever it calls itself', async () => {
+    // A fallback adapter is the browser's software implementation. Its
+    // description names a rasterizer, which the server's parser keys
+    // 'software', and stored beside the WebGL model that reads as "this
+    // machine renders in software" when it means the opposite: WebGPU had no
+    // hardware adapter to offer, and WebGL may be on a real GPU. No evidence
+    // is the honest answer, so this joins the other null arms.
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({
+          isFallbackAdapter: true,
+          info: { vendor: 'google', architecture: 'swiftshader', description: 'SwiftShader' },
+        })),
+      }),
+    ).resolves.toBe(null);
+    // The legacy call shape too: the flag is on the adapter, not on the info.
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({
+          isFallbackAdapter: true,
+          requestAdapterInfo: async () => ({ description: 'Google SwiftShader' }),
+        })),
+      }),
+    ).resolves.toBe(null);
+    // A hardware adapter is unaffected: the flag is false or absent there.
+    await expect(
+      probeGpuHighPerformanceAdapter({
+        gpu: fakeGpu(async () => ({ isFallbackAdapter: false, ...ADAPTER_4070 })),
+      }),
+    ).resolves.toBe('NVIDIA GeForce RTX 4070 Laptop GPU');
+  });
+
   it('answers null, never rejects, when the driver throws or rejects', async () => {
     // An insecure context rejects with a DOMException-shaped error.
     await expect(
