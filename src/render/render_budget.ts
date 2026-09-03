@@ -91,8 +91,9 @@ export interface RenderBudgetGovernorOptions {
    *  (an Advanced session on tier high may dial relief 3 and 4 taps) or when
    *  the tier's `detail` band is governable. Absent, the band alone decides. */
   terrainDetail?: Readonly<TerrainDetailGfxRequest>;
-  /** A dev A/B pin for the terrain-detail shed: skips its hysteresis and
-   *  holds the level exactly here, with or without an enabled governor. */
+  /** The `?terraindetail=<0..1>` dev pin (render_dev_flags.ts): skips the
+   *  terrain-detail shed's hysteresis and holds the level exactly here, with
+   *  or without an enabled governor. */
   pinnedDetailLevel?: number | null;
 }
 

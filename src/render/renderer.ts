@@ -589,7 +589,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode } from './render_dev_flags';
+import { gpuPrepMode, terrainDetailLevelPin } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -2086,6 +2086,7 @@ export class Renderer {
       budget: GFX.budget,
       enabled: GFX.autoGovernor,
       terrainDetail: GFX,
+      pinnedDetailLevel: terrainDetailLevelPin(),
     });
     this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
@@ -4372,6 +4373,7 @@ export class Renderer {
       // every-other-frame updates: surfaced so the ?perf overlay and capture
       // artifacts can tell a half-rate sample from a full-rate one.
       shadowCadenceHalfRate: this.shadowCadence.halfRate,
+      terrainDetailLevel: renderBudget.levels.detail,
       pixelRatio: this.webgl.getPixelRatio(),
       width: this.viewport.width,
       height: this.viewport.height,

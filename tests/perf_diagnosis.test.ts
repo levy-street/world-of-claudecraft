@@ -64,6 +64,7 @@ function baseSnapshot(): PerfSnapshot {
       renderScale: 1,
       effectiveRenderScale: 1,
       shadowCadenceHalfRate: false,
+      terrainDetailLevel: 1,
       renderBudget: {
         enabled: true,
         mode: 'stable',

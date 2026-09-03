@@ -200,8 +200,9 @@ function round2(v: number): number {
 
 /**
  * Advance the shed one frame. Mutates and returns the caller-owned state (no
- * per-frame allocation). A non-null `pinnedLevel` (a dev A/B pin) skips the
- * hysteresis and the slew entirely and holds the level exactly there, with
+ * per-frame allocation). A non-null `pinnedLevel` (the `?terraindetail=`
+ * dev flag, render_dev_flags.ts) skips the hysteresis and the slew entirely
+ * and holds the level exactly there, with
  * or without an enabled governor, so an A/B run compares known, stable
  * levels; a disabled governor without a pin holds the tier's own request.
  */

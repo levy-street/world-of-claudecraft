@@ -50,6 +50,14 @@ describe('terrain-detail shed renderer wiring', () => {
     expect(applyBody).not.toMatch(/[=(]\s*\{/);
   });
 
+  it('hands the governor the ?terraindetail= pin and surfaces the live level in perfStats', () => {
+    expect(rendererSource).toMatch(
+      /new RenderBudgetGovernor\(\{[^}]*pinnedDetailLevel: terrainDetailLevelPin\(\),[^}]*\}\)/,
+    );
+    const stats = methodBody('perfStats(): RendererPerfStats {');
+    expect(stats).toContain('terrainDetailLevel: renderBudget.levels.detail,');
+  });
+
   it('consumes the level through the SAME shared uniform refs the materials attach', () => {
     // terrain.ts and worn_stone.ts attach gfx.ts sharedUniforms by reference
     // (never a { value } copy), so the renderer's in-place write reaches every

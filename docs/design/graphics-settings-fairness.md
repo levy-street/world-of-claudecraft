@@ -391,7 +391,8 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   `tests/render_budget.test.ts` pins the governor integration: ultra walks the rungs to the
   floor under sustained pressure and back up under sustained calm, a high TABLE session stays
   at level 1 under the SAME sustained pressure, an Advanced session on tier high is admitted
-  by its own request, the dev pin overrides live pressure with the governor on or off, and a
+  by its own request, the `?terraindetail=` pin overrides live pressure with the governor on or
+  off, and a
   disabled governor without a pin holds level 1. `tests/terrain_fragment_shader.test.ts` and
   `tests/worn_stone_shader.test.ts` prove the live uniforms are shared by reference with
   `sharedUniforms`, weigh the existing fades inside the existing gates (worn-stone's marginal
