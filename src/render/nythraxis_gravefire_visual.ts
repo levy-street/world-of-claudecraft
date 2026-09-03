@@ -1,34 +1,60 @@
-// Nythraxis Gravefire: one terrain-draped strip per authoritative lit window.
-// Every row owns one preallocated BufferGeometry. Snapshot changes rewrite its
-// positions in place, while cached one-yard height samples are taken only as
-// the advancing window reaches them. Graphics tiers never reach this painter.
+// Nythraxis Gravefire: one line of grave-fire per authoritative lit window.
+// The footprint (the window times the half-width, exactly what the sim burns)
+// is a terrain-draped strip: a dark scorched underlay, a faint glow down the
+// middle, a bright legible edge line on each side, and a brighter two-yard
+// head cap. On top of it a fixed budget of instanced flame tongues, scattered
+// deterministically along the lit yards, makes it read as fire rather than as
+// a painted stripe. Every row owns one preallocated strip geometry (positions
+// rewritten in place as the window slides, one-yard ground samples cached as
+// the head reaches them) and one instanced tongue mesh (the tongue geometry
+// itself is module-shared, nythraxis_flame_tongue.ts). Graphics tiers never
+// reach this painter: the footprint is actionable on every preset.
 
 import * as THREE from 'three';
 import {
   type ActiveNythraxisGravefire,
   NYTHRAXIS_GRAVEFIRE_LENGTH,
 } from '../sim/nythraxis_gravefire';
+import { METEOR_FLAME_GEOMETRY_HALF_HEIGHT } from './mage_ground_fx';
 import {
+  NYTHRAXIS_FLAME_TONGUE_GEOMETRY,
+  NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT,
+} from './nythraxis_flame_tongue';
+import {
+  NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH,
+  NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION,
   NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
+  NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY,
   NYTHRAXIS_GRAVEFIRE_PALETTE,
+  NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS,
   type NythraxisGravefirePlan,
   type NythraxisGravefirePulse,
+  type NythraxisGravefireTonguePose,
   nythraxisGravefirePlanInto,
   nythraxisGravefirePulseInto,
+  nythraxisGravefireTongueCount,
+  nythraxisGravefireTonguePoseInto,
 } from './nythraxis_gravefire_core';
 
 export const NYTHRAXIS_GRAVEFIRE_VISUAL_NAME = 'nythraxis-gravefire';
 export const NYTHRAXIS_GRAVEFIRE_STRIP_NAME = 'nythraxis-gravefire-strip';
+export const NYTHRAXIS_GRAVEFIRE_TONGUES_NAME = 'nythraxis-gravefire-tongues';
 
 const MAX_SEGMENTS = NYTHRAXIS_GRAVEFIRE_LENGTH;
 const QUAD_VERTEX_COUNT = 4;
 const QUAD_INDEX_COUNT = 6;
-const LAYER_COUNT = 5;
+// Strip layers, each a run of one-yard quads along the window.
 const UNDERLAY_LAYER = 0;
-const CORE_LAYER = 1;
-const LEFT_RIM_LAYER = 2;
-const RIGHT_RIM_LAYER = 3;
+const GLOW_LAYER = 1;
+const LEFT_EDGE_LAYER = 2;
+const RIGHT_EDGE_LAYER = 3;
 const HEAD_LAYER = 4;
+const LAYER_COUNT = 5;
+// Material slots the layers draw with.
+const UNDERLAY_MATERIAL = 0;
+const GLOW_MATERIAL = 1;
+const EDGE_MATERIAL = 2;
+const HEAD_MATERIAL = 3;
 const TWO_PI = Math.PI * 2;
 
 interface GravefireVisual {
@@ -36,9 +62,11 @@ interface GravefireVisual {
   mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial[]>;
   positions: Float32Array;
   underlayMaterial: THREE.MeshBasicMaterial;
-  coreMaterial: THREE.MeshBasicMaterial;
-  rimMaterial: THREE.MeshBasicMaterial;
+  glowMaterial: THREE.MeshBasicMaterial;
+  edgeMaterial: THREE.MeshBasicMaterial;
   headMaterial: THREE.MeshBasicMaterial;
+  tongues: THREE.InstancedMesh;
+  tongueMaterial: THREE.MeshBasicMaterial;
   sampledHeights: Float32Array;
   sampled: Uint8Array;
   plan: NythraxisGravefirePlan;
@@ -51,6 +79,7 @@ interface GravefireVisual {
   head: number;
   halfWidth: number;
   phase: number;
+  tongueElapsed: number;
 }
 
 function stripMaterial(
@@ -88,13 +117,17 @@ function buildStripGeometry(): { geometry: THREE.BufferGeometry; positions: Floa
   attribute.setUsage(THREE.DynamicDrawUsage);
   geometry.setAttribute('position', attribute);
   geometry.setIndex(new THREE.BufferAttribute(indices, 1));
+  const materialFor = (layer: number): number => {
+    if (layer === UNDERLAY_LAYER) return UNDERLAY_MATERIAL;
+    if (layer === GLOW_LAYER) return GLOW_MATERIAL;
+    if (layer === HEAD_LAYER) return HEAD_MATERIAL;
+    return EDGE_MATERIAL;
+  };
   for (let layer = 0; layer < LAYER_COUNT; layer++) {
-    const materialIndex =
-      layer === UNDERLAY_LAYER ? 0 : layer === HEAD_LAYER ? 3 : layer === CORE_LAYER ? 1 : 2;
     geometry.addGroup(
       layer * MAX_SEGMENTS * QUAD_INDEX_COUNT,
       MAX_SEGMENTS * QUAD_INDEX_COUNT,
-      materialIndex,
+      materialFor(layer),
     );
   }
   geometry.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1);
@@ -183,7 +216,9 @@ function writeLayerWindow(
 function rewriteStrip(visual: GravefireVisual): void {
   const { plan } = visual;
   const halfWidth = plan.halfWidth;
-  const inner = halfWidth * 0.82;
+  const glow = halfWidth * NYTHRAXIS_GRAVEFIRE_GLOW_FRACTION;
+  const edgeInner = Math.max(0, halfWidth - NYTHRAXIS_GRAVEFIRE_EDGE_WIDTH);
+  const lift = NYTHRAXIS_GRAVEFIRE_GROUND_LIFT;
   writeLayerWindow(
     visual,
     UNDERLAY_LAYER,
@@ -191,54 +226,88 @@ function rewriteStrip(visual: GravefireVisual): void {
     plan.head,
     -halfWidth,
     halfWidth,
-    NYTHRAXIS_GRAVEFIRE_GROUND_LIFT - 0.015,
+    lift - 0.015,
   );
+  writeLayerWindow(visual, GLOW_LAYER, plan.tail, plan.head, -glow, glow, lift);
   writeLayerWindow(
     visual,
-    CORE_LAYER,
-    plan.tail,
-    plan.head,
-    -inner,
-    inner,
-    NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
-  );
-  writeLayerWindow(
-    visual,
-    LEFT_RIM_LAYER,
+    LEFT_EDGE_LAYER,
     plan.tail,
     plan.head,
     -halfWidth,
-    -inner,
-    NYTHRAXIS_GRAVEFIRE_GROUND_LIFT + 0.01,
+    -edgeInner,
+    lift + 0.01,
   );
   writeLayerWindow(
     visual,
-    RIGHT_RIM_LAYER,
+    RIGHT_EDGE_LAYER,
     plan.tail,
     plan.head,
-    inner,
+    edgeInner,
     halfWidth,
-    NYTHRAXIS_GRAVEFIRE_GROUND_LIFT + 0.01,
+    lift + 0.01,
   );
-  writeLayerWindow(
-    visual,
-    HEAD_LAYER,
-    plan.headCapTail,
-    plan.head,
-    -inner,
-    inner,
-    NYTHRAXIS_GRAVEFIRE_GROUND_LIFT + 0.02,
-  );
+  writeLayerWindow(visual, HEAD_LAYER, plan.headCapTail, plan.head, -glow, glow, lift + 0.02);
   visual.mesh.geometry.getAttribute('position').needsUpdate = true;
   const sphere = visual.mesh.geometry.boundingSphere;
   if (sphere) {
     const middle = (plan.tail + plan.head) * 0.5;
     sphere.center.set(
       (plan.tailX + plan.headX) * 0.5,
-      heightAtDistance(visual, middle) + NYTHRAXIS_GRAVEFIRE_GROUND_LIFT,
+      heightAtDistance(visual, middle) + lift,
       (plan.tailZ + plan.headZ) * 0.5,
     );
     sphere.radius = Math.max(1, plan.length * 0.5 + halfWidth + 1);
+  }
+}
+
+const TONGUE_POSE: NythraxisGravefireTonguePose = {
+  along: 0,
+  across: 0,
+  y: 0,
+  height: 0,
+  width: 0,
+  yaw: 0,
+  visible: false,
+};
+const TONGUE_DUMMY = new THREE.Object3D();
+
+/** Re-pose every tongue instance for the current window and phase. */
+function poseTongues(visual: GravefireVisual, reducedMotion: boolean): void {
+  const { plan, tongues } = visual;
+  const crossX = -visual.dirZ;
+  const crossZ = visual.dirX;
+  for (let index = 0; index < tongues.count; index++) {
+    const pose = nythraxisGravefireTonguePoseInto(
+      TONGUE_POSE,
+      index,
+      plan,
+      visual.phase,
+      reducedMotion,
+      METEOR_FLAME_GEOMETRY_HALF_HEIGHT,
+    );
+    if (!pose.visible) {
+      TONGUE_DUMMY.position.set(0, -1000, 0);
+      TONGUE_DUMMY.rotation.set(0, 0, 0);
+      TONGUE_DUMMY.scale.set(0, 0, 0);
+    } else {
+      TONGUE_DUMMY.position.set(
+        visual.x + visual.dirX * pose.along + crossX * pose.across,
+        heightAtDistance(visual, pose.along) + NYTHRAXIS_GRAVEFIRE_GROUND_LIFT + pose.y,
+        visual.z + visual.dirZ * pose.along + crossZ * pose.across,
+      );
+      TONGUE_DUMMY.rotation.set(0, pose.yaw, 0);
+      TONGUE_DUMMY.scale.set(pose.width, pose.height, pose.width);
+    }
+    TONGUE_DUMMY.updateMatrix();
+    tongues.setMatrixAt(index, TONGUE_DUMMY.matrix);
+  }
+  tongues.instanceMatrix.needsUpdate = true;
+  const sphere = visual.mesh.geometry.boundingSphere;
+  if (sphere) {
+    if (!tongues.boundingSphere) tongues.boundingSphere = new THREE.Sphere();
+    tongues.boundingSphere.center.copy(sphere.center);
+    tongues.boundingSphere.radius = sphere.radius + NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT;
   }
 }
 
@@ -252,9 +321,11 @@ function visualFromGroup(
     mesh: group.userData.mesh as GravefireVisual['mesh'],
     positions: group.userData.positions as Float32Array,
     underlayMaterial: group.userData.underlayMaterial as THREE.MeshBasicMaterial,
-    coreMaterial: group.userData.coreMaterial as THREE.MeshBasicMaterial,
-    rimMaterial: group.userData.rimMaterial as THREE.MeshBasicMaterial,
+    glowMaterial: group.userData.glowMaterial as THREE.MeshBasicMaterial,
+    edgeMaterial: group.userData.edgeMaterial as THREE.MeshBasicMaterial,
     headMaterial: group.userData.headMaterial as THREE.MeshBasicMaterial,
+    tongues: group.userData.tongues as THREE.InstancedMesh,
+    tongueMaterial: group.userData.tongueMaterial as THREE.MeshBasicMaterial,
     sampledHeights: new Float32Array(NYTHRAXIS_GRAVEFIRE_LENGTH + 1),
     sampled: new Uint8Array(NYTHRAXIS_GRAVEFIRE_LENGTH + 1),
     plan: {
@@ -277,6 +348,7 @@ function visualFromGroup(
     head: row.head,
     halfWidth: row.halfWidth,
     phase: 0,
+    tongueElapsed: 0,
   };
   nythraxisGravefirePlanInto(visual.plan, row);
   return visual;
@@ -294,23 +366,17 @@ export function buildNythraxisGravefireStrip(
   group.userData.sourceId = row.sourceId;
   group.userData.halfWidth = row.halfWidth;
 
-  const underlayMaterial = stripMaterial(
-    NYTHRAXIS_GRAVEFIRE_PALETTE.underlay,
-    0.68,
-    THREE.NormalBlending,
-  );
-  const coreMaterial = stripMaterial(NYTHRAXIS_GRAVEFIRE_PALETTE.core, 0.87, THREE.NormalBlending);
-  const rimMaterial = stripMaterial(NYTHRAXIS_GRAVEFIRE_PALETTE.rim, 0.9, THREE.AdditiveBlending);
-  const headMaterial = stripMaterial(
-    NYTHRAXIS_GRAVEFIRE_PALETTE.head,
-    0.93,
-    THREE.AdditiveBlending,
-  );
+  const opacity = NYTHRAXIS_GRAVEFIRE_LAYER_OPACITY;
+  const palette = NYTHRAXIS_GRAVEFIRE_PALETTE;
+  const underlayMaterial = stripMaterial(palette.underlay, opacity.underlay, THREE.NormalBlending);
+  const glowMaterial = stripMaterial(palette.glow, opacity.glow, THREE.AdditiveBlending);
+  const edgeMaterial = stripMaterial(palette.edge, opacity.edge, THREE.AdditiveBlending);
+  const headMaterial = stripMaterial(palette.head, opacity.head, THREE.AdditiveBlending);
   const { geometry, positions } = buildStripGeometry();
   const mesh = new THREE.Mesh(geometry, [
     underlayMaterial,
-    coreMaterial,
-    rimMaterial,
+    glowMaterial,
+    edgeMaterial,
     headMaterial,
   ]);
   mesh.name = NYTHRAXIS_GRAVEFIRE_STRIP_NAME;
@@ -319,19 +385,34 @@ export function buildNythraxisGravefireStrip(
   mesh.userData.actionable = true;
   group.add(mesh);
 
+  const tongueMaterial = stripMaterial(palette.tongue, opacity.tongue, THREE.AdditiveBlending);
+  const tongues = new THREE.InstancedMesh(
+    NYTHRAXIS_FLAME_TONGUE_GEOMETRY,
+    tongueMaterial,
+    nythraxisGravefireTongueCount(),
+  );
+  tongues.name = NYTHRAXIS_GRAVEFIRE_TONGUES_NAME;
+  tongues.renderOrder = 15;
+  tongues.userData.renderCategory = 'ui3d';
+  tongues.frustumCulled = true;
+  group.add(tongues);
+
   group.userData.mesh = mesh;
   group.userData.positions = positions;
   group.userData.underlayMaterial = underlayMaterial;
-  group.userData.coreMaterial = coreMaterial;
-  group.userData.rimMaterial = rimMaterial;
+  group.userData.glowMaterial = glowMaterial;
+  group.userData.edgeMaterial = edgeMaterial;
   group.userData.headMaterial = headMaterial;
+  group.userData.tongues = tongues;
+  group.userData.tongueMaterial = tongueMaterial;
   const visual = visualFromGroup(group, groundY, row);
   group.userData.visual = visual;
   rewriteStrip(visual);
+  poseTongues(visual, false);
   return group;
 }
 
-function applyRow(visual: GravefireVisual, row: ActiveNythraxisGravefire): void {
+function applyRow(visual: GravefireVisual, row: ActiveNythraxisGravefire): boolean {
   const axisChanged =
     visual.x !== row.x ||
     visual.z !== row.z ||
@@ -342,7 +423,7 @@ function applyRow(visual: GravefireVisual, row: ActiveNythraxisGravefire): void 
     visual.tail !== row.tail ||
     visual.head !== row.head ||
     visual.halfWidth !== row.halfWidth;
-  if (!windowChanged) return;
+  if (!windowChanged) return false;
   visual.x = row.x;
   visual.z = row.z;
   visual.dirX = row.dirX;
@@ -354,21 +435,27 @@ function applyRow(visual: GravefireVisual, row: ActiveNythraxisGravefire): void 
   visual.group.userData.halfWidth = row.halfWidth;
   if (axisChanged) visual.sampled.fill(0);
   rewriteStrip(visual);
+  return true;
 }
 
 function disposeVisual(visual: GravefireVisual): void {
   visual.mesh.geometry.dispose();
   visual.underlayMaterial.dispose();
-  visual.coreMaterial.dispose();
-  visual.rimMaterial.dispose();
+  visual.glowMaterial.dispose();
+  visual.edgeMaterial.dispose();
   visual.headMaterial.dispose();
+  // The tongue geometry is module-shared: dispose the instance buffer and the
+  // material, never the geometry.
+  visual.tongues.dispose();
+  visual.tongueMaterial.dispose();
   visual.group.removeFromParent();
 }
 
 export class NythraxisGravefireVisuals {
   private readonly visuals = new Map<string, GravefireVisual>();
   private readonly activeIds = new Set<string>();
-  private readonly pulse: NythraxisGravefirePulse = { core: 0, rim: 0, head: 0 };
+  private readonly pulse: NythraxisGravefirePulse = { edge: 0, glow: 0, head: 0, tongue: 0 };
+  private reducedMotion = false;
 
   constructor(
     private readonly scene: THREE.Scene,
@@ -382,7 +469,9 @@ export class NythraxisGravefireVisuals {
       this.activeIds.add(row.id);
       const existing = this.visuals.get(row.id);
       if (existing) {
-        applyRow(existing, row);
+        // A moved window re-poses the tongues at once so the fire never lags
+        // behind the footprint that burns.
+        if (applyRow(existing, row)) poseTongues(existing, this.reducedMotion);
         continue;
       }
       const group = buildNythraxisGravefireStrip(row, this.groundY);
@@ -402,12 +491,21 @@ export class NythraxisGravefireVisuals {
 
   update(dt: number, reducedMotion = false): void {
     const step = Math.max(0, dt);
+    this.reducedMotion = reducedMotion;
     for (const visual of this.visuals.values()) {
       if (!reducedMotion) visual.phase = (visual.phase + step * 1.8) % TWO_PI;
       const pulse = nythraxisGravefirePulseInto(this.pulse, visual.phase, reducedMotion);
-      visual.coreMaterial.opacity = pulse.core;
-      visual.rimMaterial.opacity = pulse.rim;
+      visual.edgeMaterial.opacity = pulse.edge;
+      visual.glowMaterial.opacity = pulse.glow;
       visual.headMaterial.opacity = pulse.head;
+      visual.tongueMaterial.opacity = pulse.tongue;
+      // The tongues flicker at 20 Hz, not every frame: continuous to the eye,
+      // bounded on the CPU (the patch painter's cadence).
+      visual.tongueElapsed += step;
+      if (visual.tongueElapsed >= NYTHRAXIS_GRAVEFIRE_TONGUE_UPDATE_SECONDS) {
+        visual.tongueElapsed = 0;
+        poseTongues(visual, reducedMotion);
+      }
     }
   }
 
@@ -439,6 +537,11 @@ export function buildNythraxisGravefirePrewarmVisual(): THREE.Group {
 export const nythraxisGravefireVisualInternalsForTest = {
   maxSegments: MAX_SEGMENTS,
   layerCount: LAYER_COUNT,
-  coreLayer: CORE_LAYER,
+  glowLayer: GLOW_LAYER,
+  leftEdgeLayer: LEFT_EDGE_LAYER,
   headLayer: HEAD_LAYER,
+  underlayMaterial: UNDERLAY_MATERIAL,
+  glowMaterial: GLOW_MATERIAL,
+  edgeMaterial: EDGE_MATERIAL,
+  headMaterial: HEAD_MATERIAL,
 };

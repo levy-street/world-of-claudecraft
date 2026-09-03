@@ -22,6 +22,10 @@ import {
 } from '../sim/nythraxis_grave_eruption';
 import { MageGroundFx, METEOR_FLAME_GEOMETRY_HALF_HEIGHT } from './mage_ground_fx';
 import {
+  NYTHRAXIS_FLAME_TONGUE_GEOMETRY,
+  NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT,
+} from './nythraxis_flame_tongue';
+import {
   NYTHRAXIS_GRAVE_FLAME_RIM_INNER_FRACTION,
   NYTHRAXIS_GRAVE_FLAME_TONGUE_UPDATE_SECONDS,
   NYTHRAXIS_GRAVE_FLAME_TONGUES,
@@ -46,47 +50,9 @@ export const NYTHRAXIS_GRAVE_PREWARM_NAME = 'nythraxis-grave-prewarm';
 const SEGMENTS = 64;
 const EMBER_SEGMENTS = 48;
 const EMBER_SPIN = 0.35; // rad/s, the violet inner ring's lazy drift
-const MAX_TONGUE_HEIGHT = METEOR_FLAME_GEOMETRY_HALF_HEIGHT * 2;
+const MAX_TONGUE_HEIGHT = NYTHRAXIS_FLAME_TONGUE_MAX_HEIGHT;
 
-/** The tongue silhouette: two crossed flame quads, the same shape as the meteor
- *  telegraph's rim flame so an eruption's bone-shard burst hands off to a fire
- *  of the same read. Shared by every patch; built once at module load. */
-function buildTongueGeometry(): THREE.BufferGeometry {
-  const vertices: number[] = [];
-  const indices: number[] = [];
-  for (let plane = 0; plane < 2; plane++) {
-    const offset = vertices.length / 3;
-    const points = [
-      [-0.18, -0.44],
-      [0.18, -0.44],
-      [0.12, 0.02],
-      [0.055, 0.46],
-      [-0.11, 0.05],
-    ] as const;
-    for (const [horizontal, y] of points) {
-      if (plane === 0) vertices.push(horizontal, y, 0);
-      else vertices.push(0, y, horizontal);
-    }
-    indices.push(
-      offset,
-      offset + 1,
-      offset + 2,
-      offset,
-      offset + 2,
-      offset + 4,
-      offset + 2,
-      offset + 3,
-      offset + 4,
-    );
-  }
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.setIndex(indices);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-const TONGUE_GEOMETRY = buildTongueGeometry();
+const TONGUE_GEOMETRY = NYTHRAXIS_FLAME_TONGUE_GEOMETRY;
 
 function setTongueBoundingSphere(tongues: THREE.InstancedMesh, radius: number): void {
   const boundRadius = radius + MAX_TONGUE_HEIGHT;

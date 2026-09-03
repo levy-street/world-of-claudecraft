@@ -14,6 +14,9 @@ const REPO_ROOT = path.join(__dirname, '..');
 const RELATIVE_URL = 'models/props/nythraxis_bone_spike.glb';
 const ASSET_PATH = path.join(REPO_ROOT, 'public', RELATIVE_URL);
 const AUTHORED_HEIGHT = 1.6;
+// Shown taller than authored so the spike reads from across the hall (owner
+// playtest 2026-09-04); the GLB bounds below still pin the authored size.
+const DISPLAY_HEIGHT = 2.6;
 const AUTHORED_FOOTPRINT_RADIUS = 0.88;
 
 describe('Nythraxis Bone Spike model', () => {
@@ -23,7 +26,7 @@ describe('Nythraxis Bone Spike model', () => {
     expect(key).toBe('mob_nythraxis_bone_spike');
     expect(VISUALS.mob_nythraxis_bone_spike).toMatchObject({
       url: RELATIVE_URL,
-      height: AUTHORED_HEIGHT,
+      height: DISPLAY_HEIGHT,
       yaw: 0,
       // STATIC_PROP: every action parks on the nominal 'Idle' the GLB lacks
       clips: {

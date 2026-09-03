@@ -3431,10 +3431,12 @@ export const VISUALS: Record<string, VisualDef> = {
   // prop mob: the GLB ships NO clips (registered in CLIPLESS_RIGS,
   // tests/character_clipmaps.test.ts), so STATIC_PROP parks every action on
   // the nominal 'Idle' and the mesh just stands. Authored upright and
-  // front-facing at 1.6 world units tall, footprint radius 0.88.
+  // front-facing (footprint radius 0.88); shown at 2.6 world units so the
+  // spike reads as the thing pinning a raider from across the hall (owner
+  // playtest 2026-09-04: 1.6 was too small).
   mob_nythraxis_bone_spike: {
     url: `${PROPS}/nythraxis_bone_spike.glb`,
-    height: 1.6,
+    height: 2.6,
     yaw: 0,
     clips: STATIC_PROP,
   },
