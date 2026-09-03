@@ -682,6 +682,7 @@ const RENDER_PURE_CORES = [
   'src/render/final_color_nan_guard_core.ts',
   'src/render/post_bloom_shader_core.ts',
   'src/render/dynamic_resolution_core.ts',
+  'src/render/resolution_rung_core.ts',
   'src/render/post_plan_core.ts',
   'src/render/nameplate_view.ts',
   'src/render/nameplate_pick_core.ts',

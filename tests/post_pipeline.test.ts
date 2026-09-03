@@ -346,3 +346,180 @@ describe('live post pipeline', () => {
     expect(composerDispose).toHaveBeenCalledTimes(1);
   });
 });
+
+interface SmaaInternals {
+  _edgesRT: THREE.WebGLRenderTarget;
+  _weightsRT: THREE.WebGLRenderTarget;
+  _materialEdges: THREE.ShaderMaterial;
+  _materialWeights: THREE.ShaderMaterial;
+  _materialBlend: THREE.ShaderMaterial;
+}
+
+interface N8AOQuadInternals {
+  effectShaderQuad: { material: THREE.ShaderMaterial };
+  poissonBlurQuad: { material: THREE.ShaderMaterial };
+  depthDownsampleTarget?: THREE.WebGLRenderTarget | null;
+}
+
+interface BloomMaterialInternals {
+  materialHighPassFilter: THREE.ShaderMaterial;
+  separableBlurMaterials: THREE.ShaderMaterial[];
+}
+
+describe('live post pipeline: the allocation-path resize contract', () => {
+  beforeEach(() => {
+    disabledLayers.clear();
+    gfxSettings.ao = true;
+    gfxSettings.aoFullRes = true;
+    gfxSettings.bloom = true;
+    gfxSettings.smaa = true;
+    gfxSettings.fxaa = false;
+    gfxSettings.msaaSamples = 0;
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reports the allocation mode on the composer chains and the region mode on medium', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const composer = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    expect(composer.dynamicResolution).toBe('allocation');
+    expect(composer.supportsDynamicResolution).toBe(false);
+
+    gfxSettings.ao = false;
+    gfxSettings.bloom = false;
+    gfxSettings.smaa = false;
+    const medium = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+      { gradeOnly: true },
+    );
+    expect(medium.dynamicResolution).toBe('region');
+    expect(medium.supportsDynamicResolution).toBe(true);
+  });
+
+  it('locks the mode under ?dynres=off without changing the chain', async () => {
+    vi.stubGlobal('Image', class {});
+    disabledLayers.add('dynres');
+    const { buildComposer } = await import('../src/render/post');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    expect(post.dynamicResolution).toBe('locked');
+    expect(post.composer.passes).toHaveLength(5);
+  });
+
+  it('resizes every target of the insane chain coherently and relinks no program', async () => {
+    vi.stubGlobal('Image', class {});
+    const { buildComposer } = await import('../src/render/post');
+    const { postPipelinePlan } = await import('../src/render/post_plan_core');
+    const post = buildComposer(
+      rendererStub(),
+      new THREE.Scene(),
+      new THREE.PerspectiveCamera(),
+      1280,
+      720,
+    );
+    const ao = post.ao as unknown as N8AOInternals & N8AOQuadInternals;
+    const bloom = post.bloom as unknown as BloomInternals & BloomMaterialInternals;
+    const smaa = post.composer.passes[4] as unknown as SmaaInternals;
+    const screenFx = post.composer.passes[3] as unknown as { material: THREE.ShaderMaterial };
+    const materials = [
+      post.grade.material,
+      screenFx.material,
+      smaa._materialEdges,
+      smaa._materialWeights,
+      smaa._materialBlend,
+      bloom.materialHighPassFilter,
+      ...bloom.separableBlurMaterials,
+      bloom.compositeMaterial,
+      ao.effectShaderQuad.material,
+      ao.poissonBlurQuad.material,
+      ao.effectCompositerQuad.material,
+    ];
+    const versions = materials.map((material) => material.version);
+
+    // The allocation step: the renderer's applyResolution hands the composer
+    // the new pixel ratio; a rung of 0.8 at 1280x720 logical pixels.
+    post.setSize(1280, 720, 0.8);
+
+    const plan = postPipelinePlan({
+      gradeOnly: false,
+      ao: true,
+      aoFullRes: true,
+      bloom: true,
+      smaa: true,
+      fxaa: false,
+      n8aoDisabled: false,
+      smaaDisabled: false,
+      fxaaDisabled: false,
+      dynamicResolutionDisabled: false,
+      isWebGL2: true,
+      msaaSamples: 0,
+    });
+    expect(plan.dynamicResolution).toBe('allocation');
+    const width = 1024;
+    const height = 576;
+    const live: Record<string, THREE.WebGLRenderTarget> = {
+      'composer-a': post.composer.renderTarget1,
+      'composer-b': post.composer.renderTarget2,
+      'n8ao-beauty': ao.beautyRenderTarget,
+      'n8ao-ao-a': ao.writeTargetInternal,
+      'n8ao-ao-b': ao.readTargetInternal,
+      'bloom-bright': bloom.renderTargetBright,
+      'smaa-edges': smaa._edgesRT,
+      'smaa-weights': smaa._weightsRT,
+    };
+    for (let mip = 0; mip < 5; mip++) {
+      live[`bloom-h-${mip}`] = bloom.renderTargetsHorizontal[mip];
+      live[`bloom-v-${mip}`] = bloom.renderTargetsVertical[mip];
+    }
+    // Every planned target is resized to its planned scale of the new
+    // drawing buffer (bloom halves by rounding per mip, as UnrealBloomPass
+    // does), so no pass reads a stale-sized neighbour after the step.
+    for (const target of plan.renderTargets) {
+      const rt = live[target.id];
+      expect(rt, target.id).toBeTruthy();
+      let expectedWidth = width;
+      let expectedHeight = height;
+      if (target.id.startsWith('bloom')) {
+        const mip = target.id === 'bloom-bright' ? 0 : Number(target.id.slice(-1));
+        expectedWidth = Math.round(width / 2);
+        expectedHeight = Math.round(height / 2);
+        for (let i = 0; i < mip; i++) {
+          expectedWidth = Math.round(expectedWidth / 2);
+          expectedHeight = Math.round(expectedHeight / 2);
+        }
+      } else {
+        expectedWidth = Math.floor(width * target.scale);
+        expectedHeight = Math.floor(height * target.scale);
+      }
+      expect([rt.width, rt.height], target.id).toEqual([expectedWidth, expectedHeight]);
+    }
+    expect(Object.keys(live).sort()).toEqual(plan.renderTargets.map((t) => t.id).sort());
+
+    // Texel sizes ride uniforms; no material was flagged for a relink.
+    expect(materials.map((material) => material.version)).toEqual(versions);
+    expect(smaa._materialEdges.uniforms.resolution.value.x).toBeCloseTo(1 / width);
+    expect(bloom.separableBlurMaterials[0].uniforms.invSize.value.x).toBeCloseTo(1 / 512);
+
+    // The grade's remap stays the identity on the allocation path: the whole
+    // target is the frame.
+    expect(post.grade.uniforms.uInputUvRect.value.toArray()).toEqual([1, 1, 1, 1]);
+  });
+});

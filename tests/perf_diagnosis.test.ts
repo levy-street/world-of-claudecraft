@@ -63,6 +63,7 @@ function baseSnapshot(): PerfSnapshot {
       budget: {} as never,
       renderScale: 1,
       effectiveRenderScale: 1,
+      dynamicResolution: 'allocation',
       shadowCadenceHalfRate: false,
       renderBudget: {
         enabled: true,

@@ -589,7 +589,7 @@ import {
   type RenderBudgetState,
   renderBudgetShaderPrewarmLevels,
 } from './render_budget';
-import { gpuPrepMode } from './render_dev_flags';
+import { dynamicResolutionPin, gpuPrepMode } from './render_dev_flags';
 import {
   emptyRenderDiagnosticsSnapshot,
   type RenderableDiagnosticObject,
@@ -613,6 +613,7 @@ import type {
   RendererQualityChangeStats,
 } from './renderer_perf_stats';
 import { disposeRendererPrewarmAndGroundFx } from './renderer_resource_lifecycle';
+import { resolutionAllocationScale } from './resolution_rung_core';
 import { createRevealCompileHost, REVEAL_GATE_PREP_KIND } from './reveal_compile_host';
 import { createRevealGate } from './reveal_gate';
 import type { RevealGateCore } from './reveal_gate_core';
@@ -1375,11 +1376,6 @@ export class Renderer {
   private effectiveRenderScale = 1; // runtime value after adaptive backoff
   private renderPixelHeight = 1;
   private frameMsEma = 16.7;
-  private adaptiveGrace = 2.0;
-  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
-  private adaptiveCooldown = 0;
-  // biome-ignore lint/correctness/noUnusedPrivateClassMembers: write-only render-budget restore state (pre-existing); read path not yet wired.
-  private stableFrameTime = 0;
   private readonly viewCreateBudgetState: ViewCreateBudgetState = { backoffSeconds: 0 };
   private readonly viewCreateBudgetInput: ViewCreateBudgetInput = {
     lowGfx: false,
@@ -1408,6 +1404,11 @@ export class Renderer {
     minRenderScale: 1,
     maxRenderScale: 1,
   };
+  // Set by a drawing-buffer reallocation (the composer tiers' resolution rung)
+  // and handed to the governor on the next sample, which then settles the
+  // reallocation's swap back-pressure under its own cooldown instead of
+  // reading it as a stall (render_budget.ts `reallocated`).
+  private reallocationPending = false;
   // Last frame-budget pressure (render_budget.ts), fed to the character LOD plan
   // so the animated far band is the first extra cost surrendered on a machine
   // already at its budget. Cosmetic only: the fairness floor for an actionable
@@ -4246,9 +4247,6 @@ export class Renderer {
       urlForcedTier(),
     );
     this.frameMsEma = 16.7;
-    this.adaptiveGrace = 1.0;
-    this.adaptiveCooldown = 0.5;
-    this.stableFrameTime = 0;
     this.renderBudgetState = this.renderBudgetGovernor.reset(
       this.effectiveRenderScale,
       this.renderBudgetMinScale(),
@@ -4295,10 +4293,14 @@ export class Renderer {
       };
       this.appliedBudgetLevels = nextLevels;
     }
-    this.effectiveRenderScale = Math.min(
-      this.renderBudgetMaxScale(),
-      Math.max(this.renderBudgetMinScale(), state.levels.resolution),
-    );
+    this.effectiveRenderScale = resolutionAllocationScale({
+      mode: this.post?.dynamicResolution ?? 'locked',
+      pin: dynamicResolutionPin(),
+      previous: previousScale,
+      level: state.levels.resolution,
+      ceiling: this.renderBudgetMaxScale(),
+      floor: this.renderBudgetMinScale(),
+    });
     this.lastBudgetPressure = state.pressure;
     this.foliage.setGrassQuality(state.levels.grass);
     this.foliage.setModelQuality(state.levels.foliage);
@@ -4308,11 +4310,12 @@ export class Renderer {
     this.necromancyArmyPortalFx.setQuality(state.levels.vfx);
     this.abyssalRiftFx.setQuality(state.levels.vfx);
     this.effectivePointLights = Math.max(1, Math.round(GFX.maxPointLights * state.levels.lighting));
-    if (
-      Math.abs(previousScale - this.effectiveRenderScale) >= 0.001 &&
-      this.post?.supportsDynamicResolution
-    ) {
-      this.applyRenderRegion();
+    if (Math.abs(previousScale - this.effectiveRenderScale) < 0.001) return;
+    // The region path moves a viewport; every other path reallocates at the rung.
+    if (this.post?.supportsDynamicResolution) this.applyRenderRegion();
+    else {
+      this.reallocationPending = true;
+      this.applyResolution();
     }
   }
 
@@ -4362,6 +4365,7 @@ export class Renderer {
       budget: GFX.budget,
       renderScale: this.renderScale,
       effectiveRenderScale: this.effectiveRenderScale,
+      dynamicResolution: this.post?.dynamicResolution ?? 'locked',
       renderBudget,
       // Whether the budget-governed shadow cadence is currently shedding to
       // every-other-frame updates: surfaced so the ?perf overlay and capture
@@ -4558,16 +4562,19 @@ export class Renderer {
     if (!Number.isFinite(dt) || dt <= 0) return;
     const frameMs = Math.min(250, dt * 1000);
     const info = this.webgl.info;
-    // Grade-only chains can vary a fixed target's viewport and upscale through
-    // OutputGradePass. Direct-to-canvas profiles have no upscale pass. N8AO,
-    // bloom, and SMAA sample neighboring full-target texels, so their chains stay
-    // locked until every internal target and depth read can honor the live rect.
-    const dynamicResolution = this.post?.supportsDynamicResolution === true;
+    // Grade-only chains vary a fixed target's viewport and upscale through
+    // OutputGradePass; the composer chains (N8AO, bloom and SMAA sample
+    // neighboring full-target texels) reallocate at a coarse rung instead
+    // (resolution_rung_core.ts). Both open the governor's range; only a
+    // direct-to-canvas profile or the ?dynres=off switch keeps it locked.
+    const mode = this.post?.dynamicResolution ?? 'locked';
+    const governed = mode !== 'locked';
     const resolutionRange = dynamicResolutionGovernorRange(
-      dynamicResolution,
+      governed,
       this.effectiveRenderScale,
       this.renderBudgetMinScale(),
       this.renderBudgetMaxScale(),
+      dynamicResolutionPin(),
     );
     // Post-processing tiers route the measured logical frame through the
     // session's governor signal. Direct profiles keep Three's live read.
@@ -4575,6 +4582,9 @@ export class Renderer {
     const sample = this.renderBudgetSample;
     sample.dt = dt;
     sample.frameMs = frameMs;
+    sample.reallocated = this.reallocationPending;
+    sample.resolutionReallocates = mode === 'allocation';
+    this.reallocationPending = false;
     // Non-composer profiles read info.render live, where three's per-render
     // auto-reset drops the off-screen water-simulation passes: add them back
     // (1 draw call / 2 triangles per pass). Composer tiers pass drawSignal
@@ -4600,9 +4610,6 @@ export class Renderer {
     // where it lands on every frame rather than only on a presented one.
     this.gpuPrepBudget.notePressure(state.mode === 'degrading');
     this.frameMsEma = state.frameMsEma;
-    this.adaptiveCooldown = state.cooldownSeconds;
-    this.stableFrameTime = state.stableSeconds;
-    if (this.adaptiveGrace > 0) this.adaptiveGrace = Math.max(0, this.adaptiveGrace - dt);
     this.applyRenderBudgetState(state);
     updateShadowCadence(this.shadowCadence, dt, state.pressure, state.enabled);
     this.applyShadowCadence();

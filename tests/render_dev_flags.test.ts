@@ -67,3 +67,31 @@ describe('render dev flags: the GPU-preparation mode switch', () => {
     expect(renderLayerDisabled('n8ao')).toBe(true);
   });
 });
+
+describe('render dev flags: the dynamic resolution pin', () => {
+  it('is absent by default and in a headless host', async () => {
+    expect((await loadFlags('')).dynamicResolutionPin()).toBeNull();
+    expect((await loadFlags(null)).dynamicResolutionPin()).toBeNull();
+  });
+
+  it('pins a numeric ?dynres value, clamped to the Render Quality range', async () => {
+    expect((await loadFlags('?dynres=0.78')).dynamicResolutionPin()).toBe(0.78);
+    expect((await loadFlags('?dynres=1')).dynamicResolutionPin()).toBe(1);
+    expect((await loadFlags('?dynres=0.2')).dynamicResolutionPin()).toBe(0.5);
+    expect((await loadFlags('?dynres=7')).dynamicResolutionPin()).toBe(1);
+  });
+
+  it('treats off as the layer kill switch and not as a pin', async () => {
+    const flags = await loadFlags('?dynres=off');
+    expect(flags.dynamicResolutionPin()).toBeNull();
+    expect(flags.renderLayerDisabled('dynres')).toBe(true);
+  });
+
+  it('ignores an empty or non-numeric value without disabling the lever', async () => {
+    for (const search of ['?dynres=', '?dynres=abc', '?dynres=NaN']) {
+      const flags = await loadFlags(search);
+      expect(flags.dynamicResolutionPin(), search).toBeNull();
+      expect(flags.renderLayerDisabled('dynres'), search).toBe(false);
+    }
+  });
+});

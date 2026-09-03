@@ -15,6 +15,7 @@ const insaneInput: PostPlanInput = {
   n8aoDisabled: false,
   smaaDisabled: false,
   fxaaDisabled: false,
+  dynamicResolutionDisabled: false,
   isWebGL2: true,
   msaaSamples: 0,
 };
@@ -359,5 +360,56 @@ describe('post pipeline plan', () => {
 
     expect(plan.composerSamples).toBe(0);
     expect(plan.resolveCount).toBe(0);
+  });
+});
+
+describe('post pipeline plan: the dynamic resolution mode', () => {
+  it('reports the region path only for a chain with no full-frame pass', () => {
+    const medium = postPipelinePlan(mediumInput);
+    expect(medium.supportsDynamicResolution).toBe(true);
+    expect(medium.dynamicResolution).toBe('region');
+  });
+
+  it('reports the allocation path for every composer chain, whole or attributed', () => {
+    const chains = [
+      { name: 'insane', input: insaneInput },
+      { name: 'high', input: { ...insaneInput, aoFullRes: false } },
+      { name: 'n8ao off', input: { ...insaneInput, n8aoDisabled: true } },
+      { name: 'smaa off', input: { ...insaneInput, smaaDisabled: true } },
+      { name: 'AO only', input: { ...insaneInput, bloom: false, smaa: false } },
+      { name: 'bloom only', input: { ...insaneInput, ao: false, smaa: false } },
+      { name: 'SMAA only', input: { ...insaneInput, ao: false, bloom: false } },
+      // The screen-fx pass alone is full-frame, so even a bare composer chain
+      // reallocates rather than varying a region.
+      {
+        name: 'grade + screen-fx',
+        input: { ...insaneInput, ao: false, bloom: false, smaa: false },
+      },
+    ];
+    for (const chain of chains) {
+      const plan = postPipelinePlan(chain.input);
+      expect(plan.supportsDynamicResolution, chain.name).toBe(false);
+      expect(plan.dynamicResolution, chain.name).toBe('allocation');
+    }
+  });
+
+  it('locks both paths under the ?dynres=off kill switch and changes nothing else', () => {
+    const lockedInsane = postPipelinePlan({ ...insaneInput, dynamicResolutionDisabled: true });
+    expect(lockedInsane.dynamicResolution).toBe('locked');
+    expect({ ...lockedInsane, dynamicResolution: 'allocation' }).toEqual(
+      postPipelinePlan(insaneInput),
+    );
+    const lockedMedium = postPipelinePlan({ ...mediumInput, dynamicResolutionDisabled: true });
+    expect(lockedMedium.dynamicResolution).toBe('locked');
+    expect(lockedMedium.supportsDynamicResolution).toBe(true);
+    expect({ ...lockedMedium, dynamicResolution: 'region' }).toEqual(postPipelinePlan(mediumInput));
+  });
+
+  it('agrees with the region flag: region exactly when the chain supports a region', () => {
+    const inputs = [insaneInput, mediumInput, { ...insaneInput, ao: false, bloom: false }];
+    for (const input of inputs) {
+      const plan = postPipelinePlan(input);
+      expect(plan.dynamicResolution === 'region').toBe(plan.supportsDynamicResolution);
+    }
   });
 });

@@ -61,14 +61,27 @@ export function dynamicResolutionAllocationScale(
   return supported ? manual : clampedRenderScale(effectiveRenderScale, manual);
 }
 
+/**
+ * The range the render budget may walk `levels.resolution` through. `governed`
+ * is true for BOTH lever modes (the grade-only chain's render region and the
+ * composer chains' allocation rungs, resolution_rung_core.ts); a locked lever
+ * collapses the range at the scale in force. The `?dynres=<0..1>` dev pin
+ * collapses it at the pin instead, whatever the mode, so a bench or a
+ * screenshot reads a known scale without racing the governor.
+ */
 export function dynamicResolutionGovernorRange(
-  supported: boolean,
+  governed: boolean,
   effectiveRenderScale: number,
   minRenderScale: number,
   maxRenderScale: number,
+  pin: number | null = null,
 ): DynamicResolutionGovernorRange {
+  if (pin != null && Number.isFinite(pin)) {
+    const pinned = clampedRenderScale(pin, 1);
+    return { minRenderScale: pinned, maxRenderScale: pinned };
+  }
   const effective = clampedRenderScale(effectiveRenderScale, 1);
-  if (!supported) {
+  if (!governed) {
     return {
       minRenderScale: effective,
       maxRenderScale: effective,

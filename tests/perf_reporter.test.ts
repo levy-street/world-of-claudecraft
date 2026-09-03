@@ -518,6 +518,7 @@ function snapshot(): PerfSnapshot {
       },
       renderScale: 1,
       effectiveRenderScale: 0.9,
+      dynamicResolution: 'allocation',
       shadowCadenceHalfRate: false,
       renderBudget: {
         enabled: true,

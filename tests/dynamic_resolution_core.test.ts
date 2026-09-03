@@ -132,3 +132,39 @@ describe('dynamic resolution renderer policy', () => {
     });
   });
 });
+
+describe('dynamic resolution governor range under the dev pin', () => {
+  it('collapses the range at the pin whatever the lever mode', () => {
+    expect(dynamicResolutionGovernorRange(true, 1, 0.68, 1, 0.8)).toEqual({
+      minRenderScale: 0.8,
+      maxRenderScale: 0.8,
+    });
+    expect(dynamicResolutionGovernorRange(false, 1, 0.78, 1, 0.6)).toEqual({
+      minRenderScale: 0.6,
+      maxRenderScale: 0.6,
+    });
+    // Clamped to the manual range, like every other scale input here.
+    expect(dynamicResolutionGovernorRange(true, 1, 0.68, 1, 0.1)).toEqual({
+      minRenderScale: 0.5,
+      maxRenderScale: 0.5,
+    });
+    // A null pin leaves the shipped ranges untouched.
+    expect(dynamicResolutionGovernorRange(true, 0.9, 0.6, 0.9, null)).toEqual(
+      dynamicResolutionGovernorRange(true, 0.9, 0.6, 0.9),
+    );
+  });
+
+  it('opens the composer chains to the tier floor once the lever is governed', () => {
+    // The allocation path hands the governor the same range the region path
+    // gets: the tier floor (never below MIN_DYNAMIC_RENDER_SCALE) up to the
+    // manual ceiling, so `levels.resolution` can move on high, ultra and insane.
+    expect(dynamicResolutionGovernorRange(true, 1, 0.78, 1)).toEqual({
+      minRenderScale: 0.78,
+      maxRenderScale: 1,
+    });
+    expect(dynamicResolutionGovernorRange(true, 1, 0.7, 1)).toEqual({
+      minRenderScale: 0.7,
+      maxRenderScale: 1,
+    });
+  });
+});

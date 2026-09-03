@@ -65,6 +65,21 @@ export interface RenderBudgetSample {
   createdViews: number;
   minRenderScale: number;
   maxRenderScale: number;
+  /** True on the sample that follows a drawing-buffer reallocation (the
+   *  composer tiers' resolution rung, resolution_rung_core.ts). The
+   *  reallocation is a known one-off cost, paid in the GPU process over the
+   *  next few frames as swap back-pressure, so until the governor's own
+   *  cooldown has run out it is not stall evidence: the submit stall path
+   *  (which bypasses the cooldown and arms a hold) ignores those samples.
+   *  Every other reading still lands, EMAs included. */
+  reallocated?: boolean;
+  /** True when a resolution step REALLOCATES the drawing buffer and the post
+   *  targets (the composer tiers) rather than moving a render region. There
+   *  the resolution arm answers to SUSTAINED fragment cost only (the frame
+   *  and submit EMAs), never to one long frame: a spike is what the stall
+   *  hold and the density buckets absorb, not a reason to pay an allocation
+   *  storm. The region path keeps its instantaneous arm. */
+  resolutionReallocates?: boolean;
 }
 
 export interface RenderBudgetGovernorOptions {
@@ -244,6 +259,7 @@ export class RenderBudgetGovernor {
   private stallHoldSeconds = 0;
   private stableSeconds = 0;
   private cooldownSeconds = 0;
+  private reallocationSettling = false;
   private levels: RenderBudgetLevels = { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 };
 
   constructor(options: RenderBudgetGovernorOptions) {
@@ -276,6 +292,7 @@ export class RenderBudgetGovernor {
     this.stallHoldSeconds = 0;
     this.stableSeconds = 0;
     this.cooldownSeconds = this.enabled ? 0.5 : 0;
+    this.reallocationSettling = false;
     this.pressure = 0;
     this.mode = this.enabled ? 'stable' : 'disabled';
     this.reason = this.enabled ? 'startup' : 'disabled';
@@ -339,12 +356,17 @@ export class RenderBudgetGovernor {
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
     const submitMs = Math.min(250, rawSubmitMs);
+    // A reallocation's settling window is the cooldown the step that caused it
+    // armed: no new timer, and a window that ends with the governor's own.
+    this.reallocationSettling =
+      sample.reallocated === true || (this.reallocationSettling && this.cooldownSeconds > 0);
+    const stallSubmitMs = this.reallocationSettling ? 0 : rawSubmitMs;
     const frameCost = Math.max(frameMs, totalMs);
     this.frameMsEma += (frameCost - this.frameMsEma) * 0.08;
     this.submitMsEma += (submitMs - this.submitMsEma) * 0.12;
     this.stallPressure = Math.max(
       this.stallPressure * Math.exp(-sample.dt / 12),
-      positiveRatio(rawSubmitMs, SUBMIT_STALL_MS),
+      positiveRatio(stallSubmitMs, SUBMIT_STALL_MS),
     );
 
     if (!this.enabled) {
@@ -377,6 +399,10 @@ export class RenderBudgetGovernor {
       positiveRatio(this.submitMsEma, Math.max(8, this.budget.dropFrameMs * 0.58)),
       positiveRatio(submitMs, Math.max(8, this.budget.dropFrameMs * 0.58)),
     );
+    const sustainedPressure = Math.max(
+      this.externalFrameCap ? 0 : positiveRatio(this.frameMsEma, this.budget.dropFrameMs),
+      positiveRatio(this.submitMsEma, Math.max(8, this.budget.dropFrameMs * 0.58)),
+    );
     const drawPressure = Math.max(
       positiveRatio(sample.calls, this.caps.targetCalls),
       positiveRatio(sample.triangles, this.caps.targetTriangles),
@@ -405,7 +431,7 @@ export class RenderBudgetGovernor {
       this.stallPressure,
     );
 
-    const submitStall = rawSubmitMs >= SUBMIT_STALL_MS;
+    const submitStall = stallSubmitMs >= SUBMIT_STALL_MS;
     if (submitStall) {
       this.recentSubmitStalls = Math.min(99, this.recentSubmitStalls + 1);
       this.lastSubmitStallMs = rawSubmitMs;
@@ -439,6 +465,11 @@ export class RenderBudgetGovernor {
         submit: submitStall ? Math.max(submitPressure, this.stallPressure) : submitPressure,
         draw: drawPressure,
         grass: grassPressure,
+        sustained: sustainedPressure,
+        // A reallocation's own settling window counts as a hold too: its swap
+        // back-pressure lands in the EMAs as well, and that is not fragment cost.
+        holdOff: this.stallHoldSeconds > 0 || this.reallocationSettling,
+        reallocates: sample.resolutionReallocates === true,
       });
       if (changed) {
         this.stableSeconds = 0;
@@ -498,7 +529,7 @@ export class RenderBudgetGovernor {
     if (canRecover) {
       this.stableSeconds += sample.dt;
       if (this.stableSeconds >= this.budget.recoverStableSeconds && this.cooldownSeconds <= 0) {
-        const changed = this.recover(maxRenderScale, canEnrich);
+        const changed = this.recover(maxRenderScale, canEnrich, drawPressure >= 1);
         if (changed) {
           this.mode = 'recovering';
           this.reason = 'recover';
@@ -531,7 +562,15 @@ export class RenderBudgetGovernor {
   private degrade(
     urgent: boolean,
     minRenderScale: number,
-    pressure: { frame: number; submit: number; draw: number; grass: number },
+    pressure: {
+      frame: number;
+      submit: number;
+      draw: number;
+      grass: number;
+      sustained: number;
+      holdOff: boolean;
+      reallocates: boolean;
+    },
   ): boolean {
     let changed = false;
 
@@ -581,10 +620,27 @@ export class RenderBudgetGovernor {
 
     const resolutionStep = urgent ? this.budget.urgentDropStep : this.budget.dropStep;
     const vfxDone = this.levels.vfx <= this.caps.minVfxLevel + 0.001;
-    if (
-      (severeFramePressure || (environmentFloored && lightingDone && vfxDone)) &&
-      this.reduceLevel('resolution', minRenderScale, resolutionStep)
-    ) {
+    const ladderFloored = environmentFloored && lightingDone && vfxDone;
+    // Where a resolution step reallocates the drawing buffer (the composer
+    // tiers, resolution_rung_core.ts) it is the last resort in the literal
+    // sense: it fires only on a degrade call that could shed nothing else,
+    // under SUSTAINED fragment cost (the frame and submit EMAs, never one
+    // sample), and never inside a submit-stall hold or a reallocation's own
+    // settling window. Fewer pixels do not
+    // reduce draws or triangles, so draw pressure never reaches it (every
+    // ultra town is over its draw caps by construction, with every density
+    // bucket floored, at any frame rate); a stall is a link or a stream-in
+    // paying inside a frame, and the frames around it carry the same storm
+    // into the EMAs (measured at a world entry: six stalls, the EMAs past
+    // the line between them, and the old arm at the floor before the first
+    // teleport), so the whole hold is off limits; and the buckets ahead of
+    // it, each behind the ladder's own cooldown, are the dwell that keeps a
+    // shorter burst from buying an allocation storm on top of itself.
+    // The region path keeps its instantaneous arm: a region step is free.
+    const resolutionShed = pressure.reallocates
+      ? !changed && !pressure.holdOff && pressure.sustained >= 1
+      : severeFramePressure || ladderFloored;
+    if (resolutionShed && this.reduceLevel('resolution', minRenderScale, resolutionStep)) {
       changed = true;
     }
     return changed;
@@ -592,8 +648,19 @@ export class RenderBudgetGovernor {
 
   /** Phase A restores what pressure took, quality buckets before render scale, and runs on
    * measured headroom alone. Phase B climbs past the baselines and additionally needs scene
-   * density under the draw caps. Returning false claims nothing: no cooldown, no mode change. */
-  private recover(maxRenderScale: number, allowAboveBaseline: boolean): boolean {
+   * density under the draw caps. Returning false claims nothing: no cooldown, no mode change.
+   * `drawOverBudget` puts render scale FIRST: a bucket restored while the scene is over its
+   * draw caps is re-shed by the next degrade step (the town shape, over by construction), so
+   * restoring buckets first there is futile and starves the scale, which answers to fragment
+   * cost the measured headroom already says is gone. */
+  private recover(
+    maxRenderScale: number,
+    allowAboveBaseline: boolean,
+    drawOverBudget: boolean,
+  ): boolean {
+    if (drawOverBudget && this.raiseLevel('resolution', maxRenderScale, this.budget.recoverStep)) {
+      return true;
+    }
     if (this.raiseLevel('grass', this.bands.grass.baseline, 0.08)) return true;
     if (this.raiseLevel('lighting', this.bands.lighting.baseline, 0.08)) return true;
     if (this.raiseLevel('vfx', this.bands.vfx.baseline, 0.08)) return true;

@@ -10,7 +10,7 @@ import { PreparedBloomPass } from './post_bloom';
 import { PostEffectComposer } from './post_composer';
 import { StaticOpaqueN8AOPass } from './post_n8ao';
 import { OutputGradePass } from './post_output_grade';
-import { postPipelinePlan } from './post_plan_core';
+import { type PostDynamicResolutionMode, postPipelinePlan } from './post_plan_core';
 import { renderLayerDisabled } from './render_dev_flags';
 
 // Post chain: N8AO (high: half-res Low, ultra+insane: full-res Medium)
@@ -111,7 +111,18 @@ export interface PostPipeline {
   bloom: UnrealBloomPass | null; // null on the grade-only path
   ao: N8AOPass | null;
   grade: OutputGradePass;
+  /** The chain varies a fixed target's render region (the grade-only chain). */
   supportsDynamicResolution: boolean;
+  /** How the render budget's resolution lever reaches this chain
+   *  (post_plan_core.ts): `region`, `allocation` (every target reallocated at
+   *  a rung through `setSize`, resolution_rung_core.ts) or `locked`. */
+  dynamicResolution: PostDynamicResolutionMode;
+  /** Resize the drawing-buffer-sized targets of every pass. On the allocation
+   *  path this IS the lever's step: the composer targets, the N8AO beauty,
+   *  AO and depth targets, the bloom mips and the SMAA edge and weight
+   *  targets all follow (each pass's own `setSize`), texel sizes ride
+   *  uniforms, and no pass keys a program on the size, so a step relinks
+   *  nothing and every target is fully rewritten by the next frame. */
   setSize(width: number, height: number, pixelRatio?: number): void;
   setRenderRegion(region: DynamicResolutionRect): void;
   render(): void;
@@ -151,6 +162,7 @@ export function buildComposer(
     n8aoDisabled: renderLayerDisabled('n8ao'),
     smaaDisabled: renderLayerDisabled('smaa'),
     fxaaDisabled: renderLayerDisabled('fxaa'),
+    dynamicResolutionDisabled: renderLayerDisabled('dynres'),
     isWebGL2: webgl.capabilities.isWebGL2,
     msaaSamples: GFX.msaaSamples,
   });
@@ -265,6 +277,7 @@ export function buildComposer(
     ao,
     grade,
     supportsDynamicResolution: plan.supportsDynamicResolution,
+    dynamicResolution: plan.dynamicResolution,
     setSize(width: number, height: number, pixelRatio = webgl.getPixelRatio()): void {
       composer.setSizeAndPixelRatio(width, height, pixelRatio);
       // The ripple projection maps world points to clip space, so it needs the

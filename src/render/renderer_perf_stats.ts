@@ -17,6 +17,7 @@ import type { RendererPrewarmStats } from './prewarm_compile_lifecycle';
 import type { RenderBudgetState } from './render_budget';
 import type { RenderDiagnosticsSnapshot } from './render_diagnostics';
 import type { RendererFramePhaseMs, RendererWorldPhaseMs } from './renderer_frame_telemetry_core';
+import type { DynamicResolutionMode } from './resolution_rung_core';
 import type { ZoneStreamingStats } from './zone_prepare_stats';
 
 export type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
@@ -85,7 +86,13 @@ export interface RendererPerfStats {
   autoGovernor: boolean;
   budget: GfxRuntimeBudget;
   renderScale: number;
+  /** The scale in force: on the composer tiers the allocation rung the
+   *  drawing buffer and post targets are sized at (resolution_rung_core.ts),
+   *  on the grade-only chain the live render region's scale. */
   effectiveRenderScale: number;
+  /** How the resolution lever reaches this session's chain: `region`,
+   *  `allocation`, or `locked` (no post chain, or `?dynres=off`). */
+  dynamicResolution: DynamicResolutionMode;
   renderBudget: RenderBudgetState;
   shadowCadenceHalfRate: boolean;
   pixelRatio: number;

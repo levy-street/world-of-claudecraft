@@ -521,3 +521,266 @@ describe('render budget governor', () => {
     expect(state.levels.grass).toBeLessThanOrEqual(GFX_BUCKET_BANDS.low.grass.max);
   });
 });
+
+describe('render budget governor: the resolution lever where a step reallocates', () => {
+  function flooredUltra(): RenderBudgetGovernor {
+    const governor = new RenderBudgetGovernor({
+      tier: 'ultra',
+      budget: GFX_BUDGETS.ultra,
+      enabled: true,
+    });
+    governor.reset(1, 0.78, 1);
+    return governor;
+  }
+
+  const ultraTown = (overrides: Partial<RenderBudgetSample> = {}): RenderBudgetSample =>
+    sample({
+      dt: 1 / 60,
+      // Over the triangle and call targets (under the urgent caps) with every
+      // density bucket floored: the ultra town shape by construction.
+      calls: 1_000,
+      triangles: 8_000_000,
+      grassVisibleTufts: 7_000,
+      minRenderScale: 0.78,
+      maxRenderScale: 1,
+      resolutionReallocates: true,
+      ...overrides,
+    });
+
+  const calmField = (overrides: Partial<RenderBudgetSample> = {}): RenderBudgetSample =>
+    ultraTown({ calls: 200, triangles: 500_000, grassVisibleTufts: 1_000, ...overrides });
+
+  it('never sheds resolution on draw-count pressure alone, however long it lasts', () => {
+    // Fewer pixels do not reduce draws, so the lever must not fire on a strong
+    // machine that is merely over the town's draw caps at 100 fps.
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 60; frame++) {
+      state = governor.update(ultraTown({ frameMs: 10, totalMs: 9, submitMs: 7 }));
+    }
+    expect(state.levels.resolution).toBe(1);
+  });
+
+  it('ignores a single long frame where a step would reallocate, but not on the region path', () => {
+    const spike = (reallocates: boolean) => {
+      const governor = flooredUltra();
+      for (let frame = 0; frame < 60; frame++) {
+        governor.update(calmField({ frameMs: 10, totalMs: 9, submitMs: 7 }));
+      }
+      // One 90 ms frame: a link or a stream-in, severe on the instantaneous read.
+      return governor.update(
+        calmField({ frameMs: 90, totalMs: 90, submitMs: 40, resolutionReallocates: reallocates }),
+      ).levels.resolution;
+    };
+    expect(spike(false)).toBeLessThan(1);
+    expect(spike(true)).toBe(1);
+  });
+
+  it('sheds resolution to the tier floor under sustained frame pressure at the floored ladder', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 60; frame++) {
+      state = governor.update(ultraTown({ frameMs: 36, totalMs: 34, submitMs: 14 }));
+    }
+    expect(state.levels.resolution).toBe(0.78);
+    expect(state.levels.grass).toBe(0.78);
+    expect(state.levels.vfx).toBe(0.86);
+  });
+
+  it('sheds resolution under sustained submit pressure alone at the floored ladder', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 60; frame++) {
+      state = governor.update(ultraTown({ frameMs: 20, totalMs: 19, submitMs: 19 }));
+    }
+    expect(state.levels.resolution).toBe(0.78);
+  });
+
+  it('reaches resolution only once the ladder has nothing left to shed under sustained cost', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    // 40 ms frames on ultra (drop line 30 ms) in a sparse field: severe on the
+    // instantaneous read, so VFX sheds a step per cooldown; resolution waits
+    // behind that dwell and fires on the first call that changes nothing else.
+    let vfxFloorFrame = -1;
+    let sheddingFrame = -1;
+    for (let frame = 0; frame < 60 * 12; frame++) {
+      state = governor.update(calmField({ frameMs: 40, totalMs: 40, submitMs: 12 }));
+      if (vfxFloorFrame < 0 && state.levels.vfx <= state.caps.minVfxLevel + 0.001) {
+        vfxFloorFrame = frame;
+      }
+      if (sheddingFrame < 0 && state.levels.resolution < 1) sheddingFrame = frame;
+    }
+    expect(vfxFloorFrame).toBeGreaterThan(0);
+    expect(sheddingFrame).toBeGreaterThan(vfxFloorFrame);
+    expect(state.levels.resolution).toBeLessThan(1);
+    expect(state.levels.grass).toBe(GFX_BUCKET_BANDS.ultra.grass.baseline);
+  });
+
+  it('never reallocates inside a stall hold, whatever the sustained read says between stalls', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60; frame++) {
+      state = governor.update(calmField({ frameMs: 10, totalMs: 9, submitMs: 7 }));
+    }
+    // A world-entry link storm: one stall, then a second of long frames.
+    state = governor.update(calmField({ frameMs: 200, totalMs: 200, submitMs: 190 }));
+    expect(state.stallHoldSeconds).toBeGreaterThan(0);
+    for (let frame = 0; frame < 60; frame++) {
+      state = governor.update(calmField({ frameMs: 70, totalMs: 70, submitMs: 30 }));
+    }
+    expect(state.frameMsEma).toBeGreaterThan(GFX_BUDGETS.ultra.dropFrameMs);
+    expect(state.stallHoldSeconds).toBeGreaterThan(0);
+    expect(state.levels.resolution).toBe(1);
+    // The hold runs out under sustained cost that is still there: now it counts.
+    for (let frame = 0; frame < 60 * 20; frame++) {
+      state = governor.update(calmField({ frameMs: 40, totalMs: 40, submitMs: 12 }));
+    }
+    expect(state.stallHoldSeconds).toBe(0);
+    expect(state.levels.resolution).toBeLessThan(1);
+  });
+
+  it('never reallocates on a submit-stall frame, whatever the sustained read says', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 12; frame++) {
+      // Every frame a stall (a link inside the frame) with the ladder already
+      // floored by the urgent path: the stall path bypasses the cooldown, and
+      // the sustained read is far past the line, but no reallocation is bought.
+      state = governor.update(
+        ultraTown({ frameMs: 130, totalMs: 130, submitMs: 125, calls: 1_150 }),
+      );
+    }
+    expect(state.reason).toBe('submit-stall');
+    expect(state.levels.vfx).toBe(state.caps.minVfxLevel);
+    expect(state.levels.resolution).toBe(1);
+  });
+
+  it('restores render scale first when the scene is over its draw caps, so it is not starved', () => {
+    // A strong machine at a town: sustained fragment cost shed resolution
+    // (a fight), then the fight ended, but the town is over the draw caps by
+    // construction, so every bucket restore is re-shed at the next step. The
+    // scale must not wait behind that oscillation.
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 30; frame++) {
+      state = governor.update(ultraTown({ frameMs: 36, totalMs: 34, submitMs: 14 }));
+    }
+    expect(state.levels.resolution).toBe(0.78);
+    let firstRestore: 'resolution' | 'bucket' | null = null;
+    for (let frame = 0; frame < 60 * 60; frame++) {
+      const before = { ...state.levels };
+      state = governor.update(ultraTown({ frameMs: 10, totalMs: 9, submitMs: 7 }));
+      if (firstRestore === null) {
+        if (state.levels.resolution > before.resolution) firstRestore = 'resolution';
+        else if (
+          state.levels.grass > before.grass ||
+          state.levels.foliage > before.foliage ||
+          state.levels.vfx > before.vfx ||
+          state.levels.lighting > before.lighting
+        ) {
+          firstRestore = 'bucket';
+        }
+      }
+    }
+    expect(firstRestore).toBe('resolution');
+    expect(state.levels.resolution).toBe(1);
+  });
+
+  it('keeps the bucket-first restore order when the scene is under its draw caps', () => {
+    const governor = flooredUltra();
+    let state = governor.state();
+    for (let frame = 0; frame < 60 * 30; frame++) {
+      state = governor.update(calmField({ frameMs: 40, totalMs: 40, submitMs: 12 }));
+    }
+    expect(state.levels.resolution).toBeLessThan(1);
+    expect(state.levels.vfx).toBe(state.caps.minVfxLevel);
+    let firstRestore: 'resolution' | 'bucket' | null = null;
+    for (let frame = 0; frame < 60 * 60 && firstRestore === null; frame++) {
+      const before = { ...state.levels };
+      state = governor.update(calmField({ frameMs: 10, totalMs: 9, submitMs: 7 }));
+      if (state.levels.resolution > before.resolution) firstRestore = 'resolution';
+      else if (state.levels.vfx > before.vfx) firstRestore = 'bucket';
+    }
+    expect(firstRestore).toBe('bucket');
+  });
+
+  it('settles a reallocation under its own cooldown instead of reading it as a stall', () => {
+    const governor = flooredUltra();
+    const pressured = () => ultraTown({ frameMs: 36, totalMs: 34, submitMs: 14 });
+    let state = governor.state();
+    // Drive the ladder to the first resolution step.
+    let steps = 0;
+    while (state.levels.resolution >= 1 && steps < 60 * 60) {
+      state = governor.update(pressured());
+      steps++;
+    }
+    expect(state.levels.resolution).toBeLessThan(1);
+    expect(state.cooldownSeconds).toBeGreaterThan(0);
+    const levelAfterStep = state.levels.resolution;
+
+    // The renderer reallocated on that step; the next sample says so, and the
+    // swap back-pressure lands as huge submit readings over the frames after it.
+    state = governor.update({ ...pressured(), submitMs: 300, reallocated: true });
+    for (let frame = 0; frame < 6; frame++) {
+      state = governor.update({ ...pressured(), submitMs: 180 });
+    }
+    expect(state.recentSubmitStalls).toBe(0);
+    expect(state.stallHoldSeconds).toBe(0);
+    expect(state.reason).not.toBe('submit-stall');
+    // The cooldown still stands, so no second rung was shed on the first one's cost.
+    expect(state.levels.resolution).toBe(levelAfterStep);
+    expect(state.cooldownSeconds).toBeGreaterThan(0);
+  });
+
+  it("never sheds a second rung on the first one's aftershock, even with no cooldown standing", () => {
+    // The manual Render Quality path reallocates behind reset()'s short
+    // cooldown; a reallocated sample whose swap back-pressure pushes the EMAs
+    // past the line is the reallocation's own cost, not fragment cost.
+    const governor = flooredUltra();
+    let state = governor.state();
+    const town = () => ultraTown({ frameMs: 10, totalMs: 9, submitMs: 7, calls: 1_150 });
+    for (let frame = 0; frame < 60 * 6; frame++) state = governor.update(town());
+    for (let frame = 0; frame < 120 && state.cooldownSeconds > 0; frame++) {
+      state = governor.update(town());
+    }
+    expect(state.cooldownSeconds).toBe(0);
+    expect(state.levels.grass).toBe(state.caps.minGrassLevel);
+    expect(state.levels.lighting).toBe(state.caps.minLightingLevel);
+    state = governor.update({
+      ...town(),
+      frameMs: 250,
+      totalMs: 250,
+      submitMs: 250,
+      reallocated: true,
+    });
+    expect(state.frameMsEma).toBeGreaterThan(GFX_BUDGETS.ultra.dropFrameMs * 0.9);
+    expect(state.levels.resolution).toBe(1);
+    expect(state.recentSubmitStalls).toBe(0);
+  });
+
+  it('closes the settling window with the cooldown, so a real stall after it still counts', () => {
+    const governor = flooredUltra();
+    const calm = () => calmField({ frameMs: 10, totalMs: 9, submitMs: 5 });
+    let state = governor.update({ ...calm(), submitMs: 300, reallocated: true });
+    expect(state.recentSubmitStalls).toBe(0);
+    // reset() arms a 0.5 s cooldown; run it out.
+    for (let frame = 0; frame < 60; frame++) state = governor.update(calm());
+    expect(state.cooldownSeconds).toBe(0);
+    state = governor.update({ ...calm(), submitMs: 300 });
+    expect(state.recentSubmitStalls).toBe(1);
+    expect(state.reason).toBe('submit-stall');
+  });
+
+  it('keeps the shipped stall path for a stall that carries no reallocation', () => {
+    const governor = flooredUltra();
+    for (let frame = 0; frame < 60; frame++) {
+      governor.update(sample({ dt: 1 / 60, minRenderScale: 0.78, maxRenderScale: 1 }));
+    }
+    const state = governor.update(
+      sample({ dt: 1 / 60, submitMs: 300, minRenderScale: 0.78, maxRenderScale: 1 }),
+    );
+    expect(state.recentSubmitStalls).toBe(1);
+    expect(state.stallHoldSeconds).toBeGreaterThan(0);
+  });
+});

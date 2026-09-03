@@ -25,8 +25,12 @@
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
+//   dynres      - the render budget's resolution lever (dynamic_resolution_core
+//                 and resolution_rung_core): off locks the governor's range at
+//                 the scale in force on every tier, so a bench reads a fixed
+//                 drawing buffer (the pre-lever behaviour of the composer tiers)
 
-// Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
+// Beside the ?<name>=off layer switches, two flags with their own accessors:
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit
 //                  is admitted as its turn comes and the ledger keeps learning.
 //                  It does NOT revert the reveal-gate policy (piecewise reveal,
@@ -34,6 +38,14 @@
 //                  kill switch for pacing: if the budget regresses on a machine,
 //                  ?prep=legacy is the A/B that says so without a rebuild, and
 //                  the same flag is what a rollback ships as the default.
+//   ?dynres=<0..1> - pins the effective render scale for the whole session,
+//                  governor on or off and on every tier: the governor's range
+//                  collapses at the pin and the drawing buffer (or the render
+//                  region on the grade-only chain) is allocated at it exactly,
+//                  bypassing the rung ladder, so a bench or a screenshot reads
+//                  one known scale instead of racing the governor's cooldowns.
+//                  The same parameter's `off` value is the layer kill switch
+//                  above. Clamped to the Render Quality slider's 0.5..1 range.
 
 /** Which GPU-preparation behaviour this session runs. */
 export type GpuPrepMode = 'adaptive' | 'legacy';
@@ -61,4 +73,19 @@ const gpuPrep = ((): GpuPrepMode => {
 /** The session's GPU-preparation mode: 'legacy' only under `?prep=legacy`. */
 export function gpuPrepMode(): GpuPrepMode {
   return gpuPrep;
+}
+
+const dynamicResolutionPinValue = ((): number | null => {
+  if (typeof location === 'undefined') return null;
+  const raw = new URLSearchParams(location.search).get('dynres');
+  if (raw === null || raw.trim() === '') return null;
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.min(1, Math.max(0.5, parsed));
+})();
+
+/** The `?dynres=<0..1>` dev pin, clamped to 0.5..1, or null when absent, `off`,
+ *  or otherwise not a number. */
+export function dynamicResolutionPin(): number | null {
+  return dynamicResolutionPinValue;
 }

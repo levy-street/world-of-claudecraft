@@ -11,7 +11,7 @@ function methodSource(signature: string): string {
 }
 
 describe('dynamic resolution renderer wiring', () => {
-  it('allocates at the manual ceiling and changes only the live region automatically', () => {
+  it('allocates at the manual ceiling on the region path and at the rung elsewhere', () => {
     const allocation = methodSource('private applyResolution(): void');
     expect(allocation).toContain('dynamicResolutionAllocationScale(');
     expect(allocation).toContain('this.webgl.setPixelRatio(ratio);');
@@ -19,30 +19,56 @@ describe('dynamic resolution renderer wiring', () => {
     expect(allocation).toContain('this.post.setSize(this.viewport.width, this.viewport.height');
     expect(allocation).toContain('this.applyRenderRegion();');
 
-    const automaticStep = methodSource(
-      'private applyRenderBudgetState(state: RenderBudgetState): void',
-    );
-    expect(automaticStep).toMatch(
-      /Math\.abs\(previousScale - this\.effectiveRenderScale\) >= 0\.001 &&\s+this\.post\?\.supportsDynamicResolution\s+\) \{\s+this\.applyRenderRegion\(\);\s+\}/,
-    );
-    expect(automaticStep).not.toContain('this.applyResolution();');
-    expect(automaticStep).not.toContain('.setSize(');
-    expect(automaticStep).not.toContain('.setPixelRatio(');
-
     const liveRegion = methodSource('private applyRenderRegion(): void');
     expect(liveRegion).toContain('post.setRenderRegion(rect);');
     expect(liveRegion).not.toContain('.setSize(');
     expect(liveRegion).not.toContain('.setPixelRatio(');
   });
 
-  it('locks unsupported paths and opens only the pure governor range', () => {
-    const update = methodSource('private updateAdaptiveResolution(dt: number): void');
-    expect(update).toContain(
-      'const dynamicResolution = this.post?.supportsDynamicResolution === true;',
+  it('steps the effective scale through the rung core and reallocates only off the region path', () => {
+    const automaticStep = methodSource(
+      'private applyRenderBudgetState(state: RenderBudgetState): void',
     );
-    expect(update).toContain('const resolutionRange = dynamicResolutionGovernorRange(');
+    // The scale in force is the core's answer, fed the scale before the step,
+    // the governor's level, the dev pin and the static ceiling and floor.
+    expect(automaticStep).toMatch(
+      /this\.effectiveRenderScale = resolutionAllocationScale\(\{\s+mode: this\.post\?\.dynamicResolution \?\? 'locked',\s+pin: dynamicResolutionPin\(\),\s+previous: previousScale,\s+level: state\.levels\.resolution,\s+ceiling: this\.renderBudgetMaxScale\(\),\s+floor: this\.renderBudgetMinScale\(\),\s+\}\);/,
+    );
+    // An unchanged scale touches nothing.
+    expect(automaticStep).toContain(
+      'if (Math.abs(previousScale - this.effectiveRenderScale) < 0.001) return;',
+    );
+    // The region path moves a viewport; the allocation path reallocates
+    // through the ONE allocating method and marks the frame that pays it.
+    expect(automaticStep).toMatch(
+      /if \(this\.post\?\.supportsDynamicResolution\) this\.applyRenderRegion\(\);\s+else \{\s+this\.reallocationPending = true;\s+this\.applyResolution\(\);\s+\}/,
+    );
+    expect(automaticStep).not.toContain('.setSize(');
+    expect(automaticStep).not.toContain('.setPixelRatio(');
+  });
+
+  it('opens the governor range for both lever modes and pins it under ?dynres', () => {
+    const update = methodSource('private updateAdaptiveResolution(dt: number): void');
+    expect(update).toContain("const mode = this.post?.dynamicResolution ?? 'locked';");
+    expect(update).toContain("const governed = mode !== 'locked';");
+    // The governor learns which arm it drives: a reallocating step reads
+    // sustained cost only (render_budget.ts `resolutionReallocates`).
+    expect(update).toContain("sample.resolutionReallocates = mode === 'allocation';");
+    expect(update).toMatch(
+      /const resolutionRange = dynamicResolutionGovernorRange\(\s+governed,\s+this\.effectiveRenderScale,\s+this\.renderBudgetMinScale\(\),\s+this\.renderBudgetMaxScale\(\),\s+dynamicResolutionPin\(\),\s+\);/,
+    );
     expect(update).toContain('sample.minRenderScale = resolutionRange.minRenderScale;');
     expect(update).toContain('sample.maxRenderScale = resolutionRange.maxRenderScale;');
+  });
+
+  it('hands the reallocation to the governor on the next sample, once', () => {
+    const update = methodSource('private updateAdaptiveResolution(dt: number): void');
+    expect(update).toMatch(
+      /sample\.reallocated = this\.reallocationPending;\s+sample\.resolutionReallocates = mode === 'allocation';\s+this\.reallocationPending = false;/,
+    );
+    expect(update.indexOf('sample.reallocated')).toBeLessThan(
+      update.indexOf('this.renderBudgetGovernor.update('),
+    );
   });
 
   it('keeps manual changes on the allocating path', () => {
@@ -53,6 +79,10 @@ describe('dynamic resolution renderer wiring', () => {
     expect(manual).toContain('this.renderBudgetGovernor.reset(');
     expect(manual).toContain('this.applyRenderBudgetState(this.renderBudgetState);');
     expect(manual).toContain('this.applyResolution();');
+  });
+
+  it('surfaces the lever mode beside the effective scale in perfStats', () => {
+    expect(renderer).toContain("dynamicResolution: this.post?.dynamicResolution ?? 'locked',");
   });
 
   it('keeps logical screen mapping separate from the cosmetic pixel height', () => {

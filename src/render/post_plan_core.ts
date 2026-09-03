@@ -29,9 +29,23 @@ export interface PostPlanInput {
   readonly n8aoDisabled: boolean;
   readonly smaaDisabled: boolean;
   readonly fxaaDisabled: boolean;
+  /** `?dynres=off` (render_dev_flags.ts): the resolution lever is locked for
+   *  the session, on the region path and the allocation path alike. */
+  readonly dynamicResolutionDisabled: boolean;
   readonly isWebGL2: boolean;
   readonly msaaSamples: number;
 }
+
+/**
+ * How the render budget's resolution lever reaches this chain. `region`: the
+ * chain carries no full-frame pass, so a fixed target's render region varies
+ * and the output grade remaps it (the medium chain). `allocation`: at least
+ * one pass samples full-frame texels (N8AO, bloom, screen-fx, SMAA), so the
+ * drawing buffer and every target are REALLOCATED at a coarse rung instead
+ * (resolution_rung_core.ts, the composer chains). `locked`: the `?dynres=off`
+ * kill switch, the lever holds.
+ */
+export type PostDynamicResolutionMode = 'region' | 'allocation' | 'locked';
 
 export interface PostPipelinePlan {
   readonly scene: {
@@ -47,7 +61,12 @@ export interface PostPipelinePlan {
    */
   readonly gradeFxaa: boolean;
   readonly singleComposerBuffer: boolean;
+  /** The chain can vary a fixed target's render REGION (no full-frame pass). */
   readonly supportsDynamicResolution: boolean;
+  /** Which lever mode the chain runs: `region` exactly when
+   *  `supportsDynamicResolution`, `allocation` otherwise, `locked` under
+   *  `?dynres=off`. Every chain is governable unless locked. */
+  readonly dynamicResolution: PostDynamicResolutionMode;
   readonly composerSamples: number;
   readonly resolveCount: number;
   readonly renderTargets: readonly PostRenderTargetPlan[];
@@ -123,6 +142,11 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
   const supportsDynamicResolution = composerPasses.every(
     (pass) => PASS_REGION_CONTRACT[pass] !== 'full-frame',
   );
+  const dynamicResolution: PostDynamicResolutionMode = input.dynamicResolutionDisabled
+    ? 'locked'
+    : supportsDynamicResolution
+      ? 'region'
+      : 'allocation';
   const renderTargets: PostRenderTargetPlan[] = [
     target(
       'composer-a',
@@ -228,6 +252,7 @@ export function postPipelinePlan(input: PostPlanInput): PostPipelinePlan {
     gradeFxaa: useFxaa,
     singleComposerBuffer,
     supportsDynamicResolution,
+    dynamicResolution,
     composerSamples,
     resolveCount: composerSamples > 0 ? 1 + Number(useScreenFx) + Number(useSmaa) : 0,
     renderTargets,

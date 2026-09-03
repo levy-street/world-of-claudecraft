@@ -358,7 +358,13 @@ const MONOLITHS: MonolithRow[] = [
     // and the release arm's rickshaw hooks moved with it, so the merged file
     // lands below both prior pins. Measured on the merged tree. Exact merged
     // count, zero headroom.
-    ceiling: 13214,
+    // Lowered 13214 -> 13209 by the composer-tier resolution lever: its rung
+    // and hysteresis decisions live in src/render/resolution_rung_core.ts,
+    // the reallocation settling in the governor (render_budget.ts), and the
+    // three write-only adaptive-resolution fields the governor had superseded
+    // (adaptiveGrace, adaptiveCooldown, stableFrameTime) went with their
+    // writes. Exact count, zero slack.
+    ceiling: 13209,
     seam: 'a new src/render/<thing>.ts module the renderer calls (src/render/CLAUDE.md)',
   },
   {
