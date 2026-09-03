@@ -211,5 +211,17 @@ describe('the journey script stays layer-honest', () => {
     );
     expect(script).not.toContain("document.getElementById('quest-tracker')");
     expect(script).toContain("!root.classList.contains('empty')");
+
+    const waitHelperStart = script.indexOf('const waitForTrackerText =');
+    const readHelperStart = script.indexOf('const readTrackerText =');
+    const nextHelperStart = script.indexOf('const driveQuestRowTo =');
+    expect(waitHelperStart).toBeGreaterThanOrEqual(0);
+    expect(readHelperStart).toBeGreaterThan(waitHelperStart);
+    expect(nextHelperStart).toBeGreaterThan(readHelperStart);
+
+    const waitHelper = script.slice(waitHelperStart, readHelperStart);
+    const readHelper = script.slice(readHelperStart, nextHelperStart);
+    expect(waitHelper).toContain('TRACKER_SELECTOR');
+    expect(readHelper).toContain('TRACKER_SELECTOR');
   });
 });
