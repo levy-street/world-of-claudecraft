@@ -1521,6 +1521,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxHalf': 'Наполовину',
   'hudChrome.options.gfxEffectsNote':
     'Затенение окружения, свечение и сглаживание работают через цепочку постобработки: при низком уровне «Эффекты и освещение» цепочка отключена, и эти настройки не действуют.',
+  'hudChrome.options.renderQualityBuffer': 'Рендеринг в {width}x{height} из {nativeWidth}x{nativeHeight}.',
   'hudChrome.options.gfxSectionCamera': 'Камера',
   'hudChrome.options.gfxSectionDisplay': 'Экран',
   'hudChrome.options.gfxSectionSystem': 'Система',

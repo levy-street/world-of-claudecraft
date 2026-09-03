@@ -66,6 +66,7 @@ import type { IWorld } from '../world_api';
 import { appVersionInfo } from './app_version';
 import { type AuraOverlayHooks, AuraOverlaySettingsPanel } from './aura_overlay_settings';
 import { markDialogRoot } from './dialog_root';
+import { readDrawingBuffer } from './drawing_buffer_readout';
 import { esc } from './esc';
 import type { FocusTrapHandle } from './focus_manager';
 import { captureFocusKey, restoreFirstEnabled } from './focus_restore';
@@ -79,7 +80,7 @@ import {
   supportedLanguages,
   t,
 } from './i18n';
-import type { TranslationKey } from './i18n.catalog';
+import type { InterpolationValues, TranslationKey } from './i18n.catalog';
 import { interfaceUnlockLabelKey } from './interface_unlock_core';
 import {
   type BoolToggleControl,
@@ -98,6 +99,7 @@ import {
   INTERFACE_TAB_ORDER,
   type InterfaceTab,
   interfaceControlsForTab,
+  type NoteControl,
   type OptionsControl,
   type OptionsEnv,
   type OptionsPanelId,
@@ -677,7 +679,7 @@ export class OptionsWindow {
           this.settingChoice(parent, c, hooks, c.rerender ? rerender : undefined, choiceBinding);
           break;
         case 'note':
-          this.noteRow(parent, c.textKey);
+          this.noteRow(parent, c);
           break;
         case 'musicToggle':
           this.musicToggle(parent, c.labelKey);
@@ -738,6 +740,7 @@ export class OptionsWindow {
       hooks.onSettingChange(key, sliderDispatchValue(slider.value));
       syncReadout();
       paintFill();
+      this.syncLiveNotes();
     };
     if (c.commitOnChange) {
       // Apply on release. 'input' (drag / each keyboard step) only previews the
@@ -891,10 +894,36 @@ export class OptionsWindow {
     sync();
   }
 
-  private noteRow(parent: HTMLElement, textKey: TranslationKey): void {
+  // Note values are readouts (pixel counts), printed ungrouped the way a
+  // resolution reads in every locale; prose never rides a value.
+  private noteValues(values: InterpolationValues | undefined): InterpolationValues | undefined {
+    if (!values) return undefined;
+    const out: Record<string, string | number> = {};
+    for (const [key, value] of Object.entries(values)) {
+      out[key] = typeof value === 'number' ? formatNumber(value, { useGrouping: false }) : value;
+    }
+    return out;
+  }
+
+  // Live notes re-read their source after every slider commit in the panel
+  // (the Render Quality line follows the slider under it); the list resets
+  // with each panel render, since the rebuilt DOM drops the old nodes.
+  private liveNotes: (() => void)[] = [];
+
+  private syncLiveNotes(): void {
+    for (const sync of this.liveNotes) sync();
+  }
+
+  private noteRow(parent: HTMLElement, c: NoteControl): void {
     const note = document.createElement('div');
     note.className = 'set-note';
-    note.textContent = t(textKey);
+    note.textContent = t(c.textKey, this.noteValues(c.values));
+    if (c.live === 'drawingBuffer') {
+      this.liveNotes.push(() => {
+        const readout = readDrawingBuffer();
+        if (readout) note.textContent = t(c.textKey, this.noteValues({ ...readout }));
+      });
+    }
     parent.appendChild(note);
   }
 
@@ -1167,6 +1196,7 @@ export class OptionsWindow {
     // the render() dispatcher clears the class when the view changes.
     el.classList.add('gfx-wide');
     el.innerHTML = this.panelTitle(t('hud.options.graphics'));
+    this.liveNotes = [];
     const body = document.createElement('div');
     body.className = 'gfx-cols';
     el.appendChild(body);
@@ -1189,6 +1219,7 @@ export class OptionsWindow {
               // nativeShell: the mobile shells and pre-display-mode desktop
               // builds must keep the browser toggle they can actually serve.
               desktopDisplayMode: desktopDisplayModeSupported(desktopBridge()),
+              drawingBuffer: readDrawingBuffer(),
             },
           )
         : [];

@@ -1552,6 +1552,7 @@ export const zh_TW: EnTranslations = {
       "gfxHalf": "半",
       "gfxCustomNote": "調整任一細節旋鈕會將畫質預設切換為「進階」：一套基於「高」畫質基礎、以目前預設所示等級為起點的自訂組合。",
       "gfxEffectsNote": "環境光遮蔽、泛光與反鋸齒依賴後期處理鏈：當「特效與光照」為低時，處理鏈關閉，這些選項不起作用。",
+      "renderQualityBuffer": "以 {width}x{height} 渲染（顯示解析度 {nativeWidth}x{nativeHeight}）。",
       "interfaceMode": "介面模式",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "桌面",

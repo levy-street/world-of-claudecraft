@@ -1502,6 +1502,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxHalf': '半分',
   'hudChrome.options.gfxEffectsNote':
     'アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。',
+  'hudChrome.options.renderQualityBuffer': '{width}x{height} で描画中（表示解像度 {nativeWidth}x{nativeHeight}）。',
   'hudChrome.options.gfxSectionCamera': 'カメラ',
   'hudChrome.options.gfxSectionDisplay': '表示',
   'hudChrome.options.gfxSectionSystem': 'システム',

@@ -1498,6 +1498,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxHalf': '절반',
   'hudChrome.options.gfxEffectsNote':
     '주변광 차폐, 블룸, 안티앨리어싱은 후처리 체인에 의존합니다. 효과 및 조명이 낮음이면 체인이 꺼져 이 옵션들은 효과가 없습니다.',
+  'hudChrome.options.renderQualityBuffer': '{width}x{height}로 렌더링 중 (디스플레이 해상도 {nativeWidth}x{nativeHeight}).',
   'hudChrome.options.gfxSectionCamera': '카메라',
   'hudChrome.options.gfxSectionDisplay': '디스플레이',
   'hudChrome.options.gfxSectionSystem': '시스템',

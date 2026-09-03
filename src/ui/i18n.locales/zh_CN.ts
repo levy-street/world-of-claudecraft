@@ -1457,6 +1457,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.options.gfxHalf': '半',
   'hudChrome.options.gfxEffectsNote':
     '环境光遮蔽、泛光与抗锯齿依赖后期处理链：当“特效与光照”为低时，处理链关闭，这些选项不起作用。',
+  'hudChrome.options.renderQualityBuffer': '以 {width}x{height} 渲染（显示分辨率 {nativeWidth}x{nativeHeight}）。',
   'hudChrome.options.gfxSectionCamera': '镜头',
   'hudChrome.options.gfxSectionDisplay': '显示',
   'hudChrome.options.gfxSectionSystem': '系统',

@@ -9903,6 +9903,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.options.mobileLeftHanded'
   | 'hudChrome.options.mouseoverCast'
   | 'hudChrome.options.playerFrameScale'
+  | 'hudChrome.options.renderQualityBuffer'
   | 'hudChrome.options.showAttackButton'
   | 'hudChrome.options.showDailyRewardsChest'
   | 'hudChrome.options.showDevBadges'

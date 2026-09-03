@@ -1846,6 +1846,10 @@ export const hudChromeStrings = {
       'Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.',
     gfxEffectsNote:
       'Ambient Occlusion and Bloom ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect. Anti-Aliasing keeps working there, on a cheaper edge filter built into the final image pass.',
+    // Under Render Quality: the drawing buffer the frame renders at (device
+    // pixels, after the preset's DPR cap and pixel budget and the slider)
+    // against the display's own pixels, so a 4K panel sees the budget acting.
+    renderQualityBuffer: 'Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.',
     // Interface Mode control (Graphics panel): desktop keyboard/mouse vs the
     // on-screen touch controls. Auto detects the device; the rest force one.
     interfaceMode: 'Interface Mode',

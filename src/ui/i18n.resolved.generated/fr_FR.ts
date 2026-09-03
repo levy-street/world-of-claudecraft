@@ -1552,6 +1552,7 @@ export const fr_FR: EnTranslations = {
       "gfxHalf": "Moitié",
       "gfxCustomNote": "Changer un curseur fait passer le préréglage de qualité sur Advanced : un mélange personnalisé construit sur la base High, à partir des niveaux affichés pour votre préréglage actuel.",
       "gfxEffectsNote": "L'occlusion ambiante, la floraison et l'anticrénelage passent par la chaîne de post-traitement : avec Effets et éclairage sur Low, la chaîne est désactivée et ils n'ont alors aucun effet.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Mode d'interface",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",

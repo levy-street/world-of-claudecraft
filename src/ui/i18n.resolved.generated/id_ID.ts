@@ -1552,6 +1552,7 @@ export const id_ID: EnTranslations = {
       "gfxHalf": "Setengah",
       "gfxCustomNote": "Mengubah salah satu pengatur akan mengalihkan prasetel kualitas ke Lanjutan: campuran kustom yang dibangun di atas dasar kualitas High, dimulai dari tingkat yang ditampilkan untuk prasetel Anda saat ini.",
       "gfxEffectsNote": "Oklusi Sekitar, Mekar, dan Anti-Aliasing berjalan pada rantai pascapemrosesan: dengan Efek & Pencahayaan diatur ke Low, rantai tersebut nonaktif dan ketiganya tidak berpengaruh.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Mode Antarmuka",
       "interfaceModeAuto": "Otomatis",
       "interfaceModeDesktop": "Desktop",

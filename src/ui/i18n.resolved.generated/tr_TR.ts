@@ -1552,6 +1552,7 @@ export const tr_TR: EnTranslations = {
       "gfxHalf": "Yarım",
       "gfxCustomNote": "Bir kadranı değiştirmek, kalite hazır ayarını Gelişmiş'e çevirir: mevcut hazır ayarında gösterilen seviyelerden başlayan, High kalite tabanı üzerine kurulu özel bir karışım.",
       "gfxEffectsNote": "Ortam Gölgelendirme, Parlama ve Kenar Yumuşatma son işleme zincirine bağlıdır: Efektler ve Aydınlatma Low'dayken zincir kapalıdır ve bunların hiçbir etkisi olmaz.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Arayüz Modu",
       "interfaceModeAuto": "Otomatik",
       "interfaceModeDesktop": "Masaüstü",

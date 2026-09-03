@@ -440,6 +440,7 @@ import {
   setDiscordUiEnabled,
 } from './ui/discord_status';
 import { renderDiscordWidget } from './ui/discord_widget';
+import { drawingBufferReadout, setDrawingBufferReadoutSource } from './ui/drawing_buffer_readout';
 import { finderLootItemIds } from './ui/dungeon_finder_view';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
@@ -1563,6 +1564,11 @@ async function startGame(
       renderer.enableTargetConeDebug(tabConeHalfAt, TAB_NEAR_RADIUS, TAB_QUERY_RADIUS);
     }
     perf.setRenderer(renderer);
+    // The Options Render Quality readout follows the live renderer (a rebuild
+    // reassigns `renderer`, and the closure reads the current one).
+    setDrawingBufferReadoutSource(() =>
+      rendererReady ? drawingBufferReadout(renderer.perfStats(), window.devicePixelRatio) : null,
+    );
     // Dev-channel diagnostic: the ctor ran initGfxTier, so this is the tier the scene
     // was ACTUALLY built at (vs the preset logged above), plus the memory-profile knobs.
     console.info(

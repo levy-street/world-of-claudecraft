@@ -1552,6 +1552,7 @@ export const es_ES: EnTranslations = {
       "gfxHalf": "Mitad",
       "gfxCustomNote": "Cambiar un ajuste pasa el preset de calidad a Avanzada: una mezcla personalizada basada en el nivel Alto, partiendo de los valores mostrados para tu preset actual.",
       "gfxEffectsNote": "La Oclusión ambiental, el Resplandor y el Suavizado de bordes van en la cadena de posprocesado: con Iluminación y efectos en Bajo, la cadena está desactivada y no tienen efecto.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Modo de interfaz",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Escritorio",

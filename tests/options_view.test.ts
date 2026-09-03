@@ -1063,6 +1063,37 @@ describe('options_view: the desktop display-mode picker replaces the fullscreen 
     return keysOf(card?.controls ?? []);
   };
 
+  it('states the drawing buffer under Render Quality only when a readout exists', () => {
+    // A DPR 1 4K panel on ultra: the pixel budget bounded the buffer at 1440p-plus.
+    const readout = { width: 2795, height: 1572, nativeWidth: 3840, nativeHeight: 2160 };
+    const keys = displayCardKeys({ ...DISPLAY_ENV, drawingBuffer: readout });
+    expect(keys.slice(0, 3)).toEqual([
+      'renderScale',
+      'note:hudChrome.options.renderQualityBuffer',
+      'brightness',
+    ]);
+    const note = buildGraphicsControls(makeSource({ graphicsPreset: 4 }), {
+      ...DISPLAY_ENV,
+      drawingBuffer: readout,
+    }).find((c) => c.control === 'note' && c.textKey === 'hudChrome.options.renderQualityBuffer');
+    // The values are the raw pixel counts: interpolation prints them ungrouped
+    // ("2795x1572"), the way a resolution reads on every locale.
+    // ... and the painter keeps the line live on every slider commit through the tag.
+    expect(note).toEqual({
+      control: 'note',
+      textKey: 'hudChrome.options.renderQualityBuffer',
+      values: readout,
+      live: 'drawingBuffer',
+    });
+    // No renderer yet (or a null readout): the row is exactly the pinned run above.
+    expect(displayCardKeys({ ...DISPLAY_ENV, drawingBuffer: null })).not.toContain(
+      'note:hudChrome.options.renderQualityBuffer',
+    );
+    expect(displayCardKeys(DISPLAY_ENV)).not.toContain(
+      'note:hudChrome.options.renderQualityBuffer',
+    );
+  });
+
   it('swaps the toggle for the picker IN PLACE when the shell owns the window', () => {
     // The whole ordered run, not just a membership check: the picker takes the
     // toggle's slot, so the card's row order is byte-for-byte the web order.

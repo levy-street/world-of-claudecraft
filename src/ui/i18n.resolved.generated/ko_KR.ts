@@ -1552,6 +1552,7 @@ export const ko_KR: EnTranslations = {
       "gfxHalf": "절반",
       "gfxCustomNote": "다이얼을 조정하면 품질 프리셋이 고급으로 전환됩니다. \"높음\" 품질 기반 위에 현재 프리셋에 표시된 수준에서 시작하는 사용자 지정 조합입니다.",
       "gfxEffectsNote": "주변광 차폐, 블룸, 안티앨리어싱은 후처리 체인에 의존합니다. 효과 및 조명이 낮음이면 체인이 꺼져 이 옵션들은 효과가 없습니다.",
+      "renderQualityBuffer": "{width}x{height}로 렌더링 중 (디스플레이 해상도 {nativeWidth}x{nativeHeight}).",
       "interfaceMode": "인터페이스 모드",
       "interfaceModeAuto": "자동",
       "interfaceModeDesktop": "데스크톱",

@@ -1552,6 +1552,7 @@ export const pl_PL: EnTranslations = {
       "gfxHalf": "Połowa",
       "gfxCustomNote": "Zmiana suwaka przełącza zestaw jakości na Zaawansowany: własną mieszankę zbudowaną na bazie jakości High, zaczynając od poziomów pokazanych dla twojego obecnego zestawu.",
       "gfxEffectsNote": "Okluzja otoczenia, Bloom i wygładzanie krawędzi działają w łańcuchu postprodukcji: gdy Efekty i oświetlenie są ustawione na Low, łańcuch jest wyłączony i nie mają one żadnego efektu.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Tryb interfejsu",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Komputer",

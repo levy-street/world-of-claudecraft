@@ -1552,6 +1552,7 @@ export const en_CA: EnTranslations = {
       "gfxHalf": "Half",
       "gfxCustomNote": "Changing a dial switches the quality preset to Advanced: a custom mix built on the High-quality base, starting from the levels shown for your current preset.",
       "gfxEffectsNote": "Ambient Occlusion and Bloom ride the post-processing chain: with Effects & Lighting on Low the chain is off and they have no effect. Anti-Aliasing keeps working there, on a cheaper edge filter built into the final image pass.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Interface Mode",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",

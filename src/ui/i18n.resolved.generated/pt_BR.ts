@@ -1552,6 +1552,7 @@ export const pt_BR: EnTranslations = {
       "gfxHalf": "Metade",
       "gfxCustomNote": "Alterar um controle muda a predefinição de qualidade para Avançado: uma combinação personalizada construída sobre a base de qualidade High, partindo dos níveis mostrados para sua predefinição atual.",
       "gfxEffectsNote": "Oclusão Ambiental, Brilho e Anti-Aliasing dependem da cadeia de pós-processamento: com Efeitos e Iluminação em Low, a cadeia fica desativada e eles não têm efeito.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Modo de interface",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",

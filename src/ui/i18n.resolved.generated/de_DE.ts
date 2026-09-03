@@ -1552,6 +1552,7 @@ export const de_DE: EnTranslations = {
       "gfxHalf": "Halb",
       "gfxCustomNote": "Das Ändern eines Reglers wechselt die Qualitätsvoreinstellung zu Erweitert: eine eigene Mischung auf Grundlage der Hoch-Qualitätsstufe, ausgehend von den Werten deiner aktuellen Voreinstellung.",
       "gfxEffectsNote": "Ambient Occlusion, Bloom und Anti-Aliasing laufen über die Nachbearbeitungskette: Ist Licht und Effekte auf Niedrig gestellt, ist die Kette deaktiviert und sie haben keine Wirkung.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Steuerungsmodus",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",

@@ -1552,6 +1552,7 @@ export const sv_SE: EnTranslations = {
       "gfxHalf": "Halv",
       "gfxCustomNote": "Att ändra ett reglage byter kvalitetsförinställningen till Avancerad: en anpassad mix byggd på High-basen, med start i de nivåer som visas för din nuvarande förinställning.",
       "gfxEffectsNote": "Omgivningsocklusion, Bloom och Kantutjämning följer efterbehandlingskedjan: med Effekter och belysning på Low är kedjan avstängd och de har ingen effekt.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Gränssnittsläge",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivbord",

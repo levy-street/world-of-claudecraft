@@ -1552,6 +1552,7 @@ export const cs_CZ: EnTranslations = {
       "gfxHalf": "Poloviční",
       "gfxCustomNote": "Změna kteréhokoli ovladače přepne přednastavení kvality na Pokročilé: vlastní mix postavený na základu kvality Vysoká, vycházející z úrovní zobrazených pro tvé aktuální přednastavení.",
       "gfxEffectsNote": "Ambient Occlusion, Bloom a Anti-Aliasing jedou na řetězci následného zpracování: když jsou Efekty a osvětlení na Nízké, je řetězec vypnutý a nemají žádný účinek.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Režim rozhraní",
       "interfaceModeAuto": "Automaticky",
       "interfaceModeDesktop": "Desktop",

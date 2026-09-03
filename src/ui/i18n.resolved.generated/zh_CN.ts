@@ -1552,6 +1552,7 @@ export const zh_CN: EnTranslations = {
       "gfxHalf": "半",
       "gfxCustomNote": "调整任一细节旋钮会将画质预设切换为“高级”：一套基于“高”画质基础、以当前预设所示等级为起点的自定义组合。",
       "gfxEffectsNote": "环境光遮蔽、泛光与抗锯齿依赖后期处理链：当“特效与光照”为低时，处理链关闭，这些选项不起作用。",
+      "renderQualityBuffer": "以 {width}x{height} 渲染（显示分辨率 {nativeWidth}x{nativeHeight}）。",
       "interfaceMode": "界面模式",
       "interfaceModeAuto": "自动",
       "interfaceModeDesktop": "桌面",

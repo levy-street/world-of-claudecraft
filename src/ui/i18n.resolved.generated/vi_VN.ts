@@ -1552,6 +1552,7 @@ export const vi_VN: EnTranslations = {
       "gfxHalf": "Nửa",
       "gfxCustomNote": "Thay đổi một thiết lập sẽ chuyển cài đặt trước chất lượng sang Advanced: một hỗn hợp tùy chỉnh dựa trên nền chất lượng High, bắt đầu từ các mức hiển thị cho cài đặt trước hiện tại của bạn.",
       "gfxEffectsNote": "Bóng Đổ Môi Trường, Độ Nở và Khử Răng Cưa đều nằm trên chuỗi hậu xử lý: khi Hiệu Ứng & Ánh Sáng ở mức Low, chuỗi này tắt và chúng không có tác dụng.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Chế Độ Giao Diện",
       "interfaceModeAuto": "Tự Động",
       "interfaceModeDesktop": "Máy Tính",

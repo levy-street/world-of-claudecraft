@@ -15,7 +15,8 @@
 // narrows them against the real GameSettings), label keys are t() keys the
 // painter resolves. Registered in tests/architecture.test.ts UI_PURE_CORES.
 
-import type { TranslationKey } from './i18n.catalog';
+import type { DrawingBufferReadout } from './drawing_buffer_readout';
+import type { InterpolationValues, TranslationKey } from './i18n.catalog';
 
 /** Copy at the ownership boundary so a caller can never mutate the applied
  *  renderer snapshot while editing its local options draft. */
@@ -135,6 +136,11 @@ export interface ChoiceControl {
 export interface NoteControl {
   control: 'note';
   textKey: TranslationKey;
+  /** Interpolation values for the text key (a live readout, never prose). */
+  values?: InterpolationValues;
+  /** Which live source the painter re-reads on every slider commit in the
+   *  panel, so the line follows the Render Quality slider under it. */
+  live?: 'drawingBuffer';
   /** Interface-panel tab this control lives in (unset on other panels). */
   category?: InterfaceTab;
 }
@@ -216,6 +222,11 @@ export interface OptionsEnv {
    *  shell installed before it shipped. Absent (the web/offline callers) means
    *  the row never renders. */
   desktopDiscordPresence?: boolean;
+  /** The live drawing-buffer readout (src/ui/drawing_buffer_readout.ts): the
+   *  Render Quality row states what the frame renders at versus the display,
+   *  so the tier's pixel budget is visible where it acts. Absent or null (no
+   *  renderer yet, the interface panel's env) means no helper line. */
+  drawingBuffer?: DrawingBufferReadout | null;
 }
 
 const slider = (
@@ -484,6 +495,19 @@ export function buildGraphicsSections(
 
   const display: OptionsControl[] = [
     slider(s, 'renderScale', 'hud.options.renderQuality'),
+    // The buffer the slider (and, above it, the tier's DPR cap and pixel
+    // budget) produced, against the display's own pixels: built from the
+    // readout, then kept live by the painter on every slider commit.
+    ...(env.drawingBuffer
+      ? [
+          {
+            control: 'note' as const,
+            textKey: 'hudChrome.options.renderQualityBuffer' as const,
+            values: { ...env.drawingBuffer },
+            live: 'drawingBuffer' as const,
+          },
+        ]
+      : []),
     slider(s, 'brightness', 'hud.options.brightness'),
     slider(s, 'cameraFov', 'hud.options.fieldOfView', 'degrees', 1),
     // One row, two meanings by host. A desktop shell that owns the window gets

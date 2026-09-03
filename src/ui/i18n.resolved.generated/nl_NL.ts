@@ -1552,6 +1552,7 @@ export const nl_NL: EnTranslations = {
       "gfxHalf": "Half",
       "gfxCustomNote": "Een schuifregelaar wijzigen zet het kwaliteitsniveau op Geavanceerd: een aangepaste mix gebouwd op de High-kwaliteitsbasis, startend vanaf de niveaus die voor je huidige niveau worden getoond.",
       "gfxEffectsNote": "Omgevingsocclusie, Bloei en Anti-Aliasing lopen mee in de nabewerkingsketen: staat Effecten en Belichting op Low, dan is die keten uit en hebben ze geen effect.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Interfacemodus",
       "interfaceModeAuto": "Automatisch",
       "interfaceModeDesktop": "Desktop",

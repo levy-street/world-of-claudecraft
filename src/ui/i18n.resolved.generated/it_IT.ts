@@ -1552,6 +1552,7 @@ export const it_IT: EnTranslations = {
       "gfxHalf": "Metà",
       "gfxCustomNote": "Modificare un cursore imposta il preset di qualità su Avanzata: un mix personalizzato basato sulla qualità Alta, a partire dai livelli mostrati per il tuo preset attuale.",
       "gfxEffectsNote": "Occlusione Ambientale, Fioritura e Anti-Aliasing fanno parte della catena di post-elaborazione: con Effetti e Illuminazione su Bassa la catena è disattivata e non hanno alcun effetto.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Modalità interfaccia",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Desktop",

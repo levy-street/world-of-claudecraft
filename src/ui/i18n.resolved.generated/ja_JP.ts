@@ -1552,6 +1552,7 @@ export const ja_JP: EnTranslations = {
       "gfxHalf": "半分",
       "gfxCustomNote": "ダイヤルを変更すると画質プリセットが「詳細」に切り替わります。「高」品質ベースの上に、現在のプリセットに表示されているレベルを起点として組み立てるカスタム設定です。",
       "gfxEffectsNote": "アンビエントオクルージョン、ブルーム、アンチエイリアスはポストプロセスチェーンに依存します。「エフェクトとライティング」が低の場合、チェーンが無効になりこれらの設定は効果がありません。",
+      "renderQualityBuffer": "{width}x{height} で描画中（表示解像度 {nativeWidth}x{nativeHeight}）。",
       "interfaceMode": "操作モード",
       "interfaceModeAuto": "自動",
       "interfaceModeDesktop": "デスクトップ",

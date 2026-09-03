@@ -1552,6 +1552,7 @@ export const da_DK: EnTranslations = {
       "gfxHalf": "Halv",
       "gfxCustomNote": "Ændrer du en indstilling, skifter kvalitetsforudindstillingen til Avanceret: en brugerdefineret blanding bygget på High-kvalitetsbasen, ud fra de niveauer, der vises for din nuværende forudindstilling.",
       "gfxEffectsNote": "Omgivende okklusion, Blomstring og Anti-aliasing hænger på efterbehandlingskæden: med Effekter og belysning sat til Low er kæden slået fra, og de har ingen effekt.",
+      "renderQualityBuffer": "Rendering at {width}x{height} of {nativeWidth}x{nativeHeight}.",
       "interfaceMode": "Grænsefladetilstand",
       "interfaceModeAuto": "Auto",
       "interfaceModeDesktop": "Skrivebord",
