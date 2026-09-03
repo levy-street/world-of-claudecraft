@@ -150,6 +150,46 @@ describe('StoreMountPurchase.purchase outcomes on a current surface', () => {
     expect(h.deps.setError).not.toHaveBeenCalled();
   });
 
+  it.each([
+    ['grant', result({ granted: true }), 'success'],
+    ['idempotent replay', result({ reason: 'already_granted' }), 'success'],
+    ['refusal', result({ reason: 'unavailable' }), 'failure'],
+  ] as const)(
+    'reports a %s after the surface closes during the outcome refresh',
+    async (_label, spendResult, outcome) => {
+      const h = harness(5000, [service()], [], async () => spendResult);
+      h.deps.refreshStore.mockImplementationOnce(async () => {
+        h.surface.current = false;
+        h.controller.rebuild(h.next.balance, h.next.items, h.next.owned);
+      });
+      h.controller.request(REINS);
+
+      await confirm(h);
+
+      expect(h.deps.showResult).toHaveBeenCalledWith(
+        outcome,
+        outcome === 'success' ? t('hudChrome.wocStore.owned') : t('hudChrome.wocStore.error'),
+      );
+      expect(h.deps.setError).not.toHaveBeenCalled();
+    },
+  );
+
+  it('reports price_changed when the surface closes during its refresh', async () => {
+    const h = harness(5000, [service()], [], async () => result({ reason: 'price_changed' }));
+    h.next.items = [service({ costClaudium: 1500 })];
+    h.deps.refreshStore.mockImplementationOnce(async () => {
+      h.surface.current = false;
+      h.controller.rebuild(h.next.balance, h.next.items, h.next.owned);
+    });
+    h.controller.request(REINS);
+
+    await confirm(h);
+
+    expect(h.deps.showResult).toHaveBeenCalledWith('failure', t('hudChrome.wocStore.priceChanged'));
+    expect(h.deps.showDecision).toHaveBeenCalledTimes(1);
+    expect(h.deps.setError).not.toHaveBeenCalled();
+  });
+
   it('reads already_granted as the error state when the refreshed row is still unowned', async () => {
     // The skin controller's rule: on the live surface the row proves ownership,
     // an already_granted answer alone does not (the mirror may not have landed).
@@ -235,8 +275,11 @@ describe('StoreMountPurchase.purchase outcomes on a stale surface', () => {
     return h;
   }
 
-  it('reports a grant as a success result rather than painting a body nobody sees', async () => {
-    const h = await stale(async () => result({ granted: true }));
+  it.each([
+    ['new grant', result({ granted: true })],
+    ['idempotent replay', result({ granted: false, reason: 'already_granted' })],
+  ])('reports a %s as success rather than painting a body nobody sees', async (_label, answer) => {
+    const h = await stale(async () => answer);
     expect(h.deps.showResult).toHaveBeenCalledWith('success', t('hudChrome.wocStore.owned'));
     expect(h.deps.refreshStore).not.toHaveBeenCalled();
     expect(h.deps.setError).not.toHaveBeenCalled();
