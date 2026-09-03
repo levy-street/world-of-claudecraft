@@ -920,3 +920,71 @@ describe('necromancy audio', () => {
     expect(cooldowns.size).toBe(1);
   });
 });
+
+describe('mount idle hum + mount-aware jump/land (the Mech Bird take set)', () => {
+  const KEY = 'mech_bird';
+  const IDLE_KEY = `mount_idle_${KEY}`;
+  const JUMP_KEY = `mount_jump_${KEY}`;
+  const LAND_KEY = `mount_land_${KEY}`;
+  const IDLE_BUF = { duration: 9.9 };
+  const JUMP_BUF = { duration: 0.67 };
+  const GENERIC_JUMP_BUF = { duration: 0.5 };
+
+  beforeEach(() => {
+    const buffers = (sfx as unknown as { buffers: Map<string, { duration: number }> }).buffers;
+    buffers.set(IDLE_KEY, IDLE_BUF);
+    buffers.set(JUMP_KEY, JUMP_BUF);
+    buffers.set('move_jump', GENERIC_JUMP_BUF);
+    (sfx as unknown as { mountIdles: Set<number> }).mountIdles.clear();
+    (sfx as unknown as { loops: Map<string, unknown> }).loops.clear();
+  });
+
+  afterEach(() => {
+    (sfx as unknown as { active: number }).active = 0;
+  });
+
+  it('ships the idle loop and the jump/land one-shots with the right manifest flags', () => {
+    expect(SFX_CLIPS[IDLE_KEY]).toMatchObject({ loop: true, spatial: true });
+    expect(SFX_CLIPS[JUMP_KEY]).toMatchObject({ loop: false, spatial: true });
+    expect(SFX_CLIPS[LAND_KEY]).toMatchObject({ loop: false, spatial: true });
+  });
+
+  it('ships non-empty MP3 assets for the three extra takes', () => {
+    const directory = new URL('../public/audio/sfx/', import.meta.url);
+    for (const file of [`${IDLE_KEY}.mp3`, `${JUMP_KEY}.mp3`, `${LAND_KEY}.mp3`]) {
+      const bytes = readFileSync(new URL(file, directory));
+      expect(bytes.length, `${file} is a real asset`).toBeGreaterThan(5000);
+    }
+  });
+
+  it('starts the hum loop for a stopped rider and no-ops for a mount without an idle take', () => {
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    sfx.mountIdle(0, 0, 0, 'valorsteed', true, 1);
+    expect(loops.has('mountIdle:1')).toBe(false); // no idle take: silent no-op
+    sfx.mountIdle(0, 0, 0, KEY, true, 1);
+    expect(loops.has('mountIdle:1')).toBe(true);
+    const loopSrc = sources.at(-1) as unknown as { loop?: boolean; buffer: unknown };
+    expect(loopSrc.loop).toBe(true);
+    expect(loopSrc.buffer).toBe(IDLE_BUF);
+  });
+
+  it('the moving edge and mountEngineReset both silence the hum', () => {
+    const loops = (sfx as unknown as { loops: Map<string, unknown> }).loops;
+    sfx.mountIdle(0, 0, 0, KEY, true, 1);
+    expect(loops.has('mountIdle:1')).toBe(true);
+    sfx.mountIdle(0, 0, 0, KEY, false, 1); // renderer's moving branch
+    expect(loops.has('mountIdle:1')).toBe(false);
+    sfx.mountIdle(0, 0, 0, KEY, true, 1);
+    sfx.mountEngineReset(1); // dismount / cull / audio-gate exit / death
+    expect(loops.has('mountIdle:1')).toBe(false);
+  });
+
+  it('movement prefers the mount jump take while riding, and falls back for other mounts', () => {
+    sfx.movement('jump', 0, 0, 0, false, KEY);
+    expect(lastSource().buffer).toBe(JUMP_BUF);
+    sfx.movement('jump', 0, 0, 0, false, 'valorsteed'); // no mount take: generic cue
+    expect(lastSource().buffer).toBe(GENERIC_JUMP_BUF);
+    sfx.movement('jump', 0, 0, 0, false); // on foot: generic cue
+    expect(lastSource().buffer).toBe(GENERIC_JUMP_BUF);
+  });
+});

@@ -6743,6 +6743,10 @@ export const GUIDE_RELIQUARY: GuideReliquaryPage[] = [
       },
       {
         "kind": "mount",
+        "name": "Cluckwork Mech Bird"
+      },
+      {
+        "kind": "mount",
         "name": "Aether-Jouster Hover-Cycle"
       },
       {

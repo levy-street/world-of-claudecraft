@@ -46,6 +46,7 @@ const storagePurchase = vi.fn(async () => ({
   reason: null as string | null,
 }));
 const grantWeaponSkins = vi.fn();
+const grantStoreMounts = vi.fn();
 
 function responseJson(res: FakeRes): unknown {
   return JSON.parse(res.body);
@@ -84,7 +85,7 @@ describe('the storage kind gates', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetClaudiumMutationRateLimits();
-    configureClaudiumRuntime({ grantWeaponSkins, storagePurchase });
+    configureClaudiumRuntime({ grantWeaponSkins, grantStoreMounts, storagePurchase });
   });
 
   it('forwards an allowlisted storage spend to the purchase flow verbatim', async () => {

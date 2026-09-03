@@ -368,6 +368,22 @@ const MOUNT_RIGGED: ClipMap = {
   death: 'Death',
 };
 
+// The Mech Bird's own map: it ships exactly Idle / Run / Jump (authored in
+// Blender against its 28-bone rig). Walk aliases the run cycle (the servo
+// sprint reads as a stately strut at walk timeScales), death holds Idle (a
+// ridden mount never plays a death; the summon strips on death first), and
+// jump is the one mount clip in the game that actually uses the airborne
+// channel: the renderer already feeds the real airborne flag to mount
+// visuals, so the single authored wing-flap plays on every hop.
+const MOUNT_MECH_BIRD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Run',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+};
+
 // The Chimeglass Tortoise ships three authored idle-breakers on top of the
 // breathing Idle: he looks about him, rears up to paw the air, and stamps his
 // front feet one at a time. Each ends back on the idle pose so the hand-off is
@@ -2097,6 +2113,23 @@ export const VISUALS: Record<string, VisualDef> = {
     // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
     // natural against the same 12.6 leaves it sliding over half its travel).
     runRef: 12.6,
+    lazyPreload: true,
+  },
+  // The Cluckwork Mech Bird (the store mount): authored Blender clips on its
+  // own 28-bone rig (no bake_mount_gaits entry, never bake over it). walkRef
+  // is the Run cycle's measured natural speed (stride 0.332 raw p2p, 0.433s
+  // cycle, height 3.4 over rawHeight 1.0 = 5.2 yd/s), so walking plays near
+  // the authored look. runRef follows the drakemaw precedent above: the
+  // RIDDEN speed (RUN_SPEED 7 x +75% = 12.25) so timeScale lands on 1.0 and
+  // the servo sprint keeps its authored cadence; the slide this trades away
+  // sits between the drakemaw's 28% and grag_bear's half-travel, and the
+  // 1-2-1 mount_run gait beat carries the footfall read.
+  mount_mech_bird: {
+    url: `${MOUNTS_DIR}/mech_bird.glb`,
+    height: 3.4,
+    clips: MOUNT_MECH_BIRD,
+    walkRef: 5.2,
+    runRef: 12.25,
     lazyPreload: true,
   },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its

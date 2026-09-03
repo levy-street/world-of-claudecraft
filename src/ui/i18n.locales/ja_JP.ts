@@ -331,6 +331,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOCストアのセクション',
   'hudChrome.wocStore.storeTab': 'ストア',
   'hudChrome.wocStore.rewardsTab': 'デイリー報酬',
+  'hudChrome.wocStore.mountsEyebrow': 'アカウント共有マウント',
+  'hudChrome.wocStore.mountsTitle': '機械の厩舎',
+  'hudChrome.wocStore.mountBuyAria': '{item}を購入',
   'hudChrome.wocStore.loading': 'WOCストアを読み込み中…',
   'hudChrome.wocStore.error': 'WOCストアは現在利用できません。しばらくしてからお試しください。',
   'hudChrome.wocStore.balance': 'Claudium残高',
@@ -9081,6 +9084,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'スカイリーチ・ストームフェザーの手綱',
   'entities.items.reins_drakemaw_raptor.name': '火口のラプトルの手綱',
   'entities.items.reins_thunderstrut_gobbler.name': '大七面鳥サンダーストラットの手綱',
+  'entities.items.reins_mech_bird.name': 'ゼンマイ・メカバードの始動キー',
   'entities.mobs.drowned_cantor.name': '溺れた聖歌者',
   'entities.mobs.reedbound_acolyte.name': '葦縛りの信徒',
   'entities.mobs.deepfen_spearjaw.name': '深淵沼の槍顎',
@@ -10722,6 +10726,9 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_chimeglass_tortoise': '鐘硝子のトリヴァー',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。',
+  'hudChrome.mounts.name_mech_bird': 'ゼンマイ・メカバード',
+  'hudChrome.mounts.desc_mech_bird':
+    '手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。',
   'hudChrome.mounts.desc_lanternback_troll':
     '点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。',
   'hudChrome.mounts.desc_chimeglass_tortoise':

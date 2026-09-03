@@ -339,6 +339,9 @@ const UI_PURE_CORES = [
   // The Season 1 Armory's section / card / class-chip markup, the charter_card_view
   // twin on the other half of the same store body (Bank Storage phase 15).
   'src/ui/armory_card_view.ts',
+  // The Machine Stable's section / card markup (the store-mount strip), the
+  // armory_card_view twin for the account-mount SKUs.
+  'src/ui/store_mount_card_view.ts',
   // The daily-rewards spin wheel's markup and its landing geometry (Bank Storage
   // phase 17). The overlay ELEMENT lives in the thin painter beside it.
   'src/ui/daily_rewards_spin_view.ts',
@@ -630,6 +633,7 @@ const RENDER_PURE_CORES = [
   'src/render/characters/design_code_core.ts',
   'src/render/live_program_watch_core.ts',
   'src/render/reveal_gate_core.ts',
+  'src/render/stride_audio_core.ts',
   'src/render/town_reveal_core.ts',
   'src/render/foliage_bucket_reveal_core.ts',
   'src/render/foliage_prewarm_twins_core.ts',

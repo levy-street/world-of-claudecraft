@@ -91,12 +91,25 @@ export interface SpatialAudioSink {
     moving: boolean,
     entityId: number,
   ): boolean;
-  /** Drop an entity's mountEngine state and silence its loop (dismount,
-   *  interest culled, disconnect). */
+  /** The standstill powered-on hum for a mount with a dedicated idle take
+   *  (mount_idle_<mountKey>): active=true every grounded stopped frame,
+   *  active=false from the moving branch. A no-op for mounts without one. */
+  mountIdle(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    active: boolean,
+    entityId: number,
+  ): void;
+  /** Drop an entity's per-mount loops (engine phase + idle hum) and state
+   *  (dismount, death while mounted, audio-gate exit, interest culled,
+   *  disconnect). */
   mountEngineReset(entityId: number): void;
-  /** Warm a mount's engine clips (windup/loop/winddown) ahead of first use,
-   *  e.g. on the mountKey transition that also calls mountEngineReset. A
-   *  no-op for a mount with no engine take set. */
+  /** Warm a mount's audio takes (engine windup/loop/winddown, idle hum, and
+   *  mount jump/land overrides) ahead of first use, e.g. on the mountKey
+   *  transition that also calls mountEngineReset. A no-op for a mount with
+   *  none of them. */
   preloadMountEngine(mountKey: string): void;
   /** Continuous movement loop for a mount that HAS one (a wheeled cart rolls;
    *  it has no stride to hang a one-shot on). Called every frame per mounted
@@ -105,13 +118,15 @@ export interface SpatialAudioSink {
   mountLoop(id: number, x: number, y: number, z: number, mountKey: string, moving: boolean): void;
   /** Drop a mount loop when its entity despawns or dismounts. */
   stopMountLoop(id: number): void;
-  /** A discrete movement event (jump / land / water entry / swim stroke). */
+  /** A discrete movement event (jump / land / water entry / swim stroke).
+   *  `mountKey` lets a mount's own jump/land take replace the generic cue. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
     self: boolean,
+    mountKey?: string,
   ): void;
   /** Lich Form entry, ambient pulse, and a sacrificed soul reaching its owner. */
   necromancy(

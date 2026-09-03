@@ -168,7 +168,7 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // catalogTotal comes from the same catalogCharacterCompletion the page
     // calls, so the pair assertions below would follow a drifted derivation;
     // the literal anchors them. Literal: update when catalog content lands.
-    // 366 at the release/v0.42.0 merge, re-derived from the merged
+    // 367 after the Cluckwork Mech Bird release merge, re-derived from the merged
     // catalog rather than picked from a side. The shared base reads 356 (311
     // plus the 40 Crucible raid relics and the raid's flawless title;
     // Forgebreaker left the pages for its crafting chain). Masterwrought adds 7
@@ -176,10 +176,10 @@ describe('profile page Reliquary pair + Curator rank lines', () => {
     // inscription), the three grandmaster/farming title slots, Phase 11i's apex
     // fishing rod, and Phase 18's gather_event:golden_harvest field note, the
     // same slots the character pair in tests/reliquary_content.test.ts carries.
-    // The release adds three mounts: Bonebound Rickshaw, Lanternback Troll,
-    // and Chimeglass Tortoise. The id sets are disjoint, so the merged catalog
-    // carries both sides: 356 + 7 + 3.
-    expect(catalogTotal).toBe(366);
+    // The release adds four mounts: Bonebound Rickshaw, Lanternback Troll,
+    // Chimeglass Tortoise, and Cluckwork Mech Bird. The id sets are disjoint,
+    // so the merged catalog carries both sides: 356 + 7 + 4.
+    expect(catalogTotal).toBe(367);
   });
 
   it('renders the owned/total pair and the English rank name for a ranked character', async () => {

@@ -379,6 +379,11 @@ export const hudChromeStrings = {
     tabsLabel: 'WOC Store sections',
     storeTab: 'Store',
     rewardsTab: 'Daily Rewards',
+    // The store's Mounts strip (content/store_mounts.ts): account mounts sold
+    // for Claudium; the purchase grants the soulbound reins to every character.
+    mountsEyebrow: 'Account Mounts',
+    mountsTitle: 'Machine Stable',
+    mountBuyAria: 'Purchase {item}',
     loading: 'Loading WOC Store...',
     error: 'The WOC Store is unavailable right now. Please try again shortly.',
     balance: 'Claudium Balance',
@@ -1601,6 +1606,7 @@ export const hudChromeStrings = {
     name_thunderstrut_gobbler: 'Thunderstrut the Grand Gobbler',
     name_terrorspark_groundshaker: 'Dreadspark Groundshaker',
     name_drakemaw_raptor: 'Drakemaw Raptor',
+    name_mech_bird: 'Cluckwork Mech Bird',
     name_lanternback_troll: 'Grumbol the Lanternback',
     name_chimeglass_tortoise: 'Tolliver the Chimeglass',
     name_rickshaw_mount: 'Bonebound Rickshaw',
@@ -1619,6 +1625,8 @@ export const hudChromeStrings = {
       'A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.',
     desc_drakemaw_raptor:
       'A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.',
+    desc_mech_bird:
+      'A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.',
     desc_lanternback_troll:
       'A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.',
     desc_chimeglass_tortoise:

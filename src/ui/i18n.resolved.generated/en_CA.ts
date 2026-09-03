@@ -575,6 +575,9 @@ export const en_CA: EnTranslations = {
       "tabsLabel": "WOC Store sections",
       "storeTab": "Store",
       "rewardsTab": "Daily Rewards",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Loading WOC Store...",
       "error": "The WOC Store is unavailable right now. Please try again shortly.",
       "balance": "Claudium Balance",
@@ -1392,6 +1395,7 @@ export const en_CA: EnTranslations = {
       "name_thunderstrut_gobbler": "Thunderstrut the Grand Gobbler",
       "name_terrorspark_groundshaker": "Dreadspark Groundshaker",
       "name_drakemaw_raptor": "Drakemaw Raptor",
+      "name_mech_bird": "Cluckwork Mech Bird",
       "name_lanternback_troll": "Grumbol the Lanternback",
       "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Bonebound Rickshaw",
@@ -1404,6 +1408,7 @@ export const en_CA: EnTranslations = {
       "desc_thunderstrut_gobbler": "A colossal storm-hatched gobbler that struts down from the Waking Peak, tail fanned like a thunderhead.",
       "desc_terrorspark_groundshaker": "A compact armored engine with heavy tracks, a deep-bore cannon, and a saddle built for fearless pilots.",
       "desc_drakemaw_raptor": "A saddle-broken brood raptor from the Drakemaw Caldera, all sinew and sprint, still smelling faintly of ash.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
       "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
       "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "A rattling bone-cart with a bony grunt harnessed to the shafts, hauling you along at a dead run."
@@ -13539,6 +13544,9 @@ export const en_CA: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "Reins of the Drakemaw Raptor"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Rimefang"

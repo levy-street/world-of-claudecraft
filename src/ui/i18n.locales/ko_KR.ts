@@ -336,6 +336,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 상점 구역',
   'hudChrome.wocStore.storeTab': '상점',
   'hudChrome.wocStore.rewardsTab': '일일 보상',
+  'hudChrome.wocStore.mountsEyebrow': '계정 탈것',
+  'hudChrome.wocStore.mountsTitle': '기계 마구간',
+  'hudChrome.wocStore.mountBuyAria': '{item} 구매',
   'hudChrome.wocStore.loading': 'WOC 상점 불러오는 중…',
   'hudChrome.wocStore.error': '현재 WOC 상점을 이용할 수 없습니다. 잠시 후 다시 시도해 주세요.',
   'hudChrome.wocStore.balance': 'Claudium 잔액',
@@ -9064,6 +9067,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '하늘닿이 폭풍깃의 고삐',
   'entities.items.reins_drakemaw_raptor.name': '화산구 랩터의 고삐',
   'entities.items.reins_thunderstrut_gobbler.name': '천둥활보 대왕 칠면조의 고삐',
+  'entities.items.reins_mech_bird.name': '태엽 기계새 시동 열쇠',
   'entities.mobs.drowned_cantor.name': '익사한 영창자',
   'entities.mobs.reedbound_acolyte.name': '갈대에 묶인 신도',
   'entities.mobs.deepfen_spearjaw.name': '깊은늪 창턱',
@@ -10704,6 +10708,9 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_chimeglass_tortoise': '종유리의 톨리버',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '화산구 칼데라에서 길들여진 둥지 태생 랩터. 온몸이 힘줄과 질주로 이루어졌으며, 아직도 희미한 재 냄새가 난다.',
+  'hudChrome.mounts.name_mech_bird': '태엽 기계새',
+  'hudChrome.mounts.desc_mech_bird':
+    '수제 태엽 전투 닭. 서보 관절을 튕기며 질주하고, 태엽 열쇠는 지금도 돌아가고 있다.',
   'hudChrome.mounts.desc_lanternback_troll':
     '점등인들이 멍에로 길들인 언덕 트롤. 어깨에 무쇠 왕좌를 지고, 양쪽 팔걸이마다 폭풍 등불이 타오른다.',
   'hudChrome.mounts.desc_chimeglass_tortoise':

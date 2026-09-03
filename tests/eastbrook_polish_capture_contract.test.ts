@@ -554,8 +554,14 @@ interface AttributionTargetFixture {
 // matching neither ours (8e5722cb) nor the release (72d8b7ce); every other
 // provenance input is byte-identical between the parents. The tool swept the
 // four evidence JSONs over the resolved renderer, with no capture retaken.
+// Re-minted at the Cluckwork Mech Bird release sync (tip 1fdf0f55a3): its
+// stride-audio extraction and mounted idle-hum poll moved renderer.ts against
+// the already merged Masterwrought and mount-lifecycle integrations. The
+// resolved renderer sha256 is 36b780c6, matching neither ours (ed29e747) nor
+// the release (9b4d40e5); every other provenance input remains byte-identical.
+// The four evidence JSONs were swept again, with no capture retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '6e3cb1b4edeaea28701d257ffa2ff9ae3781af78b02e4981942e03e40f72c85a';
+  'e6213886daf59e8b7bec208a3a3c0c8bbbe6187712439df92bc3204df45adb2d';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

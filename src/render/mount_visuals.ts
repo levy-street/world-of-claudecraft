@@ -270,6 +270,10 @@ export const MOUNT_VISUAL_SPECS: Record<MountKey, MountVisualSpec> = {
   // The Drakemaw Raptor: authored saddle sits over the hips behind the neck
   // spines (hence the slight rear shift), gait-rigged Walk/Run cycles.
   drakemaw_raptor: spec('mount_drakemaw_raptor', 2.35, true, undefined, -0.1),
+  // The Cluckwork Mech Bird: authored rigid-servo clips (no procedural bob,
+  // the clips carry the motion). Saddle surface sits at 0.60 of the raw model
+  // (x3.4 height), dead over the origin, so no fore/aft shift.
+  mech_bird: spec('mount_mech_bird', 2.05, true),
   // The Lanternback Troll: the rider sits IN the iron throne strapped across
   // his shoulders, not astride a back, so the seat is high and set BEHIND the
   // model origin. `seat`/`seatFwd` here are only the FALLBACK and the anchor the

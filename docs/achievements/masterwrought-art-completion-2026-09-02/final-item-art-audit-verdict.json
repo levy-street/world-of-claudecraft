@@ -5,8 +5,8 @@
     "baselineCommit": "68355bd1148ba0470c521ce43686d2097c5f936c",
     "branch": "feature/masterwrought",
     "shippingDirectory": "public/ui/items",
-    "itemArtFilesReviewed": 1208,
-    "liveItemDefinitions": 1223,
+    "itemArtFilesReviewed": 1209,
+    "liveItemDefinitions": 1224,
     "generatedHeroicDefinitions": 64,
     "heroicDefinitionsWithOwnWebp": 48,
     "heroicWeaponArtAliases": 16,
@@ -29,7 +29,7 @@
       "food": 38,
       "held_offhand": 17,
       "junk": 142,
-      "mount": 12,
+      "mount": 13,
       "potion": 13,
       "quest": 102,
       "recipe": 40,
@@ -83,7 +83,7 @@
   },
   "visualVerdict": {
     "status": "pass",
-    "passCount": 1208,
+    "passCount": 1209,
     "passIds": [
       "abyssal_loop",
       "abysswrought_band",
@@ -897,6 +897,7 @@
       "reins_drakemaw_raptor",
       "reins_grag_bear",
       "reins_lanternback_troll",
+      "reins_mech_bird",
       "reins_rickshaw_mount",
       "reins_shadowjump_toad",
       "reins_stalkglider_snail",
@@ -1335,15 +1336,15 @@
     ],
     "rejectCount": 0,
     "reject": [],
-    "summary": "All 1,208 current shipping item paintings pass. The Masterwrought completion report retains six non-blocking small-size observations; none require rejection or follow-up art before shipping. The Lanternback Troll mount reins icon (owner-supplied painted master) and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) were owner-reviewed and passed, joining this record at the release/v0.42.0 sync of PR #3439."
+    "summary": "All 1,209 current shipping item paintings pass. The Masterwrought completion report retains six non-blocking small-size observations; none require rejection or follow-up art before shipping. The Lanternback Troll mount reins icon (owner-supplied painted master) and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) were owner-reviewed and passed, joining this record at the release/v0.42.0 sync of PR #3439. The Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) was added for owner review on 2026-08-17."
   },
   "nonVisualContentWatch": [],
   "resolvedDuringAudit": [],
   "evidence": {
     "catalog": {
       "path": "tmp/imagegen/item-art-consistency/final-audit/catalog.json",
-      "sha256": "cdcec5ca6fc4270c5fa36899bab3d4576b954ec0eb0649edf75842d0f4b8a656",
-      "bytes": 657221
+      "sha256": "febda89453efdcf50432cf3cab6ba638435b301eea6c429e9e0046b8a829e25e",
+      "bytes": 657748
     },
     "rendererFingerprint": "41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7",
     "sheetCount": 240,
@@ -1357,7 +1358,7 @@
       "small-multiview": 30,
       "identity": 30
     },
-    "sheetSetSha256": "38bd1322ba2745feb370cbacfac9514484073f7a1c808c5392d64993538aeacf",
+    "sheetSetSha256": "56109aebdd56c50eaf6f701305cfa57c92568e0b1aa9d5b389314a04cdeda792",
     "sheets": [
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/armor-chest--p01--128-color.png",
@@ -2641,64 +2642,64 @@
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--128-color.png",
-        "sha256": "eb76fb821b9e95e28acc0e459ab558674e19aeb668ec639086294bdb0567cdf1",
-        "bytes": 450347,
+        "sha256": "367d807731102e76bc8ba9f12b6e7b809c3923f1781528c3e9ce316c6559900f",
+        "bytes": 479514,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--40-color.png",
-        "sha256": "e05769730ef77c27a9a9417392cddf402f6a66fb76784920b7abdde9a6306c39",
-        "bytes": 82208,
+        "sha256": "71e2cc67109d731bb9b89fc14e2d63ff0b580bcc443d1783a91f6b43a6cd6ebf",
+        "bytes": 87402,
         "width": 1600,
         "height": 288,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-color.png",
-        "sha256": "9353e807310f146705de127e1a9217c8d978add48937115fefc8d22c29e4d268",
-        "bytes": 56789,
+        "sha256": "aa0286d4ce904c09061e60dff9aad895b50d4ab04e99b1fad3f52e3a84617036",
+        "bytes": 60445,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--22-color.png",
-        "sha256": "31b0bf47886d2f49f828c3053a3dad9262defec5693b850983c27726d992c41c",
-        "bytes": 45328,
+        "sha256": "a86c66476d8850ab5eb9cab6457b04e46eefb2a9af70ba52187b8ede60f43c1f",
+        "bytes": 47914,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--28-grayscale.png",
-        "sha256": "f790e0bca2a18ad25f496247e2e0064544d5feed92775ef3fcdf8f52ddafdeaf",
-        "bytes": 43904,
+        "sha256": "5826b0411b777e0adf2ccd1ef972eb216c7859d259a0083e8b8e836da94fb7fa",
+        "bytes": 46620,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--64-circle.png",
-        "sha256": "772eab0f8b3040dee28c0479515158f57805070210573a852ad600d91227fb50",
-        "bytes": 137499,
+        "sha256": "83b57de59c5fdf5f14f5d047007ac85b066c39b83785281db33a4808500b99c6",
+        "bytes": 146153,
         "width": 1600,
         "height": 376,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--small-multiview.png",
-        "sha256": "8b09eedf8aedeec4373ac056490ccc324e89c6f4a7a75add8821c4719a1c61b7",
-        "bytes": 249567,
+        "sha256": "b9cf30045456a0118464ef4d35eb0a3cd629291f6a77665effbd218681303b9b",
+        "bytes": 267318,
         "width": 1800,
         "height": 480,
         "format": "png"
       },
       {
         "path": "tmp/imagegen/item-art-consistency/final-audit/sheets/mount--p01--identity.png",
-        "sha256": "23571d86521af0564836304e786b588ffeb1802f3ebe41f0e8672e426f3dcfdc",
-        "bytes": 473582,
+        "sha256": "4e26fe9779454fac459e3cb80c66c7d59816d395fb6943e5b9cd7a7a73ba37fb",
+        "bytes": 504528,
         "width": 1800,
         "height": 452,
         "format": "png"
@@ -3280,6 +3281,6 @@
         "format": "png"
       }
     ],
-    "shippingCatalogSha256": "e89167eddf8f0fa72f67acd101d3a54de75ed583f3049c9aeac7562cc12def68"
+    "shippingCatalogSha256": "bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c"
   }
 }

@@ -384,8 +384,8 @@ describe('item-art consistency accepted-art provenance', () => {
         // printed verdict sha and byte count. The v0.42.0 release union adds
         // the Lanternback Troll and Chimeglass Tortoise reins, re-renders the
         // 12-mount contact-sheet family, and advances this exact seal again.
-        acceptedSha256: '31082a8137183c6ae2b0a547f96f9cb1f49f7219db7b8234681f43a4eda6c2b0',
-        acceptedBytes: 136_312,
+        acceptedSha256: '1aa9f0111afd13c37f624e9b5d8f76580082f12e17fdd5bd06c1e3f9dc8f8bc9',
+        acceptedBytes: 136_469,
       },
     ]);
     for (const evidence of [...value.sourceEvidence, ...value.generationReports]) {
@@ -504,9 +504,9 @@ describe('item-art consistency accepted-art provenance', () => {
     // the v0.42.0 sync on 2026-08-31: these are the hand-merged, re-minted
     // verdict bytes, printed by the `--refresh-verdict` run over the merged
     // tree. The release union adds both reviewed mount-reins records.
-    expect(verdictBytes.length).toBe(136_312);
+    expect(verdictBytes.length).toBe(136_469);
     expect(sha256(verdictBytes)).toBe(
-      '31082a8137183c6ae2b0a547f96f9cb1f49f7219db7b8234681f43a4eda6c2b0',
+      '1aa9f0111afd13c37f624e9b5d8f76580082f12e17fdd5bd06c1e3f9dc8f8bc9',
     );
     const verdict = JSON.parse(verdictBytes.toString('utf8')) as FinalAuditVerdict;
 
@@ -532,8 +532,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // terms; the debt term stays this branch's 81. Re-counted on the merged
       // tree as 1125 committed .webp files under public/ui/items. The final
       // release union adds two reviewed mount icons and definitions.
-      itemArtFilesReviewed: 1127,
-      liveItemDefinitions: 1142,
+      itemArtFilesReviewed: 1128,
+      liveItemDefinitions: 1143,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -543,7 +543,7 @@ describe('item-art consistency accepted-art provenance', () => {
       manifest().targetSets.items.map((id) => `public/ui/items/${id}.webp`),
     );
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1127,
+      1128,
     );
     // 23 -> 24 at Masterwrought phase 10: the three apex flasks are a new item
     // kind, and the audit groups by kind, so they form their own census group
@@ -595,7 +595,7 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1127,
+      passCount: 1128,
       watchCount: 0,
       watch: [],
       rejectCount: 0,
@@ -614,7 +614,7 @@ describe('item-art consistency accepted-art provenance', () => {
       // 2026-08-31 wrote into visualVerdict.summary before the
       // `--refresh-verdict` re-mint (see the sourceEvidence seal above).
       summary:
-        'All 1127 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review. The Lanternback Troll mount reins icon (owner-supplied painted master) and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) were owner-reviewed and passed, joining this record at the release/v0.42.0 sync of PR #3439.',
+        'All 1128 shipping item-art files pass the visual contract: 817 reviewed in the 2026-08-09 campaign (documented retries included), plus the five class-overhaul integration additions owner-reviewed and passed on 2026-08-10, plus the seven bank-storage placeholder bag icons first accepted as opaque placeholder encodings on 2026-08-12 and superseded by distinct painted woc-item-icon-v1 replacements, implementation-agent reviewed and passed on 2026-08-26, plus the Dawnhold posy addition (project-authored vector illustration) owner-reviewed and passed on 2026-08-12, plus the three Masterwrought material placeholders (wyrmfall_core, sundered_essence, makers_ember) flattened onto the opaque house ground and reviewed at the feature/masterwrought v0.36.0 sync on 2026-08-10, plus the nine Masterwrought jewelcrafting placeholders (hammered_copper_band, polished_copper_loop, coiled_copper_torc, riveted_iron_signet, etched_iron_loop, iron_link_choker, weighted_thorium_band, gleaming_thorium_loop, burnished_thorium_amulet) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 05 jewelcrafting admission on 2026-08-10, plus the six Masterwrought inscription placeholders (silverleaf_primer, goldleaf_folio, sunpetal_grimoire, silverleaf_scroll, goldleaf_scroll, sunpetal_scroll) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 06 inscription admission on 2026-08-11, plus the ten Masterwrought skill-75 intermediate placeholders (duskforged_billet, forgefold_plating, wyrmhide_cording, sunspun_bolt, prismglass_setting, precision_chassis, quickening_catalyst, seasoned_stock, lucent_reagent, sablewax_vellum) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 07 intermediates admission on 2026-08-11, plus the ten Masterwrought apex armor placeholders (spiritweld_girdle, forgefold_legguards, wardspeaker_sabatons, briarstep_jerkin, fenbloom_breeches, barksong_handguards, sunspun_vestments, sunspun_leggings, sunspun_handwraps, sunspun_haversack) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 08 apex armor admission on 2026-08-12, plus the ten Masterwrought apex weapon, jewelry, and tool placeholders (duskforged_warblade, duskforged_bulwark, ridgebreaker, wyrmfall_pendant, warhewn_signet, prismglass_loop, makers_charm, gyrelens_array, masters_field_forge, voidbound_grimoire) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 09 apex weapons, jewelry, and tools admission on 2026-08-13, plus the eight Masterwrought apex consumable and station placeholders (ironhusk_flask, warboar_flask, runewater_flask, stonepot_stew, warspice_skewers, sageleaf_chowder, grand_cauldron, laden_hearth) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 10 apex consumables admission on 2026-08-14, plus the 28 Masterwrought apex recipe pattern placeholders (pattern_barksong_handguards, pattern_briarstep_jerkin, pattern_duskforged_bulwark, pattern_duskforged_warblade, pattern_fenbloom_breeches, pattern_forgefold_legguards, pattern_grand_cauldron, pattern_gyrelens_array, pattern_ironhusk_flask, pattern_laden_hearth, pattern_makers_charm, pattern_masters_field_forge, pattern_prismglass_loop, pattern_ridgebreaker, pattern_runewater_flask, pattern_sageleaf_chowder, pattern_spiritweld_girdle, pattern_stonepot_stew, pattern_sunspun_handwraps, pattern_sunspun_haversack, pattern_sunspun_leggings, pattern_sunspun_vestments, pattern_voidbound_grimoire, pattern_warboar_flask, pattern_wardspeaker_sabatons, pattern_warhewn_signet, pattern_warspice_skewers, pattern_wyrmfall_pendant) authored as original SVG rasters on the opaque house ground and reviewed at the feature/masterwrought Phase 11 apex patterns admission on 2026-08-16, plus the two Proving Shore prop renders (rendered from their own shipped world models) owner-reviewed and passed on 2026-08-17, plus the three pearl-detour icons (generated via the OpenAI proving-shore-mother-of-pearl-2026-08-20 batch) owner-reviewed and passed on 2026-08-20, plus the Bonebound Rickshaw reins icon (generated under woc-item-icon-v1 from a user-directed prompt, its own provenance recorded against its mapping.json owner) owner-reviewed against the regenerated mount contact sheet and passed on 2026-08-21, plus the Proving Shore Passing Stone render (rendered from its own shipped world model by the same deterministic pipeline as the 2026-08-17 pair) added on 2026-08-22, machine-checked and awaiting owner visual review, plus the nine Crucible raid weapon icons (generated via the OpenAI crucible-raid-weapons-2026-08-28 batch) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the two Ignivar legendary drop renders (varkhul_forgebreaker and varkhul_emberward, rendered from their own shipped held-weapon models by the deterministic weapon-still pipeline) added on 2026-08-28, machine-checked and awaiting owner visual review, plus the 192 Crucible set-piece, sigil, and off-set icons (generated via the OpenAI crucible-set-icons-2026-08-29 batch) added on 2026-08-29, machine-checked and awaiting owner visual review, plus the Core of the Last Flame reagent icon (staged early from the crucible-raid-professions-2026-08-28 batch) added on 2026-08-30, machine-checked and awaiting owner visual review. The Lanternback Troll mount reins icon (owner-supplied painted master) and the Chimeglass Tortoise mount reins icon (rendered from its shipped mount model) were owner-reviewed and passed, joining this record at the release/v0.42.0 sync of PR #3439. The Cluckwork Mech Bird store-mount icon (project Blender render under the same contract) was added for owner review on 2026-08-17.',
     });
     expect(verdict.visualVerdict.passIds).toHaveLength(verdict.visualVerdict.passCount);
     expect(new Set(verdict.visualVerdict.passIds).size).toBe(verdict.visualVerdict.passCount);
@@ -680,8 +680,8 @@ describe('item-art consistency accepted-art provenance', () => {
       // catalog is a third content and neither describes it. The predicted
       // byte count above held exactly, which is the arithmetic's own check.
       // The same sha is pinned in tests/item_art_audit_builder.test.ts.
-      sha256: '62c48a1b5f5405d82dc26b2f36e6d8604b7d6d23b973b8bb77d77500c27d89f8',
-      bytes: 615_044,
+      sha256: 'b9b2bd53e544c0b2c06e01b5c650e9bf6528af3f246081c63d5069f81d7a20db',
+      bytes: 615_571,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(
       '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
@@ -758,14 +758,14 @@ describe('item-art consistency accepted-art provenance', () => {
       // single 80-id page, so the render is still 240 sheets over 30 pages.
       // No capture or asset was retaken; these are the audit's own generated
       // contact sheets, not committed art.
-      '1e4b988c3e2f054a60b7a3cef3d174bc0e94ad7f6074103df8e505ae9dc967f9',
+      'ebb4b18ac8ef01b6d8599ac3818e1199841c8707dd4982a0b4acecbf50a0d8bb',
     );
     expect(sheetSetDigest.digest('hex')).toBe(verdict.evidence.sheetSetSha256);
 
     expect(verdict.evidence.shippingCatalogSha256).toBe(
       // Measured over the merged tree at the v0.42.0 sync: the 1125 committed
       // .webp files, digested id by id in sorted order (both arms' art in).
-      '1a4cd25093953f64f492e98f0d230caa3ab3ac2f5ad8767016dcab5db4a8c999',
+      'bca3e47acbe550a0ecc987c73ccf88c632f647d9983c4a29aee0f65475775265',
     );
   });
 
@@ -788,19 +788,19 @@ describe('item-art consistency accepted-art provenance', () => {
     expect(verdict.schemaVersion).toBe(1);
     expect(verdict.auditScope).toMatchObject({
       shippingDirectory: 'public/ui/items',
-      itemArtFilesReviewed: 1208,
-      liveItemDefinitions: 1223,
+      itemArtFilesReviewed: 1209,
+      liveItemDefinitions: 1224,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
     });
-    expect(Object.keys(ITEMS)).toHaveLength(1223);
+    expect(Object.keys(ITEMS)).toHaveLength(1224);
     expect(Object.values(verdict.auditScope.groups).reduce((sum, count) => sum + count, 0)).toBe(
-      1208,
+      1209,
     );
     expect(Object.keys(verdict.auditScope.groups)).toHaveLength(25);
-    expect(currentIds).toHaveLength(1208);
-    expect(new Set(currentIds).size).toBe(1208);
+    expect(currentIds).toHaveLength(1209);
+    expect(new Set(currentIds).size).toBe(1209);
     expect(shippingIds).toEqual(currentIds);
 
     const generatedHeroics = Object.entries(ITEMS).filter(
@@ -840,7 +840,7 @@ describe('item-art consistency accepted-art provenance', () => {
     }>(`${CURRENT_EVIDENCE_DIR}/generation-reports/all-items-qa.json`);
     expect(verdict.visualVerdict).toMatchObject({
       status: 'pass',
-      passCount: 1208,
+      passCount: 1209,
       watchCount: completionQa.result.watchNoteCount,
       watch: completionQa.watchNotes,
       rejectCount: 0,
@@ -850,8 +850,8 @@ describe('item-art consistency accepted-art provenance', () => {
 
     expect(verdict.evidence.catalog).toEqual({
       path: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      sha256: 'cdcec5ca6fc4270c5fa36899bab3d4576b954ec0eb0649edf75842d0f4b8a656',
-      bytes: 657_221,
+      sha256: 'febda89453efdcf50432cf3cab6ba638435b301eea6c429e9e0046b8a829e25e',
+      bytes: 657_748,
     });
     expect(verdict.evidence.rendererFingerprint).toBe(ITEM_ART_AUDIT_RENDERER_FINGERPRINT);
     expect(verdict.evidence.sheetCount).toBe(240);
@@ -881,7 +881,7 @@ describe('item-art consistency accepted-art provenance', () => {
       shippingCatalogDigest.update(`${id}\0${sha256(bytes)}\0${bytes.length}\n`);
     }
     expect(verdict.evidence.shippingCatalogSha256).toBe(
-      'e89167eddf8f0fa72f67acd101d3a54de75ed583f3049c9aeac7562cc12def68',
+      'bdec0afdcd3349a34b74bca9b0e01aee5b3ab2b3a82568bd9019fe0b0bb0b38c',
     );
     expect(shippingCatalogDigest.digest('hex')).toBe(verdict.evidence.shippingCatalogSha256);
   });
@@ -995,7 +995,7 @@ describe('item-art consistency accepted-art provenance', () => {
     // one generated batch. The surviving ordinary-art cohort stays explicit.
     expect(mapping.entries).toHaveLength(43);
     expect(mapping.entries.every(({ license }) => Boolean(license))).toBe(true);
-    expect(mapping.generatedBatches).toHaveLength(24);
+    expect(mapping.generatedBatches).toHaveLength(25);
     const batch = mapping.generatedBatches.find(({ batchId }) => batchId === BATCH_ID);
     expect(batch).toBeDefined();
     expect(batch).toMatchObject({
@@ -1024,17 +1024,31 @@ describe('item-art consistency accepted-art provenance', () => {
     });
     expect(completionBatch?.itemIds).toHaveLength(165);
     expect(completionBatch?.itemIds).toEqual(sorted(completionBatch?.itemIds ?? []));
+    const mechBirdBatch = mapping.generatedBatches.find(
+      ({ batchId }) => batchId === 'mech-bird-mount-icon-2026-08-17',
+    );
+    expect(mechBirdBatch).toMatchObject({
+      source:
+        'Project Blender render of the shipped mount model (Cycles) with painted-treatment post (median brushwork pass, warm and cool grade, vignette multiply)',
+      owner: 'World of ClaudeCraft',
+      license: LICENSE,
+      styleContract: {
+        id: 'woc-item-icon-v1',
+        document: 'docs/design/item-icon-art-style.md',
+      },
+      itemIds: ['reins_mech_bird'],
+    });
 
     const priorGeneratedIds = mapping.generatedBatches
       .filter(({ batchId }) => batchId !== BATCH_ID && batchId !== CURRENT_BATCH_ID)
       .flatMap(({ itemIds }) => itemIds);
-    expect(priorGeneratedIds).toHaveLength(726);
+    expect(priorGeneratedIds).toHaveLength(727);
     const allCurrentOwnerIds = [
       ...mapping.entries.map(({ itemId }) => itemId),
       ...mapping.generatedBatches.flatMap(({ itemIds }) => itemIds),
     ];
-    expect(allCurrentOwnerIds).toHaveLength(1208);
-    expect(new Set(allCurrentOwnerIds).size).toBe(1208);
+    expect(allCurrentOwnerIds).toHaveLength(1209);
+    expect(new Set(allCurrentOwnerIds).size).toBe(1209);
     expect({
       entries: mapping.entries.length,
       priorGenerated: priorGeneratedIds.length,
@@ -1042,7 +1056,7 @@ describe('item-art consistency accepted-art provenance', () => {
       masterwroughtCompletion: completionBatch?.itemIds.length,
     }).toEqual({
       entries: 43,
-      priorGenerated: 726,
+      priorGenerated: 727,
       historicalAudit: 274,
       masterwroughtCompletion: 165,
     });
@@ -1053,7 +1067,7 @@ describe('item-art consistency accepted-art provenance', () => {
     const supersededHistoricalIds = historicalVerdict.visualVerdict.passIds.filter((id) =>
       completionIdSet.has(id),
     );
-    expect(historicalVerdict.visualVerdict.passIds).toHaveLength(1127);
+    expect(historicalVerdict.visualVerdict.passIds).toHaveLength(1128);
     expect(supersededHistoricalIds).toHaveLength(84);
     expect(
       sorted([
@@ -1186,9 +1200,9 @@ describe('item-art consistency accepted-art provenance', () => {
     for (const id of ownerIds) ownerCountById.set(id, (ownerCountById.get(id) ?? 0) + 1);
 
     const violations: string[] = [];
-    if (ownerIds.length !== 1208)
-      violations.push(`mapping owner count: ${ownerIds.length} != 1208`);
-    if (fileIds.length !== 1208) violations.push(`shipping WebP count: ${fileIds.length} != 1208`);
+    if (ownerIds.length !== 1209)
+      violations.push(`mapping owner count: ${ownerIds.length} != 1209`);
+    if (fileIds.length !== 1209) violations.push(`shipping WebP count: ${fileIds.length} != 1209`);
     for (const id of ids) {
       const ownerCount = ownerCountById.get(id) ?? 0;
       if (ownerCount !== 1) violations.push(`${id}: current owner count ${ownerCount} != 1`);

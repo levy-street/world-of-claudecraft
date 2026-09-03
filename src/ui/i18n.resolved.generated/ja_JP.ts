@@ -575,6 +575,9 @@ export const ja_JP: EnTranslations = {
       "tabsLabel": "WOCストアのセクション",
       "storeTab": "ストア",
       "rewardsTab": "デイリー報酬",
+      "mountsEyebrow": "アカウント共有マウント",
+      "mountsTitle": "機械の厩舎",
+      "mountBuyAria": "{item}を購入",
       "loading": "WOCストアを読み込み中…",
       "error": "WOCストアは現在利用できません。しばらくしてからお試しください。",
       "balance": "Claudium残高",
@@ -1392,6 +1395,7 @@ export const ja_JP: EnTranslations = {
       "name_thunderstrut_gobbler": "大七面鳥サンダーストラット",
       "name_terrorspark_groundshaker": "地揺らしのドレッドスパーク",
       "name_drakemaw_raptor": "火口のラプトル",
+      "name_mech_bird": "ゼンマイ・メカバード",
       "name_lanternback_troll": "ランタンバックのグルンボル",
       "name_chimeglass_tortoise": "鐘硝子のトリヴァー",
       "name_rickshaw_mount": "骨縛りの人力車",
@@ -1404,6 +1408,7 @@ export const ja_JP: EnTranslations = {
       "desc_thunderstrut_gobbler": "嵐より生まれた巨大な七面鳥。目覚めし峰から尾羽を雷雲のごとく広げ、闊歩して降りてくる。",
       "desc_terrorspark_groundshaker": "重厚な履帯と大口径砲、恐れ知らずの操縦士向けの鞍を備えた小型装甲車両。",
       "desc_drakemaw_raptor": "火口のカルデラで鞍慣らしされた巣育ちのラプトル。筋肉と疾走のかたまりで、いまなお灰の匂いをかすかに漂わせている。",
+      "desc_mech_bird": "手作りのゼンマイ仕掛けの戦闘ニワトリ。サーボを軋ませて疾走し、ゼンマイのキーは今も回り続けている。",
       "desc_lanternback_troll": "点灯人に軛で馴らされた丘トロル。肩に鉄の玉座を担ぎ、その両の肘掛けには嵐提灯が灯る。",
       "desc_chimeglass_tortoise": "塩平原の陸亀。隊商三代を歩き通した。彼を引き取った鋳掛屋たちは嵐硝子を削って眼鏡を作り、喉元に青銅の鈴を吊るした。道は姿を見るより先に、その音を聞く。",
       "desc_rickshaw_mount": "がたがたと音を立てる骨の荷車。骨だらけの雑兵が轅に繋がれ、全力疾走であなたを引いていく。"
@@ -13539,6 +13544,9 @@ export const ja_JP: EnTranslations = {
       },
       "reins_drakemaw_raptor": {
         "name": "火口のラプトルの手綱"
+      },
+      "reins_mech_bird": {
+        "name": "ゼンマイ・メカバードの始動キー"
       },
       "rimefang": {
         "name": "霜牙"

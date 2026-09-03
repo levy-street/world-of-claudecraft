@@ -682,6 +682,7 @@ import { buildStationProps } from './stations';
 import { shouldRenderStealthGhost } from './stealth';
 import { createStepSmooth, type StepSmoothState, stepSmoothHeight } from './step_smooth_core';
 import { buildStreetlamps, type StreetlampsView } from './streetlamps';
+import { strideHit } from './stride_audio_core';
 import { buildFlaredConeFan, buildRingXZ, drapeConeWorld } from './target_cone_debug';
 import {
   syncTemporalHourglassVisual,
@@ -11038,14 +11039,15 @@ export class Renderer {
       const sink = this.audioSink;
       if (sink && d2 < SFX_MOVE_RANGE_SQ) {
         // jump / land / water-entry edges
-        if (airborne && !v.wasAirborne && !visuallyDead) sink.movement('jump', ax, ay, az, isSelf);
+        if (airborne && !v.wasAirborne && !visuallyDead)
+          sink.movement('jump', ax, ay, az, isSelf, e.mountKey || undefined);
         else if (!airborne && v.wasAirborne && !visuallyDead) {
           // A flight that ends by catching a ledge is not a fall, and the
           // heavy landing thud on one reads as a bug: you hopped onto a rock
           // mid-arc and the game played a crash. Anything softer than a plain
           // jump's own landing speed gets a footfall instead.
           if (v.fallSpeed >= SOFT_LANDING_SPEED) {
-            sink.movement('land', ax, ay, az, isSelf);
+            sink.movement('land', ax, ay, az, isSelf, e.mountKey || undefined);
           } else {
             sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), false, isSelf);
           }
@@ -11063,25 +11065,20 @@ export class Renderer {
         // footfalls / swim strokes via a distance accumulator (no timers)
         if (visuallyDead || (st.sitting && !riderMounted)) {
           v.stepAccum = 0;
+          sink.mountEngineReset(e.id); // a dead rider must not hold a frozen engine/idle loop
         } else if (swimming) {
-          v.stepAccum += loco.speed * dt;
-          if (v.stepAccum >= SWIM_STRIDE) {
-            v.stepAccum = 0;
-            sink.movement('swim', ax, ay, az, isSelf);
-          }
+          if (strideHit(v, loco.speed, dt, SWIM_STRIDE)) sink.movement('swim', ax, ay, az, isSelf);
         } else if (logicallyMounted && moving && !airborne) {
           // An engine mount (windup/loop/winddown take set, e.g. the tank
           // mount) drives its own state machine every frame instead of the
           // per-stride gait beat below; mountEngine reports whether this
           // mountKey actually has one, so ordinary mounts fall through.
+          sink.mountIdle(ax, ay, az, e.mountKey, false, e.id); // moving: hum off
           if (sink.mountEngine(ax, ay, az, e.mountKey, true, e.id)) {
             // handled entirely by mountEngine
           } else if (loco.speed >= FOOT_RUN_SPEED) {
-            v.stepAccum += loco.speed * dt;
-            if (v.stepAccum >= MOUNT_STRIDE_RUN) {
-              v.stepAccum = 0;
+            if (strideHit(v, loco.speed, dt, MOUNT_STRIDE_RUN))
               sink.mountRun(ax, ay, az, e.mountKey, this.surfaceAt(ax, az, ay), isSelf);
-            }
           } else {
             v.stepAccum = MOUNT_STRIDE_RUN * 0.6;
           }
@@ -11098,20 +11095,11 @@ export class Renderer {
           // engine mount every frame so the winddown fires on the stop edge;
           // a non-engine mount has nothing to do here (mountEngine no-ops).
           sink.mountEngine(ax, ay, az, e.mountKey, false, e.id);
+          sink.mountIdle(ax, ay, az, e.mountKey, true, e.id); // stopped: hum on
         } else if (moving && !airborne) {
-          v.stepAccum += loco.speed * dt;
-          const stride = loco.speed >= FOOT_RUN_SPEED ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK;
-          if (v.stepAccum >= stride) {
-            v.stepAccum = 0;
-            sink.footstep(
-              ax,
-              ay,
-              az,
-              this.surfaceAt(ax, az, ay),
-              loco.speed >= FOOT_RUN_SPEED,
-              isSelf,
-            );
-          }
+          const running = loco.speed >= FOOT_RUN_SPEED;
+          if (strideHit(v, loco.speed, dt, running ? FOOT_STRIDE_RUN : FOOT_STRIDE_WALK))
+            sink.footstep(ax, ay, az, this.surfaceAt(ax, az, ay), running, isSelf);
         } else {
           // standing still, prime the accumulator so the first step after moving
           // lands promptly rather than after a full stride of travel.

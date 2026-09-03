@@ -1053,9 +1053,52 @@ class Sfx {
     return true;
   }
 
-  /** Drop an entity's engine-mount state and silence its loop, e.g. on
-   *  dismount or when its view is removed (interest culled, disconnect). */
+  /** The standstill powered-on hum for a mount with a dedicated idle take
+   *  (mount_idle_<mountKey>, e.g. the Mech Bird): the renderer calls this with
+   *  active=true every grounded stopped frame and active=false from the moving
+   *  branch, keyed per entity like mountEngine. Detection is the key existing
+   *  in SFX_CLIPS, so it is data-driven the same way the engine take set is:
+   *  a mount with no idle take no-ops here. */
+  mountIdle(
+    x: number,
+    y: number,
+    z: number,
+    mountKey: string,
+    active: boolean,
+    entityId: number,
+  ): void {
+    const key = this.idleClipKey(mountKey);
+    if (key === null) return;
+    // The loop id is built only on the arm that spends it: the moving branch
+    // polls this every frame, and for a rider already off the hum that must
+    // stay a Set miss with no string allocation.
+    if (active) {
+      this.mountIdles.add(entityId);
+      this.loop(`mountIdle:${entityId}`, key, 0.55, x, y, z);
+    } else if (this.mountIdles.delete(entityId)) {
+      this.unloop(`mountIdle:${entityId}`, 0.25);
+    }
+  }
+  private mountIdles = new Set<number>();
+
+  /** Resolve (and cache) the idle-hum clip key for a mountKey, or null when
+   *  this mount ships no standstill take. Memoized like engineClipKeys: the
+   *  common case is polled every stopped frame. */
+  private idleClipKey(mountKey: string): string | null {
+    const cached = this.idleClipKeyCache.get(mountKey);
+    if (cached !== undefined) return cached;
+    const key = `mount_idle_${mountKey}`;
+    const resolved = key in SFX_CLIPS ? key : null;
+    this.idleClipKeyCache.set(mountKey, resolved);
+    return resolved;
+  }
+  private idleClipKeyCache = new Map<string, string | null>();
+
+  /** Drop an entity's per-mount loops (engine phase + idle hum) and state,
+   *  e.g. on dismount, death while mounted, the 42yd audio-gate exit, or when
+   *  its view is removed (interest culled, disconnect). */
   mountEngineReset(entityId: number): void {
+    if (this.mountIdles.delete(entityId)) this.unloop(`mountIdle:${entityId}`, 0.1);
     if (!this.mountEngines.delete(entityId)) return;
     this.unloop(`mountEngine:${entityId}`, 0.1);
   }
@@ -1071,6 +1114,15 @@ class Sfx {
    *  makes that window much smaller in practice. A no-op for a mount with no
    *  engine take set.*/
   preloadMountEngine(mountKey: string): void {
+    // The idle hum and the mount-aware jump/land takes ride the same warm-up
+    // edge: a mount can ship those without an engine take set (the Mech Bird),
+    // so they preload before the engine-set early return.
+    const idleKey = this.idleClipKey(mountKey);
+    if (idleKey) this.preload(idleKey);
+    for (const kind of ['jump', 'land'] as const) {
+      const mkey = `mount_${kind}_${mountKey}`;
+      if (mkey in SFX_CLIPS) this.preload(mkey);
+    }
     const keys = this.engineClipKeys(mountKey);
     if (!keys) return;
     this.preload(keys.startKey);
@@ -1117,14 +1169,25 @@ class Sfx {
     this.unloop(`mountloop_${id}`, MOUNT_LOOP_FADE);
   }
 
-  /** Jump / land / water-entry / swim-stroke. */
+  /** Jump / land / water-entry / swim-stroke. A mounted rider passes its
+   *  mountKey: a mount shipping its own take (mount_jump_<key> /
+   *  mount_land_<key>, e.g. the Mech Bird's servo launch and landing clank)
+   *  replaces the generic cue; every other mount falls through unchanged. */
   movement(
     kind: 'jump' | 'land' | 'splash' | 'swim',
     x: number,
     y: number,
     z: number,
     _self: boolean,
+    mountKey?: string,
   ): void {
+    if (mountKey && (kind === 'jump' || kind === 'land')) {
+      const mkey = `mount_${kind}_${mountKey}`;
+      if (mkey in SFX_CLIPS) {
+        this.playAt(mkey, x, y, z, { gain: 0.8, cooldown: 0.08 });
+        return;
+      }
+    }
     const key =
       kind === 'jump'
         ? 'move_jump'

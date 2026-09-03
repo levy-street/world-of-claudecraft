@@ -10,14 +10,14 @@ and five related interface assets accepted on 2026-09-02.
 - 10 new Masterwrought deed crests and one replacement for the interim Farming 100 crest.
 - One Farming profession emblem, one Well Fed aura, one farm-patch map marker, and two primary
   launcher icons.
-- Historical-to-current item closure: 1127 - 84 + 165 = 1208 exact painted item files.
+- Historical-to-current item closure: 1128 - 84 + 165 = 1209 exact painted item files.
 
 ## Evidence index
 
 - `accepted-art.json` is the machine-readable current manifest for 176 item and deed targets,
   the 85-entry supersession ledger, and the five supplemental interface pins.
 - `accepted-aura-art.json` remains the dedicated Well Fed aura acceptance record.
-- `final-item-art-audit-verdict.json` binds the complete 1,208-file live item catalog to its
+- `final-item-art-audit-verdict.json` binds the complete 1,209-file live item catalog to its
   deterministic machine checks and 240 reviewed contact sheets.
 - `supersession-before.json` preserves the 84 pre-task item placeholder hashes and owners.
 - `generation-reports/` preserves six disjoint item generation reports, the all-items review,

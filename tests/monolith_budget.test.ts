@@ -1844,7 +1844,12 @@ const MONOLITHS: MonolithRow[] = [
     // the full guarded skin purchase flow moved to store_armory_purchase.ts.
     // The new Store-owned modal itself lives in store_decision_prompt.ts, while
     // the cold shell markup moved to daily_rewards_chrome_view.ts.
-    ceiling: 1264,
+    // LOWERED 1264 -> 1262 by the Cluckwork Mech Bird store mount (PR #3464): the
+    // Machine Stable strip landed as src/ui/store_mount_card_view.ts (markup) +
+    // src/ui/store_mount_purchase.ts (the spend controller), the store body's
+    // button wiring moved to src/ui/store_body_actions.ts, and both grant-SKU
+    // controllers now build over one seam object (store_spend_controllers.ts).
+    ceiling: 1262,
     seam: 'a pure view-core plus a thin painter sibling (src/ui/CLAUDE.md)',
   },
   {

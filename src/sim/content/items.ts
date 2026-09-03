@@ -399,6 +399,21 @@ export const BASE_ITEMS: Record<string, ItemDef> = {
     noDiscard: true,
     sellValue: 0,
   },
+  // The store mount (content/store_mounts.ts): granted by a verified Claudium
+  // spend, never sold for copper and never dropped. SOULBOUND like the dev tank:
+  // a real-money grant that could trade hands would be an economy leak, and a
+  // lost paid mount is a support ticket. No buyValue: Claudium is not copper.
+  reins_mech_bird: {
+    id: 'reins_mech_bird',
+    name: 'Ignition Key: Cluckwork Mech Bird',
+    kind: 'mount',
+    mount: 'mech_bird',
+    quality: 'rare',
+    soulbound: true,
+    noVendorSell: true,
+    noDiscard: true,
+    sellValue: 0,
+  },
   // Developer-only mount. It is intentionally absent from vendors, quests,
   // creature loot, heroic loot, and Rift reward pools. Use /dev mounts or
   // /dev give reins_terrorspark_groundshaker while the feature remains under development.

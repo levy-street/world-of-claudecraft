@@ -331,6 +331,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分区',
   'hudChrome.wocStore.storeTab': '商店',
   'hudChrome.wocStore.rewardsTab': '每日奖励',
+  'hudChrome.wocStore.mountsEyebrow': '账号坐骑',
+  'hudChrome.wocStore.mountsTitle': '机械马厩',
+  'hudChrome.wocStore.mountBuyAria': '购买{item}',
   'hudChrome.wocStore.loading': '正在加载 WOC 商店…',
   'hudChrome.wocStore.error': 'WOC 商店暂时不可用，请稍后再试。',
   'hudChrome.wocStore.balance': 'Claudium 余额',
@@ -8704,6 +8707,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天风暴之羽的缰绳',
   'entities.items.reins_drakemaw_raptor.name': '龙喉迅猛龙的缰绳',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆阔步大火鸡的缰绳',
+  'entities.items.reins_mech_bird.name': '发条机械鸟点火钥匙',
   'entities.mobs.drowned_cantor.name': '溺亡诵经者',
   'entities.mobs.reedbound_acolyte.name': '芦苇缚信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼枪颚兽',
@@ -10238,6 +10242,9 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_chimeglass_tortoise': '钟晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '来自龙喉火山口的驯服巢生迅猛龙，浑身筋肉、疾若奔雷，身上仍带着淡淡的灰烬气味。',
+  'hudChrome.mounts.name_mech_bird': '发条机械鸟',
+  'hudChrome.mounts.desc_mech_bird':
+    '一只手工打造的发条战斗鸡，伺服关节铿锵疾驰，发条钥匙仍在转动。',
   'hudChrome.mounts.desc_lanternback_troll':
     '被点灯人驯服的山地巨魔，肩上扛着一把铁王座，两侧扶手各挂一盏燃烧的风灯。',
   'hudChrome.mounts.desc_chimeglass_tortoise':

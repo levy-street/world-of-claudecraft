@@ -263,6 +263,7 @@ export const RELIQUARY_HORIZON_MOUNTS = [
   'shadowjump_toad',
   'grag_bear',
   'stalkglider_snail',
+  'mech_bird',
   'aether_hover_cycle',
   'thunderstrut_gobbler',
   'drakemaw_raptor',
@@ -336,6 +337,9 @@ const MOUNT_SOURCES: Readonly<
   ],
   aether_hover_cycle: fromRift('S'),
   thunderstrut_gobbler: fromRift('S'),
+  // The store mount: sold for Claudium (content/store_mounts.ts). The 'store'
+  // kind is the whole answer, the same one door the Armory skins point at.
+  mech_bird: fromStore(),
 };
 
 /** Mount slots carrying their MOUNT_SOURCES hints, with RELIQUARY_HORIZON_MOUNTS

@@ -331,6 +331,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'Разделы магазина WOC',
   'hudChrome.wocStore.storeTab': 'Магазин',
   'hudChrome.wocStore.rewardsTab': 'Ежедневные награды',
+  'hudChrome.wocStore.mountsEyebrow': 'Маунты аккаунта',
+  'hudChrome.wocStore.mountsTitle': 'Механическая конюшня',
+  'hudChrome.wocStore.mountBuyAria': 'Купить: {item}',
   'hudChrome.wocStore.loading': 'Загрузка магазина WOC…',
   'hudChrome.wocStore.error': 'Магазин WOC сейчас недоступен. Повторите попытку позже.',
   'hudChrome.wocStore.balance': 'Баланс Claudium',
@@ -9285,6 +9288,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': 'Поводья Штормокрыла Поднебесного',
   'entities.items.reins_drakemaw_raptor.name': 'Поводья раптора Дрейкмо',
   'entities.items.reins_thunderstrut_gobbler.name': 'Поводья Громоступа, великого индюка',
+  'entities.items.reins_mech_bird.name': 'Ключ зажигания механоптицы',
   'entities.mobs.drowned_cantor.name': 'Утопший Кантор',
   'entities.mobs.reedbound_acolyte.name': 'Тростниковый Послушник',
   'entities.mobs.deepfen_spearjaw.name': 'Глубокотрясинный Копьечелюст',
@@ -10913,6 +10917,9 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_lanternback_troll': 'Грумбол Фонареносец',
   'hudChrome.mounts.name_chimeglass_tortoise': 'Толливер Звонкостёкл',
   'hudChrome.mounts.desc_drakemaw_raptor': 'Приученный к седлу выводковый раптор из кальдеры Дрейкмо: сплошные жилы и бег, и от него всё ещё едва пахнет пеплом.',
+  'hudChrome.mounts.name_mech_bird': 'Заводная механоптица',
+  'hudChrome.mounts.desc_mech_bird':
+    'Заводная боевая курица ручной сборки: несётся на щёлкающих сервоприводах, а заводной ключ всё ещё крутится.',
   'hudChrome.mounts.desc_lanternback_troll':
     'Холмовой тролль, укрощённый фонарщиками: на плечах он несёт железный трон, а на обоих подлокотниках горит по штормовому фонарю.',
   'hudChrome.mounts.desc_chimeglass_tortoise':

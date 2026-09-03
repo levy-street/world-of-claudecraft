@@ -925,6 +925,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/mounts/drakemaw_raptor.glb": "/media/models/mounts/drakemaw_raptor.44d00a10e348.glb",
   "models/mounts/grag_bear.glb": "/media/models/mounts/grag_bear.767ddb38445d.glb",
   "models/mounts/lanternback_troll.glb": "/media/models/mounts/lanternback_troll.4aadd52ff035.glb",
+  "models/mounts/mech_bird.glb": "/media/models/mounts/mech_bird.1b92ab1345d5.glb",
   "models/mounts/rickshaw_mount.glb": "/media/models/mounts/rickshaw_mount.5f539e1f2ad4.glb",
   "models/mounts/shadowjump_toad.glb": "/media/models/mounts/shadowjump_toad.2811f4fadfda.glb",
   "models/mounts/stalkglider_snail.glb": "/media/models/mounts/stalkglider_snail.418aa794d44f.glb",

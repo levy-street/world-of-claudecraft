@@ -200,6 +200,10 @@ until that loop stops.
 | `mount_run_stormfeather_griffin` | 0.51 | large wing rush and hard talon contact |
 | `mount_run_thunderstrut_gobbler` | 0.40 | higher feather rush and quick claw contact |
 | `mount_run_terrorspark_groundshaker` | 0.55 | compact tread clatter with a low mechanical drive pulse |
+| `mount_run_mech_bird` | 0.68 | servo footsteps assembled 1-2-1 per stride (scripts/gen_mech_bird_sfx.mjs) |
+| `mount_idle_mech_bird` | 10 | standstill powered-on servo hum loop (Sfx.mountIdle) |
+| `mount_jump_mech_bird` | 0.67 | launch servo burst, replaces move_jump while riding (Sfx.movement mount arm) |
+| `mount_land_mech_bird` | 0.67 | landing clank, replaces move_land while riding |
 | `move_jump` | 0.5 | quick light gear/leather exertion and fabric rustle, a person leaping up |
 | `move_land` | 0.6 | a person landing from a jump, boots thud with armor and gear settle |
 | `move_splash` | 0.8 | a body plunging into water, big splash |

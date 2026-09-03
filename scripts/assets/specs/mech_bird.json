@@ -1,0 +1,10 @@
+{
+  "items": [
+    {
+      "src": "tmp/asset_src/Mount/Mech_Bird/Mech_Bird.glb",
+      "out": "models/mounts/mech_bird.glb",
+      "type": "character",
+      "keepClips": ["Idle", "Jump", "Run"]
+    }
+  ]
+}

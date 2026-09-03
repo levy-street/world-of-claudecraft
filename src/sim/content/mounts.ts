@@ -20,6 +20,7 @@ export type MountKey =
   | 'stormfeather_griffin'
   | 'thunderstrut_gobbler'
   | 'drakemaw_raptor'
+  | 'mech_bird'
   | 'lanternback_troll'
   | 'chimeglass_tortoise'
   | 'terrorspark_groundshaker'
@@ -78,6 +79,16 @@ export const MOUNTS: Record<MountKey, MountDef> = {
   stalkglider_snail: {
     key: 'stalkglider_snail',
     name: 'Moss-Shell Stalk-Glider',
+    rarity: 'rare',
+    moveSpeedPct: 0.75,
+  },
+  // The store mount: sold for Claudium (the one paid mount; see
+  // content/store_mounts.ts and server/claudium.ts). Deliberately RARE tier, not
+  // epic: a real-money purchase buys the look, never the top speed, matching the
+  // cosmetics-only paid design the weapon skins established.
+  mech_bird: {
+    key: 'mech_bird',
+    name: 'Cluckwork Mech Bird',
     rarity: 'rare',
     moveSpeedPct: 0.75,
   },

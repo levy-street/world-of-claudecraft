@@ -150,6 +150,31 @@ export const SFX = [
     custom: true,
   },
   {
+    // The Mech Bird's gait beat: the recorded servo footsteps assembled 1-2-1
+    // (step one, step two, step one) per stride by scripts/gen_mech_bird_sfx.mjs.
+    key: 'mount_run_mech_bird',
+    custom: true,
+  },
+  {
+    // The Mech Bird's standstill powered-on hum: driven through Sfx.loop()
+    // while mounted and stationary (see mountIdle in src/game/sfx.ts), so the
+    // manifest loop flag must say so, like the tank engine sustain above.
+    key: 'mount_idle_mech_bird',
+    custom: true,
+    loop: true,
+  },
+  {
+    // Launch servo one-shot: replaces the generic move_jump while riding the
+    // Mech Bird (the mount-aware arm of Sfx.movement).
+    key: 'mount_jump_mech_bird',
+    custom: true,
+  },
+  {
+    // Landing clank one-shot: replaces the generic move_land while riding.
+    key: 'mount_land_mech_bird',
+    custom: true,
+  },
+  {
     // Real recording (not ElevenLabs): the cart's rolling/creaking bed, held
     // as a continuous loop while the mount moves rather than a per-stride
     // one-shot like mount_run_* above. A wheeled cart has no stride to hang

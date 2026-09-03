@@ -1240,10 +1240,16 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // matching neither ours (8e5722cb) nor the release (72d8b7ce); every other
 // provenance input is byte-identical between the parents. The tool swept the
 // four evidence JSONs over the resolved renderer, with no capture retaken.
+// Re-minted at the Cluckwork Mech Bird release sync (tip 1fdf0f55a3): its
+// stride-audio extraction and mounted idle-hum poll moved renderer.ts against
+// the already merged Masterwrought and mount-lifecycle integrations. The
+// resolved renderer sha256 is 36b780c6, matching neither ours (ed29e747) nor
+// the release (9b4d40e5); every other provenance input remains byte-identical.
+// The four evidence JSONs were swept again, with no capture retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '858b2bf21c9438996456796a13286d51695d655a5cc40f7292142dc6e7af9629';
+  '4029bda533a2b51a94c048e5f7eb36c8de1a0d32deef6b2f066adda5a6f2a093';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '6e3cb1b4edeaea28701d257ffa2ff9ae3781af78b02e4981942e03e40f72c85a';
+  'e6213886daf59e8b7bec208a3a3c0c8bbbe6187712439df92bc3204df45adb2d';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2521,7 +2527,11 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // moved beyond both parents. Parent values were ours 18756e0a and the
       // release b77851df; this seal was recomputed LAST from the swept files.
       // No capture was retaken.
-    ).toBe('de96fa4ef2a9f3cd568546b7cd65811b66df95484fe94f8c66fff77e018a6f96');
+      // Re-minted for the Cluckwork Mech Bird sync after the resolved renderer
+      // moved beyond both parents. Parent values were ours de96fa4e and the
+      // release 69c8bd5d; this seal was recomputed LAST from the swept files.
+      // No capture was retaken.
+    ).toBe('d7f5cd3baa905b78002719b629c92295ad495218eca5e58660a136202f012314');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

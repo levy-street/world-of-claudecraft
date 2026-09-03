@@ -164,7 +164,7 @@ describe('buildManifest', () => {
     expect(manifest).toContain('cast_lightning_bolt');
   });
 
-  it('keeps the release catalog, all 13 mount cues, and all 72 UI cues in one 278-key inventory', () => {
+  it('keeps the merged catalog, all 17 mount cues, and all 72 UI cues in one 282-key inventory', () => {
     // 265 -> 267 and 63 -> 65 UI cues with the Farming render/juice placeholder
     // pair (ui_farm_plant, ui_farm_harvest) joining UI_SFX_CATALOG, then
     // 267 -> 268 and 65 -> 66 with the ready-notice placeholder
@@ -185,18 +185,17 @@ describe('buildManifest', () => {
     // gendered player-voice cues from PR #2320 (player_hurt_female,
     // player_death_female) and the rickshaw mount's summon/loop pair
     // (mount_summon_rickshaw_mount, mount_loop_rickshaw_mount). 274 -> 278
-    // keys, UI unchanged at 72, and the mount cues 11 -> 13. The title's old
-    // "9 mount cues" was stale before either branch touched it; the release
-    // re-derived it to 13 and that count is what the merged catalog holds,
-    // all three re-measured from scripts/sfx/sfx_prompts.mjs on the merged tree.
-    // There are 13 mount cues across 12 catalog mounts, not one per mount: the
+    // keys, UI unchanged at 72, and the mount cues 11 -> 13. The Mech Bird adds
+    // four mount-specific run, idle, jump, and land cues, taking the semantic
+    // union to 282 keys and 17 mount cues. There are 17 mount cues across 13
+    // catalog mounts, not one per mount: the
     // rickshaw carries summon and loop cues but no stride, while the
     // Lanternback Troll and Chimeglass Tortoise deliberately borrow the
     // player's surface footfall through Sfx.mountRun's fallback branch.
     const keys = new Set(SFX.map((entry) => entry.key));
-    expect(keys.size).toBe(278);
+    expect(keys.size).toBe(282);
     expect([...keys].filter((key) => key.startsWith('ui_'))).toHaveLength(72);
-    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(13);
+    expect([...keys].filter((key) => key.startsWith('mount_'))).toHaveLength(17);
     expect(keys.has('ui_craft_cast')).toBe(true);
     expect(keys.has('ui_farm_plant')).toBe(true);
     expect(keys.has('ui_farm_harvest')).toBe(true);
@@ -210,6 +209,12 @@ describe('buildManifest', () => {
     expect(keys.has('ui_sunder_complete')).toBe(true);
     for (const key of [
       'cast_lightning_bolt',
+      // the Mech Bird, the store mount: the 1-2-1 gait beat plus the game's
+      // first standstill idle hum and mount-specific jump/land takes
+      'mount_run_mech_bird',
+      'mount_idle_mech_bird',
+      'mount_jump_mech_bird',
+      'mount_land_mech_bird',
       'mob_mudfin_attack',
       'mob_burrower_attack',
       'mob_reptile_attack',
@@ -283,7 +288,7 @@ describe('buildManifest', () => {
     // purely filesystem-discovered.
     const mobFamilyKeys = [...keys].filter((key) => key.startsWith('mob_'));
     expect(mobFamilyKeys).toHaveLength(65); // 13 families x 5 actions
-    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(278);
+    expect(SFX_FIXED_CATALOG_KEYS).toHaveLength(282);
   });
 });
 

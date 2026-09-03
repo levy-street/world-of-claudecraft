@@ -66,6 +66,7 @@ await page.evaluate(() => {
     'reins_valorsteed',
     'reins_grag_bear',
     'reins_stalkglider_snail',
+    'reins_mech_bird',
     'reins_aether_hover_cycle',
     'reins_shadowjump_toad',
     'reins_stormfeather_griffin',
