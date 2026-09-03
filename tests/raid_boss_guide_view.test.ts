@@ -7,7 +7,6 @@ import {
 import {
   NYTHRAXIS_DEATHLESS_PCT,
   NYTHRAXIS_DEATHLESS_PCT_HEROIC,
-  NYTHRAXIS_FINAL_STAND_HP,
   NYTHRAXIS_GRAVEBREAKER_HALF_ARC,
   NYTHRAXIS_PHASE_TWO_HP,
   NYTHRAXIS_SOUL_REND_MARKS,
@@ -21,14 +20,60 @@ import {
 } from '../src/sim/encounters/varkhul';
 import { IGNIVAR_JUDGMENT_HP_THRESHOLD } from '../src/sim/ignivar_forge_judgment';
 import {
+  NYTHRAXIS_ASCENSION_PER_STACK_HEROIC,
+  NYTHRAXIS_ASCENSION_PER_STACK_NORMAL,
+  NYTHRAXIS_BOUND_VULNERABILITY,
+  NYTHRAXIS_SIGIL_EVERY_HEROIC,
+  NYTHRAXIS_SIGIL_EVERY_NORMAL,
+  NYTHRAXIS_UNBOUND_HIT_MAX_HP_HEROIC,
+  NYTHRAXIS_UNBOUND_HIT_MAX_HP_NORMAL,
+} from '../src/sim/nythraxis_binding_sigil';
+import {
   NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC,
   NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL,
 } from '../src/sim/nythraxis_bone_spike';
+import {
+  NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
+  NYTHRAXIS_BONE_STORM_CHARGES,
+  NYTHRAXIS_BONE_STORM_EVERY,
+  NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
+  NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
+  NYTHRAXIS_BONE_STORM_RADIUS,
+  NYTHRAXIS_BONE_STORM_SECONDS,
+  NYTHRAXIS_BONE_STORM_SPEED_MULT,
+  NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS,
+  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+  nythraxisBoneSlamDamageMaxHp,
+} from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
   NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
 } from '../src/sim/nythraxis_dread_curse';
+import {
+  NYTHRAXIS_ENRAGE_DAMAGE_BONUS,
+  NYTHRAXIS_ENRAGE_HASTE_BONUS,
+  NYTHRAXIS_ENRAGE_RAMP_EVERY,
+  NYTHRAXIS_ENRAGE_RAMP_STEP,
+  NYTHRAXIS_ENRAGE_WARN_SECONDS,
+  nythraxisEnrageSeconds,
+} from '../src/sim/nythraxis_enrage_clock';
+import {
+  NYTHRAXIS_GRAVEFIRE_EVERY_HEROIC,
+  NYTHRAXIS_GRAVEFIRE_EVERY_NORMAL,
+  NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_HEROIC,
+  NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_NORMAL,
+} from '../src/sim/nythraxis_gravefire';
+import {
+  NYTHRAXIS_PHASE_THREE_HP,
+  NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
+  NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+  nythraxisKingsWrathDamageBonus,
+} from '../src/sim/nythraxis_kings_wrath';
+import {
+  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
+  NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
+} from '../src/sim/nythraxis_soulfire';
 import { NYTHRAXIS_BOSS_ID } from '../src/sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../src/sim/varkhul_anvils_decree';
 import {
@@ -131,40 +176,60 @@ describe('raid boss guide view', () => {
     expect(normal.bossId).toBe('nythraxis_scourge_of_thornpeak');
     expect(normal.portraitUrl).toBe('/ui/mobs/nythraxis_scourge_of_thornpeak.webp');
     expect(normal.overviewKey).toBe('hudChrome.raidBossGuide.nythraxis.overview');
-    expect(normal.phases.map((phase) => phase.id)).toEqual(['throne', 'wardstones', 'final-stand']);
+    expect(normal.phases.map((phase) => phase.id)).toEqual(['throne', 'wardstones', 'kings-wrath']);
     expect(normalMechanics.map((mechanic) => mechanic.id)).toEqual([
       'gravebreaker',
       'dread-curse',
       'bone-spike',
       'grave-eruption',
+      'binding-sigil',
       'raise-fallen',
       'soul-rend',
+      'soulfire',
+      'gravefire',
       'deathless-rage',
-      'final-stand',
+      'kings-wrath',
+      'bone-storm',
+      'crown-endures',
     ]);
     expect(heroicMechanics.map((mechanic) => mechanic.id)).toEqual([
       'gravebreaker',
       'dread-curse',
       'bone-spike',
       'grave-eruption',
+      'binding-sigil',
       'raise-fallen',
       'soul-rend',
+      'soulfire',
+      'gravefire',
       'deathless-rage',
       'deathless-court',
-      'final-stand',
+      'kings-wrath',
+      'bone-storm',
+      'crown-endures',
     ]);
+    expect(normal.phases.map((phase) => phase.mechanics.length)).toEqual([6, 4, 3]);
+    expect(heroic.phases.map((phase) => phase.mechanics.length)).toEqual([6, 5, 3]);
 
     expect(normal.phases.find((phase) => phase.id === 'throne')?.values).toBeUndefined();
     expect(normal.phases.find((phase) => phase.id === 'wardstones')).toMatchObject({
       values: { health: NYTHRAXIS_PHASE_TWO_HP },
       percentValues: ['health'],
     });
-    expect(normal.phases.find((phase) => phase.id === 'final-stand')).toMatchObject({
-      values: { health: NYTHRAXIS_FINAL_STAND_HP },
-      percentValues: ['health'],
+    expect(normal.phases.find((phase) => phase.id === 'kings-wrath')).toMatchObject({
+      nameKey: 'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName',
+      summaryKey: 'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathSummary',
+      values: {
+        health: NYTHRAXIS_PHASE_THREE_HP,
+        bonusNormal: nythraxisKingsWrathDamageBonus('normal'),
+        bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
+        eruptionEvery: NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
+        gravefireEvery: NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+      },
+      percentValues: ['health', 'bonusNormal', 'bonusHeroic'],
     });
     expect(NYTHRAXIS_PHASE_TWO_HP).toBe(0.7);
-    expect(NYTHRAXIS_FINAL_STAND_HP).toBe(0.05);
+    expect(NYTHRAXIS_PHASE_THREE_HP).toBe(0.3);
 
     const dreadCurse = normalMechanics.find((mechanic) => mechanic.id === 'dread-curse');
     expect(dreadCurse?.roles).toEqual(['tank', 'healer']);
@@ -188,6 +253,70 @@ describe('raid boss guide view', () => {
       'interruptible',
       'important',
     ]);
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'binding-sigil')).toMatchObject({
+      roles: ['tank', 'damage'],
+      flags: ['deadly', 'important'],
+      iconId: 'raid_nythraxis_binding_sigil',
+    });
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'gravefire')).toMatchObject({
+      roles: ['all'],
+      flags: ['deadly'],
+      iconId: 'raid_nythraxis_gravefire',
+    });
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'soulfire')).toMatchObject({
+      roles: ['all'],
+      flags: ['important'],
+      iconId: 'raid_nythraxis_soulfire',
+    });
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'kings-wrath')).toMatchObject({
+      roles: ['all'],
+      flags: ['important'],
+      iconId: 'raid_nythraxis_kings_wrath',
+      values: {
+        bonusNormal: nythraxisKingsWrathDamageBonus('normal'),
+        bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
+        eruptionEvery: NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
+        gravefireEvery: NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+      },
+      percentValues: ['bonusNormal', 'bonusHeroic'],
+    });
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'bone-storm')).toMatchObject({
+      roles: ['all'],
+      flags: ['deadly', 'important'],
+      iconId: 'raid_nythraxis_bone_storm',
+      values: {
+        first: NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
+        every: NYTHRAXIS_BONE_STORM_EVERY,
+        duration: NYTHRAXIS_BONE_STORM_SECONDS,
+        charges: NYTHRAXIS_BONE_STORM_CHARGES,
+        chargeSeconds: NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
+        speed: NYTHRAXIS_BONE_STORM_SPEED_MULT,
+        radius: NYTHRAXIS_BONE_STORM_RADIUS,
+        whirl: NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+        slamNormal: nythraxisBoneSlamDamageMaxHp('normal'),
+        slamHeroic: nythraxisBoneSlamDamageMaxHp('heroic'),
+        spikeAt: NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS,
+        rearm: NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
+      },
+      percentValues: ['whirl', 'slamNormal', 'slamHeroic'],
+    });
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'crown-endures')).toMatchObject({
+      roles: ['damage'],
+      flags: ['deadly'],
+      iconId: 'raid_nythraxis_crown_endures',
+      values: {
+        enrageNormal: nythraxisEnrageSeconds('normal'),
+        enrageHeroic: nythraxisEnrageSeconds('heroic'),
+        warn60: NYTHRAXIS_ENRAGE_WARN_SECONDS[0],
+        warn30: NYTHRAXIS_ENRAGE_WARN_SECONDS[1],
+        warn10: NYTHRAXIS_ENRAGE_WARN_SECONDS[2],
+        damage: NYTHRAXIS_ENRAGE_DAMAGE_BONUS,
+        haste: NYTHRAXIS_ENRAGE_HASTE_BONUS,
+        rampEvery: NYTHRAXIS_ENRAGE_RAMP_EVERY,
+        rampStep: NYTHRAXIS_ENRAGE_RAMP_STEP,
+      },
+      percentValues: ['damage', 'haste', 'rampStep'],
+    });
     expect(heroicMechanics.find((mechanic) => mechanic.id === 'deathless-court')).toMatchObject({
       roles: ['tank', 'damage'],
       flags: ['interruptible', 'important'],
@@ -202,8 +331,13 @@ describe('raid boss guide view', () => {
       'dread-curse',
       'bone-spike',
       'grave-eruption',
+      'binding-sigil',
       'soul-rend',
+      'soulfire',
+      'gravefire',
       'deathless-rage',
+      'bone-storm',
+      'crown-endures',
     ];
     const base = 'hudChrome.raidBossGuide.nythraxis';
 
@@ -220,13 +354,33 @@ describe('raid boss guide view', () => {
         summaryKey: `${base}.graveEruptionSummary`,
         responseKey: `${base}.graveEruptionResponse`,
       },
+      'binding-sigil': {
+        summaryKey: `${base}.bindingSigilSummary`,
+        responseKey: `${base}.bindingSigilResponse`,
+      },
       'soul-rend': {
         summaryKey: `${base}.soulRendSummary`,
         responseKey: `${base}.soulRendResponse`,
       },
+      soulfire: {
+        summaryKey: `${base}.soulfireSummary`,
+        responseKey: `${base}.soulfireResponse`,
+      },
+      gravefire: {
+        summaryKey: `${base}.gravefireSummary`,
+        responseKey: `${base}.gravefireResponse`,
+      },
       'deathless-rage': {
         summaryKey: `${base}.deathlessRageSummary`,
         responseKey: `${base}.deathlessRageResponse`,
+      },
+      'bone-storm': {
+        summaryKey: `${base}.boneStormSummary`,
+        responseKey: `${base}.boneStormResponse`,
+      },
+      'crown-endures': {
+        summaryKey: `${base}.crownEnduresSummary`,
+        responseKey: `${base}.crownEnduresResponse`,
       },
     });
     expect(mechanicTextKeys(heroic, difficultyMechanics)).toEqual({
@@ -242,18 +396,38 @@ describe('raid boss guide view', () => {
         summaryKey: `${base}.graveEruptionHeroicSummary`,
         responseKey: `${base}.graveEruptionResponse`,
       },
+      'binding-sigil': {
+        summaryKey: `${base}.bindingSigilHeroicSummary`,
+        responseKey: `${base}.bindingSigilResponse`,
+      },
       'soul-rend': {
         summaryKey: `${base}.soulRendHeroicSummary`,
         responseKey: `${base}.soulRendResponse`,
+      },
+      soulfire: {
+        summaryKey: `${base}.soulfireHeroicSummary`,
+        responseKey: `${base}.soulfireResponse`,
+      },
+      gravefire: {
+        summaryKey: `${base}.gravefireHeroicSummary`,
+        responseKey: `${base}.gravefireResponse`,
       },
       'deathless-rage': {
         summaryKey: `${base}.deathlessRageHeroicSummary`,
         responseKey: `${base}.deathlessRageResponse`,
       },
+      'bone-storm': {
+        summaryKey: `${base}.boneStormHeroicSummary`,
+        responseKey: `${base}.boneStormResponse`,
+      },
+      'crown-endures': {
+        summaryKey: `${base}.crownEnduresHeroicSummary`,
+        responseKey: `${base}.crownEnduresResponse`,
+      },
     });
     // Single-copy mechanics keep one key on both tiers.
     for (const view of [normal, heroic]) {
-      expect(mechanicTextKeys(view, ['gravebreaker', 'raise-fallen', 'final-stand'])).toEqual({
+      expect(mechanicTextKeys(view, ['gravebreaker', 'raise-fallen', 'kings-wrath'])).toEqual({
         gravebreaker: {
           summaryKey: `${base}.gravebreakerSummary`,
           responseKey: `${base}.gravebreakerResponse`,
@@ -262,9 +436,9 @@ describe('raid boss guide view', () => {
           summaryKey: `${base}.raiseFallenSummary`,
           responseKey: `${base}.raiseFallenResponse`,
         },
-        'final-stand': {
-          summaryKey: `${base}.finalStandSummary`,
-          responseKey: `${base}.finalStandResponse`,
+        'kings-wrath': {
+          summaryKey: `${base}.kingsWrathSummary`,
+          responseKey: `${base}.kingsWrathResponse`,
         },
       });
     }
@@ -315,6 +489,68 @@ describe('raid boss guide view', () => {
     expect(summaryOf(normal, 'deathless-rage')).toContain(`takes ${pct(NYTHRAXIS_DEATHLESS_PCT)}`);
     expect(summaryOf(heroic, 'deathless-rage')).toContain(
       `takes ${pct(NYTHRAXIS_DEATHLESS_PCT_HEROIC)}`,
+    );
+    expect(summaryOf(normal, 'binding-sigil')).toContain(
+      `Every ${NYTHRAXIS_SIGIL_EVERY_NORMAL} sec`,
+    );
+    expect(summaryOf(heroic, 'binding-sigil')).toContain(
+      `Every ${NYTHRAXIS_SIGIL_EVERY_HEROIC} sec`,
+    );
+    expect(summaryOf(normal, 'binding-sigil')).toContain(
+      `${pct(NYTHRAXIS_ASCENSION_PER_STACK_NORMAL)} damage`,
+    );
+    expect(summaryOf(heroic, 'binding-sigil')).toContain(
+      `${pct(NYTHRAXIS_ASCENSION_PER_STACK_HEROIC)} damage`,
+    );
+    expect(summaryOf(normal, 'binding-sigil')).toContain(
+      `${pct(NYTHRAXIS_UNBOUND_HIT_MAX_HP_NORMAL)} of maximum health`,
+    );
+    expect(summaryOf(heroic, 'binding-sigil')).toContain(
+      `${pct(NYTHRAXIS_UNBOUND_HIT_MAX_HP_HEROIC)} of maximum health`,
+    );
+    expect(summaryOf(normal, 'binding-sigil')).toContain(
+      `${pct(NYTHRAXIS_BOUND_VULNERABILITY)} more damage`,
+    );
+    expect(summaryOf(normal, 'gravefire')).toContain(
+      `Every ${NYTHRAXIS_GRAVEFIRE_EVERY_NORMAL} sec`,
+    );
+    expect(summaryOf(heroic, 'gravefire')).toContain(
+      `Every ${NYTHRAXIS_GRAVEFIRE_EVERY_HEROIC} sec`,
+    );
+    expect(summaryOf(normal, 'gravefire')).toContain(
+      `${pct(NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_NORMAL)} of maximum health`,
+    );
+    expect(summaryOf(heroic, 'gravefire')).toContain(
+      `${pct(NYTHRAXIS_GRAVEFIRE_TICK_MAX_HP_HEROIC)} of maximum health`,
+    );
+    expect(summaryOf(normal, 'soulfire')).toContain(
+      `${pct(NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL)} of maximum health`,
+    );
+    expect(summaryOf(heroic, 'soulfire')).toContain(
+      `${pct(NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC)} of maximum health`,
+    );
+    expect(summaryOf(normal, 'kings-wrath')).toContain(
+      `${pct(nythraxisKingsWrathDamageBonus('normal'))} more damage on Normal`,
+    );
+    expect(summaryOf(heroic, 'kings-wrath')).toContain(
+      `${pct(nythraxisKingsWrathDamageBonus('heroic'))} on Heroic`,
+    );
+    expect(summaryOf(normal, 'bone-storm')).toContain(`every ${NYTHRAXIS_BONE_STORM_EVERY} sec`);
+    expect(summaryOf(normal, 'bone-storm')).toContain(
+      `${pct(nythraxisBoneSlamDamageMaxHp('normal'))} of maximum health`,
+    );
+    expect(summaryOf(heroic, 'bone-storm')).toContain(
+      `${pct(nythraxisBoneSlamDamageMaxHp('heroic'))} of maximum health`,
+    );
+    expect(summaryOf(normal, 'crown-endures')).toContain(
+      `At ${nythraxisEnrageSeconds('normal')} sec from the pull`,
+    );
+    expect(summaryOf(heroic, 'crown-endures')).toContain(
+      `At ${nythraxisEnrageSeconds('heroic')} sec from the pull`,
+    );
+    expect(summaryOf(normal, 'crown-endures')).toContain('There is no timer bar.');
+    expect(summaryOf(normal, 'crown-endures')).toContain(
+      `${NYTHRAXIS_ENRAGE_WARN_SECONDS.join(', ').replace(', 10', ', and 10')} sec remaining`,
     );
     // The literal tuning the copy is written against; a retune must revisit the prose.
     expect(NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL).toBe(0.35);
@@ -604,10 +840,10 @@ describe('raid boss guide view', () => {
       'VARKHUL_MASTERS_ASSEMBLY_HP_THRESHOLD',
       'VARKHUL_MASTERPIECE_UNBOUND_HP_THRESHOLD',
       'NYTHRAXIS_PHASE_TWO_HP',
-      'NYTHRAXIS_FINAL_STAND_HP',
     ]) {
       expect(source).toContain(`values: { health: ${constant} }`);
     }
+    expect(source).toContain('health: NYTHRAXIS_PHASE_THREE_HP');
   });
 
   it('gives every journal mechanic a deliberate and visually distinct ability icon', () => {

@@ -103,14 +103,14 @@ describe('RaidBossGuideWindow', () => {
       '/ui/mobs/nythraxis_scourge_of_thornpeak.webp',
     );
     expect(root.querySelectorAll('.rbg-phase')).toHaveLength(3);
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(8);
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(13);
     expect(root.textContent).toContain('The Throne');
     expect(root.textContent).toContain('The Wardstones');
-    expect(root.textContent).toContain('Final Stand');
+    expect(root.textContent).toContain("The King's Wrath");
     expect(root.textContent).not.toContain('The Deathless Court');
 
     root.querySelector<HTMLButtonElement>('[data-difficulty="heroic"]')?.click();
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(9);
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(14);
     expect(root.textContent).toContain('The Deathless Court');
 
     root.querySelector<HTMLButtonElement>('[data-mechanic="dread-curse"]')?.click();

@@ -1,6 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import { ABILITIES } from '../src/sim/data';
+import {
+  NYTHRAXIS_ASCENSION_AURA_ID,
+  NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+  NYTHRAXIS_BOUND_AURA_ID,
+  NYTHRAXIS_BOUND_STUN_AURA_ID,
+  NYTHRAXIS_UNBOUND_AURA_ID,
+} from '../src/sim/nythraxis_binding_sigil';
 import { NYTHRAXIS_IMPALED_AURA_ID } from '../src/sim/nythraxis_bone_spike';
+import { NYTHRAXIS_BONE_STORM_AURA_ID } from '../src/sim/nythraxis_bone_storm';
+import {
+  NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+  NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+} from '../src/sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../src/sim/nythraxis_kings_wrath';
 import {
   BATTLE_RUNE_AURA_ID,
   CARRIED_FLAG_AURA_ID,
@@ -88,6 +101,42 @@ describe('aura icons reuse image-based ability art', () => {
     );
     expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_IMPALED_AURA_ID))).not.toBe(
       JSON.stringify(auraIconRecipe('aura_stun')),
+    );
+  });
+
+  it('gives every Binding Sigil aura its own readable identity recipe', () => {
+    const ids = [
+      NYTHRAXIS_ASCENSION_AURA_ID,
+      NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+      NYTHRAXIS_BOUND_AURA_ID,
+      NYTHRAXIS_BOUND_STUN_AURA_ID,
+      NYTHRAXIS_UNBOUND_AURA_ID,
+    ];
+    for (const id of ids) {
+      expect(hasAuraRecipe(id), id).toBe(true);
+      expect(isUnknownIconRecipe(auraIconRecipe(id)), id).toBe(false);
+    }
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_BOUND_STUN_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_stun')),
+    );
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_ASCENSION_HASTE_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe('aura_buff_haste')),
+    );
+  });
+
+  it('gives every phase three Nythraxis aura its own readable identity recipe', () => {
+    const ids = [
+      NYTHRAXIS_KINGS_WRATH_AURA_ID,
+      NYTHRAXIS_BONE_STORM_AURA_ID,
+      NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+      NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+    ];
+    for (const id of ids) {
+      expect(hasAuraRecipe(id), id).toBe(true);
+      expect(isUnknownIconRecipe(auraIconRecipe(id)), id).toBe(false);
+    }
+    expect(JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_AURA_ID))).not.toBe(
+      JSON.stringify(auraIconRecipe(NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID)),
     );
   });
 

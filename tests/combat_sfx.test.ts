@@ -15,6 +15,7 @@ import {
   mobVoiceCue,
   mobVoiceCueWithFallback,
   mobVoiceFamily,
+  nythraxisCalloutCue,
   playerSwingCueForDamage,
   playerVoiceCue,
   shouldPlayCombatImpactForTarget,
@@ -998,6 +999,16 @@ describe('combat SFX policy', () => {
     // The HUD arm is shared with the Nythraxis callouts: dispatchRaidCalloutSfx
     // routes a varkhulCallout event through dispatchVarkhulCalloutSfx.
     expect(hud).toContain('dispatchRaidCalloutSfx(');
+  });
+
+  it('gives every new Nythraxis warning an existing sampled cue', () => {
+    expect(nythraxisCalloutCue('sigilAppears')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilBound')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilUnbound')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('gravefireTarget')).toBe('impact_shadow');
+    for (const call of ['sigilAppears', 'sigilBound', 'sigilUnbound', 'gravefireTarget'] as const) {
+      expect(nythraxisCalloutCue(call) in SFX_CLIPS, call).toBe(true);
+    }
   });
 });
 

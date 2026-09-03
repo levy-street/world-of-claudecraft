@@ -81,6 +81,18 @@ const NYTHRAXIS_CALLOUT_CUES = {
   youAreImpaled: 'impact_bone',
   spikeBroken: 'ui_achievement',
   dreadCurseSwap: 'impact_shadow',
+  sigilAppears: 'impact_arcane',
+  sigilBound: 'impact_arcane',
+  sigilUnbound: 'impact_shadow',
+  gravefireTarget: 'impact_shadow',
+  kingsWrath: 'impact_shadow',
+  boneStormBegins: 'impact_bone',
+  boneStormCharge: 'impact_bone',
+  boneStormEnds: 'impact_bone',
+  crownEndures60: 'impact_shadow',
+  crownEndures30: 'impact_shadow',
+  crownEndures10: 'impact_shadow',
+  crownEndures: 'impact_shadow',
 } as const satisfies Record<NythraxisCallout, SfxId>;
 
 export function nythraxisCalloutCue(call: NythraxisCallout): SfxId {

@@ -2608,12 +2608,25 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['hand', { p: 'flame', ...BR }],
     ['crack'],
   ),
+  raid_nythraxis_binding_sigil: r(
+    'shadow',
+    'silverWhite',
+    ['sigil_rune', { p: 'tendrils', ...BR }],
+    ['arcs'],
+  ),
   raid_nythraxis_raise_fallen: r('shadow', 'bone', ['helm', { p: 'skull', ...BR }], ['arcs']),
   raid_nythraxis_soul_rend: r(
     'shadow',
     'shadowPurple',
     ['heart', { p: 'claw_slash', ...BR }],
     ['drips'],
+  ),
+  raid_nythraxis_soulfire: r('blood', 'shadowPurple', ['flame', { p: 'heart', ...BR }], ['drips']),
+  raid_nythraxis_gravefire: r(
+    'shadow',
+    'shadowPurple',
+    ['flame', { p: 'claw_slash', ...BR }],
+    ['motion'],
   ),
   raid_nythraxis_deathless_rage: r('shadow', 'blood', ['roar', { p: 'skull', ...BR }], ['glow']),
   raid_nythraxis_deathless_court: r(
@@ -2622,11 +2635,23 @@ const ABILITY_RECIPES: Record<string, IconRecipe> = {
     ['ascension_seal', { p: 'skull', ...BR }],
     ['arcs'],
   ),
-  raid_nythraxis_final_stand: r(
+  raid_nythraxis_kings_wrath: r(
     'fury',
-    'blood',
-    ['skull', { p: 'lightning', ...BR }],
-    ['glow', 'drips'],
+    'shadowPurple',
+    ['roar', { p: 'helm', ...BR, pal: 'gold' }],
+    ['glow'],
+  ),
+  raid_nythraxis_bone_storm: r(
+    'storm',
+    'bone',
+    ['bone', { p: 'sunburst', ...BIG }],
+    ['motion', 'arcs'],
+  ),
+  raid_nythraxis_crown_endures: r(
+    'shadow',
+    'gold',
+    ['helm', { p: 'shield', ...BR }],
+    ['glow', 'arcs'],
   ),
   // pet action bar (dedicated, never a class ability id: see pet_action_icons.ts).
   pet_attack: r('blood', 'blood', ['fang'], ['motion']),
@@ -3733,6 +3758,35 @@ const AURA_RECIPES: Record<string, IconRecipe> = {
   // resolver collapsed it to the aura_stun sunburst and the pinned raider could
   // not tell the spike from an ordinary daze. A bloodied bone, the spike itself.
   nythraxis_impaled: r('blood', 'bone', ['bone', { p: 'droplet', ...BR, pal: 'blood' }], ['crack']),
+  nythraxis_ascension: r(
+    'shadow',
+    'silverWhite',
+    ['ascension_seal', { p: 'sunburst', ...BR }],
+    ['glow'],
+  ),
+  nythraxis_ascension_haste: r(
+    'storm',
+    'silverWhite',
+    ['ascension_seal', { p: 'lightning', ...BR }],
+    ['motion'],
+  ),
+  nythraxis_bound: r('earth', 'silverWhite', ['sigil_rune', { p: 'skull', ...BR }], ['arcs']),
+  nythraxis_bound_stun: r('shadow', 'bone', ['sigil_rune', { p: 'skull', ...BR }], ['crack']),
+  nythraxis_unbound: r('fury', 'shadowPurple', ['skull', { p: 'claw_slash', ...BR }], ['glow']),
+  nythraxis_kings_wrath: r(
+    'fury',
+    'shadowPurple',
+    ['helm', { p: 'roar', ...BR, pal: 'blood' }],
+    ['glow'],
+  ),
+  nythraxis_bone_storm: r('storm', 'bone', ['sunburst', { p: 'bone', ...BR }], ['motion', 'arcs']),
+  nythraxis_crown_endures: r('shadow', 'gold', ['helm', { p: 'skull', ...BR }], ['glow']),
+  nythraxis_crown_endures_haste: r(
+    'storm',
+    'gold',
+    ['helm', { p: 'lightning', ...BR }],
+    ['motion', 'arcs'],
+  ),
   // Painted talent/modifier identities are not ABILITIES records, but their
   // runtime timers still need a meaningful synchronous layer while the WebP
   // decodes (and if it ever fails to load).

@@ -18,16 +18,36 @@ import {
   VARKHUL_MAKERS_BRAND_TANK_SWAP_STACKS,
 } from '../src/sim/encounters/varkhul';
 import {
+  NYTHRAXIS_ASCENSION_AURA_ID,
+  NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
+  NYTHRAXIS_BOUND_AURA_ID,
+  NYTHRAXIS_BOUND_SECONDS,
+  NYTHRAXIS_BOUND_STUN_AURA_ID,
+  NYTHRAXIS_BOUND_VULNERABILITY,
+  NYTHRAXIS_UNBOUND_AURA_ID,
+} from '../src/sim/nythraxis_binding_sigil';
+import {
   NYTHRAXIS_IMPALED_AURA_ID,
   NYTHRAXIS_IMPALED_TICK_MAX_HP_HEROIC,
   NYTHRAXIS_IMPALED_TICK_MAX_HP_NORMAL,
 } from '../src/sim/nythraxis_bone_spike';
+import {
+  NYTHRAXIS_BONE_STORM_AURA_ID,
+  NYTHRAXIS_BONE_STORM_RADIUS,
+  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+} from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
 } from '../src/sim/nythraxis_dread_curse';
+import {
+  NYTHRAXIS_CROWN_ENDURES_AURA_ID,
+  NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID,
+  NYTHRAXIS_ENRAGE_HASTE_BONUS,
+} from '../src/sim/nythraxis_enrage_clock';
+import { NYTHRAXIS_KINGS_WRATH_AURA_ID } from '../src/sim/nythraxis_kings_wrath';
 import {
   VARKHUL_SHARED_PYRE_AURA_ID,
   VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
@@ -191,6 +211,103 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ id: 'mob_charge_stun', kind: 'stun', value: 0 })).toEqual({
       key: 'hudChrome.auraEffect.stun',
     });
+  });
+
+  it('explains Deathless Ascension from its live stacks and total aura value', () => {
+    expect(
+      desc({
+        id: NYTHRAXIS_ASCENSION_AURA_ID,
+        kind: 'buff_dmg_done',
+        value: 0.12,
+        stacks: 3,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisAscension',
+      nums: { stacks: 3, pct: 12 },
+    });
+    expect(hudChromeStrings.auraEffect.nythraxisAscension).toBe(
+      'Deathless Ascension: {stacks} stacks, {pct}% more damage and attack speed. Drag Nythraxis onto the Binding Sigil to purge it.',
+    );
+  });
+
+  it('explains Bound from its fixed vulnerability and burn duration', () => {
+    expect(
+      desc({
+        id: NYTHRAXIS_BOUND_AURA_ID,
+        kind: 'vulnerability',
+        value: NYTHRAXIS_BOUND_VULNERABILITY,
+      }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisBound',
+      nums: {
+        pct: Math.round(NYTHRAXIS_BOUND_VULNERABILITY * 100),
+        duration: NYTHRAXIS_BOUND_SECONDS,
+      },
+    });
+    expect(hudChromeStrings.auraEffect.nythraxisBound).toBe(
+      'Bound by the old wards: Nythraxis takes {pct}% more damage for {duration} sec.',
+    );
+  });
+
+  it('explains Unbound from the difficulty-specific aura value', () => {
+    expect(desc({ id: NYTHRAXIS_UNBOUND_AURA_ID, kind: 'buff_dmg_done', value: 0.25 })).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisUnbound',
+      nums: { pct: 25 },
+    });
+    expect(hudChromeStrings.auraEffect.nythraxisUnbound).toBe(
+      'Unbound: Nythraxis deals {pct}% more damage until a Binding Sigil holds him.',
+    );
+  });
+
+  it('skips the mirrored Ascension haste and plain Bound stun effect lines', () => {
+    expect(
+      desc({ id: NYTHRAXIS_ASCENSION_HASTE_AURA_ID, kind: 'buff_haste', value: 1.12 }),
+    ).toBeNull();
+    expect(desc({ id: NYTHRAXIS_BOUND_STUN_AURA_ID, kind: 'stun', value: 0 })).toBeNull();
+  });
+
+  it("explains King's Wrath from the live aura value", () => {
+    expect(desc({ id: NYTHRAXIS_KINGS_WRATH_AURA_ID, kind: 'buff_dmg_done', value: 0.25 })).toEqual(
+      {
+        key: 'hudChrome.auraEffect.nythraxisKingsWrath',
+        nums: { pct: 25 },
+      },
+    );
+    expect(hudChromeStrings.auraEffect.nythraxisKingsWrath).toBe(
+      "King's Wrath: Nythraxis deals {pct}% more damage for the rest of the fight.",
+    );
+  });
+
+  it('explains Bone Storm from its live whirl and radius constants', () => {
+    expect(desc({ id: NYTHRAXIS_BONE_STORM_AURA_ID, kind: 'buff_speed', value: 2.2 })).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisBoneStorm',
+      nums: {
+        tick: Math.round(NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP * 100),
+        radius: NYTHRAXIS_BONE_STORM_RADIUS,
+      },
+    });
+    expect(hudChromeStrings.auraEffect.nythraxisBoneStorm).toBe(
+      'Bone Storm: Nythraxis ignores threat, whirls for {tick}% of maximum health every second within {radius} yd, and charges raiders. Spread out and run.',
+    );
+  });
+
+  it('explains The Crown Endures from its live stacks and aura values', () => {
+    expect(
+      desc({ id: NYTHRAXIS_CROWN_ENDURES_AURA_ID, kind: 'buff_dmg_done', value: 0.75, stacks: 2 }),
+    ).toEqual({
+      key: 'hudChrome.auraEffect.nythraxisCrownEndures',
+      nums: {
+        stacks: 2,
+        pct: 75,
+        haste: Math.round(NYTHRAXIS_ENRAGE_HASTE_BONUS * 100),
+      },
+    });
+    expect(hudChromeStrings.auraEffect.nythraxisCrownEndures).toBe(
+      'The Crown Endures: {stacks} stacks, {pct}% more damage and {haste}% faster attacks. The raid is out of time.',
+    );
+    expect(
+      desc({ id: NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID, kind: 'buff_haste', value: 1.5 }),
+    ).toBeNull();
   });
 
   it('does not describe the Cinder placement mark as a zero-percent vulnerability', () => {

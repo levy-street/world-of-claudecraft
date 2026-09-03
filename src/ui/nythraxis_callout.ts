@@ -12,6 +12,18 @@ const CALLOUT_KEYS = {
   youAreImpaled: 'hudChrome.nythraxisCallout.youAreImpaled',
   spikeBroken: 'hudChrome.nythraxisCallout.spikeBroken',
   dreadCurseSwap: 'hudChrome.nythraxisCallout.dreadCurseSwap',
+  sigilAppears: 'hudChrome.nythraxisCallout.sigilAppears',
+  sigilBound: 'hudChrome.nythraxisCallout.sigilBound',
+  sigilUnbound: 'hudChrome.nythraxisCallout.sigilUnbound',
+  gravefireTarget: 'hudChrome.nythraxisCallout.gravefireTarget',
+  kingsWrath: 'hudChrome.nythraxisCallout.kingsWrath',
+  boneStormBegins: 'hudChrome.nythraxisCallout.boneStormBegins',
+  boneStormCharge: 'hudChrome.nythraxisCallout.boneStormCharge',
+  boneStormEnds: 'hudChrome.nythraxisCallout.boneStormEnds',
+  crownEndures60: 'hudChrome.nythraxisCallout.crownEndures60',
+  crownEndures30: 'hudChrome.nythraxisCallout.crownEndures30',
+  crownEndures10: 'hudChrome.nythraxisCallout.crownEndures10',
+  crownEndures: 'hudChrome.nythraxisCallout.crownEndures',
 } as const satisfies Record<NythraxisCallout, `hudChrome.nythraxisCallout.${string}`>;
 
 export function nythraxisCalloutKey(

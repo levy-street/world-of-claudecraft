@@ -23,6 +23,18 @@ const CALLS: readonly NythraxisCallout[] = [
   'youAreImpaled',
   'spikeBroken',
   'dreadCurseSwap',
+  'sigilAppears',
+  'sigilBound',
+  'sigilUnbound',
+  'gravefireTarget',
+  'kingsWrath',
+  'boneStormBegins',
+  'boneStormCharge',
+  'boneStormEnds',
+  'crownEndures60',
+  'crownEndures30',
+  'crownEndures10',
+  'crownEndures',
 ];
 
 const hudSource = () => readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
@@ -34,6 +46,18 @@ describe('Nythraxis encounter callouts', () => {
       'hudChrome.nythraxisCallout.youAreImpaled',
       'hudChrome.nythraxisCallout.spikeBroken',
       'hudChrome.nythraxisCallout.dreadCurseSwap',
+      'hudChrome.nythraxisCallout.sigilAppears',
+      'hudChrome.nythraxisCallout.sigilBound',
+      'hudChrome.nythraxisCallout.sigilUnbound',
+      'hudChrome.nythraxisCallout.gravefireTarget',
+      'hudChrome.nythraxisCallout.kingsWrath',
+      'hudChrome.nythraxisCallout.boneStormBegins',
+      'hudChrome.nythraxisCallout.boneStormCharge',
+      'hudChrome.nythraxisCallout.boneStormEnds',
+      'hudChrome.nythraxisCallout.crownEndures60',
+      'hudChrome.nythraxisCallout.crownEndures30',
+      'hudChrome.nythraxisCallout.crownEndures10',
+      'hudChrome.nythraxisCallout.crownEndures',
     ]);
   });
 
@@ -49,6 +73,42 @@ describe('Nythraxis encounter callouts', () => {
     expect(t(nythraxisCalloutKey('spikeBroken') as TranslationKey)).toBe('Spike shattered!');
     expect(t(nythraxisCalloutKey('dreadCurseSwap') as TranslationKey)).toBe(
       'Dread Curse: swap tanks!',
+    );
+    expect(t(nythraxisCalloutKey('sigilAppears') as TranslationKey)).toBe(
+      'A Binding Sigil flares! Drag Nythraxis onto it!',
+    );
+    expect(t(nythraxisCalloutKey('sigilBound') as TranslationKey)).toBe(
+      'Nythraxis is bound! Burn him!',
+    );
+    expect(t(nythraxisCalloutKey('sigilUnbound') as TranslationKey)).toBe(
+      'The sigil fades unbound! Nythraxis grows stronger!',
+    );
+    expect(t(nythraxisCalloutKey('gravefireTarget') as TranslationKey)).toBe(
+      'Gravefire races toward you! Sidestep!',
+    );
+    expect(t(nythraxisCalloutKey('kingsWrath') as TranslationKey)).toBe(
+      'The King rises in wrath! Everything hits harder now!',
+    );
+    expect(t(nythraxisCalloutKey('boneStormBegins') as TranslationKey)).toBe(
+      'Bone Storm! Spread out and run!',
+    );
+    expect(t(nythraxisCalloutKey('boneStormCharge') as TranslationKey)).toBe(
+      'Nythraxis is charging YOU! Run!',
+    );
+    expect(t(nythraxisCalloutKey('boneStormEnds') as TranslationKey)).toBe(
+      'Bone Storm over. Tanks, pick him up!',
+    );
+    expect(t(nythraxisCalloutKey('crownEndures60') as TranslationKey)).toBe(
+      'One minute until The Crown Endures!',
+    );
+    expect(t(nythraxisCalloutKey('crownEndures30') as TranslationKey)).toBe(
+      'Thirty seconds until The Crown Endures!',
+    );
+    expect(t(nythraxisCalloutKey('crownEndures10') as TranslationKey)).toBe(
+      'Ten seconds! Burn him!',
+    );
+    expect(t(nythraxisCalloutKey('crownEndures') as TranslationKey)).toBe(
+      'The Crown Endures! Nythraxis is enraged!',
     );
   });
 
@@ -74,6 +134,18 @@ describe('Nythraxis encounter callouts', () => {
     expect(nythraxisCalloutCue('youAreImpaled')).toBe('impact_bone');
     expect(nythraxisCalloutCue('spikeBroken')).toBe('ui_achievement');
     expect(nythraxisCalloutCue('dreadCurseSwap')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('sigilAppears')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilBound')).toBe('impact_arcane');
+    expect(nythraxisCalloutCue('sigilUnbound')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('gravefireTarget')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('kingsWrath')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('boneStormBegins')).toBe('impact_bone');
+    expect(nythraxisCalloutCue('boneStormCharge')).toBe('impact_bone');
+    expect(nythraxisCalloutCue('boneStormEnds')).toBe('impact_bone');
+    expect(nythraxisCalloutCue('crownEndures60')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('crownEndures30')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('crownEndures10')).toBe('impact_shadow');
+    expect(nythraxisCalloutCue('crownEndures')).toBe('impact_shadow');
 
     const event = {
       type: 'nythraxisCallout',
@@ -149,12 +221,21 @@ describe('Nythraxis sim English is matched client-side', () => {
     'Deathless Rage',
     'Deathless Rage Interrupted',
     'Soul Ward',
-    'Final Stand',
+    "King's Wrath",
+    'Bone Storm',
+    'Bone Slam',
+    'The Crown Endures',
     'Dread Curse',
     'Bone Spike',
     'Impaled',
     'Grave Eruption',
     'Grave Flame',
+    'Binding Sigil',
+    'Deathless Ascension',
+    'Bound',
+    'Unbound',
+    'Gravefire',
+    'Soulfire',
     "Malric's Mending",
     'Royal Cleave',
   ])('recognizes the cast or aura name %s', (name) => {
@@ -181,7 +262,18 @@ describe('Nythraxis dungeon finder blurbs', () => {
         for (const mechanic of encounter.mechanics) keys.add(mechanic);
       }
     }
-    for (const mechanic of ['bone_spike', 'grave_eruption', 'deathless_court', 'dread_curse']) {
+    for (const mechanic of [
+      'bone_spike',
+      'grave_eruption',
+      'binding_sigil',
+      'gravefire',
+      'soulfire',
+      'kings_wrath',
+      'bone_storm',
+      'crown_endures',
+      'deathless_court',
+      'dread_curse',
+    ]) {
       expect(keys.has(mechanic), mechanic).toBe(true);
     }
     for (const mechanic of keys) {
