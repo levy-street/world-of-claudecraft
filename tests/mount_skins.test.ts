@@ -7,6 +7,7 @@ import {
   mountVisualSpec,
   mountVisualSpecFor,
 } from '../src/render/mount_visuals';
+import { isRickshawMount } from '../src/render/rickshaw_mount';
 import {
   isMountSkinId,
   MOUNT_SKIN_IDS,
@@ -124,5 +125,28 @@ describe('mount skin visual specs', () => {
       MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise.seat,
     );
     expect(mountSeatLiftFor('', 'chimeglass_tortoise')).toBe(0);
+  });
+});
+
+// The rickshaw is the one skin with a composed second rig and a continuous
+// loop cue, so its two extra seams are pinned for the WORN case: worn over an
+// ordinary mount, the puller must still attach and the loop/summon cues must
+// still resolve, both keyed off what the mount presents as, never the ride.
+describe('rickshaw skin worn over another mount', () => {
+  it('presents as rickshaw_mount so mount_loop_ / mount_summon_ cues resolve', () => {
+    expect(mountPresentationKey('valorsteed', 'rickshaw_mount')).toBe('rickshaw_mount');
+    expect(mountPresentationKey('grag_bear', 'rickshaw_mount')).toBe('rickshaw_mount');
+    expect(mountPresentationKey('valorsteed', null)).toBe('valorsteed');
+  });
+
+  it('resolves to the rickshaw visual so the puller hook attaches over the base mount', () => {
+    const worn = mountVisualSpecFor('valorsteed', 'rickshaw_mount');
+    expect(worn).toBe(MOUNT_SKIN_VISUAL_SPECS.rickshaw_mount);
+    expect(isRickshawMount(worn?.visualKey ?? '')).toBe(true);
+    expect(isRickshawMount(mountVisualSpecFor('valorsteed', null)?.visualKey ?? '')).toBe(false);
+    for (const id of MOUNT_SKIN_IDS) {
+      if (id === 'rickshaw_mount') continue;
+      expect(isRickshawMount(MOUNT_SKIN_VISUAL_SPECS[id].visualKey), id).toBe(false);
+    }
   });
 });

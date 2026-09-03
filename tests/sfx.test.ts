@@ -379,6 +379,9 @@ describe('mount running audio', () => {
     // mount_loop_rickshaw_mount is a real SFX_CLIPS entry (checked by
     // mountRun itself), so no mock setup is needed here.
     const before = sources.length;
+    // 'rickshaw_mount' is a PRESENTATION key here (a mount skin worn over any
+    // ride, src/sim/content/mount_skins.ts), no longer a catalog MountKey: the
+    // loop-owner rule keys off what the mount presents as.
     sfx.mountRun(0, 0, 0, 'rickshaw_mount', 'grass', true);
     expect(sources.length).toBe(before);
   });
