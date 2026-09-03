@@ -15,6 +15,11 @@ import { IGNIVAR_FORGE_APPROACH_ID, IGNIVAR_RAID_ARENA_ID } from './ignivar_raid
 import { enterDungeon, instanceInfoAt } from './instances/dungeons';
 import { mountItemId, mountOwned } from './mounts';
 import { MOUNT_TRAIN_MIN_LEVEL } from './mounts_training';
+import {
+  isNythraxisDevMechanic,
+  pokeNythraxisDevMechanic,
+  setupNythraxisDevRaid,
+} from './nythraxis_dev_raid';
 import { isGatheringProfessionId, queueGatheringGrant } from './professions/gathering';
 import { placeMobileStationForPlayer } from './professions/mobile_station';
 import { cancelProfessionSessionOnDisplacement } from './professions/session_teardown';
@@ -832,6 +837,46 @@ export function handleDevChat(
     return null;
   }
 
+  // [dev] The solo Nythraxis practice raid: nine anchored, invulnerable bots
+  // spread across the hall so every mechanic has targets, then the mechanic
+  // pokes (src/sim/nythraxis_dev_raid.ts).
+  const nythraxisRaidMatch = raw.match(
+    /^\/(?:dev\s+nythraxisraid|devnythraxisraid)(?:\s+(normal|heroic))?\s*$/i,
+  );
+  if (nythraxisRaidMatch) {
+    const difficulty = nythraxisRaidMatch[1]?.toLowerCase() as 'normal' | 'heroic' | undefined;
+    const result = setupNythraxisDevRaid(ctx, pid, difficulty);
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else {
+      emitDevLog(
+        ctx,
+        pid,
+        `[dev] Nythraxis raid ${result.reused ? 'reset' : 'ready'} (${result.difficulty === 'heroic' ? 'Heroic' : 'Normal'}): ${result.allies} stationary, invulnerable allies spread across the hall. Pull him, then /dev nyx <curse|spike|eruption|sigil|gravefire|rend|rage|storm|wards|phase2|phase3|enrage [sec]> forces a mechanic.`,
+      );
+    }
+    return null;
+  }
+  const nyxMatch = raw.match(/^\/(?:dev\s+nyx|devnyx)\s+([a-z0-9]+)(?:\s+(\d+))?\s*$/i);
+  if (nyxMatch) {
+    const verb = nyxMatch[1].toLowerCase();
+    if (!isNythraxisDevMechanic(verb)) {
+      ctx.error(
+        pid,
+        '[dev] Usage: /dev nyx <curse|spike|eruption|sigil|gravefire|rend|rage|storm|wards|phase2|phase3|enrage [sec]>.',
+      );
+      return null;
+    }
+    const result = pokeNythraxisDevMechanic(
+      ctx,
+      pid,
+      verb,
+      nyxMatch[2] === undefined ? undefined : Number(nyxMatch[2]),
+    );
+    if (!result.ok) ctx.error(pid, `[dev] ${result.message}`);
+    else emitDevLog(ctx, pid, `[dev] ${result.message}`);
+    return null;
+  }
+
   const varkhulRaidMatch = raw.match(
     /^\/(?:dev\s+varkhulraid|devvarkhulraid)(?:\s+(normal|heroic))?\s*$/i,
   );
@@ -925,7 +970,7 @@ export function handleDevChat(
   if (/^\/dev(?:\s|$)/i.test(raw)) {
     ctx.error(
       pid,
-      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
+      'Dev commands: /dev gui, /dev level, /dev tp, /dev spawn, /dev despawn, /dev killtarget, /dev give, /dev kit, /dev mounts, /dev mountquest, /dev gold, /dev quest, /dev quests, /dev attune, /dev mobilestation, /dev gather, /dev bot, /dev vendor, /dev bg, /dev bis, /dev lfg, /dev portal [seed] [level] [C|B|A|S] [infernal|random], /dev cascade, /dev sandbox, /dev smite, /dev god, /dev noaggro, /dev immortal, /dev ignivarraid [boss], /dev varkhulraid [normal|heroic], /dev nythraxisraid [normal|heroic], /dev nyx <mechanic> [sec], /dev heal, /dev hp <1-100>, /dev resource, /dev cooldowns, /dev revive, /dev combatreset, /dev daze, /dev fear, /dev dungeon, /dev raid, /dev kill',
     );
     return null;
   }
