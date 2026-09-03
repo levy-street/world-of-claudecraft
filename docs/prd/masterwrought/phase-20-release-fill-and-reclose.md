@@ -125,8 +125,10 @@ these read with it.
    'release-fill' and 'release fill' over state.md, farming/state.md, farming/progress.md
    and the phase-*-qa.md and phase-19-*.md docs (94 + 15 + 23 hits at execution), one
    reader per block, then a completeness critic over the merged list.
-4. STEP 1, the guide.gear.masterwroughtBody rule: that key was RETIRED at Phase 14
-   (scripts/i18n_retired_keys.mjs), so its 15 Latin rows are `blocked`, never pending,
+4. STEP 1, the guide.gear.masterwroughtBody rule: that key was RETIRED at Phase 16
+   (scripts/i18n_retired_keys.mjs, the 2026-08-30 reword block, commit c4213e984d; the
+   readers' completeness critic corrected this line's first 'Phase 14'), so its 15 Latin
+   rows are `blocked`, never pending,
    and never reach the worklist; the live key is guide.gear.masterwroughtBodyLegendary
    (15 Latin rows pending, human-required), and ITS Latin fills extend BOTH tables in
    tests/masterwrought_cap.test.ts, CAP_PROSE_BY_LOCALE and LEGENDARY_PROSE_BY_LOCALE, in

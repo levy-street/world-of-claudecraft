@@ -16,6 +16,9 @@ maintainer's STEP 1 decisions are collected at the end.
   unnamed keys resolved from the tree, keys that no longer exist), then a completeness critic
   over the merged list. The live-versus-superseded split is the readers' own, checked against
   the tree by a key cross-check (366 explicit keys: 11 no longer in the catalog, 6 retired).
+  The critic saw a truncated copy of the merged list, so most of its 44 'missing' items were
+  already carried; its four tree-verified findings are folded into classes F, I and J below and
+  into amendment 4 of the Phase 20 doc (masterwroughtBody was retired at Phase 16, not 14).
 - The commit walk: every first-parent commit on the branch that moved the resolved English
   slice (135 commits, `src/ui/i18n.resolved.generated/en.ts`) diffed against its parent for keys
   that already existed and changed value (592 keys, 209 deleted), then for each such key every
@@ -131,8 +134,15 @@ col_farm_roster, prog_field_to_feast, prog_legendmaker, col_deepest_cast: name a
 the jewelcrafting and inscription trios (rare, 50, grandmaster incl. title: the 13 Latin chunks),
 dgn_sanctum_speed.name and chr_nightbloom_first_cast.name (13 Latin), chr_peaks_chapter_iii.desc
 (12). Plus 3 stale rows (dgn_sanctum_speed.name ja_JP zh_CN, chr_nightbloom_first_cast.name
-ko_KR) and one romanized desc (ru_RU chr_nightbloom_first_cast: 'Poymay rybu v vodakh
-Nightbloom.'). Per locale: 41 missing in each Latin chunk (id_ID 40), 24 in each non-Latin.
+ko_KR). Per locale: 41 missing in each Latin chunk (id_ID 40), 24 in each non-Latin.
+
+Found by the completeness critic and verified in the chunks: the ru_RU chunk carries the whole
+zone-harvest and first-cast family (Frostveil, Amberfall, Nightbloom, Wraithwood, Palmreach,
+Evergarden) as ROMANIZED Russian, 11 names and 12 descs ('Urozhay na terrasakh', 'Poymay rybu
+v vodakh Nightbloom.'), not the single desc the Phase 03 ledger names; the ja_JP and ko_KR
+chunks render the same 12 descs each with the zone name in Latin letters inside an otherwise
+translated sentence. Release-inherited rows in the same channel; the deed pass replaces the
+23 romanized ru_RU rows and settles the zone-name register for the 24 ja_JP and ko_KR rows.
 
 ### G. Reliquary chunks (tests/reliquary_i18n.test.ts, the 18-locale arm)
 
@@ -156,8 +166,11 @@ Zero missing rows. One stale desc in all 18 locales: professions_field_notes.des
   have repaired it); farm.tableBodyOneMeal register (zh_CN zh_TW ko_KR).
 - ru_RU: 'Стойкость' for Stamina to 'Выносливость' in guide prose; the enchant-note tier names
   in the Cyrillic register; the 'Perfected only' badge eyeballed at mobile width.
-- zh_CN: faq.a10 and professions.toolEffectsBody store a literal backslash-n; Highwatch in Latin
-  in the craft prose against 高望 in the ladder prose of the inscription page.
+- zh_CN: faq.a10 stores a literal backslash-n (toolEffectsBody stores the same double-backslash
+  form the English does, so only faq.a10 diverges); Highwatch in Latin in the craft prose
+  against 高望 in the ladder prose of the inscription page.
+- ko_KR and zh_CN: the specimen item names and 'A Perfect Specimen' in English inside
+  guide.professions.harvestBodyFamilies (class J, the 11m set).
 - The five non-Latin soup names' 'frost gourd' qualifier and the ru Eastbrook stem split
   (farming/state.md 598): a read, not a defect.
 - Every fill that names a world entity looks the shipped entity row up first (the Drowned
@@ -176,9 +189,13 @@ Zero missing rows. One stale desc in all 18 locales: professions_field_notes.des
 
 ### I. Whole-block regens
 
-- The five non-Latin FAQ block, guide.profPages.faq.* (24 live keys: q1 to q11, a1 to a5,
-  a6ThreeRods, a7RetunedTaper, a8 to a10, a11Promotion, intro, title), regenerated whole against
-  the current English: 120 rows.
+- The five non-Latin FAQ block: CLOSED at Phase 11i, not owed. The 11i QA ledger (state.md
+  13611 to 13631) retired the six misaligned question rows and the four misaligned answers from
+  the five non-Latin overlays and re-filled them against the current questions in that change;
+  the commit walk finds no FAQ key with a stale non-Latin row today except faq.a6ThreeRods
+  (release-side, class C). The Phase 17 close's 'two whole-block regens' line predates this
+  record. What remains on the FAQ is a spot-check at the fill and the q5/a5 English reword
+  (class K).
 - The ru_RU craft-name register pass (class H, the decision first).
 
 ### J. Machine-anchored fills owed the maintainer's re-judgement
@@ -187,6 +204,14 @@ Zero missing rows. One stale desc in all 18 locales: professions_field_notes.des
 sim rows), read at the private page 'Masterwrought Fill Re-judgement' published from this
 session; the sets, their originating review notes and their shape anchors are listed there. A
 re-cut re-cuts its anchor in the same change.
+
+Added after the critic's read: the 34 apex pattern names (entities.items.pattern_<id>.name,
+five non-Latin fills each, the fourth machine-anchored set the Phase 17 close counted), and
+three keys the 11l and 11m rounds re-filled in ALL eighteen overlays with no gate behind the
+re-fill (hudChrome.bank.depositAllTooltip, guide.professions.harvestBodyFamilies,
+guide.profPages.specimenBodyFamilies: 54 rows, Latin included). In harvestBodyFamilies the
+ko_KR and zh_CN rows keep the specimen item names and the deed name 'A Perfect Specimen' in
+English where ja_JP and zh_TW translate them (a register split for class H).
 
 ### K. English rewords the ledgers queued onto this lane (each changes the source first, then every locale)
 
