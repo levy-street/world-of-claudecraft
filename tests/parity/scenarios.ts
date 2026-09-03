@@ -3454,7 +3454,7 @@ function nythraxisFullPull(): Scenario {
 
       // The Crown Endures: the clock runs out (no rng), warn callouts already
       // crossed, the enrage auras land.
-      nyx().enrageElapsed = 420 - DT;
+      nyx().enrageElapsed = 360 - DT; // the 6:00 normal clock
       step(1); // crownEndures callouts + The Crown Endures auras
       rec.snapshot('crown-endures');
 

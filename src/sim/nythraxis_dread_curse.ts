@@ -19,13 +19,20 @@ import { type DungeonDifficulty, dist2d, type Entity } from './types';
 export const NYTHRAXIS_DREAD_CURSE_AURA_ID = 'nythraxis_dread_curse';
 export const NYTHRAXIS_DREAD_CURSE_CAST_ID = 'Dread Curse';
 export const NYTHRAXIS_DREAD_CURSE_EVERY = 10;
-export const NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP = 0.25;
+export const NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL = 0.25;
+export const NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_HEROIC = 0.3;
 export const NYTHRAXIS_DREAD_CURSE_DURATION = 30;
 export const NYTHRAXIS_DREAD_CURSE_MAX_STACKS = 3;
 export const NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL = 0.35;
 export const NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC = 0.45;
 /** The stack count at which the other tank must taunt (published to the guide). */
 export const NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS = 2;
+
+export function nythraxisDreadCurseHitMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_HEROIC
+    : NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL;
+}
 
 export function nythraxisDreadCursePerStack(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'
@@ -65,10 +72,11 @@ export function castNythraxisDreadCurse(
   // mechanic and a damage-done debuff on the boss does not shrink it. The two
   // legacy Nythraxis sites (Soul Rend, Deathless Rage) keep their conditional
   // form because their normal-mode hits were never meant to be guaranteed.
+  const hit = nythraxisDreadCurseHitMaxHp(difficulty);
   ctx.dealDamage(
     boss,
     target,
-    Math.ceil(target.maxHp * NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP),
+    Math.ceil(target.maxHp * hit),
     false,
     'shadow',
     NYTHRAXIS_DREAD_CURSE_CAST_ID,
@@ -86,6 +94,7 @@ export function castNythraxisDreadCurse(
     stacks = Math.min(NYTHRAXIS_DREAD_CURSE_MAX_STACKS, Math.max(1, existing.stacks ?? 1) + 1);
     existing.stacks = stacks;
     existing.value = stacks * perStack;
+    existing.value2 = hit;
     existing.remaining = NYTHRAXIS_DREAD_CURSE_DURATION;
     ctx.emit({ type: 'aura', targetId: target.id, name: existing.name, gained: true });
   } else {
@@ -97,6 +106,8 @@ export function castNythraxisDreadCurse(
       remaining: NYTHRAXIS_DREAD_CURSE_DURATION,
       duration: NYTHRAXIS_DREAD_CURSE_DURATION,
       value: perStack,
+      // The hit fraction rides the aura so the tooltip reads the tier's number.
+      value2: hit,
       stacks: 1,
       sourceId: boss.id,
       school: 'shadow',

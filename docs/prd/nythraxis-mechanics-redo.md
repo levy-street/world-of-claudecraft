@@ -172,12 +172,13 @@ frees the spiked while running from him. When it ends the threat table is
 intact, the top-threat tank picks him up, and Gravebreaker re-arms in 3 s.
 Melee cannot attack safely; the raid spreads and runs.
 
-**The Crown Endures** (new, the hard enrage). At 7:00 from the pull (heroic
-6:00) Nythraxis gains +50% damage and +50% haste, and +25% more damage every
+**The Crown Endures** (new, the hard enrage). At 6:00 from the pull (heroic
+5:00) Nythraxis gains +50% damage and +50% haste, and +25% more damage every
 30 s after that, until the raid or the king is dead. Yells at 60, 30, and 10 s
 remaining (text now; voice deferred). No timer bar (classic fidelity, the same
 call the primitives PRD makes). The clock starts on the first encounter tick
-and includes the transition. Both times are placeholders for the Monte Carlo
+and PAUSES for the 70% transition (owner decision 2026-09-04: Brother
+Aldric's entrance is not the raid's time). Both times are placeholders for the Monte Carlo
 pass (section 8).
 
 ### 3.4 Scheduling rules
@@ -246,16 +247,16 @@ Unbound sigils (compounding boss damage against the clock).
 
 | Mechanic | Normal | Heroic |
 |---|---|---|
-| Dread Curse | +35% per stack, swap at 2 | +45% per stack, swap at 2 |
+| Dread Curse | 25% hit, +35% per stack, swap at 2 | 30% hit, +45% per stack, swap at 2 |
 | Bone Spike | every 20 s, 2 victims, 8%/s | every 16 s, 3 victims, 10%/s |
-| Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame 18 s at 9%/s |
-| Binding Sigil | every 45 s, 4 yd, 15 s to bind, +4%/stack, Unbound 40%, keeps +20% | every 40 s, 3 yd, 12 s, +5%/stack, Unbound 60%, keeps +25%, may land in fire |
-| Soul Rend / Soulfire | 3 marks, 100% split, pools 8%/s | 6 marks, 150% split, pools 12%/s |
+| Grave Eruption | every 15 s, 4 circles, 45%, flame 12 s at 6%/s | every 12 s, 6 circles, 75%, flame never goes out (clears at the transition) at 9%/s |
+| Binding Sigil | every 45 s, 10 to 24 yd out, 4 yd, 15 s to bind, +4%/stack, Bound 10 s, Unbound 40%, keeps +20% | every 40 s, 3 yd, 12 s, +5%/stack, Bound 8 s, Unbound 60%, keeps +25%, may land in fire |
+| Soul Rend / Soulfire | 3 marks, 100% split, pools 15 s at 8%/s | 6 marks, 150% split, pools never go out at 12%/s |
 | Deathless Rage | 82% on failure (unchanged) | 115% on failure, lethal, court rises (unchanged) |
 | Gravefire | every 12 s, burns 6 s at 10%/s | every 10 s, burns 8 s at 15%/s |
-| Phase 3 Wrath | +20% damage | +25% damage |
-| Bone Slam | 35% | 55% |
-| The Crown Endures | 7:00 | 6:00 |
+| Phase 3 Wrath | +20% damage, eruptions every 10 s, Gravefire every 8 s | +25% damage, eruptions every 8 s, Gravefire every 6 s |
+| Bone Storm | every 50 s, whirl 10%/s, Bone Slam 35% | every 40 s, whirl 20%/s, Bone Slam 55% |
+| The Crown Endures | 6:00 (the clock pauses for the transition), +25% every 30 s | 5:00, +25% every 20 s |
 | Court (Aldren, Malric, Voss) | absent | after a failed Rage and after each interrupt stun |
 
 Avoidable damage fractions get a Nythraxis block in
@@ -460,3 +461,21 @@ golden is regenerated once more at the end rather than per slice.
 2. The 7:00 / 6:00 enrage clock and the spike hp are placeholders until the
    matrix runs.
 3. The court stays heroic-only, or comes to normal as well.
+
+## 12. Owner adjustments before the first playtest (2026-09-04)
+
+- The arena is a compact hall, about 50 yd wide by 52 deep (`NYTHRAXIS_LAYOUT`),
+  down from 460 by 145; the boss dais keeps its local position, the wardstones
+  move in to 25 to 30 yd, the sigil band is 10 to 24 yd, eruptions land within
+  32 yd of the spawn, the adds and the court spawn just behind the dais.
+- Heroic floor fire never goes out on its own: Grave Flame and Soulfire patches
+  burn until the transition or a reset clears them (the caps still evict the
+  oldest), so the raid has to keep moving.
+- The Crown Endures is 6:00 normal, 5:00 heroic, and pauses during the
+  transition.
+- Nythraxis has 160,000 health on normal and 230,000 on heroic (boss only; the
+  adds and the Bone Spikes keep the shared arena multipliers).
+- Every redo mechanic now has a heroic step: Bone Storm whirls for 20% and
+  recurs every 40 s, Dread Curse hits for 30%, the Bound window is 8 s, phase 3
+  tightens eruptions to 8 s and Gravefire to 6 s, and the enrage ramps every
+  20 s. Gravebreaker (pre-existing) is the one flat number left.

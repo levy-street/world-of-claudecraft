@@ -12,8 +12,8 @@ import { ignivarMeteorDamageMaxHp } from '../src/sim/ignivar_meteors';
 import { nythraxisUnboundHitMaxHp } from '../src/sim/nythraxis_binding_sigil';
 import { nythraxisImpaledTickMaxHp } from '../src/sim/nythraxis_bone_spike';
 import {
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
   nythraxisBoneSlamDamageMaxHp,
+  nythraxisBoneStormWhirlTickMaxHp,
 } from '../src/sim/nythraxis_bone_storm';
 import { nythraxisDreadCursePerStack } from '../src/sim/nythraxis_dread_curse';
 import {
@@ -75,7 +75,7 @@ describe('raid avoidable damage tuning', () => {
       nythraxisGravefireTickMaxHp('normal'),
       nythraxisUnboundHitMaxHp('normal'),
       nythraxisBoneSlamDamageMaxHp('normal'),
-      NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+      nythraxisBoneStormWhirlTickMaxHp('normal'),
     ]).toEqual([0.45, 0.06, 0.08, 0.35, 0.08, 0.1, 0.4, 0.35, 0.1]);
     expect([
       nythraxisGraveEruptionDamageMaxHp('heroic'),
@@ -86,7 +86,7 @@ describe('raid avoidable damage tuning', () => {
       nythraxisGravefireTickMaxHp('heroic'),
       nythraxisUnboundHitMaxHp('heroic'),
       nythraxisBoneSlamDamageMaxHp('heroic'),
-      NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
-    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.12, 0.15, 0.6, 0.55, 0.1]);
+      nythraxisBoneStormWhirlTickMaxHp('heroic'),
+    ]).toEqual([0.75, 0.09, 0.1, 0.45, 0.12, 0.15, 0.6, 0.55, 0.2]);
   });
 });

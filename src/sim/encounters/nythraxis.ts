@@ -42,7 +42,6 @@ import {
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
   NYTHRAXIS_BOUND_AURA_ID,
   NYTHRAXIS_BOUND_AURA_NAME,
-  NYTHRAXIS_BOUND_SECONDS,
   NYTHRAXIS_BOUND_STUN_AURA_ID,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_SIGIL_CAST_ID,
@@ -56,6 +55,7 @@ import {
   type NythraxisSigilFloor,
   nythraxisAscensionPerStack,
   nythraxisBossOnSigil,
+  nythraxisBoundSeconds,
   nythraxisBoundStunSeconds,
   nythraxisSigilBindSeconds,
   nythraxisSigilCadence,
@@ -86,18 +86,18 @@ import {
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_AURA_NAME,
   NYTHRAXIS_BONE_STORM_CAST_ID,
-  NYTHRAXIS_BONE_STORM_EVERY,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
   NYTHRAXIS_BONE_STORM_SPEED_MULT,
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
   NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS,
   nythraxisBoneSlamDamageMaxHp,
+  nythraxisBoneStormCadence,
   nythraxisBoneStormChargeIndex,
   nythraxisBoneStormChargeTarget,
   nythraxisBoneStormDone,
   nythraxisBoneStormReached,
   nythraxisBoneStormSpikeDue,
+  nythraxisBoneStormWhirlTickMaxHp,
   pointInNythraxisBoneStorm,
 } from '../nythraxis_bone_storm';
 import {
@@ -151,17 +151,18 @@ import {
 import {
   NYTHRAXIS_KINGS_WRATH_AURA_ID,
   NYTHRAXIS_KINGS_WRATH_AURA_NAME,
-  NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
-  NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
   type NythraxisMajorsInFlight,
   nythraxisAnyMajorInFlight,
   nythraxisKingsWrathDamageBonus,
   nythraxisPhaseThreeReady,
   nythraxisWrathCadence,
+  nythraxisWrathGraveEruptionEvery,
+  nythraxisWrathGravefireEvery,
 } from '../nythraxis_kings_wrath';
 import {
   igniteNythraxisSoulfire,
   NYTHRAXIS_SOULFIRE_CAST_ID,
+  nythraxisSoulfireSeconds,
   nythraxisSoulfireTickMaxHp,
 } from '../nythraxis_soulfire';
 import {
@@ -322,8 +323,8 @@ const NYTHRAXIS_TRANSITION_CONTROL_GRACE = 0.5;
 // Brother Aldric enters on the door side of the arena (the raid's side, lower z
 // than the boss spawn) and walks toward the boss. Distances are yards in front
 // of the boss spawn: appears 50yd out, walks up to 30yd out (between door + boss).
-const NYTHRAXIS_ALDRIC_SPAWN_DIST = 50;
-const NYTHRAXIS_ALDRIC_WALK_DIST = 30;
+const NYTHRAXIS_ALDRIC_SPAWN_DIST = 40;
+const NYTHRAXIS_ALDRIC_WALK_DIST = 20;
 const NYTHRAXIS_PARTY_INTERACT_RANGE = 30;
 const NYTHRAXIS_VISION_LINE_DELAY = 5;
 const NYTHRAXIS_HEROIC_ADD_IDS = [
@@ -578,9 +579,11 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   }
 
   if (st.soulRendLockout > 0) st.soulRendLockout = Math.max(0, st.soulRendLockout - DT);
-  // The Crown Endures clock runs from the first encounter tick through the
-  // transition and every script-locked window: nothing pauses it.
-  if (st.phase !== 'dead') updateNythraxisEnrageClock(ctx, boss, st);
+  // The Crown Endures clock runs from the first encounter tick through every
+  // script-locked window (a Rage cast, a Bound stun, a storm), and pauses
+  // only for the 70% transition: Brother Aldric's entrance is not the raid's
+  // time (owner decision 2026-09-04).
+  if (st.phase !== 'dead' && st.phase !== 'transition') updateNythraxisEnrageClock(ctx, boss, st);
   updateNythraxisSoulRend(ctx, boss, st);
   if (st.phase === 'transition') {
     updateNythraxisTransition(ctx, boss, st);
@@ -1191,7 +1194,7 @@ export function startNythraxisGraveEruption(
   ms.eruptionTimer = nythraxisWrathCadence(
     st.phase === 3,
     nythraxisGraveEruptionCadence(difficulty),
-    NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
+    nythraxisWrathGraveEruptionEvery(difficulty),
   );
   ms.eruptionPoints.forEach((point, index) => {
     ctx.emit({
@@ -1353,7 +1356,7 @@ export function updateNythraxisGravefireCast(
   ms.gravefireTimer = nythraxisWrathCadence(
     st.phase === 3,
     nythraxisGravefireCadence(difficulty),
-    NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+    nythraxisWrathGravefireEvery(difficulty),
   );
   // The one shared-stream draw of the mechanic: which raider the line runs at.
   const target = candidates[ctx.rng.int(0, candidates.length - 1)];
@@ -1618,9 +1621,11 @@ function resolveNythraxisSigilBound(
     id: NYTHRAXIS_BOUND_AURA_ID,
     name: NYTHRAXIS_BOUND_AURA_NAME,
     kind: 'vulnerability',
-    remaining: NYTHRAXIS_BOUND_SECONDS,
-    duration: NYTHRAXIS_BOUND_SECONDS,
+    remaining: nythraxisBoundSeconds(difficulty),
+    duration: nythraxisBoundSeconds(difficulty),
     value: NYTHRAXIS_BOUND_VULNERABILITY,
+    // The burn window rides the aura so the tooltip reads the tier's number.
+    value2: nythraxisBoundSeconds(difficulty),
     sourceId: boss.id,
     school: 'arcane',
     encounterOwned: true,
@@ -1840,7 +1845,7 @@ export function updateNythraxisBoneStormCast(
     ms.boneStormTimer = 3;
     return;
   }
-  ms.boneStormTimer = NYTHRAXIS_BONE_STORM_EVERY;
+  ms.boneStormTimer = nythraxisBoneStormCadence(nythraxisDifficulty(ctx, boss));
   startNythraxisBoneStorm(ctx, boss, st);
 }
 
@@ -1875,6 +1880,8 @@ export function startNythraxisBoneStorm(
     remaining: 600,
     duration: 600,
     value: 0,
+    // The whirl tick rides the aura so the tooltip reads the tier's number.
+    value2: nythraxisBoneStormWhirlTickMaxHp(nythraxisDifficulty(ctx, boss)),
     sourceId: boss.id,
     school: 'physical',
     encounterOwned: true,
@@ -1910,12 +1917,13 @@ export function updateNythraxisBoneStorm(
   storm.whirlTickTimer -= DT;
   if (storm.whirlTickTimer <= 0) {
     storm.whirlTickTimer += NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS;
+    const whirl = nythraxisBoneStormWhirlTickMaxHp(nythraxisDifficulty(ctx, boss));
     for (const p of room) {
       if (p.dead || !pointInNythraxisBoneStorm(boss.pos, p.pos)) continue;
       ctx.dealDamage(
         boss,
         p,
-        Math.ceil(p.maxHp * NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP),
+        Math.ceil(p.maxHp * whirl),
         false,
         'physical',
         NYTHRAXIS_BONE_STORM_CAST_ID,
@@ -2147,10 +2155,11 @@ export function spawnNythraxisAdds(ctx: SimContext, boss: Entity): void {
   if (!template) return;
   // Raise the guards from BEHIND the boss (toward the back wall), so they rise
   // up behind him and march out around him, not between the boss and the raid.
-  const back = boss.spawnPos.z + 16;
+  // Just behind him on the dais: the back wall is 8 yd behind the spawn now.
+  const back = boss.spawnPos.z + 5;
   const spawnPoints = [
-    ctx.groundPos(boss.spawnPos.x - 12, back),
-    ctx.groundPos(boss.spawnPos.x + 12, back),
+    ctx.groundPos(boss.spawnPos.x - 10, back),
+    ctx.groundPos(boss.spawnPos.x + 10, back),
   ];
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   // Add waves inherit the claimed instance's difficulty exactly like
@@ -2226,9 +2235,10 @@ export function updateNythraxisHeroicSummon(
 export function spawnNythraxisHeroicAdds(ctx: SimContext, boss: Entity): void {
   const inst = ctx.instances.find((i) => i.partyKey !== null && i.mobIds.includes(boss.id));
   const spawnPoints = [
-    ctx.groundPos(boss.pos.x - 8, boss.pos.z + 8),
-    ctx.groundPos(boss.pos.x, boss.pos.z + 10),
-    ctx.groundPos(boss.pos.x + 8, boss.pos.z + 8),
+    // Close behind him: the hall's back wall is 8 yd behind the spawn.
+    ctx.groundPos(boss.pos.x - 8, boss.pos.z + 4),
+    ctx.groundPos(boss.pos.x, boss.pos.z + 6),
+    ctx.groundPos(boss.pos.x + 8, boss.pos.z + 4),
   ];
   const victimId = boss.aggroTargetId ?? threatEntries(boss, 1)[0]?.[0] ?? null;
   const victim = victimId !== null ? ctx.entities.get(victimId) : null;
@@ -2548,6 +2558,7 @@ export function updateNythraxisSoulRend(
     marked.map((p) => ({ x: p.pos.x, z: p.pos.z })),
     nythraxisWardstones(ctx, boss).map((w) => ({ x: w.pos.x, z: w.pos.z })),
     ms.graveFlameSeq,
+    nythraxisSoulfireSeconds(nythraxisDifficulty(ctx, boss)),
   );
   st.soulRendMarks = [];
 }

@@ -221,7 +221,8 @@ describe('Nythraxis raid encounter', () => {
     expect(dungeon.interior).toBe('nythraxis');
     expect(dungeon.suggestedPlayers).toBe(10);
     expect(dungeon.spawns).toEqual([{ mobId: 'nythraxis_scourge_of_thornpeak', x: 0, z: 96 }]);
-    expect(NYTHRAXIS_LAYOUT.wallX).toBeGreaterThanOrEqual(230);
+    // A compact hall: about 50 yd wide by 52 deep around the boss dais at z 96.
+    expect(NYTHRAXIS_LAYOUT).toMatchObject({ zMin: 52, zMax: 104, wallX: 26, floorHalfX: 25 });
     expect(MOBS.nythraxis_scourge_of_thornpeak.boss).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.ccImmune).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.moveSpeed).toBe(10.5);
@@ -272,7 +273,7 @@ describe('Nythraxis raid encounter', () => {
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     // Normal-raid retune (NORMAL_DUNGEON_TUNING): doubled health (was 60000)
     // and the 5x per-mob damage multiplier (weapon was 325-507).
-    expect(boss.maxHp).toBe(120000);
+    expect(boss.maxHp).toBe(160000);
     expect(boss.weapon.min).toBe(1624);
     expect(boss.weapon.max).toBe(2537);
     expect(visualKeyFor(boss)).toBe('skel_golem');
@@ -295,14 +296,14 @@ describe('Nythraxis raid encounter', () => {
         .map((w) => ({ x: Math.round(w.pos.x - origin.x), z: Math.round(w.pos.z - origin.z) }))
         .sort((a, b) => a.x - b.x),
     ).toEqual([
-      { x: -40, z: 79 },
-      { x: 0, z: 63 },
-      { x: 40, z: 79 },
+      { x: -16, z: 76 },
+      { x: 0, z: 66 },
+      { x: 16, z: 76 },
     ]);
     expect(pillars).toHaveLength(0);
     expect(isBlocked(sim.cfg.seed, origin.x + 0, origin.z + 96)).toBe(false);
-    expect(isBlocked(sim.cfg.seed, origin.x + 18, origin.z + 82)).toBe(false);
-    expect(isBlocked(sim.cfg.seed, origin.x + 230, origin.z + 82)).toBe(true);
+    expect(isBlocked(sim.cfg.seed, origin.x + 10, origin.z + 82)).toBe(false);
+    expect(isBlocked(sim.cfg.seed, origin.x + 26, origin.z + 82)).toBe(true);
     expect(dungeonDaisHasRaisedPlatform('nythraxis')).toBe(false);
     expect(dungeonDaisHasRaisedPlatform('crypt')).toBe(true);
   });
@@ -1670,7 +1671,7 @@ describe('Nythraxis raid encounter', () => {
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     engage(boss, tank);
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    teleport(sim, tankPid, origin.x, origin.z + 70);
     boss.aiState = 'chase';
     boss.swingTimer = 0;
 
@@ -1690,7 +1691,7 @@ describe('Nythraxis raid encounter', () => {
     tank.maxHp = 1e7;
     tank.hp = tank.maxHp;
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
-    teleport(sim, tankPid, origin.x, origin.z + 36);
+    teleport(sim, tankPid, origin.x, origin.z + 70);
     boss.inCombat = true;
     boss.aiState = 'idle';
     boss.aggroTargetId = tank.id;
@@ -1738,7 +1739,7 @@ describe('Nythraxis raid encounter', () => {
     };
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
-    teleport(sim, tankPid, origin.x + 34, origin.z + 82);
+    teleport(sim, tankPid, origin.x + 20, origin.z + 82);
     add.aiState = 'chase';
     add.swingTimer = 0;
 

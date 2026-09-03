@@ -21,7 +21,7 @@ import {
   NYTHRAXIS_ASCENSION_AURA_ID,
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
   NYTHRAXIS_BOUND_AURA_ID,
-  NYTHRAXIS_BOUND_SECONDS,
+  NYTHRAXIS_BOUND_SECONDS_NORMAL,
   NYTHRAXIS_BOUND_STUN_AURA_ID,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_UNBOUND_AURA_ID,
@@ -34,11 +34,11 @@ import {
 import {
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_RADIUS,
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL,
 } from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
-  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP,
+  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
 } from '../src/sim/nythraxis_dread_curse';
@@ -191,7 +191,7 @@ describe('auraEffectDescriptor', () => {
     ).toMatchObject({ perStack: 35, pct: 70, stacks: 2 });
     expect(NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL).toBe(0.35);
     expect(NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC).toBe(0.45);
-    expect(NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP).toBe(0.25);
+    expect(NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL).toBe(0.25);
     expect(hudChromeStrings.auraEffect.nythraxisDreadCurse).toBe(
       'Each stack increases damage taken from Nythraxis by {perStack}% for {duration} sec: {stacks} of {max} stacks now, {pct}% more damage. Every {every} sec his next hit on his target deals {hit}% of maximum health and adds a stack. Tanks should swap at {swap} stacks.',
     );
@@ -241,7 +241,7 @@ describe('auraEffectDescriptor', () => {
       key: 'hudChrome.auraEffect.nythraxisBound',
       nums: {
         pct: Math.round(NYTHRAXIS_BOUND_VULNERABILITY * 100),
-        duration: NYTHRAXIS_BOUND_SECONDS,
+        duration: NYTHRAXIS_BOUND_SECONDS_NORMAL,
       },
     });
     expect(hudChromeStrings.auraEffect.nythraxisBound).toBe(
@@ -282,7 +282,7 @@ describe('auraEffectDescriptor', () => {
     expect(desc({ id: NYTHRAXIS_BONE_STORM_AURA_ID, kind: 'buff_speed', value: 2.2 })).toEqual({
       key: 'hudChrome.auraEffect.nythraxisBoneStorm',
       nums: {
-        tick: Math.round(NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP * 100),
+        tick: Math.round(NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL * 100),
         radius: NYTHRAXIS_BONE_STORM_RADIUS,
       },
     });

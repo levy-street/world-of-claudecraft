@@ -16,13 +16,32 @@ import type { DungeonDifficulty } from './types';
 
 export const NYTHRAXIS_SOULFIRE_CAST_ID = 'Soulfire';
 export const NYTHRAXIS_SOULFIRE_RADIUS = 4;
-export const NYTHRAXIS_SOULFIRE_SECONDS = 15;
+/**
+ * "Permanent" floor fire on heroic: a patch burns until the phase transition
+ * or a reset clears it (owner decision 2026-09-04, so the raid keeps moving).
+ * A large finite number rather than Infinity because the readout and the wire
+ * carry duration and remaining as finite seconds; one hour outlives any pull.
+ */
+export const NYTHRAXIS_FLAME_PERMANENT_SECONDS = 3600;
+export const NYTHRAXIS_SOULFIRE_SECONDS_NORMAL = 15;
+export const NYTHRAXIS_SOULFIRE_SECONDS_HEROIC = NYTHRAXIS_FLAME_PERMANENT_SECONDS;
 export const NYTHRAXIS_SOULFIRE_TICK_SECONDS = 1;
 export const NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL = 0.08;
 export const NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC = 0.12;
 export const NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE = 6;
 /** Oldest pools expire first past this many live Soulfire pools. */
 export const NYTHRAXIS_SOULFIRE_CAP = 12;
+
+export function nythraxisSoulfireSeconds(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_SOULFIRE_SECONDS_HEROIC
+    : NYTHRAXIS_SOULFIRE_SECONDS_NORMAL;
+}
+
+/** True when a patch of this duration never times out on its own. */
+export function nythraxisFlameIsPermanent(seconds: number): boolean {
+  return seconds >= NYTHRAXIS_FLAME_PERMANENT_SECONDS;
+}
 
 export function nythraxisSoulfireTickMaxHp(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'
@@ -52,6 +71,7 @@ export function igniteNythraxisSoulfire(
   points: readonly NythraxisGravePoint[],
   wardstones: readonly NythraxisGravePoint[],
   seq: number,
+  seconds: number = NYTHRAXIS_SOULFIRE_SECONDS_NORMAL,
 ): number {
   let next = seq;
   for (const point of points) {
@@ -62,7 +82,7 @@ export function igniteNythraxisSoulfire(
       x: point.x,
       z: point.z,
       radius: NYTHRAXIS_SOULFIRE_RADIUS,
-      remaining: NYTHRAXIS_SOULFIRE_SECONDS,
+      remaining: seconds,
       tickTimer: NYTHRAXIS_SOULFIRE_TICK_SECONDS,
     });
   }

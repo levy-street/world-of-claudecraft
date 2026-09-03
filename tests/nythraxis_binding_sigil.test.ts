@@ -6,7 +6,6 @@ import { describe, expect, it } from 'vitest';
 import {
   activeNythraxisBindingSigils,
   NYTHRAXIS_ASCENSION_EVERY,
-  NYTHRAXIS_BOUND_SECONDS,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_SIGIL_FIRST_SECONDS,
   NYTHRAXIS_SIGIL_MAX_DIST,
@@ -15,6 +14,7 @@ import {
   type NythraxisSigilFloor,
   nythraxisAscensionPerStack,
   nythraxisBossOnSigil,
+  nythraxisBoundSeconds,
   nythraxisBoundStunSeconds,
   nythraxisSigilBindSeconds,
   nythraxisSigilCadence,
@@ -47,7 +47,7 @@ describe('Nythraxis Binding Sigil', () => {
       4, 3,
     ]);
     expect(NYTHRAXIS_BOUND_VULNERABILITY).toBe(0.25);
-    expect(NYTHRAXIS_BOUND_SECONDS).toBe(10);
+    expect([nythraxisBoundSeconds('normal'), nythraxisBoundSeconds('heroic')]).toEqual([10, 8]);
     expect([nythraxisUnboundHitMaxHp('normal'), nythraxisUnboundHitMaxHp('heroic')]).toEqual([
       0.4, 0.6,
     ]);
@@ -58,7 +58,7 @@ describe('Nythraxis Binding Sigil', () => {
       false,
       true,
     ]);
-    expect([NYTHRAXIS_SIGIL_MIN_DIST, NYTHRAXIS_SIGIL_MAX_DIST]).toEqual([12, 30]);
+    expect([NYTHRAXIS_SIGIL_MIN_DIST, NYTHRAXIS_SIGIL_MAX_DIST]).toEqual([10, 24]);
     expect(NYTHRAXIS_SIGIL_WARDSTONE_CLEARANCE).toBe(6);
   });
 

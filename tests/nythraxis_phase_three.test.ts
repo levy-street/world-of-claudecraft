@@ -11,9 +11,9 @@ import {
   NYTHRAXIS_BONE_SLAM_CAST_ID,
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_CAST_ID,
-  NYTHRAXIS_BONE_STORM_EVERY,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
+  nythraxisBoneStormCadence,
 } from '../src/sim/nythraxis_bone_storm';
 import { NYTHRAXIS_DREAD_CURSE_AURA_ID } from '../src/sim/nythraxis_dread_curse';
 import {
@@ -148,17 +148,17 @@ describe("Nythraxis The King's Wrath (phase 3 entry)", () => {
     expect(st.phase).toBe(3);
   });
 
-  it('tightens Grave Eruption to 10 s and Gravefire to 8 s, never loosening heroic', () => {
+  it('tightens Grave Eruption to 10 s (heroic 8) and Gravefire to 8 s (heroic 6)', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, raiders } = setup({ difficulty });
       st.eruptionTimer = DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
-      expect(st.eruptionTimer, difficulty).toBe(10);
+      expect(st.eruptionTimer, difficulty).toBe(difficulty === 'heroic' ? 8 : 10);
       st.eruptionTimer = 999;
       teleport(sim, raiders[0], boss.pos.x + 20, boss.pos.z, boss.pos.y);
       st.gravefireTimer = DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
-      expect(st.gravefireTimer, difficulty).toBe(8);
+      expect(st.gravefireTimer, difficulty).toBe(difficulty === 'heroic' ? 6 : 8);
     }
   });
 
@@ -191,7 +191,7 @@ describe('Nythraxis Bone Storm', () => {
     st.boneStormTimer = DT / 2;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(st.boneStorm).not.toBeNull();
-    expect(st.boneStormTimer).toBe(NYTHRAXIS_BONE_STORM_EVERY);
+    expect(st.boneStormTimer).toBe(nythraxisBoneStormCadence('normal'));
     expect(aura(NYTHRAXIS_BONE_STORM_AURA_ID)).toBeTruthy();
     expect(callouts('boneStormBegins').length).toBe(10);
     // The first charge window opens on the next storm tick: exactly one raider
@@ -202,7 +202,7 @@ describe('Nythraxis Bone Storm', () => {
     expect(charged[0].pid).toBe(st.boneStorm!.chargeTargetId);
   });
 
-  it('slams on arrival, lights a Gravefire down the charge, and whirls inside 9 yd', () => {
+  it('slams on arrival, lights a Gravefire down the charge, and whirls 10% (heroic 20%) inside 9 yd', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { sim, ctx, boss, st, tank, raiders, damageBy } = setup({ difficulty });
       // A storm already running with the tank as its charge, 3 yd away (reached
@@ -246,7 +246,9 @@ describe('Nythraxis Bone Storm', () => {
         whirls.map((e) => e.targetId),
         difficulty,
       ).toEqual([tank.id]);
-      expect(whirls[0].amount, difficulty).toBe(Math.ceil(tank.maxHp * 0.1));
+      expect(whirls[0].amount, difficulty).toBe(
+        Math.ceil(tank.maxHp * (difficulty === 'heroic' ? 0.2 : 0.1)),
+      );
       // The slam's Gravefire line ran through the tank too (3 yd along it).
       const burned = (
         damageBy(NYTHRAXIS_GRAVEFIRE_CAST_ID) as { targetId: number; amount: number }[]
@@ -368,32 +370,35 @@ describe('Nythraxis Bone Storm', () => {
 });
 
 describe('Nythraxis The Crown Endures (the enrage clock)', () => {
-  it('runs from the pull through the transition and warns at 60, 30, and 10 s', () => {
+  it('runs from the pull, pauses for the transition, and warns at 60, 30, and 10 s', () => {
     const { ctx, boss, st, callouts } = setup({ phase: 1 });
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(st.enrageElapsed).toBeCloseTo(DT, 9);
+    // Brother Aldric's entrance is not the raid's time: the clock holds.
     st.phase = 'transition';
     st.transitionStarted = true;
     st.transitionTimer = 5;
+    tickDriver(ctx, boss, 1);
+    expect(st.enrageElapsed).toBeCloseTo(DT, 9);
+    st.phase = 2;
     nythraxis.updateNythraxisEncounter(ctx, boss);
     expect(st.enrageElapsed).toBeCloseTo(2 * DT, 9);
-    st.phase = 2;
     for (const [mark, call] of [
       [60, 'crownEndures60'],
       [30, 'crownEndures30'],
       [10, 'crownEndures10'],
     ] as const) {
-      st.enrageElapsed = 420 - mark - DT / 2;
+      st.enrageElapsed = 360 - mark - DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
       expect(callouts(call).length, String(mark)).toBe(10);
     }
     expect(callouts('crownEndures').length).toBe(0);
   });
 
-  it('enrages at 7:00 (heroic 6:00) with +50% damage and attack speed, then ramps', () => {
+  it('enrages at 6:00 (heroic 5:00) with +50% damage and attack speed, then ramps', () => {
     for (const difficulty of ['normal', 'heroic'] as const) {
       const { ctx, boss, st, callouts, aura } = setup({ difficulty });
-      const limit = difficulty === 'heroic' ? 360 : 420;
+      const limit = difficulty === 'heroic' ? 300 : 360;
       st.enrageElapsed = limit - DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
       expect(callouts('crownEndures').length, difficulty).toBe(10);
@@ -403,8 +408,8 @@ describe('Nythraxis The Crown Endures (the enrage clock)', () => {
       });
       expect(aura(NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID)?.value, difficulty).toBe(1.5);
       expect(st.enrageStacks, difficulty).toBe(1);
-      // Thirty seconds later: a second stack, +25% more.
-      st.enrageElapsed = limit + 30 - DT / 2;
+      // One ramp later (30 s, heroic 20 s): a second stack, +25% more.
+      st.enrageElapsed = limit + (difficulty === 'heroic' ? 20 : 30) - DT / 2;
       nythraxis.updateNythraxisEncounter(ctx, boss);
       expect(aura(NYTHRAXIS_CROWN_ENDURES_AURA_ID), difficulty).toMatchObject({
         value: 0.75,

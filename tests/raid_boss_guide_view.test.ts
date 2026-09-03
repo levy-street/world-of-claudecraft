@@ -35,15 +35,15 @@ import {
 import {
   NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
   NYTHRAXIS_BONE_STORM_CHARGES,
-  NYTHRAXIS_BONE_STORM_EVERY,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
   NYTHRAXIS_BONE_STORM_SECONDS,
   NYTHRAXIS_BONE_STORM_SPEED_MULT,
   NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS,
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
   nythraxisBoneSlamDamageMaxHp,
+  nythraxisBoneStormCadence,
+  nythraxisBoneStormWhirlTickMaxHp,
 } from '../src/sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC,
@@ -53,9 +53,9 @@ import {
 import {
   NYTHRAXIS_ENRAGE_DAMAGE_BONUS,
   NYTHRAXIS_ENRAGE_HASTE_BONUS,
-  NYTHRAXIS_ENRAGE_RAMP_EVERY,
   NYTHRAXIS_ENRAGE_RAMP_STEP,
   NYTHRAXIS_ENRAGE_WARN_SECONDS,
+  nythraxisEnrageRampEvery,
   nythraxisEnrageSeconds,
 } from '../src/sim/nythraxis_enrage_clock';
 import {
@@ -66,9 +66,9 @@ import {
 } from '../src/sim/nythraxis_gravefire';
 import {
   NYTHRAXIS_PHASE_THREE_HP,
-  NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
-  NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
   nythraxisKingsWrathDamageBonus,
+  nythraxisWrathGraveEruptionEvery,
+  nythraxisWrathGravefireEvery,
 } from '../src/sim/nythraxis_kings_wrath';
 import {
   NYTHRAXIS_SOULFIRE_TICK_MAX_HP_HEROIC,
@@ -223,8 +223,10 @@ describe('raid boss guide view', () => {
         health: NYTHRAXIS_PHASE_THREE_HP,
         bonusNormal: nythraxisKingsWrathDamageBonus('normal'),
         bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
-        eruptionEvery: NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
-        gravefireEvery: NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+        eruptionEveryNormal: nythraxisWrathGraveEruptionEvery('normal'),
+        eruptionEveryHeroic: nythraxisWrathGraveEruptionEvery('heroic'),
+        gravefireEveryNormal: nythraxisWrathGravefireEvery('normal'),
+        gravefireEveryHeroic: nythraxisWrathGravefireEvery('heroic'),
       },
       percentValues: ['health', 'bonusNormal', 'bonusHeroic'],
     });
@@ -275,8 +277,10 @@ describe('raid boss guide view', () => {
       values: {
         bonusNormal: nythraxisKingsWrathDamageBonus('normal'),
         bonusHeroic: nythraxisKingsWrathDamageBonus('heroic'),
-        eruptionEvery: NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
-        gravefireEvery: NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
+        eruptionEveryNormal: nythraxisWrathGraveEruptionEvery('normal'),
+        eruptionEveryHeroic: nythraxisWrathGraveEruptionEvery('heroic'),
+        gravefireEveryNormal: nythraxisWrathGravefireEvery('normal'),
+        gravefireEveryHeroic: nythraxisWrathGravefireEvery('heroic'),
       },
       percentValues: ['bonusNormal', 'bonusHeroic'],
     });
@@ -286,19 +290,21 @@ describe('raid boss guide view', () => {
       iconId: 'raid_nythraxis_bone_storm',
       values: {
         first: NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
-        every: NYTHRAXIS_BONE_STORM_EVERY,
+        everyNormal: nythraxisBoneStormCadence('normal'),
+        everyHeroic: nythraxisBoneStormCadence('heroic'),
         duration: NYTHRAXIS_BONE_STORM_SECONDS,
         charges: NYTHRAXIS_BONE_STORM_CHARGES,
         chargeSeconds: NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
         speed: NYTHRAXIS_BONE_STORM_SPEED_MULT,
         radius: NYTHRAXIS_BONE_STORM_RADIUS,
-        whirl: NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+        whirlNormal: nythraxisBoneStormWhirlTickMaxHp('normal'),
+        whirlHeroic: nythraxisBoneStormWhirlTickMaxHp('heroic'),
         slamNormal: nythraxisBoneSlamDamageMaxHp('normal'),
         slamHeroic: nythraxisBoneSlamDamageMaxHp('heroic'),
         spikeAt: NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS,
         rearm: NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
       },
-      percentValues: ['whirl', 'slamNormal', 'slamHeroic'],
+      percentValues: ['whirlNormal', 'whirlHeroic', 'slamNormal', 'slamHeroic'],
     });
     expect(normalMechanics.find((mechanic) => mechanic.id === 'crown-endures')).toMatchObject({
       roles: ['damage'],
@@ -312,7 +318,8 @@ describe('raid boss guide view', () => {
         warn10: NYTHRAXIS_ENRAGE_WARN_SECONDS[2],
         damage: NYTHRAXIS_ENRAGE_DAMAGE_BONUS,
         haste: NYTHRAXIS_ENRAGE_HASTE_BONUS,
-        rampEvery: NYTHRAXIS_ENRAGE_RAMP_EVERY,
+        rampEveryNormal: nythraxisEnrageRampEvery('normal'),
+        rampEveryHeroic: nythraxisEnrageRampEvery('heroic'),
         rampStep: NYTHRAXIS_ENRAGE_RAMP_STEP,
       },
       percentValues: ['damage', 'haste', 'rampStep'],
@@ -535,7 +542,9 @@ describe('raid boss guide view', () => {
     expect(summaryOf(heroic, 'kings-wrath')).toContain(
       `${pct(nythraxisKingsWrathDamageBonus('heroic'))} on Heroic`,
     );
-    expect(summaryOf(normal, 'bone-storm')).toContain(`every ${NYTHRAXIS_BONE_STORM_EVERY} sec`);
+    expect(summaryOf(normal, 'bone-storm')).toContain(
+      `every ${nythraxisBoneStormCadence('normal')} sec`,
+    );
     expect(summaryOf(normal, 'bone-storm')).toContain(
       `${pct(nythraxisBoneSlamDamageMaxHp('normal'))} of maximum health`,
     );

@@ -55,7 +55,7 @@ import {
   NYTHRAXIS_ASCENSION_AURA_ID,
   NYTHRAXIS_ASCENSION_HASTE_AURA_ID,
   NYTHRAXIS_BOUND_AURA_ID,
-  NYTHRAXIS_BOUND_SECONDS,
+  NYTHRAXIS_BOUND_SECONDS_NORMAL,
   NYTHRAXIS_BOUND_STUN_AURA_ID,
   NYTHRAXIS_BOUND_VULNERABILITY,
   NYTHRAXIS_UNBOUND_AURA_ID,
@@ -69,13 +69,13 @@ import {
 import {
   NYTHRAXIS_BONE_STORM_AURA_ID,
   NYTHRAXIS_BONE_STORM_RADIUS,
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
+  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL,
 } from '../sim/nythraxis_bone_storm';
 import {
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_DURATION,
   NYTHRAXIS_DREAD_CURSE_EVERY,
-  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP,
+  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL,
   NYTHRAXIS_DREAD_CURSE_MAX_STACKS,
   NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL,
   NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
@@ -242,7 +242,8 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
       key: `${KEY}.nythraxisBound`,
       nums: {
         pct: pctFromFrac(NYTHRAXIS_BOUND_VULNERABILITY),
-        duration: NYTHRAXIS_BOUND_SECONDS,
+        // The burn window is per difficulty and rides the aura's value2.
+        duration: a.value2 ?? NYTHRAXIS_BOUND_SECONDS_NORMAL,
       },
     };
   }
@@ -262,7 +263,9 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
     return {
       key: `${KEY}.nythraxisBoneStorm`,
       nums: {
-        tick: pctFromFrac(NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP),
+        // The whirl tick is per difficulty and rides the aura's value2; a
+        // mirror that has not carried it yet falls back to the normal number.
+        tick: pctFromFrac(a.value2 ?? NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL),
         radius: NYTHRAXIS_BONE_STORM_RADIUS,
       },
     };
@@ -292,7 +295,7 @@ export function auraEffectDescriptor(a: AuraEffectInput): AuraEffectDescriptor |
         stacks,
         max: NYTHRAXIS_DREAD_CURSE_MAX_STACKS,
         pct: pctFromFrac(perStackFrac * stacks),
-        hit: pctFromFrac(NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP),
+        hit: pctFromFrac(a.value2 ?? NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL),
         every: NYTHRAXIS_DREAD_CURSE_EVERY,
         swap: NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
       },

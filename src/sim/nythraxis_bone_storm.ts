@@ -52,14 +52,16 @@ export const NYTHRAXIS_BONE_STORM_AURA_NAME = 'Bone Storm';
 
 /** Seconds into phase 3 the first storm begins. */
 export const NYTHRAXIS_BONE_STORM_FIRST_SECONDS = 8;
-export const NYTHRAXIS_BONE_STORM_EVERY = 50;
+export const NYTHRAXIS_BONE_STORM_EVERY_NORMAL = 50;
+export const NYTHRAXIS_BONE_STORM_EVERY_HEROIC = 40;
 export const NYTHRAXIS_BONE_STORM_SECONDS = 12;
 export const NYTHRAXIS_BONE_STORM_CHARGES = 4;
 export const NYTHRAXIS_BONE_STORM_CHARGE_SECONDS = 3;
 export const NYTHRAXIS_BONE_STORM_SPEED_MULT = 2.2;
 export const NYTHRAXIS_BONE_STORM_RADIUS = 9;
 export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS = 1;
-export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP = 0.1;
+export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL = 0.1;
+export const NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_HEROIC = 0.2;
 export const NYTHRAXIS_BONE_SLAM_MAX_HP_NORMAL = 0.35;
 export const NYTHRAXIS_BONE_SLAM_MAX_HP_HEROIC = 0.55;
 /** He has reached his charge target inside this distance. */
@@ -68,6 +70,18 @@ export const NYTHRAXIS_BONE_STORM_ARRIVE_DIST = 3;
 export const NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS = 6;
 /** Seconds after the storm ends before Gravebreaker is charged again. */
 export const NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS = 3;
+
+export function nythraxisBoneStormCadence(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_BONE_STORM_EVERY_HEROIC
+    : NYTHRAXIS_BONE_STORM_EVERY_NORMAL;
+}
+
+export function nythraxisBoneStormWhirlTickMaxHp(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_HEROIC
+    : NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP_NORMAL;
+}
 
 export function nythraxisBoneSlamDamageMaxHp(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'

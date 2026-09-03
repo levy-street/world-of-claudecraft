@@ -19,9 +19,23 @@ export const NYTHRAXIS_KINGS_WRATH_AURA_ID = 'nythraxis_kings_wrath';
 export const NYTHRAXIS_KINGS_WRATH_AURA_NAME = "King's Wrath";
 export const NYTHRAXIS_KINGS_WRATH_DAMAGE_BONUS_NORMAL = 0.2;
 export const NYTHRAXIS_KINGS_WRATH_DAMAGE_BONUS_HEROIC = 0.25;
-/** Phase 3 cadences for the two floor hazards (both difficulties). */
-export const NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY = 10;
-export const NYTHRAXIS_WRATH_GRAVEFIRE_EVERY = 8;
+/** Phase 3 cadences for the two floor hazards. */
+export const NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY_NORMAL = 10;
+export const NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY_HEROIC = 8;
+export const NYTHRAXIS_WRATH_GRAVEFIRE_EVERY_NORMAL = 8;
+export const NYTHRAXIS_WRATH_GRAVEFIRE_EVERY_HEROIC = 6;
+
+export function nythraxisWrathGraveEruptionEvery(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY_HEROIC
+    : NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY_NORMAL;
+}
+
+export function nythraxisWrathGravefireEvery(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_WRATH_GRAVEFIRE_EVERY_HEROIC
+    : NYTHRAXIS_WRATH_GRAVEFIRE_EVERY_NORMAL;
+}
 
 export function nythraxisKingsWrathDamageBonus(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'

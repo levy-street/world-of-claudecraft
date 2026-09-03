@@ -8,21 +8,21 @@ import {
   NYTHRAXIS_BONE_STORM_ARRIVE_DIST,
   NYTHRAXIS_BONE_STORM_CHARGE_SECONDS,
   NYTHRAXIS_BONE_STORM_CHARGES,
-  NYTHRAXIS_BONE_STORM_EVERY,
   NYTHRAXIS_BONE_STORM_FIRST_SECONDS,
   NYTHRAXIS_BONE_STORM_GRAVEBREAKER_REARM_SECONDS,
   NYTHRAXIS_BONE_STORM_RADIUS,
   NYTHRAXIS_BONE_STORM_SECONDS,
   NYTHRAXIS_BONE_STORM_SPEED_MULT,
   NYTHRAXIS_BONE_STORM_SPIKE_AT_SECONDS,
-  NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
   NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS,
   nythraxisBoneSlamDamageMaxHp,
+  nythraxisBoneStormCadence,
   nythraxisBoneStormChargeIndex,
   nythraxisBoneStormChargeTarget,
   nythraxisBoneStormDone,
   nythraxisBoneStormReached,
   nythraxisBoneStormSpikeDue,
+  nythraxisBoneStormWhirlTickMaxHp,
   pointInNythraxisBoneStorm,
 } from '../src/sim/nythraxis_bone_storm';
 
@@ -31,7 +31,9 @@ const RAID = [11, 12, 13, 14, 15, 16].map((id) => ({ id }));
 describe('Nythraxis Bone Storm', () => {
   it('pins the player-facing tuning literally on both difficulties', () => {
     expect(NYTHRAXIS_BONE_STORM_FIRST_SECONDS).toBe(8);
-    expect(NYTHRAXIS_BONE_STORM_EVERY).toBe(50);
+    expect([nythraxisBoneStormCadence('normal'), nythraxisBoneStormCadence('heroic')]).toEqual([
+      50, 40,
+    ]);
     expect(NYTHRAXIS_BONE_STORM_SECONDS).toBe(12);
     expect([NYTHRAXIS_BONE_STORM_CHARGES, NYTHRAXIS_BONE_STORM_CHARGE_SECONDS]).toEqual([4, 3]);
     // Four windows fill the storm exactly.
@@ -40,10 +42,11 @@ describe('Nythraxis Bone Storm', () => {
     );
     expect(NYTHRAXIS_BONE_STORM_SPEED_MULT).toBe(2.2);
     expect(NYTHRAXIS_BONE_STORM_RADIUS).toBe(9);
+    expect(NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS).toBe(1);
     expect([
-      NYTHRAXIS_BONE_STORM_WHIRL_TICK_SECONDS,
-      NYTHRAXIS_BONE_STORM_WHIRL_TICK_MAX_HP,
-    ]).toEqual([1, 0.1]);
+      nythraxisBoneStormWhirlTickMaxHp('normal'),
+      nythraxisBoneStormWhirlTickMaxHp('heroic'),
+    ]).toEqual([0.1, 0.2]);
     expect([
       nythraxisBoneSlamDamageMaxHp('normal'),
       nythraxisBoneSlamDamageMaxHp('heroic'),

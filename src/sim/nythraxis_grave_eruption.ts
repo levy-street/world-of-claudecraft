@@ -12,7 +12,7 @@
 //
 // `src/sim`-pure: no rng stream, no wall clock, no DOM.
 
-import { NYTHRAXIS_SOULFIRE_SECONDS } from './nythraxis_soulfire';
+import { NYTHRAXIS_FLAME_PERMANENT_SECONDS, nythraxisSoulfireSeconds } from './nythraxis_soulfire';
 import { hash2 } from './rng';
 import type { DungeonDifficulty } from './types';
 
@@ -79,7 +79,9 @@ export const NYTHRAXIS_GRAVE_ERUPTION_REVEAL_DELAY_SECONDS = 0.75;
 export const NYTHRAXIS_GRAVE_ERUPTION_DAMAGE_MAX_HP_NORMAL = 0.45;
 export const NYTHRAXIS_GRAVE_ERUPTION_DAMAGE_MAX_HP_HEROIC = 0.75;
 export const NYTHRAXIS_GRAVE_FLAME_SECONDS_NORMAL = 12;
-export const NYTHRAXIS_GRAVE_FLAME_SECONDS_HEROIC = 18;
+// Heroic patches never time out (they clear with the transition or a reset):
+// the floor fills unless the raid keeps moving.
+export const NYTHRAXIS_GRAVE_FLAME_SECONDS_HEROIC = NYTHRAXIS_FLAME_PERMANENT_SECONDS;
 export const NYTHRAXIS_GRAVE_FLAME_TICK_SECONDS = 1;
 export const NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_NORMAL = 0.06;
 export const NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_HEROIC = 0.09;
@@ -87,7 +89,7 @@ export const NYTHRAXIS_GRAVE_FLAME_TICK_MAX_HP_HEROIC = 0.09;
 export const NYTHRAXIS_GRAVE_FLAME_CAP = 24;
 // How far from the boss spawn an eruption may land: the raid fights inside this
 // band of the crypt hall, and the arena walls sit far beyond it.
-export const NYTHRAXIS_GRAVE_ERUPTION_MAX_RANGE = 60;
+export const NYTHRAXIS_GRAVE_ERUPTION_MAX_RANGE = 32;
 export const NYTHRAXIS_GRAVE_ERUPTION_MIN_SEPARATION = 5;
 
 const ERUPTION_CANDIDATES = 32;
@@ -157,7 +159,9 @@ export function nythraxisFlameSeconds(
   kind: NythraxisFlameKind,
   difficulty: DungeonDifficulty,
 ): number {
-  return kind === 'soul' ? NYTHRAXIS_SOULFIRE_SECONDS : nythraxisGraveFlameSeconds(difficulty);
+  return kind === 'soul'
+    ? nythraxisSoulfireSeconds(difficulty)
+    : nythraxisGraveFlameSeconds(difficulty);
 }
 
 /** Projects every burning patch (Grave Flame and Soulfire) into reconnect-safe rows. */

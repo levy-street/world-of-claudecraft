@@ -25,7 +25,11 @@ import {
   nythraxisGraveFlameTickMaxHp,
   pointInNythraxisGraveCircle,
 } from '../src/sim/nythraxis_grave_eruption';
-import { igniteNythraxisSoulfire, NYTHRAXIS_SOULFIRE_CAP } from '../src/sim/nythraxis_soulfire';
+import {
+  igniteNythraxisSoulfire,
+  NYTHRAXIS_FLAME_PERMANENT_SECONDS,
+  NYTHRAXIS_SOULFIRE_CAP,
+} from '../src/sim/nythraxis_soulfire';
 
 const ORIGIN = { x: 0, z: 96 };
 
@@ -42,9 +46,13 @@ describe('Nythraxis Grave Eruption', () => {
       nythraxisGraveEruptionDamageMaxHp('normal'),
       nythraxisGraveEruptionDamageMaxHp('heroic'),
     ]).toEqual([0.45, 0.75]);
+    // Heroic patches never time out on their own (they clear with the
+    // transition or a reset): the floor fills unless the raid keeps moving.
     expect([nythraxisGraveFlameSeconds('normal'), nythraxisGraveFlameSeconds('heroic')]).toEqual([
-      12, 18,
+      12,
+      NYTHRAXIS_FLAME_PERMANENT_SECONDS,
     ]);
+    expect(NYTHRAXIS_FLAME_PERMANENT_SECONDS).toBe(3600);
     expect([
       nythraxisGraveFlameTickMaxHp('normal'),
       nythraxisGraveFlameTickMaxHp('heroic'),
@@ -190,13 +198,20 @@ describe('Nythraxis Grave Eruption', () => {
         remaining: 7,
       },
     ]);
-    expect(activeNythraxisGraveFlames(9, state, 'heroic')[0]).toMatchObject({
-      duration: 18,
-      remaining: 18,
+    // Heroic patches never time out on their own: both kinds project the
+    // permanent duration and their raw remaining time (nothing to clamp).
+    const heroicRows = activeNythraxisGraveFlames(9, state, 'heroic');
+    expect(heroicRows[0]).toMatchObject({
+      duration: NYTHRAXIS_FLAME_PERMANENT_SECONDS,
+      remaining: Math.min(
+        state.graveFlames.find((f) => f.seq === 4)!.remaining,
+        NYTHRAXIS_FLAME_PERMANENT_SECONDS,
+      ),
     });
-    expect(activeNythraxisGraveFlames(9, state, 'heroic')[1]).toMatchObject({
+    expect(heroicRows[1]).toMatchObject({
       kind: 'soul',
-      duration: 15,
+      duration: NYTHRAXIS_FLAME_PERMANENT_SECONDS,
+      remaining: 7,
     });
   });
 

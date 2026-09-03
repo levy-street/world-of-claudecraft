@@ -54,8 +54,9 @@ export const NYTHRAXIS_UNBOUND_CAST_ID = 'Unbound';
 export const NYTHRAXIS_SIGIL_FIRST_SECONDS = 30;
 export const NYTHRAXIS_SIGIL_EVERY_NORMAL = 45;
 export const NYTHRAXIS_SIGIL_EVERY_HEROIC = 40;
-export const NYTHRAXIS_SIGIL_MIN_DIST = 12;
-export const NYTHRAXIS_SIGIL_MAX_DIST = 30;
+// The hall is about 50 yd wide (NYTHRAXIS_LAYOUT), so the band stays inside it.
+export const NYTHRAXIS_SIGIL_MIN_DIST = 10;
+export const NYTHRAXIS_SIGIL_MAX_DIST = 24;
 export const NYTHRAXIS_SIGIL_RADIUS_NORMAL = 4;
 export const NYTHRAXIS_SIGIL_RADIUS_HEROIC = 3;
 export const NYTHRAXIS_SIGIL_BIND_SECONDS_NORMAL = 15;
@@ -74,7 +75,8 @@ export const NYTHRAXIS_ASCENSION_PER_STACK_HEROIC = 0.05;
 export const NYTHRAXIS_BOUND_STUN_SECONDS_NORMAL = 4;
 export const NYTHRAXIS_BOUND_STUN_SECONDS_HEROIC = 3;
 export const NYTHRAXIS_BOUND_VULNERABILITY = 0.25;
-export const NYTHRAXIS_BOUND_SECONDS = 10;
+export const NYTHRAXIS_BOUND_SECONDS_NORMAL = 10;
+export const NYTHRAXIS_BOUND_SECONDS_HEROIC = 8;
 export const NYTHRAXIS_UNBOUND_HIT_MAX_HP_NORMAL = 0.4;
 export const NYTHRAXIS_UNBOUND_HIT_MAX_HP_HEROIC = 0.6;
 export const NYTHRAXIS_UNBOUND_DAMAGE_BONUS_NORMAL = 0.2;
@@ -108,6 +110,11 @@ export function nythraxisBoundStunSeconds(difficulty: DungeonDifficulty): number
   return difficulty === 'heroic'
     ? NYTHRAXIS_BOUND_STUN_SECONDS_HEROIC
     : NYTHRAXIS_BOUND_STUN_SECONDS_NORMAL;
+}
+
+/** How long the Bound burn window (the vulnerability) lasts. */
+export function nythraxisBoundSeconds(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic' ? NYTHRAXIS_BOUND_SECONDS_HEROIC : NYTHRAXIS_BOUND_SECONDS_NORMAL;
 }
 
 export function nythraxisUnboundHitMaxHp(difficulty: DungeonDifficulty): number {

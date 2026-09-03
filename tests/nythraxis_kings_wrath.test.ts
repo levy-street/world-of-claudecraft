@@ -4,13 +4,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   NYTHRAXIS_PHASE_THREE_HP,
-  NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY,
-  NYTHRAXIS_WRATH_GRAVEFIRE_EVERY,
   type NythraxisMajorsInFlight,
   nythraxisAnyMajorInFlight,
   nythraxisKingsWrathDamageBonus,
   nythraxisPhaseThreeReady,
   nythraxisWrathCadence,
+  nythraxisWrathGraveEruptionEvery,
+  nythraxisWrathGravefireEvery,
 } from '../src/sim/nythraxis_kings_wrath';
 
 const CALM: NythraxisMajorsInFlight = {
@@ -28,9 +28,12 @@ describe("Nythraxis The King's Wrath", () => {
       nythraxisKingsWrathDamageBonus('normal'),
       nythraxisKingsWrathDamageBonus('heroic'),
     ]).toEqual([0.2, 0.25]);
-    expect([NYTHRAXIS_WRATH_GRAVE_ERUPTION_EVERY, NYTHRAXIS_WRATH_GRAVEFIRE_EVERY]).toEqual([
-      10, 8,
-    ]);
+    expect([
+      nythraxisWrathGraveEruptionEvery('normal'),
+      nythraxisWrathGraveEruptionEvery('heroic'),
+      nythraxisWrathGravefireEvery('normal'),
+      nythraxisWrathGravefireEvery('heroic'),
+    ]).toEqual([10, 8, 8, 6]);
   });
 
   it('enters at 30% only while no body-owning major is in flight', () => {

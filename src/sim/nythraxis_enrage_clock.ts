@@ -1,7 +1,7 @@
 // The Crown Endures: Nythraxis's hard enrage clock.
 //
-// The clock starts on the first encounter tick and runs through the
-// transition. When it runs out he gains a large damage and attack-speed bonus,
+// The clock starts on the first encounter tick and pauses for the 70%
+// transition (Brother Aldric's entrance is not the raid's time). When it runs out he gains a large damage and attack-speed bonus,
 // and the damage bonus keeps climbing every NYTHRAXIS_ENRAGE_RAMP_EVERY
 // seconds until the raid or the king is dead. Text warnings fire as the clock
 // crosses each mark in NYTHRAXIS_ENRAGE_WARN_SECONDS; there is no timer bar
@@ -21,14 +21,15 @@ export const NYTHRAXIS_CROWN_ENDURES_AURA_ID = 'nythraxis_crown_endures';
 export const NYTHRAXIS_CROWN_ENDURES_HASTE_AURA_ID = 'nythraxis_crown_endures_haste';
 export const NYTHRAXIS_CROWN_ENDURES_AURA_NAME = 'The Crown Endures';
 
-export const NYTHRAXIS_ENRAGE_SECONDS_NORMAL = 7 * 60;
-export const NYTHRAXIS_ENRAGE_SECONDS_HEROIC = 6 * 60;
+export const NYTHRAXIS_ENRAGE_SECONDS_NORMAL = 6 * 60;
+export const NYTHRAXIS_ENRAGE_SECONDS_HEROIC = 5 * 60;
 /** Seconds remaining at which a warning fires, in the order they are crossed. */
 export const NYTHRAXIS_ENRAGE_WARN_SECONDS = [60, 30, 10] as const;
 export type NythraxisEnrageWarn = (typeof NYTHRAXIS_ENRAGE_WARN_SECONDS)[number];
 export const NYTHRAXIS_ENRAGE_DAMAGE_BONUS = 0.5;
 export const NYTHRAXIS_ENRAGE_HASTE_BONUS = 0.5;
-export const NYTHRAXIS_ENRAGE_RAMP_EVERY = 30;
+export const NYTHRAXIS_ENRAGE_RAMP_EVERY_NORMAL = 30;
+export const NYTHRAXIS_ENRAGE_RAMP_EVERY_HEROIC = 20;
 export const NYTHRAXIS_ENRAGE_RAMP_STEP = 0.25;
 
 /** The callout each warning mark and the enrage itself emit. */
@@ -38,6 +39,12 @@ export const NYTHRAXIS_ENRAGE_WARN_CALLOUT = {
   10: 'crownEndures10',
 } as const satisfies Record<NythraxisEnrageWarn, string>;
 export const NYTHRAXIS_ENRAGE_CALLOUT = 'crownEndures';
+
+export function nythraxisEnrageRampEvery(difficulty: DungeonDifficulty): number {
+  return difficulty === 'heroic'
+    ? NYTHRAXIS_ENRAGE_RAMP_EVERY_HEROIC
+    : NYTHRAXIS_ENRAGE_RAMP_EVERY_NORMAL;
+}
 
 export function nythraxisEnrageSeconds(difficulty: DungeonDifficulty): number {
   return difficulty === 'heroic'
@@ -82,7 +89,7 @@ export function nythraxisEnrageStarts(
 export function nythraxisEnrageStacks(elapsed: number, difficulty: DungeonDifficulty): number {
   const over = elapsed - nythraxisEnrageSeconds(difficulty);
   if (over < 0) return 0;
-  return 1 + Math.floor(over / NYTHRAXIS_ENRAGE_RAMP_EVERY);
+  return 1 + Math.floor(over / nythraxisEnrageRampEvery(difficulty));
 }
 
 /** The damage bonus at a stack count: the base at 1, one ramp step per stack after. */

@@ -1518,24 +1518,27 @@ export const DUNGEON_DEFS: Record<string, DungeonDef> = {
     index: 5,
     doorPos: { x: -152, z: 610 },
     overworldDoor: false,
-    entry: { x: 0, z: 4 },
-    exitOffset: { x: 0, z: -6 },
+    // The hall runs z 52 to 104 (NYTHRAXIS_LAYOUT): raiders enter at the front
+    // wall and the exit portal sits just inside it.
+    entry: { x: 0, z: 56 },
+    exitOffset: { x: 0, z: 53 },
     spawns: NYTHRAXIS_RAID_SPAWN_LIST,
     objects: [
-      // Three soul wardstones in a wide forward triangle in front of the boss
-      // (spawn 0,96), well clear of his body so all three read distinctly and
-      // raiders must split to channel them. Kept within the encounter's
-      // wardstone search radius (see nythraxisWardstones in sim.ts). The item id
-      // doubles as the Sunken Bastion quest pickup, so without interactOnly the
-      // quest-collectable display gate hides them from every raider who is not on
-      // that zone 2 quest.
-      { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -40, z: 79, interactOnly: true },
-      { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 40, z: 79, interactOnly: true },
+      // Three soul wardstones in a forward triangle in front of the boss (spawn
+      // 0,96), 25 to 30 yd out so all three read distinctly and raiders must
+      // split to channel them, and 6 yd clear of the sigil and Soulfire
+      // placement rules. Kept within the encounter's wardstone search radius
+      // (see nythraxisWardstones in sim.ts). The item id doubles as the Sunken
+      // Bastion quest pickup, so without interactOnly the quest-collectable
+      // display gate hides them from every raider who is not on that zone 2
+      // quest.
+      { itemId: 'bastion_ward_stone', name: 'Left Wardstone', x: -16, z: 76, interactOnly: true },
+      { itemId: 'bastion_ward_stone', name: 'Right Wardstone', x: 16, z: 76, interactOnly: true },
       {
         itemId: 'bastion_ward_stone',
         name: 'Threshold Wardstone',
         x: 0,
-        z: 63,
+        z: 66,
         interactOnly: true,
       },
     ],

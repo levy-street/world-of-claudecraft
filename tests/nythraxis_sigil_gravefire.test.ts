@@ -27,6 +27,7 @@ import {
   NYTHRAXIS_GRAVEFIRE_HALF_WIDTH,
 } from '../src/sim/nythraxis_gravefire';
 import {
+  NYTHRAXIS_FLAME_PERMANENT_SECONDS,
   NYTHRAXIS_SOULFIRE_CAST_ID,
   NYTHRAXIS_SOULFIRE_RADIUS,
 } from '../src/sim/nythraxis_soulfire';
@@ -383,7 +384,7 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
       const bound = boss.auras.find((a) => a.id === NYTHRAXIS_BOUND_AURA_ID);
       expect(bound?.kind, difficulty).toBe('vulnerability');
       expect(bound?.value, difficulty).toBe(0.25);
-      expect(bound?.remaining, difficulty).toBe(10);
+      expect(bound?.remaining, difficulty).toBe(difficulty === 'heroic' ? 8 : 10);
       expect(callouts('sigilBound').length, difficulty).toBe(10);
       expect(sim.activeNythraxisBindingSigils, difficulty).toHaveLength(0);
       expect(st.majorGapTimer, difficulty).toBe(6);
@@ -689,7 +690,9 @@ describe('Nythraxis Soulfire (the pools Soul Rend leaves)', () => {
       expect(pools, difficulty).toHaveLength(3);
       for (const pool of pools) {
         expect(pool.radius, difficulty).toBe(NYTHRAXIS_SOULFIRE_RADIUS);
-        expect(pool.remaining, difficulty).toBe(15);
+        expect(pool.remaining, difficulty).toBe(
+          difficulty === 'heroic' ? NYTHRAXIS_FLAME_PERMANENT_SECONDS : 15,
+        );
         expect(flat(pool, stack), difficulty).toBeLessThan(1e-6);
       }
       expect(
@@ -725,14 +728,38 @@ describe('Nythraxis Soulfire (the pools Soul Rend leaves)', () => {
     }
   });
 
-  it('burns out after fifteen seconds and never blocks the sigil on heroic', () => {
+  it('burns out after fifteen seconds on normal and never goes out on heroic', () => {
     const { ctx, boss, st, raiders, sim } = setup({ phase: 2 });
+    // Two marks stacked well clear of every wardstone (the spread raid's
+    // default spots sit inside a ward's 6 yd clearance in the compact hall).
     const marked = raiders.slice(0, 2);
+    for (const [i, p] of marked.entries()) {
+      teleport(sim, p, boss.spawnPos.x + (i ? 5 : -5), boss.spawnPos.z - 12, boss.pos.y);
+    }
     st.soulRendMarks = marked.map((p) => ({ playerId: p.id, remaining: DT }));
     nythraxis.updateNythraxisSoulRend(ctx, boss, st);
     expect(st.graveFlames!.filter((f) => f.kind === 'soul')).toHaveLength(2);
     tickDriver(ctx, boss, 15 + DT);
     expect(st.graveFlames!.filter((f) => f.kind === 'soul')).toHaveLength(0);
     expect(sim.activeNythraxisGraveFlames).toHaveLength(0);
+    // Heroic: the pools outlive any pull; only the transition or a reset clears them.
+    const heroic = setup({ phase: 2, difficulty: 'heroic' });
+    const hMarked = heroic.raiders.slice(0, 2);
+    for (const [i, p] of hMarked.entries()) {
+      teleport(
+        heroic.sim,
+        p,
+        heroic.boss.spawnPos.x + (i ? 5 : -5),
+        heroic.boss.spawnPos.z - 12,
+        heroic.boss.pos.y,
+      );
+    }
+    heroic.st.soulRendMarks = hMarked.map((p) => ({ playerId: p.id, remaining: DT }));
+    nythraxis.updateNythraxisSoulRend(heroic.ctx, heroic.boss, heroic.st);
+    tickDriver(heroic.ctx, heroic.boss, 60);
+    expect(heroic.st.graveFlames!.filter((f) => f.kind === 'soul')).toHaveLength(2);
+    expect(heroic.sim.activeNythraxisGraveFlames).toHaveLength(2);
+    nythraxis.startNythraxisTransition(heroic.ctx, heroic.boss, heroic.st);
+    expect(heroic.st.graveFlames).toHaveLength(0);
   });
 });

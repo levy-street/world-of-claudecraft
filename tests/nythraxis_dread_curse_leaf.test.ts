@@ -8,9 +8,9 @@ import {
   NYTHRAXIS_DREAD_CURSE_AURA_ID,
   NYTHRAXIS_DREAD_CURSE_DURATION,
   NYTHRAXIS_DREAD_CURSE_EVERY,
-  NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP,
   NYTHRAXIS_DREAD_CURSE_MAX_STACKS,
   NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS,
+  nythraxisDreadCurseHitMaxHp,
   nythraxisDreadCursePerStack,
   nythraxisDreadCurseStacks,
 } from '../src/sim/nythraxis_dread_curse';
@@ -19,7 +19,9 @@ import type { Entity } from '../src/sim/types';
 describe('Nythraxis Dread Curse leaf', () => {
   it('pins the swap tuning literally', () => {
     expect(NYTHRAXIS_DREAD_CURSE_EVERY).toBe(10);
-    expect(NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP).toBe(0.25);
+    expect([nythraxisDreadCurseHitMaxHp('normal'), nythraxisDreadCurseHitMaxHp('heroic')]).toEqual([
+      0.25, 0.3,
+    ]);
     expect(NYTHRAXIS_DREAD_CURSE_DURATION).toBe(30);
     expect(NYTHRAXIS_DREAD_CURSE_MAX_STACKS).toBe(3);
     expect(NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS).toBe(2);
