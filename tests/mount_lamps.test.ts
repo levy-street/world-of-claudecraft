@@ -6,6 +6,7 @@ import {
   MOUNT_LAMP_DISTANCE,
   MOUNT_LAMP_INTENSITY,
   MOUNT_LENS_COLOR,
+  MOUNT_SKIN_VISUAL_SPECS,
   MOUNT_VISUAL_SPECS,
   type MountVisualSpec,
 } from '../src/render/mount_visuals';
@@ -124,7 +125,7 @@ describe('mount lamps', () => {
   });
 
   it('wires the shipped Chimeglass spec through to one steady blue light', () => {
-    const lamps = attachMountLamps(rigWith('lens'), MOUNT_VISUAL_SPECS.chimeglass_tortoise)!;
+    const lamps = attachMountLamps(rigWith('lens'), MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise)!;
     expect(lamps.lights).toHaveLength(1);
     expect(lamps.lights[0].color.getHex()).toBe(MOUNT_LENS_COLOR);
     expect(lamps.flickers).toEqual([false]);

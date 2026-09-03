@@ -157,6 +157,7 @@ import { ensureWarriorStance } from './combat/warrior_stances';
 // the PlayerMeta interface + the power-up catalog the fiestaMatchInfo accessor reads.
 import { type AugmentSpecial, type AugmentTier, POWERUPS_BY_ID } from './content/augments';
 import { applyTalentMods } from './content/classes';
+import { normalizeMountSkinId } from './content/mount_skins';
 import { DEFAULT_MOUNT, type MountKey } from './content/mounts';
 import { GATHERING_PROFESSION_IDS, type GatheringProfessionId } from './content/professions';
 import { PROVING_SHORE_ARRIVAL } from './content/proving_shore';
@@ -1283,6 +1284,9 @@ export interface PlayerMeta {
   deathPet?: PetReturnSnapshot;
   skin: number; // appearance index into the render SKINS[player_<cls>]; persisted, synced
   skinCatalog: SkinCatalog;
+  // Worn account mount skin (content/mount_skins.ts); persisted, mirrored to
+  // Entity.mountSkinId for the identity wire. null = the ridden mount's own look.
+  mountSkinId: string | null;
   // Cosmetic skin-select event: the rank rolled when the event token was used,
   // pending a lock-in. Set on use, cleared on claim. Persisted so the reward
   // survives reconnect; re-using the token re-shows the same rank (no reroll).
@@ -1830,6 +1834,7 @@ export class Sim {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   private nextLootRollId = 1;
   private pendingLootRolls = new Map<number, PendingLootRoll>();
@@ -2677,6 +2682,7 @@ export class Sim {
       name,
       skin: savedState?.skin ?? 0,
       skinCatalog: savedState?.skinCatalog === 'mech' ? 'mech' : 'class',
+      mountSkinId: normalizeMountSkinId(savedState?.mountSkinId),
       pendingSkinRank: savedState?.pendingSkinRank ?? null,
       pendingSkinCatalog: savedState?.pendingSkinCatalog ?? null,
       pendingSkinItemId: savedState?.pendingSkinItemId ?? null,
@@ -2823,6 +2829,7 @@ export class Sim {
     this.players.set(player.id, meta);
     player.skinCatalog = meta.skinCatalog;
     player.skin = meta.skin; // mirror onto the entity so the renderer + wire can read it
+    player.mountSkinId = meta.mountSkinId;
     this.accountCosmetics = accountCosmeticsWithWornMechChroma(
       this.accountCosmetics,
       meta.skinCatalog,
@@ -3982,6 +3989,8 @@ export class Sim {
       })(),
       skin: meta.skin,
       skinCatalog: meta.skinCatalog,
+      // Absent while no mount skin is worn (zero-default omission; back-compat).
+      ...(meta.mountSkinId ? { mountSkinId: meta.mountSkinId } : {}),
       pendingSkinRank: meta.pendingSkinRank,
       pendingSkinCatalog: meta.pendingSkinCatalog,
       pendingSkinItemId: meta.pendingSkinItemId,
@@ -4248,6 +4257,27 @@ export class Sim {
 
   changeWeaponSkin(skinId: string | null, weaponType?: WeaponSkinType): void {
     this.setWeaponSkin(this.primaryId, skinId, weaponType);
+  }
+
+  /** Wear (skinId) or take off (null) a mount skin on a player: meta (persisted)
+   *  plus the entity mirror the identity wire reads. Cosmetic only: the ridden
+   *  mount keeps its own key, so speed, the melee block and crit are untouched.
+   *  The account-ownership gate is the caller's (the server's session cosmetics;
+   *  changeMountSkin below for the offline Sim). Unknown ids are refused. */
+  setMountSkin(pid: number, skinId: string | null): boolean {
+    const meta = this.players.get(pid);
+    const e = this.entities.get(pid);
+    if (!meta || e?.kind !== 'player') return false;
+    const next = skinId === null ? null : normalizeMountSkinId(skinId);
+    if (skinId !== null && next === null) return false;
+    meta.mountSkinId = next;
+    e.mountSkinId = next;
+    return true;
+  }
+
+  changeMountSkin(skinId: string | null): void {
+    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    this.setMountSkin(this.primaryId, skinId);
   }
 
   // IWorldActionBar (offline arm). The action-bar layout is client presentation
@@ -4848,6 +4878,12 @@ export class Sim {
       },
       get players() {
         return sim.players;
+      },
+      get accountCosmetics() {
+        return sim.accountCosmetics;
+      },
+      set accountCosmetics(value: AccountCosmetics) {
+        sim.accountCosmetics = value;
       },
       get stationPlacements() {
         return sim.stationPlacements;

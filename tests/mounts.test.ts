@@ -106,8 +106,8 @@ function ride(sim: Sim, pid: number, key: string): void {
 }
 
 describe('mount catalog', () => {
-  it('has exactly thirteen mounts with the horse first and the developer rickshaw last', () => {
-    expect(MOUNT_KEYS).toHaveLength(13);
+  it('has exactly eleven mounts with the horse first and the developer rickshaw last', () => {
+    expect(MOUNT_KEYS).toHaveLength(11);
     expect(MOUNT_KEYS[0]).toBe('valorsteed');
     expect(MOUNT_KEYS.at(-1)).toBe('rickshaw_mount');
     expect(DEFAULT_MOUNT).toBe('valorsteed');
@@ -126,13 +126,9 @@ describe('mount catalog', () => {
     expect(spec('shadowjump_toad')).toEqual(['uncommon', 0.7]);
     expect(spec('grag_bear')).toEqual(['rare', 0.75]);
     expect(spec('stalkglider_snail')).toEqual(['rare', 0.75]);
-    // The store mount is deliberately RARE, never epic: real money buys the
-    // look, not the top speed tier (the paid design the weapon skins set).
-    expect(spec('mech_bird')).toEqual(['rare', 0.75]);
     expect(spec('aether_hover_cycle')).toEqual(['epic', 0.8]);
     expect(spec('thunderstrut_gobbler')).toEqual(['epic', 0.8]);
     expect(spec('lanternback_troll')).toEqual(['epic', 0.8]);
-    expect(spec('chimeglass_tortoise')).toEqual(['epic', 0.8]);
     expect(spec('terrorspark_groundshaker')).toEqual(['epic', 0.8]);
     expect(spec('rickshaw_mount')).toEqual(['epic', 0.8]);
     // The level field is GONE, not merely unused: it never fired (reins carry no
@@ -188,7 +184,7 @@ describe('mount reins items (the collection: owning the item is owning the mount
       expect(items).toHaveLength(1);
       const item = items[0];
       expect(mountItemId(key)).toBe(item.id);
-      if (isDeveloperMount(key) || key === 'mech_bird') {
+      if (isDeveloperMount(key)) {
         // Bound reins, for the same leak reason from different doors: a
         // developer-only mount has no player acquisition path, and the store
         // mount's reins is a real-money grant (server/claudium.ts). Either

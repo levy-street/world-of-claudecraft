@@ -1379,6 +1379,7 @@ function identityFields(e: Entity): Record<string, unknown> {
   if (e.mainhandItemId) out.mh = e.mainhandItemId; // equipped mainhand → held weapon model (render-only)
   if (e.offhandItemId) out.oh = e.offhandItemId; // equipped offhand → held weapon model (render-only)
   if (e.weaponSkinId) out.wsk = e.weaponSkinId; // active weapon-skin cosmetic (render-only, like mh)
+  if (e.mountSkinId) out.msk = e.mountSkinId; // worn mount-skin cosmetic (render-only, like wsk)
   // Full worn set, for the inspect-another-player window. Players only and only
   // when something is equipped; rides the identity record (first appearance +
   // on change), never the per-tick dynamic fields. Render-only, like `mh`.
@@ -3467,6 +3468,7 @@ export class GameServer {
       // never resurrects from the stale side.
       weaponSkinIds: [...new Set([...(a.weaponSkinIds ?? []), ...(b.weaponSkinIds ?? [])])],
       weaponSkinLoadout: { ...(b.weaponSkinLoadout ?? {}) },
+      mountSkinIds: [...new Set([...(a.mountSkinIds ?? []), ...(b.mountSkinIds ?? [])])],
     };
   }
 
@@ -3489,6 +3491,7 @@ export class GameServer {
         mechChromaIds: [],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
       cosmetics,
     );
@@ -3608,6 +3611,19 @@ export class GameServer {
     }
     this.updateLiveAccountCosmetics(session.accountId, { ...current, weaponSkinLoadout });
     this.enqueueWeaponSkinLoadoutSave(session.accountId, weaponSkinLoadout);
+  }
+
+  /** Wear (skinId) or take off (null) a mount skin on the acting character.
+   *  Server-authoritative: the account must own the skin (anti-forge); the
+   *  Sim validates the id and mirrors it onto the entity so the identity wire
+   *  (`msk`) carries it to every client in view. Per character by design: only
+   *  the acting character's worn skin changes, the account-wide unlock is never
+   *  touched, and the character save persists the choice. */
+  private changeCharacterMountSkin(session: ClientSession, raw: unknown): void {
+    const skinId = raw === null ? null : typeof raw === 'string' ? raw : undefined;
+    if (skinId === undefined) return;
+    if (skinId !== null && !session.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    this.sim.setMountSkin(session.pid, skinId);
   }
 
   private enqueueWeaponSkinLoadoutSave(
@@ -7224,6 +7240,12 @@ export class GameServer {
         if (skinId !== null || wtype) this.changeAccountWeaponSkin(session, skinId, wtype);
         break;
       }
+      // Mount skins: wear (skin: string) or take off (skin: null) an account
+      // mount skin on the acting character. Ownership is checked against the
+      // session's account cosmetics here; the Sim only validates the id.
+      case 'change_mount_skin':
+        this.changeCharacterMountSkin(session, msg.skin);
+        break;
       // Z-key sheathe toggle: cosmetic, no payload; the Sim owns the dead-gate
       // and the combat auto-unsheathe rule.
       case 'stow_weapon':

@@ -7,6 +7,7 @@
 // for a reins item and the cast bar's summon line. Neither is a picker, and
 // neither should have to import one.
 
+import { MOUNT_SKINS, type MountSkinId } from '../sim/content/mount_skins';
 import { MOUNTS } from '../sim/content/mounts';
 import { type TranslationKey, t } from './i18n';
 
@@ -19,9 +20,7 @@ export const MOUNT_NAME_KEYS: Record<string, TranslationKey> = {
   stormfeather_griffin: 'hudChrome.mounts.name_stormfeather_griffin',
   thunderstrut_gobbler: 'hudChrome.mounts.name_thunderstrut_gobbler',
   drakemaw_raptor: 'hudChrome.mounts.name_drakemaw_raptor',
-  mech_bird: 'hudChrome.mounts.name_mech_bird',
   lanternback_troll: 'hudChrome.mounts.name_lanternback_troll',
-  chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
   terrorspark_groundshaker: 'hudChrome.mounts.name_terrorspark_groundshaker',
   rickshaw_mount: 'hudChrome.mounts.name_rickshaw_mount',
 };
@@ -35,9 +34,7 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
   stormfeather_griffin: 'hudChrome.mounts.desc_stormfeather_griffin',
   thunderstrut_gobbler: 'hudChrome.mounts.desc_thunderstrut_gobbler',
   drakemaw_raptor: 'hudChrome.mounts.desc_drakemaw_raptor',
-  mech_bird: 'hudChrome.mounts.desc_mech_bird',
   lanternback_troll: 'hudChrome.mounts.desc_lanternback_troll',
-  chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
   terrorspark_groundshaker: 'hudChrome.mounts.desc_terrorspark_groundshaker',
   rickshaw_mount: 'hudChrome.mounts.desc_rickshaw_mount',
 };
@@ -46,7 +43,41 @@ export const MOUNT_DESC_KEYS: Record<string, TranslationKey> = {
  *  finally the raw key so an unmapped mount can never render blank. */
 export function mountDisplayName(key: string): string {
   const nameKey = MOUNT_NAME_KEYS[key];
-  return nameKey ? t(nameKey) : ((MOUNTS as Record<string, { name: string }>)[key]?.name ?? key);
+  if (nameKey) return t(nameKey);
+  // A mount PRESENTATION key (src/sim/content/mount_skins.ts mountPresentationKey)
+  // can name a worn skin instead of a catalog mount: the cast bar's summon line
+  // and the bag tooltip both label what the rider will see.
+  const skinKey = (MOUNT_SKIN_NAME_KEYS as Record<string, TranslationKey | undefined>)[key];
+  if (skinKey) return t(skinKey);
+  return (MOUNTS as Record<string, { name: string }>)[key]?.name ?? key;
+}
+
+// Mount SKIN labels (src/sim/content/mount_skins.ts). The two skins that used
+// to be catalog mounts keep the hudChrome.mounts.name_*/desc_* keys they
+// shipped with, so no locale row moves; a brand-new skin adds its pair here.
+export const MOUNT_SKIN_NAME_KEYS: Record<MountSkinId, TranslationKey> = {
+  mech_bird: 'hudChrome.mounts.name_mech_bird',
+  chimeglass_tortoise: 'hudChrome.mounts.name_chimeglass_tortoise',
+};
+
+export const MOUNT_SKIN_DESC_KEYS: Record<MountSkinId, TranslationKey> = {
+  mech_bird: 'hudChrome.mounts.desc_mech_bird',
+  chimeglass_tortoise: 'hudChrome.mounts.desc_chimeglass_tortoise',
+};
+
+/** The localized mount-skin name, falling back to the catalog's English label
+ *  and finally the raw id so an unmapped skin can never render blank. */
+export function mountSkinDisplayName(id: string): string {
+  const nameKey = (MOUNT_SKIN_NAME_KEYS as Record<string, TranslationKey | undefined>)[id];
+  return nameKey
+    ? t(nameKey)
+    : ((MOUNT_SKINS as Record<string, { name: string } | undefined>)[id]?.name ?? id);
+}
+
+/** The localized mount-skin flavor line ('' for an unmapped id). */
+export function mountSkinDescription(id: string): string {
+  const descKey = (MOUNT_SKIN_DESC_KEYS as Record<string, TranslationKey | undefined>)[id];
+  return descKey ? t(descKey) : '';
 }
 
 /** The specialty lines ("+40% extra mobility") for a mount.

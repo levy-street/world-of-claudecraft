@@ -707,6 +707,9 @@ export const COMMAND_NAMES = [
   // life, and band server-side). Appended because wire tokens are never
   // reordered.
   'tutorial_start',
+  // Wear or take off an account mount skin on the acting character
+  // (IWorldCosmetics.changeMountSkin; server/game.ts gates on ownership).
+  'change_mount_skin',
 ] as const;
 
 // The union both the send path (`online.ts`) and the dispatch switch

@@ -1224,6 +1224,7 @@ describe('delta snapshots', () => {
         mechChromaIds: ['amber_crimson'],
         weaponSkinIds: [],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -4249,6 +4250,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
       mechChromaIds: [],
       weaponSkinIds: ['winterbite', 'meteorlatch_crossbow'],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
     internals.applySnapshot({
       t: 'snap',
@@ -4339,6 +4341,7 @@ describe('weapon skin wire (weaponSkinId)', () => {
         mechChromaIds: [],
         weaponSkinIds: ['ice_fang_sword'],
         weaponSkinLoadout: {},
+        mountSkinIds: [],
       },
     });
     if ('error' in joined) throw new Error(joined.error);
@@ -5254,6 +5257,7 @@ function dirtyEveryDeltaField(): {
     mechChromaIds: ['amber_crimson'],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // Session-scoped stored action-bar layout (`hbl`, self-only): set the frozen
   // join-time copy so the heavy self block wires it once.

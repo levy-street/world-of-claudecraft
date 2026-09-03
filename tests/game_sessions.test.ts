@@ -237,6 +237,7 @@ describe('GameServer sessions', () => {
           mechChromaIds: [],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          mountSkinIds: [],
         },
       }),
     );
@@ -370,6 +371,7 @@ describe('GameServer sessions', () => {
           mechChromaIds: ['amber_crimson'],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          mountSkinIds: [],
         },
       }),
     );
@@ -402,6 +404,7 @@ describe('GameServer sessions', () => {
       mechChromaIds: ['amber_crimson'],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
     const first = expectJoined(
       server.join(fakeWs(), 11, 101, 'Lupercal', 'shaman', null, false, {
@@ -475,6 +478,7 @@ describe('GameServer sessions', () => {
           mechChromaIds: [],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          mountSkinIds: [],
         },
       }),
     );
@@ -1243,6 +1247,7 @@ describe('GameServer weapon skin commands', () => {
       mechChromaIds: [],
       weaponSkinIds,
       weaponSkinLoadout,
+      mountSkinIds: [],
     },
   });
 
@@ -1388,6 +1393,7 @@ describe('GameServer weapon skin commands', () => {
       mechChromaIds: [],
       weaponSkinIds: ['ice_fang_sword'],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     };
     const first = expectJoined(
       server.join(fakeWs(), 11, 101, 'Skinone', 'warrior', null, false, {

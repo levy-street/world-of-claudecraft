@@ -1606,6 +1606,10 @@ export interface AccountCosmetics {
   // loadout. Account-wide by design; characters never carry either.
   weaponSkinIds: string[];
   weaponSkinLoadout: Record<string, string>;
+  // Mount skins (src/sim/content/mount_skins.ts): account-wide ownership in
+  // its own rollback-safe row, like the weapon skins. The worn skin is per
+  // character (characters.state) and never lives here.
+  mountSkinIds: string[];
 }
 
 function uniqueStrings(value: unknown): string[] {
@@ -1636,6 +1640,7 @@ export function normalizeAccountCosmetics(value: unknown): AccountCosmetics {
     mechChromaIds: uniqueStrings(src.mechChromaIds),
     weaponSkinIds: uniqueStrings(src.weaponSkinIds),
     weaponSkinLoadout: stringRecord(src.weaponSkinLoadout),
+    mountSkinIds: uniqueStrings(src.mountSkinIds),
   };
 }
 

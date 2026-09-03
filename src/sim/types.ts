@@ -5059,6 +5059,12 @@ export interface Entity extends ClientMirroredEntityFields {
   // applies. Render-only: the client swaps the held weapon model and rarity VFX.
   // Recomputed in recalcPlayerStats and synced in identity fields (terse `wsk`).
   weaponSkinId: string | null;
+  // Worn mount skin id (players only; null otherwise): the account cosmetic
+  // drawn OVER whatever mount `mountKey` names (content/mount_skins.ts).
+  // Render-only: the client swaps the mount visual and audio set. The sim never
+  // reads it for gameplay (speed stays on mountKey). Set by Sim.setMountSkin and
+  // synced in identity fields (terse `msk`), like `wsk`.
+  mountSkinId: string | null;
   // Full worn equipment (players only; empty otherwise). Render-only mirror of
   // PlayerMeta.equipment, recomputed in recalcPlayerStats and synced in identity
   // fields (terse `eq`) so another player can be inspected. Like mainhandItemId,

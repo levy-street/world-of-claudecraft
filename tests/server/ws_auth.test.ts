@@ -119,6 +119,7 @@ function setup() {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     })),
     // Character-lease deps: the happy path holds the lease so every existing case
     // reaches game.join unchanged; the lease branches themselves are covered by
@@ -881,6 +882,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
           mechChromaIds: [],
           weaponSkinIds: [],
           weaponSkinLoadout: {},
+          mountSkinIds: [],
         },
         isAdmin: false,
         // Not staff: the snapshotted permission set is EMPTY (fail closed), never
@@ -1154,6 +1156,7 @@ describe('createWsAuth: authenticateWebSocket accept path', () => {
       mechChromaIds: [],
       weaponSkinIds: [],
       weaponSkinLoadout: {},
+      mountSkinIds: [],
     });
     await authenticating;
 

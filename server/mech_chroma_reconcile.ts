@@ -10,6 +10,7 @@ export const EMPTY_ACCOUNT_COSMETICS: AccountCosmetics = {
   mechChromaIds: [],
   weaponSkinIds: [],
   weaponSkinLoadout: {},
+  mountSkinIds: [],
 };
 
 export function reconcileWornMechChromaForJoin(args: {

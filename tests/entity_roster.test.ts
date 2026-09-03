@@ -63,6 +63,13 @@ function makeCtx() {
   const pulseGroundAoE = vi.fn();
   const host: SimContextHost = {
     riftCollisionToken: 1,
+    accountCosmetics: {
+      completedQuestIds: [],
+      mechChromaIds: [],
+      weaponSkinIds: [],
+      weaponSkinLoadout: {},
+      mountSkinIds: [],
+    },
     storagePrices: DEFAULT_STORAGE_PRICES,
     naturalRiftPortals: [],
     riftEvents: [],

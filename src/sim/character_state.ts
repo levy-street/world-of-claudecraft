@@ -173,6 +173,11 @@ export interface CharacterState {
   helmHidden?: boolean;
   skin?: number; // appearance index (JSONB; optional so pre-skin saves load as 0)
   skinCatalog?: SkinCatalog;
+  // The mount skin THIS character wears over any ridden mount (JSONB; written
+  // only while one is worn, so pre-feature saves stay byte-equal). Ownership is
+  // account state (AccountCosmetics.mountSkinIds), never persisted here; the
+  // server clears an unowned worn id at join (content/mount_skins.ts).
+  mountSkinId?: string;
   // Pending skin-select event rank (JSONB; optional so older saves load as null).
   pendingSkinRank?: SkinRank | null;
   pendingSkinCatalog?: SkinCatalog | null;

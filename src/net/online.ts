@@ -1481,6 +1481,7 @@ function blankEntity(id: number): Entity {
     offhandItemId: null,
     weaponSkinLoadout: {},
     weaponSkinId: null,
+    mountSkinId: null,
     equippedItems: {},
     equippedInstances: {},
     guild: '',
@@ -1523,6 +1524,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
     mechChromaIds: [],
     weaponSkinIds: [],
     weaponSkinLoadout: {},
+    mountSkinIds: [],
   };
   // --- IWorldProgressionXp: XP + post-cap progression scalars + unlocked
   // milestones, mirrored from snapshot self. ---
@@ -2986,6 +2988,7 @@ export class ClientWorld extends ReconWireState implements IWorld {
         e.mainhandItemId = w.mh ?? null; // equipped mainhand → held weapon model (render-only)
         e.offhandItemId = w.oh ?? null; // equipped offhand → held weapon model (render-only)
         e.weaponSkinId = w.wsk ?? null; // active weapon-skin cosmetic (render-only)
+        e.mountSkinId = w.msk ?? null; // worn mount skin cosmetic (render-only, like wsk)
         e.equippedItems = w.eq ?? {}; // full worn set (render-only), for the inspect window
         // Worn per-slot instance payloads (masterwork/enchant rolls), for the
         // inspect window (terse `eqi`, sparse like `eq`: an absent key on a
@@ -4628,6 +4631,15 @@ export class ClientWorld extends ReconWireState implements IWorld {
       this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'change_weapon_skin', skin: skinId, wtype: type ?? null });
+  }
+  changeMountSkin(skinId: string | null): void {
+    // Optimistic local nudge on the own entity so the ridden mount re-skins
+    // without a round trip; the identity wire (`msk`) reconciles. Ownership is
+    // checked here only to skip a send the server would drop anyway.
+    if (skinId !== null && !this.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    const p = this.entities.get(this.playerId);
+    if (p) p.mountSkinId = skinId;
+    this.cmd({ cmd: 'change_mount_skin', skin: skinId });
   }
   saveActionBarLayout(layout: ActionBarLayout): void {
     // Debounced, deduped upload of the whole layout. The controller has already

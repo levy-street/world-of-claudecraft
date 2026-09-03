@@ -10,6 +10,7 @@ import {
   MOUNT_LAMP_DISTANCE,
   MOUNT_LAMP_INTENSITY,
   MOUNT_LENS_COLOR,
+  MOUNT_SKIN_VISUAL_SPECS,
   MOUNT_VISUAL_SPECS,
   mountBobY,
   mountLampFlicker,
@@ -209,7 +210,7 @@ describe('procedural bob math', () => {
   });
 
   it('seats the Chimeglass rider on the carapace, not over the neck', () => {
-    const spec = MOUNT_VISUAL_SPECS.chimeglass_tortoise;
+    const spec = MOUNT_SKIN_VISUAL_SPECS.chimeglass_tortoise;
     const def = VISUALS.mount_chimeglass_tortoise;
     // He is low and broad: shorter than the griffin (4.1) and far under the
     // Lanternback (7.0), but tall enough to ride.
@@ -257,7 +258,7 @@ describe('procedural bob math', () => {
           expect(lamp.color ?? MOUNT_LAMP_COLOR).toBe(MOUNT_LAMP_COLOR);
           expect(lamp.intensity ?? MOUNT_LAMP_INTENSITY).toBe(MOUNT_LAMP_INTENSITY);
         }
-      } else if (key === 'chimeglass_tortoise') {
+      } else if ((key as string) === 'chimeglass_tortoise') {
         // ONE light for the pair of lenses, hung off the single spectacle bone
         // so it tracks his head. Two would be the two nearest dynamic lights on
         // screen by construction (the camera rides this mount) and would evict
