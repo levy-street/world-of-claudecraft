@@ -99,6 +99,79 @@ PR body, the teardown OFFER (unchanged shape, the blast-radius addendum in
 decisions-index.md), and then ASK for the word: push and open the PR.
 ```
 
+### Amendments at Phase 20 execution (2026-09-02, verified against the tree at 103934491b before the first step ran)
+
+Each item corrects one line of the Starter Prompt above; the prompt stays as written and
+these read with it.
+
+1. STEP 0, the sync: origin/release/v0.42.0 is the newest release by version sort and its
+   tip da6458493f is already an ancestor of HEAD (the eleventh sync 2ebe95e731);
+   `git fetch origin --prune` brought nothing. No merge, no audit, no rider: the no-op.
+2. STEP 0, "the fill edits 20 overlay files": the fill has FIVE channels, not one: the 18
+   base overlays under src/ui/i18n.locales (es_ES and fr_CA inherit; en_CA inherits
+   English), the 18 base overlays under src/admin/i18n.locales (718 admin rows over 39
+   keys), the per-locale BASE_DICT blocks of src/ui/sim_i18n.ts and the BASE_NEW blocks of
+   src/ui/sim_i18n.newlocales.ts (4,309 sim rows over 246 keys, es_ES and fr_CA as their
+   own blocks), the 18 deed chunks under src/ui/deed_i18n.locales, and the 18 reliquary
+   chunks under src/ui/reliquary_i18n.locales (the last two outside the registry, proven
+   by their release-tier arms alone).
+3. STEP 1, "grep the literal heading": the literal 'RELEASE-FILL OBLIGATIONS' hits 11
+   blocks; the ledgers spell the obligation at least eight other ways ('Release-fill
+   obligations minted this phase' at state.md 4078 and 4904, 'Release-fill obligation
+   added by this audit' 6937, 'RELEASE-FILL FLAGS' 2515, 'RELEASE-FILL REGISTER
+   OBLIGATION' 2218, 'RELEASE-FILL OBLIGATION ADDED' 3435, 'RELEASE-FILL NOTE' 2123,
+   'Release-fill obligations minted' 5159, the Phase 18 bullet at 24657) plus sixty-odd
+   plain sentences ('ride the release fill'). The derivation greps case-insensitively for
+   'release-fill' and 'release fill' over state.md, farming/state.md, farming/progress.md
+   and the phase-*-qa.md and phase-19-*.md docs (94 + 15 + 23 hits at execution), one
+   reader per block, then a completeness critic over the merged list.
+4. STEP 1, the guide.gear.masterwroughtBody rule: that key was RETIRED at Phase 14
+   (scripts/i18n_retired_keys.mjs), so its 15 Latin rows are `blocked`, never pending,
+   and never reach the worklist; the live key is guide.gear.masterwroughtBodyLegendary
+   (15 Latin rows pending, human-required), and ITS Latin fills extend BOTH tables in
+   tests/masterwrought_cap.test.ts, CAP_PROSE_BY_LOCALE and LEGENDARY_PROSE_BY_LOCALE, in
+   the same change. The catalog comment at src/ui/i18n.catalog/guide.ts ('masterwroughtBody
+   stays in the catalog at its original English until the release-tier fill retires it')
+   is stale by one phase; corrected in this phase's docs rider.
+5. STEP 1, the worklist's own split (absent from the prompt): scripts/i18n_fill_worklist.mjs
+   classifies pending rows blocked-by-default. At execution: 14,290 pending rows over 940
+   distinct keys in 20 locales, 8,476 autoFillable (sim chrome 3,826, hudChrome 3,617,
+   admin 718, itemUi 240, hud and abilityUi 75) and 5,814 humanRequired (entities.items
+   2,676, guide.profPages 1,350, sim dialogue and lore 483, entities.quests 395,
+   guide.professions 210, entities.npcs 192, entities.abilities 182, the rest under 65
+   each); the five non-Latin locales carry 188 rows each (172 auto, 16 human), the fifteen
+   Latin locales 848 to 911. The skill's 'never machine-fill humanRequired' line is the
+   contributor default; every prior release fill (v0.19.0 to v0.23.0, memory
+   i18n-release-fill-workflow) filled the whole pending set under the maintainer's word, so
+   the humanRequired half is filled here ONLY under that same in-session word, asked for
+   explicitly at the STEP 1 confirmation, with the entity-name conventions (reuse a shipped
+   localized stem, transliterate proper nouns per locale, the glossary's locked terms).
+6. STEP 3, the stamp: 'the frozen bounded stamp (database vars unset ...) against the
+   Phase 18 QA stamp' is amended to the Phase 19G form by the maintainer's instruction at
+   the Phase 20 launch: the stamp is the pg-armed gate's full-suite step (TEST_DATABASE_URL
+   only, DATABASE_URL never exported, 8 workers), predicted before the run and attributed
+   against the 19G reading, Test Files 3670 passed / 1 skipped (3671) and Tests 54,550
+   passed / 9 expected fail / 28 skipped (54,587); no separate unarmed run is owed.
+7. STEP 3, the PR body base: the Phase 17 draft lived only in that session's scratchpad
+   (the Phase 17 ledger says 're-draft from the ledger if lost'); it was recovered at
+   execution from the 2026-08-30 session's scratchpad (pr-body-draft.md, 156 lines, target
+   branch release/v0.41.0), and the refreshed body is committed at
+   docs/prd/masterwrought/pr-body-draft.md so it survives the session. The draft uses the
+   word 'phase' throughout; the standing rule (never write 'phase' into PR text) governs
+   the refresh, so every occurrence is reworded.
+8. STEP 2, 'TURBO_FORCE=1 npm run i18n:gen': `npm run i18n:gen` chains the three
+   generators directly and has no turbo layer; TURBO_FORCE=1 matters for the GATE's cached
+   i18n:gen task (memory turbo-i18n-gen-stale-dict-cache) and is set on every gate run
+   here; on the direct regen it is harmless.
+9. The 19F hand-carried entry's '4,569 rows' was the count at the D148 fix; D149's 260
+   non-Latin rift fills took it to 4,309 (the 19F ledger), and the worklist at execution
+   carries exactly 4,309 sim rows (3,826 auto plus 483 dialogue and lore, human-required).
+10. The 19G hand-carried entry's arm quotes: the first inscription arm is named 'the
+    inscription materials prose states the live scroll bill and its parity with the
+    serpent elixir (D171)' and the per-locale farm arm 'the farm beds fills name the
+    scribe, the scroll, one gourd, the elixir and the parity in their own locale' (both in
+    tests/guide.test.ts).
+
 ### Hand-carried fill entries from Phase 19F (2026-09-02)
 
 Written at Phase 19F execution because the registry could not carry them before that wave,
@@ -109,7 +182,8 @@ or because a fill's provenance is not something the worklist can say:
   `sim_i18n` source blocks through `simDictProvidedKeys`, so `npm run i18n:worklist` lists the
   sim-scope rows every locale never carried: 4,569 rows across the 20 non-English locales at
   the 19F measurement (206 to 246 per locale; en_CA inherits English and carries none), every
-  one byte-identical English today. They land in the per-locale `BASE_DICT` blocks of
+  one byte-identical English today (AMENDED 2026-09-02: 4,309 after D149's 260 non-Latin
+  rift fills; the Phase 20 worklist reads exactly 4,309, amendment 9 above). They land in the per-locale `BASE_DICT` blocks of
   `src/ui/sim_i18n.ts` (or, for the eight newest locales, in `src/ui/sim_i18n.newlocales.ts`,
   whose `BASE_NEW` blocks each `BASE_DICT` block spreads; the passthrough suite
   `tests/sim_i18n_base_new_passthrough.test.ts` guards the spread). The sim DICT has NO dialect
@@ -161,7 +235,8 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   (stale on the one clause the repair made true) and never reaches the worklist. The fifteen
   Latin locales render ENGLISH on the inscription page until this fill lands, the same trade
   19F took. The English and every fill are pinned per clause by 'the inscription materials
-  prose states the live scroll bill and its parity with the serpent elixir' and 'the
+  prose states the live scroll bill and its parity with the serpent elixir (D171)' (the arm
+  name corrected 2026-09-02, amendment 10 above) and 'the
   inscription materials fills name the gourd, the serpent elixir and the parity in their
   own locale' in tests/guide.test.ts.
 - **One NEW sibling paragraph whose 15 Latin rows the registry carries as pending:**
