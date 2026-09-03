@@ -21,6 +21,8 @@ interface FakeObject {
     groups: unknown[];
     index?: { count: number } | null;
     getAttribute(name: string): { count: number } | undefined;
+    isInstancedBufferGeometry?: boolean;
+    instanceCount?: number;
   };
   material?:
     | { name: string; type: string; uuid: string }
@@ -110,6 +112,27 @@ describe('render diagnostics census', () => {
     expect(snapshot.categories.props.materials).toBe(2);
     expect(snapshot.newMaterials.some((label) => label.startsWith('village:Wood'))).toBe(true);
     expect(snapshot.newMaterials.some((label) => label.startsWith('never-drawn'))).toBe(false);
+  });
+
+  it('counts one quad per particle for a mesh over an instanced geometry', () => {
+    // The sprite-quad clouds (sprite_quad_cloud.ts) are plain meshes whose
+    // geometry is instanced: the particle count lives on the geometry.
+    const cloud = makeMesh('vfx:cloud', 2, 'vfx');
+    cloud.geometry = {
+      ...(cloud.geometry as NonNullable<FakeObject['geometry']>),
+      isInstancedBufferGeometry: true,
+      instanceCount: 37,
+    };
+    const empty = makeMesh('vfx:empty', 2, 'vfx');
+    empty.geometry = {
+      ...(empty.geometry as NonNullable<FakeObject['geometry']>),
+      isInstancedBufferGeometry: true,
+      instanceCount: 0,
+    };
+    const scene = makeObject();
+    scene.children.push(cloud, empty);
+    const { diagnostics } = makeHarness(scene);
+    expect(diagnostics.collect().estimatedTriangles).toBe(74);
   });
 
   it('reports program and texture deltas across collects', () => {

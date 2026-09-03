@@ -25,6 +25,9 @@
 //   farvista    - the whole coarse far-vista terrain layer (far_terrain); off
 //                 is the A/B that says whether a suspect distant surface is
 //                 this layer or the real splat terrain underneath it
+//   spritequads - the instanced-quad arm of the particle clouds
+//                 (sprite_quad_cloud.ts); off restores THREE.Points, the A/B
+//                 for ANGLE D3D11's geometry-shader point emulation
 
 // Beside the ?<name>=off layer switches, one MODE flag with its own accessor:
 //   ?prep=legacy - restores the pre-scheduler queue ADMISSION only: every unit

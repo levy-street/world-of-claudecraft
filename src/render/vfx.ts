@@ -16,6 +16,15 @@ import {
   writeIgnivarJudgmentFireSample,
 } from './ignivar_judgment_fire_core';
 import { PaladinSpellVfxController, type PaladinSpellVfxSprite } from './paladin_spell_vfx';
+import {
+  buildSpriteCloudInterleavedBuffer,
+  buildSpriteCloudInterleavedGeometry,
+  buildSpriteCloudMaterial,
+  buildSpriteCloudObject,
+  setSpriteCloudCount,
+  spriteCloudCount,
+  spriteQuadsEnabled,
+} from './sprite_quad_cloud';
 import type { VfxAnchorResolver, VfxOffsetAnchorResolver } from './vfx_anchor';
 import {
   insertActiveParticleSlot,
@@ -23,9 +32,10 @@ import {
   spriteEarlyRejectRadiusSq,
 } from './vfx_pool_core';
 
-// Spell & ambience particle system. One pooled THREE.Points cloud drawn with
-// additive blending; projectiles are lightweight emitters that home on their
-// target and burst on arrival. Particles sample a 4x4 atlas of Kenney
+// Spell & ambience particle system. One pooled sprite cloud (instanced quads,
+// or THREE.Points under `?spritequads=off`, see sprite_quad_cloud.ts) drawn
+// with additive blending; projectiles are lightweight emitters that home on
+// their target and burst on arrival. Particles sample a 4x4 atlas of Kenney
 // particle-pack sprites (black-background, additive-ready, CC0): flames,
 // sparks, magic wisps, smoke, built once at startup from the preloaded PNGs.
 //
@@ -42,6 +52,15 @@ const DRAW_ALPHA = 7;
 const DRAW_SPRITE = 8;
 const DRAW_ROTATION = 9;
 const DRAW_RADIUS_SQ = 10;
+const DRAW_LAYOUT = [
+  { name: 'position', itemSize: 3, offset: DRAW_POSITION },
+  { name: 'aColor', itemSize: 3, offset: DRAW_COLOR },
+  { name: 'aSize', itemSize: 1, offset: DRAW_SIZE },
+  { name: 'aAlpha', itemSize: 1, offset: DRAW_ALPHA },
+  { name: 'aSprite', itemSize: 1, offset: DRAW_SPRITE },
+  { name: 'aRot', itemSize: 1, offset: DRAW_ROTATION },
+  { name: 'aRadiusSq', itemSize: 1, offset: DRAW_RADIUS_SQ },
+] as const;
 
 // HDR multipliers (graphics-plan step 9); 1.0 on the no-composer path
 function hdr(k: number): number {
@@ -317,7 +336,7 @@ function projectileSprites(school: string): { core: number; trail: number } {
 export type EntityAnchor = VfxAnchorResolver;
 
 export class Vfx {
-  private points: THREE.Points;
+  private points: ReturnType<typeof buildSpriteCloudObject>;
   private pos: Float32Array;
   private vel: Float32Array;
   private col: Float32Array;
@@ -390,51 +409,25 @@ export class Vfx {
     this.activeSlots = new Int32Array(CAPACITY);
     this.activeSlotFlags = new Uint8Array(CAPACITY);
     this.drawData = new Float32Array(CAPACITY * DRAW_STRIDE);
-    this.drawBuffer = new THREE.InterleavedBuffer(this.drawData, DRAW_STRIDE);
-    this.drawBuffer.setUsage(THREE.DynamicDrawUsage);
-
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute(
-      'position',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_POSITION),
-    );
-    geo.setAttribute(
-      'aColor',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 3, DRAW_COLOR),
-    );
-    geo.setAttribute('aSize', new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SIZE));
-    geo.setAttribute(
-      'aAlpha',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ALPHA),
-    );
-    geo.setAttribute(
-      'aSprite',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_SPRITE),
-    );
-    geo.setAttribute(
-      'aRot',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_ROTATION),
-    );
-    geo.setAttribute(
-      'aRadiusSq',
-      new THREE.InterleavedBufferAttribute(this.drawBuffer, 1, DRAW_RADIUS_SQ),
-    );
-    geo.setDrawRange(0, 0);
+    const quads = spriteQuadsEnabled();
+    this.drawBuffer = buildSpriteCloudInterleavedBuffer(this.drawData, DRAW_STRIDE, quads);
+    const geo = buildSpriteCloudInterleavedGeometry(this.drawBuffer, DRAW_LAYOUT, quads);
     // Keep the historical static geometry bound. Camera-aware point culling is
     // separate and cannot affect transparent sorting against renderOrder peers.
     geo.boundingSphere = new THREE.Sphere(new THREE.Vector3(450, 0, 0), 2400);
 
     const atlas = buildAtlasTexture();
     this.spriteRadiusSq = atlas.earlyRejectRadiusSq;
-    const mat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      uniforms: {
-        uScale: { value: 600 },
-        uAtlas: { value: atlas.texture },
-      },
-      vertexShader: `
+    const mat = buildSpriteCloudMaterial(
+      {
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uScale: { value: 600 },
+          uAtlas: { value: atlas.texture },
+        },
+        vertexHeader: `
         attribute vec3 aColor;
         attribute float aSize;
         attribute float aAlpha;
@@ -446,8 +439,8 @@ export class Vfx {
         varying vec2 vCell;
         varying vec2 vRotCs;
         varying float vRadiusSq;
-        uniform float uScale;
-        void main() {
+        uniform float uScale;`,
+        vertexBody: `
           vColor = aColor;
           vAlpha = aAlpha;
           float idx = floor(aSprite + 0.5);
@@ -455,11 +448,8 @@ export class Vfx {
           vRotCs = vec2(cos(aRot), sin(aRot));
           vRadiusSq = aRadiusSq;
           vec4 mv = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = clamp(aSize * uScale / max(1.0, -mv.z), 0.0, 110.0);
-          gl_Position = projectionMatrix * mv;
-        }
-      `,
-      fragmentShader: `
+          float pointSize = clamp(aSize * uScale / max(1.0, -mv.z), 0.0, 110.0);`,
+        fragmentShader: `
         uniform sampler2D uAtlas;
         varying vec3 vColor;
         varying float vAlpha;
@@ -467,7 +457,7 @@ export class Vfx {
         varying vec2 vRotCs;
         varying float vRadiusSq;
         void main() {
-          vec2 pc = gl_PointCoord - 0.5;
+          vec2 pc = SPRITE_COORD - 0.5;
           if (dot(pc, pc) > vRadiusSq) discard;
           // rotate the point coord around its centre, clamped inside the cell
           pc = vec2(
@@ -483,17 +473,18 @@ export class Vfx {
           gl_FragColor = vec4(vColor * tex, vAlpha);
         }
       `,
-    });
-    this.points = new THREE.Points(geo, mat);
+      },
+      quads,
+    );
+    this.points = buildSpriteCloudObject(geo, mat);
     this.points.userData.renderCategory = 'vfx';
-    this.points.frustumCulled = false;
     this.points.renderOrder = 5;
     // The first zero-count submit still compiles the exact shader and uploads
     // the atlas on constrained prewarm profiles that skip the explicit burst.
     this.points.visible = true;
     this.points.onAfterRender = () => {
       this.cloudWarmed = true;
-      if (this.points.geometry.drawRange.count === 0) this.points.visible = false;
+      if (spriteCloudCount(this.points.geometry) === 0) this.points.visible = false;
     };
     scene.add(this.points);
     this.paladinSpellFx = new PaladinSpellVfxController(anchor, (particle) => {
@@ -705,7 +696,7 @@ export class Vfx {
     this.alphaAttr.fill(0);
     this.activeCount = 0;
     this.activeSlotFlags.fill(0);
-    this.points.geometry.setDrawRange(0, 0);
+    setSpriteCloudCount(this.points.geometry, 0);
     this.points.visible = !this.cloudWarmed;
   }
 
@@ -794,7 +785,7 @@ export class Vfx {
   private packRenderCloud(camera: THREE.Camera): void {
     const geo = this.points.geometry;
     if (this.activeCount === 0) {
-      geo.setDrawRange(0, 0);
+      setSpriteCloudCount(geo, 0);
       this.points.visible = !this.cloudWarmed;
       return;
     }
@@ -837,7 +828,7 @@ export class Vfx {
       count++;
     }
 
-    geo.setDrawRange(0, count);
+    setSpriteCloudCount(geo, count);
     this.points.visible = count > 0 || !this.cloudWarmed;
     if (count === 0) return;
 

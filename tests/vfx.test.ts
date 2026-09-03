@@ -12,10 +12,11 @@ vi.mock('../src/render/assets/preload', () => ({
   registerDeferredPreload: vi.fn(),
 }));
 
+import { spriteCloudCount, spriteQuadPointRange } from '../src/render/sprite_quad_cloud';
 import { Vfx } from '../src/render/vfx';
 
 interface VfxProbe {
-  points: THREE.Points<THREE.BufferGeometry, THREE.ShaderMaterial>;
+  points: THREE.Mesh<THREE.BufferGeometry, THREE.ShaderMaterial>;
   cloudWarmed: boolean;
   pos: Float32Array;
   vel: Float32Array;
@@ -207,7 +208,7 @@ describe('pooled VFX cloud', () => {
     const { points } = probe;
     const geometry = points.geometry;
 
-    expect(geometry.drawRange.count).toBe(0);
+    expect(spriteCloudCount(geometry)).toBe(0);
     expect(points.visible).toBe(true);
     expect(points.frustumCulled).toBe(false);
     const position = geometry.getAttribute('position') as THREE.InterleavedBufferAttribute;
@@ -248,7 +249,7 @@ describe('pooled VFX cloud', () => {
     camera.updateMatrixWorld();
     vfx.prepareDraw(camera);
     expect(lifeReads).toBe(probe.activeCount);
-    expect(geometry.drawRange.count).toBe(2);
+    expect(spriteCloudCount(geometry)).toBe(2);
     expect([position.getX(0), position.getX(1)]).toEqual([-1, 1]);
     expect(position.data.updateRanges).toEqual([{ start: 0, count: 22 }]);
     expect((geometry.getAttribute('aColor') as THREE.InterleavedBufferAttribute).getX(0)).toBe(1);
@@ -267,7 +268,7 @@ describe('pooled VFX cloud', () => {
     probe.cloudWarmed = true;
     vfx.prepareDraw(camera);
     expect(points.visible).toBe(false);
-    expect(geometry.drawRange.count).toBe(0);
+    expect(spriteCloudCount(geometry)).toBe(0);
     expect(position.data.version).toBe(visibleVersion);
 
     vfx.clear();
@@ -277,7 +278,7 @@ describe('pooled VFX cloud', () => {
     camera.lookAt(0, 0, -10);
     camera.updateMatrixWorld();
     vfx.prepareDraw(camera);
-    expect(geometry.drawRange.count).toBe(1);
+    expect(spriteCloudCount(geometry)).toBe(1);
     expect(points.visible).toBe(true);
 
     const historicalSortSphere = geometry.boundingSphere;
@@ -287,7 +288,7 @@ describe('pooled VFX cloud', () => {
           vCell = vec2(mod(idx, 4.0), floor(idx / 4.0));
           vRotCs = vec2(cos(aRot), sin(aRot));
           vRadiusSq = aRadiusSq;`);
-    expect(points.material.fragmentShader).toContain(`vec2 pc = gl_PointCoord - 0.5;
+    expect(points.material.fragmentShader).toContain(`vec2 pc = SPRITE_COORD - 0.5;
           if (dot(pc, pc) > vRadiusSq) discard;
           // rotate the point coord around its centre, clamped inside the cell
           pc = vec2(
@@ -309,7 +310,7 @@ describe('pooled VFX cloud', () => {
     const orthographic = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 100);
     orthographic.updateMatrixWorld();
     vfx.prepareDraw(orthographic);
-    expect(geometry.drawRange.count).toBe(1);
+    expect(spriteCloudCount(geometry)).toBe(1);
     expect(position.getX(0)).toBe(1_000);
   });
 
@@ -344,7 +345,7 @@ describe('pooled VFX cloud', () => {
     camera.position.z = 20;
     camera.updateMatrixWorld();
     vfx.prepareDraw(camera);
-    expect(geometry.drawRange.count).toBe(1);
+    expect(spriteCloudCount(geometry)).toBe(1);
     const expectedColor = new THREE.Color(0x804020);
     const color = geometry.getAttribute('aColor') as THREE.InterleavedBufferAttribute;
     expect(color.getX(0)).toBeCloseTo(expectedColor.r);
@@ -364,7 +365,7 @@ describe('pooled VFX cloud', () => {
     vfx.prepareDraw(camera);
     expect(probe.activeCount).toBe(0);
     expect(probe.size[0]).toBe(0);
-    expect(geometry.drawRange.count).toBe(0);
+    expect(spriteCloudCount(geometry)).toBe(0);
     vfx.clear();
     vfx.clear();
     expect(probe.activeCount).toBe(0);
@@ -379,7 +380,7 @@ describe('pooled VFX cloud', () => {
       'position',
     ) as THREE.InterleavedBufferAttribute;
     expect(capacityProbe.activeCount).toBe(4_096);
-    expect(capacityProbe.points.geometry.drawRange.count).toBe(4_096);
+    expect(spriteCloudCount(capacityProbe.points.geometry)).toBe(4_096);
     expect(capacityPosition.getX(0)).toBe(4_096);
     expect(capacityPosition.getX(1)).toBe(1);
     expect(capacityPosition.getX(4_095)).toBe(4_095);
@@ -396,6 +397,42 @@ describe('pooled VFX cloud', () => {
     capacityVfx.prepareDraw(camera);
     expect(capacityPosition.getX(0)).toBe(8_192);
     expect(capacityPosition.getX(1)).toBe(1);
+  });
+
+  it('draws the cloud as instanced quads over the same packed buffer by default', () => {
+    installCanvasStub();
+    const vfx = new Vfx(new THREE.Scene(), () => null);
+    const probe = vfx as unknown as VfxProbe;
+    const { points } = probe;
+    expect(points).toBeInstanceOf(THREE.Mesh);
+    expect(points.geometry).toBeInstanceOf(THREE.InstancedBufferGeometry);
+    expect(points.renderOrder).toBe(5);
+    expect(points.frustumCulled).toBe(false);
+    expect(points.userData.renderCategory).toBe('vfx');
+    expect(probe.drawBuffer).toBeInstanceOf(THREE.InstancedInterleavedBuffer);
+    const position = points.geometry.getAttribute('position') as THREE.InterleavedBufferAttribute;
+    expect(position.data).toBe(probe.drawBuffer);
+    expect(points.geometry.getAttribute('aCorner').count).toBe(4);
+    expect(points.geometry.index?.count).toBe(6);
+    expect(points.material.uniforms.uPointRange).toBe(spriteQuadPointRange);
+    expect(points.material.vertexShader).not.toContain('gl_PointSize');
+    expect(points.material.vertexShader).toContain(
+      'float halfExtent = spritePx * (-mv.z) / (2.0 * uScale);',
+    );
+    expect(points.material.fragmentShader).toContain('#define SPRITE_COORD vSpriteCoord');
+    expect(points.material.blending).toBe(THREE.AdditiveBlending);
+    expect(points.material.depthWrite).toBe(false);
+    expect(points.material.transparent).toBe(true);
+
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.updateMatrixWorld();
+    probe.spawn(0, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    probe.spawn(1, 0, -10, 0, 0, 0, 0xffffff, 1, 1, 0, 0, 0);
+    vfx.prepareDraw(camera);
+    expect((points.geometry as THREE.InstancedBufferGeometry).instanceCount).toBe(2);
+    // the vertex draw range stays whole: the quad's six indices are what the instances draw
+    expect(points.geometry.drawRange.count).toBe(Number.POSITIVE_INFINITY);
+    expect(probe.drawBuffer.updateRanges).toEqual([{ start: 0, count: 22 }]);
   });
 
   it('keeps settled idle frames upload-free and rearms prewarm after context restore', () => {

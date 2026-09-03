@@ -672,6 +672,7 @@ import { zoneArrivalReady } from './sky_residency_core';
 import { SkyResidencyDriver } from './sky_residency_driver';
 import { nearestSloppyPickId, type SloppyPickCandidate } from './sloppy_pick';
 import { buildSoulwell, disposeSoulwellVisual, syncSoulwellVisual } from './soulwell';
+import { syncSpriteQuadPointRange } from './sprite_quad_cloud';
 import {
   freezeStaticMatrices,
   freezeStaticSubtreeMatrices,
@@ -2063,6 +2064,7 @@ export class Renderer {
     // reloads (location.reload) don't exhaust the browser's WebGL context pool.
     this.unregisterWebGLContext = trackWebGLContext(this.webgl);
     this.captureGlIdentity();
+    syncSpriteQuadPointRange(this.webgl.getContext());
     canvas.addEventListener('webglcontextlost', this.onWebGLContextLost);
     canvas.addEventListener('webglcontextrestored', this.onWebGLContextRestored);
     if (options.initializeGfx !== false) {

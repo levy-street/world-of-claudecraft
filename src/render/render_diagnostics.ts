@@ -105,6 +105,20 @@ function drawCountFor(
   );
 }
 
+/** Instances a mesh draws: an InstancedMesh's count, an instanced geometry's
+ *  (the sprite-quad clouds draw one quad per particle), else one. */
+function meshInstanceCount(
+  renderable: RenderableDiagnosticObject,
+  geometry?: THREE.BufferGeometry,
+): number {
+  if (renderable.isInstancedMesh) return Math.max(0, renderable.count ?? 0);
+  const instanced = geometry as THREE.InstancedBufferGeometry | undefined;
+  if (instanced?.isInstancedBufferGeometry && Number.isFinite(instanced.instanceCount)) {
+    return Math.max(0, instanced.instanceCount);
+  }
+  return 1;
+}
+
 function triangleCountFor(geometry?: THREE.BufferGeometry): number {
   if (!geometry) return 0;
   const drawCount = geometry.index?.count ?? geometry.getAttribute('position')?.count ?? 0;
@@ -209,10 +223,7 @@ export class RenderDiagnostics {
           let triangles = 0;
           let pointCount = 0;
           if (hasMesh) {
-            const instanceCount = renderable.isInstancedMesh
-              ? Math.max(0, renderable.count ?? 0)
-              : 1;
-            triangles = triangleCountFor(geometry) * instanceCount;
+            triangles = triangleCountFor(geometry) * meshInstanceCount(renderable, geometry);
           } else if (hasSprite) {
             triangles = 2;
           } else if (hasPoints) {
