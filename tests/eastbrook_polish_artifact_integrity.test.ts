@@ -1037,10 +1037,13 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the 2026-08-31 v0.41.0 sync into the shader-warm branch: both
 // arms had re-minted, the merged renderer, lockfile, and re-stamped GLB inputs
 // land together. No capture was retaken.
+// Re-minted for the shader-warm PR's give-up rule and its review fixes
+// (renderer.ts: the census bracket and the cast units' compile-arm host).
+// No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '2ca53c180cad67ed0aac9525f61ba04ef6c694302f1e2a0d9e0ac9c93ba0f61d';
+  '66a130d709be19c547c4014e4616db02641aa55df7997502af88cacc393d6a2d';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'f3c315dda9c1a3c9f580ccc7d71a2bab4c871c1814c8aa3849a536f2c0ee59d9';
+  'ef6d1ec16d53d727d14100ffefe44b76ea02bca5e17552185e777f7ce9435db1';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2198,7 +2201,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // composite first, then this seal. No capture was retaken.
       // Re-minted for review round 3 of the shader-warm PR: the composite
       // follows the moved ward walk, then this seal. No capture was retaken.
-    ).toBe('0c5cde113ef0f2b0cdc077097f2a7acdebd79efc9fe48632f2dc01878d51f15b');
+      // Re-minted for the shader-warm PR's give-up rule and its review fixes:
+      // the composite first, then this seal. No capture was retaken.
+    ).toBe('0fd0bfc520121f3b8f6a0d2ecc5ab09db625d4c2934adc4860d35a6666f0eb78');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

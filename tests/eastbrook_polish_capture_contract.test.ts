@@ -354,8 +354,11 @@ interface AttributionTargetFixture {
 // Re-minted for review round 3 of the shader-warm PR (the battleground ward
 // walk left renderer.ts for battleground_views.ts and the prebuild release
 // call replaced it). No capture was retaken.
+// Re-minted for the shader-warm PR's give-up rule and its review fixes
+// (renderer.ts: the census bracket and the cast units' compile-arm host).
+// No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'f3c315dda9c1a3c9f580ccc7d71a2bab4c871c1814c8aa3849a536f2c0ee59d9';
+  'ef6d1ec16d53d727d14100ffefe44b76ea02bca5e17552185e777f7ce9435db1';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [
