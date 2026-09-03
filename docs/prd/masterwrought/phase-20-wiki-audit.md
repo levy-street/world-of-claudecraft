@@ -106,3 +106,53 @@ and its successor, the flagged fills, the review record, the stamps, the maintai
 NEXT = docs/prd/masterwrought/phase-20-release-fill-and-reclose.md STEP 2 in a FRESH session,
 which begins by regenerating the worklist and re-running the commit-walk staleness audit.
 ```
+
+### Amendments at execution (2026-09-03, verified against the tree at f93217ccc8 before STEP 1 ran)
+
+Each item corrects one line of the Starter Prompt above; the prompt stays as written and
+these read with it.
+
+1. STEP 0, the sync: origin/release/v0.42.0 is the newest release by version sort and its
+   tip 1fdf0f55a3 is already an ancestor of HEAD (the Mech Bird mount sync 0fd5390dbb);
+   `git fetch origin --prune` brought nothing. No merge, no release-merge-audit, no
+   re-inventory: the no-op, the same shape as the Phase 20 doc's amendment 1.
+2. STEP 0, the census at the launch tip reads RESULT: FAIL, before any change of this lane:
+   one unexplained EXTRA, `gateMountSwapOnCompile` in src/render/mount_lifecycle.ts, a name
+   present on NO parent because it was authored INSIDE the mount sync merge commit
+   9ba72f3cb7 (the maintainer's art session, 2026-09-03 08:30; `git blame` attributes the
+   line to the merge itself and `git log -S` finds no non-merge commit, the evil-merge
+   shape the census exists to catch). It is live (tests/mount_lifecycle.test.ts imports and
+   exercises it), so the repair is its explained-extras row in merge-deletion-list.md, a
+   STEP 0 rider of this lane; STEP 4's 'the census RESULT: PASS' is measured against that
+   rider. The row is parsed by tests/merge_audit_symbol_census.test.ts
+   (`parseExplainedExtras`).
+3. STEP 1, 'the 39 page modules under src/guide/pages/': 39 FILES, of which index.ts
+   (the PAGES registry), types.ts and ui.ts (shared helpers) are not pages; 36 page
+   modules (the 31 routed pages of `PAGES` plus the five professions_* sub-modules the
+   professions page composes). The audit's unit is the RENDERED SURFACE, not the file: 59
+   surfaces (31 routes, 9 class details, 18 profession sub-pages from `GUIDE_PROF_PAGES`,
+   and the chrome: nav, head meta, search, breadcrumbs, TOC, placeholder, not-found), driven
+   the way tests/guide_key_coverage.test.ts drives them ('renders every catalog key that is
+   not explicitly retired or off-sweep'), with a wrapped t() recording the keys per surface.
+4. STEP 1, the counts: 1,923 guide.* keys resolve in the English slice; 1,832 render on at
+   least one surface and the remaining 91 are exactly RETIRED_KEYS (80 guide keys) plus
+   LIVE_OFF_SWEEP_KEYS (12) minus their one overlap-free union as the coverage sweep
+   allows them (verified: zero unrendered keys outside the two allowlists). 639 catalog
+   keys are prose of 120+ characters (52,938 words); 624 of them render (the other 15 are
+   retired). 491 rendered keys are shared by two or more surfaces: each is audited ONCE on
+   its primary surface (the largest page that renders it) with the other surfaces named,
+   the prompt's rule. Lanes: 48 (the nine class details, the classes chooser, the models
+   page and the home page fold into one lane; the chrome lane keeps only the 47 keys no
+   page renders; prof:logging and prof:herbalism keep two keys each because the shared
+   gathering prose lands on the farming and mining lanes).
+5. STEP 2, 'one fact-checker per page': one per LANE (48), and under ULTRACODE two finders
+   per lane with different lenses (a claim-by-claim reader and a numbers-names-enumerations
+   extractor), deduplicated by (key, claim) before the adversarial refuters.
+6. STEP 4, the launch-tip measurement: taken at f93217ccc8 with the gate's own form (npm
+   test -- --maxWorkers=8, WOC_SKIP_PRETEST=1 after the artifacts regenerated zero-diff,
+   TEST_DATABASE_URL only). A first launch was stopped and restarted because a scratch
+   inventory test under tests/ (deleted after one run, never committed) could have been
+   globbed into the count; the reading recorded below is from the restart.
+7. STEP 0 reads: `TURBO_FORCE=1 npm run i18n:gen` and `npm run wiki:content` are zero-diff
+   at the launch tip; the registry reads 14,455 pending rows, the figure the Phase 20 doc's
+   maintainer's-word section records.

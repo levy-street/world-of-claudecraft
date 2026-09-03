@@ -2127,3 +2127,15 @@ DEFECT, not an exemption: `parseExplainedExtras` checks the claim.
 | i18n key | `profPages.rareBodyFourFlavors` | | 19 | qr-19-rarebody-reword-landmine (Phase 19F, under qr-19-best-for-project) | the successor of guide.profPages.rareBody (retired in scripts/i18n_retired_keys.mjs): the shared 'Rare finds' prose of the four gathering pages now names farming's golden harvest beside the three node windfalls, in the maintainer's wording (src/ui/i18n.catalog/guide.ts). |
 | i18n key | `profPages.craftProse.inscription.materialsBodyFrostGourd` | | 19 | qr-19-scroll-elixir-15c-parity (Phase 19G, under qr-19-best-for-project) | the successor of guide.profPages.craftProse.inscription.materialsBody (retired in scripts/i18n_retired_keys.mjs): the prose said the double scroll batch is priced even with the Elixir of the Serpent, false by 15 copper since Phase 11g; the repair puts the elixir's gourd on the scroll and the successor names it; wired through the bodyKey override of proseSection in src/guide/pages/professions_craft.ts (src/ui/i18n.catalog/guide.ts). |
 | i18n key | `profPages.farm.bedsBodyScribeBuyer` | | 19 | qr-19-scroll-elixir-15c-parity, the D171 review round (Phase 19G, under qr-19-best-for-project) | a NEW sibling paragraph rendered after the shipped farm.bedsBody (untouched, its reviewed fills kept): the beds prose names two crafts that buy produce (cooking, through the kitchens and Marlow's ladder; alchemy, through the elixirs) and the parity repair made the scribe a buyer too, so the paragraph names the scribe (no ordinal: the hoe ladder takes fine produce as a tool reagent); wired in farmingSection of src/guide/pages/professions_gathering.ts (src/ui/i18n.catalog/guide.ts). |
+
+## Explained extras (2026-09-03, the Phase 20 wiki completeness audit STEP 0 rider)
+
+One name the census reported as an unexplained EXTRA at the launch tip of the wiki
+completeness lane (f93217ccc8), before that lane changed anything. It was authored INSIDE a
+merge commit, so no parent carries it and `git log -S` finds no non-merge commit: the
+evil-merge shape this census exists to catch. The name is live and tested; the row records
+its origin so the census reads PASS again.
+
+| Class | Name | Path | Phase | Ruling | Reason |
+|---|---|---|---|---|---|
+| exports | `gateMountSwapOnCompile` |  | 20 | the maintainer's mount sync merge 9ba72f3cb7 (2026-09-03, 'merge: integrate v0.42.0 mount updates'), recorded by the Phase 20 wiki completeness audit at STEP 0 | the mount lifecycle's compile-gate helper, written in the merge itself while resolving the v0.42.0 mount updates against the branch's shared mount lifecycle host (48898ce309): holds one mount root behind its compile gate and lets only the callback whose root is still the live visual clear the pending flag, so an older, non-cancellable gate callback cannot reveal a replacement root (the merge body's 'harden mount swaps and compile-gate presentation against semantic merge races'). Exercised by tests/mount_lifecycle.test.ts, which imports it by name. No Path: src/render is inside census scope (src/render/mount_lifecycle.ts) |
