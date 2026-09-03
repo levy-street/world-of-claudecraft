@@ -19,5 +19,7 @@ export function wornMountSkinAllowed(
   mountSkinId: string | null | undefined,
 ): boolean {
   if (!mountSkinId) return true;
-  return cosmetics.mountSkinIds.includes(mountSkinId);
+  // Nullish-tolerant like account_cosmetics_live.ts: an older narrower shape
+  // handed over at runtime reads as owning nothing, never as a throw at join.
+  return (cosmetics.mountSkinIds ?? []).includes(mountSkinId);
 }

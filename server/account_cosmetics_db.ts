@@ -9,6 +9,10 @@
 // returns that same merged view so the live session can be refreshed from it.
 // The DDL stays in db.ts's SCHEMA (the weapon backfill is order-sensitive);
 // db.ts re-exports this module so callers and test doubles keep one import.
+// Deliberate cycle with ./db (which re-exports this module): `pool` is read
+// only inside the functions below, at call time, never at module scope, so
+// the hoisted re-export cannot hit a temporal dead zone at boot. Keep it that
+// way: a top-level `pool` read here would break the server's import graph.
 import { pool } from './db';
 
 export interface AccountCosmetics {

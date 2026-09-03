@@ -234,7 +234,7 @@ export class AccountCosmeticsService {
   changeMountSkin(session: CosmeticsSession, raw: unknown): void {
     const skinId = raw === null ? null : typeof raw === 'string' ? raw : undefined;
     if (skinId === undefined) return;
-    if (skinId !== null && !session.accountCosmetics.mountSkinIds.includes(skinId)) return;
+    if (skinId !== null && !(session.accountCosmetics.mountSkinIds ?? []).includes(skinId)) return;
     this.host.sim().setMountSkin(session.pid, skinId);
   }
 }

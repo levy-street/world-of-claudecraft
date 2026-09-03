@@ -364,6 +364,7 @@ import {
 import {
   forceDismount as forceDismountImpl,
   ownedMounts as ownedMountsImpl,
+  setMountSkin as setMountSkinImpl,
   toggleMount as toggleMountImpl,
   updateMountTransition,
 } from './mounts';
@@ -4259,20 +4260,11 @@ export class Sim {
     this.setWeaponSkin(this.primaryId, skinId, weaponType);
   }
 
-  /** Wear (skinId) or take off (null) a mount skin on a player: meta (persisted)
-   *  plus the entity mirror the identity wire reads. Cosmetic only: the ridden
-   *  mount keeps its own key, so speed, the melee block and crit are untouched.
-   *  The account-ownership gate is the caller's (the server's session cosmetics;
-   *  changeMountSkin below for the offline Sim). Unknown ids are refused. */
+  /** Wear (skinId) or take off (null) a mount skin on a player. Rules live in
+   *  src/sim/mounts.ts (setMountSkin); the account-ownership gate is the
+   *  caller's (the server's session cosmetics; changeMountSkin below offline). */
   setMountSkin(pid: number, skinId: string | null): boolean {
-    const meta = this.players.get(pid);
-    const e = this.entities.get(pid);
-    if (!meta || e?.kind !== 'player') return false;
-    const next = skinId === null ? null : normalizeMountSkinId(skinId);
-    if (skinId !== null && next === null) return false;
-    meta.mountSkinId = next;
-    e.mountSkinId = next;
-    return true;
+    return setMountSkinImpl(this.ctx, pid, skinId);
   }
 
   changeMountSkin(skinId: string | null): void {
