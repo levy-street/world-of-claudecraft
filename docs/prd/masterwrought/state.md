@@ -27292,3 +27292,158 @@ flavor names and the deed sentence since they were written) and the Latin locale
 for the Phase 20 fill. The handoff row in docs/prd/masterwrought/farming/state.md carries the dated
 close. This record was owed by the unit commit and landed at its review round
 (content-obligations-reviewer).
+
+## Phase 19G ledger (2026-09-02, the closeout wave of the rulings gate)
+
+STATUS: **COMPLETE, 1 of 2 units executed, ONE escalation (D168, by the
+maintainer's word in session).** Two units in dependency order (D171 first,
+D168 after it), one commit each, whole-tree tsc between them; every ruling
+and the escalation written where its open record actually stands (both rows
+live in phase-19-new-rows.md, so their ANSWERED and ESCALATED clauses sit on
+their FLAGS lines there, the D169 shape; the gate table carries only a dated
+dependency NOTE on the D022 push-consent row); then six fresh typed
+reviewers at the units, eight fix rounds that applied every finding, and
+eight fresh reads over the rounds plus the close-out reader, until a read
+returned nothing above a nit.
+
+STEP 0, the sync check: origin/release/v0.42.0 had not moved since the 19F
+close (its tip da6458493f is still the second parent of the 19E sync merge
+2ebe95e731), so no merge and no audit; recorded as the no-op the phase asked
+for.
+
+STEP 1: NINETEEN corrections to the wave's own instructions, amended in place
+and dated before execution as their own docs commit (4da6b08401), one
+correcting a premise before the maintainer's values were taken: D171's 'the
+only reagent whose unit value lands the repair exactly' is false on the live
+catalog (every tier-3 crop lands 15 under the shipped rule, and so does
+chipped_tusk, a poor drop no recipe consumes); the corrected menu was put to
+the maintainer, who chose frost_gourd because it mirrors the elixir's own
+produce line. Four values went to the maintainer in session: D168's
+disposition ('Escalate whole'), and D171's (a) reagent (frost_gourd count 1),
+(b) band scope (rung 50 alone; the all-bands arm is the R5 escalation and was
+not taken) and (c) pin shape (the numbers and the equality). The review
+rounds added thirty-eight more corrections to the contract, every one dated
+and attributed (D171 thirty in all, D168 twenty-six).
+
+### What moved, stated as narrowly as it is true
+- **D171** (qr-19-scroll-elixir-15c-parity, da5f89c51e; the rounds
+  7e8fc8257f, e582764fc2, fc676e2780, b039514caa): recipe_sunpetal_scroll
+  takes frost_gourd count 1 (second line, after the rung herb), so both
+  rung-50 bills price at 229 through the shipped reagentUnitValue rule; the
+  recipes.ts comment corrected (four pristine_venom_gland sinks; the rung-25
+  pair 90 against 106 and the rung-0 pair 26 against 36, both recorded, not
+  repaired; the tier-3 crops named as the only reagent family at 15); the
+  inscription catalog literal re-cut and its standing note rewritten into the
+  ruling; the parity pin 'the rung-50 scroll and the serpent elixir bill at
+  exact input parity (229 each, through the shipped unit-value rule)' in
+  tests/recipe_economy.test.ts, beside the rule, which now lives once in
+  tests/helpers/reagent_unit_value.ts (four suites import it; the two that
+  restate it on purpose are named in it); the accent sweep in
+  tests/provisioning_supply_line.test.ts made craft-agnostic (a slotless,
+  non-gathering-tool output that consumes produce, whatever its craft) with a
+  membership arm for the scroll row, its exclusion set pinned to the hoe
+  ladder, its floor raised 17 to 21; craftIdsForMaterialItem('frost_gourd')
+  pinned to alchemy, cooking and inscription (the fine twin stays cooking:
+  farming's twin record is not a material grade) and the Frost Gourd
+  tooltip's three-craft line pinned as a string; the player copy retired and
+  re-keyed (guide.profPages.craftProse.inscription.materialsBody to
+  materialsBodyFrostGourd, the bodyKey override in professions_craft.ts, a
+  RETIRED_KEYS row, a census row), the English pinned per clause with an
+  exact paragraph-two narrowness and the paragraph count, the five non-Latin
+  fills pinned in their own locale (every count derived from the live bills
+  and looked up in a per-locale forms table welded to the shipped names and
+  to its numeral, each clause closed to the other's items, an exact
+  per-locale narrowness transform, the paragraph count); the farm page's NEW
+  sibling paragraph guide.profPages.farm.bedsBodyScribeBuyer naming the scribe
+  as a produce buyer with no ordinal (the hoe ladder takes fine produce as a
+  tool reagent), five fresh non-Latin fills, pinned whole in English and per
+  locale with derived needles, anchored and ordered in the page arm, its
+  census row and its Phase 20 hand-carry; the wiki regenerated; fifteen Latin
+  rows pending per new key for Phase 20.
+- **D168** (qr-19-ci-shard-weights-go-public-harvest, dda61d91be; the rounds
+  50620a909a, bb69f27dd9, a862523396, 410575a89b): ESCALATED, not executed.
+  The precondition (a green FULL-MODE CI run of a PUSHED branch) is
+  unreachable under the standing NO-push rule, and the dependency D009+D170
+  has been escalated and unexecuted since 19A, so the harvest could not be
+  the LAST code-carrying change even if the run existed. No code or artifact
+  in the harvest set moved; the handoff row stays handed-to-maintainer,
+  unflipped; the coverage-drift rider stays bundled with the harvest by the
+  maintainer's choice, with its direction corrected on the record (the
+  release commit b38f38ba16 lowered the test literal to 0.94 while the docs
+  and the union tool kept 95 percent: reconcile toward 0.95). The
+  ready-to-run recipe on the row was wrong in eleven places at the escalation
+  commit and is now the reviewed one: two arms red on a wholesale harvest
+  (reproduced by simulation by three readers), the fabrication arm's
+  mutations move onto a synthetic table, the qa-gate block is retired only
+  with a replacement carrying its four acceptance items and the three
+  procedural ones, every literal assertion a harvest can move is named by its
+  arm, a coverage breach is healed by a local carry and a ratio breach by the
+  shard count (never a bar raise), the biome step is a red step never repaired
+  by un-ignoring the table, the harvester's ten-green-job refusal is named.
+
+### Reviews and the fix rounds
+Six fresh typed reviewers at the units (D171: content-obligations,
+frontend-seam, test-coverage, qa-checklist; D168: gate-integrity,
+qa-checklist), eight fix rounds (four per unit, one commit each) and eight
+fresh reads over them (D171: two coverage-and-frontend pairs over rounds one
+and two, a coverage read over round three; D168: a qa-checklist read over
+each of rounds one to three), the last round of each unit read by the
+close-out reader. Every finding, blocking, should-fix and nit alike, was
+applied or refused on evidence; the findings that moved a pin or a record,
+the three refusals with their reasons, the two invalid mutants recorded, and
+the machine-authored fill sets FLAGGED for the maintainer's read are all in
+phase-19g-qa.md. Chief among the findings: the recorded D168 recipe said one
+arm reds on a wholesale harvest where two do; its coverage rider had the
+drift's direction inverted; the D171 fills hardcoded their counts and left
+two regions of paragraph two unwindowed (two green mutants); the accent
+sweep's widening swapped one silent exemption for another; the farm page was
+silent on the new produce buyer and then claimed a contestable ordinal; the
+unit-value rule was restated six times; and three record claims were false.
+
+### Carried for the maintainer, not taken
+The full list is in phase-19g-qa.md: the five stale non-Latin bedsBody fills
+(a pre-11g English, with 'Vale Wheat' and 'Marsh Rice' in English), the
+inscription materials heading's under-count (flagged for the Phase 20 fill
+pass, refused here on cost), the zh_CN Highwatch rendering, the harvester's
+no-mode-line acceptance, the union tool's untested 0.95 floor, the coverage
+literal's three surfaces, the escalation commit's 'closes' wording, the
+bodyKey override at its third ternary rung, the unpinned prose of the
+recipe comment's corrected clauses, the two farm fills that keep a second
+scribe reference, and D009+D170 with D168 behind it. 19F's twenty carried
+items, 19E's seven, 19D's four, 19C's three and 19B's four remain the
+maintainer's and were not taken here; R5 stays frozen (section 12.3
+re-derived by the content review, every printed claim survives).
+
+### Validation
+node scripts/gate_select.mjs on the committed code tip b039514caa, pg-armed with TEST_DATABASE_URL only (DATABASE_URL never exported; the arming proved by contrast first: tests/account_wealth_db.pg.test.ts 3 skipped unarmed, 3 passed armed; the porcelain clean at launch), launched in the background with a done marker and judged by the real GATE_EXIT=0 line: PASS, all 12 steps green, mode full (a broad change set: 2150 paths against origin/release/v0.42.0), 8 workers, 12 minutes (19:32:13 to 19:44:55); the malware scan PASS (7931 files, 442 flags, 0 high after priors); the real-browser suite 38 files, 332 passed. tsc 0 at every commit; npm run ci:changed exit 0 after the last
+code commit and after every record commit; the census RESULT: PASS captured
+without a pipe at every commit; the guard suites green throughout
+(architecture, monolith, world_api parity, the S3 guard
+tests/localization_fixes.test.ts, tests/i18n_completeness.test.ts,
+tests/guide.test.ts, tests/guide_key_coverage.test.ts,
+tests/i18n_resolved_equivalence.test.ts); I18N_RELEASE_TIER never set. DRIFT
+predicted before the gate and re-derived from the diff itself (eight it
+declarations added, none removed, no new suite): files 3670/1 = 3671,
+unchanged; cases +8 over the 19F close (54,542/9/28 = 54,579), so 54,550/9/28
+= 54,587. Measured: Test Files 3670 passed | 1 skipped (3671); Tests 54,550 passed | 9 expected fail | 28 skipped (54,587). Prediction exact in both.. Every new pin mutated and watched fail
+alone (fifty-five mutants across eight suites, two invalid first passes
+recorded and re-run), the failing test name and counts in phase-19g-qa.md.
+
+### JUDGED, and not re-raised
+- The two units, their rulings and the escalation, and every reviewer and
+  fresh-read finding are SETTLED. This ledger records them; it does not
+  reopen them.
+- Refused with the reason recorded (phase-19g-qa.md): re-authoring the
+  inscription page's lead sentence and materials heading for the one crop
+  (the heading flagged for the Phase 20 fill pass, on cost); the 'off the
+  Highwatch terraces' phrase kept as the page's idiom for where the gourd is
+  grown, derived rather than trusted.
+
+RULED (qr-19-scroll-elixir-15c-parity, 2026-09-02, under qr-19-best-for-project): recorded on
+the D171 row of phase-19-new-rows.md and after the 11g finding block ('THE SUNPETAL SCROLL /
+SERPENT ELIXIR PARITY IS NOW BROKEN') in this file; the ruling text sits there, not repeated.
+
+ESCALATED (qr-19-ci-shard-weights-go-public-harvest, 2026-09-02, under qr-19-best-for-project):
+recorded on the D168 row of phase-19-new-rows.md, after the sixteenth-absorb entry of
+farming/progress.md, on item 21 of farming/state.md, and on the D022 row of the gate table as a
+dependency note; the record sits there, not repeated.
