@@ -729,4 +729,14 @@ collision/movement.
 - **`render_budget.ts` is the renderer's adaptive-budget core** (tier-driven frame
   budget + telemetry, keyed off `gfx.ts` quality bands). `renderer.ts` owns it,
   degrades against it, and pushes the resulting grass/foliage/vfx quality levels into
-  those subsystems. Consult it rather than reinventing a frame-level budget.
+  those subsystems. Consult it rather than reinventing a frame-level budget. Its
+  `resolution` level reaches the frame two ways (`post_plan_core.ts`
+  `dynamicResolution`): the grade-only chain varies a fixed target's render REGION
+  (`dynamic_resolution_core.ts`), and the composer chains, whose full-frame passes
+  cannot honour a region, REALLOCATE the drawing buffer and every post target at a
+  coarse rung (`resolution_rung_core.ts`: rungs about 0.1 apart down to the static
+  tier floor, moved only when the level crosses a whole rung, the reallocating frame
+  withheld from the governor's readings). A resize must stay a pure `setSize`
+  (texel sizes on uniforms, never a define): the resize contract is pinned in
+  `tests/post_pipeline.test.ts`. `?dynres=off` locks the lever, `?dynres=<0..1>` pins
+  the scale for a bench.

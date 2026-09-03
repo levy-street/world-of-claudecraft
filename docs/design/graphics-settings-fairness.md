@@ -93,6 +93,31 @@ COSMETIC (may be tiered down on lower presets):
   toward the colorway's own hue: a rougher, whole-armour approximation of the same colour
   rather than the atlas's undyed default. Pinned by `tests/tinted_material.test.ts`.
 
+- Render resolution under the frame-budget governor, on EVERY tier that carries a post
+  chain. The governor's `resolution` level (`src/render/render_budget.ts`) sheds pixels of
+  the 3D image only, and it is the last lever it pulls (after grass, foliage, lighting and
+  VFX, or under severe frame pressure). Two mechanisms, one classification:
+  - The grade-only medium chain varies the RENDER REGION of fixed targets and the output
+    grade remaps it (`src/render/dynamic_resolution_core.ts`, `dynamicResolutionRect`).
+  - The composer tiers (high, ultra, insane) cannot vary a region (N8AO, bloom, the
+    screen-fx pass and SMAA all sample full-frame texels), so there the lever REALLOCATES
+    the drawing buffer and every post target at a coarse rung
+    (`src/render/resolution_rung_core.ts`): rungs about 0.1 apart between the Render
+    Quality ceiling and the tier floor, moved only when the governor's level crosses a
+    whole rung, at the governor's own cooldowns. The frame that reallocates is withheld
+    from the governor's readings so its one-off cost cannot shed a second rung.
+  Both are GOVERNOR-driven sheds like the shadow cadence above (a perf-governor output, not
+  a UI tier knob), and both are cosmetic: a softer 3D image carries the same entities, at
+  the same positions, at the same time. What is NOT scaled is everything a player reads
+  text from: the HUD is DOM in CSS space, nameplates paint on their own canvas at the
+  DEVICE pixel ratio (`nameplate_canvas.ts` `beginFrame`), and the `?perf` overlay is DOM;
+  the canvas keeps its CSS box (`webgl.setSize(..., false)`) and the compositor upscales
+  the reduced drawing buffer into it. The FLOOR of the shed is a pure function of the
+  STATIC preset: `GFX_BUDGETS[tier].minRenderScaleDesktop` (high 0.7, ultra and insane
+  0.78) or `minRenderScaleMobile` (high 0.6, ultra and insane 0.68), the same floors the
+  medium region path already honoured, so two players on the same preset share the same
+  worst case and a preset can never be pushed below it. Pinned by
+  `tests/resolution_rung_fairness.test.ts`.
 - Edge anti-aliasing, and WHICH edge anti-aliasing a tier gets. High and above run the SMAA
   tail; medium (and any mix that resolves to the grade-only chain) runs the FXAA arm fused
   into `OutputGradePass`; low and the memory-constrained WebKit rungs run none, because they
@@ -352,6 +377,15 @@ measured design decision. Tracked at levy-street/world-of-claudecraft#3525.
   literal-pinned, the shed is strictly every-other-frame (never a removal: the application
   writes only the `shadowMap.autoUpdate`/`needsUpdate` flags), and the wiring scan pins the
   renderer call sites.
+- `tests/resolution_rung_fairness.test.ts` + `tests/resolution_rung_core.test.ts`: the
+  composer-tier resolution lever. Every tier floor is literal-pinned (desktop and mobile),
+  the allocation ladder is proven to end on the floor and never leave the ceiling-to-floor
+  band from any held scale, the renderer's floor read is source-scanned to the static
+  `GFX.budget` (no governor, pressure or level input), the rung core is scanned free of any
+  tier, preset, profile or governor input, the drawing-buffer reallocation is pinned to keep
+  the canvas CSS box (`setSize(..., false)`), the nameplate surface is pinned to the device
+  pixel ratio and scanned free of the render scale, and the HUD's only read of the effective
+  scale is the perf overlay readout.
 - `tests/weapon_vfx_shed.test.ts`: the weapon-skin fade. Neither arm reaches zero and the
   lever's floor is proven to stay clear of the multiplier at which a part would stop drawing,
   so the fade can never be mistaken for a cull; the distance arm is anchored to the fixed
