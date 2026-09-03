@@ -428,21 +428,28 @@ ranged.
 
 ## 10. Delivery
 
-Three PRs, each off the latest release branch, each gated with
-`node scripts/gate_select.mjs` and `/qa`:
+ONE PR, off the latest release branch, carrying every mechanic in this plan so
+the whole fight can be tested at once (owner decision, 2026-09-03; an earlier
+draft split it into three PRs). The branch `feature/nythraxis-mechanics-redo`
+is built in three internal slices, each a group of commits on the same branch,
+each gated with `node scripts/gate_select.mjs` and `/qa` before the next
+begins; only the finished branch opens a PR:
 
-1. **Core loop**: Dread Curse swap on both difficulties, Bone Spike with the
-   impale look, Grave Eruption and Grave Flame, the callout channel, the Raid
-   Boss Guide entry, finder blurbs and the two-tank composition, `sim_i18n`
-   rows, parity regen.
+1. **Core loop** (committed): Dread Curse swap on both difficulties, Bone Spike
+   with the impale look, Grave Eruption and Grave Flame, the callout channel,
+   the Raid Boss Guide entry, finder blurbs, `sim_i18n` rows.
 2. **Pressure**: Binding Sigil, Gravefire, Soulfire, the major-cast scheduler
    and the calm-window rules.
 3. **Phase 3**: the 30% phase, Bone Storm, The Crown Endures, Final Stand
    removal, matrix bot responses, the tuning pass.
 
+One wire epoch bump (25 to 26) covers every new readout, since they are all
+additive and land before anything ships, and the `nythraxis_full_pull` parity
+golden is regenerated once more at the end rather than per slice.
+
 ## 11. Open questions for the owner
 
-1. Bone Storm ships in PR 3, or is cut and Gravefire plus the sigil drag carry
+1. Bone Storm ships in this PR, or is cut and Gravefire plus the sigil drag carry
    the movement (it is the largest pathing risk).
 2. The 7:00 / 6:00 enrage clock and the spike hp are placeholders until the
    matrix runs.
