@@ -568,7 +568,12 @@ export const FORGEFATHER_FORTRESS_PLACEMENTS: readonly IgnivarPropPlacement[] = 
   { key: 'church', x: 451.65, y: 6.75, z: 2146, ry: 90 * DEG, scale: 12 },
   { key: 'gravestone_3', x: 457.4, y: 1.75, z: 2136.5, ry: 240 * DEG, scale: 5 },
   { key: 'gravestone_2', x: 443.9, y: 1.5, z: 2140.25, ry: 150 * DEG, scale: 4 },
-  { key: 'well_pump', x: 403.7, y: 4.3, z: 1898.9, ry: 45 * DEG, scale: 4 },
+  { key: 'well_pump', x: 403.7, y: 3.55, z: 1898.9, ry: 45 * DEG, scale: 4 },
+  // ---------------------------------------------------------------------
+  // The seventh placer pass (2026-09-05): the west gate notice board, and
+  // the Wyrmwatch well re-seated to the lawn.
+  // ---------------------------------------------------------------------
+  { key: 'notice_board', x: 429.55, y: 3.4, z: 2164.8, ry: 285 * DEG, scale: 4 },
 ];
 
 /** How far above the local ground a piece's base may sit and still count as

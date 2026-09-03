@@ -12,6 +12,7 @@ import { addRoofDarkness } from './gfx';
 import type { IgnivarEnvPropKey, IgnivarPropPlacement } from './ignivar_dressing_plan_core';
 import { decorateLiftBeamMaterial, decorateLiftSpoolMaterial } from './ignivar_lift_room';
 import { markSharedGeometry, markSharedMaterial } from './shared_resource';
+import { applySurfaceDetail } from './worn_stone';
 
 export const IGNIVAR_ENV_PROP_URLS: Record<IgnivarEnvPropKey, string> = {
   beam: '/models/dungeon/ignivar_prop_beam.glb',
@@ -226,12 +227,34 @@ function canonicalGeometry(source: THREE.Object3D): {
 
 const PROP_KEY_COUNT = Object.keys(IGNIVAR_ENV_PROP_URLS).length;
 
+/** The kit's architecture pieces: the source models ship smooth,
+ *  single-tone faces, so beside the fortress kit's worked stone they read
+ *  as plastic. These take the worn-stone surface detail layer (the
+ *  Eastbrook town treatment) so walls and roofs pick up masonry grain up
+ *  close; the small furniture keeps its clean silhouette. */
+const DRAKELANDS_KIT_DETAILED: ReadonlySet<string> = new Set([
+  'alchemist',
+  'barracks',
+  'building_1',
+  'building_2',
+  'building_base',
+  'building_base_roof',
+  'castle_door',
+  'church',
+  'house_1',
+  'market_stall',
+  'stables',
+]);
+
 /** The soft red grade the drakelands rebuild kit wears so it sits in the
- *  fortress kit's baked ember palette: dim the cool channels a touch and
- *  give shade a faint ember floor. Values chosen conservative so daylight
- *  texture detail survives; the night lamp wash multiplies on top. */
-function applyDrakelandsKitWarmth(mat: THREE.Material): void {
+ *  fortress kit's baked ember palette, plus the surface-detail grain for
+ *  its architecture pieces (DRAKELANDS_KIT_DETAILED above). */
+function applyDrakelandsKitWarmth(key: string, mat: THREE.Material): void {
   const m = mat as THREE.MeshStandardMaterial;
+  // The grain first (it keys off the material before the grade tints it),
+  // in object space so the varied per-piece UV layouts all read evenly.
+  if (DRAKELANDS_KIT_DETAILED.has(key))
+    applySurfaceDetail(m, 'stone', { strength: 0.55, objectSpace: true });
   // Brighten, not just tint: the kit's source textures run dark, so the
   // grade lifts the whole albedo (warm-biased) and keeps a real ember
   // floor for night reads beside the lamp wash.
@@ -267,7 +290,8 @@ export function prepareIgnivarEnvProps(): Promise<void> {
           // them at load to match: a soft red multiply plus a faint ember
           // emissive floor so shadowed faces keep the same warm read.
           // Keyed off the kit directory so a future drop joins by path.
-          if (url.startsWith('/models/drakelands_kit/')) applyDrakelandsKitWarmth(baked.material);
+          if (url.startsWith('/models/drakelands_kit/'))
+            applyDrakelandsKitWarmth(key, baked.material);
           // The lift machinery moves in the vertex shader (single baked
           // meshes on the shared uTime clock): the spool turns whole in its
           // static mount (the owner's winch remake) and the beam's sheave
