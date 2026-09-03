@@ -138,6 +138,19 @@ cadence logic of its own. Narrow helpers:
 - **VFX:** add an effect to `vfx.ts` (emit into the pooled particle cloud; HDR
   colour multipliers via `hdr()` so it blooms on composer tiers). Sprite atlas
   cells are append-only (`SPRITE_FILES`/`SPR` must stay in sync).
+- **Particle sprites are instanced quads, not `THREE.Points`.** ANGLE's D3D11
+  backend (every Windows Chrome/Edge player) has no point-sprite primitive and
+  emulates `gl_PointSize` with a generated geometry shader per program, so the
+  pooled cloud and the weapon-skin clouds build through `sprite_quad_cloud.ts`
+  (`buildSpriteCloudMaterial` + `buildSpriteCloudGeometry` /
+  `buildSpriteCloudInterleavedGeometry`), whose size math is the registered
+  `sprite_quad_core.ts`. A new cloud writes its shader as header + body (the body
+  leaves `vec4 mv` and `float pointSize`) and reads `SPRITE_COORD` in the
+  fragment, and gets both arms for free: `?spritequads=off` restores
+  `THREE.Points` for an A/B. Pixel parity between the arms is pinned by
+  `tests/sprite_quad_core.test.ts`; the still-`Points` users (`weather.ts`,
+  `ability_vfx/overlay_sprites.ts`, the `PointsMaterial` motes in the bespoke
+  spell visuals) are the backlog.
 - **Per-ability class VFX have two sanctioned landing spots.** Default: a
   declarative spec in a class-owned `*_vfx_specs.ts` module (exemplars:
   `destruction_vfx_specs.ts`, `necromancy_vfx_specs.ts`,

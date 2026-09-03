@@ -27,6 +27,12 @@
 import * as THREE from 'three';
 import { isSharedTexture, markSharedTexture } from './shared_resource';
 import {
+  buildSpriteCloudGeometry,
+  buildSpriteCloudMaterial,
+  buildSpriteCloudObject,
+  spriteQuadsEnabled,
+} from './sprite_quad_cloud';
+import {
   WEAPON_EMISSIVE_IDLE_CACHE_MAX,
   WeaponEmissiveDerivationCache,
 } from './weapon_vfx_emissive_cache_core';
@@ -2311,7 +2317,8 @@ function deriveEmissive(mat: THREE.MeshStandardMaterial, e: WeaponVfxEmissiveSpe
 // ---------------------------------------------------------------------------
 // Particle / mesh effect builders. Each returns { node, mats?, update? }.
 // Point sizes are world units converted in-shader via uScale (device px per
-// world unit at distance 1), so sizes hold up at any zoom.
+// world unit at distance 1), so sizes hold up at any zoom. The sprite clouds
+// draw as instanced quads, or THREE.Points under `?spritequads=off`.
 // ---------------------------------------------------------------------------
 
 type VfxMaterial = THREE.Material & { uniforms?: Record<string, THREE.IUniform> };
@@ -2365,36 +2372,31 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
     aBob[i] = (c.bob ?? 0.03) * rand(0.5, 1.5);
     aEcc[i] = rand(0.82, 1);
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('aRad', new THREE.BufferAttribute(aRad, 1));
-  geo.setAttribute('aPhase', new THREE.BufferAttribute(aPhase, 1));
-  geo.setAttribute('aSpeed', new THREE.BufferAttribute(aSpeed, 1));
-  geo.setAttribute('aTiltX', new THREE.BufferAttribute(aTiltX, 1));
-  geo.setAttribute('aTiltZ', new THREE.BufferAttribute(aTiltZ, 1));
-  geo.setAttribute('aSize', new THREE.BufferAttribute(aSize, 1));
-  geo.setAttribute('aMix', new THREE.BufferAttribute(aMix, 1));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(aSeed, 1));
-  geo.setAttribute('aBob', new THREE.BufferAttribute(aBob, 1));
-  geo.setAttribute('aEcc', new THREE.BufferAttribute(aEcc, 1));
-  const mat = new THREE.ShaderMaterial({
-    ...POINT_COMMON,
-    uniforms: {
-      uTime: { value: 0 },
-      uScale: { value: 600 },
-      uMap: { value: starFlareTex() },
-      uColorA: { value: new THREE.Color(c.colorA) },
-      uColorB: { value: new THREE.Color(c.colorB) },
-      uOpacity: { value: c.opacity ?? 1 },
-    },
-    vertexShader: `
+  const quads = spriteQuadsEnabled();
+  const geo = buildSpriteCloudGeometry(
+    { position: pos, aRad, aPhase, aSpeed, aTiltX, aTiltZ, aSize, aMix, aSeed, aBob, aEcc },
+    { position: 3 },
+    quads,
+  );
+  const mat = buildSpriteCloudMaterial(
+    {
+      ...POINT_COMMON,
+      uniforms: {
+        uTime: { value: 0 },
+        uScale: { value: 600 },
+        uMap: { value: starFlareTex() },
+        uColorA: { value: new THREE.Color(c.colorA) },
+        uColorB: { value: new THREE.Color(c.colorB) },
+        uOpacity: { value: c.opacity ?? 1 },
+      },
+      vertexHeader: `
       attribute float aRad; attribute float aPhase; attribute float aSpeed;
       attribute float aTiltX; attribute float aTiltZ; attribute float aSize;
       attribute float aMix; attribute float aSeed; attribute float aBob;
       attribute float aEcc;
       uniform float uTime; uniform float uScale;
-      varying float vMix; varying float vTw;
-      void main() {
+      varying float vMix; varying float vTw;`,
+      vertexBody: `
         float a = aPhase + uTime * aSpeed;
         vec3 p = vec3(cos(a) * aRad, 0.0, sin(a) * aRad * aEcc);
         float cx = cos(aTiltX); float sx = sin(aTiltX);
@@ -2405,22 +2407,20 @@ function makeMotes(b: THREE.Box3, c: WeaponVfxMotes): VfxPart {
         vMix = aMix;
         vTw = 0.7 + 0.3 * sin(uTime * (1.5 + aSeed * 2.5) + aSeed * 40.0);
         vec4 mv = modelViewMatrix * vec4(position + p, 1.0);
-        gl_PointSize = aSize * uScale / max(0.15, -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
+        float pointSize = aSize * uScale / max(0.15, -mv.z);`,
+      fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColorA; uniform vec3 uColorB;
       uniform float uOpacity;
       varying float vMix; varying float vTw;
       void main() {
-        float a = texture2D(uMap, gl_PointCoord).a;
+        float a = texture2D(uMap, SPRITE_COORD).a;
         vec3 c = mix(uColorA, uColorB, vMix) * vTw;
         gl_FragColor = vec4(c * a * uOpacity, a * uOpacity);
       }`,
-  });
-  const points = new THREE.Points(geo, mat);
-  points.frustumCulled = false;
-  return { node: points, mats: [mat] };
+    },
+    quads,
+  );
+  return { node: buildSpriteCloudObject(geo, mat), mats: [mat] };
 }
 
 function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
@@ -2449,31 +2449,30 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
     aSeed[i] = Math.random();
     aSwirl[i] = (c.swirl ?? 0.05) * rand(0.5, 1.5);
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('aVel', new THREE.BufferAttribute(aVel, 3));
-  geo.setAttribute('aLife', new THREE.BufferAttribute(aLife, 1));
-  geo.setAttribute('aPhase', new THREE.BufferAttribute(aPhase, 1));
-  geo.setAttribute('aSize', new THREE.BufferAttribute(aSize, 1));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(aSeed, 1));
-  geo.setAttribute('aSwirl', new THREE.BufferAttribute(aSwirl, 1));
-  const mat = new THREE.ShaderMaterial({
-    ...POINT_COMMON,
-    uniforms: {
-      uTime: { value: 0 },
-      uScale: { value: 600 },
-      uMap: { value: softDiscTex() },
-      uColorA: { value: new THREE.Color(c.colorA) },
-      uColorB: { value: new THREE.Color(c.colorB) },
-      uOpacity: { value: c.opacity ?? 0.5 },
-      uGrow: { value: c.grow ?? 0 },
-    },
-    vertexShader: `
+  const quads = spriteQuadsEnabled();
+  const geo = buildSpriteCloudGeometry(
+    { position: pos, aVel, aLife, aPhase, aSize, aSeed, aSwirl },
+    { position: 3, aVel: 3 },
+    quads,
+  );
+  const mat = buildSpriteCloudMaterial(
+    {
+      ...POINT_COMMON,
+      uniforms: {
+        uTime: { value: 0 },
+        uScale: { value: 600 },
+        uMap: { value: softDiscTex() },
+        uColorA: { value: new THREE.Color(c.colorA) },
+        uColorB: { value: new THREE.Color(c.colorB) },
+        uOpacity: { value: c.opacity ?? 0.5 },
+        uGrow: { value: c.grow ?? 0 },
+      },
+      vertexHeader: `
       attribute vec3 aVel; attribute float aLife; attribute float aPhase;
       attribute float aSize; attribute float aSeed; attribute float aSwirl;
       uniform float uTime; uniform float uScale; uniform float uGrow;
-      varying float vFade; varying float vSeed;
-      void main() {
+      varying float vFade; varying float vSeed;`,
+      vertexBody: `
         float ft = fract(uTime / aLife + aPhase);
         vec3 p = position + aVel * (ft * aLife);
         float sw = aSwirl * ft;
@@ -2483,22 +2482,20 @@ function makeDrift(b: THREE.Box3, c: WeaponVfxDrift): VfxPart {
         vSeed = aSeed;
         float size = aSize * (1.0 + uGrow * ft);
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
-        gl_PointSize = size * uScale / max(0.15, -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
+        float pointSize = size * uScale / max(0.15, -mv.z);`,
+      fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColorA; uniform vec3 uColorB;
       uniform float uOpacity;
       varying float vFade; varying float vSeed;
       void main() {
-        float a = texture2D(uMap, gl_PointCoord).a * vFade * uOpacity;
+        float a = texture2D(uMap, SPRITE_COORD).a * vFade * uOpacity;
         vec3 c = mix(uColorA, uColorB, vSeed);
         gl_FragColor = vec4(c * a, a);
       }`,
-  });
-  const points = new THREE.Points(geo, mat);
-  points.frustumCulled = false;
-  return { node: points, mats: [mat] };
+    },
+    quads,
+  );
+  return { node: buildSpriteCloudObject(geo, mat), mats: [mat] };
 }
 
 function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles): VfxPart | null {
@@ -2516,25 +2513,27 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
     aSize[i] = rand(c.size[0], c.size[1]);
     aRate[i] = rand(c.rate[0], c.rate[1]);
   }
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-  geo.setAttribute('aSeed', new THREE.BufferAttribute(aSeed, 1));
-  geo.setAttribute('aSize', new THREE.BufferAttribute(aSize, 1));
-  geo.setAttribute('aRate', new THREE.BufferAttribute(aRate, 1));
-  const mat = new THREE.ShaderMaterial({
-    ...POINT_COMMON,
-    uniforms: {
-      uTime: { value: 0 },
-      uScale: { value: 600 },
-      uMap: { value: c.star ? starFlareTex() : softDiscTex() },
-      uColor: { value: new THREE.Color(c.color) },
-      uOpacity: { value: 1 },
-    },
-    vertexShader: `
+  const quads = spriteQuadsEnabled();
+  const geo = buildSpriteCloudGeometry(
+    { position: pos, aSeed, aSize, aRate },
+    { position: 3 },
+    quads,
+  );
+  const mat = buildSpriteCloudMaterial(
+    {
+      ...POINT_COMMON,
+      uniforms: {
+        uTime: { value: 0 },
+        uScale: { value: 600 },
+        uMap: { value: c.star ? starFlareTex() : softDiscTex() },
+        uColor: { value: new THREE.Color(c.color) },
+        uOpacity: { value: 1 },
+      },
+      vertexHeader: `
       attribute float aSeed; attribute float aSize; attribute float aRate;
       uniform float uTime; uniform float uScale;
-      varying float vI;
-      void main() {
+      varying float vI;`,
+      vertexBody: `
         // clamp() is load-bearing: GLSL leaves the precision of sin() to the
         // implementation, so 0.5 + 0.5 * sin(x) is only non-negative in exact
         // arithmetic. pow() of a negative base is NaN, and one NaN here is a
@@ -2542,20 +2541,18 @@ function makeTwinkles(root: THREE.Object3D, b: THREE.Box3, c: WeaponVfxTwinkles)
         float w = clamp(0.5 + 0.5 * sin(uTime * aRate * 6.2831 + aSeed * 6.2831), 0.0, 1.0);
         vI = pow(w, 9.0);
         vec4 mv = modelViewMatrix * vec4(position, 1.0);
-        gl_PointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);
-        gl_Position = projectionMatrix * mv;
-      }`,
-    fragmentShader: `
+        float pointSize = aSize * uScale * (0.55 + 0.45 * vI) / max(0.15, -mv.z);`,
+      fragmentShader: `
       uniform sampler2D uMap; uniform vec3 uColor; uniform float uOpacity;
       varying float vI;
       void main() {
-        float a = texture2D(uMap, gl_PointCoord).a * vI * uOpacity;
+        float a = texture2D(uMap, SPRITE_COORD).a * vI * uOpacity;
         gl_FragColor = vec4(uColor * a, a);
       }`,
-  });
-  const points = new THREE.Points(geo, mat);
-  points.frustumCulled = false;
-  return { node: points, mats: [mat] };
+    },
+    quads,
+  );
+  return { node: buildSpriteCloudObject(geo, mat), mats: [mat] };
 }
 
 function auroraPoints(b: THREE.Box3, c: WeaponVfxAurora): THREE.Vector3[] {
