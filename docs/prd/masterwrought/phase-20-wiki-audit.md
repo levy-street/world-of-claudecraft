@@ -179,3 +179,78 @@ these read with it.
    batching saves nothing. Grouping by lane shares the table lookups the refuters would
    each repeat, not their verdicts; a group of four is still four independent
    re-derivations against the live tree.
+
+## The ledger (2026-09-03)
+
+### What ran
+
+STEP 0 committed at 09c580a786 (the contract amendments and the census rider) and
+7e41841eff (the two outage amendments). STEP 1 and STEP 2 ran as bounded Workflows over
+48 lanes; the per-finding record is `docs/prd/masterwrought/phase-20-wiki-audit-findings.md`,
+generated from the run journals and committed beside this file.
+
+| | |
+|---|---|
+| Rendered surfaces driven | 59 |
+| Lanes | 48, each read by two independent lenses |
+| Guide keys audited | 1,832 of 1,832 rendered (the other 91 catalog keys are exactly RETIRED_KEYS plus LIVE_OFF_SWEEP_KEYS) |
+| Claims classified | 7,059 |
+| Claims TRUE against the live tree | 6,450 |
+| Findings raised | 1,019 |
+| Verified (an adversarial refuter could not refute) | 763 |
+| Refuted or bound by a refuter | 123 |
+| Recorded only (style, unverifiable, finder-bound) | 124 |
+| Keys carrying at least one verified finding | 418 |
+
+Verified findings by the refuter's severity: 121 changes-the-page (a player would act
+wrongly on it), 437 worth-fixing, 226 minor. By key, worst severity: 86, 237 and 91.
+33 verified findings carry gameDefectSuspected, where the prose was judged against the
+game as it is and the game's own behaviour is the maintainer's item.
+
+### What the audit found, stated plainly
+
+The hand-written prose is accurate in the large: 6,450 of 7,059 claims held against the
+live tables, and the refuters overturned 123 findings outright, several of them the kind
+of plausible-but-wrong reading the adversarial pass exists to kill (a 'three hub towns'
+count the same sentence enumerates; a search-page label whose real defect is a code bug in
+the zone anchor, not the word).
+
+The failures cluster, and the clusters are structural rather than scattered:
+
+1. **Shared sections rendered on a page they are not true of.** The gathering page
+   assembles `rhythmSection`, `yieldsSection` and the tools note for FARMING, whose prose
+   describes node mechanics throughout: the node gain curve where farming pays a
+   deterministic schedule (`FARMING_GAIN_SCHEDULE`, 0.25 / 0.125 / 0.0625 / 0.03125 by
+   proficiency band), a cast where `harvestCrop` is documented and coded as instant, a
+   common-to-legendary quality ladder where a bed mints only a crop's plain and fine
+   grades, and a character-XP promise farming never pays. Ten of the farming lane's
+   findings are changes-the-page and nearly all trace to this one reuse. The page already
+   has the shape of the fix: `nodesSection` is guarded off for farming and `deedsSection`
+   re-points it at its own key.
+2. **Prose that predates a tier that shipped.** The armorcrafting identity prose calls the
+   rare osmiumscale rung the top of a crafter's art while the same page's recipe table
+   lists three apex epics above it; the enchanting market prose calls a Greater enchant the
+   ceiling while the Lucent tier is live and ungated on four of five members.
+3. **Enumerations the game outgrew.** The heroic rewards prose describes the
+   quartermaster's counter as jewelry when 29 of its 39 rows are patterns, seeds and a
+   catalyst; the `/gear` readout prose says nine equipment slots where `ALL_EQUIP_SLOTS`
+   holds twelve; the `/overpower` entry names an ability that ships as Redhand.
+4. **Interface prose describing controls that are not there.** The settings page documents
+   a UI Scale slider whose menu row the code deliberately removed, and five party-frame
+   sliders the Frames tab does not render.
+
+### The scope this opens, put to the maintainer
+
+418 keys carry a verified defect. Under the packet's retire-and-re-key convention every
+shipped key corrected mints fifteen pending Latin rows plus five machine non-Latin fills,
+so correcting all of them mints roughly 6,270 pending rows and 2,090 fills: about 43 per
+cent on top of the 14,455 rows the Phase 20 fill already carries. That is a materially
+larger fill than the one the maintainer confirmed at STEP 1, where class K took three
+English rewords and the routeBody register unification was CARRIED at about 140 fills for
+no falsehood. These are falsehoods rather than style, so the cost buys something the
+carried item did not, but the volume is a decision the maintainer owns and this lane
+records rather than takes unilaterally. RECOMMENDATION: take the 86 changes-the-page keys
+in this pass (about 1,290 pending rows and 430 fills), take the worth-fixing keys whose
+page is already being touched for a changes-the-page key in the same unit at no extra
+commit, and carry the remaining worth-fixing and minor keys to a named follow-up lane with
+this file as its worklist.
