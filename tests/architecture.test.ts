@@ -566,6 +566,7 @@ const RENDER_PURE_CORES = [
   'src/render/dungeon_banner_core.ts',
   'src/render/dungeon_tile_kind_core.ts',
   'src/render/ignivar_dressing_plan_core.ts',
+  'src/render/nythraxis_grave_core.ts',
   'src/render/roof_darkness_core.ts',
   'src/render/varkhul_assembly_focus_core.ts',
   'src/render/delve_interior_cache_core.ts',

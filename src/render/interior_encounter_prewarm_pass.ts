@@ -28,6 +28,7 @@ import {
   buildVarkhulForgePortalPrewarmVisual,
   type VarkhulForgePortalPrewarmVisual,
 } from './necromancy_army_portal_fx';
+import { buildNythraxisGravePrewarmVisual } from './nythraxis_grave_flame_visual';
 import { runBackgroundPrewarm } from './prewarm_pass';
 import { setRenderCategory } from './renderer_diagnostics';
 import { buildVarkhulAssemblyPrewarmVisual } from './varkhul_assembly_visual';
@@ -156,7 +157,14 @@ async function runInteriorEncounterPrewarm(
   // prewarm_policy.ts). The catalog is 30-odd rigs held for the session; the
   // live arm below is bounded by the bodies actually in the room, so THAT is
   // the half a constrained device keeps.
-  if (GFX.constrainedMemory && !spec.varkhulVisuals && !spec.ignivarVisuals) return;
+  if (
+    GFX.constrainedMemory &&
+    !spec.varkhulVisuals &&
+    !spec.ignivarVisuals &&
+    !spec.nythraxisGraveVisuals
+  ) {
+    return;
+  }
   const plan = planInteriorEncounterPrewarm(spec, {
     playerClasses: GFX.constrainedMemory ? [] : ALL_CLASSES,
     weaponSkinIds: GFX.constrainedMemory ? [] : vfxWeaponSkinIds(WEAPON_SKINS, WEAPON_VFX),
@@ -269,6 +277,20 @@ async function runInteriorEncounterPrewarm(
             judgment.position.set(0, 0, 36);
             group.add(judgment);
             varkhulKeepAlive.push(judgment);
+          },
+        ]
+      : []),
+    // The Grave Eruption telegraph and the Grave Flame patch: actionable floor
+    // telegraphs built lazily by the per-frame encounter sync, so without this
+    // the first eruption of a session linked the grave palette (and the
+    // instanced shard burst) inside a live combat frame.
+    ...(spec.nythraxisGraveVisuals
+      ? [
+          () => {
+            const grave = buildNythraxisGravePrewarmVisual();
+            grave.position.set(-24, 0, 0);
+            group.add(grave);
+            varkhulKeepAlive.push(grave);
           },
         ]
       : []),

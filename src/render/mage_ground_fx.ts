@@ -8,6 +8,13 @@
 // Both are cosmetic riders on one 'meteorFall' / 'runeCircle' spellfxAt cue;
 // the sim's pulses remain the authoritative gameplay telegraph.
 //
+// The Nythraxis GRAVE ERUPTION rides the same meteor-warning path (it shares
+// the reconnect-safe warning contract with Ignivar's meteors) but reads as
+// skeletal hands bursting UP from the crypt floor: the actionable ring
+// geometry is identical, the palette is the sickly green / violet set in
+// nythraxis_grave_core.ts, no rock ever falls, and the rim-flame instances
+// become a cluster of bone shards erupting from the disc at impact.
+//
 // Renderer contract: construct once with the scene + a terrain-height
 // resolver, spawn from the events, update(dt) once per frame beside the other
 // transient systems. Geometries are shared or per instance (spawn position
@@ -19,8 +26,17 @@
 // cast. Math.random is fine here (render-only).
 
 import * as THREE from 'three';
+import { NYTHRAXIS_GRAVE_ERUPTION_CAST_ID } from '../sim/nythraxis_grave_eruption';
 import type { SimEvent } from '../sim/types';
 import { createGroundFireAoe, type GroundFireAoeHandle } from './ignivar_fire_vfx';
+import {
+  isNythraxisGraveEruption,
+  NYTHRAXIS_GRAVE_ERUPTION_PALETTE,
+  type NythraxisGraveShardPose,
+  nythraxisGraveShardFade,
+  nythraxisGraveShardPoseInto,
+  nythraxisGraveShardRise,
+} from './nythraxis_grave_core';
 import { SCHOOL_COLORS } from './vfx';
 
 /** HSL lightness ceiling applied before a rune ring's additive brightening
@@ -55,6 +71,39 @@ const RUNE_FADE = 0.8; // seconds of fade at the rune's end of life
 const RUNE_SPIN = 0.5; // rad/s, lazy mote rotation
 const RUNE_GROUND_LIFT = 0.08; // avoids z-fighting after terrain sampling
 const RUNE_SEGMENTS = 48;
+/** Half the height of the shared flame/shard quad geometry (its points span
+ *  y = -0.44 .. 0.46), so a scaled shard's base can be planted on the ground. */
+export const METEOR_FLAME_GEOMETRY_HALF_HEIGHT = 0.45;
+
+/** One colour per telegraph material. The fire set is the meteor's own; the
+ *  Grave Eruption maps the grave palette onto the same slots, so the two
+ *  flavours share every geometry and differ in tint alone. */
+export interface MeteorTelegraphPalette {
+  footprint: number;
+  boundary: number;
+  countdown: number;
+  vein: number;
+  mote: number;
+  shard: number;
+}
+
+const METEOR_FIRE_TELEGRAPH_PALETTE: MeteorTelegraphPalette = {
+  footprint: 0x260407,
+  boundary: 0xff101c,
+  countdown: 0xff1830,
+  vein: 0xff0818,
+  mote: 0xff3820,
+  shard: 0xff2a12,
+};
+
+const EMPTY_WARNINGS: readonly MeteorWarningState[] = [];
+const EMPTY_GRAVE_SHARD_GROUND_YS = new Float64Array(0);
+
+/** The spawn when it names a cue (an ability or a school), else undefined: a
+ *  bare snapshot warning has nothing to hand the landing burst. */
+function meteorCueSpawn(spawn: MeteorFallSpawn): MeteorFallSpawn | undefined {
+  return spawn.ability !== undefined || spawn.school !== undefined ? spawn : undefined;
+}
 
 export interface MeteorFallSpawn {
   x: number;
@@ -65,6 +114,9 @@ export interface MeteorFallSpawn {
    *  retain their legacy fire burst. */
   sourceId?: number;
   ability?: string;
+  /** The cue's damage school, handed to the landing burst so a shadow
+   *  eruption never detonates in fire. Absent on the legacy mage cue. */
+  school?: string;
   showTelegraph?: boolean;
   warningLead?: number; // seconds where only the ground warning is visible
   persistentId?: string;
@@ -137,6 +189,23 @@ interface MeteorFx {
   spawn: MeteorFallSpawn;
   contributorOwnsGroundDetail: boolean;
   ignivarFireAoe: GroundFireAoeHandle | null;
+  /** The Grave Eruption flavour: no falling body, bone shards at impact. */
+  grave: boolean;
+  /** Terrain height under each grave shard, sampled once at the landing edge. */
+  graveShardGroundYs: Float64Array;
+  /** True after the full-rise matrix upload, so only opacity changes afterward. */
+  graveShardsFullyRisen: boolean;
+  /** Pool-kind suffix of the telegraph materials (`''` fire, `:grave`), so
+   *  acquire and release can never drift apart across the two palettes. */
+  telegraphKindSuffix: string;
+}
+
+/** One authoritative warning-row source plus the cue identity its rows carry
+ *  (a snapshot row has no ability of its own, so the source names it). */
+interface MeteorWarningSource {
+  rows: readonly MeteorWarningState[];
+  ability?: string;
+  school?: string;
 }
 
 function advanceGroundFireAoe(aoe: GroundFireAoeHandle, seconds: number): void {
@@ -197,6 +266,25 @@ export class MageGroundFx {
    *  unbounded: a real ceiling, not a cap this pool enforces itself. */
   private readonly materialPool = new Map<string, THREE.Material[]>();
   private disposed = false;
+  /** Per-frame scratch for the grave shard poses (the update loop allocates nothing). */
+  private readonly shardPose: NythraxisGraveShardPose = {
+    dx: 0,
+    dz: 0,
+    y: 0,
+    width: 1,
+    height: 1,
+    yaw: 0,
+    leanX: 0,
+    leanZ: 0,
+  };
+  /** The four authoritative warning sources, preallocated: only `rows` is
+   *  reassigned per frame. Order matches syncWorldMeteorWarnings. */
+  private readonly worldWarningSources: MeteorWarningSource[] = [
+    { rows: [] },
+    { rows: [] },
+    { rows: [] },
+    { rows: [], ability: NYTHRAXIS_GRAVE_ERUPTION_CAST_ID, school: 'shadow' },
+  ];
 
   constructor(
     scene: THREE.Scene,
@@ -247,18 +335,23 @@ export class MageGroundFx {
       return;
     }
     const geometry = this.ensureMeteorGeometry();
+    // The grave flavour keeps the falling body built (its pooled materials are
+    // shared with every fire meteor) but never shows it: nothing falls from the
+    // sky, the ground itself is the threat.
+    const grave = isNythraxisGraveEruption(opts.ability);
     const fire = new THREE.Color(SCHOOL_COLORS.fire);
     const magma = new THREE.Color(0xff5a0a);
     const root = new THREE.Group();
     root.name = 'mage-meteor-fx';
     root.userData.persistentMeteorId = opts.persistentId;
+    root.userData.graveEruption = grave;
 
     const body = new THREE.Group();
     body.name = 'mage-meteor-body';
     const duration = Math.max(0.3, opts.duration);
     const warningLead = Math.min(Math.max(0, opts.warningLead ?? 0), duration - 0.1);
     const initialElapsed = Math.min(duration, Math.max(0, opts.initialElapsed ?? 0));
-    body.visible = warningLead === 0;
+    body.visible = !grave && warningLead === 0;
     const rockMat = this.acquireMaterial(
       'meteor-rock',
       1,
@@ -318,7 +411,7 @@ export class MageGroundFx {
 
     const trail = new THREE.Group();
     trail.name = 'mage-meteor-trail';
-    trail.visible = warningLead === 0;
+    trail.visible = !grave && warningLead === 0;
     const trailOuterMat = this.acquireMaterial(
       'meteor-trail-outer',
       0.48,
@@ -392,17 +485,29 @@ export class MageGroundFx {
     body.position.set(opts.x, startY, opts.z);
     trail.position.copy(body.position);
 
-    const warning = this.buildMeteorTelegraph(opts, geometry.flame, initialElapsed / duration);
+    const telegraphKindSuffix = grave ? ':grave' : '';
+    const warning = this.buildMeteorTelegraph(
+      opts,
+      geometry.flame,
+      initialElapsed / duration,
+      grave ? NYTHRAXIS_GRAVE_ERUPTION_PALETTE : METEOR_FIRE_TELEGRAPH_PALETTE,
+      telegraphKindSuffix,
+    );
     warning.group.visible = opts.showTelegraph !== false;
-    const contributorOwnsGroundDetail = opts.persistentId !== undefined;
+    // A fire boss's authored warning hands its ground detail to the contributor
+    // fire disc below. The grave flavour keeps the module's own footprint,
+    // cracks and rising motes (recoloured) and no fire disc at all; its rim
+    // flames stay hidden through the warning and come back as the shard burst.
+    const contributorOwnsGroundDetail = opts.persistentId !== undefined && !grave;
     if (contributorOwnsGroundDetail) {
       warning.group.getObjectByName('mage-meteor-telegraph-footprint')!.visible = false;
       warning.group.getObjectByName('mage-meteor-telegraph-veins')!.visible = false;
       warning.group.getObjectByName('mage-meteor-telegraph-flames')!.visible = false;
       warning.beaconEmbers.visible = false;
     }
+    if (grave) warning.flames.visible = false;
     root.add(warning.group);
-    const ignivarFireAoe = opts.persistentId
+    const ignivarFireAoe = contributorOwnsGroundDetail
       ? createGroundFireAoe({
           radius: opts.radius,
           count: 36,
@@ -451,23 +556,38 @@ export class MageGroundFx {
       warningLead,
       elapsed: initialElapsed,
       landed: false,
-      spawn: { ...opts },
+      // The grave cue's school follows its cast id when the cue did not name
+      // one (the live event path), so the landing never detonates in fire.
+      spawn: grave && opts.school === undefined ? { ...opts, school: 'shadow' } : { ...opts },
       contributorOwnsGroundDetail,
       ignivarFireAoe,
+      grave,
+      graveShardGroundYs: grave
+        ? new Float64Array(warning.flameBases.length)
+        : EMPTY_GRAVE_SHARD_GROUND_YS,
+      graveShardsFullyRisen: false,
+      telegraphKindSuffix,
     });
   }
 
-  /** Reconciles warnings from authoritative snapshots with their live event visual. */
+  /** Reconciles warnings from authoritative snapshots with their live event
+   *  visual. The Nythraxis rows carry the Grave Eruption cue identity so a
+   *  warning first seen from a snapshot (reconnect, late join) still gets the
+   *  grave read instead of a fire meteor. The fourth source is optional only so
+   *  the existing three-source callers keep compiling; the renderer hands the
+   *  whole IWorld, which always has it. */
   syncWorldMeteorWarnings(world: {
     activeIgnivarMeteors: readonly MeteorWarningState[];
     activeVarkhulAnvilMeteors: readonly MeteorWarningState[];
     activeVarkhulForgestormWarnings: readonly MeteorWarningState[];
+    activeNythraxisGraveEruptions?: readonly MeteorWarningState[];
   }): void {
-    this.syncMeteorWarnings(
-      world.activeIgnivarMeteors,
-      world.activeVarkhulAnvilMeteors,
-      world.activeVarkhulForgestormWarnings,
-    );
+    const sources = this.worldWarningSources;
+    sources[0].rows = world.activeIgnivarMeteors;
+    sources[1].rows = world.activeVarkhulAnvilMeteors;
+    sources[2].rows = world.activeVarkhulForgestormWarnings;
+    sources[3].rows = world.activeNythraxisGraveEruptions ?? EMPTY_WARNINGS;
+    this.syncMeteorWarningSources(sources);
   }
 
   syncMeteorWarnings(
@@ -475,8 +595,16 @@ export class MageGroundFx {
     secondaryWarnings: readonly MeteorWarningState[] = [],
     tertiaryWarnings: readonly MeteorWarningState[] = [],
   ): void {
+    this.syncMeteorWarningSources([
+      { rows: warnings },
+      { rows: secondaryWarnings },
+      { rows: tertiaryWarnings },
+    ]);
+  }
+
+  private syncMeteorWarningSources(sources: readonly MeteorWarningSource[]): void {
     const activeIds = new Set<string>();
-    const syncWarning = (warning: MeteorWarningState): void => {
+    const syncWarning = (warning: MeteorWarningState, source: MeteorWarningSource): void => {
       activeIds.add(warning.id);
       if (this.resolvedPersistentMeteorIds.has(warning.id)) return;
       const existing = this.meteors.find((meteor) => meteor.persistentId === warning.id);
@@ -499,6 +627,8 @@ export class MageGroundFx {
         z: warning.z,
         radius: warning.radius,
         duration: warning.duration,
+        ability: source.ability,
+        school: source.school,
         warningLead: warning.warningLead,
         persistentId: warning.id,
         initialElapsed: warning.duration - warning.remaining,
@@ -506,9 +636,9 @@ export class MageGroundFx {
       const spawned = this.meteors.find((meteor) => meteor.persistentId === warning.id);
       if (spawned) spawned.snapshotManaged = true;
     };
-    for (const warning of warnings) syncWarning(warning);
-    for (const warning of secondaryWarnings) syncWarning(warning);
-    for (const warning of tertiaryWarnings) syncWarning(warning);
+    for (const source of sources) {
+      for (const warning of source.rows) syncWarning(warning, source);
+    }
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const meteor = this.meteors[i];
       if (!meteor.snapshotManaged || !meteor.persistentId || activeIds.has(meteor.persistentId)) {
@@ -522,7 +652,11 @@ export class MageGroundFx {
     }
   }
 
-  /** Resolves a server-authored impact and consumes its pending warning exactly once. */
+  /** Resolves a server-authored impact and consumes its pending warning exactly
+   *  once. A known warning that carries a cue identity (an ability or a school:
+   *  the live event's, or the snapshot source's for the grave rows) hands it to
+   *  the landing burst so the detonation keys on it; a bare warning, and an
+   *  impact whose warning this client never saw, land the legacy way. */
   impactMeteor(persistentId: string, x: number, z: number): void {
     if (this.resolvedPersistentMeteorIds.has(persistentId)) return;
     this.resolvedPersistentMeteorIds.add(persistentId);
@@ -532,19 +666,60 @@ export class MageGroundFx {
       return;
     }
     const meteor = this.meteors[index];
-    const shouldBurst = !meteor.landed;
-    if (!shouldBurst) return;
-    meteor.landed = true;
+    if (meteor.landed) return;
     meteor.elapsed = meteor.duration;
-    meteor.body.visible = false;
-    meteor.trail.visible = false;
-    meteor.boundaryMat.opacity = 0;
-    meteor.flameMat.opacity = 0;
-    meteor.flames.visible = false;
-    meteor.beaconEmberMat.opacity = 0;
-    meteor.beaconEmbers.visible = false;
-    meteor.ignivarFireAoe?.erupt();
-    this.onMeteorLand(x, z);
+    this.landMeteor(meteor);
+    const cue = meteorCueSpawn(meteor.spawn);
+    if (cue) this.onMeteorLand(x, z, cue);
+    else this.onMeteorLand(x, z);
+  }
+
+  /** The one landing edge, shared by the local clock and the authoritative
+   *  impact: the falling read stops, the fire disc erupts, and the grave
+   *  flavour's shard cluster breaks the surface. */
+  private landMeteor(m: MeteorFx): void {
+    m.landed = true;
+    m.body.visible = false;
+    m.trail.visible = false;
+    m.boundaryMat.opacity = 0;
+    m.beaconEmberMat.opacity = 0;
+    m.beaconEmbers.visible = false;
+    m.ignivarFireAoe?.erupt();
+    if (m.grave) {
+      m.flames.visible = true;
+      m.flameMat.opacity = 0.92;
+      m.graveShardsFullyRisen = this.poseGraveShards(m, 0, true);
+      return;
+    }
+    m.flameMat.opacity = 0;
+    m.flames.visible = false;
+  }
+
+  /** Re-lays the rim-flame instances as the bone-shard cluster, `sinceImpact`
+   *  seconds into the burst. Pure pose math lives in nythraxis_grave_core. */
+  private poseGraveShards(m: MeteorFx, sinceImpact: number, sampleGround = false): boolean {
+    const rise = nythraxisGraveShardRise(sinceImpact);
+    const count = m.flameBases.length;
+    for (let shardIndex = 0; shardIndex < count; shardIndex++) {
+      const pose = nythraxisGraveShardPoseInto(
+        this.shardPose,
+        shardIndex,
+        count,
+        m.radius,
+        rise,
+        METEOR_FLAME_GEOMETRY_HALF_HEIGHT,
+      );
+      const x = m.x + pose.dx;
+      const z = m.z + pose.dz;
+      if (sampleGround) m.graveShardGroundYs[shardIndex] = this.groundY(x, z);
+      m.flameDummy.position.set(x, m.graveShardGroundYs[shardIndex] + pose.y, z);
+      m.flameDummy.rotation.set(pose.leanX, pose.yaw, pose.leanZ);
+      m.flameDummy.scale.set(pose.width, pose.height, pose.width);
+      m.flameDummy.updateMatrix();
+      m.flames.setMatrixAt(shardIndex, m.flameDummy.matrix);
+    }
+    m.flames.instanceMatrix.needsUpdate = true;
+    return rise >= 1;
   }
 
   private disposeMeteor(meteor: MeteorFx): void {
@@ -556,12 +731,13 @@ export class MageGroundFx {
     this.releaseMaterial('meteor-trail-outer', meteor.trailOuterMat);
     this.releaseMaterial('meteor-trail-inner', meteor.trailInnerMat);
     this.releaseMaterial('meteor-ember', meteor.emberMat);
-    this.releaseMaterial('meteor-footprint', meteor.footprintMat);
-    this.releaseMaterial('meteor-boundary', meteor.boundaryMat);
-    this.releaseMaterial('meteor-countdown', meteor.countdownMat);
-    this.releaseMaterial('meteor-vein', meteor.veinMat);
-    this.releaseMaterial('meteor-flame', meteor.flameMat);
-    this.releaseMaterial('meteor-beacon-ember', meteor.beaconEmberMat);
+    const suffix = meteor.telegraphKindSuffix;
+    this.releaseMaterial(`meteor-footprint${suffix}`, meteor.footprintMat);
+    this.releaseMaterial(`meteor-boundary${suffix}`, meteor.boundaryMat);
+    this.releaseMaterial(`meteor-countdown${suffix}`, meteor.countdownMat);
+    this.releaseMaterial(`meteor-vein${suffix}`, meteor.veinMat);
+    this.releaseMaterial(`meteor-flame${suffix}`, meteor.flameMat);
+    this.releaseMaterial(`meteor-beacon-ember${suffix}`, meteor.beaconEmberMat);
     meteor.flames.dispose();
     for (const geometry of meteor.ownedGeometries) geometry.dispose();
   }
@@ -701,6 +877,8 @@ export class MageGroundFx {
     opts: MeteorFallSpawn,
     flameGeometry: THREE.BufferGeometry,
     initialProgress: number,
+    palette: MeteorTelegraphPalette,
+    kindSuffix: string,
   ): {
     group: THREE.Group;
     footprintMat: THREE.MeshBasicMaterial;
@@ -760,11 +938,11 @@ export class MageGroundFx {
     footprintGeo.setAttribute('position', new THREE.BufferAttribute(footprintPositions, 3));
     footprintGeo.setIndex(footprintIndices);
     const footprintMat = this.acquireMaterial(
-      'meteor-footprint',
+      `meteor-footprint${kindSuffix}`,
       0.2,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0x260407,
+          color: palette.footprint,
           transparent: true,
           opacity: 0.2,
           blending: THREE.NormalBlending,
@@ -789,11 +967,11 @@ export class MageGroundFx {
     const boundaryGeo = new THREE.BufferGeometry();
     boundaryGeo.setAttribute('position', new THREE.BufferAttribute(boundaryPositions, 3));
     const boundaryMat = this.acquireMaterial(
-      'meteor-boundary',
+      `meteor-boundary${kindSuffix}`,
       0.58,
       () =>
         new THREE.LineBasicMaterial({
-          color: 0xff101c,
+          color: palette.boundary,
           transparent: true,
           opacity: 0.58,
           blending: THREE.AdditiveBlending,
@@ -820,11 +998,11 @@ export class MageGroundFx {
     countdownGeo.setAttribute('position', new THREE.BufferAttribute(countdownPositions, 3));
     countdownGeo.setIndex(countdownIndices);
     const countdownMat = this.acquireMaterial(
-      'meteor-countdown',
+      `meteor-countdown${kindSuffix}`,
       0.34,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0xff1830,
+          color: palette.countdown,
           transparent: true,
           opacity: 0.34,
           blending: THREE.AdditiveBlending,
@@ -881,11 +1059,11 @@ export class MageGroundFx {
     const veinGeo = new THREE.BufferGeometry();
     veinGeo.setAttribute('position', new THREE.Float32BufferAttribute(veinVertices, 3));
     const veinMat = this.acquireMaterial(
-      'meteor-vein',
+      `meteor-vein${kindSuffix}`,
       0.34,
       () =>
         new THREE.LineBasicMaterial({
-          color: 0xff0818,
+          color: palette.vein,
           transparent: true,
           opacity: 0.34,
           blending: THREE.AdditiveBlending,
@@ -898,11 +1076,11 @@ export class MageGroundFx {
     group.add(veins);
 
     const flameMat = this.acquireMaterial(
-      'meteor-flame',
+      `meteor-flame${kindSuffix}`,
       0.24,
       () =>
         new THREE.MeshBasicMaterial({
-          color: 0xff2a12,
+          color: palette.shard,
           transparent: true,
           opacity: 0.24,
           blending: THREE.AdditiveBlending,
@@ -944,11 +1122,11 @@ export class MageGroundFx {
     const beaconGeo = new THREE.BufferGeometry();
     beaconGeo.setAttribute('position', new THREE.BufferAttribute(beaconPositions, 3));
     const beaconEmberMat = this.acquireMaterial(
-      'meteor-beacon-ember',
+      `meteor-beacon-ember${kindSuffix}`,
       0.18,
       () =>
         new THREE.PointsMaterial({
-          color: 0xff3820,
+          color: palette.mote,
           size: 0.14,
           transparent: true,
           opacity: 0.18,
@@ -1483,15 +1661,7 @@ export class MageGroundFx {
       m.ignivarFireAoe?.update(dt);
       const t = Math.min(1, m.elapsed / m.duration);
       if (!m.landed && t >= 1) {
-        m.landed = true;
-        m.body.visible = false;
-        m.trail.visible = false;
-        m.boundaryMat.opacity = 0;
-        m.flameMat.opacity = 0;
-        m.flames.visible = false;
-        m.beaconEmberMat.opacity = 0;
-        m.beaconEmbers.visible = false;
-        m.ignivarFireAoe?.erupt();
+        this.landMeteor(m);
         this.onMeteorLand(m.x, m.z, m.spawn);
       }
       if (m.landed) {
@@ -1504,6 +1674,16 @@ export class MageGroundFx {
           if (!m.contributorOwnsGroundDetail) {
             m.veinMat.opacity = 0.56 * fade * (0.88 + Math.sin(scorchElapsed * 8 + 0.7) * 0.12);
           }
+          if (m.grave) {
+            // The shards keep rising through the first half second, then hold
+            // and fade with the scorch; the flame patch the sim leaves behind
+            // (nythraxis_grave_flame_visual.ts) takes over the read from here.
+            if (!m.graveShardsFullyRisen) {
+              m.graveShardsFullyRisen = this.poseGraveShards(m, scorchElapsed);
+            }
+            m.flameMat.opacity =
+              0.92 * nythraxisGraveShardFade(scorchElapsed, METEOR_SCORCH_LINGER);
+          }
           if (scorchElapsed > METEOR_SCORCH_LINGER - 1) m.ignivarFireAoe?.stop();
           continue;
         }
@@ -1513,23 +1693,25 @@ export class MageGroundFx {
       }
       const fallDuration = m.duration - m.warningLead;
       const fallT = Math.min(1, Math.max(0, (m.elapsed - m.warningLead) / fallDuration));
-      const falling = m.elapsed >= m.warningLead;
-      m.body.visible = falling;
-      m.trail.visible = falling;
-      // Ease-in fall: slow release, violent finish, like a real drop.
-      const eased = fallT * fallT;
-      const meteorY = m.groundY + METEOR_DROP_HEIGHT * (1 - eased) + METEOR_RADIUS;
-      m.body.position.y = meteorY;
-      m.trail.position.y = meteorY;
-      m.body.rotation.y += 2.6 * dt;
-      m.body.rotation.x += 1.7 * dt;
-      const heatPulse = 0.88 + Math.sin(m.elapsed * 10) * 0.12;
-      m.magmaMat.opacity = 0.82 + heatPulse * 0.16;
-      m.coronaMat.opacity = (0.12 + fallT * 0.12) * heatPulse;
-      m.trailOuterMat.opacity = (0.4 + fallT * 0.12) * heatPulse;
-      m.trailInnerMat.opacity = (0.24 + fallT * 0.12) * heatPulse;
-      m.emberMat.opacity = 0.72 + fallT * 0.24;
-      m.trail.rotation.y -= dt * 0.45;
+      if (!m.grave) {
+        const falling = m.elapsed >= m.warningLead;
+        m.body.visible = falling;
+        m.trail.visible = falling;
+        // Ease-in fall: slow release, violent finish, like a real drop.
+        const eased = fallT * fallT;
+        const meteorY = m.groundY + METEOR_DROP_HEIGHT * (1 - eased) + METEOR_RADIUS;
+        m.body.position.y = meteorY;
+        m.trail.position.y = meteorY;
+        m.body.rotation.y += 2.6 * dt;
+        m.body.rotation.x += 1.7 * dt;
+        const heatPulse = 0.88 + Math.sin(m.elapsed * 10) * 0.12;
+        m.magmaMat.opacity = 0.82 + heatPulse * 0.16;
+        m.coronaMat.opacity = (0.12 + fallT * 0.12) * heatPulse;
+        m.trailOuterMat.opacity = (0.4 + fallT * 0.12) * heatPulse;
+        m.trailInnerMat.opacity = (0.24 + fallT * 0.12) * heatPulse;
+        m.emberMat.opacity = 0.72 + fallT * 0.24;
+        m.trail.rotation.y -= dt * 0.45;
+      }
 
       const warningPulse = 0.88 + Math.sin(m.elapsed * (5 + t * 7)) * 0.12;
       m.boundaryMat.opacity = (0.58 + t * 0.25) * warningPulse;
@@ -1537,7 +1719,7 @@ export class MageGroundFx {
       if (!m.contributorOwnsGroundDetail) {
         m.footprintMat.opacity = (0.18 + t * 0.07) * (0.96 + Math.sin(m.elapsed * 4) * 0.04);
         m.veinMat.opacity = (0.34 + t * 0.46) * warningPulse;
-        m.flameMat.opacity = (0.22 + t * 0.16) * warningPulse;
+        if (!m.grave) m.flameMat.opacity = (0.22 + t * 0.16) * warningPulse;
         m.beaconEmberMat.opacity = (0.14 + t * 0.14) * warningPulse;
         m.beaconEmbers.rotation.y += dt * (0.2 + t * 0.35);
       }
@@ -1550,7 +1732,9 @@ export class MageGroundFx {
         this.writeMeteorCountdownRing(m.countdownPositions, m.x, m.z, m.radius, t);
         m.countdownRing.geometry.attributes.position.needsUpdate = true;
       }
-      if (!m.contributorOwnsGroundDetail) {
+      // The grave flavour's flame instances are its shard burst, posed at the
+      // landing edge above and hidden until then; the rim-flame flicker is fire only.
+      if (!m.contributorOwnsGroundDetail && !m.grave) {
         for (let flameIndex = 0; flameIndex < m.flameBases.length; flameIndex++) {
           const base = m.flameBases[flameIndex];
           const flicker = 0.58 + Math.sin(m.elapsed * 9 + base.phase) * 0.13 + t * 0.22;
@@ -1654,6 +1838,9 @@ export function handleMageGroundSpellfxEvent(
     return true;
   }
   if (ev.fx === 'meteorFall' || ev.fx === 'ambientMeteorFall') {
+    // No school here on purpose: the cue's school follows its ability
+    // (spawnMeteor derives the grave flavour's from the cast id), so the
+    // legacy mage cue keeps its exact spawn shape.
     fx.spawnMeteor({
       x: ev.x,
       z: ev.z,
