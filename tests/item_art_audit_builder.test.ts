@@ -17,8 +17,6 @@ import {
   renderItemArtAuditPreview,
   updateItemArtAuditVerdict,
 } from '../scripts/lib/item_art_audit.mjs';
-import { ITEMS } from '../src/sim/data';
-import { adoptedTrophyIds } from './helpers/adopted_trophy_ids';
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const temporaryRoots: string[] = [];
@@ -821,10 +819,12 @@ describe('item-art audit builder', () => {
     expect(help).toContain('--verify-only');
     expect(help).toContain('--refresh-verdict');
     expect(help).toContain('tmp/imagegen/item-art-consistency/final-audit');
+    expect(help).toContain(
+      'docs/achievements/masterwrought-art-completion-2026-09-02/final-item-art-audit-verdict.json',
+    );
 
-    // The current digest includes the Passing Stone addition and the seven reviewed painted bag
-    // replacements. `verdict: null` is the point: verify-only validates the live catalog without
-    // rewriting the committed visual verdict.
+    // `verdict: null` is the point: verify-only validates the live catalog
+    // without rewriting the committed visual verdict.
     const verified = JSON.parse(
       execFileSync(process.execPath, ['scripts/item_art_audit.mjs', '--verify-only'], {
         cwd: repoRoot,
@@ -832,106 +832,13 @@ describe('item-art audit builder', () => {
         timeout: 30_000,
       }),
     ) as Record<string, unknown>;
-    // Re-minted for the farming absorb (Phase 11d): the audit gained the
-    // ITEM_ART_PENDING exemption (44 farming ids ship procedural icons as
-    // declared debt, counted by pendingArtCount in scripts/item_art_audit.mjs),
-    // liveItemCount counts the ART-SUBJECT universe (live defs minus declared
-    // debt, so the reviewed 922 stands: base 838 plus the 84 Masterwrought
-    // art-shipping ids), and the catalog sha moves only through the lib's
-    // self-hash fingerprint. The 907 reviewed art files and their shipping
-    // catalog sha are untouched.
-    // Re-minted again at Masterwrought phase 11l: the catalog embeds each
-    // item's quality (scripts/lib/item_art_audit.mjs), and the phase moved
-    // eight junk trophies from poor to common, so the bytes grow by exactly
-    // 8 x ('common' minus 'poor') = 16 (498026 to 498042) and the sha moves
-    // with them; liveItemCount, the 907 reviewed files and the shipping
-    // catalog sha are unchanged (no new id, no art touched).
-    // Re-minted once more at the phase's sixth fix round, which
-    // output-excluded the chipped tusk and put its def back to poor: seven
-    // quality tokens moved instead of eight, so the bytes shrink by exactly
-    // one 'common' minus 'poor' = 2 (498042 to 498040), predicted and then
-    // measured, and the sha moves with them; everything else on the object
-    // is unchanged for the same reasons as before.
-    // The contract beside the blob (the 11l QA): the only byte movement since
-    // the pre-phase catalog (498026, the sha above it) is the promoted
-    // trophies' quality token, 'common' for 'poor', two bytes each, so the
-    // count is DERIVED from the live adopted set minus the two trophies that
-    // were common before the phase and the sha's cause is stated rather
-    // than only re-recorded: a promotion or a demotion moves this arithmetic
-    // before it moves the sha.
-    const ALREADY_COMMON_TROPHIES = new Set(['emberwing_cinderscale', 'old_cragmaws_pelt']);
-    const promoted = adoptedTrophyIds(ITEMS).filter((id) => !ALREADY_COMMON_TROPHIES.has(id));
-    expect(promoted).toHaveLength(5);
-    for (const id of promoted) expect(ITEMS[id].quality, id).toBe('common');
-    for (const id of ALREADY_COMMON_TROPHIES) expect(ITEMS[id].quality, id).toBe('common');
-    // Release v0.41.0 sync: the pre-phase base moves 498026 to 501066, the
-    // six Proving Shore records the release's catalog carries (3040 bytes,
-    // measured by the merged build: 501076 with the five promotions in);
-    // the promotion arithmetic on top of it is unchanged.
-    // Release-batch v0.41.0 sync: the base moves 501066 to 504715, the seven
-    // painted bank-bag records the release's catalog carries (3649 bytes,
-    // the same delta as on its own arm; measured by the merged build: 504725
-    // with the five promotions in); the promotion arithmetic on top of it is
-    // unchanged.
-    // v0.41.0 Crucible sync: the base moves 504715 to 613412, the 204 Crucible
-    // records the release's catalog carries (108697 bytes; measured by the
-    // merged build: 613422 with the five promotions in); the promotion
-    // arithmetic on top of it is unchanged.
-    // v0.42.0 sync: the base moves 613412 to 613948, the one reins_rickshaw_mount
-    // record the release's catalog carries plus the mount group's count digit
-    // (9 to 10). That 536-byte delta is the release arm's own measurement
-    // (567150 to 567686 for the same single addition) and transfers exactly,
-    // because the record serializes identically on either arm and no other
-    // field changes width; the promotion arithmetic on top of it is unchanged.
-    expect(verified.catalogBytes).toBe(
-      613948 + promoted.length * ('common'.length - 'poor'.length),
-    );
-    // Re-minted a third time at the 11l QA, which excluded the cracked fetish
-    // and the bogiron nugget under the tusk standard and put both defs back
-    // to poor: five quality tokens moved instead of seven, so the bytes
-    // shrink by exactly two more 'common' minus 'poor' = 4 (498040 to
-    // 498036), predicted and then measured, and the sha moves with them.
     expect(verified).toMatchObject({
       catalogPath: 'tmp/imagegen/item-art-consistency/final-audit/catalog.json',
-      // Release v0.41.0 sync: 907 / 922 on the Masterwrought branch, 829 / 844
-      // on the release, 913 / 928 merged (the release's six art-shipping ids
-      // join both terms); 920 / 935 at the release-batch sync (the seven
-      // painted bank bags join both terms); the catalog bytes and sha are the
-      // merged build's own measurement. The renderer fingerprint is this
-      // branch's lib self-hash (the release left scripts/lib/item_art_audit.mjs
-      // at the base bytes, so the merge keeps the pendingArtCount-aware lib).
-      // v0.41.0 Crucible sync: 1040 / 1055 on the release's own arm (its 204
-      // post-base ids: 9 painted Crucible weapons, 2 rendered Varkhul
-      // legendaries, the 192-piece Crucible set wave and the Core of the Last
-      // Flame reagent), 1124 / 1139 merged (both arms' additions join both
-      // terms, the debt term stays this branch's 81). The release ALSO grew
-      // the audit lib (its own art-pending sweep, folded into the
-      // pendingArtIds option here), so the lib self-hash, the catalog bytes
-      // and sha, and the shipping catalog sha are all the merged build's own
-      // measurement; the release's 22 groups over 27 pages fold into this
-      // branch's 25 groups.
-      // v0.42.0 sync: 1041 / 1056 on the release's own arm (its one post-base
-      // id, the Bonebound Rickshaw reins painted icon), 1125 / 1140 merged.
-      // The release did not touch scripts/lib/item_art_audit.mjs, so the lib
-      // self-hash below is still this branch's; the catalog grows by exactly
-      // the one reins record plus the mount group's count digit (536 bytes on
-      // the release's own arm, 567150 to 567686), and the shipping catalog sha
-      // is re-measured over the merged 1125-file set.
-      // RE-MINTED at the v0.42.0 sync on 2026-08-31, once
-      // public/ui/items/mapping.json was hand-merged to its 1125-owner union
-      // (ours plus the release's single appended reins_rickshaw_mount owner, a
-      // bijection with the 1125 committed .webp files). Parent values for the
-      // record: ours e0c30df5 over 1124 files, the release de2dae43 over 1041.
-      // The sha below is the printed catalogSha256 from `node
-      // scripts/item_art_audit.mjs --refresh-verdict` over the merged tree, the
-      // same run this case's own build reproduces, and it is pinned identically
-      // in verdict.evidence.catalog in tests/item_art_consistency.test.ts. No
-      // capture or asset was retaken.
-      catalogSha256: 'b5601f861fe189d39e2edc292df65587f9f0a5a7310ba87e8520935612de58fa',
-      catalogBytes: 613958,
+      catalogSha256: 'd87d48822a1e3d008655e99bc5c7ad6b16ebbf91c2f6ff0f1762c2df84034a82',
+      catalogBytes: 656138,
       rendererFingerprint: '41f5404c4d6d9643c8f03b9d88a8546e44564cc03a1baabdd4a72cb9258a2da7',
-      catalogCount: 1125,
-      liveItemCount: 1140,
+      catalogCount: 1206,
+      liveItemCount: 1221,
       generatedHeroicDefinitions: 64,
       heroicDefinitionsWithOwnWebp: 48,
       heroicWeaponArtAliases: 16,
@@ -940,10 +847,7 @@ describe('item-art audit builder', () => {
       sheetCount: 240,
       sheetModeCounts: Object.fromEntries(ITEM_ART_AUDIT_MODES.map((mode) => [mode, 30])),
       sheetSetSha256: null,
-      // Measured over the merged tree at the v0.42.0 sync: the 1125-id
-      // shipping set, both arms' art in (the release's one reins icon on top
-      // of the v0.41.0 Crucible sync's 1124).
-      shippingCatalogSha256: '941770df7a583cfa875c10568596ecf25ae0c0bdde2ae67da7de16907c9a395f',
+      shippingCatalogSha256: '083dc4a1b5bc245eac29d22af80f2a27ae38e63567ad7ef2c332a49114b3f98c',
       machineChecksPassed: true,
       verdict: null,
     });

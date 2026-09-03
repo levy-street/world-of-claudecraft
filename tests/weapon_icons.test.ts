@@ -12,6 +12,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const itemsDir = path.join(repoRoot, 'public/ui/items');
 const weaponProvenanceRecord = 'docs/achievements/placeholder-art-completion-2026-08-09/';
 const itemConsistencyProvenanceRecord = 'docs/achievements/item-art-consistency-2026-08-09/';
+const masterwroughtCompletionRecord = 'docs/achievements/masterwrought-art-completion-2026-09-02/';
 const weaponGenerationRecordFiles = [
   'weapons-a-generation-record.json',
   'weapons-b-generation-record.json',
@@ -40,7 +41,7 @@ describe('painted weapon inventory icons', () => {
     // 123 with the class-overhaul integration daggers (rimefang, marrowpoint,
     // duskwhisper, boneglass_shiv), painted in integration-dagger-icons-2026-08-10;
     // 125 with the Masterwrought phase 09 pair (duskforged_warblade,
-    // ridgebreaker), painted in masterwrought-phase09-art;
+    // ridgebreaker), now repainted in the final Masterwrought completion wave;
     // 132 with the nine Crucible raid weapons (crucible-raid-weapons-2026-08-28;
     // the Emberflight Longbow was pulled: bows wait for the hunter rework);
     // 133 with the Ignivar legendary maul (varkhul_forgebreaker, rendered in
@@ -127,25 +128,21 @@ describe('painted weapon inventory icons', () => {
       'marrowpoint',
       'rimefang',
     ]);
-    // Masterwrought phase 09 is the first content phase to ship weapons in
-    // its own woc_original_svg batch (the phase 06/08 batches carried no
-    // weapon ids, so the ownership model never saw one until now).
+    // The completion wave supersedes the two interim Masterwrought phase 09
+    // SVG placeholders and owns their final paintings alongside the rest of
+    // the feature art.
     const masterwroughtBatch = weaponBatches.find(
-      ({ batchId }) => batchId === 'masterwrought-phase09-art',
+      ({ batchId }) => batchId === 'masterwrought-art-completion-2026-09-02',
     );
     expect(masterwroughtBatch).toBeDefined();
     const masterwroughtWeaponIds = (masterwroughtBatch?.itemIds ?? [])
       .filter((id) => Object.hasOwn(ITEM_WEAPON_VARIANTS, id))
       .sort();
     expect(masterwroughtWeaponIds).toEqual(['duskforged_warblade', 'ridgebreaker']);
-    // The first weapon-owning woc_original_svg batch: pin its provenance
-    // fields the way the loop below pins the two generated batches.
-    expect(masterwroughtBatch?.source).toBe('woc_original_svg');
+    expect(masterwroughtBatch?.source).toBe('OpenAI built-in image generation');
     expect(masterwroughtBatch?.owner).toBe('World of ClaudeCraft');
     expect(masterwroughtBatch?.license).toContain('project asset');
-    expect(masterwroughtBatch?.provenanceRecord).toBe(
-      'docs/achievements/masterwrought-phase09-art/',
-    );
+    expect(masterwroughtBatch?.provenanceRecord).toBe(masterwroughtCompletionRecord);
     // The Crucible raid weapons land in their own batch
     // (crucible-raid-weapons-2026-08-28), like the integration daggers.
     const crucibleBatch = weaponBatches.find(
@@ -253,7 +250,7 @@ describe('painted weapon inventory icons', () => {
     }
   });
 
-  it('ships 125 distinct opaque 128px paintings within budget', async () => {
+  it('ships 135 distinct opaque 128px paintings within budget', async () => {
     const hashes = new Set<string>();
     for (const id of baseWeapons) {
       const violations: string[] = [];

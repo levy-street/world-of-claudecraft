@@ -5713,49 +5713,56 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Deepest Cast",
     "category": "collection",
     "renown": 10,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/col_deepest_cast.webp"
   },
   {
     "id": "prog_first_planting",
     "name": "Sow It Begins",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_first_planting.webp"
   },
   {
     "id": "chr_vale_first_harvest",
     "name": "First Fruits of the Vale",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_vale_first_harvest.webp"
   },
   {
     "id": "chr_marsh_first_harvest",
     "name": "Sprouts in the Peat",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_marsh_first_harvest.webp"
   },
   {
     "id": "chr_peaks_first_harvest",
     "name": "A Crop Among the Crags",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_peaks_first_harvest.webp"
   },
   {
     "id": "chr_evergarden_first_harvest",
     "name": "A Plot in Paradise",
     "category": "chronicle",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/chr_evergarden_first_harvest.webp"
   },
   {
     "id": "col_golden_harvest",
     "name": "Golden Harvest",
     "category": "collection",
     "renown": 0,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/col_golden_harvest.webp"
   },
   {
     "id": "prog_farming_100",
@@ -5771,14 +5778,16 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "Every Furrow Filled",
     "category": "collection",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/col_farm_roster.webp"
   },
   {
     "id": "prog_field_to_feast",
     "name": "From Field to Feast",
     "category": "progression",
     "renown": 5,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_field_to_feast.webp"
   },
   {
     "id": "soc_strongbox_outfitter",
@@ -5806,7 +5815,8 @@ export const GUIDE_DEEDS: GuideDeed[] = [
     "name": "The Legendmaker",
     "category": "progression",
     "renown": 50,
-    "feat": false
+    "feat": false,
+    "crest": "/ui/deeds/prog_legendmaker.webp"
   }
 ];
 

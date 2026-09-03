@@ -46,6 +46,7 @@ import {
   weaponIconUrl,
 } from '../src/ui/icons';
 import {
+  RELIQUARY_GOLDEN_HARVEST_IMAGE_URL,
   RELIQUARY_PERFECT_SPECIMEN_IMAGE_URL,
   RELIQUARY_SLAIN_GLYPH_ID,
   RELIQUARY_SLAIN_GLYPH_URL,
@@ -237,6 +238,12 @@ describe('profession mark relics resolve the profession sheet', () => {
     expect(reliquaryCellArt({ kind: 'mark', id: 'gather_event:moonlit_bloom' })).toEqual({
       kind: 'url',
       url: '/ui/professions/gather_herbalism.webp',
+    });
+    expect(FIELD_NOTE_PROFESSIONS['gather_event:golden_harvest']).toBe('farming');
+    expect(reliquaryCellArt({ kind: 'mark', id: 'gather_event:golden_harvest' })).toEqual({
+      kind: 'url',
+      url: '/ui/professions/gather_farming.webp',
+      fallbackUrl: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL,
     });
   });
 });
@@ -506,22 +513,11 @@ describe('unknown ids fall through to the caller fallback', () => {
     // through to the procedural compositor instead paints an OPAQUE radial
     // tile, which must not be darkened as though it were a cutout.
     //
-    // THIS ARM USED TO REQUIRE THE PROCEDURAL LIST TO BE EMPTY and its own
-    // message said what to do when it stopped being: "the FIRST such relic reds
-    // here and must extend the predicate rather than land silently on the wrong
-    // filter." Masterwrought Phase 11i is that first relic. It catalogued the
-    // apex fishing rod while the rod's painting is still parked in
-    // ITEM_ART_PENDING with the rest of the packet's art, so the predicate was
-    // extended exactly as instructed and this arm now checks the STRONGER
-    // property: whichever pipeline an item lands in, reliquaryCellArtOpaque
-    // agrees with it. An empty procedural list would have gone back to being a
-    // weaker claim than the one now available.
-    //
-    // The release/v0.41.0 merge (2026-08-30) brought the same item arm upstream
-    // in a second shape: the iff is swept both ways, and every procedural
-    // relic must additionally be an ITEM_ART_PENDING member (the enumerated
-    // icon debt), so an unenumerated procedural relic still reds rather than
-    // landing silently on either filter. Both arms are kept below.
+    // Check both directions: reliquaryCellArtOpaque must agree with the live
+    // pipeline, and any procedural relic must be explicitly enumerated in
+    // ITEM_ART_PENDING. The completed Masterwrought wave leaves that list
+    // empty today, while the guard still catches a future unpainted catalog
+    // item by name.
     const procedural: string[] = [];
     let itemsWebp = 0;
     let weaponsJpg = 0;
@@ -544,26 +540,21 @@ describe('unknown ids fall through to the caller fallback', () => {
     expect(weaponsJpg, 'anti-vacuity: the weapons-jpg pipeline really contributed').toBeGreaterThan(
       10,
     );
-    // Every procedural relic must be an enumerated ITEM_ART_PENDING member (the
-    // release's arm): an unenumerated one reds here by name.
+    // Every procedural relic must be an enumerated ITEM_ART_PENDING member; an
+    // unenumerated one reds here by name.
     for (const itemId of procedural) {
       expect(
         ITEM_ART_PENDING.has(itemId),
         `${itemId} has only procedural art and is not an enumerated ITEM_ART_PENDING member`,
       ).toBe(true);
     }
-    // The parked set is EXACTLY the phase's own catalogued id, spelled out
-    // rather than counted: a second parked relic arriving unnoticed is the
-    // thing this list is here to surface, and it stays a one-line edit when
-    // that art lands (the id leaves ITEM_ART_PENDING and leaves this list).
-    // The release's Crucible relics left this set when their wave painted
-    // (crucible-set-icons-2026-08-29), so its snug ceiling now reads the same
-    // one member; growth is a deliberate catalog decision that re-raises both.
+    // The completion wave leaves no catalogued relic on procedural art. Any
+    // future growth is a deliberate exact-set edit here and in the debt ledger.
     expect(
       procedural,
       `catalogued item relics with only procedural art (park them here deliberately):\n${procedural.join('\n')}`,
-    ).toEqual(['clockreel_fishing_rod']);
-    expect(procedural.length).toBeLessThanOrEqual(1);
+    ).toEqual([]);
+    expect(procedural).toHaveLength(0);
   });
 
   it('preserves the item passthrough for a real item id (behavior unchanged)', () => {

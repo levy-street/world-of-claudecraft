@@ -140,6 +140,13 @@ painted pass:
 - [v1] `ps_castaway_crate`, Castaway Crate: a salt-bleached slat crate bound in tarred rope, one plank sprung, sand still in its seams.
 - [v1] `ps_ferry_bell`, Ferry Bell: a brass dockside bell on a weathered post bracket, rope pull knotted twice, morning light off the rim.
 
+## The Masterwrought angling crest (2026-09-02)
+
+One collection crest from the Masterwrought high-band fishing pass, under the
+same 512x512 RGBA delivery contract as the other deed paintings.
+
+- [v1] `col_deepest_cast`, The Deepest Cast: a Clockreel Fishing Rod casting a taut luminous line into a deep teal whirlpool, the reel's brass cogs catching one pale highlight above abyssal blue water.
+
 ## The farming celebration crests (2026-08-18)
 
 Seven new ids from the farming celebrations pass (D13), same delivery contract
@@ -161,10 +168,12 @@ Progression and chronicle (the planting and first-harvest line):
 Collection (the rare-find family):
 
 - [v1] `col_golden_harvest`, Golden Harvest: one impossibly golden gourd glowing amid ordinary crops, radiant sunburst rays on harvest amber.
+- [v1] `col_farm_roster`, Every Furrow Filled: a quartered crop field bearing four distinct harvests inside a simple grain-and-leaf wreath, rich earth brown under seasonal green and harvest gold.
 
 Progression (the profession milestone):
 
 - [v1] `prog_farming_100`, Harvestmaster: a crossed hoe and sickle over a ribbon-tied wheat crown, proud guild-seal framing in bronze and gold. NOTE: an interim tied-wheat-sheaf medallion crest is COMMITTED with the phase (the Reliquary title shelf forbids fallback art for title deeds, so this one could not ride the pending ledger); the commissioned piece replaces it through the normal converter run.
+- [v1] `prog_field_to_feast`, From Field to Feast: a cultivated furrow and fresh greens flowing into a generous communal feast platter, a garden hoe and cook's ladle crossed behind it, earth green warming into hearth gold.
 
 ## The Crucible of the Last Spring raid crests (2026-08-29)
 

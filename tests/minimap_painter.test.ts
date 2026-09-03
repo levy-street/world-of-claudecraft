@@ -1427,7 +1427,55 @@ describe('minimap_painter: painted stable marker sprites', () => {
     );
   });
 
-  it('paints the farm-patch sprout procedurally, in the station token, with no art lookup', () => {
+  it('routes farm-patch art through the minimap station size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ farmPatch: true });
+
+    paint(newPainter(markerArt.art), fakeMinimapContext(trace), world);
+
+    const patch = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'farm-patch');
+    if (patch?.kind !== 'farm-patch') throw new Error('expected the farm-patch marker');
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'minimapStation' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'minimapStation' },
+      dx: Math.round(patch.mx - MAP_MARKER_SIZES.minimapStation / 2),
+      dy: Math.round(patch.my - MAP_MARKER_SIZES.minimapStation / 2),
+    });
+  });
+
+  it('routes farm-patch art through the compact minimap station size', () => {
+    const markerArt = fakeMarkerArt(['farm-patch']);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ farmPatch: true });
+
+    paint(
+      newPainter(markerArt.art, () => 'compact'),
+      fakeMinimapContext(trace),
+      world,
+    );
+
+    const patch = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'farm-patch');
+    if (patch?.kind !== 'farm-patch') throw new Error('expected the farm-patch marker');
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'minimapStationCompact' },
+    ]);
+    expect(trace.markerBlits.find((blit) => blit.sprite.markerId === 'farm-patch')).toMatchObject({
+      sprite: { markerId: 'farm-patch', sizeId: 'minimapStationCompact' },
+      dx: Math.round(patch.mx - MAP_MARKER_SIZES.minimapStationCompact / 2),
+      dy: Math.round(patch.my - MAP_MARKER_SIZES.minimapStationCompact / 2),
+    });
+  });
+
+  it('falls back to the procedural farm-patch sprout in the station token', () => {
     const markerArt = fakeMarkerArt([]);
     const trace = newTrace();
     installGlyphGlobals(trace);
@@ -1435,9 +1483,9 @@ describe('minimap_painter: painted stable marker sprites', () => {
 
     paint(newPainter(markerArt.art), fakeMinimapContext(trace), world);
 
-    // No MapMarkerArtId exists for a garden bed this phase: the painter must
-    // neither ask the art cache for one nor blit a sprite.
-    expect(markerArt.calls.filter((call) => call.id.includes('farm'))).toEqual([]);
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'minimapStation' },
+    ]);
     expect(trace.markerBlits).toEqual([]);
 
     const patch = createMinimapMarkers()
@@ -1482,6 +1530,55 @@ describe('minimap_painter: painted stable marker sprites', () => {
         (path) => path.commands.join() === 'moveTo,lineTo,lineTo,lineTo,closePath',
       ),
     ).toBe(false);
+  });
+
+  it('scales the procedural farm-patch fallback with the compact minimap profile', () => {
+    const markerArt = fakeMarkerArt([]);
+    const trace = newTrace();
+    installGlyphGlobals(trace);
+    const world = stableMarkerWorld({ farmPatch: true });
+
+    paint(
+      newPainter(markerArt.art, () => 'compact'),
+      fakeMinimapContext(trace),
+      world,
+    );
+
+    expect(markerArt.calls.filter((call) => call.id === 'farm-patch')).toEqual([
+      { id: 'farm-patch', size: 'minimapStationCompact' },
+    ]);
+    expect(trace.markerBlits).toEqual([]);
+    const patch = createMinimapMarkers()
+      .build(world, 162, 1.7)
+      .markers.find((marker) => marker.kind === 'farm-patch');
+    if (patch?.kind !== 'farm-patch') throw new Error('expected the farm-patch marker');
+
+    const radius = 3.5 * 1.5;
+    const crownY = patch.my - radius * 0.2;
+    const heelX = radius * 0.15;
+    const heelY = patch.my + radius * 0.25;
+    const leaves = trace.filledPaths.find(
+      (path) =>
+        path.commands.join() === 'moveTo,lineTo,lineTo,closePath,moveTo,lineTo,lineTo,closePath',
+    );
+    expect(leaves).toMatchObject({
+      fillStyle: 'paint:--color-minimap-station',
+      points: [
+        { x: patch.mx, y: crownY },
+        { x: patch.mx - radius, y: patch.my - radius },
+        { x: patch.mx - heelX, y: heelY },
+        { x: patch.mx, y: crownY },
+        { x: patch.mx + radius, y: patch.my - radius },
+        { x: patch.mx + heelX, y: heelY },
+      ],
+    });
+    const stem = trace.strokedPaths.find((path) => path.commands.join() === 'moveTo,lineTo');
+    expect(stem).toMatchObject({ strokeStyle: trace.outlineColor, lineWidth: 2 });
+    expect(trace.segments).toEqual(
+      expect.arrayContaining([
+        { fromX: patch.mx, fromY: crownY, toX: patch.mx, toY: patch.my + radius, stroked: true },
+      ]),
+    );
   });
 
   it('routes distinct dungeon entrance and exit paintings through the shared minimap size', () => {

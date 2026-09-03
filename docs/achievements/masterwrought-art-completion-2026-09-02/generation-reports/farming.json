@@ -1,0 +1,796 @@
+{
+  "schemaVersion": 1,
+  "batchId": "masterwrought-farming-items-2026-09-02",
+  "generator": "OpenAI built-in image_gen tool",
+  "owner": "World of ClaudeCraft project",
+  "license": "Project-owned generated asset",
+  "styleContract": "woc-item-icon-v1",
+  "generatedAt": "2026-09-02",
+  "outputPolicy": "Accepted generated originals were copied into ignored workspace staging; original tool outputs remain preserved under CODEX_HOME.",
+  "assets": [
+    {
+      "id": "withered_husks",
+      "name": "Withered Husks",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Withered Husks (withered_husks) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 is a style reference for tactile soft goods and compact three-quarter volume; Image 2 is a style reference for warm top-left light, crisp focal rendering, and dark painted ground. Do not copy their unrelated objects.\nSubject and identity: one compact tied bundle of dead brittle crop husks, curled straw-colored and ashen-brown leaves with split dry seed cases and snapped stems. It is the small salvage from a failed farm plot. Absolutely no living green growth, no fresh grain, no flowers.\nComposition: one centered complete bundle in readable three-quarter view, about 72 percent subject fill with safe padding, crisp dead-leaf silhouette readable at 22px and in a circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette, subtle dust and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; dry fibrous texture; crisp focal edges and softer peripheral brushwork; restrained palette; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one inventory subject; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, lush plant, green sprout, food plate, sack, or cropped silhouette.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile soft goods and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, tactile rendering, and dark painted value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-8348da6c-83bf-4704-8d1c-ee77150c8251.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/withered_husks.png",
+      "sha256": "fd45d8ca4dc370999c9b8019ff0f0facc97dddf88cfdfbb9aae936a3fa7b849e",
+      "bytes": 2411301,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: dead brittle silhouette stays distinct from every living crop; no green; tied bundle reads at 22px."
+    },
+    {
+      "id": "compost",
+      "name": "Compost",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Compost (compost) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile canvas, leather wear, and compact container volume; Image 2 controls warm top-left light and painted value range. Do not copy their unrelated objects.\nSubject and identity: one squat, open, slumped heavy canvas sack filled with damp dark crumbly loam and a few unmistakably dead brown plant fragments. The mouth and coarse fabric are clearly visible. It must read as rich heavy compost, not seeds, flour, a coin pouch, or a living plant.\nComposition: One centered complete three-quarter sack, about 72 percent fill with safe padding; the open dark loam mass remains legible at 22px and in a circular crop.\nScene and backdrop: opaque full-square deep charcoal and umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile materials; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one inventory subject; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile soft goods and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, tactile rendering, and dark painted value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-07b724ae-22d4-4022-988c-dc03a82a9b77.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/compost.png",
+      "sha256": "413c13a5289f454a3a3e48ef676932afb4c6dffed26616b86a37bd87df495354",
+      "bytes": 2394452,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: damp heavy loam and open sack read clearly; visually distinct from tied seed sacks."
+    },
+    {
+      "id": "growth_tonic",
+      "name": "Growth Tonic",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Growth Tonic (growth_tonic) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls glass, liquid, contained glow, and vessel treatment; Image 2 controls warm top-left light, tactile rendering, and dark painted ground. Do not copy their unrelated objects.\nSubject and identity: one stoppered amber-green glass alchemy vial containing luminous green-gold tonic, a small twisted root suspended inside, a tiny fresh sprout curling near the stopper, and a few clearly contained bubbles. Its restrained internal growth glow is part of the liquid, with no exterior star or crop-quality sparkle. It must read as a plant-growth tonic, not poison or a generic healing potion.\nComposition: One centered complete round-bellied vial in readable three-quarter view, about 72 percent fill with safe padding; crisp glass rim, liquid line, root and sprout silhouette readable at 22px and in a circular crop.\nScene and backdrop: opaque full-square deep charcoal and umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile materials; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one inventory subject; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette.",
+      "references": [
+        {
+          "path": "public/ui/items/firebottle.webp",
+          "role": "Style reference for glass, liquid, contained glow, and readable vessel treatment."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, tactile rendering, and dark painted ground."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-50986e26-15bb-409e-9b50-f395db949733.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/growth_tonic.png",
+      "sha256": "f39d43a900f0be2e89278aba7a1b0000824830de95044ed7a7b9f3c3102a2fe0",
+      "bytes": 2027769,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: root, sprout, bubbles, and contained green-gold glow read; no fine-crop star."
+    },
+    {
+      "id": "garden_hoe",
+      "name": "Garden Hoe",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Garden Hoe (garden_hoe) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls complete tool silhouette, hard material wear, and diagonal safe padding; Image 2 controls metal and wood light response. Do not copy their unrelated objects.\nSubject and identity: one complete humble working garden hoe: long weathered wooden shaft, simple worn rectangular iron draw-hoe blade set at a clear right angle, rough forged socket and practical grip wear. It must unmistakably read as a hoe, not a pickaxe, shovel, hammer, axe, or mace.\nComposition: Complete full-length hoe on a strong lower-left to upper-right diagonal with blade, socket, haft and butt all visible; functional flat blade emphasized; about 72 percent fill and safe margin at both tips; readable at 22px and in a circular crop.\nScene and backdrop: opaque full-square deep charcoal and umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile materials; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one inventory subject; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette.",
+      "references": [
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "Style reference for complete tool silhouette, hard material treatment, and diagonal safe padding; its pick head is explicitly not an identity reference."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for forged metal and wood light response."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-baa5af7c-8ecf-413d-8921-dcb065a4f381.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/garden_hoe.png",
+      "sha256": "b7aa7463d5bf26485e7397e7de1e5bf6760bb13911126048bf07b31ec3c01844",
+      "bytes": 1999211,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: humble iron rectangle and worn long wood shaft form a clear baseline hoe."
+    },
+    {
+      "id": "bronze_hoe",
+      "name": "Bronze Hoe",
+      "exactPrompt": "Use case: precise-object-edit\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: correct only the Bronze Hoe's functional head so it unmistakably reads as a farming draw hoe instead of a pickaxe.\nEdit target: the most recently shown Bronze Hoe image.\nRequired change: remove both curved pick-like wings. Replace them with one single broad one-sided bronze trapezoid hoe blade, like a rectangular soil-cutting paddle set perpendicular to the long handle. The blade must have one wide straight sharpened lower edge, a clear right-angle socket, and no opposing spike, no second blade, no curved pick point. Make the wooden shaft visibly long enough to be a full farm hoe.\nKeep unchanged: warm bronze, wood and leather materials; painterly dark-fantasy MMORPG rendering; warm top-left light; dark opaque vignette; strong full-tool diagonal; safe padding; no text or frame.\nConstraints: one complete tool only; it must read as a working farm hoe at 22px, never a pickaxe, war pick, axe, hammer, spear, mace, or weapon; no text, runes, pseudo-writing, UI chrome, border, watermark, transparency, hand, or cropped tips.",
+      "references": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-8aad419d-345c-4e81-8dc5-a25e011d8a7a.png",
+          "role": "Edit target from rejected first Bronze Hoe generation; identity and palette preserved while head silhouette was corrected."
+        },
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "Style reference for complete tool silhouette, hard material treatment, and diagonal safe padding; its pick head is explicitly not an identity reference."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for forged metal and wood light response."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-1710cfa9-1999-4ad8-ae37-03e800d1a85b.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/bronze_hoe.png",
+      "sha256": "ebfd2a0d7361b4b9285d87df8babc1ebbd20fc7a1d9271a5e7ea5a7707515380",
+      "bytes": 2017909,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 1,
+      "reviewNotes": "Accepted after one targeted correction: one broad perpendicular bronze soil-cutting blade, no opposing point; distinct from Garden Hoe.",
+      "discardedResults": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-8aad419d-345c-4e81-8dc5-a25e011d8a7a.png",
+          "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Bronze Hoe (bronze_hoe) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls complete tool silhouette, hard material wear, and diagonal safe padding; Image 2 controls metal and wood light response. Do not copy their unrelated objects.\nSubject and identity: one complete crafted bronze farming hoe: broad warm bronze crescent-trapezoid draw blade with a reinforced riveted socket, sturdy honey-brown wood haft, and a short dark leather mid-grip. The bronze head must be materially and structurally distinct from the humble rectangular iron Garden Hoe, while remaining a functional hoe rather than a weapon.\nComposition: Complete full-length hoe on a strong lower-left to upper-right diagonal with broad blade, socket, haft and butt visible; functional cutting edge emphasized; about 72 percent fill and safe margin at both tips; readable at 22px and in a circular crop.\nScene and backdrop: opaque full-square deep charcoal and umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile materials; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one inventory subject; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped silhouette.",
+          "reason": "Rejected because the double-ended curved head read as a pickaxe, not a farming hoe."
+        }
+      ]
+    },
+    {
+      "id": "skysilver_hoe",
+      "name": "Skysilver Hoe",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Skysilver Hoe (skysilver_hoe) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls complete tool silhouette, hard material treatment, and diagonal safe padding; Image 2 controls forged metal and wood light response. Do not copy their unrelated objects, especially the reference pickaxe head.\nSubject and identity: one refined pale-skysilver farming hoe with a wide single spade-like cultivation blade whose softly forked lower cutting edge evokes a swallowtail without forming weapon points; slim ashwood haft, silver reinforcing collar, and cool blue-gray leather grip. It is structurally lighter and more elegant than the broad bronze hoe, but remains visibly practical.\nComposition: one complete full-length working hoe on a strong lower-left to upper-right diagonal, with its single broad soil-cutting blade, clear right-angle socket, long haft, grip and butt all visible. The functional blade is emphasized. About 72 percent subject fill with safe margin at both tips, readable at 22px and inside a circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained zone-tinted painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged metal, wood and leather; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one complete farm hoe; one single one-sided flat hoe blade; no opposing spike, no second blade, no pick point. It must never read as a pickaxe, war pick, axe, shovel, hammer, spear, mace, staff, or weapon. Borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped tips.",
+      "references": [
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "Style reference for complete tool silhouette, hard material treatment, and diagonal safe padding; its pick head is explicitly not an identity reference."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for forged metal and wood light response."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-4bef75a6-5ece-4a74-91b5-c4979a76690a.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/skysilver_hoe.png",
+      "sha256": "68eb1b88b4345407587110d92ed35e43205a1ea3fd7250eed9404f2396de50e3",
+      "bytes": 1927927,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: pale forked single blade remains a hoe, not a pick, and is distinct from bronze."
+    },
+    {
+      "id": "osmium_hoe",
+      "name": "Osmium Hoe",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Osmium Hoe (osmium_hoe) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls complete tool silhouette, hard material treatment, and diagonal safe padding; Image 2 controls forged metal and wood light response. Do not copy their unrelated objects, especially the reference pickaxe head.\nSubject and identity: one dense heavy osmium farming hoe with a single deep rectangular black-metal cultivation blade, blunt squared corners, thick reinforced socket, dark ironwood haft, and one narrow ember-orange forge seam along the blade shoulder. It is structurally weighty and severe, distinct from pale skysilver; the contained forge seam is subordinate and does not become a rune.\nComposition: one complete full-length working hoe on a strong lower-left to upper-right diagonal, with its single broad soil-cutting blade, clear right-angle socket, long haft, grip and butt all visible. The functional blade is emphasized. About 72 percent subject fill with safe margin at both tips, readable at 22px and inside a circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained zone-tinted painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged metal, wood and leather; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one complete farm hoe; one single one-sided flat hoe blade; no opposing spike, no second blade, no pick point. It must never read as a pickaxe, war pick, axe, shovel, hammer, spear, mace, staff, or weapon. Borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped tips.",
+      "references": [
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "Style reference for complete tool silhouette, hard material treatment, and diagonal safe padding; its pick head is explicitly not an identity reference."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for forged metal and wood light response."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-9426371a-5fe3-4cfe-b9a9-8e5bf75de4d3.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/osmium_hoe.png",
+      "sha256": "645e9b94e8e7315b22959d7636d196ef179224e315a245543e5aa9a7a964910a",
+      "bytes": 1885515,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: dense squared black blade and restrained forge seam remain legible at small sizes."
+    },
+    {
+      "id": "evergarden_hoe",
+      "name": "Evergarden Hoe",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Hoe (evergarden_hoe) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls complete tool silhouette, hard material treatment, and diagonal safe padding; Image 2 controls forged metal and wood light response. Do not copy their unrelated objects, especially the reference pickaxe head.\nSubject and identity: one epic verdant-gold farming hoe with a single very broad leaf-inspired cultivation blade, a clearly straight functional soil-cutting edge, a gold-bronze reinforced right-angle socket, and a long polished living-wood haft wrapped with dark green leather. A restrained emerald enamel vein and tiny vine binding signal Evergarden craft, but the wide hoe blade and long handle dominate so it cannot read as a mace or scepter.\nComposition: one complete full-length working hoe on a strong lower-left to upper-right diagonal, with its single broad soil-cutting blade, clear right-angle socket, long haft, grip and butt all visible. The functional blade is emphasized. About 72 percent subject fill with safe margin at both tips, readable at 22px and inside a circular crop.\nScene and backdrop: opaque full-square deep charcoal and restrained zone-tinted painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile forged metal, wood and leather; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one complete farm hoe; one single one-sided flat hoe blade; no opposing spike, no second blade, no pick point. It must never read as a pickaxe, war pick, axe, shovel, hammer, spear, mace, staff, or weapon. Borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, mannequin, environmental scene, or cropped tips.",
+      "references": [
+        {
+          "path": "public/ui/items/arcanite_mining_pick.webp",
+          "role": "Style reference for complete tool silhouette, hard material treatment, and diagonal safe padding; its pick head is explicitly not an identity reference."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for forged metal and wood light response."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-02c6d5b8-30bd-4077-b0ad-53e460be9140.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/evergarden_hoe.png",
+      "sha256": "1704ba143e233299cf40dbc35d906b9c9afdcc731e76337c5a495597cae292c5",
+      "bytes": 1998675,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: verdant-gold leaf blade reads as a functional apex hoe and never a mace."
+    },
+    {
+      "id": "vale_hearth_loaf",
+      "name": "Vale Hearth Loaf",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Vale Hearth Loaf (vale_hearth_loaf) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls the warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one rustic golden-brown round wheat hearth loaf with a cracked flour-dusted crust, broad natural scoring, and a little torn edge revealing soft crumb. Present it as a humble starter food; the scoring must be ordinary bread cuts, never a symbol or writing.\nComposition: One complete loaf centered on a compact dark wooden bread peel or trencher as a single serving, front three-quarter view, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle kitchen warmth and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f3d327fd-fb98-4cf1-a013-923c488082ad.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/vale_hearth_loaf.png",
+      "sha256": "8a12b2ed6d2a84238b9251309f58b8926350ce0c646b777d2d5c6a5e104bb7b1",
+      "bytes": 2329261,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: immediately readable round loaf, natural scoring, distinct from bannock."
+    },
+    {
+      "id": "eastbrook_root_pottage",
+      "name": "Eastbrook Root Pottage",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Eastbrook Root Pottage (eastbrook_root_pottage) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls the warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one deep earthenware crock of thick Eastbrook root pottage: orange-brown carrot-and-wheat stew with unmistakable chunky carrot rounds and softened root pieces, dense enough to mound near the rim, with restrained steam. It must read as a hearty deep pottage, not glazed carrots, soup, or potion.\nComposition: One centered complete deep crock in readable three-quarter view, contents and thick texture fully visible, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle kitchen warmth and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-c1376674-f44b-42f4-8bbf-6f5ffbfa4791.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/eastbrook_root_pottage.png",
+      "sha256": "9003631151900a83d62ea3be61430c3e6235e93a5141ba8c850bf954870e2f8c",
+      "bytes": 2105159,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: deep chunky crock is clearly distinct from arranged glazed carrots."
+    },
+    {
+      "id": "fenbridge_rice_bowl",
+      "name": "Fenbridge Rice Bowl",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fenbridge Rice Bowl (fenbridge_rice_bowl) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls the warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one simple green-gray fen earthenware bowl filled with a generous mound of steamed pearly marsh rice, distinct individual grains and a light wisp of steam, plain and salted. It must read as savory cooked rice, not pudding, porridge, coins, seeds, or raw grain.\nComposition: One centered complete bowl in readable three-quarter view, bright rice mound separated cleanly from the dark rim, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle kitchen warmth and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-cfa1c5bf-1468-4143-b45d-df0d4b96a528.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/fenbridge_rice_bowl.png",
+      "sha256": "4c86eb03c3e259d949fa1e07df3d84f1dcd2dbab15f60063af71add477066de2",
+      "bytes": 2045258,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: clean white rice mound and green-gray bowl read as savory rice."
+    },
+    {
+      "id": "fenbridge_beet_braise",
+      "name": "Fenbridge Beet Braise",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fenbridge Beet Braise (fenbridge_beet_braise) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls the warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one shallow dark earthen braising dish filled with glossy jewel-red and deep magenta beet wedges cooked until candied, with a little rich ruby reduction and restrained steam. The cut vegetable shapes must remain unmistakable. It must read as braised beets, not berries, meat, soup, or potion.\nComposition: One centered complete shallow dish in readable three-quarter view, glossy beet wedges forming the focal mass, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle kitchen warmth and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-55698128-55a3-4af9-bef6-779e6256245e.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/fenbridge_beet_braise.png",
+      "sha256": "41a55f81682034b18738b7b2b6f0a59f14f33759ce944898419da489a6bc2ce9",
+      "bytes": 2175764,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: glossy ruby beet wedges keep a strong vegetable silhouette."
+    },
+    {
+      "id": "highwatch_barley_bannock",
+      "name": "Highwatch Barley Bannock",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Highwatch Barley Bannock (highwatch_barley_bannock) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one thick rustic round barley bannock, a griddle-cooked flatcake with browned blistered surface, broken edge showing coarse barley crumb, and small visible green cabbage flecks baked through the dough. Light salt crystals suggest watch-rations. It must read as a flatcake, distinct from the tall Vale loaf, tart, pie, or pancake stack.\nComposition: One complete low round bannock centered on a small dark slate serving tile, front three-quarter view, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f3faf5fc-551a-42b2-aebf-7972c9793ca5.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/highwatch_barley_bannock.png",
+      "sha256": "3cfdb5c628422618004098ba1ec06bbb9fbbc0112a3f56ff43312bcd9ab29006",
+      "bytes": 2455549,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: low flatcake silhouette and coarse crumb stay distinct from the hearth loaf."
+    },
+    {
+      "id": "highwatch_gourd_soup",
+      "name": "Highwatch Gourd Soup",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Highwatch Gourd Soup (highwatch_gourd_soup) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one broad handled stoneware soup bowl filled with creamy pale-orange frost-gourd soup, visible soft gourd cubes and dark lentils at the surface, with unmistakable rising steam. It must read as a hot savory soup bowl, not a potion, drinking cup, porridge, stew meat, or pumpkin decoration.\nComposition: One centered complete wide soup bowl in readable three-quarter view, rim and steaming liquid clearly visible, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-06ca179b-e0f9-4b66-81d3-ed7c9f74eefc.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/highwatch_gourd_soup.png",
+      "sha256": "d1907f9b34eed79cd899d2667b09632e1c9fa749983b28b3fe7efba7e6f79eed",
+      "bytes": 2145580,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: wide handled bowl, broth, cubes, lentils, and steam read as soup rather than potion."
+    },
+    {
+      "id": "evergarden_sunmelon_tart",
+      "name": "Evergarden Sunmelon Tart",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Sunmelon Tart (evergarden_sunmelon_tart) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one complete elegant round wheat-crust tart topped with radiant golden sunmelon crescents and a few rich amber-purple glazed fruit segments arranged in a sunlike pattern. The pastry has crisp fluted edges and restrained verdant garnish. It must read as a baked fruit tart, not a raw melon, pizza, flower, clock, or magical disc.\nComposition: One complete tart centered on a small dark ceramic plate, front three-quarter view showing crust depth and fruit topping, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-0d23abbf-c8c8-4923-897b-cc33e087b920.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/evergarden_sunmelon_tart.png",
+      "sha256": "cdb7cba5e6f8ac489319e4285ade38227ff1edf3ccd9f14e42b6704def1e7f37",
+      "bytes": 2272477,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: fluted pastry and fruit arrangement read as tart at every checked size."
+    },
+    {
+      "id": "evergarden_harvest_platter",
+      "name": "Evergarden Harvest Platter",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Harvest Platter (evergarden_harvest_platter) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one compact oval serving platter of dressed Evergarden produce: glossy layered green leaves as the primary mass, roasted orange pumpkin wedges, and a restrained golden dressing. It should look abundant and refined while every vegetable remains recognizable. It must read as a prepared harvest platter, not a raw crop basket, flower arrangement, soup, or seafood plate.\nComposition: One centered complete oval platter in readable three-quarter view, greens and pumpkin separated into strong color masses, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f27c968d-ffc6-46a6-81e4-17ed95aeddff.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/evergarden_harvest_platter.png",
+      "sha256": "e4848a58db9ba74c2a85be77a3706cab7fe0bfcd4f174bbc3a247533f5f6f1ad",
+      "bytes": 2276581,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: prepared green and orange platter has clear ingredient separation and no seafood."
+    },
+    {
+      "id": "eastbrook_glazed_carrots",
+      "name": "Eastbrook Glazed Carrots",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Eastbrook Glazed Carrots (eastbrook_glazed_carrots) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one shallow cream stoneware serving plate holding a neat fan of five glossy roasted orange carrots, their tapered whole shapes immediately readable, coated in warm amber glaze with a few coarse salt crystals. Use no leafy tops. It must read as arranged glazed carrots, sharply distinct from a deep crock of chunky root pottage, and never as sausages, fingers, or fish.\nComposition: One centered complete shallow plate in readable three-quarter view, carrots arranged as one strong orange serving mass, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-313f8713-40d4-4a01-bca5-bcd7a805fdc1.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/eastbrook_glazed_carrots.png",
+      "sha256": "c829d12a4bc21a972f5739a4f6b3a726f021c81c0ecad9aad08d52565ca1eda1",
+      "bytes": 2267845,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: five whole tapered glazed carrots remain clear and distinct from pottage."
+    },
+    {
+      "id": "fenbridge_rice_pudding",
+      "name": "Fenbridge Rice Pudding",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Fenbridge Rice Pudding (fenbridge_rice_pudding) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one shallow blue-gray fen stoneware ramekin filled with creamy ivory rice pudding, visible individual softened rice grains, a lightly caramelized golden top, and one restrained wisp of warmth. It must read as a soft dessert pudding in a ramekin, not a coin, potion, plain steamed rice mound, porridge, soup, or candle.\nComposition: One centered complete shallow ramekin in readable three-quarter view, pale creamy surface and grains clearly separated from the dark rim, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f6516484-d74c-4b40-b411-1e756f23f636.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/fenbridge_rice_pudding.png",
+      "sha256": "e82239f7d47759c28bafb5339f9d35dc8fa49f8807592dabbc580b98e47da7a4",
+      "bytes": 2053860,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: shallow caramelized ramekin reads as pudding rather than coin or plain rice."
+    },
+    {
+      "id": "highwatch_barley_porridge",
+      "name": "Highwatch Barley Porridge",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Highwatch Barley Porridge (highwatch_barley_porridge) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one deep rugged dark-stone bowl filled with thick tan barley porridge, unmistakable plump pearled barley grains throughout, a small melting pat of golden butter, and strong but controlled rising steam. It must read as a hot hearty porridge bowl, not potion, soup, rice pudding, coins, raw grain, or stew.\nComposition: One centered complete deep bowl in readable three-quarter view, dense steaming porridge mounded above the inner rim, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-fda43b19-d483-4a93-9b7d-5d47e717eb4d.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/highwatch_barley_porridge.png",
+      "sha256": "0093c3afef01f874f2bf89ee14c6beea65d0e8f1d8a8d209cfe0fde539d55c8a",
+      "bytes": 1948596,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: deep steaming grain bowl and butter focal point read as porridge."
+    },
+    {
+      "id": "evergarden_braised_greens",
+      "name": "Evergarden Braised Greens",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Evergarden Braised Greens (evergarden_braised_greens) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls warm top-left key light, readable rounded mass, and dark value range. Do not copy their unrelated seafood or shield objects.\nSubject and identity: one wide shallow verdant ceramic braising crock filled with glossy dark emerald leaves folded in golden broth, recognizable braised greens with curled leaf edges, a few pale stems, and restrained steam. It must read as cooked leafy greens, not seaweed, salad, soup, herb bundle, or decorative plant.\nComposition: One centered complete wide braising crock in readable three-quarter view, glossy cooked leaves forming a strong green focal mass, about 72 percent subject fill and safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle restrained zone tint, kitchen warmth, and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food and ceramic/wood textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one compact inventory serving only; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, character, hand, mannequin, unrelated utensils, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for warm top-left light, readable rounded mass, and dark value range."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-1b8cbb89-055b-4ae9-9866-2a847d6fffa4.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/evergarden_braised_greens.png",
+      "sha256": "de48481dc1c772beaec475fbbbfcd6f0d1a63894dabe5c549f8014df7ac0235c",
+      "bytes": 2196723,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: cooked glossy leaf folds and crock read as braised greens rather than salad."
+    },
+    {
+      "id": "harvest_feast",
+      "name": "Harvest Feast",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory item icon\nPrimary request: paint Harvest Feast (harvest_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls the house treatment for a compact appetizing food grouping, warm presentation, small-size separation, and painted finish. Image 2 controls tactile soft goods and three-quarter container volume. Do not copy their unrelated seafood or travel-bag objects.\nSubject and identity: one compact communal harvest feast arranged as a stout low wooden serving crate/tray: a central crock of glossy braised Evergarden greens, golden sunmelon wedges, a rustic hearth loaf, roasted pumpkin pieces, and a few glazed carrots. It should feel abundant enough for a party and clearly distinct from every single-dish icon, yet remain one unified carryable serving spread rather than a table scene.\nComposition: One centered complete laden crate/tray in readable three-quarter view, its rectangular container giving a strong communal silhouette and the food separating into large green, gold, bread-brown, and orange masses. About 74 percent subject fill with safe padding. It must read instantly at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle Evergarden green warmth and grounded contact shadow, never transparency, flat black, or a dining-room scene.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; appetizing tactile food, wood, ceramic and cloth textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: one unified compact feast inventory subject; communal crate or tray, not a single plate; borderless; no text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, dining table, furniture, character, hand, mannequin, seafood, or cropped subject.",
+      "references": [
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Style reference for compact appetizing food grouping, warm presentation, small-size separation, and painted finish."
+        },
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile soft goods and three-quarter container volume."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-ba53cfbd-55db-4257-83f1-50b1eee3f08a.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/harvest_feast.png",
+      "sha256": "a3c47a76e033cddb707eb2fabddad1c65571ec2b0542b303067b6bb2aab74557",
+      "bytes": 2272563,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: one laden rectangular crate reads as a communal spread, not a single plate or table scene."
+    },
+    {
+      "id": "pattern_highwatch_gourd_soup",
+      "name": "Recipe: Highwatch Gourd Soup",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Highwatch Gourd Soup (pattern_highwatch_gourd_soup) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: a thick rolled weathered parchment tied with frost-blue cord, a small pale gourd wedge and dark lentil pod secured beneath the cord, and one large amber wax seal bearing only a simple raised pictorial soup-bowl impression with no glyphs. Highwatch stone-gray edging and cool blue accents distinguish it. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-3187b233-ee44-4001-97de-5cba769d7fd9.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_highwatch_gourd_soup.png",
+      "sha256": "4c561a485bf29c09ab2004edca9ace5fc55e244786996dd1e5e713513b6c897c",
+      "bytes": 2239987,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: gourd, lentil pod, blue cord, and bowl seal distinguish it with no writing."
+    },
+    {
+      "id": "pattern_highwatch_barley_porridge",
+      "name": "Recipe: Highwatch Barley Porridge",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Highwatch Barley Porridge (pattern_highwatch_barley_porridge) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: a folded-and-rolled weathered parchment tied with slate-blue cord and a short golden barley sheaf, closed by one large pale bronze wax seal bearing only a simple raised pictorial bowl-with-three-grains impression with no glyphs. Its vertical grain silhouette must differ clearly from the gourd-soup pattern. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-2e3ad206-eb98-47b0-b700-3b3d10de052d.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_highwatch_barley_porridge.png",
+      "sha256": "8dff6f700512eab85ad949bc77e547278a880491f12a5094f43bbfd27e2b2e68",
+      "bytes": 2217867,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: barley sheaf and grain-bowl seal distinguish it from the gourd scroll; no writing."
+    },
+    {
+      "id": "pattern_evergarden_sunmelon_tart",
+      "name": "Recipe: Evergarden Sunmelon Tart",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Evergarden Sunmelon Tart (pattern_evergarden_sunmelon_tart) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: an elegant rolled ivory parchment tied with deep green and muted violet cord, a small golden sunmelon crescent secured beneath the tie, and one large warm gold wax seal bearing only a simple raised pictorial fluted-tart impression with no glyphs. Refined Evergarden green-gold accents signal the tier-four recipe. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-40296bc9-56d1-466a-aacf-b1b724b910f0.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_evergarden_sunmelon_tart.png",
+      "sha256": "bc9648db8344a02c91ebad1b75b25ff2c2dc41123a846db07212bf7dea12aa24",
+      "bytes": 1918212,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: melon crescent and fluted tart seal remain readable; blank parchment."
+    },
+    {
+      "id": "pattern_evergarden_harvest_platter",
+      "name": "Recipe: Evergarden Harvest Platter",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Evergarden Harvest Platter (pattern_evergarden_harvest_platter) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: a broad rolled ivory parchment tied with layered forest-green cord, one curled emerald leaf and one tiny orange pumpkin wedge secured beneath the tie, and one large green-gold wax seal bearing only a simple raised pictorial oval-platter impression with no glyphs. Its paired green-and-orange ingredient motif must distinguish it from the braised-greens pattern. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f10ea08e-27ac-446c-a114-fd0af6b6c4fd.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_evergarden_harvest_platter.png",
+      "sha256": "ead9dc1fe18674b842f52bbf694218e81b48498d5106aa269a82a42d455ba241",
+      "bytes": 2118225,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: paired leaf and pumpkin motif distinguishes the broad platter scroll; no writing."
+    },
+    {
+      "id": "pattern_evergarden_braised_greens",
+      "name": "Recipe: Evergarden Braised Greens",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Evergarden Braised Greens (pattern_evergarden_braised_greens) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: a compact folded parchment scroll tied with dark emerald cord and a small bundle of curled braising greens secured beneath it, closed by one large deep green wax seal bearing only a simple raised pictorial shallow-crock-and-leaf impression with no glyphs. Dark glossy greens and the compact folded silhouette distinguish it from the broad harvest-platter pattern. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-e7117eae-d79c-439f-8435-007b38ddc5b4.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_evergarden_braised_greens.png",
+      "sha256": "1b0cbca29998da503cc05281166ec67ca208b983825ef55afacce7873b4bcdd3",
+      "bytes": 2108708,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: compact fold, dark greens, and crock-leaf seal distinguish it; no writing."
+    },
+    {
+      "id": "pattern_harvest_feast",
+      "name": "Recipe: Harvest Feast",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: opaque square fantasy MMORPG inventory recipe-pattern icon\nPrimary request: paint Recipe: Harvest Feast (pattern_harvest_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.\nInput images: Image 1 controls tactile parchment/leather softness and compact three-quarter volume. Image 2 controls a readable circular focal mass for the wax seal and warm top-left light. Image 3 controls cloth accents, controlled dark values, and painterly finish. Do not copy their unrelated bag, shield, or garment objects.\nSubject and identity: a substantial layered parchment packet rolled at both ends and bound with braided harvest-gold cord, a short wheat sprig plus one tiny carrot and green leaf tucked beneath the binding, and one oversized crimson-gold wax seal bearing only a simple raised pictorial laden-harvest-crate impression with no glyphs. It must feel like the rare communal feast plan, broader and more ceremonial than the five single-dish recipes. The parchment itself is entirely blank and unmarked, with no ink lines or writing.\nComposition: one centered complete rolled recipe folio or sealed parchment packet in readable three-quarter view, about 72 percent subject fill with safe padding. The large dish-specific seal and attached ingredient motif provide the identity and must read at 22px and inside a 64px circular crop.\nScene and backdrop: opaque full-square deep charcoal-umber painted vignette with a restrained regional tint, subtle atmosphere, and grounded contact shadow, never transparency or flat black.\nStyle: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile parchment, cord, wax and ingredient textures; crisp focal edges and softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.\nConstraints: exactly one unified physical recipe-pattern subject; blank parchment only; no written recipes, ink marks, lines of script, text, letters, numbers, labels, runes, pseudo-writing, glyphs, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, open book, hand, mannequin, environmental scene, or cropped parchment.",
+      "references": [
+        {
+          "path": "public/ui/items/linen_pouch.webp",
+          "role": "Style reference for tactile parchment and leather softness and compact three-quarter volume."
+        },
+        {
+          "path": "public/ui/items/eastbrook_buckler.webp",
+          "role": "Style reference for a readable circular wax-seal focal mass and warm top-left light."
+        },
+        {
+          "path": "public/ui/items/cinderweave_raiment.webp",
+          "role": "Style reference for cloth accents, controlled dark values, and painterly finish."
+        }
+      ],
+      "originalResult": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-3a41db81-9b32-4748-9bdf-0c9cc7965e0f.png",
+      "acceptedMaster": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/pattern_harvest_feast.png",
+      "sha256": "a46f263393ed06f196fafa22b9a9d1f136f78adee8f657d47a061a5b4676cd98",
+      "bytes": 2294570,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "reviewNotes": "Accepted: broad ceremonial packet, harvest ingredients, and red-gold crate seal clearly lead the pattern family; no writing."
+    }
+  ],
+  "review": {
+    "checks": [
+      "1254px source",
+      "128px color",
+      "40px color",
+      "22px grayscale",
+      "64px circular crop"
+    ],
+    "artifacts": [
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-supplies-tools-1.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-hoes.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-dishes.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-patterns.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-all-128.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-all-40.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-all-22-gray.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/review-all-circle-64.png"
+    ],
+    "summary": "All 27 accepted masters are square 1254x1254 opaque sRGB RGB PNGs. Identity, full silhouette, padding, material, top-left light, subdued painted ground, small-size readability, circular crop, and absence of text, pseudo-writing, frame, watermark, and transparency were reviewed. Bronze Hoe required one correction; no other retries were needed."
+  }
+}

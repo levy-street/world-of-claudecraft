@@ -1,0 +1,674 @@
+{
+  "schemaVersion": 1,
+  "batchId": "masterwrought-special-ui-deeds-2026-09-02",
+  "generatedAt": "2026-09-02",
+  "generator": "OpenAI built-in image_gen tool",
+  "license": "Project-owned generated asset",
+  "owner": "World of ClaudeCraft project",
+  "outputPolicy": "Accepted opaque generator originals were copied byte-for-byte into ignored workspace staging. The original image_gen outputs remain preserved under CODEX_HOME. No shipping conversion, tracked public asset, source, test, documentation, or mapping file was changed by this owner.",
+  "styleContracts": [
+    "Book of Deeds keyed crest contract from docs/design/deeds.md and docs/achievements/icon-brief.md",
+    "woc-map-marker-art-v2",
+    "Existing primary-launcher chrome family"
+  ],
+  "rawSourceContract": {
+    "format": "PNG",
+    "dimensions": [1254, 1254],
+    "mode": "RGB",
+    "colorspace": "sRGB",
+    "alpha": "none; opaque magenta-key source",
+    "keyIntent": "#FF00FF exterior for downstream chroma removal"
+  },
+  "processingAndReview": {
+    "shippingConversionPerformed": false,
+    "shippingIntegrationOwner": "root agent",
+    "qaOnlyChromaSimulation": {
+      "keynessFormula": "min(red, blue) - green",
+      "alphaRules": [
+        "keyness >= 140 => alpha 0",
+        "60 < keyness < 140 => linear alpha round(255 * (140 - keyness) / 80)",
+        "keyness <= 60 => alpha 255"
+      ],
+      "despill": "For alpha > 0 where red > green and blue > green, reduce red and blue toward green by excess * max(1 - alpha/255, 0.5).",
+      "trimVisibilityThreshold": "alpha >= 8",
+      "normalizeFit": {
+        "deeds": "trim, then contain in 456x456 on 512x512 (28px nominal outer pad)",
+        "mapMarkers": "trim, then contain in 58x58 on 64x64 (3px nominal outer pad)",
+        "chrome": "trim, then contain in 118x118 on 128x128 (5px nominal outer pad)"
+      },
+      "caveat": "This helper was used only to inspect keyed isolation, normalized coverage, and small-size legibility. It is not the repository shipping converter and does not claim byte- or pixel-equivalence. In particular, the canonical deed pipeline may normalize to a 448px maximum dimension; root must use the repository converters."
+    }
+  },
+  "review": {
+    "checks": [
+      "1254px raw source",
+      "deeds: QA-normalized 512px, 128px color, 32px dark/light/grayscale",
+      "map marker: final shipping WebP at actual 16/20/22/28px runtime sizes on dark/light/grayscale",
+      "chrome: QA-normalized 128px, runtime 20/24/26px dark/grayscale",
+      "hash equality between accepted staging copies and preserved generator originals"
+    ],
+    "artifacts": [
+      "tmp/imagegen/masterwrought-art-2026-09-02/deeds/review-keyed-512-sheet.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/deeds/review-keyed-128-dark.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/deeds/review-keyed-32-dark.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/deeds/review-keyed-32-light.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/deeds/review-keyed-32-gray.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-dark.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-light.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/review-runtime-gray.png",
+      "docs/screenshots/masterwrought-art-completion-2026-09-02/farm-patch-runtime-sizes.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-chrome.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-runtime-dark.png",
+      "tmp/imagegen/masterwrought-art-2026-09-02/chrome/review-runtime-gray.png"
+    ],
+    "summary": "All 14 accepted raw sources are 1254x1254 opaque RGB sRGB PNGs and byte-identical to their preserved image_gen originals. All motifs were reviewed at source and simulated delivery sizes. Deepest Cast required one density retry to clear the requested normalized visible-area gate; Harvestmaster required one retry so the left tool reads as a one-sided hoe rather than a hammer. No other retries were required."
+  },
+  "assets": [
+    {
+      "id": "col_deepest_cast",
+      "name": "The Deepest Cast",
+      "category": "deeds",
+      "imageGenUseCase": "precise-object-edit",
+      "referenceMode": "num_last_images_to_include: 1",
+      "exactPrompt": "Use case: precise-object-edit\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: make the most recently shown Deepest Cast crest slightly denser for the keyed 512px deed-coverage gate while preserving its identity and overall composition.\nRequired change: increase the visible painted area modestly, about 5 percent, by making the deep teal whirlpool a little broader and denser along its upper edge, making the Clockreel rod and brass reel assembly slightly thicker, and making the one pale-teal fishing line about twice its current hairline thickness. Keep the same complete rod arc, connected line, brass cog reel, and compact whirlpool. Do not add any new object, scenery, border, halo, or medallion.\nKeep unchanged: abyssal blue and brass palette, tactile painted material, warm upper-left key light, cool lower-right shadow, centered freestanding silhouette, safe padding, and exact subject relationships.\nBackground invariant: every exterior pixel, corner, and gap remains perfectly uniform solid flat #FF00FF magenta, with no texture, gradient, shadow, reflection, or pink spill. No magenta inside the subject.\nConstraints: no text, letters, numbers, pseudo-writing, runes, UI frame, medallion, watermark, checkerboard, transparency, extra fish, boat, hand, landscape, cropped subject, or magenta interior detail. The motif must remain readable at 128px and 32px.",
+      "references": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-98b6d8ff-af0f-47b2-a17b-6c56bf0df381.png",
+          "role": "Ordered reference 1 and edit target, supplied from the immediately preceding image via num_last_images_to_include: 1."
+        },
+        {
+          "path": "public/ui/deeds/chr_vale_first_cast.webp",
+          "role": "Initial-generation style reference for a bold rod, line, water, and small-size contrast."
+        },
+        {
+          "path": "public/ui/deeds/col_full_creel.webp",
+          "role": "Initial-generation style reference for tactile tackle and brass detail."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-4175236c-e241-47ec-9d3d-4c2ca88dbf16.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/col_deepest_cast.png",
+      "sha256": "69a54ccf1131523cae437755c11057c41f50c2d08cde2494ffc7ad6ef6e907fe",
+      "bytes": 1863495,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 1,
+      "review": {
+        "sourceReview": "Accepted after one density correction: complete Clockreel rod and brass reel, connected pale-teal line, and compact deep-teal whirlpool read clearly; no frame, text, or scene.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.3587,
+          "paddingLTRB": [32, 28, 33, 28],
+          "alphaVisibilityCutoff": 8
+        }
+      },
+      "discardedResults": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-98b6d8ff-af0f-47b2-a17b-6c56bf0df381.png",
+          "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint The Deepest Cast (col_deepest_cast) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing first-cast crest style reference for a bold rod, line, water, and small-size contrast. Image 2 is the existing fishing-collection crest style reference for tactile tackle and brass detail. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Their circular rims are legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: a complete Clockreel Fishing Rod casting a taut luminous pale-teal line into one deep teal whirlpool below it, with the reel's broad brass cogs catching one pale highlight above abyssal blue water. The full rod and reel must be recognizable, the luminous line must visibly connect to the whirlpool, and the whirlpool must remain a compact bold spiral rather than a scenic ocean.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+          "reason": "Rejected after QA normalization because visible-area coverage was 0.3350, below the requested 0.34 minimum; the rod, reel, line, and whirlpool were thickened without changing identity."
+        }
+      ]
+    },
+    {
+      "id": "prog_first_planting",
+      "name": "Sow It Begins",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint Sow It Begins (prog_first_planting) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing Callused Hands crest style reference for a readable open hand and warm work-worn materials. Image 2 is the existing marsh crest style reference for earth, restrained natural color, and small-size silhouette. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Their circular rims are legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: a single large seed dropping from one work-worn open hand into a fresh dark-earth furrow directly beneath it, with a simple warm morning light catching the turned soil. The falling seed, palm, and furrow are the only elements; the action must read instantly and must not resemble an offering of a gem or coin.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/prog_callused_hands.webp",
+          "role": "Readable open hand and warm work-worn materials."
+        },
+        {
+          "path": "public/ui/deeds/chr_marsh_first_cast.webp",
+          "role": "Earth, restrained natural color, and small-size silhouette."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-5c3c15e9-8a6e-425c-bb09-8567d04f3229.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/prog_first_planting.png",
+      "sha256": "b86485d99753dd8935ff202e1e062511ddeda5122698565dbb850ab8216ff658",
+      "bytes": 1625448,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: one large seed visibly falls from an open work-worn hand into a fresh dark-earth furrow; action remains distinct from a gem or coin offering.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.3512,
+          "paddingLTRB": [67, 28, 67, 28],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "chr_vale_first_harvest",
+      "name": "First Fruits of the Vale",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint First Fruits of the Vale (chr_vale_first_harvest) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing collection crest style reference for a large readable wicker container and separated contents. Image 2 is the existing Vale crest style reference for warm regional landscape color and depth. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Their circular rims are legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one sturdy wicker harvest basket visibly filled with ripe carrots, greens, wheat, and one small gourd, set before only a simplified rolling green meadow ridge and a tiny distant mill silhouette, all in warm valley daylight. The basket and produce dominate; the landscape is a compact supporting shape, not a scenic illustration.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/col_full_creel.webp",
+          "role": "Large readable wicker container and separated contents."
+        },
+        {
+          "path": "public/ui/deeds/chr_vale_first_cast.webp",
+          "role": "Warm regional landscape color and depth."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-83532e7c-9cd2-4d49-ae87-5a27e97a2be4.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/chr_vale_first_harvest.png",
+      "sha256": "94a47b5f9c71ebb8d43292198d81001cbd2360319bb622a105341eac8b533fc5",
+      "bytes": 2019718,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: wicker basket and separated carrots, greens, wheat, and gourd dominate; meadow ridge and tiny mill stay subordinate.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.5853,
+          "paddingLTRB": [28, 38, 28, 39],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "chr_marsh_first_harvest",
+      "name": "Sprouts in the Peat",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint Sprouts in the Peat (chr_marsh_first_harvest) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the newly accepted planting crest as a family reference for turned earth, morning light, and bold crop scale. Image 2 is the existing marsh crest style reference for reed silhouettes, wet earth, and bog palette. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: three bright young two-leaf shoots standing together in one low compact mound of dark wet peaty soil, with a few bold mist wisps and two simple reed silhouettes behind them. Fresh bog green against deep umber is the identity. The shoots dominate and must not become an herb bundle, potted plant, or full landscape.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/prog_first_planting.png",
+          "role": "Accepted family reference for turned earth, morning light, and bold crop scale."
+        },
+        {
+          "path": "public/ui/deeds/chr_marsh_first_cast.webp",
+          "role": "Reed silhouettes, wet earth, and bog palette."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-ac024018-f167-4f79-b2a2-da6472885423.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/chr_marsh_first_harvest.png",
+      "sha256": "710915589997e79cfecd9387c1c814324ad19816c2c511ad48d2cd2c50a31a55",
+      "bytes": 1631777,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: three young shoots dominate one wet peat mound; mist and reeds stay bold and subordinate; it does not read as an herb bundle or pot.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.4965,
+          "paddingLTRB": [29, 28, 29, 28],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "chr_peaks_first_harvest",
+      "name": "A Crop Among the Crags",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint A Crop Among the Crags (chr_peaks_first_harvest) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing Peaks crest style reference for crag stone, hardy gathered plant material, and cold mountain accents. Image 2 is the existing Vale crest style reference for readable regional depth and warm natural light. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one hardy golden barley sheaf firmly lashed with rough cord to a squat three-stone cairn on a small windswept ledge, with only one simple pale sliver of thin mountain sky behind. The tied sheaf and cairn dominate; no scenic mountain panorama, field, basket, or loose grain.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/chr_peaks_gatherer.webp",
+          "role": "Crag stone, hardy gathered plant material, and cold mountain accents."
+        },
+        {
+          "path": "public/ui/deeds/chr_vale_first_cast.webp",
+          "role": "Readable regional depth and warm natural light."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-5aa7837c-ca56-4057-b11a-d92b9c48dde0.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/chr_peaks_first_harvest.png",
+      "sha256": "149a8b9bb115c999bd2527b38062980fa45d63c6edb7d81b4073e1e0d7a4d3af",
+      "bytes": 1904265,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: tied golden barley sheaf and squat three-stone cairn read as one narrow bold crest; no scenic panorama or basket.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.3404,
+          "paddingLTRB": [101, 28, 102, 28],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "chr_evergarden_first_harvest",
+      "name": "A Plot in Paradise",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint A Plot in Paradise (chr_evergarden_first_harvest) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing Evergarden crest style reference for lush green foliage, pale blossom light, and tactile garden materials. Image 2 is the existing collection crest style reference for clear separated harvest contents. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one tidy low rectangular raised garden bed overflowing with a few bold ripe vegetables: rich greens, one small orange pumpkin, and golden sunmelon shapes, beneath three drifting pale flower petals and lush garden light. The raised bed and harvest dominate as one compact motif; no broad garden scene, fence, gardener, or tools.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/chr_evergarden_gatherer.webp",
+          "role": "Lush green foliage, pale blossom light, and tactile garden materials."
+        },
+        {
+          "path": "public/ui/deeds/col_full_creel.webp",
+          "role": "Clear separated harvest contents."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-2c705ca4-33ce-4f2d-aa51-4da46916553c.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/chr_evergarden_first_harvest.png",
+      "sha256": "41b8ab860ec5086f74584ce59e3c621b2878a6fa64b99ffe61d76fcaf28510d1",
+      "bytes": 1805097,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: low rectangular raised bed, greens, pumpkin, sunmelons, and three petals remain a compact harvest motif with no tools or gardener.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.3967,
+          "paddingLTRB": [28, 48, 28, 49],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "col_golden_harvest",
+      "name": "Golden Harvest",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint Golden Harvest (col_golden_harvest) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing rare-find crest style reference for one luminous exceptional object contrasted against a dark field. Image 2 is the existing Evergarden crest style reference for crop material, leaves, and green-gold garden palette. Use them only for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one impossibly golden gourd as the unmistakable central hero, glowing amid a small supporting cluster of ordinary muted green and orange crops, with six broad radiant amber sunburst rays emerging behind it. The gourd must remain a solid tactile vegetable, not a jewel, coin, pumpkin lantern, sun, or magical orb; the rays are subordinate and not an enclosing halo.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/col_first_rare.webp",
+          "role": "One luminous exceptional object contrasted against a dark field."
+        },
+        {
+          "path": "public/ui/deeds/chr_evergarden_gatherer.webp",
+          "role": "Crop material, leaves, and green-gold garden palette."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-8f8d03ff-70c1-4155-930d-6ab026d49ffe.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/col_golden_harvest.png",
+      "sha256": "d4498f4759fe8f4c441ff6b1e9f9343f04edf5622fa06e6d339a0d4ee5996a69",
+      "bytes": 1862865,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: solid tactile golden gourd is unmistakable against ordinary crops; amber rays stay subordinate and do not form a medallion.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.4033,
+          "paddingLTRB": [60, 28, 60, 28],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "col_farm_roster",
+      "name": "Every Furrow Filled",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint Every Furrow Filled (col_farm_roster) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the newly accepted Vale first-harvest crest as identity reference for bold separated crops and warm earth. Image 2 is the existing Evergarden collection crest style reference for a readable garden material palette and foliage. Use them only for identity where stated and otherwise for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one compact quartered field tile seen at a readable shallow angle, divided into four bold crop quadrants: golden wheat, orange carrots, pale marsh rice, and a green pumpkin vine. A loose open grain-and-leaf wreath curves around only the lower sides without closing into a ring. Rich dark earth unifies the four sections. The quarters must remain distinct at 32px and must not become a landscape map or pie chart.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/chr_vale_first_harvest.png",
+          "role": "Accepted identity reference for bold separated crops and warm earth."
+        },
+        {
+          "path": "public/ui/deeds/chr_evergarden_gatherer.webp",
+          "role": "Readable garden material palette and foliage."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-40dc58eb-c0b0-43aa-97a0-85d23cd2cc75.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/col_farm_roster.png",
+      "sha256": "adad925b0bc1a22dade1aa6f3a628f8a8092d70116c450dc3c634738fe50949f",
+      "bytes": 2327144,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: four field quadrants remain separated as wheat, carrots, rice, and pumpkin vine; lower wreath stays open and does not create a ring.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.465,
+          "paddingLTRB": [28, 61, 28, 62],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "prog_field_to_feast",
+      "name": "From Field to Feast",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint From Field to Feast (prog_field_to_feast) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the accepted Harvest Feast item painting as identity reference only for the compact communal feast and its green, gold, bread-brown, and orange masses; do not copy its opaque backdrop. Image 2 is the existing Tools of the Trade crest style reference for crossed working tools and metal/wood treatment. Use them only for identity where stated and otherwise for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: a clear transformation motif: a short cultivated dark-earth furrow with fresh green shoots on the lower left flows in one broad golden-green sweep into a generous compact communal feast platter on the upper right, while one complete garden hoe and one cook's ladle cross boldly behind the transition. Earth green warms into hearth gold. The furrow, feast, hoe, and ladle must stay large and readable, with no table scene.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "tmp/imagegen/masterwrought-art-2026-09-02/items/farming/harvest_feast.png",
+          "role": "Identity reference only for the compact communal feast and green, gold, bread-brown, and orange masses; opaque backdrop excluded."
+        },
+        {
+          "path": "public/ui/deeds/prog_tools_of_the_trade.webp",
+          "role": "Crossed working tools and metal/wood treatment."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-f8052cc6-c477-46a4-a7a6-665c45a74ce7.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/prog_field_to_feast.png",
+      "sha256": "173e685432e030edb6b42f65994bb32ed18ab540ad7b895f0c391b3138c98799",
+      "bytes": 2074188,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: tilled furrow flows into a compact communal feast with complete hoe and ladle; reads as transformation, not a table scene.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.5376,
+          "paddingLTRB": [28, 44, 28, 44],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "prog_legendmaker",
+      "name": "The Legendmaker",
+      "category": "deeds",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint The Legendmaker (prog_legendmaker) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the existing Tools of the Trade crest style reference for anvil, finished metalwork, and tactile forge materials. Image 2 is the existing Masterwright crest style reference for concentrated orange achievement glow and bold crafting silhouette. Use them only for identity where stated and otherwise for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one finished ornate apex blade resting across a stout blackened anvil and catching a controlled legendary orange edge glow. Beneath the anvil lies one blank signed Deed of Making parchment with a visibly cracked dark-red wax seal and one quill laid diagonally across it. The parchment has no marks or writing of any kind. Ember orange against iron black is the dominant palette; the blade and anvil lead, while parchment, broken seal, and quill remain clearly recognizable.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+      "references": [
+        {
+          "path": "public/ui/deeds/prog_tools_of_the_trade.webp",
+          "role": "Anvil, finished metalwork, and tactile forge materials."
+        },
+        {
+          "path": "public/ui/deeds/prog_masterwright.webp",
+          "role": "Concentrated orange achievement glow and bold crafting silhouette."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-fe647b46-4fc8-4e73-ab54-6d455daab925.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/prog_legendmaker.png",
+      "sha256": "e42dfa3b1e107e5d65e8219aab99478a8344713c66a8ea1201286217972b5122",
+      "bytes": 2087686,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: apex blade and blackened anvil lead; blank parchment, cracked red seal, and quill remain visible without writing or runes.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.4814,
+          "paddingLTRB": [28, 29, 28, 30],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "prog_farming_100",
+      "name": "Harvestmaster",
+      "category": "deeds",
+      "imageGenUseCase": "precise-object-edit",
+      "referenceMode": "num_last_images_to_include: 1",
+      "exactPrompt": "Use case: precise-object-edit\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: correct only the left-hand tool in the most recently shown Harvestmaster crest so it unmistakably reads as a working garden hoe instead of a hammer.\nRequired change: replace the current two-sided rectangular hammer head with one single broad one-sided bronze cultivation blade set at a clear right angle to the wooden handle. The blade should be a flat trapezoid or rectangular soil-cutting plate with one broad edge. There must be no metal mass or striking face on the opposite side of the socket, no hammer head, no pick point, and no second blade.\nKeep unchanged: the curved sickle on the right; the dense crown-shaped golden wheat sheaf; deep-green bronze-edged ribbon and central solid guild clasp; crossed-tool composition; warm top-left light; painterly tactile rendering; scale, centering, and safe padding.\nBackground invariant: keep the exterior field perfectly uniform solid flat #FF00FF magenta across every corner and gap, with no texture, vignette, shadow, gradient, or pink spill. No magenta inside the subject.\nConstraints: one unified crest; no text, letters, numbers, pseudo-writing, runes, UI frame, medallion, watermark, checkerboard, transparency, extra tool, hand, cropped subject, or magenta interior detail. The left tool must read as a hoe at 32px, never as a hammer, axe, pickaxe, mace, or weapon.",
+      "references": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-97a784a9-eb31-47c5-abf2-83dce1d99d40.png",
+          "role": "Ordered reference 1 and edit target, supplied from the immediately preceding image via num_last_images_to_include: 1."
+        },
+        {
+          "path": "public/ui/deeds/prog_farming_100.webp",
+          "role": "Initial-generation identity reference only for tied golden wheat; its round medallion composition was excluded."
+        },
+        {
+          "path": "public/ui/deeds/prog_callused_hands.webp",
+          "role": "Initial-generation style reference for work-tool material, wheat accents, and warm profession palette."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-ebbd0801-eac4-4111-898b-9d314657e430.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/deeds/prog_farming_100.png",
+      "sha256": "e2e0bf9fb20c3072ab983e9ac72848e9916dd497e6c1ea29ea95d67b419e6240",
+      "bytes": 1822734,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 1,
+      "review": {
+        "sourceReview": "Accepted after one object correction: left tool now has one broad one-sided perpendicular cultivation blade, distinct from the right sickle and legible at 32px; no hammer, weapon, frame, or medallion.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 512px and composited at 128px color plus 32px on dark, light, and grayscale grounds; silhouette and primary motif remained legible.",
+        "qaSimulation": {
+          "canvas": [512, 512],
+          "containBox": [456, 456],
+          "coverage": 0.4162,
+          "paddingLTRB": [28, 37, 28, 38],
+          "alphaVisibilityCutoff": 8
+        }
+      },
+      "discardedResults": [
+        {
+          "path": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-97a784a9-eb31-47c5-abf2-83dce1d99d40.png",
+          "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG Book of Deeds crest source\nPrimary request: paint Harvestmaster (prog_farming_100) as a new World of ClaudeCraft deed crest, following the exact commissioned brief.\nInput images: Image 1 is the current interim Farming 100 crest and controls only the tied golden-wheat identity; replace its flat round medallion composition entirely. Image 2 is the existing Callused Hands crest style reference for work-tool material, wheat accents, and warm profession palette. Use them only for identity where stated and otherwise for hand-painted material, lighting, broad-value grouping, and motif legibility. Any circular rim in a reference is legacy presentation and must not appear.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the motif, with no gradient, texture, vignette, shadow, reflection, or pink spill in the key field. No magenta is allowed anywhere inside the painted subject.\nSubject and identity: one proud profession crest made from a complete garden hoe and curved harvest sickle crossed behind a dense crown-shaped sheaf of golden wheat, tied at its base with one broad bronze-and-deep-green ribbon. A small solid bronze guild clasp anchors the tie, but it is not a medallion or enclosing seal. The hoe's flat perpendicular blade and the sickle's curved blade must remain distinct. Bronze and harvest gold dominate.\nComposition: one bold centered freestanding crest motif with a complete silhouette, balanced around the square center, at least 7 percent safe padding on all sides, roughly 68 to 74 percent of the square in width and height, and an expected keyed visible-area coverage between 34 and 61 percent. Keep all identity-bearing parts large and readable at 128px and 32px. No enclosing ring, plaque, shield, circular border, frame, or medallion.\nStyle: premium hand-painted classic dark-fantasy MMORPG achievement art; tactile materials; near-black controlled contour; two or three broad value groups; crisp focal edges; warm upper-left key light and cool lower-right shadow; restrained glow only where the brief calls for it.\nConstraints: exactly one unified crest motif; no text, letters, numbers, signatures, ink writing, pseudo-writing, runes, generic glyphs, UI chrome, baked frame, medallion, watermark, checkerboard, transparency, split sheet, collage, detached decorative border, cropped subject, or magenta-colored interior detail.",
+          "reason": "Rejected because the left tool's double-ended rectangular head read as a hammer rather than a garden hoe."
+        }
+      ]
+    },
+    {
+      "id": "farm_patch",
+      "name": "Farm Patch",
+      "category": "map-markers",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG map and minimap marker master\nPrimary request: paint the farm patch marker (shipping filename farm_patch.webp) in the World of ClaudeCraft woc-map-marker-art-v2 language.\nInput images: Image 1 is the approved gathering-marker style reference for a bold botanical silhouette, near-black painted contour, broad value groups, and readability at tiny sizes. Image 2 is the approved station-marker style reference for a compact low rounded mass, warm top-left light, and tactile painted finish. Do not copy their herb sprig or cauldron objects.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and interior gap around the marker, with no gradient, texture, vignette, terrain, cast shadow, reflection, or pink spill. No magenta may appear inside the marker.\nSubject and identity: one compact low oval patch of tilled dark loam with exactly three bold curved furrows and exactly one crisp central green sprout consisting of one short stem and exactly two broad leaves. A slim pale-gold exterior keyline cleanly separates the complete loam-and-sprout silhouette. The sprout is a farm seedling, not a gathered herb bundle.\nComposition: one centered optically balanced marker, broad low oval soil mass with the two-leaf sprout rising above it, roughly 68 percent square fill, generous safe transparent-key perimeter, near-black inner contour, only two or three broad value groups. Every cue must survive 18px, 20px, 24px, and 28px rendering and grayscale.\nStyle: hand-painted classic dark-fantasy MMORPG map heraldry, tactile earth and leaf surfaces, warm upper-left key light, cool lower-right shadow, crisp silhouette and restrained detail.\nConstraints: exactly one sprout, exactly two leaves, two or three bold furrows; no flower, fruit, seed packet, herb bundle, grass cluster, hoe, sickle, shovel, watering can, basket, fence, pot, hands, readiness glow, halo, pulse, tracking ring, cooldown arc, lock, label, text, letters, numbers, runes, pseudo-writing, UI frame, medallion, watermark, checkerboard, transparency, split sheet, collage, cropped silhouette, or magenta interior detail.",
+      "references": [
+        {
+          "path": "public/ui/map-markers/gather_herb.webp",
+          "role": "Approved gathering-marker style reference for bold botanical silhouette, near-black contour, broad value groups, and tiny-size readability; herb identity excluded."
+        },
+        {
+          "path": "public/ui/map-markers/station_kitchens.webp",
+          "role": "Approved station-marker style reference for compact low rounded mass, warm top-left light, and tactile finish; cauldron identity excluded."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-7fbc6f46-e6e3-4c10-92d3-f2b1f5f445fe.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/map-markers/farm_patch.png",
+      "sha256": "ac104f7cd3b1d250e0d7282e77e28f047e33d467403bec5021dd129b20586494",
+      "bytes": 1350647,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: one low dark-loam oval, three bold furrow grooves, exactly one short stem with two broad leaves, and pale-gold keyline; no herb bundle, tool, or readiness glow.",
+        "deliverySizeReview": "Reviewed from the final shipping WebP at the actual 16px and 22px minimap sizes and 20px and 28px map sizes on dark, light, and grayscale grounds; sprout, two leaves, and furrows remain recognizable.",
+        "runtimeSizeEvidence": {
+          "path": "docs/screenshots/masterwrought-art-completion-2026-09-02/farm-patch-runtime-sizes.png",
+          "sha256": "818cc240f124e755e726418c4fbd4d537636e0e20216d4d21f0d19431adb0529",
+          "bytes": 41935,
+          "width": 480,
+          "height": 360,
+          "sizes": [16, 20, 22, 28],
+          "grounds": ["dark", "light", "grayscale"]
+        },
+        "qaSimulation": {
+          "canvas": [64, 64],
+          "containBox": [58, 58],
+          "coverage": 0.4365,
+          "paddingLTRB": [3, 11, 3, 12],
+          "alphaVisibilityCutoff": 8
+        }
+      },
+      "shippingFilename": "farm_patch.webp"
+    },
+    {
+      "id": "perfecting",
+      "name": "Perfecting",
+      "category": "chrome",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG primary-destination HUD chrome icon source\nPrimary request: paint Perfecting (perfecting) for the World of ClaudeCraft primary launcher rail.\nInput images: Image 1 is the approved Crafting launcher style reference for smithing material, hammer treatment, bold silhouette, and gold/cream palette, but its anvil must not appear. Image 2 is the approved Character launcher style reference for refined steel facets, pale-gold edges, dark contour, and small-size contrast. Use them only for the established chrome family's hand-painted material finish, warm gold and bronze accents, cream highlights, near-black outline, broad silhouette, and 24px readability. Do not copy their unrelated objects.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the icon, with no gradient, texture, vignette, cast shadow, reflection, or pink spill. No magenta may appear inside the icon.\nSubject and identity: one refined masterwork steel blade blank or elongated beveled ingot facet angled boldly across the center, its one pale-gold perfected edge catching light, while one small precision smithing hammer floats just above and visibly strikes that edge. At the single contact point is exactly one controlled compact orange upgrade spark. No anvil appears. The faceted workpiece dominates and must read as careful refinement, not ordinary crafting, combat, mining, or a crossed-weapons badge.\nComposition: one centered complete unified launcher motif in a readable three-quarter presentation, roughly 72 percent square fill with safe padding. Use a thick controlled dark contour and two or three broad value groups; all identity cues must survive 20px, 24px, 26px, and 3x mobile display.\nStyle: premium hand-painted classic fantasy MMORPG HUD icon, warm top-left key light, cool lower-right shadow, pale-gold edge accents, tactile materials, crisp silhouette, restrained highlights.\nConstraints: no text, letters, numbers, labels, ink marks, pseudo-writing, runes, generic glyphs, UI frame, medallion, button plate, watermark, checkerboard, transparency, split sheet, collage, hand, character, cropped subject, multiple examples, or magenta interior detail.",
+      "references": [
+        {
+          "path": "public/ui/chrome/crafting.webp",
+          "role": "Approved launcher style reference for smithing material, hammer treatment, bold silhouette, and gold/cream palette; anvil excluded."
+        },
+        {
+          "path": "public/ui/chrome/character.webp",
+          "role": "Approved launcher style reference for refined steel facets, pale-gold edges, dark contour, and small-size contrast."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-1068ef2e-9d0b-450c-8024-180445ae1b97.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/chrome/perfecting.png",
+      "sha256": "d0f6d001a786cdb19f9d707b0ad07139548e980baf5ab5d1dce86a8d39ae0689",
+      "bytes": 1436102,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: elongated refined steel facet dominates, small precision hammer contacts one pale-gold edge with one compact orange spark, and no anvil appears.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 128px and composited at 20px, 24px, and 26px on dark and grayscale grounds; workpiece, hammer, and one spark remain distinguishable.",
+        "qaSimulation": {
+          "canvas": [128, 128],
+          "containBox": [118, 118],
+          "coverage": 0.4448,
+          "paddingLTRB": [5, 5, 6, 5],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    },
+    {
+      "id": "harvest-journal",
+      "name": "Harvest Journal",
+      "category": "chrome",
+      "imageGenUseCase": "stylized-concept",
+      "referenceMode": "referenced_image_paths",
+      "exactPrompt": "Use case: stylized-concept\nAsset type: chroma-keyed square fantasy MMORPG primary-destination HUD chrome icon source\nPrimary request: paint Harvest Journal (harvest-journal) for the World of ClaudeCraft primary launcher rail.\nInput images: Image 1 is the approved Book launcher style reference for a readable closed volume, leather texture, corner hardware, and bold 24px silhouette; its brown palette, star, and clasp are not identity references. Image 2 is the approved Professions launcher style reference for mossy botanical color, pale-gold trim, and organic-versus-stone contrast; its mortar, pestle, and herb bundle must not appear. Use them only for the established chrome family's hand-painted material finish, warm gold and bronze accents, cream highlights, near-black outline, broad silhouette, and 24px readability. Do not copy their unrelated objects.\nScene and background: perfectly uniform solid flat #FF00FF magenta across every exterior pixel, corner, and gap around the icon, with no gradient, texture, vignette, cast shadow, reflection, or pink spill. No magenta may appear inside the icon.\nSubject and identity: one compact moss-green leather field journal, closed at a readable three-quarter angle, with warm bronze corner caps and one bold embossed emblem showing three simple curved furrows beneath exactly one two-leaf sprout. One small tied golden wheat tab projects from the lower edge. The green journal dominates and must stay visibly distinct from the brown clasped Book of Deeds and from the mortar-and-pestle Professions launcher.\nComposition: one centered complete unified launcher motif in a readable three-quarter presentation, roughly 72 percent square fill with safe padding. Use a thick controlled dark contour and two or three broad value groups; all identity cues must survive 20px, 24px, 26px, and 3x mobile display.\nStyle: premium hand-painted classic fantasy MMORPG HUD icon, warm top-left key light, cool lower-right shadow, pale-gold edge accents, tactile materials, crisp silhouette, restrained highlights.\nConstraints: no text, letters, numbers, labels, ink marks, pseudo-writing, runes, generic glyphs, UI frame, medallion, button plate, watermark, checkerboard, transparency, split sheet, collage, hand, character, cropped subject, multiple examples, or magenta interior detail.",
+      "references": [
+        {
+          "path": "public/ui/chrome/book.webp",
+          "role": "Approved style reference for closed-volume silhouette, leather texture, corner hardware, and 24px readability; brown palette, star, and clasp excluded."
+        },
+        {
+          "path": "public/ui/chrome/professions.webp",
+          "role": "Approved style reference for mossy botanical color, pale-gold trim, and organic-versus-stone contrast; mortar, pestle, and herb bundle excluded."
+        }
+      ],
+      "generatedResultPath": "/Users/fernando/.codex/generated_images/01a064ea-a54c-78f0-ae47-7e72c42112b8/exec-819ca919-1480-4249-a507-d480b688c828.png",
+      "acceptedRawPath": "tmp/imagegen/masterwrought-art-2026-09-02/chrome/harvest-journal.png",
+      "sha256": "d62e7d2df39f115e4d43157de7fbaa6958a6c0bcb793342b4580bff86659856b",
+      "bytes": 1947092,
+      "dimensions": {
+        "width": 1254,
+        "height": 1254
+      },
+      "mode": "RGB",
+      "channels": "RGB, fully opaque",
+      "colorspace": "sRGB",
+      "retries": 0,
+      "review": {
+        "sourceReview": "Accepted: compact moss-green closed field journal with bronze corners, bold embossed three-furrow/two-leaf-sprout emblem, and one small wheat tab; distinct from the brown Deeds book and mortar launcher.",
+        "deliverySizeReview": "Reviewed after QA-only chroma isolation at 128px and composited at 20px, 24px, and 26px on dark and grayscale grounds; green volume, embossed farm emblem, and wheat tab remain readable.",
+        "qaSimulation": {
+          "canvas": [128, 128],
+          "containBox": [118, 118],
+          "coverage": 0.6013,
+          "paddingLTRB": [5, 5, 6, 5],
+          "alphaVisibilityCutoff": 8
+        }
+      }
+    }
+  ]
+}

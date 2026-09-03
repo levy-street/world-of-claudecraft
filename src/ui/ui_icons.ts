@@ -270,24 +270,15 @@ const ICONS: Record<UiIconName, string> = {
   // cut stone hollowed with evenodd so the facet reads at micro-button size,
   // and a four-point spark above its shoulder for the rank climb. Distinct from
   // the `crafting` anvil it sits under and from the `enchant-rune` spark alone.
-  // DELIBERATELY GLYPH-ONLY until the maintainer's art wave: this is a primary
-  // destination (a side-rail tile), so DESIGN.md section 6 gives it painted
-  // art like its eighteen rail neighbours in CHROME_ART_IDS, but painted chrome
-  // art cannot be authored in this environment. The upgrade path is the
-  // ordinary one and needs no change here: drop a magenta-keyed raster into
-  // public/ui/chrome/, run `npm run assets:chrome`, then list the name in
-  // CHROME_ART_IDS and public/ui/chrome/mapping.json. This glyph stays either
-  // way: it is what every direct svgIcon() call beside text renders.
+  // This glyph remains the inline and load-failure fallback for the painted
+  // side-rail launcher registered in CHROME_ART_IDS.
   perfecting:
     '<path fill-rule="evenodd" d="M256 128 L388 240 L256 448 L124 240 Z M256 192 L336 244 L256 376 L176 244 Z"/><path d="M400 56 L416 108 L468 124 L416 140 L400 192 L384 140 L332 124 L384 108 Z"/>',
   // hand-authored sprout over a soil line (the Harvest Journal launcher): a
   // stem with two leaves, the growing-crop read the journal tracks. Distinct
   // from the `professions` mortar it sits beside and from the deeds `book`.
-  // DELIBERATELY GLYPH-ONLY until the maintainer's art wave, for the same
-  // reason as `perfecting` above: a side-rail tile is a primary destination and
-  // rates painted art, which cannot be authored in this environment. Same
-  // upgrade path: a magenta-keyed raster into public/ui/chrome/,
-  // `npm run assets:chrome`, then CHROME_ART_IDS plus mapping.json.
+  // This glyph remains the inline and load-failure fallback for the painted
+  // side-rail launcher registered in CHROME_ART_IDS.
   'harvest-journal':
     '<path d="M256 464V236" stroke="currentColor" stroke-width="36" fill="none" stroke-linecap="round"/><path d="M252 300C150 300 100 240 90 150C190 150 250 200 252 300Z"/><path d="M260 240C262 140 320 90 420 90C410 190 360 240 260 240Z"/><path d="M128 464H384" stroke="currentColor" stroke-width="28" fill="none" stroke-linecap="round"/>',
 };

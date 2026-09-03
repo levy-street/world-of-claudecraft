@@ -112,9 +112,7 @@ describe('the Perfecting rail tile and keybind (the seven-piece exemplar)', () =
     expect(hasUiIcon('perfecting')).toBe(true);
     expect(svgIcon('perfecting')).not.toBe(svgIcon('crafting'));
     expect(svgIcon('perfecting')).not.toBe(svgIcon('enchant-rune'));
-    // A glyph tile, not painted art: the rail's wiki tile is the precedent, and
-    // guard A of tests/chrome_icons.test.ts would demand a committed webp.
-    expect(hasChromeIconArt('perfecting')).toBe(false);
+    expect(hasChromeIconArt('perfecting')).toBe(true);
   });
 });
 
@@ -151,22 +149,27 @@ describe('the Harvest Journal rail tile (the tile half over the existing Shift+K
     expect(hasUiIcon('harvest-journal')).toBe(true);
     expect(svgIcon('harvest-journal')).not.toBe(svgIcon('book'));
     expect(svgIcon('harvest-journal')).not.toBe(svgIcon('professions'));
-    expect(hasChromeIconArt('harvest-journal')).toBe(false);
+    expect(hasChromeIconArt('harvest-journal')).toBe(true);
   });
 });
 
 describe('both tiles hydrate and stay under the rail height budget', () => {
-  it('hydrateIcons materializes a glyph for each tile (a missing registration leaves no svg)', () => {
+  it('hydrateIcons materializes the painted launcher for each tile', () => {
     document.body.innerHTML =
       '<div id="side-buttons">' +
       '<button type="button" class="micro-btn" id="mm-harvest-journal" data-icon="harvest-journal"><span class="keybind">s-k</span></button>' +
       '<button type="button" class="micro-btn" id="mm-perfecting" data-icon="perfecting"><span class="keybind">s-t</span></button>' +
       '</div>';
     hydrateIcons(document.body);
-    for (const id of ['mm-harvest-journal', 'mm-perfecting']) {
+    for (const [id, icon] of [
+      ['mm-harvest-journal', 'harvest-journal'],
+      ['mm-perfecting', 'perfecting'],
+    ] as const) {
       const btn = document.getElementById(id) as HTMLButtonElement;
-      expect(btn.querySelector('svg.ui-icon'), id).not.toBeNull();
-      expect(btn.querySelector('img'), id).toBeNull();
+      expect(btn.querySelector('svg.ui-icon'), id).toBeNull();
+      expect(btn.querySelector<HTMLImageElement>('img.ui-icon-art')?.src, id).toContain(
+        `/ui/chrome/${icon}.webp`,
+      );
     }
   });
 

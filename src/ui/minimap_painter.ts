@@ -1626,17 +1626,17 @@ export class MinimapPainter {
           break;
         }
         case 'farm-patch': {
-          // Procedural only this phase: no marker art id exists for a garden
-          // bed, so there is nothing to blit and the sprout is always painted.
-          // Station color, NOT gatherReady: that green means "harvestable right
-          // now" on this surface and the pin carries no readiness or plot state
-          // (the map window painter refuses the same green for the same
-          // reason, and since the Phase 18 sweep paints the same pin in ITS
-          // station family token, colors.stall, so the two surfaces agree). A
-          // patch is a static service site like a crafting station, so it
-          // takes the station family's color and the two-leaf silhouette is
-          // what tells it apart from the diamond beside it. Tier-identical
+          // A farm patch shares the station painted-size family because it is
+          // a static service site. Keep the procedural sprout as the deliberate
+          // fallback if the committed sprite is unavailable. Tier-identical
           // (fairness invariant): never preset- or governor-gated.
+          const sizeId = profile === 'compact' ? 'minimapStationCompact' : 'minimapStation';
+          const sprite = this.markerArt.sprite('farm-patch', sizeId);
+          if (sprite) {
+            const size = MAP_MARKER_SIZES[sizeId];
+            ctx.drawImage(sprite, Math.round(m.mx - size / 2), Math.round(m.my - size / 2));
+            break;
+          }
           const radius = geometry.farmSproutRadius;
           const crownY = m.my - radius * FARM_SPROUT_CROWN;
           const heelX = radius * FARM_SPROUT_HEEL_X;

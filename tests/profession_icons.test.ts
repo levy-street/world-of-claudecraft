@@ -51,15 +51,10 @@ const ART_ICON_IDS = [
   'masterwork_seal',
 ];
 
-// Row ids that ship PROCEDURAL-ONLY until the maintainer's next painted icon
-// batch: the manifest declares them (so the commission is on the books) and
-// their recipe renders the live UI, but no .webp master exists yet, so they are
-// deliberately absent from PROFESSION_IMAGE_IDS and from mapping.json. Only the
-// art-backed assertions of E2 are relaxed for these; every other guard here
-// still binds them, and the companion test below pins that the procedural
-// fallback they fall back TO actually exists. The farming asset manifest lands
-// with the phase 13 art batch and clears this list.
-const PENDING_ART_IDS = new Set(['gather_farming']);
+// Row ids that ship PROCEDURAL-ONLY until a commissioned painting lands. The
+// Masterwrought completion wave clears the last debt, but the empty allowlist
+// remains explicit so a future exception has to pass the fallback guards below.
+const PENDING_ART_IDS = new Set<string>();
 
 const isDotfile = (p: string): boolean => path.basename(p).startsWith('.');
 const isMapping = (p: string): boolean => path.basename(p) === 'mapping.json';

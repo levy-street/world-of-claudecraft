@@ -161,13 +161,10 @@ const GOLDEN_HARVEST_MARK_ID = 'gather_event:golden_harvest';
 /** Marker id carried by the golden-harvest glyph. */
 export const RELIQUARY_GOLDEN_HARVEST_GLYPH_ID = 'woc-golden-harvest-glyph';
 
-// The golden harvest: a bound wheat sheaf in the same DESIGN.md section 6
-// direction the two glyphs above take (rich color, heavy dark outline, light
-// from the top left, double-quoted attributes only so the window's esc()
-// leaves the encoding alone). It is AUTHORED rather than borrowed because
-// farming is the one FIELD_NOTE_PROFESSIONS member with no committed
-// gather_* sheet art, and the specimen note set the precedent for a field
-// note owning its own image when no profession art can be borrowed.
+// The golden-harvest fallback: a bound wheat sheaf in the same DESIGN.md
+// section 6 direction the two glyphs above take. The committed Farming emblem
+// is the primary art now; this authored data URL remains useful for mixed
+// deploys and image decode failures.
 const SHEAF_BAND_PATH = 'M23 36h18l-2 9H25z';
 const GOLDEN_HARVEST_GLYPH_SVG =
   `<svg id="${RELIQUARY_GOLDEN_HARVEST_GLYPH_ID}" xmlns="http://www.w3.org/2000/svg" ` +
@@ -259,29 +256,12 @@ export function reliquaryCellArt(slot: ReliquaryArtSlot): ReliquaryCellArt | nul
 export function reliquaryCellArtOpaque(art: ReliquaryCellArt): boolean {
   if (art.kind === 'url') return art.url.startsWith(`${ARMORY_SKIN_ART_DIR}/`);
   if (art.kind === 'crest') return !deedCrestHasPaintedArt(art.crestId);
-  // The item arm used to answer false unconditionally, on the premise that
-  // every item the catalog can show ships one of the two committed dark-card
-  // pipelines: a /ui/items webp, or a /ui/weapons rendered-model jpg. Both are
-  // measured dark and stay legible under the silhouette darken.
-  //
-  // MASTERWROUGHT PHASE 11i BROKE THAT PREMISE, and it did so in the way the
-  // guard in tests/reliquary_cell_art.test.ts predicted rather than by
-  // accident: it catalogued the apex fishing rod while that rod's painting is
-  // still PARKED in ITEM_ART_PENDING with the rest of the packet's art. An item
-  // whose art is parked falls through to the procedural compositor, which
-  // paints an OPAQUE radial tile, and darkening an opaque tile as though it
-  // were a transparent cutout is what the crest arm one line up already
-  // refuses to do.
-  //
-  // So the item arm asks the same question the crest arm does: is there
-  // committed painted art behind this id. An item with neither committed
-  // pipeline (no /ui/items webp, no /ui/weapons variant render) takes the
-  // crest-style answer: opaque exactly while its painted art is pending (the
-  // ITEM_ART_PENDING ledger in icons.ts; the release's Crucible arm emptied
-  // when its wave landed, this packet's parked ids are the live case). Reading
-  // exactly the two pipelines the premise named keeps the predicate honest as
-  // each parked id's painting lands: a committed webp flips it back to false
-  // with no edit here.
+  // Ask the same dynamic question as the crest arm: is there committed painted
+  // art behind this id? A /ui/items webp or rendered weapon card is already a
+  // dark-card composition; an item with neither falls through to the opaque
+  // procedural compositor. Keeping this derived from the two live pipelines
+  // means a newly parked item and its eventual painting both take the correct
+  // filter without another special case here.
   return itemImageUrl(art.itemId) === null && weaponIconUrl(art.itemId) === null;
 }
 
@@ -298,11 +278,10 @@ function markArt(markId: string): ReliquaryCellArt | null {
     };
   }
   if (markId === GOLDEN_HARVEST_MARK_ID) {
-    // Named before the FIELD_NOTE_PROFESSIONS lookup below because farming is
-    // the one member with no committed gather_* sheet art: the lookup would
-    // answer a URL that does not ship. Its own glyph instead, the specimen
-    // note's answer to the same problem.
-    return { kind: 'url', url: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL };
+    const farmingUrl = professionImageUrl('gather_farming');
+    return farmingUrl === null
+      ? { kind: 'url', url: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL }
+      : { kind: 'url', url: farmingUrl, fallbackUrl: RELIQUARY_GOLDEN_HARVEST_IMAGE_URL };
   }
   if (markId.startsWith(MASTERWORK_PREFIX)) {
     const craft = markId.slice(MASTERWORK_PREFIX.length);

@@ -94,6 +94,15 @@
       "license": "World of ClaudeCraft original art (project-owned, created for this game)"
     },
     {
+      "id": "gather_farming",
+      "name": "Farming",
+      "batch": "batch-6",
+      "acceptedVersion": "v1",
+      "source": "batch-6/masters/gather_farming.png",
+      "sourceSha256": "82811b427c9c35994d49e2c77241a491867448dc05fe41142d7cf3d3fd0cf317",
+      "license": "World of ClaudeCraft original art (project-owned, created for this game)"
+    },
+    {
       "id": "gather_fishing",
       "name": "Fishing",
       "batch": "batch-2",

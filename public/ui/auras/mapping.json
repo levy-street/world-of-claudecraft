@@ -10,7 +10,8 @@
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-elixir-aura-art.json",
     "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-fear-aura-art.json",
-    "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json"
+    "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-mob-aura-art.json",
+    "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json"
   ],
   "externalAssets": [
     {
@@ -4072,6 +4073,36 @@
       "acceptedBytes": 5406,
       "acceptedArtManifest": "docs/achievements/release-v039-icon-art-second-pass-2026-08-16/accepted-aura-art.json",
       "sourceProvenance": "tmp/imagegen/v039-second-pass/collision-auras/provenance.json"
+    },
+    {
+      "auraId": "well_fed",
+      "sourcePack": "masterwrought-art-completion-2026-09-02",
+      "sourceFile": "tmp/imagegen/masterwrought-art-2026-09-02/auras/well_fed.png",
+      "sourceBytes": 2141126,
+      "output": "well_fed.webp",
+      "source": "OpenAI built-in image generation",
+      "owner": "World of ClaudeCraft",
+      "license": "World of ClaudeCraft project-generated art, project asset, rights reserved",
+      "intendedVisualSubject": "One abundant hearth meal of roast, bread, and garden greens in a dark stoneware bowl, with three warm nourishing curls of steam: the shared Well Fed buff, not a specific recipe.",
+      "references": [
+        {
+          "path": "public/ui/items/harvest_feast.webp",
+          "role": "Rustic farm-harvest palette, compact grouping, and hand-painted material separation."
+        },
+        {
+          "path": "public/ui/items/anglers_feast_platter.webp",
+          "role": "Feast abundance and tiny-size food readability."
+        },
+        {
+          "path": "public/ui/auras/sated.webp",
+          "role": "Existing aura-family contrast, restrained edge light, and compact 128px presentation."
+        }
+      ],
+      "sourceSha256": "482467fc60c686656a138f262ea7eadf1fbc15c509a49383e4546f1ba5d767a3",
+      "acceptedSha256": "574bc0be1b4c524e2d49395a7e102b135ea8f78792a2b0cd667aa26dc223b602",
+      "acceptedBytes": 3468,
+      "acceptedArtManifest": "docs/achievements/masterwrought-art-completion-2026-09-02/accepted-aura-art.json",
+      "sourceProvenance": "docs/achievements/masterwrought-art-completion-2026-09-02/generation-reports/root-special.json"
     }
   ]
 }

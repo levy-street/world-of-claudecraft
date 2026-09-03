@@ -5376,6 +5376,7 @@ export const AURA_FILE_IMAGE_IDS: ReadonlySet<string> = new Set([
   'voidsong_echo',
   'water_jet',
   'water_jet_slow',
+  'well_fed',
   'winters_chill',
   'wlk_forbidden_reflection',
   'wlk_forbidden_reflection_lock',
@@ -5779,164 +5780,10 @@ for (const item of Object.values(ITEMS)) {
 // real, non-weapon item; both sets are served by itemImageUrl and gated on committed art.
 export const UI_ITEM_IMAGE_IDS = new Set<string>(['backpack']);
 
-// Items whose painted art has not been commissioned yet. The derivation above deliberately
-// enters EVERY non-weapon item into ITEM_IMAGE_IDS, which is what keeps the filesystem and
-// provenance gates honest, but an id listed here has no committed .webp behind it yet, so
-// itemImageUrl declines it and iconDataUrl composes the procedural recipe instead of pointing
-// an <img> at a file that 404s. Same shape as the i18n `pending` model: the debt is
-// enumerated rather than silent, and it shrinks as art lands.
-//
-// Empty after the accepted 2026-08-01 painted-art wave, and empty again after the three
-// quest-collect items this branch's dedupe pass added were painted. Keep the mechanism: a
-// future development-only item may still use it temporarily. tests/item_icons.test.ts holds
-// the line from both sides: it rejects stale entries after art lands and unenumerated art
-// debt. Do not add to this list merely to silence that failure; commission the art.
-// Empty again after the hunter quiver art landed in the same branch that enumerated it,
-// and it stayed empty upstream when the Proving Shore pair landed: the island's castaway
-// crate and ferry bell icons are rendered from their own world models
-// (scripts/render_island_item_icons.mjs), so they ship with committed art like
-// every other item. (History; the paragraphs below are why the set is not empty here.)
-//
-// Re-opened by the farming growth-engine phase for its four items. This is the
-// "development-only item" case the paragraph above reserves the mechanism for, not a way to
-// silence the gate: the packet schedules farming art as its own later phase, and
-// committing placeholder binaries to turn the guard green would be the dishonest fix. Each id
-// therefore serves its procedural recipe through iconDataUrl instead of pointing an <img> at a
-// 404, and A2/A3 in tests/item_icons.test.ts keep the debt from outliving the art: A2 reds the
-// moment a .webp lands, and A3's size pin reds if this set grows without a deliberate re-pin.
-//
-// CORRECTED at the Phase 11e QA. This block used to justify itself with "farming is DORMANT
-// ONLINE at this phase (no seed faucet exists, so no player can hold any of these)", and that
-// was already false when it was written: farmer_jessica has stocked vale_wheat_seed,
-// brook_carrot_seed, brook_carrot and garden_hoe since the growth engine shipped, and Phase
-// 11e's GATE 1 added the tier-3 and tier-4 counters, so live players can hold art-pending
-// items today. The honest reason is the one that survives: this is a deliberate, scheduled
-// ART PARK covering Phases 11e to 11k, exactly like the DEED_ART_PENDING sibling below, which
-// already words its own rationale that way. The park is the decision; dormancy never was.
-//
-// The Ignivar raid loot table (content/ignivar_loot.ts) carries its own arm of
-// this ledger, IGNIVAR_ART_PENDING_ITEM_IDS, spread in first: the release
-// enumerated its 192 non-weapon items there behind the development-only
-// Crucible raid until their painted wave landed (crucible-set-icons-2026-08-29
-// emptied that arm; the spread stays so a future Crucible re-park flows through
-// the same ledger). The 10 raid weapons are excluded: weapons never enter this
-// set (guard A2); they ship painted art through WEAPON_IMAGE_IDS like every
-// other weapon. The ids below are this packet's own scheduled art park.
-export const ITEM_ART_PENDING = new Set<string>([
-  ...IGNIVAR_ART_PENDING_ITEM_IDS,
-  'bog_beet',
-  'bog_beet_seed',
-  'bronze_hoe',
-  'brook_carrot',
-  'brook_carrot_seed',
-  'compost',
-  'eastbrook_glazed_carrots',
-  'eastbrook_root_pottage',
-  'evergarden_braised_greens',
-  'evergarden_greens',
-  'evergarden_greens_seed',
-  'evergarden_harvest_platter',
-  'evergarden_hoe',
-  'evergarden_pumpkin',
-  'evergarden_pumpkin_seed',
-  'evergarden_sunmelon_tart',
-  'fenbridge_beet_braise',
-  'fenbridge_rice_bowl',
-  'fenbridge_rice_pudding',
-  'fine_bog_beet',
-  'fine_brook_carrot',
-  'fine_evergarden_greens',
-  'fine_evergarden_pumpkin',
-  'fine_frost_gourd',
-  'fine_frost_lentils',
-  'fine_gilded_sunmelon',
-  'fine_gilded_yam',
-  'fine_highland_barley',
-  'fine_marsh_rice',
-  'fine_thornpeak_cabbage',
-  'fine_vale_wheat',
-  'frost_gourd',
-  'frost_gourd_seed',
-  'frost_lentils',
-  'frost_lentils_seed',
-  'garden_hoe',
-  'gilded_sunmelon',
-  'gilded_sunmelon_seed',
-  'gilded_yam',
-  'gilded_yam_seed',
-  'growth_tonic',
-  'harvest_feast',
-  'highland_barley',
-  'highland_barley_seed',
-  'highwatch_barley_bannock',
-  'highwatch_barley_porridge',
-  'highwatch_gourd_soup',
-  'marsh_rice',
-  'marsh_rice_seed',
-  'osmium_hoe',
-  // The angler's endgame, masterwrought Phase 11i: NINE ids on the SAME
-  // scheduled park (three high-band catches, the apex rod, two dishes, and the
-  // three patterns that teach the drop-taught rows). It was ELEVEN with four
-  // patterns until Phase 11k retired the capstone feast AND its pattern; those
-  // two ids are gone from the game, not moved, which is why both the total and
-  // the pattern count fall by one (the Phase 11k QA caught this arithmetic
-  // reading ten and four).
-  // The park is the packet-wide decision recorded above, not a way to silence
-  // A2: committed WebP art needs the maintainer's master SHA, which a phase
-  // session cannot produce. Each id serves its procedural recipe through
-  // iconDataUrl instead of pointing an <img> at a 404, and A2 reds the moment
-  // any of their art lands.
-  'clockreel_fishing_rod',
-  'pattern_clockreel_fishing_rod',
-  'pattern_peppered_deepbarb_catfish',
-  'pattern_roast_hollowgill_sturgeon',
-  'peppered_deepbarb_catfish',
-  'raw_deepbarb_catfish',
-  'raw_hollowgill_sturgeon',
-  'raw_stillmere_salmon',
-  'roast_hollowgill_sturgeon',
-  // The apex feast tier, masterwrought Phase 11k: six ids, three feasts and
-  // the three patterns that teach them, on the same packet-wide scheduled
-  // park. Each serves the authored procedural recipe above (a parked id with
-  // NO recipe falls to itemFallback and draws the wrong thing, which is how
-  // the apex hoe nearly shipped as a mace).
-  'pattern_sageleaf_feast',
-  'pattern_stonepot_feast',
-  'pattern_warspice_feast',
-  'sageleaf_feast',
-  'stonepot_feast',
-  'warspice_feast',
-  // The six farming patterns (Phase 11f, content/farm_patterns.ts). Same
-  // scheduled park as the produce above and for the same reason: committed
-  // WebP art needs the maintainer's master SHA, which a phase session cannot
-  // produce, so parking is the packet-wide answer rather than a placeholder
-  // binary. Each serves its procedural recipe through iconDataUrl instead of
-  // pointing an <img> at a 404.
-  'pattern_evergarden_braised_greens',
-  'pattern_evergarden_harvest_platter',
-  'pattern_evergarden_sunmelon_tart',
-  'pattern_harvest_feast',
-  'pattern_highwatch_barley_porridge',
-  'pattern_highwatch_gourd_soup',
-  'skysilver_hoe',
-  'thornpeak_cabbage',
-  'thornpeak_cabbage_seed',
-  'vale_hearth_loaf',
-  'vale_wheat',
-  'vale_wheat_seed',
-  'withered_husks',
-  // The engineering on-ramp pair (masterwrought Phase 11o, qr-11o-ENG): the
-  // same scheduled art park as the phase 11e-11k ids above (ip-16-ICON), with
-  // authored recipes in ITEM_RECIPES and NO mapping.json row while parked.
-  'cogwheel_blank',
-  'copperlens_ocular',
-  // The orange promotion's writ (masterwrought phase 13): the same ip-16-ICON
-  // scheduled park, for the same reason as every entry above: committed WebP
-  // art needs the maintainer's master SHA, which a phase session cannot
-  // produce. Authored recipe in ITEM_RECIPES; no mapping.json row while
-  // parked.
-  'deed_of_making',
-]);
+// Explicit development-only item-art debt ledger. The Masterwrought completion wave
+// cleared all 81 feature entries; keep the Crucible-owned spread as the canonical seam for
+// future parked raid art. Tests reject both unenumerated debt and stale entries after art lands.
+export const ITEM_ART_PENDING = new Set<string>([...IGNIVAR_ART_PENDING_ITEM_IDS]);
 
 /** Static URL of an item's (or a UI pseudo-item's) image icon, or null if it uses a recipe. */
 export function itemImageUrl(id: string): string | null {
@@ -5953,78 +5800,16 @@ export function itemImageUrl(id: string): string | null {
 const DEED_ICON_DIR = '/ui/deeds';
 const DEED_CREST_PREFIX = 'deed_';
 
-// Exhaustive live-deed art debt ledger, following the ITEM_ART_PENDING model one screen up. The
-// Icons authoring rule in docs/design/deeds.md permits a procedural category fallback while art
-// trails a deed. Every deed of the release base is painted today; this set is the one
-// authoritative ledger of the debt that remains, and a new entry must be commissioned and filed
-// in docs/achievements/icon-brief.md rather than hidden by an unreviewed fallback.
-// tests/deed_icons.test.ts holds the line from both sides: a stale entry once art lands, and
-// unenumerated debt.
+// Exhaustive live-deed art debt ledger. The Masterwrought completion wave clears its
+// eleven crests (including the commissioned Harvestmaster replacement); the remaining rows
+// belong to independent release work and retain their deliberate procedural category fallback.
+// Insertion order mirrors DEED_ORDER because the deed-art gate derives its exact debt in order.
 export const DEED_ART_PENDING: ReadonlySet<string> = new Set([
-  // The walk-in castle visit pair: both are 'exploration', so both fall back to
-  // the deed_cat_exploration crest until their commissioned art lands
-  // (docs/achievements/icon-brief.md).
   'exp_the_last_keep',
   'exp_dawnhold_castle',
-  // The farming celebration deeds (D13): the chronicles and prog_ rows fall
-  // back to their category crests (deed_cat_chronicle / deed_cat_progression)
-  // and col_golden_harvest to deed_cat_collection until their commissioned
-  // art lands (docs/achievements/icon-brief.md). prog_farming_100 is NOT
-  // here: the Reliquary title shelf forbids fallback art for title deeds
-  // (tests/reliquary_cell_art.test.ts), so its wheat-sheaf medallion crest
-  // shipped committed with the phase; the brief flags it for a commissioned
-  // replacement.
-  // Phase 11i's one deed, falling back to deed_cat_collection on the same
-  // scheduled park. It carries NO title either (prog_master_angler already owns
-  // fishing's one title), so the Reliquary title-shelf rule that forced
-  // prog_farming_100's crest to ship committed does not apply here.
-  //
-  // ITS POSITION IN THIS SET IS LOAD-BEARING, not cosmetic: the art suites
-  // compare an artless list DERIVED from DEED_ORDER against this set spread in
-  // insertion order, so a row parked out of table order reds them. It sits
-  // ahead of the farming block here for the same reason it does in the catalog.
-  'col_deepest_cast',
-  'prog_first_planting',
-  'chr_vale_first_harvest',
-  'chr_marsh_first_harvest',
-  'chr_peaks_first_harvest',
-  'chr_evergarden_first_harvest',
-  'col_golden_harvest',
-  // Phase 11e's roster deed, falling back to deed_cat_collection until its
-  // commissioned art lands. It carries NO title, so the Reliquary title-shelf
-  // rule that forced prog_farming_100's crest to ship committed does not apply
-  // here, and the pending row is the honest place for it.
-  'col_farm_roster',
-  // Phase 11k's cross-packet deed, falling back to deed_cat_progression on the
-  // same scheduled park, and appended at the TAIL because this set is compared
-  // against a DEED_ORDER-derived list in insertion order (see the load-bearing
-  // note above). It carries NO title, so the Reliquary title-shelf rule that
-  // forced prog_farming_100's crest to ship committed does not apply here.
-  'prog_field_to_feast',
-  // The bank socket ladder pair (Bank Storage phase 06): both are 'social', so
-  // both fall back to the deed_cat_social crest until their commissioned art
-  // lands (docs/achievements/icon-brief.md). Neither carries a reward, so the
-  // title-shelf rule that forbids a title deed from riding this ledger does
-  // not apply.
   'soc_strongbox_outfitter',
   'soc_four_bags_deep',
-  // The Proving Shore graduation deed rides the deed_cat_progression crest
-  // until its commissioned art lands (docs/achievements/icon-brief.md). It
-  // lands at the TAIL for the same load-bearing reason: the release merge
-  // appended it to the deeds table behind this branch's farming rows, so
-  // DEED_ORDER lists it last.
   'prog_ready_for_an_adventure',
-  // Phase 13's promotion capstone, falling back to deed_cat_progression until
-  // its commissioned art lands (docs/achievements/icon-brief.md), appended at
-  // the TAIL to match its DEED_ORDER position (the load-bearing note above);
-  // the release/v0.41.0 merge then appended the Crucible block BEHIND it in
-  // the deeds table, so the raid deeds follow it here too.
-  // It carries NO title, so the Reliquary title-shelf rule that forced
-  // prog_farming_100's crest to ship committed does not apply here.
-  'prog_legendmaker',
-  // The Crucible of the Last Spring raid deeds: all five are 'dungeon', so
-  // each rides the deed_cat_dungeon crest until its commissioned art lands
-  // (docs/achievements/icon-brief.md).
   'dgn_ignivar',
   'dgn_ignivar_heroic',
   'dgn_varkhul',

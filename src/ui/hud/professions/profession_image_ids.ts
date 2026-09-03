@@ -14,6 +14,7 @@ export const PROFESSION_IMAGE_IDS: ReadonlySet<string> = new Set([
   'archetype_outfitter',
   'archetype_smith',
   'archetype_trapper',
+  'gather_farming',
   'gather_fishing',
   'gather_herbalism',
   'gather_logging',

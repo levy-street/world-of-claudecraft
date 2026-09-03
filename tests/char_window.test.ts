@@ -171,7 +171,7 @@ describe('char_window: profession art placements', () => {
     expect(painter).toContain('alt=""');
   });
 
-  it('paints the exact gathering (farming via the procedural fallback), Honor, and archetype identities', () => {
+  it('paints the exact gathering, Honor, and archetype identities', () => {
     let canvasContext: unknown;
     canvasContext = new Proxy(
       {},
@@ -268,10 +268,7 @@ describe('char_window: profession art placements', () => {
       '/ui/professions/gather_logging.webp',
       '/ui/professions/gather_herbalism.webp',
       '/ui/professions/gather_fishing.webp',
-      // Farming has no committed art (PENDING_ART_IDS), so the char sheet
-      // must paint the same procedural composer the professions window uses,
-      // never an iconless gap beside four painted siblings.
-      'data:image/png;base64,stub',
+      '/ui/professions/gather_farming.webp',
     ]);
     const crest = root.querySelector<HTMLImageElement>('.char-archetype-title-crest');
     expect(crest?.getAttribute('src')).toBe('/ui/professions/archetype_smith.webp');

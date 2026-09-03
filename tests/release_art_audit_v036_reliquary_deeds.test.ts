@@ -190,33 +190,18 @@ describe('v0.36 release-audit Reliquary deed art', () => {
     }
   });
 
-  it('closes the exhaustive live deed debt ledger at 278 painted deeds', () => {
+  it('keeps the historical audit sealed while the current ledger reaches 288 painted deeds', () => {
     // The audit's own claim is historical: the 271 deeds live at the v0.36
     // audit are ALL painted, the six Masterwrought jewelcrafting and
     // inscription milestone deeds (phases 05 and 06) each shipped their
     // crest in the change that authored them, and the farming phase
-    // committed the prog_farming_100 crest (the Reliquary title shelf
-    // forbids fallback art for title deeds), so 278 of the 298 live deeds
-    // are painted. Deeds appended after the audit without art (the release's
-    // walk-in castle visit pair and its bank socket pair, the six farming
-    // celebration deeds, the packet's parked rows, the Proving Shore
-    // graduation, and the release's five-deed Crucible raid block, twenty in
-    // all and the list below in order)
-    // ride the DEED_ART_PENDING ledger until their art lands; the audit
-    // holds exactly when the pending set and the artless set are the same
-    // post-audit appends and every other deed is painted.
+    // committed the prog_farming_100 crest. The later Masterwrought art wave
+    // paints ten more live rows and records the replacement separately, while
+    // the historical v0.36 evidence remains untouched. Only release-owned
+    // post-audit additions remain on the current pending ledger.
     expect([...DEED_ART_PENDING]).toEqual([
       'exp_the_last_keep',
       'exp_dawnhold_castle',
-      'col_deepest_cast',
-      'prog_first_planting',
-      'chr_vale_first_harvest',
-      'chr_marsh_first_harvest',
-      'chr_peaks_first_harvest',
-      'chr_evergarden_first_harvest',
-      'col_golden_harvest',
-      'col_farm_roster',
-      'prog_field_to_feast',
       // The release's bank socket ladder pair (Bank Storage phase 06),
       // appended at the v0.41.0 release-batch sync in DEED_ORDER position.
       'soc_strongbox_outfitter',
@@ -224,9 +209,6 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       // The release's Proving Shore graduation deed, appended at the
       // release/v0.41.0 sync behind this branch's tail (DEED_ORDER position).
       'prog_ready_for_an_adventure',
-      // The masterwrought Phase 13 promotion capstone, appended at the tail
-      // (DEED_ORDER position); no title, so no committed crest is forced.
-      'prog_legendmaker',
       // The release's Crucible of the Last Spring raid block (five 'dungeon'
       // deeds), appended at the v0.41.0 Crucible sync behind this branch's
       // tail (DEED_ORDER position); each rides the deed_cat_dungeon crest
@@ -237,31 +219,9 @@ describe('v0.36 release-audit Reliquary deed art', () => {
       'dgn_varkhul_heroic',
       'dgn_varkhul_flawless',
     ]);
-    // 286 at the farming absorb (Phase 11d): the base 273 plus the six
-    // Masterwrought milestone deeds plus farming's seven; 287 at Phase 11e,
-    // which appends the roster deed; 288 at Phase 11i, which adds the angler's
-    // one; 289 at Phase 11k, which adds the cross-packet feast deed. The
-    // PAINTED count is unmoved at 278 through all three, because none of those
-    // phases ships a crest: the packet's art park runs 11e to 11k, so each deed
-    // joins the pending ledger instead. The pending list above is in DEED_ORDER
-    // position, which is why 11i's row sits ahead of the farming block and
-    // 11k's sits behind it, at the tail.
-    // 290 at the release/v0.41.0 sync: the release appended one deed (the
-    // Proving Shore graduation, 273 to 274 on its own arm) with no crest, so
-    // it joins the pending ledger at the tail and the PAINTED count holds at
-    // 278 (the Vale Cup deed records stay in the append-only table).
-    // 291 at masterwrought Phase 13: the promotion capstone prog_legendmaker
-    // ships no crest either (no title, so none is forced), joining the
-    // pending ledger at the tail with the PAINTED count still at 278.
-    // 293 at the v0.41.0 release-batch sync: the release's bank socket pair
-    // (Bank Storage phase 06, 274 to 276 on its own arm) ships no crest, so
-    // both join the pending ledger and the PAINTED count still holds at 278.
-    // 298 at the v0.41.0 Crucible sync: the release's five Crucible raid
-    // deeds (276 to 281 on its own arm, its PAINTED count still the audit's
-    // 271) ship no crest, so all five join the pending ledger and the PAINTED
-    // count still holds at 278.
+    // Current arithmetic: 298 live - 10 release-owned pending = 288 painted.
     expect(DEED_ORDER).toHaveLength(298);
-    expect(DEED_IMAGE_IDS.size).toBe(278);
+    expect(DEED_IMAGE_IDS.size).toBe(288);
     expect(DEED_ORDER.filter((id) => !DEED_IMAGE_IDS.has(id))).toEqual([...DEED_ART_PENDING]);
     expect(sorted(DEED_IMAGE_IDS)).toEqual(
       sorted(DEED_ORDER.filter((id) => !DEED_ART_PENDING.has(id))),

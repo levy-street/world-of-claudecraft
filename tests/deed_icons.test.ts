@@ -364,53 +364,11 @@ describe('Book of Deeds webp icons', () => {
     expect(artless, 'only the pinned art-pending deeds may lack painted art').toEqual([
       ...DEED_ART_PENDING_IDS,
     ]);
-    // The chain, extended at the farming absorb (masterwrought Phase 11d) and
-    // again at Phase 11e, so it matches the literals below rather than stopping
-    // at this branch's 279.
-    // LIVE: 279 = the branch's 277 (the 271 the v0.36 audit closed at, plus the
-    // six Masterwrought jewelcrafting and inscription milestone deeds, each
-    // crest shipped in the change that authored it) + the release's walk-in
-    // castle visit pair, which ships art-pending by upstream design; then
-    // 279 + farming's SEVEN deeds = 286, + Phase 11e's roster deed = 287.
-    // PAINTED: 277 + farming's one painted crest = 278, UNMOVED by 11e, which
-    // ships no crest (the packet's art park runs 11e to 11k).
-    // Then masterwrought Phase 11i's col_deepest_cast = 288, and Phase 11k's
-    // prog_field_to_feast = 289, which is the number the first assertion below
-    // actually pins.
-    // PENDING: 2 (the castle pair) + farming's remaining 6 + the roster deed
-    // + col_deepest_cast + prog_field_to_feast = 11, which is also the
-    // 289 - 278 cross-check. The
-    // arithmetic said 9 and 287 - 278 until the Phase 11i QA re-derived it:
-    // the phase moved both assertions and left the derivation that explains
-    // them a deed behind, which is the whole hazard of writing the working
-    // out in prose beside the numbers, so it is re-derived here rather than
-    // nudged.
-    // Then the release/v0.41.0 merge appends the Proving Shore graduation
-    // deed prog_ready_for_an_adventure, which ships art-pending by upstream
-    // design (the release's own chain reads 274 / 271, its painted count
-    // unmoved by the tutorial deed): LIVE 289 + 1 = 290, PAINTED unmoved at 278,
-    // PENDING 11 + 1 = 12, which is also the 290 - 278 cross-check. Measured
-    // on the merged tree rather than nudged from either parent's prose.
-    // Then masterwrought Phase 13 appends the promotion capstone
-    // prog_legendmaker, which joins the PENDING side (no title, so the
-    // Reliquary title-shelf rule does not force a committed crest): LIVE
-    // 290 + 1 = 291, PAINTED unmoved at 278, PENDING 12 + 1 = 13, which is
-    // also the 291 - 278 cross-check.
-    // Then the release/v0.41.0 merge (2026-08-29) appends the bank socket
-    // deed pair (Bank Storage phase 06: soc_strongbox_outfitter and
-    // soc_four_bags_deep), both riding DEED_ART_PENDING until their
-    // commissioned art lands: LIVE 291 + 2 = 293, PAINTED unmoved at 278,
-    // PENDING 13 + 2 = 15, which is also the 293 - 278 cross-check. Measured
-    // on the merged tree rather than nudged from either parent's prose.
-    // Then the release/v0.41.0 merge (2026-08-30) appends the five Crucible
-    // raid deeds (dgn_ignivar, dgn_ignivar_heroic, dgn_varkhul,
-    // dgn_varkhul_heroic, dgn_varkhul_flawless), all riding DEED_ART_PENDING
-    // until their commissioned art lands (the release's own chain read
-    // 281 / 271, its painted count unmoved): LIVE 293 + 5 = 298, PAINTED
-    // unmoved at 278, PENDING 15 + 5 = 20, which is also the 298 - 278
-    // cross-check. Measured on the merged tree rather than nudged.
+    // The Masterwrought completion wave paints its ten formerly pending deed
+    // identities (and replaces prog_farming_100), leaving only the ten
+    // release-owned castle, bank, tutorial, and Crucible rows on fallback art.
     expect(DEED_ORDER, 'the merged live deed catalog').toHaveLength(298);
-    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(278);
+    expect(DEED_IMAGE_IDS.size, 'every live deed but the pending set is painted').toBe(288);
     expect(DEED_ORDER.length - DEED_IMAGE_IDS.size).toBe(DEED_ART_PENDING_IDS.length);
     for (const id of artless) {
       const catCrestId = deedCrestId(id, DEEDS[id].category);

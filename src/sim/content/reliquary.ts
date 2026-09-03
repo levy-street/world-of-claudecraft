@@ -1419,9 +1419,8 @@ export const RELIQUARY_PAGES: readonly ReliquaryPageDef[] = freezePageTable([
       // the completed tier-5 tool family reads asymmetric, one of five.
       // Authoring a hoe page later also means growing the DOC_RELICS pin in
       // tests/delve_shop.test.ts in the same change, since both hoe rungs sit
-      // on a delve counter, AND the exact-set procedural list in
-      // tests/reliquary_cell_art.test.ts plus its ceiling of one, since both
-      // hoes are ITEM_ART_PENDING members with no committed painting.
+      // on a delve counter, and extending the exact catalog-art assertions in
+      // tests/reliquary_cell_art.test.ts for the newly reachable item rows.
     ),
   },
 

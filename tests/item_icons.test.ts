@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { describe, expect, it } from 'vitest';
 import { validateAcceptedArtManifest } from '../scripts/lib/icon_asset_audit.mjs';
-import { IGNIVAR_LOOT_ITEM_IDS } from '../src/sim/content/ignivar_loot';
 import { ITEMS } from '../src/sim/data';
 import type { ItemDef } from '../src/sim/types';
 import {
@@ -365,134 +364,20 @@ describe('item webp icons', () => {
     for (const id of ITEM_ART_PENDING) {
       expect(itemImageUrl(id), `${id} must not resolve to uncommitted art`).toBeNull();
     }
-    // The size pin is what stops the list becoming a dumping ground: it must be
-    // re-pinned deliberately, in the change that enumerates the debt, never
-    // grown quietly. The painted-art wave cleared this to 0; the farming
-    // growth-engine phase re-opened it for its four items, the knobs phase
-    // added its two supplies (compost and the growth tonic), the crop-ladder
-    // phase added its seven crop families (21 ids: seed, produce, fine twin
-    // per crop), the hoe phase added its four ladder rungs, the Phase 6
-    // economy-hooks phase added its eight farm dishes, the Phase 11
-    // well-fed phase added its four buff dishes, the Phase 12 shared
-    // feast added the harvest_feast placeable, and Phase 11f added the six
-    // farming PATTERNS its rung climb minted (56 -> 62), and Phase 11i added
-    // the angler's endgame's eleven (62 -> 73: three high-band catches, the
-    // apex rod, two dishes, the capstone feast and four patterns), and Phase
-    // 11j added the apex hoe (73 -> 74), Phase 11k added its apex feast
-    // tier while retiring two 11i ids (74 -> 78), Phase 11o added the
-    // engineering on-ramp pair (78 -> 80), and masterwrought Phase 13 added
-    // the Deed of Making (80 -> 81), all under
-    // the same reasoning: their art is scheduled as its own later phase, a
-    // deliberate ART PARK running Phases 11e onward (ip-16-ICON). It must
-    // fall back to 0 as that art lands. CORRECTED at the Phase 11e QA: this used to add "all are dormant
-    // online (no faucet for any exists yet)", which was already false when it
-    // was written (farmer_jessica has stocked the Vale seeds, brook_carrot and
-    // the garden hoe since the growth engine shipped) and is doubly false now
-    // that GATE 1 stocks the tier-3 and tier-4 seeds. Live players can hold
-    // art-pending items; the park is the reason, dormancy never was.
-    // The release's Crucible arm (IGNIVAR_ART_PENDING_ITEM_IDS, spread into the
-    // set first) is EMPTY since its wave painted (crucible-set-icons-2026-08-29),
-    // so it adds no member here; the next commissioned wave re-pins its exact
-    // membership in this list when it stages. Re-pinned on the merged tree at
-    // the release/v0.41.0 merge (2026-08-30): the packet ids alone, 81.
+    // The completion wave clears the feature debt. The release-owned Crucible
+    // spread is also empty today, so any future parked id needs an explicit re-pin.
     expect(
       [...ITEM_ART_PENDING].sort(),
       'art debt is enumerated and re-pinned deliberately, never grown quietly',
-    ).toEqual([
-      'bog_beet',
-      'bog_beet_seed',
-      'bronze_hoe',
-      'brook_carrot',
-      'brook_carrot_seed',
-      'clockreel_fishing_rod',
-      'cogwheel_blank',
-      'compost',
-      'copperlens_ocular',
-      'deed_of_making',
-      'eastbrook_glazed_carrots',
-      'eastbrook_root_pottage',
-      'evergarden_braised_greens',
-      'evergarden_greens',
-      'evergarden_greens_seed',
-      'evergarden_harvest_platter',
-      'evergarden_hoe',
-      'evergarden_pumpkin',
-      'evergarden_pumpkin_seed',
-      'evergarden_sunmelon_tart',
-      'fenbridge_beet_braise',
-      'fenbridge_rice_bowl',
-      'fenbridge_rice_pudding',
-      'fine_bog_beet',
-      'fine_brook_carrot',
-      'fine_evergarden_greens',
-      'fine_evergarden_pumpkin',
-      'fine_frost_gourd',
-      'fine_frost_lentils',
-      'fine_gilded_sunmelon',
-      'fine_gilded_yam',
-      'fine_highland_barley',
-      'fine_marsh_rice',
-      'fine_thornpeak_cabbage',
-      'fine_vale_wheat',
-      'frost_gourd',
-      'frost_gourd_seed',
-      'frost_lentils',
-      'frost_lentils_seed',
-      'garden_hoe',
-      'gilded_sunmelon',
-      'gilded_sunmelon_seed',
-      'gilded_yam',
-      'gilded_yam_seed',
-      'growth_tonic',
-      'harvest_feast',
-      'highland_barley',
-      'highland_barley_seed',
-      'highwatch_barley_bannock',
-      'highwatch_barley_porridge',
-      'highwatch_gourd_soup',
-      'marsh_rice',
-      'marsh_rice_seed',
-      'osmium_hoe',
-      'pattern_clockreel_fishing_rod',
-      'pattern_evergarden_braised_greens',
-      'pattern_evergarden_harvest_platter',
-      'pattern_evergarden_sunmelon_tart',
-      'pattern_harvest_feast',
-      'pattern_highwatch_barley_porridge',
-      'pattern_highwatch_gourd_soup',
-      'pattern_peppered_deepbarb_catfish',
-      'pattern_roast_hollowgill_sturgeon',
-      'pattern_sageleaf_feast',
-      'pattern_stonepot_feast',
-      'pattern_warspice_feast',
-      'peppered_deepbarb_catfish',
-      'raw_deepbarb_catfish',
-      'raw_hollowgill_sturgeon',
-      'raw_stillmere_salmon',
-      'roast_hollowgill_sturgeon',
-      'sageleaf_feast',
-      'skysilver_hoe',
-      'stonepot_feast',
-      'thornpeak_cabbage',
-      'thornpeak_cabbage_seed',
-      'vale_hearth_loaf',
-      'vale_wheat',
-      'vale_wheat_seed',
-      'warspice_feast',
-      'withered_husks',
-    ]);
+    ).toEqual([]);
     // And the inverse: an id with committed art must still win the static url.
     expect(itemImageUrl('linen_pouch')).toBe('/ui/items/linen_pouch.webp');
   });
 
   it('A4) every art-pending id serves a deliberate, DISTINCT procedural recipe', () => {
-    // A3 proves the four ids decline static art; this arm proves what they get
-    // instead is usable. Without explicit ITEM_RECIPES rows all four fell to
-    // the trinket default (scroll on leather), so a farmer's bag showed the
-    // seed, the produce, its fine twin and the husks as four identical
-    // glyphs. The recipes must exist (never the shared unknown fallback) and
-    // must differ pairwise, so the fine twin is tellable from the base grade
-    // at a glance.
+    // Empty after the completion wave, but kept as the live guard for any
+    // future deliberately parked item: every fallback must remain explicit
+    // and pairwise distinct.
     const seen = new Map<string, string>();
     for (const id of ITEM_ART_PENDING) {
       const recipe = itemIconRecipe(id);
@@ -832,9 +717,14 @@ describe('item webp icons', () => {
       expect(batch.styleReference).toBeTruthy();
       expect(batch.commonPrompt).toBeTruthy();
     }
-    // The remaining legacy bag family is project-owned ordinary art. Silkspun Satchel and the
-    // seven replacement paintings belong only to generatedBatches.
-    const generatedBagIds = new Set<string>([...BANK_STORAGE_PAINTED_BAG_IDS, 'silkspun_satchel']);
+    // The remaining legacy bag family is project-owned ordinary art. Silkspun
+    // Satchel, the seven bank-storage replacements, and Masterwrought's
+    // Sunspun Haversack belong only to generatedBatches.
+    const generatedBagIds = new Set<string>([
+      ...BANK_STORAGE_PAINTED_BAG_IDS,
+      'silkspun_satchel',
+      'sunspun_haversack',
+    ]);
     for (const id of [...BAG_IDS.filter((bagId) => !generatedBagIds.has(bagId)), 'backpack']) {
       const entry = m.entries.find((e) => e.itemId === id);
       expect(entry?.license, `${id} must carry its own license override`).toContain(

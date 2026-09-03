@@ -19,6 +19,7 @@ const EXPECTED_IMAGE_IDS = [
   'archetype_outfitter',
   'archetype_smith',
   'archetype_trapper',
+  'gather_farming',
   'gather_fishing',
   'gather_herbalism',
   'gather_logging',

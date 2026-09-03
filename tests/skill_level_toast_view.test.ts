@@ -269,10 +269,11 @@ describe('skillLevelArtId', () => {
   it('maps gathering ids to the profession art registry prefix', () => {
     expect(skillLevelArtId('mining')).toBe('gather_mining');
     expect(skillLevelArtId('fishing')).toBe('gather_fishing');
+    expect(skillLevelArtId('farming')).toBe('gather_farming');
   });
 
   it('resolves to shipped art URLs for every gathering profession', () => {
-    for (const id of ['mining', 'logging', 'herbalism', 'fishing'] as const) {
+    for (const id of ['mining', 'logging', 'herbalism', 'fishing', 'farming'] as const) {
       expect(professionImageUrl(skillLevelArtId(id))).toMatch(
         new RegExp(`/ui/professions/gather_${id}\\.webp$`),
       );

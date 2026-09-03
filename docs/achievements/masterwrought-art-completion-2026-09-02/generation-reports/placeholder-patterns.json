@@ -1,0 +1,426 @@
+{
+  "batchId": "masterwrought-placeholder-patterns-2026-09-02",
+  "contract": "woc-item-icon-v1",
+  "generator": "OpenAI built-in image_gen",
+  "promptEncoding": "Join each promptLines array with LF and no final newline to recover the exact prompt.",
+  "preservedGeneratorOriginals": true,
+  "commonMasterProperties": {
+    "width": 1254,
+    "height": 1254,
+    "colorspace": "sRGB",
+    "channels": "RGB",
+    "fullyOpaque": true
+  },
+  "commonReview": {
+    "sizes": ["1254px master", "128px", "40px", "28px", "22px", "28px grayscale", "64px circular crop"],
+    "result": "accepted",
+    "notes": "Every asset is a distinct physical parchment or schematic with one large result-specific pictorial motif. No readable text, pseudo-writing, runes, UI frame, transparency, watermark, or cropped identity-bearing feature remains."
+  },
+  "assets": [
+    {
+      "id": "pattern_ironhusk_flask",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-eec335a0-14dd-4f34-9245-73b9ccad367c.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_ironhusk_flask.png",
+      "sha256": "ddcf66ef66ba7b659e40ea463e81135646c08cf6b4d3f45de30bab99067f2678",
+      "bytes": 2201336,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/ironhusk_flask.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, cord, leather wear, lighting, and composition only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "tangible fantasy vessel and restrained glow only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Ironhusk Flask (item id pattern_ironhusk_flask) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Ironhusk Flask result; preserve its dark squat flask silhouette, iron cage ribs, and restrained red liquid band, but do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, cord, leather wear, warm key light, volume, and composition only. Image 3 is a style reference for a tangible fantasy vessel and restrained glow only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical alchemist's recipe scroll, half-unfurled into a broad parchment face with thick rolled ends; soot-dark aged vellum, an iron-grey braided cord around the upper roll, and one deep red wax seal near the lower edge. The otherwise blank parchment bears one single large hand-painted pictorial motif of the Ironhusk Flask: a squat blackened-glass bottle held in vertical iron cage ribs with one horizontal red liquid band. The motif is an object painting, not a symbol, rune, label, diagram, or writing.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, all rolled ends and seal safely inside the square; the scroll itself is the one inventory object. The iron-caged flask motif must remain identifiable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep charcoal and warm umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; tactile fibrous parchment, frayed cord, dense wax, blackened iron, and glass; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial flask motif; otherwise blank parchment. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, alchemical symbols, diagrams, equations, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose extra objects, hand, character, or cropped silhouette."
+      ],
+      "reviewNotes": "Strong iron-caged red flask identity, tactile parchment and cord, complete silhouette, clear at small sizes, and circle-safe framing."
+    },
+    {
+      "id": "pattern_warboar_flask",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-aae7938d-eee2-4922-839e-98f8ebb8e8c5.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_warboar_flask.png",
+      "sha256": "966519fd1e7cd9d0097229e832acc54969271cd5ba71b42e1f2da5b854f6ed70",
+      "bytes": 2292454,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/warboar_flask.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, leather, wear, volume, and composition only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "tangible vessel, restrained glow, and focal material only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Warboar Flask (item id pattern_warboar_flask) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Warboar Flask result; preserve its squat round amber flask, small boar-face medallion, and two outward ivory tusks, but not its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, leather, warm wear, volume, and composition only. Image 3 is a style reference for a tangible fantasy vessel, restrained glow, and crisp focal material only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical alchemist's recipe scroll, broadly unfurled between thick rolled ends; tawny boar-hide-toned vellum, a rugged dark-brown leather thong around one roll, and one amber-gold wax seal near the lower corner. The otherwise blank parchment bears one single large hand-painted pictorial motif of the Warboar Flask: a squat round amber bottle with a small sculpted boar-face medallion on its belly and a matched pair of curved ivory tusks projecting outward. The motif is an object painting, not a symbol, rune, label, diagram, writing, or living boar.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every roll, tusk motif, thong, and seal safely inside the square; the scroll itself is the one inventory object. The round tusked flask motif must remain unmistakable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep smoked umber and charcoal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous vellum, worn leather, dense amber wax, ivory, dark glass, and warm liquid; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial tusked-flask motif; otherwise blank parchment. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, alchemical symbols, diagrams, equations, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose extra objects, hand, character, animal, or cropped silhouette."
+      ],
+      "reviewNotes": "Round amber flask, boar medallion, and ivory tusks remain unmistakable. Rugged leather and amber seal differentiate it; complete and circle-safe."
+    },
+    {
+      "id": "pattern_runewater_flask",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-8910be25-df64-4615-9935-8ead6d10af88.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_runewater_flask.png",
+      "sha256": "7c32fd7313280906fed4cc2d94f5715d17440d3fce66b9e50a413a7b9b6f3ca1",
+      "bytes": 2142889,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/runewater_flask.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "glass highlights, contained energy, and focal material only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Runewater Flask (item id pattern_runewater_flask) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Runewater Flask result; preserve its tall tapered clear-glass vessel, silver harness and cap, and luminous blue water, but omit the placeholder's floating glyph-like marks and do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, straps, warm wear, volume, and composition only. Image 3 is a style reference for a tangible fantasy vessel, glass highlights, contained energy, and crisp focal material only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical alchemist's recipe scroll, partially unfurled with a broad central face and compact rolled ends; cool ivory vellum with faint blue edge staining, a braided navy-blue cord around the upper roll, and one dense silver-blue wax seal near the lower edge. The otherwise blank parchment bears one single large hand-painted pictorial motif of the Runewater Flask: a tall tapered transparent glass flask held by a simple silver cap and edge harness, filled halfway with luminous clear blue water and a small natural meniscus highlight. The motif is an object painting, not a symbol, rune, label, diagram, or writing.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every rolled end, cord, seal, cap, and flask edge safely inside the square; the scroll itself is the one inventory object. The tall blue flask motif must remain identifiable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep navy-charcoal painted vignette with restrained cool atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous vellum, braided cord, dense wax, transparent glass, cool silver, and contained blue liquid; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial blue-flask motif; otherwise blank parchment. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, magical symbols, alchemical symbols, diagrams, equations, floating particles, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose extra objects, hand, character, or cropped silhouette."
+      ],
+      "reviewNotes": "Tall tapered blue flask and silver harness read immediately. Cool vellum, navy cord, and seal distinguish it; no floating glyphs and safe framing."
+    },
+    {
+      "id": "pattern_stonepot_stew",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-699ac025-4c8e-4db5-a9c3-8fbee10ff217.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_stonepot_stew.png",
+      "sha256": "0ebfc0c75a7e0fbf6038e297ba49cce2fadc54c0707a290cea99a8a06ef3e418",
+      "bytes": 2450208,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/stonepot_stew.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation and small-size readability only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Stonepot Stew (item id pattern_stonepot_stew) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Stonepot Stew result; preserve its heavy dark stone bowl, warm orange-red stew, visible vegetable pieces, short side grips, and steam, but do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, straps, warm wear, volume, and composition only. Image 3 is a style reference for appetizing painted food separation and small-size readability only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical cook's recipe scroll, broadly unfurled between thick uneven rolled ends; rough grey-brown parchment with soot-dark edges, a coarse hemp cord around one roll, and one terracotta-red wax seal near the lower corner. The otherwise blank parchment bears one single large hand-painted pictorial motif of Stonepot Stew: a weighty black-grey stone bowl with small side grips, filled with thick orange-red stew and a few distinct round root-vegetable pieces, with two simple wisps of natural steam. The motif is an object painting, not a symbol, rune, label, diagram, or writing.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every roll, cord, seal, bowl edge, grip, and steam wisp safely inside the square; the scroll itself is the one inventory object. The dark bowl and bright stew motif must remain identifiable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep charcoal and hearth-umber painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous rough parchment, hemp, dense wax, coarse stone, glossy stew, and soft steam; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial stone-bowl motif; otherwise blank parchment. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, cooking symbols, diagrams, equations, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose ingredients, plate, table scene, hand, character, or cropped silhouette."
+      ],
+      "reviewNotes": "Coarse stone bowl, orange-red stew, root pieces, and steam are legible at tiny sizes. Rough parchment, hemp, and terracotta distinguish the recipe family."
+    },
+    {
+      "id": "pattern_warspice_skewers",
+      "mode": "style-transfer with targeted precise-object-edit retry",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-8dbf711d-7d0f-4fc4-b388-8e85fd265cb1.png",
+      "rejectedGeneratorOriginals": [
+        {"path": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-06030908-7112-4d87-9fb0-e910b0de29f9.png", "reason": "seal contained a second flame-like motif"}
+      ],
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_warspice_skewers.png",
+      "sha256": "35d3070fd9bf8756d0f8ae7fe57034e8f11988e650815ec7310984faab4c2aae",
+      "bytes": 2273563,
+      "dimensions": "1254x1254",
+      "retries": 1,
+      "orderedReferences": [
+        {"path": "public/ui/items/warspice_skewers.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation, warm glaze, and small-size readability only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Warspice Skewers (item id pattern_warspice_skewers) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Warspice Skewers result; preserve its compact dark platter and three thick red-orange grilled meat skewers with strong char marks, but do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, straps, warm wear, volume, and composition only. Image 3 is a style reference for appetizing painted food separation, warm glaze, and small-size readability only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical cook's recipe scroll, partly unfurled into a broad central parchment face with compact rolled ends; smoke-tanned brown vellum, a braided crimson cord around the upper roll, and one dark oxblood wax seal near the lower edge. The otherwise blank parchment bears one single large hand-painted pictorial motif of Warspice Skewers: a compact charcoal-slate platter holding exactly three close-set wooden skewers threaded with thick red-orange glazed meat pieces and bold dark grill marks. The motif is one unified plated-serving painting, not a symbol, rune, label, diagram, writing, or pile of loose food.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every rolled end, cord, seal, platter edge, and skewer tip safely inside the square; the scroll itself is the one inventory object. The three fiery grilled skewers must remain distinct at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep smoked umber, ember-brown, and charcoal painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous smoke-tanned parchment, braided cord, dense wax, slate, wood, glossy spiced glaze, and charred meat; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial plated-skewer motif; otherwise blank parchment. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, cooking symbols, diagrams, equations, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose ingredients, table scene, flame halo, hand, character, or cropped silhouette."
+      ],
+      "retryPromptLines": [
+        "Use case: precise-object-edit",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: remove only the embossed flame-like emblem from the lower-right wax seal so the seal becomes smooth, blank dark oxblood wax.",
+        "Input images: Image 1 is the edit target.",
+        "Constraints: change only the seal face; preserve the parchment scroll, red braided cord, three-skewer plated food painting, all geometry, framing, materials, lighting, backdrop, and every other pixel-level visual relationship. The finished seal must contain no symbol, glyph, rune, letter, number, pseudo-writing, picture, or stamped motif. Do not add any element. Keep the full image square, opaque, borderless, and free of text, UI chrome, frames, watermarks, signatures, or transparency."
+      ],
+      "reviewNotes": "Initial seal motif was rejected. The accepted targeted edit has a blank seal, strong red-glazed skewer identity, excellent small-size contrast, and full framing."
+    },
+    {
+      "id": "pattern_sageleaf_chowder",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-c29a339f-5a42-45e7-ad77-3af15b3782a2.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_sageleaf_chowder.png",
+      "sha256": "e2a6eceb7ae9225f1093b81a7704afb14c9c337f18745296b835a37eeee6a007",
+      "bytes": 2318190,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/sageleaf_chowder.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "food separation and small-size readability only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global material, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Sageleaf Chowder (item id pattern_sageleaf_chowder) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Sageleaf Chowder result; preserve its cream ceramic bowl with a cool teal lower band, pale creamy chowder, distinct green sage leaves, and soft steam, but do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, straps, warm wear, volume, and composition only. Image 3 is a style reference for appetizing painted food separation and small-size readability only. Image 4 is a global house-style reference for painted material separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical cook's recipe scroll, gently unfurled with a broad central face and rounded rolled ends; pale herb-tinted ivory vellum with moss-green edge wear, a braided sage-green cord around the upper roll, and one smooth blank leaf-green wax seal near the lower edge. The otherwise blank parchment bears one single large hand-painted pictorial motif of Sageleaf Chowder: a rounded cream ceramic bowl with a cool teal glazed lower band, filled with pale velvety chowder and topped by several clearly separated fresh green sage leaves, with two soft natural steam wisps. The motif is an object painting, not a symbol, rune, label, diagram, or writing.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every rolled end, cord, blank seal, bowl edge, leaf, and steam wisp safely inside the square; the scroll itself is the one inventory object. The pale bowl, green leaves, and teal band must remain legible at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep forest-charcoal and muted green painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous herb-stained vellum, braided cord, dense smooth wax, glazed ceramic, creamy chowder, fresh leaves, and soft steam; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial sage-chowder motif; otherwise blank parchment, and the wax seal must remain entirely blank. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, leaf symbols, cooking symbols, diagrams, equations, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose ingredients, table scene, hand, character, or cropped silhouette."
+      ],
+      "reviewNotes": "Cream bowl, teal glaze, pale chowder, and separated green leaves remain crisp at tiny sizes. Herb-toned parchment and blank green seal are distinct."
+    },
+    {
+      "id": "pattern_grand_cauldron",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064fb-3ffb-7881-86e6-e2555e6f4af1/exec-ecdcd75c-dac9-423e-8377-f5d48bb1d7ec.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_grand_cauldron.png",
+      "sha256": "486c583ee564fe6ad1d5ff89919ca364a364eee15dc910b7bb54930f7fd763e0",
+      "bytes": 2167531,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/grand_cauldron.webp", "role": "live-result identity only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "parchment-like soft goods, straps, wear, volume, and composition only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "tangible vessel, contained glow, and focal material only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "global metal, value, lighting, and centered-mass style only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Grand Cauldron (item id pattern_grand_cauldron) in the World of ClaudeCraft woc-item-icon-v1 house style, replacing its programmatic SVG placeholder.",
+        "Input images: Image 1 is identity-only reference for the live Grand Cauldron result; preserve its low wide black iron cauldron, three stout feet, gold rim and side handles, and contained luminous violet brew, but do not reproduce its flat vector treatment. Image 2 is a style reference for tactile parchment-like soft goods, straps, warm wear, volume, and composition only. Image 3 is a style reference for a tangible fantasy vessel, restrained contained glow, and crisp focal material only. Image 4 is a global house-style reference for painted metal separation, value range, warm top-left light, cool shadow, and centered mass only. Do not copy unrelated objects from style references.",
+        "Subject and identity: one substantial physical master-alchemist's recipe scroll, partly unfurled into a broad central parchment face with weighty rolled ends; darkened ivory vellum with restrained plum edge staining, a braided purple-and-dull-gold cord around the upper roll, and one smooth blank violet wax seal near the lower edge. The otherwise blank parchment bears one single large hand-painted pictorial motif of the Grand Cauldron: a low wide blackened-iron cauldron standing on three clearly readable stout feet, with a broad gold rim and two small gold side handles, filled with a luminous violet brew and one restrained plume of violet-tinted steam. The motif is an object painting, not a symbol, rune, label, diagram, or writing.",
+        "Composition: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, every rolled end, cord, blank seal, cauldron foot, handle, and steam plume safely inside the square; the scroll itself is the one inventory object. The gold-rimmed three-footed violet cauldron must remain identifiable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep plum-charcoal and blue-black painted vignette with subtle atmosphere and grounded contact shadow, never transparency or flat black.",
+        "Style and materials: premium hand-painted classic dark-fantasy MMORPG inventory art; fibrous vellum, braided cord, dense smooth wax, blackened iron, aged gold, and contained violet liquid; crisp focal edges and softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: exactly one substantial recipe scroll object with exactly one large pictorial grand-cauldron motif; otherwise blank parchment, and the wax seal must remain entirely blank. Borderless. No text, letters, numbers, words, recipe lines, scribbles, pseudo-writing, glyphs, runes, magical symbols, alchemical symbols, diagrams, equations, floating particles, UI chrome, rarity frame, watermark, signature, checkerboard, transparency, split sheet, collage, loose extra objects, table scene, hand, character, or cropped silhouette."
+      ],
+      "reviewNotes": "Wide black cauldron, three feet, gold hardware, and violet brew read clearly. Plum edge treatment and purple-gold cord establish capstone identity; blank seal and safe crop."
+    },
+    {
+      "id": "pattern_warhewn_signet",
+      "mode": "style-transfer with targeted precise-object-edit retry",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-b5018f0c-6c94-43e7-9d62-d99ffce08a95.png",
+      "rejectedGeneratorOriginals": [
+        {"path": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-0d3ec50d-905d-4ef6-8a13-2d5c9c17964c.png", "reason": "seal carried a generic four-point star instead of the result-specific maker motif"}
+      ],
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_warhewn_signet.png",
+      "sha256": "3ee6910081308fc9138ea2625989a6a42d2f5d5c6f7787d0cc8e53def3fa9766",
+      "bytes": 2321320,
+      "dimensions": "1254x1254",
+      "retries": 1,
+      "orderedReferences": [
+        {"path": "public/ui/items/warhewn_signet.webp", "role": "live-result identity only: heavy dark ring, rectangular signet face, ember crossed-tool motif"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, cord, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged dark metal, controlled edge highlights, centered mass, and cool shadow only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Design: Warhewn Signet icon (pattern_warhewn_signet) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its heavy dark ring, rectangular signet face, and ember crossed-tool motif, but do not preserve its flat vector rendering. Image 2 is a house-style reference for tactile parchment, cord, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for forged dark metal, controlled edge highlights, centered mass, and cool shadow only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial charcoal-grey jeweler's design parchment, partly unfurled with thick curled ends, an ember-orange braided cord, and a dark iron wax seal. Its deliberately clean face carries one single large pictorial illustration of a broad blackened-steel signet ring with a rectangular bezel and one simple crossed pair of small smithing hammers picked out in restrained orange metal. The ring picture must immediately communicate the strength-focused Warhewn Signet design. This is the physical learnable design, not the finished loose ring, an official deed, spell scroll, or treasure map.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, cord, seal, and the full ring motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep iron-charcoal and warm forge-umber painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, cord, wax, blackened steel, and restrained ember metal; crisp focal edges around the large ring motif with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-design subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, extra diagrams, measurements, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, separate loose ring, weapon, official folded writ, or cropped parchment. The only surface mark is the one large recognizable signet-ring pictorial illustration."
+      ],
+      "retryPromptLines": [
+        "Use case: precise-object-edit",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Input images: Image 1 is the edit target, the current painted pattern_warhewn_signet candidate.",
+        "Primary request: change only the small raised emblem inside the dark round wax seal at the lower-right. Replace the generic four-point star with one simple clean crossed pair of tiny smithing hammers, matching the orange-copper crossed-hammer motif already painted on the signet illustration.",
+        "Constraints: preserve every other pixel-level design choice and overall composition as closely as possible: the parchment shape and texture, large blackened signet illustration, rectangular bezel, orange braided cord, seal body and position, dark forge vignette, warm top-left light, cool shadow, margins, brushwork, and opacity. Do not add text, letters, numbers, writing, pseudo-writing, runes, stars, magic symbols, extra tools, extra seals, border, frame, watermark, transparency, hand, or person. Change only the seal imprint."
+      ],
+      "reviewNotes": "Targeted retry replaced the generic star seal with crossed smithing hammers. The broad blackened ring and orange maker motif remain distinct at tiny sizes."
+    },
+    {
+      "id": "pattern_prismglass_loop",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-cec5fa4e-8fea-467e-8bdd-d381f790bf22.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_prismglass_loop.png",
+      "sha256": "39881ec5017ec1a9b4947aee749ed1d1b766a933c03b9439110ef26f11ece440",
+      "bytes": 1998343,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/prismglass_loop.webp", "role": "live-result identity only: pale segmented loop and pointed faceted prismglass crown"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, ribbon, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "crisp glass rim light, restrained internal cool color, and dark painted ground only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Design: Prismglass Loop icon (pattern_prismglass_loop) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its pale segmented loop and pointed faceted prismglass crown, but do not preserve its flat vector rendering. Image 2 is a house-style reference for tactile parchment, ribbon, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for crisp glass rim light, restrained internal cool color, and dark painted ground only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial pale slate-blue jeweler's design parchment, folded into a broad soft curl and bound with a silver-blue silk ribbon and clear-lilac wax seal. Its deliberately clean face carries one single large pictorial illustration of an elegant segmented pale-silver ring loop crowned by one pointed multi-faceted prismglass setting. A restrained cool reflection passes through the glass facets without becoming a magical beam. The ring picture must immediately communicate the intellect-focused Prismglass Loop design and look lighter and more refined than the Warhewn Signet. This is the physical learnable design, not the finished loose ring, a spell scroll, or a treasure map.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, ribbon, seal, and the full ring motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep navy, charcoal, and muted cool-violet painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, silk, wax, pale metal, and faceted prismglass; crisp focal edges around the large ring motif with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-design subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, extra diagrams, measurements, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, separate loose ring or gem, official folded writ, or cropped parchment. The only surface mark is the one large recognizable prismglass-ring pictorial illustration."
+      ],
+      "reviewNotes": "Pale segmented loop, pointed prismglass crown, silver-blue ribbon, and lilac seal create a refined caster design clearly distinct from Warhewn."
+    },
+    {
+      "id": "pattern_gyrelens_array",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-fff96946-01a6-457e-b903-977be24d84b3.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_gyrelens_array.png",
+      "sha256": "e1d8916654abd0b1d2501257d7c9d6d30205ed8d8843965a8620c4b5dbca357b",
+      "bytes": 2176448,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/gyrelens_array.webp", "role": "live-result identity only: articulated row of three differently sized brass-ringed blue lenses"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "crisp glass rim light, contained cool luminance, and dark painted ground only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Schematic: Gyrelens Array icon (pattern_gyrelens_array) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its articulated row of three differently sized brass-ringed blue lenses, but do not preserve its flat vector rendering. Image 2 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for crisp glass rim light, contained cool luminance, and dark painted ground only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial deep navy engineering schematic parchment, partly unfurled with thick curled ends, reinforced by two narrow brass corner strips, a teal cord, and a plain gear-shaped dark wax seal. Its deliberately clean face carries one single large pictorial illustration of an articulated brass frame holding three round skyglass lenses in a descending row, one large focal lens and two smaller adjustable lenses, with visible hinges but no measurements. The lens-array picture must immediately communicate an epic caster offhand and look clearly more elaborate than a single handheld ocular. This is the physical learnable schematic, not the finished loose array, a clock, telescope, spell scroll, or treasure map.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, brass strips, cord, seal, and the full three-lens motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep navy-charcoal and restrained teal painted vignette with subtle workshop atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, brass, cord, wax, and translucent skyglass; crisp focal edges around the large lens-array motif with softer peripheral brushwork; restrained lens glints; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-schematic subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, blueprint grid, extra diagrams, measurements, tick marks, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, separate loose lens or gear, clock face, official folded writ, or cropped parchment. The only surface mark is the one large recognizable three-lens-array pictorial illustration."
+      ],
+      "reviewNotes": "The descending three-lens brass array remains clear at 22px and is materially richer than the entry-level ocular, with no blueprint labels or ticks."
+    },
+    {
+      "id": "pattern_masters_field_forge",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-9abdf657-f02e-4809-a4ad-ab1c1c10c39e.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_masters_field_forge.png",
+      "sha256": "d47cf7e236e7cfb2a5594f93bd7ad69d401f732e1034d946a7776057362d2dea",
+      "bytes": 2513879,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/masters_field_forge.webp", "role": "live-result identity only: compact portable forge, anvil top, ember chamber, folding legs"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "hard tool silhouette, forged metal, wear, and restrained magical polish only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Schematic: Master's Field Forge icon (pattern_masters_field_forge) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its compact portable forge, anvil top, ember chamber, and folding-leg construction, but do not preserve its flat vector rendering. Image 2 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for hard tool silhouette, forged metal, wear, and restrained magical polish only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial soot-grey engineering schematic parchment mounted on a thin dark leather backing, partly unfurled with iron corner clamps, a burnt-orange cord, and a black wax seal stamped with one simple anvil silhouette. Its deliberately clean face carries one single large pictorial illustration of a compact portable field forge: a broad miniature anvil top above a blackened ember firebox with orange coals, two brass latches, and sturdy folding tripod legs. The complete station picture must immediately communicate the party-shared mobile weaponcrafting forge, not a full building, ordinary campfire, loose anvil, chest, stove, or weapon. This is the physical learnable schematic, not the finished loose station.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, backing, clamps, cord, seal, and the full forge motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep iron-charcoal and warm ember-umber painted vignette with subtle workshop smoke and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile soot-stained vellum, leather, iron, brass, wax, and contained ember; crisp focal edges around the large portable-forge motif with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-schematic subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, blueprint grid, extra diagrams, measurements, arrows, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, separate loose tool, weapon, building, official folded writ, or cropped parchment. The only surface mark is the one large recognizable portable-field-forge pictorial illustration."
+      ],
+      "reviewNotes": "Anvil top, ember firebox, brass latches, and folding legs form a compact mobile forge, with a soot-stained leather-backed plan distinct from other schematics."
+    },
+    {
+      "id": "pattern_makers_charm",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-c60c5570-4c01-458a-bcb7-09551c57c2ff.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_makers_charm.png",
+      "sha256": "233cb11299a87fde485594e10a660befee998274964afbca0634a76f5be3cbdb",
+      "bytes": 2349395,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/makers_charm.webp", "role": "live-result identity only: hanging oval brass frame, violet central lens, upright maker needle"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "contained violet luminance, crisp rim highlights, and dark painted ground only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Schematic: Maker's Charm icon (pattern_makers_charm) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its hanging oval brass frame, violet central lens, and upright maker's needle, but do not preserve its flat vector rendering or turn it into an eye. Image 2 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for contained violet luminance, crisp rim highlights, and dark painted ground only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial plum-grey engineering schematic parchment, folded into a broad soft curl, bound with a narrow violet leather cord, a small brass suspension ring, and a plain dark wax seal bearing one tiny hammer impression. Its deliberately clean face carries one single large pictorial illustration of an oval brass-rimmed calibration charm with a restrained violet crystal lens at the center and one straight copper maker's needle held vertically across it. The charm picture must immediately communicate a precise epic crafting tool that improves a maker's yield, not an eye, compass, clock, amulet for combat, magical portal, or loose gem. This is the physical learnable schematic, not the finished loose charm.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, cord, ring, seal, and the full oval-charm motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep plum, charcoal, and restrained violet painted vignette with subtle workshop atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, leather, wax, brass, copper, and violet crystal; crisp focal edges around the large charm motif with softer peripheral brushwork; contained violet glint only; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-schematic subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, blueprint grid, extra diagrams, measurements, tick marks, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, eye anatomy, iris, compass rose, clock face, separate loose charm or gem, official folded writ, or cropped parchment. The only surface mark is the one large recognizable oval maker's-charm pictorial illustration."
+      ],
+      "reviewNotes": "The hanging brass calibration charm, restrained violet lens, vertical needle, and hammer seal preserve the authored tool identity without text or generic sigils."
+    },
+    {
+      "id": "pattern_voidbound_grimoire",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-453e85e8-c158-46f2-98df-0f665d2ecd6c.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_voidbound_grimoire.png",
+      "sha256": "4ab3b13a3b976cf0e5055a4c36e1656178b5363427e8a4eeab11aa1e18667cab",
+      "bytes": 2244099,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/voidbound_grimoire.webp", "role": "live-result identity only: closed obsidian-purple grimoire, metal corners, central violet void aperture"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/cinderweave_raiment.webp", "role": "deep violet-black values, controlled magical accent, and peripheral brushwork only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Technique: Voidbound Grimoire icon (pattern_voidbound_grimoire) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its closed obsidian-purple grimoire, metal corners, and restrained central violet void aperture, but do not preserve its flat vector rendering or its generic radial marks. Image 2 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for deep violet-black material values, cloth-like softness, controlled magical accent, and peripheral brushwork only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial deep charcoal-violet technique parchment, partly unfurled with thick asymmetric curls, bound by a black leather ribbon and one dark purple wax seal stamped with a simple closed-book silhouette. Its deliberately clean face carries one single large pictorial illustration of a closed obsidian-leather grimoire with four pale silver corner caps and one small contained violet void aperture set into the cover. The aperture is a dark circular depth with a restrained amethyst rim, never an eye, rune, portal scene, or starburst. The book picture must immediately communicate the healer-inclusive epic Voidbound Grimoire technique. This is the physical learnable inscription technique, not the finished loose book, an open spell page, or official guild deed.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, ribbon, seal, and the full closed-grimoire motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal, black-purple, and restrained violet painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, black leather, wax, obsidian binding, pale metal, and contained violet depth; crisp focal edges around the large grimoire motif with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-technique subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, decorative script, glyphs, runes, generic magic symbols, radial sigils, extra diagrams, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, eye anatomy, separate loose book, open pages, official folded writ, or cropped parchment. The only surface mark is the one large recognizable closed-grimoire pictorial illustration."
+      ],
+      "reviewNotes": "Obsidian book, pale corners, and contained violet aperture are clear against asymmetric charcoal-violet parchment with no radial sigils or writing."
+    },
+    {
+      "id": "pattern_laden_hearth",
+      "mode": "style-transfer",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-c159a142-364e-4b59-8dca-db0befe9419b.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/placeholder-patterns/pattern_laden_hearth.png",
+      "sha256": "70075bd56071de990e8e1a5be10a5445b782affda768fb3ea45f6763fe0ec149",
+      "bytes": 2232893,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/laden_hearth.webp", "role": "live-result identity only: portable brick-and-iron hearth, flame, roast-spit bar, stocked food cues"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "appetizing food grouping, warm separation, and tiny-size readability only"}
+      ],
+      "promptLines": [
+        "Use case: style-transfer",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: replace the programmatic placeholder with a fresh painted Recipe: The Laden Hearth icon (pattern_laden_hearth) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is identity-only reference for the live result item; preserve its compact portable brick-and-iron hearth, bright central flame, overhead roast-spit bar, and stocked food cues, but do not preserve its flat vector rendering or arrow-like marks. Image 2 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 3 is a house-style reference for appetizing food grouping, warm color separation, and tiny-size readability only. Do not copy unrelated objects.",
+        "Subject and identity: one substantial warm umber cooking-recipe parchment rolled around short dark wooden dowels, bound with a copper-red ribbon and one deep orange wax seal stamped with a simple hearthstone silhouette. Its deliberately clean face carries one single large pictorial illustration of a compact portable laden hearth: a low ironbound brick firebox with one bright contained flame, a small roast turning on a horizontal spit above it, and two compact loaves with a few vegetables tucked into a lower provision shelf. The complete station picture must immediately communicate the permanent party-shared cooking hearth stocked for a feast, not a house fireplace, oven building, ordinary campfire, treasure chest, or single plated meal. This is the physical learnable recipe, not the finished loose station.",
+        "Composition/framing: one centered complete parchment in readable three-quarter view, about 72 percent subject fill, safe padding on all sides, all curls, dowels, ribbon, seal, and the full hearth motif visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep warm charcoal, hearth-umber, and restrained ember-orange painted vignette with subtle smoke and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile vellum fiber, wood, ribbon, wax, brick, iron, bread, roast, and contained flame; crisp focal edges around the large laden-hearth motif with softer peripheral brushwork; warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one parchment-recipe subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, arrows, extra diagrams, measurements, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, separate loose food, building facade, official folded writ, or cropped parchment. The only surface mark is the one large recognizable portable-laden-hearth pictorial illustration."
+      ],
+      "reviewNotes": "Portable ironbound hearth, contained flame, spit roast, loaves, vegetables, warm dowelled parchment, and hearth seal stay legible at 22px and clearly read as a cooking-station recipe."
+    }
+  ]
+}

@@ -9,7 +9,7 @@ import {
 
 const DEFAULT_OUTPUT = 'tmp/imagegen/item-art-consistency/final-audit';
 const DEFAULT_VERDICT =
-  'docs/achievements/item-art-consistency-2026-08-09/final-item-art-audit-verdict.json';
+  'docs/achievements/masterwrought-art-completion-2026-09-02/final-item-art-audit-verdict.json';
 
 function usage() {
   return `Usage: node scripts/item_art_audit.mjs [options]
@@ -103,94 +103,22 @@ const build = await buildItemArtAudit({
   mapping,
   pendingArtIds: [...pendingArtIds].sort(),
   expected: {
-    // 913 at the v0.41.0 release merge: the v0.39.0 823 plus the 84
-    // Masterwrought art-shipping ids (907 on the packet branch) plus the six
-    // release additions, all Proving Shore ids (the castaway crate and ferry
-    // bell pair, the passing stone, and the pearl detour's mother_of_pearl,
-    // briny lure and lustrous pearl), measured as the committed .webp count
-    // under public/ui/items. 920 at the v0.41.0 release-batch sync: the
-    // release's seven painted bank-storage bags join the count.
-    // 1124 at the v0.41.0 Crucible sync: the release's own arm went 829 to
-    // 1040 (the crucible-raid-weapons-2026-08-28 batch's 9 painted weapons,
-    // the ignivar-varkhul-drop-renders-2026-08-28 batch's 2 rendered
-    // legendaries, the crucible-set-icons-2026-08-29 wave's 192 non-weapon
-    // Crucible pieces, and the Core of the Last Flame reagent), so its 204
-    // post-base ids join the 920 (836 shared base plus this branch's 84 plus
-    // the release's 204), again measured as the committed .webp count.
-    // 1125 at the v0.42.0 sync: the release's own arm went 1040 to 1041 with
-    // one more painted piece, the Bonebound Rickshaw reins
-    // (reins_rickshaw_mount, the OSSBrain v0.41 batch's own icon carried
-    // through the release's base merge alongside the Crucible waves), so that
-    // one id joins the 1124; re-counted on the merged tree as 1125 committed
-    // .webp files under public/ui/items.
-    catalogCount: 1125,
-    // The ART-SUBJECT count: live defs minus the declared procedural-art
-    // debt (ITEM_ART_PENDING, exact-set-pinned in tests/item_icons.test.ts).
-    // 922 was the v0.39.0 reviewed universe (the 2026-08-09 831 plus the
-    // release's seven art-shipping additions, the Dawnhold posy last) plus
-    // the 84 Masterwrought item ids that each ship committed art; 928 adds
-    // the v0.41.0 release's six art-shipping ids at the merge; 935 adds the
-    // release-batch sync's seven painted bank-bag defs. It stays a
-    // hard literal: a new item ships art (joining this count) or
-    // joins the pending pin, and either move is a visible, deliberate edit.
-    // 1139 at the v0.41.0 Crucible sync: the release's arm went 844 to 1055
-    // (the 201 Crucible raid loot definitions, once 192 of them art-pending
-    // and now all painted, plus the 2 Varkhul legendary definitions, plus
-    // the release-sync's 7 bank-storage painted bags, already counted here),
-    // so its 204 post-base art-shipping defs join the 935; the release's
-    // content-side ledger (IGNIVAR_ART_PENDING_ITEM_IDS) is empty, so the
-    // debt term below is this branch's 81 alone.
-    // 1140 at the v0.42.0 sync: the release's arm went 1055 to 1056, the one
-    // Bonebound Rickshaw reins definition, which ships its own art, so it
-    // joins this term too; the debt term below is still this branch's 81
-    // (IGNIVAR_ART_PENDING_ITEM_IDS is still empty on the release arm).
-    liveItemCount: 1140,
-    // The other half of the art-subject split: the declared procedural-art
-    // debt, pinned as its own literal so the audit reds on new debt even
-    // when it runs standalone (the vitest exact-set pin in
-    // tests/item_icons.test.ts names the ids; this counts them). Total live
-    // defs = liveItemCount + pendingArtCount, so both growth directions are
-    // visible, deliberate edits. 44 was the farming Phase 6 39 plus the
-    // Phase 11 well-fed phase's four buff dishes plus the Phase 12 shared
-    // feast, carried unchanged through the farming absorb; Phase 11e's four
-    // upper-tier crops add twelve ids (seed, produce and fine twin each) under
-    // the packet's declared art park for 11e to 11k, taking it to 56; Phase
-    // 11f's six farming PATTERNS park under the same declaration, taking it to
-    // 62; Phase 11i's angler's endgame parks eleven more under the same
-    // declaration (three high-band catches, the apex rod, two dishes, the
-    // capstone feast and four patterns), taking it to 73; Phase 11j's apex
-    // hoe parks one more under the same declaration, taking it to 74; and
-    // Phase 11k's apex feast tier parks its six ids (three feasts, three
-    // patterns) while RETIRING two of 11i's (that phase's capstone feast and
-    // its pattern, removed from the game rather than moved), a net plus four
-    // to 78; and Phase 11o's engineering on-ramp parks its two ids (the
-    // cogwheel_blank part and the copperlens_ocular gadget) under the same
-    // ip-16-ICON declaration, taking it to 80; and masterwrought Phase 13's
-    // Deed of Making parks its one id under the same declaration, taking it
-    // to 81 (one def minted, the same one parked, so liveItemCount holds at
-    // 928, the Phase 13-era value, and catalogCount at 913 by the
-    // cancellation below).
-    // liveItemCount is unmoved by any of that, which is the point of the
-    // split, and the 11k arithmetic is worth spelling out because "net plus
-    // four" appears on BOTH terms and they are different sums. Live ITEMS defs
-    // went up four (six minted, two deleted). The debt went up four (the same
-    // six parked, the same two unparked). liveItemCount is defs MINUS debt, so
-    // it held at 922, the 11k-era value (later phases moved it to the 928
-    // above): an artless def joining the park moves the debt term and
-    // the def count together and cancels out of this one.
-    pendingArtCount: 81,
+    // Masterwrought's completion wave adds 81 newly painted identities and
+    // replaces 84 interim project-owned placeholders. The replacements do
+    // not grow the catalog; the new identities take the shipping census from
+    // 1,125 to 1,206.
+    catalogCount: 1206,
+    // The art-subject universe is every live definition minus the explicit
+    // pending-art ledger. This wave clears that ledger, so all 1,221 live
+    // definitions are painted (16 Heroic weapons intentionally alias base
+    // paintings; the implicit backpack is the one non-definition catalog id).
+    liveItemCount: 1221,
+    pendingArtCount: 0,
     generatedHeroicDefinitions: 64,
     heroicDefinitionsWithOwnWebp: 48,
     heroicWeaponArtAliases: 16,
-    // 29 pages over 25 groups on this branch (the flask, recipe and scroll
-    // kinds each formed a group of their own), 27 pages over the release's 22
-    // groups (its 204 ids landed in existing kinds and split one more page);
-    // at the v0.41.0 Crucible sync the merged census keeps the 25 groups and
-    // the release's 204 ids split one more page, 30, measured by the merged
-    // build.
-    // Both hold at the v0.42.0 sync: the release's one id lands in the
-    // existing 'mount' group (9 to 10), far inside that group's single 80-id
-    // page, so neither the page count nor the group count moves.
+    // The 81 additions land inside the existing 25 kind groups without
+    // crossing another 80-record page boundary: 30 pages, eight modes each.
     sheetPageCount: 30,
     groupCount: 25,
   },

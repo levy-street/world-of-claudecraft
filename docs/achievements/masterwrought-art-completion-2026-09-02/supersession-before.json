@@ -1,0 +1,2066 @@
+{
+  "schemaVersion": 1,
+  "capturedAtCommit": "103934491b9cdc72cbad99c4601919962b871fd7",
+  "records": [
+    {
+      "itemId": "barksong_handguards",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "0ea99cb77dc7aaf9a9757125c53344faa4b017e12aa19511c8b85b6e0e88a27e",
+          "bytes": 1652
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 67,
+          "itemId": "barksong_handguards",
+          "name": "Barksong Handguards",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "briarstep_jerkin",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "02213db46e96f94b62bf8cbbeb93468e7e110c6ad2c5b53d961eea9a96aa5aab",
+          "bytes": 1772
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 65,
+          "itemId": "briarstep_jerkin",
+          "name": "Briarstep Jerkin",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "burnished_thorium_amulet",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "84e828b6eb1563e5a1c4951cdab1f7acfd8470c6dfdef0811dfce4930c0ce9ca",
+          "bytes": 1152
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 6,
+          "itemId": "burnished_thorium_amulet",
+          "name": "Burnished Osmium Amulet",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "coiled_copper_torc",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "5057ddcc7fddbab22cfa8231d6bf794fead4c87215ee35087bd5da754c1b4b3c",
+          "bytes": 1794
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 7,
+          "itemId": "coiled_copper_torc",
+          "name": "Coiled Copper Torc",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "duskforged_billet",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "8ff13ded23b98249119df7fe198a70f22f7d88fe7548dc353cd0c0380098c84d",
+          "bytes": 976
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 11,
+          "itemId": "duskforged_billet",
+          "name": "Duskforged Billet",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "duskforged_bulwark",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "fe7b7f3edb4963922a6c9fb5dc6dad768ab0fc6fbddbe4d90468270b321f6407",
+          "bytes": 1524
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "duskforged_warblade",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "976a4528a2cef224fa01d11cefca88286b34e70924404209007eb24dd7df228b",
+          "bytes": 1204
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "etched_iron_loop",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "c71b532223437480dfecd369bf068304ecdc79513f0325370a8047cef04b5ea4",
+          "bytes": 1184
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 13,
+          "itemId": "etched_iron_loop",
+          "name": "Etched Iron Loop",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "fenbloom_breeches",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "f0985327e46141d7eaf22b1687d1a53a74aca99510339555cb3a329f8e67417c",
+          "bytes": 1284
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 66,
+          "itemId": "fenbloom_breeches",
+          "name": "Fenbloom Breeches",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "forgefold_legguards",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "35ee96eee3d30e9d47af39bec032709bc95d13e0bbfa41807c47a25819619472",
+          "bytes": 1506
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 63,
+          "itemId": "forgefold_legguards",
+          "name": "Forgefold Legguards",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "forgefold_plating",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1e4e15c8797ed2239e653b6385dec023ef930810cc520091ea9447c4739ede3c",
+          "bytes": 784
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 14,
+          "itemId": "forgefold_plating",
+          "name": "Forgefold Plating",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "gleaming_thorium_loop",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "3000ddb19343d9530f8d6b6cc8b41715b11c416f575f540472f6e8f8e19fe776",
+          "bytes": 1226
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 17,
+          "itemId": "gleaming_thorium_loop",
+          "name": "Gleaming Osmium Loop",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "goldleaf_folio",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "05e6336c571307025403bed93d3d0ce9e1cc6b99c2011054bb9cc60de4108213",
+          "bytes": 1662
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "goldleaf_scroll",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "ffd5d9630440c1b674bccdda32bf4c9c18800de65b62295c270e15d22bd9095c",
+          "bytes": 1270
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "grand_cauldron",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "550c750a35801530535fd02e4777e810b20e2bb63aeb669ddec35952dacce5ec",
+          "bytes": 1852
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 78,
+          "itemId": "grand_cauldron",
+          "name": "Grand Cauldron",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "gyrelens_array",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "2c5a4b049c1afe698864366ece91016961eff359cfe75a0b88f81dddad97f46d",
+          "bytes": 2240
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "hammered_copper_band",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "a037f3b2fc314d297f8a86c8413a9dbc47f6c70b93cea1da852494a147f64345",
+          "bytes": 1160
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 20,
+          "itemId": "hammered_copper_band",
+          "name": "Hammered Copper Band",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "iron_link_choker",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "8c432282220638b9bfda665f2ea0200041a7473276b33efea2bba5c7b7860000",
+          "bytes": 1152
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 22,
+          "itemId": "iron_link_choker",
+          "name": "Iron Link Choker",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "ironhusk_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "8c717b5d4f82d7f7a0d4a7f5ae33fa6b4fbb8da6af9aa10fd5b7fd5ed970ffa0",
+          "bytes": 1140
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 72,
+          "itemId": "ironhusk_flask",
+          "name": "Ironhusk Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "laden_hearth",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "f3b30113525466159ef5df7de4c408740a63fe5fcf8303a448e3dced8de975eb",
+          "bytes": 2278
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 79,
+          "itemId": "laden_hearth",
+          "name": "The Laden Hearth",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "lucent_reagent",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "2cd8e1693d9c6ae8e809bbb87489b929985a524ba1709bc6d769836d3e4454ba",
+          "bytes": 1056
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 26,
+          "itemId": "lucent_reagent",
+          "name": "Lucent Reagent",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "makers_charm",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "e3ee91cee117eaa89874d90c82bee55d65c467daa9bbfb0a924d66077bcb7bd7",
+          "bytes": 1886
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "makers_ember",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "3c3f214ac2c1f88c7a09757e6cc2545f4c96785dead838cc6e49b2dd49ebeddc",
+          "bytes": 1858
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 27,
+          "itemId": "makers_ember",
+          "name": "Maker's Ember",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "masters_field_forge",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "349d04f0c0b89c32462ec357a82515545df0c25383a89fb344454b239c656bae",
+          "bytes": 1532
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "pattern_barksong_handguards",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "82f19a0c65254faf0ea2a8c7b4416d00e7c14423ddd84d09faff2288f62b6373",
+          "bytes": 1372
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 85,
+          "itemId": "pattern_barksong_handguards",
+          "name": "Pattern: Barksong Handguards",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_briarstep_jerkin",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "36791a2e86404b7e2bd7858a5c6a930948ef059347f4554c59f1cf0ec00f4cd4",
+          "bytes": 1368
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 83,
+          "itemId": "pattern_briarstep_jerkin",
+          "name": "Pattern: Briarstep Jerkin",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_duskforged_bulwark",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1472192dbc6c88d1f0563fc7b8305318f1060d88cfad7eefae94a8772fef30bb",
+          "bytes": 1256
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 92,
+          "itemId": "pattern_duskforged_bulwark",
+          "name": "Plans: Duskforged Bulwark",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_duskforged_warblade",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "74195319a34cd8d8efaf89d87c12e9c9b37225ecd9d3872628b03413f336ed50",
+          "bytes": 1266
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 90,
+          "itemId": "pattern_duskforged_warblade",
+          "name": "Plans: Duskforged Warblade",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_fenbloom_breeches",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "abad28dc92c28714b11764d0f11dfcdf3ef90284bd59539620fe2cacc0f05726",
+          "bytes": 1370
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 84,
+          "itemId": "pattern_fenbloom_breeches",
+          "name": "Pattern: Fenbloom Breeches",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_forgefold_legguards",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "5ac9a7dd53f882580b5a6697bd4c878cf691840d672bdbe51d0fd2cf79f7dce1",
+          "bytes": 1344
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 81,
+          "itemId": "pattern_forgefold_legguards",
+          "name": "Plans: Forgefold Legguards",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_grand_cauldron",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "46f37fc9975a3e78e03ff9c67966eb208fe131b4b4766f79ffbc5c8125732b14",
+          "bytes": 1284
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 106,
+          "itemId": "pattern_grand_cauldron",
+          "name": "Recipe: Grand Cauldron",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_gyrelens_array",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "2210d5857e8d69822668b2fac8dd5a8579da25b552f014665d024431cc31919e",
+          "bytes": 1288
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 96,
+          "itemId": "pattern_gyrelens_array",
+          "name": "Schematic: Gyrelens Array",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_ironhusk_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "a049956fc62f43e7e02d4eed41b161a402958b4ce29dc5118b34c7f6f2b4d8be",
+          "bytes": 1254
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 100,
+          "itemId": "pattern_ironhusk_flask",
+          "name": "Recipe: Ironhusk Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_laden_hearth",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "5002497aaef4eb28283a2ef601ddb8116ab66407975976d47b67a0c02ee05b03",
+          "bytes": 1304
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 107,
+          "itemId": "pattern_laden_hearth",
+          "name": "Recipe: The Laden Hearth",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_makers_charm",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1d2db5ec459c540f6c5308e9371978e2931a6fa09fd0e43f748abf88c4a55c37",
+          "bytes": 1278
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 98,
+          "itemId": "pattern_makers_charm",
+          "name": "Schematic: Maker's Charm",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_masters_field_forge",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "6a3c404d4bd26e856d6d9f9d4ab8e335d60c12ef7dfb7eb460551cda7f92408e",
+          "bytes": 1290
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 97,
+          "itemId": "pattern_masters_field_forge",
+          "name": "Schematic: Master's Field Forge",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_prismglass_loop",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "abf0055fcf50c902f4b196b39679ffd6d652653f332e3bd2b2b13f675db8b864",
+          "bytes": 1300
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 95,
+          "itemId": "pattern_prismglass_loop",
+          "name": "Design: Prismglass Loop",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_ridgebreaker",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "7632638593124d4c83a6be22b4c1185f64ea7124762635244456cbd262a389d2",
+          "bytes": 1244
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 91,
+          "itemId": "pattern_ridgebreaker",
+          "name": "Plans: Ridgebreaker",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_runewater_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "fdd09d14110437a04ed5b45203f43af9387d337143add00e552ca213f754257f",
+          "bytes": 1264
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 102,
+          "itemId": "pattern_runewater_flask",
+          "name": "Recipe: Runewater Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_sageleaf_chowder",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "05e37f86ba141aa5cd663036a66d0ec558e7bcb79f4a93539ec52553c5fb7722",
+          "bytes": 1294
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 105,
+          "itemId": "pattern_sageleaf_chowder",
+          "name": "Recipe: Sageleaf Chowder",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_spiritweld_girdle",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1104eec284b93bef825cef71414f30f23987630b6c8dd24ea544dc294c18902d",
+          "bytes": 1312
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 80,
+          "itemId": "pattern_spiritweld_girdle",
+          "name": "Plans: Spiritweld Girdle",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_stonepot_stew",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "b2fbd74ee921437ed9be1f8359af1ec93b22805c8ebc7b4e97ee4cd013eb3249",
+          "bytes": 1342
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 103,
+          "itemId": "pattern_stonepot_stew",
+          "name": "Recipe: Stonepot Stew",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_sunspun_handwraps",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1532e1ec3816c82ea51cafacb066b6cb86b060840e5104f46c9a7dc0b8329ddc",
+          "bytes": 1246
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 88,
+          "itemId": "pattern_sunspun_handwraps",
+          "name": "Pattern: Sunspun Handwraps",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_sunspun_haversack",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "b6b06c6e758c607c0db185307711868b58a33ee6a5b2b6e104db878ad9942604",
+          "bytes": 1214
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 89,
+          "itemId": "pattern_sunspun_haversack",
+          "name": "Pattern: Sunspun Haversack",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_sunspun_leggings",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "0ab01c389f024be01432d01cf6b89a832e8407395e20752edb65d586224d0e78",
+          "bytes": 1248
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 87,
+          "itemId": "pattern_sunspun_leggings",
+          "name": "Pattern: Sunspun Leggings",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_sunspun_vestments",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "7e677ce0fd2c53211c52ee2f3984d0fe7c0114278ba1775ce69204720999cded",
+          "bytes": 1236
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 86,
+          "itemId": "pattern_sunspun_vestments",
+          "name": "Pattern: Sunspun Vestments",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_voidbound_grimoire",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "9c2b9180166105abc54542ae2ba2d98263be76ab57a212343ebefef0251237f4",
+          "bytes": 1192
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 99,
+          "itemId": "pattern_voidbound_grimoire",
+          "name": "Technique: Voidbound Grimoire",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_warboar_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "ec43be2fb487a8cfba9e290f2359060f452b9f900c8e0415db86fe912c346be8",
+          "bytes": 1250
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 101,
+          "itemId": "pattern_warboar_flask",
+          "name": "Recipe: Warboar Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_wardspeaker_sabatons",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "9ceb08c01934f93ce4d84b1cbd1bf5a887bafc44f1f5a1cca1af459fb2298e2d",
+          "bytes": 1334
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 82,
+          "itemId": "pattern_wardspeaker_sabatons",
+          "name": "Plans: Wardspeaker Sabatons",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_warhewn_signet",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "d549fa39c2c06b5f8299438fab16881b28ea613ae5be14d881e97ce78bc7d96e",
+          "bytes": 1328
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 94,
+          "itemId": "pattern_warhewn_signet",
+          "name": "Design: Warhewn Signet",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_warspice_skewers",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "830c1507890f609f2bb23da5e94ebbebadaab7994194a6d5ce24390e32e40524",
+          "bytes": 1310
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 104,
+          "itemId": "pattern_warspice_skewers",
+          "name": "Recipe: Warspice Skewers",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "pattern_wyrmfall_pendant",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "d9321bca26f6a4005727e79b88982ed06009f768d3038752f71780bd4082db0b",
+          "bytes": 1350
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 93,
+          "itemId": "pattern_wyrmfall_pendant",
+          "name": "Design: Wyrmfall Pendant",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "polished_copper_loop",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "a2ba91dfc2c30174d6bf3881981e8d7f0657f952fb42b4d64bb7546af8715f86",
+          "bytes": 1416
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 29,
+          "itemId": "polished_copper_loop",
+          "name": "Polished Copper Loop",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "precision_chassis",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "3d8aaa7539a291d14dabb0722b1cfd7778d8c4209204fad5828330fd27b303a9",
+          "bytes": 1482
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 30,
+          "itemId": "precision_chassis",
+          "name": "Precision Chassis",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "prismglass_loop",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "15ee5ca3b34d128d94715e3bec17b592fa5d8e51f2912d07138143b59ab084d8",
+          "bytes": 1704
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "prismglass_setting",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "f468be833d1b83af07129cda774d10d87622633a1659dcc5887a70f8ca163d63",
+          "bytes": 1390
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 32,
+          "itemId": "prismglass_setting",
+          "name": "Prismglass Setting",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "quickening_catalyst",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "174968cc194de16cdb0ee7eaf9296113ba70c706226f529936b417b7c5fdd9ac",
+          "bytes": 1210
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 36,
+          "itemId": "quickening_catalyst",
+          "name": "Quickening Catalyst",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "ridgebreaker",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1a02239ce60961d543195ff774a9951e060519d192122bf64474aa117c21737b",
+          "bytes": 1128
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "riveted_iron_signet",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "af45deeb5f1042af0b6058cf0b2159c40f6d0bfc9f48e0cefb94b8ddba5b170d",
+          "bytes": 1016
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 42,
+          "itemId": "riveted_iron_signet",
+          "name": "Riveted Iron Signet",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "runewater_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "c0b6a79e49a8ed54322baebe1929e1bf82aba23b0728710c0c24a4569f7e1460",
+          "bytes": 1412
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 74,
+          "itemId": "runewater_flask",
+          "name": "Runewater Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sablewax_vellum",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "27643072a53c69b1afda1a66333cefba93215e8710dfe284fc5fb1399135ccc7",
+          "bytes": 1156
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 44,
+          "itemId": "sablewax_vellum",
+          "name": "Sablewax Vellum",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sageleaf_chowder",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "f22acafe2e0ceb982e1c45c6b180507ccea4d2c4e1b41de54c8a3c734e57cd98",
+          "bytes": 1338
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 77,
+          "itemId": "sageleaf_chowder",
+          "name": "Sageleaf Chowder",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "seasoned_stock",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "fb9db4cf0bef1e42fd1e0b00ddbd5da14efebcb72fdbc07d1272be00a1b2f0b3",
+          "bytes": 1232
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 45,
+          "itemId": "seasoned_stock",
+          "name": "Seasoned Stock",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "silverleaf_primer",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "320bc483406dc83ac4887a709b49b1f3d2eaf4d82b12d722aa61613fbdb6fedd",
+          "bytes": 1348
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "silverleaf_scroll",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "cc8cf8dc576cf7608a7c28350eb1a5f4973e34be86e996d4bd7e2b90b4111cfa",
+          "bytes": 1282
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "spiritweld_girdle",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "21698ccab0dbab4b4a2bf6dc3766f8cc60704c595935558e86375714dfbb1699",
+          "bytes": 1358
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 62,
+          "itemId": "spiritweld_girdle",
+          "name": "Spiritweld Girdle",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "stonepot_stew",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "914b5be938d251a785cff19797c5894acf7515d85d699a2b51fbf7af97a2a48c",
+          "bytes": 1114
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 75,
+          "itemId": "stonepot_stew",
+          "name": "Stonepot Stew",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sundered_essence",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "cde881a04c06270be34abfa5af7763bf0a81023d11895f6ecb3ce435ce3ba9b3",
+          "bytes": 1926
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 51,
+          "itemId": "sundered_essence",
+          "name": "Sundered Essence",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sunpetal_grimoire",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "7a580b1114d9cdf19e2790c8de1b1185f23756d1d9df5fb8279219c4cbcca344",
+          "bytes": 1966
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "sunpetal_scroll",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "75141f7d9123abd14eac8205e33bb89a78a0e9aa333cc0d212f0d1e7e3df7aa8",
+          "bytes": 1392
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 16,
+          "batchId": "masterwrought-phase06-inscription",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 05 woc_original_svg jewelcrafting placeholders: one hero object on the opaque dark painted vignette with a top-left key light; the Sheenleaf pieces carry the silvery green register, the Goldleaf pieces gilded gold, and the Sunpetal pieces a radiant sun-petal seal. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase06-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered inscription subject (a bound primer, folio, or grimoire, or a rolled parchment scroll with its ribbon or wax seal) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase06-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase06-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase06-art/README.md"
+          ],
+          "itemIds": [
+            "goldleaf_folio",
+            "goldleaf_scroll",
+            "silverleaf_primer",
+            "silverleaf_scroll",
+            "sunpetal_grimoire",
+            "sunpetal_scroll"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "sunspun_bolt",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "0e84d1eefd24f512c32b98b9569b6f560a1d18c230bb144374c5317b6aba75b7",
+          "bytes": 1040
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 53,
+          "itemId": "sunspun_bolt",
+          "name": "Sunspun Bolt",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sunspun_handwraps",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "7b88450a1daddb0c126ab5b3bf73ac03c3b9e2664a4a58e2ca8ae52c23bfe53a",
+          "bytes": 1710
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 70,
+          "itemId": "sunspun_handwraps",
+          "name": "Sunspun Handwraps",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sunspun_haversack",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "56e7afb2be8c9b454d5cb1637046fe8be589d3db172b9b9106e54eb20141c00e",
+          "bytes": 2116
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 71,
+          "itemId": "sunspun_haversack",
+          "name": "Sunspun Haversack",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sunspun_leggings",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "0cffdf151880a660916a87c84464451bbb84465445ab4015391f12a12547210a",
+          "bytes": 1648
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 69,
+          "itemId": "sunspun_leggings",
+          "name": "Sunspun Leggings",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "sunspun_vestments",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "341b5e9c6352321599b85cf39e89e13d9229047084be4a5d7177fd5f466f013a",
+          "bytes": 2014
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 68,
+          "itemId": "sunspun_vestments",
+          "name": "Sunspun Vestments",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "voidbound_grimoire",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "37cc6556f91c5a67f5b0f36879b65e5d125d11799bff96c5132eed06cc31b4b3",
+          "bytes": 1344
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "warboar_flask",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "d8df17ce50834343381091c3e8b635636eb0031ba968b848508a792761be63b4",
+          "bytes": 1646
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 73,
+          "itemId": "warboar_flask",
+          "name": "Warboar Flask",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "wardspeaker_sabatons",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "9208b4dab4f7986ce04e915e92357fe9da195ab67796a36d199d3388cc8da4a3",
+          "bytes": 1512
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 64,
+          "itemId": "wardspeaker_sabatons",
+          "name": "Wardspeaker Sabatons",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "warhewn_signet",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "1cc7afcd621b57c606b4a7b36562da231a14b8bc8ea78e99ae81154b13496319",
+          "bytes": 1398
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "warspice_skewers",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "d56392481000b771361afe91bdec2e4d63232813ba8d1dd9877686ecf9713b3e",
+          "bytes": 1388
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 76,
+          "itemId": "warspice_skewers",
+          "name": "Warspice Skewers",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "weighted_thorium_band",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "5b27e92689d01b63cf90d9c0fa6aff522ec2a82335f23d7e766e7debb425f3cf",
+          "bytes": 1192
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 58,
+          "itemId": "weighted_thorium_band",
+          "name": "Weighted Osmium Band",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "wyrmfall_core",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "cb079e8becd5bf1397f97b514962c35b1051c4a66cadc449874bcda2149ea087",
+          "bytes": 2074
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 60,
+          "itemId": "wyrmfall_core",
+          "name": "Wyrmfall Core",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    },
+    {
+      "itemId": "wyrmfall_pendant",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "31191e8d1aa6be4493b48978850a01677a9a3761f34cff122fe74b6daf377076",
+          "bytes": 1604
+        },
+        "provenanceClass": "priorGeneratedPlaceholderBatch",
+        "owner": {
+          "ownerType": "generatedBatch",
+          "batchIndex": 17,
+          "batchId": "masterwrought-phase09-art",
+          "source": "woc_original_svg",
+          "owner": "World of ClaudeCraft",
+          "license": "World of ClaudeCraft original art (project-owned, hand-written SVG compositions rasterized in-repo; placeholders pending commissioned painted icons in the profession-materials style), project asset, rights reserved",
+          "styleContract": {
+            "id": "woc-item-icon-v1",
+            "document": "docs/design/item-icon-art-style.md"
+          },
+          "styleReference": "Authored in the woc-item-icon-v1 house style beside the phase 06 woc_original_svg batch and the phase 08 per-item entries: one hero object on the opaque dark painted vignette with a top-left key light, in the dark apex palette of the masterwrought set. Committed SVG sources, the rasterizer script, and accepted hashes are retained in docs/achievements/masterwrought-phase09-art/.",
+          "commonPrompt": "Hand-written SVG composition per item (no image-generation service): one centered apex-gear subject (weapon, shield, jewelry, lens array, field forge, charm, or tome) on an opaque dark atmospheric vignette with a grounded contact shadow, supersampled and encoded to the opaque 128px shipping WebP by docs/achievements/masterwrought-phase09-art/rasterize_item_icons.mjs.",
+          "provenanceRecord": "docs/achievements/masterwrought-phase09-art/",
+          "provenanceRecords": [
+            "docs/achievements/masterwrought-phase09-art/README.md"
+          ],
+          "itemIds": [
+            "duskforged_warblade",
+            "ridgebreaker",
+            "duskforged_bulwark",
+            "wyrmfall_pendant",
+            "warhewn_signet",
+            "prismglass_loop",
+            "gyrelens_array",
+            "masters_field_forge",
+            "makers_charm",
+            "voidbound_grimoire"
+          ]
+        }
+      }
+    },
+    {
+      "itemId": "wyrmhide_cording",
+      "previous": {
+        "shipping": {
+          "commit": "103934491b9cdc72cbad99c4601919962b871fd7",
+          "sha256": "d8dac026d8f5dd1ec9144357ca83f14b3d7d4d49cc02b5bcc50134b44b94d017",
+          "bytes": 922
+        },
+        "provenanceClass": "projectOwnedProgrammaticPlaceholder",
+        "owner": {
+          "ownerType": "ordinaryEntry",
+          "entryIndex": 61,
+          "itemId": "wyrmhide_cording",
+          "name": "Wyrmhide Cording",
+          "sourcePack": "woc_original_svg",
+          "sourceFile": "n/a (procedurally rasterized SVG, no source pack)",
+          "confidence": "high",
+          "license": "World of ClaudeCraft original art (project-owned, programmatically drawn placeholder pending a commissioned painted icon in the profession-materials style)"
+        }
+      }
+    }
+  ]
+}

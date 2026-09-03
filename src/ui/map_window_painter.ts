@@ -729,18 +729,19 @@ export class MapWindowPainter {
       }
     }
 
-    // Farming garden beds share the static-landmark layer with stations and
-    // services. The glyph is a two-leaf sprout over a short stem: procedural
-    // only this phase (no marker art id, so nothing to blit), and its
-    // silhouette is what separates a patch from the station diamond and the
-    // noticeboard rectangle beside it. The fill is the STATION family's token
-    // on this surface (colors.stall, the fill the station diamond takes here
-    // when it has no sprite; the minimap paints the same pin in ITS station
-    // token), because a patch is a static service site like a crafting
-    // station, and never the herb-node green, so a growing site never reads
-    // as a gather node's readiness. Tier-identical (fairness): the pin is
-    // actionable information, never preset- or governor-gated.
+    // Farming garden beds share the static-landmark layer and painted-size
+    // family with stations. The procedural sprout remains the deliberate
+    // fallback if the committed sprite is unavailable. Tier-identical
+    // (fairness): the pin is actionable information, never preset- or
+    // governor-gated.
     for (const patch of model.farmPatches) {
+      const sizeId = profile === 'compact' ? 'mapStationCompact' : 'mapStation';
+      const sprite = this.markerArt.sprite('farm-patch', sizeId);
+      if (sprite) {
+        const size = MAP_MARKER_SIZES[sizeId];
+        ctx.drawImage(sprite, Math.round(patch.mx - size / 2), Math.round(patch.my - size / 2));
+        continue;
+      }
       const radius = geometry.farmPatchRadius;
       const crownY = patch.my - radius * FARM_SPROUT_CROWN;
       const heelX = radius * FARM_SPROUT_HEEL_X;

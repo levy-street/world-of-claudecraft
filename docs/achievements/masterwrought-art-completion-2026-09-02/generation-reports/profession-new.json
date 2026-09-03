@@ -1,0 +1,496 @@
+{
+  "batchId": "masterwrought-profession-new-2026-09-02",
+  "contract": "woc-item-icon-v1",
+  "generator": "OpenAI built-in image_gen",
+  "promptEncoding": "Join each promptLines array with LF and no final newline to recover the exact prompt.",
+  "preservedGeneratorOriginals": true,
+  "commonMasterProperties": {
+    "width": 1254,
+    "height": 1254,
+    "colorspace": "sRGB",
+    "channels": "RGB",
+    "bitDepth": 8,
+    "fullyOpaque": true
+  },
+  "commonReview": {
+    "sizes": ["1254px master", "128px", "40px", "28px", "22px", "28px grayscale", "64px circular crop"],
+    "result": "accepted",
+    "notes": "All subjects retain identity-bearing silhouettes at tiny sizes and circular crop. No text, pseudo-writing, transparency, baked frame, watermark, or unintended repeated painting was observed. Feast roles, fish species, cooked-versus-raw state, pattern motifs, tool construction, engineering tier, and guild-writ identity remain distinct."
+  },
+  "assets": [
+    {
+      "id": "clockreel_fishing_rod",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-b85bb301-c37e-485f-9689-d30e48b994e4.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/clockreel_fishing_rod.png",
+      "sha256": "97ce7a6bf1f2681d201538bcb3576da2b523671891d753c0ddd2c8a28aed5819",
+      "bytes": 2103239,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "complete tool silhouette, tactile hard materials, restrained magical polish, and top-left lighting only"},
+        {"path": "public/ui/items/kingsbane_last_oath.webp", "role": "long diagonal composition and safe tip padding only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-metal values and warm-to-cool lighting only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Clockreel Fishing Rod (clockreel_fishing_rod) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for complete tool silhouette, tactile hard materials, restrained magical polish, and top-left lighting only. Image 2 is a style reference for long diagonal composition and safe tip padding only. Image 3 is a style reference for forged-metal values and warm-to-cool lighting only. Do not copy any unrelated object or motif.",
+        "Subject and identity: one complete epic tier-6 fishing rod, a long dark steel and weathered ash pole running corner-to-corner, with a prominent intricate brass clockwork reel near the leather-wrapped grip. The reel must visibly read as a functional fishing reel with a round spool, compact toothed gears, crank handle, bail and taut line guides, not a clock face. Add restrained teal-blue line glints and subtle salt wear. It is the engineering apex of a fishing-rod ladder, refined and mechanically credible, never a wand, spear, rifle, or loose pile of parts.",
+        "Composition: one complete diagonal hero tool in readable three-quarter view, about 72 percent subject fill, full rod tip, grip and reel visible, safe margin on all sides, strong simple silhouette readable at 22px and inside a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep navy-charcoal painted vignette with a faint cool water haze and grounded contact shadow, never transparency or a flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile brass, steel, leather and wood, crisp focal edges on the reel and softer peripheral brushwork, warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one complete rod; no fish, hook as a separate subject, hand, person, boat, environmental scene, text, letters, numbers, clock numerals, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, cropped tip, or unrelated object."
+      ],
+      "reviewNotes": "Complete diagonal rod with safe margins. The brass clockwork reel remains the focal read at tiny sizes and in the circular crop; it reads as a fishing rod, not a weapon, wand, or clock face."
+    },
+    {
+      "id": "raw_deepbarb_catfish",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-e9cc841c-b90c-45cc-b6d9-c213a95bd44c.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/raw_deepbarb_catfish.png",
+      "sha256": "d2bb680c638ef3defb82c3c1e3aa6d7aaa2e75bf5d273573f598e8f6ef3da3b7",
+      "bytes": 2031333,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "warm top-left lighting, cool shadow, and strong centered mass only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "subdued dark-ground material contrast only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Raw Deepbarb Catfish (raw_deepbarb_catfish) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for hand-painted food rendering, organic surface separation, and tiny-scale readability only. Image 2 is a style reference for warm top-left lighting, cool shadow, and strong centered mass only. Image 3 is a style reference for subdued dark-ground material contrast only. Do not copy their objects, shapes, or motifs.",
+        "Subject and identity: one whole freshly caught Deepbarb Catfish, clearly a catfish with a broad flattened head and several long pronounced whisker barbs. Give it a muscular river-fish body, mottled river-blue and sky-blue wet skin, a pale cool belly, small bronze-gray fins, and a subtle ridge of short defensive barbs. It must read as a raw cooking catch from a high fishing band, not a cooked dish, generic trout, shark, eel, monster, or trophy mount.",
+        "Composition: one complete fish in readable side three-quarter view with a gentle natural curve, about 72 percent subject fill, head and tail fully visible, pronounced whiskers kept inside safe margins, strong silhouette readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep river-navy and charcoal painted vignette with faint watery atmosphere and a soft contact shadow, never a plate, table scene, transparent exterior, or flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile wet skin and controlled scale highlights, crisp face and barb edges with softer tail brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one whole raw fish; no blood, gore, cut fillet, plate, garnish, hook, fishing rod, hand, person, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped fins, tail, head, or whiskers."
+      ],
+      "reviewNotes": "Broad catfish head, curled body, river-blue palette, and pronounced whisker barbs remain unmistakable at 22px. No plate or cooked presentation."
+    },
+    {
+      "id": "raw_hollowgill_sturgeon",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-8bbbb147-7a86-4f6d-990d-c13421374dc6.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/raw_hollowgill_sturgeon.png",
+      "sha256": "02ef87cd00496d681280ce2473490aa8dbf4be0768ce11d2834df6ddd0339b0e",
+      "bytes": 1821369,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-steel values, warm top-left lighting, cool shadow, and strong mass only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "subdued dark-ground material contrast only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Raw Hollowgill Sturgeon (raw_hollowgill_sturgeon) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for hand-painted food rendering, organic surface separation, and tiny-scale readability only. Image 2 is a style reference for forged-steel values, warm top-left lighting, cool shadow, and strong mass only. Image 3 is a style reference for subdued dark-ground material contrast only. Do not copy their objects, shapes, or motifs.",
+        "Subject and identity: one whole freshly caught Hollowgill Sturgeon, unmistakably a heavy sturgeon with a long pointed snout, low-set mouth, armored rows of bony scutes, and a deeply shadowed but natural gill opening. Its body is shadow-steel gray with cold blue along the scutes, a pale slate belly, and restrained icy highlights. It must feel older, heavier, and deeper-water than the Deepbarb Catfish, not a generic shark, swordfish, eel, prehistoric monster, skeleton, or cooked dish.",
+        "Composition: one complete elongated fish in readable side three-quarter view with a slight rising curve, about 72 percent subject fill, pointed snout, dorsal ridges and forked tail fully visible with safe margins, broad identity-bearing profile readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep cold-blue and charcoal painted vignette with faint deep-water haze and a soft contact shadow, never a plate, table scene, transparent exterior, or flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile armored scutes and wet skin, crisp snout, gill and dorsal edges with softer peripheral brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one whole raw fish; no blood, gore, exposed bones, cut fillet, plate, garnish, hook, fishing rod, hand, person, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped snout, fins, tail, or scutes."
+      ],
+      "reviewNotes": "Pointed snout and orderly armored scutes create a strong sturgeon identity. Its colder, straighter profile separates it from the curled Deepbarb and silver Stillmere."
+    },
+    {
+      "id": "raw_stillmere_salmon",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-165aebda-4d17-4e25-b868-1b5545e8c236.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/raw_stillmere_salmon.png",
+      "sha256": "ca9f032b95a751ad2dd958aab3ff24c5decdd0d3af5b5d5f6f851aec6b4424eb",
+      "bytes": 2203206,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "hand-painted food rendering, organic surface separation, and tiny-scale readability only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "contained magical luminance and crisp wet highlights only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "warm top-left lighting, cool shadow, and strong centered mass only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Raw Stillmere Salmon (raw_stillmere_salmon) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for hand-painted food rendering, organic surface separation, and tiny-scale readability only. Image 2 is a style reference for contained magical luminance and crisp wet highlights only. Image 3 is a style reference for warm top-left lighting, cool shadow, and strong centered mass only. Do not copy their objects, shapes, or motifs.",
+        "Subject and identity: one whole freshly caught Stillmere Salmon, the rarest apex catch, unmistakably a powerful salmon with a compact tapered head, thick torpedo body, small adipose fin, and broad forked tail. Paint frost-silver scales, an indigo-blue back, pearl-white belly, and sparse pale cyan glints that suggest moonlit still water. The rare glow must stay subtle and cling to a few scale edges, never becoming an aura or replacing the fish. It must read as a raw salmon catch, not a cooked dish, koi, trout, shark, magical spirit, or frozen block.",
+        "Composition: one complete elegant fish in readable side three-quarter view with a restrained upward arch, about 72 percent subject fill, head, fins and tail fully visible with safe margins, luminous silhouette readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep midnight-blue and charcoal painted vignette with faint still-water mist and a soft contact shadow, never a plate, table scene, transparent exterior, or flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile wet silver scales, crisp head and scale highlights with softer tail brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one whole raw fish; no blood, gore, cut fillet, plate, garnish, hook, fishing rod, hand, person, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, large aura, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped fins, tail, or head."
+      ],
+      "reviewNotes": "Salmon anatomy, frost-silver flank, and sparse blue highlights create the rare apex read without becoming a spirit or glowing orb."
+    },
+    {
+      "id": "peppered_deepbarb_catfish",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-85c7ff14-a451-43d0-8ece-a5a32f48c214.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/peppered_deepbarb_catfish.png",
+      "sha256": "2fd076702fd6393488648fb5f933c963fa7b30fe7308bd19324585d992111cbb",
+      "bytes": 2472489,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "contained warm highlights against a dark ground only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile organic surfaces and subdued vignette values only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Peppered Deepbarb Catfish (peppered_deepbarb_catfish) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is the same-family style reference for one appetizing plated serving, warm food light, grouping, and tiny-scale separation only. Image 2 is a style reference for contained warm highlights against a dark ground only. Image 3 is a style reference for tactile organic surfaces and subdued vignette values only. Do not copy their food, vessel, shapes, or motifs.",
+        "Subject and identity: one rustic dark ceramic plate holding a finished serving of two broad catfish fillets, visibly cooked rather than raw. The fillets have crisp golden-brown edges, moist pale flakes, a generous coarse black-pepper crust, and a few restrained goldleaf-herb sprigs with warm green-gold leaves. Suggest the Deepbarb identity through the broad tapered fillet shapes and a small curved crisp skin edge, never by placing a whole raw blue fish on the plate. It is a hearty rare cooking-rung dish, pepper-forward and appetizing.",
+        "Composition: one complete plated serving in readable three-quarter overhead view, about 72 percent subject fill, plate rim and all food fully visible with safe padding, high-contrast peppered fillet shapes readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle kitchen warmth and grounded contact shadow, no table scene, transparency, or flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile crisp skin, moist fish flakes, cracked pepper and ceramic, crisp focal food edges with softer plate and backdrop brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one plated serving; no whole raw fish, blue raw flesh, blood, gore, separate loose ingredient pile, cutlery, hand, person, kitchen scene, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped plate."
+      ],
+      "reviewNotes": "Broad golden fillets, coarse pepper crust, and green-gold herb accents remain obvious at 22px. It reads as cooked food rather than a raw-fish recolor."
+    },
+    {
+      "id": "roast_hollowgill_sturgeon",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-69683e7c-9ec4-4af5-ba96-fd461c34d308.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/roast_hollowgill_sturgeon.png",
+      "sha256": "6e8ee865ea08ee25853181fb12f1bbb2bcb912d08185f60d6ae205ef908f2db6",
+      "bytes": 2542209,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "same-family plated-food composition, warm food light, grouping, and tiny-scale separation only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "contained warm highlights against a dark ground only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile hard-edged surface values and readable circular mass only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Roast Hollowgill Sturgeon (roast_hollowgill_sturgeon) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is the same-family style reference for one appetizing plated serving, warm food light, grouping, and tiny-scale separation only. Image 2 is a style reference for contained warm highlights against a dark ground only. Image 3 is a style reference for tactile hard-edged surface values and readable circular mass only. Do not copy their food, vessel, shapes, or motifs.",
+        "Subject and identity: one heavy dark stoneware platter holding a finished roasted Hollowgill Sturgeon portion, clearly cooked rather than raw. Make the hero piece a thick broad sturgeon steak with roasted ivory flakes, lacquered amber-brown surface, and a distinctive charcoal-gray armored skin edge with small orderly scute plates. Add only a few restrained sunpetal-herb accents, tiny warm orange-gold petals and sea salt, integrated on the serving. It must feel richer and heavier than the peppered catfish dish, never a whole raw fish, generic red-meat steak, or recolor of another plate.",
+        "Composition: one complete plated serving in readable three-quarter overhead view, about 72 percent subject fill, platter rim and all food fully visible with safe padding, the thick roast and armored skin edge readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep slate-charcoal and umber painted vignette with subtle hearth warmth and grounded contact shadow, no table scene, transparency, or flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile crisp skin, flaky fish, glazed roast surface and stoneware, crisp focal food edges with softer plate and backdrop brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one plated serving; no whole raw fish, blue raw flesh, blood, gore, separate loose ingredient pile, cutlery, hand, person, kitchen scene, text, letters, numbers, labels, runes, pseudo-writing, UI chrome, rarity frame, circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped platter."
+      ],
+      "reviewNotes": "The circular heavy roast, amber glaze, flaky interior, and dark scute-like skin ring distinguish it strongly from the elongated peppered fillets."
+    },
+    {
+      "id": "pattern_peppered_deepbarb_catfish",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-85d57bcd-8c0f-4a31-b137-6f8e3920c2f3.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_peppered_deepbarb_catfish.png",
+      "sha256": "4c342b7d70df30155aa662f73b001d594ecdd1198374595db8503b073126bbb9",
+      "bytes": 2308733,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "corresponding food-family palette and tiny-scale separation only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable centered mass and cool deep shadow only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Recipe: Peppered Deepbarb Catfish (pattern_peppered_deepbarb_catfish) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only. Image 2 is a style reference for the corresponding food family's warm painted palette and tiny-scale separation only. Image 3 is a style reference for readable centered mass and cool deep shadow only. Do not copy their objects, shapes, emblems, or motifs.",
+        "Subject and identity: one substantial rare cooking-recipe parchment, partly unfurled with curled ends and a tied dark olive cord. Its broad central face carries exactly one large hand-painted pictorial motif: a broad blue-gray catfish silhouette with long curved whisker barbs above a golden pepper-speckled fillet shape. Add one attached muted green-gold blank wax seal with a simple raised fish-fin impression. The motif must be image-like and immediately communicate peppered catfish, with no written recipe, glyphs, diagram labels, tiny marks, or pseudo-script.",
+        "Composition: one complete parchment hero object in readable three-quarter view, about 72 percent subject fill, all curled corners, cord and seal fully visible with safe padding, the catfish-and-pepper motif readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep umber-charcoal painted vignette with subtle warm kitchen atmosphere and grounded contact shadow, never transparency or a flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile aged parchment, fiber, cord and wax, crisp central motif and seal edges with softer curled-periphery brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one parchment recipe object; no readable text, letters, numbers, words, labels, runes, pseudo-writing, scribbles, horizontal writing-like marks, ingredient list, UI chrome, rarity frame, circular halo, separate fish or plate beside it, hand, person, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped parchment."
+      ],
+      "reviewNotes": "Parchment, catfish, peppered fillet motif, olive cord, and fin seal remain cohesive. No written marks; distinct from the sturgeon recipe through shape, color, and seal placement."
+    },
+    {
+      "id": "pattern_roast_hollowgill_sturgeon",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-9d1de23d-ad73-47f2-ae23-b9986202d90e.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_roast_hollowgill_sturgeon.png",
+      "sha256": "aa19897f46a2def95889b1bf37fc8e8442a99aef74a2a601f1f638cf94829698",
+      "bytes": 2361509,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "corresponding food-family palette and tiny-scale separation only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "forged-steel values, readable centered mass, and cool deep shadow only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Recipe: Roast Hollowgill Sturgeon (pattern_roast_hollowgill_sturgeon) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only. Image 2 is a style reference for the corresponding food family's warm painted palette and tiny-scale separation only. Image 3 is a style reference for forged-steel values, readable centered mass, and cool deep shadow only. Do not copy their objects, shapes, emblems, or motifs.",
+        "Subject and identity: one substantial rare cooking-recipe parchment, partly unfurled with curled ends and a tied slate-blue cord. Its broad central face carries exactly one large hand-painted pictorial motif: a long shadow-steel sturgeon silhouette with pointed snout and orderly armored scutes above a thick amber roast medallion shape. Add one attached muted amber blank wax seal with a simple raised scute impression. The motif must be image-like and immediately communicate roasted sturgeon, with no written recipe, glyphs, diagram labels, tiny marks, or pseudo-script.",
+        "Composition: one complete parchment hero object in readable three-quarter view, about 72 percent subject fill, all curled corners, cord and seal fully visible with safe padding, the sturgeon-and-roast motif readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep slate-charcoal and umber painted vignette with subtle hearth atmosphere and grounded contact shadow, never transparency or a flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile aged parchment, fiber, cord and wax, crisp central motif and seal edges with softer curled-periphery brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one parchment recipe object; no readable text, letters, numbers, words, labels, runes, pseudo-writing, scribbles, horizontal writing-like marks, ingredient list, UI chrome, rarity frame, circular halo, separate fish or plate beside it, hand, person, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped parchment."
+      ],
+      "reviewNotes": "Pointed sturgeon and armored scutes are clear. The amber roast motif and blue cord separate it from the catfish recipe; no written or pseudo-written marks."
+    },
+    {
+      "id": "pattern_clockreel_fishing_rod",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064eb-837b-7df3-81ed-ddf226c77fc0/exec-93092ac1-69ca-41bd-8163-592f65495f03.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_clockreel_fishing_rod.png",
+      "sha256": "31fd738ca37c21bb5f7dcae821706e27c0267dc633faa2201a1e4940246c5697",
+      "bytes": 2293745,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only"},
+        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "complete functional tool construction, hard materials, and restrained magical polish only"},
+        {"path": "public/ui/items/kingsbane_last_oath.webp", "role": "long diagonal silhouette and safe tip padding only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Schematic: Clockreel Fishing Rod (pattern_clockreel_fishing_rod) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a style reference for tactile parchment-like soft goods, leather detail, warm top-left light, and compact three-quarter volume only. Image 2 is a style reference for complete functional tool construction, hard materials, and restrained magical polish only. Image 3 is a style reference for a long diagonal silhouette and safe tip padding only. Do not copy their objects, shapes, emblems, or motifs.",
+        "Subject and identity: one substantial epic engineering schematic parchment, partly unfurled with thick curled ends, reinforced by a dark blue leather strap and one brass gear-shaped blank seal. Its broad central face carries exactly one large clean pictorial motif: a long diagonal fishing rod silhouette meeting a prominent round brass clockwork reel with a spool, crank, and three bold gear forms. Use embossed brass and pale cyan inlay for this single image-like motif. It must immediately communicate a clockwork fishing-rod schematic, not a clock face, wand, weapon, treasure map, or pile of gears, and it must contain no writing, glyphs, diagram labels, measurements, ticks, tiny notes, or pseudo-script.",
+        "Composition: one complete parchment hero object in readable three-quarter view, about 72 percent subject fill, all curled corners, strap and seal fully visible with safe padding, the large rod-and-reel motif readable at 22px and in a 64px circular crop.",
+        "Scene and backdrop: opaque full-square deep navy-charcoal painted vignette with subtle workshop atmosphere and grounded contact shadow, never transparency or a flat black void.",
+        "Style: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile aged parchment, leather, brass and wax, crisp central mechanical motif and seal edges with softer curled-periphery brushwork, warm top-left key light and cool deep bottom-right shadow.",
+        "Constraints: square borderless single icon; exactly one parchment schematic object; no readable text, letters, numbers, words, labels, runes, pseudo-writing, scribbles, horizontal writing-like marks, blueprint grid, measurements, UI chrome, rarity frame, circular halo, separate rod or loose gear beside it, hand, person, watermark, signature, checkerboard, transparency, split sheet, collage, or cropped parchment."
+      ],
+      "reviewNotes": "The large rod-and-reel motif, cyan spool, blue reinforcement, and gear seal retain the epic engineering read at tiny sizes. No blueprint labels, measurements, or pseudo-writing."
+    },
+    {
+      "id": "stonepot_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-abdaffba-f3ca-47ed-b829-24a218f884e1.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/stonepot_feast.png",
+      "sha256": "d52a56b4cccadf4032b1cbbe1ace81182585b27cf98cde5fa851f216f086e003",
+      "bytes": 2203238,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile iron material and top-left lighting only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "compact three-quarter container volume only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Stonepot Feast (stonepot_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only. Image 2 is a house-style reference for tactile iron material and top-left lighting only. Image 3 is a house-style reference for compact three-quarter container volume only. Do not copy their unrelated objects.",
+        "Subject and identity: one cohesive portable multi-serving feast arrangement, centered as a single inventory subject: a squat black stoneware pot of thick savory root-and-fish stew nested into a low ironbound serving crate, with three filled stout bowls tucked tightly around it. Heavy dark iron fittings and broad sturdy shapes communicate the defensive stamina role. A small plain shield-shaped iron clasp is construction detail, not a UI emblem. Rich broth, root vegetables, greens, and steam should read clearly; this is a generous party feast, not one plated meal, not a restaurant table, and not raw ingredients.",
+        "Composition/framing: readable three-quarter presentation, complete compact silhouette about 72 percent of the square, safe padding on all four sides, no cropped pot, bowls, crate, or steam; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal and cool slate painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile stoneware, iron, wood, broth, and vegetables; crisp focal edges with softer peripheral brushwork; restrained wisps of steam; no photographic product shot and no raw 3D thumbnail.",
+        "Lighting/mood: warm top-left key light on the food and iron edges, cool deep bottom-right shadow, hearty and steadfast.",
+        "Constraints: one cohesive feast inventory subject only; square; borderless; opaque; no text, letters, numbers, labels, writing, pseudo-writing, runes, generic magical symbols, UI chrome, rarity frame, baked circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, people, hands, dining-room scene, oversized shield, or cropped silhouette."
+      ],
+      "reviewNotes": "Black stoneware, ironbound crate, shield clasp, and four servings create a sturdy defensive feast identity. Food remains legible at 22px."
+    },
+    {
+      "id": "warspice_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-0fd12a9d-8f28-4f6b-9f90-3e9693864ec3.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/warspice_feast.png",
+      "sha256": "af1e6b4c2157385d22fe5c2a60f980872422012f41f49dab56d720a8dde267a4",
+      "bytes": 2511657,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "tactile dark iron and top-left edge light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember glow only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Warspice Feast (warspice_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only. Image 2 is a house-style reference for tactile dark iron and top-left edge light only. Image 3 is a house-style reference for restrained contained ember glow only. Do not copy their unrelated objects.",
+        "Subject and identity: one cohesive portable multi-serving feast arrangement, centered as a single inventory subject: a low blackened-iron serving crate packed with several rows of ember-glazed meat-and-red-pepper skewers, a small central brazier tray of glowing coals, and two compact bowls of crimson warspice. A pair of short plain iron carving blades is crossed and secured flat against the crate front as a construction motif, communicating the physical attack role without becoming the main subject. This is a generous martial party spread, not one plated meal, not raw ingredients, and not a restaurant table.",
+        "Composition/framing: readable three-quarter presentation, complete compact silhouette about 72 percent of the square, safe padding on all four sides, no cropped crate, skewers, blades, or coals; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal and smoke-red painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile blackened iron, worn wood, glazed food, pepper, and ember; crisp focal edges with softer peripheral brushwork; restrained sparks and heat haze; no photographic product shot and no raw 3D thumbnail.",
+        "Lighting/mood: warm top-left firelit key on the skewers and iron edges, cool deep bottom-right shadow, bold and martial.",
+        "Constraints: one cohesive feast inventory subject only; square; borderless; opaque; no text, letters, numbers, labels, writing, pseudo-writing, runes, generic magical symbols, UI chrome, rarity frame, baked circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, people, hands, dining-room scene, oversized weapons, or cropped silhouette."
+      ],
+      "reviewNotes": "The ember skewers, blackened crate, spice bowls, and secured crossed carving blades make the martial role clear without turning the icon into a weapon painting."
+    },
+    {
+      "id": "sageleaf_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-39b89420-4fed-424a-82dd-de391aa83f71.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/sageleaf_feast.png",
+      "sha256": "fb9ff09bcef4a52465f3be63ce90587daca7f3be5df3403e105a24f7695ddf57",
+      "bytes": 2327250,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "compact three-quarter container volume, cloth, and leather only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "ceramic or glass rim light and restrained internal color glow only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Sageleaf Feast (sageleaf_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for compact food grouping, warm appetizing light, small-size separation, brushwork, and value hierarchy only. Image 2 is a house-style reference for compact three-quarter container volume, cloth, and leather only. Image 3 is a house-style reference for ceramic or glass rim light and restrained internal color glow only. Do not copy their unrelated objects.",
+        "Subject and identity: one cohesive portable multi-serving feast arrangement, centered as a single inventory subject: a violet-glazed ceramic tureen of creamy sageleaf chowder nested into a low carved dark-wood serving tray, with three smaller filled bowls, fresh sage-green leaves, violet arcane herbs, and one elegant silver serving ladle whose simple long finial subtly resembles a mage staff. The leaves and faint violet aromatic steam communicate the intellect caster role. This is a generous party feast, not one plated meal, not raw ingredients, and not a restaurant table.",
+        "Composition/framing: readable three-quarter presentation, complete compact silhouette about 72 percent of the square, safe padding on all four sides, no cropped tureen, bowls, tray, leaves, ladle, or steam; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep navy and muted violet painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile ceramic, wood, creamy chowder, herbs, and silver; crisp focal edges with softer peripheral brushwork; restrained aromatic violet steam; no photographic product shot and no raw 3D thumbnail.",
+        "Lighting/mood: warm top-left key light on the food and silver rim, cool deep bottom-right shadow, learned and restorative.",
+        "Constraints: one cohesive feast inventory subject only; square; borderless; opaque; no text, letters, numbers, labels, writing, pseudo-writing, runes, generic magical symbols, UI chrome, rarity frame, baked circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, people, hands, dining-room scene, oversized staff, or cropped silhouette."
+      ],
+      "reviewNotes": "The violet tureen, multiple bowls, sage leaves, aromatic steam, and ladle with staff-like finial establish the caster feast while staying a food icon."
+    },
+    {
+      "id": "pattern_stonepot_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-702aabb9-2ffc-4218-a9c0-170986c90214.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_stonepot_feast.png",
+      "sha256": "ccf572ffe92dcf8f639750409309fbb7fc86489cf6e608b1394148969ea65645",
+      "bytes": 2401885,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "worn iron material and controlled cool shadow only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "readable visual language of a compact multi-serving food arrangement only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Stonepot Feast (pattern_stonepot_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for tactile cloth, leather, compact volume, and warm top-left light only. Image 2 is a house-style reference for worn iron material and controlled cool shadow only. Image 3 is a house-style reference for the readable visual language of a compact multi-serving food arrangement only. Do not copy their unrelated objects.",
+        "Subject and identity: one thick blue-grey vellum recipe scroll unfurled in a compact curl, secured by dark cord and one heavy iron corner clip. Its front is deliberately clean except for one single large charcoal pictorial illustration of a squat stone cooking pot with three simple bowls, plus a small shield-shaped iron-grey wax seal. The broad pot-and-bowls picture must read instantly as the Stonepot Feast recipe at tiny size. This is a physical learnable cooking pattern, not the cooked feast, not an official guild deed, and not a magic scroll.",
+        "Composition/framing: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, safe padding on every side, compact strong silhouette readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal and cool slate painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile curled vellum, cord, wax, and iron; crisp focal edges with softer peripheral brushwork; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one recipe-scroll subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, extra diagrams, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, cooked feast as the main object, official folded writ, or cropped silhouette. The only surface mark is the one large recognizable pot-and-bowls pictorial illustration."
+      ],
+      "reviewNotes": "Cool blue-grey parchment, iron clips, heavy pot illustration, and blank dark seal distinguish this tank recipe at tiny sizes without any written marks."
+    },
+    {
+      "id": "pattern_warspice_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-2e5b9880-15e4-41ad-a977-190bd9a1cf37.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_warspice_feast.png",
+      "sha256": "3ad8e5f936dbcd11cdf3066ffcb69708e510638ab517c644e2403b57473608be",
+      "bytes": 2363074,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember color and dark painted ground only"},
+        {"path": "public/ui/items/anglers_feast_platter.webp", "role": "readable visual language of a compact multi-serving food arrangement only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Warspice Feast (pattern_warspice_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for tactile cloth, leather, compact volume, and warm top-left light only. Image 2 is a house-style reference for restrained contained ember color and dark painted ground only. Image 3 is a house-style reference for the readable visual language of a compact multi-serving food arrangement only. Do not copy their unrelated objects.",
+        "Subject and identity: one warm umber vellum recipe scroll unfurled in a compact curl, bound with a crimson ribbon and ember-red wax seal. Its front is deliberately clean except for one single large dark pictorial illustration of crossed cooking skewers over a small brazier tray, with a few bold crimson spice flecks contained inside that motif. The crossed-skewer picture must read instantly as the martial Warspice Feast recipe at tiny size. This is a physical learnable cooking pattern, not the cooked feast, not an official guild deed, and not a magic scroll.",
+        "Composition/framing: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, safe padding on every side, compact strong silhouette readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal and smoke-red painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile curled vellum, ribbon, and wax; crisp focal edges with softer peripheral brushwork; restrained ember flecks; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one recipe-scroll subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, extra diagrams, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, cooked feast as the main object, official folded writ, or cropped silhouette. The only surface mark is the one large recognizable crossed-skewers-and-brazier pictorial illustration."
+      ],
+      "reviewNotes": "Warm parchment, crimson ribbon, crossed-skewer illustration, and brazier silhouette make the martial recipe distinct. No text or pseudo-writing."
+    },
+    {
+      "id": "pattern_sageleaf_feast",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-a29dd5c0-c905-4fc9-8948-1303695f91e5.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/pattern_sageleaf_feast.png",
+      "sha256": "86f40ba23e477c11ad3cbc561475f476cc271f2af78b3e9e9645d4b2fb05c595",
+      "bytes": 2481482,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile cloth, leather, compact volume, and warm top-left light only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained violet color and dark painted ground only"},
+        {"path": "public/ui/items/cinderweave_raiment.webp", "role": "deep violet cloth values and soft peripheral brushwork only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory recipe icon",
+        "Primary request: paint Recipe: Sageleaf Feast (pattern_sageleaf_feast) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for tactile cloth, leather, compact volume, and warm top-left light only. Image 2 is a house-style reference for restrained contained violet color and dark painted ground only. Image 3 is a house-style reference for deep violet cloth values and soft peripheral brushwork only. Do not copy their unrelated objects.",
+        "Subject and identity: one pale herb-stained vellum recipe scroll unfurled in a compact curl, bound with a sage-green ribbon and violet wax seal. Its front is deliberately clean except for one single large dark-green pictorial illustration of a leafy soup tureen and a simple long serving ladle with a staff-like finial. A tiny bundle of real sage leaves is secured under the ribbon as part of the scroll. The leaf-tureen-and-ladle picture must read instantly as the caster Sageleaf Feast recipe at tiny size. This is a physical learnable cooking pattern, not the cooked feast, not an official guild deed, and not a magic scroll.",
+        "Composition/framing: one centered complete scroll in readable three-quarter view, about 72 percent subject fill, safe padding on every side, compact strong silhouette readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep navy and muted violet painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile curled vellum, ribbon, wax, and herbs; crisp focal edges with softer peripheral brushwork; restrained violet aromatic atmosphere; warm top-left key light with cool deep bottom-right shadow.",
+        "Constraints: square single icon; exactly one recipe-scroll subject; borderless; no readable text, letters, numbers, labels, writing lines, pseudo-writing, glyphs, runes, generic magic symbols, extra diagrams, UI chrome, rarity frame, baked halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, person, cooked feast as the main object, official folded writ, or cropped silhouette. The only surface mark is the one large recognizable leaf-tureen-and-ladle pictorial illustration."
+      ],
+      "reviewNotes": "Sage ribbon, real herb bundle, violet seal, and bold tureen-and-ladle illustration remain clear in grayscale and at 22px with no writing."
+    },
+    {
+      "id": "cogwheel_blank",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-1c874727-23c8-49dd-b0ff-739a1546329e.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/cogwheel_blank.png",
+      "sha256": "10eae6ecd3f3ed48bfea361ae7c398bc8d23c6f93b9bf77f469608d996fc4bd2",
+      "bytes": 2364717,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable circular mass, tactile metal, and top-left key light only"},
+        {"path": "public/ui/items/arcanite_mining_pick.webp", "role": "worn hard-tool material and crisp silhouette only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "warm leather-brown reflected color and compact three-quarter volume only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Cogwheel Blank (cogwheel_blank) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for readable circular mass, tactile metal, and top-left key light only. Image 2 is a house-style reference for worn hard-tool material and crisp silhouette only. Image 3 is a house-style reference for warm leather-brown reflected color and compact three-quarter volume only. Do not copy their unrelated objects.",
+        "Subject and identity: one unfinished engineering cogwheel blank, a thick hand-forged iron-and-brass disk with coarse newly cut teeth, a rough punched central axle hole, two smaller alignment holes, visible hammering and machining grooves, oily residue, burrs, and an uneven utilitarian edge. It is a humble common workshop component at the first engineering rung, clearly unfinished and unenchanted, yet unmistakably a cogwheel rather than a coin, shield, compass, clock face, or finished ornate gear.",
+        "Composition/framing: one centered complete hero object in readable three-quarter view, about 72 percent subject fill, safe padding on all four sides, every tooth visible, strong circular silhouette readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal and warm workshop-umber painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered iron, dull brass, oil, wear, and broad reflected value; crisp focal edges with softer peripheral brushwork; no photographic product shot, raw 3D thumbnail, flat vector, or plastic gradient.",
+        "Lighting/mood: warm top-left key light on rough brass and burrs, cool deep bottom-right shadow, practical workshop mood with no magical glow.",
+        "Constraints: square single icon; exactly one cogwheel blank; borderless; opaque; no text, letters, numbers, labels, writing, pseudo-writing, runes, generic magical symbols, UI chrome, rarity frame, baked circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, loose tools, hands, clock hands, compass needle, shield boss, gem, flame, or cropped silhouette."
+      ],
+      "reviewNotes": "Rough hammering, machining rings, three punched holes, thick teeth, and plain iron-brass construction clearly read as an unfinished first-rung cogwheel blank."
+    },
+    {
+      "id": "copperlens_ocular",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-980f139e-6a8a-429d-b087-a9d6cc62e734.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/copperlens_ocular.png",
+      "sha256": "b19851afe85de76fc6e046816555090cdeb37fedb6c9001c495a1bc43d4e6332",
+      "bytes": 1974230,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/firebottle.webp", "role": "glass rim light, contained blue color, and dark painted ground only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "readable circular mass, tactile metal, and top-left key light only"},
+        {"path": "public/ui/items/linen_pouch.webp", "role": "compact leather-wrapped detail and three-quarter volume only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Copperlens Ocular (copperlens_ocular) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for glass rim light, contained blue color, and dark painted ground only. Image 2 is a house-style reference for readable circular mass, tactile metal, and top-left key light only. Image 3 is a house-style reference for a compact leather-wrapped detail and three-quarter volume only. Do not copy their unrelated objects.",
+        "Subject and identity: one hand-sized engineering ocular for a caster offhand: a single round pale sky-blue magnifying glass lens set into a hammered copper and dull-brass ring, with a short leather-wrapped handgrip, two plain adjustment screws, and one small open mounting fork. The modest restrained craftsmanship is one clear rung below an epic multi-lens Gyrelens Array: no extra lenses, no elaborate armature, no excessive gears, and no powerful magical emission. It must read as a handheld optical instrument, not an eye, compass, clock, mirror, shield, bottle, or telescope.",
+        "Composition/framing: one centered complete hero object in readable three-quarter view, set on a gentle diagonal, about 72 percent subject fill, safe padding on all four sides, full handle and lens ring visible, strong silhouette readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep navy and charcoal painted vignette with subtle workshop atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile hammered copper, tarnished brass, worn leather, and translucent skyglass; crisp focal edges with softer peripheral brushwork; only a restrained cool glint in the lens; no photographic product shot, raw 3D thumbnail, flat vector, or plastic gradient.",
+        "Lighting/mood: warm top-left key light on copper edges and leather, cool deep bottom-right shadow through the lens, ingenious but entry-level.",
+        "Constraints: square single icon; exactly one handheld ocular; borderless; opaque; no text, letters, numbers, labels, writing, pseudo-writing, runes, generic magical symbols, UI chrome, rarity frame, baked circular halo, watermark, signature, checkerboard, transparency, split sheet, collage, hand, face, eye motif, compass needle, clock hands, telescope tube, extra loose gears, multiple lenses, overwhelming glow, or cropped silhouette."
+      ],
+      "reviewNotes": "One skyglass lens, hammered copper ring, short leather grip, two plain adjustments, and mounting fork read as an entry-level handheld ocular rather than a clock, compass, eye, or epic array."
+    },
+    {
+      "id": "deed_of_making",
+      "generatorOriginal": "/Users/fernando/.codex/generated_images/01a064ea-ce5f-7283-8962-96761c1ff363/exec-71129e12-6da3-42af-86af-5a41469fbc39.png",
+      "acceptedMaster": "/Users/fernando/Documents/wocc-masterwrought/tmp/imagegen/masterwrought-art-2026-09-02/items/profession-new/deed_of_making.png",
+      "sha256": "e6d314b0d9f6d1ea541437754f876b4286a0393c81b1edf238594c4efb95deb1",
+      "bytes": 2202340,
+      "dimensions": "1254x1254",
+      "retries": 0,
+      "orderedReferences": [
+        {"path": "public/ui/items/linen_pouch.webp", "role": "tactile parchment, leather, compact three-quarter volume, and warm top-left light only"},
+        {"path": "public/ui/items/eastbrook_buckler.webp", "role": "dark forged-metal edge treatment and controlled cool shadow only"},
+        {"path": "public/ui/items/firebottle.webp", "role": "restrained contained ember-orange accent against a dark ground only"}
+      ],
+      "promptLines": [
+        "Use case: stylized-concept",
+        "Asset type: opaque square fantasy MMORPG inventory item icon",
+        "Primary request: paint Deed of Making (deed_of_making) in the World of ClaudeCraft item style contract woc-item-icon-v1.",
+        "Input images: Image 1 is a house-style reference for tactile parchment, leather, compact three-quarter volume, and warm top-left light only. Image 2 is a house-style reference for dark forged-metal edge treatment and controlled cool shadow only. Image 3 is a house-style reference for restrained contained ember-orange accent against a dark ground only. Do not copy their unrelated objects.",
+        "Subject and identity: one official master-crafter guild writ packet made from dark sablewax vellum, folded into an angular rectangular document rather than a rolled recipe scroll. It is secured by a broad black cord and one large visibly cracked ember-orange wax seal bearing a single clean gold hammer-over-anvil maker emblem. A black feather quill with a brass nib is tucked firmly under the cord along one diagonal edge as part of the packet. Add two modest iron corner guards and a thin gold edge rule on the physical vellum to communicate a valuable rare promotion catalyst. The face of the writ is otherwise completely blank. It must read as a consequential signed guild deed used to promote an already Perfected craft, clearly unlike a learnable cooking pattern, generic spell scroll, letter, book, or achievement crest.",
+        "Composition/framing: one centered cohesive writ-and-attached-quill inventory subject in readable three-quarter view, about 72 percent subject fill, safe padding on all four sides, complete seal, quill tip, corners, and folded silhouette visible; readable at 22px and in a 64px circular crop.",
+        "Scene/backdrop: opaque full-square deep charcoal, black-brown, and restrained ember-umber painted vignette with subtle atmosphere and grounded contact shadow; never transparency or a flat black void.",
+        "Style/medium: premium hand-painted classic dark-fantasy MMORPG inventory art, tactile waxed vellum, cracked wax, cord, iron, gold leaf, and feather; crisp focal edges around the maker seal with softer peripheral brushwork; restrained ember accent only; no photographic product shot, raw 3D thumbnail, flat vector, or plastic gradient.",
+        "Lighting/mood: warm top-left forge-like key light on the gold emblem, seal cracks, and brass nib, cool deep bottom-right shadow, solemn guild authority.",
+        "Constraints: square single icon; one cohesive writ packet only; borderless icon; opaque; absolutely no text, letters, numbers, labels, signatures, handwriting, writing lines, pseudo-writing, decorative script, runes, generic magic symbols, extra diagrams, UI chrome, rarity frame, baked circular halo, watermark, checkerboard, transparency, split sheet, collage, loose desk scene, ink bottle, hand, person, open book, rolled recipe-scroll silhouette, achievement shield, or cropped subject. The only surface symbol is the one intentional hammer-over-anvil maker emblem on the cracked wax seal."
+      ],
+      "reviewNotes": "Dark angular writ packet, cracked ember seal, gold hammer-over-anvil maker emblem, black quill, cord, and iron corners create a consequential promotion deed clearly unlike the open recipe scrolls."
+    }
+  ]
+}
