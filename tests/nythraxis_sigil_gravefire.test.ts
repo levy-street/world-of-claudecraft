@@ -21,7 +21,11 @@ import {
   nythraxisSigilCandidate,
   nythraxisSigilRadius,
 } from '../src/sim/nythraxis_binding_sigil';
-import { isNythraxisImpaled } from '../src/sim/nythraxis_bone_spike';
+import {
+  isNythraxisImpaled,
+  NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS,
+  NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS,
+} from '../src/sim/nythraxis_bone_spike';
 import {
   NYTHRAXIS_GRAVEFIRE_CAST_ID,
   NYTHRAXIS_GRAVEFIRE_HALF_WIDTH,
@@ -499,7 +503,9 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     st.sigilTimer = DT / 2;
     st.gravefireTimer = DT / 2;
     st.soulRendTimer = DT / 2;
-    st.deathlessTimer = DT / 2;
+    // The Rage stays out of its spike lead here: an imminent Rage would (by
+    // design) hold the spike cast this test wants to see resume.
+    st.deathlessTimer = NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS + 20;
     st.gravefires = [
       {
         seq: 0,
@@ -537,9 +543,14 @@ describe('Nythraxis Binding Sigil (the pull)', () => {
     tickSim(sim, 3.2);
     expect(st.gravebreakerCharged).toBe(true);
     expect(st.boneSpikes!.length).toBeGreaterThan(0);
-    expect(st.eruptionPoints!.length).toBeGreaterThan(0);
+    // Spikes and eruptions never overlap: the spike wave that just landed holds
+    // the eruption for its settle window, then it arms.
+    expect(st.eruptionPoints).toEqual([]);
+    expect(st.spikeSettleTimer).toBeGreaterThan(0);
     expect(st.gravefires!.length).toBeGreaterThan(1);
     expect(st.soulRendMarks.length).toBeGreaterThan(0);
+    tickSim(sim, NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS);
+    expect(st.eruptionPoints!.length).toBeGreaterThan(0);
     tickSim(sim, 2);
     expect(st.sigil).not.toBeNull();
     nythraxis.clearNythraxisSigil(boss);

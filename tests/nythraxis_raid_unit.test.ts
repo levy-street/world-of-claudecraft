@@ -228,8 +228,9 @@ describe('Nythraxis raid encounter', () => {
     expect(MOBS.nythraxis_scourge_of_thornpeak.boss).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.ccImmune).toBe(true);
     expect(MOBS.nythraxis_scourge_of_thornpeak.moveSpeed).toBe(10.5);
-    expect(MOBS.nythraxis_scourge_of_thornpeak.dmgBase).toBeCloseTo(54);
-    expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(11.4);
+    // 70% of the pre-redo 54 / 11.4 swing (first playtest, 2026-09-04).
+    expect(MOBS.nythraxis_scourge_of_thornpeak.dmgBase).toBeCloseTo(37.8);
+    expect(MOBS.nythraxis_scourge_of_thornpeak.dmgPerLevel).toBeCloseTo(7.98);
     expect(MOBS.nythraxis_skeleton_warrior.dmgBase).toBeCloseTo(26);
     expect(MOBS.nythraxis_skeleton_warrior.dmgPerLevel).toBeCloseTo(5.6);
     expect(MOBS.nythraxis_heroic_warrior_add).toMatchObject({
@@ -274,10 +275,10 @@ describe('Nythraxis raid encounter', () => {
     expect(sim.entities.get(pid)!.pos.x).toBeGreaterThan(3000);
     const boss = mob(sim, 'nythraxis_scourge_of_thornpeak');
     // Normal-raid retune (NORMAL_DUNGEON_TUNING): doubled health (was 60000)
-    // and the 5x per-mob damage multiplier (weapon was 325-507).
-    expect(boss.maxHp).toBe(160000);
-    expect(boss.weapon.min).toBe(1624);
-    expect(boss.weapon.max).toBe(2537);
+    // and the 5x per-mob damage multiplier on the redo's 70% swing.
+    expect(boss.maxHp).toBe(120000);
+    expect(boss.weapon.min).toBe(1137);
+    expect(boss.weapon.max).toBe(1776);
     expect(visualKeyFor(boss)).toBe('skel_golem');
     expect(
       visualKeyFor({ kind: 'mob', templateId: 'nythraxis_heroic_warrior_add' } as Entity),

@@ -26,7 +26,7 @@
 // through the seam.
 
 import { isBlocked } from '../colliders';
-import { isStunned, isUnbreakableControlAura } from '../combat/cc';
+import { isUnbreakableControlAura } from '../combat/cc';
 import { resetLongCooldownsForRaidWipe } from '../combat/raid_wipe_cooldowns';
 import { resurrectionArrivalAnchor } from '../combat/resurrection_offer';
 import { ITEMS, MOBS, NPCS, QUESTS } from '../data';
@@ -67,9 +67,13 @@ import {
 } from '../nythraxis_binding_sigil';
 import {
   isNythraxisImpaled,
+  isNythraxisWardChannelLocked,
   NYTHRAXIS_BONE_SPIKE_CAST_ID,
+  NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS,
   NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
   NYTHRAXIS_BONE_SPIKE_ID,
+  NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS,
+  NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS,
   NYTHRAXIS_IMPALED_AURA_ID,
   NYTHRAXIS_IMPALED_AURA_NAME,
   NYTHRAXIS_IMPALED_TICK_SECONDS,
@@ -121,6 +125,7 @@ import {
   igniteNythraxisGraveFlames,
   NYTHRAXIS_GRAVE_ERUPTION_CAST_ID,
   NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS,
+  NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE,
   NYTHRAXIS_GRAVE_ERUPTION_RADIUS,
   NYTHRAXIS_GRAVE_ERUPTION_REVEAL_DELAY_SECONDS,
   NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS,
@@ -202,6 +207,8 @@ type NythraxisMechanicField =
   | 'dreadCurseTimer'
   | 'boneSpikeTimer'
   | 'boneSpikes'
+  | 'eruptionSettleTimer'
+  | 'spikeSettleTimer'
   | 'eruptionTimer'
   | 'eruptionCastKey'
   | 'eruptionImpactRemaining'
@@ -234,6 +241,8 @@ export function nythraxisMechanicState(st: NythraxisState): NythraxisMechanicSta
   st.dreadCurseTimer ??= NYTHRAXIS_DREAD_CURSE_EVERY;
   st.boneSpikeTimer ??= NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS;
   st.boneSpikes ??= [];
+  st.eruptionSettleTimer ??= 0;
+  st.spikeSettleTimer ??= 0;
   st.eruptionTimer ??= NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS;
   st.eruptionCastKey ??= 0;
   st.eruptionImpactRemaining ??= 0;
@@ -465,6 +474,8 @@ export function initNythraxisEncounter(boss: Entity): NonNullable<Entity['nythra
       dreadCurseTimer: NYTHRAXIS_DREAD_CURSE_EVERY,
       boneSpikeTimer: NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS,
       boneSpikes: [],
+      eruptionSettleTimer: 0,
+      spikeSettleTimer: 0,
       eruptionTimer: NYTHRAXIS_GRAVE_ERUPTION_FIRST_SECONDS,
       eruptionCastKey: 0,
       eruptionImpactRemaining: 0,
@@ -600,6 +611,10 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     // resolution sets later this tick keeps its full length.
     const ms = nythraxisMechanicState(st);
     if (ms.majorGapTimer > 0) ms.majorGapTimer = Math.max(0, ms.majorGapTimer - DT);
+    // The spike/fire settle windows count down here too, for the same reason.
+    if (ms.eruptionSettleTimer > 0)
+      ms.eruptionSettleTimer = Math.max(0, ms.eruptionSettleTimer - DT);
+    if (ms.spikeSettleTimer > 0) ms.spikeSettleTimer = Math.max(0, ms.spikeSettleTimer - DT);
   }
   updateNythraxisBoneSpikes(ctx, boss, st);
   updateNythraxisGraveHazards(ctx, boss, st, room);
@@ -948,11 +963,52 @@ export function updateNythraxisBoneSpikeCast(
   const ms = nythraxisMechanicState(st);
   ms.boneSpikeTimer -= DT;
   if (ms.boneSpikeTimer > 0) return;
+  if (nythraxisBoneSpikeHeld(st, ms)) {
+    ms.boneSpikeTimer = NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS;
+    return;
+  }
   const difficulty = nythraxisDifficulty(ctx, boss);
   const victims = castNythraxisBoneSpike(ctx, boss, st, room, difficulty);
-  // Nobody eligible (everyone but the aggro holder is marked, impaled, or
-  // dead): retry shortly instead of skipping a whole cycle, the Soul Rend hold.
+  // Nobody eligible (everyone but the aggro holder is marked, impaled, in
+  // fire, or dead): retry shortly instead of skipping a whole cycle, the Soul
+  // Rend hold.
   ms.boneSpikeTimer = victims.length === 0 ? 3 : nythraxisBoneSpikeCadence(difficulty);
+  if (victims.length > 0) ms.spikeSettleTimer = NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS;
+}
+
+/**
+ * Why a due spike cast waits: fire is telegraphing or has just landed (nobody
+ * is pinned in a circle they were about to leave), or Deathless Rage is due
+ * within its lead (the channelers must be free to reach the wardstones).
+ */
+export function nythraxisBoneSpikeHeld(
+  st: NonNullable<Entity['nythraxis']>,
+  ms: NythraxisMechanicState = nythraxisMechanicState(st),
+): boolean {
+  if (ms.eruptionPoints.length > 0 || ms.eruptionSettleTimer > 0) return true;
+  return (
+    (st.phase === 2 || st.phase === 3) &&
+    st.deathlessCastRemaining <= 0 &&
+    st.deathlessTimer <= NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS
+  );
+}
+
+/** True when a raider stands in live fire: a Grave Flame or Soulfire patch, or a burning Gravefire yard. */
+export function nythraxisStandingInFire(
+  st: NonNullable<Entity['nythraxis']>,
+  player: Entity,
+  difficulty: DungeonDifficulty,
+): boolean {
+  const ms = nythraxisMechanicState(st);
+  for (const flame of ms.graveFlames) {
+    if (pointInNythraxisCircle(flame, flame.radius, player.pos)) return true;
+  }
+  const burn = nythraxisGravefireBurnSeconds(difficulty);
+  for (const line of ms.gravefires) {
+    const extent = nythraxisGravefireExtent(line.elapsed, burn);
+    if (extent && pointInNythraxisGravefire(line, extent, player.pos)) return true;
+  }
+  return false;
 }
 
 /**
@@ -970,7 +1026,13 @@ export function castNythraxisBoneSpike(
 ): Entity[] {
   const ms = nythraxisMechanicState(st);
   const marked = new Set(st.soulRendMarks.map((mark) => mark.playerId));
-  const candidates = nythraxisBoneSpikeCandidates(room, boss.id, boss.aggroTargetId, marked);
+  const candidates = nythraxisBoneSpikeCandidates(
+    room,
+    boss.id,
+    boss.aggroTargetId,
+    marked,
+    (player) => nythraxisStandingInFire(st, player, difficulty),
+  );
   const victims: Entity[] = [];
   const count = nythraxisBoneSpikeVictims(difficulty);
   while (victims.length < count && candidates.length > 0) {
@@ -1158,6 +1220,9 @@ export function updateNythraxisGraveEruptionCast(
   const ms = nythraxisMechanicState(st);
   ms.eruptionTimer -= DT;
   if (ms.eruptionTimer > 0 || ms.eruptionPoints.length > 0) return;
+  // A due eruption waits out the settle window after a spike wave, so the
+  // freshly pinned never find a circle opening under their neighbours.
+  if (ms.spikeSettleTimer > 0) return;
   startNythraxisGraveEruption(ctx, boss, st, room);
 }
 
@@ -1177,9 +1242,21 @@ export function startNythraxisGraveEruption(
   const difficulty = nythraxisDifficulty(ctx, boss);
   const castKey = (Math.imul(ctx.tickCount, 0x9e3779b1) ^ boss.id) >>> 0;
   const count = nythraxisGraveEruptionCount(difficulty);
-  const eligible = room.filter(
+  // Never under an impaled raider, and never so close to one that a circle
+  // would reach the pinned body.
+  const impaled = room.filter((p) => !p.dead && isNythraxisImpaled(p, boss.id));
+  const free = room.filter(
     (p) => !p.dead && !isNythraxisImpaled(p, boss.id) && !isNythraxisWardChanneler(st, p.id),
   );
+  const clear = free.filter(
+    (p) =>
+      !impaled.some(
+        (victim) => dist2d(victim.pos, p.pos) < NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE,
+      ),
+  );
+  // A raid stacked tight on its impaled can leave nobody clear; the eruption
+  // still fires under whoever can move rather than starving the mechanic.
+  const eligible = clear.length > 0 ? clear : free;
   const targets = nythraxisGraveEruptionTargetOrder(
     castKey,
     eligible.map((p) => ({ id: p.id, x: p.pos.x, z: p.pos.z })),
@@ -1312,6 +1389,8 @@ function resolveNythraxisGraveEruption(
   );
   st.eruptionPoints = [];
   st.eruptionImpactRemaining = 0;
+  // Spikes wait until the raid has had a moment to step out of the new fire.
+  st.eruptionSettleTimer = NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS;
 }
 
 /** Drop every armed eruption and burning patch (transition, reset, kill). */
@@ -2575,6 +2654,9 @@ export function startNythraxisDeathlessRage(
   st.deathlessTimer = NYTHRAXIS_DEATHLESS_EVERY;
   st.deathlessCastRemaining = NYTHRAXIS_DEATHLESS_CAST;
   st.soulRendLockout = NYTHRAXIS_DEATHLESS_SOUL_REND_LOCKOUT;
+  // The calm window frees everyone: the king draws the bone back into himself,
+  // so no channeler is left pinned away from their stone.
+  shatterNythraxisBoneSpikes(ctx, boss);
   st.wardChannels = nythraxisDeathlessChannelObjects(ctx, boss).map((ward) => ({
     objectId: ward.id,
     playerId: null,
@@ -2727,7 +2809,15 @@ export function updateNythraxisWardChannels(
     if (channel.complete || channel.playerId === null) continue;
     const ward = ctx.entities.get(channel.objectId);
     const p = ctx.entities.get(channel.playerId);
-    if (!ward || !p || p.dead || isStunned(p) || dist2d(p.pos, ward.pos) > INTERACT_RANGE + 1) {
+    // Impaled channelers keep channeling (the spike holds the body, not the
+    // will); every other control effect still breaks the channel.
+    if (
+      !ward ||
+      !p ||
+      p.dead ||
+      isNythraxisWardChannelLocked(p, boss.id) ||
+      dist2d(p.pos, ward.pos) > INTERACT_RANGE + 1
+    ) {
       if (p) clearNythraxisWardChannelCast(p);
       channel.playerId = null;
       channel.remaining = NYTHRAXIS_DEATHLESS_CHANNEL;

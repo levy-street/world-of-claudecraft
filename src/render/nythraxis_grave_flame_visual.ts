@@ -41,6 +41,7 @@ import {
   nythraxisGraveFlameSpriteCount,
   nythraxisSoftFireDiscSpotInto,
 } from './nythraxis_soft_fire_core';
+import { buildNythraxisSoulRendMarkerPrewarmVisual } from './nythraxis_soul_rend_marker';
 
 export const NYTHRAXIS_GRAVE_FLAME_VISUAL_NAME = 'nythraxis-grave-flame';
 export const NYTHRAXIS_GRAVE_FLAME_FILL_NAME = 'nythraxis-grave-flame-fill';
@@ -303,6 +304,9 @@ export function buildNythraxisGravePrewarmVisual(): THREE.Group {
   const cage = buildNythraxisBoundCagePrewarmVisual();
   cage.position.z = -8;
   root.add(cage);
+  const marker = buildNythraxisSoulRendMarkerPrewarmVisual();
+  marker.position.x = 16;
+  root.add(marker);
 
   const staging = new THREE.Scene();
   const fx = new MageGroundFx(

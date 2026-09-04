@@ -1098,8 +1098,11 @@ export const DUNGEON_MOBS: Record<string, MobTemplate> = {
     // this via the nythraxis_boss_arena healthMultiplier.
     hpBase: 60000 / 2.3,
     hpPerLevel: 0,
-    dmgBase: 54,
-    dmgPerLevel: 11.4,
+    // 70% of the pre-redo swing (54 / 11.4): the owner's first playtest of the
+    // mechanics redo (2026-09-04) found the white damage too high on top of
+    // the Dread Curse stacks. Gravebreaker's splash scales off the swing too.
+    dmgBase: 37.8,
+    dmgPerLevel: 7.98,
     attackSpeed: 2.6,
     armorPerLevel: 42,
     moveSpeed: 10.5,

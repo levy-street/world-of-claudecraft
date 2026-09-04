@@ -112,7 +112,7 @@ describe('Nythraxis Bone Spike', () => {
   it('pins the impale tuning literally on both difficulties', () => {
     expect(NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS).toBe(12);
     expect([NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL, NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC]).toEqual([
-      20, 16,
+      24, 20,
     ]);
     expect([NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL, NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC]).toEqual([
       2, 3,

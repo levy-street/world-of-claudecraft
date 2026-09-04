@@ -91,6 +91,12 @@ export const NYTHRAXIS_GRAVE_FLAME_CAP = 24;
 // band of the crypt hall, and the arena walls sit far beyond it.
 export const NYTHRAXIS_GRAVE_ERUPTION_MAX_RANGE = 50;
 export const NYTHRAXIS_GRAVE_ERUPTION_MIN_SEPARATION = 5;
+/**
+ * No circle ever touches an impaled raider: a raider this close to one is not
+ * a target, so a circle centred on a neighbour (radius 3) stops short of the
+ * pinned body (owner playtest, 2026-09-04).
+ */
+export const NYTHRAXIS_GRAVE_ERUPTION_IMPALED_CLEARANCE = NYTHRAXIS_GRAVE_ERUPTION_RADIUS * 2;
 
 const ERUPTION_CANDIDATES = 32;
 const ERUPTION_TARGET_SCATTER_MAX = 9;

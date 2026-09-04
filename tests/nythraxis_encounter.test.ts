@@ -567,7 +567,7 @@ describe('Nythraxis encounter module (N1)', () => {
       expect(curse?.value, difficulty).toBeCloseTo(perStack);
       expect(curse?.kind, difficulty).toBe('vuln_source');
       expect(curse?.encounterOwned, difficulty).toBe(true);
-      expect(st.dreadCurseTimer, difficulty).toBe(10);
+      expect(st.dreadCurseTimer, difficulty).toBe(12);
 
       st.dreadCurseTimer = 0.01;
       nythraxis.updateNythraxisDreadCurse(ctx, boss, st);

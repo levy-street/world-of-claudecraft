@@ -18,11 +18,16 @@ import type { Entity } from '../src/sim/types';
 
 describe('Nythraxis Dread Curse leaf', () => {
   it('pins the swap tuning literally', () => {
-    expect(NYTHRAXIS_DREAD_CURSE_EVERY).toBe(10);
+    expect(NYTHRAXIS_DREAD_CURSE_EVERY).toBe(12);
     expect([nythraxisDreadCurseHitMaxHp('normal'), nythraxisDreadCurseHitMaxHp('heroic')]).toEqual([
       0.25, 0.3,
     ]);
-    expect(NYTHRAXIS_DREAD_CURSE_DURATION).toBe(30);
+    expect(NYTHRAXIS_DREAD_CURSE_DURATION).toBe(20);
+    // A tank swapped out at the swap stack (its last stack landing at
+    // swapStacks x every) is clean before the swap comes back to them one
+    // swap cycle later, so a taunt never lands on live stacks.
+    const swapCycle = NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS * NYTHRAXIS_DREAD_CURSE_EVERY;
+    expect(swapCycle + NYTHRAXIS_DREAD_CURSE_DURATION).toBeLessThan(2 * swapCycle);
     expect(NYTHRAXIS_DREAD_CURSE_MAX_STACKS).toBe(3);
     expect(NYTHRAXIS_DREAD_CURSE_TANK_SWAP_STACKS).toBe(2);
     expect([nythraxisDreadCursePerStack('normal'), nythraxisDreadCursePerStack('heroic')]).toEqual([

@@ -251,10 +251,14 @@ export function pokeNythraxisDevMechanic(
       st.dreadCurseTimer = DT;
       return { ok: true, message: 'Dread Curse: next tick (the boss must be in melee reach).' };
     case 'spike':
+      // A poke skips the spike/fire settle window (the driver's own gates still
+      // hold it behind a live eruption telegraph or an imminent Rage).
       st.boneSpikeTimer = DT;
-      return { ok: true, message: 'Bone Spike: next tick.' };
+      st.eruptionSettleTimer = 0;
+      return { ok: true, message: 'Bone Spike: next tick (it waits out a live eruption).' };
     case 'eruption':
       st.eruptionTimer = DT;
+      st.spikeSettleTimer = 0;
       return { ok: true, message: 'Grave Eruption: next tick.' };
     case 'sigil':
       if (st.sigil)

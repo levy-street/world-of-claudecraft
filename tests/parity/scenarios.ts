@@ -3347,6 +3347,10 @@ function nythraxisFullPull(): Scenario {
       for (const spike of spikes)
         sim.dealDamage(tank, spike, spike.hp + 1, false, 'physical', null, 'hit', true);
       step(1); // updateNythraxisBoneSpikes -> victims freed, spikeBroken callouts
+      // Spikes and eruptions never overlap in the live fight (the spike wave
+      // holds the next eruption for a settle window); this scenario sequences
+      // them by hand, so skip the window and fire the eruption at once.
+      nyx().spikeSettleTimer = 0;
       nyx().eruptionTimer = DT;
       step(1); // startNythraxisGraveEruption -> hash-placed warning rings (no shared rng)
       step(Math.round(NYTHRAXIS_GRAVE_ERUPTION_TELEGRAPH_SECONDS / DT) + 1); // impact -> Grave Flame

@@ -480,3 +480,24 @@ golden is regenerated once more at the end rather than per slice.
   recurs every 40 s, Dread Curse hits for 30%, the Bound window is 8 s, phase 3
   tightens eruptions to 8 s and Gravefire to 6 s, and the enrage ramps every
   20 s. Gravebreaker (pre-existing) is the one flat number left.
+
+## 13. First playtest adjustments (2026-09-04)
+
+- Dread Curse lands every 12 s and its stacks last 20 s (was 10 s and 30 s):
+  the tank swapped out at two stacks is clean 4 s before the swap comes back,
+  so a taunt never lands on live stacks.
+- Bone Spikes and fire never overlap. A spike never picks a raider standing in
+  Grave Flame, Soulfire, or a burning Gravefire yard; a due spike cast holds
+  while an eruption is telegraphing and for 3 s after it lands; a due eruption
+  holds for 3 s after a spike wave; and eruption circles never target a raider
+  within 6 yd of an impaled one, so no circle reaches a pinned body. Bone
+  Spike recurs every 24 s (heroic 20 s).
+- Deathless Rage and the impaled: no spike lands in the 8 s before a Rage is
+  due, the Rage cast shatters every live spike as it begins, and an impaled
+  raider already within reach of a wardstone may start and hold its channel
+  (the Impale is the one control effect the channel ignores).
+- Soul Rend marks are visible: a floor ring at the exact 5 yd stack range and a
+  sigil over the head, red while the raider stands alone and green once another
+  mark is inside the ring.
+- Nythraxis's swing is 70% of its pre-redo value (Gravebreaker's splash scales
+  with it), and his health is 120,000 on normal and 192,000 on heroic.

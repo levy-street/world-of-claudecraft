@@ -205,7 +205,8 @@ export const NORMAL_DUNGEON_TUNING: Record<string, NormalDungeonTuning> = {
     // mechanics redo, 2026-09-04; was the shared 2.0 for 120,000). Adds and
     // the Bone Spikes keep the shared multiplier.
     healthMultiplierByMob: {
-      nythraxis_scourge_of_thornpeak: 160_000 / 60_000,
+      // 120,000 after the first playtest (2026-09-04; the redo tried 160,000).
+      nythraxis_scourge_of_thornpeak: 120_000 / 60_000,
     },
     damageMultiplierByMob: {
       nythraxis_scourge_of_thornpeak: 5,
@@ -449,9 +450,9 @@ export const HEROIC_DUNGEON_TUNING: Record<string, HeroicDungeonTuning> = {
       // their normal pool (1,500 vs 1,000) so three spikes still shatter inside
       // the impale drain window when the raid splits onto them.
       nythraxis_bone_spike: 3.0,
-      // The boss alone: 230,000 on the 60,000 template (owner call for the
-      // mechanics redo, 2026-09-04; was the shared 3.2 for 192,000).
-      nythraxis_scourge_of_thornpeak: 230_000 / 60_000,
+      // The boss alone: 192,000 on the 60,000 template (owner call after the
+      // first playtest, 2026-09-04; the redo tried 230,000).
+      nythraxis_scourge_of_thornpeak: 192_000 / 60_000,
     },
     armorMultiplier: 1.2,
     finalBossId: 'nythraxis_scourge_of_thornpeak',

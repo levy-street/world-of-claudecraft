@@ -11,13 +11,19 @@ import { NythraxisBoundCageVisuals } from './nythraxis_bound_cage_visual';
 import { NythraxisGraveFlameVisuals } from './nythraxis_grave_flame_visual';
 import { NythraxisGravefireVisuals } from './nythraxis_gravefire_visual';
 import { NythraxisBindingSigilVisuals } from './nythraxis_sigil_visual';
+import { NythraxisSoulRendMarkers } from './nythraxis_soul_rend_marker';
+import type { NythraxisSoulRendEntityLike } from './nythraxis_soul_rend_marker_core';
 
 export interface NythraxisMechanicWorld {
   activeNythraxisGraveFlames: readonly ActiveNythraxisGraveFlame[];
   activeNythraxisGravefires: readonly ActiveNythraxisGravefire[];
   activeNythraxisBindingSigils: readonly ActiveNythraxisBindingSigil[];
-  /** The roster, for the Bound cage: it follows the boss's stun aura, not a row of its own. */
-  entities: ReadonlyMap<number, NythraxisCageBossLike>;
+  /**
+   * The roster, for the aura-driven painters: the Bound cage follows the boss's
+   * stun and the Soul Rend markers follow the raiders' marks, so neither needs
+   * a row of its own.
+   */
+  entities: ReadonlyMap<number, NythraxisCageBossLike & NythraxisSoulRendEntityLike>;
 }
 
 export class NythraxisMechanicVisuals {
@@ -25,12 +31,14 @@ export class NythraxisMechanicVisuals {
   private readonly gravefires: NythraxisGravefireVisuals;
   private readonly sigils: NythraxisBindingSigilVisuals;
   private readonly cages: NythraxisBoundCageVisuals;
+  private readonly soulRendMarkers: NythraxisSoulRendMarkers;
 
   constructor(scene: THREE.Scene, groundY: (x: number, z: number) => number) {
     this.flames = new NythraxisGraveFlameVisuals(scene, groundY);
     this.gravefires = new NythraxisGravefireVisuals(scene, groundY);
     this.sigils = new NythraxisBindingSigilVisuals(scene, groundY);
     this.cages = new NythraxisBoundCageVisuals(scene, groundY);
+    this.soulRendMarkers = new NythraxisSoulRendMarkers(scene, groundY);
   }
 
   syncWorld(world: NythraxisMechanicWorld): void {
@@ -38,6 +46,7 @@ export class NythraxisMechanicVisuals {
     this.gravefires.syncWorld(world);
     this.sigils.syncWorld(world);
     this.cages.syncWorld(world);
+    this.soulRendMarkers.syncWorld(world);
   }
 
   update(dt: number, reducedMotion: boolean): void {
@@ -45,6 +54,7 @@ export class NythraxisMechanicVisuals {
     this.gravefires.update(dt, reducedMotion);
     this.sigils.update(dt, reducedMotion);
     this.cages.update(dt, reducedMotion);
+    this.soulRendMarkers.update(dt, reducedMotion);
   }
 
   dispose(): void {
@@ -52,5 +62,6 @@ export class NythraxisMechanicVisuals {
     this.gravefires.dispose();
     this.sigils.dispose();
     this.cages.dispose();
+    this.soulRendMarkers.dispose();
   }
 }

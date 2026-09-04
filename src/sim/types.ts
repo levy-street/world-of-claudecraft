@@ -5184,6 +5184,10 @@ export interface NythraxisEncounterState {
   // Bone Spike cadence and the live spike/victim pairs (nythraxis_bone_spike.ts).
   boneSpikeTimer?: number;
   boneSpikes?: NythraxisBoneSpike[];
+  // Spikes and fire never overlap: seconds left in the settle window after an
+  // eruption lands (spikes hold) and after a spike wave (eruptions hold).
+  eruptionSettleTimer?: number;
+  spikeSettleTimer?: number;
   // Grave Eruption: the cadence, the live warning window, and the burning
   // patches it left behind (nythraxis_grave_eruption.ts). eruptionCastKey is
   // the stable id root the warning rows and their impact events share.

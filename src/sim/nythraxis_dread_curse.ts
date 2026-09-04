@@ -18,10 +18,16 @@ import { type DungeonDifficulty, dist2d, type Entity } from './types';
 
 export const NYTHRAXIS_DREAD_CURSE_AURA_ID = 'nythraxis_dread_curse';
 export const NYTHRAXIS_DREAD_CURSE_CAST_ID = 'Dread Curse';
-export const NYTHRAXIS_DREAD_CURSE_EVERY = 10;
+export const NYTHRAXIS_DREAD_CURSE_EVERY = 12;
 export const NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_NORMAL = 0.25;
 export const NYTHRAXIS_DREAD_CURSE_HIT_MAX_HP_HEROIC = 0.3;
-export const NYTHRAXIS_DREAD_CURSE_DURATION = 30;
+/**
+ * Shorter than two swap cycles on purpose: a tank swapped out at two stacks
+ * (24 s in) is clean again 4 s before the swap comes back to them (48 s), so
+ * a taunt never lands on a tank still carrying stacks (owner playtest,
+ * 2026-09-04).
+ */
+export const NYTHRAXIS_DREAD_CURSE_DURATION = 20;
 export const NYTHRAXIS_DREAD_CURSE_MAX_STACKS = 3;
 export const NYTHRAXIS_DREAD_CURSE_PER_STACK_NORMAL = 0.35;
 export const NYTHRAXIS_DREAD_CURSE_PER_STACK_HEROIC = 0.45;

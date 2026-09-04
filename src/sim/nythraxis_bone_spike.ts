@@ -19,8 +19,23 @@ export const NYTHRAXIS_BONE_SPIKE_CAST_ID = 'Bone Spike';
 export const NYTHRAXIS_IMPALED_AURA_ID = 'nythraxis_impaled';
 export const NYTHRAXIS_IMPALED_AURA_NAME = 'Impaled';
 export const NYTHRAXIS_BONE_SPIKE_FIRST_SECONDS = 12;
-export const NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL = 20;
-export const NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC = 16;
+export const NYTHRAXIS_BONE_SPIKE_EVERY_NORMAL = 24;
+export const NYTHRAXIS_BONE_SPIKE_EVERY_HEROIC = 20;
+/**
+ * Spikes and fire never overlap (owner playtest, 2026-09-04: raiders pinned in
+ * a circle they were about to leave). A spike cast holds while a Grave
+ * Eruption is telegraphing and for this long after it lands; an eruption holds
+ * this long after a spike wave; a held cast polls again every
+ * NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS instead of skipping a whole cycle.
+ */
+export const NYTHRAXIS_BONE_SPIKE_FIRE_SETTLE_SECONDS = 3;
+export const NYTHRAXIS_BONE_SPIKE_RETRY_SECONDS = 1;
+/**
+ * No spike lands in the run-up to Deathless Rage, so the wardstone channelers
+ * are free to reach their stones; anyone still impaled when the cast begins
+ * is freed by it (the calm window frees everyone).
+ */
+export const NYTHRAXIS_BONE_SPIKE_RAGE_LEAD_SECONDS = 8;
 export const NYTHRAXIS_BONE_SPIKE_VICTIMS_NORMAL = 2;
 export const NYTHRAXIS_BONE_SPIKE_VICTIMS_HEROIC = 3;
 export const NYTHRAXIS_IMPALED_TICK_SECONDS = 1;
@@ -70,13 +85,33 @@ export function nythraxisBoneSpikeCandidates(
   bossId: number,
   aggroTargetId: number | null,
   soulRendMarkedIds: ReadonlySet<number>,
+  standingInFire: (player: Entity) => boolean = () => false,
 ): Entity[] {
   return room.filter(
     (player) =>
       !player.dead &&
       player.id !== aggroTargetId &&
       !soulRendMarkedIds.has(player.id) &&
-      !isNythraxisImpaled(player, bossId),
+      !isNythraxisImpaled(player, bossId) &&
+      // never pinned in fire they cannot step out of
+      !standingInFire(player),
+  );
+}
+
+/**
+ * The wardstone channel's control gate: every stun, stasis, incapacitate, or
+ * polymorph locks it EXCEPT this boss's own Impale. A spiked raider already
+ * within reach of a wardstone may channel it (owner decision, 2026-09-04): the
+ * spike holds their body, not their will.
+ */
+export function isNythraxisWardChannelLocked(player: Entity, bossId: number): boolean {
+  return player.auras.some(
+    (aura) =>
+      (aura.kind === 'stun' ||
+        aura.kind === 'stasis' ||
+        aura.kind === 'incapacitate' ||
+        aura.kind === 'polymorph') &&
+      !(aura.id === NYTHRAXIS_IMPALED_AURA_ID && aura.sourceId === bossId),
   );
 }
 
