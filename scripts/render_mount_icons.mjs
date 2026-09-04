@@ -27,6 +27,8 @@ mkdirSync(outDir, { recursive: true });
 if (debugDir) mkdirSync(debugDir, { recursive: true });
 
 // Per-mount render jobs. `file` is the GLB basename, `id` the reins item id (icon filename).
+// The Lanternback Troll is deliberately absent: its reins ship a PAINTED icon, and a
+// render job here would overwrite that with a 3D cut-out on the next run.
 // `cfg` overrides the generic head framing (defaults live in the entry); tuned by eye until
 // each mount's face fills the frame. All mounts face +Z (the model convention), so `fwd` is
 // only set where a model deviates.
@@ -84,6 +86,15 @@ const JOBS = [
     file: 'drakemaw_raptor.glb',
     id: 'reins_drakemaw_raptor',
     cfg: { headFwd: 0.95, headUp: 0.82, fill: 0.55, yaw: 0.52, pitch: 0.14 },
+  },
+  {
+    // The tortoise's whole identity is on his face: storm-glass spectacles, the
+    // crest, and the bell just under his chin. Anchor high and forward onto the
+    // head and pitch down a touch so the bell reads at the bottom of the frame
+    // instead of the shell filling it.
+    file: 'chimeglass_tortoise.glb',
+    id: 'reins_chimeglass_tortoise',
+    cfg: { headFwd: 0.88, headUp: 0.76, fill: 0.6, yaw: 0.58, pitch: 0.2 },
   },
 ];
 

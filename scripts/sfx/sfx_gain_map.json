@@ -196,10 +196,14 @@
     "spell_nova": 4.5,
     "stealth": 6.7,
     "ui_achievement": 4.8,
-    "ui_level_up": 5.0,
+    "ui_level_up": 5,
     "vanish": 6.3,
     "wand_arcane": 5.2,
     "wand_holy": 5.3,
-    "wand_shadow": 5.2
+    "wand_shadow": 5.2,
+    "mount_run_mech_bird": 1.6,
+    "mount_idle_mech_bird": 1.6,
+    "mount_jump_mech_bird": 1.6,
+    "mount_land_mech_bird": 1.6
   }
 }

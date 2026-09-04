@@ -2232,6 +2232,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Oko Rzemieślnika',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi',
+  'entities.items.reins_lanternback_troll.name':
+    'Jarzmo latarnika: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstremalne',
   'hud.options.surfaceDetail': 'Szczegóły powierzchni',
   'hud.options.surfaceDetailBasic': 'Podstawowe',

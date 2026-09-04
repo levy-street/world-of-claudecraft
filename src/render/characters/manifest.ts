@@ -44,6 +44,22 @@ export interface EmoteClipSpec {
 
 export interface ClipMap {
   idle: string;
+  /** Extra standing-still clips, played one at a time in place of `idle` and
+   *  then handed back to it over the standard one-shot crossfade. Purely
+   *  cosmetic idle-breakers ("fidgets"): author each to END on the idle pose,
+   *  because leaving idle CANCELS one mid-clip and the rig cuts straight back
+   *  over a 0.18s fade. Empty/absent for every rig that just breathes.
+   *
+   *  These fire from ONE shared, jittered timer and are picked at random, so a
+   *  given clip's own cadence falls as the pool grows. A clip that has to show
+   *  up on a schedule belongs in `idleBeat` instead. */
+  idleVariants?: string[];
+  /** A signature idle on a FIXED cadence, scheduled independently of the
+   *  `idleVariants` pool. Same contract as a fidget (one-shot, must end on the
+   *  idle pose, cancelled the moment the rig stops standing still); the
+   *  difference is only that it keeps its own clock, so "every N seconds"
+   *  actually means it. */
+  idleBeat?: { clip: string; everySec: number; jitterSec?: number };
   /** The braced battle stance: the idle a body holds while it is actually
    *  fighting someone, played instead of `idle` whenever the rig is engaged and
    *  standing still (see anim_state.desiredBaseState). Absent = the rig relaxes
@@ -342,6 +358,44 @@ const MOUNT_RIGGED: ClipMap = {
   run: 'Run',
   attack: [],
   death: 'Death',
+};
+
+// The Mech Bird's own map: it ships exactly Idle / Run / Jump (authored in
+// Blender against its 28-bone rig). Walk aliases the run cycle (the servo
+// sprint reads as a stately strut at walk timeScales), death holds Idle (a
+// ridden mount never plays a death; the summon strips on death first), and
+// jump is the one mount clip in the game that actually uses the airborne
+// channel: the renderer already feeds the real airborne flag to mount
+// visuals, so the single authored wing-flap plays on every hop.
+const MOUNT_MECH_BIRD: ClipMap = {
+  idle: 'Idle',
+  walk: 'Run',
+  run: 'Run',
+  attack: [],
+  death: 'Idle',
+  jump: 'Jump',
+};
+
+// The Chimeglass Tortoise ships three authored idle-breakers on top of the
+// breathing Idle: he looks about him, rears up to paw the air, and stamps his
+// front feet one at a time. Each ends back on the idle pose so the hand-off is
+// seamless.
+const MOUNT_TORTOISE: ClipMap = {
+  ...MOUNT_RIGGED,
+  idleVariants: ['Idle_Look', 'Idle_Rear', 'Idle_Stamp', 'Idle_Groove'],
+  // The wet-dog head shake is his signature, so it keeps its own clock rather
+  // than taking a one-in-five share of the pool's 20-45s draw (which would have
+  // put it 100-225s apart). Small jitter only, so a paddock of them does not
+  // shake in lockstep.
+  idleBeat: { clip: 'Idle_Shake', everySec: 20, jitterSec: 4 },
+  // Naming `land` opts this rig into the HELD-jump treatment (visual.ts
+  // isOnce): `Jump` stops looping and clamps on its last frame, the airborne
+  // tuck, for as long as the body is off the ground, and `Land` fires as a
+  // one-shot on the touchdown edge. So `Jump` is only the spring and the tuck;
+  // the arc itself is the game's, and the clip must not carry a rise or the
+  // mount would still be held above the ground when it touches down.
+  jump: 'Jump',
+  land: 'Land',
 };
 
 // The Drakelands dragonkin brood (tmp/dragonkin_build.mjs bakes): artist
@@ -1942,6 +1996,50 @@ export const VISUALS: Record<string, VisualDef> = {
     runRef: 4.5,
     lazyPreload: true,
   },
+  // The Lanternback Troll: a hand-authored rig (troll body skinned, the iron
+  // throne and both lanterns each welded rigid to a single bone) with authored
+  // Idle/Walk/Run/Death clips. runRef is deliberately the RIDDEN speed
+  // (RUN_SPEED 7 x +80% = 12.6), the same call the Drakemaw Raptor makes above:
+  // his stride is a long loose lope, and foot-matching a 3.4yd stride to 12.6
+  // yd/s would play the cycle at 3.7 strides/sec, which reads as a wind-up toy
+  // on a mount this heavy. At 12.6 the timeScale lands on 1.0 and he lopes at
+  // the authored 2.5 steps/sec.
+  mount_lanternback_troll: {
+    url: `${MOUNTS_DIR}/lanternback_troll.glb`,
+    // 7.0 makes him the tallest thing in the stable by a distance (the griffin
+    // is 4.1), which is the point: he is a hill troll wearing a throne, and at
+    // 5.0 he read as merely large rather than as something you would strap a
+    // chair to. walkRef scales with him, since a bigger creature covers more
+    // ground per stride and would otherwise scurry.
+    height: 7.0,
+    clips: MOUNT_RIGGED,
+    walkRef: 5.6,
+    runRef: 12.6,
+    lazyPreload: true,
+  },
+  // The Chimeglass Tortoise. Low and broad: 3.6 puts the crown of his shell
+  // near a horse's saddle without pretending he is horse-shaped.
+  //
+  // walkRef/runRef are a CADENCE choice, not a foot match, and the gap is not
+  // small: say so plainly rather than calling it a slide. His legs rest 99.6%
+  // extended, so the reach envelope caps his stride at 0.092 model units, about
+  // 0.33yd here. At a mounted 12.6 yd/s (RUN_SPEED 7 x +80%) a true foot match
+  // would need ~38 strides/sec. Nothing recovers that, so his feet carry only
+  // ~5% of the ground he covers and the refs buy a readable gait instead.
+  //
+  // The numbers are picked to land INSIDE locomotionTimeScale's clamp rather
+  // than against it: run clamps to [0.6, 1.6] and walk to [0.6, 1.8], so any
+  // runRef at or under 7.9 would saturate at 1.6 and every value in that range
+  // would render identically. 10 gives 1.26 (about 1.7 strides/sec), brisk for
+  // a tortoise without reading as a wind-up toy.
+  mount_chimeglass_tortoise: {
+    url: `${MOUNTS_DIR}/chimeglass_tortoise.glb`,
+    height: 3.6,
+    clips: MOUNT_TORTOISE,
+    walkRef: 3.6,
+    runRef: 10,
+    lazyPreload: true,
+  },
   // Compact fantasy tank. One wheel revolution per locomotion clip matches
   // its authored tread cadence at the reference ground speeds below.
   mount_terrorspark_groundshaker: {
@@ -1976,6 +2074,23 @@ export const VISUALS: Record<string, VisualDef> = {
     // inside what the other baked mounts already ship (grag_bear's 3.58 yd/s
     // natural against the same 12.6 leaves it sliding over half its travel).
     runRef: 12.6,
+    lazyPreload: true,
+  },
+  // The Cluckwork Mech Bird (the store mount): authored Blender clips on its
+  // own 28-bone rig (no bake_mount_gaits entry, never bake over it). walkRef
+  // is the Run cycle's measured natural speed (stride 0.332 raw p2p, 0.433s
+  // cycle, height 3.4 over rawHeight 1.0 = 5.2 yd/s), so walking plays near
+  // the authored look. runRef follows the drakemaw precedent above: the
+  // RIDDEN speed (RUN_SPEED 7 x +75% = 12.25) so timeScale lands on 1.0 and
+  // the servo sprint keeps its authored cadence; the slide this trades away
+  // sits between the drakemaw's 28% and grag_bear's half-travel, and the
+  // 1-2-1 mount_run gait beat carries the footfall read.
+  mount_mech_bird: {
+    url: `${MOUNTS_DIR}/mech_bird.glb`,
+    height: 3.4,
+    clips: MOUNT_MECH_BIRD,
+    walkRef: 5.2,
+    runRef: 12.25,
     lazyPreload: true,
   },
   // Developer-only Halloween cart (image-to-glb static prop, no clips of its

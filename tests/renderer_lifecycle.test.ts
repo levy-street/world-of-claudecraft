@@ -6,13 +6,25 @@ import { Renderer } from '../src/render/renderer';
 import type { Entity, QuestProgress } from '../src/sim/types';
 
 const source = readFileSync(new URL('../src/render/renderer.ts', import.meta.url), 'utf8');
+// The mount transition FX moved out of the renderer's entity sweep when the
+// rideable-mount lifecycle was extracted (the renderer is under a line
+// ratchet). The guarantee these tests encode is unchanged, so they follow the
+// code rather than pinning the file it used to live in.
+const mountLifecycleSource = readFileSync(
+  new URL('../src/render/mount_lifecycle.ts', import.meta.url),
+  'utf8',
+);
 
-function slice(startText: string, endText: string): string {
-  const start = source.indexOf(startText);
-  const end = source.indexOf(endText, start);
+function sliceIn(src: string, startText: string, endText: string): string {
+  const start = src.indexOf(startText);
+  const end = src.indexOf(endText, start);
   expect(start).toBeGreaterThan(-1);
   expect(end).toBeGreaterThan(start);
-  return source.slice(start, end);
+  return src.slice(start, end);
+}
+
+function slice(startText: string, endText: string): string {
+  return sliceIn(source, startText, endText);
 }
 
 describe('Renderer lifecycle wiring', () => {
@@ -156,27 +168,34 @@ describe('Renderer lifecycle wiring', () => {
   });
 
   it('resets an entity engine-mount audio state on every mountKey transition', () => {
-    const mountKeyEdge = slice(
-      'if (e.mountKey !== v.lastMountKey) {',
-      '\n      }\n\n      // per-ability windup orb',
+    const mountKeyEdge = sliceIn(
+      mountLifecycleSource,
+      'if (x.mountKey !== v.lastMountKey) {',
+      '\n  }\n  return x.mountCasting;',
     );
     // Covers dismount (mountKey -> ''), a live mount swap (mountKey -> a
     // different mountKey), and a fresh summon reusing this entity id
     // ('' -> mountKey): all three funnel through this one check, and
     // mountEngineReset is a safe no-op when there is no engine-mount state
     // to drop (an ordinary mount, or no prior mount at all).
-    expect(mountKeyEdge).toContain('this.audioSink?.mountEngineReset(e.id)');
+    expect(mountKeyEdge).toContain('x.engineReset()');
+    // ...and the renderer still hands it the real audio sink.
+    expect(source).toContain('engineReset: () => this.audioSink?.mountEngineReset(e.id)');
   });
 
   it("preloads a new mount's engine clips on the same mountKey-transition edge", () => {
-    const mountKeyEdge = slice(
-      'if (e.mountKey !== v.lastMountKey) {',
-      '\n      }\n\n      // per-ability windup orb',
+    const mountKeyEdge = sliceIn(
+      mountLifecycleSource,
+      'if (x.mountKey !== v.lastMountKey) {',
+      '\n  }\n  return x.mountCasting;',
     );
     // Threading the preload through the same edge that resets state (rather
     // than lazily on the first movement frame) is what actually shrinks the
     // cold-first-ride silence window: the fetch+decode gets a head start.
-    expect(mountKeyEdge).toContain('this.audioSink?.preloadMountEngine(e.mountKey)');
+    expect(mountKeyEdge).toContain('x.preloadEngine(x.mountKey)');
+    expect(source).toContain(
+      'preloadEngine: (key: string) => this.audioSink?.preloadMountEngine(key)',
+    );
   });
 
   it("preloads an already-mounted entity's engine clips at view creation", () => {

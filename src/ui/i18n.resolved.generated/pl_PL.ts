@@ -570,6 +570,9 @@ export const pl_PL: EnTranslations = {
       "tabsLabel": "Sekcje sklepu WOC",
       "storeTab": "Sklep",
       "rewardsTab": "Codzienne nagrody",
+      "mountsEyebrow": "Account Mounts",
+      "mountsTitle": "Machine Stable",
+      "mountBuyAria": "Purchase {item}",
       "loading": "Ładowanie sklepu WOC...",
       "error": "Sklep WOC jest obecnie niedostępny. Spróbuj ponownie wkrótce.",
       "balance": "Saldo Claudium",
@@ -1387,6 +1390,9 @@ export const pl_PL: EnTranslations = {
       "name_thunderstrut_gobbler": "Grzmotokroczek, Wielki Indyk",
       "name_terrorspark_groundshaker": "Groziskra, Wstrząsacz Ziemi",
       "name_drakemaw_raptor": "Raptor Smoczej Paszczy",
+      "name_mech_bird": "Cluckwork Mech Bird",
+      "name_lanternback_troll": "Grumbol the Lanternback",
+      "name_chimeglass_tortoise": "Tolliver the Chimeglass",
       "name_rickshaw_mount": "Spętana Kośćmi Riksza",
       "desc_valorsteed": "Wytrzymały, pewny kroku rumak, który zapewnia zwiększoną prędkość podróżowania.",
       "desc_grag_bear": "Wytrzymały, pewny kroku niedźwiedź, który zapewnia zwiększoną prędkość podróżowania.",
@@ -1397,6 +1403,9 @@ export const pl_PL: EnTranslations = {
       "desc_thunderstrut_gobbler": "Kolosalny, wylęgły z burzy indyk, który dumnie kroczy z Przebudzonego Szczytu, z ogonem rozłożonym jak burzowa chmura.",
       "desc_terrorspark_groundshaker": "Zwarta opancerzona maszyna z ciężkimi gąsienicami, wielkokalibrowym działem i siodłem stworzonym dla nieustraszonych pilotów.",
       "desc_drakemaw_raptor": "Ujeżdżony wylęgowy raptor z Kaldery Smoczej Paszczy: same ścięgna i pęd, wciąż pachnący z lekka popiołem.",
+      "desc_mech_bird": "A hand-built clockwork war chicken that sprints on snapping servos, wind-up key still turning.",
+      "desc_lanternback_troll": "A hill troll broken to the yoke by lamplighters, carrying an iron throne across his shoulders with a storm lantern burning on either arm.",
+      "desc_chimeglass_tortoise": "A salt-flat tortoise who has outwalked three generations of caravans. Tinkers ground him spectacles from storm-glass and hung a bronze bell at his throat, so the road hears him long before it sees him.",
       "desc_rickshaw_mount": "Grzechoczący wózek z kości, z kościstym pachołkiem zaprzężonym do dyszli, ciągnącym cię w pełnym pędzie."
     },
     "mountTraining": {
@@ -13205,11 +13214,20 @@ export const pl_PL: EnTranslations = {
       "reins_terrorspark_groundshaker": {
         "name": "Kluczyk zapłonu: Groziskra, Wstrząsacz Ziemi"
       },
+      "reins_lanternback_troll": {
+        "name": "Jarzmo latarnika: Grumbol"
+      },
+      "reins_chimeglass_tortoise": {
+        "name": "Roadwarden's Bellstrap: Tolliver"
+      },
       "reins_rickshaw_mount": {
         "name": "Spętane lejce: Spętana Kośćmi Riksza"
       },
       "reins_drakemaw_raptor": {
         "name": "Wodze Raptora Smoczej Paszczy"
+      },
+      "reins_mech_bird": {
+        "name": "Ignition Key: Cluckwork Mech Bird"
       },
       "rimefang": {
         "name": "Szronowy Kieł"

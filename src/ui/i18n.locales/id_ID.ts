@@ -2223,6 +2223,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Mata Sang Perajin',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Kunci Kontak: Percik Teror, Pengguncang Bumi',
+  'entities.items.reins_lanternback_troll.name':
+    'Kuk Penyala Lentera: Grumbol',
   'hud.options.graphicsPresetInsane': 'Ekstrem',
   'hud.options.surfaceDetail': 'Detail Permukaan',
   'hud.options.surfaceDetailBasic': 'Dasar',

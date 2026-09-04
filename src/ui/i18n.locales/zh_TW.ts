@@ -329,6 +329,9 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.wocStore.tabsLabel': 'WOC 商店分區',
   'hudChrome.wocStore.storeTab': '商店',
   'hudChrome.wocStore.rewardsTab': '每日獎勵',
+  'hudChrome.wocStore.mountsEyebrow': '帳號坐騎',
+  'hudChrome.wocStore.mountsTitle': '機械馬廄',
+  'hudChrome.wocStore.mountBuyAria': '購買{item}',
   'hudChrome.wocStore.loading': '正在載入 WOC 商店…',
   'hudChrome.wocStore.error': 'WOC 商店目前無法使用，請稍後再試。',
   'hudChrome.wocStore.balance': 'Claudium 餘額',
@@ -8648,6 +8651,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.reins_stormfeather_griffin.name': '凌天風暴之羽的韁繩',
   'entities.items.reins_drakemaw_raptor.name': '龍喉迅猛龍的韁繩',
   'entities.items.reins_thunderstrut_gobbler.name': '雷霆闊步大火雞的韁繩',
+  'entities.items.reins_mech_bird.name': '發條機械鳥點火鑰匙',
   'entities.mobs.drowned_cantor.name': '溺亡誦經者',
   'entities.mobs.reedbound_acolyte.name': '蘆葦縛信徒',
   'entities.mobs.deepfen_spearjaw.name': '深沼槍顎獸',
@@ -10021,8 +10025,17 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.mounts.name_shadowjump_toad': '影躍蟾蜍卡瑪影',
   'hudChrome.mounts.name_stormfeather_griffin': '凌天風暴之羽',
   'hudChrome.mounts.name_drakemaw_raptor': '龍喉迅猛龍',
+  'hudChrome.mounts.name_lanternback_troll': '提燈背者格倫博',
+  'hudChrome.mounts.name_chimeglass_tortoise': '鐘晶的托利弗',
   'hudChrome.mounts.desc_drakemaw_raptor':
     '來自龍喉火山口的馴服巢生迅猛龍，渾身筋肉、疾若奔雷，身上仍帶著淡淡的灰燼氣味。',
+  'hudChrome.mounts.name_mech_bird': '發條機械鳥',
+  'hudChrome.mounts.desc_mech_bird':
+    '一隻手工打造的發條戰鬥雞，伺服關節鏗鏘疾馳，發條鑰匙仍在轉動。',
+  'hudChrome.mounts.desc_lanternback_troll':
+    '被點燈人馴服的山地巨魔，肩上扛著一把鐵王座，兩側扶手各掛一盞燃燒的風燈。',
+  'hudChrome.mounts.desc_chimeglass_tortoise':
+    '鹽原上的陸龜，走過了三代商隊。收留他的補鍋匠用暴風晶磨成眼鏡，又在他喉前掛上一枚青銅鈴——道路總是先聽見他，才看見他。',
   'hudChrome.mounts.name_thunderstrut_gobbler': '雷霆闊步大火雞',
   'hudChrome.mounts.name_terrorspark_groundshaker': '驚雷撼地者',
   'hudChrome.mounts.name_rickshaw_mount': '白骨人力車',
@@ -10775,6 +10788,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'entities.items.last_keep_signet.name': '最後的堡壘印戒',
   'entities.dungeons.the_last_keep.enterText': '你踏入最後的堡壘那冰冷而寂靜的大廳。',
   'entities.items.reins_terrorspark_groundshaker.name': '驚雷撼地者點火鑰匙',
+  'entities.items.reins_lanternback_troll.name':
+    '點燈人之軛：格倫博',
+  'entities.items.reins_chimeglass_tortoise.name':
+    '守道人的鈴帶：托利弗',
   'entities.items.reins_rickshaw_mount.name': '白骨人力車縛繩',
   'entities.dungeons.the_last_keep.leaveText': '你帶上堡門，重新走進龍裔荒原的寒風中。',
   'entities.dungeons.dawnhold_castle.name': '晨曦堡',

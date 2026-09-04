@@ -165,8 +165,11 @@ export const ENTITY_GATE_STAND_INS: readonly EntityGateStandIn[] = [
   {
     gate: 'gateSwapFlagOnCompile',
     file: 'src/render/renderer.ts',
-    callSite: 'this.gateSwapFlagOnCompile(v.mountVisual.root, () => {',
-    hides: 'a newly summoned mount',
+    // The gate is invoked from mount_lifecycle.ts syncMountVisual through the
+    // renderer's one MountViewHost; this is the host arm that reaches the
+    // wrapper, so it is the call site the scan sees.
+    callSite: 'gateSwapFlagOnCompile: (root, done) => this.gateSwapFlagOnCompile(root, done),',
+    hides: 'a newly summoned mount (mount_lifecycle.ts syncMountVisual, via the MountViewHost)',
     standIn: 'the rider, who keeps drawing on foot at seat lift 0',
   },
   {
