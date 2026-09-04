@@ -1283,7 +1283,13 @@ describe('perf report ingestion', () => {
   });
 
   it('keeps the drawing buffer block, verbatim and across truncation', async () => {
-    const drawingBuffer = { width: 1728, height: 1080, cssWidth: 1440, cssHeight: 900 };
+    const drawingBuffer = {
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+      dynamicResolution: true,
+    };
 
     const kept = fakeRes();
     await handlePerfReport(
@@ -1346,6 +1352,7 @@ describe('perf report ingestion', () => {
       height: 0,
       cssWidth: 1440,
       cssHeight: 0,
+      dynamicResolution: false,
     });
 
     // A non-record block is dropped, never stored as whatever was sent.

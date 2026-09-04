@@ -550,10 +550,15 @@ function snapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
-      // Deliberately NOT width x pixelRatio (2160x1350): the tier's DPR cap and
-      // the Render Quality slider move the backing store under a fixed CSS
-      // viewport, so the fleet reads the allocation rather than deriving it.
-      drawingBuffer: { width: 1728, height: 1080, cssWidth: 1440, cssHeight: 900 },
+      // A governor-backed-off medium session: the allocation stands at the
+      // manual ceiling and the flag says the scene rasterizes a sub-rect of it.
+      drawingBuffer: {
+        width: 1728,
+        height: 1080,
+        cssWidth: 1440,
+        cssHeight: 900,
+        dynamicResolution: true,
+      },
       calls: 500,
       triangles: 300000,
       geometries: 120,
@@ -689,16 +694,18 @@ describe('perf reporter payload', () => {
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
-    // The 3D drawing buffer rides in rawSummary (the no-DDL home): the fleet
-    // cannot say what resolution a session plays at from the columns alone.
-    // The fixture's buffer is 1728x1080 while its viewport x pixelRatio is
-    // 2160x1350, so a regression that derived the block instead of reading the
-    // canvas backing store reds on these exact values.
+    // The 3D drawing buffer rides in rawSummary (the no-DDL home): the report's
+    // own columns cannot say what a session rasterizes, because `dpr` is the raw
+    // window.devicePixelRatio and the viewport columns are window.innerWidth /
+    // innerHeight, neither of which is the renderer's capped ratio or the canvas
+    // rect. The dynamicResolution flag has to survive with the numbers: without
+    // it a governor-backed-off session reads as if it drew at full allocation.
     expect((body.rawSummary as { rendererDrawingBuffer?: unknown }).rendererDrawingBuffer).toEqual({
       width: 1728,
       height: 1080,
       cssWidth: 1440,
       cssHeight: 900,
+      dynamicResolution: true,
     });
     // The entry reveal wait rides in rawSummary too (the fleet-side watch for the
     // establishing-shot bound): the counters verbatim, the waits from the ring.

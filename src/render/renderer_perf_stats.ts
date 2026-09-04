@@ -21,13 +21,23 @@ import type { ZoneStreamingStats } from './zone_prepare_stats';
 
 export type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 
-/** The buffer the 3D scene is actually rasterized into, beside the CSS viewport
- *  it covers. `pixelRatio` x `width`/`height` does NOT reconstruct it: the tier's
- *  DPR cap and the Render Quality slider both move the allocation under a fixed
- *  viewport, so the backing store is the only field that says what a session
- *  really renders. On the dynamic-resolution path (medium's composer) the
- *  allocation stands at the manual ceiling and the governor renders a sub-rect
- *  of it, scaled by the `effectiveRenderScale` this same block already carries. */
+/** The allocated 3D drawing buffer, beside the CSS viewport it covers.
+ *
+ *  Inside THIS block the pair is redundant (`width === floor(cssWidth *
+ *  pixelRatio)`: both canvas sizing sites go through one `setPixelRatio` plus
+ *  `setSize(viewport)`). It is reported because the FLEET REPORT cannot rebuild
+ *  it from its own columns: the beacon's `dpr` is the raw
+ *  `window.devicePixelRatio`, never the renderer's capped ratio, and its
+ *  viewport is `window.innerWidth`/`innerHeight`, never the canvas rect. So
+ *  this is the only field that says what a session rasterizes.
+ *
+ *  On the dynamic-resolution path (`dynamicResolution` true: the grade-only
+ *  composer, medium today) this is the ALLOCATION, held at the manual Render
+ *  Quality ceiling while the governor rasterizes a sub-rect of it. The live
+ *  extent is then this buffer times `effectiveRenderScale / renderScale`, both
+ *  of which the report already carries as their own columns; the factor is that
+ *  RATIO and not `effectiveRenderScale` alone, because the allocation already
+ *  contains the manual scale. Everywhere else the two are the same buffer. */
 export interface DrawingBufferStats {
   /** The canvas backing store, in device pixels (`canvas.width`/`canvas.height`). */
   width: number;
@@ -35,6 +45,11 @@ export interface DrawingBufferStats {
   /** The CSS viewport it covers, from the renderer's cached measurement. */
   cssWidth: number;
   cssHeight: number;
+  /** Whether the governor rasterizes a sub-rect of the allocation rather than
+   *  reallocating. Reported because it is NOT derivable downstream: it comes
+   *  from the post chain's pass list, not from the tier or the quality buckets,
+   *  and without it a backed-off session reads as if it drew at full size. */
+  dynamicResolution: boolean;
 }
 
 export type RendererPhaseStats = Record<

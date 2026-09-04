@@ -264,7 +264,9 @@ function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undef
 // longtask block above, and the same reason for a bound: it rides the compact
 // path, where every retained key is copied verbatim, so "four scalars" has to be
 // enforced here rather than trusted. The ceiling is generous against any real
-// panel and MAX_VIEWPORT_DIMS, and only defends the ingest.
+// panel and MAX_VIEWPORT_DIMS, and only defends the ingest. The flag says
+// whether the governor rasterizes a sub-rect of that allocation, without which
+// a backed-off session reads as if it drew at full size.
 const DRAWING_BUFFER_RAW_PIXELS_MAX = 65_536;
 
 function sanitizeDrawingBuffer(value: unknown): Record<string, unknown> | undefined {
@@ -274,6 +276,7 @@ function sanitizeDrawingBuffer(value: unknown): Record<string, unknown> | undefi
     height: intIn(value.height, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
     cssWidth: intIn(value.cssWidth, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
     cssHeight: intIn(value.cssHeight, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
+    dynamicResolution: Boolean(value.dynamicResolution),
   };
 }
 
