@@ -180,25 +180,37 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
   it('reverse-maps EVERY typed outcome prose of the clear-item-name strip to a real catalog key', () => {
     // The phase 13 strip surfaces its proses through fail(ctx.res, 400,
     // outcome.error), a VARIABLE the fail() scan below cannot resolve, so the
-    // module's own literals are scanned instead: every `error: '...'` the
-    // endpoint body returns, every `return '...'` of the body validator, and
-    // the lease-fenced save's exported refusal line. Unmapped, an operator
-    // would read raw English through localizeAdminError's fallback.
-    const source = readServerSource('server/clear_item_name.ts');
-    const proses = Array.from(source.matchAll(/error: '((?:[^'\\]|\\.)*)'/g)).map((m) => m[1]);
+    // decision and transaction modules' literals are scanned instead: every
+    // `error: '...'` they return, every `return '...'` of the body validator,
+    // and the lease-fenced save's exported refusal line. The atomic mutation
+    // now owns not-found, so scanning only the decision core misses an outcome.
+    const modules = [
+      'server/clear_item_name.ts',
+      'server/clear_item_name_db.ts',
+      'server/offline_character_mutation_db.ts',
+    ];
+    const sources = modules.map(readServerSource);
+    const proses = sources.flatMap((source, index) => {
+      const literals = Array.from(source.matchAll(/error: '((?:[^'\\]|\\.)*)'/g)).map((m) => m[1]);
+      expect(literals.length, `${modules[index]} must expose its error outcomes`).toBeGreaterThan(
+        0,
+      );
+      return literals;
+    });
+    const source = sources[0];
     const validator = source.slice(
       source.indexOf('export function clearItemNameBodyError('),
       source.indexOf('export function clearItemNameTarget('),
     );
     for (const m of validator.matchAll(/return '((?:[^'\\]|\\.)*)';/g)) proses.push(m[1]);
     proses.push(CHARACTER_SAVE_LEASED_LINE);
-    // Liveness: the validator's five refusals, the body's four, the lease line.
+    // Liveness: five literal validator refusals, four decision/DB outcomes,
+    // and the lease line. The extraction must preserve the complete set.
     expect(new Set(proses).size).toBeGreaterThanOrEqual(10);
     for (const prose of proses) {
-      expect(
-        ADMIN_ERROR_KEYS[prose.toLowerCase()],
-        `unmatched clear-item-name prose: ${prose}`,
-      ).toBeTruthy();
+      const key = ADMIN_ERROR_KEYS[prose.toLowerCase()];
+      expect(key, `unmatched clear-item-name prose: ${prose}`).toBeTruthy();
+      expect((en as Record<string, string>)[key], `missing catalog key: ${key}`).toBeTruthy();
     }
   });
 

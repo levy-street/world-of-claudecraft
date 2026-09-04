@@ -22,6 +22,8 @@
 
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { perfectingCommand } from '../src/net/perfecting_command';
+import type { PerfectingCopyReads } from '../src/sim/professions/perfecting_copy';
 
 const ONLINE = readFileSync(new URL('../src/net/online.ts', import.meta.url), 'utf8');
 const SERVER = readFileSync(new URL('../server/game.ts', import.meta.url), 'utf8');
@@ -133,6 +135,7 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
   module: string;
   cellField: string;
   senderFields: string[];
+  senderHelper: { symbol: string; module: string };
 }> = [
   {
     cmd: 'perfect_item',
@@ -142,7 +145,8 @@ const PARSE_CORE_COMMANDS: ReadonlyArray<{
     // `name` is the phase 13 optional legendary name riding the same frame
     // (parsed by the sibling parsePerfectItemName in the same module; a bad
     // name drops the FIELD, never the frame).
-    senderFields: ['slot', 'bag', 'item', 'name'],
+    senderFields: ['slot', 'bag', 'item', 'copy', 'name'],
+    senderHelper: { symbol: 'perfectingCommand', module: './perfecting_command' },
   },
 ];
 
@@ -247,17 +251,26 @@ describe('every item command can name the copy it acts on', () => {
 
   it.each(PARSE_CORE_COMMANDS)(
     '$cmd names its copy through the $parser parse core, with teeth',
-    ({ cmd, parser, module, cellField, senderFields }) => {
-      // AGGREGATE over the windows here, deliberately unlike the addressed
-      // test above: perfect_item's two arms send COMPLEMENTARY shapes by
-      // contract (slot on the worn arm, bag plus item on the bagged arm),
-      // so demanding every field per occurrence would fail the correct
-      // sender. Both arms live in one method, so the aggregate is still
-      // method-bounded.
-      const body = senderWindowsFor(cmd).join('');
-      expect(body, `no ClientWorld sender found for ${cmd}`).not.toBe('');
+    ({ cmd, parser, module, cellField, senderFields, senderHelper }) => {
+      // The sender now delegates its complementary worn/bagged shapes to a
+      // pure helper. Follow the actual import, and require EVERY occurrence
+      // to spread its whole result with the live reads, ref and name. The
+      // exact bounded body also rejects overrides after the spread, so a
+      // helper call left beside a dropped/rewritten copy field cannot pass.
+      const windows = senderWindowsFor(cmd);
+      expect(windows.length, `no ClientWorld sender found for ${cmd}`).toBeGreaterThan(0);
+      expect(ONLINE).toContain(`import { ${senderHelper.symbol} } from '${senderHelper.module}';`);
+      for (const body of windows) {
+        expect(body.replace(/\s+/g, ' ').trim()).toBe(
+          `cmd: '${cmd}', ...${senderHelper.symbol}(this, ref, name) });`,
+        );
+      }
+      const senderSource = readFileSync(
+        new URL(`../src/net/${senderHelper.module}.ts`, import.meta.url),
+        'utf8',
+      );
       for (const f of senderFields) {
-        expect(body, `${cmd} must be able to send ${f}`).toContain(f);
+        expect(senderSource, `${cmd} helper must be able to send ${f}`).toContain(f);
       }
       const at = SERVER.indexOf(`case '${cmd}':`);
       expect(at, `no dispatch arm for ${cmd}`).toBeGreaterThan(-1);
@@ -273,6 +286,35 @@ describe('every item command can name the copy it acts on', () => {
       expect(simCall, `${cmd} must forward the parsed ref to the sim call`).toMatch(/\bref\b/);
     },
   );
+
+  it('the actual Perfecting sender helper emits both copy-addressed shapes and preserves a capture', () => {
+    const itemId = 'wyrmfall_pendant';
+    const reads = {
+      inventory: [
+        { itemId, count: 1, instance: { signer: 'First' } },
+        { itemId, count: 1, instance: { signer: 'Second' } },
+      ],
+      equipment: { neck: itemId },
+      equipmentInstances: { neck: { signer: 'Worn' } },
+    } satisfies PerfectingCopyReads;
+    expect(perfectingCommand(reads, { slot: 'neck' })).toStrictEqual({
+      slot: 'neck',
+      copy: { pin: expect.stringMatching(/^[0-9a-f]{32}$/) },
+      name: undefined,
+    });
+    const bag = perfectingCommand(reads, { bag: 1, itemId }, 'Dawn Star');
+    expect(bag).toStrictEqual({
+      bag: 1,
+      item: itemId,
+      copy: { pin: expect.stringMatching(/^[0-9a-f]{32}$/), anchor: { ordinal: 1, count: 2 } },
+      name: 'Dawn Star',
+    });
+    reads.inventory[1].instance.signer = 'Replacement';
+    expect(perfectingCommand(reads, { bag: 1, itemId }).copy?.pin).not.toBe(bag.copy?.pin);
+    expect(perfectingCommand(reads, { bag: 1, itemId, copy: bag.copy }, 'Dawn Star')).toStrictEqual(
+      bag,
+    );
+  });
 
   it('exempts only commands with a written reason, and no command is in two lists', () => {
     // Guards the guard. An exemption with no reason, or a command quietly living
