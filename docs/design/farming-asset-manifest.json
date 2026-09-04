@@ -7,7 +7,6 @@
     "src/render/farm_patches_core.ts (render identity tables)"
   ],
   "assetCount": 17,
-  "journeyEvidence": "docs/screenshots/farming-phase-13 holds the Phase 13 full-journey capture set (desktop 1600x900 and landscape mobile 844x390, LOW preset)",
   "heightNote": "authoredHeightYd is the exporter fit target (the shipped GLB bounds); drawHeightYd is the height the adapter renormalizes the whole model to at draw time. The three crop families share one drawHeightYd per stage even though their authored heights differ, which is what keeps a stage silhouette readable across families.",
   "assets": [
     {
@@ -456,5 +455,5 @@
     "FARM_COMPOST_BIN_OFFSET": 3,
     "compostBinNote": "yd west of the bed grid west edge, on the first row line, short of the 5 yd bed pitch so the bin never lands where a future bed row would"
   },
-  "regenerationNote": "assets and replacementContract derive from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; renderIdentity derives from the src/render/farm_patches_core.ts tables and adapterParameters from src/render/farm_patches.ts constants. No generator script exists: a re-derivation is a hand edit against those pinned sources, and tests/farming_asset_manifest.test.ts binds the derivable halves so drift reds instead of rotting (for adapterParameters only the three importable constants are suite-bound: FEAST_SHADOW_CAP and the two wet-band ms values; the module-internal rows were verified by hand at the Phase 13 QA and drift with the adapter's own suites). journeyEvidence, heightNote, this note, the replacementIntent prose, and the channelUse note under renderIdentity are hand-added and MUST be preserved on any re-derivation (the journeyEvidence reference keeps tests/ci_workflow.test.ts green: the screenshot cone entry needs a tracked reference outside docs/screenshots)."
+  "regenerationNote": "assets and replacementContract derive from FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js; renderIdentity derives from the src/render/farm_patches_core.ts tables and adapterParameters from src/render/farm_patches.ts constants. No generator script exists: a re-derivation is a hand edit against those pinned sources, and tests/farming_asset_manifest.test.ts binds the derivable halves so drift reds instead of rotting (for adapterParameters only the three importable constants are suite-bound: FEAST_SHADOW_CAP and the two wet-band ms values; the module-internal rows were verified by hand and drift with the adapter's own suites). heightNote, this note, the replacementIntent prose, and the channelUse note under renderIdentity are hand-added and MUST be preserved on any re-derivation."
 }

@@ -1,19 +1,16 @@
 // The Phase 13 asset handoff manifest (docs/design/farming-asset-manifest.json)
 // is the maintainer's contract for sourcing real GLBs, and it survives any
-// packet teardown (the farming packet now lives at
-// docs/prd/masterwrought/farming/ after the 11b absorb), so it must not rot.
+// packet teardown, so it must not rot.
 // No generator script
 // exists (a re-derivation is a hand edit), which is exactly why this suite
 // binds every DERIVABLE half to its pinned source: the asset rows to
 // FARM_PROP_CONTRACTS in scripts/assets/farm_props/model.js, the render
 // identity block to the src/render/farm_patches_core.ts tables, and the
 // importable adapter constants to src/render/farm_patches.ts. The hand-added
-// prose fields (journeyEvidence, heightNote, regenerationNote, the
+// prose fields (heightNote, regenerationNote, the
 // replacementIntent rows, renderIdentity.channelUse, and the two enriched
 // tint strings below) are pinned for PRESENCE, not content: they are the
-// halves a regen must preserve (the manifest's own regenerationNote says so),
-// and journeyEvidence is additionally load-bearing for the
-// tests/ci_workflow.test.ts screenshot-cone referenced-corpus scan.
+// halves a regen must preserve (the manifest's own regenerationNote says so).
 //
 // Deliberately NOT bound here: drawHeightYd and the adapterParameters rows
 // whose constants are module-internal to farm_patches.ts
@@ -61,7 +58,6 @@ const manifestText = readFileSync(manifestPath, 'utf8');
 const manifest = JSON.parse(manifestText) as {
   generatedFrom: string;
   assetCount: number;
-  journeyEvidence: string;
   heightNote: string;
   regenerationNote: string;
   assets: Array<
@@ -163,18 +159,12 @@ describe('farming asset manifest binds to its pinned sources', () => {
     expect(manifest.adapterParameters.FEAST_SHADOW_CAP).toBe(FEAST_SHADOW_CAP);
     expect(manifest.adapterParameters.FARM_WET_BAND_1_MS).toBe(FARM_WET_BAND_1_MS);
     expect(manifest.adapterParameters.FARM_WET_BAND_2_MS).toBe(FARM_WET_BAND_2_MS);
-    // The hand-added fields a re-derivation must preserve. journeyEvidence is
-    // load-bearing: it is the one tracked reference that keeps the
-    // farming-phase-13 screenshot cone in tests/ci_workflow.test.ts's
-    // referenced corpus after any packet teardown.
-    expect(manifest.journeyEvidence).toContain('docs/screenshots/farming-phase-13');
+    // The hand-added fields a re-derivation must preserve.
     expect(manifest.heightNote.length).toBeGreaterThan(0);
     expect(manifest.regenerationNote).toContain('tests/farming_asset_manifest.test.ts');
     expect(manifest.renderIdentity.channelUse).toContain('no draw-time consumer');
-    // Teardown safety: the manifest survives the packet deletion, so it must
-    // never point into it. Re-pointed at the MERGED packet root by the 11b
-    // absorb (the pre-move packet path can never appear again, so a needle
-    // aimed at it would pass vacuously and silently stop guarding).
-    expect(manifestText.includes('docs/prd/masterwrought/')).toBe(false);
+    // Teardown safety: this permanent manifest must not point into a temporary
+    // planning packet.
+    expect(manifestText.includes('/prd/')).toBe(false);
   });
 });
