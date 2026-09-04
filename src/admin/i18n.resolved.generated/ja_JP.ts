@@ -730,6 +730,7 @@ export const ja_JP: AdminTranslations = {
   "error.clearItemNameAllLiteral": "all はリテラルの true でなければなりません",
   "error.clearItemNameBagPair": "バッグ対象にはセル番号とアイテムIDの両方が必要です",
   "error.clearItemNameBagIndex": "bag は0以上の整数でなければなりません",
+  "error.clearItemNameBagRange": "bag must be a whole number from {min} to {max}",
   "error.clearItemNameOnline": "キャラクターはこのレルムでオンラインです。先に切断してください",
   "error.clearItemNameNoMatch": "その対象に一致する名前付きのコピーはありません",
   "error.clearItemNameCameOnline": "削除が反映される前にキャラクターがオンラインになりました。キックして再試行してください",

@@ -730,6 +730,7 @@ export const ko_KR: AdminTranslations = {
   "error.clearItemNameAllLiteral": "all은 리터럴 true여야 합니다",
   "error.clearItemNameBagPair": "가방 대상에는 칸 번호와 아이템 ID가 모두 필요합니다",
   "error.clearItemNameBagIndex": "bag은 0 이상의 정수여야 합니다",
+  "error.clearItemNameBagRange": "bag must be a whole number from {min} to {max}",
   "error.clearItemNameOnline": "캐릭터가 이 렐름에서 온라인 상태입니다. 먼저 접속을 끊으세요",
   "error.clearItemNameNoMatch": "해당 대상과 일치하는 이름 붙은 사본이 없습니다",
   "error.clearItemNameCameOnline": "삭제가 반영되기 전에 캐릭터가 온라인 상태가 되었습니다. 킥한 뒤 다시 시도하세요",

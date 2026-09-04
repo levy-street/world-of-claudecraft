@@ -730,6 +730,7 @@ export const en_XA: AdminTranslations = {
   "error.clearItemNameAllLiteral": "[áļļ ɱúšţ ƀé ţĥé ļíţéŕáļ ţŕúé]",
   "error.clearItemNameBagPair": "[á ƀáĝ ţáŕĝéţ ñééðš ƀóţĥ ţĥé çéļļ íñðéẋ áñð íţš íţéɱ íð]",
   "error.clearItemNameBagIndex": "[ƀáĝ ɱúšţ ƀé á ñóñ-ñéĝáţíʋé ŵĥóļé ñúɱƀéŕ]",
+  "error.clearItemNameBagRange": "[ƀáĝ ɱúšţ ƀé á ŵĥóļé ñúɱƀéŕ ƒŕóɱ {min} ţó {max}]",
   "error.clearItemNameOnline": "[çĥáŕáçţéŕ íš óñļíñé óñ ţĥíš ŕéáļɱ; ðíšçóññéçţ ţĥéɱ ƒíŕšţ]",
   "error.clearItemNameNoMatch": "[ñó ñáɱéð çóþý ɱáţçĥéð ţĥáţ ţáŕĝéţ]",
   "error.clearItemNameCameOnline": "[çĥáŕáçţéŕ çáɱé óñļíñé ƀéƒóŕé ţĥé šţŕíþ ļáñðéð; ķíçķ ţĥéɱ áñð ŕéţŕý]",

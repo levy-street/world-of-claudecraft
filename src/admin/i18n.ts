@@ -321,8 +321,19 @@ export const ADMIN_ERROR_KEYS: Record<string, string> = {
   'a note is required': 'error.flagNoteRequired',
 };
 export function localizeAdminError(message: string): string {
-  const key = ADMIN_ERROR_KEYS[message.trim().toLowerCase()];
-  if (!key) return message;
+  const normalized = message.trim().toLowerCase();
+  const key = ADMIN_ERROR_KEYS[normalized];
+  if (!key) {
+    // The server owns this clamp; read its bounds instead of copying them.
+    const bagRange = /^bag must be a whole number from (\d+) to (\d+)$/.exec(normalized);
+    if (bagRange) {
+      return t('error.clearItemNameBagRange', {
+        min: fmtNumber(Number(bagRange[1])),
+        max: fmtNumber(Number(bagRange[2])),
+      });
+    }
+    return message;
+  }
   // The quota-bound proses carry locale-grouped numbers. Formatting lives in
   // src/admin/format.ts (the admin's one sanctioned Intl home, mirroring the
   // game's src/ui/i18n.ts formatNumber), so the bounds are formatted there and

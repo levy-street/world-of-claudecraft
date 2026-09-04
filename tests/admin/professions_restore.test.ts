@@ -8,7 +8,9 @@ import {
   RESTORE_ITEM_MAX_COUNT as SERVER_RESTORE_ITEM_MAX_COUNT,
 } from '../../server/character_professions';
 import { CHARACTER_SAVE_LEASED_LINE } from '../../server/character_save_statement';
-import { ADMIN_ERROR_KEYS, t } from '../../src/admin/i18n';
+import { clearItemNameBodyError } from '../../server/clear_item_name';
+import { fmtNumber } from '../../src/admin/format';
+import { ADMIN_ERROR_KEYS, DICT, localizeAdminError, t } from '../../src/admin/i18n';
 import { en } from '../../src/admin/i18n.en';
 import {
   RESTORE_ITEM_MAX_COUNT,
@@ -203,6 +205,12 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
       source.indexOf('export function clearItemNameTarget('),
     );
     for (const m of validator.matchAll(/return '((?:[^'\\]|\\.)*)';/g)) proses.push(m[1]);
+    // Dynamic refusals cannot silently escape the literal scan. Each template
+    // must have an actual-validator fixture in the range test below.
+    expect(Array.from(validator.matchAll(/return `([^`]*)`;/g), (m) => m[1])).toEqual([
+      // biome-ignore lint/suspicious/noTemplateCurlyInString: pins the server source template.
+      'bag must be a whole number from 0 to ${MAX_BAG_INDEX}',
+    ]);
     proses.push(CHARACTER_SAVE_LEASED_LINE);
     // Liveness: five literal validator refusals, four decision/DB outcomes,
     // and the lease line. The extraction must preserve the complete set.
@@ -212,6 +220,45 @@ describe('server prose coupling (the count clamp and the error reverse map)', ()
       expect(key, `unmatched clear-item-name prose: ${prose}`).toBeTruthy();
       expect((en as Record<string, string>)[key], `missing catalog key: ${key}`).toBeTruthy();
     }
+  });
+
+  it('localizes every malformed clear-name bag index through a parameterized catalog key', () => {
+    const key = 'error.clearItemNameBagRange';
+    const rangeError = clearItemNameBodyError({ bag: -1, itemId: 'wolf_fang' });
+    expect(rangeError).toMatch(/^bag must be a whole number from 0 to \d+$/);
+    const max = Number(rangeError?.match(/\d+$/)?.[0]);
+    expect(Number.isSafeInteger(max) && max > 0).toBe(true);
+    const original = DICT.en[key];
+    // A distinct template proves the actual localizer used t(), even while
+    // unreleased locale overlays intentionally fall back to English.
+    DICT.en[key] = 'catalog bag range: {min} / {max}';
+    try {
+      for (const bag of [-1, 0.5, '0', null, Number.NaN, Number.POSITIVE_INFINITY, max + 1]) {
+        const prose = clearItemNameBodyError({ bag, itemId: 'wolf_fang' });
+        expect(prose).toBe(rangeError);
+        if (prose === null) throw new Error('expected invalid bag fixture to be refused');
+        expect(localizeAdminError(prose)).toBe(
+          `catalog bag range: ${fmtNumber(0)} / ${fmtNumber(max)}`,
+        );
+      }
+      // The mapper reads the server bounds, so a later clamp change cannot
+      // leave an independently copied number in the operator's message.
+      expect(localizeAdminError('  BAG MUST BE A WHOLE NUMBER FROM 1 TO 4095  ')).toBe(
+        `catalog bag range: ${fmtNumber(1)} / ${fmtNumber(4095)}`,
+      );
+    } finally {
+      if (original === undefined) delete DICT.en[key];
+      else DICT.en[key] = original;
+    }
+    expect((en as Record<string, string>)[key]).toBe(
+      'bag must be a whole number from {min} to {max}',
+    );
+    expect(clearItemNameBodyError({ bag: 0, itemId: 'wolf_fang' })).toBeNull();
+    expect(clearItemNameBodyError({ bag: max, itemId: 'wolf_fang' })).toBeNull();
+    expect(localizeAdminError('bag must be a non-negative whole number')).toBe(
+      t('error.clearItemNameBagIndex'),
+    );
+    expect(localizeAdminError('unexpected diagnostic')).toBe('unexpected diagnostic');
   });
 
   it('reverse-maps EVERY fail() prose in server/admin.ts to a real catalog key', () => {

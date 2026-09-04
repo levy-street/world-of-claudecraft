@@ -730,6 +730,7 @@ export const zh_CN: AdminTranslations = {
   "error.clearItemNameAllLiteral": "all 必须是字面值 true",
   "error.clearItemNameBagPair": "背包目标需要同时提供格子序号和物品 ID",
   "error.clearItemNameBagIndex": "bag 必须是非负整数",
+  "error.clearItemNameBagRange": "bag must be a whole number from {min} to {max}",
   "error.clearItemNameOnline": "该角色在此服务器在线，请先将其断开",
   "error.clearItemNameNoMatch": "没有与该目标匹配的已命名副本",
   "error.clearItemNameCameOnline": "清除生效前该角色已上线，请踢出后重试",

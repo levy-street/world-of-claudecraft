@@ -730,6 +730,7 @@ export const es: AdminTranslations = {
   "error.clearItemNameAllLiteral": "all must be the literal true",
   "error.clearItemNameBagPair": "a bag target needs both the cell index and its item id",
   "error.clearItemNameBagIndex": "bag must be a non-negative whole number",
+  "error.clearItemNameBagRange": "bag must be a whole number from {min} to {max}",
   "error.clearItemNameOnline": "character is online on this realm; disconnect them first",
   "error.clearItemNameNoMatch": "no named copy matched that target",
   "error.clearItemNameCameOnline": "character came online before the strip landed; kick them and retry",

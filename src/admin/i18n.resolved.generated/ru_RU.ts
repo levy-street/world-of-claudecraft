@@ -730,6 +730,7 @@ export const ru_RU: AdminTranslations = {
   "error.clearItemNameAllLiteral": "all должно быть литералом true",
   "error.clearItemNameBagPair": "для цели в сумке нужны и индекс ячейки, и идентификатор предмета",
   "error.clearItemNameBagIndex": "bag должно быть целым неотрицательным числом",
+  "error.clearItemNameBagRange": "bag must be a whole number from {min} to {max}",
   "error.clearItemNameOnline": "персонаж в сети на этом мире; сначала отключите его",
   "error.clearItemNameNoMatch": "ни одна именованная копия не подошла под эту цель",
   "error.clearItemNameCameOnline": "персонаж вошёл в сеть до применения удаления; кикните его и повторите",
