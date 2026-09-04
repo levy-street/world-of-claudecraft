@@ -27448,3 +27448,71 @@ ESCALATED (qr-19-ci-shard-weights-go-public-harvest, 2026-09-02, under qr-19-bes
 recorded on the D168 row of phase-19-new-rows.md, after the sixteenth-absorb entry of
 farming/progress.md, on item 21 of farming/state.md, and on the D022 row of the gate table as a
 dependency note; the record sits there, not repeated.
+
+## Phase 20 ledger (2026-09-04, the corrections lane and the handoff)
+
+Phase 20 was scheduled as the release-tier locale fill and the packet re-close. It ran its STEP 2
+re-derivation, corrected the wiki audit's worst findings, and then STOPPED SHORT of the fill on
+the maintainer's word, which authorized the pull request instead. What follows is what actually
+happened, stated as narrowly as it is true.
+
+### What ran
+
+- **The re-derivation, first, as the contract demands.** The worklist and the commit-walk
+  staleness audit were regenerated at the launch tip 6dc716c156 rather than trusted from the
+  STEP 1 package. The registry reads 14,545 pending rows over 957 keys against the 14,455 over
+  951 the package recorded, and the difference is exactly the wiki lane's six farming keys in
+  the fifteen Latin locales. The commit walk over 138 first-parent commits reproduced the
+  package's judged set byte for byte: 592 reworded keys, 209 with stale rows, 96 punctuation
+  only, 113 semantic, zero keys added, removed or moved. The side channels and the older rename
+  wave reproduced identically. The full comparison is amendment 11 of
+  phase-20-release-fill-and-reclose.md.
+- **The newline repair (ccf620d87b), a defect class the audit could not see.** The guide's
+  paragraph splitter breaks on real newlines only, and two English values plus eighteen locale
+  rows that copied their form, plus eleven of the thirty machine-authored fills the wiki lane
+  landed two hours earlier, spelled the two characters backslash and n in their source. Every
+  guide.* literal now spells a newline; no English wording changed. The same commit adds
+  tests/guide_wiki_audit_fills.test.ts and its fixture, the whole-literal shape anchor the ruled
+  contract asks of a machine-authored fill no reviewer has read.
+- **Three correction lanes, one commit each** (4b70fa06ed the arena page, 151036e66f the social
+  page, 261857f07c the interface page): 13 of the audit's 83 open changes-the-page keys,
+  every one retired and re-keyed so its predecessor keeps its reviewed translations, every
+  successor pinned per clause against the live tables with the old false clause asserted absent,
+  and the five non-Latin fills the M16 guard makes mandatory riding each change.
+
+### The corrections, and the scope ruling behind them
+
+The audit left one open ruling: how much of its 418 verified-defect keys to correct before a
+fill. The maintainer ruled the changes-the-page keys only (amendment 12), which re-priced at
+execution to 83 keys after unit 1 settled three of the 86. Of those 83, this lane landed 13 and
+drafted 71 more (one key was judged no-change by its verifier). The drafts are complete author
+packets, corrected English plus page edits, pins, census rows and retirement comments, but they
+are UNVERIFIED by the adversarial pass this lane requires before a correction lands, so they were
+not carried into the branch. The worklist for whoever finishes them is
+phase-20-wiki-audit-findings.md, which carries the audit's own evidence per finding.
+
+### The fill, handed off rather than run
+
+The maintainer's word at STEP 2 (recorded in phase-20-release-fill-and-reclose.md) hands the
+release-tier locale fill to whoever runs it on the release branch: the fifteen Latin locales, the
+sim dictionary blocks, the admin overlays, the deed and reliquary chunks, the register passes and
+the reword-staleness replacements. The derivations this lane re-ran are that fill's worklist and
+stand recorded in phase-20-fill-package.md. What this lane still owed and paid is the one i18n
+obligation the pull-request tier enforces, M16: a new wordy English key ships with its five
+non-Latin fills or the branch is red.
+
+### Validation
+
+Per lane: the i18n and wiki regenerations, the changed-files formatter, a whole-tree typecheck,
+the guide and i18n guard suites, and the export-and-symbol census, with the regenerated artifacts
+committed in the same commit as their source (the freshness gates diff against the committed
+tree). The closing evidence is in the pull request body.
+
+### Carried, and not taken
+
+- The 71 drafted corrections above, and the 332 worth-fixing and minor keys the audit verified
+  but the ruling did not open.
+- Every item of the fill package, which is the fill's own work.
+- The maintainer items the correction authors raised while re-deriving, recorded in the pull
+  request body rather than acted on: suspected game defects where the prose was made to follow
+  the game as it runs today.

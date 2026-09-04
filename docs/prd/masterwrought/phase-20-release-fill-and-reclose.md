@@ -315,3 +315,96 @@ non-fill item recorded here so the re-close reads the packet's own procedure doc
   biome line); nothing here is a fill item, recorded so the Phase 20 re-close does not read the
   harvest as done and does not take the qa-gate block's 'before the packet's PR is called
   mergeable' as satisfied.
+### Amendments at STEP 2 execution (2026-09-03, verified against the tree at 6dc716c156 before the first edit)
+
+Each item corrects or completes one line of the Starter Prompt or of an earlier section; the
+prompt stays as written and these read with it.
+
+11. STEP 2, "regenerate the worklist and re-run the commit-walk staleness audit": done at
+    6dc716c156 with session f56d3576's scripts re-pointed at this tip. The registry reads 14,545
+    pending rows over 957 distinct keys (auto 8,611, human 5,934), against the 14,455 over 951
+    the maintainer's-word section records: exactly the wiki lane's six farming keys times the
+    fifteen Latin locales (90 human rows), nothing else moved. The commit walk reads 138
+    first-parent commits touching the resolved English slice (135 at the package plus the art
+    pass, the mount sync and the wiki lane's unit), 592 reworded keys, 209 deleted, 209 keys
+    with stale rows (2,942 rows), 96 punctuation-only (1,884 rows) and 113 semantic (1,058 rows,
+    70 packet-side and 43 release-side by the merge attribution): byte for byte the set the
+    package judged, with zero keys added, removed or moved and every semantic key already in its
+    judged record. The side channels re-read identically (sim aura.frostbite 8 stale rows; deed
+    chunks 652 missing rows over 21 ids plus 3 stale; reliquary professions_field_notes.desc
+    stale in 18; zero sim passthrough) and so does the older rename wave (20 keys, 58 rows). The
+    registry-invisible package therefore stands as recorded, and the wiki lane added nothing to
+    it, which is what the sequencing decision was for.
+12. STEP 2, the open correction-scope ruling: put to the maintainer in session and RULED
+    2026-09-03, correct the changes-the-page keys only. Re-priced at execution: 86 keys by worst
+    severity in phase-20-wiki-audit-findings.md, of which unit 1 (a206370548) settled the three
+    shared node bodies as rendered on farming, leaving 83; 79 of them shipped in a release and
+    take the retire-and-re-key convention, 4 never shipped
+    (engineering.materialsBodyThreeRods, inscription.identityBody, fish.tablesNoteSixBands,
+    toolsNoteFishingPageMarks) and are reworded in place. The audit ledger's "worth-fixing keys
+    whose page is already being touched at no extra commit" line is corrected here: 206 of the
+    237 worth-fixing keys sit on such a page (38 of 48 lanes carry a changes-the-page key), so
+    the clause priced a commit, not the 2,865 pending rows it would have minted. The 332
+    worth-fixing and minor keys carry to the follow-up lane with
+    phase-20-wiki-audit-findings.md as its worklist.
+13. A defect class the audit could not see, found while re-deriving: the guide's paragraph
+    splitter (paras in src/guide/pages/ui.ts) breaks on REAL newlines only, and two English
+    values (guide.professions.toolEffectsBody and guide.profPages.faq.a10) plus eighteen locale
+    rows that copied their form, and eleven of unit 1's thirty machine-authored fills
+    (farm.gainBody and farm.yieldsBody in all five non-Latin locales, farm.rhythmBody in zh_CN),
+    spelled the two characters backslash and n in their source, so the live page rendered that
+    text inside one paragraph. Repaired as unit 0 (ccf620d87b): every guide.* literal now spells
+    a newline and the English wording is unchanged. The fill package's class H line
+    "toolEffectsBody stores the same double-backslash form the English does, so only faq.a10
+    diverges" was wrong in both halves: the English of faq.a10 carried the form too, and
+    thirteen of its locale rows with it.
+14. The wiki lane closed as an audit with its ledger short of its own STEP 5: no stamps, no
+    review record, no flagged-fills table, no wiki completeness ledger section in state.md and
+    no progress.md row, and its one execution unit a206370548 recorded only under the fill
+    package's class K. This lane treats unit 1 as UNREVIEWED code (item 13 is its first
+    finding) and writes the missing records beside its own.
+15. STEP 3 of the wiki lane, "the 19G shape: an exact narrowness transform or the whole literal
+    per locale": proportionality amendment. The 19G arms hand-author a numeral table, an undo
+    transform and clause anchors per fill, which is not writable at this lane's volume, and the
+    ruled contract names the whole literal as an acceptable shape. Every machine-authored
+    non-Latin fill of this lane, unit 1's thirty included, is anchored as a whole literal per
+    key and locale in tests/fixtures/guide_wiki_audit_fills.ts, walked by
+    tests/guide_wiki_audit_fills.test.ts ("every machine-authored non-Latin fill renders byte
+    for byte as anchored"), the sibling suite src/guide/CLAUDE.md asks for; the English
+    per-clause derivations stay in tests/guide.test.ts under "Guide wiki completeness
+    corrections (Phase 20, 2026-09-03)". A maintainer who re-cuts a fill re-cuts its literal.
+16. Execution shape of the corrections: one read-only author per lane, an adversarial verifier
+    with a revise round, and the five non-Latin fills the M16 guard makes mandatory for a new
+    wordy key, every agent returning DATA; a deterministic inserter applies each lane (the
+    catalog leaf beside its predecessor through the TypeScript AST, the page edits, the
+    RETIRED_KEYS entry, the census section, the overlay rows, the pin block, the anchor
+    fixture) and each lane is regenerated, typechecked, tested and committed on its own. The
+    account's rolling session limit killed the batches repeatedly; every resume replayed the
+    completed agents from the run journal and re-ran only the failures, and the lane state was
+    moved into per-lane files so a kill costs a stage rather than a lane.
+
+### THE MAINTAINER'S WORD AT STEP 2 (2026-09-04, in session)
+
+Two decisions that end this lane early and open the pull request, recorded so the next session
+reads the word rather than the contract it replaces:
+
+1. **The release fill is HANDED OFF, not run here.** "Can you skip the translations? We only do
+   those at release time." The fifteen Latin locales, the sim DICT blocks, the admin overlays,
+   the deed and reliquary chunks, the register passes and the reword-staleness replacements of
+   the fill package all carry to whoever runs the fill on the release branch. What this lane
+   still owes is the ONE i18n obligation the PR tier enforces: M16, the five non-Latin fills of
+   every new wordy English key (tests/i18n_completeness.test.ts, "non-Latin player surfaces ship
+   no untranslated English"), without which the branch is red. The derivations this lane
+   re-ran (item 11) stand as the fill's worklist and are recorded in
+   phase-20-fill-package.md; the chunked per-locale briefs the fill consumes regenerate from
+   `npm run i18n:worklist` at whatever tip the fill starts from.
+2. **THE PUSH AND THE PULL REQUEST ARE AUTHORIZED**, which answers ruling D022 and the standing
+   delivery rule that every phase of this packet has stopped on. "I want to get this up in a
+   pull request and have others finish it and that includes the translations." The branch pushes
+   to origin and the pull request opens against the newest release branch by version sort,
+   origin/release/v0.42.0 (its tip is an ancestor of this branch through the eleventh sync and
+   the mount-sync merge), with the handoff stated in the body rather than implied.
+
+STEP 3's re-close battery and STEP 4's ledger are scoped to what this lane actually did: the
+union matrix delta, the full-gate stamp and the drift attribution are the PR's evidence for the
+corrections and the newline repair, not for a fill that did not run.
