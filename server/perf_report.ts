@@ -258,6 +258,25 @@ function sanitizeBrowserSummary(value: unknown): Record<string, unknown> | undef
   };
 }
 
+// rendererDrawingBuffer: the allocated 3D backing store and the CSS viewport it
+// covers, the only field that says what resolution a session rasterizes at
+// (viewport x dpr is not the allocation). Same JSONB-not-DDL treatment as the
+// longtask block above, and the same reason for a bound: it rides the compact
+// path, where every retained key is copied verbatim, so "four scalars" has to be
+// enforced here rather than trusted. The ceiling is generous against any real
+// panel and MAX_VIEWPORT_DIMS, and only defends the ingest.
+const DRAWING_BUFFER_RAW_PIXELS_MAX = 65_536;
+
+function sanitizeDrawingBuffer(value: unknown): Record<string, unknown> | undefined {
+  if (!isRecord(value)) return undefined;
+  return {
+    width: intIn(value.width, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
+    height: intIn(value.height, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
+    cssWidth: intIn(value.cssWidth, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
+    cssHeight: intIn(value.cssHeight, 0, DRAWING_BUFFER_RAW_PIXELS_MAX, 0),
+  };
+}
+
 // rendererGpuQueue (issue #3167): the background GPU queue drains one unit at
 // a time (plus a small released-tail overlap), so the running unit, the
 // released tails, and the stalls they record are the only evidence a
@@ -732,6 +751,11 @@ function rawSummary(value: unknown, devTraceAllowed = false): Record<string, unk
     const gpuQueue = sanitizeGpuQueueSummary(parsed.rendererGpuQueue);
     if (gpuQueue) parsed.rendererGpuQueue = gpuQueue;
     else delete parsed.rendererGpuQueue;
+    // Field-shaped here, BEFORE the byte check, so the compact path's verbatim
+    // copy of the key is bounded by construction.
+    const drawingBuffer = sanitizeDrawingBuffer(parsed.rendererDrawingBuffer);
+    if (drawingBuffer) parsed.rendererDrawingBuffer = drawingBuffer;
+    else delete parsed.rendererDrawingBuffer;
     // The prewarm summary rides through verbatim on this path, bounded only by
     // the body cap, so its client-supplied LISTS are bounded here explicitly.
     // Without this the resume block's entries and failed-unit ids reach storage
@@ -891,6 +915,7 @@ export const perfReportInternalsForTest = {
   PERF_REPORT_SCHEMA_VERSION,
   LONG_TASK_RAW_MS_MAX,
   LONG_TASK_RAW_AGE_MS_MAX,
+  DRAWING_BUFFER_RAW_PIXELS_MAX,
   GPU_QUEUE_RAW_MS_MAX,
   GPU_QUEUE_RAW_AGE_MS_MAX,
   GPU_QUEUE_RAW_STALLS_MAX,

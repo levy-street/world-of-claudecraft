@@ -1325,6 +1325,38 @@ describe('perf report ingestion', () => {
     expect(compacted.oversized).toBeUndefined();
   });
 
+  it('field-shapes the drawing buffer rather than storing what was posted', () => {
+    const { rawSummary, DRAWING_BUFFER_RAW_PIXELS_MAX } = perfReportInternalsForTest;
+
+    // Every retained key of the compact path is copied verbatim, so "four
+    // scalars" has to be enforced at the ingest, not trusted. A hostile block
+    // keeps exactly four clamped integers and loses its extra members.
+    const hostile = rawSummary({
+      rendererDrawingBuffer: {
+        width: 1e308,
+        height: -5,
+        cssWidth: '1440.7',
+        cssHeight: { nested: 'x'.repeat(4000) },
+        extra: 'x'.repeat(4000),
+        list: new Array(500).fill('x'),
+      },
+    });
+    expect(hostile.rendererDrawingBuffer).toEqual({
+      width: DRAWING_BUFFER_RAW_PIXELS_MAX,
+      height: 0,
+      cssWidth: 1440,
+      cssHeight: 0,
+    });
+
+    // A non-record block is dropped, never stored as whatever was sent.
+    expect(rawSummary({ rendererDrawingBuffer: 'x'.repeat(4000) })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
+    expect(rawSummary({ rendererDrawingBuffer: [1, 2, 3] })).not.toHaveProperty(
+      'rendererDrawingBuffer',
+    );
+  });
+
   it('stores the GPU queue block bounded, and keeps it when raw summaries are truncated (#3167)', async () => {
     const {
       GPU_QUEUE_RAW_MS_MAX,
