@@ -3517,6 +3517,14 @@ export const guideStrings = {
     lootRollTitle: 'Need, Greed, or Pass.',
     lootRollBody:
       'When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. The highest roll wins.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of lootRollBody, retired in
+    // scripts/i18n_retired_keys.mjs. The loot roll prose said the highest roll wins, but the roll
+    // contends Need before any number: the highest Need roll takes the item and the Greed rolls do
+    // not count, and only with no Need does the highest Greed roll win. The successor
+    // lootRollBodyNeedBeatsGreed states that rule; its choices sentence is the predecessor's byte
+    // for byte.
+    lootRollBodyNeedBeatsGreed:
+      'When an item goes to a roll, each eligible member chooses Need if they want it, Greed if they would only take it spare, or Pass to bow out. Need beats Greed: if anyone rolls Need, the item goes to the highest Need roll and the Greed rolls do not count; otherwise the highest Greed roll wins.',
     lootMasterTitle: 'Master looter.',
     lootMasterBody:
       'The leader can instead take charge of the better drops, handing each one out to the member who should get it. It keeps prized gear from going to a stray roll, the way an organized group runs a dungeon.',
@@ -3544,11 +3552,27 @@ export const guideStrings = {
       'A few everyday commands are worth memorizing: /w Name sends a whisper and /r answers the last one you received, /invite asks someone into your party, /follow falls in step behind a friend, /roll casts dice for the group to see, /who shows who is online, and /afk marks you away. Type /help in the game for the full list.',
     emotesBody:
       'Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, target a friend first to aim it at them, or hold X to open the emote wheel for a quick overhead expression.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of emotesBody, retired in
+    // scripts/i18n_retired_keys.mjs. The emote prose told players to target a friend to aim an
+    // emote, while the router aims by the typed name alone, and presented X as the wheel key where
+    // it is only the rebindable default. The successor emotesBodyNamedTarget aims by name ('/wave
+    // Aleph'), calls X the default key, and adds that the Emotes button (window rail, More tray on
+    // touch) opens the same wheel.
+    emotesBodyNamedTarget:
+      "Your character can also speak without words: type an emote like /wave, /dance, /cheer, or /bow, add a name to aim it at someone, as in /wave Aleph, or hold X, the emote wheel's default key, to open the emote wheel for a quick overhead expression. The Emotes button in the rail of window buttons, or under More on touch, opens the same wheel.",
 
     // The Event Calendar window: realm event days plus the guild schedule.
     calendarHeading: 'The event calendar',
     calendarBody:
       'Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather, not a bonus; nothing about your character changes because a day is marked.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of calendarBody, retired in
+    // scripts/i18n_retired_keys.mjs. The calendar prose named six realm days where the calendar
+    // ships seven and promised that no marked day changes your character, false on the Double Honor
+    // Weekend, when every Thornhollow Fields honor award pays double and a played-out loss pays
+    // like a win. The successor calendarBodyDoubleHonor names the seventh day and states that one
+    // exception; 'Press I' is kept byte for byte per the audit's recorded-not-corrected ruling.
+    calendarBodyDoubleHonor:
+      'Press I to open the event calendar. It marks the realm days worth planning around, the weekly Raid Call, Market Day, Arena Clash, Double Honor Weekend, and Fishing Derby, plus the monthly Delve Day and Moongate Communion, and it is where guilds keep their schedule: the guild leader and officers can book events on it, and every member sees them on the same page. The realm days are a prompt to gather rather than a bonus, with one exception: all through the Double Honor Weekend, Thornhollow Fields Honor pays double and a played-out loss pays like a win. Nothing else about your character changes because a day is marked.',
 
     // Ready checks: /ready polls the group; counts-only summary, answers stay private.
     readyHeading: 'Ready checks',
@@ -3578,6 +3602,15 @@ export const guideStrings = {
     finderHeading: 'Finding a group',
     finderBody:
       'You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own or with the party you already have. The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, puts you on a short cooldown before the queue offers you another, so the line keeps moving.',
+    // Phase 20 wiki completeness audit (2026-09-03): the successor of finderBody, retired in
+    // scripts/i18n_retired_keys.mjs. The finder prose let any member queue a party and said a
+    // decline waits for the queue's next offer, where only the leader can queue a party and a
+    // decline drops the decliner's whole unit out of the queue. The successor
+    // finderBodyLeaderQueues has the leader queue the party and states that a decline or a lapsed
+    // offer drops you and your party out with a short cooldown while everyone else keeps their
+    // place.
+    finderBodyLeaderQueues:
+      'You do not have to shout in Looking for Group to fill a run. Open the Dungeon Finder, choose the run you want and the roles you are willing to fill, and join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in). The finder waits until it has a full set of roles, then offers the group to everyone at once: a popup asks each of you to accept, and the party forms the moment the last person says yes. Turning an offer down, or letting it run out, drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, so the line keeps moving.',
     finderBoardBody:
       'The finder also keeps a board of premade groups. A leader posts a listing with tags saying what the run is for, from a first visit to a straight full clear, and you apply to it for the leader to approve. The automatic queue fills the dungeons and the endgame raid, each at normal and heroic, while the board can also carry the solo attunement run, which the queue never fills for you; delves and open-world outings are yours to arrange. Either way the finder only builds the group: walking to the door, setting the difficulty, and agreeing the loot rules are still yours.',
     finderMore: 'See what is inside each dungeon',

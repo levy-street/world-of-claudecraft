@@ -203,6 +203,34 @@ export const RETIRED_KEYS = [
   // clause to the Warfare rating and set bonuses, and its five non-Latin fills
   // rode the same change; this key keeps its reviewed overlay rows.
   'guide.arenaPage.warfareTradeBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's
+  // calendar prose listed six realm days where SYSTEM_EVENTS ships seven and
+  // closed on 'not a bonus; nothing about your character changes', false on the
+  // Double Honor Weekend (src/sim/pvp/honor_event.ts doubles Thornhollow Fields
+  // honor all weekend); the successor calendarBodyDoubleHonor names the seventh
+  // day and the one exception, and its five non-Latin fills rode the change.
+  'guide.social.calendarBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's emote
+  // prose said 'target a friend first to aim it at them', while the emote arm of
+  // src/sim/social/chat.ts aims by the typed name alone and never reads the
+  // actor's target, and called X the wheel key where KeyX is only the default;
+  // the successor emotesBodyNamedTarget says both, and its five non-Latin fills
+  // rode the change (the old key keeps its five reviewed overlay rows here).
+  'guide.social.emotesBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's
+  // finder prose let any member queue 'with the party you already have'
+  // (dungeonFinderQueueJoin refuses everyone but the leader) and had a decline
+  // wait 'before the queue offers you another' (failProposal drops the
+  // decliner's unit from the queue and never re-queues it); the successor
+  // finderBodyLeaderQueues says both, and its five non-Latin fills rode the change.
+  'guide.social.finderBody',
+  // Phase 20 (2026-09-03, the wiki completeness audit): the social page's loot
+  // roll prose closed on 'The highest roll wins.', while resolveLootRoll in
+  // src/sim/loot/loot_roll.ts contends the Need rolls alone whenever anyone
+  // rolled Need, so a Greed roll of any size loses to a Need roll of 1; the
+  // successor lootRollBodyNeedBeatsGreed states the rule, and its five
+  // non-Latin fills rode the change (the old key keeps its reviewed rows here).
+  'guide.social.lootRollBody',
 ];
 
 export const RETIRED_KEY_SET = new Set(RETIRED_KEYS);

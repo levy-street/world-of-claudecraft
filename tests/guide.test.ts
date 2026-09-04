@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { RETIRED_KEYS } from '../scripts/i18n_retired_keys.mjs';
 import { assertFamiliesKnown } from '../scripts/wiki/family_guard.mjs';
 import { patternChannelSets, recipeAcquisitionChannel } from '../scripts/wiki/vendor_channel.mjs';
@@ -92,8 +92,10 @@ import {
 } from '../src/sim/content/vendor_row_gates';
 import { ABILITIES, CAMPS, DUNGEONS, ITEMS, MOBS, NPCS, QUESTS, ZONES } from '../src/sim/data';
 import { FINAL_BOSS_DUNGEONS, FLAWLESS_TASKS } from '../src/sim/deeds';
+import { createMob } from '../src/sim/entity';
 import { MASTERWROUGHT_EQUIP_CAP, MASTERWROUGHT_LEGENDARY_CAP } from '../src/sim/equipment_rules';
 import { itemLevel, primaryStatSum } from '../src/sim/item_level';
+import { awardSharedLootItem, submitLootRoll } from '../src/sim/loot/loot_roll';
 import { MARKET_CUT, MARKET_LISTING_DEPOSIT_COPPER } from '../src/sim/market';
 import {
   WORK_ORDER_CADENCE_TICKS,
@@ -166,9 +168,15 @@ import {
   RANKED_ARENA_LOSS_HONOR,
   RANKED_ARENA_WIN_HONOR,
 } from '../src/sim/pvp/honor';
+import { DOUBLE_HONOR_MULTIPLIER, DOUBLE_HONOR_WEEKDAYS } from '../src/sim/pvp/honor_event';
 import { FARM_RIFT_DROP_ITEM_IDS, RIFT_PATTERN_ITEM_IDS } from '../src/sim/rift/progression';
 import { Sim } from '../src/sim/sim';
+import {
+  FINDER_DECLINE_COOLDOWN_SECONDS,
+  FINDER_PROPOSAL_SECONDS,
+} from '../src/sim/social/dungeon_finder';
 import { CONSUME_DURATION, type DeedDef, DT } from '../src/sim/types';
+import { SYSTEM_EVENTS } from '../src/ui/calendar_view';
 import { DEED_IMAGE_IDS } from '../src/ui/deed_image_ids';
 import { entityTranslationKey } from '../src/ui/entity_i18n';
 import { esc } from '../src/ui/esc';
@@ -184,6 +192,7 @@ import {
 import { guideStrings } from '../src/ui/i18n.catalog/guide';
 import { itemStrings } from '../src/ui/i18n.catalog/items';
 import { recipeInputValue } from './helpers/reagent_unit_value';
+import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const publicPath = (url: string): string => resolve(repoRoot, 'public', url.replace(/^\//, ''));
@@ -6075,6 +6084,275 @@ describe('Guide wiki completeness corrections (Phase 20, 2026-09-03)', () => {
         0,
       );
     }
+  });
+
+  it('guide.social.calendarBodyDoubleHonor names every realm day and the one weekend that pays (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.calendarBody listed six realm days where SYSTEM_EVENTS ships
+    // seven ids, and its 'not a bonus' close is false on the Double Honor
+    // Weekend (src/sim/pvp/honor_event.ts doubles Thornhollow Fields honor on
+    // the weekdays the calendar marks). Every name is read from SYSTEM_EVENTS
+    // in table order through the calendar window's own title keys.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.calendarBodyDoubleHonor' as never);
+    expect(html).toContain(esc(body));
+    const camel = (id: string) => id.replace(/_([a-z])/g, (_m, c: string) => c.toUpperCase());
+    const title = (id: string) => t(`hudChrome.calendar.events.${camel(id)}.title` as never);
+    const ids = [...new Set(SYSTEM_EVENTS.map((e) => e.id))];
+    const kindOf = (id: string) => SYSTEM_EVENTS.find((e) => e.id === id)?.rule.kind;
+    const weekly = ids.filter((id) => kindOf(id) === 'weekly').map(title);
+    const monthly = ids.filter((id) => kindOf(id) === 'monthly').map(title);
+    expect(body).toContain(
+      `the weekly ${weekly.slice(0, -1).join(', ')}, and ${weekly[weekly.length - 1]}`,
+    );
+    expect(body).toContain(`the monthly ${monthly.join(' and ')}`);
+    let cursor = -1;
+    for (const id of ids) {
+      const at = body.indexOf(title(id));
+      expect(at, `${id} is named, in SYSTEM_EVENTS order`).toBeGreaterThan(cursor);
+      cursor = at;
+    }
+    // The exception: the marked weekdays are the sim's window, 'double' is the
+    // multiplier in words, and the in-game calendar note makes the same claims.
+    const marked = SYSTEM_EVENTS.filter((e) => e.id === 'double_honor').map((e) =>
+      e.rule.kind === 'weekly' ? e.rule.weekday : -1,
+    );
+    expect([...marked].sort()).toEqual([...DOUBLE_HONOR_WEEKDAYS].sort());
+    expect(DOUBLE_HONOR_MULTIPLIER).toBe(2);
+    const field = t('hudChrome.bg.title' as never);
+    const exception = `all through the ${title('double_honor')}, ${field} Honor pays double and a played-out loss pays like a win`;
+    expect(body).toContain(`with one exception: ${exception}.`);
+    const note = t('hudChrome.calendar.events.doubleHonor.note' as never);
+    expect(note).toContain(`${field} Honor pays double`);
+    expect(note).toContain('a played-out loss pays like a win');
+    expect(body).toContain('Nothing else about your character changes because a day is marked.');
+    // Narrowness: the opening and the guild clause are the predecessor's bytes.
+    const predecessor = guideStrings.social.calendarBody;
+    expect(body.slice(0, body.indexOf('the weekly'))).toBe(
+      predecessor.slice(0, predecessor.indexOf('the weekly')),
+    );
+    const guildClause = predecessor.slice(
+      predecessor.indexOf(', and it is where guilds'),
+      predecessor.indexOf(' The realm days'),
+    );
+    expect(guildClause.length).toBeGreaterThan(40);
+    expect(body).toContain(guildClause);
+    expect(html).not.toContain('Arena Clash, and Fishing Derby');
+    expect(html).not.toContain(
+      'a prompt to gather, not a bonus; nothing about your character changes',
+    );
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.calendarBody');
+  });
+
+  it('guide.social.emotesBodyNamedTarget aims an emote by a typed name and calls the wheel key a default (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.emotesBody said 'target a friend first to aim it at them';
+    // the emote arm of src/sim/social/chat.ts aims by the typed name and never
+    // reads the actor's target, and KeyX is only the emoteWheel row's default
+    // in the rebindable BIND_ACTIONS registry. Driven through the real router.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.emotesBodyNamedTarget' as never);
+    expect(html).toContain(esc(body));
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const aleph = sim.addPlayer('warrior', 'Aleph');
+    sim.addPlayer('mage', 'Bet');
+    sim.tick();
+    const emoteLine = (line: string): string | undefined => {
+      sim.chat(line, aleph);
+      const ev = sim
+        .tick()
+        .find(
+          (e): e is Extract<Ev, { type: 'chat' }> =>
+            e.type === 'chat' && e.pid === aleph && e.channel === 'emote',
+        );
+      return ev?.text;
+    };
+    for (const cmd of ['/wave', '/dance', '/cheer', '/bow']) {
+      expect(body, `${cmd} is listed`).toContain(cmd);
+      expect(emoteLine(cmd), `${cmd} is a live emote`).toBeDefined();
+    }
+    expect(emoteLine('/wave')).not.toContain('Bet');
+    expect(emoteLine('/wave Bet')).toContain('Bet');
+    expect(body).toContain('add a name to aim it at someone, as in /wave Aleph');
+    const wheel = BIND_ACTIONS.find((a) => a.id === 'emoteWheel');
+    expect(wheel?.kind).toBe('held');
+    const key = keyLabel(wheel?.defaults[0] ?? null);
+    expect(key).not.toBe('');
+    expect(body).toContain(
+      `or hold ${key}, the emote wheel's default key, to open the emote wheel`,
+    );
+    const label = t('hudChrome.emoteWheel.label' as never);
+    const more = t('hud.core.mobileMore' as never);
+    expect(body).toContain(
+      `The ${label} button in the rail of window buttons, or under ${more} on touch, opens the same wheel.`,
+    );
+    // Narrowness: the opening clause is the predecessor's bytes.
+    const predecessor = guideStrings.social.emotesBody;
+    expect(body.startsWith(predecessor.slice(0, predecessor.indexOf('target a friend')))).toBe(
+      true,
+    );
+    expect(html).not.toContain('target a friend first to aim it at them');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.emotesBody');
+  });
+
+  it('guide.social.finderBodyLeaderQueues states who queues a party and what a decline costs (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.finderBody let any member queue 'with the party you already
+    // have' (dungeonFinderQueueJoin refuses everyone but the leader) and had a
+    // decline wait 'before the queue offers you another' (failProposal drops the
+    // decliner's unit and never re-queues it; the accepted units keep their
+    // place, pinned in tests/dungeon_finder.test.ts). The gate is driven live.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.finderBodyLeaderQueues' as never);
+    expect(html).toContain(esc(body));
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const lead = sim.addPlayer('warrior', 'Lead');
+    const mate = sim.addPlayer('priest', 'Mate');
+    sim.partyInvite(mate, lead);
+    sim.partyAccept(mate);
+    sim.tick();
+    // An empty selection: the leader guard fires before the selection is read.
+    sim.dungeonFinderQueueJoin([], mate);
+    const errors = sim
+      .tick()
+      .filter((e): e is Extract<Ev, { type: 'error' }> => e.type === 'error' && e.pid === mate)
+      .map((e) => e.text);
+    expect(errors).toContain('Only the party leader may use the Dungeon Finder.');
+    expect(t('hudChrome.finder.leaderNote' as never)).toBe(
+      'Only your party leader can queue the group.',
+    );
+    expect(body).toContain(
+      'join the queue on your own, or have your party leader queue the party you already have (only the leader can put a group in).',
+    );
+    expect(FINDER_DECLINE_COOLDOWN_SECONDS).toBeGreaterThan(0);
+    expect(body).toContain(
+      'drops you, and any party you queued with, out of the queue and puts you on a short cooldown before you can join it again; everyone else in the offer keeps their place, so the line keeps moving.',
+    );
+    expect(body).not.toContain(String(FINDER_DECLINE_COOLDOWN_SECONDS));
+    expect(body).not.toContain(String(FINDER_PROPOSAL_SECONDS));
+    // Narrowness: the opening and the offer sentence are the predecessor's bytes.
+    const predecessor = guideStrings.social.finderBody;
+    expect(
+      body.startsWith(predecessor.slice(0, predecessor.indexOf('join the queue on your own'))),
+    ).toBe(true);
+    const offer = predecessor.slice(
+      predecessor.indexOf('The finder waits'),
+      predecessor.indexOf('Turning an offer'),
+    );
+    expect(offer.length).toBeGreaterThan(40);
+    expect(body).toContain(offer);
+    expect(html).not.toContain('or with the party you already have.');
+    expect(html).not.toContain('puts you on a short cooldown before the queue offers you another');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.finderBody');
+  });
+
+  it('guide.social.lootRollBodyNeedBeatsGreed states that Need beats Greed before any number counts (wiki completeness audit)', () => {
+    // Phase 20, the wiki completeness audit (2026-09-03). The predecessor
+    // guide.social.lootRollBody closed on 'The highest roll wins.', which is not
+    // the rule: resolveLootRoll contends the Need rolls alone whenever there is
+    // one. The three choice names are the loot prompt's own labels.
+    setLanguage('en');
+    const html =
+      pageFor('social')?.render({ params: [], sub: 'social', titleKey: 'guide.nav.social' }) ?? '';
+    const body = t('guide.social.lootRollBodyNeedBeatsGreed' as never);
+    expect(html).toContain(esc(body));
+    const need = t('itemUi.lootRoll.need' as never);
+    const greed = t('itemUi.lootRoll.greed' as never);
+    const pass = t('itemUi.lootRoll.pass' as never);
+    expect(body).toContain(
+      `chooses ${need} if they want it, ${greed} if they would only take it spare, or ${pass} to bow out.`,
+    );
+    expect(body).toContain(
+      `${need} beats ${greed}: if anyone rolls ${need}, the item goes to the highest ${need} roll and the ${greed} rolls do not count; otherwise the highest ${greed} roll wins.`,
+    );
+    // Narrowness: the choices sentence is the predecessor's bytes, and its
+    // false closing sentence renders nowhere on the page.
+    const predecessor = guideStrings.social.lootRollBody;
+    expect(
+      body.startsWith(predecessor.slice(0, predecessor.indexOf(' The highest roll wins.'))),
+    ).toBe(true);
+    expect(html).not.toContain('to bow out. The highest roll wins.');
+    expect(html).not.toContain(esc(predecessor));
+    expect(RETIRED_KEYS).toContain('guide.social.lootRollBody');
+  });
+
+  it('guide.social.lootRollBodyNeedBeatsGreed is the live rule: a forced Greed 100 loses to a Need 1 (wiki completeness audit)', () => {
+    // The clause 'the Greed rolls do not count', driven through the real roll
+    // with both d100s forced: the greeder draws 100, the needer 1, and the
+    // needer holds the item while no Greed roll is even revealed.
+    setLanguage('en');
+    type Ev = ReturnType<Sim['tick']>[number];
+    const cfg = {
+      seed: 42,
+      playerClass: 'warrior' as const,
+      noPlayer: true,
+      world: EMPTY_TEST_WORLD,
+    };
+    const sim = new Sim(cfg);
+    const needer = sim.addPlayer('warrior', 'Aaa');
+    const greeder = sim.addPlayer('mage', 'Bbb');
+    sim.partyInvite(greeder, needer);
+    sim.partyAccept(greeder);
+    const itemId = 'greyjaw_hide_boots';
+    expect(['poor', 'common']).not.toContain(ITEMS[itemId].quality);
+    const mob = createMob(sim.nextId++, MOBS.forest_wolf, 2, { x: 0, y: 0, z: 0 });
+    mob.dead = true;
+    mob.lootable = true;
+    mob.tappedById = needer;
+    mob.lootRecipientIds = [needer, greeder];
+    mob.loot = { copper: 0, items: [{ itemId, count: 1 }] };
+    sim.entities.set(mob.id, mob);
+    const looter = sim.ctx.players.get(needer);
+    expect(looter).toBeDefined();
+    awardSharedLootItem(sim.ctx, itemId, mob, looter as NonNullable<typeof looter>);
+    const opened = sim.events.find(
+      (e): e is Extract<Ev, { type: 'lootRoll' }> => e.type === 'lootRoll',
+    );
+    expect(opened).toBeDefined();
+    const rollId = (opened as Extract<Ev, { type: 'lootRoll' }>).rollId;
+    const realInt = sim.ctx.rng.int.bind(sim.ctx.rng);
+    let d100 = 0;
+    const spy = vi
+      .spyOn(sim.ctx.rng, 'int')
+      .mockImplementation((min: number, max: number) =>
+        min === 1 && max === 100 ? (d100++ === 0 ? 100 : 1) : realInt(min, max),
+      );
+    submitLootRoll(sim.ctx, rollId, 'greed', greeder);
+    submitLootRoll(sim.ctx, rollId, 'need', needer);
+    spy.mockRestore();
+    expect(d100).toBe(2);
+    expect(sim.countItem(itemId, needer)).toBe(1);
+    expect(sim.countItem(itemId, greeder)).toBe(0);
+    const need = t('itemUi.lootRoll.need' as never);
+    const greed = t('itemUi.lootRoll.greed' as never);
+    const lines = sim.events
+      .filter((e): e is Extract<Ev, { type: 'loot' }> => e.type === 'loot')
+      .map((e) => e.text);
+    expect(lines.some((l) => l.startsWith(`${need} Roll - 1 `))).toBe(true);
+    expect(lines.some((l) => l.startsWith(`${greed} Roll`))).toBe(false);
   });
 
   // END wiki completeness corrections (the inserter appends above this line)
