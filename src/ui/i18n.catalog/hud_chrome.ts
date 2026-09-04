@@ -1908,6 +1908,12 @@ export const hudChromeStrings = {
     // player frame (the debuff row then slides up beside the minimap) instead
     // of the classic two-row top-right corner (wordy, M16: the five non-Latin
     // fills land in this same change).
+    // Interface panel choice rows: the health text mode printed on your own unit
+    // frame and on the target (plus target-of-target) frame, the same table the
+    // party frames use (wordy, M16: the five non-Latin fills land in this same
+    // change).
+    playerHealthText: 'Player Health Text',
+    targetHealthText: 'Target Health Text',
     aurasOnPlayerFrame: 'Buffs on the Player Frame',
     // Interface panel toggle: bypass the Low graphics preset's buff-icon cap so
     // every active buff always renders, at the cap's per-frame cost (wordy,
@@ -3888,6 +3894,10 @@ export const hudChromeStrings = {
     healthPercent: 'Percent',
     healthCurrent: 'Current',
     healthCurrentMax: 'Current / Max',
+    // Fifth mode, shared with the player and target frame rows: the pair plus the
+    // percent in parentheses. Wordy (M16): the five non-Latin fills land in this
+    // same change.
+    healthCurrentMaxPercent: 'Current / Max (Percent)',
     sort: 'Sort Players',
     sortGroup: 'Group',
     sortRole: 'Role',

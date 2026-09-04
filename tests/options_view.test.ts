@@ -572,6 +572,8 @@ const FRAMES_KEYS = [
   'partyFrameShowAuras',
   'partyFrameShowPets',
   'partyFrameShowSelf',
+  'playerFrameHealthText',
+  'targetFrameHealthText',
   'aurasOnPlayerFrame',
   'alwaysShowAllBuffs',
   'showTargetOfTarget',

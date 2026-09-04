@@ -258,6 +258,16 @@ export function nearestOptionValue(value: number, options: ChoiceOption[]): numb
   return best;
 }
 
+/** The one health-text mode table the player, target and party frame rows share
+ *  (hud_frames.ts HealthTextMode): the choice values ARE the setting values. */
+const HEALTH_TEXT_CHOICES: ChoiceOption[] = [
+  { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
+  { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
+  { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
+  { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
+  { value: 4, labelKey: 'hudChrome.partyFrames.healthCurrentMaxPercent' },
+];
+
 const choice = (
   s: OptionsSettingsSource,
   key: string,
@@ -728,12 +738,7 @@ export function buildInterfaceControls(
       // partyFrameSpacing moved into the in-editor Frames Settings dropdown
       // beside the other frame knobs; the keys stay live and this tab's
       // Reset to Defaults still clears them.
-      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', [
-        { value: 0, labelKey: 'hudChrome.partyFrames.healthNone' },
-        { value: 1, labelKey: 'hudChrome.partyFrames.healthPercent' },
-        { value: 2, labelKey: 'hudChrome.partyFrames.healthCurrent' },
-        { value: 3, labelKey: 'hudChrome.partyFrames.healthCurrentMax' },
-      ]),
+      choice(s, 'partyFrameHealthText', 'hudChrome.partyFrames.healthText', HEALTH_TEXT_CHOICES),
       choice(s, 'partyFrameSort', 'hudChrome.partyFrames.sort', [
         { value: 0, labelKey: 'hudChrome.partyFrames.sortGroup' },
         { value: 1, labelKey: 'hudChrome.partyFrames.sortRole' },
@@ -744,6 +749,8 @@ export function buildInterfaceControls(
       boolToggle(s, 'partyFrameShowAuras', 'hudChrome.partyFrames.showAuras'),
       boolToggle(s, 'partyFrameShowPets', 'hudChrome.partyFrames.showPets'),
       boolToggle(s, 'partyFrameShowSelf', 'hudChrome.partyFrames.showSelf'),
+      choice(s, 'playerFrameHealthText', 'hudChrome.options.playerHealthText', HEALTH_TEXT_CHOICES),
+      choice(s, 'targetFrameHealthText', 'hudChrome.options.targetHealthText', HEALTH_TEXT_CHOICES),
       boolToggle(s, 'aurasOnPlayerFrame', 'hudChrome.options.aurasOnPlayerFrame'),
       boolToggle(s, 'alwaysShowAllBuffs', 'hudChrome.options.alwaysShowAllBuffs'),
       boolToggle(s, 'showTargetOfTarget', 'hudChrome.options.showTargetOfTarget'),

@@ -562,8 +562,12 @@ export const guideStrings = {
     ifTargetFrameScale: 'The size of your target frame.',
     ifPartyStyle:
       'The party layout: Automatic follows your group size, Classic is the traditional stack, and Raid packs everyone into the compact grid.',
+    ifPlayerHealthText:
+      'What your own health bar prints: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.',
+    ifTargetHealthText:
+      'What the target and target-of-target health bars print, with the same choices as your own frame.',
     ifPartyHealthText:
-      'What the party bars print: nothing, a percentage, current health, or current and maximum.',
+      'What the party bars print: nothing, a percentage, current health, current and maximum, or both with the percentage beside them.',
     ifPartySort: 'The order party members are listed in: group order, role, or name.',
     ifPartyShowAuras:
       'Whether buffs and debuffs show on the party frames. Matching switches cover resource bars, absorbs, pets, and whether you appear in your own party list.',

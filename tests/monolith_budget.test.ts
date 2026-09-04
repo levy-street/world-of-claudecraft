@@ -273,7 +273,11 @@ const MONOLITHS: MonolithRow[] = [
     // Re-pinned to the exact merged count of the OSSBrain v0.41.0 base
     // merge: both parents had already ratcheted for their own work, so
     // the composite is the honest size. Exact count, zero slack.
-    ceiling: 18905,
+    // Lowered 18905 -> 18902 after extracting the duplicated party-frame display
+    // config reader (live paint + Edit Frames preview) into
+    // party_frames.ts readPartyFrameDisplayConfig; the unit-frame Health Text
+    // wiring landed inside that saving. Exact count, zero slack.
+    ceiling: 18902,
     seam: 'pure view core + thin painter on PainterHost (src/ui/CLAUDE.md)',
   },
   {

@@ -538,7 +538,7 @@ import { buildWarfareVendorView, warfareShopViewer } from './hud/vendor/warfare_
 import { renderWarfareVendorWindow } from './hud/vendor/warfare_vendor_window';
 import { afflictionFateThreadCount, createDoomMeter, destructionRuinPips } from './hud/warlock';
 import { WocTradeController } from './hud/woc_trade';
-import { unitFrameCurrentMaxText } from './hud_frames';
+import { healthTextMode, unitFrameCurrentMaxText, unitFrameHealthText } from './hud_frames';
 import { availableMobVoiceCue, sfxHasCue, yellVoiceKey } from './hud_voice_cues';
 import {
   formatMoney as formatLocalizedMoney,
@@ -658,7 +658,11 @@ import { createPaladinDevotionView } from './paladin_devotion_view';
 import { PartyBelowTargetPainter } from './party_below_target_painter';
 import { loadPartyCollapsed, savePartyCollapsed } from './party_collapse';
 import type { PartyRowAuraDeps } from './party_frame_row';
-import { partyFrameSignature, selectPartyFrameMembers } from './party_frames';
+import {
+  partyFrameSignature,
+  readPartyFrameDisplayConfig,
+  selectPartyFrameMembers,
+} from './party_frames';
 import { PartyFramesPainter } from './party_frames_painter';
 import type { PerfOverlayHooks } from './perf_overlay_settings';
 import { PET_ACTION_ICONS, petFeedButtonState, petSpecialButtonState } from './pet_action_icons';
@@ -2005,17 +2009,7 @@ export class Hud {
       onToggleCollapse: noopWrite,
       partyAuras: this.partyAurasDeps,
     });
-    const settings = this.optionsHooks?.settings;
-    const config = {
-      showSelf: settings?.get('partyFrameShowSelf') ?? false,
-      showResource: settings?.get('partyFrameShowResource') ?? true,
-      showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
-      showAuras: settings?.get('partyFrameShowAuras') ?? true,
-      showPets: settings?.get('partyFrameShowPets') ?? true,
-      presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
-      healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
-      sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
-    };
+    const config = readPartyFrameDisplayConfig(this.optionsHooks?.settings);
     // The player's REAL party renders first, selected through the exact
     // pipeline the live frames use; the pure core pads the roster out to the
     // full sample stack (interface_unlock_menu_core.ts).
@@ -4658,6 +4652,7 @@ export class Hud {
     outOfRange: false,
   };
   private lastPlayerFrameHp = Number.NaN;
+  private lastPlayerFrameHpMode = Number.NaN;
   private lastPlayerFrameMaxHp = Number.NaN;
   private lastPlayerFrameResource = Number.NaN;
   private lastPlayerFrameMaxResource = Number.NaN;
@@ -9006,10 +9001,17 @@ export class Hud {
     // here, OUT of the shared family (target/party must not inherit them).
     const playerFrame = this.playerFrameDescriptor;
     playerFrame.hpFrac = p.hp / Math.max(1, p.maxHp);
-    if (p.hp !== this.lastPlayerFrameHp || p.maxHp !== this.lastPlayerFrameMaxHp) {
+    const hpMode = healthTextMode(this.optionsHooks?.settings?.get('playerFrameHealthText'), 3);
+    if (
+      p.hp !== this.lastPlayerFrameHp ||
+      p.maxHp !== this.lastPlayerFrameMaxHp ||
+      hpMode !== this.lastPlayerFrameHpMode
+    ) {
       this.lastPlayerFrameHp = p.hp;
       this.lastPlayerFrameMaxHp = p.maxHp;
-      playerFrame.hpText = unitFrameCurrentMaxText(p.hp, p.maxHp);
+      this.lastPlayerFrameHpMode = hpMode;
+      playerFrame.hpText = unitFrameHealthText(p.hp, p.maxHp, hpMode);
+      playerFrame.showAbsorbText = hpMode !== 0;
     }
     playerFrame.resourceKind = p.resourceType;
     playerFrame.resFrac = p.resource / Math.max(1, p.maxResource);
@@ -9143,10 +9145,11 @@ export class Hud {
         const targetFrame = this.targetFrameDescriptor;
         targetFrame.present = true;
         targetFrame.hpFrac = target.hp / Math.max(1, target.maxHp);
+        const hpMode = healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3);
         targetFrame.hpText = target.dead
           ? t('hud.core.dead')
-          : unitFrameCurrentMaxText(target.hp, target.maxHp);
-        targetFrame.showAbsorbText = !target.dead;
+          : unitFrameHealthText(target.hp, target.maxHp, hpMode);
+        targetFrame.showAbsorbText = !target.dead && hpMode !== 0;
         // The target's power bar (classic target frame): players and caster
         // mobs show their mana/rage/energy; a resource-less target (a plain
         // beast, rtype null) maps to 'none' EXPLICITLY (unitResourceClass
@@ -9261,7 +9264,11 @@ export class Hud {
           totFrame.hpFrac = tot.hp / Math.max(1, tot.maxHp);
           totFrame.hpText = tot.dead
             ? t('hud.core.dead')
-            : unitFrameCurrentMaxText(tot.hp, tot.maxHp);
+            : unitFrameHealthText(
+                tot.hp,
+                tot.maxHp,
+                healthTextMode(this.optionsHooks?.settings?.get('targetFrameHealthText'), 3),
+              );
           totFrame.showAbsorbText = false;
           totFrame.resourceKind = 'none';
           totFrame.resFrac = 0;
@@ -17702,17 +17709,7 @@ export class Hud {
     // Hoist the cheap signature (a single string pass, no intermediate arrays) AHEAD
     // of the selector so an unchanged party short-circuits before selectPartyFrameMembers
     // allocates its sorted / filtered / mapped arrays.
-    const settings = this.optionsHooks?.settings;
-    const config = {
-      showSelf: settings?.get('partyFrameShowSelf') ?? false,
-      showResource: settings?.get('partyFrameShowResource') ?? true,
-      showAbsorbs: settings?.get('partyFrameShowAbsorbs') ?? true,
-      showAuras: settings?.get('partyFrameShowAuras') ?? true,
-      showPets: settings?.get('partyFrameShowPets') ?? true,
-      presentation: Math.round(settings?.get('partyFrameStyle') ?? 0) as 0 | 1 | 2,
-      healthText: Math.round(settings?.get('partyFrameHealthText') ?? 1) as 0 | 1 | 2 | 3,
-      sort: Math.round(settings?.get('partyFrameSort') ?? 0) as 0 | 1 | 2,
-    };
+    const config = readPartyFrameDisplayConfig(this.optionsHooks?.settings);
     // Party members' pets, resolved from the SAME roster the pet frame uses. Built
     // before the signature because the signature folds pet health: a pet losing health
     // moves no wire field on the party payload, so without it the sliver would freeze.

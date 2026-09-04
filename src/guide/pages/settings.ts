@@ -362,6 +362,14 @@ const INTERFACE_TABS: InterfaceTabBlock[] = [
       { setting: 'hudChrome.partyFrames.sort', body: 'guide.settingsPage.ifPartySort' },
       { setting: 'hudChrome.partyFrames.showAuras', body: 'guide.settingsPage.ifPartyShowAuras' },
       {
+        setting: 'hudChrome.options.playerHealthText',
+        body: 'guide.settingsPage.ifPlayerHealthText',
+      },
+      {
+        setting: 'hudChrome.options.targetHealthText',
+        body: 'guide.settingsPage.ifTargetHealthText',
+      },
+      {
         setting: 'hudChrome.options.aurasOnPlayerFrame',
         body: 'guide.settingsPage.ifAurasOnPlayerFrame',
       },
