@@ -62,7 +62,10 @@ const REPO_ROOT = path.join(__dirname, '..');
 // bytes. That re-export also discharged the v0.42.0 lockfile drift this family
 // still owed (the release re-minted its own asset families and could not touch
 // this branch-owned one).
-const SOURCE_FINGERPRINT = 'd3be15761b4891dcf9e30779da9337f5eaf11033f9f36a62f4f84c22f5b2812f';
+// Re-minted during PR cleanup after moving non-shipping preview output from a
+// retired screenshot directory into ignored tmp/. Geometry and byte counts did
+// not change; only the two source-fingerprint stamps and resulting hashes did.
+const SOURCE_FINGERPRINT = 'e239133b88e99bc7a712ed20aed95b60b7510ee84ef770fc2368fe2f148df6e4';
 const SET_BYTES = 208_200;
 const PER_ASSET_BYTE_CEILING = 35 * 1024;
 const TRIANGLE_CEILING = 1_200;
@@ -110,112 +113,112 @@ interface AssetPin {
 const PINS: Readonly<Record<string, AssetPin>> = {
   farm_bed: {
     bytes: 6_880,
-    sha256: 'daeaa5ace092d41bdbc425ae435c78df32cc1a44dc57fed801d1e91d3f2ea429',
+    sha256: 'e8d09d1c57f898d6120f26191b4a090ce49804a7d56832001fb259fe5a9b1d73',
     triangles: 228,
     footprintYd: [3, 2],
     heightYd: 0.34,
   },
   farm_sprout: {
     bytes: 5_168,
-    sha256: 'e3dabe23ee7ee654b772aba83e1febcf30b2bb9d73b7ce2fe47b94f0360d6ff0',
+    sha256: '78252ca0dcce1e7c62cc77fb01a7b28906ca3bba74505dcefcd4db1f858e2737',
     triangles: 108,
     footprintYd: [1.67, 0.97],
     heightYd: 0.25,
   },
   farm_grain_stage2: {
     bytes: 5_248,
-    sha256: '75f747cabf837350e513a3847e4edd361bb4636bcb7cd2197c6fd0a968e1838f',
+    sha256: '448c030b9783cdafd3e29ea3cb827521d797705ac92336812ae79d5fb2a2f189',
     triangles: 108,
     footprintYd: [1.81, 1.04],
     heightYd: 0.42,
   },
   farm_rootleaf_stage2: {
     bytes: 8_792,
-    sha256: '06b582fd54d3a46841ab9d298bc2723658bba9d2eeb9bbcd21dbb00ed1f91249',
+    sha256: '16c31c56248d7c9e0dcece13a3f99bc15f3f9ec698a354fe8b2686f01917d818',
     triangles: 240,
     footprintYd: [1.61, 1.31],
     heightYd: 0.22,
   },
   farm_gourd_stage2: {
     bytes: 9_580,
-    sha256: '27926d4856d1f148757e7359a8ed4a47cbaa0c8d2c471f934b6686b4862c04ad',
+    sha256: 'a0003b81b354b013d126a380e6e6535e3bf12f007bafed0ab9896eb0485c8b5c',
     triangles: 360,
     footprintYd: [1.8, 1.16],
     heightYd: 0.09,
   },
   farm_grain_stage3: {
     bytes: 10_988,
-    sha256: 'f3dec95cdc4e8b7ee2ca40c1cb149e050d30d414f7114f641e4c14998108e3a2',
+    sha256: '2a88709d418ce829499bd6ed0a94928d7cb6e757bb65a73165201b5afc76f504',
     triangles: 288,
     footprintYd: [1.91, 1.31],
     heightYd: 0.82,
   },
   farm_rootleaf_stage3: {
     bytes: 17_776,
-    sha256: '11fdac397e34b7b9eb2029f6c2e0634eb76566a8e9160b5c63f074697b184775',
+    sha256: 'a5958c8b8d66afe17dc5b3d631be273b2b86e34102f30ed6f18fa8dd0329fcdc',
     triangles: 540,
     footprintYd: [2.16, 1.49],
     heightYd: 0.37,
   },
   farm_gourd_stage3: {
     bytes: 16_460,
-    sha256: 'a8b9aa53a81d1ae4ecbe0d74159276d5223b7c50901fcb34686d3e75a7f1f15c',
+    sha256: '78bd567b309dac51e69d7a6bdb9b3051960b0beec20e3eb8b3f828b06baadc7f',
     triangles: 612,
     footprintYd: [2.46, 1.5],
     heightYd: 0.18,
   },
   farm_grain_stage4: {
     bytes: 12_212,
-    sha256: '3f9fa3f0be95bafd6cbcad90c9685692cff6e2e66415259eb62bfa9eff6fcb33',
+    sha256: '8f81ddcb0d5096724364bcd4f2c360f327654bf8cf94a445dd9e732186299cab',
     triangles: 336,
     footprintYd: [2.54, 1.38],
     heightYd: 1.07,
   },
   farm_rootleaf_stage4: {
     bytes: 22_308,
-    sha256: '4d23f6706cd3823cb56e6e1f4bba17720be4a1de3589bcb5a32d407dbd7a69f0',
+    sha256: '4edda1e258899c4f8161eea462ab7637599e7b0b11dbfe01b8a897b2f5f43a92',
     triangles: 720,
     footprintYd: [2.72, 1.71],
     heightYd: 0.58,
   },
   farm_gourd_stage4: {
     bytes: 16_740,
-    sha256: 'eebdb72321eafa3891481ca3a9917515c40311a41682a7014570634b80582c5f',
+    sha256: '6b5552ce657322c2e68a95aab169ab2eb503a863e1c3f7f7905096b4c7f8c2e0',
     triangles: 620,
     footprintYd: [2.63, 1.61],
     heightYd: 0.4,
   },
   farm_grain_withered: {
     bytes: 9_656,
-    sha256: '6879bcaa1a13f08ab6192f67a36506c59c6cb4111426a49dc5c839bb32707ad8',
+    sha256: '50a27b9da4b4f06145f7d1e9b78a455bb7f40ca8ba672f357418db7ec4a46fa0',
     triangles: 288,
     footprintYd: [2.17, 1.36],
     heightYd: 0.66,
   },
   farm_rootleaf_withered: {
     bytes: 11_724,
-    sha256: '7a297afb6a058fea5d7c4d68360666d9392be5ea184f93523740c4289af50deb',
+    sha256: '57a15c7c9ff75a84c68d4a764c4fdbb886c1c349d9289f8b9eb9d03f7b5cea8c',
     triangles: 360,
     footprintYd: [2.12, 1.47],
     heightYd: 0.24,
   },
   farm_gourd_withered: {
     bytes: 13_872,
-    sha256: 'eaa139609c554391fcda9fbe2bd5fc3d28104ed17d7539fc037cf8ea78ba3063',
+    sha256: '26f089da0497a75a123e80caa35c7b579cb41109f50205b9f36b7dd6040017cf',
     triangles: 576,
     footprintYd: [2.43, 1.42],
     heightYd: 0.14,
   },
   farm_compost_bin: {
     bytes: 7_440,
-    sha256: 'ae7726735da104c7ed91fd160e32d6b9f038b5e8d9e20f94e167b777e790f29a',
+    sha256: '6b5c1683424cc07a9010aaf194501f59ebde1dc3f703dbae04a1e2eee278b061',
     triangles: 264,
     footprintYd: [1, 1],
     heightYd: 0.8,
   },
   farm_feast: {
     bytes: 15_644,
-    sha256: '1fad730a050f77a527019aa3903c9b9cb82569b81294b02a0048c8a58d19add0',
+    sha256: '2c5f74c01a26767b4ec44d307ebdacbb2c132167e5e5435c47693545eabb1036',
     triangles: 656,
     footprintYd: [1.6, 1.6],
     heightYd: 0.9,
@@ -226,7 +229,7 @@ const PINS: Readonly<Record<string, AssetPin>> = {
   // the equality is asserted here as well.
   farm_feast_apex: {
     bytes: 17_712,
-    sha256: '1d8a48c6c3fa2f93a44f3279275025c9dd828a68d987157273ba869d231dea1c',
+    sha256: 'f2cf7fb5cbe215e4380594078721ffc93a9cdfbd53beba502a537d86b1cc80b2',
     triangles: 780,
     footprintYd: [1.6, 1.6],
     heightYd: 0.9,
@@ -310,6 +313,12 @@ describe('farm prop authoring pipeline', () => {
       'pnpm-lock.yaml',
     ]);
     expect(farmPropsSourceFingerprint(REPO_ROOT)).toBe(SOURCE_FINGERPRINT);
+    const exporter = readFileSync(
+      path.join(REPO_ROOT, 'scripts/assets/farm_props/export_farm_props.mjs'),
+      'utf8',
+    );
+    expect(exporter).toContain("path.join(ROOT, 'tmp/farm_props_preview')");
+    expect(exporter).not.toContain('docs/screenshots/');
 
     const spec = JSON.parse(
       readFileSync(path.join(REPO_ROOT, 'scripts/assets/specs/farm_props.json'), 'utf8'),

@@ -35,7 +35,10 @@ const REPO_ROOT = path.join(__dirname, '..');
 // phase 06 tomes came back byte-identical in size, triangles and bounds, with
 // only their stamped fingerprint (and so their sha256) moved. That re-export
 // also discharged the v0.42.0 lockfile drift this family still owed.
-const SOURCE_FINGERPRINT = 'a5195614ecd45e5620c841c1154b7d8ae90f91db40385cdf3263acafd1fcd1de';
+// Re-minted during PR cleanup after moving non-shipping preview output from a
+// retired screenshot directory into ignored tmp/. Geometry and byte counts did
+// not change; only the two source-fingerprint stamps and resulting hashes did.
+const SOURCE_FINGERPRINT = '31a49ba170e68dbb4e3d6bbe72c734f63947bd63e7a7c21de8a5f6159f966adc';
 
 interface TomePin {
   itemId: string;
@@ -51,7 +54,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'silverleaf_primer',
     rootName: 'InscriptionTomeSilverleaf',
     bytes: 11_136,
-    sha256: '3d37736ce324abe4efc79a0e8fa84c9eb87185e7f234ce22699070486ded758e',
+    sha256: '9676ec0b0b20247261b9aaf665ae664c589f0b25265308de803a6aa97bd95756',
     triangles: 404,
     bounds: { min: [-0.1763, -0.1, -0.0555], max: [0.163, 0.3, 0.0622] },
   },
@@ -59,7 +62,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'goldleaf_folio',
     rootName: 'InscriptionTomeGoldleaf',
     bytes: 12_948,
-    sha256: '5e06915a0766c12b79b2017ddad318367f93f8d3e90ca476e28e89ef87521394',
+    sha256: '32c3dc3be35e84b224c8bb9880b236810278e8b36691ad2034b0d94dfa2ba2f1',
     triangles: 512,
     bounds: { min: [-0.1866, -0.1668, -0.0605], max: [0.1705, 0.33, 0.0672] },
   },
@@ -67,7 +70,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'sunpetal_grimoire',
     rootName: 'InscriptionTomeSunpetal',
     bytes: 13_956,
-    sha256: 'd3fdfbd8ba143fe726ee3cc95182484a755ae0f088e6b712b9fc5b0e20ffbe3b',
+    sha256: '4350c2e2cdcf365d9c01c69a69da64f218e775b21b1df96e45581875d646acd1',
     triangles: 584,
     bounds: { min: [-0.2007, -0.1668, -0.068], max: [0.1805, 0.36, 0.0863] },
   },
@@ -78,7 +81,7 @@ const TOME_PINS: Record<string, TomePin> = {
     itemId: 'voidbound_grimoire',
     rootName: 'InscriptionTomeVoidbound',
     bytes: 16_556,
-    sha256: '5cb8f511ccf8af5670b7a8c838c9f5b792d6cdb58e7d555b124eac14d2a601c6',
+    sha256: '033af05292d5bdc084dc8a74aefdbea7d8c53246cc07388547fe31c1a4bc7671',
     triangles: 724,
     bounds: { min: [-0.211, -0.1, -0.073], max: [0.188, 0.38, 0.086] },
   },
@@ -112,6 +115,12 @@ describe('inscription tome held models', () => {
       'pnpm-lock.yaml',
     ]);
     expect(inscriptionTomesSourceFingerprint(REPO_ROOT)).toBe(SOURCE_FINGERPRINT);
+    const exporter = readFileSync(
+      path.join(REPO_ROOT, 'scripts/assets/inscription_tomes/export_inscription_tomes.mjs'),
+      'utf8',
+    );
+    expect(exporter).toContain("path.join(ROOT, 'tmp/inscription_tomes_preview')");
+    expect(exporter).not.toContain('docs/screenshots/');
     const spec = JSON.parse(
       readFileSync(path.join(REPO_ROOT, 'scripts/assets/specs/inscription_tomes.json'), 'utf8'),
     );

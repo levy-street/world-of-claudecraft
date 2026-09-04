@@ -34,7 +34,7 @@ const RAW_ROOT = path.join(ROOT, 'tmp/asset_src/farm_props');
 const CANDIDATE_ROOT = path.join(ROOT, 'tmp/asset_optimized/farm_props/candidate');
 const REPEAT_ROOT = path.join(ROOT, 'tmp/asset_optimized/farm_props/repeat');
 const PUBLIC_ROOT = path.join(ROOT, 'public');
-const EVIDENCE_ROOT = path.join(ROOT, 'docs/screenshots/farming/assets/farm_props');
+const PREVIEW_ROOT = path.join(ROOT, 'tmp/farm_props_preview');
 
 const rawOnly = process.argv.includes('--raw-only');
 const noPreview = process.argv.includes('--no-preview');
@@ -398,7 +398,7 @@ try {
         data: exported.get(id),
         view: 'front-3q',
       });
-      soloFiles.push(writeDataUrl(stats.dataUrl, path.join(EVIDENCE_ROOT, 'solo', `${id}.png`)));
+      soloFiles.push(writeDataUrl(stats.dataUrl, path.join(PREVIEW_ROOT, 'solo', `${id}.png`)));
     }
     console.log(
       `solo contact: ${path.relative(
@@ -406,7 +406,7 @@ try {
         await makeContactSheet(
           soloFiles,
           [...FARM_PROP_IDS],
-          path.join(EVIDENCE_ROOT, 'solo-contact.png'),
+          path.join(PREVIEW_ROOT, 'solo-contact.png'),
           'Farm prop set, procedural GLB turnaround',
           5,
         ),
@@ -427,7 +427,7 @@ try {
       mountingFiles.push(
         writeDataUrl(
           stats.dataUrl,
-          path.join(EVIDENCE_ROOT, 'mounting', `${stageId ?? 'bare'}.png`),
+          path.join(PREVIEW_ROOT, 'mounting', `${stageId ?? 'bare'}.png`),
         ),
       );
       mountingLabels.push(label);
@@ -438,7 +438,7 @@ try {
         await makeContactSheet(
           mountingFiles,
           mountingLabels,
-          path.join(EVIDENCE_ROOT, 'mounting-contact.png'),
+          path.join(PREVIEW_ROOT, 'mounting-contact.png'),
           'Stage meshes mounted on the bed Socket_Soil node',
           3,
         ),

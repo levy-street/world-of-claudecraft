@@ -31,7 +31,7 @@ const ENTRY = path.join(HERE, 'export_entry.js');
 const SPEC = path.join(ROOT, 'scripts/assets/specs/inscription_tomes.json');
 const BUILD_ASSETS = path.join(ROOT, 'scripts/assets/build_assets.mjs');
 const CANDIDATE_ROOT = path.join(ROOT, 'tmp/asset_optimized/inscription_tomes/deterministic');
-const EVIDENCE_ROOT = path.join(ROOT, 'docs/screenshots/masterwrought-phase06-tomes');
+const PREVIEW_ROOT = path.join(ROOT, 'tmp/inscription_tomes_preview');
 const noPreview = process.argv.includes('--no-preview');
 const rawOnly = process.argv.includes('--raw-only');
 const TURNAROUND_VIEWS = Object.freeze([
@@ -290,7 +290,7 @@ async function makeReferenceComparison(key, optimizedContact) {
     .resize(panelWidth, panelHeight, { fit: 'contain', background: '#d7d9dc' })
     .png()
     .toBuffer();
-  const out = path.join(EVIDENCE_ROOT, key, 'reference-vs-optimized-contact.png');
+  const out = path.join(PREVIEW_ROOT, key, 'reference-vs-optimized-contact.png');
   await sharp({
     create: { width: panelWidth * 2, height: panelHeight + 40, channels: 3, background: '#d7d9dc' },
   })
@@ -387,7 +387,7 @@ try {
     };
 
     for (const key of INSCRIPTION_TOME_KEYS) {
-      const evidence = path.join(EVIDENCE_ROOT, key);
+      const evidence = path.join(PREVIEW_ROOT, key);
       const stageFiles = [];
       for (const stage of STAGES) {
         stageFiles.push(
