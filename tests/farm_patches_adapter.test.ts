@@ -29,7 +29,6 @@ import {
   FARM_APEX_FEAST_MODEL_URL,
   FARM_FEAST_MODEL_URL,
   FARM_SOIL_SOCKET_NAME,
-  farmPrewarmDisabled,
   farmStageModelUrl,
   resolveFarmPlotVisual,
 } from '../src/render/farm_patches_core';
@@ -1156,31 +1155,6 @@ describe('the prepared producer: the gated attach, the stand-ins and the program
     calls.at(-1)?.release();
     await flush();
     expect(shown?.visible).toBe(true);
-  });
-
-  it('?farmPrep=0 restores the bare attach and stages no anchors (the tour control leg)', () => {
-    expect(farmPrewarmDisabled('?farmPrep=0')).toBe(true);
-    expect(farmPrewarmDisabled('?perf&farmPrep=0')).toBe(true);
-    expect(farmPrewarmDisabled('?perf')).toBe(false);
-    expect(farmPrewarmDisabled('?farmPrep=1')).toBe(false);
-    expect(farmPrewarmDisabled('')).toBe(false);
-    const globals = globalThis as { location?: { search: string } };
-    const previous = globals.location;
-    globals.location = { search: '?farmPrep=0' };
-    try {
-      const scene = new THREE.Scene();
-      const { seats } = buildFarmPatchProps(SEED, FARM_PATCHES);
-      const { calls, gate } = fakeGate();
-      const visuals = new FarmPatchVisuals(scene, seats, recordingVfx().sink, gate);
-      expect(scene.children.find((c) => c.name === FARM_PROGRAM_ANCHORS_NAME)).toBeUndefined();
-      visuals.sync(fakeWorld([plot()], 0).source, READ_DT);
-      const [crop] = plotsIn(scene);
-      expect(crop.visible).toBe(true);
-      expect(calls).toHaveLength(0);
-    } finally {
-      if (previous === undefined) delete globals.location;
-      else globals.location = previous;
-    }
   });
 
   it('the renderer hands the visuals its compile gate, guarded on async compile (source pin)', () => {

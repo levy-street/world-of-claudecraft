@@ -82,32 +82,43 @@ describe('CI shard weight harvester provenance', () => {
     }
   }
 
-  it('warns before replacing the checked-in mergedLocal/mergedFiles rows', async () => {
+  it('reports the checked-in carried rows before replacing them', async () => {
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
         __provenance: {
           run: '32621561241',
-          mergedLocal: '2026-08-24',
-          mergedFiles: 46,
+          harvested: '2026-08-23',
+          files: 3,
+          harvestedFiles: 1,
+          carried: {
+            'tests/local.test.ts': {
+              ms: 20,
+              method: 'local-median',
+              measured: '2026-08-24',
+              reason: 'pending harvest',
+              runs: [19, 20, 21],
+            },
+            'tests/backfill.test.ts': { ms: 7, method: 'prose-backfill' },
+          },
+          backfill: { date: '2026-08-31', note: 'legacy carry batch attribution' },
         },
       }),
     );
     const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
+    const warns = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await runHarvester();
 
     const replacement = logs.mock.calls
       .map(([line]) => String(line))
-      .find((line) => line.includes('locally measured rows'));
-    expect(replacement).toContain('46 locally measured rows');
-    expect(replacement).toContain('2026-08-24');
+      .find((line) => line.includes('carried weights'));
+    expect(replacement).toContain('2 carried weights');
+    expect(warns).not.toHaveBeenCalled();
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 
   it('speaks up on an unrecognized provenance shape instead of a silent discard', async () => {
-    // A THIRD local-merge shape (neither sibling mergedLocal/mergedFiles nor
-    // nested localMerge) used to fall through the ?? chain and the bare
-    // catch, printing NOTHING while the rewrite discarded its rows.
+    // An unknown provenance shape must warn before the rewrite discards it.
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
@@ -129,24 +140,26 @@ describe('CI shard weight harvester provenance', () => {
     // Names the shape it could not parse and the consequence.
     expect(warning).toContain('merged');
     expect(warning).toContain('DISCARDS');
-    // The known-shape advisory must NOT also fire.
+    // The current-schema advisory must NOT also fire.
     expect(
-      logs.mock.calls
-        .map(([line]) => String(line))
-        .find((l) => l.includes('locally measured rows')),
+      logs.mock.calls.map(([line]) => String(line)).find((l) => l.includes('carried weights')),
     ).toBeUndefined();
     // The rewrite itself still proceeds: the arm warns, it does not block.
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();
   });
 
   it('stays silent on the plain-harvest provenance this script writes itself', async () => {
-    // A prior table with ONLY run/harvested/files carries no locally measured
-    // rows, so neither the advisory nor the unrecognized-shape warning should
-    // fire (a warning here would cry wolf on every routine re-harvest).
+    // A prior table with no carried rows needs neither advisory nor warning.
     primeGreenRun();
     harvestIo.readFileSync.mockReturnValue(
       JSON.stringify({
-        __provenance: { run: '32621561241', harvested: '2026-08-23', files: 3188 },
+        __provenance: {
+          run: '32621561241',
+          harvested: '2026-08-23',
+          files: 1,
+          harvestedFiles: 1,
+          carried: {},
+        },
       }),
     );
     const logs = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -154,9 +167,7 @@ describe('CI shard weight harvester provenance', () => {
     await runHarvester();
 
     expect(
-      logs.mock.calls
-        .map(([line]) => String(line))
-        .find((l) => l.includes('locally measured rows')),
+      logs.mock.calls.map(([line]) => String(line)).find((l) => l.includes('carried weights')),
     ).toBeUndefined();
     expect(warns.mock.calls).toHaveLength(0);
     expect(harvestIo.writeFileSync).toHaveBeenCalledOnce();

@@ -1,17 +1,13 @@
 // Fixture pins for scripts/lib/ci_shard_weight_carry.mjs, the machine-readable
 // attribution of every shard-weight row the newest CI harvest did not measure.
-// The gate reviewer's standing finding (masterwrought Phases 11g, 11h, 11k):
-// NOTHING MACHINE-CHECKED THAT A CARRIED WEIGHT WAS A REAL MEASUREMENT, so N
-// rows appended at MEASURED_FALLBACK_MS would pass every pin and leave the
-// balance bar byte-identical. Each arm here trips exactly one clause of the
-// contract the committed-table pin (tests/ci_shard_partition.test.ts) applies.
+// A carried row must prove where its measurement came from; merely appending a
+// fallback-valued row must not satisfy the coverage floor. Each arm here trips
+// exactly one clause of the contract the committed-table pin applies.
 //
 // The last describe drives the ENTRY that consumes this module,
 // scripts/ci_shard_weights_harvest.mjs, over BOTH of its local-carry modes with
-// an injected spawner: neither had a test at all (Phase 18 QA, gate-census
-// items 3, 4 and 6), against this module's own stated principle that the
-// parsers were extracted here "so the fixture suite pins the refusals instead
-// of the entry parsing arguments no test ever drives".
+// an injected spawner, so their parsing and refusal paths remain executable
+// rather than prose-only contracts.
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type {
   CarriedProvenance,
@@ -32,7 +28,6 @@ import {
   pruneMissingRows,
   serializeWeightTable,
   tableRows,
-  unionCarried,
 } from '../scripts/lib/ci_shard_weight_carry.mjs';
 
 // The injected spawner (and the rest of the entry's world). vi.mock is hoisted,
@@ -112,7 +107,7 @@ describe('carriedDefects: the contract, one clause per arm', () => {
 
   it('passes a clean table and pins the method list as literals', () => {
     expect(carriedDefects(clean, { fallbackMs: 31, requireMap: true })).toEqual([]);
-    expect(CARRY_METHODS).toEqual(['local-median', 'union-older-harvest', 'prose-backfill']);
+    expect(CARRY_METHODS).toEqual(['local-median', 'prose-backfill']);
     expect(tableRows(clean)).toEqual(['tests/a.test.ts', 'tests/b.test.ts', 'tests/c.test.ts']);
     expect(Object.keys(carriedRows(clean))).toEqual(['tests/c.test.ts']);
   });
@@ -223,32 +218,6 @@ describe('carriedDefects: the contract, one clause per arm', () => {
     ]);
   });
 
-  it('union-older-harvest needs the older run id and its harvest date', () => {
-    const entry = (over: Record<string, unknown>) =>
-      table(
-        { 'tests/a.test.ts': 10 },
-        {
-          harvestedFiles: 0,
-          carried: {
-            'tests/a.test.ts': {
-              ms: 10,
-              method: 'union-older-harvest',
-              run: '99',
-              measured: '2026-08-01',
-              ...over,
-            },
-          },
-        },
-      );
-    expect(carriedDefects(entry({}))).toEqual([]);
-    expect(carriedDefects(entry({ run: undefined }))).toEqual([
-      'tests/a.test.ts: union-older-harvest without a numeric run',
-    ]);
-    expect(carriedDefects(entry({ measured: undefined }))).toEqual([
-      'tests/a.test.ts: union-older-harvest without a measured date',
-    ]);
-  });
-
   it('prose-backfill rows need the ONE dated backfill note on the provenance', () => {
     const rows = { 'tests/a.test.ts': 10, 'tests/b.test.ts': 4 };
     const carried = {
@@ -263,7 +232,7 @@ describe('carriedDefects: the contract, one clause per arm', () => {
         table(rows, {
           harvestedFiles: 0,
           carried,
-          backfill: { date: '2026-08-31', note: 'attributed from the localMerge prose' },
+          backfill: { date: '2026-08-31', note: 'legacy carry batch attribution' },
         }),
       ),
     ).toEqual([]);
@@ -311,7 +280,7 @@ describe('applyLocalCarry', () => {
     {
       harvestedFiles: 1,
       carried: { 'tests/old.test.ts': { ms: 5, method: 'prose-backfill' } },
-      backfill: { date: '2026-08-31', note: 'attributed from the localMerge prose' },
+      backfill: { date: '2026-08-31', note: 'legacy carry batch attribution' },
     },
   );
 
@@ -394,57 +363,6 @@ describe('applyLocalCarry', () => {
   });
 });
 
-describe('unionCarried', () => {
-  it("keeps the newer table's attributions, carries the older's, and attributes older-harvest rows to the older run", () => {
-    const newer = table(
-      { 'tests/a.test.ts': 10, 'tests/n.test.ts': 3 },
-      {
-        run: '200',
-        harvestedFiles: 1,
-        carried: {
-          'tests/n.test.ts': { ms: 3, method: 'local-median', measured: '2026-08-30', runs: [3] },
-        },
-      },
-    );
-    const older = table(
-      { 'tests/a.test.ts': 9, 'tests/o1.test.ts': 40, 'tests/o2.test.ts': 6 },
-      {
-        run: '100',
-        harvested: '2026-08-10',
-        harvestedFiles: 2,
-        carried: { 'tests/o2.test.ts': { ms: 6, method: 'prose-backfill' } },
-      },
-    );
-    const { carried, harvestedFiles } = unionCarried({
-      newer,
-      older,
-      carriedKeys: ['tests/o1.test.ts', 'tests/o2.test.ts'],
-    });
-    expect(harvestedFiles).toBe(1);
-    expect(Object.keys(carried)).toEqual([
-      'tests/n.test.ts',
-      'tests/o1.test.ts',
-      'tests/o2.test.ts',
-    ]);
-    expect(carried['tests/o1.test.ts']).toEqual({
-      ms: 40,
-      method: 'union-older-harvest',
-      run: '100',
-      measured: '2026-08-10',
-    });
-    expect(carried['tests/o2.test.ts']).toEqual({ ms: 6, method: 'prose-backfill' });
-    expect(carried['tests/n.test.ts'].method).toBe('local-median');
-  });
-
-  it('treats a legacy newer table (no map) as fully harvested', () => {
-    const newer = table({ 'tests/a.test.ts': 10, 'tests/b.test.ts': 1 }, { run: '200' });
-    const older = table({ 'tests/a.test.ts': 9, 'tests/z.test.ts': 2 }, { run: '100' });
-    const out = unionCarried({ newer, older, carriedKeys: ['tests/z.test.ts'] });
-    expect(out.harvestedFiles).toBe(2);
-    expect(out.carried['tests/z.test.ts'].method).toBe('union-older-harvest');
-  });
-});
-
 describe('missingWeightFiles', () => {
   it('keeps walk order and treats anything not a number as unmeasured', () => {
     const walked = ['tests/a.test.ts', 'tests/b.test.ts', 'tests/c.test.ts', 'tests/d.test.ts'];
@@ -475,9 +393,8 @@ describe('parseCarryLocalCli: the --reason flag', () => {
     const { reason, tokens } = parseCarryLocalCli(['tests/a.test.ts=1,2,3', 'tests/b.test.ts=4']);
     expect(tokens).toEqual(['tests/a.test.ts=1,2,3', 'tests/b.test.ts=4']);
     expect(reason).toBe(DEFAULT_LOCAL_CARRY_REASON);
-    // Pinned as a literal, not just as the constant: the phase-close step in
-    // docs/qa-gate.md quotes this exact sentence as what lands on every row.
-    expect(DEFAULT_LOCAL_CARRY_REASON).toBe('phase 18 local carry pending the post-push harvest');
+    // Pinned as a literal so a default-reason change is intentional.
+    expect(DEFAULT_LOCAL_CARRY_REASON).toBe('local carry pending the next full-mode harvest');
   });
 
   it('takes an explicit reason from anywhere in the list, trimmed, and removes both tokens', () => {
@@ -845,11 +762,8 @@ describe('the harvest entry: the local-carry modes (an injected spawner)', () =>
     expect(entryIo.writeFileSync).not.toHaveBeenCalled();
   });
 
-  // The sibling branch, added by the Phase 18 QA re-review. It is the branch
-  // an operator reaches for by hand, the branch the phase-close step delegates
-  // to, and the item-6 exit restructure moved its terminator; with writeFileSync
-  // injected nothing real is written, so there was no worktree reason to leave
-  // it unpinned.
+  // This is the branch an operator reaches for by hand and the local-missing
+  // mode delegates to. With writeFileSync injected, nothing real is written.
   it('--carry-local writes the median row with its attribution and exits 0', async () => {
     entryIo.readFileSync.mockReturnValue(JSON.stringify(baseTable()));
     const { exitCode, out } = await runEntry([

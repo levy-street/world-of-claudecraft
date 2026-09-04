@@ -10,11 +10,8 @@ import {
   partitionForCi,
   weightForTestFile,
 } from '../scripts/ci_shard_partition.mjs';
-// The walk is SHARED with the union tool (scripts/merge_audit/shard_weight_union.mjs)
-// on purpose: the population this pin grades the table against and the one the
-// tool certifies a table against must be the same predicate, by import rather
-// than by two copies (tests/ci_shard_walk.test.ts pins the predicate and the
-// import on both sides).
+// The walk is SHARED with the shard-weight harvester: the population this pin
+// grades and the population local-missing carry enumerates must be identical.
 import { walkShardTestFiles } from '../scripts/lib/ci_shard_walk.mjs';
 // The carried-weight contract (the machine-readable half of the table's
 // provenance); the fixture arms live in tests/ci_shard_weight_carry.test.ts,
@@ -273,18 +270,17 @@ describe('ci_shard_partition (D11 path-matrix)', () => {
     const mid = Math.floor(loads.length / 2);
     const median = loads.length % 2 === 0 ? (sorted[mid - 1] + sorted[mid]) / 2 : sorted[mid];
     expect(Math.max(...loads) / median).toBeLessThanOrEqual(1.15);
-    // Table coverage over the real walked tree: staleness shows up as
-    // fallback churn. The table is refreshed only from a completed all-green
-    // CI harvest, so release-side suite growth rides the measured-median
-    // fallback until the next harvest rather than inventing local weights.
+    // Table coverage over the real walked tree: staleness shows up as fallback
+    // churn. A full CI harvest refreshes the table wholesale; the carried-row
+    // contract below covers locally measured rows between harvests.
     const covered = items.filter((i) => MEASURED_WEIGHTS[i.key.slice(1)] !== undefined).length;
     expect(covered / items.length).toBeGreaterThanOrEqual(0.94);
   });
 });
 
 describe('the committed weight table attributes every row it did not harvest', () => {
-  // The gate reviewer's standing finding through Phases 11g, 11h and 11k:
-  // nothing machine-checked that a CARRIED weight was a real measurement. The
+  // Before the carried map, nothing machine-checked that a CARRIED weight was
+  // a real measurement. The
   // coverage floor above only asks whether a row EXISTS, so N rows appended at
   // MEASURED_FALLBACK_MS would raise coverage, leave the balance bar
   // byte-identical (the bar already scores an unknown file at the fallback),
@@ -308,9 +304,8 @@ describe('the committed weight table attributes every row it did not harvest', (
     const { harvestedFiles } = (table.__provenance ?? {}) as { harvestedFiles?: number };
     const carried = carriedRows(table);
     const rows = tableRows(table);
-    // Floors near the committed shape (2939 harvested + 410 carried = 3349 at
-    // Phase 18), so a table that emptied one side cannot satisfy the identity
-    // trivially and read as a pass.
+    // Both populations need real rows, so a table that emptied one side cannot
+    // satisfy the identity trivially and read as a pass.
     expect(rows.length).toBeGreaterThan(3000);
     expect(harvestedFiles).toBeGreaterThan(2000);
     expect(Object.keys(carried).length).toBeGreaterThan(0);

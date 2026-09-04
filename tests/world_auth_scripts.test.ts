@@ -19,13 +19,6 @@ const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const SCRIPTS_ROOT = join(ROOT, 'scripts');
 const AUTHENTICATED_NODE_CLIENTS = [
   {
-    // The Market Metrics capture tool (Masterwrought phase 18): the panel reads
-    // the sim's live in-process listing book, so the only way to a populated
-    // shot is a real session listing real goods, which is why it joins here.
-    path: 'scripts/admin_market_metrics_shot.mjs',
-    authSend: 'ws.send(JSON.stringify(worldAuthMessage(reg.body.token, char.body.id)))',
-  },
-  {
     // The R35 admin capture tool: joins one throwaway character over the
     // wire so the professions inspector reads a LIVE session.
     path: 'scripts/admin_professions_shot.mjs',
@@ -243,14 +236,14 @@ describe('standalone world WebSocket auth', () => {
     // The server's `case 'chat'` lives in the COMMAND switch, so a top-level
     // { t: 'chat' } frame matches nothing and is dropped without an error: the
     // script keeps running and reports numbers for bots that were never
-    // levelled, geared, god-moded or teleported. Five perf scripts shipped that
+    // levelled, geared, god-moded or teleported. Several perf scripts shipped that
     // shape, which is why this is a scan and not a review note.
     //
     // Read over CODE, not prose: a script that documents the trap right above
     // its chatCommandMessage call spells the forbidden frame out in a comment
-    // (admin_market_metrics_shot.mjs does exactly that), and a raw-text scan
-    // reads that sentence as an offense. Stripping full-line comments is the
-    // same discipline the loopback-guard call-site pins already run on, and it
+    // too, and a raw-text scan reads that sentence as an offense. Stripping
+    // full-line comments is the same discipline the loopback-guard call-site
+    // pins already run on, and it
     // narrows the scan to what can actually be SENT: a comment sends nothing.
     // Both directions are proven below, so the strip cannot blind the scan.
     const offenders = nodeWebSocketSources()

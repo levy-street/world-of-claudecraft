@@ -14,9 +14,8 @@
 // mesh is the primitive-box fallback wearing a gfx surfaceMat clone: the same
 // mechanism the shipped GLB materials ride (cloneMaterialWithHooks keeps the
 // program key, three releases a program with its last material, an anchor
-// wearing the source keeps it), proved on the one material set a headless
-// suite can build. scripts/farm_gpu_tour.mjs is the same proof on the shipped
-// assets in the running game.
+// wearing the source keeps it), proved on the one material set a browser suite
+// can build.
 import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import {

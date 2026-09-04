@@ -2,16 +2,12 @@
 // provenance (scripts/ci_shard_weights.generated.json).
 //
 // A CI harvest (scripts/ci_shard_weights_harvest.mjs <run-id>) measures every
-// file the run executed. Between harvests the table also carries rows no harvest
-// produced: test files a release sync or a phase added, measured locally so the
-// coverage floor in tests/ci_shard_partition.test.ts keeps grading the LPT
-// balance claim against reality, and rows an older table measured in an earlier
-// harvest that a KEY UNION (scripts/merge_audit/shard_weight_union.mjs) kept.
-// Until Phase 18 that carrying was disclosed in prose only, and the gate
-// reviewer's finding stood through three phases: NOTHING MACHINE-CHECKED THAT A
-// CARRIED WEIGHT WAS A REAL MEASUREMENT. A contributor appending rows valued at
-// MEASURED_FALLBACK_MS would have passed every pin and left the balance bar
-// byte-identical, since that bar already scores an unknown file at the fallback.
+// file the run executed. Between harvests the table also carries locally measured
+// rows for test files the newest harvest did not include, so the coverage floor
+// in tests/ci_shard_partition.test.ts keeps grading the LPT balance claim against
+// reality. Before this map existed, that carrying was disclosed in prose only;
+// a row appended at MEASURED_FALLBACK_MS could pass the old pins without proving
+// that it came from a real measurement.
 //
 // The contract this module owns, pinned by tests/ci_shard_weight_carry.test.ts
 // (fixtures) and tests/ci_shard_partition.test.ts (the committed table):
@@ -32,21 +28,15 @@
 //                         is always a stopgap for a harvest that could not run,
 //                         and the row has to say which one, so a reader months
 //                         later can tell a pending-harvest row from a permanent
-//                         one without going back through the phase docs.
-//   union-older-harvest   measured by an OLDER CI harvest and kept by a key
-//                         union: `run` names that harvest, `measured` its date.
+//                         one without reconstructing branch history.
 //   prose-backfill        a row the table carried before this map existed,
-//                         attributed once from the localMerge prose on the date
-//                         __provenance.backfill records (its `note` says so).
-//                         New rows never take this method; it exists so the 410
-//                         rows carried through Phases 11d to 11m are declared
-//                         rather than laundered into the harvested count.
+//                         attributed once before the map existed; the dated
+//                         batch basis is recorded by __provenance.backfill.
+//                         New rows never take this method; it exists so legacy
+//                         rows remain declared rather than laundered into the
+//                         harvested count.
 
-export const CARRY_METHODS = Object.freeze([
-  'local-median',
-  'union-older-harvest',
-  'prose-backfill',
-]);
+export const CARRY_METHODS = Object.freeze(['local-median', 'prose-backfill']);
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -61,9 +51,8 @@ export function tableRows(table) {
  *
  * Named medianMs, not median: scripts/load_probe.mjs and
  * scripts/assets/eastbrook_grand_armoury/capture_contract.mjs already export a
- * `median`, and a third same-named export in the scripts tree is a
- * duplicate-definition row in the merge census for no gain. The suffix also
- * states the unit this one rounds to.
+ * `median`. The suffix avoids an ambiguous third export and states the unit
+ * this one rounds to.
  * @param {readonly number[]} values
  */
 export function medianMs(values) {
@@ -99,8 +88,8 @@ export function carriedRows(table) {
  * Every defect in a table's carried attribution, as messages. An empty list is
  * the pass. The committed table is checked with `requireMap: true` (the map and
  * the harvested count must be PRESENT, not merely consistent when present); the
- * tools accept a legacy table without a map so an old parent can still be
- * unioned.
+ * tools accept a legacy table without a map so it can still be inspected and
+ * locally carried forward.
  *
  * @param {Record<string, any>} table
  * @param {{ fallbackMs?: number, requireMap?: boolean }} [opts]
@@ -171,11 +160,6 @@ export function carriedDefects(table, opts = {}) {
       if (typeof entry.reason !== 'string' || entry.reason.trim() === '') {
         defects.push(`${key}: local-median without a reason`);
       }
-    } else if (entry.method === 'union-older-harvest') {
-      if (!/^\d+$/.test(String(entry.run)))
-        defects.push(`${key}: union-older-harvest without a numeric run`);
-      if (!DATE_RE.test(String(entry.measured)))
-        defects.push(`${key}: union-older-harvest without a measured date`);
     } else {
       backfilled += 1;
     }
@@ -268,51 +252,15 @@ export function applyLocalCarry(table, measurements, opts) {
 }
 
 /**
- * The carried map and harvested count of a KEY UNION: the newer table's own
- * attributions travel with its rows, and every row only the older table carried
- * keeps the older table's attribution when it has one, else is attributed to the
- * older table's harvest run.
- *
- * @param {{ newer: Record<string, any>, older: Record<string, any>, carriedKeys: readonly string[] }} args
- * @returns {{ carried: Record<string, Record<string, unknown>>, harvestedFiles: number }}
+ * The default `reason` a `--carry-local` row carries. Override it when a more
+ * specific explanation is available.
  */
-export function unionCarried({ newer, older, carriedKeys }) {
-  const newerCarried = carriedRows(newer);
-  const olderCarried = carriedRows(older);
-  const newerKeys = tableRows(newer);
-  const carried = {};
-  let harvestedFiles = 0;
-  for (const k of newerKeys) {
-    if (newerCarried[k]) carried[k] = newerCarried[k];
-    else harvestedFiles += 1;
-  }
-  for (const k of carriedKeys) {
-    carried[k] = olderCarried[k] ?? {
-      ms: older[k],
-      method: 'union-older-harvest',
-      run: String(older.__provenance?.run),
-      measured: older.__provenance?.harvested,
-    };
-  }
-  return {
-    carried: Object.fromEntries(Object.entries(carried).sort(([a], [b]) => (a < b ? -1 : 1))),
-    harvestedFiles,
-  };
-}
+export const DEFAULT_LOCAL_CARRY_REASON = 'local carry pending the next full-mode harvest';
 
 /**
- * The default `reason` a `--carry-local` row carries. Phase 18 of the
- * masterwrought packet added roughly thirty test files whose weights no CI
- * harvest has measured, and the harvest cannot run while the branch is local,
- * so the rows are carried at local medians until the post-push harvest replaces
- * them wholesale. Override with `--reason` when carrying for a different cause.
- */
-export const DEFAULT_LOCAL_CARRY_REASON = 'phase 18 local carry pending the post-push harvest';
-
-/**
- * The test files a weight table does not measure, in walk order. The phase-close
- * carry enumerates its work with this rather than a hand-kept list, so a file a
- * late unit added cannot be missed.
+ * The test files a weight table does not measure, in walk order. The
+ * local-missing mode enumerates its work with this rather than a hand-kept list,
+ * so a newly added file cannot be missed.
  *
  * @param {readonly string[]} walkedFiles the shard walk's population
  * @param {Record<string, unknown>} weights the measured table (rows only)

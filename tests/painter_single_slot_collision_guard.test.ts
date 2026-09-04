@@ -271,9 +271,8 @@ describe('the detector itself, driven over a fixture tree', () => {
 // cache in the HUD, the other widens a standing gate's reach).
 //
 // RULED (qr-19-single-slot-writer-slot-key, 2026-09-02, under qr-19-best-for-project):
-// MEASURED FIRST, then shaped on the number; the evidence is committed under
-// docs/screenshots/masterwrought-phase-19e/ (the prototype as
-// d128-option-a-prototype.patch, the tour summaries, the heap probe and its output).
+// MEASURED FIRST, then shaped on the number; the development evidence included
+// a prototype, tour summaries, and a heap probe.
 //
 // THE PROOF OF ZERO is deductive, and the tour corroborates it. With all seven shipped
 // sites fixed, every element the HUD routes a write through carries ONE kind, and for a
@@ -295,8 +294,8 @@ describe('the detector itself, driven over a fixture tree', () => {
 // THE TOUR (scripts/perf_tour.mjs, headless swiftshader, both viewports, two runs each
 // way on one Vite process and one tree, the merge tip 2ebe95e731, Chrome 152 headless,
 // macOS 26.5.2, Node v26.5.0): hudHotDomWrites before 1052 and 1072 desktop, 575 and
-// 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. The per-step series
-// is in the committed summary, and what it shows is bounded. Through the first
+// 575 mobile; after 1062 and 1079 desktop, 585 and 589 mobile. What the per-step
+// series showed is bounded. Through the first
 // four steps the eight series agree exactly, except where one run rendered
 // markedly fewer frames at that step (before-run2 desktop at the fourth step, 20
 // frames against 33 to 39; before-run1 mobile at the second, 9 against 21 to 24).
@@ -329,10 +328,9 @@ describe('the detector itself, driven over a fixture tree', () => {
 // THE PRICE: the establishing write still allocates ONE object per element, only
 // bigger (a four-slot record; only a per-element Map would add an allocation). Retained
 // per entry, Node v26 without pointer compression, 200,000 entries in an array,
-// GC-fenced heapUsed delta, median of five, shared value strings (the harness is the
-// committed d128-slot-entry-heap-probe.mjs, run with node --expose-gc): 72 bytes for
-// the two-field entry, 88 for
-// the four-slot record, 216 for a Map, so +16 bytes per routed element in Node and
+// GC-fenced heapUsed delta, median of five, shared value strings: 72 bytes for
+// the two-field entry, 88 for the four-slot record, 216 for a Map, so +16 bytes
+// per routed element in Node and
 // about +8 in Chrome, whose V8 runs pointer compression; the absolutes include the
 // array slot and the value string and exclude the WeakMap entry, so the delta is the
 // sound number.
@@ -341,10 +339,9 @@ describe('the detector itself, driven over a fixture tree', () => {
 // bytes per routed element in the browser, and what it buys is the deletion of the
 // class for the shapes this scan cannot see. RULED ON THE NUMBER: Option A is ROUTED
 // OUT of this packet as a maintainer-owned change (the row's own reading, taken by the
-// maintainer on the figures above), this scan stays the defence, and the follow-up is
-// recorded in docs/prd/masterwrought/phase-19-routed-followups.md (row D128). If a
-// collision the scan cannot see is ever measured, the committed patch and the three
-// pins it reds are the starting point.
+// maintainer on the figures above), this scan stays the defence. If a collision
+// the scan cannot see is ever measured, the three pins the prototype red are the
+// starting point.
 // The one rider rides regardless: this guard stays keyed on the SHAPE and stays an AST
 // walk; ARM 2's exemption rationale already states the per-(element, KIND) guarantee
 // exactly (hud_perf_budget.test.ts, landed 2026-08-31, before the phase document named

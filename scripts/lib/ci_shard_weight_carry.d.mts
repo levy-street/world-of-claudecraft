@@ -1,4 +1,4 @@
-export type CarryMethod = 'local-median' | 'union-older-harvest' | 'prose-backfill';
+export type CarryMethod = 'local-median' | 'prose-backfill';
 export const CARRY_METHODS: readonly CarryMethod[];
 
 export interface CarriedEntry {
@@ -8,7 +8,6 @@ export interface CarriedEntry {
   /** Required for `local-median`: why the row is carried, not harvested. */
   reason?: string;
   runs?: number[];
-  run?: string;
 }
 
 export interface CarriedProvenance {
@@ -16,7 +15,6 @@ export interface CarriedProvenance {
   harvested?: string;
   files?: number;
   harvestedFiles?: number;
-  localMerge?: string;
   carried?: Record<string, CarriedEntry>;
   backfill?: { date: string; note: string };
 }
@@ -38,11 +36,6 @@ export function applyLocalCarry(
   measurements: ReadonlyArray<{ file: string; runs: readonly number[] }>,
   opts: { measured: string; reason: string },
 ): CarriedWeightTable;
-export function unionCarried(args: {
-  newer: Record<string, unknown>;
-  older: Record<string, unknown>;
-  carriedKeys: readonly string[];
-}): { carried: Record<string, CarriedEntry>; harvestedFiles: number };
 export const DEFAULT_LOCAL_CARRY_REASON: string;
 export function missingWeightFiles(
   walkedFiles: readonly string[],

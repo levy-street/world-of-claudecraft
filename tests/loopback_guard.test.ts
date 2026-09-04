@@ -156,13 +156,6 @@ const GUARDED_SCRIPTS = [
   'scripts/bank_rung_claudium_probe.mjs',
   'scripts/admin_cheater_mark_shot.mjs',
   'scripts/admin_guild_bank_shot.mjs',
-  // The Market Metrics capture tool (Masterwrought phase 18): it registers
-  // accounts, grants a staff role by shelling out to grant_admin.mjs, and drives
-  // /dev cheats to stage real listings. It opens NO pool of its own, so the
-  // discovery arm below never sees it; it belongs HERE and not with the URL-only
-  // scripts because it guards a DATABASE_URL all the same, the one grant_admin
-  // dials, and that arm is the whole reason the staff grant cannot leave the box.
-  'scripts/admin_market_metrics_shot.mjs',
   // The guild-pane seed step (Bank Storage phase 18 QA): it mints accounts and
   // characters over REST and writes guild, membership and guild-book rows
   // straight into Postgres, so it guards its server URL and its connection

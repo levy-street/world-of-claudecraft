@@ -42,6 +42,7 @@ import { MEASURED_FALLBACK_MS } from './ci_shard_partition.mjs';
 import {
   applyLocalCarry,
   carriedDefects,
+  carriedRows,
   missingWeightFiles,
   parseCarryLocalArgs,
   parseCarryLocalCli,
@@ -316,34 +317,26 @@ if (process.argv[2] === '--carry-local') {
     },
     ...sorted,
   };
-  // A wholesale re-harvest replaces any locally measured rows a release sync
-  // merged in. The checked-in provenance uses sibling mergedLocal/mergedFiles;
-  // accept the older nested localMerge shape too so either table warns.
+  // A wholesale re-harvest replaces every carried row with a CI measurement.
+  // Report the current machine-readable map before overwriting it, and warn on
+  // unknown provenance fields rather than silently discarding a future shape.
   try {
-    const provenance = JSON.parse(readFileSync(target, 'utf8')).__provenance;
-    const measured = provenance?.mergedLocal ?? provenance?.localMerge?.measured;
-    const files = provenance?.mergedFiles ?? provenance?.localMerge?.files;
-    if (typeof measured === 'string' && measured && Number.isInteger(files) && files > 0) {
-      console.log(
-        `[harvest] replacing ${files} locally measured rows from ${measured} with CI-harvested weights`,
-      );
-    } else if (
-      provenance &&
-      typeof provenance === 'object' &&
-      // The keys THIS script writes (including the Phase 18 attribution pair);
-      // anything else is a shape the advisory above could not read.
-      Object.keys(provenance).some(
-        (k) => !['run', 'harvested', 'files', 'harvestedFiles', 'carried'].includes(k),
-      )
-    ) {
-      // The provenance carries keys beyond this script's own plain-harvest
-      // output, but neither known local-merge shape parsed: a THIRD shape the
-      // advisory above cannot see. Say so instead of silently overwriting
-      // whatever locally measured rows that shape recorded.
+    const prior = JSON.parse(readFileSync(target, 'utf8'));
+    const provenance = prior.__provenance;
+    const carriedFiles = Object.keys(carriedRows(prior)).length;
+    if (carriedFiles > 0) {
+      console.log(`[harvest] replacing ${carriedFiles} carried weights with CI-harvested weights`);
+    }
+    const known = new Set(['run', 'harvested', 'files', 'harvestedFiles', 'carried', 'backfill']);
+    const unknown =
+      provenance && typeof provenance === 'object'
+        ? Object.keys(provenance).filter((key) => !known.has(key))
+        : [];
+    if (unknown.length > 0) {
       console.warn(
         `[harvest] unrecognized __provenance shape (keys: ${Object.keys(provenance).join(', ')}); ` +
-          'the prior table may carry locally measured rows this rewrite DISCARDS. Inspect the ' +
-          'old provenance before trusting the new table.',
+          'the prior table may carry weights this rewrite DISCARDS. Inspect the old provenance ' +
+          'before trusting the new table.',
       );
     }
   } catch {

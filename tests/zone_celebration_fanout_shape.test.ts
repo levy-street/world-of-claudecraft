@@ -63,11 +63,10 @@
 //
 // MEASURED 2026-09-02 (Phase 19E, qr-19-zone-celebration-fanout-shape): the half
 // neither record above priced, the O(all players) walk in emitToZonePlayers with a
-// zoneAt call per player. The bench (committed as
-// docs/screenshots/masterwrought-phase-19e/d139-fanout-scan-bench.ts and its
-// shapes twin, outputs beside them) ran a SCALED VARIANT of this file's fixture,
-// the same three populations at realm widths (in-zone recipients at the zone-1
-// centre, non-recipients spread over the other fourteen zones, one in ten in
+// zoneAt call per player. The development bench ran a SCALED VARIANT of this
+// file's fixture, using the same three populations at realm widths (in-zone
+// recipients at the zone-1 centre, non-recipients spread over the other
+// fourteen zones, one in ten in
 // instance space; the committed fakeWorld below adds one far-zone and one
 // instanced player), timing the whole walk including the per-recipient event mint
 // and emit. Node v26, median of five: about 100 ns per non-home player (zoneAt is

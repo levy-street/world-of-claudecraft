@@ -47,8 +47,6 @@
 // feast GLBs, wearing the source materials, staged at construction under the
 // same gate and retained for the visuals' life, so every farm program keeps a
 // live use, never enters the retention FIFO, and cannot be evicted by it.
-// `?farmPrep=0` (farm_patches_core.ts farmPrewarmDisabled) restores the bare
-// attach with no anchors, the control leg of scripts/farm_gpu_tour.mjs.
 import * as THREE from 'three';
 import { isFeastTemplateId } from '../sim/professions/feast';
 import type { Entity, SimEvent } from '../sim/types';
@@ -73,7 +71,6 @@ import {
   farmFeastModelUrls,
   farmModelUrls,
   farmPlotKeyMatches,
-  farmPrewarmDisabled,
   farmStageModelUrl,
   resolveFarmPlotVisual,
 } from './farm_patches_core';
@@ -409,8 +406,8 @@ export class FarmPatchVisuals {
   // WITHOUT the placement flourish on that pass (see applyFeasts).
   private feastFlourishArmed = false;
   // The host's compile gate, or null where programs cannot link off-thread (no
-  // KHR_parallel_shader_compile, a headless suite) and under ?farmPrep=0: then
-  // every attach is the bare, immediate one and no anchors are staged.
+  // KHR_parallel_shader_compile or a headless suite). Without one, attaches are
+  // immediate and no anchors are staged.
   private readonly compileGate: FarmCompileGate | null;
   // The hidden program anchors (module header), staged once at construction.
   private readonly anchors: THREE.Group | null;
@@ -421,8 +418,7 @@ export class FarmPatchVisuals {
     private readonly vfx: FarmVfxSink,
     compileGate: FarmCompileGate | null = null,
   ) {
-    const disabled = farmPrewarmDisabled(typeof location === 'undefined' ? '' : location.search);
-    this.compileGate = disabled ? null : compileGate;
+    this.compileGate = compileGate;
     this.anchors = this.compileGate ? buildFarmProgramAnchors() : null;
     if (this.anchors && this.compileGate) {
       // Added hidden and never revealed: the anchors exist to be compiled, so
@@ -552,8 +548,8 @@ export class FarmPatchVisuals {
    *  gate or stand-in, so the first plot stage-advance or in-scope feast of a
    *  session paid a cold program link mid-frame, and every rebuild relinked.
    *  CLOSED at Masterwrought phase 18 (2026-08-31) by the gated attach plus
-   *  the retained program anchors described in the module header, measured
-   *  by scripts/farm_gpu_tour.mjs. */
+   *  the retained program anchors described in the module header and covered
+   *  by the adapter and browser suites. */
   private applyFeasts(entities: ReadonlyMap<number, Entity>, seed: number): void {
     this.feastsSeen.clear();
     const flourish = this.feastFlourishArmed;

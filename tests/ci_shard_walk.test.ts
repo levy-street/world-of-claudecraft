@@ -1,12 +1,7 @@
 // The shard-weight walk predicate (scripts/lib/ci_shard_walk.mjs) is the ONE
-// population both the coverage floor pin (tests/ci_shard_partition.test.ts) and
-// the union tool (scripts/merge_audit/shard_weight_union.mjs) grade the weight
-// table against. Until Phase 18 each carried a copy, and the copies had drifted
-// in two places (the tool skipped dot-prefixed DIRECTORIES only and re-checked
-// isFile(); the pin skipped any dot-prefixed entry and pushed via a bare else),
-// so the tool could certify a coverage number the pin then rejected. These arms
-// pin the predicate on a fixture tree, entry class by entry class, and pin that
-// both consumers import the module rather than hand-rolling a read again.
+// population used by both the coverage floor and the harvester's local-missing
+// mode. These arms pin the predicate on a fixture tree and keep both consumers
+// from hand-rolling a different directory walk.
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -39,8 +34,7 @@ describe('walkShardTestFiles: the predicate, one entry class per arm', () => {
     tmp = mkdtempSync(join(tmpdir(), 'shard-walk-'));
     plant('tests/a.test.ts');
     plant('tests/nested/deep/e.test.ts');
-    // Excluded by NAME, whether the entry is a file or a directory: the drift
-    // the union tool carried was applying the dot skip to directories only.
+    // Excluded by NAME, whether the entry is a file or a directory.
     plant('tests/.hidden.test.ts');
     plant('tests/.hiddendir/x.test.ts');
     plant('tests/browser/b.test.ts');
@@ -100,29 +94,53 @@ describe('walkShardTestFiles: the predicate, one entry class per arm', () => {
 
 describe('both consumers read the walk by import, never by a hand-rolled directory read', () => {
   const consumers = [
-    'tests/ci_shard_partition.test.ts',
-    'scripts/merge_audit/shard_weight_union.mjs',
+    {
+      file: 'tests/ci_shard_partition.test.ts',
+      importRe:
+        /import\s*\{[^}]*\bwalkShardTestFiles\b[^}]*\}\s*from\s*'[^']*\/ci_shard_walk\.mjs'/,
+    },
+    {
+      file: 'scripts/ci_shard_weights_harvest.mjs',
+      importRe:
+        /const\s*\{[^}]*\bwalkShardTestFiles\b[^}]*\}\s*=\s*await\s+import\('.*\/ci_shard_walk\.mjs'\)/,
+    },
   ] as const;
-  const importRe =
-    /import\s*\{[^}]*\bwalkShardTestFiles\b[^}]*\}\s*from\s*'[^']*\/ci_shard_walk\.mjs'/;
 
-  it.each(consumers)('%s imports walkShardTestFiles and opens no directory itself', (file) => {
-    // Comment-stripped: a commented-out readdirSync must not convict and a
-    // commented-out import must not satisfy.
-    const code = stripComments(readFileSync(join(ROOT, file), 'utf8'));
-    expect(code).toMatch(importRe);
-    for (const spelling of ['readdirSync(', 'opendirSync(', 'globSync(', 'readdir(', 'opendir(']) {
-      expect(code.split(spelling).length - 1, `${file} reads a directory via ${spelling}`).toBe(0);
-    }
-  });
+  it.each(consumers)(
+    '$file imports walkShardTestFiles and opens no directory itself',
+    ({ file, importRe }) => {
+      // Comment-stripped: a commented-out readdirSync must not convict and a
+      // commented-out import must not satisfy.
+      const code = stripComments(readFileSync(join(ROOT, file), 'utf8'));
+      expect(code).toMatch(importRe);
+      for (const spelling of [
+        'readdirSync(',
+        'opendirSync(',
+        'globSync(',
+        'readdir(',
+        'opendir(',
+      ]) {
+        expect(code.split(spelling).length - 1, `${file} reads a directory via ${spelling}`).toBe(
+          0,
+        );
+      }
+    },
+  );
 
-  it('the positive control: the import matcher recognizes the shipped statement shapes', () => {
+  it('the positive controls recognize the shipped static and dynamic import shapes', () => {
+    const [staticConsumer, dynamicConsumer] = consumers;
     expect(
-      importRe.test("import { walkShardTestFiles } from '../scripts/lib/ci_shard_walk.mjs';"),
+      staticConsumer.importRe.test(
+        "import { walkShardTestFiles } from '../scripts/lib/ci_shard_walk.mjs';",
+      ),
     ).toBe(true);
-    expect(importRe.test("import { walkShardTestFiles } from '../lib/ci_shard_walk.mjs';")).toBe(
-      true,
+    expect(
+      dynamicConsumer.importRe.test(
+        "const { walkShardTestFiles } = await import('./lib/ci_shard_walk.mjs');",
+      ),
+    ).toBe(true);
+    expect(staticConsumer.importRe.test("import { other } from '../lib/ci_shard_walk.mjs';")).toBe(
+      false,
     );
-    expect(importRe.test("import { other } from '../lib/ci_shard_walk.mjs';")).toBe(false);
   });
 });

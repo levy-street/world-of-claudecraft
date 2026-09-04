@@ -1,15 +1,6 @@
-// The ONE walk predicate behind the shard-weight coverage floor.
-//
-// tests/ci_shard_partition.test.ts grades scripts/ci_shard_weights.generated.json
-// against the test tree it walks (95 percent of walked files must carry a
-// measured row), and scripts/merge_audit/shard_weight_union.mjs certifies a
-// merged table BEFORE it is committed by walking the same tree. Until Phase 18
-// each carried its own copy of the walk, and the two had drifted in two places
-// (the tool applied the dot-prefix skip only to directories and re-checked
-// isFile() on every entry), so the tool could certify a coverage number the pin
-// then rejected. Both now import this module, and tests/ci_shard_walk.test.ts
-// pins the predicate on a fixture tree plus the fact that neither consumer
-// hand-rolls a directory read of its own.
+// The ONE walk predicate behind the shard-weight coverage floor and the
+// harvester's local-missing carry mode. Keeping both consumers on this helper
+// prevents them from measuring different test populations.
 //
 // The predicate, stated once: skip any entry (file OR directory) named
 // node_modules, dist, or browser, or whose name starts with a dot; recurse into
