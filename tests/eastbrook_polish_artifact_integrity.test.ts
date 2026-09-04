@@ -1040,10 +1040,22 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // Re-minted for the shader-warm PR's give-up rule and its review fixes
 // (renderer.ts: the census bracket and the cast units' compile-arm host).
 // No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm branch:
+// both arms had re-minted, and the merged renderer (the mount lifecycle and
+// stride audio moves beside this branch's changes) and evidence inputs land
+// together. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  '66a130d709be19c547c4014e4616db02641aa55df7997502af88cacc393d6a2d';
+  'bb6f8117590a1d6c81c73e374d0f54e13afd5448635ef0ef9a62a2e053834a60';
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  'ef6d1ec16d53d727d14100ffefe44b76ea02bca5e17552185e777f7ce9435db1';
+  'c31833196d4b756604eba1bb30a3b07e4d5e37381db2a7828a4d1ce2ba411974';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2203,7 +2215,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
       // follows the moved ward walk, then this seal. No capture was retaken.
       // Re-minted for the shader-warm PR's give-up rule and its review fixes:
       // the composite first, then this seal. No capture was retaken.
-    ).toBe('0fd0bfc520121f3b8f6a0d2ecc5ab09db625d4c2934adc4860d35a6666f0eb78');
+      // Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm
+      // branch: the composite first, then this seal. No capture was retaken.
+    ).toBe('2ae19af726d8213e099a216186801c6dcb20d7decb1165242b42d3b5d6420e59');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

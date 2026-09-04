@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { buildArmorySections, type WocStoreItemInput } from '../src/ui/woc_store_view';
+import { STORE_MOUNT_ITEM_IDS } from '../src/sim/content/store_mounts';
+import {
+  buildArmorySections,
+  buildStoreMountRows,
+  type WocStoreItemInput,
+} from '../src/ui/woc_store_view';
 
 const noCosmetics = { weaponSkinIds: [], weaponSkinLoadout: {} };
 
@@ -144,5 +149,61 @@ describe('buildArmorySections', () => {
     // And a type hunters cannot equip still omits them.
     const wand = rows.find((r) => r.skin.weaponType === 'wand');
     expect(wand?.eligibleClasses).not.toContain('hunter');
+  });
+});
+
+describe('buildStoreMountRows (the store Mounts strip)', () => {
+  const service = (over: Partial<WocStoreItemInput> = {}): WocStoreItemInput => ({
+    itemId: 'reins_mech_bird',
+    name: 'Ignition Key: Cluckwork Mech Bird',
+    kind: 'item',
+    costClaudium: 1200,
+    owned: false,
+    ...over,
+  });
+
+  it('shows every declared store mount even when the service snapshot lacks the SKU', () => {
+    const rows = buildStoreMountRows(5000, [], []);
+    expect(rows.map((r) => r.itemId)).toEqual([...STORE_MOUNT_ITEM_IDS]);
+    // The pinned no-invented-price rule: no service row means no price and no Buy.
+    expect(rows[0]).toMatchObject({
+      mountKey: 'mech_bird',
+      costClaudium: null,
+      purchasable: false,
+      owned: false,
+      affordable: false,
+    });
+  });
+
+  it('prices from the service and computes affordability against the balance', () => {
+    const [row] = buildStoreMountRows(800, [service()], []);
+    expect(row).toMatchObject({
+      costClaudium: 1200,
+      purchasable: true,
+      affordable: false,
+      shortfall: 400,
+    });
+    const [flush] = buildStoreMountRows(1500, [service()], []);
+    expect(flush).toMatchObject({ affordable: true, shortfall: 0 });
+  });
+
+  it('owned unions the service grant flag with the live mount ownership mirror', () => {
+    const [viaService] = buildStoreMountRows(0, [service({ owned: true })], []);
+    expect(viaService.owned).toBe(true);
+    const [viaBags] = buildStoreMountRows(0, [service()], ['mech_bird']);
+    expect(viaBags.owned).toBe(true);
+    expect(viaBags.affordable).toBe(false); // owned rows never advertise Buy
+  });
+
+  it('ignores service rows of other kinds and unknown item SKUs', () => {
+    const rows = buildStoreMountRows(
+      5000,
+      [
+        service({ itemId: 'guildmark_arming_sword', kind: 'skin' }),
+        service({ itemId: 'not_a_store_mount' }),
+      ],
+      [],
+    );
+    expect(rows[0].costClaudium).toBeNull(); // nothing matched the reins SKU
   });
 });

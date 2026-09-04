@@ -41,6 +41,8 @@
 // unit-tests in plain Node against hand-rolled fakes.
 
 /** A click event as far as this module needs it. */
+import { type PanelKeyTarget, panelKeyGuardStops } from './panel_key_guard';
+
 export interface ClickLike {
   detail: number;
   target: unknown;
@@ -131,8 +133,11 @@ export function bindPointerBlur(container: ListenerHost, selector = 'button'): v
 export function bindChromeButtonKeyGuard(container: ListenerHost): void {
   container.addEventListener('keydown', (e) => {
     const ke = e as KeyboardEvent;
-    const target = ke.target as { tagName?: string } | null;
-    if (target?.tagName !== 'BUTTON') return;
-    if (ke.key === 'Enter' || ke.key === ' ' || ke.code === 'Space') ke.stopPropagation();
+    // The decision (only a focused BUTTON, only Enter/Space, and the one bag
+    // item row Space must pass through to reach the jump) is the pure rule in
+    // panel_key_guard.ts; this stays the one listener that acts on it.
+    if (panelKeyGuardStops(ke.target as PanelKeyTarget | null, ke.key, ke.code)) {
+      ke.stopPropagation();
+    }
   });
 }

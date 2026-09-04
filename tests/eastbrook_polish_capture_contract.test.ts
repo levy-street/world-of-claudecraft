@@ -357,8 +357,18 @@ interface AttributionTargetFixture {
 // Re-minted for the shader-warm PR's give-up rule and its review fixes
 // (renderer.ts: the census bracket and the cast units' compile-arm host).
 // No capture was retaken.
+// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
+// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for the Cluckwork Mech Bird store mount (PR #3464) on top of the
+// v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
+// src/render/stride_audio_core.ts and the mounted audio branch gained the
+// idle-hum poll. No capture was retaken.
+// Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm branch:
+// both arms had re-minted, and the merged renderer (the mount lifecycle and
+// stride audio moves beside this branch's changes) and evidence inputs land
+// together. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  'ef6d1ec16d53d727d14100ffefe44b76ea02bca5e17552185e777f7ce9435db1';
+  'c31833196d4b756604eba1bb30a3b07e4d5e37381db2a7828a4d1ce2ba411974';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

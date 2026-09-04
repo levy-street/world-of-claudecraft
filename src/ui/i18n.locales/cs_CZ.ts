@@ -2227,6 +2227,8 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'entities.items.artisans_eye.name': 'Řemeslníkovo oko',
   'entities.items.reins_terrorspark_groundshaker.name':
     'Klíček zapalování: Hrůzojiskra, otřásač země',
+  'entities.items.reins_lanternback_troll.name':
+    'Lampářovo jho: Grumbol',
   'hud.options.graphicsPresetInsane': 'Extrémní',
   'hud.options.surfaceDetail': 'Detail povrchů',
   'hud.options.surfaceDetailBasic': 'Základní',

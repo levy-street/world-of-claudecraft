@@ -7,6 +7,7 @@
 // identity.
 import { describe, expect, it } from 'vitest';
 import { HEROIC_DUNGEON_TUNING } from '../src/sim/content/dungeon_difficulty';
+import { DUNGEON_DEFS } from '../src/sim/content/dungeons';
 import { HEROIC_BOSS_LOOT } from '../src/sim/content/heroic_loot';
 import {
   CRUCIBLE_VENDOR_STOCK,
@@ -24,6 +25,12 @@ import { SET_ENGINE_BONUSES } from '../src/sim/content/ignivar_set_bonuses';
 import { ITEM_SETS } from '../src/sim/content/item_sets';
 import { WEAPON_TYPE_BY_ITEM } from '../src/sim/content/weapon_skin_rules';
 import { ITEMS, MOBS } from '../src/sim/data';
+import { createMob } from '../src/sim/entity';
+import {
+  IGNIVAR_RAID_ARENA_ID,
+  IGNIVAR_SECOND_WING_ID,
+  VARKHUL_BOSS_ID,
+} from '../src/sim/ignivar_raid_ids';
 import {
   expectedStatBudget,
   itemFromRaid,
@@ -31,7 +38,10 @@ import {
   itemSourceLevel,
   primaryStatSum,
 } from '../src/sim/item_level';
-import type { ItemDef } from '../src/sim/types';
+import { rollLoot } from '../src/sim/loot/loot_roll';
+import { Rng } from '../src/sim/rng';
+import { Sim } from '../src/sim/sim';
+import type { ItemDef, LootEntry } from '../src/sim/types';
 import { HIT_RATING_PER_PCT, meleeMissChance, spellHitChance } from '../src/sim/types';
 import { ITEM_WEAPON_VARIANTS } from '../src/ui/weapon_variants';
 
@@ -44,6 +54,8 @@ const SIGIL_GROUPS: Record<string, readonly string[]> = {
   ember: ['paladin', 'hunter', 'priest'],
   tempest: ['shaman', 'rogue', 'warlock'],
 };
+
+const IGNIVAR_BOSS_ID = 'ignivar_herald_of_the_last_flame';
 
 const gearItems = (): ItemDef[] =>
   Object.values(IGNIVAR_LOOT_ITEMS).filter((item) => item.kind !== 'tool');
@@ -329,84 +341,137 @@ describe('ignivar loot: the 10 weapons', () => {
   });
 });
 
-describe('ignivar loot: the boss drop tables', () => {
-  const groupsOf = (
-    entries: readonly { itemId?: string; chance: number; rollGroup?: string }[],
-  ) => {
-    const groups = new Map<string, { ids: string[]; sum: number }>();
+describe('ignivar loot: the boss drop tables (one item per five raiders)', () => {
+  // The cadence rule (docs/prd/ignivar-raid-loot.md, "Boss loot tables"): a
+  // kill pays ONE item per five raiders on BOTH difficulties, two on the
+  // 10-player raid. Slot one is the boss's merged sigil partition; slot two is
+  // its Normal-only off-set partition, which a heroic claim skips
+  // (LootEntry.normalOnly) so the HEROIC_BOSS_LOOT exclusive partition pays in
+  // its place. Heroic therefore differs in WHICH items drop, never in how many.
+  const groupsOf = (entries: readonly LootEntry[]) => {
+    const groups = new Map<string, { ids: string[]; sum: number; normalOnly: Set<boolean> }>();
     for (const entry of entries) {
       if (!entry.rollGroup) continue;
-      const group = groups.get(entry.rollGroup) ?? { ids: [], sum: 0 };
+      const group = groups.get(entry.rollGroup) ?? { ids: [], sum: 0, normalOnly: new Set() };
       if (entry.itemId) group.ids.push(entry.itemId);
       group.sum += entry.chance;
+      group.normalOnly.add(entry.normalOnly === true);
       groups.set(entry.rollGroup, group);
     }
     return groups;
   };
+  const chanceOf = (entries: readonly LootEntry[], id: string): number =>
+    entries.find((entry) => entry.itemId === id)?.chance ?? 0;
+  const shareOf = (entries: readonly LootEntry[], ids: readonly string[]): number =>
+    ids.reduce((sum, id) => sum + chanceOf(entries, id), 0);
+  const SIGIL_FAMILIES = ['anvil', 'ember', 'tempest'] as const;
+  const familyShares = (entries: readonly LootEntry[], ids: readonly string[]) =>
+    SIGIL_FAMILIES.map((family) =>
+      shareOf(
+        entries,
+        ids.filter((id) => id.includes(`_${family}_`)),
+      ),
+    );
 
-  it('Ignivar pays two sigil slots, a neck, and the raid copper on both difficulties', () => {
-    const loot = MOBS.ignivar_herald_of_the_last_flame.loot ?? [];
+  it('Ignivar pays one sigil slot plus one Normal-only neck/waist/weapon slot, and the raid copper', () => {
+    const loot = MOBS[IGNIVAR_BOSS_ID].loot ?? [];
     const money = loot[0];
     expect(money).toMatchObject({ copper: 150000, chance: 1 });
     expect(money.heroicCopper).toBeGreaterThan(0);
     const groups = groupsOf(loot);
-    expect([...groups.keys()]).toEqual([
-      'ignivar_sigil_mantle',
-      'ignivar_sigil_grip',
-      'ignivar_jewelry',
-      'ignivar_offset',
-    ]);
-    expect(groups.get('ignivar_sigil_mantle')?.ids).toEqual([
+    expect([...groups.keys()]).toEqual(['ignivar_sigils', 'ignivar_offset']);
+    const sigils = [
       'sigil_anvil_shoulder',
       'sigil_ember_shoulder',
       'sigil_tempest_shoulder',
-    ]);
-    expect(groups.get('ignivar_sigil_grip')?.ids).toEqual([
       'sigil_anvil_gloves',
       'sigil_ember_gloves',
       'sigil_tempest_gloves',
-    ]);
-    expect(groups.get('ignivar_jewelry')?.ids).toEqual([
+    ];
+    expect(groups.get('ignivar_sigils')?.ids).toEqual(sigils);
+    expect(groups.get('ignivar_sigils')?.normalOnly).toEqual(new Set([false]));
+    // Both axes of the merged sigil partition stay balanced.
+    expect(shareOf(loot, sigils.slice(0, 3))).toBeCloseTo(0.5, 6);
+    expect(shareOf(loot, sigils.slice(3))).toBeCloseTo(0.5, 6);
+    expect(familyShares(loot, sigils)).toEqual([0.34, 0.33, 0.33]);
+    const necks = [
       'pendant_of_the_first_tempering',
       'ignivars_ember_choker',
       'locket_of_the_last_flame',
       'heartspring_amulet',
-    ]);
+    ];
+    const offset = groups.get('ignivar_offset');
+    expect(offset?.ids.slice(0, 4)).toEqual(necks);
+    expect(offset?.ids.length).toBe(4 + 10 + 3); // necks, waists, the smaller weapons
+    expect(offset?.normalOnly).toEqual(new Set([true]));
+    for (const id of offset?.ids.slice(4) ?? []) {
+      expect(['waist', 'mainhand', 'offhand', 'ranged'], id).toContain(ITEMS[id].slot);
+    }
+    // The necks keep the half of the slot they used to own outright; the
+    // waists and weapons split the other half on binary-exact weights, so the
+    // partition is exactly 1.00 in floating point (see the table comment).
+    expect(shareOf(loot, necks)).toBeCloseTo(0.5, 6);
+    expect(shareOf(loot, offset?.ids.filter((id) => ITEMS[id].slot === 'waist') ?? [])).toBeCloseTo(
+      0.3125,
+      6,
+    );
+    expect(
+      shareOf(loot, offset?.ids.filter((id) => ITEMS[id].kind === 'weapon') ?? []),
+    ).toBeCloseTo(0.1875, 6);
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });
 
-  it('Varkhul pays two sigil slots, the feet-and-held group, a ring, and copper on Normal', () => {
-    const loot = MOBS.varkhul_forgefather_of_the_last_flame.loot ?? [];
+  it('Varkhul pays one sigil slot plus one Normal-only feet/held/ring slot, and copper', () => {
+    const loot = MOBS[VARKHUL_BOSS_ID].loot ?? [];
     expect(loot[0]).toMatchObject({ copper: 200000, chance: 1 });
     const groups = groupsOf(loot);
-    expect([...groups.keys()]).toEqual([
-      'varkhul_sigil_legging',
-      'varkhul_sigil_helm',
-      'varkhul_offset',
-      'varkhul_rings',
-    ]);
-    // Neither legendary belongs to the normal table. Emberward is a
+    expect([...groups.keys()]).toEqual(['varkhul_sigils', 'varkhul_offset']);
+    const sigils = [
+      'sigil_anvil_legs',
+      'sigil_ember_legs',
+      'sigil_tempest_legs',
+      'sigil_anvil_helmet',
+      'sigil_ember_helmet',
+      'sigil_tempest_helmet',
+    ];
+    expect(groups.get('varkhul_sigils')?.ids).toEqual(sigils);
+    expect(groups.get('varkhul_sigils')?.normalOnly).toEqual(new Set([false]));
+    expect(shareOf(loot, sigils.slice(0, 3))).toBeCloseTo(0.5, 6);
+    expect(shareOf(loot, sigils.slice(3))).toBeCloseTo(0.5, 6);
+    expect(familyShares(loot, sigils)).toEqual([0.34, 0.33, 0.33]);
+    // Neither legendary belongs to the Normal table. Emberward is a
     // heroic-only Varkhul drop, while Forgebreaker remains reserved for the
-    // crafting professions. The two held offhands keep their full 0.15
-    // slices and the partition stays exactly 1.00.
+    // crafting professions.
     const legendaryRows = loot.filter(
       (r) => 'itemId' in r && String(r.itemId).startsWith('varkhul_'),
     );
     expect(legendaryRows).toEqual([]);
     const offset = groups.get('varkhul_offset');
-    expect(offset?.ids.length).toBe(12); // 10 feet + both held offhands
+    expect(offset?.ids.length).toBe(10 + 2 + 4); // feet, both held offhands, the rings
+    expect(offset?.normalOnly).toEqual(new Set([true]));
     expect(offset?.ids).toContain('orb_of_the_last_spring');
     expect(offset?.ids).toContain('cinder_of_the_first_design');
-    for (const id of offset?.ids ?? []) {
-      // mainhand joins the allowlist for the Forgebreaker alone.
-      expect(['feet', 'offhand', 'mainhand'], id).toContain(ITEMS[id].slot);
-    }
-    expect(groups.get('varkhul_rings')?.ids).toEqual([
+    const rings = [
       'seal_of_the_forgewall',
       'band_of_marked_strikes',
       'circle_of_cinders',
       'loop_of_quiet_springs',
-    ]);
+    ];
+    expect(offset?.ids.slice(-4)).toEqual(rings);
+    for (const id of offset?.ids ?? []) {
+      expect(['feet', 'offhand', 'ring'], id).toContain(ITEMS[id].slot);
+    }
+    // The rings keep the half of the slot they used to own outright; the feet
+    // and held offhands split the other half on binary-exact weights, so the
+    // partition is exactly 1.00 in floating point (see the table comment).
+    expect(shareOf(loot, rings)).toBeCloseTo(0.5, 6);
+    expect(shareOf(loot, offset?.ids.filter((id) => ITEMS[id].slot === 'feet') ?? [])).toBeCloseTo(
+      0.3125,
+      6,
+    );
+    expect(
+      shareOf(loot, offset?.ids.filter((id) => ITEMS[id].slot === 'offhand') ?? []),
+    ).toBeCloseTo(0.1875, 6);
     for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
   });
 
@@ -418,46 +483,218 @@ describe('ignivar loot: the boss drop tables', () => {
     // while still collecting the appends (free loot for zero difficulty).
     const tuning = HEROIC_DUNGEON_TUNING.ignivar_inner_crucible;
     expect(tuning).toBeDefined();
-    expect(tuning?.finalBossId).toBe('varkhul_forgefather_of_the_last_flame');
+    expect(tuning?.finalBossId).toBe(VARKHUL_BOSS_ID);
   });
 
-  it('Heroic appends pay the Robe sigil on both bosses and Emberward in Varkhul shields', () => {
-    const ignivar = HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame ?? [];
-    const varkhul = HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? [];
+  it('Heroic appends are ONE exclusive slot per boss, Emberward at its absolute 3 percent', () => {
+    const ignivar = HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? [];
+    const varkhul = HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? [];
     const ignivarGroups = groupsOf(ignivar);
     const varkhulGroups = groupsOf(varkhul);
-    expect(ignivarGroups.get('ignivar_h_sigil_robe')?.ids).toEqual([
-      'sigil_anvil_chest',
-      'sigil_ember_chest',
-      'sigil_tempest_chest',
+    expect([...ignivarGroups.keys()]).toEqual(['ignivar_h_exclusive']);
+    expect([...varkhulGroups.keys()]).toEqual(['varkhul_h_exclusive']);
+    const robes = ['sigil_anvil_chest', 'sigil_ember_chest', 'sigil_tempest_chest'];
+    const ignivarWeapons = ['forgefathers_warhammer', 'anvilguard_blade', 'springtouched_crozier'];
+    expect(ignivarGroups.get('ignivar_h_exclusive')?.ids).toEqual([...robes, ...ignivarWeapons]);
+    expect(shareOf(ignivar, robes)).toBeCloseTo(0.5, 6);
+    expect(shareOf(ignivar, ignivarWeapons)).toBeCloseTo(0.5, 6);
+    expect(familyShares(ignivar, robes)).toEqual([0.17, 0.17, 0.16]);
+    const shields = ['bulwark_of_the_inner_crucible', 'ember_wardens_barrier', 'varkhul_emberward'];
+    const varkhulWeapons = [
+      'heart_of_the_end_greatblade',
+      'forgefire_spire',
+      'staff_of_the_last_spring',
+    ];
+    expect(varkhulGroups.get('varkhul_h_exclusive')?.ids).toEqual([
+      ...robes,
+      ...shields,
+      ...varkhulWeapons,
     ]);
-    expect(varkhulGroups.get('varkhul_h_sigil_robe')?.ids).toEqual([
-      'sigil_anvil_chest',
-      'sigil_ember_chest',
-      'sigil_tempest_chest',
-    ]);
-    expect(varkhulGroups.get('varkhul_h_shields')?.ids).toEqual([
-      'bulwark_of_the_inner_crucible',
-      'ember_wardens_barrier',
-      'varkhul_emberward',
-    ]);
+    expect(shareOf(varkhul, robes)).toBeCloseTo(0.35, 6);
+    expect(shareOf(varkhul, shields)).toBeCloseTo(0.3, 6);
+    expect(shareOf(varkhul, varkhulWeapons)).toBeCloseTo(0.35, 6);
+    // The legendary's odds did not move with the re-cut: 3 percent per heroic
+    // Varkhul kill, exactly what the shipped shield group paid.
     expect(varkhul.find((entry) => entry.itemId === 'varkhul_emberward')).toMatchObject({
       chance: 0.03,
-      rollGroup: 'varkhul_h_shields',
+      rollGroup: 'varkhul_h_exclusive',
     });
     for (const groups of [ignivarGroups, varkhulGroups])
-      for (const [name, group] of groups) expect(group.sum, name).toBeCloseTo(1, 6);
+      for (const [name, group] of groups) {
+        expect(group.sum, name).toBeCloseTo(1, 6);
+        expect(group.normalOnly, name).toEqual(new Set([false]));
+      }
+  });
+
+  it('pins every row of every partition to its exact chance, in table order', () => {
+    // The category shares above cannot see a redistribution INSIDE a category
+    // (0.0625 x 3 to 0 / 0.125 / 0.0625 keeps the weapon share at 0.1875), so
+    // each row's chance is pinned by id here, in draw order, on both tables.
+    // Every chance is strictly positive: a zero-weight row is an unreachable
+    // item, never a way to park one.
+    const rowsOf = (entries: readonly LootEntry[], group: string): [string, number][] =>
+      entries
+        .filter((entry) => entry.rollGroup === group)
+        .map((entry) => [entry.itemId ?? '', entry.chance]);
+    const ignivar = MOBS[IGNIVAR_BOSS_ID].loot;
+    const varkhul = MOBS[VARKHUL_BOSS_ID].loot;
+    const ignivarHeroic = HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? [];
+    const varkhulHeroic = HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? [];
+    expect(rowsOf(ignivar, 'ignivar_sigils')).toEqual([
+      ['sigil_anvil_shoulder', 0.17],
+      ['sigil_ember_shoulder', 0.17],
+      ['sigil_tempest_shoulder', 0.16],
+      ['sigil_anvil_gloves', 0.17],
+      ['sigil_ember_gloves', 0.16],
+      ['sigil_tempest_gloves', 0.17],
+    ]);
+    expect(rowsOf(ignivar, 'ignivar_offset')).toEqual([
+      ['pendant_of_the_first_tempering', 0.125],
+      ['ignivars_ember_choker', 0.125],
+      ['locket_of_the_last_flame', 0.125],
+      ['heartspring_amulet', 0.125],
+      ['cord_of_the_last_flame', 0.03125],
+      ['springbinder_sash', 0.03125],
+      ['cinderbark_cinch', 0.03125],
+      ['slagstalker_belt', 0.03125],
+      ['moonscorch_waistwrap', 0.03125],
+      ['grovetender_belt', 0.03125],
+      ['forgewall_girdle', 0.03125],
+      ['warforged_waistguard', 0.03125],
+      ['stormkindled_chain', 0.03125],
+      ['tidebinder_links', 0.03125],
+      ['cinderfang_kris', 0.0625],
+      ['slagrender_cleaver', 0.0625],
+      ['wand_of_quenched_sparks', 0.0625],
+    ]);
+    expect(rowsOf(ignivarHeroic, 'ignivar_h_exclusive')).toEqual([
+      ['sigil_anvil_chest', 0.17],
+      ['sigil_ember_chest', 0.17],
+      ['sigil_tempest_chest', 0.16],
+      ['forgefathers_warhammer', 0.17],
+      ['anvilguard_blade', 0.17],
+      ['springtouched_crozier', 0.16],
+    ]);
+    expect(rowsOf(varkhul, 'varkhul_sigils')).toEqual([
+      ['sigil_anvil_legs', 0.17],
+      ['sigil_ember_legs', 0.17],
+      ['sigil_tempest_legs', 0.16],
+      ['sigil_anvil_helmet', 0.17],
+      ['sigil_ember_helmet', 0.16],
+      ['sigil_tempest_helmet', 0.17],
+    ]);
+    expect(rowsOf(varkhul, 'varkhul_offset')).toEqual([
+      ['cindersoaked_slippers', 0.03125],
+      ['steps_of_quiet_water', 0.03125],
+      ['ashenbark_treads', 0.03125],
+      ['ashrunner_boots', 0.03125],
+      ['scorchgrove_striders', 0.03125],
+      ['dewfall_moccasins', 0.03125],
+      ['anvilstance_sabatons', 0.03125],
+      ['furnace_march_greaves', 0.03125],
+      ['thundershock_treads', 0.03125],
+      ['springwarden_sabatons', 0.03125],
+      ['orb_of_the_last_spring', 0.09375],
+      ['cinder_of_the_first_design', 0.09375],
+      ['seal_of_the_forgewall', 0.125],
+      ['band_of_marked_strikes', 0.125],
+      ['circle_of_cinders', 0.125],
+      ['loop_of_quiet_springs', 0.125],
+    ]);
+    expect(rowsOf(varkhulHeroic, 'varkhul_h_exclusive')).toEqual([
+      ['sigil_anvil_chest', 0.12],
+      ['sigil_ember_chest', 0.12],
+      ['sigil_tempest_chest', 0.11],
+      ['bulwark_of_the_inner_crucible', 0.135],
+      ['ember_wardens_barrier', 0.135],
+      ['varkhul_emberward', 0.03],
+      ['heart_of_the_end_greatblade', 0.12],
+      ['forgefire_spire', 0.12],
+      ['staff_of_the_last_spring', 0.11],
+    ]);
+    // The tables hold nothing else but the money row and the reagent rows.
+    for (const [entries, groups] of [
+      [ignivar, ['ignivar_sigils', 'ignivar_offset']],
+      [varkhul, ['varkhul_sigils', 'varkhul_offset']],
+    ] as const) {
+      const rest = entries.filter((entry) => !entry.rollGroup);
+      expect(rest.map((entry) => entry.itemId ?? 'copper')).toEqual([
+        'copper',
+        'lastflame_core',
+        'lastflame_core',
+      ]);
+      expect(rest.slice(1).map((entry) => entry.chance)).toEqual([1, 0.5]);
+      expect(
+        new Set(entries.flatMap((entry) => (entry.rollGroup ? [entry.rollGroup] : []))),
+      ).toEqual(new Set(groups));
+    }
+    for (const entry of [...ignivar, ...varkhul, ...ignivarHeroic, ...varkhulHeroic])
+      expect(entry.chance, entry.itemId ?? 'copper').toBeGreaterThan(0);
   });
 
   it('every drop-table id resolves in the merged item table', () => {
     const all = [
-      ...(MOBS.ignivar_herald_of_the_last_flame.loot ?? []),
-      ...(MOBS.varkhul_forgefather_of_the_last_flame.loot ?? []),
-      ...(HEROIC_BOSS_LOOT.ignivar_herald_of_the_last_flame ?? []),
-      ...(HEROIC_BOSS_LOOT.varkhul_forgefather_of_the_last_flame ?? []),
+      ...(MOBS[IGNIVAR_BOSS_ID].loot ?? []),
+      ...(MOBS[VARKHUL_BOSS_ID].loot ?? []),
+      ...(HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? []),
+      ...(HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? []),
     ];
     for (const entry of all) {
       if (entry.itemId) expect(ITEMS[entry.itemId], entry.itemId).toBeTruthy();
+    }
+  });
+
+  it('a kill pays exactly one item per five raiders on BOTH difficulties, through the live roller', () => {
+    // Rolls the real tables through rollLoot with and without a live heroic
+    // claim (the same claim shape the roller reads in production), so the
+    // cadence is pinned where it is paid, not just in the authored weights.
+    // The crafting reagent rides outside the cadence (a material, not gear).
+    const perKill = DUNGEON_DEFS[IGNIVAR_RAID_ARENA_ID].suggestedPlayers / 5;
+    expect(perKill).toBe(2);
+    expect(DUNGEON_DEFS[IGNIVAR_SECOND_WING_ID].suggestedPlayers).toBe(
+      DUNGEON_DEFS[IGNIVAR_RAID_ARENA_ID].suggestedPlayers,
+    );
+    const bosses = [
+      [IGNIVAR_BOSS_ID, IGNIVAR_RAID_ARENA_ID],
+      [VARKHUL_BOSS_ID, IGNIVAR_SECOND_WING_ID],
+    ] as const;
+    const sim = new Sim({ seed: 1, playerClass: 'warrior', noPlayer: true });
+    const pid = sim.addPlayer('warrior', 'Raider');
+    const meta = sim.ctx.players.get(pid);
+    if (!meta) throw new Error('expected the raider');
+    for (const [bossId, dungeonId] of bosses) {
+      const template = MOBS[bossId];
+      const base = template.loot ?? [];
+      const sigilIds = new Set(
+        base.filter((e) => e.rollGroup && !e.normalOnly).map((e) => e.itemId),
+      );
+      const offsetIds = new Set(base.filter((e) => e.normalOnly).map((e) => e.itemId));
+      const exclusiveIds = new Set((HEROIC_BOSS_LOOT[bossId] ?? []).map((e) => e.itemId));
+      for (const heroic of [false, true]) {
+        for (let seed = 0; seed < 25; seed++) {
+          sim.rng = new Rng(seed);
+          const mob = createMob(-1, template, template.minLevel, { x: 0, y: 0, z: 0 });
+          sim.ctx.instances.length = 0;
+          if (heroic) {
+            sim.ctx.instances.push({
+              id: -1,
+              dungeonId,
+              difficulty: 'heroic',
+              partyKey: 'raid',
+              mobIds: [mob.id],
+            } as unknown as (typeof sim.ctx.instances)[number]);
+          }
+          rollLoot(sim.ctx, mob, meta);
+          const gear = (mob.loot?.items ?? [])
+            .map((slot) => slot.itemId)
+            .filter((id) => id !== 'lastflame_core');
+          const label = `${bossId} ${heroic ? 'heroic' : 'normal'} seed ${seed}`;
+          expect(gear.length, label).toBe(perKill);
+          expect(gear.filter((id) => sigilIds.has(id)).length, label).toBe(1);
+          expect(gear.filter((id) => offsetIds.has(id)).length, label).toBe(heroic ? 0 : 1);
+          expect(gear.filter((id) => exclusiveIds.has(id)).length, label).toBe(heroic ? 1 : 0);
+        }
+      }
     }
   });
 });
@@ -495,6 +732,58 @@ describe('the Crucible hit program reaches cap for every spec (the 2026-08-30 re
     // The caps themselves stay honest against the live miss table.
     expect(meleeCap).toBe(130);
     expect(spellCap).toBe(110);
+  });
+
+  it('the elective lanes are Normal-only partitions, so the floor is farmed from the Normal lock', () => {
+    // The one-item-per-five re-cut made every non-weapon hit elective a
+    // Normal-only drop (LootEntry.normalOnly): the waists and necks sit in
+    // Ignivar's off-set partition, the rings in Varkhul's, and the Heroic
+    // exclusive pools carry hit ONLY on the marquee weapons. A Heroic roster
+    // therefore farms its cap from its Normal lock (a separate weekly lockout),
+    // which is the intended shape: Heroic pays exclusives, Normal pays the
+    // electives. Pinned per difficulty so a future re-cut that strands a lane
+    // on neither table, or quietly re-seats one, re-decides this suite.
+    const normalOnlyIds = (bossId: string, group: string) =>
+      new Set(
+        MOBS[bossId].loot
+          .filter((entry) => entry.rollGroup === group && entry.normalOnly)
+          .map((entry) => entry.itemId),
+      );
+    const ignivarOffset = normalOnlyIds(IGNIVAR_BOSS_ID, 'ignivar_offset');
+    const varkhulOffset = normalOnlyIds(VARKHUL_BOSS_ID, 'varkhul_offset');
+    for (const item of crucible.filter((i) => i.slot === 'waist' || i.slot === 'neck'))
+      expect(ignivarOffset.has(item.id), item.id).toBe(true);
+    for (const item of crucible.filter((i) => i.slot === 'ring'))
+      expect(varkhulOffset.has(item.id), item.id).toBe(true);
+    // Both partitions are guaranteed Normal draws (sum exactly 1), so the
+    // floor above is farmable, never a bonus roll.
+    for (const [bossId, group] of [
+      [IGNIVAR_BOSS_ID, 'ignivar_offset'],
+      [VARKHUL_BOSS_ID, 'varkhul_offset'],
+    ] as const) {
+      const sum = MOBS[bossId].loot
+        .filter((entry) => entry.rollGroup === group)
+        .reduce((acc, entry) => acc + entry.chance, 0);
+      expect(sum, group).toBe(1);
+    }
+    // The Heroic-exclusive hit carriers are exactly the six marquee weapons at
+    // 30, so a Heroic-only kit tops out at 60 (both hands) against both caps:
+    // the Normal lock is load-bearing for hit, by design.
+    const heroicIds = [
+      ...(HEROIC_BOSS_LOOT[IGNIVAR_BOSS_ID] ?? []),
+      ...(HEROIC_BOSS_LOOT[VARKHUL_BOSS_ID] ?? []),
+    ].flatMap((entry) => (entry.itemId ? [entry.itemId] : []));
+    const heroicHitCarriers = heroicIds.filter((id) => (ITEMS[id].hitRating ?? 0) > 0).sort();
+    expect(heroicHitCarriers).toEqual([
+      'anvilguard_blade',
+      'forgefathers_warhammer',
+      'forgefire_spire',
+      'heart_of_the_end_greatblade',
+      'springtouched_crozier',
+      'staff_of_the_last_spring',
+    ]);
+    for (const id of heroicHitCarriers) expect(ITEMS[id].hitRating, id).toBe(30);
+    expect(2 * 30).toBeLessThan(Math.min(meleeCap, spellCap));
   });
 
   it('every class can wear a hit waist and a hit weapon from the tier', () => {

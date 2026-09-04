@@ -15,6 +15,7 @@
 
 import type * as http from 'node:http';
 import { isKnownStorageSkuId } from '../src/sim/content/storage_charters';
+import { isStoreMountItemId } from '../src/sim/content/store_mounts';
 import { WEAPON_SKINS } from '../src/sim/content/weapon_skins';
 import {
   type ClaudiumNativeRail,
@@ -137,6 +138,12 @@ export function claudiumConfigured(): boolean {
 // session).
 interface ClaudiumGameHooks {
   grantWeaponSkins(accountId: number, skinIds: string[]): void;
+  /** Materialize purchased store-mount reins (kind 'item' SKUs) into the
+   *  buyer's live character(s). The economy service's grant ledger stays the
+   *  rollback-safe source of truth; this mirror is idempotent per character
+   *  (a character already owning the mount is skipped), so the store-open
+   *  reconcile can call it freely. */
+  grantStoreMounts(accountId: number, itemIds: string[]): void;
   /** The whole storage purchase flow (Bank Storage phase 11): resolve the
    *  live character session, gate, persist the pending record, spend, and
    *  apply the slots exactly once (server/storage_purchases.ts). The result
@@ -173,6 +180,17 @@ function noteWeaponSkinGrants(accountId: number, skinIds: string[]): void {
   void grantAccountWeaponSkins(accountId, known).catch((err) =>
     console.error('failed to persist weapon skin grant:', err),
   );
+}
+
+function noteStoreMountGrants(accountId: number, itemIds: string[]): void {
+  const known = itemIds.filter(isStoreMountItemId);
+  if (known.length === 0) return;
+  // Unlike weapon skins there is no direct-DB fallback: the reins item lands
+  // in a live character through the Sim. Without a live game wired
+  // (tests/tools) the mirror is skipped; the buyer's next store open on a
+  // live realm re-runs the reconcile and heals it, because the economy
+  // service's grant ledger, not this mirror, is the source of truth.
+  claudiumRuntime?.grantStoreMounts(accountId, known);
 }
 
 export async function handleClaudiumStripeWebhook(
@@ -262,25 +280,34 @@ export async function handleClaudiumApi(
       items: store.items.filter(
         (item) =>
           (item.kind === 'skin' && isKnownWeaponSkinId(item.itemId)) ||
+          (item.kind === 'item' && isStoreMountItemId(item.itemId)) ||
           (item.kind === 'storage' && isKnownStorageSkuId(item.itemId)),
       ),
     };
     // Reconcile: the service's grant ledger is authoritative for purchases, so
-    // mirror any owned weapon skins the game DB does not know about yet.
+    // mirror any owned weapon skins (and materialize any owned store-mount
+    // reins) the game does not know about yet.
     // Filtering on `owned` alone is safe here, and it is worth saying why so a
     // later reader does not "fix" it the wrong way. `owned` means the service
-    // holds a GRANT row, which only the skin family ever has: a storage spend
-    // writes no grant row, so a storage row's owned is false by construction and
-    // forever. Two independent gates keep a storage id out of the weapon-skin
-    // entitlement table even if the service ever set the flag on one: the filter
-    // just above admits a row only under its OWN family's registry, and
-    // noteWeaponSkinGrants re-filters its input through isKnownWeaponSkinId.
-    // Reaching the table would take an id carried by BOTH registries, and they
-    // are disjoint (tests/server/storage_gates.test.ts pins the tampered
-    // owned:true storage row never reaching the mirror).
+    // holds a GRANT row, which only the skin and store-mount families ever
+    // have: a storage spend writes no grant row, so a storage row's owned is
+    // false by construction and forever. Two independent gates keep a storage
+    // id out of the weapon-skin entitlement table (and out of the store-mount
+    // mirror) even if the service ever set the flag on one: the filter just
+    // above admits a row only under its OWN family's registry, and
+    // noteWeaponSkinGrants / noteStoreMountGrants re-filter their input through
+    // isKnownWeaponSkinId / isStoreMountItemId. Reaching either would take an
+    // id carried by two registries, and they are disjoint
+    // (tests/server/storage_gates.test.ts pins the tampered owned:true storage
+    // row never reaching the mirror).
+    const ownedItems = supportedStore.items.filter((item) => item.owned);
     noteWeaponSkinGrants(
       accountId,
-      supportedStore.items.filter((item) => item.owned).map((item) => item.itemId),
+      ownedItems.filter((item) => item.kind === 'skin').map((item) => item.itemId),
+    );
+    noteStoreMountGrants(
+      accountId,
+      ownedItems.filter((item) => item.kind === 'item').map((item) => item.itemId),
     );
     return json(res, 200, supportedStore);
   }
@@ -416,7 +443,10 @@ export async function handleClaudiumApi(
         }),
       );
     }
-    if (kind !== 'skin' || !isKnownWeaponSkinId(itemId)) {
+    const supportedSku =
+      (kind === 'skin' && isKnownWeaponSkinId(itemId)) ||
+      (kind === 'item' && isStoreMountItemId(itemId));
+    if (!supportedSku) {
       return json(res, 200, {
         granted: false,
         balance: null,
@@ -438,10 +468,11 @@ export async function handleClaudiumApi(
     // store failure leaves the game mirror untouched; the next store open heals it.
     if (result.granted || result.reason === 'already_granted') {
       const store = await claudiumStore(accountId);
-      const ownsRequestedSkin = store.items.some(
-        (item) => item.kind === 'skin' && item.itemId === itemId && item.owned,
+      const ownsRequested = store.items.some(
+        (item) => item.kind === kind && item.itemId === itemId && item.owned,
       );
-      if (ownsRequestedSkin) noteWeaponSkinGrants(accountId, [itemId]);
+      if (ownsRequested && kind === 'skin') noteWeaponSkinGrants(accountId, [itemId]);
+      else if (ownsRequested && kind === 'item') noteStoreMountGrants(accountId, [itemId]);
     }
     return json(res, 200, result);
   }

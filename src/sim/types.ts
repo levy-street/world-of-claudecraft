@@ -1496,6 +1496,13 @@ export interface LootEntry {
   // Entries sharing a rollGroup are exclusive: one rng draw is partitioned by
   // their chances, so at most one matching entry drops.
   rollGroup?: string;
+  // Rolls on Normal kills only: a heroic claim skips the entry, and for a
+  // rollGroup the whole group (no rng draw), so the boss's HEROIC_BOSS_LOOT
+  // append can REPLACE that slot instead of stacking on it (the Crucible's
+  // one-item-per-five-raiders cadence; loot/loot_difficulty_gate.ts is the one
+  // predicate). Every entry of a group must agree, and the heroic-append
+  // tables never carry it (both pinned by tests/loot_roll.test.ts).
+  normalOnly?: true;
 }
 
 export type MobFamily =

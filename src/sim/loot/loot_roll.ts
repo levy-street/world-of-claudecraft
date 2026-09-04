@@ -23,6 +23,8 @@
 //  - producer (rollLoot): per template.loot entry, in array order -- exactly ONE
 //    ctx.rng.next() per rollGroup (partitioned across the group), then for non-group
 //    entries ctx.rng.chance(entry.chance) and, if entry.copper, ctx.rng.int(...).
+//    A `normalOnly` entry draws NOTHING on a heroic claim (loot_difficulty_gate.ts):
+//    the normal trace is unchanged, the heroic trace simply omits those draws.
 //  - consumer: tryAwardCopperByFairSplit's Fisher-Yates ctx.rng.int(i, len-1) on the
 //    remainder, and submitLootRoll's ctx.rng.int(1, 100) for need/greed (null for pass).
 //
@@ -54,6 +56,7 @@ import type {
 } from '../types';
 import { dist2d, PARTY_XP_RANGE } from '../types';
 import { bopPartyTradeInstance } from './bop_trade_window';
+import { lootEntryRollsOnClaim } from './loot_difficulty_gate';
 import { isTapGroupMember, LOOT_FFA_DELAY } from './loot_ffa';
 
 // How long (seconds) a need-greed roll stays open before it auto-resolves. Sole
@@ -262,6 +265,10 @@ export function rollLoot(
     return (itemLevel(variant) ?? 0) > (itemLevel(ITEMS[id]) ?? 0) ? variant.id : id;
   };
   for (const entry of template.loot) {
+    // A Normal-only row is not part of a heroic kill at all: skipped BEFORE the
+    // group bookkeeping, so a normalOnly group never draws its partition and the
+    // boss's heroic append below pays that slot instead.
+    if (!lootEntryRollsOnClaim(entry, heroicClaim)) continue;
     // Exclusive groups: a single rng draw is partitioned by the group
     // entries' chances, so at most one matching entry drops.
     // Exactly one rng.next() per group keeps replays deterministic.
