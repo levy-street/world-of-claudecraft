@@ -87,7 +87,7 @@ describe('RaidBossGuideWindow', () => {
     expect(document.activeElement).toBe(root.querySelector('[data-boss="ignivar"]'));
   });
 
-  it('opens the Nythraxis journal in the crypt arena with three phases and the heroic-only court', () => {
+  it('opens the Nythraxis journal in the crypt arena with three phases and no add mechanics', () => {
     const button = guide.syncAvailability(NYTHRAXIS_BOSS_ARENA_ID);
     expect(button).toBe(guide.button);
     expect(button?.textContent).toContain('Nythraxis');
@@ -103,15 +103,17 @@ describe('RaidBossGuideWindow', () => {
       '/ui/mobs/nythraxis_scourge_of_thornpeak.webp',
     );
     expect(root.querySelectorAll('.rbg-phase')).toHaveLength(3);
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(13);
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
     expect(root.textContent).toContain('The Throne');
     expect(root.textContent).toContain('The Wardstones');
     expect(root.textContent).toContain("The King's Wrath");
+    expect(root.textContent).not.toContain('Raise Fallen');
     expect(root.textContent).not.toContain('The Deathless Court');
 
+    // The heroic tier lists the same twelve: the court is switched off with the adds.
     root.querySelector<HTMLButtonElement>('[data-difficulty="heroic"]')?.click();
-    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(14);
-    expect(root.textContent).toContain('The Deathless Court');
+    expect(root.querySelectorAll('.rbg-ability')).toHaveLength(12);
+    expect(root.textContent).not.toContain('The Deathless Court');
 
     root.querySelector<HTMLButtonElement>('[data-mechanic="dread-curse"]')?.click();
     const detail = root.querySelector<HTMLElement>('[data-detail="dread-curse"]');

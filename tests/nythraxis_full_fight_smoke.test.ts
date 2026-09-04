@@ -229,12 +229,12 @@ describe('Nythraxis full fight smoke (every mechanic fires)', () => {
         'damage abilities',
       ).toEqual([]);
       expect(missing(EXPECTED_AURAS, report.auras), 'auras').toEqual([]);
-      // Raise Fallen's guards rose, and the heroic court after the landed Rage.
-      expect(report.mobTemplates.has(NYTHRAXIS_ADD_ID)).toBe(true);
+      // The redo fields no adds (owner playtest call 2026-09-04): no guard wave
+      // rose and no court followed the landed Rage, on either difficulty. The
+      // spikes are the impale mechanic, not adds, and still shatter.
+      expect(report.mobTemplates.has(NYTHRAXIS_ADD_ID)).toBe(false);
       expect(report.mobTemplates.has(NYTHRAXIS_BONE_SPIKE_ID)).toBe(true);
-      if (difficulty === 'heroic') {
-        expect(report.mobTemplates.has('nythraxis_heroic_priest_add')).toBe(true);
-      }
+      expect(report.mobTemplates.has('nythraxis_heroic_priest_add')).toBe(false);
       expect(report.sigilsSeen).toBeGreaterThanOrEqual(2);
       expect(report.seconds).toBeLessThan(MAX_SECONDS);
     });

@@ -9,7 +9,7 @@
 //
 // Data-as-code: plain exported records, no engine logic (content CLAUDE.md).
 
-import type { DungeonDifficulty, PlayerClass } from '../types';
+import { type DungeonDifficulty, NYTHRAXIS_ADDS_ENABLED, type PlayerClass } from '../types';
 import type { Role } from './talents';
 
 // Structured listing tags: the only "description" a premade listing carries.
@@ -147,13 +147,15 @@ const NYTHRAXIS_CRYPT_ENCOUNTERS: readonly FinderEncounter[] = [
 // Every Nythraxis mechanic runs on both difficulties (heroic raises counts and
 // damage, see src/sim/encounters/nythraxis.ts); the heroic tier's one addition
 // is the court (Aldren, Malric, Voss) that rises after Deathless Rage.
-const NYTHRAXIS_RAID_MECHANICS = [
+const NYTHRAXIS_RAID_MECHANICS: readonly string[] = [
   'gravebreaker',
   'dread_curse',
   'bone_spike',
   'grave_eruption',
   'binding_sigil',
-  'raise_fallen',
+  // The guard waves and the heroic court ride NYTHRAXIS_ADDS_ENABLED with the
+  // encounter, so the finder never advertises adds the fight does not field.
+  ...(NYTHRAXIS_ADDS_ENABLED ? ['raise_fallen'] : []),
   'soul_rend',
   'soulfire',
   'gravefire',
@@ -162,7 +164,7 @@ const NYTHRAXIS_RAID_MECHANICS = [
   'kings_wrath',
   'bone_storm',
   'crown_endures',
-] as const;
+];
 
 const NYTHRAXIS_RAID_ENCOUNTERS: readonly FinderEncounter[] = [
   {
@@ -178,7 +180,10 @@ const NYTHRAXIS_RAID_ENCOUNTERS_HEROIC: readonly FinderEncounter[] = [
   {
     mobId: 'nythraxis_scourge_of_thornpeak',
     final: true,
-    mechanics: [...NYTHRAXIS_RAID_MECHANICS, 'deathless_court'],
+    mechanics: [
+      ...NYTHRAXIS_RAID_MECHANICS,
+      ...(NYTHRAXIS_ADDS_ENABLED ? ['deathless_court'] : []),
+    ],
   },
 ];
 

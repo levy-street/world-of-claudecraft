@@ -2698,7 +2698,7 @@ export const zh_TW: EnTranslations = {
       "nythraxis": {
         "overview": "大祭司馬爾里克不願讓他的國王死去，而喚起尼思拉克西斯的儀式將整個王庭都束縛在墓穴之中。這場戰鬥考驗嚴謹的坦克輪換、迅速轉火骨刺、遠離燃燒地面的走位，以及王座陷落後協同引導護符石。",
         "phaseThroneName": "王座",
-        "phaseThroneSummary": "尼思拉克西斯坐鎮王座廳，施展蓄力正面順劈、恐懼詛咒坦克輪換、穿刺團隊的骨刺、留下燃燒地面的墓穴爆發，以及一波波復甦王室衛兵。",
+        "phaseThroneSummary": "尼思拉克西斯坐鎮王座廳，施展蓄力正面順劈、恐懼詛咒坦克輪換、穿刺團隊的骨刺，以及留下燃燒地面的墓穴爆發。",
         "phaseWardstonesName": "護符石",
         "phaseWardstonesSummary": "生命值降至{health}時，震顫踐踏會定住全團，此時奧德里克修士抵達並點燃護符石。所有尖刺隨即碎裂，地面停止燃燒，接著靈魂撕裂與不死之怒將加入王座階段的機制。",
         "phaseKingsWrathName": "國王之怒",

@@ -1,4 +1,4 @@
-// Nythraxis Binding Sigil: an authoritative gold floor decal with eight rune
+// Nythraxis Binding Sigil: an authoritative blue floor decal with eight rune
 // spokes and a clockwise countdown sweep. Each row owns its dynamic sweep
 // buffer and materials, and every resource retires when the row vanishes.
 // Graphics tiers never reach this actionable painter.

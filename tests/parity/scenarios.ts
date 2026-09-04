@@ -3212,7 +3212,7 @@ function nythraxisFullPull(): Scenario {
     coverage: [
       'updateNythraxisEncounter full pull (phase 1 -> transition -> phase 2 -> phase 3 -> enrage -> death)',
       'Gravebreaker rng.range weapon draw + front-cone Gravebreaker damage',
-      'Raise Fallen add wave (spawnNythraxisAdds) in phase one',
+      'Raise Fallen add wave switched off in phase one (NYTHRAXIS_ADDS_ENABLED false: no guards rise)',
       'transition: nythraxis_transition_stun room stun + Aldric spawn/walk-in + wardstones lit',
       'Soul Rend rng.int marks pick + mark-expiry damage',
       'Deathless Rage interrupt via tryStartNythraxisWardChannel (object-click channel) + boss self-stun',

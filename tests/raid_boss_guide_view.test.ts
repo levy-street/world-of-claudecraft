@@ -166,7 +166,7 @@ describe('raid boss guide view', () => {
     expect(raidBossGuideBossForDungeon('nythraxis_crypt')).toBeNull();
   });
 
-  it('builds Nythraxis as three phases with the heroic-only court and sim-sourced numbers', () => {
+  it('builds Nythraxis as three phases without adds and with sim-sourced numbers', () => {
     const normal = raidBossGuideView('nythraxis', 'normal');
     const heroic = raidBossGuideView('nythraxis', 'heroic');
     const normalMechanics = normal.phases.flatMap((phase) => phase.mechanics);
@@ -183,7 +183,6 @@ describe('raid boss guide view', () => {
       'bone-spike',
       'grave-eruption',
       'binding-sigil',
-      'raise-fallen',
       'soul-rend',
       'soulfire',
       'gravefire',
@@ -198,18 +197,18 @@ describe('raid boss guide view', () => {
       'bone-spike',
       'grave-eruption',
       'binding-sigil',
-      'raise-fallen',
       'soul-rend',
       'soulfire',
       'gravefire',
       'deathless-rage',
-      'deathless-court',
       'kings-wrath',
       'bone-storm',
       'crown-endures',
     ]);
-    expect(normal.phases.map((phase) => phase.mechanics.length)).toEqual([6, 4, 3]);
-    expect(heroic.phases.map((phase) => phase.mechanics.length)).toEqual([6, 5, 3]);
+    // Raise Fallen and the heroic court are switched off with the adds
+    // (NYTHRAXIS_ADDS_ENABLED), so neither tier lists them.
+    expect(normal.phases.map((phase) => phase.mechanics.length)).toEqual([5, 4, 3]);
+    expect(heroic.phases.map((phase) => phase.mechanics.length)).toEqual([5, 4, 3]);
 
     expect(normal.phases.find((phase) => phase.id === 'throne')?.values).toBeUndefined();
     expect(normal.phases.find((phase) => phase.id === 'wardstones')).toMatchObject({
@@ -324,11 +323,9 @@ describe('raid boss guide view', () => {
       },
       percentValues: ['damage', 'haste', 'rampStep'],
     });
-    expect(heroicMechanics.find((mechanic) => mechanic.id === 'deathless-court')).toMatchObject({
-      roles: ['tank', 'damage'],
-      flags: ['interruptible', 'important'],
-      iconId: 'raid_nythraxis_deathless_court',
-    });
+    expect(heroicMechanics.find((mechanic) => mechanic.id === 'deathless-court')).toBeUndefined();
+    expect(heroicMechanics.find((mechanic) => mechanic.id === 'raise-fallen')).toBeUndefined();
+    expect(normalMechanics.find((mechanic) => mechanic.id === 'raise-fallen')).toBeUndefined();
   });
 
   it('pins every Nythraxis Normal and Heroic text-key branch to its mechanic', () => {
@@ -434,14 +431,10 @@ describe('raid boss guide view', () => {
     });
     // Single-copy mechanics keep one key on both tiers.
     for (const view of [normal, heroic]) {
-      expect(mechanicTextKeys(view, ['gravebreaker', 'raise-fallen', 'kings-wrath'])).toEqual({
+      expect(mechanicTextKeys(view, ['gravebreaker', 'kings-wrath'])).toEqual({
         gravebreaker: {
           summaryKey: `${base}.gravebreakerSummary`,
           responseKey: `${base}.gravebreakerResponse`,
-        },
-        'raise-fallen': {
-          summaryKey: `${base}.raiseFallenSummary`,
-          responseKey: `${base}.raiseFallenResponse`,
         },
         'kings-wrath': {
           summaryKey: `${base}.kingsWrathSummary`,

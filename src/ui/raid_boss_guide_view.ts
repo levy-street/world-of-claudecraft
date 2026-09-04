@@ -132,7 +132,7 @@ import {
   NYTHRAXIS_SOULFIRE_TICK_MAX_HP_NORMAL,
   NYTHRAXIS_SOULFIRE_WARDSTONE_CLEARANCE,
 } from '../sim/nythraxis_soulfire';
-import { IGNIVAR_BOSS_ID, NYTHRAXIS_BOSS_ID } from '../sim/types';
+import { IGNIVAR_BOSS_ID, NYTHRAXIS_ADDS_ENABLED, NYTHRAXIS_BOSS_ID } from '../sim/types';
 import { VARKHUL_ANVILS_DECREE_STRIKES } from '../sim/varkhul_anvils_decree';
 import {
   VARKHUL_SHARED_PYRE_RAID_DAMAGE_PER_MISSING,
@@ -200,6 +200,8 @@ interface MechanicDefinition {
   roles: readonly RaidBossGuideRole[];
   flags?: readonly RaidBossGuideFlag[];
   availability?: RaidBossGuideDifficulty;
+  /** A mechanic the encounter has switched off (never rendered on either tier). */
+  enabled?: boolean;
   values?: Readonly<Record<string, number>>;
   percentValues?: readonly string[];
 }
@@ -678,6 +680,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       },
       {
         id: 'raise-fallen',
+        enabled: NYTHRAXIS_ADDS_ENABLED,
         iconId: 'raid_nythraxis_raise_fallen',
         nameKey: key('nythraxis.raiseFallenName'),
         summaryKey: key('nythraxis.raiseFallenSummary'),
@@ -781,6 +784,7 @@ const NYTHRAXIS_PHASES: readonly PhaseDefinition[] = [
       },
       {
         id: 'deathless-court',
+        enabled: NYTHRAXIS_ADDS_ENABLED,
         iconId: 'raid_nythraxis_deathless_court',
         nameKey: key('nythraxis.courtName'),
         summaryKey: key('nythraxis.courtSummary'),
@@ -912,7 +916,11 @@ function buildPhases(
     ...(phase.values ? { values: phase.values } : {}),
     ...(phase.percentValues ? { percentValues: phase.percentValues } : {}),
     mechanics: phase.mechanics
-      .filter((mechanic) => !mechanic.availability || mechanic.availability === difficulty)
+      .filter(
+        (mechanic) =>
+          mechanic.enabled !== false &&
+          (!mechanic.availability || mechanic.availability === difficulty),
+      )
       .map((mechanic) => ({
         id: mechanic.id,
         iconId: mechanic.iconId,

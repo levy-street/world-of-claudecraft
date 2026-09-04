@@ -66,6 +66,13 @@ export const DUNGEON_LEASH_DISTANCE = 70;
 // Nythraxis add template id. Used by the mob-locomotion slice (the add branch of
 // updateMob); the boss id NYTHRAXIS_BOSS_ID lives lower in this file (C1 relocation).
 export const NYTHRAXIS_ADD_ID = 'nythraxis_skeleton_warrior';
+// Owner playtest call 2026-09-04: the mechanics redo fields NO adds. Raise
+// Fallen's guard waves (phase 1) and the heroic court summon (phase 2) both read
+// this switch, and so do the Raid Boss Guide page and the Dungeon Finder blurbs,
+// so the fight and the text that describes it always agree. The add templates
+// and their AI stay authored (loot, portraits, deeds, and the direct-call unit
+// tests reference them); flipping this back restores the waves and the court.
+export const NYTHRAXIS_ADDS_ENABLED = false;
 export const GCD = 1.5; // seconds
 // Owner 2026-07-13: spell haste now shortens the global cooldown, floored here so it
 // never collapses to nothing. The base GCD is divided by spellHasteMult at cast time.

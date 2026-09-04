@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { Sim } from '../src/sim/sim';
-import type { Entity } from '../src/sim/types';
+import { type Entity, NYTHRAXIS_ADDS_ENABLED } from '../src/sim/types';
 import { EMPTY_TEST_WORLD } from './sim_shared';
 
 const HEROIC_ADD_IDS = [
@@ -23,10 +23,10 @@ function heroicBoss(sim: Sim, pid: number): { boss: Entity; st: NonNullable<Enti
 }
 
 // Drop the boss into phase 2 with an imminent, uncontested Deathless Rage, then
-// tick until it lands and the summon channel resolves. The Rage is a
-// body-owning major, so the other majors and the 6 s gap after the last one
-// (the court summon included) are parked too: this suite is about the court,
-// not the scheduler (tests/nythraxis_sigil_gravefire.test.ts owns that).
+// tick until it lands and any summon channel would have resolved. The Rage is a
+// body-owning major, so the other majors and the 6 s gap after the last one are
+// parked too: this suite is about the court, not the scheduler
+// (tests/nythraxis_sigil_gravefire.test.ts owns that).
 function forcePillarCast(sim: Sim, st: NonNullable<Entity['nythraxis']>): void {
   st.phase = 2;
   st.deathlessTimer = 0;
@@ -39,13 +39,18 @@ function forcePillarCast(sim: Sim, st: NonNullable<Entity['nythraxis']>): void {
   for (let i = 0; i < 20 * 16; i++) sim.tick();
 }
 
-describe('heroic Nythraxis raises his court on the phase-2 pillar cast', () => {
+// Owner playtest call 2026-09-04 (NYTHRAXIS_ADDS_ENABLED in types.ts): the redo
+// fields no adds, so the heroic court never rises behind a landed Deathless
+// Rage. The summon channel and spawn helpers stay authored for the day the
+// switch flips back; this suite pins that the encounter loop never reaches them.
+describe('heroic Nythraxis fields no court while the redo runs without adds', () => {
   const countHeroicAdds = (sim: Sim) =>
     [...sim.entities.values()].filter(
       (e) => e.kind === 'mob' && !e.dead && HEROIC_ADD_IDS.includes(e.templateId),
     ).length;
 
-  it('summons exactly one court after an uninterrupted Deathless Rage, not on engage', () => {
+  it('raises no court after an uninterrupted Deathless Rage lands, on engage or later', () => {
+    expect(NYTHRAXIS_ADDS_ENABLED).toBe(false);
     const sim = new Sim({
       seed: 4,
       playerClass: 'warrior',
@@ -54,46 +59,14 @@ describe('heroic Nythraxis raises his court on the phase-2 pillar cast', () => {
       world: EMPTY_TEST_WORLD,
     });
     sim.setPlayerLevel(20);
-    const { st } = heroicBoss(sim, sim.playerId);
+    const { boss, st } = heroicBoss(sim, sim.playerId);
     expect(countHeroicAdds(sim)).toBe(0); // phase 1: no court
     forcePillarCast(sim, st);
-    expect(countHeroicAdds(sim)).toBe(3); // Aldren + Malric + Voss, exactly once
-  });
-
-  it('does NOT stack a second court while the first is still alive', () => {
-    const sim = new Sim({
-      seed: 4,
-      playerClass: 'warrior',
-      autoEquip: true,
-      devCommands: true,
-      world: EMPTY_TEST_WORLD,
-    });
-    sim.setPlayerLevel(20);
-    const { st } = heroicBoss(sim, sim.playerId);
+    expect(countHeroicAdds(sim)).toBe(0); // the landed Rage raises nobody
+    expect(st.heroicSummonChannelRemaining ?? 0).toBe(0);
+    expect(boss.castingAbility).not.toBe('nythraxis_heroic_summon');
+    // A second Deathless Rage cycle changes nothing either.
     forcePillarCast(sim, st);
-    expect(countHeroicAdds(sim)).toBe(3);
-    // A second Deathless Rage with the court still up must not summon a fresh set.
-    forcePillarCast(sim, st);
-    expect(countHeroicAdds(sim)).toBe(3);
-  });
-
-  it('re-summons the court on the next pillar once the previous court has fallen', () => {
-    const sim = new Sim({
-      seed: 4,
-      playerClass: 'warrior',
-      autoEquip: true,
-      devCommands: true,
-      world: EMPTY_TEST_WORLD,
-    });
-    sim.setPlayerLevel(20);
-    const { st } = heroicBoss(sim, sim.playerId);
-    forcePillarCast(sim, st);
-    expect(countHeroicAdds(sim)).toBe(3);
-    // Kill the court, then the next pillar raises a fresh one.
-    for (const e of sim.entities.values()) {
-      if (e.kind === 'mob' && HEROIC_ADD_IDS.includes(e.templateId)) e.dead = true;
-    }
-    forcePillarCast(sim, st);
-    expect(countHeroicAdds(sim)).toBe(3);
+    expect(countHeroicAdds(sim)).toBe(0);
   });
 });

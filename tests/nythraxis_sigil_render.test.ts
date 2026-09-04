@@ -247,12 +247,12 @@ describe('Nythraxis Binding Sigil core', () => {
     expect(opposite.length).toBeCloseTo(first.length, 8);
   });
 
-  it('registers the gold sigil cue and the shadow Unbound burst', () => {
+  it('registers the blue sigil cue and the shadow Unbound burst', () => {
     expect(abilityVfxFullSpecFor(NYTHRAXIS_SIGIL_CAST_ID)).toMatchObject({
       archetype: 'nova',
       palette: 'arcane',
       decal: 'rune',
-      tint: '#ffd27a',
+      tint: '#7fc0ff',
     });
     expect(abilityVfxFullSpecFor(NYTHRAXIS_UNBOUND_CAST_ID)).toMatchObject({
       archetype: 'nova',

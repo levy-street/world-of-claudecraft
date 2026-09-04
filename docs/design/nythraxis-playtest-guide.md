@@ -4,6 +4,10 @@ How one person tests the whole fight. Everything here is dev-gated
 (`/dev` commands need `npm run dev` for the offline client, or a local server
 started with `ALLOW_DEV_COMMANDS=1`; never in production).
 
+Adds: none. The owner's 2026-09-04 playtest call switched off Raise Fallen's guard
+waves and the heroic court (`NYTHRAXIS_ADDS_ENABLED` in `src/sim/types.ts`); the Bone
+Spikes remain, as the impale mechanic rather than adds.
+
 ## Two checks
 
 1. **Headless, every mechanic fires.** One command, both difficulties, about
@@ -43,7 +47,7 @@ major.
 | `/dev nyx curse` | Dread Curse hits you (you must be in melee reach); at 2 stacks the swap callout |
 | `/dev nyx spike` | Two bots (three on heroic) impaled with a spike through them; kill the spikes |
 | `/dev nyx eruption` | Warning rings under bots, the burst, then green Grave Flame (never fades on heroic) |
-| `/dev nyx sigil` | A gold ring 10 to 24 yd out; drag him onto it inside 15 s (12 s) for Bound, or let it lapse for Unbound |
+| `/dev nyx sigil` | A blue ring 10 to 24 yd out; drag him onto it inside 15 s (12 s) for Bound, or let it lapse for Unbound |
 | `/dev nyx phase2` | Health to 69%: the stomp, Brother Aldric's entrance, the wardstones light |
 | `/dev nyx gravefire` | A violet line runs from his feet at a bot (phase 2 and 3 only) |
 | `/dev nyx rend` | Three bots (six) marked; red Soulfire pools where they stood (permanent on heroic) |

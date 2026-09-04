@@ -603,7 +603,7 @@ describe('Nythraxis encounter module (N1)', () => {
     expect(st.dreadCurseTimer).toBe(1);
   });
 
-  it('heroic wardstone interrupt leads to a three second add summon channel', () => {
+  it('heroic wardstone interrupt raises no court while the redo fields no adds', () => {
     const { sim, ctx, boss, dps } = setup({ difficulty: 'heroic' });
     const st = nythraxis.initNythraxisEncounter(boss);
     st.phase = 2;
@@ -625,12 +625,20 @@ describe('Nythraxis encounter module (N1)', () => {
     nythraxis.updateNythraxisDeathlessRage(ctx, boss, st);
     expect(st.deathlessStunRemaining).toBeGreaterThan(0);
 
+    // Owner playtest call 2026-09-04 (NYTHRAXIS_ADDS_ENABLED in types.ts): the
+    // encounter loop never starts the court summon behind the interrupt stun.
     st.deathlessStunRemaining = 0.01;
+    const before = boss.summonedIds.length;
     nythraxis.updateNythraxisEncounter(ctx, boss);
+    expect(st.heroicSummonChannelRemaining ?? 0).toBe(0);
+    expect(boss.castingAbility).not.toBe('nythraxis_heroic_summon');
+    expect(boss.summonedIds).toHaveLength(before);
+
+    // The three second channel itself stays authored for the day the switch
+    // flips back: started directly, it still resolves into the three court members.
+    nythraxis.startNythraxisHeroicSummon(ctx, boss, st);
     expect(st.heroicSummonChannelRemaining).toBeGreaterThan(0);
     expect(boss.castingAbility).toBe('nythraxis_heroic_summon');
-
-    const before = boss.summonedIds.length;
     for (let i = 0; i < 20 * 3 + 1; i++) nythraxis.updateNythraxisHeroicSummon(ctx, boss, st);
     const spawned = boss.summonedIds
       .slice(before)

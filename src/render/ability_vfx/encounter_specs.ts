@@ -155,7 +155,7 @@ const ENCOUNTER_VFX_SPECS: Readonly<Record<string, AbilityVfxSpec>> = {
     a: 'beam',
   },
   [NYTHRAXIS_SIGIL_CAST_ID]: {
-    c: '#ffd27a',
+    c: '#7fc0ff',
     p: 'arcane',
     pw: 0.9,
     sp: 8,
@@ -448,7 +448,7 @@ const ENCOUNTER_VFX_FULL_SPECS: Readonly<Record<string, AbilityVfxFullSpec>> = {
     },
   },
   // The stateful floor painter owns the countdown. This cue gives the cast a
-  // matching gold rune inscription without competing with that timer.
+  // matching blue rune inscription without competing with that timer.
   [NYTHRAXIS_SIGIL_CAST_ID]: {
     archetype: 'nova',
     palette: 'arcane',
@@ -458,8 +458,8 @@ const ENCOUNTER_VFX_FULL_SPECS: Readonly<Record<string, AbilityVfxFullSpec>> = {
     nova: { radius: 4 },
     decal: 'rune',
     linger: 2,
-    tint: '#ffd27a',
-    rim: '#ffe7ad',
+    tint: '#7fc0ff',
+    rim: '#cfe8ff',
     impact: {
       flipbook: false,
       ring: 1,

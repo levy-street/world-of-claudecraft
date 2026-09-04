@@ -8005,7 +8005,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '英雄: 炉の熱は下がらず、金床の布告に隕石が加わり、最終段階は世界炎に集中する。',
   'hudChrome.raidBossGuide.nythraxis.overview': '大司祭マルリックは己の王を死なせることを拒み、ナイスラクシスを甦らせた儀式は宮廷ごと地下墓所に縛りつけた。この戦闘では、規律あるタンク交代、骨の棘への素早い切り替え、燃える地面を避ける立ち回り、そして玉座の段階を終えた後の連携したウォードストーン詠唱が試される。',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': '玉座',
-  'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary': 'ナイスラクシスは玉座の間を、溜めた前方クリーブ、ドレッドカースによるタンク交代、レイドを串刺しにする骨の棘、燃える地面を残す墓所の噴出、そして蘇った王家の衛兵の波で守り抜く。',
+  'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary': 'ナイスラクシスは玉座の間を、溜めた前方クリーブ、ドレッドカースによるタンク交代、レイドを串刺しにする骨の棘、そして燃える地面を残す墓所の噴出で守り抜く。',
   'hudChrome.raidBossGuide.nythraxis.phaseWardstonesName': 'ウォードストーン',
   'hudChrome.raidBossGuide.nythraxis.phaseWardstonesSummary': '体力{health}で、身震いの踏みつけがレイドを足止めしている間にアルドリック修道士が到着し、ウォードストーンに火を灯す。すべての棘が砕け、床の炎も鎮まる。その後、ソウルレンドと不死の憤怒が玉座のメカニクスに加わる。',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '王の怒り',

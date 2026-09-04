@@ -183,6 +183,7 @@ import {
   type Entity,
   INTERACT_RANGE,
   NYTHRAXIS_ADD_ID,
+  NYTHRAXIS_ADDS_ENABLED,
   NYTHRAXIS_BOSS_ID,
   NYTHRAXIS_ROOM_RADIUS,
   type NythraxisBoneSpike,
@@ -625,6 +626,7 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
     // Interrupted Deathless Rage: the court rises again once the boss shakes off
     // the wardstone stun, but only if the previous court has fallen.
     if (
+      NYTHRAXIS_ADDS_ENABLED &&
       st.deathlessStunRemaining <= 0 &&
       isHeroicNythraxis(ctx, boss) &&
       !nythraxisHeroicCourtPending(ctx, st)
@@ -650,7 +652,8 @@ export function updateNythraxisEncounter(ctx: SimContext, boss: Entity): void {
   updateNythraxisBoneSpikeCast(ctx, boss, st, room);
   updateNythraxisGraveEruptionCast(ctx, boss, st, room);
   updateNythraxisSigilCast(ctx, boss, st, room);
-  if (st.phase === 1) updateNythraxisRaiseFallen(ctx, boss, st);
+  // The guard waves ride the adds switch (owner playtest call, see types.ts).
+  if (NYTHRAXIS_ADDS_ENABLED && st.phase === 1) updateNythraxisRaiseFallen(ctx, boss, st);
   if (st.phase === 3) updateNythraxisBoneStormCast(ctx, boss, st, room);
   if (st.phase === 2 || st.phase === 3) {
     updateNythraxisGravefireCast(ctx, boss, st, room);
@@ -2656,7 +2659,11 @@ export function updateNythraxisDeathlessRage(
   // Heroic: an uninterrupted Deathless Rage (the pillar cast) raises the court
   // right after it lands, and it repeats each Deathless Rage cycle in phase 2 -
   // but only once the previous court has fallen, so the adds never stack.
-  if (isHeroicNythraxis(ctx, boss) && !nythraxisHeroicCourtPending(ctx, st)) {
+  if (
+    NYTHRAXIS_ADDS_ENABLED &&
+    isHeroicNythraxis(ctx, boss) &&
+    !nythraxisHeroicCourtPending(ctx, st)
+  ) {
     startNythraxisHeroicSummon(ctx, boss, st);
   }
 }

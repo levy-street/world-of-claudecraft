@@ -281,8 +281,9 @@ describe('coverage: each scenario fires its subsystem', () => {
     const sim = rec.sim as any;
     const chats = ev.filter((e) => e.type === 'chat');
     const auras = ev.filter((e) => e.type === 'aura' && e.gained);
-    // Phase 1 raise-fallen wave + the three wardstones the transition lit.
-    expect(n.addIds.length).toBe(2);
+    // No phase 1 raise-fallen wave (the redo fields no adds, NYTHRAXIS_ADDS_ENABLED
+    // in src/sim/types.ts), plus the three wardstones the transition lit.
+    expect(n.addIds.length).toBe(0);
     expect(n.wardIds.length).toBe(3);
     // Transition: Shuddering Stomp room stun + Brother Aldric spawned and still present.
     expect(auras.some((e) => e.name === 'Shuddering Stomp')).toBe(true);

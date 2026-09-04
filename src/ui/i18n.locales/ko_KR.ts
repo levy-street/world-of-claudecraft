@@ -7998,7 +7998,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
     '영웅: 대장간 열기는 식지 않고 모루의 칙령에 운석이 추가되며 마지막 단계는 세계불꽃에 집중합니다.',
   'hudChrome.raidBossGuide.nythraxis.overview': '대사제 말릭은 자신의 왕이 죽는 것을 용납하지 않았고, 나이트락시스를 되살린 의식은 궁정 전체를 묘실에 묶어 놓았습니다. 이 전투는 절제된 방어 담당 교대, 뼈가시로의 신속한 전환, 불타는 바닥을 피하는 이동, 그리고 왕좌가 무너진 뒤 이루어지는 수호석 정신집중의 협동을 시험합니다.',
   'hudChrome.raidBossGuide.nythraxis.phaseThroneName': '왕좌',
-  'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary': '나이트락시스는 충전되는 전방 참격, 방어 담당을 교대시키는 공포의 저주, 플레이어를 꿰뚫는 뼈가시, 바닥을 불태우는 무덤 분출, 그리고 되살아난 왕실 근위병의 파도로 왕좌의 방을 지킵니다.',
+  'hudChrome.raidBossGuide.nythraxis.phaseThroneSummary': '나이트락시스는 충전되는 전방 참격, 방어 담당을 교대시키는 공포의 저주, 플레이어를 꿰뚫는 뼈가시, 그리고 바닥을 불태우는 무덤 분출로 왕좌의 방을 지킵니다.',
   'hudChrome.raidBossGuide.nythraxis.phaseWardstonesName': '수호석',
   'hudChrome.raidBossGuide.nythraxis.phaseWardstonesSummary': '생명력이{health}가 되면 전율의 발구르기가 공격대를 그 자리에 묶어 두는 동안 알드릭 수사가 도착해 수호석에 불을 밝힙니다. 모든 가시가 부서지고 바닥의 불길이 꺼지며, 이후 영혼 가르기와 불사의 격노가 왕좌의 메커니즘에 더해집니다.',
   'hudChrome.raidBossGuide.nythraxis.phaseKingsWrathName': '왕의 분노',

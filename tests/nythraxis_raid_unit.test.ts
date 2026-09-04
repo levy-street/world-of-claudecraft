@@ -9,6 +9,7 @@ import {
   initNythraxisEncounter,
   nythraxisGravebreakerOnMobSwing,
   resetNythraxisEncounter,
+  spawnNythraxisAdds,
 } from '../src/sim/encounters/nythraxis';
 import { isShieldItem } from '../src/sim/equipment_rules';
 import { expectedStatBudget, itemLevel, primaryStatSum } from '../src/sim/item_level';
@@ -18,6 +19,7 @@ import {
   armorReduction,
   dist2d,
   type Entity,
+  NYTHRAXIS_ADDS_ENABLED,
   type WorldContent,
 } from '../src/sim/types';
 import { groundHeight } from '../src/sim/world';
@@ -1163,6 +1165,9 @@ describe('Nythraxis raid encounter', () => {
       ...QUIET_REDO_MECHANICS,
     };
 
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.pos = { x: tank.pos.x, y: tank.pos.y, z: tank.pos.z - 6.0 };
@@ -1214,6 +1219,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.pos = { x: tank.pos.x, y: tank.pos.y, z: tank.pos.z - 8 };
@@ -1263,6 +1271,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.swingTimer = 0;
@@ -1329,6 +1340,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.swingTimer = 0;
@@ -1397,6 +1411,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.aggroTargetId = tank.id;
@@ -1448,6 +1465,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.aggroTargetId = tank.id;
@@ -1496,6 +1516,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     add.aggroTargetId = tank.id;
@@ -1607,6 +1630,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     const controls: Omit<Aura, 'sourceId'>[] = [
@@ -1737,6 +1763,9 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    // The redo fields no waves (NYTHRAXIS_ADDS_ENABLED); raise the guards
+    // directly, this test is about the add's own AI.
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const add = mob(sim, 'nythraxis_skeleton_warrior');
     teleport(sim, tankPid, origin.x + 20, origin.z + 82);
@@ -1830,6 +1859,7 @@ describe('Nythraxis raid encounter', () => {
       deathSpoken: false,
       ...QUIET_REDO_MECHANICS,
     };
+    spawnNythraxisAdds(sim.ctx, boss);
     sim.tick();
     const adds = [...sim.entities.values()].filter(
       (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior',
@@ -1921,7 +1951,13 @@ describe('Nythraxis raid encounter', () => {
     expect(boss.hp).toBe(transitionBossHp);
   });
 
-  it('spawns Nythraxis add waves every 30 seconds in phase one', () => {
+  it('raises no guard waves in phase one while the redo fields no adds', () => {
+    // Owner playtest call 2026-09-04 (NYTHRAXIS_ADDS_ENABLED in types.ts): the
+    // 30 s Raise Fallen cadence is switched off. Flip the switch back and this
+    // pin is the one to restore to the two-guard wave at 30 s (weapon 794 to
+    // 1241 after the 5x normal-raid retune; tests/dungeons.test.ts still pins
+    // the add stats through the direct spawn).
+    expect(NYTHRAXIS_ADDS_ENABLED).toBe(false);
     const sim = makeWorld();
     const tankPid = sim.addPlayer('warrior', 'Tank');
     const origin = enterRaid(sim, tankPid);
@@ -1933,21 +1969,14 @@ describe('Nythraxis raid encounter', () => {
     engage(boss, tank);
     quietRedoMechanics(boss);
 
-    tickSeconds(sim, 28);
+    tickSeconds(sim, 64);
     expect(
       [...sim.entities.values()].filter(
         (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
       ),
     ).toHaveLength(0);
-
-    tickSeconds(sim, 4);
-    const adds = [...sim.entities.values()].filter(
-      (e) => e.kind === 'mob' && e.templateId === 'nythraxis_skeleton_warrior' && !e.dead,
-    );
-    expect(adds).toHaveLength(2);
-    // 5x normal-raid retune (weapon was 159-248 before the economy pass).
-    expect(adds[0].weapon.min).toBe(794);
-    expect(adds[0].weapon.max).toBe(1241);
+    // The wave timer never even counts down: the raise tick is not reached.
+    expect(boss.nythraxis?.raiseFallenTimer).toBe(30);
   });
 
   it('stages Aldric transition dialogue without interrupting itself before Soul Rend opens phase two after a settle delay', () => {
