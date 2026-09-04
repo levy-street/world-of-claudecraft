@@ -170,13 +170,16 @@ describe('Nythraxis raid floors', () => {
     );
   });
 
-  it('pins raid health: boss doubled, heroic skeletons at 1.2x their normal HP', () => {
-    expect(maxHpAt(RAID_BOSS, RAID, 'heroic')).toBe(192000); // was 96000
+  it('pins raid health: the redo boss pool, heroic skeletons at 1.2x their normal HP', () => {
+    // The mechanics redo sets the boss pool directly (160,000 normal, 230,000
+    // heroic) through the per-mob health multiplier on the tuning records; the
+    // adds keep the shared difficulty multipliers.
+    expect(maxHpAt(RAID_BOSS, RAID, 'heroic')).toBe(230000); // was 192000 before the redo
     // Skeleton waves: 2.22x base = 3,768 at the level-22 pin, 1.2x the normal
     // wave's 3,137 (heroic waves stay beefier than normal, but stop being
     // 73% beefier: they are wave pressure, not extra bosses).
     expect(maxHpAt(RAID_NORMAL_ADD, RAID, 'heroic')).toBe(3768);
-    expect(maxHpAt(RAID_BOSS, RAID, 'normal', undefined, 20)).toBe(120000); // was 60000
+    expect(maxHpAt(RAID_BOSS, RAID, 'normal', undefined, 20)).toBe(160000); // was 120000 before the redo
     expect(maxHpAt(RAID_NORMAL_ADD, RAID, 'normal', undefined, 20)).toBe(3137); // was 1569
   });
 

@@ -6,7 +6,7 @@
     "bytes": 1510,
     "sha256": "bb0b6bacba9acb12568c3bbbe536e4442cb2964266cffef890f27ee4915dcf2a"
   },
-  "rendererFingerprint": "493ebe02c6912c089d40f1d6bb98c13399783366ec972446d1ee9929d37a1668",
+  "rendererFingerprint": "c86ce59db50b645017ad6d302d2963a1eedecc363bf9ee34c655013d364b9eee",
   "renderer": {
     "trackedFiles": [
       {
@@ -27,8 +27,8 @@
     ],
     "browserBundle": {
       "entry": "scripts/wiki/stills_render_entry.js",
-      "bytes": 4560752,
-      "sha256": "7bdfee4985e1891392bbfcf3837ad03d350c1674eedfdcead8d32ff878b5786f",
+      "bytes": 4564436,
+      "sha256": "6f9275a7853c241d073f145f4c8e7079f9db80284022d5c64509f8f595573cf7",
       "esbuildVersion": "0.28.1"
     },
     "output": {
@@ -4422,7 +4422,7 @@
           "sha256": "54cef7af378d2f101639533bcf395eb82c9dfa117d078a03ff19b088fe694dc3"
         },
         "idle": "Idle",
-        "height": 1.6,
+        "height": 2.6,
         "yaw": 0,
         "hover": null,
         "show": null,
@@ -4436,7 +4436,7 @@
         "resolved": null,
         "strength": null
       },
-      "sourceFingerprint": "1d6b88ce88132c5390d1983eb9a917bbc882489c5d3790de50e866987b528f5a",
+      "sourceFingerprint": "c5d61b8664623cf2eb0bbb924a602a424909e843ca6f970996548768148819e3",
       "output": {
         "path": "public/ui/mobs/nythraxis_bone_spike.webp",
         "bytes": 1504,

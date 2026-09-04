@@ -131,6 +131,7 @@ const POW_SITES_PER_FILE: Record<string, number> = {
   'src/render/foliage_shader_core.ts': 1,
   'src/render/ignivar_fire_vfx.ts': 10,
   'src/render/ignivar_model_vfx.ts': 1,
+  'src/render/nythraxis_soft_fire.ts': 1,
   'src/render/pbr_fragment_shader.ts': 1,
   'src/render/post_output_grade.ts': 1,
   'src/render/sky.ts': 1,

@@ -56,7 +56,7 @@ void main() {
   pos.x += sin(uTime * 1.6 + iSeed * 43.0 + life * 4.0) * 0.14 * life;
   pos.z += cos(uTime * 1.3 + iSeed * 29.0 + life * 3.0) * 0.14 * life;
   vec4 world = modelMatrix * vec4(pos, 1.0);
-  float size = uSpriteScale * boost * (0.55 + 0.75 * pow(life, 0.6))
+  float size = uSpriteScale * boost * (0.55 + 0.75 * pow(max(life, 0.0), 0.6))
              * (0.75 + 0.5 * h11(iSeed + 9.7)) * lit;
   float rot = h11(iSeed + 4.4) * 6.2831853 + uTime * (h11(iSeed + 6.1) - 0.5) * 1.6;
   vec2 rc = vec2(position.x * cos(rot) - position.y * sin(rot),
