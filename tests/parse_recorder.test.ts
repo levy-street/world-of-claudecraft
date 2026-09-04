@@ -230,6 +230,102 @@ describe('ParseRecorder enrichment', () => {
     expect(ev.x).toMatchObject({ auraSourceId: 5, auraId: 'rend', auraStacks: 3 });
   });
 
+  test('gained aura events snapshot the live aura scalar state, tether partner included', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    const target = sim.entities.get(7);
+    if (target !== undefined) {
+      (target as { auras: unknown }).auras = [
+        // An unrelated same-source aura first: the join must pick the named one.
+        { id: 'brand', name: 'Brand', sourceId: 5, value: 1, remaining: 9, duration: 9 },
+        {
+          id: 'forge_chains',
+          name: 'Chains',
+          sourceId: 5,
+          kind: 'vulnerability',
+          remaining: 8,
+          duration: 8,
+          value: 0,
+          value2: 8,
+          linkedEntityId: 8,
+          school: 'fire',
+          encounterOwned: true,
+          // Non-scalars never ship, and per-tick counters are omitted.
+          empowerAbilities: ['x'],
+          tickTimer: 0.35,
+        },
+      ];
+    }
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([
+      {
+        type: 'aura',
+        targetId: 7,
+        name: 'Chains',
+        gained: true,
+        sourceId: 5,
+        abilityId: 'forge_chains',
+      },
+    ]);
+
+    const ev = records.find((r) => r.t === 'ev') as Record<string, unknown>;
+    expect(ev.x).toEqual({
+      auraSourceId: 5,
+      auraId: 'forge_chains',
+      auraState: {
+        kind: 'vulnerability',
+        duration: 8,
+        value: 0,
+        value2: 8,
+        linkedEntityId: 8,
+        school: 'fire',
+        encounterOwned: true,
+      },
+    });
+  });
+
+  test('faded aura events carry no state snapshot', () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([{ type: 'aura', targetId: 7, name: 'Chains', gained: false }]);
+
+    const ev = records.find((r) => r.t === 'ev') as Record<string, unknown>;
+    expect(ev.x).toBeUndefined();
+  });
+
+  test("record-policy events ship verbatim to the actor's fight", () => {
+    const sim = fakeSim();
+    seedArena(sim, arenaMatch());
+    const { recorder, records } = makeRecorder(sim);
+
+    sim.tickCount = 10;
+    recorder.observe([]);
+    sim.tickCount = 11;
+    recorder.observe([
+      { type: 'respawn', pid: 7 },
+      { type: 'resurrectionOffer', fromName: 'Healer', pid: 8 },
+      // A player outside the fight: nothing to attach it to.
+      { type: 'respawn', pid: 99 },
+      // Skip policy: never recorded even for a participant.
+      { type: 'log', text: 'hello', pid: 7 },
+    ]);
+
+    const evs = records.filter((r) => r.t === 'ev').map((r) => r.ev as Record<string, unknown>);
+    expect(evs).toEqual([
+      { type: 'respawn', pid: 7 },
+      { type: 'resurrectionOffer', fromName: 'Healer', pid: 8 },
+    ]);
+  });
+
   test('cue-only heal2 events never enter the parse', () => {
     const sim = fakeSim();
     seedArena(sim, arenaMatch());

@@ -635,6 +635,12 @@ export interface Aura {
   value: number; // dot/hot: per tick; slow/haste/speed: multiplier; absorb: remaining; buffs: amount
   value2?: number; // imbue: judgement min; Greater Invisibility: aftereffect DR
   value3?: number; // imbue: judgement max; Greater Invisibility: aftereffect duration
+  // Another entity this aura ties its holder to (a tether partner, a bond
+  // target). Self-describing where value2 is not: the parse recorder snapshots
+  // it with the rest of the aura's scalar state and the parse site renders it
+  // as a link, so any pairing mechanic that sets it is recorded and shown with
+  // no per-mechanic wiring.
+  linkedEntityId?: number;
   tickInterval?: number;
   tickTimer?: number;
   // Sim-only periodic ramp: after each resolved DoT tick, increase `stacks`

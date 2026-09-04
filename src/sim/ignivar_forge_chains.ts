@@ -54,11 +54,19 @@ export function movementCrossesIgnivarForgeChain(
   return passedThrough || landedOnChain;
 }
 
-function clearChainAura(player: Entity | undefined, bossId: number): void {
+// Strips the chain aura directly (no aura-kind hooks fire for it) but still
+// announces the fade: the parse recorder and the client's aura tracking only
+// learn about a removal from this event, and a silent strip left the parse
+// showing chains "up" long after the pair was released.
+function clearChainAura(ctx: SimContext, player: Entity | undefined, bossId: number): void {
   if (!player) return;
+  const before = player.auras.length;
   player.auras = player.auras.filter(
     (aura) => aura.id !== IGNIVAR_FORGE_CHAINS_AURA_ID || aura.sourceId !== bossId,
   );
+  if (player.auras.length !== before) {
+    ctx.emit({ type: 'aura', targetId: player.id, name: IGNIVAR_FORGE_CHAINS_NAME, gained: false });
+  }
 }
 
 export function clearIgnivarForgeChainAura(player: Entity, bossId?: number): void {
@@ -131,6 +139,7 @@ function applyChainAura(ctx: SimContext, boss: Entity, player: Entity, partner: 
     duration: IGNIVAR_FORGE_CHAINS_DURATION_SECONDS,
     value: 0,
     value2: partner.id,
+    linkedEntityId: partner.id,
     sourceId: boss.id,
     school: 'fire',
     encounterOwned: true,
@@ -158,7 +167,7 @@ function finishChainPair(
     }
   }
   for (const player of [first, second]) {
-    clearChainAura(player, boss.id);
+    clearChainAura(ctx, player, boss.id);
     if (!player) continue;
     ctx.emit({
       type: 'spellfx',

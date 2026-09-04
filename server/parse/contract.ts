@@ -109,6 +109,18 @@ export interface ParticipantJoinRecord {
   participant: FightParticipant;
 }
 
+/**
+ * The live aura's scalar state at application, joined by the recorder: every
+ * number/string/boolean field on the sim's Aura object except the identity
+ * fields already carried beside it and the per-tick counters
+ * (server/parse/aura_state.ts in the game repo owns the omit list). The set
+ * of keys is whatever the sim's Aura type carries at capture time, so a field
+ * added to the sim reaches the parse without a contract change; readers must
+ * treat every key as optional. `linkedEntityId` is the one key with reserved
+ * meaning: another entity this aura ties its holder to (a tether partner).
+ */
+export type AuraStateSnapshot = Record<string, number | string | boolean>;
+
 /** Capture-time enrichments only the recorder can compute (state joins). */
 export interface EventEnrichment {
   /** Pet attribution: the owning player's entityId, joined at drain time. */
@@ -117,6 +129,8 @@ export interface EventEnrichment {
   auraSourceId?: number;
   auraId?: string;
   auraStacks?: number;
+  /** Aura scalar state at application (gained events only). */
+  auraState?: AuraStateSnapshot;
 }
 
 export interface EventRecord {
