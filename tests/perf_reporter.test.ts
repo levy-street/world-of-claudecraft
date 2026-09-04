@@ -550,6 +550,10 @@ function snapshot(): PerfSnapshot {
       pixelRatio: 1.5,
       width: 1440,
       height: 900,
+      // Deliberately NOT width x pixelRatio (2160x1350): the tier's DPR cap and
+      // the Render Quality slider move the backing store under a fixed CSS
+      // viewport, so the fleet reads the allocation rather than deriving it.
+      drawingBuffer: { width: 1728, height: 1080, cssWidth: 1440, cssHeight: 900 },
       calls: 500,
       triangles: 300000,
       geometries: 120,
@@ -685,6 +689,17 @@ describe('perf reporter payload', () => {
     // rides in rawSummary (the no-DDL home), never as a top-level column.
     expect((body.rawSummary as { hiddenPresentSkips?: number }).hiddenPresentSkips).toBe(0);
     expect((body.rawSummary as { graphicsConfigVersion?: number }).graphicsConfigVersion).toBe(16);
+    // The 3D drawing buffer rides in rawSummary (the no-DDL home): the fleet
+    // cannot say what resolution a session plays at from the columns alone.
+    // The fixture's buffer is 1728x1080 while its viewport x pixelRatio is
+    // 2160x1350, so a regression that derived the block instead of reading the
+    // canvas backing store reds on these exact values.
+    expect((body.rawSummary as { rendererDrawingBuffer?: unknown }).rendererDrawingBuffer).toEqual({
+      width: 1728,
+      height: 1080,
+      cssWidth: 1440,
+      cssHeight: 900,
+    });
     // The entry reveal wait rides in rawSummary too (the fleet-side watch for the
     // establishing-shot bound): the counters verbatim, the waits from the ring.
     expect((body.rawSummary as { entryReveal?: unknown }).entryReveal).toEqual({

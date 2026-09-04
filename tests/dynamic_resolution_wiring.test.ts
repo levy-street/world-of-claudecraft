@@ -66,4 +66,22 @@ describe('dynamic resolution renderer wiring', () => {
     expect(renderer).toContain('(this.tmpV.x * 0.5 + 0.5) * this.viewport.width');
     expect(renderer).toContain('(-this.tmpV.y * 0.5 + 0.5) * this.viewport.height');
   });
+
+  it('reports the allocated drawing buffer from the canvas, with no layout read', () => {
+    // What perfStats says the scene is rasterized into: the canvas backing
+    // store beside the CSS viewport the renderer already caches. perfStats is
+    // read at boot, by the ~1 Hz metrics sampler and by the prewarm headroom
+    // poll, so a getBoundingClientRect here would be a layout read on a
+    // repeating path; the cached `this.viewport` is the sanctioned source.
+    expect(renderer).toContain(
+      [
+        'drawingBuffer: {',
+        '  width: this.webgl.domElement.width,',
+        '  height: this.webgl.domElement.height,',
+        '  cssWidth: this.viewport.width,',
+        '  cssHeight: this.viewport.height,',
+        '},',
+      ].join('\n      '),
+    );
+  });
 });

@@ -615,6 +615,18 @@ function payloadFromSnapshot(
       rendererFoliage: renderer.foliage,
       rendererBudget: renderer.renderBudget,
       rendererQualityBuckets: renderer.qualityBuckets,
+      // The resolution the 3D scene is actually drawn at. The report already
+      // carries the CSS viewport and the DPR, but their product is not the
+      // allocation (the tier's DPR cap and the Render Quality slider both move
+      // the backing store under a fixed viewport), so without this the fleet
+      // cannot say what a Windows session renders. Four bounded scalars in
+      // rawSummary, the no-DDL home: no column, no metric.
+      rendererDrawingBuffer: {
+        width: renderer.drawingBuffer.width,
+        height: renderer.drawingBuffer.height,
+        cssWidth: renderer.drawingBuffer.cssWidth,
+        cssHeight: renderer.drawingBuffer.cssHeight,
+      },
       rendererDiagnostics: renderer.renderDiagnostics,
       // The summary above is the whole prewarm payload. The live stats object
       // used to ride along beside it as `rendererPrewarm`, from before the

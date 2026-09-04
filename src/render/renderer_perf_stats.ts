@@ -21,6 +21,22 @@ import type { ZoneStreamingStats } from './zone_prepare_stats';
 
 export type RendererPhase = 'setup' | 'entities' | 'world' | 'nameplates' | 'submit' | 'total';
 
+/** The buffer the 3D scene is actually rasterized into, beside the CSS viewport
+ *  it covers. `pixelRatio` x `width`/`height` does NOT reconstruct it: the tier's
+ *  DPR cap and the Render Quality slider both move the allocation under a fixed
+ *  viewport, so the backing store is the only field that says what a session
+ *  really renders. On the dynamic-resolution path (medium's composer) the
+ *  allocation stands at the manual ceiling and the governor renders a sub-rect
+ *  of it, scaled by the `effectiveRenderScale` this same block already carries. */
+export interface DrawingBufferStats {
+  /** The canvas backing store, in device pixels (`canvas.width`/`canvas.height`). */
+  width: number;
+  height: number;
+  /** The CSS viewport it covers, from the renderer's cached measurement. */
+  cssWidth: number;
+  cssHeight: number;
+}
+
 export type RendererPhaseStats = Record<
   RendererPhase,
   { count: number; avg: number; p95: number; max: number }
@@ -91,6 +107,9 @@ export interface RendererPerfStats {
   pixelRatio: number;
   width: number;
   height: number;
+  /** The allocated drawing buffer (see DrawingBufferStats): what the fleet perf
+   *  report reads to say the resolution a session actually plays at. */
+  drawingBuffer: DrawingBufferStats;
   calls: number;
   triangles: number;
   geometries: number;
