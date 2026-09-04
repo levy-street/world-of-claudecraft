@@ -271,10 +271,14 @@ describe('Nythraxis dungeon finder blurbs', () => {
       'kings_wrath',
       'bone_storm',
       'crown_endures',
-      'deathless_court',
       'dread_curse',
     ]) {
       expect(keys.has(mechanic), mechanic).toBe(true);
+    }
+    // The guard waves and the heroic court are switched off with the adds
+    // (NYTHRAXIS_ADDS_ENABLED in src/sim/types.ts), so neither preview lists them.
+    for (const add of ['raise_fallen', 'deathless_court']) {
+      expect(keys.has(add), add).toBe(false);
     }
     for (const mechanic of keys) {
       const text = t(`hudChrome.finder.mech.${mechanic}` as TranslationKey);
