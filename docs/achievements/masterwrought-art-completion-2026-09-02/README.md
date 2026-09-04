@@ -28,6 +28,11 @@ independently measures the final shipping WebP bytes, dimensions, color space, a
 Temporary source masters remain under the gitignored `tmp/imagegen/masterwrought-art-2026-09-02/`
 tree in the accepting worktree.
 
+The supersession records are immutable snapshots of the pre-replacement tree. Paths in those
+records may name placeholder sources that were later removed; their exact bytes remain recoverable
+from commit `6742cd8bf2e65b44b5f8a8887d3ec767c258eff2`. The six deed masters and four tome-fingerprint
+inputs that still have a live source role remain committed in their original locations.
+
 ## Runtime visual evidence
 
 `docs/screenshots/masterwrought-art-completion-2026-09-02/` contains the canonical LOW-preset

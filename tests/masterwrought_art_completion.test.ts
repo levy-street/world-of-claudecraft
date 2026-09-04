@@ -723,7 +723,7 @@ describe('Masterwrought art completion evidence', () => {
     });
   });
 
-  it('pins the operative credits and all eight superseded placeholder lineages', () => {
+  it('pins the operative credits and consolidated supersession lineage', () => {
     const credits = readFileSync(path.join(repoRoot, 'CREDITS.md'), 'utf8');
     const requiredRows = [
       [
@@ -732,39 +732,7 @@ describe('Masterwrought art completion evidence', () => {
       ],
       [
         '| Masterwrought art-completion wave (181 painted assets',
-        'aff1ceff940d11b073260939fcd63059a532c78060fd9e3d9c6f8d6fcea14115',
-      ],
-      [
-        '| Historical Masterwrought material placeholder lineage',
-        'ef0fb61c0267dce328d4412514bdead877c4d14f703aa5847b989b0f481f71eb',
-      ],
-      [
-        '| Historical Masterwrought jewelcrafting placeholder lineage',
-        '966674f9ab9b1e3e56a4e8f462160f66e4945f0119761c65cca74279ea052b8b',
-      ],
-      [
-        '| Historical Masterwrought inscription placeholder lineage',
-        'b80cbb60dc283fd1cad440baadaa914a6c38f3db32699300498bbe50c646a6e4',
-      ],
-      [
-        '| Historical Masterwrought intermediate-material placeholder lineage',
-        'fe786fd1175761817b724db2ab4a7cac1b910d60c8abf1d03e22cb5f5e5beed5',
-      ],
-      [
-        '| Historical Masterwrought apex-armor placeholder lineage',
-        '6e17b4cad5e0b1f0e45fb33532e85c3e284fcda7de63ee75da6a3cd4413ec41c',
-      ],
-      [
-        '| Historical Masterwrought apex weapon, jewelry, and tool placeholder lineage',
-        '84b466aee01e50c387aed0a6a912d749f25c594056a122ddf3d2e8333009158e',
-      ],
-      [
-        '| Historical Masterwrought apex consumable and station placeholder lineage',
-        '0d9d8f7ec0bcf60bfae2e17a64f2cb464483313434c619b663073e25c74903ac',
-      ],
-      [
-        '| Historical Masterwrought apex recipe-pattern placeholder lineage',
-        '6ec50a18897c9c5cec17a4fe47c49167bff5e9daf0c930b8af97c791a759f975',
+        '93b63a5bd6aff180f185ced2b760b34b70271747c0cbaad92415abf10c0a2786',
       ],
       [
         '| Exact runtime aura paintings (`public/ui/auras/*.webp`)',

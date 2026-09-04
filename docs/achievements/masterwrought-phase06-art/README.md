@@ -1,11 +1,8 @@
-# Masterwrought Phase 06 art provenance (2026-08-11)
+# Inscription deed and tome source provenance
 
-Provenance and accepted-output record for the original art assets the
-inscription base catalog shipped. All are project-owned originals authored
-in-repo (hand-written SVG compositions, rasterized and encoded through the
-owning converter pipelines); no external generation service, source pack, or
-third-party reference was used. This file is shared by the phase 06 agents:
-extend it by appending a section, never by rewriting an existing one.
+Provenance and accepted-output record for the retained inscription source art.
+All six SVGs are project-owned originals authored in-repo; no external
+generation service, source pack, or third-party reference was used.
 
 ## Deed crests
 
@@ -50,40 +47,16 @@ by `ACCEPTED_PHASE06_CREST_SHA256` in `tests/deed_icons.test.ts` (the PR #3295
 authored-art lesson: the contract is pinned beside the blob, and a re-encode
 moves BOTH the pin and this record after re-review, never the pin alone).
 
-## Item icons (2026-08-11)
+## Tome model inputs
 
-Six placeholder originals in the `woc-item-icon-v1` house style (one hero
-object on the opaque dark house ground with a top-left key light and a
-grounded contact shadow) for the inscription base catalog: three bound
-volumes (the Sheenleaf Primer in the uncommon silvery-green leather register,
-the Goldleaf Folio in gilded gold-leaf brown, the Sunpetal Grimoire in the
-rare-blue register under a radiant sun-petal seal) and three rolled parchment
-scrolls (silver-green ribbon tie, gold wax seal, radiant sun-petal wax seal).
-Each is a distinct hand-written SVG authored at the 128px shipping square.
-Unlike the phase 05 item icons (whose authoring SVGs were not retained), the
-committed sources live beside this file as `<itemId>.svg` and are the exact
-bytes that rendered the shipping art; `rasterize_item_icons.mjs` (run from
-the repo root with `node`) supersamples each at 4x, downscales to 128px,
-flattens onto the opaque ground, strips alpha, and encodes with the item
-converter's tuned q82 WebP settings, verifying geometry, opacity, colorspace,
-the 15 KiB budget, and byte-uniqueness. Provenance rows live in
-`public/ui/items/mapping.json` (the `masterwrought-phase06-inscription`
-`woc_original_svg` batch, placeholder license pending commissioned painted
-icons); audit admission lives in
-`docs/achievements/item-art-consistency-2026-08-09/` (counts 834 to 840 art
-files, 849 to 855 live items). Review evidence: each icon was inspected at
-128px and a 22px downscale (identity, silhouette, and register all hold; the
-three books and three scrolls stay distinct at both sizes).
+`silverleaf_primer.svg`, `goldleaf_folio.svg`, and `sunpetal_grimoire.svg` are
+retained because their exact paths and bytes feed the deterministic
+inscription-tome source fingerprint. Together with the exporter, model
+specification, fingerprint helper, and lockfile, they pin the corresponding
+shipping GLBs under `public/models/props/`.
 
-| id | accepted sha256 | bytes |
-|---|---|---|
-| silverleaf_primer | `320bc483406dc83ac4887a709b49b1f3d2eaf4d82b12d722aa61613fbdb6fedd` | 1348 |
-| goldleaf_folio | `05e6336c571307025403bed93d3d0ce9e1cc6b99c2011054bb9cc60de4108213` | 1662 |
-| sunpetal_grimoire | `7a580b1114d9cdf19e2790c8de1b1185f23756d1d9df5fb8279219c4cbcca344` | 1966 |
-| silverleaf_scroll | `cc8cf8dc576cf7608a7c28350eb1a5f4973e34be86e996d4bd7e2b90b4111cfa` | 1282 |
-| goldleaf_scroll | `ffd5d9630440c1b674bccdda32bf4c9c18800de65b62295c270e15d22bd9095c` | 1270 |
-| sunpetal_scroll | `75141f7d9123abd14eac8205e33bb89a78a0e9aa333cc0d212f0d1e7e3df7aa8` | 1392 |
-
-The two silverleaf ids display the Sheenleaf register (Sheenleaf Primer,
-Sheenleaf Scroll); ids are frozen and keep silverleaf, matching
-`silverleaf_herb` whose display is Sheenleaf.
+The accepted painted WebPs supersede the temporary item icons that once came
+from these sources. The three scroll SVGs and the placeholder rasterizer were
+removed. Do not move or edit the retained tome inputs without running the full
+export, optimization, review, and fingerprint pipeline in
+`scripts/assets/inscription_tomes/`.
