@@ -49,6 +49,7 @@ import {
   type ImpostorArchetypeSpec,
   type ImpostorCellRect,
   packImpostorAtlas,
+  sameImpostorCellLayout,
 } from './foliage_impostor_core';
 import { GFX, sharedUniforms } from './gfx';
 
@@ -215,6 +216,7 @@ function archetypeBounds(parts: BakePart[]): { minY: number; height: number; rad
 function bakeAtlas(
   webgl: THREE.WebGLRenderer,
   archetypes: Archetype[],
+  into: THREE.WebGLRenderTarget | null = null,
 ): { target: THREE.WebGLRenderTarget; rects: ImpostorCellRect[]; size: number } {
   const placement = packImpostorAtlas(
     archetypes.map((a) => a.spec),
@@ -250,16 +252,22 @@ function bakeAtlas(
   const prevAutoClear = webgl.autoClear;
 
   // The mip-mapped atlas the sprites sample; created up front so the
-  // finally arm can dispose it on a mid-bake throw. generateMipmaps stays
-  // OFF until every cell has landed: three regenerates a target's whole
+  // finally arm can dispose it on a mid-bake throw. A context-restore re-bake
+  // renders INTO the live target instead (same texture object, so every
+  // sprite material keeps its map; see rebakeImpostorAtlas), and a failed
+  // re-bake leaves that target standing for the next attempt. generateMipmaps
+  // stays OFF until every cell has landed: three regenerates a target's whole
   // mip chain at the end of every render() into it, so leaving it on would
   // rebuild the 2048 chain a few hundred times during the bake.
-  const finalTarget = new THREE.WebGLRenderTarget(size, size, {
-    depthBuffer: false,
-    generateMipmaps: false,
-    minFilter: THREE.LinearMipmapLinearFilter,
-    magFilter: THREE.LinearFilter,
-  });
+  const reuse = into !== null && into.width === size && into.height === size;
+  const finalTarget = reuse
+    ? into
+    : new THREE.WebGLRenderTarget(size, size, {
+        depthBuffer: false,
+        generateMipmaps: false,
+        minFilter: THREE.LinearMipmapLinearFilter,
+        magFilter: THREE.LinearFilter,
+      });
   finalTarget.texture.generateMipmaps = false;
   finalTarget.texture.anisotropy = Math.min(4, webgl.capabilities.getMaxAnisotropy());
 
@@ -373,7 +381,7 @@ function bakeAtlas(
     scratch.dispose();
     for (const mat of bakeMaterialCache.values()) mat.dispose();
     bakeMaterialCache.clear();
-    if (!done) finalTarget.dispose();
+    if (!done && !reuse) finalTarget.dispose();
   }
 
   return { target: finalTarget, rects: placement.origin, size };
@@ -417,10 +425,50 @@ const materialCache = new Map<ImpostorCategory, THREE.MeshStandardMaterial>();
 // the previous target must be released (texture AND framebuffer, which only
 // WebGLRenderTarget.dispose frees) or each rebuild leaks GPU pages.
 let liveAtlas: THREE.WebGLRenderTarget | null = null;
+// What the live atlas was baked from, retained for a context-restore re-bake
+// (the archetypes hold the extracted GLB parts, which the world keeps alive
+// anyway; the rects are the layout the sprites' cell attributes encode).
+let liveArchetypes: Archetype[] | null = null;
+let liveRects: ImpostorCellRect[] | null = null;
 
 function adoptAtlas(target: THREE.WebGLRenderTarget): void {
   if (liveAtlas && liveAtlas !== target) liveAtlas.dispose();
   liveAtlas = target;
+}
+
+/** Renderer teardown: release the live atlas target and forget what it was
+ *  baked from, so a queued context-restore re-bake can never drive a
+ *  disposed renderer (a rebuilt renderer bakes afresh through finalize). The
+ *  category materials keep their map reference: the next finalize re-points
+ *  them, and a profile with sprites off never draws them. */
+export function disposeImpostorAtlas(): void {
+  liveAtlas?.dispose();
+  liveAtlas = null;
+  liveArchetypes = null;
+  liveRects = null;
+}
+
+/**
+ * Re-bake the live atlas after an in-place WebGL context restore (issue
+ * 3846). The atlas is a render target the sprites only ever SAMPLE, so the
+ * restored context never re-allocates it and every sprite reads black until
+ * it is rendered again. Renders into the SAME live target from the retained
+ * archetypes: identical specs pack to identical cells, so the per-instance
+ * cell attributes stay valid (a layout change would desynchronize every
+ * sprite, so it throws instead of adopting), then re-points every category
+ * material at the atlas texture. Returns false when no atlas has been baked
+ * this session (sprites off for the profile, or the bake failed).
+ */
+export function rebakeImpostorAtlas(webgl: THREE.WebGLRenderer): boolean {
+  if (!liveAtlas || !liveArchetypes || !liveRects) return false;
+  const { target, rects } = bakeAtlas(webgl, liveArchetypes, liveAtlas);
+  if (!sameImpostorCellLayout(rects, liveRects)) {
+    if (target !== liveAtlas) target.dispose();
+    throw new Error('impostor atlas re-bake changed the cell layout; sprites keep their cells');
+  }
+  adoptAtlas(target);
+  for (const mat of materialCache.values()) mat.map = target.texture;
+  return true;
 }
 
 function impostorMaterial(category: ImpostorCategory, atlas: THREE.Texture): THREE.Material {
@@ -736,6 +784,8 @@ export function createImpostorSession(): ImpostorSession | null {
       if (archetypes.length === 0) return [];
       const { target, rects } = bakeAtlas(webgl, archetypes);
       adoptAtlas(target);
+      liveArchetypes = archetypes;
+      liveRects = rects;
       const texture = target.texture;
       const registrations: ImpostorRegistration[] = [];
       // Session-scoped shortfall sampler: seed, spacing and origin fix at

@@ -72,6 +72,21 @@ Everything else is a sibling module in one of these families:
   `software_renderer.ts` (the SINGLE source of truth for detecting a software
   rasterizer from the adapter string; `gfx.ts`, `perf_doctor.ts`, and
   `perf_reporter.ts` all consume it so the detectors cannot drift).
+  The IN-PLACE restore (a driver-side loss, no rebuild) is
+  `context_restore_core.ts` + `context_restore.ts`: three re-creates
+  textures from their images and geometry from its arrays, but a render
+  target the renderer only SAMPLES (the grass ground bake, the impostor
+  atlas, the PMREM sky environments) stays black on the restored context, so
+  each such producer registers a re-bake (`rebakeGrassGroundTexture`,
+  `rebakeImpostorAtlas`, `environment_map_restore_core.ts`) and the
+  renderer's `webglcontextrestored` handler runs them through the background
+  GPU queue, forgives the governor's restore-frame stalls
+  (`RenderBudgetGovernor.forgiveExternalStall`) and reports failures in
+  `perfStats().contextRestoreFailures`. A NEW sampled-only target must
+  register here in the same change (`tests/renderer_lifecycle.test.ts` pins
+  the set). KTX2 world textures restore through their own retry-and-fallback
+  path in `assets/ktx2_mip_release.ts`. `gl_identity.ts` reads the adapter
+  strings the beacon reports, re-captured on every restore.
 - `view_create_retry.ts`: bounded cooldown state for fail-soft character builds
   in per-frame paths, including required targets, form swaps, and visual-key
   swaps (`tests/view_create_retry.test.ts`).

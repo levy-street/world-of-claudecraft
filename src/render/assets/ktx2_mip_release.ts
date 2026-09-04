@@ -59,6 +59,24 @@
 // self-healing cosmetic transient, never worth stranding a texture on stubs
 // over.
 //
+// Retry and fallback (issue 3846): a transcode that rejects is retried up to
+// KTX2_RESTORE_MAX_ATTEMPTS times per context loss with a backoff
+// (KTX2_RESTORE_RETRY_BACKOFF_MS), all inside the one in-flight promise
+// ktx2MipsRestored awaits. A texture whose attempts are exhausted, or whose
+// transcode comes back in another shape, is never parked black until the
+// next loss: release keeps the TAIL of its real mip chain resident (every
+// level at or below KTX2_FALLBACK_MAX_LEVEL_PX, copied out of the transcode
+// so the retained bytes are those few levels and not a view into the whole
+// chain), and the fallback uploads that tail as a small complete texture, so
+// the prop draws blurry instead of black. Because a stub upload on the
+// current context already allocated the FULL shape and three only writes
+// sub-images into an existing allocation, the fallback first drops the GL
+// texture (a dispose the registry listener is told to ignore) so the next
+// upload allocates the tail's own shape; a later full restore does the same
+// drop in reverse. Failures and successes are counted for the perf beacon
+// (ktx2RestoreStats), and the next context loss retries fallback textures
+// exactly like released ones.
+//
 // Retention bounds: both registries hold their textures WEAKLY. A texture the
 // world never references again (for example the normal/roughness maps a
 // Lambert-tier material build discards) is garbage-collected together with
@@ -102,6 +120,7 @@ interface ReleasableCompressedTexture {
   source?: { dataReady: boolean };
   onUpdate: ((texture: unknown) => void) | null;
   addEventListener(type: string, listener: () => void): void;
+  dispose(): void;
 }
 
 /** Model roots drawn ONLY by the world renderer in the game entry: safe to
@@ -136,7 +155,7 @@ type BackgroundGpuQueueSource =
   | BackgroundGpuQueue
   | (() => BackgroundGpuQueue | undefined | Promise<BackgroundGpuQueue | undefined>);
 
-type ReleaseState = 'armed' | 'released' | 'restoring';
+type ReleaseState = 'armed' | 'released' | 'restoring' | 'fallback';
 
 interface ReleaseEntry {
   source: ArrayBuffer;
@@ -144,6 +163,85 @@ interface ReleaseEntry {
   state: ReleaseState;
   releasedBytes: number;
   priorOnUpdate: ((texture: unknown) => void) | null;
+  /** The resident tail of the real mip chain (see the module header), null
+   *  when no level fits under KTX2_FALLBACK_MAX_LEVEL_PX. */
+  fallbackTail: Ktx2MipLevel[] | null;
+  /** True while `mipmaps` is the fallback tail: whatever context uploads next
+   *  allocates the tail's shape, so a full-chain restore must drop the GL
+   *  texture before it re-uploads. */
+  fallbackUploaded: boolean;
+}
+
+/** Re-transcode attempts per context loss before a texture falls back. */
+export const KTX2_RESTORE_MAX_ATTEMPTS = 3;
+/** Wait before retry n (1-based), in ms; the last entry repeats. Short first:
+ *  the common failure is a transcode worker still restarting. */
+export const KTX2_RESTORE_RETRY_BACKOFF_MS: readonly number[] = [250, 1000, 4000];
+/** Every real mip level whose larger side is at most this many texels stays
+ *  resident after release as the visible fallback: about 1.4 KB per texture
+ *  at 4x4-block compression, against mip chains of megabytes. */
+export const KTX2_FALLBACK_MAX_LEVEL_PX = 32;
+
+type RestoreScheduler = (callback: () => void, delayMs: number) => void;
+const defaultRestoreScheduler: RestoreScheduler = (callback, delayMs) => {
+  setTimeout(callback, delayMs);
+};
+let restoreScheduler: RestoreScheduler = defaultRestoreScheduler;
+
+/** Test seam for the retry backoff; null restores setTimeout. */
+export function setKtx2RestoreScheduler(scheduler: RestoreScheduler | null): void {
+  restoreScheduler = scheduler ?? defaultRestoreScheduler;
+}
+
+function restoreBackoffMs(failedAttempt: number): number {
+  const index = Math.min(failedAttempt - 1, KTX2_RESTORE_RETRY_BACKOFF_MS.length - 1);
+  return KTX2_RESTORE_RETRY_BACKOFF_MS[Math.max(0, index)] ?? 0;
+}
+
+export interface Ktx2RestoreStats {
+  /** Textures whose full mip chain came back after a context loss. */
+  restored: number;
+  /** Restores that exhausted their attempts or changed shape (each shows the
+   *  fallback tail, or stays black when the texture has no tail). */
+  failed: number;
+  /** Restore chains still in flight (transcode, backoff, or queued upload). */
+  inflight: number;
+}
+
+let restoreSuccesses = 0;
+let restoreFailures = 0;
+
+export function ktx2RestoreStats(): Ktx2RestoreStats {
+  return { restored: restoreSuccesses, failed: restoreFailures, inflight: inflightRestores.size };
+}
+
+// Disposes issued from inside this module (a fallback swap or a full restore
+// after one) drop the GPU allocation only; the registry listener installed by
+// stashKtx2TranscodeSource must not drop the entry for them.
+const internalDisposes = new WeakSet<object>();
+
+/** Drop the texture's GPU allocation without dropping its registry entry.
+ *  three's own 'dispose' listener deletes the GL texture and forgets its
+ *  properties; the texture object stays usable and re-uploads (allocating
+ *  from its CURRENT mipmaps shape) on the next needsUpdate. */
+function forgetGpuTexture(tex: ReleasableCompressedTexture): void {
+  internalDisposes.add(tex);
+  try {
+    tex.dispose();
+  } finally {
+    internalDisposes.delete(tex);
+  }
+}
+
+function fallbackTailOf(levels: Ktx2MipLevel[]): Ktx2MipLevel[] | null {
+  const tail = levels.filter(
+    (m) => Math.max(m.width, m.height) <= KTX2_FALLBACK_MAX_LEVEL_PX && m.data.byteLength > 0,
+  );
+  if (tail.length === 0) return null;
+  // Copies, never views: each level's data is a view into the transcode's
+  // one output buffer, and retaining a view would pin the whole chain the
+  // release exists to drop.
+  return tail.map((m) => ({ width: m.width, height: m.height, data: m.data.slice() }));
 }
 
 /** A Map whose KEYS are held weakly but stay enumerable while alive: lookup
@@ -259,6 +357,7 @@ export function stashKtx2TranscodeSource(texture: unknown, source: ArrayBuffer):
   if (!isPlainCompressedTexture(tex)) return;
   pendingSources.set(tex, source);
   tex.addEventListener('dispose', () => {
+    if (internalDisposes.has(tex)) return;
     pendingSources.delete(tex);
     entries.delete(tex);
   });
@@ -294,6 +393,8 @@ export function armKtx2MipRelease(texture: unknown): void {
     state: 'armed',
     releasedBytes: 0,
     priorOnUpdate: typeof tex.onUpdate === 'function' ? tex.onUpdate : null,
+    fallbackTail: null,
+    fallbackUploaded: false,
   };
   entries.set(tex, entry);
   tex.onUpdate = (t: unknown) => {
@@ -316,6 +417,7 @@ function releaseAfterUpload(tex: ReleasableCompressedTexture, entry: ReleaseEntr
   const levels = mips as Ktx2MipLevel[];
   entry.shape = levels.map((m) => ({ width: m.width, height: m.height }));
   entry.releasedBytes = levels.reduce((sum, m) => sum + (m.data?.byteLength ?? 0), 0);
+  entry.fallbackTail ??= fallbackTailOf(levels);
   // Full-shape stubs (see the module header): identical level count and
   // dimensions keep a fresh context's texStorage2D allocation correct.
   tex.mipmaps = entry.shape.map((s) => ({
@@ -355,7 +457,7 @@ export function ktx2MipsOnContextLost(queue?: BackgroundGpuQueueSource): void {
   if (!rederive) return;
   const released: [ReleasableCompressedTexture, ReleaseEntry][] = [];
   for (const pair of entries.entries()) {
-    if (pair[1].state === 'released') released.push(pair);
+    if (pair[1].state === 'released' || pair[1].state === 'fallback') released.push(pair);
   }
   for (let i = released.length - 1; i >= 0; i--) {
     const [tex, entry] = released[i] as [ReleasableCompressedTexture, ReleaseEntry];
@@ -436,17 +538,32 @@ function startRestore(
 ): void {
   if (!rederive) return;
   entry.state = 'restoring';
+  const restore = attemptRestore(tex, entry, queue, 1);
+  inflightRestores.add(restore);
+  void restore.finally(() => inflightRestores.delete(restore));
+}
+
+/** One transcode attempt. A rejection with attempts left waits out the
+ *  backoff and recurses, so the returned promise spans the WHOLE retry chain
+ *  (which is what ktx2MipsRestored awaits). */
+function attemptRestore(
+  tex: ReleasableCompressedTexture,
+  entry: ReleaseEntry,
+  queue: BackgroundGpuQueueSource | undefined,
+  attempt: number,
+): Promise<void> {
+  const transcode = rederive;
+  if (!transcode) return Promise.resolve();
   // Pass a copy: the transcode transfers its input buffer to the worker
   // (detaching it in this thread), and the retained source must survive
   // repeated context losses.
-  const restore = rederive(entry.source.slice(0)).then(
+  return transcode(entry.source.slice(0)).then(
     (fresh) => {
       if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
       if (fresh.format !== tex.format || fresh.mipmaps.length !== (entry.shape?.length ?? -1)) {
-        // Dev-channel English: the transcode target changed mid-session; the
-        // GPU allocation cannot be reshaped, so the texture stays on stubs.
-        console.warn('[ktx2] restore transcode shape changed; texture left released');
-        entry.state = 'released';
+        // The transcode target changed mid-session: not transient, so no
+        // retry; the fallback tail (in the texture's own format) shows.
+        failRestore(tex, entry, 'restore transcode shape changed', null);
         return;
       }
       // Re-checked at the point of application, not just above: when queued,
@@ -455,9 +572,17 @@ function startRestore(
       // second context loss in between.
       const applyRestore = (): void => {
         if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
+        // A fallback tail is a smaller allocation than the full chain, and
+        // three writes sub-images into whatever is allocated: drop it so the
+        // full upload allocates afresh (see the module header).
+        if (entry.fallbackUploaded) {
+          forgetGpuTexture(tex);
+          entry.fallbackUploaded = false;
+        }
         tex.mipmaps = fresh.mipmaps;
         if (tex.source) tex.source.dataReady = true;
         entry.state = 'armed';
+        restoreSuccesses++;
         // Re-upload on the next render; that upload's onUpdate re-releases.
         tex.needsUpdate = true;
       };
@@ -489,15 +614,58 @@ function startRestore(
       );
     },
     (err: unknown) => {
-      if (entries.get(tex) !== entry) return;
-      // Dev-channel English: the texture stays on stubs (black) but the
-      // session survives; the next context loss retries.
-      console.warn('[ktx2] restore transcode failed; texture left released', err);
-      entry.state = 'released';
+      if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
+      if (attempt < KTX2_RESTORE_MAX_ATTEMPTS) {
+        const backoff = restoreBackoffMs(attempt);
+        // Dev-channel English: a transient worker failure, retried in place.
+        console.warn(
+          `[ktx2] restore transcode failed (attempt ${attempt} of ${KTX2_RESTORE_MAX_ATTEMPTS}); retrying in ${backoff}ms`,
+          err,
+        );
+        return new Promise<void>((resolve) => restoreScheduler(resolve, backoff)).then(() => {
+          if (entries.get(tex) !== entry || entry.state !== 'restoring') return;
+          return attemptRestore(tex, entry, queue, attempt + 1);
+        });
+      }
+      failRestore(tex, entry, 'restore transcode failed', err);
     },
   );
-  inflightRestores.add(restore);
-  void restore.finally(() => inflightRestores.delete(restore));
+}
+
+/** Terminal for this context loss: count it, and show the resident tail when
+ *  there is one. The next context loss retries the full chain either way. */
+function failRestore(
+  tex: ReleasableCompressedTexture,
+  entry: ReleaseEntry,
+  reason: string,
+  err: unknown,
+): void {
+  restoreFailures++;
+  if (entry.fallbackTail) {
+    // Dev-channel English: blurry beats black; still reported so a field
+    // recurrence is visible in the beacon and the console.
+    console.warn(`[ktx2] ${reason}; showing the resident low-resolution fallback`, err);
+    applyFallback(tex, entry);
+    return;
+  }
+  // Dev-channel English: no level small enough to keep resident, so the
+  // texture stays on stubs (black) until the next context loss retries.
+  console.warn(`[ktx2] ${reason}; texture left released`, err);
+  entry.state = 'released';
+}
+
+function applyFallback(tex: ReleasableCompressedTexture, entry: ReleaseEntry): void {
+  if (!entry.fallbackTail) return;
+  // The stub upload on this context allocated the FULL shape, and three
+  // writes sub-images into the existing allocation: a 32-texel level 0 would
+  // land as a corner patch of an otherwise black texture. Drop the GL texture
+  // so the next upload allocates the tail's own shape.
+  forgetGpuTexture(tex);
+  tex.mipmaps = entry.fallbackTail;
+  if (tex.source) tex.source.dataReady = true;
+  entry.fallbackUploaded = true;
+  entry.state = 'fallback';
+  tex.needsUpdate = true;
 }
 
 /** True when a model URL's category is drawn only by the world renderer.
@@ -556,10 +724,15 @@ export const ktx2MipReleaseInternalsForTest = {
     releaseEnabled = false;
     constrainedProbe = null;
     rederive = null;
+    restoreScheduler = defaultRestoreScheduler;
+    restoreSuccesses = 0;
+    restoreFailures = 0;
     pendingSources.clear();
     entries.clear();
     inflightRestores.clear();
   },
+  fallbackTailOf: (texture: unknown): Ktx2MipLevel[] | null =>
+    entries.get(texture as ReleasableCompressedTexture)?.fallbackTail ?? null,
   isEnabled: (): boolean => releaseEnabled,
   hasRederive: (): boolean => rederive !== null,
   pendingCount: (): number => pendingSources.count(),
@@ -569,7 +742,7 @@ export const ktx2MipReleaseInternalsForTest = {
   releasedBytes: (): number => {
     let total = 0;
     for (const [, e] of entries.entries()) {
-      if (e.state === 'released' || e.state === 'restoring') total += e.releasedBytes;
+      if (e.state !== 'armed') total += e.releasedBytes;
     }
     return total;
   },

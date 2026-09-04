@@ -315,3 +315,78 @@ describe('Renderer lifecycle wiring', () => {
     report.mockRestore();
   });
 });
+
+describe('Renderer in-place WebGL context restore (issue 3846)', () => {
+  const restoreHandler = slice(
+    '  private readonly onWebGLContextRestored = (): void => {',
+    '\n  private readonly onViewportResize',
+  );
+
+  it('re-arms every sampled-only render target through the restore coordinator on the GPU queue', () => {
+    // Order matters: identity and draw stats first (cheap, synchronous), then
+    // the governor forgives the restore frames, then the re-bakes are queued.
+    expect(restoreHandler).toContain('this.captureGlIdentity()');
+    expect(restoreHandler).toContain(
+      'if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info)',
+    );
+    expect(restoreHandler).toContain('this.renderBudgetGovernor.forgiveExternalStall()');
+    expect(restoreHandler).toContain(
+      'void runContextRestore(this.contextRestore, this.backgroundGpuWork)',
+    );
+    expect(restoreHandler.indexOf('forgiveExternalStall')).toBeLessThan(
+      restoreHandler.indexOf('runContextRestore'),
+    );
+  });
+
+  it('registers the grass bake, the impostor atlas and the environment maps as restore producers', () => {
+    const constructorSource = slice(
+      '  constructor(\n    private sim: IWorld,',
+      '\n  private beginRendererShutdown(): void',
+    );
+    const registration = sliceIn(
+      constructorSource,
+      'registerRendererRestoreProducers(this.contextRestore, this.backgroundGpuWork, {',
+      '\n    });',
+    );
+    // The env host resets BOTH prefilter caches: the source-keyed target map
+    // would otherwise hand the dead target back, and the PMREM generator's
+    // own targets died with the context.
+    expect(registration).toContain('webgl: () => this.webgl');
+    // Every re-bake is gated on liveness: a queued unit can start after a
+    // second loss or after teardown, and rendering into a lost context is a
+    // silent no-op that would otherwise count as success.
+    expect(registration).toContain(
+      'isLive: () => !this.shutdownStarted && !this.webgl.getContext().isContextLost()',
+    );
+    // The untracked dome-prefilter fallback is rebuilt too, not left dead.
+    expect(registration).toContain(
+      'rebuildUntrackedEnvironment: () => this.prefilterDomeEnvironment().texture',
+    );
+    expect(registration).toContain('envRTs: () => this.envRTs');
+    expect(registration).toContain('this.envRTBySource = new WeakMap()');
+    expect(registration).toContain('this.pmremGenerator?.dispose()');
+    expect(registration).toContain('this.pmremGenerator = null');
+    expect(registration).toContain(
+      'ensureEnvironmentBiome: (biome) => this.ensureEnvironmentBiome(biome)',
+    );
+    expect(registration).toContain('scene: () => this.scene');
+    // Registration happens AFTER the grass bake so the bake exists to re-bake.
+    expect(constructorSource.indexOf('setGrassGroundBake(bakeGrassGroundTexture(')).toBeLessThan(
+      constructorSource.indexOf('registerRendererRestoreProducers('),
+    );
+  });
+
+  it('reports restore failures beside the loss and restore counts, and releases the grass bake on teardown', () => {
+    expect(source).toContain(
+      'contextRestoreFailures: this.contextRestore.stats().failed + ktx2RestoreStats().failed',
+    );
+    const disposal = slice(
+      '  private disposeRendererResources(): void',
+      '\n  /**\n   * Quiesce this generation',
+    );
+    expect(disposal).toContain('bestEffort(() => disposeGrassGroundBake())');
+    // The atlas globals must not outlive the renderer either, or a queued
+    // re-bake could drive a disposed renderer.
+    expect(disposal).toContain('bestEffort(() => disposeImpostorAtlas())');
+  });
+});

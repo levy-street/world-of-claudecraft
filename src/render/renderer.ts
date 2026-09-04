@@ -66,7 +66,7 @@ import { type AmberFeaturesView, buildAmberFeatures } from './amber_features';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
 import { arrivalCoverActive, noteArrivalIfTeleported } from './arrival_cover';
-import { ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
+import { ktx2RestoreStats, ktx2RetainedSourceBytes } from './assets/ktx2_mip_release';
 import { formatResidencyBudget, residencyBudget } from './assets/residency_budget';
 import type { AmbientPointSource, SpatialAudioSink, Surface } from './audio_sink';
 import { createBackgroundGpuQueue, GPU_WORK_PRIORITY } from './background_gpu_queue';
@@ -201,6 +201,8 @@ import {
 } from './compile_priority_core';
 import { preflightWebGL2ContextRecycle, type RecycledRendererContext } from './context_recycle';
 import { trackWebGLContext } from './context_release';
+import { registerRendererRestoreProducers, runContextRestore } from './context_restore';
+import { createContextRestoreCoordinator } from './context_restore_core';
 import {
   animatesEveryFrame,
   animCadenceFrames,
@@ -314,7 +316,7 @@ import {
   foliageResidencySources,
   setFoliageShadowVolume,
 } from './foliage';
-import { activeFarFieldPolicy } from './foliage_impostor';
+import { activeFarFieldPolicy, disposeImpostorAtlas } from './foliage_impostor';
 import { roundMs, summarizeMs } from './frame_ms_stats_core';
 import { type FramePresentHost, presentFrame } from './frame_present';
 import {
@@ -338,11 +340,16 @@ import {
   sharedUniforms,
   urlForcedTier,
 } from './gfx';
+import { readGlIdentity } from './gl_identity';
 import { GlacialFrontVisual } from './glacial_front_visual';
 import { createGpuPrepAdmission } from './gpu_prep_admission';
 import { createGpuPrepBudget } from './gpu_prep_budget_core';
 import { gpuPrepEventsSnapshot } from './gpu_prep_events';
-import { bakeGrassGroundTexture, setGrassGroundBake } from './grass_ground_bake';
+import {
+  bakeGrassGroundTexture,
+  disposeGrassGroundBake,
+  setGrassGroundBake,
+} from './grass_ground_bake';
 import { buildGreatTreePrewarmGroup } from './great_tree_prewarm';
 import { GroundAimReticleVisual } from './ground_aim_reticle_visual';
 import {
@@ -1912,22 +1919,18 @@ export class Renderer {
   private glRenderer = '';
   private contextLostCount = 0;
   private contextRestoredCount = 0;
+  private readonly contextRestore = createContextRestoreCoordinator();
   private readonly onWebGLContextLost = (): void => {
     this.contextLostCount++;
   };
   private readonly onWebGLContextRestored = (): void => {
     this.contextRestoredCount++;
     this.captureGlIdentity();
-    // three's onContextRestore re-runs initGLContext, which REPLACES
-    // webgl.info with a fresh WebGLInfo; the composer-tier draw-stats session
-    // captured the old object at construction and would read a dead
-    // accumulator (governor draw signal and opaque-sort input pinned at zero)
-    // for the rest of the session. Re-create it against the live info; the
-    // fresh session's first beginFrame re-baselines safely. Pre-existing on
-    // the release branch (not a phase 6 regression); r185 even preserves
-    // autoReset onto the new object, so only this rebind is needed.
+    // three's initGLContext REPLACES webgl.info; the draw-stats session held the old one.
     if (this.drawStats) this.drawStats = createLogicalFrameDrawStats(this.webgl.info);
     this.vfx?.onContextRestored();
+    this.renderBudgetGovernor.forgiveExternalStall();
+    void runContextRestore(this.contextRestore, this.backgroundGpuWork);
   };
   private readonly onViewportResize = (): void => {
     if (!this.shutdownStarted) this.resizeViewport();
@@ -2148,6 +2151,19 @@ export class Renderer {
         setGrassGroundBake(null); // headless/stub GL: keep the legacy ground
       }
     }
+    registerRendererRestoreProducers(this.contextRestore, this.backgroundGpuWork, {
+      webgl: () => this.webgl,
+      isLive: () => !this.shutdownStarted && !this.webgl.getContext().isContextLost(),
+      envRTs: () => this.envRTs,
+      resetPrefilterCaches: () => {
+        this.envRTBySource = new WeakMap();
+        this.pmremGenerator?.dispose();
+        this.pmremGenerator = null;
+      },
+      ensureEnvironmentBiome: (biome) => this.ensureEnvironmentBiome(biome),
+      rebuildUntrackedEnvironment: () => this.prefilterDomeEnvironment().texture,
+      scene: () => this.scene,
+    });
     bd('gl-init');
     this.camera = new THREE.PerspectiveCamera(
       CAMERA_BASE_FOV,
@@ -2260,14 +2276,7 @@ export class Renderer {
         this.scene.environmentRotation.y = this.skyView.envRotationY(seedBiome);
         this.envBiome = seedBiome;
       } else {
-        // fallback: prefilter the dome itself (gain/clamp already applied)
-        this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl);
-        const envScene = new THREE.Scene();
-        envScene.add(this.sky.clone());
-        // far covers the 560u dome; size 128 matches the 512-wide equirect
-        // prefilters (cubeUV height is a program-cache-key input)
-        const envRT = this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 });
-        this.scene.environment = envRT.texture;
+        this.scene.environment = this.prefilterDomeEnvironment().texture;
       }
       this.scene.environmentIntensity = this.envOutdoorIntensity;
       this.envTransition.current = this.envBiome;
@@ -3228,6 +3237,8 @@ export class Renderer {
       bestEffort(() => target.dispose());
     }
     this.envRTs.clear();
+    bestEffort(() => disposeGrassGroundBake());
+    bestEffort(() => disposeImpostorAtlas());
     disposeRendererPrewarmAndGroundFx(this, bestEffort);
     for (const bubble of this.chatBubbles.values()) bestEffort(() => bubble.el.remove());
     this.chatBubbles.clear();
@@ -3364,19 +3375,18 @@ export class Renderer {
   }
 
   private captureGlIdentity(): void {
-    try {
-      const gl = this.webgl.getContext();
-      const dbg = gl.getExtension('WEBGL_debug_renderer_info');
-      this.glVendor = String(
-        dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : gl.getParameter(gl.VENDOR),
-      );
-      this.glRenderer = String(
-        dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER),
-      );
-    } catch {
-      this.glVendor = '';
-      this.glRenderer = '';
-    }
+    const identity = readGlIdentity(() => this.webgl.getContext());
+    this.glVendor = identity.vendor;
+    this.glRenderer = identity.renderer;
+  }
+
+  // No realm HDRI prefilter: prefilter the dome itself (far covers the 560u dome;
+  // size 128 matches the 512-wide equirect prefilters, a program-cache-key input).
+  private prefilterDomeEnvironment(): THREE.WebGLRenderTarget {
+    this.pmremGenerator ??= new THREE.PMREMGenerator(this.webgl);
+    const envScene = new THREE.Scene();
+    envScene.add(this.sky.clone());
+    return this.pmremGenerator.fromScene(envScene, 0.04, 0.1, 1100, { size: 128 });
   }
 
   private resizeViewport(measured = this.measureViewport()): void {
@@ -4393,6 +4403,7 @@ export class Renderer {
       glRenderer: this.glRenderer,
       contextLost: this.contextLostCount,
       contextRestored: this.contextRestoredCount,
+      contextRestoreFailures: this.contextRestore.stats().failed + ktx2RestoreStats().failed,
       nightAmount: Math.round(this.dnGlobalNight * 100) / 100,
       phaseMs: this.rendererPhaseStats(),
       renderDiagnostics: this.lastFrameStats.renderDiagnostics,

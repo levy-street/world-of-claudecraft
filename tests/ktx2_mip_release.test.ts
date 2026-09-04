@@ -15,15 +15,20 @@ import {
   enableKtx2MipRelease,
   isKtx2MipReleasableUrl,
   isKtx2MipReleaseEnabled,
+  KTX2_FALLBACK_MAX_LEVEL_PX,
   KTX2_MIP_EXEMPT_MODEL_ROOTS,
   KTX2_MIP_RELEASABLE_MODEL_ROOTS,
+  KTX2_RESTORE_MAX_ATTEMPTS,
   KTX2_RESTORE_MAX_WAIT_MS,
+  KTX2_RESTORE_RETRY_BACKOFF_MS,
   type Ktx2MipLevel,
   ktx2MipReleaseInternalsForTest,
   ktx2MipsOnContextLost,
   ktx2MipsRestored,
+  ktx2RestoreStats,
   ktx2RetainedSourceBytes,
   setKtx2MipRederive,
+  setKtx2RestoreScheduler,
   stashKtx2TranscodeSource,
 } from '../src/render/assets/ktx2_mip_release';
 import { residencyBudget } from '../src/render/assets/residency_budget';
@@ -501,52 +506,58 @@ describe('context-loss restore story', () => {
     expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('restoring');
   });
 
-  it('leaves stubs in place when the transcode comes back with a different format', async () => {
+  it('never applies a transcode that comes back with a different format (falls back, no retry)', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const tex = armedTexture(4);
     simulateUpload(tex);
-    setKtx2MipRederive(async () => ({
+    const rederive = vi.fn(async () => ({
       mipmaps: makeMips(4),
       format: (tex.format as number) + 1,
     }));
-    const versionBefore = tex.version;
+    setKtx2MipRederive(rederive);
     ktx2MipsOnContextLost();
     await ktx2MipsRestored();
-    // The GPU allocation cannot be reshaped: stubs stay, no upload requested,
-    // the write gate stays closed, and the entry returns to released so a
-    // later loss can retry.
-    expect(mipsOf(tex)[0]?.data.byteLength).toBe(0);
-    expect(tex.version).toBe(versionBefore);
-    expect(tex.source.dataReady).toBe(false);
-    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    // The mismatched chain is never adopted: the texture keeps its own
+    // format, and a shape change is not transient, so there is no retry.
+    expect(rederive).toHaveBeenCalledTimes(1);
+    expect(mipsOf(tex).every((m) => m.width <= 8)).toBe(true);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('fallback');
     expect(warn).toHaveBeenCalledWith(
-      '[ktx2] restore transcode shape changed; texture left released',
+      '[ktx2] restore transcode shape changed; showing the resident low-resolution fallback',
+      null,
     );
+    expect(ktx2RestoreStats().failed).toBe(1);
   });
 
-  it('leaves stubs in place when the transcode returns a different level count', async () => {
+  it('never applies a transcode that returns a different level count', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const tex = armedTexture(4);
     simulateUpload(tex);
     // Same format, fewer levels: the immutable texStorage allocation cannot
     // absorb a reshaped chain either, so this arm must behave like the format
     // mismatch above.
-    setKtx2MipRederive(async () => ({
+    const rederive = vi.fn(async () => ({
       mipmaps: makeMips(3),
       format: tex.format as number,
     }));
+    setKtx2MipRederive(rederive);
     ktx2MipsOnContextLost();
     await ktx2MipsRestored();
-    expect(mipsOf(tex)).toHaveLength(4);
-    expect(mipsOf(tex)[0]?.data.byteLength).toBe(0);
-    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    expect(rederive).toHaveBeenCalledTimes(1);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('fallback');
     expect(warn).toHaveBeenCalledWith(
-      '[ktx2] restore transcode shape changed; texture left released',
+      '[ktx2] restore transcode shape changed; showing the resident low-resolution fallback',
+      null,
     );
   });
 
-  it('survives a transcode failure and stays retryable', async () => {
+  it('retries a failed transcode with the backoff schedule, then falls back, and the next loss retries again', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const delays: number[] = [];
+    setKtx2RestoreScheduler((callback, delayMs) => {
+      delays.push(delayMs);
+      callback();
+    });
     const tex = armedTexture(2);
     simulateUpload(tex);
     const rederive = vi
@@ -555,13 +566,70 @@ describe('context-loss restore story', () => {
     setKtx2MipRederive(rederive);
     ktx2MipsOnContextLost();
     await ktx2MipsRestored();
-    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    expect(rederive).toHaveBeenCalledTimes(KTX2_RESTORE_MAX_ATTEMPTS);
+    expect(delays).toEqual(KTX2_RESTORE_RETRY_BACKOFF_MS.slice(0, KTX2_RESTORE_MAX_ATTEMPTS - 1));
     expect(warn).toHaveBeenCalledWith(
-      '[ktx2] restore transcode failed; texture left released',
+      `[ktx2] restore transcode failed (attempt 1 of ${KTX2_RESTORE_MAX_ATTEMPTS}); retrying in ${KTX2_RESTORE_RETRY_BACKOFF_MS[0]}ms`,
       expect.any(Error),
     );
+    expect(warn).toHaveBeenCalledWith(
+      '[ktx2] restore transcode failed; showing the resident low-resolution fallback',
+      expect.any(Error),
+    );
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('fallback');
+    expect(ktx2RestoreStats()).toEqual({ restored: 0, failed: 1, inflight: 0 });
+    // A fallback texture is retried on the next loss exactly like a released one.
     ktx2MipsOnContextLost();
+    expect(rederive).toHaveBeenCalledTimes(KTX2_RESTORE_MAX_ATTEMPTS + 1);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('restoring');
+  });
+
+  it('recovers when a retry succeeds: full mips back, one restored, nothing failed', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setKtx2RestoreScheduler((callback) => callback());
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    const rederive = vi
+      .fn<(source: ArrayBuffer) => Promise<{ mipmaps: Ktx2MipLevel[]; format: number }>>()
+      .mockRejectedValueOnce(new Error('worker restarting'))
+      .mockResolvedValue({ mipmaps: makeMips(2), format: tex.format as number });
+    setKtx2MipRederive(rederive);
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
     expect(rederive).toHaveBeenCalledTimes(2);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+    expect(mipsOf(tex)[0]?.data.byteLength).toBeGreaterThan(0);
+    expect(tex.source.dataReady).toBe(true);
+    expect(ktx2RestoreStats()).toEqual({ restored: 1, failed: 0, inflight: 0 });
+  });
+
+  it('ktx2MipsRestored spans the whole retry chain, backoff included', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    let releaseBackoff: () => void = () => {};
+    setKtx2RestoreScheduler((callback) => {
+      releaseBackoff = callback;
+    });
+    const tex = armedTexture(2);
+    simulateUpload(tex);
+    setKtx2MipRederive(
+      vi
+        .fn<(source: ArrayBuffer) => Promise<{ mipmaps: Ktx2MipLevel[]; format: number }>>()
+        .mockRejectedValueOnce(new Error('first attempt'))
+        .mockResolvedValue({ mipmaps: makeMips(2), format: tex.format as number }),
+    );
+    ktx2MipsOnContextLost();
+    let settled = false;
+    const wait = ktx2MipsRestored(Number.POSITIVE_INFINITY).then(() => {
+      settled = true;
+    });
+    // Drain the first attempt's rejection and the backoff scheduling.
+    for (let i = 0; i < 5; i++) await Promise.resolve();
+    expect(settled).toBe(false);
+    expect(ktx2RestoreStats().inflight).toBe(1);
+    releaseBackoff();
+    await wait;
+    expect(settled).toBe(true);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
   });
 
   it('discards a transcode that resolves after the texture was disposed', async () => {
@@ -857,5 +925,120 @@ describe('wiring pins (source scans, anchor style per docs/qa-gate.md)', () => {
     for (const entry of ['src/editor/main.ts', 'src/guide/main.ts']) {
       expect(read(entry), entry).not.toContain('enableKtx2MipRelease');
     }
+  });
+});
+
+describe('fallback tail (issue 3846: a texture that cannot be restored draws blurry, not black)', () => {
+  function armedTextureOf(levels: number, size: number): THREE.CompressedTexture {
+    enableKtx2MipRelease(() => false);
+    const tex = new THREE.CompressedTexture(
+      makeMips(levels, size) as unknown as ImageData[],
+      size,
+      Math.max(1, size >> 1),
+      THREE.RGBA_ETC2_EAC_Format,
+      THREE.UnsignedByteType,
+    );
+    stashKtx2TranscodeSource(tex, makeSource());
+    armKtx2MipRelease(tex);
+    return tex;
+  }
+
+  it('keeps COPIES of every level at or under the fallback ceiling when it releases', () => {
+    // 128 > 64 > 32 > 16 > 8: the three small levels form the tail.
+    const tex = armedTextureOf(5, 128);
+    const original = mipsOf(tex).map((m) => m.data);
+    simulateUpload(tex);
+    const tail = ktx2MipReleaseInternalsForTest.fallbackTailOf(tex);
+    expect(tail?.map((m) => m.width)).toEqual([32, 16, 8]);
+    expect(tail?.every((m) => m.width <= KTX2_FALLBACK_MAX_LEVEL_PX)).toBe(true);
+    // Copies, never views: the tail must not pin the transcode's buffer.
+    expect(tail?.[0]?.data.buffer).not.toBe(original[2]?.buffer);
+    expect(Array.from(tail?.[0]?.data ?? [])).toEqual(Array.from(original[2] ?? []));
+    // The released chain itself is still full-shape stubs.
+    expect(mipsOf(tex)).toHaveLength(5);
+    expect(mipsOf(tex)[0]?.data.byteLength).toBe(0);
+  });
+
+  it('uploads the tail as a small complete texture after a terminal failure, dropping the stub allocation first', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setKtx2RestoreScheduler((callback) => callback());
+    const tex = armedTextureOf(5, 128);
+    simulateUpload(tex);
+    const dispose = vi.spyOn(tex, 'dispose');
+    const versionBefore = tex.version;
+    setKtx2MipRederive(() => Promise.reject(new Error('worker gone')));
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('fallback');
+    // Dropped the GL texture (a sub-image write into the full-shape stub
+    // allocation would land as a corner patch), then requested a fresh
+    // upload of the tail with the write gate open.
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(mipsOf(tex).map((m) => m.width)).toEqual([32, 16, 8]);
+    expect(mipsOf(tex).every((m) => m.data.byteLength > 0)).toBe(true);
+    expect(tex.source.dataReady).toBe(true);
+    expect(tex.version).toBeGreaterThan(versionBefore);
+    // The internal dispose must NOT have dropped the registry entry.
+    expect(ktx2MipReleaseInternalsForTest.entryCount()).toBe(1);
+  });
+
+  it('a fallback upload does not re-release (the tail stays resident)', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setKtx2RestoreScheduler((callback) => callback());
+    const tex = armedTextureOf(5, 128);
+    simulateUpload(tex);
+    setKtx2MipRederive(() => Promise.reject(new Error('worker gone')));
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    simulateUpload(tex);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('fallback');
+    expect(mipsOf(tex).every((m) => m.data.byteLength > 0)).toBe(true);
+  });
+
+  it('a later successful restore drops the tail allocation before the full chain re-uploads, then re-releases', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setKtx2RestoreScheduler((callback) => callback());
+    const tex = armedTextureOf(5, 128);
+    simulateUpload(tex);
+    setKtx2MipRederive(() => Promise.reject(new Error('worker gone')));
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    const dispose = vi.spyOn(tex, 'dispose');
+    setKtx2MipRederive(async () => ({ mipmaps: makeMips(5, 128), format: tex.format as number }));
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    expect(dispose).toHaveBeenCalledOnce();
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('armed');
+    expect(mipsOf(tex).map((m) => m.width)).toEqual([128, 64, 32, 16, 8]);
+    expect(ktx2RestoreStats()).toEqual({ restored: 1, failed: 1, inflight: 0 });
+    simulateUpload(tex);
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    expect(ktx2MipReleaseInternalsForTest.entryCount()).toBe(1);
+  });
+
+  it('stays released (black) after a terminal failure when no level fits under the ceiling', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    setKtx2RestoreScheduler((callback) => callback());
+    // 256 > 128 > 64: nothing at or under 32 texels.
+    const tex = armedTextureOf(3, 256);
+    simulateUpload(tex);
+    expect(ktx2MipReleaseInternalsForTest.fallbackTailOf(tex)).toBeNull();
+    setKtx2MipRederive(() => Promise.reject(new Error('worker gone')));
+    ktx2MipsOnContextLost();
+    await ktx2MipsRestored();
+    expect(ktx2MipReleaseInternalsForTest.stateOf(tex)).toBe('released');
+    expect(mipsOf(tex)[0]?.data.byteLength).toBe(0);
+    expect(warn).toHaveBeenCalledWith(
+      '[ktx2] restore transcode failed; texture left released',
+      expect.any(Error),
+    );
+    expect(ktx2RestoreStats().failed).toBe(1);
+  });
+
+  it('an EXTERNAL dispose still drops the entry (only module-issued disposes are ignored)', () => {
+    const tex = armedTextureOf(5, 128);
+    simulateUpload(tex);
+    tex.dispose();
+    expect(ktx2MipReleaseInternalsForTest.entryCount()).toBe(0);
   });
 });

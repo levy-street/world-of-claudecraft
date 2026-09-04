@@ -1040,12 +1040,17 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
+// Re-minted for issue 3846 (in-place context restore): renderer.ts gained the
+// restore coordinator wiring, the dome-prefilter method and the gl_identity
+// extraction. No capture was retaken.
 const ACCEPTED_POLISH_V2_METADATA_SHA256 =
-  'acdad02b012824b6a0588fa8330eb7cc20fcd0112d9f159a04ab1062752869ab';
+  'ae6df58d78119f31e6ae6936eedfba184a0db6c15535b9a3ad5af64ee0575093';
 // Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
 // mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
+// Re-minted for issue 3846 (in-place context restore), same renderer.ts move as
+// the metadata seal above.
 const ACCEPTED_POLISH_V2_COMPOSITE_PROVENANCE =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '43a6c253e58ec78187fd6bb80238d51e1c2d8fcbf51a464c71f4f79bcc5956a8';
 const ACCEPTED_POLISH_V2_METADATA = readJsonFile<CaptureMetadata>(ACCEPTED_POLISH_V2_METADATA_PATH);
 const ACCEPTED_POLISH_V2_PROVENANCE = ACCEPTED_POLISH_V2_METADATA.polishProvenance;
 const ACCEPTED_POLISH_V2_TOWN_CONTRACT = ACCEPTED_POLISH_V2_METADATA.records[0]?.townContract;
@@ -2199,9 +2204,9 @@ describe('Eastbrook polish performance and contact evidence', () => {
     expect(
       fingerprint.digest('hex'),
       `the second-order performance digest moved; if every input moved legitimately, re-mint with: ${REMINT_COMMAND} (it recomputes this literal LAST, from the swept files)`,
-      // Re-minted for the Drakelands entrance merge into the raid branch: the
-      // composite first, then this seal. No capture was retaken.
-    ).toBe('69c8bd5d29f52927682340a17af5935bdc33585a5b0599daa4c2682c04a3211f');
+      // Re-minted for issue 3846 (in-place context restore): renderer.ts moved,
+      // so the composite moved first, then this seal. No capture was retaken.
+    ).toBe('ede45be3bcf49075de41fbfc1517f4dfdb2872fbfa60032373e243b0bbc1e347');
   });
 
   it('binds every historical after record to its accepted source and asset provenance', () => {

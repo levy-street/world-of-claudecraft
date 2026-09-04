@@ -405,3 +405,20 @@ export function impostorSpriteNormal(
  * the two sides of the swap line can never drift apart.
  */
 export const CANOPY_EMISSIVE_FLOOR: readonly [number, number, number] = [0.155, 0.175, 0.135];
+
+/** True when two atlas layouts place every cell identically. A context
+ *  restore re-bakes the live atlas from the same specs and must land on the
+ *  same cells, or the sprites' baked cell attributes would point at the
+ *  wrong texels (foliage_impostor.ts rebakeImpostorAtlas). */
+export function sameImpostorCellLayout(
+  a: readonly ImpostorCellRect[],
+  b: readonly ImpostorCellRect[],
+): boolean {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) {
+    const x = a[i];
+    const y = b[i];
+    if (x.u0 !== y.u0 || x.v0 !== y.v0 || x.u1 !== y.u1 || x.v1 !== y.v1) return false;
+  }
+  return true;
+}

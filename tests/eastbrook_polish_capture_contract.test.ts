@@ -354,8 +354,11 @@ interface AttributionTargetFixture {
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
+// Re-minted for issue 3846 (in-place context restore): renderer.ts gained the
+// restore coordinator wiring, the dome-prefilter method and the gl_identity
+// extraction. No capture was retaken.
 const PINNED_POLISH_COMPOSITE_FINGERPRINT =
-  '87d8b0efb81ca5d41f5a57f7fd9654739ba16b59f9f8de4cda6a39031b5e8806';
+  '43a6c253e58ec78187fd6bb80238d51e1c2d8fcbf51a464c71f4f79bcc5956a8';
 
 function validPolishAttributionTargets(): AttributionTargetFixture[] {
   return [

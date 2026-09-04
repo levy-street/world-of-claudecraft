@@ -11,7 +11,8 @@ export type RenderBudgetReason =
   | 'submit-stall'
   | 'draw'
   | 'grass'
-  | 'recover';
+  | 'recover'
+  | 'context-restore';
 
 export interface RenderBudgetLevels {
   grass: number;
@@ -226,6 +227,16 @@ const SUBMIT_STALL_RECOVERY_CEILING_MS = 42;
 const EXTERNAL_FRAME_CAP_MIN_MS = 28;
 const EXTERNAL_FRAME_CAP_MAX_MS = 48;
 
+/** After an in-place WebGL context loss and restore, Three.js re-uploads hundreds of
+ * textures and re-links programs synchronously across the first frames, and the
+ * renderer re-bakes several render targets. That is external cost the governor must
+ * not learn from: this window covers the restore frame's re-upload burst plus the
+ * lazy program re-links of the first seconds after a restore. */
+export const CONTEXT_RESTORE_STALL_GRACE_SECONDS = 3;
+// A single very long frame (the restore frame itself can report a multi-second dt)
+// must not burn the whole grace window by itself.
+const GRACE_TICK_CAP_SECONDS = 0.25;
+
 export class RenderBudgetGovernor {
   private readonly tier: GfxTier;
   private readonly budget: GfxRuntimeBudget;
@@ -242,6 +253,7 @@ export class RenderBudgetGovernor {
   private recentSubmitStalls = 0;
   private lastSubmitStallMs = 0;
   private stallHoldSeconds = 0;
+  private externalStallGraceSeconds = 0;
   private stableSeconds = 0;
   private cooldownSeconds = 0;
   private levels: RenderBudgetLevels = { grass: 1, foliage: 1, vfx: 1, lighting: 1, resolution: 1 };
@@ -274,6 +286,7 @@ export class RenderBudgetGovernor {
     this.recentSubmitStalls = 0;
     this.lastSubmitStallMs = 0;
     this.stallHoldSeconds = 0;
+    this.externalStallGraceSeconds = 0;
     this.stableSeconds = 0;
     this.cooldownSeconds = this.enabled ? 0.5 : 0;
     this.pressure = 0;
@@ -333,8 +346,59 @@ export class RenderBudgetGovernor {
     return state;
   }
 
+  /** Seconds of restore grace still armed (0 when no restore is in flight). */
+  externalStallGraceRemaining(): number {
+    return this.externalStallGraceSeconds;
+  }
+
+  /** Call once right after an in-place WebGL context loss and restore. Forgives
+   * whatever submit stall the restore itself caused (the governor must not degrade
+   * quality or keep holding degrading/submit-stall for it) and arms a grace window so
+   * the restore frame's re-upload burst and the following seconds of lazy program
+   * re-links are never judged either. Never touches levels (no quality change).
+   * Samples inside the window report mode 'stable' with reason 'context-restore',
+   * so readouts and telemetry see the window for what it is; the first judged
+   * update after it recomputes both (with the hold cleared, the
+   * stallHoldSeconds > 0 branch that forced degrading/submit-stall no longer
+   * fires). */
+  forgiveExternalStall(graceSeconds: number = CONTEXT_RESTORE_STALL_GRACE_SECONDS): void {
+    this.stallHoldSeconds = 0;
+    this.recentSubmitStalls = 0;
+    this.lastSubmitStallMs = 0;
+    this.stallPressure = 0;
+    if (Number.isFinite(graceSeconds) && graceSeconds > 0) {
+      this.externalStallGraceSeconds = Math.max(this.externalStallGraceSeconds, graceSeconds);
+    }
+  }
+
   update(sample: RenderBudgetSample, out?: RenderBudgetState): RenderBudgetState {
     if (!Number.isFinite(sample.dt) || sample.dt <= 0) return this.state(out);
+
+    // A sample inside the restore grace is not judged at all: the restore frames are
+    // external cost the governor must neither shed quality for nor learn as the new
+    // baseline. Cooldown and stall-hold timers still drain (so the governor keeps
+    // recovering from whatever it was doing before the restore), but the EMAs,
+    // pressure, degrade/recover ladder, and stableSeconds are all left untouched.
+    // Gated on enabled so a disabled governor's early-return semantics further down
+    // are unaffected by grace bookkeeping.
+    if (this.enabled && this.externalStallGraceSeconds > 0) {
+      this.externalStallGraceSeconds = Math.max(
+        0,
+        this.externalStallGraceSeconds - Math.min(sample.dt, GRACE_TICK_CAP_SECONDS),
+      );
+      if (this.cooldownSeconds > 0) {
+        this.cooldownSeconds = Math.max(0, this.cooldownSeconds - sample.dt);
+      }
+      if (this.stallHoldSeconds > 0) {
+        this.stallHoldSeconds = Math.max(0, this.stallHoldSeconds - sample.dt);
+      }
+      // Levels are frozen and nothing is judged: say so with a reason of its own,
+      // never 'stable' (a lie to every readout) and never a stale submit-stall.
+      this.mode = 'stable';
+      this.reason = 'context-restore';
+      return this.state(out);
+    }
+
     const frameMs = Math.min(250, Math.max(0, sample.frameMs));
     const totalMs = Math.min(250, Math.max(0, sample.totalMs));
     const rawSubmitMs = Math.max(0, sample.submitMs);
