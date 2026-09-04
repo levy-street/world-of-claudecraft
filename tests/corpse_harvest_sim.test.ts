@@ -3431,7 +3431,13 @@ describe('a pick of nothing but unmapped families is refused, claim intact (#250
     // implied by the three literals above, kept as the statement of
     // intent.)
     expect(retagged.byPick + retagged.byCorpse).toBe(retagged.disabledSeen);
-  });
+    // Measured 16.1 s alone on a warm developer machine, which sits close enough to
+    // vitest's 20 s default that a shared CI runner under an eight-way shard split times
+    // it out: the sweep drives a real Sim once per template per tag subset. The allowance
+    // is roughly four times the measurement, the same contention headroom the duration
+    // ledger's other rows carry, and the file's declared sum stays under the per-file
+    // default so no ledger row is owed.
+  }, 60_000);
 
   it('keeps the settled #2504 ruling: an ALL-junk pick still spreads, junk beside an unmapped family still refuses', () => {
     // The two rules meet here. A tag the corpse does not CARRY sanitizes away,

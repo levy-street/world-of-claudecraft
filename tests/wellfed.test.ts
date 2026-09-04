@@ -674,7 +674,11 @@ describe('well fed: the retired namespace is gone (the unification landed)', () 
         `${itemId} minted no second well-fed namespace`,
       ).toEqual([]);
     }
-  });
+    // Measured 8.0 s alone here, and it timed out at vitest's 20 s default on a CI
+    // runner sharing eight shards: the case mints through every carrier at runtime
+    // rather than reading source text. Allowance sized like the sibling above, and the
+    // file's declared sum stays under the per-file default so no ledger row is owed.
+  }, 40_000);
 
   it('scan hygiene: this guard reads only through the shared walker', () => {
     expectScansOnlyThroughSharedWalkers(import.meta.url, ['source_files_under']);

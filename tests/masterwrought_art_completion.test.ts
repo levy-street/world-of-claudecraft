@@ -194,11 +194,22 @@ function reportAssetIds(report: Record<string, unknown>): string[] {
   return sorted((records ?? []).map(({ id }) => id));
 }
 
+// The generation reports record the AUTHORING MACHINE's absolute path for each master
+// (/Users/<someone>/<their checkout>/tmp/imagegen/...), while the manifest pins the
+// repo-relative form. Relativizing against this checkout's root only recovers that form when
+// the test runs from the very path the art was generated on; anywhere else (CI, another
+// clone, a worktree) path.relative walks up out of the repo and the comparison fails on a
+// difference that is about the machine rather than the evidence. Every one of these masters
+// lives under the generator's workspace root, so an absolute candidate is cut at that segment
+// instead. An absolute path with no such segment still falls through to path.relative, so an
+// unrecognized shape fails loudly rather than being silently accepted.
+const GENERATOR_WORKSPACE_SEGMENT = 'tmp/imagegen/';
 function repoRelative(candidate: string): string {
-  return (path.isAbsolute(candidate) ? path.relative(repoRoot, candidate) : candidate).replaceAll(
-    path.sep,
-    '/',
-  );
+  const slashed = candidate.replaceAll(path.sep, '/');
+  if (!path.isAbsolute(candidate)) return slashed;
+  const at = slashed.indexOf(GENERATOR_WORKSPACE_SEGMENT);
+  if (at >= 0) return slashed.slice(at);
+  return path.relative(repoRoot, candidate).replaceAll(path.sep, '/');
 }
 
 function normalizedItemReportRecord(
@@ -409,6 +420,13 @@ describe('Masterwrought art completion evidence', () => {
           sha256: source.sha256,
           bytes: source.bytes,
         });
+        // The normalization is machine-independent or this whole comparison is: a path that
+        // still carries an absolute root, or climbs out of the repo, means the record's shape
+        // was not recognized and the pin above would only hold on the machine that wrote it.
+        expect(source.path, `${id}:${source.id} normalized to a repo-relative path`).toMatch(
+          /^[A-Za-z0-9_.]/,
+        );
+        expect(source.path, `${id}:${source.id} normalized inside the repo`).not.toContain('..');
         expect(source.exactPrompt.length, `${id}:${source.id} exact prompt`).toBeGreaterThan(500);
       }
     }
