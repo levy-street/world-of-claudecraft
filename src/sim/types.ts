@@ -1387,7 +1387,7 @@ export interface FoodItemDef extends BaseItemDef {
 }
 
 // A buff SCROLL: the inscription-crafted alternative source of a battle-elixir
-// aura family (docs/prd/masterwrought, R14 corollary). It reuses the SAME
+// aura family (masterwrought R14 corollary; see docs/design/professions.md). It reuses the SAME
 // `elixir` effect payload and the same use-path arm as kind 'elixir', so the
 // synthesized aura id (`elixir_${kind}`) and applyAura same-id replacement make
 // a scroll and an elixir of one family mutually exclusive in both orders with
@@ -1406,7 +1406,7 @@ export interface ScrollItemDef extends BaseItemDef {
   use?: never;
 }
 
-// A FLASK: the alchemy apex consumable (docs/prd/masterwrought phase 10). Like
+// A FLASK: the alchemy apex consumable (see docs/design/professions.md). Like
 // the scroll above it reuses the SAME `elixir` effect payload and the same
 // use-path arm, so it joins the shipped `elixir_${kind}` aura family and a flask
 // and an elixir of one stat replace each other in both orders through applyAura,
@@ -3808,8 +3808,7 @@ export type GatherNodeType = 'ore' | 'wood' | 'herb';
 
 // Rare gather event flavors (Professions 2.0), one per gather family:
 // ore rolls pristine_vein, wood rolls ancient_heartwood, herb rolls
-// moonlit_bloom, and a farm-bed harvest rolls golden_harvest (the farming
-// celebrations phase, state.md D12), all mapped by
+// moonlit_bloom, and a farm-bed harvest rolls golden_harvest, all mapped by
 // professions/gather_events.ts gatherRareEventFlavor.
 export type GatherRareEventFlavor =
   | 'pristine_vein'
@@ -7257,7 +7256,7 @@ export type SimEvent = { pid?: number } & (
   // gatherDenied above): the client composes its own localized copy off the
   // structured fields. Emitted at most ONCE per harvest command (the
   // gatherDenied dedupe idiom), even when several yields downgrade.
-  // 'crop' is the golden-harvest surface (farming.ts, the (bu) follow-up):
+  // 'crop' is the golden-harvest surface (farming.ts):
   // farming's nothing-rots rule means a crop can only ever lose the mark
   // (totals always land in full; only the signature truncates), so a crop
   // event always carries lost 'mark', never 'find'.

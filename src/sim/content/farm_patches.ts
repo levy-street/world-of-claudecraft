@@ -11,10 +11,10 @@
 // One patch per farming hub, four hubs on the farming tier ladder (the D2
 // hub list): Eastbrook tier 1, Fenbridge tier 2, Highwatch tier 3, and the
 // Evergarden's parterre grounds tier 4 (the showcase; its reachability anchor
-// is the zone hub, Hedgewick). The tier column must agree with
-// FARMING_ZONE_TIERS (src/sim/professions/farming_zones.ts): the one-ladder
-// arm in tests/farm_patch_placement.test.ts pins the agreement, so no other
-// module ever hardcodes a farming zone tier.
+// is the zone hub, Hedgewick). The tier carried by each patch is the sole
+// farming-zone tier column; tests/professions_zone_rollout.test.ts pins the
+// authored zone/tier pairs directly so there is no duplicate side table to
+// drift from this content.
 //
 // BED IDS ARE STABLE AND NEVER RENUMBER: plot state is persisted in
 // CharacterState keyed by these ids (the shipped-id rule in
@@ -154,8 +154,8 @@ const FARM_PATCH_ROWS: readonly FarmPatchDef[] = [
 ];
 
 // Frozen at module load, not just readonly-typed, because both worlds hand
-// this table across the IWorld seam BY REFERENCE (the FARMING_ZONE_TIERS
-// symmetry): a consumer that sorted or spliced the shared array in place
+// this table across the IWorld seam BY REFERENCE: a consumer that sorted or
+// spliced the shared array in place
 // would corrupt shipped content process-wide, and `readonly` is erased at
 // runtime. Deep: the array, each patch, each beds array, each bed.
 export const FARM_PATCHES: readonly FarmPatchDef[] = Object.freeze(

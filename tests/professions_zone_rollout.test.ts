@@ -37,7 +37,6 @@ import { ZONE2_NPCS } from '../src/sim/content/zone2';
 import { ZONE3_NPCS } from '../src/sim/content/zone3';
 import { GATHER_NODE_TYPES, GATHER_NODES, ITEMS, NPCS, ZONES } from '../src/sim/data';
 import { ZONE_FISH } from '../src/sim/deeds';
-import { FARMING_ZONE_TIERS } from '../src/sim/professions/farming_zones';
 import { FISHING_ZONE_ROD_TIERS } from '../src/sim/professions/fishing_zones';
 import {
   gatherNodeGainMultiplier,
@@ -48,7 +47,6 @@ import { MATERIAL_GRADES } from '../src/sim/professions/material_grades';
 import { wieldRequirementForTier } from '../src/sim/professions/wield_gate';
 import { Sim } from '../src/sim/sim';
 import { itemNames } from '../src/ui/i18n.catalog/items';
-import { isUnknownIconRecipe, itemIconRecipe } from '../src/ui/icons';
 import { placeAtHarvestSpot } from './helpers/harvest_spot';
 
 /**
@@ -710,31 +708,29 @@ describe('the new-zone checklist: every complete zone arrives mechanically whole
 });
 
 // ---------------------------------------------------------------------------
-// THE FARMING LADDER (Phase 5): farming is the fifth gathering profession and
-// deliberately fishing-shaped on land (D2): no GatherNodeType, its stock on
-// the farmer NPCs alone (the go-live), and its own zone tier column. Every arm below is
-// keyed to the FARMING_ZONE_TIERS literal set, never derived from
-// GATHER_NODES (deviation (j)): the farming column intentionally disagrees
-// with the ground at evergarden, so a node-derived expectation would either
-// red on the designed row or force the design to follow the ground (the
-// farming_zones.ts header). The one-ladder agreement arm (FARM_PATCHES[].tier
-// equals farmingZoneTierFor) already lives in
-// tests/farm_patch_placement.test.ts; these arms own the content-completeness
-// half, the way the new-zone checklist above owns it for 'complete' zones.
+// THE FARMING LADDER: farming is the fifth gathering profession and
+// deliberately fishing-shaped on land: no GatherNodeType, its stock on the
+// farmer NPCs alone, and one authored tier on each FARM_PATCHES row. The
+// patch table is the authority, never GATHER_NODES: farming intentionally
+// disagrees with the ground progression at evergarden, so a node-derived
+// expectation would either reject the designed row or drag farming back onto
+// the wrong axis. These arms pin the patch tiers literally and own the same
+// content-completeness half the new-zone checklist above owns for complete
+// zones.
 // ---------------------------------------------------------------------------
 
 describe('the farming ladder: every farming zone arrives mechanically whole', () => {
   const farmingTools = Object.entries(ITEMS).filter(
     ([, def]) => def.use?.type === 'gatherTool' && def.use.professionId === 'farming',
   );
+  const farmingTiers = [...new Set(FARM_PATCHES.map((patch) => patch.tier))].sort((a, b) => a - b);
 
-  it('every farming zone has exactly one patch at its literal tier with its pinned bed count', () => {
-    // The tier column itself, as LITERALS: the column's authority is a design
-    // decision (evergarden is farming tier 4 while the shipped progression
-    // still says 1), so no derivation can stand in for these numbers. This
-    // pin is also the non-vacuity proof for every loop below that walks
-    // FARMING_ZONE_TIERS.
-    expect(FARMING_ZONE_TIERS).toEqual({
+  it('pins every farming patch to its literal zone tier and bed count', () => {
+    // The zone/tier pairs are LITERALS: evergarden is farming tier 4 while
+    // the shipped progression still says 1, so no other content table can
+    // stand in for these numbers. The exact object plus the four-row floor
+    // also forbids duplicate or unclassified patch zones.
+    expect(Object.fromEntries(FARM_PATCHES.map((patch) => [patch.zoneId, patch.tier]))).toEqual({
       eastbrook_vale: 1,
       mirefen_marsh: 2,
       thornpeak_heights: 3,
@@ -748,16 +744,17 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       thornpeak_heights: 6,
       evergarden: 8,
     };
-    for (const [zoneId, tier] of Object.entries(FARMING_ZONE_TIERS)) {
-      const patches = FARM_PATCHES.filter((p) => p.zoneId === zoneId);
-      expect(patches, `${zoneId} needs exactly one farm patch`).toHaveLength(1);
-      expect(patches[0].tier, `${zoneId} patch tier must be the ladder literal`).toBe(tier);
-      expect(patches[0].beds, `${zoneId} bed count`).toHaveLength(BEDS_BY_ZONE[zoneId]);
+    for (const patch of FARM_PATCHES) {
+      expect(patch.beds, `${patch.zoneId} bed count`).toHaveLength(BEDS_BY_ZONE[patch.zoneId]);
+      expect(Object.isFrozen(patch), `${patch.id} row must stay frozen`).toBe(true);
+      expect(Object.isFrozen(patch.beds), `${patch.id} beds must stay frozen`).toBe(true);
+      for (const bed of patch.beds) {
+        expect(Object.isFrozen(bed), `${bed.id} row must stay frozen`).toBe(true);
+      }
     }
-    // The counter-example for the per-zone filter: the four rows above are
-    // the WHOLE patch table, so a fifth site cannot ship outside the ladder
-    // and leave every loop above green.
+    expect(Object.isFrozen(FARM_PATCHES), 'the shared patch table must stay frozen').toBe(true);
     expect(FARM_PATCHES).toHaveLength(4);
+    expect(farmingTiers).toEqual([1, 2, 3, 4]);
   });
 
   it('each farming tier grows exactly its D11 crops, 2 / 2 / 4 / 4 after 11e', () => {
@@ -767,7 +764,7 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
       3: ['frost_gourd', 'frost_lentils', 'highland_barley', 'thornpeak_cabbage'],
       4: ['evergarden_greens', 'evergarden_pumpkin', 'gilded_sunmelon', 'gilded_yam'],
     };
-    for (const tier of Object.values(FARMING_ZONE_TIERS)) {
+    for (const tier of farmingTiers) {
       const ofTier = Object.values(FARM_CROPS)
         .filter((c) => c.tier === tier)
         .map((c) => c.id)
@@ -782,9 +779,8 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
     expect(Object.keys(FARM_CROPS)).toHaveLength(12);
   });
 
-  it('every crop family is whole: defs, junk produce, the 2x/4x fine pricing, icon and name rows', () => {
+  it('every crop family is whole: defs, junk produce, the 2x/4x fine pricing, and name rows', () => {
     const enNames = itemNames.en.entities.items as Record<string, { name?: string } | undefined>;
-    const recipesSeen = new Map<string, string>();
     for (const crop of Object.values(FARM_CROPS)) {
       const produce = ITEMS[crop.produceItemId];
       const fine = ITEMS[crop.fineProduceItemId];
@@ -812,26 +808,10 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
         crop.fineProduceItemId,
       );
       for (const itemId of [crop.seedItemId, crop.produceItemId, crop.fineProduceItemId]) {
-        // The icon registry, probed the way tests/item_icons.test.ts does:
-        // never the shared unknown fallback, and pairwise DISTINCT below,
-        // which is what proves an explicit ITEM_RECIPES row (all 24 ids are
-        // kind junk, so the kind-default fallback would collide them).
-        const recipe = itemIconRecipe(itemId);
-        expect(isUnknownIconRecipe(recipe), `${itemId} must resolve a real icon recipe`).toBe(
-          false,
-        );
-        const key = JSON.stringify(recipe);
-        const clash = recipesSeen.get(key);
-        expect(clash, `${itemId} must not share its whole icon recipe with ${clash}`).toBe(
-          undefined,
-        );
-        recipesSeen.set(key, itemId);
         expect(enNames[itemId]?.name, `${itemId} needs an English item-name row`).toBeTruthy();
       }
     }
-    // The two probes really discriminate: an unshipped id resolves the shared
-    // unknown recipe and no name row, so the loop above cannot pass vacuously.
-    expect(isUnknownIconRecipe(itemIconRecipe('no_such_farming_item'))).toBe(true);
+    // The negative control makes the catalog assertion non-vacuous.
     expect(enNames.no_such_farming_item).toBeUndefined();
   });
 
@@ -931,13 +911,13 @@ describe('the farming ladder: every farming zone arrives mechanically whole', ()
   it('exactly one hoe per tier; rung 1 is the only priced rung and the top rung routes through content', () => {
     // Non-vacuity for the per-tier loop: the ladder really has five members
     // since masterwrought Phase 11j added the apex rung. The loop below still
-    // walks FARMING_ZONE_TIERS, which tops out at 4, and that mismatch is the
+    // walks the patch tiers, which top out at 4, and that mismatch is the
     // POINT rather than a gap: there is no tier-5 crop zone, so the apex hoe
     // opens no new crop tier and buys the epic rarity rung on the tool-effect
     // economy instead. A tier-5 zone arriving later would pull it into the
     // loop with no edit here.
     expect(farmingTools).toHaveLength(5);
-    for (const tier of Object.values(FARMING_ZONE_TIERS)) {
+    for (const tier of farmingTiers) {
       const ofTier = farmingTools.filter(
         ([, def]) => def.use?.type === 'gatherTool' && def.use.tier === tier,
       );

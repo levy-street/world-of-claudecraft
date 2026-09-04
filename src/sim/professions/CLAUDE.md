@@ -303,12 +303,6 @@ or pure leaves, never a `Sim` import, randomness only via `ctx.rng` (guarded by
   `farming.ts` re-exports the surface on the `farm_projection.ts` precedent.
   Zero new item ids, and the pattern weight is the shipped per-pattern drop
   point, held slower than the quartermaster marks route by ruling.
-- `farming_zones.ts`: farming's OWN per-zone tier ladder (`farmingZoneTierFor`),
-  the fishing_zones-shaped pure leaf; deliberately DIVERGES from the shipped
-  progression column at evergarden (farming tier 4 showcase vs the named
-  inversion's tier 1), so its guards are literal pins plus the one-ladder arm
-  against `FARM_PATCHES[].tier`, never a GATHER_NODES derivation. First runtime
-  consumer is the growth phase's crop gating.
 - `farm_projection.ts`: pure leaf owning `PlotState` (the full per-player plot
   record incl the hidden pre-rolled outcome slots) and `projectFarmPlots`, the
   ONLY public projection: explicit field picks are the wire leak barrier, and
@@ -442,4 +436,3 @@ hosts, plus the pinned callback-name list in `tests/sim_context.test.ts`.
   entering the gathering system's import ring.
 - `salvage_materials.ts`: `SALVAGE_MATERIAL_BY_QUALITY` (frozen), the same extraction
   for the salvage side; consumed by `salvage.ts` and the material registry derive.
-

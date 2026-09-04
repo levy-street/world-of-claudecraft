@@ -631,11 +631,9 @@ describe('farm patch placement: every bed sits on ground a player can work', () 
   });
 
   it('zone containment: every bed and every patch anchor stands in its declared zone', () => {
-    // The declared zoneId is what the farming tier ladder is keyed on
-    // (professions/farming_zones.ts), so a patch standing in one band while
-    // claiming another farms at the other band's tier. zoneAt is the resolver
-    // the sim uses, and it is EXCLUSIVE at zMax where an inclusive band check
-    // would pass a row sitting exactly on a boundary.
+    // Each patch owns its tier, while zoneAt proves that its anchor still sits
+    // in the declared geography. It is EXCLUSIVE at zMax, where an inclusive
+    // band check would pass a row sitting exactly on a boundary.
     for (const patch of FARM_PATCHES) {
       expect(
         zoneAt(patch.x, patch.z).id,

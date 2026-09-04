@@ -176,19 +176,6 @@ export interface FeastState {
    *  transient like the rest of FeastState (no save blob, no PlayerMeta, no
    *  wire field), so it is sim-local and adds no cross-platform surface. */
   dishItemId: string;
-  /** The CRAFTER'S signature, copied from the SOURCE INSTANCE at placement.
-   *  Absent when the spent copy carried no signer (an unsigned feast, and the
-   *  id-only spend, which names no copy to read one from).
-   *
-   *  Distinct from the placer, and that distinction is the point: a feast is a
-   *  tradable item, so the player who sets the table is routinely not the one
-   *  who cooked it. The placer's name already rides the entity as its wire
-   *  `name`; this is the second name, and without it the maker's mark a crafted
-   *  feast carries in the bags vanished the instant it was set down, which no
-   *  other signed item does (the shipped signer doctrine, mintsSignerPayload in
-   *  professions/crafting.ts). Mirrored to clients on the entity's own sparse
-   *  `feastSigner` field, so it needs no new wire mechanism. */
-  signer?: string;
   /** The per-player consumed ledger: one bite per player per feast. */
   eatenBy: Set<string>;
 }
@@ -366,7 +353,6 @@ export function placeFeastAction(
     charges: info.charges,
     expiresAtTick: ctx.tickCount + info.durationTicks,
     dishItemId: info.dishItemId,
-    signer,
     eatenBy: new Set(),
   });
   ctx.emit({ type: 'farmFeastPlaced', pid: meta.entityId, feastId: e.id });

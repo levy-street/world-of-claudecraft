@@ -308,8 +308,6 @@ describe('the multi-session feast routing over the real broadcast path', () => {
     // The two names are distinct on the wire: nm is the host, fsg the cook.
     expect(row.nm).toBe('Placer');
     expect(row.fsg).toBe('Mira');
-    // The authoritative state carries it too, so the wire is not the only copy.
-    expect(server.sim.ctx.feasts.get(row.id as number)?.signer).toBe('Mira');
   });
 
   it('routes place, the entity snapshot, the bite, Well Fed, the ledger deny, and the despawn across two sessions', () => {

@@ -35,7 +35,7 @@ export interface FarmCropDef {
   // The farming tier this crop belongs to, which decides BOTH its skill gate
   // (farmCropSkillThreshold) and its survival band (farmSurvivalChance in
   // professions/farm_projection.ts). Must agree with the tier of the patch a
-  // player can reach it from (FARM_PATCHES / FARMING_ZONE_TIERS).
+  // player can reach it from (`FARM_PATCHES[].tier`).
   readonly tier: 1 | 2 | 3 | 4;
   // Wall-clock growth time in milliseconds, added to the plant-time
   // lockoutNowMs to set the plot's absolute readyAtMs. Growth continues while

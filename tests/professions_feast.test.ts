@@ -376,7 +376,7 @@ describe('shared feast: placing', () => {
     expect(unlockedUnits(placer)).toBe(0);
   });
 
-  it("carries the CRAFTER'S signature from the spent copy onto the state and the entity", () => {
+  it("carries the CRAFTER'S signature from the spent copy onto the entity", () => {
     // A feast is tradable, so the cook and the host are routinely different
     // people. The placer's name rides the entity as `name` (the title); the
     // crafter's rides beside it, read off the SOURCE copy before the spend
@@ -387,8 +387,6 @@ describe('shared feast: placing', () => {
     const from = sim.events.length;
     sim.placeFeast(placer.pid, idx);
     expect(eventsOf(sim, from, 'farmFeastPlaced')).toHaveLength(1);
-    const [state] = [...sim.ctx.feasts.values()];
-    expect(state.signer).toBe('Mira');
     const [entity] = feastEntities(sim);
     expect(entity.feastSigner).toBe('Mira');
     // The two names are DISTINCT: the placer is still the title's name.
@@ -396,13 +394,11 @@ describe('shared feast: placing', () => {
     expect(entity.name).not.toBe('Mira');
   });
 
-  it('an UNSIGNED copy leaves the mark absent, on the state and the wire alike', () => {
+  it('an UNSIGNED copy leaves the mark absent on the placed entity', () => {
     const { sim, placer } = world(0);
     giveFeast(sim, placer);
     const idx = placer.meta.inventory.findIndex((s) => s.itemId === FARM_FEAST_ITEM_ID);
     sim.placeFeast(placer.pid, idx);
-    const [state] = [...sim.ctx.feasts.values()];
-    expect(state.signer).toBeUndefined();
     expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
   });
 
@@ -410,7 +406,6 @@ describe('shared feast: placing', () => {
     const { sim, placer } = world(0);
     sim.addItemInstance(FARM_FEAST_ITEM_ID, { signer: 'Mira' }, placer.pid, 1, { silent: true });
     sim.placeFeast(placer.pid);
-    expect([...sim.ctx.feasts.values()][0].signer).toBeUndefined();
     expect(feastEntities(sim)[0].feastSigner).toBeUndefined();
   });
 
