@@ -1046,8 +1046,6 @@ const ACCEPTED_POLISH_V2_METADATA_PATH = path.join(REPO_ROOT, POLISH_SEAL_PATH);
 // v0.42.0 mount-lifecycle move: the renderer's stride accumulator moved to
 // src/render/stride_audio_core.ts and the mounted audio branch gained the
 // idle-hum poll. No capture was retaken.
-// Re-minted at the release/v0.42.0 sync of PR #3439: renderer.ts moved for the
-// mount lifecycle seam (mount_lifecycle.ts) and the rickshaw hooks it absorbed.
 // Re-minted for the 2026-09-04 release/v0.42.0 sync into the shader-warm branch:
 // both arms had re-minted, and the merged renderer (the mount lifecycle and
 // stride audio moves beside this branch's changes) and evidence inputs land
