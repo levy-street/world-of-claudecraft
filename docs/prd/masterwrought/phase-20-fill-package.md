@@ -270,3 +270,35 @@ otherwise left as a dated historical record.
 7. Class M: retire the eight reworded keys now or leave them to the post-merge chore.
 8. The ru_RU craft-name register: Latin or Cyrillic.
 9. Class D's four talent titles: keep the closest translations or re-cut to the new names.
+
+### K (continued). What the wiki completeness audit lane added, 2026-09-03
+
+The audit lane (docs/prd/masterwrought/phase-20-wiki-audit.md, ledger at its foot; the
+per-finding record is phase-20-wiki-audit-findings.md) ran before this fill, as ruled. What
+it changed in the registry, measured rather than remembered:
+
+- **SIX NEW KEYS, no retirement and no re-key** (commit a206370548). The farming page had
+  been rendering the node trades' `guide.profPages.rhythmBody`, `gainBody` and `yieldsBody`,
+  every one of which states a model farming does not use. Those three shared keys are
+  UNTOUCHED and still serve mining, logging and herbalism, so nothing was retired and no
+  predecessor keeps stale rows; the farming page renders six keys of its own instead:
+  `guide.profPages.farm.rhythmHeading`, `rhythmBody`, `gainHeading`, `gainBody`,
+  `yieldsHeading`, `yieldsBody`. Their five non-Latin fills rode the same change
+  (machine-authored under the i18n-locale-fill conventions, each verified by a second agent;
+  the verifier caught a factual error in the ENGLISH, a vein-and-fishing-hole contrast that
+  implied fishing pays character XP, and the English was corrected before the fills landed).
+  FLAGGED for the maintainer's read like every machine-authored set.
+- **The registry moved from 14,455 pending rows to 14,545**: 6 keys x 20 locales = 120 new
+  rows, less the 30 non-Latin fills that rode the change. The fifteen Latin locales' 90 rows
+  are this fill's to close, and they are ordinary new-key rows with no staleness history.
+- **A terminology defect recorded, not fixed**, found by the zh_CN verifier and in scope for
+  the register pass of class H: `guide.profPages.gatherIntro.farming` renders a crop's fine
+  grade as the locale's word for the RARE rarity, where the zh_CN overlay's own stated
+  convention (and its eight shipped fine-crop item names) use the fine-grade prefix. It is
+  the only such row in that overlay and it is the lead paragraph of the same farming page.
+
+WHAT THIS FILL MUST NOT ASSUME: the audit's corrections are ONE UNIT IN, not finished. 418
+keys carry a verified defect and the scope of correcting them is an OPEN MAINTAINER RULING
+recorded in the audit doc's ledger, because every further correction mints pending rows and
+would re-open exactly the staleness this fill closes. Settle that ruling before filling, or
+the fill pays for the same keys twice.
